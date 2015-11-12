@@ -1236,6 +1236,7 @@
     "2435": "Analluogwyd eich cydamseriad \"%1\"gan nad yw'r blygell bell yn bodoli",
     "2436": "Analluogwyd eich cydamseriad \"%1\"gan fod y blygell bell yn y bin sbwriel",
     "2438": "Ni uwchlwythywd y blygell (%1) gan ei bod yn rhy fawr (cyfyngir y beta hwn i %2 o blygellau neu %3 o ffeiliau.",
+    "2439": "Ni uwchlwythwyd %1 o blygellau gan eu bod yn rhy fawr (cyfyngir y beta hwn i %2 o blygellau neu %3 o ffeiliau.",
     "2440": "Bydd cydamseru'n dod i ben.Tra nad yw'n rhedeg, ni fydd dileadau ar un ochr o'r cydamseriad gael eu dileu ar yr ochr arall.Gadael beth bynnag?Gadael beth bynnag?",
     "2443": "Cydamserwyd y blygell gyrchfan eisoes ac mae gennych ffeil ynddi o'r un enw eisoes (%1). Os byddwch chi'n parhau \u00e2'r \u00e2'r uwchlwytho, caiff y ffeil flaenorol ei throsysgrifo.Ydych chi'n si\u0175r?",
     "2445": "Ni ellir cydamseru'r blygell wraidd.Dewiswch isblygell.",
@@ -2762,5 +2763,16 @@
     "7711": "Choose other plan",
     "7712": "Please log in or register to redeem your voucher.",
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7714": "Voucher redemption link",
+    "7715": "Email support at resellers@mega.nz",
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

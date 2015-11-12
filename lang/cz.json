@@ -1236,6 +1236,7 @@
     "2435": "Va\u0161e synchronizace \"%1\" byla zak\u00e1z\u00e1na,proto\u017ee vzd\u00e1len\u00e1 slo\u017eka neexistuje",
     "2436": "Va\u0161e synchronizace \"%1\" byla zak\u00e1z\u00e1na,proto\u017ee vzd\u00e1len\u00e1 slo\u017eka je v ko\u0161i",
     "2438": "Slo\u017eka (%1) nebyla nahr\u00e1na, proto\u017ee je p\u0159\u00edli\u0161 velk\u00e1 (tato beta je omezena na %2 slo\u017eek nebo %3 soubor\u016f.",
+    "2439": "%1 slo\u017eek nebylo nahr\u00e1no, proto\u017ee jsou p\u0159\u00edli\u0161 velk\u00e9 (tato beta je omezena na %2 slo\u017eek nebo %3 soubor\u016f.",
     "2440": "Synchronizace bude zastavena.Odstran\u011bn\u00ed, ke kter\u00fdm dojde, kdy\u017e nen\u00ed spu\u0161t\u011bna, nebudou zpracov\u00e1na.",
     "2443": "C\u00edlov\u00e1 slo\u017eka je synchronizov\u00e1na a ji\u017e v n\u00ed m\u00e1te souborse stejn\u00fdm n\u00e1zvem (%1).Pokud budete pokra\u010dovat v nahr\u00e1v\u00e1n\u00ed, bude p\u0159edchoz\u00ed soubor p\u0159eps\u00e1n.Opravdu to chcete?",
     "2445": "Ko\u0159enov\u00e1 slo\u017eka nem\u016f\u017ee b\u00fdt synchronizov\u00e1na.Vyberte podslo\u017eku.",
@@ -2761,6 +2762,17 @@
     "7710": "DOKON\u010cIT UPGRADE",
     "7711": "Zvolte jin\u00fd pl\u00e1n",
     "7712": "P\u0159ihlaste se nebo zaregistrujte, abyste uplatnili sv\u016fj poukaz.",
-    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7713": "Tato operace vyma\u017ee v\u0161echna data MEGA z mezipam\u011bti va\u0161eho prohl\u00ed\u017ee\u010de a znovu na\u010dte v\u00e1\u0161 \u00fa\u010det z na\u0161ich server\u016f. M\u016f\u017ee to trvat p\u00e1r minut.",
+    "7714": "Odkaz na uplatn\u011bn\u00ed poukazu",
+    "7715": "Napi\u0161te podpo\u0159e e-mail na poresellers@mega.nz",
+    "7716": "Ji\u017e jste odeslali potvrzovac\u00ed odkaz na tuto adresu.",
+    "7717": "Ji\u017e jste si vy\u017e\u00e1dali potvrzovac\u00ed odkaz pro tuto e-mailovou adresu.",
+    "7718": "Tato e-mailov\u00e1 adresa je ji\u017e obsazena. Obra\u0165te se na podporu MEGA kv\u016fli dal\u0161\u00edm informac\u00edm.",
+    "7719": "V\u00e1\u0161 potvrzovac\u00ed odkaz pro tento e-mail vypr\u0161el. Klikn\u011bte na OK pro nov\u00e9 spu\u0161t\u011bn\u00ed procesu.",
+    "7720": "Pro dokon\u010den\u00ed zm\u011bny sv\u00e9ho e-mailu mus\u00edte b\u00fdt p\u0159ihl\u00e1\u0161en\u00ed. P\u0159ihlaste se znovu pomoc\u00ed sv\u00e9 aktu\u00e1ln\u00ed e-mailov\u00e9 adresy a potom klikn\u011bte znovu na potvrzovac\u00ed odkaz.",
+    "7730": "Ov\u011b\u0159te svou e-mailovou adresu",
+    "7731": "Zadejte sv\u00e9 heslo pro ov\u011b\u0159en\u00ed va\u0161\u00ed e-mailov\u00e9 adresy",
+    "7732": "Potvrdit e-mail",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

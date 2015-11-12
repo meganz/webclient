@@ -38,7 +38,7 @@
     "requireSpaceAfterBinaryOperators": true,
 
     "disallowMultipleVarDecl": true,
-
+    "disallowTrailingWhitespace": "ignoreEmptyLines",
     "disallowSpacesInsideParentheses": true,
     "disallowEmptyBlocks": true,
 
@@ -89,7 +89,6 @@
     "requireSpaceAfterLineComment": true,
     "requireLineFeedAtFileEnd": true,
     "disallowMixedSpacesAndTabs": true,
-    "disallowTrailingWhitespace": false,
     "validateIndentation": 4,
 
     "requireSemicolons": true,

@@ -1236,6 +1236,7 @@
     "2435": "Synkronointisi \"%1\" on lopetettu, koska et\u00e4kansiota ei ole olemassa",
     "2436": "Synkronointisi \"%1\" on lopetettu, koska et\u00e4kansio on roskakorissa",
     "2438": "Kansiota (%1) ei l\u00e4hetetty, koska se on liian suuri (t\u00e4m\u00e4 beta on rajattu %2 kansioihin tai %3 tiedostoihin).",
+    "2439": "%1 kansioita ei l\u00e4hetetty, koska ne ovat liian suuria (t\u00e4m\u00e4 beta on rajattu %2 kansioihin tai %3 tiedostoihin).",
     "2440": "Synkronointi pys\u00e4htyy. Sen pys\u00e4hdyksiss\u00e4 ollessa tapahtuvia tiedostopoistoja ei tehd\u00e4.",
     "2443": "Kohdekansio on synkronoitu ja sinulla on siell\u00e4 saman niminen tiedosto (%1). Jos jatkat l\u00e4hetyst\u00e4, aiempi tiedosto korvataan.",
     "2445": "Juurikansiota ei voida synkronoida. Ole hyv\u00e4 ja valitse alikansio.",
@@ -2762,5 +2763,16 @@
     "7711": "Choose other plan",
     "7712": "Please log in or register to redeem your voucher.",
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7714": "Voucher redemption link",
+    "7715": "Email support at resellers@mega.nz",
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

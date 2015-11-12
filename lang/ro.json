@@ -1236,6 +1236,7 @@
     "2435": "Sincronizarea ta \u201e%1\u201d a fost dezactivat\u0103 deoarece folderul de la distan\u0163\u0103 nu exist\u0103",
     "2436": "Sincronizarea ta \u201e%1\u201d a fost dezactivat\u0103 deoarece folderul de la distan\u0163\u0103 este \u00een co\u015ful de gunoi",
     "2438": "Folderul (%1) nu a fost \u00eenc\u0103rcat deoarece este prea mare (acest beta este limitat la %2 foldere \u015fi %3 fi\u015fiere.",
+    "2439": "%1 foldere nu au fost \u00eenc\u0103rcate deoarece sunt prea mari (acest beta este limitat la %2 foldere \u015fi %3 fi\u015fiere.",
     "2440": "Sincronizarea se va opri.\u015etergerile care se produc c\u00e2t timp aplica\u0163ia nu ruleaz\u0103 nu vor fi propagate.",
     "2443": "Folderul de destina\u0163ie este sincronizate \u015fi ai deja un fi\u015fier \u00een\u0103utrul s\u0103u cu acela\u015fi nume (%1).Dac\u0103 continui \u00eenc\u0103rcarea, fi\u015fierul anterior va fi suprascris. E\u015fti sigur?",
     "2445": "Folderul r\u0103d\u0103cin\u0103 (root) nu poate fi sincronizat.Te rug\u0103m s\u0103 selectezi un subfolder.",
@@ -2762,5 +2763,16 @@
     "7711": "Choose other plan",
     "7712": "Please log in or register to redeem your voucher.",
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7714": "Voucher redemption link",
+    "7715": "Email support at resellers@mega.nz",
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

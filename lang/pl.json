@@ -1236,6 +1236,7 @@
     "2435": "Synchonizacja \"%1\" zosta\u0142a wstrzymana poniewa\u017c katalog zdalny nie istnieje",
     "2436": "Synchonizacja \"%1\" zosta\u0142a wstrzymana poniewa\u017c katalog zdalny zosta\u0142 umieszczony w koszu",
     "2438": "Katalog (%1) nie zosta\u0142 wgrany poniewa\u017c jest za du\u017cy (wersja beta posiada ograniczenia do %2 na katalogi lub %3 na pliki).",
+    "2439": "%1 katalogi nie zosta\u0142y wgrane poniewa\u017c s\u0105 za du\u017ce (wersja beta posiada ograniczenia do %2 na katalogi lub %3 na pliki).",
     "2440": "Synchronizacja zostanie zatrzymana. Usuwanie nie b\u0119dzie kontynuowane.",
     "2443": "Katalog docelowy jest synchronizowany i posiada ju\u017c plik o tej samej nazwie (%1). Je\u017celi chcesz kontynuowa\u0107, poprzedni plik zostanie nadpisany.",
     "2445": "G\u0142\u00f3wny katalog nie mo\u017cesz zosta\u0107 zsynchronizowany.Wybierz podkatalog.",
@@ -2761,6 +2762,17 @@
     "7710": "DOKONAJ ZMIANY",
     "7711": "Wybierz inne konto",
     "7712": "Zaloguj si\u0119 lub zarejestruj aby zrealizowa\u0107 kupon.",
-    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7713": "Powy\u017csza operacja usunie wszystkie dane MEGA z przegl\u0105darki i od\u015bwie\u017cy Twoje konto na naszych serweach. Mo\u017ce to potrwa\u0107 do kilku minut.",
+    "7714": "Link do kuponu",
+    "7715": "Napisz do nas na resellers@mega.nz",
+    "7716": "Link potwierdzaj\u0105cy zosta\u0142 ju\u017c wys\u0142any na ten adres.",
+    "7717": "Link potwierdzaj\u0105cy zosta\u0142 ju\u017c wygenerowany dla podanego adresu email.",
+    "7718": "Te adres email jest ju\u017c u\u017cywany na MEGA. Skontaktuj si\u0119 z nami aby uzyska\u0107 wi\u0119cej informacji.",
+    "7719": "Link do potwierdzenia adresu email ju\u017c wygas\u0142. Naci\u015bnij OK aby ponowi\u0107 proces.",
+    "7720": "Musisz by\u0107 zalogowany a doko\u0144czy\u0107 zmian\u0119 adresu email. Zaloguj si\u0119 u\u017cywaj\u0105c dotychczasowego adresu email a nast\u0119pnie kliknij ponownie w link.",
+    "7730": "Zweryfikuj sw\u00f3j adres email",
+    "7731": "Wprowad\u017a swoje has\u0142o w celu weryfikacji adresu email",
+    "7732": "Potwierd\u017a email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

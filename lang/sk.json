@@ -1236,6 +1236,7 @@
     "2435": "Va\u0161a synchroniz\u00e1cia \"%1\" bola zablokovan\u00e1, preto\u017ee vzdialen\u00fd prie\u010dinok neexistuje",
     "2436": "Va\u0161a synchroniz\u00e1cia \"%1\" bola zablokovan\u00e1, preto\u017ee vzdialen\u00fd prie\u010dinok  je v Ko\u0161i",
     "2438": "Prie\u010dinok (%1) nebol upladovan\u00fd, preto\u017ee je pr\u00edli\u0161 ve\u013ek\u00fd (t\u00e1to beta verzia je limitovan\u00e1 na %2 prie\u010dinkov alebo %3 s\u00faborov).",
+    "2439": "%1 prie\u010dinkov nebolo uploadnut\u00fdch, preto\u017ee boli pr\u00edli\u0161 ve\u013ek\u00e9 (t\u00e1to beta verzia je limitovan\u00e1 na %2 prie\u010dinkov alebo %3 s\u00faborov).",
     "2440": "Synchroniz\u00e1cia bude zastaven\u00e1.Mazania ktor\u00e9 nastan\u00fa ke\u010f nebe\u017e\u00ed, nebud\u00fa propagovan\u00e9.",
     "2443": "Cielov\u00fd prie\u010dinok je synchronizovan\u00fd a u\u017e v \u0148om m\u00e1te s\u00fabor s rovnak\u00fdm menom (%1). Ak budete v uploade pokra\u010dova\u0165, predch\u00e1dzaj\u00faci s\u00fabor bude prep\u00edsan\u00fd.",
     "2445": "kore\u0148ov\u00fd prie\u010dinok nem\u00f4\u017ee by\u0165 synchronizovan\u00fd.Pros\u00edm, zvo\u013ete podprie\u010dinok.",
@@ -2760,5 +2761,18 @@
     "7709": "Click [S]COMPLETE UPGRADE[\/S] and enjoy your new %1 plan.",
     "7710": "COMPLETE UPGRADE",
     "7711": "Choose other plan",
-    "7712": "Please log in or register to redeem your voucher."
+    "7712": "Please log in or register to redeem your voucher.",
+    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
+    "7714": "Voucher redemption link",
+    "7715": "Email support at resellers@mega.nz",
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

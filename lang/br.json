@@ -1236,6 +1236,7 @@
     "2435": "O seu sync \"%1\" foi desativadoporque a pasta remota n\u00e3o existe",
     "2436": "O seu sync \"%1\" foi desativadoporque a pasta remota esta no lixo",
     "2438": "A pasta (%1) n\u00e3o foi enviada porque \u00e9 demasiado grande (esta vers\u00e3o beta est\u00e1 limitado a 2% pastas ou % 3 ficheiros.",
+    "2439": "%1 pastas n\u00e3o foram enviadas porque s\u00e3o muito grandes (esta vers\u00e3o beta est\u00e1 limitado a 2% pastas ou % 3 ficheiros.",
     "2440": "Sincroniza\u00e7\u00e3o ser\u00e1 interrompida.Remo\u00e7\u00f5es de arquivos que acontecerem enquanto ela n\u00e3o estiver ativada, n\u00e3o ser\u00e3o propagadas.",
     "2443": "A pasta de destino esta sincronizada e j\u00e1 tem um ficheiro com o mesmo nome no seu interior (%1).Se continuar a fazer upload, o ficheiro anterior ser\u00e1 substitu\u00eddo.Tem a certeza que quer proceder?",
     "2445": "A pasta raiz n\u00e3o pode ser sincronizada, por favor, selecione uma sub-pasta.",
@@ -2760,5 +2761,18 @@
     "7709": "Clique [S]UPGRADE COMPLETO[\/ S] e desfrute do seu novo plano de 1%.",
     "7710": "UPGRADE COMPLETO",
     "7711": "Escolha outro plano",
-    "7712": "Por favor fa\u00e7a o login ou registre-se para resgatar o seu voucher."
+    "7712": "Por favor fa\u00e7a o login ou registre-se para resgatar o seu voucher.",
+    "7713": "Esta opera\u00e7\u00e3o ir\u00e1 limpar todos os dados de MEGA o cache do navegador e recarregar sua conta a partir de nossos servidores. Isso pode demorar alguns minutos.",
+    "7714": "link do seu vouncher",
+    "7715": "Suporte por e-mail em resellers@mega.nz",
+    "7716": "Voc\u00ea j\u00e1 enviou um link de confirma\u00e7\u00e3o para esse endere\u00e7o.",
+    "7717": "Voc\u00ea j\u00e1 solicitou um link de confirma\u00e7\u00e3o para esse endere\u00e7o de e-mail.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

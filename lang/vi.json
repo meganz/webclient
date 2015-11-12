@@ -1236,6 +1236,7 @@
     "2435": "\u0110\u1ed3ng b\u1ed9 cho \"%1\" \u0111\u00e3 b\u1ecb t\u1eaftv\u00ec th\u01b0 m\u1ee5c \u0111\u00f3 \u0111\u00e3 b\u1ecb m\u1ea5t \u1edf n\u01a1i kh\u00e1c (m\u00e1y kh\u00e1c ho\u1eb7c tr\u00ean m\u1ea1ng)",
     "2436": "\u0110\u1ed3ng b\u1ed9 cho \"%1\" \u0111\u00e3 b\u1ecb t\u1eaftv\u00ec th\u01b0 m\u1ee5c \u0111\u00e3 b\u1ecb chuy\u1ec3n v\u00e0o th\u00f9ng r\u00e1c \u1edf n\u01a1i kh\u00e1c",
     "2438": "Th\u01b0 m\u1ee5c (%1) ch\u01b0a \u0111\u01b0\u1ee3c t\u1ea3i l\u00ean b\u1edfi v\u00ec k\u00edch th\u01b0\u1edbc qu\u00e1 l\u1edbn (b\u1ea3n beta ch\u1ec9 cho ph\u00e9p %2 th\u01b0 m\u1ee5c hay %3 t\u1ec7p tin.",
+    "2439": "C\u00f3 %1 th\u01b0 m\u1ee5c ch\u01b0a \u0111\u01b0\u1ee3c t\u1ea3i l\u00ean b\u1edfi v\u00ec k\u00edch th\u01b0\u1edbc qu\u00e1 l\u1edbn (b\u1ea3n beta ch\u1ec9 cho ph\u00e9p %2 th\u01b0 m\u1ee5c hay %3 t\u1ec7p tin.",
     "2440": "Ti\u1ebfn tr\u00ecnh \u0111\u1ed3ng b\u1ed9 s\u1ebd b\u1ecb d\u1eebng.M\u1ecdi thao t\u00e1c x\u00f3a b\u1ecf d\u1eef li\u1ec7u khi ch\u01b0\u01a1ng tr\u00ecnh kh\u00f4ng ho\u1ea1t \u0111\u1ed9ng s\u1ebd kh\u00f4ng \u0111\u01b0\u1ee3c ghi nh\u1eadn.",
     "2443": "Th\u01b0 m\u1ee5c \u0111\u00edch \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u1ed3ng b\u1ed9 r\u1ed3i v\u00e0 b\u1ea1n c\u0169ng \u0111\u00e3 c\u00f3 m\u1ed9t t\u1ec7p tin b\u00ean trong \u0111\u00f3 v\u1edbi c\u00f9ng t\u00ean (%1).N\u1ebfu b\u1ea1n ti\u1ebfp t\u1ee5c vi\u1ec7c upload, th\u00ec t\u1ec7p tin n\u1eb1m trong th\u01b0 m\u1ee5c n\u00e0y s\u1ebd b\u1ecb ghi \u0111\u00e8 l\u00ean.B\u1ea1n c\u00f3 ch\u1eafc kh\u00f4ng?",
     "2445": "Th\u01b0 m\u1ee5c root kh\u00f4ng th\u1ec3 \u0111\u01b0\u1ee3c \u0111\u1ed3ng b\u1ed9.Xin ch\u1ecdn m\u1ed9t th\u01b0 m\u1ee5c con kh\u00e1c.",
@@ -2760,5 +2761,18 @@
     "7709": "Nh\u1ea5p v\u00e0o [S]HO\u00c0N T\u1ea4T N\u00c2NG C\u1ea4P[\/S] v\u00e0 t\u1eadn h\u01b0\u1edfng h\u1ea1ng %1 m\u1edbi mua.",
     "7710": "HO\u00c0N T\u1ea4T N\u00c2NG C\u1ea4P",
     "7711": "Ch\u1ecdn g\u00f3i thu\u00ea bao kh\u00e1c",
-    "7712": "Xin \u0111\u0103ng nh\u1eadp ho\u1eb7c t\u1ea1o t\u00e0i kho\u1ea3n \u0111\u1ec3 l\u1ea5y voucher n\u00e0y."
+    "7712": "Xin \u0111\u0103ng nh\u1eadp ho\u1eb7c t\u1ea1o t\u00e0i kho\u1ea3n \u0111\u1ec3 l\u1ea5y voucher n\u00e0y.",
+    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
+    "7714": "Voucher redemption link",
+    "7715": "Email support at resellers@mega.nz",
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "X\u00e1c th\u1ef1c \u0111\u1ecba ch\u1ec9 email c\u1ee7a b\u1ea1n",
+    "7731": "Xin nh\u1eadp m\u1eadt kh\u1ea9u \u0111\u1ec3 x\u00e1c th\u1ef1c \u0111\u00e2y l\u00e0 email c\u1ee7a b\u1ea1n",
+    "7732": "X\u00e1c nh\u1eadn thay \u0111\u1ed5i email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

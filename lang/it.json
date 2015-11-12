@@ -1241,7 +1241,7 @@
     "2443": "a cartella di destinazione \u00e8 sincronizzata e hai gi\u00e0 un file al suo interno con lo stesso nome (%1). Se si continua l'upload, il file precedente verr\u00e0 sovrascritto. Sei sicuro?",
     "2445": "La cartella principale non pu\u00f2 essere sincronizzata.Si prega di selezionare una sottocartella.",
     "2447": "Nessun link MEGA valido trovati (collegamenti delle cartelle non sono ancora supportati).",
-    "2461": "I agree with the MEGA <a href=\"https:\/\/mega.nz\/#terms\">Terms of Service<\/a>",
+    "2461": "I agree with the MEGA <a href=\"https:\/\/mega.co.nz\/#terms\">Terms of Service<\/a>",
     "2464": "Inserisci il tuo indirizzo e-mail",
     "2465": "Per favore inserisci un indirizzo email valido",
     "2466": "Inserisci la tua password",
@@ -2772,5 +2772,7 @@
     "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
     "7730": "Verify your email address",
     "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

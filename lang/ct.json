@@ -2767,10 +2767,12 @@
     "7715": "\u9023\u7d61MEGA\u652f\u63f4\u4e2d\u5fc3\uff1aresellers@mega.nz",
     "7716": "\u60a8\u5df2\u7d93\u767c\u9001\u4e86\u78ba\u8a8d\u4fe1\u5230\u8a72\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u3002",
     "7717": "\u4f60\u5df2\u7d93\u70ba\u6b64\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u7533\u8acb\u4e86\u78ba\u8a8d\u4fe1\u3002",
-    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
-    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
-    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
-    "7730": "Verify your email address",
-    "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7718": "\u6b64\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u5df2\u88ab\u4f7f\u7528\u3002\u82e5\u9700\u9032\u4e00\u6b65\u8cc7\u8a0a\uff0c\u8acb\u9023\u7d61MEGA\u652f\u63f4\u4e2d\u5fc3\u3002",
+    "7719": "\u60a8\u7684\u78ba\u8a8d\u4fe1\u4e2d\u4e4b\u9023\u7d50\u5df2\u5931\u6548\uff0c\u8acb\u9ede\u64caOK\u9375\u4ee5\u91cd\u65b0\u958b\u59cb\u9a57\u8b49\u7a0b\u5e8f\u3002",
+    "7720": "\u60a8\u5fc5\u9808\u767b\u5165\u4ee5\u5b8c\u6210\u60a8\u7684\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u8b8a\u66f4\u4f5c\u696d\u3002\u8acb\u60a8\u4f7f\u7528\u76ee\u524d\u7684\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u91cd\u65b0\u767b\u5165\uff0c\u7136\u5f8c\u518d\u6b21\u9ede\u64ca\u60a8\u7684\u78ba\u8a8d\u9023\u7d50\u3002",
+    "7730": "\u9a57\u8b49\u60a8\u7684\u96fb\u5b50\u90f5\u4ef6\u5730\u5740",
+    "7731": "\u8acb\u8f38\u5165\u60a8\u7684\u5bc6\u78bc\u4ee5\u9a57\u8b49\u60a8\u7684\u96fb\u5b50\u90f5\u4ef6\u5730\u5740",
+    "7732": "\u78ba\u8a8d\u96fb\u5b50\u90f5\u4ef6\u5730\u5740",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

@@ -2772,5 +2772,7 @@
     "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
     "7730": "Verify your email address",
     "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

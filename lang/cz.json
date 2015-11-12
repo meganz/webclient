@@ -2764,13 +2764,15 @@
     "7712": "P\u0159ihlaste se nebo zaregistrujte, abyste uplatnili sv\u016fj poukaz.",
     "7713": "Tato operace vyma\u017ee v\u0161echna data MEGA z mezipam\u011bti va\u0161eho prohl\u00ed\u017ee\u010de a znovu na\u010dte v\u00e1\u0161 \u00fa\u010det z na\u0161ich server\u016f. M\u016f\u017ee to trvat p\u00e1r minut.",
     "7714": "Odkaz na uplatn\u011bn\u00ed poukazu",
-    "7715": "Napi\u0161te e-mail podpo\u0159e na poresellers@mega.nz",
+    "7715": "Napi\u0161te podpo\u0159e e-mail na poresellers@mega.nz",
     "7716": "Ji\u017e jste odeslali potvrzovac\u00ed odkaz na tuto adresu.",
     "7717": "Ji\u017e jste si vy\u017e\u00e1dali potvrzovac\u00ed odkaz pro tuto e-mailovou adresu.",
-    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
-    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
-    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
-    "7730": "Verify your email address",
-    "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7718": "Tato e-mailov\u00e1 adresa je ji\u017e obsazena. Obra\u0165te se na podporu MEGA kv\u016fli dal\u0161\u00edm informac\u00edm.",
+    "7719": "V\u00e1\u0161 potvrzovac\u00ed odkaz pro tento e-mail vypr\u0161el. Klikn\u011bte na OK pro nov\u00e9 spu\u0161t\u011bn\u00ed procesu.",
+    "7720": "Pro dokon\u010den\u00ed zm\u011bny sv\u00e9ho e-mailu mus\u00edte b\u00fdt p\u0159ihl\u00e1\u0161en\u00ed. P\u0159ihlaste se znovu pomoc\u00ed sv\u00e9 aktu\u00e1ln\u00ed e-mailov\u00e9 adresy a potom klikn\u011bte znovu na potvrzovac\u00ed odkaz.",
+    "7730": "Ov\u011b\u0159te svou e-mailovou adresu",
+    "7731": "Zadejte sv\u00e9 heslo pro ov\u011b\u0159en\u00ed va\u0161\u00ed e-mailov\u00e9 adresy",
+    "7732": "Potvrdit e-mail",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

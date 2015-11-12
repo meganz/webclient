@@ -1241,7 +1241,7 @@
     "2443": "Destinationsmappen synkroniseras och du redan har en fil inuti med samma namn (%1).Om du forts\u00e4tter uppladdningen, kommer den tidigare filen \u00f6ver.",
     "2445": "Rotmappen kan inte synkroniseras.V\u00e4lj en undermapp.",
     "2447": "Inga giltiga MEGA l\u00e4nkar funna (mapp l\u00e4nkar st\u00f6ds inte \u00e4nnu).",
-    "2461": "I agree with the MEGA <a href=\"https:\/\/mega.nz\/#terms\">Terms of Service<\/a>",
+    "2461": "I agree with the MEGA <a href=\"https:\/\/mega.co.nz\/#terms\">Terms of Service<\/a>",
     "2464": "Var v\u00e4nlig och ange din e-mail adress",
     "2465": "Ange en giltig e-postadress",
     "2466": "Var god och skriv in ditt l\u00f6senord",
@@ -2772,5 +2772,7 @@
     "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
     "7730": "Verify your email address",
     "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

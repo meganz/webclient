@@ -5610,8 +5610,8 @@ function fm_getcopynodes(cn, t)
 /**
  * Create new folder on the cloud
  * @param {String} toid The handle where the folder will be created.
- * @param {Mixed} name Either a string with the folder name to create, or an array of them.
- * @param {Object} ulparams Either an old-fashion object with a `callback` function or a MegaPromise.
+ * @param {String|Array} name Either a string with the folder name to create, or an array of them.
+ * @param {Object|MegaPromise} ulparams Either an old-fashion object with a `callback` function or a MegaPromise.
  * @return {Object} The `ulparams`, whatever it is.
  */
 function createFolder(toid, name, ulparams) {

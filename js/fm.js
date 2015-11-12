@@ -4092,11 +4092,13 @@ function accountUI()
 
         function accountWidth() {
             var $mainBlock = $('.fm-account-main');
-
-            if ($mainBlock.width() < 920) {
+            if ($mainBlock.width() > 1675) {
+                $mainBlock.addClass('hi-width');
+            }
+            else if ($mainBlock.width() < 920) {
                 $mainBlock.addClass('low-width');
             } else {
-                $mainBlock.removeClass('low-width');
+                $mainBlock.removeClass('low-width hi-width');
             }
         }
 

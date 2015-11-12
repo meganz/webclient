@@ -4005,7 +4005,7 @@ function accountUI()
 
             $('.grid-table.vouchers tr').remove();
             var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
-            
+
             $(account.vouchers).each(function(i, el) {
 
                 // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
@@ -7145,12 +7145,19 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  */
 function disableReadOnlySharedFolders(dialogName) {
 
-    var nodeId, accessRight,
+    var nodeId, accessRight, rootParentDirId,
+        $mcTreeSub = $("#mctreesub_shares"),
         $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
 
     $ro.each(function(i, v) {
         nodeId = $(v).attr('id').replace('mctreea_', '');
-        accessRight = M.d[nodeId].r;
+
+        // Apply access right of root parent dir to all subfolders
+        rootParentDirId = $("#mctreea_" + nodeId).parentsUntil($mcTreeSub).last().attr('id').replace('mctreeli_', '');
+
+        if (M.d[rootParentDirId]) {
+            accessRight = M.d[rootParentDirId].r;
+        }
 
         if (!accessRight || (accessRight === 0)) {
             $(v).addClass('disabled');

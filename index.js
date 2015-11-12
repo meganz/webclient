@@ -950,18 +950,6 @@ function loginDialog(close) {
             $(this).val(l[195]);
         }
     });
-    $('#login-password').rebind('focus', function (e) {
-        if ($(this).val() == l[909]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
-    });
-    $('#login-password').rebind('blur', function (e) {
-        if ($(this).val() == '') {
-            $(this).val(l[909]);
-            $(this)[0].type = 'text';
-        }
-    });
     $('.top-login-full').rebind('click', function (e) {
         loginDialog(1);
         document.location.hash = 'login';

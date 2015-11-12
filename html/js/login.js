@@ -156,7 +156,7 @@ function pagelogin() {
         $('.login-register-input.email').addClass('incorrect');
         $('#login-name2').focus();
     }
-    else if ($('#login-password2').val() === '' || $('#login-password2').val() === l[909]) {
+    else if ($('#login-password2').val() === '') {
         $('.login-register-input.password').addClass('incorrect');
         $('#login-password2').focus();
     }
@@ -255,24 +255,15 @@ function init_login() {
     });
     $('#login-password2').rebind('focus', function(e) {
         $('.login-register-input.password').addClass('focused');
-        if ($(this).val() === l[909]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
     });
     $('#login-password2').rebind('blur', function(e) {
         $('.login-register-input.password').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[909]);
-            $(this)[0].type = 'text';
-        }
     });
 
     $('#login-password2, #login-name2').rebind('keydown', function(e) {
         if ($('#login-name2').val() !== ''
                 && $('#login-name2').val() !== l[195]
-                && $('#login-password2').val() !== ''
-                && $('#login-password2').val() !== l[909]) {
+                && $('#login-password2').val() !== '') {
             $('.register-st2-button').addClass('active');
         }
         $('.login-register-input.password').removeClass('incorrect');

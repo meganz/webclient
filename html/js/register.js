@@ -317,33 +317,17 @@ function init_register() {
         $('.login-register-input.password.first').removeClass('incorrect');
         $('.login-register-input.password.confirm').removeClass('incorrect');
         $('.login-register-input.password').addClass('focused');
-        if ($(this).val() === l[909]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
     });
     $('#register-password').rebind('blur', function(e) {
         $('.login-register-input.password').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[909]);
-            $(this)[0].type = 'text';
-        }
         registerpwcheck();
     });
     $('#register-password2').rebind('focus', function(e) {
         $('.login-register-input.password.confirm').removeClass('incorrect');
         $('.login-register-input.password2').addClass('focused');
-        if ($(this).val() === l[1114]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
     });
     $('#register-password2').rebind('blur', function(e) {
         $('.login-register-input.password2').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[1114]);
-            $(this)[0].type = 'text';
-        }
     });
     $('.new-registration-checkbox .radio-txt,.register-check').rebind('click.uiCheckboxes', function(e) {
         if ($('.register-check').attr('class').indexOf('checkboxOn') > -1) {

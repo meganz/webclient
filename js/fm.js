@@ -52,7 +52,7 @@ function initGridScrolling()
 }
 
 function initSelectScrolling(scrollBlock)
-{    
+{
     $(scrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scrollBlock);
 }
@@ -1429,13 +1429,19 @@ function addNewContact($addButton) {
  */
 function sharedUInode(nodeHandle) {
 
-    DEBUG('sharedUInode');
-
     var oShares,
         iShareNum = 0,
         bExportLink = false,
         bAvailShares = false,
         UiExportLink = new mega.UI.Share.ExportLink();
+
+    if (d) {
+        if (!fminitialized) {
+            UiExportLink.logger.warn('Skipping sharedUInode call...');
+            return;
+        }
+        UiExportLink.logger.debug('Entering sharedUInode...');
+    }
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -1475,7 +1481,7 @@ function sharedUInode(nodeHandle) {
     }
 
     // t === 1, folder
-    if (M.d[nodeHandle].t) {
+    if (M.d[nodeHandle] && M.d[nodeHandle].t) {
 
         // Update right panel selected node with appropriate icon for list view
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
@@ -2876,7 +2882,7 @@ function accountUI()
 {
     var sectionTitle,
         sectionClass;
-        
+
     $('.fm-account-overview').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
@@ -2889,7 +2895,7 @@ function accountUI()
         $.transferClose();
     }
 
-    //Destroy jScrollings in select dropdowns 
+    //Destroy jScrollings in select dropdowns
     $('.fm-account-main .default-select-scroll').each(function(i, e) {
         $(e).parent().fadeOut(200).parent().removeClass('active');
         deleteScrollPanel(e, 'jsp');
@@ -3406,7 +3412,7 @@ function accountUI()
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
             i--;
         }
-        $('.default-select.year .default-select-scroll').html(html); 
+        $('.default-select.year .default-select-scroll').html(html);
         var i = 1, html = '', sel = '';
         $('.default-select.day span').text('DD');
         while (i < 32)
@@ -3486,7 +3492,7 @@ function accountUI()
             u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
             u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
             u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
-            
+
             $('.fm-account-avatar').html(useravatar.contact(u_handle));
             $('.fm-avatar img').attr('src', useravatar.mine());
 
@@ -3625,7 +3631,7 @@ function accountUI()
                 // i => requesti (Always has the global variable requesti (last request ID))
                 api_req({
                 a:'se',
-                aa:'a', 
+                aa:'a',
                 e: email,
                 i: requesti,
                 },  {
@@ -3985,7 +3991,7 @@ function accountUI()
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
-            
+
             $('.fm-account-button.reseller').removeClass('hidden');
             $('.account-history-dropdown-button.vouchers').text(buttonText);
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
@@ -4005,7 +4011,7 @@ function accountUI()
 
             $('.grid-table.vouchers tr').remove();
             var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
-            
+
             $(account.vouchers).each(function(i, el) {
 
                 // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
@@ -10626,7 +10632,7 @@ function bindDropdownEvents($dropdown, saveOption) {
     var $dropdownsItem = $dropdown.find('.default-dropdown-item');
 
     $($dropdown).rebind('click', function(e)
-    {    
+    {
         var $this = $(this);
         if (!$this.hasClass('active')) {
             var bottPos, jsp,
@@ -10637,12 +10643,12 @@ function bindDropdownEvents($dropdown, saveOption) {
             //Show Select dropdown
             $('.active .default-select-dropdown').fadeOut(200);
             $this.addClass('active');
-            $dropdown.css('margin-top', '0px');    
+            $dropdown.css('margin-top', '0px');
             $dropdown.fadeIn(200);
 
             //Dropdown position relative to the window
             bottPos = $(window).height() - ($dropdown.offset().top + $dropdown.outerHeight());
-            if (bottPos < 50) { 
+            if (bottPos < 50) {
                 $dropdown.css('margin-top', '-' + (60 - bottPos) + 'px');
             }
 
@@ -10675,7 +10681,7 @@ function bindDropdownEvents($dropdown, saveOption) {
             }
         }
     });
-        
+
     $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e)
     {
         if (!$(e.target).hasClass('default-select')) {

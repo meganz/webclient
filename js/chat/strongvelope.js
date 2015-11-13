@@ -113,10 +113,13 @@ var strongvelope = {};
      *     Message containing a sender key (initial, key rotation, key re-send).
      * @property GROUP_CONTINUE {Number}
      *     Message using an existing sender key for encryption.
+     * @property INCLUDE_MEMBER {Number}
+     *     Includes a new participant into the group chat.
      */
     var MESSAGE_TYPES = {
         GROUP_KEYED:        0x00,
-        GROUP_FOLLOWUP:     0x01
+        GROUP_FOLLOWUP:     0x01,
+        ALTER_MEMBERS:      0x03
     };
     strongvelope.MESSAGE_TYPES = MESSAGE_TYPES;
 
@@ -321,7 +324,7 @@ var strongvelope = {};
      * AES-128. It is derived from the Diffie-Hellman shared secret, a x25519
      * public value, using HKDF-SHA256.
      *
-     * @param {String} sharedCardinalKey
+     * @param {String} sharedSecret
      *     Input IKM for the HKDF. In mpENC, this is the x25519 public key
      *     result of the group key agreement.
      * @param {String} [context]
@@ -530,6 +533,9 @@ var strongvelope = {};
      * @property {Object.<handle, ParticipantKeys>} participantKeys
      *     Collection of participant specific key information (including our own,
      *     @see {@link ParticipantKey} for all (past and present) participants.
+     * @property {Array.<String>} otherParticipants
+     *     An array of all the participants' user handles in the chat, but
+     *     excluding one self.
      */
     strongvelope.ProtocolHandler = function(ownHandle, privCu25519, privEd25519,
             pubEd25519) {
@@ -550,6 +556,7 @@ var strongvelope = {};
         this._sentKeyId = null;
         this.participantKeys = {};
         this.participantKeys[this.ownHandle] = {};
+        this.otherParticipants = [];
     };
 
 
@@ -859,21 +866,92 @@ var strongvelope = {};
 
 
     /**
-     * Encrypts a message to (currently just a single) recipient.
+     * An object containing the encrypted and TLV encoded recipient key IDs and
+     * sender keys.
+     *
+     * @typedef {Object} EncryptedSenderKeys
+     * @property {String} recipients
+     *     TLV encoded recipients for keys.
+     * @property {String} keys
+     *     TLV encoded, encrypted sender key to recipients.
+     * @property {String} keyIds
+     *     TLV encoded key IDs.
+     */
+
+
+    /**
+     * Encrypts the sender key to the recipients as needed.
      *
      * @method
+     * @private
+     * @param {String} nonce
+     *     "Master nonce" used for encrypting the message. Will be used to
+     *     derive an IV for the key encryption.
+     * @returns {EncryptedSenderKeys}
+     *     Encrypted sender key to participants or `false` if nothing is to send.
+     */
+    strongvelope.ProtocolHandler.prototype._encryptSenderKey = function(nonce) {
+
+        // XXX: Jiggle around with this.includeParticipants and this.excludeParticipants:
+        //      - includeParticipants only get new sender key
+        //      - oldParticipants will get no key or mention in recipients
+        //      - update this.otherParticipants to include/exclude new/old participants
+        //        (best to put this into a method this_updateParticipants([new], [old]))
+
+        if (this.otherParticipants.length === 0) {
+            return false;
+        }
+
+        var recipients = '';
+        var keys = '';
+        var keyIds = '';
+
+        var senderKey = this.participantKeys[this.ownHandle][this.keyId];
+
+        // Assemble the key ID(s) to be sent.
+        var keyIdContent = this.keyId;
+        if (this.previousKeyId) {
+            keyIdContent += this.previousKeyId;
+        }
+        keyIds = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
+                                      keyIdContent);
+
+        // Assemble the output for all recipients.
+        var destination = '';
+        var keysIncluded = [];
+        var encryptedKeys = '';
+        for (var i = 0; i < this.otherParticipants.length; i++) {
+            destination = this.otherParticipants[i];
+            recipients += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
+                                               base64urldecode(destination));
+            keysIncluded = [senderKey];
+            if (this.previousKeyId) {
+                // Also add previous key.
+                keysIncluded.push(this.participantKeys[this.ownHandle][this.previousKeyId]);
+            }
+            encryptedKeys = this._encryptKeysFor(keysIncluded, nonce, destination);
+            keys += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
+                                         encryptedKeys);
+        }
+
+        return { recipients: recipients, keys: keys, keyIds: keyIds };
+    };
+
+
+    /**
+     * Assembles the message body to the recipients of the (group) chat.
+     * This function also rotates or re-sends the sender key if required.
+     *
+     * @method
+     * @private
      * @param {String} message
      *     Data message to encrypt. If `null` or `undefined`, no message payload
      *     will be encoded (i. e. it's a "blind" management message).
-     * @param {String} destination
-     *     User handle of the recipient.
-     * @returns {String}
+     * @returns {{ keyed: Boolean, content: String }}
+     *     Outgoing message content encoded in TLV records, and a flag
+     *     indicating whether the message is keyed.
      */
-    strongvelope.ProtocolHandler.prototype.encryptTo = function(message, destination) {
-
-        var content = '';
-        var encryptedKeys;
-        var messageType;
+    strongvelope.ProtocolHandler.prototype._assembleBody = function(message) {
 
         // Check and rotate key if due.
         if (this._keyEncryptionCount >= this.rotateKeyEvery) {
@@ -883,41 +961,25 @@ var strongvelope = {};
         var senderKey = this.participantKeys[this.ownHandle][this.keyId];
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
-        var keyIds = this.keyId;
         var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
+        var encryptedKeys = false;
         if (repeatKey || (this._sentKeyId !== this.keyId)) {
-            // Default: Keyed message.
-            var keysIncluded = [senderKey];
-            if (this.previousKeyId && !repeatKey) {
-                // Include previous sender key on key rotation only.
-                keysIncluded.push(this.participantKeys[this.ownHandle][this.previousKeyId]);
-                keyIds += this.previousKeyId;
-            }
-            encryptedKeys = this._encryptKeysFor(keysIncluded, encryptedMessage.nonce,
-                                                 destination);
-            messageType = MESSAGE_TYPES.GROUP_KEYED;
-            this._totalMessagesWithoutSendKey = 0;
+            encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
-        else {
-            // Use a (leaner) followup message and avoid re-sending key(s).
-            messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
-        }
+        var messageType = encryptedKeys
+                        ? MESSAGE_TYPES.GROUP_KEYED
+                        : MESSAGE_TYPES.GROUP_FOLLOWUP;
 
         // Assemble message content.
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
-                                        String.fromCharCode(messageType));
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.NONCE),
-                                        encryptedMessage.nonce);
+        var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.NONCE),
+                                           encryptedMessage.nonce);
         if (encryptedKeys) {
             // Include recipient(s) and sender key(s).
-            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
-                                            base64urldecode(destination));
-            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
-                                            encryptedKeys);
+            content += encryptedKeys.recipients;
+            content += encryptedKeys.keys;
+            content += encryptedKeys.keyIds;
             this._sentKeyId = this.keyId;
-            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
-                                            keyIds);
-
+            this._totalMessagesWithoutSendKey = 0;
         }
         else {
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
@@ -931,15 +993,73 @@ var strongvelope = {};
             this._keyEncryptionCount++;
         }
 
-        // Sign message.
-        var signature = ns._signMessage(content,
-                                        this.privEd25519, this.pubEd25519);
-        content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.SIGNATURE),
-                                       signature)
-                + content;
-
         // Update message counters.
         this._totalMessagesWithoutSendKey++;
+
+        return { keyed: (encryptedKeys !== false), content: content };
+    };
+
+
+    /**
+     * Signs content for delivery in the (group) chat.
+     *
+     * @method
+     * @private
+     * @param {String} content
+     *     Content to sign.
+     * @returns {String}
+     *     Content with signature TLV record prepended.
+     */
+    strongvelope.ProtocolHandler.prototype._signContent = function(content) {
+
+        var signature = ns._signMessage(content,
+                                        this.privEd25519, this.pubEd25519);
+        var signatureRecord = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.SIGNATURE),
+                                                   signature)
+
+        return signatureRecord + content;
+    };
+
+
+    /**
+     * Encrypts a message to the recipients of the (group) chat.
+     *
+     * @method
+     * @param {String} message
+     *     Data message to encrypt. If `null` or `undefined`, no message payload
+     *     will be encoded (i. e. it's a "blind" management message).
+     * @param {String} [destination]
+     *     User handle of the (new and only) recipient.
+     * @returns {String|Boolean}
+     *     Encrypted outgoing message or `false` if something fails.
+     */
+    strongvelope.ProtocolHandler.prototype.encryptTo = function(message, destination) {
+
+        // Check we're in a chat with this destination, or a new chat.
+        if (this.otherParticipants.indexOf(destination) === -1) {
+            if (this.otherParticipants.length === 0) {
+                this.otherParticipants.push(destination);
+            }
+            else {
+                logger.warn('Destination not in current participants: ' + destination);
+
+                return false;
+            }
+        }
+
+        // Assemble main message body and rotate keys if required.
+        var assembledMessage = this._assembleBody(message);
+        var messageType = assembledMessage.keyed
+                        ? MESSAGE_TYPES.GROUP_KEYED
+                        : MESSAGE_TYPES.GROUP_FOLLOWUP;
+
+        // Assemble rest of message.
+        var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
+                                           String.fromCharCode(messageType))
+                    + assembledMessage.content;
+
+        // Sign message.
+        content = this._signContent(content);
 
         // Return assembled total message.
         return String.fromCharCode(PROTOCOL_VERSION) + content;
@@ -961,6 +1081,19 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
             sender, historicMessage) {
+
+        // Check we're in a chat with this sender, or on a new chat.
+        if ((this.otherParticipants.indexOf(sender) === -1)
+                && (sender !== this.ownHandle)) {
+            if (this.otherParticipants.length === 0) {
+                this.otherParticipants.push(sender);
+            }
+            else {
+                logger.warn('Sender not in current participants: ' + sender);
+
+                return false;
+            }
+        }
 
         var parsedMessage = ns._parseMessageContent(message);
 
@@ -1100,6 +1233,90 @@ var strongvelope = {};
         }
 
         return decryptedMessages;
+    };
+
+
+    /**
+     * Alters the participant list of the chat room.
+     *
+     * @method
+     * @param {Array.<String>} includeParticipants
+     *     Array of new participants' user handles to include to the chat room.
+     * @param {Array.<String>} excludeParticipants
+     *     Array of old participants' user handles to exclude from the chat room.
+     * @param {String} [message]
+     *     Data message to send directly with the member change. If `null`
+     *     or `undefined`, no message payload will be encoded (i. e. it's a
+     *     "blind" management message).
+     * @returns {String|Boolean}
+     *     Message to be sent to the room. `false` if no message is to be
+     *     sent (e.g. on an error).
+     */
+    strongvelope.ProtocolHandler.prototype.alterParticipants = function(
+            includeParticipants, includeParticipants, message) {
+
+        var errorOut = false;
+
+        includeParticipants = includeParticipants || [];
+        excludeParticipants = excludeParticipants || [];
+
+        // General sanity check.
+        if ((includeParticipants.length === 0)
+                && (excludeParticipants.length === 0)) {
+            logger.warn('No participants to include or exclude.');
+            errorOut = true;
+        }
+
+        // Some sanity checking on new participants to include.
+        for (var i = 0; i < includeParticipants.length; i++) {
+            if (this.otherParticipants.indexOf(includeParticipants[i]) >= 0) {
+                logger.warn('User ' + includeParticipants[i] + ' already participating, cannot include.');
+                errorOut = true;
+            }
+            else if (includeParticipants[i] === this.ownHandle) {
+                logger.warn('Cannot include myself to a chat.');
+                errorOut = true;
+            } else {
+                this.includeParticipants.push(includeParticipants[i]);
+            }
+        }
+
+        // Some sanity checking on existing participants to exclude.
+        for (var i = 0; i < excludeParticipants.length; i++) {
+            if (this.otherParticipants.indexOf(excludeParticipants[i]) < 0) {
+                logger.warn('User ' + excludeParticipants[i] + ' not participating, cannot exclude.');
+                errorOut = true;
+            }
+            else if (excludeParticipants[i] === this.ownHandle) {
+                logger.warn('Cannot exclude myself fom a chat.');
+                errorOut = true;
+            } else {
+                this.excludeParticipants.push(excludeParticipants[i]);
+            }
+        }
+
+        if (errorOut) {
+            return false;
+        }
+
+        // Update our sender key.
+        this.updateSenderKey();
+
+        // Assemble main message body and rotate keys if required.
+        var assembledMessage = this._assembleBody(message);
+
+        // Assemble rest of message.
+        var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
+                                           String.fromCharCode(MESSAGE_TYPES.ALTER_MEMBERS))
+                    + assembledMessage.content;
+
+        // Sign message.
+        content = this._signContent(content);
+
+        // Return assembled total message.
+        return String.fromCharCode(PROTOCOL_VERSION) + content;
+
+        return this.encryptTo(message);
     };
 
 }());

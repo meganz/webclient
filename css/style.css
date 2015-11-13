@@ -26741,8 +26741,13 @@ body, body * {
     top: 3px;
 }
 
+.avatar-wrapper div.verified_icon {
+    display: none;
+}
+
 .avatar-wrapper.verified div.verified_icon {
     background-image: url(../images/verified.svg);
+    display: block;
     width: 14px;
     height: 14px;
     position: absolute;

@@ -3403,7 +3403,7 @@ function MegaData()
             }
             if (typeof mDB === 'object' && !pfkey) {
                 if (!u_sharekeys[h]) {
-                    console.error('INVALID OPERATION -- No share key for handle "%s"', h);
+                    console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
                 }
                 else {
                     mDBadd('ok', {
@@ -5607,7 +5607,80 @@ function fm_getcopynodes(cn, t)
     return a;
 }
 
+/**
+ * Create new folder on the cloud
+ * @param {String} toid The handle where the folder will be created.
+ * @param {String|Array} name Either a string with the folder name to create, or an array of them.
+ * @param {Object|MegaPromise} ulparams Either an old-fashion object with a `callback` function or a MegaPromise.
+ * @return {Object} The `ulparams`, whatever it is.
+ */
 function createFolder(toid, name, ulparams) {
+
+    // This will be called when the folder creation succeed, pointing
+    // the caller with the handle of the deeper created folder.
+    var resolve = function(folderHandle) {
+        if (ulparams) {
+            if (ulparams instanceof MegaPromise) {
+                ulparams.resolve(folderHandle);
+            }
+            else {
+                ulparams.callback(ulparams, folderHandle);
+            }
+        }
+        return ulparams;
+    };
+
+    // This will be called when the operation failed.
+    var reject = function(error) {
+        if (ulparams instanceof MegaPromise) {
+            ulparams.reject(error);
+        }
+        else {
+            msgDialog('warninga', l[135], l[47], api_strerror(error));
+        }
+    };
+
+    toid = toid || M.RootID;
+
+    if (Array.isArray(name)) {
+        name = name.map(String.trim).filter(String).slice(0);
+
+        if (!name.length) {
+            name = undefined;
+        }
+        else {
+            // Iterate through the array of folder names, creating one at a time
+            var next = function(target, folderName) {
+                createFolder(target, folderName, new MegaPromise())
+                    .done(function(folderHandle) {
+                        if (!name.length) {
+                            resolve(folderHandle);
+                        }
+                        else {
+                            next(folderHandle, name.shift());
+                        }
+                    })
+                    .fail(function(error) {
+                        reject(error);
+                    });
+            };
+            next(toid, name.shift());
+            return ulparams;
+        }
+    }
+
+    if (!name) {
+        return resolve(toid);
+    }
+
+    if (M.c[toid]) {
+        // Check if a folder with the same name already exists.
+        for (var handle in M.c[toid]) {
+            if (M.d[handle] && M.d[handle].t && M.d[handle].name === name) {
+                return resolve(M.d[handle].h);
+            }
+        }
+    }
 
     var mkat = enc_attr({n: name}, []),
         attr = ab_to_base64(mkat[0]),
@@ -5637,16 +5710,16 @@ function createFolder(toid, name, ulparams) {
                 refreshDialogContent();
                 loadingDialog.hide();
 
-                if (ctx.ulparams) {
-                    ulparams.callback(ctx.ulparams, res.f[0].h);
-                }
+                resolve(res.f[0].h);
             }
             else {
                 loadingDialog.hide();
-                msgDialog('warninga', l[135], l[47], api_strerror(res));
+                reject(res);
             }
         }
     });
+
+    return ulparams;
 }
 
 function getuid(email) {
@@ -6451,20 +6524,7 @@ function fmviewmode(id, e)
 
 function fm_requestfolderid(h, name, ulparams)
 {
-    if (!h)
-        h = M.RootID;
-    if (M.c[h])
-    {
-        for (var n in M.c[h])
-        {
-            if (M.d[n] && M.d[n].t && M.d[n].name == name)
-            {
-                ulparams.callback(ulparams, M.d[n].h);
-                return true;
-            }
-        }
-    }
-    createFolder(h, name, ulparams);
+    return createFolder(h, name, ulparams);
 }
 
 var isNativeObject = function(obj) {

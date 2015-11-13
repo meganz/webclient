@@ -33,6 +33,10 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     if (!doc) {
         doc = document;
     }
+    if (!markup) {
+        console.error('Empty content passed to parseHTML', arguments);
+        markup = 'no content';
+    }
     if (is_chrome_firefox) {
         try {
             var flags = 0;

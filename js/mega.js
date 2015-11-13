@@ -935,7 +935,7 @@ function MegaData()
         function renderLayout(u, n_cache) {
             var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
-                sExportLink, sLinkIcon, takenDown,
+                sExportLink, sLinkIcon, takenDown, takenDownTitle,
                 iShareNum = 0,
                 s, ftype, c, cc, star;
 
@@ -1075,13 +1075,19 @@ function MegaData()
                         ? true : false;
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
-                    takenDown = (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) ? 'taken-down' : '';
+                    takenDown = '';
+                    takenDownTitle = '';
+
+                    if (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) {
+                        takenDown = 'taken-down';
+                        takenDownTitle = (M.v[i].t === 1) ? l[7705] : l[7704];
+                    }
 
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + takenDown +  '">\n\
+                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
@@ -1101,7 +1107,7 @@ function MegaData()
                         }
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '">\n\
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
                                     <td width="30">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
@@ -3299,47 +3305,83 @@ function MegaData()
         }
     };
 
-    this.favourite = function(h_ar, del)
-    {
-        if (del)
-            del = 0;
-        else
-            del = 1;
+    /**
+     * favourite
+     *
+     * Handles item favourite status
+     * @param {Array} nodesId
+     * @param {Boolean} del User action i.e. true - delete from favorites, false - add to favorite
+     */
+    this.favourite = function(nodesId, del) {
 
-        for (var i in h_ar)
-        {
-            if (M.d[h_ar[i]])
-            {
-                var n = M.d[h_ar[i]];
-                if (n && n.ar)
-                {
-                    n.ar.fav = del;
-                    var mkat = enc_attr(n.ar, n.key);
-                    var attr = ab_to_base64(mkat[0]);
-                    var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
-                    M.nodeAttr({h: n.h, fav: del, a: attr});
-                    api_req({a: 'a', n: n.h, attr: attr, key: key, i: requesti});
-                    if (!m)
-                    {
-                        if (del)
-                        {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                            $('#' + n.h + '.file-block .file-status-icon').addClass('star');
-                        }
-                        else
-                        {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                            $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
-                        }
-                    }
-                }
-            }
+        var mkat, attr, key, node, newFavStarState,
+            nodes = nodesId,
+            toRenderMain = false,
+            exportLink = new mega.Share.ExportLink({});
+
+        if (!Array.isArray(nodesId)) {
+            nodes = [nodesId];
         }
+        newFavStarState = (del) ? 0 : 1;
 
-        if (M.sortingBy && (M.sortingBy[0] === 'fav')) {
+        $.each(nodes, function(index, value) {
+            node = M.d[value];
+            if (node && node.ar && (node.fav !== newFavStarState) && !exportLink.isTakenDown(value)) {
+                node.fav = newFavStarState;
+                mkat = enc_attr(node.ar, node.key);
+                attr = ab_to_base64(mkat[0]);
+                key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
+
+                M.nodeAttr({ h: node.h, fav: newFavStarState, a: attr });
+                api_req({ a: 'a', n: node.h, attr: attr, key: key, i: requesti });
+
+                // Add favourite
+                if (!del) {
+                    $('.grid-table.fm #' + node.h + ' .grid-status-icon').addClass('star');
+                    $('#' + node.h + '.file-block .file-status-icon').addClass('star');
+                }
+
+                // Remove from favourites
+                else {
+                    $('.grid-table.fm #' + node.h + ' .grid-status-icon').removeClass('star');
+                    $('#' + node.h + '.file-block .file-status-icon').removeClass('star');
+                }
+
+                toRenderMain = true;
+            }
+        });
+
+        if (toRenderMain && M.sortingBy && (M.sortingBy[0] === 'fav')) {
             M.doSort('fav', M.sortingBy[1]);
             M.renderMain();
         }
+    };
+
+    /**
+     * isFavourite
+     *
+     * Search throught items via nodesId and report about fav attribute
+     * @param {Array} nodesId Array of nodes Id
+     * @returns {Boolean}
+     */
+    this.isFavourite = function(nodesId) {
+
+        var result = false,
+            nodes = nodesId;
+
+        if (!Array.isArray(nodesId)) {
+            nodes = [nodesId];
+        }
+
+        // On first favourite found break the loop
+        $.each(nodes, function(index, value) {
+            if (M.d[value].fav) {
+                result = true;
+                return false;// Break each loop
+            }
+        });
+
+        return result;
     };
 
     this.nodeShare = function(h, s, ignoreDB) {
@@ -3361,7 +3403,7 @@ function MegaData()
             }
             if (typeof mDB === 'object' && !pfkey) {
                 if (!u_sharekeys[h]) {
-                    console.error('INVALID OPERATION -- No share key for handle "%s"', h);
+                    console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
                 }
                 else {
                     mDBadd('ok', {
@@ -5565,7 +5607,80 @@ function fm_getcopynodes(cn, t)
     return a;
 }
 
+/**
+ * Create new folder on the cloud
+ * @param {String} toid The handle where the folder will be created.
+ * @param {String|Array} name Either a string with the folder name to create, or an array of them.
+ * @param {Object|MegaPromise} ulparams Either an old-fashion object with a `callback` function or a MegaPromise.
+ * @return {Object} The `ulparams`, whatever it is.
+ */
 function createFolder(toid, name, ulparams) {
+
+    // This will be called when the folder creation succeed, pointing
+    // the caller with the handle of the deeper created folder.
+    var resolve = function(folderHandle) {
+        if (ulparams) {
+            if (ulparams instanceof MegaPromise) {
+                ulparams.resolve(folderHandle);
+            }
+            else {
+                ulparams.callback(ulparams, folderHandle);
+            }
+        }
+        return ulparams;
+    };
+
+    // This will be called when the operation failed.
+    var reject = function(error) {
+        if (ulparams instanceof MegaPromise) {
+            ulparams.reject(error);
+        }
+        else {
+            msgDialog('warninga', l[135], l[47], api_strerror(error));
+        }
+    };
+
+    toid = toid || M.RootID;
+
+    if (Array.isArray(name)) {
+        name = name.map(String.trim).filter(String).slice(0);
+
+        if (!name.length) {
+            name = undefined;
+        }
+        else {
+            // Iterate through the array of folder names, creating one at a time
+            var next = function(target, folderName) {
+                createFolder(target, folderName, new MegaPromise())
+                    .done(function(folderHandle) {
+                        if (!name.length) {
+                            resolve(folderHandle);
+                        }
+                        else {
+                            next(folderHandle, name.shift());
+                        }
+                    })
+                    .fail(function(error) {
+                        reject(error);
+                    });
+            };
+            next(toid, name.shift());
+            return ulparams;
+        }
+    }
+
+    if (!name) {
+        return resolve(toid);
+    }
+
+    if (M.c[toid]) {
+        // Check if a folder with the same name already exists.
+        for (var handle in M.c[toid]) {
+            if (M.d[handle] && M.d[handle].t && M.d[handle].name === name) {
+                return resolve(M.d[handle].h);
+            }
+        }
+    }
 
     var mkat = enc_attr({n: name}, []),
         attr = ab_to_base64(mkat[0]),
@@ -5595,16 +5710,16 @@ function createFolder(toid, name, ulparams) {
                 refreshDialogContent();
                 loadingDialog.hide();
 
-                if (ctx.ulparams) {
-                    ulparams.callback(ctx.ulparams, res.f[0].h);
-                }
+                resolve(res.f[0].h);
             }
             else {
                 loadingDialog.hide();
-                msgDialog('warninga', l[135], l[47], api_strerror(res));
+                reject(res);
             }
         }
     });
+
+    return ulparams;
 }
 
 function getuid(email) {
@@ -5999,7 +6114,7 @@ function processPH(publicHandles) {
         nodeId = value.h;
         publicHandleId = value.ph;
 
-        // Remove export link, d: 1
+        // Remove export link, down: 1
         if (value.d) {
             M.delNodeShare(nodeId, 'EXP');
             M.deleteExportLinkShare(nodeId);
@@ -6409,20 +6524,7 @@ function fmviewmode(id, e)
 
 function fm_requestfolderid(h, name, ulparams)
 {
-    if (!h)
-        h = M.RootID;
-    if (M.c[h])
-    {
-        for (var n in M.c[h])
-        {
-            if (M.d[n] && M.d[n].t && M.d[n].name == name)
-            {
-                ulparams.callback(ulparams, M.d[n].h);
-                return true;
-            }
-        }
-    }
-    createFolder(h, name, ulparams);
+    return createFolder(h, name, ulparams);
 }
 
 var isNativeObject = function(obj) {
@@ -6979,6 +7081,38 @@ function balance2pro(callback)
         });
     };
 
+    /**
+     * isTakenDown
+     *
+     * Returns true in case that any of checked items is taken down, otherwise false
+     * @param {Array} nodesId Array of strings nodes ids
+     * @returns {Boolean}
+     */
+    ExportLink.prototype.isTakenDown = function(nodesId) {
+
+        var self = this,
+            result = false,
+            nodes = nodesId;
+
+        if (nodesId) {
+            if (!Array.isArray(nodesId)) {
+                nodes = [nodesId];
+            }
+        }
+        else {
+            nodes = self.options.nodesToProcess;
+        }
+
+        $.each(nodes, function(index, value) {
+            if (M.d[value] && M.d[value].shares && M.d[value].shares.EXP && (M.d[value].shares.EXP.down === 1)) {
+                result = true;
+                return false;// Break the loop
+            }
+        });
+
+        return result;
+    };
+
     // export
     scope.mega = scope.mega || {};
     scope.mega.Share = scope.mega.Share || {};
@@ -7013,8 +7147,6 @@ function balance2pro(callback)
      */
     UiExportLink.prototype.addExportLinkIcon = function(nodeId) {
 
-        var self = this;
-
         // Add link-icon to list view
         $('#' + nodeId + ' .own-data').addClass('linked');
 
@@ -7040,8 +7172,6 @@ function balance2pro(callback)
      */
     UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
 
-        var self = this;
-
         // Remove link icon from list view
         $('#' + nodeId + ' .own-data').removeClass('linked');
         $('#' + nodeId + ' .own-data span').removeClass('link-icon');
@@ -7065,13 +7195,11 @@ function balance2pro(callback)
 
         var self = this;
 
-        var hasStar = false;
-
         if (isTakenDown) {
             if (M.d[nodeId].fav === 1) {
 
                 // Remove favourite (star)
-                M.favourite([nodeId], true);
+                M.favourite(nodeId, true);
             }
             self.addTakenDownIcon(nodeId);
         }
@@ -7088,8 +7216,6 @@ function balance2pro(callback)
      */
     UiExportLink.prototype.addTakenDownIcon = function(nodeId) {
 
-        var self = this;
-
         // Add taken-down to list view
         $('.grid-table.fm #' + nodeId).addClass('taken-down');
 
@@ -7098,6 +7224,16 @@ function balance2pro(callback)
 
         // Add taken-down to left panel
         $('#treea_' + nodeId).addClass('taken-down');
+
+        // Add title, mouse popup
+        if (M.d[nodeId].t === 1) {// Item is folder
+            $('.grid-table.fm #' + nodeId).attr('title', l[7705]);
+            $('#' + nodeId + '.file-block').attr('title', l[7705]);
+        }
+        else {// Item is file
+            $('.grid-table.fm #' + nodeId).attr('title', l[7704]);
+            $('#' + nodeId + '.file-block').attr('title', l[7704]);
+        }
     };
 
     /**
@@ -7108,8 +7244,6 @@ function balance2pro(callback)
      */
     UiExportLink.prototype.removeTakenDownIcon = function(nodeId) {
 
-        var self = this;
-
         // Add taken-down to list view
         $('.grid-table.fm #' + nodeId).removeClass('taken-down');
 
@@ -7118,6 +7252,10 @@ function balance2pro(callback)
 
         // Add taken-down to left panel
         $('#treea_' + nodeId).removeClass('taken-down');
+
+        // Remove title, mouse popup
+        $('.grid-table.fm #' + nodeId).attr('title', '');
+        $('#' + nodeId + '.file-block').attr('title', '');
     };
 
     // export

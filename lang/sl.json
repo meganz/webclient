@@ -1236,6 +1236,7 @@
     "2435": "Va\u0161a sinronizacija \"%1\" je bila onemogo\u010dena, ker oddaljena mapa ne obstaja",
     "2436": "Va\u0161a sinhronizacija \"%1\" je bila onemogo\u010dena, ker je oddaljena mapa v ko\u0161u",
     "2438": "Mapa (%1) ni bila nalo\u017eena, ker je prevelika (ta beta je omejena na %2 map ali %3 datotek).",
+    "2439": "%1 map ni bilo nalo\u017eenih, ker so prevelike (ta beta je omejena na %2 map ali %3 datotek).",
     "2440": "Sinhronizacija se bo ustavila.Brisanja, ki se naredijo v \u010dasu, ko ne te\u010de, se ne bodo prenesla naprej.",
     "2443": "Ciljna mapa je sinhronizirana in v njej je \u017ee datoteka z istim imenom (%1).\u010ce nadaljujete nalaganje, bo prej\u0161nja datoteka prepisana.Ali ste prepri\u010dani?",
     "2445": "Glavne mape ni mo\u017eno sinhronizirati. Prosim, izberite podmapo.",
@@ -2761,6 +2762,17 @@
     "7710": "ZAKLJU\u010cI NADGRADNJO",
     "7711": "Izberite drugi paket",
     "7712": "Prosim, prijavite se, da izkoristite svoj kupon.",
-    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7713": "Ta postopek bo pobrisal vse MEGA podatke s predpomnilnika brskljalnika in bo ponovno nalo\u017eil podatke va\u0161ega ra\u010duna z na\u0161ih stre\u017enikov. To lahko traja nekaj minut.",
+    "7714": "Povezava za kori\u0161\u010denje kupona",
+    "7715": "Po\u0161ljite e-po\u0161to za podporo na resellers@mega.nz",
+    "7716": "Na ta naslov ste \u017ee poslali potrditveno povezavo.",
+    "7717": "Za ta e-po\u0161tni naslov ste \u017ee zahtevali potrditveno povezavo.",
+    "7718": "Ta e-po\u0161tni naslov je \u017ee uporabljen. Prosim, kontaktirajte MEGA podporo za ve\u010d informacij.",
+    "7719": "Potrjevalna povezava iz te e-po\u0161te je potekla. Prosim, pritisnite OK za ponovni zagon procesa.",
+    "7720": "Morate biti prijavljeni, da lahko zaklju\u010dite postopek spremembe e-po\u0161te. Prosim, ponovno se prijavite s trenutnim e-po\u0161tnim naslovom in potem ponovno kliknite na potrjevalno povezavo.",
+    "7730": "Preverite svoj e-po\u0161tni ra\u010dun",
+    "7731": "Prosim, vnesite svoje geslo za preverjanje e-po\u0161tnega naslova",
+    "7732": "Potrdite e-po\u0161to",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

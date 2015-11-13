@@ -111,10 +111,6 @@
         "text": "New Folder",
         "context": "Menu option from the `Add` section that allows you to create a \"New Folder\""
     },
-    "70": {
-        "text": "Empty rubbish bin",
-        "context": "Title shown when your Rubbish Bin is empty."
-    },
     "71": {
         "text": "Add contact",
         "context": "Alert title shown when you select to add a contact inserting his\/her email"
@@ -190,10 +186,6 @@
     "99": {
         "text": "File Upload",
         "context": "Button to upload a file."
-    },
-    "100": {
-        "text": "Clear Rubbish Bin",
-        "context": "Button to clear the trash bin"
     },
     "101": {
         "text": "Add Contact",
@@ -3409,7 +3401,7 @@
     },
     "1591": {
         "text": "MEGA folder:",
-        "context": "Label to indicate the user the MEGA folder in which the selected files\/folders will be uploaded (String short as possible)"
+        "context": "Label to indicate the user the MEGA folder for a synchronization (String short as possible)"
     },
     "1592": {
         "text": "Select local folder",
@@ -4237,7 +4229,7 @@
     },
     "1812": {
         "text": "Always upload to this destination",
-        "context": "Label to let the user select a default upload folder with a checkbox."
+        "context": "Label to inform the user upload files\/folder to a default destination. with a checkbox."
     },
     "1813": {
         "text": "MEGA synced folder",
@@ -4873,7 +4865,7 @@
     },
     "2041": {
         "text": "You don't have write permissions in this local folder.",
-        "context": "Message displayed when a user is trying to synchronized a local folder in wich the user has no write permissions."
+        "context": "Message shown when a user is trying to download a file to a local folder without the right permissions."
     },
     "2042": {
         "text": "You don't have write permissions in this folder.",
@@ -4881,11 +4873,11 @@
     },
     "2043": {
         "text": "MEGAsync won't be able to download anything here.",
-        "context": "Message displayed when a user is trying to synchronized a local folder in wich the user has no write permissions."
+        "context": "Label to indicate that MEGAsync won't be able to download anything due to the user doesn't have writhe permissions on the local selected folder."
     },
     "2044": {
         "text": "Do you want to continue?",
-        "context": "Message of confirmation to continue with the current operation."
+        "context": "Label to indicate if the user wants to continue in spite of the problem occured."
     },
     "2045": {
         "text": "Error getting link:",
@@ -5302,10 +5294,6 @@
     "5598": {
         "text": "OUTGOING",
         "context": "Capital letters. Outgoing shared folders. The title of a tab"
-    },
-    "5599": {
-        "text": "Empty Rubbish Bin",
-        "context": "message when there are no files in the Rubbish Bin."
     },
     "5600": {
         "text": "No incoming shared folders",
@@ -7037,7 +7025,7 @@
     },
     "6066": {
         "text": "Logging in...",
-        "context": "Label displayed when the user is logging in."
+        "context": "Notification message showing a Logging in state. Keep capital letters."
     },
     "6067": {
         "text": "Logging out...",
@@ -7634,10 +7622,6 @@
     "6793": {
         "text": "Recover space by emptying the rubbish bin",
         "context": "Explain the user that he can recover space by emptying the Rubbish Bin"
-    },
-    "6794": {
-        "text": "Empty the rubbish bin",
-        "context": "Title of the button to empty the Rubbish Bin (action!)"
     },
     "6795": {
         "text": "Are you sure you want to permanently remove all items from your rubbish bin?\nYou cannot undo this action!",
@@ -9579,10 +9563,6 @@
         "text": "Sort",
         "context": "Label for any 'Sort' button, link, text, etc. - (String as short as possible)."
     },
-    "7332": {
-        "text": "Empty rubbish bin",
-        "context": "Label for any 'Empty rubbish' button, link, text, etc. - (String as short as possible).This indicates an action to clear rubbish bin."
-    },
     "7333": {
         "text": "Ok",
         "context": "Label for any 'Ok' button, link, text, title, etc. - (String as short as possible)."
@@ -11083,6 +11063,42 @@
         "text": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
         "context": "Error message when a user attempts to change their email without an active login session."
     },
+    "7721": {
+        "text": "New in this version:",
+        "context": "Label to indicate new features or fixes for the current MEGAsync version. Please keep the colon."
+    },
+    "7722": {
+        "text": "MEGAsync is in guest mode",
+        "context": "A label to inform the user that MEGAsync is running in guest user mode."
+    },
+    "7723": {
+        "text": "Your download has started",
+        "context": "A notification shown when a web download has commenced."
+    },
+    "7724": {
+        "text": "DEBUG mode disabled",
+        "context": "Notification message shown when the DEBUG mode is disabled."
+    },
+    "7725": {
+        "text": "DEBUG mode enabled. A log is being created in your desktop (MEGAsync.log).",
+        "context": "A notification message which is shown when the DEBUG mode is enabled."
+    },
+    "7726": {
+        "text": "Error: Invalid destination folder. The download has been cancelled.",
+        "context": "A notification message which is shown when an error occurs while downloading a file to an invalid destination folder."
+    },
+    "7727": {
+        "text": "Our SSL key can't be verified. You could be affected by a man-in-the-middle attack or your antivirus software could be intercepting your communications and causing this problem. Please temporarily disable your antivirus software and try again.",
+        "context": "A notification message shown when the SSL checks fail."
+    },
+    "7728": {
+        "text": "No Internet connection",
+        "context": "Tooltip shown when there is not an active Internet connection."
+    },
+    "7729": {
+        "text": "Please enter a valid folder name",
+        "context": "An error message which is shown when a user is trying to create a folder without entering the folder name."
+    },
     "7730": {
         "text": "Verify your email address",
         "context": "Dialog title for verifying the user's email address."
@@ -11095,6 +11111,34 @@
         "text": "Confirm email",
         "context": "Button text for the user to confirm their change of email address."
     },
+    "7733": {
+        "text": "Excluded file and folder names",
+        "context": "A label to indicate the file and folder names excluded from synchronization."
+    },
+    "7734": {
+        "text": "Clear local cache",
+        "context": "The title of a dialog which will clear the local cache for the current user."
+    },
+    "7735": {
+        "text": "Backup versions of previously synced files in your computer will be permanently deleted. Please check your backup folders to see if you need to rescue something before continuing.",
+        "context": "A message shown to inform the user about what will happen if they delete their local cache."
+    },
+    "7736": {
+        "text": "Do you want to delete your local cache now?",
+        "context": "A confirmation message which is shown before performing a deletion of local cache data."
+    },
+    "7737": {
+        "text": "Clear remote cache",
+        "context": "The title of a dialog to clear the remote cache for the current user."
+    },
+    "7738": {
+        "text": "Backup versions of previously synced files in MEGA will be permanently deleted. Please, check your [A] folder in the Rubbish Bin of your MEGA account to see if you need to rescue something before continuing.",
+        "context": "Message shown to the user about what will happen if they delete their remote cache."
+    },
+    "7739": {
+        "text": "Do you want to delete your remote cache now?",
+        "context": "A confirmation message which is shown before performing a deletion of remotely cache data."
+    },
     "7740": {
         "text": "The rubbish bin is empty",
         "context": "Text underneath the large icon on the Rubbish Bin page. This lets the user know there are no files currently in their recycle bin."
@@ -11102,5 +11146,9 @@
     "7741": {
         "text": "Clear the rubbish bin",
         "context": "Button text on the Rubbish Bin page. This button will empty all files and folders currently stored in the rubbish bin."
+    },
+    "7742": {
+        "text": "Are you sure you want to delete \"%1\"?",
+        "context": "Confirm with the users if they are sure they want to delete the item. Please keep \"%1\" in translation."
     }
 }

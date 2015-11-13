@@ -180,6 +180,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.$msgsHistoryLoading = null;
     self._unreadCountCache = 0;
 
+    self.haveMessages = false;
+
     self.logger = MegaLogger.getLogger("messagesBuff[" + chatRoom.roomJid.split("@")[0] + "]", {}, chatRoom.logger);
 
     manualTrackChangesOnStructure(self, true);
@@ -220,6 +222,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
+            self.haveMessages = true;
 
             if (self.$msgsHistoryLoading && self.$msgsHistoryLoading.state() === 'pending') {
                 self.$msgsHistoryLoading.resolve();
@@ -246,6 +249,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.firstMessageId = eventData.oldest;
             self.lastMessageId = eventData.newest;
+            self.haveMessages = true;
             self.trackDataChange();
         }
     });
@@ -263,6 +267,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
+            self.haveMessages = true;
+
             var msgObject = new Message(chatRoom,
                 self,
                 {
@@ -315,6 +321,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageCheck.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
+
+        self.haveMessages = true;
+
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.retrieveChatHistory(true);
         }
@@ -327,6 +336,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return; // ignore event
         }
         if (eventData.state === "CONFIRMED") {
+            self.haveMessages = true;
+
             if (!eventData.id) {
                 debugger;
             }

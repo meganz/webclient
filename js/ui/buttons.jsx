@@ -11,17 +11,17 @@ var Button = React.createClass({
         return {'focused': false};
     },
     componentWillUpdate: function(nextProps, nextState) {
-        if(nextProps.disabled === true && nextState.focused === true) {
+        if (nextProps.disabled === true && nextState.focused === true) {
             nextState.focused = false;
         }
 
-        if(this.state.focused != nextState.focused && nextState.focused === true) {
+        if (this.state.focused != nextState.focused && nextState.focused === true) {
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
             document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
             // change the focused state to any other buttons in this group
-            if(this.props.group) {
-                if(_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
+            if (this.props.group) {
+                if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
                     _buttonGroups[this.props.group].setState({focused: false});
                 }
                 _buttonGroups[this.props.group] = this;
@@ -29,7 +29,7 @@ var Button = React.createClass({
         }
 
         // deactivate group if focused => false and i'm the currently "focused" in the group
-        if(this.props.group && nextState.focused === false &&  _buttonGroups[this.props.group] == this) {
+        if (this.props.group && nextState.focused === false &&  _buttonGroups[this.props.group] == this) {
             _buttonGroups[this.props.group] = null;
         }
     },
@@ -41,88 +41,66 @@ var Button = React.createClass({
         }.bind(this))
     },
     onBlur: function(e) {
-        if(!e || $(e.target).parents(".button-container").size() === 0) {
+        var $element = $(this.getDOMNode());
+
+        if(
+            (!e || !$(e.target).parents(".button").is($element))
+        ) {
             this.setState({focused: false});
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         }
+
+
     },
     onClick: function(e) {
-        if(this.props.disabled === true) {
+        if (this.props.disabled === true) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
+        
+        if ($(e.target).is("input,textarea,select")) {
+            return
+        }
 
-        if(this.state.focused === false) {
+        if (this.state.focused === false) {
             if (this.props.onClick) {
                 this.props.onClick(this);
-            } else if (React.Children.count(this.props.children) > 0) { // does it contain some kind of a popup/container?
+            }
+            else if (React.Children.count(this.props.children) > 0) { // does it contain some kind of a popup/container?
                 this.setState({'focused': true});
             }
-        } else if(this.state.focused === true) {
-            this.onBlur();
+        }
+        else if (this.state.focused === true) {
+            this.setState({focused: false});
+            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         }
     },
     render: function () {
-        var classes = this.props.className ? this.props.className : "chat-button fm-start-video-call";
+        var classes = this.props.className ? "button " + this.props.className : "button";
 
-        if(this.props.disabled === true) {
+        if (this.props.disabled === true) {
             classes += " disabled";
-        } else if(this.state.focused) {
+        }
+        else if (this.state.focused) {
             classes += " active";
         }
 
+        var label;
+        if (this.props.label) {
+            label = this.props.label;
+        }
+
+        var icon;
+        if (this.props.icon) {
+            icon = <i className={"small-icon " + this.props.icon}></i>
+        }
 
         return (
-            <div className="button-container">
-                <div className={classes} onClick={this.onClick}>
-                    <span className={this.props.spanClass ? this.props.spanClass : "fm-chatbutton-arrow" }>{this.props.label}</span>
-                </div>
+            <div className={classes} onClick={this.onClick}>
+                {icon}
+                {label}
                 {this.renderChildren()}
-            </div>
-        );
-    }
-});
-
-var ButtonPopup = React.createClass({
-    mixins: [MegaRenderMixin],
-    render: function() {
-        var classes="fm-call-dialog";
-
-        if(this.props.active !== true) {
-            classes += " hidden";
-        }
-
-        var styles;
-
-        // calculate and move the popup arrow to the correct position.
-        if(this.isMounted() && this.getOwnerElement()) {
-            var parentDomNode = this.getOwnerElement().getDOMNode();
-            var $button = $(parentDomNode).children(1);
-            var $buttonContainer = $(parentDomNode).children(0);
-            var parentWidth = $buttonContainer.outerWidth();
-            var parentPos = $button.offset().left;
-
-            var bottomOffset = 4;
-            var rightPos = ($(window).outerWidth() - parentPos - (parentWidth*0.5));
-            var topPos = $button.offset().top + $button.outerHeight() - bottomOffset;
-
-            styles = {
-                'right': rightPos,
-                'zIndex': 110,
-                'position': 'fixed',
-                'top': topPos
-            };
-        }
-
-        return (
-            <div className={classes}>
-                <div className="fm-call-dialog-arrow"  style={styles}></div>
-                <div className="fm-call-dialog-scroll">
-                    <utils.JScrollPane {...this.props}>
-                        {this.props.children}
-                    </utils.JScrollPane>
-                </div>
             </div>
         );
     }
@@ -130,6 +108,5 @@ var ButtonPopup = React.createClass({
 
 
 module.exports = {
-    ButtonPopup,
     Button
 };

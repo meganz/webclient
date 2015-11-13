@@ -2792,6 +2792,10 @@ makeMetaAware(Karere);
             self.logger.warn("Not connected");
         }
     };
+
+    Karere.prototype.getMyPresence = function() {
+        return this._myPresence;
+    };
 }
 
 /**

@@ -1,6 +1,8 @@
 // Karma configuration.
 
 module.exports = function(config) {
+
+  var specific_tests = process.env.SPECIFIC_TEST ? process.env.SPECIFIC_TEST : {pattern: 'test/**/*_test.js', included: true};
   config.set({
     // Base path, that will be used to resolve files and exclude.
     basePath: '',
@@ -41,6 +43,7 @@ module.exports = function(config) {
         'js/vendor/ion.sound.js',
         'js/vendor/favico.js',
         'js/vendor/notification.js',
+        'js/vendor/moment.min.js',
         // Chat libraries.
         'js/chat/mpenc.js',
         'js/vendor/chat/strophe.light.js',
@@ -147,8 +150,7 @@ module.exports = function(config) {
         (process.env.SKIP_WORKFLOWS)
             ? 'test/config/test_workflows_off.js'
             : 'test/config/test_workflows.js',
-        {pattern: 'test/**/*_test.js', included: true}
-        //'test/chat/messages_test.js'
+        specific_tests
     ],
 
     // List of files to exclude.

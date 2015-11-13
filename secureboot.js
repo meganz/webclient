@@ -1216,6 +1216,7 @@ else if (!b_u)
 
     // Other
     jsl.push({f:'js/vendor/Autolinker.js', n: 'autolinker_js', j:1,w:1});
+    jsl.push({f:'js/vendor/moment.min.js', n: 'moment_js', j:1,w:1});
 
     // Google Import Contacts
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});

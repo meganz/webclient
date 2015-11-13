@@ -750,6 +750,53 @@ function time2last(timestamp) {
     }
 }
 
+/**
+ * Basic calendar math function (using moment.js) that will return a string, depending on the exact calendar
+ * dates/months ago when the passed `dateString` had happened.
+ *
+ * @param dateString {String|int}
+ * @param [refDate] {String|int}
+ * @returns {String}
+ */
+var time2lastSeparator = function(dateString, refDate) {
+    var momentDate = moment(dateString);
+    var today = moment(refDate ? refDate : undefined).startOf('day');
+    var yesterday = today.clone().subtract(1, 'days');
+    var weekAgo = today.clone().startOf('week').endOf('day');
+    var twoWeeksAgo = today.clone().startOf('week').subtract(1, 'weeks').endOf('day');
+    var thisMonth = today.clone().startOf('month').startOf('day');
+    var thisYearAgo = today.clone().startOf('year');
+
+    if (momentDate.isSame(today, 'd')) {
+        // Today
+        return l[1301];
+    }
+    else if(momentDate.isSame(yesterday, 'd')) {
+        // Yesterday
+        return l[1302];
+    }
+    else if(momentDate.isAfter(weekAgo)) {
+        // This week
+        return l[1303];
+    }
+    else if(momentDate.isAfter(twoWeeksAgo)) {
+        // Last week
+        return l[1304];
+    }
+    else if(momentDate.isAfter(thisMonth)) {
+        // This month
+        return l[1305];
+    }
+    else if(momentDate.isAfter(thisYearAgo)) {
+        // This year
+        return l[1306];
+    }
+    else {
+        // more then 1 year ago...
+        return l[1307];
+    }
+};
+
 function unixtime() {
     return (new Date().getTime() / 1000);
 }

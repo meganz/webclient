@@ -23,6 +23,9 @@
 .chat-right-pad {
 	padding: 22px;
 }
+.chat-right-pad .dropdown .dropdown-white-arrow {
+	margin-left: -108px;
+}
 .chat-right-area.conversation-details-scroll {
 	height: 100%;
     height: -webkit-calc(100% - 98px);
@@ -61,10 +64,6 @@
 }
 .chat-right-area .dropdown-item i {
     margin: 0 6px 1px 1px;
-}
-.chat-right-area .dropdown-white-arrow {
-	left:7px;
-	margin-left: 0;
 }
 .date-time {
 	font-size: 12px;

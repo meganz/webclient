@@ -4,6 +4,7 @@ var utils = require('./../../ui/utils.jsx');
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
 var ButtonsUI = require('./../../ui/buttons.jsx');
+var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationsUI = require('./../ui/conversations.jsx');
 
@@ -71,6 +72,7 @@ var ConversationMessage = React.createClass({
         var buttons = [];
         var contact;
         var timestamp;
+        var timestampInt;
         var textMessage;
         var authorTextDiv="";
         var messageLabel="";
@@ -90,16 +92,16 @@ var ConversationMessage = React.createClass({
         }
 
         if (message.getDelay) {
-            timestamp = message.getDelay()
+            timestampInt = message.getDelay()
         }
         else if (message.delay) {
-            timestamp = message.delay;
+            timestampInt = message.delay;
         }
         else {
-            timestamp = unixtime();
+            timestampInt = unixtime();
         }
 
-        timestamp = unixtimeToTimeString(timestamp);
+        timestamp = unixtimeToTimeString(timestampInt);
 
         // if this is a text msg.
         if (
@@ -186,7 +188,7 @@ var ConversationMessage = React.createClass({
                     <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar" />
                     <div className="message content-area">
                         <div className="message user-card-name">{displayName}</div>
-                        <div className="message date-time">{timestamp}</div>
+                        <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
 
                         <div className="default-white-button tiny-button">
                             <i className="tiny-icon grey-down-arrow"></i>
@@ -217,7 +219,7 @@ var ConversationMessage = React.createClass({
                 }
                 textMessage = tmpMsg;
                 textMessage = textMessage
-                    .replace("[[ ", "<span class=\"grey-color\">")
+                    .replace("[[ ", "<span className=\"grey-color\">")
                     .replace("]]", "</span>");
             } else {
                 textMessage = textMessage.replace("[X]", htmlentities(generateContactName(contact.u)));
@@ -360,14 +362,49 @@ var ConversationRightArea = React.createClass({
                             <i className="small-icon video-call"></i>
                             {__("Start Video Call")}
                         </div>
-                        <div className="link-button">
-                            <i className="small-icon rounded-grey-plus"></i>
-                            {__("Add participant…")}
-                        </div>
-                        <div className="link-button">
-                            <i className="small-icon rounded-grey-up-arrow"></i>
-                            {__("Send Files…")}
-                        </div>
+
+                        <ButtonsUI.Button
+                            className="link-button dropdown-element"
+                            icon="rounded-grey-plus"
+                            label={__("Add participant…")}
+                            contacts={this.props.contacts}
+                            >
+                            <DropdownsUI.DropdownContactsSelector
+                                styles={{
+                                    marginLeft: -12,
+                                    width: 252
+                                }}
+                                contacts={this.props.contacts}
+                                megaChat={this.props.megaChat}
+                                className="add-participant-selector"
+                                onClick={() => {}}
+                                />
+                        </ButtonsUI.Button>
+
+                        <ButtonsUI.Button
+                            className="link-button dropdown-element"
+                            icon="rounded-grey-up-arrow"
+                            label={__("Send Files…")}
+                            >
+                            <DropdownsUI.Dropdown
+                                styles={{
+                                    marginLeft: -12,
+                                    width: 252
+                                }}
+                                contacts={this.props.contacts}
+                                megaChat={this.props.megaChat}
+                                className="add-participant-selector"
+                                onClick={() => {}}
+                            >
+                                <DropdownsUI.DropdownItem icon="grey-cloud" label="From my Cloud Drive" onClick={() => {
+                                    console.error("TBD!");
+                                }} />
+                                <DropdownsUI.DropdownItem icon="grey-computer" label="From my Computer" onClick={() => {
+                                    console.error("TBD!");
+                                }} />
+                            </DropdownsUI.Dropdown>
+                        </ButtonsUI.Button>
+
                         <div className="link-button">
                             <i className="small-icon shared-grey-folder"></i>
                             {__("Share Folders")}
@@ -763,7 +800,6 @@ var ConversationPanel = React.createClass({
                 var prevPosY = (
                         $jsp.getContentHeight() - self.lastScrollHeight
                     ) + self.lastScrollPosition;
-                console.error("onMessagesHistoryDone scroll prevposY", prevPosY);
 
                 $jsp.scrollToY(
                     prevPosY
@@ -935,6 +971,7 @@ var ConversationPanel = React.createClass({
         );
         if (scrollBlockHeight != self.$messages.outerHeight()) {
             self.$messages.css('height', scrollBlockHeight);
+            $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
             self.refreshUI(true);
         } else {
             self.refreshUI(scrollToBottom);
@@ -1038,13 +1075,53 @@ var ConversationPanel = React.createClass({
         }
         var messagesList = [];
 
+        var lastTimeMarker;
         self.props.messagesBuff.messages.forEach(function(v, k) {
             if (v.deleted !== 1 && !v.protocol) {
+                var curTimeMarker = time2lastSeparator((new Date(v.delay * 1000).toISOString()));
+
+                if(curTimeMarker && lastTimeMarker !== curTimeMarker) {
+                    lastTimeMarker = curTimeMarker;
+                    messagesList.push(
+                        <div className="message date-divider" key={v.messageId + "_marker"}>{curTimeMarker}</div>
+                    );
+                }
+
                 messagesList.push(
                     <ConversationMessage message={v} chatRoom={room} key={v.messageId} />
                 );
             }
         });
+
+
+        if (messagesList.length === 0) {
+            var avatarMeta = generateAvatarMeta(contact.u);
+            var contactName = avatarMeta.fullName;
+
+            if (self.props.messagesBuff.haveMessages === true &&
+                self.props.messagesBuff.messagesHistoryIsLoading() === true
+            ) {
+                messagesList = <div className="messages notification">
+                    <div className="header">
+                        Chat history with <span>{contactName}</span> is now loading...
+                    </div>
+                    <div className="info">
+                        Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
+                    </div>
+                </div>;
+            }
+            else {
+
+                messagesList = <div className="messages notification">
+                    <div className="header">
+                        No chat history with <span>{contactName}</span>
+                    </div>
+                    <div className="info">
+                        Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
+                    </div>
+                </div>;
+            }
+        }
 
         /**
          * Audio/video UI handling
@@ -1162,21 +1239,38 @@ var ConversationPanel = React.createClass({
         }
 
         if (self.state.currentlyTyping.length > 0) {
-            typingElement = <div className="fm-chat-messages-block typing" key="typingElement">
-                <div className="fm-chat-messages-pad">
-                    <span>
-                        {self.state.currentlyTyping.map((u_h) => {
-                            return <ContactsUI.Avatar key={u_h} contact={M.u[u_h]} />
-                        })}
-                    </span>
-                    <div className="fm-chat-message">
-                        <div className="circle" id="circleG">
-                            <div id="circleG_1" className="circleG"></div>
-                            <div id="circleG_2" className="circleG"></div>
-                            <div id="circleG_3" className="circleG"></div>
-                        </div>
-                    </div>
-                    <div className="clear"></div>
+            var names = self.state.currentlyTyping.map((u_h) => {
+                var avatarMeta = generateAvatarMeta(u_h);
+                return avatarMeta.fullName.split(" ")[0];
+            });
+
+            var namesDisplay = "";
+            var areMultipleUsersTyping = false;
+
+            if (names.length > 1) {
+                areMultipleUsersTyping = true;
+                namesDisplay = [names.splice(0, names.length - 1).join(", "), names[0]];
+            } else {
+                areMultipleUsersTyping = false;
+                namesDisplay = [names[0]];
+            }
+
+            var msg;
+            if (areMultipleUsersTyping === true) {
+                msg = __("%s and %s are typing")
+                    .replace("%s", namesDisplay[0])
+                    .replace("%s", namesDisplay[1]);
+            }
+            else {
+                msg = __("%s is typing").replace("%s", namesDisplay[0]);
+            }
+
+            typingElement = <div className="typing-block">
+                <div className="typing-text">{msg}</div>
+                <div className="typing-bounce">
+                    <div className="typing-bounce1"></div>
+                    <div className="typing-bounce2"></div>
+                    <div className="typing-bounce3"></div>
                 </div>
             </div>;
         } else {
@@ -1185,7 +1279,11 @@ var ConversationPanel = React.createClass({
 
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove} data-room-jid={self.props.chatRoom.roomJid.split("@")[0]}>
-                <ConversationRightArea chatRoom={this.props.chatRoom} />
+                <ConversationRightArea
+                    chatRoom={this.props.chatRoom}
+                    contacts={self.props.contacts}
+                    megaChat={this.props.chatRoom.megaChat}
+                    />
 
                 <div className="chat-content-block">
                     <div className="messages-block">
@@ -1251,16 +1349,20 @@ var ConversationPanels = React.createClass({
         self.props.conversations.forEach(function(chatRoom) {
             var contact = megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
 
-            conversations.push(
-                <ConversationPanel
-                    chatRoom={chatRoom}
-                    contacts={M.u}
-                    contact={contact}
-                    messagesBuff={chatRoom.messagesBuff}
-                    key={chatRoom.roomJid}
-                    chat={self.props.megaChat}
-                    />
-            );
+            // XX: Performance trick. However, scroll positions are NOT retained properly when switching conversations,
+            // so this should be done some day in the future, after we have more stable product.
+            // if (chatRoom.isCurrentlyActive) {
+                conversations.push(
+                    <ConversationPanel
+                        chatRoom={chatRoom}
+                        contacts={M.u}
+                        contact={contact}
+                        messagesBuff={chatRoom.messagesBuff}
+                        key={chatRoom.roomJid}
+                        chat={self.props.megaChat}
+                        />
+                );
+            // }
         });
 
         return (

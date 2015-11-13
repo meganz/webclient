@@ -7,6 +7,7 @@ var utils = require('./../../ui/utils.jsx');
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
 var ButtonsUI = require('./../../ui/buttons.jsx');
+var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 
@@ -145,6 +146,8 @@ var ConversationsList = React.createClass({
         this.handleWindowResize();
     },
     render: function() {
+        var self = this;
+
         var currentCallingContactStatusProps = {
             'className': "nw-conversations-item current-calling",
             'data-jid': ''
@@ -203,7 +206,9 @@ var ConversationsList = React.createClass({
             }
 
             currConvsList.push(
-                <ConversationsListItem key={k} chatRoom={chatRoom} megaChat={megaChat} onConversationClicked={this.conversationClicked.bind(this, chatRoom)} />
+                <ConversationsListItem key={k} chatRoom={chatRoom} megaChat={megaChat} onConversationClicked={(e) => {
+                    self.conversationClicked(chatRoom, e);
+                }} />
             );
         });
 
@@ -307,8 +312,12 @@ var ConversationsMainListing =  React.createClass({
 
             if(presence !== undefined && presence != "offline") {
                 startCallButtons = [
-                    <div key="startCallVideo" className="conversations-icon video" onClick={this.videoClicked.bind(this, room)}></div>,
-                    <div key="startCallAudio" className="conversations-icon audio" onClick={this.audioClicked.bind(this, room)}></div>
+                    <div key="startCallVideo" className="conversations-icon video" onClick={(e) => {
+                        self.videoClicked(room, e)
+                    }}></div>,
+                    <div key="startCallAudio" className="conversations-icon audio" onClick={(e) => {
+                        self.audioClicked(room, e)
+                    }}></div>
                 ];
             }
 
@@ -351,7 +360,9 @@ var ConversationsMainListing =  React.createClass({
             conversations.push(
                 <div className="conversations-block" key={roomJid}>
                     <div className="conversations-border">
-                        <div className="conversations-pad" onClick={this.dblClicked.bind(this, room)}>
+                        <div className="conversations-pad" onClick={(e) => {
+                            self.dblClicked(room, e);
+                        }}>
                             {startCallButtons}
 
                             <ContactsUI.Avatar contact={contact} />
@@ -430,47 +441,10 @@ var ConversationsMainListing =  React.createClass({
 
 var ConversationsApp = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
-    startCallClicked: function(contact, e) {
+    startChatClicked: function(contact, e) {
         e.preventDefault();
         window.location = "#fm/chat/" + contact.u;
         var room = this.props.megaChat.createAndShowPrivateRoomFor(contact.u);
-        if(room) {
-            room.startAudioCall();
-        }
-    },
-    startVideoCallClicked: function(contact, e) {
-        e.preventDefault();
-        window.location = "#fm/chat/" + contact.u;
-        var room = this.props.megaChat.createAndShowPrivateRoomFor(contact.u);
-        if(room) {
-            room.startVideoCall();
-        }
-    },
-    renderOnlineContactsPopup: function(callback) {
-        var self = this;
-        var result = [];
-        self.props.contacts.forEach(function(v, k) {
-            var pres = self.props.megaChat.karere.getPresence(
-                self.props.megaChat.getJidFromNodeId(v.u)
-            );
-
-            if(v.c == 0 || v.u == u_handle || !pres || pres === 'offline') {
-                return;
-            }
-
-            result.push(
-                <div className="fm-call-dialog-item" onClick={callback.bind(self, v)} key={v.u}>
-                    <ContactsUI.Avatar contact={v} />
-
-                    <div className="fm-chat-user-info">
-                        <div className="fm-chat-user">{v.name ? v.name : v.m}</div>
-                        <div className="contact-email">{v.name ? "" : v.m}</div>
-                    </div>
-                </div>
-            );
-        });
-
-        return result;
     },
     componentDidMount: function() {
         window.addEventListener('resize', this.handleWindowResize);
@@ -495,10 +469,10 @@ var ConversationsApp = React.createClass({
 
         //console.error("ConversationsApp render");
 
-        var onlineContactsAudioCall = self.renderOnlineContactsPopup(self.startCallClicked);
-        var onlineContactsVideoCall = self.renderOnlineContactsPopup(self.startVideoCallClicked);
+        var presence = self.props.megaChat.karere.getMyPresence();
 
-        var callButtonsAreDisabled = onlineContactsAudioCall.length === 0 || onlineContactsVideoCall.length === 0;
+        var startChatIsDisabled = !presence || presence === "offline";
+
 
         return (
             <div className="conversationsApp" key="conversationsApp">
@@ -508,7 +482,19 @@ var ConversationsApp = React.createClass({
                     <div className="fm-left-menu conversations">
                         <div className="nw-fm-tree-header conversations">
                             <span>{__("Chat")}</span>
-                            <div className="button"><i className="small-icon white-medium-plus"></i></div>
+
+                            <ButtonsUI.Button
+                                group="conversationsListing"
+                                icon="white-medium-plus"
+                                disabled={startChatIsDisabled}
+                                contacts={this.props.contacts}
+                                >
+                                <DropdownsUI.DropdownContactsSelector
+                                    contacts={this.props.contacts}
+                                    megaChat={this.props.megaChat}
+                                    onClick={this.startChatClicked}
+                                    />
+                            </ButtonsUI.Button>
                         </div>
                     </div>
 
@@ -521,31 +507,6 @@ var ConversationsApp = React.createClass({
                 </div>
                 <div className="fm-right-files-block">
                     <div className="fm-right-header fm hidden">
-
-                        <ButtonsUI.Button
-                            group="conversationsListing"
-                            label={__('Start video call ...')}
-                            className="chat-button fm-start-video-call"
-                            disabled={callButtonsAreDisabled}
-                            contacts={this.props.contacts}
-                        >
-                            <ButtonsUI.ButtonPopup contacts={this.props.contacts}>
-                                {onlineContactsVideoCall}
-                            </ButtonsUI.ButtonPopup>
-                        </ButtonsUI.Button>
-
-                        <ButtonsUI.Button
-                            group="conversationsListing"
-                            label={__('Start call ...')}
-                            className="chat-button fm-start-call"
-                            disabled={callButtonsAreDisabled}
-                        >
-                            <ButtonsUI.ButtonPopup contacts={this.props.contacts}>
-                                {onlineContactsAudioCall}
-                            </ButtonsUI.ButtonPopup>
-                        </ButtonsUI.Button>
-
-
                     </div>
 
 

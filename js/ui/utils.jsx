@@ -20,7 +20,9 @@ var JScrollPane = React.createClass({
         var $jspPaneReact = $elem.find('.jspPane');
 
         $elem.find('.jspContainer').replaceWith(
-            $elem.find('.jspPane').children()
+            function() {
+                return $elem.find('.jspPane').children();
+            }
         );
 
         var options = $.extend({}, {
@@ -34,8 +36,8 @@ var JScrollPane = React.createClass({
 
         $elem.jScrollPane(options);
 
-        $elem.find('.jspContainer').attr('data-reactid', $jspContainerReact.data('reactid'));
-        $elem.find('.jspPane').attr('data-reactid', $jspPaneReact.data('reactid'));
+        //$elem.find('.jspContainer').attr('data-reactid', $jspContainerReact.data('reactid'));
+        //$elem.find('.jspPane').attr('data-reactid', $jspPaneReact.data('reactid'));
 
 
         window.addEventListener('resize', this.onResize);
@@ -74,7 +76,7 @@ var JScrollPane = React.createClass({
     render: function () {
 
         return (
-            <div className={this.props.classNames + " jScrollPaneContainer"} {...this.props} onResize={this.onResize}>
+            <div className={this.props.className + " jScrollPaneContainer"} {...this.props} onResize={this.onResize}>
                 <div className="jspContainer">
                     <div className="jspPane">
                         {this.props.children}

@@ -68,7 +68,7 @@ var useravatar = (function() {
         var letters = "";
         var color   = 1;
         if (word && word !== u_handle) {
-            letters = $.trim(word)[0];
+            letters = $.trim(word).toUpperCase()[0];
             color   = letters.charCodeAt(0) % _colors.length;
         }
         return {letters: letters, color: _colors[color], colorIndex: color + 1 };

@@ -3805,7 +3805,7 @@ if (typeof sjcl !== 'undefined') {
         // Loop through all selected items
         $.each(nodes, function(index, value) {
             node = M.d[value];
-            if (node.ph && node.shares && node.shares.EXP) {
+            if (node.shares && node.shares.EXP) {
                 result = true;
                 return false;// Stop further $.each loop execution
 

@@ -910,7 +910,8 @@ var strongvelope = {};
 
         // Assemble the key ID(s) to be sent.
         var keyIdContent = this.keyId;
-        if (this.previousKeyId) {
+        if (this.previousKeyId && (this._sentKeyId !== this.keyId)) {
+            // Also add previous key ID on key rotation.
             keyIdContent += this.previousKeyId;
         }
         keyIds = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
@@ -925,8 +926,8 @@ var strongvelope = {};
             recipients += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
                                                base64urldecode(destination));
             keysIncluded = [senderKey];
-            if (this.previousKeyId) {
-                // Also add previous key.
+            if (this.previousKeyId && (this._sentKeyId !== this.keyId)) {
+                // Also add previous key on key rotation.
                 keysIncluded.push(this.participantKeys[this.ownHandle][this.previousKeyId]);
             }
             encryptedKeys = this._encryptKeysFor(keysIncluded, nonce, destination);
@@ -966,6 +967,7 @@ var strongvelope = {};
         if (repeatKey || (this._sentKeyId !== this.keyId)) {
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
+
         var messageType = encryptedKeys
                         ? MESSAGE_TYPES.GROUP_KEYED
                         : MESSAGE_TYPES.GROUP_FOLLOWUP;
@@ -1253,7 +1255,7 @@ var strongvelope = {};
      *     sent (e.g. on an error).
      */
     strongvelope.ProtocolHandler.prototype.alterParticipants = function(
-            includeParticipants, includeParticipants, message) {
+            includeParticipants, excludeParticipants, message) {
 
         var errorOut = false;
 
@@ -1305,7 +1307,7 @@ var strongvelope = {};
         // Assemble main message body and rotate keys if required.
         var assembledMessage = this._assembleBody(message);
 
-        // Assemble rest of message.
+        // Add correct message type to front.
         var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
                                            String.fromCharCode(MESSAGE_TYPES.ALTER_MEMBERS))
                     + assembledMessage.content;
@@ -1315,8 +1317,6 @@ var strongvelope = {};
 
         // Return assembled total message.
         return String.fromCharCode(PROTOCOL_VERSION) + content;
-
-        return this.encryptTo(message);
     };
 
 }());

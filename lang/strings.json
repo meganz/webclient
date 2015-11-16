@@ -11150,5 +11150,25 @@
     "7742": {
         "text": "Are you sure you want to delete \"%1\"?",
         "context": "Confirm with the users if they are sure they want to delete the item. Please keep \"%1\" in translation."
+    },
+    "7743": {
+        "text": "Change Email",
+        "context": "A heading for the account profile section where the user can change their email address."
+    },
+    "7744": {
+        "text": "Current Email",
+        "context": "A label in the account profile section which shows the user's current email address."
+    },
+    "7745": {
+        "text": "New Email",
+        "context": "A label for a text field in the account profile section which will let the user enter a new email address."
+    },
+    "7746": {
+        "text": "Enter your new email address in the text field above and click Save.",
+        "context": "An instruction in the account profile section to tell the user to enter their email address and click the save button."
+    },
+    "7747": {
+        "text": "After clicking Save, click the link in your email inbox to confirm this change.",
+        "context": "An instruction in the account profile section to tell the user to check for a confirmation link in their email inbox to complete the process of changing their email address."
     }
 }

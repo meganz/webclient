@@ -3636,10 +3636,11 @@ function accountUI()
                 $('#account-confirm-password,#account-password,#account-new-password').val('');
             }
 
+            // Get the new email address
             var email = $('#account-email').val().trim().toLowerCase();
             
-            // If they changed the email to something different
-            if (u_attr.email !== email) {
+            // If there is text in the email field and it doesn't match the existing one
+            if ((email !== '') && (u_attr.email !== email)) {
                 
                 loadingDialog.show();
                 
@@ -3659,6 +3660,7 @@ function accountUI()
                         
                         $('.awaiting-confirmation').removeClass('hidden');
                         $('.fm-account-save-block').addClass('hidden');
+                        
                         localStorage.new_email = email;
                     }
                 });

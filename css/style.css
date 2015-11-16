@@ -25150,6 +25150,7 @@ a.ui-datepicker-next {
 }
 .profile-form.change-email-section {
     margin-bottom: 95px;
+    padding-top: 0;
 }
 /* Small font-size settings option */
 .fontsize1 .nw-fm-tree-header input {

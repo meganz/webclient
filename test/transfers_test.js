@@ -17,7 +17,6 @@ describe("Transfers Unit Test", function() {
     var sandbox = null;
 
     var fsTested = false;
-    var fsSupported = false;
     beforeEach(function(done) {
         localStorage.clear();
         sandbox = sinon.sandbox.create();
@@ -25,7 +24,7 @@ describe("Transfers Unit Test", function() {
             fsTested = true;
             window.requestFileSystem(0, 0x10000,
                 function() {
-                    fsSupported = true;
+                    ioTests[1].supported = true;
                     done();
                 },
                 function(e) {
@@ -55,7 +54,7 @@ describe("Transfers Unit Test", function() {
         },
         {
             method: 'FileSystemAPI',
-            supported: fsSupported
+            supported: false // see beforeEach()
         },
         {
             method: 'CacheIO',

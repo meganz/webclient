@@ -54,7 +54,7 @@ var useravatar = (function() {
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
 
-        tpl = window.btoa(unescape(tpl.html()));
+        tpl = window.btoa(unescape(encodeURIComponent(tpl.html())));
         return 'data:image/svg+xml;base64,' + tpl;
     };
 
@@ -68,9 +68,7 @@ var useravatar = (function() {
         var letters = "";
         var color   = 1;
         if (word && word !== u_handle) {
-            // Word is indeed not empty nor our user ID.
-            var words = $.trim(word).toUpperCase().split(/\W+/);
-            letters = words[0][0];
+            letters = $.trim(word).toUpperCase()[0];
             color   = letters.charCodeAt(0) % _colors.length;
         }
         return {letters: letters, color: _colors[color], colorIndex: color + 1 };
@@ -94,9 +92,9 @@ var useravatar = (function() {
             _watching[id] = {};
         }
         _watching[id][className] = true;
-        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '">'
+        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
                     + s.letters
-                + '</' + element + '>';
+                + '</span></' + element + '>';
     };
 
     /**
@@ -196,12 +194,12 @@ var useravatar = (function() {
         if (typeof user === "string" && user.length > 0) {
             if (isEmail(user)) {
                 return emailAvatar(user, className, element);
-            }
-            else if (M.u[user]) {
+            } else if (user === u_handle) {
+                user = u_attr;
+            } else if (M.u[user]) {
                 // It's an user ID
                 user = M.u[user];
-            }
-            else {
+            } else {
                 return _letters(user, user, className, element);
             }
         }
@@ -214,7 +212,7 @@ var useravatar = (function() {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        return _letters(user.name || user.m, user.u, className, element);
+        return _letters(user.firstname || user.name || user.m, user.u, className, element);
     };
 
     registerCssColors();

@@ -2786,5 +2786,10 @@
     "7739": "\u60a8\u60f3\u6e05\u9664\u9060\u7a0b\u5feb\u53d6\u66ab\u5b58\u6a94\u55ce\uff1f",
     "7740": "\u5783\u573e\u6876\u5df2\u6e05\u7a7a",
     "7741": "\u6e05\u7a7a\u5783\u573e\u6876",
-    "7742": "\u60a8\u78ba\u5b9a\u8981\u522a\u9664 \"%1\" \u55ce\uff1f"
+    "7742": "\u60a8\u78ba\u5b9a\u8981\u522a\u9664 \"%1\" \u55ce\uff1f",
+    "7743": "Change Email",
+    "7744": "Current Email",
+    "7745": "New Email",
+    "7746": "Enter your new email address in the text field above and click Save.",
+    "7747": "Following that, please go to your email inbox and confirm this email change."
 }

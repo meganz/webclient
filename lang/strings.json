@@ -11168,7 +11168,7 @@
         "context": "An instruction in the account profile section to tell the user to enter their email address and click the save button."
     },
     "7747": {
-        "text": "After clicking Save, click the link in your email inbox to confirm this change.",
+        "text": "Following that, please go to your email inbox and confirm this email change.",
         "context": "An instruction in the account profile section to tell the user to check for a confirmation link in their email inbox to complete the process of changing their email address."
     }
 }

@@ -2690,7 +2690,7 @@ function MegaData()
         var proceed = this.checkCancelContactPrerequisites(target);
 
         if (proceed === 0) {
-            api_req({'a': 'upc', 'u': target, 'aa': 'd', i: requesti}, {
+            api_req({ 'a': 'upc', 'u': target, 'aa': 'd', i: requesti }, {
                 callback: function(resp) {
                     proceed = resp;
                 }
@@ -5956,14 +5956,14 @@ function processIPC(ipc, ignoreDB) {
                 }
 
                 // Update token.input plugin
-                removeFromMultiInputDDL('.share-multiple-input', {id: ipc[i].m, name: ipc[i].m});
-                removeFromMultiInputDDL('.add-contact-multiple-input', {id: ipc[i].m, name: ipc[i].m});
+                removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
             }
             else {
 
                 // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
-                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
+                addToMultiInputDropDownList('.share-multiple-input', [{ id: ipc[i].m, name: ipc[i].m }]);
+                // Don't prevent contact creation when there's already IPC available
+                // When user add contact who already sent IPC, server will automatically create full contact
             }
         }
     }

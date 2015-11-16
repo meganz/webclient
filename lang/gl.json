@@ -2786,5 +2786,10 @@
     "7739": "Do you want to delete your remote cache now?",
     "7740": "The rubbish bin is empty",
     "7741": "Clear the rubbish bin",
-    "7742": "Are you sure you want to delete \"%1\"?"
+    "7742": "Are you sure you want to delete \"%1\"?",
+    "7743": "Change Email",
+    "7744": "Current Email",
+    "7745": "New Email",
+    "7746": "Enter your new email address in the text field above and click Save.",
+    "7747": "Following that, please go to your email inbox and confirm this email change."
 }

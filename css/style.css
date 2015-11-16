@@ -7256,8 +7256,8 @@ table {
 	color: #777777 !important;
 }
 .fm-verify.verified {
-    background-color: rgba(255,255,255,0);
-    cursor: default;
+	background-color: rgba(255,255,255,0);
+	cursor: default;
 }
 .fm-chat-file-button.primary-button.fm-chat-inline-dialog-button-answer {
 	margin-left: 10px;
@@ -7854,6 +7854,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 1;
 	opacity: 1;
 }
+.fm-account-input.current-email {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    color: #777;
+    font-size: 14px;
+    line-height: 32px;
+    vertical-align: middle;
+}
+.fm-account-input.current-email:hover::before {
+    -moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+}
 .create-folder-input-bl, .add-user-popup-input-bl, .rename-input-bl {
 	width: 100%;
 	float: none;
@@ -8050,20 +8062,18 @@ color: white;
 }
 .fm-account-change-email {
 	font-size: 12px;
-	line-height: 12px;
+	line-height: 16px;
 	color: #E54C51;
-	padding: 4px 0 0 10px;
-	height: 18px;
+	padding: 10px 0 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	display: none;
 }
 .fm-account-labels .labels-block.email-confirm-txt {
 	height: 18px;
 	display: none;
 }
-.email-confirm .fm-account-change-email, .email-confirm .fm-account-labels .labels-block.email-confirm-txt {
+.email-confirm .fm-account-labels .labels-block.email-confirm-txt {
 	display: block;
 }
 .fmholder td {
@@ -12447,13 +12457,10 @@ table {
 .canceltransfer-item .context-menu-icon {
 	background-position: 4px -3716px;
 }
-
 .do-sort .context-menu-icon {
 	background-position: -100px -5290px;
 }
-
-.do-sort.selected .context-menu-icon,
-.select-all .context-menu-icon {
+.do-sort.selected .context-menu-icon, .select-all .context-menu-icon {
 	background-position: -3px -5290px;
 }
 .preview-item .context-menu-icon {
@@ -12846,10 +12853,31 @@ table {
 .fm-account-blocks.half-sized.second {
 	padding: 0 0 0 6px;
 }
+.fm-account-reseller .fm-account-blocks.half-sized {
+	max-width: 412px;
+}
+.hi-width .fm-accounts-charts {
+	float: left;
+	width: 50%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 12px 0 0;
+}
+.hi-width .fm-account-overview .fm-account-blocks.half-sized {
+	width: 25%;
+}
+.hi-width .fm-account-overview .half-sized .fm-account-header {
+	height: 58px;
+}
+.hi-width .fm-account-overview .half-sized .default-big-button {
+	margin-top: 36px;
+}
 .low-width .fm-account-blocks.half-sized {
 	float: none;
 	padding: 0;
 	width: 100%;
+	max-width: none;
 }
 .low-width .fm-account-blocks.profile-form {
 	float: none;
@@ -13120,8 +13148,8 @@ table {
 }
 .fm-account-input.voucheramount {
 	float: left;
-    min-width: 50px;
-    width: 80px;
+	min-width: 50px;
+	width: 80px;
 	margin: 0;
 }
 .default-select.month {
@@ -13219,8 +13247,8 @@ table {
 	cursor: pointer;
 	display: inline-block;
 	height: 32px;
-    margin: 9px 16px;
-    text-align: left;
+	margin: 9px 16px;
+	text-align: left;
 	float: none;
 }
 .fm-close-all-sessions span {
@@ -13237,7 +13265,6 @@ table {
 .settings-logout:hover {
 	background-color: #999999;
 }
-
 .grid-table.sessions th.no-border {
 	background: none;
 }
@@ -14098,9 +14125,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: #F6F6F6;
 	margin: 0 -15px -4px -15px;
 	padding: 5px 15px 0 15px;
-	-webkit-border-bottom-left-radius: 8px;
-	-moz-border-radius-bottomleft: 8px;
-	border-bottom-left-radius: 8px;
+	-webkit-border-bottom-left-radius: 6px;
+	-moz-border-radius-bottomleft: 6px;
+	border-bottom-left-radius: 6px;
 	height: 56px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -23244,18 +23271,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	margin: 12px 0;
 }
 .credentials-warning-dialog .fm-mega-dialog-bottom {
-    background-color: #eee;
-    margin: 0 0 -12px;
+	background-color: #eee;
+	margin: 0 0 -12px;
 }
 .credentials-warning-dialog {
-    background-color: #fff;
-    width: 600px;
-    z-index: 1101;
+	background-color: #fff;
+	width: 600px;
+	z-index: 1101;
 }
 .credentials-warning-dialog .content {
-    color: #999999;
-    font-size: 13px;
-    line-height: 20px;
+	color: #999999;
+	font-size: 13px;
+	line-height: 20px;
 }
 .credentials-warning-dialog .avatarAndWarningMessage {
 	margin: 0 20px;
@@ -23281,30 +23308,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	color: #000;
 }
 .credentials-warning-dialog .userAvatar img {
-    border-radius: 50%;
-    height: 90px;
-    width: 90px;
+	border-radius: 50%;
+	height: 90px;
+	width: 90px;
 }
 .credentials-warning-dialog .previousCredentials {
-    margin-top: 20px;
-    padding: 20px;
+	margin-top: 20px;
+	padding: 20px;
 }
 .credentials-warning-dialog .previousCredentials .title {
 	color: #000;
 	font-weight: bold;
 }
-.credentials-warning-dialog .previousCredentials .fingerprint,
-.credentials-warning-dialog .newCredentials .fingerprint,
-.credentials-warning-dialog .postResetCredentials .fingerprint {
-    font-family: monospace;
-    font-size: 14px;
-    margin-left: -4px;
-    margin-top: 10px;
-    text-transform: uppercase;
+.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint, .credentials-warning-dialog .postResetCredentials .fingerprint {
+	font-family: monospace;
+	font-size: 14px;
+	margin-left: -4px;
+	margin-top: 10px;
+	text-transform: uppercase;
 }
-.credentials-warning-dialog .previousCredentials .fingerprint > span,
-.credentials-warning-dialog .newCredentials .fingerprint > span,
-.credentials-warning-dialog .postResetCredentials .fingerprint > span {
+.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span, .credentials-warning-dialog .postResetCredentials .fingerprint > span {
 	display: inline-block;
 	text-align: center;
 	width: 44px;
@@ -23313,62 +23336,61 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	color: #D90007;
 }
 .credentials-warning-dialog .newCredentials {
-    background-color: #fafafa;
-    padding: 20px;
+	background-color: #fafafa;
+	padding: 20px;
 }
 .credentials-warning-dialog .newCredentials .title {
 	color: #D90007;
 	font-weight: bold;
 }
 .credentials-warning-dialog .newCredentials .title.reset {
-    color: #000;
+	color: #000;
 }
 .credentials-warning-dialog .resetCredentials {
-    background-color: #fafafa;
-    padding: 20px;
+	background-color: #fafafa;
+	padding: 20px;
 }
 .credentials-warning-dialog .resetCredentials .title {
-    color: #000;
-    font-weight: bold;
-    margin-bottom: 10px;
+	color: #000;
+	font-weight: bold;
+	margin-bottom: 10px;
 }
 .credentials-warning-dialog .resetCredentials .reset-credentials-button {
-    display: inline-block;
-    float: none;
-    margin-left: -3px;
+	display: inline-block;
+	float: none;
+	margin-left: -3px;
 }
 .credentials-warning-dialog .resetCredentials .reset-credentials-button span {
-    background-image: url("../images/mega/shared-sprite_v3.svg");
-    background-position: -34px -1506px;
-    text-indent: 17px;
+	background-image: url("../images/mega/shared-sprite_v3.svg");
+	background-position: -34px -1506px;
+	text-indent: 17px;
 }
 .credentials-warning-dialog .resetCredentials .reset-credentials-button.hidden {
-    display: none;
+	display: none;
 }
 .credentials-warning-dialog .verifyCredentials {
-    background-color: #fafafa;
-    padding: 20px;
+	background-color: #fafafa;
+	padding: 20px;
 }
 .credentials-warning-dialog .verifyCredentials .verify-contact-button {
-    display: inline-block;
-    float: none;
-    margin-left: -3px;
+	display: inline-block;
+	float: none;
+	margin-left: -3px;
 }
 .credentials-warning-dialog .verifyCredentials .verify-contact-button span {
-    background-image: url("../images/mega/shared-sprite_v3.svg");
-    background-position: -4px -739px;
-    text-indent: 19px;
+	background-image: url("../images/mega/shared-sprite_v3.svg");
+	background-position: -4px -739px;
+	text-indent: 19px;
 }
 .credentials-warning-dialog .verifyCredentials .verify-contact-button.hidden {
-    display: none;
+	display: none;
 }
 .credentials-warning-dialog .postResetCredentials {
-    padding: 20px;
+	padding: 20px;
 }
-.credentials-warning-dialog .postResetCredentials .title,
-.credentials-warning-dialog .verifyCredentials .title {
-    color: #000;
-    font-weight: bold;
+.credentials-warning-dialog .postResetCredentials .title, .credentials-warning-dialog .verifyCredentials .title {
+	color: #000;
+	font-weight: bold;
 }
 .credentials-warning-dialog .instruction {
 	padding: 3px 20px;
@@ -23397,9 +23419,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	margin: 12px 0 -12px;
 }
 .key-signature-warning-dialog {
-    background-color: #fff;
-    width: 600px;
-    z-index: 1101;
+	background-color: #fff;
+	width: 600px;
+	z-index: 1101;
 }
 .key-signature-warning-dialog .content {
 	color: #999999;
@@ -23873,74 +23895,73 @@ a.voucher-reseller-link {
 
 /* Voucher direct redeem dialog */
 .voucher-redeem-dialog .account-information {
-    left: 50%;
-    margin: -145px 0 0 -393px;
-    position: absolute;
-    text-align: left;
-    top: 50%;
-    z-index: 2200;
+	left: 50%;
+	margin: -145px 0 0 -393px;
+	position: absolute;
+	text-align: left;
+	top: 50%;
+	z-index: 2200;
 }
 .voucher-redeem-dialog .left-information {
-    float: left;
-    padding-right: 50px;
-    padding-top: 20px;
+	float: left;
+	padding-right: 50px;
+	padding-top: 20px;
 }
 .voucher-redeem-dialog .right-information {
-    color: #fff;
-    float: left;
-    width: 500px;
+	color: #fff;
+	float: left;
+	width: 500px;
 }
 .voucher-redeem-dialog .title-text {
-    font-size: 24px;
-    line-height: 36px;
-    max-width: 400px;
+	font-size: 24px;
+	line-height: 36px;
+	max-width: 400px;
 }
 .voucher-redeem-dialog .balance-text {
-    color: #ccc;
-    font-size: 14px;
-    letter-spacing: 0.2px;
-    margin-top: 40px;
+	color: #ccc;
+	font-size: 14px;
+	letter-spacing: 0.2px;
+	margin-top: 40px;
 }
 .voucher-redeem-dialog .complete-upgrade-text {
-    color: #ccc;
-    font-size: 14px;
-    letter-spacing: 0.2px;
-    line-height: 20px;
-    margin-top: 20px;
+	color: #ccc;
+	font-size: 14px;
+	letter-spacing: 0.2px;
+	line-height: 20px;
+	margin-top: 20px;
 }
 .voucher-redeem-dialog .complete-text {
-    color: rgba(19, 224, 60, 1);
+	color: rgba(19, 224, 60, 1);
 }
 .voucher-redeem-dialog .click-here-text {
-    font-weight: bold;
+	font-weight: bold;
 }
 .voucher-redeem-dialog .buttons {
-    margin-top: 50px;
+	margin-top: 50px;
 }
 .voucher-redeem-dialog .complete-upgrade-button {
-    text-align: center;
+	text-align: center;
 }
 .voucher-redeem-dialog .choose-plan-button {
-    border: 2px solid #ccc;
-    color: #ccc;
-    margin-left: 10px;
-    min-width: initial;
-    padding: 0 30px;
-    text-align: center;
-    text-transform: none;
+	border: 2px solid #ccc;
+	color: #ccc;
+	margin-left: 10px;
+	min-width: initial;
+	padding: 0 30px;
+	text-align: center;
+	text-transform: none;
 }
 .voucher-redeem-dialog .choose-plan-button:hover {
-    background-color: #ccc;
-    border-color: #ccc;
-    color: #2e2e2e;
+	background-color: #ccc;
+	border-color: #ccc;
+	color: #2e2e2e;
 }
 .voucher-redeem-dialog .membership-pad-bl {
-    height: 255px;
+	height: 255px;
 }
 .voucher-redeem-dialog .reg-st3-bott-title .period {
-    font-weight: bold;
+	font-weight: bold;
 }
-
 .payment-animation-pad {
 	width: 100%;
 	position: absolute;
@@ -24636,7 +24657,7 @@ body.pro:after {
 	-ms-transition: all 500ms ease-in-out;
 	transition: all 500ms ease-in-out;
 	cursor: default;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
@@ -25122,9 +25143,14 @@ a.ui-datepicker-next {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	max-width: 538px;
 }
 .profile-form.second {
 	padding: 46px 64px 8px 0;
+}
+.profile-form.change-email-section {
+    margin-bottom: 95px;
+    padding-top: 0;
 }
 /* Small font-size settings option */
 .fontsize1 .nw-fm-tree-header input {
@@ -26721,4 +26747,25 @@ body, body * {
 }
 .blog-new-full ul li {
 	padding: 0 0 0px 15px;
+}
+
+.avatar-wrapper.verified.square div.verified_icon,
+.fm-blocks-view .avatar-wrapper.verified div.verified_icon {
+    right: 3px;
+    top: 3px;
+}
+
+.avatar-wrapper div.verified_icon {
+    display: none;
+}
+
+.avatar-wrapper.verified div.verified_icon {
+    background-image: url(../images/verified.svg);
+    display: block;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    right: -3px;
+    top: -3px;
+    float: right;
 }

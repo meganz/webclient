@@ -7854,6 +7854,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 1;
 	opacity: 1;
 }
+.fm-account-input.current-email {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    color: #777;
+    font-size: 14px;
+    line-height: 32px;
+    vertical-align: middle;
+}
+.fm-account-input.current-email:hover::before {
+    -moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+}
 .create-folder-input-bl, .add-user-popup-input-bl, .rename-input-bl {
 	width: 100%;
 	float: none;
@@ -8050,20 +8062,18 @@ color: white;
 }
 .fm-account-change-email {
 	font-size: 12px;
-	line-height: 12px;
+	line-height: 16px;
 	color: #E54C51;
-	padding: 4px 0 0 10px;
-	height: 18px;
+	padding: 10px 0 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	display: none;
 }
 .fm-account-labels .labels-block.email-confirm-txt {
 	height: 18px;
 	display: none;
 }
-.email-confirm .fm-account-change-email, .email-confirm .fm-account-labels .labels-block.email-confirm-txt {
+.email-confirm .fm-account-labels .labels-block.email-confirm-txt {
 	display: block;
 }
 .fmholder td {
@@ -25138,6 +25148,10 @@ a.ui-datepicker-next {
 .profile-form.second {
 	padding: 46px 64px 8px 0;
 }
+.profile-form.change-email-section {
+    margin-bottom: 95px;
+    padding-top: 0;
+}
 /* Small font-size settings option */
 .fontsize1 .nw-fm-tree-header input {
 	margin: 12px 0 0 0;
@@ -26733,4 +26747,25 @@ body, body * {
 }
 .blog-new-full ul li {
 	padding: 0 0 0px 15px;
+}
+
+.avatar-wrapper.verified.square div.verified_icon,
+.fm-blocks-view .avatar-wrapper.verified div.verified_icon {
+    right: 3px;
+    top: 3px;
+}
+
+.avatar-wrapper div.verified_icon {
+    display: none;
+}
+
+.avatar-wrapper.verified div.verified_icon {
+    background-image: url(../images/verified.svg);
+    display: block;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    right: -3px;
+    top: -3px;
+    float: right;
 }

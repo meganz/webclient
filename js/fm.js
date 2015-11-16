@@ -3451,21 +3451,38 @@ function accountUI()
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
         }
         $('.default-select.country .default-select-scroll').html(html);
-
-        //Bind Dropdowns events
+        
+        // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
 
-        $('#account-email').rebind('keyup', function(e) {
-            var $emailBlock = $('.profile-form.first');
-            var mail = $('#account-email').val();
+        // Cache selectors
+        var $newEmail = $('#account-email');
+        var $emailInfoMessage = $('.fm-account-change-email');
+
+        // Reset change email fields after change
+        $newEmail.val('');
+        $emailInfoMessage.addClass('hidden');
+
+        // On text entry in the new email text field
+        $newEmail.rebind('keyup', function() {
+            
+            var mail = $newEmail.val();
+            
+            // Show information message
+            $emailInfoMessage.removeClass('hidden');
+            
+            // If not valid email yet, exit
             if (checkMail(mail)) {
                 return;
             }
+            
+            // Show save button
             if (mail !== u_attr.email) {
-                $emailBlock.addClass('email-confirm');
+                $('.profile-form.first').addClass('email-confirm');
                 $('.fm-account-save-block').removeClass('hidden');
             }
         });
+        
         $('#account-firstname,#account-lastname').rebind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
@@ -3477,8 +3494,8 @@ function accountUI()
             $('.profile-form.first').removeClass('email-confirm');
             accountUI();
         });
-        $('.fm-account-save').unbind('click');
-        $('.fm-account-save').bind('click', function(e)
+        
+        $('.fm-account-save').rebind('click', function()
         {
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim()||' ';
@@ -3615,32 +3632,39 @@ function accountUI()
                         }
                     }});
             }
-            else
+            else {
                 $('#account-confirm-password,#account-password,#account-new-password').val('');
+            }
 
+            // Get the new email address
             var email = $('#account-email').val().trim().toLowerCase();
-            if (u_attr.email !== email) {
+            
+            // If there is text in the email field and it doesn't match the existing one
+            if ((email !== '') && (u_attr.email !== email)) {
+                
+                loadingDialog.show();
+                
                 // Request change of email
                 // e => new email address
                 // i => requesti (Always has the global variable requesti (last request ID))
-                api_req({
-                a:'se',
-                aa:'a', 
-                e: email,
-                i: requesti,
-                },  {
-                    callback : function(res) {
+                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, { callback : function(res) {
+                        
+                        loadingDialog.hide();
+                        
                         if (res === -12) {
                             return msgDialog('warninga', l[135], l[7717]);
                         }
 
                         fm_showoverlay();
                         dialogPositioning('.awaiting-confirmation');
+                        
                         $('.awaiting-confirmation').removeClass('hidden');
                         $('.fm-account-save-block').addClass('hidden');
+                        
                         localStorage.new_email = email;
                     }
-                   });
+                });
+                
                 return;
             }
 
@@ -3648,7 +3672,7 @@ function accountUI()
             showToast('settings', l[7698]);
             accountUI();
         });
-        $('#account-email').val(u_attr.email);
+        $('.current-email').html(htmlentities(u_attr.email));
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
         $('.account-history-dropdown-button').unbind('click');
@@ -3657,7 +3681,6 @@ function accountUI()
             $(this).addClass('active');
             $('.account-history-dropdown').addClass('hidden');
             $(this).next().removeClass('hidden');
-
         });
         $('.account-history-drop-items').unbind('click');
         $('.account-history-drop-items').bind('click', function()
@@ -4005,7 +4028,7 @@ function accountUI()
 
             $('.grid-table.vouchers tr').remove();
             var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
-            
+
             $(account.vouchers).each(function(i, el) {
 
                 // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
@@ -7145,12 +7168,19 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  */
 function disableReadOnlySharedFolders(dialogName) {
 
-    var nodeId, accessRight,
+    var nodeId, accessRight, rootParentDirId,
+        $mcTreeSub = $("#mctreesub_shares"),
         $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
 
     $ro.each(function(i, v) {
         nodeId = $(v).attr('id').replace('mctreea_', '');
-        accessRight = M.d[nodeId].r;
+
+        // Apply access right of root parent dir to all subfolders
+        rootParentDirId = $("#mctreea_" + nodeId).parentsUntil($mcTreeSub).last().attr('id').replace('mctreeli_', '');
+
+        if (M.d[rootParentDirId]) {
+            accessRight = M.d[rootParentDirId].r;
+        }
 
         if (!accessRight || (accessRight === 0)) {
             $(v).addClass('disabled');
@@ -10395,7 +10425,7 @@ function contactUI() {
             megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
         );
 
-        $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar') )
+        $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar').addClass('square') );
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);

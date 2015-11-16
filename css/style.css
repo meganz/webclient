@@ -8174,14 +8174,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .nw-conversations-item.current-calling {
 	height: 48px;
-	cursor: pointer;
-	background-color: rgba(149,211,239,1);
-	color: white;
-	cursor: default;
+    color: #333333;
 }
-.nw-conversations-item.current-calling .nw-conversations-name {
-	color: white;
-}
+
+
 .nw-conversations-item.current-calling.selected {
 	cursor: default;
 }
@@ -8236,6 +8232,16 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	display: none !important;
 }
 /* end */
+
+/* .conversation-panel(s) sizing, so that height: 100% will work in the .video-call enabled
+ right header */
+
+.conversation-panels, .conversation-panel {
+	box-sizing: border-box;
+	height: 100% !important;
+	position: relative;
+}
+
 .full-sized .fm-right-header {
 	max-height: -webkit-calc(100% - 48px);
 	max-height: -moz-calc(100% - 48px);
@@ -8307,6 +8313,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .audio-call-container .video-call-button.size-icon {
 	top: -2px;
 	right: -2px;
+}
+.video-call-container {
+	display: block; /* bug in chrome, causing the <video> child elements to disapear */
 }
 .video-call-container img, .video-call-container video {
 	height: 100%;
@@ -8607,6 +8616,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-call-dialog-item {
 	height: 48px;
 	clear: both;
+    cursor: pointer;
 }
 .fm-call-dialog-item:nth-child(odd) {
 	background-color: rgba(0,0,0,0.02)
@@ -8810,6 +8820,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin-right: 89px;
 	padding-right: 26px;
 	word-wrap: break-word;
+	white-space: pre;
 }
 .fm-chat-filename {
 	margin: 30px 0 0 15px;
@@ -8971,6 +8982,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
+.fm-chat-emotions-icon.disabled {
+	opacity: 0.2 !important;
+}
 .fm-chat-input-block {
 	margin: 0;
 	-webkit-box-sizing: border-box;
@@ -9051,6 +9065,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .message-textarea:-ms-input-placeholder {
  color: #666666;
+}
+.message-textarea[disabled] {
+	opacity: 0.2;
 }
 .hiddendiv {
 	display: none;
@@ -9321,7 +9338,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .fm-start-call-popup {
 	margin-right: 0;
 }
-.fm-add-contact-popup.active, .fm-chat-emotion-popup.active {
+.fm-add-contact-popup.active {
 	right: -10000px;
 }
 .fm-chat-emotion-popup {
@@ -9332,6 +9349,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+}
+.fm-chat-emotion-popup.active {
+	right: 0;
 }
 .fm-send-files-popup.active {
 	left: 0;
@@ -22240,11 +22260,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-position: left top;
 	z-index: 10;
 }
-.full-mode .video-full-demo-ticket {
-	left: auto;
-	right: 0;
-	background-position: right top;
-}
 .video-full-logo {
 	position: absolute;
 	left: 50%;
@@ -22256,14 +22271,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-repeat: no-repeat;
 	background-position: center -185px;
 	z-index: 10;
-}
-.full-mode .video-full-logo {
-	left: 20px;
-	top: 20px;
-	margin: 0;
-	width: 184px;
-	height: 64px;
-	background-position: 1px -90px;
 }
 .video-size-button {
 	position: absolute;
@@ -22301,9 +22308,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	height: 32px;
 	left: 0;
 	top: 0;
-}
-.video-full-container.full-mode {
-	overflow: hidden;
 }
 .video-full-canvas-block {
 	position: absolute;
@@ -22629,11 +22633,13 @@ video.localViewport {
 	-webkit-transform: rotateY(180deg); /* Safari and Chrome */
 	-moz-transform: rotateY(180deg); /* Firefox */
 }
-.fm-chat-message-scroll.conversations {
+.fm-chat-message-scroll.conversations, .conversations-main-listing > .jScrollPaneContainer {
 	background-color: #fafafa;
+    height: 100%;
 }
+
 .conversations .fm-chat-message-pad {
-	padding: 2px 6px 6px 2px;
+	padding-right: 4px;
 }
 .conversations-block {
 	width: 25%;
@@ -22724,6 +22730,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	z-index: 10;
 	margin: 2px 0 2px 8px;
+}
+.conversations-pad .conversations-call-info.fm-chat-messages-pad {
+	background: transparent;
 }
 .conversation-status {
 	height: 36px;
@@ -26720,6 +26729,69 @@ body, body * {
 	width: 12px !important;
 	float: left !important;
 	margin-right: 4px !important;
+}
+
+/**
+ * New sections UI structure
+ */
+
+.section {
+    width: 100%;
+}
+.section.conversations .nw-conversations-item {
+    transition: all 500ms ease;
+    box-sizing: border-box;
+}
+/**
+ * new full screen mode
+ */
+
+.fm-chat-block.fullscreen,
+	.fm-chat-block.fullscreen .chat-call-block {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 100% !important;
+	height: 100% !important;
+	z-index: 50;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;/*background: #4c4c4c;*/
+	margin: 0 !important;
+}
+.fm-chat-block.fullscreen .video-call-container {
+	display: block;
+	width: 100% !important;
+	height: 100% !important;
+}
+.fm-chat-block.fullscreen .rmtVideo {
+	object-fit: cover;
+	object-position: 50% 50%; /* default */
+	width: 100%;
+}
+.video-full-demo-ticket {
+	display: none;
+}
+.fm-chat-block.fullscreen .video-full-demo-ticket {
+	right: 0;
+	top: 0;
+	left: auto;
+	background-position: right top;
+	display: block;
+}
+.video-full-logo {
+	display: none;
+}
+.fm-chat-block.fullscreen .video-full-logo {
+	display: block;
+	left: 20px;
+	top: 20px;
+	margin: 0;
+	width: 184px;
+	height: 64px;
+	background-position: 1px -90px;
 }
 .blog-new-full ul {
 	padding: 0px;

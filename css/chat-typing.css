@@ -13,6 +13,7 @@
     width: 34px;
     text-align: center;
     float: left;
+	margin-top: 7px;
 }
 .typing-bounce div {
     width: 4px;

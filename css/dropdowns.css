@@ -51,7 +51,7 @@
     top: -9px;
     width: 26px;
     height: 9px;
-    z-index: 100;
+    z-index: 123;
     background-image: url(../images/mega/new-chat-sprite.svg);
     background-repeat: no-repeat;
     background-position: 0px -1388px;

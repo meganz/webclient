@@ -18,6 +18,7 @@
 }
 .contacts-search-scroll {
 	max-height: 288px;
+	min-height: 146px;
 	overflow: hidden;
 }
 .contacts-info.body.contacts-search {

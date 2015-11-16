@@ -2786,5 +2786,10 @@
     "7739": "\u05d4\u05d0\u05dd \u05d0\u05ea\u05d4 \u05e8\u05d5\u05e6\u05d4 \u05dc\u05de\u05d7\u05d5\u05e7 \u05d0\u05ea \u05d4\u05d6\u05db\u05e8\u05d5\u05df \u05d4\u05d6\u05de\u05e0\u05d9 \u05d1\u05e9\u05e8\u05ea \u05db\u05e2\u05ea?",
     "7740": "\u05e4\u05d7 \u05d4\u05d0\u05e9\u05e4\u05d4 \u05e0\u05e7\u05d9",
     "7741": "\u05e0\u05e7\u05d4 \u05d0\u05ea \u05e4\u05d7 \u05d4\u05d0\u05e9\u05e4\u05d4",
-    "7742": "Are you sure you want to delete \"%1\"?"
+    "7742": "\u05d4\u05d0\u05dd \u05d0\u05ea\u05d4 \u05d1\u05d8\u05d5\u05d7 \u05e9\u05d1\u05e8\u05e6\u05d5\u05e0\u05da \u05dc\u05de\u05d7\u05d5\u05e7 \u05d0\u05ea \"%1\"? ",
+    "7743": "Change Email",
+    "7744": "Current Email",
+    "7745": "New Email",
+    "7746": "Enter your new email address in the text field above and click Save.",
+    "7747": "Following that, please go to your email inbox and confirm this email change."
 }

@@ -54,7 +54,7 @@ var useravatar = (function() {
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
 
-        tpl = window.btoa(unescape(tpl.html()));
+        tpl = window.btoa(unescape(encodeURIComponent(tpl.html())));
         return 'data:image/svg+xml;base64,' + tpl;
     };
 
@@ -68,9 +68,7 @@ var useravatar = (function() {
         var letters = "";
         var color   = 1;
         if (word && word !== u_handle) {
-            // Word is indeed not empty nor our user ID.
-            var words = $.trim(word).toUpperCase().split(/\W+/);
-            letters = words[0][0];
+            letters = $.trim(word).toUpperCase()[0];
             color   = letters.charCodeAt(0) % _colors.length;
         }
         return {letters: letters, color: _colors[color], colorIndex: color + 1 };

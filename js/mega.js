@@ -7067,31 +7067,27 @@ function balance2pro(callback)
      */
     UiExportLink.prototype.addExportLinkIcon = function(nodeId) {
 
+        var self = this;
         var $nodeId = $('#' + nodeId);
         var $tree = $('#treea_' + nodeId);
 
         if (!$nodeId.length && !$tree.length) {
-            if (d) {
-                this.logger.warn('No DOM Node matching "%s"', nodeId);
-            }
-            return;
+            self.logger.warn('No DOM Node matching "%s"', nodeId);
+
+            return false;
         }
 
-        if (d) {
-            this.logger.debug('addExportLinkIcon', nodeId);
-        }
+        self.logger.debug('addExportLinkIcon', nodeId);
 
         if ($nodeId.length) {
 
             // Add link-icon to list view
-            $(' .own-data', $nodeId).addClass('linked');
-
-            // Add class to the second from the list, prevent failure of the arrow icon
-            $(' .own-data span', $nodeId).eq(1).addClass('link-icon');
+            $('.own-data', $nodeId).addClass('linked');
+            $('.own-data span', $nodeId).eq(0).addClass('link-icon');
 
             // Add link-icon to grid view
-            $('.file-block', $nodeId).addClass('linked');
-            $('.file-block span', $nodeId).eq(1).addClass('link-icon');
+            $nodeId.addClass('linked');
+            $(' span', $nodeId).eq(1).addClass('link-icon');
         }
 
         if ($tree.length) {
@@ -7100,7 +7096,7 @@ function balance2pro(callback)
             $tree.addClass('linked');
 
             // Add class to the third from the list
-            $('span', $tree).eq(2).addClass('link-icon');
+            $(' span', $tree).eq(2).addClass('link-icon');
         }
     };
 

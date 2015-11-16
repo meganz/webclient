@@ -105,9 +105,6 @@
 .small-icon.dashed-conversation {
 	background-position: -3px -533px;
 }
-.small-icon.rounded-up-arrow {
-	    background-position: -3px -620px;
-}
 .small-icon.square-profile {
 	background-position: -3px -663px;
 }
@@ -123,19 +120,20 @@
 .dropdown-item .small-icon.grey-computer {
 	background-position: -3px -2501px;
 }
-
+.dropdown-item .small-icon.rounded-grey-up-arrow {
+	background-position: -3px -620px;
+}
 .dropdown-item:hover .small-icon.grey-cloud {
     background-position: -4px -773px;
 }
 .dropdown-item:hover .small-icon.grey-computer {
 	background-position: -4px -815px;
 }
-
 .dropdown-item:hover .small-icon.red-cross {
 	background-position: -3px -926px;
 }
 .dropdown-item:hover .small-icon.writing-pen {
-	    background-position: -3px -857px;
+	background-position: -3px -857px;
 }
 .dropdown-item:hover .small-icon.quotes {
 	background-position: -3px -899px;
@@ -146,8 +144,8 @@
 .dropdown-item:hover .small-icon.dashed-conversation {
 	background-position: -3px -1023px;
 }
-.dropdown-item:hover .small-icon.rounded-up-arrow {
-	    background-position: -3px -1130px;
+.dropdown-item:hover .small-icon.rounded-grey-up-arrow {
+	background-position: -3px -1110px;
 }
 .dropdown-item:hover .small-icon.square-profile {
 	background-position: -3px -1173px;

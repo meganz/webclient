@@ -16,6 +16,9 @@
 	padding: 0 26px 0 0;
 	display: inline-block;
 }
+.user-card-name.conversation-name.group {
+	padding:0;
+}
 .conversation-name .user-card-presence {
 	margin: 6px 0 0 0;
 	position:absolute;

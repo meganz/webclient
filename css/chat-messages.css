@@ -75,18 +75,28 @@
 	font-size: 14px;
 	line-height: 20px;
 	color: #666666;
-	padding: 3px 30px 0 0;
+	padding: 2px 30px 0 0;
+}
+.small-info-txt .message.text-block {
+	font-size: 13px;
+	line-height: 14px;
+	color: #999999;
+	padding: 0 30px 0 0;
+}
+.small-info-txt.message.content-area {
+	padding: 2px 0 6px 0;
+}
+.message .dark-grey-txt {
+	color:#666666;
 }
 .message.date-time {
 	font-size:13px;
 	line-height: 18px;
-	display: inline-block;
-	vertical-align: top;
+	display: inline;
 }
 .message.user-card-name {
-	display:inline-block;
+	display:inline;
 	padding: 0 10px 0 0;
-	vertical-align: top;
 }
 .message.date-divider {
 	font-size: 16px;

@@ -21,10 +21,13 @@
 	float:none;
 }
 .chat-right-pad {
-	padding: 22px;
+	padding: 20px 22px 22px 22px;
+}
+.chat-right-pad .contacts-info.body {
+	padding: 8px 0 6px 0;
 }
 .chat-right-pad .dropdown .dropdown-white-arrow {
-	margin-left: -108px;
+	margin-left: -110px;
 }
 .chat-right-area.conversation-details-scroll {
 	height: 100%;

@@ -3272,7 +3272,7 @@ function MegaData()
 
     this.nodeAttr = function(attrs) {
 
-        if (typeof mDB === 'object' && !pfkey) {
+        if ((typeof mDB === 'object') && !pfkey) {
             var node = M.d[attrs.h];
 
             if (node) {
@@ -3404,7 +3404,7 @@ function MegaData()
             if (fminitialized) {
                 sharedUInode(h);
             }
-            if (typeof mDB === 'object' && !pfkey) {
+            if ((typeof mDB === 'object') && !pfkey) {
                 if (!u_sharekeys[h]) {
                     console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
                 }
@@ -3434,7 +3434,7 @@ function MegaData()
             }
             if (a === 0) {
                 delete this.d[h].shares;
-                M.nodeAttr({h: h, shares: undefined});
+                M.nodeAttr({ h: h, shares: undefined });
                 delete u_sharekeys[h];
                 sharedUInode(h);
                 if (typeof mDB === 'object') {
@@ -6047,7 +6047,7 @@ function processPH(publicHandles) {
             }
         }
 
-        if (UiExportLink && value.down !== undefined) {
+        if (UiExportLink && (value.down !== undefined)) {
             UiExportLink.updateTakenDownItem(nodeId, value.down);
         }
     }

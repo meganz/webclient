@@ -3223,7 +3223,8 @@ function accountUI()
                     status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
                 }
             }
-
+            
+            // If unknown country code use question mark gif
             if (!country.icon || country.icon === '??.gif') {
                 country.icon = 'ud.gif';
             }

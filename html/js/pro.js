@@ -10,7 +10,7 @@ var pro_package,
     pro_do_next = null;
 
 function init_pro()
-{
+{    
     // Detect if there exists a verify get parameter
     var verifyUrlParam = proPage.getUrlParam("verify");
     if (typeof verifyUrlParam !== 'undefined')
@@ -1100,8 +1100,9 @@ var proPage = {
     }
 };
 
+
 /**
- * Code for the voucher dialog
+ * Code for the voucher dialog on the second step of the Pro page
  */
 var voucherDialog = {
     
@@ -1296,7 +1297,7 @@ var voucherDialog = {
                     // Not a valid voucher code
                     else if (result < 0) {
                         loadingDialog.hide();
-                        msgDialog('warninga', l[135], l[714], '', function() {
+                        msgDialog('warninga', l[135], l[473], '', function() {
                             voucherDialog.showBackgroundOverlay();
                         });
                     }
@@ -1700,15 +1701,9 @@ var cardDialog = {
         this.$dialog.find('.city').val('');
         this.$dialog.find('.state-province').val('');
         this.$dialog.find('.post-code').val('');
-        
-        this.$dialog.find('.expiry-date-month')[0].selectedIndex = 0;
-        this.$dialog.find('.expiry-date-month').parent().find('.account-select-txt').text(l[913]);
-        
-        this.$dialog.find('.expiry-date-year')[0].selectedIndex = 0;
-        this.$dialog.find('.expiry-date-year').parent().find('.account-select-txt').text(l[932]);
-        
-        this.$dialog.find('.countries')[0].selectedIndex = 0;
-        this.$dialog.find('.countries').parent().find('.account-select-txt').text(l[481]);
+        this.$dialog.find('.expiry-date-month span').text(l[913]);
+        this.$dialog.find('.expiry-date-year span').text(l[932]);
+        this.$dialog.find('.countries span').text(l[481]);
     },
     
     /**
@@ -1744,22 +1739,20 @@ var cardDialog = {
      */
     initCountryDropDown: function() {
       
-        var countryOptions = '<option value=""></option>';
-        var $countriesDropDown = this.$dialog.find('.countries');
+        var countryOptions = '';
+        var $countriesSelect = this.$dialog.find('.default-select.countries');
+        var $countriesDropDown = $countriesSelect.find('.default-select-scroll');
         
         // Build options
         $.each(isocountries, function(isoCode, countryName) {            
-            countryOptions += '<option value="' + isoCode + '">' + countryName + '</option>';
+            countryOptions += '<div class="default-dropdown-item " data-value="' + isoCode + '">' + countryName + '</div>';
         });
         
         // Render the countries and update the text when a country is selected
         $countriesDropDown.html(countryOptions);
-		$countriesDropDown.rebind('change', function(event)
-        {
-            var $this = $(this);
-            var countryName = $this.find(':selected').text();            
-            $this.parent().find('.account-select-txt').text(countryName);
-        });
+
+        // Bind custom dropdowns events
+        bindDropdownEvents($countriesSelect);
     },
     
     /**
@@ -1768,23 +1761,21 @@ var cardDialog = {
     initExpiryMonthDropDown: function() {
         
         var twoDigitMonth = '';
-        var monthOptions = '<option value=""></option>';
-        var $expiryMonthDropDown = this.$dialog.find('.expiry-date-month');
+        var monthOptions = '';
+        var $expiryMonthSelect = this.$dialog.find('.default-select.expiry-date-month');
+        var $expiryMonthDropDown = $expiryMonthSelect.find('.default-select-scroll');
         
         // Build options
         for (var month = 1; month <= 12; month++) {            
             twoDigitMonth = (month < 10) ? '0' + month : month;
-            monthOptions += '<option value="' + twoDigitMonth + '">' + twoDigitMonth + '</option>';
+            monthOptions += '<div class="default-dropdown-item " data-value="' + twoDigitMonth + '">' + twoDigitMonth + '</div>';
         }
         
         // Render the months and update the text when a country is selected
         $expiryMonthDropDown.html(monthOptions);
-        $expiryMonthDropDown.rebind('change', function(event)
-        {
-            var $this = $(this);
-            var monthNum = $this.find(':selected').text();            
-            $this.parent().find('.account-select-txt').text(monthNum);
-        });
+
+        // Bind custom dropdowns events
+        bindDropdownEvents($expiryMonthSelect);
     },
     
     /**
@@ -1792,27 +1783,25 @@ var cardDialog = {
      */
     initExpiryYearDropDown: function() {
         
-        var yearOptions = '<option value=""></option>';
+        var yearOptions = '';
         var currentYear = new Date().getFullYear();
         var endYear = currentYear + 20;                                     // http://stackoverflow.com/q/2500588
-        var $expiryYearDropDown = this.$dialog.find('.expiry-date-year');
+        var $expiryYearSelect = this.$dialog.find('.default-select.expiry-date-year');
+        var $expiryYearDropDown = $expiryYearSelect.find('.default-select-scroll');
         
         // Build options
         for (var year = currentYear; year <= endYear; year++) {
-            yearOptions += '<option value="' + year + '">' + year + '</option>';
+            yearOptions += '<div class="default-dropdown-item " data-value="' + year + '">' + year + '</div>';
         }
-        
+
         // Render the months and update the text when a country is selected
         $expiryYearDropDown.html(yearOptions);
-        $expiryYearDropDown.rebind('change', function(event)
-        {
-            var $this = $(this);
-            var yearText = $this.find(':selected').text();            
-            $this.parent().find('.account-select-txt').text(yearText);
-        });
+
+        // Bind custom dropdowns events
+        bindDropdownEvents($expiryYearSelect);
     },
-	
-	/**
+    
+    /**
      * Inputs focused states
      */
     initInputsFocus: function() {
@@ -1834,19 +1823,19 @@ var cardDialog = {
     getBillingDetails: function() {
         
         // All payment data
-        var billingData =	{
+        var billingData =    {
             first_name: this.$dialog.find('.first-name').val(),
             last_name: this.$dialog.find('.last-name').val(),
             card_number: this.$dialog.find('.credit-card-number').val(),
-            expiry_date_month: this.$dialog.find('.expiry-date-month').val(),
-            expiry_date_year: this.$dialog.find('.expiry-date-year').val(),
+            expiry_date_month: this.$dialog.find('.expiry-date-month .active').attr('data-value'),
+            expiry_date_year: this.$dialog.find('.expiry-date-year .active').attr('data-value'),
             cv2: this.$dialog.find('.cvv-code').val(),
             address1: this.$dialog.find('.address1').val(),
             address2: this.$dialog.find('.address2').val(),
             city: this.$dialog.find('.city').val(),
             province: this.$dialog.find('.state-province').val(),
             postal_code: this.$dialog.find('.post-code').val(),
-            country_code: this.$dialog.find('.countries').val(),
+            country_code: this.$dialog.find('.countries .active').attr('data-value'),
             email_address: u_attr.email
         };
         

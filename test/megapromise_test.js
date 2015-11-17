@@ -166,6 +166,17 @@ describe("MegaPromise Unit Test", function() {
         done();
     });
 
+    it("all with no promises", function(done) {
+        var pCombo = MegaPromise.all([]);
+
+        pCombo.then(function() {
+            expect(arguments.length).to.eql(1);
+            done();
+        }, function() {
+            fail('.all was rejected, while it should have been resolved');
+        });
+    });
+
     it("all with 2 MegaPromises", function(done) {
         var p1 = new MegaPromise();
         var p2 = new MegaPromise();

@@ -22,6 +22,7 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
+var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
@@ -158,6 +159,9 @@ if (!b_u) try
         }
     }
     try {
+        if (typeof localStorage === 'undefined' || localStorage === null) {
+            throw new Error('SecurityError: DOM Exception 18');
+        }
         d = !!localStorage.d;
     }
     catch (ex) {
@@ -199,7 +203,7 @@ if (!b_u) try
         Object.defineProperty(window, 'sessionStorage', {
             value: localStorage
         });
-        if (location.host !== 'mega.nz') {
+        if (location.host !== 'mega.nz' && !is_karma) {
             localStorage.jj = localStorage.dd = localStorage.d = 1;
         }
         setTimeout(function() {
@@ -208,24 +212,24 @@ if (!b_u) try
                 'it will die once you close/reload the browser/tab.');
         }, 4000);
     }
-    if (typeof localStorage !== 'undefined') {
-        var contenterror = 0;
-        var nocontentcheck = !!localStorage.dd;
-        if (localStorage.dd) {
-             var devhost = window.location.host;
-            // handle subdirs
-            var pathSuffix = window.location.pathname;
-            pathSuffix = pathSuffix.split("/").slice(0,-1).join("/");
-            // set the staticpath for debug mode
-            localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-            // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
-            if (localStorage.d) {
-                console.debug('StaticPath set to "' + localStorage.staticpath + '"');
-            }
+
+    var contenterror = 0;
+    var nocontentcheck = false;
+    if (localStorage.dd || is_karma) {
+        nocontentcheck = true;
+        var devhost = window.location.host;
+        // handle subdirs
+        var pathSuffix = window.location.pathname;
+        pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
+        // set the staticpath for debug mode
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+        if (localStorage.d) {
+            console.debug('StaticPath set to "' + localStorage.staticpath + '"');
         }
-        staticpath = localStorage.staticpath || geoStaticpath();
-        apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
     }
+    staticpath = localStorage.staticpath || geoStaticpath();
+    apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
@@ -1346,6 +1350,8 @@ else if (!b_u)
         'cancel_js': {f:'html/js/cancel.js', n: 'cancel_js', j:1},
         'reset': {f:'html/reset.html', n: 'reset', j:0},
         'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
+        'change_email_js': {f:'html/js/emailchange.js', n: 'change_email_js', j:1},
+        'change_email': {f:'html/emailchange.html', n: 'change_email', j:0},
         'filesaver': {f:'js/vendor/filesaver.js', n: 'filesaver', j:1},
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
@@ -1362,7 +1368,9 @@ else if (!b_u)
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1}
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},        
+        'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
+        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1}
     };
 
     var subpages =
@@ -1373,6 +1381,7 @@ else if (!b_u)
         'backup': ['backup','backup_js','filesaver'],
         'recovery': ['recovery','recovery_js'],
         'reset': ['reset','reset_js'],
+        'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js'],
@@ -1393,7 +1402,8 @@ else if (!b_u)
         'help': ['help_js'],
         'chrome': ['chrome'],
         'plugin': ['chrome','firefox'],
-        'recover': ['reset','reset_js']
+        'recover': ['reset','reset_js'],
+        'redeem': ['redeem','redeem_js']
     };
 
     if (page)
@@ -1703,7 +1713,9 @@ else if (!b_u)
     }
     window.onload = function ()
     {
-        if (!maintenance && !androidsplash) jsl_start();
+        if (!maintenance && !androidsplash && !is_karma) {
+            jsl_start();
+        }
     };
     function jsl_load(xhri)
     {

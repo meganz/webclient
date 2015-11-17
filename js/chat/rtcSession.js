@@ -372,7 +372,7 @@ RtcSession.prototype = {
         case Strophe.Status.CONNFAIL:
         case Strophe.Status.DISCONNECTING:
         {
-            this.hangupAll('xmpp-disconnect', null, true);
+            this.rtcSession.hangupAll('xmpp-disconnect', null, true);
             break;
         }
         case Strophe.Status.CONNECTED:

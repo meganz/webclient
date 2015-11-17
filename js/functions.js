@@ -33,6 +33,10 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     if (!doc) {
         doc = document;
     }
+    if (!markup) {
+        console.error('Empty content passed to parseHTML', arguments);
+        markup = 'no content';
+    }
     if (is_chrome_firefox) {
         try {
             var flags = 0;
@@ -835,53 +839,6 @@ function bytesToSize(bytes, precision) {
     }
 }
 
-function checkPassword(strPassword) {
-    var m_strUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    var m_strLowerCase = "abcdefghijklmnopqrstuvwxyz";
-    var m_strNumber = "0123456789";
-    var m_strCharacters = "!@#$%^&*?_~";
-    var nScore = 0;
-    nScore += countDif(strPassword) * 2;
-    var extra = countDif(strPassword) * strPassword.length / 3;
-    if (extra > 25) {
-        extra = 25;
-    }
-    nScore += extra;
-    var nUpperCount = countContain(strPassword, m_strUpperCase);
-    var nLowerCount = countContain(strPassword, m_strLowerCase);
-    var nLowerUpperCount = nUpperCount + nLowerCount;
-    if (nUpperCount === 0 && nLowerCount !== 0) {
-        nScore += 10;
-    }
-    else if (nUpperCount !== 0 && nLowerCount !== 0) {
-        nScore += 10;
-    }
-    var nNumberCount = countContain(strPassword, m_strNumber);
-    if (nNumberCount === 1) {
-        nScore += 10;
-    }
-    if (nNumberCount >= 3) {
-        nScore += 15;
-    }
-    var nCharacterCount = countContain(strPassword, m_strCharacters);
-    if (nCharacterCount === 1) {
-        nScore += 10;
-    }
-    if (nCharacterCount > 1) {
-        nScore += 10;
-    }
-    if (nNumberCount !== 0 && nLowerUpperCount !== 0) {
-        nScore += 2;
-    }
-    if (nNumberCount !== 0 && nLowerUpperCount !== 0 && nCharacterCount !== 0) {
-        nScore += 3;
-    }
-    if (nNumberCount !== 0 && nUpperCount !== 0 && nLowerCount !== 0 && nCharacterCount !== 0) {
-        nScore += 5;
-    }
-    return nScore;
-}
-
 function showNonActivatedAccountDialog(log) {
     if (log) {
         megaAnalytics.log("pro", "showNonActivatedAccountDialog");
@@ -936,28 +893,6 @@ function showOverQuotaDialog() {
     $('.warning-button').click(function() {
         document.location.hash = 'pro';
     });
-}
-
-function countDif(strPassword) {
-    var chararr = [];
-    var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) {
-        if (!chararr[strPassword.charAt(i)]) {
-            chararr[strPassword.charAt(i)] = true;
-            nCount++;
-        }
-    }
-    return nCount;
-}
-
-function countContain(strPassword, strCheck) {
-    var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) {
-        if (strCheck.indexOf(strPassword.charAt(i)) > -1) {
-            nCount++;
-        }
-    }
-    return nCount;
 }
 
 function logincheckboxCheck(ch_id) {
@@ -3240,7 +3175,8 @@ mega.utils.reload = function megaUtilsReload() {
         u_storage.wasloggedin = true;
 
         if (debug) {
-            u_storage.d = true;
+            u_storage.d = 1;
+            u_storage.minLogLevel = 0;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
                 if (!is_extension) {
@@ -3262,8 +3198,8 @@ mega.utils.reload = function megaUtilsReload() {
         }
     }
     else {
-        // Show message that this operation will destroy and reload the data stored by MEGA in the browser
-        msgDialog('confirmation', l[761], l[6995], l[6994], function(doIt) {
+        // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
+        msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
                 if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
                     msgDialog('warningb', l[882], l[7157]);
@@ -3869,7 +3805,7 @@ if (typeof sjcl !== 'undefined') {
         // Loop through all selected items
         $.each(nodes, function(index, value) {
             node = M.d[value];
-            if (node.ph && node.shares && node.shares.EXP) {
+            if (node.shares && node.shares.EXP) {
                 result = true;
                 return false;// Stop further $.each loop execution
 

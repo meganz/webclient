@@ -1,9 +1,10 @@
 /**
- *  Handle all logic for rendering for users' avatar
+ * Handle all logic for rendering for users' avatar
  */
-
 var useravatar = (function() {
-    "use strict";
+    
+    'use strict';
+    
     var _colors = [
         '#FF6A19',
         '#5856d6',
@@ -14,12 +15,12 @@ var useravatar = (function() {
         '#ff1a53',
         '#d90007',
         '#ff9500',
-        '#ffcc00',
+        '#ffcc00'
     ];
 
     /**
-     *  List of TWO-letters avatars that we ever generated. It's useful to replace
-     *  the moment we discover the real avatar associate with that avatar
+     * List of TWO-letters avatars that we ever generated. It's useful to replace
+     * the moment we discover the real avatar associate with that avatar
      */
     var _watching = {};
 
@@ -29,111 +30,197 @@ var useravatar = (function() {
     var ns = {};
 
     /**
-     *  Take the class colors and create a inject as a CSS.
+     * Take the class colors and create a inject as a CSS.
      */
-    var registerCssColors = function() {
-        var css = "";
+    function registerCssColors() {
+        
+        var css = '';
+        
         for (var i in _colors) {
             if (!_colors.hasOwnProperty(i)) {
                 continue;
             }
-            css += ".color" + (parseInt(i) + 1) + " { background-color: "
-                + _colors[i] + "; }";
+            css += '.color' + (parseInt(i) + 1) + ' { background-color: '
+                + _colors[i] + '; }';
         }
-        css = mObjectURL([css], "text/css");
-        mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head').href = css;
+        
+        css = mObjectURL([css], 'text/css');
+        mCreateElement('link', { type: 'text/css', rel: 'stylesheet' }, 'head').href = css;
     };
 
     /**
      * Return a SVG image representing the TWO-Letters avatar
      * @private
+     * @param {String} letters
+     * @returns {String}
      */
-    var _lettersImg = function(letters) {
+    function _lettersImg(letters) {
+        
         var s = _lettersSettings(letters);
-        var tpl = $('#avatar-svg').clone().removeClass('hidden')
+        var $template = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
 
-        tpl = window.btoa(unescape(tpl.html()));
-        return 'data:image/svg+xml;base64,' + tpl;
+        $template = window.btoa(unescape(encodeURIComponent($template.html())));
+        
+        return 'data:image/svg+xml;base64,' + $template;
     };
 
     /**
-     * Return two letters and the color for a given string
-     *
-     * @return {string}
+     * Return two letters and the color for a given string.
      * @private
+     * @param {String} word
+     * @returns {String}
      */
-    var _lettersSettings = function(word) {
-        var letters = "";
+    function _lettersSettings(word) {
+        
+        var letters = '';
         var color   = 1;
+        
         if (word && word !== u_handle) {
-            // Word is indeed not empty nor our user ID.
-            var words = $.trim(word).toUpperCase().split(/\W+/);
-            letters = words[0][0];
+            letters = $.trim(word).toUpperCase()[0];
             color   = letters.charCodeAt(0) % _colors.length;
         }
-        return {letters: letters, color: _colors[color], colorIndex: color + 1 };
+        
+        return { letters: letters, color: _colors[color], colorIndex: color + 1 };
     };
 
     /**
-     *  Return the HTML to represent a two letter avatar.
+     * Return the HTML to represent a two letter avatar.
      *
-     *  @param letters      String used to generate the avatar
-     *  @param id           ID associate with the avatar (uid, email)
-     *  @param className Any extra CSS classes that we want to append to the HTML
-     *
-     *  @return HTML
+     * @param {String} letters The string used to generate the avatar e.g. first name, full name or email address
+     * @param {String} id The ID associate with the avatar (uid, email)
+     * @param {String} className Any extra CSS classes that we want to append to the HTML
+     * @param {String} element The HTML tag
+     * @return {String} Returns the HTML
      */
-    var _letters = function(letters, id, className, element) {
+    function _letters(letters, id, className, element) {
+        
         if (element === 'ximg') {
             return _lettersImg(letters);
         }
+        
         var s = _lettersSettings(letters);
+        
         if (!_watching[id]) {
             _watching[id] = {};
         }
+        
         _watching[id][className] = true;
-        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '">'
+        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
+                    + '<div class="verified_icon"></div>'
                     + s.letters
-                + '</' + element + '>';
+                + '</span></' + element + '>';
     };
 
     /**
-     *  Return an image HTML from an URL
+     * Return an image HTML from an URL.
      *
-     *  @param url          Image URL
-     *  @param id           ID associate with the avatar (uid)
-     *  @param className Any extra CSS classes that we want to append to the HTML
+     * @param {String} url The image URL
+     * @param {String} id The ID associated with the avatar (uid)
+     * @param {String} className Any extra CSS classes that we want to append to the HTML
+     * @param {String} type The HTML tag type
+     * @returns {String} The image HTML
      */
-    var _image = function(url, id, className, type) {
+    function _image(url, id, className, type) {
+        
         return '<' + type + ' class="avatar-wrapper ' + id + ' ' + className + '">'
+                + '<div class="verified_icon"></div>'
                 + '<img src="' + url + '">'
          + '</' + type + '>';
     };
 
     /**
-     *  Check if the input is an email address or not.
+     * Render an avatar based on given email. We try to find
+     * the contact object by their email, if we cannot, we render
+     * the first two letters of the email address.
+     *
+     * @param {String} email Email address
+     * @param {String} className Any extra class attribute to inject
+     * @param {String} element Wrap the output with `element` tag
+     * @returns HTML
      */
-    function isEmail(email) {
-        return typeof email === "string" && email.match(/.+@.+/);
+    function emailAvatar(email, className, element) {
+        
+        // User is an email, we should look if the user
+        // exists, if it does exists we use the user Object.
+        for (var u in M.u) {
+            if (M.u[u].m === email) {
+                // Found the user object
+                return ns.contact(M.u[u], className, element);
+            }
+        }
+        return _letters(email.substr(0, 2), email, className, element);
+    }
+
+    var authringPromise;
+
+    /**
+     * Check if the current user is verified by the current user. It
+     * is asynchronous and waits for `u_authring.Ed25519` is ready.
+     * @param {Object} user The user object
+     */
+    function isUserVerified(user) {
+        if (u_type !== 3) {
+            return;
+        }
+        if (!authringPromise) {
+            authringPromise = new MegaPromise();
+            
+            if (u_authring.Ed25519) {
+                authringPromise.resolve();
+            } else {
+                // First load the authentication system.
+                var authSystemPromise = authring.initAuthenticationSystem();
+                authringPromise.linkDoneAndFailTo(authSystemPromise);
+            }
+        }
+
+        function isUserVerified_Callback() {
+            
+            var verifyState = u_authring.Ed25519[user.h] || {};
+            var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+            
+            if (isVerified) {
+                $('.avatar-wrapper.' + user.h).addClass('verified');
+            }
+        }
+
+        setTimeout(function() {
+            authringPromise.done(isUserVerified_Callback);
+        });
     }
 
     /**
-     *  Like the `contact` method but instead of returning a
-     *  div with the avatar inside it returns an image URL.
+     * Check if the input is an email address or not.
+     * @param {String} email The email address
+     * @returns {Boolean}
+     */
+    function isEmail(email) {
+        
+        return ((typeof email === 'string') && email.match(/.+@.+/));
+    }
+
+    /**
+     * Like the `contact` method but instead of returning a
+     * div with the avatar inside it returns an image URL.
+     * @param {String} contact The contact's user handle
+     * @returns {String} The HTML to be rendered
      */
     ns.imgUrl = function(contact) {
+        
         if (avatars[contact]) {
             return avatars[contact].url;
         }
+        
         return ns.contact(contact, '', 'ximg');
     };
 
     /**
-     *  Return the current user's avatar in image URL.
+     * Return the current user's avatar in image URL.
      */
     ns.top = function() {
+        
         if (!u_handle) {
             /* No user */
             return staticpath + 'images/mega/default-top-avatar.png';
@@ -143,21 +230,25 @@ var useravatar = (function() {
 
 
     /**
-     *  Return the current user's avatar in image URL.
+     * Return the current user's avatar in image URL.
      */
     ns.mine = function() {
+        
+        // If no user, return default avatar
         if (!u_handle) {
-            /* No user */
             return staticpath + 'images/mega/default-avatar.png';
         }
+        
         return ns.imgUrl(u_handle);
     };
 
     /**
-     *  A new contact has been loaded, let's see if they have any two-letters avatars, if
-     *  that is the case we replace that old avatar *everywhere* with their proper avatar
+     * A new contact has been loaded, let's see if they have any two-letters avatars, if
+     * that is the case we replace that old avatar *everywhere* with their proper avatar.
+     * @param {String} user The user handle
      */
     ns.loaded = function(user) {
+        
         if (typeof user !== "string") {
             return false;
         }
@@ -169,33 +260,33 @@ var useravatar = (function() {
 
         var avatar = $(ns.contact(user)).html();
         $('.avatar-wrapper.' + user).empty().html(avatar);
+        
         if ((M.u[user] || {}).m) {
             $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
         }
     };
 
-    function emailAvatar(user, className, element)
-    {
-        // User is an email, we should look if the user
-        // exists, if it does exists we use the user Object.
-        for (var u in M.u) {
-            if (M.u[u].m === user) {
-                // found the user object
-                return ns.contact(M.u[u], className, element);
-            }
-        }
-        return _letters(user.substr(0, 2), user, className, element);
-    }
-
+    /**
+     * Returns a contact avatar
+     * @param {String} user
+     * @param {String} className
+     * @param {String} element
+     * @returns {String}
+     */
     ns.contact = function(user, className, element) {
         
         if (!className) {
-            className = "avatar";
+            className = 'avatar';
         }
-        element   = element || "div";
-        if (typeof user === "string" && user.length > 0) {
+        
+        element = element || 'div';
+        
+        if (typeof user === 'string' && user.length > 0) {            
             if (isEmail(user)) {
                 return emailAvatar(user, className, element);
+            }
+            else if (user === u_handle) {
+                user = u_attr;
             }
             else if (M.u[user]) {
                 // It's an user ID
@@ -206,15 +297,19 @@ var useravatar = (function() {
             }
         }
 
-        if (typeof user !== "object" || !(user||{}).u) {
-            return "";
+        if (typeof user !== 'object' || !(user || {}).u) {
+            return '';
         }
+
+        isUserVerified(user);
 
         if (avatars[user.u]) {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        return _letters(user.name || user.m, user.u, className, element);
+        var letters = user.firstname || user.name || user.m;
+
+        return _letters(letters, user.u, className, element);
     };
 
     registerCssColors();

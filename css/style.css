@@ -26752,3 +26752,23 @@ body, body * {
 .fm-account-blocks.disabled {
     opacity: 0.4;
 }
+.avatar-wrapper.verified.square div.verified_icon,
+.fm-blocks-view .avatar-wrapper.verified div.verified_icon {
+    right: 3px;
+    top: 3px;
+}
+
+.avatar-wrapper div.verified_icon {
+    display: none;
+}
+
+.avatar-wrapper.verified div.verified_icon {
+    background-image: url(../images/verified.svg);
+    display: block;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    right: -3px;
+    top: -3px;
+    float: right;
+}

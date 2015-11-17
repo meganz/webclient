@@ -3471,9 +3471,9 @@ function accountUI()
             });
             $newEmail.val('');
             if (texts.join("") === "") {
-                $newEmail.removeAttr('disabled');
+                $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             } else {
-                $newEmail.attr('disabled', 'disabled');
+                $newEmail.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
             }
         });
 
@@ -3484,9 +3484,9 @@ function accountUI()
             $passwords.val('');
 
             if (mail === "") {
-                $passwords.removeAttr('disabled');
+                $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             } else {
-                $passwords.attr('disabled', 'disabled');
+                $passwords.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
             }
             
             // Show information message
@@ -3511,8 +3511,8 @@ function accountUI()
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
-            $passwords.removeAttr('disabled');
-            $newEmail.removeAttr('disabled');
+            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             $('.fm-account-save-block').addClass('hidden');
             $('.profile-form.first').removeClass('email-confirm');
             accountUI();
@@ -3520,8 +3520,8 @@ function accountUI()
         
         $('.fm-account-save').rebind('click', function()
         {
-            $passwords.removeAttr('disabled');
-            $newEmail.removeAttr('disabled');
+            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim()||' ';
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');

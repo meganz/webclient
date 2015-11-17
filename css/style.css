@@ -26748,3 +26748,7 @@ body, body * {
 .blog-new-full ul li {
 	padding: 0 0 0px 15px;
 }
+
+.fm-account-blocks.disabled {
+    opacity: 0.4;
+}

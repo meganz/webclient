@@ -163,7 +163,14 @@ var emailchange = (function() {
         if (!context) {
             return;
         }
+
+
+        /**
+         *  After we updated the user's data, we verify if they
+         *  typed their password correctly or not.
+         */
         function verifyUserPassword() {
+
             $input = $input || $('#verify-password');
             var password = $input.val();
             
@@ -200,6 +207,8 @@ var emailchange = (function() {
         // password
         api_req({ a: 'ug' }, {
             callback: function(res) {
+
+                // Update the user's data and then verify their password
                 u_checklogin3a(res, {checkloginresult: verifyUserPassword});
             }
         })

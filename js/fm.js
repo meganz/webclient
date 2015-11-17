@@ -3456,6 +3456,7 @@ function accountUI()
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
 
         // Cache selectors
+        var $passwords = $('#account-password,#account-new-password,#account-confirm-password');
         var $newEmail = $('#account-email');
         var $emailInfoMessage = $('.fm-account-change-email');
 
@@ -3463,10 +3464,30 @@ function accountUI()
         $newEmail.val('');
         $emailInfoMessage.addClass('hidden');
 
+        $passwords.rebind('keyup', function() {
+            var texts = [];
+            $passwords.each(function() {
+                texts.push($(this).val());
+            });
+            $newEmail.val('');
+            if (texts.join("") === "") {
+                $newEmail.removeAttr('disabled');
+            } else {
+                $newEmail.attr('disabled', 'disabled');
+            }
+        });
+
         // On text entry in the new email text field
         $newEmail.rebind('keyup', function() {
-            
-            var mail = $newEmail.val();
+            var mail = $.trim($newEmail.val());
+
+            $passwords.val('');
+
+            if (mail === "") {
+                $passwords.removeAttr('disabled');
+            } else {
+                $passwords.attr('disabled', 'disabled');
+            }
             
             // Show information message
             $emailInfoMessage.removeClass('hidden');

@@ -27,6 +27,7 @@
     "63": "Kopieren",
     "64": "Zugriffsrechte",
     "68": "Neuer Ordner",
+    "70": "Der Papierkorb ist leer",
     "71": "Kontakt hinzuf\u00fcgen",
     "76": "Sie sind dabei, [X] unwiderruflich aus dem Papierkorb zu l\u00f6schen.",
     "77": "M\u00f6chten Sie fortfahren?",
@@ -2777,7 +2778,7 @@
     "7730": "E-Mail-Adresse best\u00e4tigen",
     "7731": "Geben Sie Ihr Passwort ein, um Ihre E-Mail-Adresse zu best\u00e4tigen",
     "7732": "E-Mail-Adresse best\u00e4tigen",
-    "7733": "Excluded file and folder names",
+    "7733": "Ausgenomme Datei- und Ordnernamen",
     "7734": "Lokalen Zwischenspeicher leeren",
     "7735": "Backups vorherig synchronisierter Dateien auf Ihrem Computer werden unwiderruflich gel\u00f6scht. Bitte pr\u00fcfen Sie Ihre Backupordner und stellen Sie sicher, dass sich in ihnen keine wichtigen Dateien mehr befinden.",
     "7736": "Lokalen Zwischenspeicher jetzt l\u00f6schen?",
@@ -2786,10 +2787,10 @@
     "7739": "Serverseitigen Zwischenspeicher jetzt l\u00f6schen?",
     "7740": "Der Papierkorb ist leer",
     "7741": "Papierkorb leeren",
-    "7742": "Are you sure you want to delete \"%1\"?",
-    "7743": "Change Email",
-    "7744": "Current Email",
-    "7745": "New Email",
-    "7746": "Enter your new email address in the text field above and click Save.",
-    "7747": "Following that, please go to your email inbox and confirm this email change."
+    "7742": "Wollen Sie \"%1\" wirklich l\u00f6schen?",
+    "7743": "E-Mail-Adresse \u00e4ndern",
+    "7744": "Derzeitige E-Mail-Adresse",
+    "7745": "Neue E-Mail-Adresse",
+    "7746": "Geben Sie Ihre neue E-Mail-Adresse ein und klicken Sie auf Speichern.",
+    "7747": "Danach klicken Sie bitte auf den Best\u00e4tigungslink, den Sie in Ihrem Posteingang finden."
 }

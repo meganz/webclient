@@ -23,7 +23,7 @@
         "with"
     ],
     "disallowIdentifierNames": [
-        "html",
+        "n",
         "append",
         "innerHTML",
         "outerHTML"

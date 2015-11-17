@@ -52,7 +52,7 @@ function initGridScrolling()
 }
 
 function initSelectScrolling(scrollBlock)
-{    
+{
     $(scrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scrollBlock);
 }
@@ -1429,13 +1429,19 @@ function addNewContact($addButton) {
  */
 function sharedUInode(nodeHandle) {
 
-    DEBUG('sharedUInode');
-
     var oShares,
         iShareNum = 0,
         bExportLink = false,
         bAvailShares = false,
         UiExportLink = new mega.UI.Share.ExportLink();
+
+    if (d) {
+        if (!fminitialized) {
+            UiExportLink.logger.warn('Skipping sharedUInode call...');
+            return;
+        }
+        UiExportLink.logger.debug('Entering sharedUInode...');
+    }
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -1475,7 +1481,7 @@ function sharedUInode(nodeHandle) {
     }
 
     // t === 1, folder
-    if (M.d[nodeHandle].t) {
+    if (M.d[nodeHandle] && M.d[nodeHandle].t) {
 
         // Update right panel selected node with appropriate icon for list view
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
@@ -2876,7 +2882,7 @@ function accountUI()
 {
     var sectionTitle,
         sectionClass;
-        
+
     $('.fm-account-overview').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
@@ -2889,7 +2895,7 @@ function accountUI()
         $.transferClose();
     }
 
-    //Destroy jScrollings in select dropdowns 
+    //Destroy jScrollings in select dropdowns
     $('.fm-account-main .default-select-scroll').each(function(i, e) {
         $(e).parent().fadeOut(200).parent().removeClass('active');
         deleteScrollPanel(e, 'jsp');
@@ -3179,6 +3185,8 @@ function accountUI()
         $('.account-history-drop-items.session10-').text(l[472].replace('[X]', 10));
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
+        
+        var $passwords = $('#account-password,#account-new-password,#account-confirm-password').unbind('click');
 
         M.account.sessions.sort(function(a, b)
         {
@@ -3223,7 +3231,8 @@ function accountUI()
                     status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
                 }
             }
-
+            
+            // If unknown country code use question mark gif
             if (!country.icon || country.icon === '??.gif') {
                 country.icon = 'ud.gif';
             }
@@ -3406,7 +3415,7 @@ function accountUI()
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
             i--;
         }
-        $('.default-select.year .default-select-scroll').html(html); 
+        $('.default-select.year .default-select-scroll').html(html);
         var i = 1, html = '', sel = '';
         $('.default-select.day span').text('DD');
         while (i < 32)
@@ -3451,7 +3460,7 @@ function accountUI()
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
         }
         $('.default-select.country .default-select-scroll').html(html);
-        
+       
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
 
@@ -3463,10 +3472,30 @@ function accountUI()
         $newEmail.val('');
         $emailInfoMessage.addClass('hidden');
 
+        $passwords.bind('keyup', function() {
+            var texts = [];
+            $passwords.each(function() {
+                texts.push($(this).val());
+            });
+            $newEmail.val('');
+            if (texts.join("") === "") {
+                $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            } else {
+                $newEmail.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
+            }
+        });
+
         // On text entry in the new email text field
         $newEmail.rebind('keyup', function() {
-            
-            var mail = $newEmail.val();
+            var mail = $.trim($newEmail.val());
+
+            $passwords.val('');
+
+            if (mail === "") {
+                $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            } else {
+                $passwords.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
+            }
             
             // Show information message
             $emailInfoMessage.removeClass('hidden');
@@ -3490,6 +3519,8 @@ function accountUI()
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
+            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             $('.fm-account-save-block').addClass('hidden');
             $('.profile-form.first').removeClass('email-confirm');
             accountUI();
@@ -3497,13 +3528,15 @@ function accountUI()
         
         $('.fm-account-save').rebind('click', function()
         {
+            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim()||' ';
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
             u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
             u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
             u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
-            
+
             $('.fm-account-avatar').html(useravatar.contact(u_handle));
             $('.fm-avatar img').attr('src', useravatar.mine());
 
@@ -3620,20 +3653,20 @@ function accountUI()
                         }
                         else if (typeof res == 'number' && res < 0)
                         { // something went wrong
-                            $('#account-confirm-password,#account-password,#account-new-password').val('');
+                            $passwords.val('');
                             msgDialog('warninga', 'Error', l[6972]);
                         }
                         else
                         { // success
                             msgDialog('info', l[726], l[725], false, function()
                             {
-                                $('#account-confirm-password,#account-password,#account-new-password').val('');
+                                $passwords.val('');
                             });
                         }
                     }});
             }
             else {
-                $('#account-confirm-password,#account-password,#account-new-password').val('');
+                $passwords.val('');
             }
 
             // Get the new email address
@@ -3657,14 +3690,14 @@ function accountUI()
 
                         fm_showoverlay();
                         dialogPositioning('.awaiting-confirmation');
-                        
+
                         $('.awaiting-confirmation').removeClass('hidden');
                         $('.fm-account-save-block').addClass('hidden');
-                        
+
                         localStorage.new_email = email;
                     }
                 });
-                
+
                 return;
             }
 
@@ -3681,6 +3714,7 @@ function accountUI()
             $(this).addClass('active');
             $('.account-history-dropdown').addClass('hidden');
             $(this).next().removeClass('hidden');
+
         });
         $('.account-history-drop-items').unbind('click');
         $('.account-history-drop-items').bind('click', function()
@@ -4008,7 +4042,7 @@ function accountUI()
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
-            
+
             $('.fm-account-button.reseller').removeClass('hidden');
             $('.account-history-dropdown-button.vouchers').text(buttonText);
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
@@ -4115,6 +4149,7 @@ function accountUI()
 
         function accountWidth() {
             var $mainBlock = $('.fm-account-main');
+
             if ($mainBlock.width() > 1675) {
                 $mainBlock.addClass('hi-width');
             }
@@ -4213,7 +4248,6 @@ function accountUI()
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').unbind('keyup');
     $('#account-new-password').bind('keyup', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
@@ -4233,11 +4267,11 @@ function accountUI()
         }
     });
 
-    $('#account-confirm-password').unbind('keyup');
-    $('#account-confirm-password').bind('keyup', function(el)
-    {
-        if ($(this).val() == $('#account-new-password').val())
+    $('#account-confirm-password').bind('keyup', function(el) {
+
+        if ($(this).val() === $('#account-new-password').val()) {
             $('.fm-account-save-block').removeClass('hidden');
+        }
     });
 }
 
@@ -10425,7 +10459,7 @@ function contactUI() {
             megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
         );
 
-        $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar') )
+        $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar').addClass('square') );
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
@@ -10658,7 +10692,7 @@ function bindDropdownEvents($dropdown, saveOption) {
     var $dropdownsItem = $dropdown.find('.default-dropdown-item');
 
     $($dropdown).rebind('click', function(e)
-    {    
+    {
         var $this = $(this);
         if (!$this.hasClass('active')) {
             var bottPos, jsp,
@@ -10669,12 +10703,12 @@ function bindDropdownEvents($dropdown, saveOption) {
             //Show Select dropdown
             $('.active .default-select-dropdown').fadeOut(200);
             $this.addClass('active');
-            $dropdown.css('margin-top', '0px');    
+            $dropdown.css('margin-top', '0px');
             $dropdown.fadeIn(200);
 
             //Dropdown position relative to the window
             bottPos = $(window).height() - ($dropdown.offset().top + $dropdown.outerHeight());
-            if (bottPos < 50) { 
+            if (bottPos < 50) {
                 $dropdown.css('margin-top', '-' + (60 - bottPos) + 'px');
             }
 
@@ -10707,7 +10741,7 @@ function bindDropdownEvents($dropdown, saveOption) {
             }
         }
     });
-        
+
     $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e)
     {
         if (!$(e.target).hasClass('default-select')) {

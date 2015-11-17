@@ -111,6 +111,10 @@
         "text": "New Folder",
         "context": "Menu option from the `Add` section that allows you to create a \"New Folder\""
     },
+    "70": {
+        "text": "Empty rubbish bin",
+        "context": "Title shown when your Rubbish Bin is empty."
+    },
     "71": {
         "text": "Add contact",
         "context": "Alert title shown when you select to add a contact inserting his\/her email"
@@ -5297,11 +5301,11 @@
     },
     "5600": {
         "text": "No incoming shared folders",
-        "context": "message when there are no incoming shared folders"
+        "context": "Title shown when there's no incoming Shared Items"
     },
     "5601": {
         "text": "No outgoing shared folders",
-        "context": "message when there are no outgoing shared folders"
+        "context": "Title shown when there's no outgoing Shared Items"
     },
     "5602": {
         "text": "Available offline",
@@ -6453,7 +6457,7 @@
     },
     "5905": {
         "text": "Owner",
-        "context": ""
+        "context": "Text shown next to name of the \"Owner\" of the folder that is being shared"
     },
     "5906": {
         "text": "Access",
@@ -6873,11 +6877,11 @@
     },
     "6026": {
         "text": "Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?",
-        "context": ""
+        "context": "Alert message shown when the user is overquota"
     },
     "6027": {
         "text": "Overquota Alert!",
-        "context": ""
+        "context": "Alert title shown when the user is overquota"
     },
     "6028": {
         "text": "You have not selected a default download location for your files.\n\nTo proceed with the download, please select a destination folder or go to preferences in order to set up your default download location.",
@@ -7453,7 +7457,7 @@
     },
     "6196": {
         "text": "No requests pending at this time",
-        "context": "Empty ipc and opc grid label."
+        "context": "Title shown when there's no pending request"
     },
     "6197": {
         "text": "Account name",

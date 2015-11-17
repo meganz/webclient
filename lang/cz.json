@@ -27,6 +27,7 @@
     "63": "Kop\u00edrovat",
     "64": "Opr\u00e1vn\u011bn\u00ed",
     "68": "Nov\u00e1 slo\u017eka",
+    "70": "Vysypat ko\u0161",
     "71": "P\u0159idat kontakt",
     "76": "Chyst\u00e1te se trvale odebrat [X] soubor\u016f z ko\u0161e.",
     "77": "Chcete pokra\u010dovat?",
@@ -2787,9 +2788,9 @@
     "7740": "Ko\u0161 je pr\u00e1zdn\u00fd",
     "7741": "Vysypat ko\u0161",
     "7742": "Opravdu chcete odstranit \"%1\"?",
-    "7743": "Change Email",
-    "7744": "Current Email",
-    "7745": "New Email",
-    "7746": "Enter your new email address in the text field above and click Save.",
-    "7747": "Following that, please go to your email inbox and confirm this email change."
+    "7743": "Zm\u011bna e-mailu",
+    "7744": "Aktu\u00e1ln\u00ed e-mail",
+    "7745": "Nov\u00fd e-mail",
+    "7746": "Zadejte svou novou e-mailovou adresu do v\u00fd\u0161e uveden\u00e9ho pole a klikn\u011bte na Ulo\u017eit.",
+    "7747": "Abyste tak u\u010dinili, p\u0159ejd\u011bte do doru\u010den\u00e9 po\u0161ty sv\u00e9 e-mailov\u00e9 schr\u00e1nky a potvr\u010fte tuto zm\u011bnu e-mailu."
 }

@@ -3272,15 +3272,15 @@ function MegaData()
 
     this.nodeAttr = function(attrs) {
 
-        if ((typeof mDB === 'object') && !pfkey) {
-            var node = M.d[attrs.h];
+        var node = M.d[attrs.h];
 
-            if (node) {
-                for (var i in attrs) {
-                    if (attrs.hasOwnProperty(i)) {
-                        node[i] = attrs[i];
-                    }
+        if (node) {
+            for (var i in attrs) {
+                if (attrs.hasOwnProperty(i)) {
+                    node[i] = attrs[i];
                 }
+            }
+            if ((typeof mDB === 'object') && !pfkey) {
                 mDBadd('f', clone(node));
             }
         }

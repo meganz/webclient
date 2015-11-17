@@ -2063,10 +2063,12 @@ function MegaData()
                         this.buildtree(folders[ii], dialog, stype);
                     }
 
-                    var nodeHandle = folders[ii].h;
+                    if (fminitialized) {
+                        var nodeHandle = folders[ii].h;
 
-                    if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
-                        sharedUInode(nodeHandle);
+                        if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
+                            sharedUInode(nodeHandle);
+                        }
                     }
                 }
             }// END of for folders loop
@@ -2688,7 +2690,7 @@ function MegaData()
         var proceed = this.checkCancelContactPrerequisites(target);
 
         if (proceed === 0) {
-            api_req({'a': 'upc', 'u': target, 'aa': 'd', i: requesti}, {
+            api_req({ 'a': 'upc', 'u': target, 'aa': 'd', i: requesti }, {
                 callback: function(resp) {
                     proceed = resp;
                 }
@@ -3268,16 +3270,18 @@ function MegaData()
             $('.nw-fm-left-icon.rubbish-bin').addClass('filled')
     };
 
-    this.nodeAttr = function(a) {
+    this.nodeAttr = function(attrs) {
 
-        var n = M.d[a.h];
+        if ((typeof mDB === 'object') && !pfkey) {
+            var node = M.d[attrs.h];
 
-        if (n) {
-            for (var i in a) {
-                n[i] = a[i];
-            }
-            if (typeof mDB === 'object' && !pfkey) {
-                mDBadd('f', clone(n));
+            if (node) {
+                for (var i in attrs) {
+                    if (attrs.hasOwnProperty(i)) {
+                        node[i] = attrs[i];
+                    }
+                }
+                mDBadd('f', clone(node));
             }
         }
     };
@@ -3397,11 +3401,10 @@ function MegaData()
                     mDBadd('s', clone(s));
                 }
             }
-            sharedUInode(h);
-            if ($.dialog === 'sharing' && $.selected && $.selected[0] === h) {
-                shareDialog();
+            if (fminitialized) {
+                sharedUInode(h);
             }
-            if (typeof mDB === 'object' && !pfkey) {
+            if ((typeof mDB === 'object') && !pfkey) {
                 if (!u_sharekeys[h]) {
                     console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
                 }
@@ -3431,7 +3434,7 @@ function MegaData()
             }
             if (a === 0) {
                 delete this.d[h].shares;
-                M.nodeAttr({h: h, shares: undefined});
+                M.nodeAttr({ h: h, shares: undefined });
                 delete u_sharekeys[h];
                 sharedUInode(h);
                 if (typeof mDB === 'object') {
@@ -3440,9 +3443,6 @@ function MegaData()
             }
             if (typeof mDB === 'object') {
                 mDBdel('s', h + '_' + u);
-            }
-            if ($.dialog === 'sharing' && $.selected && $.selected[0] === h) {
-                shareDialog();
             }
         }
     };
@@ -3485,17 +3485,7 @@ function MegaData()
      */
     this.deleteExportLinkShare = function(handle) {
 
-        var index;
-
-//  ToDo: Find out what's .fln stand for
-//        if (M.fln.h === handle) {
-//            delete M.fln;
-//        }
-
-        index = $.inArray(handle, M.links);
-        if (index !== -1) {
-            M.links.splice(index, 1);
-        }
+        removeValue(M.links || [], handle);
 
         if (M.d[handle] && M.d[handle].ph) {
             delete M.d[handle].ph;
@@ -6039,14 +6029,14 @@ function processIPC(ipc, ignoreDB) {
                 }
 
                 // Update token.input plugin
-                removeFromMultiInputDDL('.share-multiple-input', {id: ipc[i].m, name: ipc[i].m});
-                removeFromMultiInputDDL('.add-contact-multiple-input', {id: ipc[i].m, name: ipc[i].m});
+                removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
             }
             else {
 
                 // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
-                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
+                addToMultiInputDropDownList('.share-multiple-input', [{ id: ipc[i].m, name: ipc[i].m }]);
+                // Don't prevent contact creation when there's already IPC available
+                // When user add contact who already sent IPC, server will automatically create full contact
             }
         }
     }
@@ -6102,15 +6092,13 @@ function processOPC(opc, ignoreDB) {
  */
 function processPH(publicHandles) {
 
-    var logger = MegaLogger.getLogger('processPH'),
-        publicHandleId, nodeId,
-        hasStar = false;
+    var nodeId;
+    var publicHandleId;
+    var UiExportLink = fminitialized && new mega.UI.Share.ExportLink();
 
-    logger.debug();
-
-    var UiExportLink = new mega.UI.Share.ExportLink();
-
-    $.each(publicHandles, function(index, value) {
+    for (var value in publicHandles) {
+        /* jshint -W089 */
+        value = publicHandles[value];
         nodeId = value.h;
         publicHandleId = value.ph;
 
@@ -6119,19 +6107,23 @@ function processPH(publicHandles) {
             M.delNodeShare(nodeId, 'EXP');
             M.deleteExportLinkShare(nodeId);
 
-            UiExportLink.removeExportLinkIcon(nodeId);
+            if (UiExportLink) {
+                UiExportLink.removeExportLinkIcon(nodeId);
+            }
         }
         else {
             M.nodeAttr({ h: nodeId, ph: publicHandleId });
             M.nodeShare(value.h, { h: nodeId, r: 0, u: 'EXP', down: value.down, ets: value.ets, ts: unixtime() });
 
-            UiExportLink.addExportLinkIcon(nodeId);
+            if (UiExportLink) {
+                UiExportLink.addExportLinkIcon(nodeId);
+            }
         }
 
-        if (value.down !== undefined) {
+        if (UiExportLink && (value.down !== undefined)) {
             UiExportLink.updateTakenDownItem(nodeId, value.down);
         }
-    });
+    }
 }
 
 /**
@@ -6401,16 +6393,11 @@ function loadfm_callback(res, ctx) {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
-            var sharedNodes = [];
             for (var i in res.s) {
                 if (res.s.hasOwnProperty(i)) {
 
                     var nodeHandle = res.s[i].h;
                     M.nodeShare(nodeHandle, res.s[i]);
-
-                    if (res.s[i].u === 'EXP') {
-                        sharedNodes.push(nodeHandle);
-                    }
                 }
             }
         }
@@ -7129,14 +7116,7 @@ function balance2pro(callback)
      */
     var UiExportLink = function(opts) {
 
-        var self = this;
-
-        var defaultOptions = {
-        };
-
-        self.options = $.extend(true, {}, defaultOptions, opts);
-
-        self.logger = MegaLogger.getLogger('UiExportLink');
+        this.logger = MegaLogger.getLogger('UiExportLink');
     };
 
     /**
@@ -7147,21 +7127,37 @@ function balance2pro(callback)
      */
     UiExportLink.prototype.addExportLinkIcon = function(nodeId) {
 
-        // Add link-icon to list view
-        $('#' + nodeId + ' .own-data').addClass('linked');
+        var self = this;
+        var $nodeId = $('#' + nodeId);
+        var $tree = $('#treea_' + nodeId);
 
-        // Add class to the second from the list, prevent failure of the arrow icon
-        $('#' + nodeId + ' .own-data span').eq(1).addClass('link-icon');
+        if (!$nodeId.length && !$tree.length) {
+            self.logger.warn('No DOM Node matching "%s"', nodeId);
 
-        // Add link-icon to grid view
-        $('#' + nodeId + '.file-block').addClass('linked');
-        $('#' + nodeId + '.file-block span').eq(1).addClass('link-icon');
+            return false;
+        }
 
-        // Add link-icon to left panel
-        $('#treea_' + nodeId).addClass('linked');
+        self.logger.debug('addExportLinkIcon', nodeId);
 
-        // Add class to the third from the list
-        $('#treea_' + nodeId + ' span').eq(2).addClass('link-icon');
+        if ($nodeId.length) {
+
+            // Add link-icon to list view
+            $('.own-data', $nodeId).addClass('linked');
+            $('.own-data span', $nodeId).eq(0).addClass('link-icon');
+
+            // Add link-icon to grid view
+            $nodeId.addClass('linked');
+            $(' span', $nodeId).eq(1).addClass('link-icon');
+        }
+
+        if ($tree.length) {
+
+            // Add link-icon to left panel
+            $tree.addClass('linked');
+
+            // Add class to the third from the list
+            $(' span', $tree).eq(2).addClass('link-icon');
+        }
     };
 
     /**

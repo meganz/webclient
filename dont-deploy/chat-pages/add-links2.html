@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Chat one on one</title>
+<title>Group Chat</title>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <link rel="stylesheet" type="text/css" href="../../css/style.css" />
 <link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
@@ -11,7 +11,9 @@
 <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
 <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
 <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+<link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-messages.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-share-links.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-textarea.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-typing.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-left-pane.css" />
@@ -21,114 +23,18 @@
 
 <body>
 
-<!-- Context menu dropdown. Please remove Style attr. Its just as an example. !-->
-<div class="dropdown body white-context-menu" style="right: 280px; bottom: 148px;">
+<div class="dropdown body white-context-menu" style="left: 585px; bottom: 243px;">
 	<i class="dropdown-white-arrow"></i>
-    <div class="dropdown-item hidden">
-    	<i class="small-icon human-profile"></i>
-        Profile
+    <div class="dropdown-item">
+    	<i class="small-icon play-icon"></i>
+        Play video
     </div>
     <div class="dropdown-item">
-    	<i class="small-icon writing-pen"></i>
-        Edit
-    </div>
-    <div class="dropdown-item">
-    	<i class="small-icon quotes"></i>
-        Quote
-    </div>
-    <hr />
-    <div class="dropdown-item hidden">
-    	<i class="small-icon dashed-conversation"></i>
-        Enter Whisper Mode
-    </div>
-    <div class="dropdown-item red">
-    	<i class="small-icon red-cross"></i>
-        Delete
+    	<i class="small-icon circle-with-arrow"></i>
+        Open in a new tab
     </div>
     
 </div>
-<!-- End of Context menu dropdown !-->
-
-
-<!-- Search users dropdown. Please remove Style attr. Its just as an example. !-->
-<!-- Please add "wide-dropdown" for wide light dropdown.  
-     Please add "dropdown-arrow" class and any of "up-arrow/down-arrow" classes !-->
-<div class="dropdown body dropdown-arrow up-arrow popup contacts-search" style="left: 101px; top: 95px;">
-	<i class="dropdown-white-arrow"></i>
-    
-    <div class="contacts-search-header">
-    	<i class="small-icon search-icon"></i>
-    	Search
-    </div>
-    
-    <div class="contacts-search-scroll">
-    
-    	<div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-verified"></div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-    </div>
-    
-</div>
-<!-- End of Context menu dropdown !-->
-
 
 <div class="fmholder" id="fmholder">
   <div class="top-head"></div>
@@ -138,8 +44,6 @@
           <div class="nw-fm-left-icon shared-with-me"></div>
           <div class="nw-fm-left-icon contacts"></div>
           <div class="nw-fm-left-icon conversations active"><div class="nw-fm-left-border"></div></div>
-          <div class="nw-fm-left-icon rubbish-bin"></div>
-          <div class="nw-fm-left-icon settings"></div>
           <div class="nw-fm-left-icon transfers"></div>
     </div>
     <div class="fm-left-panel">
@@ -156,11 +60,25 @@
                 <!-- Left Conversations List !--> 
             	<ul class="conversations-pane">
                     <li class="active">
+                    	
+                        <!-- Please add "group" class  and remove "presence" span for group chat !--> 
+                    	<div class="user-card-name conversation-name group">
+                            Bruce Schneier, Clifford Cocks,  David Chaum
+                        </div>
+                        <div class="conversation-message">My place! Bring wine and cheese!</div>
+                        <div class="date-time">12:35 AM</div>
+                    </li>
+                    <li>
                     	<div class="user-card-name conversation-name">
                             Bruce Schneier
-                            <span class="user-card-presence online"></span>
+                            <span class="user-card-presence away"></span>
                         </div>
-                        <div class="conversation-message">Write a message…</div>
+                        <!-- Unread messages counter !-->
+                        <div class="unread-messages">
+                        	2
+                        </div>
+                        <!-- Please add 'unread" classname !-->
+                        <div class="conversation-message unread">Hey man, where are you?</div>
                         <div class="date-time">12:35 AM</div>
                     </li>
                 </ul>
@@ -174,7 +92,7 @@
         
         <!-- Chat content block !-->
         <div class="chat-content-block">
-        
+    
             <!-- Right contacts block !-->
             <div class="chat-right-area">
                 <!-- jScrollPane block !-->
@@ -196,42 +114,45 @@
                             </div>
                         </div>
                         
+                        <div class="contacts-info body">
+                            <!-- Please add "online/away/busy/offline" classname !-->
+                            <div class="user-card-presence online"></div>
+                            <div class="small-rounded-avatar color4">C</div>
+                            
+                            <div class="default-white-button tiny-button">
+                                <i class="tiny-icon grey-down-arrow"></i>
+                            </div>
+                            
+                            <div class="user-card-data">
+                                <div class="user-card-name">Clifford Cocks</div>
+                                <div class="user-card-email">cc@mega.co.nz</div>
+                            </div>
+                        </div>
+                        
+                        <div class="contacts-info body">
+                            <!-- Please add "online/away/busy/offline" classname !-->
+                            <div class="user-card-presence online"></div>
+                            <div class="small-rounded-avatar color6">D</div>
+                            
+                            <div class="default-white-button tiny-button">
+                                <i class="tiny-icon grey-down-arrow"></i>
+                            </div>
+                            
+                            <div class="user-card-data">
+                                <div class="user-card-name">David Chaum</div>
+                                <div class="user-card-email">dc@mega.co.nz</div>
+                            </div>
+                        </div>
+                        
                         <div class="buttons-block">
-                            <div class="link-button">
-                                <i class="small-icon audio-call"></i>
-                                Start Audio Call
-                            </div>
-                            <div class="link-button">
-                                <i class="small-icon video-call"></i>
-                                Start Video Call
-                            </div>
                             <div class="link-button">
                                 <i class="small-icon rounded-grey-plus"></i>
                                 Add participant…
                             </div>
-                            
-                            
-                            <!-- Link with dropdown !-->
-                            <div class="link-button dropdown-element active">
+                            <div class="link-button">
                                 <i class="small-icon rounded-grey-up-arrow"></i>
                                 Send Files…
                             </div>
-                            <!-- Dropdown body. Please add "wide-dropdown" for wide light dropdown. 
-                                 Please add "dropdown-arrow" class and any of "up-arrow/down-arrow" classes !-->
-                            <div class="dropdown body wide-dropdown dropdown-arrow up-arrow">
-                                <i class="dropdown-white-arrow"></i>
-                                <div class="dropdown-item">
-                                    <i class="small-icon grey-cloud"></i>
-                                    From my Cloud Drive
-                                </div>
-                                <div class="dropdown-item">
-                                    <i class="small-icon grey-computer"></i>
-                                    From my computer
-                                </div>
-                            </div>
-                            <!-- End of Dropdown body !-->
-                            
-                            
                             <div class="link-button">
                                 <i class="small-icon shared-grey-folder"></i>
                                 Share Folders
@@ -252,6 +173,7 @@
                 
             </div>
             <!-- End of Right contacts block !-->
+            
         
             <!-- Messages component !-->
             <div class="messages-block">
@@ -259,23 +181,56 @@
                 <div class="messages scroll-area">
                 	<div class="messages main-pad">
                     	<div class="messages content-area">
-                            
-                            <!-- Message block !-->
+                        
+                        
+                        	<!-- Message block !-->
                             <div class="message body">
-                                <div class="message small-rounded-avatar color6">B</div>
+                                <div class="message small-rounded-avatar color6">В</div>
                                 <div class="message content-area">
-                                	<div class="message user-card-name">Bruce Schneider</div>
+                                	<div class="message user-card-name">David Chaum</div>
                                     <div class="message date-time">12:35 AM</div>
                                     
-                                    <div class="default-white-button tiny-button active">
-                        				<i class="tiny-icon grey-down-arrow"></i>
-                       				</div>
-                                    
-                                    <div class="message text-block">
-                                    	You are now our ruler, <br />so you must come back to us as soon as possible.
+                                    <!-- Block with all shared data. !-->
+                                    <div class="message shared-block">
+                                    	
+                                    	<a href="https://vimeo.com/41486619" class="shared-link main-link">
+                                        	https://www.youtube.com/watch?v=NBlCM9gSqGg
+                                        </a>
+                                        <div class="shared-link data-block">
+                                        	
+                                            <div class="shared-link project-title">
+                                            	<i class="shared-link small-icon youtube"></i>
+                                            	YouTube
+                                            </div>
+                                            <div class="shared-link author-name">
+                                            	Eskmo
+                                            </div>
+                                            <a href="https://vimeo.com/41486619" class="shared-link page-link">
+                                            	Eskmo: "Mind of War" (Official Video)
+                                            </a>
+                                            <div class="shared-link description">
+                                            	The new album "Sol" out now on Apollo (R&S). - VINYL: <a href="">http://www.eskmo.com</a> / iTUNES: <a href="">http://hyperurl.co/SOL</a><br />
+Info below - show more <a href="" class="shared-link show-more">show more…</a>
+                                            </div>
+                                            <div class="shared-link img-block">
+                                                <div class="button overlay-button visible">
+                                                    <i class="huge-white-icon play"></i>
+                                                </div>
+                                                
+                                                <div class="default-white-button tiny-button active">
+                                                    <i class="tiny-icon grey-down-arrow"></i>
+                                                </div>
+                                            	<img alt="" src="../../images/temp/video01.jpg" />
+                                            </div>
+                                            
+                                        </div>
+                                        
                                     </div>
+                                    <!-- End of Block with all shared data. !--> 
+                                    
                                 </div>
                             </div>
+                           
                        
                        </div> 
                     </div>

@@ -11,7 +11,9 @@
 <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
 <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
 <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+<link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-messages.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-share-links.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-textarea.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-typing.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-left-pane.css" />
@@ -20,6 +22,38 @@
 </head>
 
 <body>
+
+<!-- Context menu dropdown. Please remove Style attr. Its just as an example. !-->
+<div class="dropdown body white-context-menu" style="left: 497px; bottom: 311px;">
+	<i class="dropdown-white-arrow"></i>
+    <div class="dropdown-item">
+    	<i class="small-icon rounded-grey-plus"></i>
+        Add contact
+    </div>
+    
+</div>
+<!-- End of Context menu dropdown !-->
+
+<!-- Context menu dropdown. Please remove Style attr. Its just as an example. !-->
+<div class="dropdown body white-context-menu" style="left: 497px; bottom: 118px;">
+	<i class="dropdown-white-arrow"></i>
+    <div class="dropdown-item">
+    	<i class="small-icon human-profile"></i>
+        View profile
+    </div>
+    <hr />
+    <div class="dropdown-item">
+    	<i class="small-icon rounded-grey-plus"></i>
+        Add to chat
+    </div>
+    <div class="dropdown-item">
+    	<i class="small-icon conversations"></i>
+        Start new chat
+    </div>
+    
+</div>
+<!-- End of Context menu dropdown !-->
+
 
 <div class="fmholder" id="fmholder">
   <div class="top-head"></div>
@@ -167,48 +201,89 @@
                 	<div class="messages main-pad">
                     	<div class="messages content-area">
                         
-                        	<!-- Joined information !-->
-                            <div class="messages notification">
-                                <div class="header">
-                                    New group chat with <span>Bruce Schneier, Clifford Cocks and David Chaum</span>
-                                </div>
-                                <div class="info">
-                                    Text explaining MEGA’s group chat, it’s advantages and limitations, something specific enough, ideally between 160-200 characters in English.
-                                </div>
-                            </div>
-                            <!-- end of Joined information !-->
                         
-                            <!-- Joined Message block !-->
+                        	<!-- Message block !-->
                             <div class="message body">
-                                <div class="message small-rounded-avatar color2">C</div>
-                                
-                                <!-- Please add "small-info-txt" for joined information !-->
-                                <div class="message content-area small-info-txt">
-                                	<div class="message user-card-name">Clifford</div>
+                                <div class="message small-rounded-avatar color6">В</div>
+                                <div class="message content-area">
+                                	<div class="message user-card-name">David Chaum</div>
                                     <div class="message date-time">12:35 AM</div>
                                     
-                                    <div class="message text-block">
-                                    	Joined the group chat by invitation from <strong class="dark-grey-txt">Bruce Schneier</strong>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- End of Joined Message block !-->
-                            
-                            <!-- Joined Message block !-->
-                            <div class="message body">
-                                <div class="message small-rounded-avatar color2">B</div>
-                                
-                                <!-- Please add "small-info-txt" for joined information !-->
-                                <div class="message content-area small-info-txt">
-                                	<div class="message user-card-name">Bruce Schneier</div>
-                                    <div class="message date-time">02:35 AM</div>
+                                    <!-- Block with all shared data. !-->
+                                    <div class="message shared-block">
+                                    	
                                     
-                                    <div class="message text-block">
-                                    	Joined the group chat invited by <strong class="dark-grey-txt">you</strong>
+                                    	<!-- One shared contact. !-->
+                                        <div class="message shared-info">
+                                            <div class="message data-title red">
+                                                David Chaum
+                                            </div>
+                                            
+                                            <div class="user-card-email">
+                                            	dc@mega.co.nz
+                                            </div>
+                                        </div>
+                                        <div class="message shared-data">
+                                        
+                                            <!-- Default file/folder/contact block. Please remove "active" classname !-->
+                                            <div class="data-block-view medium">
+                                                <div class="default-white-button tiny-button active">
+                                                    <i class="tiny-icon grey-down-arrow"></i>
+                                                </div>
+                                                
+                                            	<div class="data-block-bg">
+                                                	<img alt="" src="../../images/temp/avatar-img.jpg" />
+                                                </div>
+                                            </div>
+                                            <div class="clear"></div>
+                                        
+                                        </div>
+                                    	<!-- End of One shared contact. !-->
+                                        
+                                        
+                                        <!-- One shared contact. !-->
+                                        <div class="message shared-info">
+                                            <div class="message data-title">
+                                                David Chaum
+                                            </div>
+                                            
+                                            <!-- Verified icon !-->
+                                            <div class="user-card-verified big"></div>
+                                            
+                                            <div class="user-card-email">
+                                            	dc@mega.co.nz
+                                            </div>
+                                        </div>
+                                        <div class="message shared-data">
+                                        
+                                            <!-- Default file/folder/contact block. Please remove "active" classname !-->
+                                            <div class="data-block-view medium active">
+                                            	<!-- Presence block for existing contact !-->
+                                            	<span class="user-card-presence big away"></span>
+                                                
+                                                <div class="default-white-button tiny-button active">
+                                                    <i class="tiny-icon grey-down-arrow"></i>
+                                                </div>
+                                                
+                                            	<div class="data-block-bg">
+                                                	<img alt="" src="../../images/temp/avatar-img.jpg" />
+                                                </div>
+                                            </div>
+                                            <div class="clear"></div>
+                                        
+                                        </div>
+                                    	<!-- End of One shared contact. !-->
+                                        
+                                        
+                                        <!-- 
+                                        	New contact/file/image should go here. 
+                                        !-->
+                                        
                                     </div>
+                                    <!-- End of Block with all shared data. !--> 
+                                    
                                 </div>
                             </div>
-                            <!-- End of Joined Message block !-->
                            
                        
                        </div> 
@@ -218,16 +293,6 @@
                 
                 <!-- Chat textarea component !-->
                 <div class="chat-textarea-block">
-                	
-                    <!-- Typing component !-->
-                    <div class="typing-block">
-                    	<div class="typing-text">Bruce, Clifford and David are typing</div>
-                        <div class="typing-bounce">
-                            <div class="typing-bounce1"></div>
-                            <div class="typing-bounce2"></div>
-                            <div class="typing-bounce3"></div>
-                        </div>
-                    </div>
                     
                 	<div class="chat-textarea">
                     	<i class="small-icon conversations"></i>

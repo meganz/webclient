@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Chat one on one</title>
+<title>Group Chat</title>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <link rel="stylesheet" type="text/css" href="../../css/style.css" />
 <link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
@@ -11,7 +11,9 @@
 <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
 <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
 <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+<link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-messages.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-share-links.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-textarea.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-typing.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-left-pane.css" />
@@ -21,23 +23,36 @@
 
 <body>
 
+
 <!-- Context menu dropdown. Please remove Style attr. Its just as an example. !-->
-<div class="dropdown body wide-dropdown dropdown-arrow down-arrow" style="right: 280px; bottom: 148px;">
+<div class="dropdown body white-context-menu" style="left: 561px; bottom: 111px;">
 	<i class="dropdown-white-arrow"></i>
     <div class="dropdown-item">
+    	<i class="small-icon search-icon"></i>
+        Preview
+    </div>
+    <hr />
+    <div class="dropdown-item">
+    	<i class="small-icon rounded-grey-down-arrow"></i>
+        Download
+    </div>
+    <div class="dropdown-item">
     	<i class="small-icon grey-cloud"></i>
-    	Add from your Cloud Drive
+        Add to Cloud Drive
     </div>
     <div class="dropdown-item">
-    	<i class="small-icon rounded-grey-up-arrow"></i>
-        Upload a file
+    	<i class="small-icon grey-chain"></i>
+        Get Link
     </div>
-    <div class="dropdown-item">
-    	<i class="small-icon human-profile"></i>
-        Send contact
+    <hr />
+    <div class="dropdown-item red">
+    	<i class="small-icon red-cross"></i>
+        Delete
     </div>
+    
 </div>
 <!-- End of Context menu dropdown !-->
+
 
 <div class="fmholder" id="fmholder">
   <div class="top-head"></div>
@@ -47,8 +62,6 @@
           <div class="nw-fm-left-icon shared-with-me"></div>
           <div class="nw-fm-left-icon contacts"></div>
           <div class="nw-fm-left-icon conversations active"><div class="nw-fm-left-border"></div></div>
-          <div class="nw-fm-left-icon rubbish-bin"></div>
-          <div class="nw-fm-left-icon settings"></div>
           <div class="nw-fm-left-icon transfers"></div>
     </div>
     <div class="fm-left-panel">
@@ -65,11 +78,12 @@
                 <!-- Left Conversations List !--> 
             	<ul class="conversations-pane">
                     <li class="active">
-                    	<div class="user-card-name conversation-name">
-                            Bruce Schneier
-                            <span class="user-card-presence online"></span>
+                    	
+                        <!-- Please add "group" class  and remove "presence" span for group chat !--> 
+                    	<div class="user-card-name conversation-name group">
+                            Bruce Schneier, Clifford Cocks,  David Chaum
                         </div>
-                        <div class="conversation-message">Write a message…</div>
+                        <div class="conversation-message">My place! Bring wine and cheese!</div>
                         <div class="date-time">12:35 AM</div>
                     </li>
                     <li>
@@ -85,22 +99,6 @@
                         <div class="conversation-message unread">Hey man, where are you?</div>
                         <div class="date-time">12:35 AM</div>
                     </li>
-                    <li>
-                    	<div class="user-card-name conversation-name">
-                            Bruce Schneier
-                            <span class="user-card-presence offline"></span>
-                        </div>
-                        <div class="conversation-message">Hey Ho, lets go</div>
-                        <div class="date-time">12:35 AM</div>
-                    </li>
-                    <li>
-                    	<div class="user-card-name conversation-name">
-                            Bruce Schneier
-                            <span class="user-card-presence online"></span>
-                        </div>
-                        <div class="conversation-message">Hahaha, no way. Long long long message!!</div>
-                        <div class="date-time">Yesterday</div>
-                    </li>
                 </ul>
                 <!-- Left Conversations List !--> 
                  
@@ -112,7 +110,7 @@
         
         <!-- Chat content block !-->
         <div class="chat-content-block">
-        
+    
             <!-- Right contacts block !-->
             <div class="chat-right-area">
                 <!-- jScrollPane block !-->
@@ -134,15 +132,37 @@
                             </div>
                         </div>
                         
+                        <div class="contacts-info body">
+                            <!-- Please add "online/away/busy/offline" classname !-->
+                            <div class="user-card-presence online"></div>
+                            <div class="small-rounded-avatar color4">C</div>
+                            
+                            <div class="default-white-button tiny-button">
+                                <i class="tiny-icon grey-down-arrow"></i>
+                            </div>
+                            
+                            <div class="user-card-data">
+                                <div class="user-card-name">Clifford Cocks</div>
+                                <div class="user-card-email">cc@mega.co.nz</div>
+                            </div>
+                        </div>
+                        
+                        <div class="contacts-info body">
+                            <!-- Please add "online/away/busy/offline" classname !-->
+                            <div class="user-card-presence online"></div>
+                            <div class="small-rounded-avatar color6">D</div>
+                            
+                            <div class="default-white-button tiny-button">
+                                <i class="tiny-icon grey-down-arrow"></i>
+                            </div>
+                            
+                            <div class="user-card-data">
+                                <div class="user-card-name">David Chaum</div>
+                                <div class="user-card-email">dc@mega.co.nz</div>
+                            </div>
+                        </div>
+                        
                         <div class="buttons-block">
-                            <div class="link-button">
-                                <i class="small-icon audio-call"></i>
-                                Start Audio Call
-                            </div>
-                            <div class="link-button">
-                                <i class="small-icon video-call"></i>
-                                Start Video Call
-                            </div>
                             <div class="link-button">
                                 <i class="small-icon rounded-grey-plus"></i>
                                 Add participant…
@@ -171,6 +191,7 @@
                 
             </div>
             <!-- End of Right contacts block !-->
+            
         
             <!-- Messages component !-->
             <div class="messages-block">
@@ -179,16 +200,96 @@
                 	<div class="messages main-pad">
                     	<div class="messages content-area">
                         
-                            <!-- No history information !-->
-                            <div class="messages notification">
-                                <div class="header">
-                                    No chat history with <span>Bruce Schneier</span>
-                                </div>
-                                <div class="info">
-                                    Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
+                        
+                        	<!-- Message block !-->
+                            <div class="message body">
+                                <div class="message small-rounded-avatar color6">B</div>
+                                <div class="message content-area">
+                                	<div class="message user-card-name">Bruce Schneider</div>
+                                    <div class="message date-time">12:35 AM</div>
+                                    
+                                    <!-- Block with all shared data. !-->
+                                    <div class="message shared-block">
+                                    
+                                    	<!-- One shared img. !-->
+                                        <div class="message shared-info">
+                                            <div class="message data-title">
+                                                image_1.jpg
+                                            </div>
+                                            <div class="message file-size">
+                                                160 Kb
+                                            </div>
+                                        </div>
+                                        <div class="shared-link img-block">
+                                        	<div class="img-overlay"></div>
+                                            <div class="button overlay-button">
+                                            	<i class="huge-white-icon loupe"></i>
+                                            </div>
+                                            
+                                            <div class="default-white-button tiny-button">
+                                                <i class="tiny-icon grey-down-arrow"></i>
+                                            </div>
+                                        
+                                            <img alt="" src="../../images/temp/img01.png" />
+                                        </div>
+                                    	<!-- End of One shared img. !-->
+                                        
+                                        <!-- 
+                                        	Second file should goes here. 
+                                        !-->
+                                        
+                                    </div>
+                                    <!-- End of Block with all shared data. !--> 
+                                    
                                 </div>
                             </div>
-                            <!-- End of No history information !-->
+                            
+                            
+                            
+                            <!-- Message block !-->
+                            <div class="message body">
+                                <div class="message small-rounded-avatar color6">A</div>
+                                <div class="message content-area">
+                                	<div class="message user-card-name">Me</div>
+                                    <div class="message date-time">12:35 AM</div>
+                                    
+                                    <!-- Block with all shared data. !-->
+                                    <div class="message shared-block">
+                                    
+                                    	<!-- One shared img. !-->
+                                        <div class="message shared-info">
+                                            <div class="message data-title">
+                                                image_1.jpg
+                                            </div>
+                                            <div class="message file-size">
+                                                160 Kb
+                                            </div>
+                                        </div>
+                                        <div class="shared-link img-block">
+                                        	<div class="img-overlay"></div>
+                                            <div class="button overlay-button">
+                                            	<i class="huge-white-icon loupe"></i>
+                                            </div>
+                                            
+                                            <!-- Remove class "visible". Its just an example !-->
+                                            <div class="default-white-button tiny-button active">
+                                                <i class="tiny-icon grey-down-arrow"></i>
+                                            </div>
+                                        
+                                            <img alt="" src="../../images/temp/img01.png" />
+                                        </div>
+                                    	<!-- End of One shared img. !-->
+                                        
+                                        <!-- 
+                                        	Second file should goes here. 
+                                        !-->
+                                        
+                                    </div>
+                                    <!-- End of Block with all shared data. !--> 
+                                    
+                                </div>
+                            </div>
+                           
                        
                        </div> 
                     </div>
@@ -197,16 +298,6 @@
                 
                 <!-- Chat textarea component !-->
                 <div class="chat-textarea-block">
-                	
-                    <!-- Typing component !-->
-                    <div class="typing-block">
-                    	<div class="typing-text">Bruce is typing</div>
-                        <div class="typing-bounce">
-                            <div class="typing-bounce1"></div>
-                            <div class="typing-bounce2"></div>
-                            <div class="typing-bounce3"></div>
-                        </div>
-                    </div>
                     
                 	<div class="chat-textarea">
                     	<i class="small-icon conversations"></i>

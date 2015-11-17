@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Chat one on one</title>
+<title>Add attachment from message area</title>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <link rel="stylesheet" type="text/css" href="../../css/style.css" />
 <link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
@@ -11,7 +11,9 @@
 <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
 <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
 <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+<link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-messages.css" />
+<link rel="stylesheet" type="text/css" href="../../css/chat-share-links.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-textarea.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-typing.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-left-pane.css" />
@@ -22,113 +24,22 @@
 <body>
 
 <!-- Context menu dropdown. Please remove Style attr. Its just as an example. !-->
-<div class="dropdown body white-context-menu" style="right: 280px; bottom: 148px;">
+<div class="dropdown body wide-dropdown dropdown-arrow down-arrow" style="right: 227px; bottom: 71px;">
 	<i class="dropdown-white-arrow"></i>
-    <div class="dropdown-item hidden">
-    	<i class="small-icon human-profile"></i>
-        Profile
+    <div class="dropdown-item">
+    	<i class="small-icon grey-cloud"></i>
+    	Add from your Cloud Drive
     </div>
     <div class="dropdown-item">
-    	<i class="small-icon writing-pen"></i>
-        Edit
+    	<i class="small-icon rounded-grey-up-arrow"></i>
+        Upload a file
     </div>
     <div class="dropdown-item">
-    	<i class="small-icon quotes"></i>
-        Quote
+    	<i class="small-icon square-profile"></i>
+        Send contact
     </div>
-    <hr />
-    <div class="dropdown-item hidden">
-    	<i class="small-icon dashed-conversation"></i>
-        Enter Whisper Mode
-    </div>
-    <div class="dropdown-item red">
-    	<i class="small-icon red-cross"></i>
-        Delete
-    </div>
-    
 </div>
 <!-- End of Context menu dropdown !-->
-
-
-<!-- Search users dropdown. Please remove Style attr. Its just as an example. !-->
-<!-- Please add "wide-dropdown" for wide light dropdown.  
-     Please add "dropdown-arrow" class and any of "up-arrow/down-arrow" classes !-->
-<div class="dropdown body dropdown-arrow up-arrow popup contacts-search" style="left: 101px; top: 95px;">
-	<i class="dropdown-white-arrow"></i>
-    
-    <div class="contacts-search-header">
-    	<i class="small-icon search-icon"></i>
-    	Search
-    </div>
-    
-    <div class="contacts-search-scroll">
-    
-    	<div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-verified"></div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-        <div class="contacts-info body contacts-search">
-            <!-- Please add "online/away/busy/offline" classname !-->
-            <div class="user-card-presence online"></div>
-            <div class="small-rounded-avatar color6">B</div>
-            <div class="user-card-data">
-                <div class="user-card-name">Bruce Schneider</div>
-                <div class="user-card-email">bs@mega.co.nz</div>
-            </div>
-    	</div>
-        
-    </div>
-    
-</div>
-<!-- End of Context menu dropdown !-->
-
 
 <div class="fmholder" id="fmholder">
   <div class="top-head"></div>
@@ -138,9 +49,6 @@
           <div class="nw-fm-left-icon shared-with-me"></div>
           <div class="nw-fm-left-icon contacts"></div>
           <div class="nw-fm-left-icon conversations active"><div class="nw-fm-left-border"></div></div>
-          <div class="nw-fm-left-icon rubbish-bin"></div>
-          <div class="nw-fm-left-icon settings"></div>
-          <div class="nw-fm-left-icon transfers"></div>
     </div>
     <div class="fm-left-panel">
     	<div class="left-pane-drag-handle"></div>
@@ -162,6 +70,35 @@
                         </div>
                         <div class="conversation-message">Write a message…</div>
                         <div class="date-time">12:35 AM</div>
+                    </li>
+                    <li>
+                    	<div class="user-card-name conversation-name">
+                            Bruce Schneier
+                            <span class="user-card-presence away"></span>
+                        </div>
+                        <!-- Unread messages counter !-->
+                        <div class="unread-messages">
+                        	2
+                        </div>
+                        <!-- Please add 'unread" classname !-->
+                        <div class="conversation-message unread">Hey man, where are you?</div>
+                        <div class="date-time">12:35 AM</div>
+                    </li>
+                    <li>
+                    	<div class="user-card-name conversation-name">
+                            Bruce Schneier
+                            <span class="user-card-presence offline"></span>
+                        </div>
+                        <div class="conversation-message">Hey Ho, lets go</div>
+                        <div class="date-time">12:35 AM</div>
+                    </li>
+                    <li>
+                    	<div class="user-card-name conversation-name">
+                            Bruce Schneier
+                            <span class="user-card-presence online"></span>
+                        </div>
+                        <div class="conversation-message">Hahaha, no way. Long long long message!!</div>
+                        <div class="date-time">Yesterday</div>
                     </li>
                 </ul>
                 <!-- Left Conversations List !--> 
@@ -209,29 +146,10 @@
                                 <i class="small-icon rounded-grey-plus"></i>
                                 Add participant…
                             </div>
-                            
-                            
-                            <!-- Link with dropdown !-->
-                            <div class="link-button dropdown-element active">
+                            <div class="link-button">
                                 <i class="small-icon rounded-grey-up-arrow"></i>
                                 Send Files…
                             </div>
-                            <!-- Dropdown body. Please add "wide-dropdown" for wide light dropdown. 
-                                 Please add "dropdown-arrow" class and any of "up-arrow/down-arrow" classes !-->
-                            <div class="dropdown body wide-dropdown dropdown-arrow up-arrow">
-                                <i class="dropdown-white-arrow"></i>
-                                <div class="dropdown-item">
-                                    <i class="small-icon grey-cloud"></i>
-                                    From my Cloud Drive
-                                </div>
-                                <div class="dropdown-item">
-                                    <i class="small-icon grey-computer"></i>
-                                    From my computer
-                                </div>
-                            </div>
-                            <!-- End of Dropdown body !-->
-                            
-                            
                             <div class="link-button">
                                 <i class="small-icon shared-grey-folder"></i>
                                 Share Folders
@@ -259,23 +177,17 @@
                 <div class="messages scroll-area">
                 	<div class="messages main-pad">
                     	<div class="messages content-area">
-                            
-                            <!-- Message block !-->
-                            <div class="message body">
-                                <div class="message small-rounded-avatar color6">B</div>
-                                <div class="message content-area">
-                                	<div class="message user-card-name">Bruce Schneider</div>
-                                    <div class="message date-time">12:35 AM</div>
-                                    
-                                    <div class="default-white-button tiny-button active">
-                        				<i class="tiny-icon grey-down-arrow"></i>
-                       				</div>
-                                    
-                                    <div class="message text-block">
-                                    	You are now our ruler, <br />so you must come back to us as soon as possible.
-                                    </div>
+                        
+                            <!-- No history information !-->
+                            <div class="messages notification">
+                                <div class="header">
+                                    No chat history with <span>Bruce Schneier</span>
+                                </div>
+                                <div class="info">
+                                    Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
                                 </div>
                             </div>
+                            <!-- End of No history information !-->
                        
                        </div> 
                     </div>
@@ -284,6 +196,16 @@
                 
                 <!-- Chat textarea component !-->
                 <div class="chat-textarea-block">
+                	
+                    <!-- Typing component !-->
+                    <div class="typing-block">
+                    	<div class="typing-text">Bruce is typing</div>
+                        <div class="typing-bounce">
+                            <div class="typing-bounce1"></div>
+                            <div class="typing-bounce2"></div>
+                            <div class="typing-bounce3"></div>
+                        </div>
+                    </div>
                     
                 	<div class="chat-textarea">
                     	<i class="small-icon conversations"></i>

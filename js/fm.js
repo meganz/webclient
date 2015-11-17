@@ -3511,6 +3511,8 @@ function accountUI()
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
+            $passwords.removeAttr('disabled');
+            $newEmail.removeAttr('disabled');
             $('.fm-account-save-block').addClass('hidden');
             $('.profile-form.first').removeClass('email-confirm');
             accountUI();
@@ -3518,6 +3520,8 @@ function accountUI()
         
         $('.fm-account-save').rebind('click', function()
         {
+            $passwords.removeAttr('disabled');
+            $newEmail.removeAttr('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim()||' ';
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');

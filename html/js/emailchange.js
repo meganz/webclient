@@ -35,7 +35,7 @@ var emailchange = (function() {
                 document.location.href = "#login";
             });
         }
-        
+
         $input = $('#verify-password');
         $input.rebind('focus', function() {
             
@@ -148,7 +148,7 @@ var emailchange = (function() {
             }
         });
     }
-    
+
     /**
      * Verify if verify code is valid.
      *
@@ -163,34 +163,46 @@ var emailchange = (function() {
         if (!context) {
             return;
         }
-        
-        $input = $input || $('#verify-password');
-        var password = $input.val();
-        
-        // Use passAES (AES object with the user's password as the key)
-        // *or* whatever the user typed in `$input`.
-        passAES = passAES || new sjcl.cipher.aes(prepare_key_pw(password));
-        
-        $('.login-register-input.password').addClass('loading').removeClass('incorrect');
-        $input.val('');
-        
-        // Check if the code is valid using 'Email Request Service' API call
-        api_req({ 'a': 'ersv', 'c': context.code }, { callback: function(res) {
-                
-            if (checkError(res)) {
-                return;
-            }
-
-            if (keys) {
-                context.k1 = keys.k1;
-                context.k2 = keys.k2;
-            }
+        function verifyUserPassword() {
+            $input = $input || $('#verify-password');
+            var password = $input.val();
+            
+            // Use passAES (AES object with the user's password as the key)
+            // *or* whatever the user typed in `$input`.
+            passAES = passAES || new sjcl.cipher.aes(prepare_key_pw(password));
+            
+            $('.login-register-input.password').addClass('loading').removeClass('incorrect');
+            $input.val('');
+            
+            // Check if the code is valid using 'Email Request Service' API call
+            api_req({ 'a': 'ersv', 'c': context.code }, { callback: function(res) {
+                    
+                if (checkError(res)) {
+                    return;
+                }
     
-            // Receive the old email address and verify the password they typed is correct.
-            // If it is correct, then we update the user hash with the new email address.
-            context.email = res[1];
-            verifyEmailCallback(passAES);
-        }});
+                if (keys) {
+                    context.k1 = keys.k1;
+                    context.k2 = keys.k2;
+                }
+        
+                // Receive the old email address and verify the password they typed is correct.
+                // If it is correct, then we update the user hash with the new email address.
+                context.email = res[1];
+                verifyEmailCallback(passAES);
+            }});
+        }
+        
+
+        // User-Get 
+        // Get the user information from the session. We call it here
+        // because we need to be sure we're always getting the latest user's
+        // password
+        api_req({ a: 'ug' }, {
+            callback: function(res) {
+                u_checklogin3a(res, {checkloginresult: verifyUserPassword});
+            }
+        })
     };
 
     return ns;

@@ -178,7 +178,6 @@ var emailchange = (function() {
             // *or* whatever the user typed in `$input`.
             passAES = passAES || new sjcl.cipher.aes(prepare_key_pw(password));
             
-            $('.login-register-input.password').addClass('loading').removeClass('incorrect');
             $input.val('');
             
             // Check if the code is valid using 'Email Request Service' API call
@@ -200,6 +199,8 @@ var emailchange = (function() {
             }});
         }
         
+
+        $('.login-register-input.password').addClass('loading').removeClass('incorrect');
 
         // User-Get
         // Get the user information from the session. We call it here

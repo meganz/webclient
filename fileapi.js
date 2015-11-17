@@ -5,6 +5,10 @@ var mozOnSavingDownload = function(file,callback,ask) {
 		saveFolder: 2 == ask
 	}, f;
 
+	if (!ask && !mozOnSavingDownload.last_path) {
+		ask = mozPrefs.getBoolPref('askdir');
+	}
+
 	if(!ask && ((mozOnSavingDownload.last_path && file.folder)
 		|| (~file.filename.indexOf('.') && options.folder)))
 	{
@@ -1017,6 +1021,10 @@ function mozClearStartupCache() {
 	if (!mozPrefs.getPrefType('notifydl'))
 	{
 		mozPrefs.setBoolPref('notifydl', true);
+	}
+
+	if (!mozPrefs.getPrefType('askdir')) {
+		mozPrefs.setBoolPref('askdir', false);
 	}
 
 	if (!mozPrefs.getPrefType('dir'))

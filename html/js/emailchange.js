@@ -201,7 +201,7 @@ var emailchange = (function() {
         }
         
 
-        // User-Get 
+        // User-Get
         // Get the user information from the session. We call it here
         // because we need to be sure we're always getting the latest user's
         // password

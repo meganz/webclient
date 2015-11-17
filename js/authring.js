@@ -701,7 +701,7 @@ var authring = (function () {
         }
         else {
             logger.error('Unsupported key type for key generation: ' + keyType);
-            return MegaPromise.all([]);
+            return;
         }
 
         window[crypt.PRIVKEY_VARIABLE_MAPPING[keyType]] = privKey;

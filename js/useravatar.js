@@ -161,7 +161,9 @@ var useravatar = (function() {
      * @param {Object} user The user object
      */
     function isUserVerified(user) {
-        
+        if (u_type !== 3) {
+            return;
+        }
         if (!authringPromise) {
             authringPromise = new MegaPromise();
             

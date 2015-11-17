@@ -27,6 +27,7 @@
     "63": "Kopeeri",
     "64": "N\u00f5uded",
     "68": "Uus kaust",
+    "70": "T\u00fchjenda Pr\u00fcgikast",
     "71": "Lisa kontakt",
     "76": "Te eemaldate ajutiselt [X] faili Pr\u00fcgikasti.",
     "77": "Soovite j\u00e4tkata?",
@@ -2787,9 +2788,9 @@
     "7740": "Pr\u00fcgikast on t\u00fchi",
     "7741": "Puhasta pr\u00fcgikasti",
     "7742": "Olete \"%1\" kustutamises kindel?",
-    "7743": "Change Email",
-    "7744": "Current Email",
-    "7745": "New Email",
-    "7746": "Enter your new email address in the text field above and click Save.",
-    "7747": "Following that, please go to your email inbox and confirm this email change."
+    "7743": "E-posti muutmine",
+    "7744": "Praegune e-post",
+    "7745": "Uus e-post",
+    "7746": "Sisestage oma uus e-posti aadress k\u00f5rvalolevasse lahtrisse ja vajutage Salvesta.",
+    "7747": "P\u00e4rast seda minge oma e-posti sisendkausta ja kinnitage e-posti muutmist."
 }

@@ -22,7 +22,7 @@ mega.popunda = {
 
     /**
      *  Initialises the popunder to launch on a click
-     *  @param {jquery element} button The element to trigger click events from
+     *  @param {JQuery} button The element to trigger click events from
      */
     init: function(button) {
         if (typeof(button) === 'undefined' || button === null) {

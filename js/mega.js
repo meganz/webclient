@@ -7146,8 +7146,10 @@ function balance2pro(callback)
             $('.own-data span', $nodeId).eq(0).addClass('link-icon');
 
             // Add link-icon to grid view
-            $nodeId.addClass('linked');
-            $(' span', $nodeId).eq(1).addClass('link-icon');
+            if ($nodeId.hasClass('file-block')) {
+                $nodeId.addClass('linked');
+                $('span', $nodeId).eq(1).addClass('link-icon');
+            }
         }
 
         if ($tree.length) {

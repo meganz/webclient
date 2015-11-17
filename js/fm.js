@@ -3185,6 +3185,8 @@ function accountUI()
         $('.account-history-drop-items.session10-').text(l[472].replace('[X]', 10));
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
+        
+        var $passwords = $('#account-password,#account-new-password,#account-confirm-password').unbind('click');
 
         M.account.sessions.sort(function(a, b)
         {
@@ -3463,7 +3465,6 @@ function accountUI()
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
 
         // Cache selectors
-        var $passwords = $('#account-password,#account-new-password,#account-confirm-password');
         var $newEmail = $('#account-email');
         var $emailInfoMessage = $('.fm-account-change-email');
 
@@ -3471,7 +3472,7 @@ function accountUI()
         $newEmail.val('');
         $emailInfoMessage.addClass('hidden');
 
-        $passwords.rebind('keyup', function() {
+        $passwords.bind('keyup', function() {
             var texts = [];
             $passwords.each(function() {
                 texts.push($(this).val());
@@ -3652,20 +3653,20 @@ function accountUI()
                         }
                         else if (typeof res == 'number' && res < 0)
                         { // something went wrong
-                            $('#account-confirm-password,#account-password,#account-new-password').val('');
+                            $passwords.val('');
                             msgDialog('warninga', 'Error', l[6972]);
                         }
                         else
                         { // success
                             msgDialog('info', l[726], l[725], false, function()
                             {
-                                $('#account-confirm-password,#account-password,#account-new-password').val('');
+                                $passwords.val('');
                             });
                         }
                     }});
             }
             else {
-                $('#account-confirm-password,#account-password,#account-new-password').val('');
+                $passwords.val('');
             }
 
             // Get the new email address
@@ -4247,7 +4248,6 @@ function accountUI()
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').unbind('keyup');
     $('#account-new-password').bind('keyup', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
@@ -4267,11 +4267,11 @@ function accountUI()
         }
     });
 
-    $('#account-confirm-password').unbind('keyup');
-    $('#account-confirm-password').bind('keyup', function(el)
-    {
-        if ($(this).val() == $('#account-new-password').val())
+    $('#account-confirm-password').bind('keyup', function(el) {
+
+        if ($(this).val() === $('#account-new-password').val()) {
             $('.fm-account-save-block').removeClass('hidden');
+        }
     });
 }
 

@@ -26749,6 +26749,9 @@ body, body * {
 	padding: 0 0 0px 15px;
 }
 
+.fm-account-blocks.disabled {
+    opacity: 0.4;
+}
 .avatar-wrapper.verified.square div.verified_icon,
 .fm-blocks-view .avatar-wrapper.verified div.verified_icon {
     right: 3px;

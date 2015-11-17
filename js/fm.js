@@ -3185,6 +3185,8 @@ function accountUI()
         $('.account-history-drop-items.session10-').text(l[472].replace('[X]', 10));
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
+        
+        var $passwords = $('#account-password,#account-new-password,#account-confirm-password').unbind('click');
 
         M.account.sessions.sort(function(a, b)
         {
@@ -3470,10 +3472,30 @@ function accountUI()
         $newEmail.val('');
         $emailInfoMessage.addClass('hidden');
 
+        $passwords.bind('keyup', function() {
+            var texts = [];
+            $passwords.each(function() {
+                texts.push($(this).val());
+            });
+            $newEmail.val('');
+            if (texts.join("") === "") {
+                $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            } else {
+                $newEmail.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
+            }
+        });
+
         // On text entry in the new email text field
         $newEmail.rebind('keyup', function() {
-            
-            var mail = $newEmail.val();
+            var mail = $.trim($newEmail.val());
+
+            $passwords.val('');
+
+            if (mail === "") {
+                $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            } else {
+                $passwords.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
+            }
             
             // Show information message
             $emailInfoMessage.removeClass('hidden');
@@ -3497,6 +3519,8 @@ function accountUI()
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
+            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             $('.fm-account-save-block').addClass('hidden');
             $('.profile-form.first').removeClass('email-confirm');
             accountUI();
@@ -3504,6 +3528,8 @@ function accountUI()
         
         $('.fm-account-save').rebind('click', function()
         {
+            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim()||' ';
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
@@ -3627,20 +3653,20 @@ function accountUI()
                         }
                         else if (typeof res == 'number' && res < 0)
                         { // something went wrong
-                            $('#account-confirm-password,#account-password,#account-new-password').val('');
+                            $passwords.val('');
                             msgDialog('warninga', 'Error', l[6972]);
                         }
                         else
                         { // success
                             msgDialog('info', l[726], l[725], false, function()
                             {
-                                $('#account-confirm-password,#account-password,#account-new-password').val('');
+                                $passwords.val('');
                             });
                         }
                     }});
             }
             else {
-                $('#account-confirm-password,#account-password,#account-new-password').val('');
+                $passwords.val('');
             }
 
             // Get the new email address
@@ -4222,7 +4248,6 @@ function accountUI()
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').unbind('keyup');
     $('#account-new-password').bind('keyup', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
@@ -4242,11 +4267,11 @@ function accountUI()
         }
     });
 
-    $('#account-confirm-password').unbind('keyup');
-    $('#account-confirm-password').bind('keyup', function(el)
-    {
-        if ($(this).val() == $('#account-new-password').val())
+    $('#account-confirm-password').bind('keyup', function(el) {
+
+        if ($(this).val() === $('#account-new-password').val()) {
             $('.fm-account-save-block').removeClass('hidden');
+        }
     });
 }
 

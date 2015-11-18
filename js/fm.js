@@ -1336,7 +1336,7 @@ function addContactToFolderShare() {
             // Determin current group permission level
             iconPermLvl = $shareDialog.find('.permissions-icon')[0];
             permissionClass = checkMultiInputPermission($(iconPermLvl));
-            permissionLevel = sharedPermissionLevel(permissionClass);
+            permissionLevel = sharedPermissionLevel(permissionClass[0]);
 
             // Add new planned contact to list
             $.each($newContacts, function(ind, val) {

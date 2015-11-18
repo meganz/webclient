@@ -27,6 +27,7 @@
     "63": "Copiar",
     "64": "Permisos",
     "68": "Nueva carpeta",
+    "70": "No hay archivos en la papelera",
     "71": "A\u00f1adir contacto",
     "76": "Est\u00e1s a punto de eliminar permanentemente [X] archivos de la Papelera.",
     "77": "\u00bfSeguro que quieres seguir con esto?",
@@ -2787,9 +2788,9 @@
     "7740": "La papelera est\u00e1 vac\u00eda",
     "7741": "Vaciar la papelera",
     "7742": "\u00bfSeguro que quieres eliminar \"%1\"?",
-    "7743": "Change Email",
-    "7744": "Current Email",
-    "7745": "New Email",
-    "7746": "Enter your new email address in the text field above and click Save.",
-    "7747": "Following that, please go to your email inbox and confirm this email change."
+    "7743": "Cambiar Email",
+    "7744": "Email Actual",
+    "7745": "Nuevo Email",
+    "7746": "Introduce tu nueva direcci\u00f3n de email en el campo de texto superior y pulsa Guardar",
+    "7747": "A continuaci\u00f3n, ve a tu correo y confirma el cambio de correo."
 }

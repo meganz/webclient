@@ -161,14 +161,15 @@ var useravatar = (function() {
      * @param {Object} user The user object
      */
     function isUserVerified(user) {
-        
+        if (u_type !== 3) {
+            return;
+        }
         if (!authringPromise) {
             authringPromise = new MegaPromise();
             
             if (u_authring.Ed25519) {
                 authringPromise.resolve();
-            }
-            else {
+            } else {
                 // First load the authentication system.
                 var authSystemPromise = authring.initAuthenticationSystem();
                 authringPromise.linkDoneAndFailTo(authSystemPromise);

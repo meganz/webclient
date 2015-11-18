@@ -27,6 +27,7 @@
     "63": "Kopiuj",
     "64": "Uprawnienia",
     "68": "Nowy katalog",
+    "70": "Wyczy\u015b\u0107 kosz",
     "71": "Dodaj kontakt",
     "76": "Zamierzasz trwale usun\u0105\u0107 [X] z kosza.",
     "77": "Czy chcesz kontynuowa\u0107?",
@@ -2787,9 +2788,9 @@
     "7740": "Kosz jest pusty",
     "7741": "Wyczy\u015b\u0107 kosz",
     "7742": "Czy na pewno chcesz usun\u0105\u0107 \"%1\"?",
-    "7743": "Change Email",
-    "7744": "Current Email",
-    "7745": "New Email",
-    "7746": "Enter your new email address in the text field above and click Save.",
-    "7747": "Following that, please go to your email inbox and confirm this email change."
+    "7743": "Zmie\u0144 adres email",
+    "7744": "Aktualny adres email",
+    "7745": "Nowy adres email",
+    "7746": "Wpisz sw\u00f3j nowy adres email powy\u017cej i kliknij Zapisz",
+    "7747": "Nast\u0119pnie, przejd\u017a do swojej skrzynki odbiorczej i potwierd\u017a zmian\u0119."
 }

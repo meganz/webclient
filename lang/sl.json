@@ -2788,9 +2788,18 @@
     "7740": "Ko\u0161 je prazen",
     "7741": "Izbri\u0161i ko\u0161",
     "7742": "Ali ste prepri\u010dani, da \u017eelite izbrisati \"%1\"?",
-    "7743": "Change Email",
-    "7744": "Current Email",
-    "7745": "New Email",
-    "7746": "Enter your new email address in the text field above and click Save.",
-    "7747": "Following that, please go to your email inbox and confirm this email change."
+    "7743": "Spremeni e-po\u0161to",
+    "7744": "Trenutna e-po\u0161ta",
+    "7745": "Nova e-po\u0161ta",
+    "7746": "Vnesite svoj nov e-po\u0161tni naslov v polje zgoraj in pritisnite Shrani.",
+    "7747": "Po tem, pojdite prosim v svoj e-po\u0161tni predal in potrdite spremembo e-po\u0161tnega naslova.",
+    "7749": "Poslani",
+    "7750": "Zahteve",
+    "7751": "Request accepted",
+    "7753": "Request deleted",
+    "7754": "Shared Items",
+    "7755": "Deljeni",
+    "7756": "Dohodni",
+    "7757": "Odhodni",
+    "7758": "Request sent"
 }

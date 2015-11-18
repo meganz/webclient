@@ -2792,5 +2792,14 @@
     "7744": "Current Email",
     "7745": "New Email",
     "7746": "Enter your new email address in the text field above and click Save.",
-    "7747": "Following that, please go to your email inbox and confirm this email change."
+    "7747": "Following that, please go to your email inbox and confirm this email change.",
+    "7749": "Sent",
+    "7750": "Requests",
+    "7751": "Request accepted",
+    "7753": "Request deleted",
+    "7754": "Shared Items",
+    "7755": "Shared",
+    "7756": "Incoming",
+    "7757": "Outgoing",
+    "7758": "Request sent"
 }

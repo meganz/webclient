@@ -1435,11 +1435,13 @@ function sharedUInode(nodeHandle) {
         bAvailShares = false,
         UiExportLink = new mega.UI.Share.ExportLink();
 
-    if (d) {
-        if (!fminitialized) {
+    if (!fminitialized) {
+        if (d) {
             UiExportLink.logger.warn('Skipping sharedUInode call...');
-            return;
         }
+        return;
+    }
+    if (d) {
         UiExportLink.logger.debug('Entering sharedUInode...');
     }
 
@@ -3185,7 +3187,7 @@ function accountUI()
         $('.account-history-drop-items.session10-').text(l[472].replace('[X]', 10));
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
-        
+
         var $passwords = $('#account-password,#account-new-password,#account-confirm-password').unbind('click');
 
         M.account.sessions.sort(function(a, b)
@@ -3231,7 +3233,7 @@ function accountUI()
                     status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
                 }
             }
-            
+
             // If unknown country code use question mark gif
             if (!country.icon || country.icon === '??.gif') {
                 country.icon = 'ud.gif';
@@ -3460,7 +3462,7 @@ function accountUI()
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
         }
         $('.default-select.country .default-select-scroll').html(html);
-       
+
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
 
@@ -3496,22 +3498,22 @@ function accountUI()
             } else {
                 $passwords.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
             }
-            
+
             // Show information message
             $emailInfoMessage.removeClass('hidden');
-            
+
             // If not valid email yet, exit
             if (checkMail(mail)) {
                 return;
             }
-            
+
             // Show save button
             if (mail !== u_attr.email) {
                 $('.profile-form.first').addClass('email-confirm');
                 $('.fm-account-save-block').removeClass('hidden');
             }
         });
-        
+
         $('#account-firstname,#account-lastname').rebind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
@@ -3525,7 +3527,7 @@ function accountUI()
             $('.profile-form.first').removeClass('email-confirm');
             accountUI();
         });
-        
+
         $('.fm-account-save').rebind('click', function()
         {
             $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
@@ -3671,19 +3673,19 @@ function accountUI()
 
             // Get the new email address
             var email = $('#account-email').val().trim().toLowerCase();
-            
+
             // If there is text in the email field and it doesn't match the existing one
             if ((email !== '') && (u_attr.email !== email)) {
-                
+
                 loadingDialog.show();
-                
+
                 // Request change of email
                 // e => new email address
                 // i => requesti (Always has the global variable requesti (last request ID))
                 api_req({ a: 'se', aa: 'a', e: email, i: requesti }, { callback : function(res) {
-                        
+
                         loadingDialog.hide();
-                        
+
                         if (res === -12) {
                             return msgDialog('warninga', l[135], l[7717]);
                         }

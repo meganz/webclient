@@ -1417,11 +1417,13 @@ function sharedUInode(nodeHandle) {
         bAvailShares = false,
         UiExportLink = new mega.UI.Share.ExportLink();
 
-    if (d) {
-        if (!fminitialized) {
+    if (!fminitialized) {
+        if (d) {
             UiExportLink.logger.warn('Skipping sharedUInode call...');
-            return;
         }
+        return;
+    }
+    if (d) {
         UiExportLink.logger.debug('Entering sharedUInode...');
     }
 

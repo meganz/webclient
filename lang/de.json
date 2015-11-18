@@ -2792,5 +2792,14 @@
     "7744": "Derzeitige E-Mail-Adresse",
     "7745": "Neue E-Mail-Adresse",
     "7746": "Geben Sie Ihre neue E-Mail-Adresse ein und klicken Sie auf Speichern.",
-    "7747": "Danach klicken Sie bitte auf den Best\u00e4tigungslink, den Sie in Ihrem Posteingang finden."
+    "7747": "Danach klicken Sie bitte auf den Best\u00e4tigungslink, den Sie in Ihrem Posteingang finden.",
+    "7749": "Sent",
+    "7750": "Requests",
+    "7751": "Request accepted",
+    "7753": "Request deleted",
+    "7754": "Shared Items",
+    "7755": "Shared",
+    "7756": "Incoming",
+    "7757": "Outgoing",
+    "7758": "Request sent"
 }

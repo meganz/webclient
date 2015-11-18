@@ -2972,7 +2972,7 @@ function MegaData()
         }
         loadingDialog.show();
         if (t.length === 11 && !u_pubkeys[t]) {
-            var keyCachePromise = api_cachepubkeys({}, [t]);
+            var keyCachePromise = api_cachepubkeys([t]);
             keyCachePromise.done(function _cachepubkeyscomplete() {
                 if (u_pubkeys[t]) {
                     M.copyNodes(cn, t);

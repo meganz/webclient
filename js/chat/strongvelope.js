@@ -536,6 +536,10 @@ var strongvelope = {};
      * @property {Array.<String>} otherParticipants
      *     An array of all the participants' user handles in the chat, but
      *     excluding one self.
+     * @property {Array.<String>} includeParticipants
+     *     An array of participants' user handles to include in the chat.
+     * @property {Array.<String>} excludeParticipants
+     *     An array of participants' user handles to exclude from the chat.
      */
     strongvelope.ProtocolHandler = function(ownHandle, privCu25519, privEd25519,
             pubEd25519) {
@@ -557,6 +561,8 @@ var strongvelope = {};
         this.participantKeys = {};
         this.participantKeys[this.ownHandle] = {};
         this.otherParticipants = [];
+        this.includeParticipants = [];
+        this.excludeParticipants = [];
     };
 
 
@@ -892,14 +898,24 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype._encryptSenderKey = function(nonce) {
 
-        // XXX: Jiggle around with this.includeParticipants and this.excludeParticipants:
-        //      - includeParticipants only get new sender key
-        //      - oldParticipants will get no key or mention in recipients
-        //      - update this.otherParticipants to include/exclude new/old participants
-        //        (best to put this into a method this_updateParticipants([new], [old]))
-
         if (this.otherParticipants.length === 0) {
             return false;
+        }
+
+        // Sanitise arrays we're working on.
+        this.includeParticipants = (this.includeParticipants instanceof Array)
+                                 ? this.includeParticipants : [];
+        this.excludeParticipants = (this.excludeParticipants instanceof Array)
+                                 ? this.excludeParticipants : [];
+
+        // Update participants list.
+        this.otherParticipants = this.otherParticipants.concat(this.includeParticipants);
+        var index = -1;
+        for (var i = 0; i < this.excludeParticipants.length; i++) {
+            index = this.otherParticipants.indexOf(this.excludeParticipants[i]);
+            if (index >= 0) {
+                this.otherParticipants.splice(index, 1);
+            }
         }
 
         var recipients = '';
@@ -921,19 +937,36 @@ var strongvelope = {};
         var destination = '';
         var keysIncluded = [];
         var encryptedKeys = '';
+        var isOldMember = false;
+        var isNewMember = false;
         for (var i = 0; i < this.otherParticipants.length; i++) {
             destination = this.otherParticipants[i];
+            isNewMember = (this.includeParticipants.indexOf(destination) >= 0);
+            isOldMember = (this.excludeParticipants.indexOf(destination) >= 0);
+
+            if (isOldMember) {
+                // Short circuit, as this is a member we want to exclude.
+                // This shouldn't happen, unless we've had duplicates in the list.
+                continue;
+            }
+
             recipients += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
                                                base64urldecode(destination));
             keysIncluded = [senderKey];
-            if (this.previousKeyId && (this._sentKeyId !== this.keyId)) {
-                // Also add previous key on key rotation.
+            if (this.previousKeyId
+                    && (this._sentKeyId !== this.keyId)
+                    && !isNewMember) {
+                // Also add previous key on key rotation for existing members.
                 keysIncluded.push(this.participantKeys[this.ownHandle][this.previousKeyId]);
             }
             encryptedKeys = this._encryptKeysFor(keysIncluded, nonce, destination);
             keys += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
                                          encryptedKeys);
         }
+
+        // Reset include/exclude lists before leaving.
+        this.includeParticipants = [];
+        this.excludeParticipants = [];
 
         return { recipients: recipients, keys: keys, keyIds: keyIds };
     };
@@ -1241,6 +1274,11 @@ var strongvelope = {};
     /**
      * Alters the participant list of the chat room.
      *
+     * Note: There are no checks for overlaps in the include/eclude lists.
+     *
+     * TODO: Employ the usage of sets (via object attributes) over arrays for
+     *       uniqueness of entries (implement in _encryptSenderKey).
+     *
      * @method
      * @param {Array.<String>} includeParticipants
      *     Array of new participants' user handles to include to the chat room.
@@ -1271,28 +1309,30 @@ var strongvelope = {};
 
         // Some sanity checking on new participants to include.
         for (var i = 0; i < includeParticipants.length; i++) {
-            if (this.otherParticipants.indexOf(includeParticipants[i]) >= 0) {
+            if (includeParticipants[i] === this.ownHandle) {
+                logger.warn('Cannot include myself to a chat.');
+                errorOut = true;
+            }
+            else if (this.otherParticipants.indexOf(includeParticipants[i]) >= 0) {
                 logger.warn('User ' + includeParticipants[i] + ' already participating, cannot include.');
                 errorOut = true;
             }
-            else if (includeParticipants[i] === this.ownHandle) {
-                logger.warn('Cannot include myself to a chat.');
-                errorOut = true;
-            } else {
+            else {
                 this.includeParticipants.push(includeParticipants[i]);
             }
         }
 
         // Some sanity checking on existing participants to exclude.
         for (var i = 0; i < excludeParticipants.length; i++) {
-            if (this.otherParticipants.indexOf(excludeParticipants[i]) < 0) {
+            if (excludeParticipants[i] === this.ownHandle) {
+                logger.warn('Cannot exclude myself from a chat.');
+                errorOut = true;
+            }
+            else if (this.otherParticipants.indexOf(excludeParticipants[i]) < 0) {
                 logger.warn('User ' + excludeParticipants[i] + ' not participating, cannot exclude.');
                 errorOut = true;
             }
-            else if (excludeParticipants[i] === this.ownHandle) {
-                logger.warn('Cannot exclude myself fom a chat.');
-                errorOut = true;
-            } else {
+            else {
                 this.excludeParticipants.push(excludeParticipants[i]);
             }
         }

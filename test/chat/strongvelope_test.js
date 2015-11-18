@@ -915,6 +915,35 @@ describe("chat.strongvelope unit test", function() {
                     keyIds: '|k042k041'
                 });
             });
+
+            it("three participants, one included, one excluded", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = 'k042';
+                handler.previousKeyId = 'k041';
+                handler.participantKeys['me3456789xw']['k042'] = 'key_42';
+                handler.participantKeys['me3456789xw']['k041'] = 'key_41';
+                handler.otherParticipants = ['you456789xw', 'otto56789xw'];
+                handler.includeParticipants = ['lino56789xw'];
+                handler.excludeParticipants = ['otto56789xw'];
+                sandbox.stub(window, 'base64urldecode', function(dest) {
+                    return dest;
+                });
+                sandbox.stub(handler, '_encryptKeysFor', function(keys, _, to) {
+                    return keys + ':' + to;
+                });
+                sandbox.stub(tlvstore, 'toTlvRecord', _toTlvRecord);
+
+                var result = handler._encryptSenderKey('gooniegoogoo');
+                assert.deepEqual(result, {
+                    recipients: '|you456789xw|lino56789xw',
+                    keys: '|key_42,key_41:you456789xw|key_42:lino56789xw',
+                    keyIds: '|k042k041'
+                });
+                assert.deepEqual(handler.otherParticipants, ['you456789xw', 'lino56789xw']);
+                assert.deepEqual(handler.includeParticipants, []);
+                assert.deepEqual(handler.excludeParticipants, []);
+            });
         });
 
         describe('_assembleBody', function() {
@@ -1089,6 +1118,37 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(result.keyed, false);
                 assert.strictEqual(btoa(result.content), btoa(FOLLOWUP_MESSAGE_BODY_BIN));
                 assert.strictEqual(result.content.length, 34);
+                assert.strictEqual(handler._keyEncryptionCount, 1);
+            });
+
+            it("three participants, one included, one excluded", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = 'key ID';
+                handler._sentKeyId = 'other key ID';
+                handler.participantKeys['me3456789xw']['key ID'] = 'sender key';
+                handler.otherParticipants = ['you456789xw', 'otto56789xw'];
+                handler.includeParticipants = ['lino56789xw'];
+                handler.excludeParticipants = ['otto56789xw'];
+                sandbox.stub(window, 'u_handle', 'me3456789xw');
+                sandbox.stub(ns, '_symmetricEncryptMessage').returns(
+                    { key: 'sender key', nonce: 'gooniegoogoo', ciphertext: 'ciphertext' });
+                sandbox.stub(handler, '_encryptSenderKey').returns({
+                    recipients: '|you456789xw|lino56789xw',
+                    keys: '|key_42,key_41:you456789xw|key_42:lino56789xw',
+                    keyIds: '|k042k041'
+                });
+                sandbox.stub(tlvstore, 'toTlvRecord', _toTlvRecord);
+
+                var result = handler._assembleBody('Hello!');
+                assert.deepEqual(result,
+                    { keyed: true, content:
+                     '|gooniegoogoo|you456789xw|lino56789xw|key_42,key_41:you456789xw|key_42:lino56789xw|k042k041|ciphertext' }
+                 );
+                assert.strictEqual(ns._symmetricEncryptMessage.callCount, 1);
+                assert.strictEqual(handler._encryptSenderKey.callCount, 1);
+                assert.strictEqual(tlvstore.toTlvRecord.callCount, 2);
+                assert.strictEqual(handler._sentKeyId, handler.keyId);
                 assert.strictEqual(handler._keyEncryptionCount, 1);
             });
         });
@@ -1748,5 +1808,87 @@ describe("chat.strongvelope unit test", function() {
                 }
             });
         });
+
+        describe('alterParticipants', function() {
+            it("nothing to do", function() {
+                sandbox.stub(ns._logger, '_log');
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.otherParticipants = ['you456789xw'];
+
+                var result = handler.alterParticipants([], []);
+                assert.strictEqual(result, false);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'No participants to include or exclude.');
+            });
+
+            it("include self", function() {
+                sandbox.stub(ns._logger, '_log');
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.otherParticipants = ['you456789xw'];
+
+                var result = handler.alterParticipants(['me3456789xw'], []);
+                assert.strictEqual(result, false);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Cannot include myself to a chat.');
+            });
+
+            it("exclude self", function() {
+                sandbox.stub(ns._logger, '_log');
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.otherParticipants = ['you456789xw'];
+
+                var result = handler.alterParticipants([], ['me3456789xw']);
+                assert.strictEqual(result, false);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Cannot exclude myself from a chat.');
+            });
+
+            it("include existant", function() {
+                sandbox.stub(ns._logger, '_log');
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.otherParticipants = ['you456789xw'];
+
+                var result = handler.alterParticipants(['you456789xw'], []);
+                assert.strictEqual(result, false);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'User you456789xw already participating, cannot include.');
+            });
+
+            it("exclude non-existant", function() {
+                sandbox.stub(ns._logger, '_log');
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.otherParticipants = ['you456789xw'];
+
+                var result = handler.alterParticipants([], ['other6789xw']);
+                assert.strictEqual(result, false);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'User other6789xw not participating, cannot exclude.');
+            });
+
+            it("include other", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = KEY_ID;
+                handler.participantKeys['me3456789xw'][KEY_ID] = KEY;
+                handler._sentKeyId = KEY_ID;
+                sandbox.stub(handler, '_assembleBody', function(message) {
+                    return { content: message, keyed: true };
+                });
+                sandbox.stub(tlvstore, 'toTlvRecord', _toTlvRecord);
+                sandbox.stub(handler, '_signContent', function(content) {
+                    return '|squiggle' + content;
+                });
+
+                var result = handler.alterParticipants(['other6789xw'], [], 'Hello!');
+                assert.strictEqual(result, '\u0000|squiggle|\u0003Hello!');
+            });
+        });
+
+        // TODO: test _assembleBody on alterations.
     });
 });

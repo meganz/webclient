@@ -11174,5 +11174,41 @@
     "7747": {
         "text": "Following that, please go to your email inbox and confirm this email change.",
         "context": "An instruction in the account profile section to tell the user to check for a confirmation link in their email inbox to complete the process of changing their email address."
+    },
+    "7749": {
+        "text": "Sent",
+        "context": "Title of one of the filters in \"Contacts requests\" section. If \"Sent\" is selected, it will only show the requests which have been sent out."
+    },
+    "7750": {
+        "text": "Requests",
+        "context": "Title of one of the filters in \"Contacts requests\" section. When \"Requests\" is selected, it will show all the requests the user has received from other people."
+    },
+    "7751": {
+        "text": "Request accepted",
+        "context": "Success message when a contact request is accepted."
+    },
+    "7753": {
+        "text": "Request deleted",
+        "context": "Success message when a contact request is deleted."
+    },
+    "7754": {
+        "text": "Shared Items",
+        "context": "Title of Shared Items section."
+    },
+    "7755": {
+        "text": "Shared",
+        "context": "Title of the tab bar item for the Shared Items section"
+    },
+    "7756": {
+        "text": "Incoming",
+        "context": "Title of the \"Incoming\" Shared Items.\r\nIncoming shared items mean the items which are shared to the user by his contacts."
+    },
+    "7757": {
+        "text": "Outgoing",
+        "context": "Title of the \"Outgoing\" Shared Items.\r\nOutgoing shared items mean the items are shared to contacts by the user."
+    },
+    "7758": {
+        "text": "Request sent",
+        "context": "Success message when a contact invitation request is sent out."
     }
 }

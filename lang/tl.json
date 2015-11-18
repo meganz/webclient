@@ -2788,9 +2788,18 @@
     "7740": "Bakante ang basurahan",
     "7741": "Linisin ang basurahan",
     "7742": "Gusto mo bang burahin ang \"%1\"?",
-    "7743": "Change Email",
-    "7744": "Current Email",
-    "7745": "New Email",
-    "7746": "Enter your new email address in the text field above and click Save.",
-    "7747": "Following that, please go to your email inbox and confirm this email change."
+    "7743": "Baguhin ang Email",
+    "7744": "Kasalukuyang Email",
+    "7745": "Bagong Email",
+    "7746": "Ilagay ang bagong email address sa itaas at i-click ang Save.",
+    "7747": "Following that, please go to your email inbox and confirm this email change.",
+    "7749": "Naipadala",
+    "7750": "Kahilingan",
+    "7751": "Request accepted",
+    "7753": "Request deleted",
+    "7754": "Shared Items",
+    "7755": "Binahagi",
+    "7756": "Padating",
+    "7757": "Papaalis",
+    "7758": "Request sent"
 }

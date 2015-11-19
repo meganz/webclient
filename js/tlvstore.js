@@ -155,10 +155,13 @@ var tlvstore = (function () {
      *     Encryption key as byte string.
      * @param mode {Number}
      *     Encryption mode as an integer. One of tlvstore.BLOCK_ENCRYPTION_SCHEME.
+     * @param [raw] {Boolean}
+     *     Do not convert plain text to UTF-8 (default: false).
      * @returns {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      */
-    ns.blockEncrypt = function(clearText, key, mode) {
+    ns.blockEncrypt = function(clearText, key, mode, raw) {
+
         var nonceSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].nonceSize;
         var tagSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
         var cipher = asmCrypto[ns.BLOCK_ENCRYPTION_PARAMETERS[mode].cipher];
@@ -170,9 +173,11 @@ var tlvstore = (function () {
             key = a32_to_str(key);
         }
         var keyBytes = asmCrypto.string_to_bytes(key);
-        var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(clearText)));
+        var clearBytes = asmCrypto.string_to_bytes(
+            raw ? clearText : unescape(encodeURIComponent(clearText)));
         var cipherBytes = cipher.encrypt(clearBytes, keyBytes, nonceBytes,
                                          undefined, tagSize);
+
         return String.fromCharCode(mode) + asmCrypto.bytes_to_string(nonceBytes)
                + asmCrypto.bytes_to_string(cipherBytes);
     };
@@ -186,10 +191,13 @@ var tlvstore = (function () {
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      * @param key {String}
      *     Encryption key as byte string.
+     * @param [raw] {Boolean}
+     *     Do not convert plain text to UTF-8 (default: false).
      * @returns {String}
      *     Clear text as byte string.
      */
-    ns.blockDecrypt = function(cipherText, key) {
+    ns.blockDecrypt = function(cipherText, key, raw) {
+
         var mode = cipherText.charCodeAt(0);
         var nonceSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].nonceSize;
         var nonceBytes = asmCrypto.string_to_bytes(cipherText.substring(1, nonceSize + 1));
@@ -204,7 +212,9 @@ var tlvstore = (function () {
         var keyBytes = asmCrypto.string_to_bytes(key);
         var clearBytes = cipher.decrypt(cipherBytes, keyBytes, nonceBytes,
                                         undefined, tagSize);
-        return decodeURIComponent(escape(asmCrypto.bytes_to_string(clearBytes)));
+        var clearText = asmCrypto.bytes_to_string(clearBytes);
+
+        return raw ? clearText : decodeURIComponent(escape(clearText));
     };
 
 

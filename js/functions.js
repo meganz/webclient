@@ -1661,17 +1661,20 @@ var stringcrypt = (function() {
      * Encrypts clear text data to an authenticated ciphertext, armoured with
      * encryption mode indicator and IV.
      *
-     * @param plain {string}
+     * @param plain {String}
      *     Plain data block as (unicode) string.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @param [raw] {Boolean}
+     *     Do not convert plain text to UTF-8 (default: false).
+     * @returns {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      */
-    ns.stringEncrypter = function(plain, key) {
-        var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
-        var plainBytes = unescape(encodeURIComponent(plain));
-        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode);
+    ns.stringEncrypter = function(plain, key, raw) {
+        var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+        var plainBytes = raw ? plain : unescape(encodeURIComponent(plain));
+        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode, raw);
+
         return cipher;
     };
 
@@ -1679,16 +1682,20 @@ var stringcrypt = (function() {
      * Decrypts an authenticated cipher text armoured with a mode indicator and IV
      * to clear text data.
      *
-     * @param cipher {string}
+     * @param cipher {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @param [raw] {Boolean}
+     *     Do not convert plain text from UTF-8 (default: false).
+     * @returns {String}
      *     Clear text as (unicode) string.
      */
-    ns.stringDecrypter = function(cipher, key) {
-        var plain = tlvstore.blockDecrypt(cipher, key);
-        return decodeURIComponent(escape(plain));
+    ns.stringDecrypter = function(cipher, key, raw) {
+
+        var plain = tlvstore.blockDecrypt(cipher, key, raw);
+
+        return raw ? plain : decodeURIComponent(escape(plain));
     };
 
     /**
@@ -1698,8 +1705,10 @@ var stringcrypt = (function() {
      *     Symmetric key as byte string.
      */
     ns.newKey = function() {
+
         var keyBytes = new Uint8Array(16);
         asmCrypto.getRandomValues(keyBytes);
+
         return asmCrypto.bytes_to_string(keyBytes);
     };
 

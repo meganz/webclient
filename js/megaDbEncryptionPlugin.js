@@ -40,12 +40,10 @@ function MegaDBEncryption(mdbInstance) {
         mdbServerInstance.getUData('enckey')
             .then(function(data) {
                 logger.debug('getUData.enckey', data);
-
                 if (!data) {
                     // Generate new encryption key
-
                     _encDecKeyCache = stringcrypt.newKey();
-                    data = stringcrypt.stringEncrypter(_encDecKeyCache, u_k);
+                    data = stringcrypt.stringEncrypter(_encDecKeyCache, u_k, true);
 
                     mdbInstance.flags |= MegaDB.DB_FLAGS.HASNEWENCKEY;
 

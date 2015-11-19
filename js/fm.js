@@ -518,10 +518,8 @@ function initUI() {
         }
         // if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
-        if (a == 'drop' && dd)
-        {
-            if (dd === 'nw-fm-left-icon')
-            {
+        if ((a === 'drop') && dd) {
+            if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }
             /*else if ($(e.target).hasClass('nw-conversations-item'))
@@ -536,40 +534,35 @@ function initUI() {
                 if (d)
                     console.error('TODO: dragging to the chat', currentRoom);
             }*/
-            else if (dd == 'move')
-            {
+            else if (dd === 'move') {
                 nRevert(t !== M.RubbishID);
                 $.moveids = ids;
                 $.movet = t;
-                setTimeout(function()
-                {
+                setTimeout(function() {
                     if ($.movet === M.RubbishID) {
                         $.selected = $.moveids;
                         fmremove();
-                    } else {
+                    }
+                    else {
                         M.moveNodes($.moveids, $.movet);
                     }
                 }, 50);
             }
-            else if (dd == 'copy' || dd == 'copydel')
-            {
+            else if ((dd === 'copy') || (dd === 'copydel')) {
                 nRevert();
                 $.copyids = ids;
                 $.copyt = t;
-                setTimeout(function()
-                {
-                    M.copyNodes($.copyids, $.copyt, dd == 'copydel', function()
-                    {
+                setTimeout(function() {
+                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), function() {
+
                         // Update files count...
-                        if (M.currentdirid === 'shares' && !M.viewmode)
-                        {
+                        if (M.currentdirid === 'shares' && !M.viewmode) {
                             M.openFolder('shares', 1);
                         }
                     });
                 }, 50);
             }
-            else if (dd === 'download')
-            {
+            else if (dd === 'download') {
                 nRevert();
                 var as_zip = e.altKey;
                 M.addDownload(ids, as_zip);
@@ -1309,26 +1302,15 @@ function addContactToFolderShare() {
 
     var targets = [],
         $shareDialog = $('.share-dialog'),
-        $newContacts, customMsg, $txtArea,
-        permissionLevel, iconPermLvl, permissionClass, selectedNode;
+        $newContacts, permissionLevel, iconPermLvl, permissionClass, selectedNode;
 
     // Share button enabled
     if (($.dialog === 'share') && !$shareDialog.find('.dialog-share-button').is('.disabled')) {
 
         selectedNode = $.selected[0];
-
         $newContacts = $shareDialog.find('.token-input-list-mega .token-input-token-mega');
-        $txtArea = $shareDialog.find('.share-message-textarea textarea');
 
         loadingDialog.show();
-
-        // Custom message textarea
-        if ($txtArea.is(':visible') &&  ($txtArea.val() !== l[6853])) {
-            customMsg = $txtArea.val();
-        }
-        else {
-            customMsg = '';
-        }
 
         // Is there a new contacts planned for addition to share
         if ($newContacts.length) {
@@ -1336,7 +1318,7 @@ function addContactToFolderShare() {
             // Determin current group permission level
             iconPermLvl = $shareDialog.find('.permissions-icon')[0];
             permissionClass = checkMultiInputPermission($(iconPermLvl));
-            permissionLevel = sharedPermissionLevel(permissionClass);
+            permissionLevel = sharedPermissionLevel(permissionClass[0]);
 
             // Add new planned contact to list
             $.each($newContacts, function(ind, val) {
@@ -1349,7 +1331,7 @@ function addContactToFolderShare() {
 
         // Add new contacts to folder share
         if (targets.length > 0) {
-            doShare(selectedNode, targets, true, customMsg);
+            doShare(selectedNode, targets, true);
         }
 
         loadingDialog.hide();

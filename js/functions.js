@@ -33,6 +33,10 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     if (!doc) {
         doc = document;
     }
+    if (!markup) {
+        console.error('Empty content passed to parseHTML', arguments);
+        markup = 'no content';
+    }
     if (is_chrome_firefox) {
         try {
             var flags = 0;
@@ -3223,7 +3227,8 @@ mega.utils.reload = function megaUtilsReload() {
         u_storage.wasloggedin = true;
 
         if (debug) {
-            u_storage.d = true;
+            u_storage.d = 1;
+            u_storage.minLogLevel = 0;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
                 if (!is_extension) {
@@ -3245,8 +3250,8 @@ mega.utils.reload = function megaUtilsReload() {
         }
     }
     else {
-        // Show message that this operation will destroy and reload the data stored by MEGA in the browser
-        msgDialog('confirmation', l[761], l[6995], l[6994], function(doIt) {
+        // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
+        msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
                 if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
                     msgDialog('warningb', l[882], l[7157]);
@@ -3852,7 +3857,7 @@ if (typeof sjcl !== 'undefined') {
         // Loop through all selected items
         $.each(nodes, function(index, value) {
             node = M.d[value];
-            if (node.ph && node.shares && node.shares.EXP) {
+            if (node.shares && node.shares.EXP) {
                 result = true;
                 return false;// Stop further $.each loop execution
 

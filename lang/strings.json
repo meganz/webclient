@@ -191,10 +191,6 @@
         "text": "File Upload",
         "context": "Button to upload a file."
     },
-    "100": {
-        "text": "Clear Rubbish Bin",
-        "context": "Button to clear the trash bin"
-    },
     "101": {
         "text": "Add Contact",
         "context": "Button to add a new contact to your contact list"
@@ -869,7 +865,7 @@
     },
     "495": {
         "text": "Storage",
-        "context": "Label abreviated for any 'Storage' button, link, text, title, etc. - (String as short as possible - MAX 10 characteres)."
+        "context": "Label for Storage space used. Maintain capital letters in each word."
     },
     "496": {
         "text": "Bandwidth",
@@ -1701,7 +1697,7 @@
     },
     "920": {
         "text": "Upgrade your account",
-        "context": ""
+        "context": "Button label to redirect the user to upgrade web page."
     },
     "921": {
         "text": "2 months free",
@@ -2341,7 +2337,7 @@
     },
     "1124": {
         "text": "Very Weak",
-        "context": ""
+        "context": "Label displayed during checking the strength of the password introduced. Represents Very Weak security "
     },
     "1125": {
         "text": "Weak",
@@ -2349,7 +2345,7 @@
     },
     "1126": {
         "text": "Medium",
-        "context": ""
+        "context": "Label displayed during checking the strength of the password introduced. Represents Medium security "
     },
     "1127": {
         "text": "Good",
@@ -2357,7 +2353,7 @@
     },
     "1128": {
         "text": "Strong",
-        "context": ""
+        "context": "Label displayed during checking the strength of the password introduced. Represents Strong security "
     },
     "1129": {
         "text": "your password is too weak to proceed",
@@ -2885,7 +2881,7 @@
     },
     "1379": {
         "text": "Skip",
-        "context": "Label for any 'Skip' button, link, text, title, etc. - (String as short as possible)."
+        "context": "Button label to skip the Setup Wizard configuration."
     },
     "1381": {
         "text": "User interface settings",
@@ -3409,7 +3405,7 @@
     },
     "1591": {
         "text": "MEGA folder:",
-        "context": "Label to indicate the user the MEGA folder in which the selected files\/folders will be uploaded (String short as possible)"
+        "context": "Label to indicate the user the MEGA folder for a synchronization (String short as possible)"
     },
     "1592": {
         "text": "Select local folder",
@@ -3457,7 +3453,7 @@
     },
     "1604": {
         "text": "Usage: Data temporarily unavailable",
-        "context": ""
+        "context": "Labe to indicate that the account usage is temporaryly unavailable."
     },
     "1605": {
         "text": "Syncs",
@@ -3465,15 +3461,15 @@
     },
     "1606": {
         "text": "MEGA website",
-        "context": ""
+        "context": "Label to MEGA website link"
     },
     "1607": {
         "text": "%1 of %2",
-        "context": ""
+        "context": "Label to indicate the current amount of account usage.over the total actual plan.  Keep %1 and %2 codes."
     },
     "1608": {
         "text": "Usage: %1",
-        "context": ""
+        "context": "Label to indicate the amount of account usage. Keep %1 code."
     },
     "1609": {
         "text": "%1 of %2 (%3\/s)",
@@ -3621,11 +3617,11 @@
     },
     "1647": {
         "text": "Pause",
-        "context": "Label for any 'Pause' button, link, text, title, etc. - (String as short as possible)."
+        "context": ""
     },
     "1649": {
         "text": "Resume",
-        "context": "Label for any 'Resume' button, link, text, title, etc. - (String as short as possible)."
+        "context": ""
     },
     "1650": {
         "text": "Up to date",
@@ -3865,7 +3861,7 @@
     },
     "1712": {
         "text": "General",
-        "context": "Label for \"General\" settings pivot"
+        "context": ""
     },
     "1713": {
         "text": "Account",
@@ -4152,7 +4148,7 @@
         "context": "Status text when the application is loading the user's file list"
     },
     "1785": {
-        "text": "Incorrect e-mail and\/or password.",
+        "text": "Incorrect email and\/or password.",
         "context": "Message displayed when a user is trying to loging with an incorrect email\/password."
     },
     "1786": {
@@ -4237,7 +4233,7 @@
     },
     "1812": {
         "text": "Always upload to this destination",
-        "context": "Label to let the user select a default upload folder with a checkbox."
+        "context": "Label to inform the user upload files\/folder to a default destination. with a checkbox."
     },
     "1813": {
         "text": "MEGA synced folder",
@@ -4785,7 +4781,7 @@
     },
     "2016": {
         "text": "Show status",
-        "context": "Label displayed to let the user display the Information dialog of MEGAsync. MAX 20 characters. Keep capital letter."
+        "context": "Label displayed to let the user displays the Information dialog of MEGAsync. MAX 20 characters. Keep capital letter."
     },
     "2017": {
         "text": "Folder for uploads from this computer",
@@ -4873,7 +4869,7 @@
     },
     "2041": {
         "text": "You don't have write permissions in this local folder.",
-        "context": "Message displayed when a user is trying to synchronized a local folder in wich the user has no write permissions."
+        "context": "Message shown when a user is trying to download a file to a local folder without the right permissions."
     },
     "2042": {
         "text": "You don't have write permissions in this folder.",
@@ -4881,11 +4877,11 @@
     },
     "2043": {
         "text": "MEGAsync won't be able to download anything here.",
-        "context": "Message displayed when a user is trying to synchronized a local folder in wich the user has no write permissions."
+        "context": "Label to indicate that MEGAsync won't be able to download anything due to the user doesn't have writhe permissions on the local selected folder."
     },
     "2044": {
         "text": "Do you want to continue?",
-        "context": "Message of confirmation to continue with the current operation."
+        "context": "Label to indicate if the user wants to continue in spite of the problem occured."
     },
     "2045": {
         "text": "Error getting link:",
@@ -4932,7 +4928,7 @@
         "context": ""
     },
     "2426": {
-        "text": "The name \"%1\" is already in use for another sync. \r\nPlease enter a different name to identify this synced folder:",
+        "text": "The name \"%1\" is already in use for another sync\nPlease enter a different name to identify this synced folder:",
         "context": "Detailed message displayed when a user is using a name for a local folder that is already used. Preserve \"%1\" code because is used to indicate the local folder at runtime."
     },
     "2435": {
@@ -4947,6 +4943,10 @@
         "text": "The folder (%1) wasn't uploaded because it's too large (this beta is limited to %2 folders or %3 files.",
         "context": ""
     },
+    "2439": {
+        "text": "%1 folders weren't uploaded because they are too large (this beta is limited to %2 folders or %3 files.",
+        "context": ""
+    },
     "2440": {
         "text": "Synchronization will stop.\nDeletions that occur while it is not running will not be propagated.\n\nExit anyway?",
         "context": ""
@@ -4956,47 +4956,47 @@
         "context": "Message displayed when a user tries to upload a file to a synced folder wich already contains it  Ask for confirmation. Keep  (%1) code because it will be filled with name of the file. String as short as possible."
     },
     "2445": {
-        "text": "The root folder can't be synced.\nPlease select a subfolder.",
+        "text": "The root folder can't be synced.\nPlease, select a subfolder.",
         "context": "Message displayed when a user is creating incompatible synchronizations."
     },
     "2447": {
-        "text": "No valid MEGA links found (folder links aren't supported yet).",
+        "text": "No valid MEGA links found. (Folder links aren't yet supported)",
         "context": "Message displayed when a user tries to import some invalid links or links to folders."
     },
     "2461": {
-        "text": "I agree with the MEGA <a href=\"https:\/\/mega.nz\/#terms\">Terms of Service<\/a>",
+        "text": "I agree with the MEGA <a href=\"https:\/\/mega.co.nz\/#terms\">Terms of Service<\/a>",
         "context": "Label to aggre with the Terms of use.  Keep code <a href=\"https:\/\/mega.co.nz\/#terms\">Terms of Service<\/a> .String as short as possible."
     },
     "2464": {
-        "text": "Please enter your e-mail address",
+        "text": "Please, enter your e-mail address",
         "context": "Label displayed when the user has not filled the email field."
     },
     "2465": {
-        "text": "Please enter a valid e-mail address",
+        "text": "Please, enter a valid e-mail address",
         "context": "Label displayed when the user has filled an invalid email address."
     },
     "2466": {
-        "text": "Please enter your password",
+        "text": "Please, enter your password",
         "context": "Label displayed when the user has not filled the password field."
     },
     "2467": {
-        "text": "Please enter your name",
+        "text": "Please, enter your name",
         "context": "Label displayed when the user has not filled the name field."
     },
     "2468": {
-        "text": "Please enter a stronger password",
+        "text": "Please, enter a stronger password",
         "context": "Label displayed when the user has filled a password not enough secure."
     },
     "2471": {
-        "text": "Please select a local folder",
+        "text": "Please, select a local folder",
         "context": "Label displayed when the user has not select a local folder."
     },
     "2472": {
-        "text": "Please select a MEGA folder",
+        "text": "Please, select a MEGA folder",
         "context": "Label displayed when the user has not select a MEGA folder."
     },
     "2475": {
-        "text": "Please select the upload folder for your files:",
+        "text": "Please, select the upload folder for your files:",
         "context": "Label to inform the user of the destination local folder for the files to be uploaded (MAX 50 characters)"
     },
     "2480": {
@@ -5085,7 +5085,7 @@
     },
     "5542": {
         "text": "Incoming Shares",
-        "context": "Title of the Incoming Shares section. Here you can see the folders that your contacts have shared with you"
+        "context": ""
     },
     "5543": {
         "text": "Outgoing Shares",
@@ -5299,17 +5299,13 @@
         "text": "OUTGOING",
         "context": "Capital letters. Outgoing shared folders. The title of a tab"
     },
-    "5599": {
-        "text": "Empty Rubbish Bin",
-        "context": "message when there are no files in the Rubbish Bin."
-    },
     "5600": {
         "text": "No incoming shared folders",
-        "context": "message when there are no incoming shared folders"
+        "context": "Title shown when there's no incoming Shared Items"
     },
     "5601": {
         "text": "No outgoing shared folders",
-        "context": "message when there are no outgoing shared folders"
+        "context": "Title shown when there's no outgoing Shared Items"
     },
     "5602": {
         "text": "Available offline",
@@ -6461,7 +6457,7 @@
     },
     "5905": {
         "text": "Owner",
-        "context": ""
+        "context": "Text shown next to name of the \"Owner\" of the folder that is being shared"
     },
     "5906": {
         "text": "Access",
@@ -6881,11 +6877,11 @@
     },
     "6026": {
         "text": "Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?",
-        "context": ""
+        "context": "Alert message shown when the user is overquota"
     },
     "6027": {
         "text": "Overquota Alert!",
-        "context": ""
+        "context": "Alert title shown when the user is overquota"
     },
     "6028": {
         "text": "You have not selected a default download location for your files.\n\nTo proceed with the download, please select a destination folder or go to preferences in order to set up your default download location.",
@@ -7033,11 +7029,11 @@
     },
     "6066": {
         "text": "Logging in...",
-        "context": "Label displayed when the user is logging in."
+        "context": "Notification message showing a Logging in state. Keep capital letters."
     },
     "6067": {
         "text": "Logging out...",
-        "context": ""
+        "context": "Label shown when an user is logging out from his account."
     },
     "6068": {
         "text": "Moving...",
@@ -7461,7 +7457,7 @@
     },
     "6196": {
         "text": "No requests pending at this time",
-        "context": "Empty ipc and opc grid label."
+        "context": "Title shown when there's no pending request"
     },
     "6197": {
         "text": "Account name",
@@ -7630,10 +7626,6 @@
     "6793": {
         "text": "Recover space by emptying the rubbish bin",
         "context": "Explain the user that he can recover space by emptying the Rubbish Bin"
-    },
-    "6794": {
-        "text": "Empty the rubbish bin",
-        "context": "Title of the button to empty the Rubbish Bin (action!)"
     },
     "6795": {
         "text": "Are you sure you want to permanently remove all items from your rubbish bin?\nYou cannot undo this action!",
@@ -9575,10 +9567,6 @@
         "text": "Sort",
         "context": "Label for any 'Sort' button, link, text, etc. - (String as short as possible)."
     },
-    "7332": {
-        "text": "Empty rubbish bin",
-        "context": "Label for any 'Empty rubbish' button, link, text, etc. - (String as short as possible).This indicates an action to clear rubbish bin."
-    },
     "7333": {
         "text": "Ok",
         "context": "Label for any 'Ok' button, link, text, title, etc. - (String as short as possible)."
@@ -11046,5 +11034,145 @@
     "7712": {
         "text": "Please log in or register to redeem your voucher.",
         "context": "Text on the Login page telling the user they need to log in or register first to be able to redeem their voucher."
+    },
+    "7713": {
+        "text": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
+        "context": "A dialog message to be shown before a user performs a full account reload using the website reload tool in the menu."
+    },
+    "7714": {
+        "text": "Voucher redemption link",
+        "context": "A table column heading on the #resellers page. It describes a link to be given to users who purchase a voucher, then it can be used to redeem the voucher directly. For example: https:\/\/mega.nz\/#voucher6E0U4QA7SFM5DM6RMEJ5."
+    },
+    "7715": {
+        "text": "Email support at resellers@mega.nz",
+        "context": "Text for the \"send email\" button on the Resellers page. It allows the user to contact MEGA's support center. Do not translate the  \"resellers@mega.nz\" email address."
+    },
+    "7716": {
+        "text": "You have already sent a confirm link to that address.",
+        "context": "Error message. Displayed if confirmation link has already been sent to the selected email."
+    },
+    "7717": {
+        "text": "You have already requested a confirmation link for that email address.",
+        "context": "Error message when a use wants to validate the same email twice"
+    },
+    "7718": {
+        "text": "This email address has already been taken. Please contact MEGA support for more information.",
+        "context": "Error message shown when the user is trying to change their email address but the new email address they are trying to use is unavailable."
+    },
+    "7719": {
+        "text": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+        "context": "Error message."
+    },
+    "7720": {
+        "text": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+        "context": "Error message when a user attempts to change their email without an active login session."
+    },
+    "7721": {
+        "text": "New in this version:",
+        "context": "Label to indicate new features or fixes for the current MEGAsync version. Please keep the colon."
+    },
+    "7722": {
+        "text": "MEGAsync is in guest mode",
+        "context": "A label to inform the user that MEGAsync is running in guest user mode."
+    },
+    "7723": {
+        "text": "Your download has started",
+        "context": "A notification shown when a web download has commenced."
+    },
+    "7724": {
+        "text": "DEBUG mode disabled",
+        "context": "Notification message shown when the DEBUG mode is disabled."
+    },
+    "7725": {
+        "text": "DEBUG mode enabled. A log is being created in your desktop (MEGAsync.log).",
+        "context": "A notification message which is shown when the DEBUG mode is enabled."
+    },
+    "7726": {
+        "text": "Error: Invalid destination folder. The download has been cancelled.",
+        "context": "A notification message which is shown when an error occurs while downloading a file to an invalid destination folder."
+    },
+    "7727": {
+        "text": "Our SSL key can't be verified. You could be affected by a man-in-the-middle attack or your antivirus software could be intercepting your communications and causing this problem. Please temporarily disable your antivirus software and try again.",
+        "context": "A notification message shown when the SSL checks fail."
+    },
+    "7728": {
+        "text": "No Internet connection",
+        "context": "Tooltip shown when there is not an active Internet connection."
+    },
+    "7729": {
+        "text": "Please enter a valid folder name",
+        "context": "An error message which is shown when a user is trying to create a folder without entering the folder name."
+    },
+    "7730": {
+        "text": "Verify your email address",
+        "context": "Dialog title for verifying the user's email address."
+    },
+    "7731": {
+        "text": "Please enter your password to verify your email address",
+        "context": "Dialog title telling the user they need to enter their password to verify their email address."
+    },
+    "7732": {
+        "text": "Confirm email",
+        "context": "Button text for the user to confirm their change of email address."
+    },
+    "7733": {
+        "text": "Excluded file and folder names",
+        "context": "A label to indicate the file and folder names excluded from synchronization."
+    },
+    "7734": {
+        "text": "Clear local cache",
+        "context": "The title of a dialog which will clear the local cache for the current user."
+    },
+    "7735": {
+        "text": "Backup versions of previously synced files in your computer will be permanently deleted. Please check your backup folders to see if you need to rescue something before continuing.",
+        "context": "A message shown to inform the user about what will happen if they delete their local cache."
+    },
+    "7736": {
+        "text": "Do you want to delete your local cache now?",
+        "context": "A confirmation message which is shown before performing a deletion of local cache data."
+    },
+    "7737": {
+        "text": "Clear remote cache",
+        "context": "The title of a dialog to clear the remote cache for the current user."
+    },
+    "7738": {
+        "text": "Backup versions of previously synced files in MEGA will be permanently deleted. Please, check your [A] folder in the Rubbish Bin of your MEGA account to see if you need to rescue something before continuing.",
+        "context": "Message shown to the user about what will happen if they delete their remote cache."
+    },
+    "7739": {
+        "text": "Do you want to delete your remote cache now?",
+        "context": "A confirmation message which is shown before performing a deletion of remotely cache data."
+    },
+    "7740": {
+        "text": "The rubbish bin is empty",
+        "context": "Text underneath the large icon on the Rubbish Bin page. This lets the user know there are no files currently in their recycle bin."
+    },
+    "7741": {
+        "text": "Clear the rubbish bin",
+        "context": "Button text on the Rubbish Bin page. This button will empty all files and folders currently stored in the rubbish bin."
+    },
+    "7742": {
+        "text": "Are you sure you want to delete \"%1\"?",
+        "context": "Confirm with the users if they are sure they want to delete the item. Please keep \"%1\" in translation."
+    },
+    "7743": {
+        "text": "Change Email",
+        "context": "A heading for the account profile section where the user can change their email address."
+    },
+    "7744": {
+        "text": "Current Email",
+        "context": "A label in the account profile section which shows the user's current email address."
+    },
+    "7745": {
+        "text": "New Email",
+        "context": "A label for a text field in the account profile section which will let the user enter a new email address."
+    },
+    "7746": {
+        "text": "Enter your new email address in the text field above and click Save.",
+        "context": "An instruction in the account profile section to tell the user to enter their email address and click the save button."
+    },
+    "7747": {
+        "text": "Following that, please go to your email inbox and confirm this email change.",
+        "context": "An instruction in the account profile section to tell the user to check for a confirmation link in their email inbox to complete the process of changing their email address."
     }
 }

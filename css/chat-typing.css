@@ -1,57 +1,59 @@
 .typing-block {
-	position:absolute;
-	    padding: 3px 0 0 71px;
+	position: absolute;
+	padding: 3px 0 0 71px;
 }
 .typing-text {
 	font-size: 12px;
 	line-height: 15px;
-	color:#999999;
-	float:left;
+	color: #999999;
+	float: left;
 }
 .typing-bounce {
 	margin: 0 2px;
+	width: 34px;
+	text-align: center;
+	float: left;
+	margin-top: 7px;
     width: 34px;
     text-align: center;
     float: left;
 	margin-top: 7px;
 }
 .typing-bounce div {
-    width: 4px;
-    height: 4px;
-    background-color: #999999;
-    border-radius: 100%;
-    display: inline-block;
-    -webkit-animation: typing-bounce 1.4s ease-in-out 0s infinite both;
-    animation: typing-bounce 1.4s ease-in-out 0s infinite both;
-    vertical-align: middle;
+	width: 4px;
+	height: 4px;
+	background-color: #999999;
+	border-radius: 100%;
+	display: inline-block;
+	-webkit-animation: typing-bounce 1.4s ease-in-out 0s infinite both;
+	animation: typing-bounce 1.4s ease-in-out 0s infinite both;
+	vertical-align: middle;
 }
 .typing-bounce div.typing-bounce1 {
-    -webkit-animation-delay: -0.32s;
-    animation-delay: -0.32s; 
+	-webkit-animation-delay: -0.32s;
+	animation-delay: -0.32s;
 }
 .typing-bounce div.typing-bounce2 {
-    -webkit-animation-delay: -0.16s;
-    animation-delay: -0.16s; 
+	-webkit-animation-delay: -0.16s;
+	animation-delay: -0.16s;
 }
-
-@-webkit-keyframes typing-bounce {
-	0%, 80%, 100% {
-		-webkit-transform: scale(0);
-		transform: scale(0); 
-		}
-	40% {
-		-webkit-transform: scale(1);
-		transform: scale(1); 
-		}
+ @-webkit-keyframes typing-bounce {
+ 0%, 80%, 100% {
+ -webkit-transform: scale(0);
+ transform: scale(0);
 }
-
+ 40% {
+ -webkit-transform: scale(1);
+ transform: scale(1);
+}
+}
 @keyframes typing-bounce {
 	0%, 80%, 100% {
 		-webkit-transform: scale(0);
-		transform: scale(0); 
+		transform: scale(0);
 	}
 	40% {
 		-webkit-transform: scale(1);
-		transform: scale(1); 
-	} 
+		transform: scale(1);
+	}
 }

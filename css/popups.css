@@ -3,17 +3,17 @@
 }
 .popup.dropdown.body.contacts-search {
 	width: 360px;
-	padding:0 0 7px 0;
+	padding: 0 0 7px 0;
 }
 .contacts-search-header {
-	text-align:center;
+	text-align: center;
 	line-height: 48px;
 	height: 48px;
 	font-size: 14px;
 	color: #666666;
 }
 .contacts-search-header i {
-	vertical-align:middle;
+	vertical-align: middle;
 	margin: 0 7px 1px 0;
 }
 .contacts-search-scroll {
@@ -26,7 +26,7 @@
 	cursor: pointer;
 }
 .contacts-info.body.contacts-search:nth-child(odd) {
-	background-color:#fafafa;
+	background-color: #fafafa;
 }
 .contacts-search .user-card-presence {
 	margin: 14px 10px 0 14px;

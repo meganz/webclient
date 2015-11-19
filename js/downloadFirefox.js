@@ -112,7 +112,14 @@ function mozIOCleanup(name, path, size, dl) {
 function mozIOSetup(name, path, size, error, success) {
     function setup() {
         try {
-            var root = mozGetDownloadsFolder().path;
+            var root; /* jshint -W117 */
+            if (mozPrefs.getBoolPref('askdir')) {
+                root = mozFilePicker(name, 2);
+            }
+            else {
+                root = mozGetDownloadsFolder();
+            }
+            root = root.path;
         }
         catch (e) {
             return Soon(() => error(e));

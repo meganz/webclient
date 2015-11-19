@@ -1,13 +1,13 @@
 .feedback.round-icon-block {
 	margin: 2px 0 0 0;
-	float:left;
+	float: left;
 }
 .feedback.error-notification {
 	background-color: rgba(0,0,0,0.05);
 	-moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-	padding:24px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	padding: 24px;
 	margin: 29px 0 0 0;
 }
 .feedback.error-header {
@@ -25,5 +25,5 @@
 	padding: 10px 0;
 }
 .error-notification .buttons-block {
-	padding:17px 0 0 0;
+	padding: 17px 0 0 0;
 }

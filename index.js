@@ -294,6 +294,10 @@ function init_page() {
         parsepage(pages['blogarticle']);
         init_blog();
     }
+    else if (page.substr(0, 6) == 'verify') {
+        parsepage(pages['change_email']);
+        emailchange.main();
+    }
     else if (page.substr(0, 9) == 'corporate') {
         function doRenderCorpPage() {
             if (window.corpTemplate) {

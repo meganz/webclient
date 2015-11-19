@@ -124,7 +124,7 @@
 	-khtml-opacity: 0;
 	opacity: 0;
 }
-.default-white-button.tiny-button i {
+.default-white-button.tiny-button .tiny-icon {
 	margin: 0 auto;
 	display: block;
 }

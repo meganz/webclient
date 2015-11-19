@@ -199,7 +199,7 @@ function u_logout(logout) {
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
         localStorage.removeItem('agreedToCopyrightWarning');
-        
+
         if (mDBact) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];
@@ -324,7 +324,7 @@ function setpwset(confstring, ctx) {
  *  @param string|AES   password
  *  @param array        encrypted private key (optional)
  *  @param array        private key (optional)
- *  
+ *
  *
  *  @return bool
  */
@@ -684,7 +684,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
  * @param mode {integer}
- *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
+ *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_GCM_12_16).
  * @return {MegaPromise}
  *     A promise that is resolved when the original asynch code is settled.
  *     Can be used to use promises instead of callbacks for asynchronous

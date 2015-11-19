@@ -124,8 +124,10 @@ var tlvstore = (function () {
         AES_CCM_12_16: 0x00,
         AES_CCM_10_16: 0x01,
         AES_CCM_10_08: 0x02,
-        AES_GCM_12_16: 0x03,
-        AES_GCM_10_08: 0x04,
+        // AES_CCM_12_16: 0x03, - Same as 0x00 (due to a legacy bug).
+        // AES_CCM_10_08: 0x04, - Same as 0x02 (due to a legacy bug).
+        AES_GCM_12_16: 0x10,
+        AES_GCM_10_08: 0x11
     };
 
 
@@ -133,11 +135,13 @@ var tlvstore = (function () {
      * Parameters for supported block cipher encryption schemes.
      */
     ns.BLOCK_ENCRYPTION_PARAMETERS = {
-        0x00: {nonceSize: 12, macSize: 16}, // BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16
-        0x01: {nonceSize: 10, macSize: 16}, // BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16
-        0x02: {nonceSize: 10, macSize:  8}, // BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08
-        0x03: {nonceSize: 12, macSize: 16}, // BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16
-        0x04: {nonceSize: 10, macSize:  8}, // BLOCK_ENCRYPTION_SCHEME.AES_GCM_10_08
+        0x00: {nonceSize: 12, macSize: 16, cipher: 'AES_CCM'}, // BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16
+        0x01: {nonceSize: 10, macSize: 16, cipher: 'AES_CCM'}, // BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16
+        0x02: {nonceSize: 10, macSize:  8, cipher: 'AES_CCM'}, // BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08
+        0x03: {nonceSize: 12, macSize: 16, cipher: 'AES_CCM'}, // Same as 0x00 (due to a legacy bug).
+        0x04: {nonceSize: 10, macSize:  8, cipher: 'AES_CCM'}, // Same as 0x02 (due to a legacy bug).
+        0x10: {nonceSize: 12, macSize: 16, cipher: 'AES_GCM'}, // BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16
+        0x11: {nonceSize: 10, macSize:  8, cipher: 'AES_GCM'}  // BLOCK_ENCRYPTION_SCHEME.AES_GCM_10_08
     };
 
 
@@ -145,29 +149,30 @@ var tlvstore = (function () {
      * Encrypts clear text data to an authenticated ciphertext, armoured with
      * encryption mode indicator and IV.
      *
-     * @param clear {string}
+     * @param clearText {String}
      *     Clear text as byte string.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @param mode {integer}
-     *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (currently GCM is not
-     *     supported by asmCrypto, so they won't work).
-     * @returns {string}
+     * @param mode {Number}
+     *     Encryption mode as an integer. One of tlvstore.BLOCK_ENCRYPTION_SCHEME.
+     * @returns {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      */
-    ns.blockEncrypt = function(clear, key, mode) {
+    ns.blockEncrypt = function(clearText, key, mode) {
         var nonceSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].nonceSize;
         var tagSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
+        var cipher = asmCrypto[ns.BLOCK_ENCRYPTION_PARAMETERS[mode].cipher];
         var nonceBytes = new Uint8Array(nonceSize);
         asmCrypto.getRandomValues(nonceBytes);
-        if (key instanceof Array || Object.prototype.toString.call(key) === '[object Array]') {
+        if ((key instanceof Array)
+                || (Object.prototype.toString.call(key) === '[object Array]')) {
             // Key is in the form of an array of four 32-bit words.
             key = a32_to_str(key);
         }
         var keyBytes = asmCrypto.string_to_bytes(key);
-        var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(clear)));
-        var cipherBytes = asmCrypto.AES_CCM.encrypt(clearBytes, keyBytes, nonceBytes,
-                                                    undefined, tagSize);
+        var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(clearText)));
+        var cipherBytes = cipher.encrypt(clearBytes, keyBytes, nonceBytes,
+                                         undefined, tagSize);
         return String.fromCharCode(mode) + asmCrypto.bytes_to_string(nonceBytes)
                + asmCrypto.bytes_to_string(cipherBytes);
     };
@@ -177,26 +182,28 @@ var tlvstore = (function () {
      * Decrypts an authenticated cipher text armoured with a mode indicator and IV
      * to clear text data.
      *
-     * @param cipher {string}
+     * @param cipherText {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @returns {String}
      *     Clear text as byte string.
      */
-    ns.blockDecrypt = function(cipher, key) {
-        var mode = cipher.charCodeAt(0);
+    ns.blockDecrypt = function(cipherText, key) {
+        var mode = cipherText.charCodeAt(0);
         var nonceSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].nonceSize;
-        var nonceBytes = asmCrypto.string_to_bytes(cipher.substring(1, nonceSize + 1));
-        var cipherBytes = asmCrypto.string_to_bytes(cipher.substring(nonceSize + 1));
+        var nonceBytes = asmCrypto.string_to_bytes(cipherText.substring(1, nonceSize + 1));
+        var cipherBytes = asmCrypto.string_to_bytes(cipherText.substring(nonceSize + 1));
         var tagSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
-        if (key instanceof Array || Object.prototype.toString.call(key) === '[object Array]') {
+        var cipher = asmCrypto[ns.BLOCK_ENCRYPTION_PARAMETERS[mode].cipher];
+        if ((key instanceof Array)
+                || (Object.prototype.toString.call(key) === '[object Array]')) {
             // Key is in the form of an array of four 32-bit words.
             key = a32_to_str(key);
         }
         var keyBytes = asmCrypto.string_to_bytes(key);
-        var clearBytes = asmCrypto.AES_CCM.decrypt(cipherBytes, keyBytes, nonceBytes,
-                                                   undefined, tagSize);
+        var clearBytes = cipher.decrypt(cipherBytes, keyBytes, nonceBytes,
+                                        undefined, tagSize);
         return decodeURIComponent(escape(asmCrypto.bytes_to_string(clearBytes)));
     };
 

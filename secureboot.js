@@ -221,7 +221,12 @@ if (!b_u) try
         var pathSuffix = window.location.pathname;
         pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
         // set the staticpath for debug mode
-        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        if(typeof(tempStaticpath) !== 'undefined') {
+            localStorage.staticpath = tempStaticpath;
+        }
+        else {
+            localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        }
         // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
         if (localStorage.d) {
             console.debug('StaticPath set to "' + localStorage.staticpath + '"');

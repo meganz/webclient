@@ -13,9 +13,16 @@ var Dropdown = React.createClass({
             if(this.isMounted() && this.getOwnerElement()) {
                 var $element = $(this.getDOMNode());
                 var parentDomNode = $element.parents('.button');
+                var positionToElement = parentDomNode;
+                var offsetLeft = 0;
+                if($('> i', parentDomNode).size() > 0) {
+                    positionToElement = $('> i', parentDomNode);
+                    offsetLeft = positionToElement.outerWidth() / 2;
+                }
+
                 $element.css('margin-left','');
                 $element.position({
-                    of: $(parentDomNode),
+                    of: positionToElement,
                     my: "center top",
                     at: "center bottom",
                     collision: "flip flip",
@@ -33,7 +40,7 @@ var Dropdown = React.createClass({
                         var $arrow = $('.dropdown-white-arrow', $element);
 
                         $(this).css({
-                            left: obj.left + 'px',
+                            left: (obj.left + (offsetLeft ? offsetLeft/2 : 0)) + 'px',
                             top: (obj.top + $arrow.outerHeight()) + 'px',
                             marginLeft: self.props.styles ? self.props.styles.marginLeft : undefined
                         });
@@ -43,7 +50,7 @@ var Dropdown = React.createClass({
         }
     },
     render: function() {
-        var classes = "dropdown body dropdown-arrow up-arrow popup " + this.props.className;
+        var classes = "dropdown body dropdown-arrow up-arrow " + this.props.className;
 
 
         if(this.props.active !== true) {

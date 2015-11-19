@@ -79,7 +79,7 @@ var Button = React.createClass({
     render: function () {
         var classes = this.props.className ? "button " + this.props.className : "button";
 
-        if (this.props.disabled === true) {
+        if (this.props.disabled == true || this.props.disabled == "true") {
             classes += " disabled";
         }
         else if (this.state.focused) {
@@ -97,7 +97,7 @@ var Button = React.createClass({
         }
 
         return (
-            <div className={classes} onClick={this.onClick}>
+            <div className={classes} onClick={this.onClick} style={this.props.style}>
                 {icon}
                 {label}
                 {this.renderChildren()}

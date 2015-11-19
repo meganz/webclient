@@ -7,6 +7,7 @@ NODE = node
 KARMA  = $(NODE_PATH)/karma/bin/karma
 JSDOC  = $(NODE_PATH)/.bin/jsdoc
 JSHINT = $(NODE_PATH)/.bin/jshint
+RSG = $(NODE_PATH)/.bin/rsg
 JSCS = $(NODE_PATH)/.bin/jscs
 BUILD_DEP_ALL = $(KARMA) $(JSDOC)
 BUILD_DEP_ALL_NAMES = karma jsdoc
@@ -29,7 +30,7 @@ ifeq ($(OS), Windows_NT)
     TESTALL_BROWSERS := $(TESTALL_BROWSERS),IE,FirefoxNightly,FirefoxDeveloper,Firefox_NoCookies,Chrome_NoCookies,Chrome_Incognito
 endif
 
-all: test-ci api-doc dist test-shared
+all: test-ci api-doc ui-styleguide dist test-shared
 
 test-no-workflows:
 	SKIP_WORKFLOWS=true $(MAKE) $(SILENT_MAKE) test
@@ -49,6 +50,8 @@ api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \
                  --configure jsdoc.json \
                  --recurse
+ui-styleguide: $(RSG)
+	$(RSG) "./dont-deploy/ui/src/**/*.jsx" -c styleguide.json
 
 jshint: $(JSHINT)
 	@-$(NODE) $(JSHINT) --verbose .
@@ -63,7 +66,7 @@ pkg-upgrade:
 checks: jshint jscs
 
 clean:
-	rm -rf doc/api/ coverage/ build/ test-results.xml test/phantomjs-storage
+	rm -rf doc/api/ coverage/ build/ test-results.xml test/phantomjs-storage dont-deploy/ui/out/
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)

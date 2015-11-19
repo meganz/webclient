@@ -118,11 +118,13 @@
 	height: 16px;
 	padding: 0;
 	float: right;
-	text-align: center;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
+}
+.default-white-button.tiny-button i {
+	margin:0 auto;
 }
 .contacts-info:hover .tiny-button, .message.content-area:hover > .tiny-button, .default-white-button.tiny-button.active, .shared-link.img-block:hover .tiny-button, .data-block-view:hover .tiny-button {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);

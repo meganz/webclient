@@ -25369,6 +25369,91 @@ a.ui-datepicker-next {
 .key .reg-st3-big-txt span, .key .reg-st3-mid-txt {
 	font-size:14px;
 }
+body.key.bg .reg-st3-big-txt span , 
+body.key.uk .reg-st3-big-txt span , 
+body.key.ru .reg-st3-big-txt span , 
+body.key.ca .reg-st3-big-txt span , 
+body.key.gl .reg-st3-big-txt span , 
+body.key.it .reg-st3-big-txt span , 
+body.key.lv .reg-st3-big-txt span , 
+body.key.nl .reg-st3-big-txt span , 
+body.key.pt .reg-st3-big-txt span , 
+body.key.br .reg-st3-big-txt span , 
+body.key.sk .reg-st3-big-txt span , 
+body.key.ka .reg-st3-big-txt span , 
+body.key.es .reg-st3-big-txt span , 
+body.key.ro .reg-st3-big-txt span,
+
+body.key.de .reg-st3-big-txt span,
+body.key.fr .reg-st3-big-txt span,
+body.key.hu .reg-st3-big-txt span,
+body.key.pl .reg-st3-big-txt span {
+	    line-height: 26px;
+    vertical-align: top;
+}
+body.key.bg .reg-st3-storage , 
+body.key.uk .reg-st3-storage , 
+body.key.ru .reg-st3-storage , 
+body.key.ca .reg-st3-storage , 
+body.key.gl .reg-st3-storage , 
+body.key.it .reg-st3-storage , 
+body.key.lv .reg-st3-storage , 
+body.key.nl .reg-st3-storage , 
+body.key.pt .reg-st3-storage , 
+body.key.br .reg-st3-storage , 
+body.key.sk .reg-st3-storage , 
+body.key.ka .reg-st3-storage , 
+body.key.es .reg-st3-storage , 
+body.key.ro .reg-st3-storage,
+body.key.de .reg-st3-storage,
+body.key.fr .reg-st3-storage,
+body.key.hu .reg-st3-storage,
+body.key.pl .reg-st3-storage {
+	padding-top:11px;
+	
+}
+body.key.bg .reg-st3-big-txt, 
+body.key.uk .reg-st3-big-txt, 
+body.key.ru .reg-st3-big-txt, 
+body.key.ca .reg-st3-big-txt, 
+body.key.gl .reg-st3-big-txt, 
+body.key.it .reg-st3-big-txt, 
+body.key.lv .reg-st3-big-txt, 
+body.key.nl .reg-st3-big-txt, 
+body.key.pt .reg-st3-big-txt, 
+body.key.br .reg-st3-big-txt, 
+body.key.sk .reg-st3-big-txt, 
+body.key.ka .reg-st3-big-txt, 
+body.key.es .reg-st3-big-txt, 
+body.key.ro .reg-st3-big-txt,
+body.key.de .reg-st3-big-txt,
+body.key.fr .reg-st3-big-txt,
+body.key.hu .reg-st3-big-txt,
+body.key.pl .reg-st3-big-txt,
+
+
+body.key.bg .reg-st3-mid-txt, 
+body.key.uk .reg-st3-mid-txt, 
+body.key.ru .reg-st3-mid-txt, 
+body.key.ca .reg-st3-mid-txt, 
+body.key.gl .reg-st3-mid-txt, 
+body.key.it .reg-st3-mid-txt, 
+body.key.lv .reg-st3-mid-txt, 
+body.key.nl .reg-st3-mid-txt, 
+body.key.pt .reg-st3-mid-txt, 
+body.key.br .reg-st3-mid-txt, 
+body.key.sk .reg-st3-mid-txt, 
+body.key.ka .reg-st3-mid-txt, 
+body.key.es .reg-st3-mid-txt, 
+body.key.ro .reg-st3-mid-txt,
+body.key.de .reg-st3-mid-txt,
+body.key.fr .reg-st3-mid-txt,
+body.key.hu .reg-st3-mid-txt,
+body.key.pl .reg-st3-mid-txt {
+	float:none;
+	height:22px;
+	line-height: 20px;
+}
 }
 @media only screen and (max-height:  833px) {
 .ads-tablet .ads-right-bottom-txt, .ads-ipad .ads-right-bottom-txt {

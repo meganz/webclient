@@ -6061,7 +6061,7 @@ function contextMenuUI(e, ll) {
         $(menuCMI).hide();
         items = menuItems();
         delete items['.download-item'];
-        delete items['.zipdownload-item-item'];
+        delete items['.zipdownload-item'];
         delete items['.copy-item'];
         delete items['.open-item'];
 

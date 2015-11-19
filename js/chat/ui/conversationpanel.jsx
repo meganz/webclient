@@ -190,9 +190,29 @@ var ConversationMessage = React.createClass({
                         <div className="message user-card-name">{displayName}</div>
                         <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
 
-                        <div className="default-white-button tiny-button">
-                            <i className="tiny-icon grey-down-arrow"></i>
-                        </div>
+                        <ButtonsUI.Button
+                            className="default-white-button tiny-button"
+                            icon="tiny-icon grey-down-arrow">
+                            <DropdownsUI.Dropdown
+                                styles={{
+                                }}
+                                className="message-dropdown"
+                                onClick={() => {}}
+                                >
+                                <DropdownsUI.DropdownItem icon="writing-pen" label="Edit" onClick={() => {
+                                    console.error("TBD!");
+                                }} />
+                                <DropdownsUI.DropdownItem icon="quotes" label="Quote" onClick={() => {
+                                    console.error("TBD!");
+                                }} />
+
+                                <hr />
+
+                                <DropdownsUI.DropdownItem icon="red-cross" label="Delete" className="red" onClick={() => {
+                                    console.error("TBD!");
+                                }} />
+                            </DropdownsUI.Dropdown>
+                        </ButtonsUI.Button>
 
                         <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}>
                         </div>
@@ -936,14 +956,14 @@ var ConversationPanel = React.createClass({
         // typeArea resizing
         var $textarea = $('textarea.messages-textarea', $container);
         var textareaHeight =  $textarea.outerHeight();
-        var $hiddenDiv = $('.hidden', $container);
+        var $hiddenDiv = $('.message-preview.hidden', $container);
         var $pane = $('.chat-textarea-scroll', $container);
         var $jsp;
 
         if (textareaHeight != $hiddenDiv.outerHeight()) {
             $textarea.css('height', $hiddenDiv.outerHeight());
 
-            if ($('.chat-textarea-block', $container).outerHeight() >= 200) {
+            if ($('.chat-textarea-block', $container).outerHeight() >= 139) {
                 $pane.jScrollPane({
                     enableKeyboardNavigation:false,
                     showArrows:true,
@@ -1317,18 +1337,18 @@ var ConversationPanel = React.createClass({
                                     </div>
                                 </div>
                                 <div className="chat-textarea-scroll">
-                                <textarea
-                                    className={messageTextAreaClasses}
-                                    placeholder="Write a message..."
-                                    onKeyDown={self.onTypeAreaKeyDown}
-                                    onBlur={self.onTypeAreaBlur}
-                                    onChange={self.onTypeAreaChange}
-                                    value={self.state.typedMessage}
-                                    ref="typearea"
-                                    disabled={room.pubCu25519KeyIsMissing === true ? true : false}
-                                    readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
-                                    ></textarea>
-                                    <div className="hidden" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
+                                    <textarea
+                                        className={messageTextAreaClasses}
+                                        placeholder="Write a message..."
+                                        onKeyDown={self.onTypeAreaKeyDown}
+                                        onBlur={self.onTypeAreaBlur}
+                                        onChange={self.onTypeAreaChange}
+                                        value={self.state.typedMessage}
+                                        ref="typearea"
+                                        disabled={room.pubCu25519KeyIsMissing === true ? true : false}
+                                        readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
+                                        ></textarea>
+                                    <div className="hidden message-preview" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
                                 </div>
                             </div>
                         </div>

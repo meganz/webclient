@@ -177,7 +177,7 @@ var DropdownItem = React.createClass({
     }
 });
 
-module.exports = {
+module.exports = window.DropdownsUI = {
     Dropdown,
     DropdownItem,
     DropdownContactsSelector

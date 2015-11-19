@@ -35,7 +35,7 @@
 	margin: 0 0 0 20px;
 }
 .chat-textarea-scroll {
-	max-height: 80px;
+	max-height: 140px;
 }
 .chat-textarea-scroll textarea, .chat-textarea-scroll .hidden {
 	font-size: 13px;
@@ -47,7 +47,7 @@
 	color: #777777;
 	overflow: hidden;
 	resize: none;
-	max-height: 80px;
+	max-height: 140px;
 }
 .chat-textarea-scroll textarea {
 	height: 20px;

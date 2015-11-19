@@ -55,14 +55,21 @@ IndexedDBKVStorage._requiresDbConn = function(fn) {
                 promise.linkDoneAndFailTo(
                     fn.apply(self, args)
                 );
-                promise.fail(function() {
-                    self.logger.error("Failed to init IndexedDBKVStorage", arguments);
-                });
             });
         } else {
-            promise.linkDoneAndFailTo(
-                fn.apply(self, args)
-            );
+            if(self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+                promise.linkDoneAndFailTo(
+                    fn.apply(self, args)
+                );
+            }
+            else if(self.db.dbState === MegaDB.DB_STATE.OPENING) {
+                self.db.one('onDbStateReady', function() {
+                    promise.linkDoneAndFailTo(
+                        fn.apply(self, args)
+                    );
+                });
+            }
+
         }
 
         return promise;

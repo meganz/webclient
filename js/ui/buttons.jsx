@@ -107,6 +107,7 @@ var Button = React.createClass({
 });
 
 
-module.exports = {
+
+module.exports = window.ButtonsUI = {
     Button
 };

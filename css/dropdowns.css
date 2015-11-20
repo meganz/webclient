@@ -18,7 +18,7 @@
 }
 .dropdown.body.popup {
 	min-width: 360px;
-    padding: 0;
+	padding: 0;
 }
 .dropdown.body:not(.white-context-menu)::before {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -117,7 +117,7 @@
 	border-radius: 0;
 }
 .link-button .dropdown.body .dropdown-item i {
-	    margin: 0 9px 1px -1px;
+	margin: 0 9px 1px -1px;
 }
 .link-button .dropdown.body:not(.popup) .dropdown-white-arrow {
 	margin-left: -108px;

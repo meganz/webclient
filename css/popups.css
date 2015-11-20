@@ -7,34 +7,66 @@
 }
 .popup.add-participant-selector {
 	right: 12px;
-    left: auto !important;
+	left: auto !important;
 }
 .popup.add-participant-selector .dropdown-white-arrow {
 	margin-left: 36px;
 }
 .contacts-search-header {
-	text-align: center;
 	line-height: 48px;
 	height: 48px;
 	font-size: 14px;
 	color: #666666;
 	position: relative;
 	z-index: 10;
+	padding: 0 0 0 104px;
 }
 .add-participant-selector .contacts-search-header {
-	text-align:left;
-	padding-left: 40px
+	padding: 0 0 0 40px;
 }
-.contacts-search-header i {
+.contacts-search-header input {
+	font-size: 14px;
+	line-height: 24px;
+	color: #666666;
+	width: auto;
+	display: inline-block;
+	margin: 12px 0 0 7px;
+	border: 0;
+	padding: 0;
 	vertical-align: middle;
-	margin: 0 7px 1px 0;
+}
+.add-participant-selector .contacts-search-header input {
+	margin: 12px 0 0 16px;
+}
+.contacts-search-header input::-webkit-input-placeholder {
+color: #666666;
+}
+.contacts-search-header input:-moz-placeholder {
+color: #666666;
+ opacity: 1;
+}
+.contacts-search-header input::-moz-placeholder {
+color: #666666;
+ opacity: 1;
+}
+.contacts-search-header input:-ms-input-placeholder {
+color: #666666;
+}
+.add-participant-selector .contacts-search-header {
+	text-align: left;
+	padding-left: 40px;
+}
+.contacts-search-header > i {
+	vertical-align: middle;
+	margin: 14px 3px 1px 0;
 }
 .contacts-search-scroll {
 	min-height: 288px;
 	overflow: hidden;
 }
-.contacts-info.body.contacts-search {
+.popup .contacts-info.body.contacts-search {
 	height: 48px;
+	padding: 6px 0;
 	cursor: pointer;
 }
 .contacts-info.body.contacts-search:nth-child(odd) {

@@ -143,7 +143,7 @@ var DropdownContactsSelector = React.createClass({
                 <i className="small-icon search-icon"></i>
                 <input
                     type="search"
-                    placeholder={__("Search")}
+                    placeholder={__("Search contacts")}
                     ref="contactSearchField"
                     onChange={this.onSearchChange}
                     value={this.state.searchValue}

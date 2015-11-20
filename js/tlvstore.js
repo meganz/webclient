@@ -23,6 +23,8 @@ var tlvstore = (function () {
      */
     var ns = {};
 
+    ns._logger = MegaLogger.getLogger('tlvstore');
+
     /**
      * Generates a binary encoded TLV record from a key-value pair.
      *
@@ -66,12 +68,13 @@ var tlvstore = (function () {
      * Splits and decodes a TLV record off of a container into a key-value pair and
      * returns the record and the rest.
      *
-     * @param tlvContainer {string}
+     * @param tlvContainer {String}
      *     Single binary encoded container of TLV records.
-     * @returns {object}
+     * @returns {Object|Boolean}
      *     Object containing two elements: `record` contains an array of two
      *     elements (key and value of the decoded TLV record) and `rest` containing
-     *     the remainder of the tlvContainer still to decode.
+     *     the remainder of the tlvContainer still to decode. In case of decoding
+     *     errors, `false` is returned.
      */
     ns.splitSingleTlvRecord = function(tlvContainer) {
         var keyLength = tlvContainer.indexOf('\u0000');
@@ -80,7 +83,16 @@ var tlvstore = (function () {
                         | tlvContainer.charCodeAt(keyLength + 2);
         var value = tlvContainer.substring(keyLength + 3, keyLength + valueLength + 3);
         var rest = tlvContainer.substring(keyLength + valueLength + 3);
-        return {'record': [key, value], 'rest': rest};
+
+        // Consistency checks.
+        if ((valueLength !== value.length)
+                || (rest.length !== tlvContainer.length - (keyLength + valueLength + 3))) {
+            ns._logger.warn('Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
+
+            return false;
+        }
+
+        return { 'record': [key, value], 'rest': rest };
     };
 
 
@@ -88,19 +100,35 @@ var tlvstore = (function () {
      * Decodes a binary encoded container of TLV records into an object
      * representation.
      *
-     * @param tlvContainer {string}
+     * @param tlvContainer {String}
      *     Single binary encoded container of TLV records.
-     * @returns {object}
-     *     Object containing (non-nested) key-value pairs.
+     * @param [utf8LegacySafe] {Boolean}
+     *     Single binary encoded container of TLV records.
+     * @returns {Object|Boolean}
+     *     Object containing (non-nested) key-value pairs. `false` in case of
+     *     failing TLV decoding.
      */
-    ns.tlvRecordsToContainer = function(tlvContainer) {
+    ns.tlvRecordsToContainer = function(tlvContainer, utf8LegacySafe) {
         var rest = tlvContainer;
         var container = {};
         while (rest.length > 0) {
             var result = ns.splitSingleTlvRecord(rest);
+            if (result === false) {
+                container = false;
+                break;
+            }
             container[result.record[0]] = result.record[1];
             rest = result.rest;
         }
+
+        if (utf8LegacySafe && (container === false)) {
+            // Treat the legacy case and first UTF-8 decode the container content.
+            ns._logger.info('Retrying to decode after UTF-8 decoding TLV container.');
+
+            return ns.tlvRecordsToContainer(decodeURIComponent(escape(tlvContainer)),
+                                            false);
+        }
+
         return container;
     };
 

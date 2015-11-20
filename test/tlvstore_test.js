@@ -86,20 +86,35 @@ describe("tlvstore unit test", function() {
         it('tlvRecordsToContainer', function() {
             var tests = ['foo\u0000\u0000\u0003bar'
                          + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY,
-                         '\u0000\u0000\u0008fortytwo'];
+                         '\u0000\u0000\u0008fortytwo',
+                         atob('Zm9vAAADYmFycHVFZDI1NQAAINdamAGCsQq31Uv+08lkBzoO4XLz2qYjJa8CGmj3B1Ea')];
             var expected = [{'foo': 'bar',
                              'puEd255': ED25519_PUB_KEY},
-                            {'': 'fortytwo'}];
+                            {'': 'fortytwo'},
+                            {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}];
             for (var i = 0; i < tests.length; i++) {
                 assert.deepEqual(ns.tlvRecordsToContainer(tests[i]), expected[i]);
             }
         });
 
+        it('tlvRecordsToContainer, malformed TLV (UTF-8 encoded)', function() {
+            sandbox.stub(ns._logger, '_log');
+            var test = atob('Zm9vAAADYmFycHVFZDI1NQAAIMOXWsKYAcKCwrEKwrfDlUvDvsOTw4lkBzoOw6Fyw7PDmsKmIyXCrwIaaMO3B1Ea');
+            assert.strictEqual(ns.tlvRecordsToContainer(test), false);
+            assert.strictEqual(ns._logger._log.args[0][1][0],
+                               'Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
+        });
 
-        // Add new tests/functionality to decode *both* to the same:
-        // {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}
-        // raw: 'Zm9vAAADYmFycHVFZDI1NQAAINdamAGCsQq31Uv+08lkBzoO4XLz2qYjJa8CGmj3B1Ea'
-        // UTF-8 encoded: 'Zm9vAAADYmFycHVFZDI1NQAAIMOXWsKYAcKCwrEKwrfDlUvDvsOTw4lkBzoOw6Fyw7PDmsKmIyXCrwIaaMO3B1Ea'
+        it('tlvRecordsToContainer, UTF-8 legacy decoding', function() {
+            sandbox.stub(ns._logger, '_log');
+            var test = atob('Zm9vAAADYmFycHVFZDI1NQAAIMOXWsKYAcKCwrEKwrfDlUvDvsOTw4lkBzoOw6Fyw7PDmsKmIyXCrwIaaMO3B1Ea');
+            var expected = {'foo': 'bar', 'puEd255': ED25519_PUB_KEY};
+            assert.deepEqual(ns.tlvRecordsToContainer(test, true), expected);
+            assert.strictEqual(ns._logger._log.args[0][1][0],
+                               'Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
+            assert.strictEqual(ns._logger._log.args[1][1][0],
+                               'Retrying to decode after UTF-8 decoding TLV container.');
+        });
     });
 
     describe('attribute en-/decryption', function() {

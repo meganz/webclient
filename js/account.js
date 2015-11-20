@@ -612,7 +612,11 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                 try {
                     var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
                                                                u_k);
-                    res = tlvstore.tlvRecordsToContainer(clearContainer);
+                    res = tlvstore.tlvRecordsToContainer(clearContainer, true);
+
+                    if (res === false) {
+                        res = EINTERNAL;
+                    }
                 }
                 catch (e) {
                     if (e.name === 'SecurityError') {

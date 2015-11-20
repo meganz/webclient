@@ -28,18 +28,15 @@
 	font-size: 14px;
 	line-height: 24px;
 	color: #666666;
-	cursor: default;
 	width: auto;
 	display: inline-block;
-	vertical-align: middle;
-	margin: 12px 0 0 0;
+	margin: 12px 0 0 7px;
 	border: 0;
 	padding: 0;
 	vertical-align: middle;
 }
 .add-participant-selector .contacts-search-header input {
-	margin: 12px 0 0 13px;
-	width: 235px;
+	margin: 12px 0 0 16px;
 }
 .contacts-search-header input::-webkit-input-placeholder {
 color: #666666;
@@ -67,8 +64,9 @@ color: #666666;
 	min-height: 288px;
 	overflow: hidden;
 }
-.contacts-info.body.contacts-search {
+.popup .contacts-info.body.contacts-search {
 	height: 48px;
+	padding: 6px 0;
 	cursor: pointer;
 }
 .contacts-info.body.contacts-search:nth-child(odd) {

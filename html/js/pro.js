@@ -73,8 +73,11 @@ function init_pro()
             account_type_num = $selectedPlan.attr('data-payment');
 
             if (account_type_num === '0') {
-                if (page == 'fm') document.location.hash = '#start';
-                else document.location.hash = '#fm';
+                if (page === 'fm') {
+                    document.location.hash = '#start';
+                } else {
+                    document.location.hash = '#fm';
+                }
                 return false;
             }
 
@@ -143,8 +146,11 @@ function init_pro()
             account_type_num = $(this).attr('data-payment');
 
             if (account_type_num === '0') {
-                if (page == 'fm') document.location.hash = '#start';
-                else document.location.hash = '#fm';
+                if (page === 'fm') {
+                    document.location.hash = '#start';
+                } else {
+                    document.location.hash = '#fm';
+                }
                 return false;
             }
 

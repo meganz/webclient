@@ -396,7 +396,7 @@ var ConversationRightArea = React.createClass({
                                 }}
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}
-                                className="popup contacts-search"
+                                className="popup add-participant-selector"
                                 onClick={() => {}}
                                 />
                         </ButtonsUI.Button>
@@ -408,7 +408,7 @@ var ConversationRightArea = React.createClass({
                             >
                             <DropdownsUI.Dropdown
                                 styles={{
-                                    marginLeft: 92
+                                    marginLeft: 91
                                 }}
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}

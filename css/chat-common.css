@@ -26,9 +26,6 @@
 .chat-right-pad .contacts-info.body {
 	padding: 8px 0 6px 0;
 }
-.chat-right-pad .dropdown .dropdown-white-arrow {
-	margin-left: -108px;
-}
 .chat-right-area.conversation-details-scroll {
 	height: 100%;
 	height: -webkit-calc(100% - 98px);
@@ -56,18 +53,7 @@
 .chat-right-area .big-button {
 	margin: 25px 23px 0 23px;
 }
-.chat-right-area .dropdown.body.wide-dropdown {
-	margin: 8px 0 0 0;
-	padding: 8px 0;
-}
-.chat-right-area .wide-dropdown .dropdown-item {
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	border-radius: 0;
-}
-.chat-right-area .wide-dropdown .dropdown-item i {
-	margin: 0 6px 1px 1px;
-}
+
 .date-time {
 	font-size: 12px;
 	line-height: 15px;

@@ -107,3 +107,18 @@
 	margin: 8px -8px;
 	background-color: rgba(0,0,0,0.1);
 }
+.link-button .dropdown.body:not(.popup) {
+	margin: 8px 0 0 0;
+	padding: 8px 0;
+}
+.link-button .dropdown.body .dropdown-item {
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+.link-button .dropdown.body .dropdown-item i {
+	    margin: 0 9px 1px -1px;
+}
+.link-button .dropdown.body:not(.popup) .dropdown-white-arrow {
+	margin-left: -108px;
+}

@@ -931,7 +931,8 @@ ChunkUpload.prototype.upload = function() {
 
     if (!this.file) {
         if (d) {
-            this.logger.error('This upload was cancelled while the Encrypter was working,'
+            var logger = this.logger || ulmanager.logger;
+            logger.error('This upload was cancelled while the Encrypter was working,'
                 + ' prevent this aborting it beforehand');
         }
         return;

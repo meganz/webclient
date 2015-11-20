@@ -117,7 +117,7 @@
 	border-radius: 0;
 }
 .link-button .dropdown.body .dropdown-item i {
-	margin: 0 9px 1px -1px;
+	margin: 0 9px 1px 0;
 }
 .link-button .dropdown.body:not(.popup) .dropdown-white-arrow {
 	margin-left: -108px;

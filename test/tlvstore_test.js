@@ -24,6 +24,29 @@ describe("tlvstore unit test", function() {
         sandbox.restore();
     });
 
+    describe('asmcrypto library test', function() {
+        // it('AES-GCM test', function() {
+            // // This has hit us in the past as a bug, so let's check whether it works.
+            // var key = asmCrypto.string_to_bytes(atob('dGQhii+B7+eLLHRiOA690w=='));
+            // var nonce = asmCrypto.string_to_bytes(atob('R8q1njARXS7urWv3'));
+            // var plainText = atob('dGQhwoovwoHDr8OnwossdGI4DsK9w5M=');
+            // var result = asmCrypto.AES_GCM.encrypt(plainText, key, nonce, undefined, 16);
+            // assert.strictEqual(asmCrypto.bytes_to_base64(result),
+                // 'L3zqVYAOsRk7zMg2KsNTVShcad8TjIQ7umfsvia21QO0XTj8vaeR');
+        // });
+
+        // it('AES-CCM test', function() {
+            // // This has hit us in the past as a bug, so let's check whether it works.
+            // var adataCases = [undefined, null, '', new Uint8Array()];
+            // var key = asmCrypto.string_to_bytes(atob('dGQhii+B7+eLLHRiOA690w=='));
+            // var nonce = asmCrypto.string_to_bytes(atob('R8q1njARXS7urWv3'));
+            // var plainText = atob('dGQhwoovwoHDr8OnwossdGI4DsK9w5M=');
+            // for (var i = 0; i < adataCases.length; i++) {
+                // asmCrypto.AES_CCM.encrypt(plainText, key, nonce, adataCases[i], 16);
+            // }
+        // });
+    });
+
     describe('TLV en-/decoding', function() {
         it("toTlvRecord", function() {
             var tests = [['foo', 'bar',
@@ -71,6 +94,12 @@ describe("tlvstore unit test", function() {
                 assert.deepEqual(ns.tlvRecordsToContainer(tests[i]), expected[i]);
             }
         });
+
+
+        // Add new tests/functionality to decode *both* to the same:
+        // {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}
+        // raw: 'Zm9vAAADYmFycHVFZDI1NQAAINdamAGCsQq31Uv+08lkBzoO4XLz2qYjJa8CGmj3B1Ea'
+        // UTF-8 encoded: 'Zm9vAAADYmFycHVFZDI1NQAAIMOXWsKYAcKCwrEKwrfDlUvDvsOTw4lkBzoOw6Fyw7PDmsKmIyXCrwIaaMO3B1Ea'
     });
 
     describe('attribute en-/decryption', function() {
@@ -149,7 +178,7 @@ describe("tlvstore unit test", function() {
                 sandbox.stub(asmCrypto, 'getRandomValues', _copy);
                 for (var j = 0; j < clearVectors.length; j++) {
                     var clear = clearVectors[j];
-                    assert.strictEqual(btoa(ns.blockEncrypt(clear, key, mode)),
+                    assert.strictEqual(btoa(ns.blockEncrypt(clear, key, mode, true)),
                                        cipherVectors[i * clearVectors.length + j]);
                 }
                 asmCrypto.getRandomValues.restore();
@@ -161,7 +190,7 @@ describe("tlvstore unit test", function() {
                 var mode = modes[i][0];
                 for (var j = 0; j < clearVectors.length; j++) {
                     var cipherText = atob(cipherVectors[i * clearVectors.length + j]);
-                    assert.strictEqual(ns.blockDecrypt(cipherText, key), clearVectors[j]);
+                    assert.strictEqual(ns.blockDecrypt(cipherText, key, true), clearVectors[j]);
                 }
             }
         });
@@ -184,8 +213,8 @@ describe("tlvstore unit test", function() {
                 var mode = modes[i][0];
                 for (var j = 0; j < clearVectors.length; j++) {
                     var clearText = clearVectors[j];
-                    var cipherText = ns.blockEncrypt(clearText, key, mode);
-                    var reClear = ns.blockDecrypt(cipherText, key);
+                    var cipherText = ns.blockEncrypt(clearText, key, mode, true);
+                    var reClear = ns.blockDecrypt(cipherText, key, true);
                     assert.strictEqual(reClear, clearText);
                 }
             }
@@ -197,8 +226,8 @@ describe("tlvstore unit test", function() {
                 var mode = modes[i][0];
                 for (var j = 0; j < clearVectors.length; j++) {
                     var clearText = clearVectors[j];
-                    var cipherText = ns.blockEncrypt(clearText, arrayKey, mode);
-                    var reClear = ns.blockDecrypt(cipherText, arrayKey);
+                    var cipherText = ns.blockEncrypt(clearText, arrayKey, mode, true);
+                    var reClear = ns.blockDecrypt(cipherText, arrayKey, true);
                     assert.strictEqual(reClear, clearText);
                 }
             }

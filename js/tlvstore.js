@@ -155,12 +155,12 @@ var tlvstore = (function () {
      *     Encryption key as byte string.
      * @param mode {Number}
      *     Encryption mode as an integer. One of tlvstore.BLOCK_ENCRYPTION_SCHEME.
-     * @param [raw] {Boolean}
-     *     Do not convert plain text to UTF-8 (default: false).
+     * @param [utf8Convert] {Boolean}
+     *     Perform UTF-8 conversion of clear text before encryption (default: false).
      * @returns {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      */
-    ns.blockEncrypt = function(clearText, key, mode, raw) {
+    ns.blockEncrypt = function(clearText, key, mode, utf8Convert) {
 
         var nonceSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].nonceSize;
         var tagSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
@@ -174,7 +174,7 @@ var tlvstore = (function () {
         }
         var keyBytes = asmCrypto.string_to_bytes(key);
         var clearBytes = asmCrypto.string_to_bytes(
-            raw ? clearText : unescape(encodeURIComponent(clearText)));
+            utf8Convert ? unescape(encodeURIComponent(clearText)) : clearText);
         var cipherBytes = cipher.encrypt(clearBytes, keyBytes, nonceBytes,
                                          undefined, tagSize);
 
@@ -191,12 +191,12 @@ var tlvstore = (function () {
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      * @param key {String}
      *     Encryption key as byte string.
-     * @param [raw] {Boolean}
-     *     Do not convert plain text to UTF-8 (default: false).
+     * @param [utf8Convert] {Boolean}
+     *     Perform UTF-8 conversion of clear text after decryption (default: false).
      * @returns {String}
      *     Clear text as byte string.
      */
-    ns.blockDecrypt = function(cipherText, key, raw) {
+    ns.blockDecrypt = function(cipherText, key, utf8Convert) {
 
         var mode = cipherText.charCodeAt(0);
         var nonceSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].nonceSize;
@@ -214,7 +214,7 @@ var tlvstore = (function () {
                                         undefined, tagSize);
         var clearText = asmCrypto.bytes_to_string(clearBytes);
 
-        return raw ? clearText : decodeURIComponent(escape(clearText));
+        return utf8Convert ? decodeURIComponent(escape(clearText)) : clearText;
     };
 
 

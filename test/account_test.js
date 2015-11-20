@@ -331,7 +331,7 @@ describe("account unit test", function() {
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
-                assert.lengthOf(api_req.args[0][0]['*keyring'], 127);
+                assert.lengthOf(api_req.args[0][0]['*keyring'], 107);
             });
 
             it("private attribute, compact crypto mode", function() {
@@ -349,7 +349,7 @@ describe("account unit test", function() {
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
-                assert.lengthOf(api_req.args[0][0]['*keyring'], 114);
+                assert.lengthOf(api_req.args[0][0]['*keyring'], 94);
             });
         });
     });

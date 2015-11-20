@@ -1673,7 +1673,7 @@ var stringcrypt = (function() {
     ns.stringEncrypter = function(plain, key, raw) {
         var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
         var plainBytes = raw ? plain : unescape(encodeURIComponent(plain));
-        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode, raw);
+        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode, false);
 
         return cipher;
     };
@@ -1693,7 +1693,7 @@ var stringcrypt = (function() {
      */
     ns.stringDecrypter = function(cipher, key, raw) {
 
-        var plain = tlvstore.blockDecrypt(cipher, key, raw);
+        var plain = tlvstore.blockDecrypt(cipher, key, false);
 
         return raw ? plain : decodeURIComponent(escape(plain));
     };

@@ -23,13 +23,9 @@ export default class extends Component {
             contacts={sampleData.contacts.singleContact}
             >
             <DropdownContactsSelector
-                styles={{
-                                    marginLeft: -12,
-                                    width: 252
-                                }}
                 contacts={sampleData.contacts.singleContact}
                 megaChat={sampleData.megaChat.dummy}
-                className="add-participant-selector"
+                className="popup add-participant-selector"
                 onClick={function() { consol.error("Clicked!"); }}
                 />
         </Button>
@@ -49,13 +45,9 @@ export default class extends Component {
                     contacts={sampleData.contacts.singleContact}
                     >
                     <DropdownContactsSelector
-                        styles={{
-                                            marginLeft: -12,
-                                            width: 252
-                                        }}
                         contacts={sampleData.contacts.singleContact}
                         megaChat={sampleData.megaChat.dummy}
-                        className="add-participant-selector"
+                        className="popup add-participant-selector"
                         onClick={() => { console.error("Clicked!"); }}
                         />
                 </Button>

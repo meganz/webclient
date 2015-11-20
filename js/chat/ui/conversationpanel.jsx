@@ -396,7 +396,7 @@ var ConversationRightArea = React.createClass({
                                 }}
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}
-                                className="add-participant-selector"
+                                className="popup add-participant-selector"
                                 onClick={() => {}}
                                 />
                         </ButtonsUI.Button>
@@ -408,12 +408,11 @@ var ConversationRightArea = React.createClass({
                             >
                             <DropdownsUI.Dropdown
                                 styles={{
-                                    marginLeft: -12,
-                                    width: 252
+                                    marginLeft: 91
                                 }}
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}
-                                className="add-participant-selector"
+                                className="wide-dropdown send-files-selector"
                                 onClick={() => {}}
                             >
                                 <DropdownsUI.DropdownItem icon="grey-cloud" label="From my Cloud Drive" onClick={() => {

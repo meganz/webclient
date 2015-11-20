@@ -138,7 +138,7 @@ var DropdownContactsSelector = React.createClass({
             );
         });
 
-        return <Dropdown className="contacts-search" {...self.props} ref="dropdown">
+        return <Dropdown className="popup contacts-search" {...self.props} ref="dropdown">
             <div className="contacts-search-header">
                 <i className="small-icon search-icon"></i>
                 <input

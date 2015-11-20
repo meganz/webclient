@@ -1,9 +1,16 @@
 .popup.dropdown.body {
 	padding: 0;
 }
-.popup.dropdown.body.contacts-search {
+.popup.dropdown.body.contacts-search, .popup.dropdown.body.add-participant-selector {
 	width: 360px;
 	padding: 0 0 7px 0;
+}
+.popup.add-participant-selector {
+	right: 12px;
+    left: auto !important;
+}
+.popup.add-participant-selector .dropdown-white-arrow {
+	margin-left: 36px;
 }
 .contacts-search-header {
 	text-align: center;
@@ -11,14 +18,19 @@
 	height: 48px;
 	font-size: 14px;
 	color: #666666;
+	position: relative;
+	z-index: 10;
+}
+.add-participant-selector .contacts-search-header {
+	text-align:left;
+	padding-left: 40px
 }
 .contacts-search-header i {
 	vertical-align: middle;
 	margin: 0 7px 1px 0;
 }
 .contacts-search-scroll {
-	max-height: 288px;
-	min-height: 146px;
+	min-height: 288px;
 	overflow: hidden;
 }
 .contacts-info.body.contacts-search {

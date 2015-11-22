@@ -5529,7 +5529,7 @@ th.grid-first-th {
 	background-image: none;
 }
 .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
-	background-image: url(../images/mega/register-big-sprite-v6.png);
+	background-image: url(../images/mega/register-big-sprite-v7.png);
 	background-repeat: no-repeat;
 	background-position: -69px -963px;
 }
@@ -7855,14 +7855,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	opacity: 1;
 }
 .fm-account-input.current-email {
-    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
-    color: #777;
-    font-size: 14px;
-    line-height: 32px;
-    vertical-align: middle;
+	background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+	color: #777;
+	font-size: 14px;
+	line-height: 32px;
+	vertical-align: middle;
 }
 .fm-account-input.current-email:hover::before {
-    -moz-opacity: 0;
+	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
 }
@@ -14267,6 +14267,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	box-sizing: border-box;
 	padding: 0 20px 10px 20px;
 }
+.key .main-mid-pad.plans {
+	max-width: 1280px;
+	min-width: 980px;
+	width: auto;
+}
 .key3.main-mid-pad {
 	width: 100%;
 	padding: 0;
@@ -14533,7 +14538,7 @@ h5.main-italic-header {
 .reg-success-icon, .payment-confirmation .icon {
 	width: 200px;
 	height: 192px;
-	background-image: url(../images/mega/register-big-sprite-v6.png);
+	background-image: url(../images/mega/register-big-sprite-v7.png);
 	background-position: left top;
 	background-repeat: no-repeat;
 	margin: 30px auto 4px auto;
@@ -14679,6 +14684,22 @@ h5.main-italic-header {
 	transition: background-color 200ms ease-in-out;
 	padding: 8px;
 }
+.reg-st3-membership-bl.pro4 {
+	margin: 0;
+}
+.key .plans .reg-st3-membership-bl {
+	width: 100%;
+	width: -webkit-calc(20% - 3.2px);
+	width: -moz-calc(20% - 3.2px);
+	width: calc(20% - 3.2px);
+}
+.key .plans .reg-st3-membership-bl.free {
+	display: block;
+	margin: 0;
+}
+.key .plans .reg-st3-membership-bl.pro4 {
+	margin: 0 0 0 4px;
+}
 .membership-step1 .reg-st3-membership-bl {
 	cursor: pointer;
 }
@@ -14687,9 +14708,6 @@ h5.main-italic-header {
 }
 .membership-step1 .sub-optimal-plan .membership-gray-block, .membership-step1 .sub-optimal-plan .reg-st3-storage, .membership-step1 .sub-optimal-plan .reg-st3-bandwidth {
 	opacity: 0.7;
-}
-.reg-st3-membership-bl:first-child {
-	margin: 0;
 }
 .membership-pad-bl {
 	background-color: white;
@@ -14754,6 +14772,10 @@ h5.main-italic-header {
 	background-color: #FFA500;
 	color: #FFA500;
 }
+.free .membership-button:hover {
+	background-color: #31B500;
+	color: #31B500;
+}
 .pro1 .membership-gray-block {
 	background-color: #333333;
 }
@@ -14771,7 +14793,7 @@ h5.main-italic-header {
 .reg-st3-membership-icon, .membership-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v6.png);
+	background-image: url(../images/mega/register-big-sprite-v7.png);
 	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -35px;
@@ -15187,8 +15209,12 @@ div.membership-bott-button {
 .pro4 .reg-st3-big-txt {
 	color: #FFA500;
 }
+.free .reg-st3-big-txt {
+	color: #31B500;
+}
 .reg-st3-big-txt span {
 	font-size: 16px;
+	line-height: 32px;
 	text-transform: uppercase;
 }
 .reg-st3-mid-txt {
@@ -15210,18 +15236,27 @@ div.membership-bott-button {
 	border: 2px solid #d9d9d9;
 	margin: 8px;
 }
-.bg .reg-st3-big-txt span, .uk .reg-st3-big-txt span, .ru .reg-st3-big-txt span, .ca .reg-st3-mid-txt, .ca .reg-st3-big-txt span, .gl .reg-st3-mid-txt, .gl .reg-st3-big-txt span, .it .reg-st3-mid-txt, .it .reg-st3-big-txt span, .lv .reg-st3-mid-txt, .lv .reg-st3-big-txt span, .nl .reg-st3-mid-txt, .nl .reg-st3-big-txt span, .pt .reg-st3-mid-txt, .pt .reg-st3-big-txt span, .br .reg-st3-mid-txt, .br .reg-st3-big-txt span, .sk .reg-st3-mid-txt, .sk .reg-st3-big-txt span, .ka .reg-st3-big-txt span, .es .reg-st3-big-txt span, .ro .reg-st3-big-txt span {
-	font-size: 14px;
+body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-big-txt {
+	font-size: 20px;
+	line-height: 26px;
 }
-.bg .reg-st3-mid-txt, .uk .reg-st3-mid-txt, .ru .reg-st3-mid-txt, .ka .reg-st3-mid-txt, .es .reg-st3-mid-txt, .ro .reg-st3-mid-txt {
+body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-big-txt span,  body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-mid-txt,  body.key.de .reg-st3-big-txt span, body.key.de .reg-st3-mid-txt, body.key.hu .reg-st3-big-txt span, body.key.hu .reg-st3-mid-txt, body.key.fr .reg-st3-big-txt span, body.key.fr .reg-st3-mid-txt, body.key.se .reg-st3-big-txt span, body.key.se .reg-st3-mid-txt, body.key.dk .reg-st3-big-txt span, body.key.dk .reg-st3-mid-txt, body.key.ee .reg-st3-big-txt span, body.key.ee .reg-st3-mid-txt, body.key.fi .reg-st3-big-txt span, body.key.fi .reg-st3-mid-txt, body.key.hr .reg-st3-big-txt span, body.key.hr .reg-st3-mid-txt, body.key.sl .reg-st3-big-txt span, body.key.sl .reg-st3-mid-txt, body.key.sr .reg-st3-big-txt span, body.key.sr .reg-st3-mid-txt, body.key.vi .reg-st3-big-txt span, body.key.vi .reg-st3-mid-txt {
 	font-size: 13px;
 }
-.bg .reg-st3-storage, .bg .reg-st3-bandwidth, .uk .reg-st3-storage, .uk .reg-st3-bandwidth, .ru .reg-st3-storage, .ru .reg-st3-bandwidth, .gl .reg-st3-storage, .gl .reg-st3-bandwidth, .it .reg-st3-storage, .it .reg-st3-bandwidth, .lv .reg-st3-storage, .lv .reg-st3-bandwidth, .pt .reg-st3-storage, .pt .reg-st3-bandwidth, .br .reg-st3-storage, .br .reg-st3-bandwidth, .sk .reg-st3-storage, .sk .reg-st3-bandwidth, .ka .reg-st3-storage, .ka .reg-st3-bandwidth, .es .reg-st3-storage, .es .reg-st3-bandwidth, .ro .reg-st3-bandwidth {
+body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.cz):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.sr):not(.th):not(.fa):not(.ee):not(.tl) .reg-st3-storage,  body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.cz):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.sr):not(.th):not(.fa):not(.ee):not(.tl) .reg-st3-bandwidth {
 	padding-left: 20px;
 	padding-right: 20px;
 }
-.ca .reg-st3-mid-txt, .gl .reg-st3-mid-txt, .it .reg-st3-mid-txt, .nl .reg-st3-mid-txt, .pt .reg-st3-mid-txt, .br .reg-st3-mid-txt, .sk .reg-st3-mid-txt, .es .reg-st3-mid-txt, .ro .reg-st3-mid-txt {
-	line-height: 34px;
+body.key.ka .reg-st3-big-txt, body.key.ka .reg-st3-mid-txt, body.key.uk .reg-st3-big-txt, body.key.uk .reg-st3-mid-txt {
+	float: none;
+	height: 22px;
+	line-height: 20px;
+}
+body.key.ka .reg-st3-storage, body.key.uk .reg-st3-storage {
+	padding-top: 8px;
+}
+body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
+	padding-top: 2px;
 }
 .no .membership-new-offer text, .kr .membership-new-offer text, .ct .membership-new-offer text {
 	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(-27.500000px, -39.000000px) !important;
@@ -15279,7 +15314,7 @@ div.membership-bott-button {
 	text-align: center;
 	padding: 56px 10px 0 10px;
 }
-.pro4 .reg-st3-bott-title.title {
+.free .reg-st3-bott-title.title, .pro4 .reg-st3-bott-title.title {
 	font-family: 'source_sans_proextralight';
 }
 .pro1 .reg-st3-bott-title.title {
@@ -15339,6 +15374,11 @@ div.membership-bott-button {
 .reg-st3-top-txt-block {
 	max-width: 730px;
 }
+.key .reg-st3-top-txt-block {
+	max-width: none;
+	text-align: center;
+	float: none;
+}
 .reg-st5-top-txt-block {
 	float: none;
 	margin-right: 0;
@@ -15353,6 +15393,18 @@ div.membership-bott-button {
 	font-size: 14px;
 	line-height: 20px;
 	color: #3F4646;
+}
+.key .reg-st3-top-txt-block h3.main-italic-header {
+	color: #D90007;
+	font-size: 40px;
+	line-height: 50px;
+	padding-top: 20px;
+	font-family: 'source_sans_prolight', Arial;
+}
+.key .reg-st3-top-txt-block .reg-st3-txt, .key .reg-st3-top-txt-block .reg-st3-txt span {
+	font-size: 16px;
+	line-height: 20px;
+	color: #333333;
 }
 .membership-step2 .other-payment-providers {
 	margin-top: 3px;
@@ -15386,7 +15438,7 @@ div.membership-bott-button {
 	height: 82px;
 	width: 82px;
 	float: left;
-	background-image: url(../images/mega/register-big-sprite-v6.png);
+	background-image: url(../images/mega/register-big-sprite-v7.png);
 	background-position: center -960px;
 	background-repeat: no-repeat;
 	margin-top: 28px;
@@ -22872,7 +22924,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .loginrequired-dialog .fm-notification-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v6.png);
+	background-image: url(../images/mega/register-big-sprite-v7.png);
 	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 4px 16px 0 0px;
@@ -24686,7 +24738,7 @@ body.pro:after {
 	left: 9px;
 	top: 50%;
 	margin: -15px 0 0 0;
-	background-image: url(../images/mega/register-big-sprite-v6.png);
+	background-image: url(../images/mega/register-big-sprite-v7.png);
 	background-position: -85px -860px;
 }
 .clipboard .toast-icon {
@@ -25149,8 +25201,8 @@ a.ui-datepicker-next {
 	padding: 46px 64px 8px 0;
 }
 .profile-form.change-email-section {
-    margin-bottom: 95px;
-    padding-top: 0;
+	margin-bottom: 95px;
+	padding-top: 0;
 }
 /* Small font-size settings option */
 .fontsize1 .nw-fm-tree-header input {
@@ -25232,6 +25284,17 @@ a.ui-datepicker-next {
 .download-mid-centered-block.not-available-some-reason .new-download-right-block {
 	margin-left: 0;
 }
+body.key.ru .reg-st3-big-txt, body.key.ru .reg-st3-mid-txt, body.key.hu .reg-st3-big-txt, body.key.hu .reg-st3-mid-txt, body.key.sr .reg-st3-big-txt, body.key.sr .reg-st3-mid-txt {
+	float: none;
+	height: 22px;
+	line-height: 20px;
+}
+body.key.ru .reg-st3-storage, body.key.hu .reg-st3-storage, body.key.sr .reg-st3-storage {
+	padding-top: 8px;
+}
+body.key.ru .reg-st3-bandwidth, body.key.hu .reg-st3-bandwidth, body.key.sr .reg-st3-bandwidth {
+	padding-top: 2px;
+}
 }
 @media only screen and (max-width: 1232px) {
 .ads-right-block, .products-right-block {
@@ -25268,6 +25331,40 @@ a.ui-datepicker-next {
 	width: -webkit-calc(100% -808px);
 	width: -moz-calc(100% - 808px);
 	width: calc(100% - 808px);
+}
+.key .reg-st3-membership-bl {
+	padding: 4px;
+	-moz-border-radius: 12px;
+	-webkit-border-radius: 12px;
+	border-radius: 12px;
+}
+}
+@media only screen and (max-width: 1188px) {
+.key .reg-st3-big-txt {
+	font-size: 20px;
+	line-height: 26px;
+}
+.key .reg-st3-big-txt span, .key .reg-st3-mid-txt {
+	font-size: 14px;
+}
+body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-big-txt span,  body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-mid-txt {
+	font-size: 13px;
+	line-height: 26px;
+	vertical-align: top;
+}
+body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-storage {
+	padding-top: 8px;
+}
+body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-bandwidth {
+	padding-top: 2px;
+}
+body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-big-txt {
+	font-size: 20px;
+}
+body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.tl) .reg-st3-big-txt,  body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.tl) .reg-st3-mid-txt {
+	float: none;
+	height: 20px;
+	line-height: 20px;
 }
 }
 @media only screen and (max-height:  833px) {
@@ -25674,7 +25771,7 @@ background-size: 50px auto;
  background-size:48px auto;
 }
  .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .toast-icon {
- background-image: url(../images/mega/register-big-sprite-v6@2x.png);
+ background-image: url(../images/mega/register-big-sprite-v7@2x.png);
  background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {
@@ -26748,27 +26845,23 @@ body, body * {
 .blog-new-full ul li {
 	padding: 0 0 0px 15px;
 }
-
 .fm-account-blocks.disabled {
-    opacity: 0.4;
+	opacity: 0.4;
 }
-.avatar-wrapper.verified.square div.verified_icon,
-.fm-blocks-view .avatar-wrapper.verified div.verified_icon {
-    right: 3px;
-    top: 3px;
+.avatar-wrapper.verified.square div.verified_icon, .fm-blocks-view .avatar-wrapper.verified div.verified_icon {
+	right: 3px;
+	top: 3px;
 }
-
 .avatar-wrapper div.verified_icon {
-    display: none;
+	display: none;
 }
-
 .avatar-wrapper.verified div.verified_icon {
-    background-image: url(../images/verified.svg);
-    display: block;
-    width: 14px;
-    height: 14px;
-    position: absolute;
-    right: -3px;
-    top: -3px;
-    float: right;
+	background-image: url(../images/verified.svg);
+	display: block;
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	right: -3px;
+	top: -3px;
+	float: right;
 }

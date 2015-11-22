@@ -71,7 +71,16 @@ function init_pro()
             $selectedPlan.addClass('selected');
 
             account_type_num = $selectedPlan.attr('data-payment');
-            
+
+            if (account_type_num === '0') {
+                if (page === 'fm') {
+                    document.location.hash = '#start';
+                } else {
+                    document.location.hash = '#fm';
+                }
+                return false;
+            }
+
             // Clear to prevent extra clicks showing multiple
             $stageTwoSelectedPlan.html($selectedPlan.clone());
             
@@ -135,6 +144,16 @@ function init_pro()
             $(this).addClass('selected');
 
             account_type_num = $(this).attr('data-payment');
+
+            if (account_type_num === '0') {
+                if (page === 'fm') {
+                    document.location.hash = '#start';
+                } else {
+                    document.location.hash = '#fm';
+                }
+                return false;
+            }
+
             $(this).clone().appendTo( '.membership-selected-block');
             
             var proPlanName = $(this).find('.reg-st3-bott-title.title').html();
@@ -146,13 +165,6 @@ function init_pro()
             $selectedPlanHeader.html(selectedPlanText);
 
             pro_next_step();
-        });
-
-        $('.membership-free-button').unbind('click');
-        $('.membership-free-button').bind('click',function(e) {
-            if (page == 'fm') document.location.hash = '#start';
-            else document.location.hash = '#fm';
-            return false;
         });
 
         $('.pro-bottom-button').unbind('click');

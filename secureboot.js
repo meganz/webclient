@@ -934,7 +934,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 19, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 20, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -981,6 +981,12 @@ else if (!b_u)
                 // Prevent InvalidStateError exceptions from indexedDB.open
                 // caused while using Private Browser Mode on Firefox.
                 return false;
+            }
+
+            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1) {
+                // ^ this seems a quirk on latest Chrome (~46)
+                dump.l = 1;
+                errobj = null;
             }
 
             if (~dump.m.indexOf("\n")) {
@@ -1369,7 +1375,7 @@ else if (!b_u)
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},        
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1}
     };

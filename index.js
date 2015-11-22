@@ -1671,6 +1671,10 @@ function topmenuUI() {
 
     $('.top-search-input').rebind('keyup', function (e) {
         if (e.keyCode == 13 || folderlink) {
+            
+            // Add log to see how often they use the search
+            api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+            
             var val = $.trim($('.top-search-input').val());
             if (folderlink || val.length > 2 || !asciionly(val)) {
                 if (folderlink) {
@@ -1681,7 +1685,7 @@ function topmenuUI() {
                     if (val) {
                         val = val.toLowerCase();
                         dn.filter(function () {
-                            return !~$(this).text().toLowerCase().indexOf(val)
+                            return !~$(this).text().toLowerCase().indexOf(val);
                         }).closest(ct).hide();
                     }
                     $(window).trigger('resize');

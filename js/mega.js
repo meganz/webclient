@@ -2972,7 +2972,7 @@ function MegaData()
         }
         loadingDialog.show();
         if (t.length === 11 && !u_pubkeys[t]) {
-            var keyCachePromise = api_cachepubkeys({}, [t]);
+            var keyCachePromise = api_cachepubkeys([t]);
             keyCachePromise.done(function _cachepubkeyscomplete() {
                 if (u_pubkeys[t]) {
                     M.copyNodes(cn, t);
@@ -3272,15 +3272,15 @@ function MegaData()
 
     this.nodeAttr = function(attrs) {
 
-        if ((typeof mDB === 'object') && !pfkey) {
-            var node = M.d[attrs.h];
+        var node = M.d[attrs.h];
 
-            if (node) {
-                for (var i in attrs) {
-                    if (attrs.hasOwnProperty(i)) {
-                        node[i] = attrs[i];
-                    }
+        if (node) {
+            for (var i in attrs) {
+                if (attrs.hasOwnProperty(i)) {
+                    node[i] = attrs[i];
                 }
+            }
+            if ((typeof mDB === 'object') && !pfkey) {
                 mDBadd('f', clone(node));
             }
         }
@@ -7146,8 +7146,10 @@ function balance2pro(callback)
             $('.own-data span', $nodeId).eq(0).addClass('link-icon');
 
             // Add link-icon to grid view
-            $nodeId.addClass('linked');
-            $(' span', $nodeId).eq(1).addClass('link-icon');
+            if ($nodeId.hasClass('file-block')) {
+                $nodeId.addClass('linked');
+                $('span', $nodeId).eq(1).addClass('link-icon');
+            }
         }
 
         if ($tree.length) {

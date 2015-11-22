@@ -26772,3 +26772,7 @@ body, body * {
     top: -3px;
     float: right;
 }
+
+.help2 img[alt="small"] {
+    max-width: 50%;
+}

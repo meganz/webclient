@@ -38,11 +38,15 @@ describe("tlvstore unit test", function() {
         // it('AES-CCM test', function() {
             // // This has hit us in the past as a bug, so let's check whether it works.
             // var adataCases = [undefined, null, '', new Uint8Array()];
-            // var key = asmCrypto.string_to_bytes(atob('dGQhii+B7+eLLHRiOA690w=='));
-            // var nonce = asmCrypto.string_to_bytes(atob('R8q1njARXS7urWv3'));
-            // var plainText = atob('dGQhwoovwoHDr8OnwossdGI4DsK9w5M=');
+            // var clearText = '42';
+            // var nonce = asmCrypto.hex_to_bytes('000102030405060708090a0b');
+            // var key = asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100');
+//
             // for (var i = 0; i < adataCases.length; i++) {
-                // asmCrypto.AES_CCM.encrypt(plainText, key, nonce, adataCases[i], 16);
+                // dump('***', JSON.stringify(adataCases[i]));
+                // var cipherText = asmCrypto.AES_CCM.encrypt(clearText, key, nonce, adataCases[i], 16);
+                // var reClear = asmCrypto.AES_CCM.decrypt(cipherText, key, nonce, adataCases[i], 16);
+                // assert.strictEqual(asmCrypto.bytes_to_string(reClear), clearText);
             // }
         // });
     });

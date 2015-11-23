@@ -27,25 +27,32 @@ describe("tlvstore unit test", function() {
     describe('asmcrypto library test', function() {
         it('AES-GCM test', function() {
             // This has hit us in the past as a bug, so let's check whether it works.
+            var adataCases = [undefined, null, '', new Uint8Array()];
             var key = asmCrypto.string_to_bytes(atob('dGQhii+B7+eLLHRiOA690w=='));
             var nonce = asmCrypto.string_to_bytes(atob('R8q1njARXS7urWv3'));
             var plainText = atob('dGQhwoovwoHDr8OnwossdGI4DsK9w5M=');
-            var result = asmCrypto.AES_GCM.encrypt(plainText, key, nonce, undefined, 16);
-            assert.strictEqual(asmCrypto.bytes_to_base64(result),
-                'L3zqVYAOsRk7zMg2KsNTVShcad8TjIQ7umfsvia21QO0XTj8vaeR');
+            for (var i = 0; i < adataCases.length; i++) {
+                var cipherText = asmCrypto.AES_GCM.encrypt(plainText, key, nonce, adataCases[i], 16);
+                assert.strictEqual(asmCrypto.bytes_to_base64(cipherText),
+                    'L3zqVYAOsRk7zMg2KsNTVShcad8TjIQ7umfsvia21QO0XTj8vaeR');
+                var rePlain = asmCrypto.AES_GCM.decrypt(cipherText, key, nonce, adataCases[i], 16);
+                assert.strictEqual(asmCrypto.bytes_to_string(rePlain), plainText);
+            }
         });
 
         it('AES-CCM test', function() {
             // This has hit us in the past as a bug, so let's check whether it works.
             var adataCases = [undefined, null, '', new Uint8Array()];
-            var clearText = '42';
+            var plainText = '42';
             var nonce = asmCrypto.hex_to_bytes('000102030405060708090a0b');
             var key = asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100');
 
             for (var i = 0; i < adataCases.length; i++) {
-                var cipherText = asmCrypto.AES_CCM.encrypt(clearText, key, nonce, adataCases[i], 16);
-                var reClear = asmCrypto.AES_CCM.decrypt(cipherText, key, nonce, adataCases[i], 16);
-                assert.strictEqual(asmCrypto.bytes_to_string(reClear), clearText);
+                var cipherText = asmCrypto.AES_CCM.encrypt(plainText, key, nonce, adataCases[i], 16);
+                assert.strictEqual(asmCrypto.bytes_to_hex(cipherText),
+                    '28be1ac7b43d8868869b9a45d3de436cd0cc');
+                var rePlain = asmCrypto.AES_CCM.decrypt(cipherText, key, nonce, adataCases[i], 16);
+                assert.strictEqual(asmCrypto.bytes_to_string(rePlain), plainText);
             }
         });
     });

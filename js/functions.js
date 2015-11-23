@@ -1671,7 +1671,7 @@ var stringcrypt = (function() {
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      */
     ns.stringEncrypter = function(plain, key, raw) {
-        var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+        var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
         var plainBytes = raw ? plain : unescape(encodeURIComponent(plain));
         var cipher = tlvstore.blockEncrypt(plainBytes, key, mode, false);
 

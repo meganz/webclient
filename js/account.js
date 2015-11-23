@@ -688,7 +688,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
  * @param mode {integer}
- *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
+ *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_GCM_12_16).
  * @return {MegaPromise}
  *     A promise that is resolved when the original asynch code is settled.
  *     Can be used to use promises instead of callbacks for asynchronous
@@ -701,7 +701,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     // Prepare all data needed for the call on the Mega API.
     if (mode === undefined) {
-        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
     }
     if (nonHistoric === true || nonHistoric === 1) {
         attribute = '!' + attribute;

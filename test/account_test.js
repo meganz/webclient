@@ -275,7 +275,7 @@ describe("account unit test", function() {
                 sandbox.stub(window, 'u_k', 'foo');
                 setUserAttribute('keyring', 'fortytwo', false, false, myCallback);
                 assert.ok(tlvstore.blockEncrypt.calledWith('fortytwo', 'foo',
-                    tlvstore.BLOCK_ENCRYPTION_SCHEME. AES_CCM_12_16));
+                    tlvstore.BLOCK_ENCRYPTION_SCHEME. AES_GCM_12_16));
                 assert.ok(tlvstore.containerToTlvRecords.calledWith('fortytwo'));
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;

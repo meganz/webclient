@@ -4,6 +4,7 @@ var support = (function() {
         1: 'Technical Issue', 
         2: 'Payment Issue'
     };
+    var minLetters = 50;
     var ns = {};
     var $textarea;
     var $button;
@@ -27,8 +28,8 @@ var support = (function() {
             m: $.trim($textarea.val()), // message
             t: $subject.find('.active').data('value'),
         }
-        if (opts.m.length <= 100) {
-            msgDialog('warninga', 'Message too short', 'Please type at least a 100 letters', false, function() {
+        if (opts.m.length <= minLetters) {
+            msgDialog('warninga', 'Message too short', 'Please type at least a %d letters'.replace('%d', minLetters), false, function() {
                 $textarea.focus();
             });
             return false;

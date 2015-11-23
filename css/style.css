@@ -26865,3 +26865,23 @@ body, body * {
 	top: -3px;
 	float: right;
 }
+
+.support .fm-account-labels {
+    padding-top: 6px
+}
+.support .fm-accout-inputs-blocks {
+    padding-top: 12px
+}
+
+.support .fm-account-labels {
+    width: 30px;
+}
+
+.support #support-subject {
+    width: 100px;
+}
+
+.support textarea {
+    width: 100%;
+    height: 80%;
+}

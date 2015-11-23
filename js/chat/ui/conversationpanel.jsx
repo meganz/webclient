@@ -420,10 +420,16 @@ var ConversationRightArea = React.createClass({
                             <i className="small-icon shared-grey-folder"></i>
                             {__("Share Folders")}
                         </div>
-                        <div className="link-button red">
-                            <i className="small-icon rounded-stop"></i>
-                            {__("Leave Chat")}
-                        </div>
+                        {
+                            room.type !== "private" ?
+                                <div className="link-button red" onClick={() => {
+                                   room.leaveChat(true);
+                                }}>
+                                    <i className="small-icon rounded-stop"></i>
+                                    {__("Leave Chat")}
+                                </div>
+                                : null
+                        }
                     </div>
 
                 </div>
@@ -1390,11 +1396,67 @@ var ConversationPanels = React.createClass({
             // }
         });
 
-        return (
-            <div className="conversation-panels">
-                {conversations}
-            </div>
-        );
+        if(conversations.length === 0) {
+            var contactsList = [];
+            var contactsListOffline = [];
+            
+            self.props.contacts.forEach(function(contact) {
+                if (contact.u === u_handle) { return; }
+                else if (contact.c === 0) { return; }
+
+                var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+                var avatarMeta = generateAvatarMeta(contact.u);
+
+                (pres === "offline" ? contactsListOffline : contactsList).push(
+                    <div className={"contacts-info body " + (pres === "offline" ? "offline" : "")}>
+                        <div className={"user-card-presence " + pres}></div>
+                        <ContactsUI.Avatar contact={contact} className="small-rounded-avatar" />
+
+                        {
+                            pres !== "offline" ?
+                                <div className="default-white-button tiny-button">
+                                    <i className="tiny-icon grey-down-arrow"></i>
+                                </div>
+                                :
+                                ""
+                        }
+    
+                        <div className="user-card-data">
+                            <div className="user-card-name small">{avatarMeta.fullName}</div>
+                            <div className="user-card-email small">{contact.m}</div>
+                        </div>
+                    </div>
+                );
+            });
+            return (
+                <div>
+                    <div className="chat-right-area">
+                        <div className="chat-right-area contacts-list-scroll">
+                            <div className="chat-right-pad">
+                                {contactsList}
+                                {contactsListOffline}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="empty-block">
+                        <div className="empty-pad conversations">
+                            <div className="empty-icon conversations"></div>
+                            <div className="empty-title" dangerouslySetInnerHTML={{
+                                __html: __('You have no [[Conversations]]')
+                                    .replace("[[", "<span>")
+                                    .replace("]]", "</span>")
+                            }}></div>
+                        </div>
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <div className="conversation-panels">
+                    {conversations}
+                </div>
+            );
+        }
     }
 });
 

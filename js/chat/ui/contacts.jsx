@@ -40,8 +40,16 @@ var Avatar = React.createClass({
 
         var displayedAvatar;
 
+
+        var verifyState = u_authring.Ed25519[contact.h] || {};
+        var verifiedElement = (
+            verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ?
+                <div className="user-card-verified"></div> : ""
+        );
+
         if($avatar.find("img").length > 0) {
             displayedAvatar = <div className={classes}>
+                {verifiedElement}
                 <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
             </div>;
         } else {
@@ -49,7 +57,10 @@ var Avatar = React.createClass({
             var colorNum = tempClasses.split("color")[1].split(" ")[0];
             classes += " color" + colorNum;
 
-            displayedAvatar = <div className={classes}>{$(useravatar.contact(contact)).text()}</div>;
+            displayedAvatar = <div className={classes}>
+                {verifiedElement}
+                {$(useravatar.contact(contact)).text()}
+            </div>;
 
 
         }

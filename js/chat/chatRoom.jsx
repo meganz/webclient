@@ -716,8 +716,6 @@ ChatRoom.prototype.show = function() {
 
 
     self.megaChat.currentlyOpenedChat = self.roomJid;
-
-
     self.megaChat.lastOpenedChat = self.roomJid;
 
     self.trigger('activity');
@@ -729,6 +727,10 @@ ChatRoom.prototype.show = function() {
  */
 ChatRoom.prototype.isActive = function() {
     return document.hasFocus() && this.$header.is(":visible");
+};
+
+ChatRoom.prototype.setActive = function() {
+    window.location = this.getRoomUrl();
 };
 
 

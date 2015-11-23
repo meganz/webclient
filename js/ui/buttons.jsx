@@ -1,7 +1,9 @@
-var React = require("react/addons");
+var React = require("react");
+var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
+
 
 var _buttonGroups = {};
 
@@ -35,13 +37,13 @@ var Button = React.createClass({
     },
     renderChildren: function () {
         return React.Children.map(this.props.children, function (child) {
-            return React.addons.cloneWithProps(child, {
+            return React.cloneElement(child, {
                 active: this.state.focused
             });
         }.bind(this))
     },
     onBlur: function(e) {
-        var $element = $(this.getDOMNode());
+        var $element = $(ReactDOM.findDOMNode(this));
 
         if(
             (!e || !$(e.target).parents(".button").is($element))

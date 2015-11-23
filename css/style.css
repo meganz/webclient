@@ -26773,6 +26773,10 @@ body, body * {
     float: right;
 }
 
+.help2 img[alt="smallx"] {
+    max-width: 50px;
+}
+
 .help2 img[alt="small"] {
     max-width: 50%;
 }

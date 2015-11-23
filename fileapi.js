@@ -304,7 +304,12 @@ function mozAddToLibrary(file, name, size, st, type, url)
 		if (size < 1) size = file.fileSize;
 		url = url || location.href;
 
-		var { Downloads, DownloadsData } = Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
+		try {
+			var { Downloads, DownloadsData } = Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
+		}
+		catch (e) {
+			var { Downloads, DownloadsData } = Cu.import("resource:///modules/DownloadsCommon.jsm", {});
+		}
 
 		Downloads.getList(Downloads.PUBLIC).then(function(aList) {
 

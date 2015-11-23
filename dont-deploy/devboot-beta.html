@@ -45,20 +45,20 @@
         localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
 
         // Disable the cryptographic hash verification logic.
-        localStorage.dd = true;
+        localStorage.dd = '1';
 
-        // localStorage.contextmenu = true;
+        // localStorage.contextmenu = '1';
 
-        localStorage.jj = true;
-        // localStorage.stopOnAssertFail = true;
+        localStorage.jj = '1';
+        // localStorage.stopOnAssertFail = '1';
 
         // Turn on full debugging.
-        localStorage.d = true; // Using console.*
-        localStorage.minLogLevel = 0; // Using MegaLogger, 0 = MegaLogger.LEVELS.DEBUG.
+        localStorage.d = '1'; // Using console.*
+        localStorage.minLogLevel = '0'; // Using MegaLogger, '0' = MegaLogger.LEVELS.DEBUG.
 
         // Chat stuff.
-        // localStorage.dxmpp = true;
-        // localStorage.chatDisabled = true;
+        // localStorage.dxmpp = '1';
+        // localStorage.chatDisabled = '1';
 
         localStorage.apipath = "https://staging.api.mega.co.nz/";
 

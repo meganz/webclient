@@ -355,6 +355,7 @@ function init_page() {
     else if (page.substr(0, 4) == 'blog' && page.length > 4) {
         blogmonth = page.substr(5, page.length - 2);
         page = 'blog';
+        blogpage = 1;
         parsepage(pages['blog']);
         init_blog();
     }

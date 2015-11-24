@@ -32,18 +32,23 @@ var firefoxpage = {
      */
     getServerBuildVersion: function() {
         
-        var request = new XMLHttpRequest();
-
-        request.onload = function() {
-
-            // Parse from JSON
-            var serverBuildVersion = JSON.parse(request.response);
+        var xhr = getxhr();
+        
+        // Fetch the latest current_ver.txt
+        xhr.open('GET', 'https://mega.nz/current_ver.txt?time=' + unixtime());
+        xhr.onreadystatechange = function() {
             
-            // Display information
-            firefoxpage.compareLocalToServerBuildVersion(serverBuildVersion);
-        };
-        request.open('GET', 'https://mega.nz/current_ver.txt');
-        request.send();
+            // If done
+            if (this.readyState === 4) {
+                
+                // Parse from JSON
+                var serverBuildVersion = JSON.parse(xhr.responseText);
+                
+                // Display information
+                firefoxpage.compareLocalToServerBuildVersion(serverBuildVersion);
+            }
+        };        
+        xhr.send();
     },
     
     /**

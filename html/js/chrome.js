@@ -86,13 +86,23 @@ var chromepage = {
      */
     getServerBuildVersion: function() {
         
-        $.ajax({
-            dataType: 'json',
-            url: 'https://mega.nz/current_ver.txt'
-        })
-        .done(function(result) {
-            chromepage.compareLocalToServerBuildVersion(result);
-        });
+        var xhr = getxhr();
+        
+        // Fetch the latest current_ver.txt
+        xhr.open('GET', 'https://mega.nz/current_ver.txt?time=' + unixtime());
+        xhr.onreadystatechange = function() {
+            
+            // If done
+            if (this.readyState === 4) {
+                
+                // Parse from JSON
+                var serverBuildVersion = JSON.parse(xhr.responseText);
+                
+                // Display information
+                chromepage.compareLocalToServerBuildVersion(serverBuildVersion);
+            }
+        };        
+        xhr.send();
     },
     
     /**

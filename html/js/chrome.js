@@ -11,7 +11,7 @@ var chromepage = {
         chromepage.initWebstoreDownloadButton();
         chromepage.fixHeightOfBottomBlocks();
         chromepage.getServerBuildVersion();
-    },    
+    },
     
     /**
      * Add warning rollover and log for Chrome webstore clicks
@@ -114,7 +114,7 @@ var chromepage = {
         
         // Default message shown if the Chrome extension is not installed
         var message = l[7873].replace('%1', serverBuildVersion.chrome);
-                
+        
         // If current build information is available (not in development) and currently using the Chrome extension
         if ((buildVersion.chrome !== '') && (is_extension) && (ua.indexOf('chrome') > -1)) {
             

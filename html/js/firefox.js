@@ -7,6 +7,7 @@ var firefoxpage = {
      * Initialise the Chrome extension page
      */
     init: function() {
+        firefoxpage.addHoverToDownloadButton();
         firefoxpage.getServerBuildVersion();
     },
     
@@ -47,7 +48,7 @@ var firefoxpage = {
                 // Display information
                 firefoxpage.compareLocalToServerBuildVersion(serverBuildVersion);
             }
-        };        
+        };
         xhr.send();
     },
     

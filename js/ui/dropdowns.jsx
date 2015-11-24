@@ -1,4 +1,5 @@
-var React = require("react/addons");
+var React = require("react");
+var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
@@ -10,22 +11,24 @@ var Dropdown = React.createClass({
         var self = this;
 
         if(this.props.active === true) {
-            if(this.isMounted() && this.getOwnerElement()) {
-                var $element = $(this.getDOMNode());
+            if(this.getOwnerElement()) {
+                var $element = $(ReactDOM.findDOMNode(this));
                 var parentDomNode = $element.parents('.button');
                 var positionToElement = parentDomNode;
                 var offsetLeft = 0;
-                if($('> i', parentDomNode).size() > 0) {
-                    positionToElement = $('> i', parentDomNode);
-                    offsetLeft = positionToElement.outerWidth() / 2;
+                var $container = $element.parents('.jspPane:first');
+
+                if($container.size() == 0) {
+                    $container = $(document.body);
                 }
 
                 $element.css('margin-left','');
                 $element.position({
                     of: positionToElement,
-                    my: "center top",
-                    at: "center bottom",
+                    my: self.props.positionMy ? self.props.positionMy : "center top",
+                    at: self.props.positionAt ? self.props.positionAt : "center bottom",
                     collision: "flip flip",
+                    within: $container,
                     using: function (obj, info) {
                         if (info.vertical != "top") {
                             $(this)
@@ -41,8 +44,7 @@ var Dropdown = React.createClass({
 
                         $(this).css({
                             left: (obj.left + (offsetLeft ? offsetLeft/2 : 0)) + 'px',
-                            top: (obj.top + $arrow.outerHeight()) + 'px',
-                            marginLeft: self.props.styles ? self.props.styles.marginLeft : undefined
+                            top: (obj.top + (info.vertical == "top" ? $arrow.outerHeight() : 0)) + 'px'
                         });
                     }
                 });
@@ -55,25 +57,29 @@ var Dropdown = React.createClass({
 
         if(this.props.active !== true) {
             classes += " hidden";
+
+            return (
+                <div className={classes}></div>
+            );
+        } else {
+            var styles;
+
+            // calculate and move the popup arrow to the correct position.
+            if (this.getOwnerElement()) {
+                styles = {
+                    'zIndex': 123,
+                    'position': 'absolute',
+                    'width': this.props.styles ? this.props.styles.width : undefined
+                };
+            }
+
+            return (
+                <div className={classes} style={styles}>
+                    <i className="dropdown-white-arrow"></i>
+                    {this.props.children}
+                </div>
+            );
         }
-
-        var styles;
-
-        // calculate and move the popup arrow to the correct position.
-        if(this.isMounted() && this.getOwnerElement()) {
-            styles = {
-                'zIndex': 123,
-                'position': 'absolute',
-                'width': this.props.styles ? this.props.styles.width : undefined
-            };
-        }
-
-        return (
-            <div className={classes} style={styles}>
-                <i className="dropdown-white-arrow"></i>
-                {this.props.children}
-            </div>
-        );
     }
 });
 
@@ -87,8 +93,7 @@ var DropdownContactsSelector = React.createClass({
     },
     onSearchChange: function(e) {
         var self = this;
-
-        self.setState({searchValue: event.target.value});
+        self.setState({searchValue: e.target.value});
     },
     render: function() {
         var self = this;

@@ -1,4 +1,5 @@
 var React = require("react");
+var ReactDOM = require("react-dom");
 var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
@@ -685,7 +686,7 @@ Chat.prototype.init = function() {
 
     self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={this} contacts={M.u} />;
 
-    self.$conversationsAppInstance = React.render(
+    self.$conversationsAppInstance = ReactDOM.render(
         self.$conversationsApp,
         document.querySelector('.section.conversations')
     );
@@ -1652,8 +1653,33 @@ Chat.prototype.renderListing = function() {
 
     $('.section.conversations .fm-right-header').removeClass('hidden');
 
-
     self.renderConversationsApp();
+
+
+    if (Object.keys(self.chats).length === 0) {
+        console.error("empty!");
+        $('.fm-empty-conversations').removeClass('hidden');
+    } else {
+        $('.fm-empty-conversations').addClass('hidden');
+
+        if (self.lastOpenedChat && self.chats[self.lastOpenedChat] && self.chats[self.lastOpenedChat]._leaving !== true) {
+            // have last opened chat, which is active
+            self.chats[self.lastOpenedChat].setActive();
+            self.chats[self.lastOpenedChat].show();
+            return true;
+        } else {
+            // show first chat from the conv. list
+            var chatIds = self.chats.keys();
+            if (chatIds.length === 1) {
+                var room = self.chats[chatIds[0]];
+                room.setActive();
+                room.show();
+                return true;
+            } else {
+                $('.fm-empty-conversations').removeClass('hidden');
+            }
+        }
+    }
 };
 
 /**

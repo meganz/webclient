@@ -1,5 +1,6 @@
 // libs
 var React = require("react");
+var ReactDOM = require("react-dom");
 var utils = require('./../../ui/utils.jsx');
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
@@ -194,8 +195,6 @@ var ConversationMessage = React.createClass({
                             className="default-white-button tiny-button"
                             icon="tiny-icon grey-down-arrow">
                             <DropdownsUI.Dropdown
-                                styles={{
-                                }}
                                 className="message-dropdown"
                                 onClick={() => {}}
                                 >
@@ -390,10 +389,6 @@ var ConversationRightArea = React.createClass({
                             contacts={this.props.contacts}
                             >
                             <DropdownsUI.DropdownContactsSelector
-                                styles={{
-                                    marginLeft: -12,
-                                    width: 252
-                                }}
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}
                                 className="popup add-participant-selector"
@@ -407,9 +402,6 @@ var ConversationRightArea = React.createClass({
                             label={__("Send Files…")}
                             >
                             <DropdownsUI.Dropdown
-                                styles={{
-                                    marginLeft: 91
-                                }}
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}
                                 className="wide-dropdown send-files-selector"
@@ -428,10 +420,16 @@ var ConversationRightArea = React.createClass({
                             <i className="small-icon shared-grey-folder"></i>
                             {__("Share Folders")}
                         </div>
-                        <div className="link-button red">
-                            <i className="small-icon rounded-stop"></i>
-                            {__("Leave Chat")}
-                        </div>
+                        {
+                            room.type !== "private" ?
+                                <div className="link-button red" onClick={() => {
+                                   room.leaveChat(true);
+                                }}>
+                                    <i className="small-icon rounded-stop"></i>
+                                    {__("Leave Chat")}
+                                </div>
+                                : null
+                        }
                     </div>
 
                 </div>
@@ -742,7 +740,7 @@ var ConversationPanel = React.createClass({
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
 
-        var $container = $(self.getDOMNode());
+        var $container = $(ReactDOM.findDOMNode(self));
 
         self.$header = $('.fm-right-header[data-room-jid="' + self.props.chatRoom.roomJid.split("@")[0] + '"]', $container);
         self.$messages = $('.messages.scroll-area > .jScrollPaneContainer', $container);
@@ -945,7 +943,7 @@ var ConversationPanel = React.createClass({
         self.handleWindowResize();
     },
     handleWindowResize: function(e, scrollToBottom) {
-        var $container = $(this.getDOMNode());
+        var $container = $(ReactDOM.findDOMNode(this));
         var self = this;
 
         if (!self.props.chatRoom.isCurrentlyActive) {
@@ -1365,6 +1363,20 @@ var ConversationPanels = React.createClass({
 
         var conversations = [];
 
+        if(window.location.hash === "#fm/chat") {
+            // do we need to "activate" an conversation?
+            var activeFound = false;
+            self.props.conversations.forEach(function (chatRoom) {
+                if (chatRoom.isCurrentlyActive) {
+                    activeFound = true;
+                }
+            });
+            if (self.props.conversations.length > 0 && !activeFound) {
+                self.props.conversations[self.props.conversations.keys()[0]].setActive();
+                self.props.conversations[self.props.conversations.keys()[0]].show();
+            }
+        }
+
         self.props.conversations.forEach(function(chatRoom) {
             var contact = megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
 
@@ -1384,11 +1396,67 @@ var ConversationPanels = React.createClass({
             // }
         });
 
-        return (
-            <div className="conversation-panels">
-                {conversations}
-            </div>
-        );
+        if(conversations.length === 0) {
+            var contactsList = [];
+            var contactsListOffline = [];
+            
+            self.props.contacts.forEach(function(contact) {
+                if (contact.u === u_handle) { return; }
+                else if (contact.c === 0) { return; }
+
+                var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+                var avatarMeta = generateAvatarMeta(contact.u);
+
+                (pres === "offline" ? contactsListOffline : contactsList).push(
+                    <div className={"contacts-info body " + (pres === "offline" ? "offline" : "")}>
+                        <div className={"user-card-presence " + pres}></div>
+                        <ContactsUI.Avatar contact={contact} className="small-rounded-avatar" />
+
+                        {
+                            pres !== "offline" ?
+                                <div className="default-white-button tiny-button">
+                                    <i className="tiny-icon grey-down-arrow"></i>
+                                </div>
+                                :
+                                ""
+                        }
+    
+                        <div className="user-card-data">
+                            <div className="user-card-name small">{avatarMeta.fullName}</div>
+                            <div className="user-card-email small">{contact.m}</div>
+                        </div>
+                    </div>
+                );
+            });
+            return (
+                <div>
+                    <div className="chat-right-area">
+                        <div className="chat-right-area contacts-list-scroll">
+                            <div className="chat-right-pad">
+                                {contactsList}
+                                {contactsListOffline}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="empty-block">
+                        <div className="empty-pad conversations">
+                            <div className="empty-icon conversations"></div>
+                            <div className="empty-title" dangerouslySetInnerHTML={{
+                                __html: __('You have no [[Conversations]]')
+                                    .replace("[[", "<span>")
+                                    .replace("]]", "</span>")
+                            }}></div>
+                        </div>
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <div className="conversation-panels">
+                    {conversations}
+                </div>
+            );
+        }
     }
 });
 

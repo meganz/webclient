@@ -3,6 +3,7 @@ require('./../../stores/actions.jsx');
 
 // libs
 var React = require("react");
+var ReactDOM = require("react-dom");
 var utils = require('./../../ui/utils.jsx');
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
@@ -224,221 +225,6 @@ var ConversationsList = React.createClass({
 });
 
 
-var ConversationsMainListing =  React.createClass({
-    mixins: [MegaRenderMixin],
-    audioClicked: function(room, e) {
-        e.stopPropagation();
-        room.activateWindow();
-        room.show();
-        room.startAudioCall();
-    },
-    videoClicked: function(room, e) {
-        e.stopPropagation();
-        room.activateWindow();
-        room.show();
-        room.startVideoCall();
-    },
-    dblClicked: function(room, e) {
-        e.stopPropagation();
-        room.activateWindow();
-        room.show();
-    },
-
-    componentDidMount: function() {
-        window.addEventListener('resize', this.handleWindowResize);
-        this.handleWindowResize();
-
-    },
-    componentWillUnmount: function() {
-        window.removeEventListener('resize', this.handleWindowResize);
-    },
-    componentDidUpdate: function() {
-        this.handleWindowResize();
-    },
-    handleWindowResize: function() {
-        var $container = $(this.getDOMNode());
-        var $listings = $('.fm-chat-message-scroll.conversations', $container);
-
-        $listings.height(
-            $(window).outerHeight() -
-            $('#topmenu').outerHeight() -
-            $('.fm-right-header.fm:first', $container.parent()).outerHeight()
-        );
-    },
-
-    render: function () {
-        var self = this;
-
-        var conversations = [];
-        var anyChatWindowVisible = false;
-        self.props.conversations.map((room, roomJid) => {
-            if(room._leaving || room.stateIsLeftOrLeaving()) {
-                return;
-            }
-
-            var contactJid = room.getParticipantsExceptMe()[0];
-            var contact = room.megaChat.getContactFromJid(contactJid);
-            var contactAvatarMeta = generateAvatarMeta(contact.u);
-            var presence = room.megaChat.karere.getPresence(contactJid);
-
-            var lastActionClasses = "conversations-call-info";
-            var lastActionText = "";
-
-            var chatUserInfoClasses = "fm-chat-user-info ustatus " + contact.u + " " + room.megaChat.xmppPresenceToCssClass(
-                presence
-            );
-
-            if(room.isActive()) {
-                anyChatWindowVisible = true;
-            }
-
-            var chatUserStatusClasses = "fm-chat-user-status " + contact.u;
-
-            var haventCommunicated;
-            var lastActivity;
-            if(!room.lastActivity) {
-                haventCommunicated = (
-                    <div className="not-communicated-txt">
-                        {__("You haven’t communicated with <strong>%1</strong> recently.").replace("%1", contactAvatarMeta.fullName)}
-                    </div>
-                );
-            } else {
-                lastActivity = "about " + time2last(room.lastActivity);
-            }
-
-
-
-            var startCallButtons;
-
-            if(presence !== undefined && presence != "offline") {
-                startCallButtons = [
-                    <div key="startCallVideo" className="conversations-icon video" onClick={(e) => {
-                        self.videoClicked(room, e)
-                    }}></div>,
-                    <div key="startCallAudio" className="conversations-icon audio" onClick={(e) => {
-                        self.audioClicked(room, e)
-                    }}></div>
-                ];
-            }
-
-            var lastAction;
-            var lastMessage = room.messagesBuff.messages.getItem(room.messagesBuff.messages.length - 1);
-
-            if(room.messagesBuff.messages.length > 0 && lastMessage) {
-                if (lastMessage.textContents || lastMessage.getContents) {
-                    // notification?
-                    if (lastMessage.textContents) {
-                        lastActionClasses += " " + (lastMessage.cssClass ? lastMessage.cssClass : " fm-chat-messages-pad");
-                        lastActionText += lastMessage.textContents;
-                    } else {
-                        // text message
-                        lastActionClasses += " fm-chat-messages-pad";
-                        lastActionText = lastMessage.getContents();
-                    }
-
-                    lastAction = <div className={lastActionClasses}>
-                        <div className="nw-chat-notification-icon"></div>
-                        <div className="conversation-status">
-                                        <span>
-                                            {lastActionText}
-                                        </span>
-                        </div>
-                        <div className="conversations-time">{lastActivity}</div>
-                    </div>;
-                }
-            } else {
-                lastAction = <div className={lastActionClasses}>
-                    <div className="conversation-status">
-                                        <span>
-
-                                        </span>
-                    </div>
-                    <div className="conversations-time">{lastActivity}</div>
-                </div>;
-            }
-
-            conversations.push(
-                <div className="conversations-block" key={roomJid}>
-                    <div className="conversations-border">
-                        <div className="conversations-pad" onClick={(e) => {
-                            self.dblClicked(room, e);
-                        }}>
-                            {startCallButtons}
-
-                            <ContactsUI.Avatar contact={contact} />
-
-                            <div className={chatUserInfoClasses}>
-                                <div className="fm-chat-user-star"></div>
-                                <div className="fm-chat-user">{contactAvatarMeta.fullName}</div>
-                                <div className="nw-contact-status"></div>
-                                <div className={chatUserStatusClasses}>{room.megaChat.xmppPresenceToText(presence)}</div>
-                                <div className="clear"></div>
-                            </div>
-                            <div className="clear"></div>
-
-                            <div>{lastAction}</div>
-
-                            {haventCommunicated}
-
-                        </div>
-                    </div>
-                </div>
-            );
-        });
-
-
-        var classes = "fm-chat-message-scroll conversations";
-        var containerClasses = "conversations-main-listing";
-
-        if(anyChatWindowVisible || window.location.hash != "#fm/chat" || window.location.hash.indexOf("/chat") === -1) {
-            classes += " hidden";
-            containerClasses += " hidden";
-        }
-
-        var jspClasses = "";
-
-        var emptyClasses = "fm-empty-conversations";
-        if(conversations.length > 0) {
-            emptyClasses += " hidden";
-        } else {
-            jspClasses += " hidden";
-        }
-
-        //console.error("ConversationsMainListing render");
-        //console.error("convs size: ", conversations.length, "emptyClasses: ", emptyClasses, "jsp: ", jspClasses);
-
-        return (
-            <div className={containerClasses}>
-                <div className={emptyClasses}>
-                    <div className="fm-empty-pad">
-                        <div className="fm-empty-conversations-bg"></div>
-                        <div className="fm-empty-cloud-txt">No Conversations</div>
-                        <div className="fm-not-logged-text">
-                            <div className="fm-not-logged-description">
-                                Login or create an account to <span className="red">get 50GB FREE</span> and speak with your friends and coworkers.
-                            </div>
-                            <div className="fm-not-logged-button login">
-                                Login
-                            </div>
-                            <div className="fm-not-logged-button create-account">
-                                Create account
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <utils.JScrollPane className={jspClasses}>
-                    <div className={classes}>
-                        <div className="fm-chat-message-pad">
-                            {conversations}
-                            <div className="clear"></div>
-                        </div>
-                    </div>
-                </utils.JScrollPane>
-            </div>
-        );
-    }
-});
-
 var ConversationsApp = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     startChatClicked: function(contact, e) {
@@ -458,7 +244,7 @@ var ConversationsApp = React.createClass({
         this.handleWindowResize();
     },
     handleWindowResize: function() {
-        var $container = $(this.getDOMNode());
+        var $container = $(ReactDOM.findDOMNode(this));
 
         $container.height(
             $(window).outerHeight() -  $('#topmenu').outerHeight()
@@ -528,7 +314,6 @@ var ConversationsApp = React.createClass({
                     </div>
                     </div>
 
-                    <ConversationsMainListing {...this.props} conversations={this.props.megaChat.chats} />
 
                     <ConversationPanelUI.ConversationPanels
                         {...this.props}
@@ -544,6 +329,5 @@ var ConversationsApp = React.createClass({
 
 module.exports = {
     ConversationsList,
-    ConversationsMainListing,
     ConversationsApp
 };

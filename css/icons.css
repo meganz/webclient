@@ -123,6 +123,61 @@
 .small-icon.circle-with-arrow {
 	background-position: -4px -735px;
 }
+.square-button .small-icon {
+    width: 22px;
+    height: 22px;
+    
+}
+.small-icon.clock-icon {
+    background-position: -2px -3200px;
+}
+.small-icon.smile-icon {
+    background-position: -32px -3200px;
+}
+.small-icon.sun-icon {
+    background-position: -62px -3200px;
+}
+.small-icon.wineglass-icon {
+    background-position: -92px -3200px;
+}
+.small-icon.present-icon {
+    background-position: -122px -3200px;
+}
+.small-icon.bowling-ball-icon {
+    background-position: -152px -3200px;
+}
+.small-icon.earth-icon {
+    background-position: -182px -3200px;
+}
+.small-icon.percents-icon {
+    background-position: -212px -3200px;
+}
+
+.square-button.active .small-icon.clock-icon {
+    background-position: -2px -3230px;
+}
+.square-button.active .small-icon.smile-icon {
+    background-position: -32px -3230px;
+}
+.square-button.active .small-icon.sun-icon {
+    background-position: -62px -3230px;
+}
+.square-button.active .small-icon.wineglass-icon {
+    background-position: -92px -3230px;
+}
+.square-button.active .small-icon.present-icon {
+    background-position: -122px -3230px;
+}
+.square-button.active .small-icon.bowling-ball-icon {
+    background-position: -152px -3230px;
+}
+.square-button.active .small-icon.earth-icon {
+    background-position: -182px -3230px;
+}
+.square-button.active .small-icon.percents-icon {
+    background-position: -212px -3230px;
+}
+
 .dropdown-item .small-icon.rounded-grey-plus {
 	background-position: -3px -3131px;
 }

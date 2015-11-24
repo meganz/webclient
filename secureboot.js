@@ -1341,6 +1341,7 @@ else if (!b_u)
     jsl.push({f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});

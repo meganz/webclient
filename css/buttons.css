@@ -168,3 +168,26 @@
 	opacity: 0;
 	z-index: 10;
 }
+.button.square-button {
+    width: 32px;
+    height: 32px;
+    float: left;
+     -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+        -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-transition: all 100ms ease-in-out;
+	-moz-transition: all 100ms ease-in-out;
+	-o-transition: all 100ms ease-in-out;
+	-ms-transition: all 100ms ease-in-out;
+	transition: all 100ms ease-in-out;
+    text-align:center;
+}
+.button.square-button:hover {
+    background-color: #EEEEEE;
+}
+.button.square-button.active {
+    background-color: #999999;
+}

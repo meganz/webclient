@@ -1,8 +1,8 @@
 .popup.dropdown.body {
 	padding: 0;
 }
+/* Search contacts popup */
 .popup.dropdown.body.contacts-search, .popup.dropdown.body.add-participant-selector {
-	width: 360px;
 	padding: 0 0 7px 0;
 }
 .popup.add-participant-selector {
@@ -24,7 +24,7 @@
 .add-participant-selector .contacts-search-header {
 	padding: 0 0 0 40px;
 }
-.contacts-search-header input {
+.contacts-search-header input, .search-block.emoji-one input {
 	font-size: 14px;
 	line-height: 24px;
 	color: #666666;
@@ -52,11 +52,7 @@ color: #666666;
 .contacts-search-header input:-ms-input-placeholder {
 color: #666666;
 }
-.add-participant-selector .contacts-search-header {
-	text-align: left;
-	padding-left: 40px;
-}
-.contacts-search-header > i {
+.contacts-search-header > i,  .search-block.emoji-one > i {
 	vertical-align: middle;
 	margin: 14px 3px 1px 0;
 }
@@ -81,3 +77,60 @@ color: #666666;
 .contacts-search .user-card-data {
 	padding: 0 30px 0 79px;
 }
+/* End of Search contacts popup */
+
+/* Emoji one popup */
+.popup-header.emoji-one, .popup-footer.emoji-one {
+    height: 48px;
+    border-bottom: 1px solid #e5e5e5;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin:0 12px;
+    position:relative;
+    z-index: 10;
+}
+.popup-header.emoji-one {
+	padding: 0 0 0 10px;
+}
+.popup-footer.emoji-one {
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 0;
+    padding: 4px 0 0 0;
+}
+ .popup-header.emoji-one input {
+	margin: 12px 0 0 14px;
+}
+.popup-scroll-area.emoji-one {
+    height: 336px;
+    position:relative;
+    z-index: 10;
+    overflow: hidden;
+}
+.popup-scroll-content.emoji-one {
+    padding: 12px;
+}
+.button.square-button{
+    margin: 3px 5px 0 5px;
+}
+.square-button.emoji-one span {
+    top: 6px;
+}
+.square-button.emoji-one i {
+    top: 5px;
+    position:relative;
+}
+
+.emoji-type-txt {
+    font-size: 14px;
+    line-height: 18px;
+    color:#666666;
+    text-transform:uppercase;
+    padding: 21px 11px 13px 11px;
+    
+}
+.emoji-type-txt:first-child {
+    padding: 2px 11px 15px 11px;
+}
+
+/* End of Emoji one popup */

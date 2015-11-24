@@ -17,7 +17,7 @@
 	margin: -2px 0 0 0;
 }
 .dropdown.body.popup {
-	min-width: 360px;
+	width: 360px;
 	padding: 0;
 }
 .dropdown.body:not(.white-context-menu)::before {

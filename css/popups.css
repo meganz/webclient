@@ -38,18 +38,18 @@
 .add-participant-selector .contacts-search-header input {
 	margin: 12px 0 0 16px;
 }
-.contacts-search-header input::-webkit-input-placeholder {
+.contacts-search-header input::-webkit-input-placeholder,  .popup-header.emoji-one input::-webkit-input-placeholder {
 color: #666666;
 }
-.contacts-search-header input:-moz-placeholder {
-color: #666666;
- opacity: 1;
-}
-.contacts-search-header input::-moz-placeholder {
+.contacts-search-header input:-moz-placeholder,  .popup-header.emoji-one inputt:-moz-placeholder {
 color: #666666;
  opacity: 1;
 }
-.contacts-search-header input:-ms-input-placeholder {
+.contacts-search-header input::-moz-placeholder,  .popup-header.emoji-one input::-moz-placeholder {
+color: #666666;
+ opacity: 1;
+}
+.contacts-search-header input:-ms-input-placeholder,  .popup-header.emoji-one inputt:-ms-input-placeholder {
 color: #666666;
 }
 .contacts-search-header > i,  .search-block.emoji-one > i {
@@ -110,27 +110,4 @@ color: #666666;
 .popup-scroll-content.emoji-one {
     padding: 12px;
 }
-.button.square-button{
-    margin: 3px 5px 0 5px;
-}
-.square-button.emoji-one span {
-    top: 6px;
-}
-.square-button.emoji-one i {
-    top: 5px;
-    position:relative;
-}
-
-.emoji-type-txt {
-    font-size: 14px;
-    line-height: 18px;
-    color:#666666;
-    text-transform:uppercase;
-    padding: 21px 11px 13px 11px;
-    
-}
-.emoji-type-txt:first-child {
-    padding: 2px 11px 15px 11px;
-}
-
 /* End of Emoji one popup */

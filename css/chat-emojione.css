@@ -13,6 +13,40 @@
     background-size: 3600%;
     background-repeat: no-repeat;
 }
+.emoji-one.demo-icon {
+    display: block;
+    float: left;
+    top: 0;
+    margin: 14px 0 0 0;
+}
+.emoji-one.title {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    float: left;
+    margin: 15px 0 0 20px;
+}
+.emoji-one.square-button {
+    margin: 3px 5px 0 5px;
+}
+.emoji-one.square-button span {
+    top: 6px;
+}
+.emoji-one.square-button i {
+    top: 5px;
+    position:relative;
+}
+.emoji-type-txt {
+    font-size: 14px;
+    line-height: 18px;
+    color:#666666;
+    text-transform:uppercase;
+    padding: 21px 11px 13px 11px;
+    
+}
+.emoji-type-txt:first-child {
+    padding: 2px 11px 15px 11px;
+}
 .emojione-button.people {
     background-position: 2.85714% 100%;
 }

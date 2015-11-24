@@ -35,6 +35,22 @@
     emojione.sprites = true;
     // default is ignore ASCII smileys like :) but you can easily turn them on
     emojione.ascii = true;
+    
+    // demo events
+    $(document).ready(function() {
+        $('.popup-scroll-content .square-button.emoji-one').bind('mouseover', function() {
+            var className = $(this).find('span').attr('class'),
+                  title =  $(this).find('span').attr('title');
+            $('.search-block.emoji-one').addClass('hidden');
+            $('.emoji-one.demo-icon').attr('class','emoji-one demo-icon ' + className);
+            $('.emoji-one.title').text(title)
+            $('.emoji-one-preview').removeClass('hidden');
+        })
+        $('.popup-scroll-content .square-button.emoji-one').bind('mouseout', function() {
+            $('.emoji-one-preview').addClass('hidden');
+            $('.search-block.emoji-one').removeClass('hidden');
+        })
+    });
 </script>
 
 </head>
@@ -51,6 +67,8 @@
             <input type="search" placeholder="Search" value="" />
         </div>
         <div class="emoji-one-preview hidden">
+            <span class="emoji-one demo-icon" ></span>
+            <div class="emoji-one title">:sleepy:</div>
         </div>
         
     </div>

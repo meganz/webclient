@@ -44,7 +44,7 @@ var Avatar = React.createClass({
         var verifyState = u_authring.Ed25519[contact.h] || {};
         var verifiedElement = (
             verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ?
-                <div className="user-card-verified"></div> : ""
+                <div className="user-card-verified"></div> : undefined
         );
 
         if($avatar.find("img").length > 0) {
@@ -57,10 +57,7 @@ var Avatar = React.createClass({
             var colorNum = tempClasses.split("color")[1].split(" ")[0];
             classes += " color" + colorNum;
 
-            displayedAvatar = <div className={classes}>
-                {verifiedElement}
-                {$(useravatar.contact(contact)).text()}
-            </div>;
+            displayedAvatar = <div className={classes}>{verifiedElement}<div>{$(useravatar.contact(contact)).text()}</div></div>;
 
 
         }
@@ -69,7 +66,70 @@ var Avatar = React.createClass({
     }
 });
 
+var ContactCard = React.createClass({
+    mixins: [MegaRenderMixin, RenderDebugger],
+    render: function() {
+        var self = this;
+
+        var contact = this.props.contact;
+        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
+        var avatarMeta = generateAvatarMeta(contact.u);
+
+        var contextMenu;
+        if (!this.props.noContextMenu) {
+            var ButtonsUI = require('./../../ui/buttons.jsx');
+            var DropdownsUI = require('./../../ui/dropdowns.jsx');
+
+            var moreDropdowns = [];
+
+            if(window.location.hash != '#fm/chat/' + contact.u) {
+                moreDropdowns.push(
+                    <DropdownsUI.DropdownItem
+                        key={"start_conv_" + contact.u}
+                        icon="conversations" label={__("Open/start Chat")} onClick={() => {
+                                    window.location = '#fm/chat/' + contact.u;
+                                }} />
+                );
+            }
+            contextMenu = <ButtonsUI.Button
+                className="default-white-button tiny-button"
+                icon="tiny-icon grey-down-arrow">
+                <DropdownsUI.Dropdown className="contact-card-dropdown">
+                    <DropdownsUI.DropdownItem icon="human-profile" label={__("View Profile")} onClick={() => {
+                                    window.location = '#fm/' + contact.u;
+                                }} />
+                    {moreDropdowns}
+                </DropdownsUI.Dropdown>
+            </ButtonsUI.Button>;
+        }
+
+        return <div
+                    className={
+                        "contacts-info body " +
+                        (pres === "offline" ? "offline" : "") +
+                        (this.props.className ? " " + this.props.className : "")
+                    }
+                    onClick={(e) => {
+                        if (self.props.onClick) {
+                            self.props.onClick(contact, e);
+                        }
+                    }}
+                    >
+                <div className={"user-card-presence " + pres}></div>
+                <Avatar contact={contact} className="small-rounded-avatar" />
+
+                {contextMenu}
+
+                <div className="user-card-data">
+                    <div className="user-card-name small">{avatarMeta.fullName}</div>
+                    <div className="user-card-email small">{contact.m}</div>
+                </div>
+            </div>;
+    }
+});
+
 module.exports = {
     ContactsListItem,
+    ContactCard,
     Avatar
 };

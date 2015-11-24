@@ -8,8 +8,33 @@ var chromepage = {
      */
     init: function() {
         chromepage.initManualDownloadButton();
+        chromepage.initWebstoreDownloadButton();
         chromepage.fixHeightOfBottomBlocks();
         chromepage.getServerBuildVersion();
+    },    
+    
+    /**
+     * Add warning rollover and log for Chrome webstore clicks
+     */
+    initWebstoreDownloadButton: function() {
+        
+        var $webstoreButton = $('.chrome-app-button');
+        var $warningText = $('.chrome-warning');
+        
+        // Show warning in red background
+        $webstoreButton.mouseover(function() {
+            $warningText.addClass('chrome-warning-hover');
+        });
+        
+        // Hide warning background
+        $webstoreButton.mouseout(function() {
+            $warningText.removeClass('chrome-warning-hover');
+        });
+        
+        // Log that they downloaded via the webstore link
+        $webstoreButton.click(function() {
+            api_req({ a: 'log', e: 99604, m: 'Downloaded Chrome ext via webstore link' });
+        });
     },
     
     /**
@@ -21,9 +46,14 @@ var chromepage = {
         
         // On manual download button click, hide the button text and show the mega.co.nz and mega.nz links
         $('.chrome-download-button').rebind('click', function() {            
+            
+            // Change button state to show different versions
             $downloadButton.css('cursor', 'default');
             $downloadButton.find('.initial-state').hide();
             $downloadButton.find('.actual-links').show();
+            
+            // Log that they downloaded via the manual link
+            api_req({ a: 'log', e: 99605, m: 'Downloaded Chrome ext via manual link' });
         });
         
         // Fix font size for different languages
@@ -31,7 +61,7 @@ var chromepage = {
             $downloadButton.find('.actual-links > a').css('font-size', '12px');
         }
     },
-    
+        
     /**
      * Set all the bottom blocks for the manual installation to the same height
      */

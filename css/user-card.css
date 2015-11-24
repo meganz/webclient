@@ -85,11 +85,16 @@
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	margin: -3px 0 0 -12px;
 	float: left;
 	background-image: url(../images/mega/new-chat-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1353px;
+}
+.small-rounded-avatar .user-card-verified {
+    position: absolute;
+    z-index: 10;
+    right: -6px;
+    top: -5px;
 }
 .user-card-verified.big {
 	border: 0;

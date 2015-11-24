@@ -32,13 +32,18 @@ var firefoxpage = {
      */
     getServerBuildVersion: function() {
         
-        $.ajax({
-            dataType: 'json',
-            url: 'https://mega.nz/current_ver.txt'
-        })
-        .done(function(result) {
-            firefoxpage.compareLocalToServerBuildVersion(result);
-        });
+        var request = new XMLHttpRequest();
+
+        request.onload = function() {
+
+            // Parse from JSON
+            var serverBuildVersion = JSON.parse(request.response);
+            
+            // Display information
+            firefoxpage.compareLocalToServerBuildVersion(serverBuildVersion);
+        };
+        request.open('GET', 'https://mega.nz/current_ver.txt');
+        request.send();
     },
     
     /**

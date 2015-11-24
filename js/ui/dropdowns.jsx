@@ -127,19 +127,11 @@ var DropdownContactsSelector = React.createClass({
             }
 
             contacts.push(
-                <div className="contacts-info body contacts-search"  onClick={(e) => {
-                    if (self.props.onClick) {
-                        self.props.onClick(v, e);
-                    }
-                }} key={v.u}>
-                    <div className={"user-card-presence " + (pres ? pres : "offline")}></div>
-                    <ContactsUI.Avatar contact={v} />
-
-                    <div className="user-card-data">
-                        <div className="user-card-name">{avatarMeta.fullName}</div>
-                        <div className="user-card-email">{v.m}</div>
-                    </div>
-                </div>
+                <ContactsUI.ContactCard
+                    contact={v} className="contacts-search" onClick={self.props.onClick}
+                    noContextMenu={true}
+                    key={v.u}
+                    />
             );
         });
 

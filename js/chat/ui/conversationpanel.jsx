@@ -351,22 +351,7 @@ var ConversationRightArea = React.createClass({
             <div className="chat-right-area conversation-details-scroll">
                 <div className="chat-right-pad">
 
-                    <div className="contacts-info body">
-                        <div
-                            className={"user-card-presence " + room.megaChat.xmppPresenceToCssClass(contact.presence)}
-                            >
-                        </div>
-                        <ContactsUI.Avatar contact={contact} />
-
-                        <div className="default-white-button tiny-button">
-                            <i className="tiny-icon grey-down-arrow"></i>
-                        </div>
-
-                        <div className="user-card-data">
-                            <div className="user-card-name">{generateAvatarMeta(contact.u).fullName}</div>
-                            <div className="user-card-email">{contact.m}</div>
-                        </div>
-                    </div>
+                    <ContactsUI.ContactCard contact={contact} megaChat={room.megaChat} />
 
                     <div className="buttons-block">
                         <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
@@ -1405,27 +1390,9 @@ var ConversationPanels = React.createClass({
                 else if (contact.c === 0) { return; }
 
                 var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
-                var avatarMeta = generateAvatarMeta(contact.u);
 
                 (pres === "offline" ? contactsListOffline : contactsList).push(
-                    <div className={"contacts-info body " + (pres === "offline" ? "offline" : "")}>
-                        <div className={"user-card-presence " + pres}></div>
-                        <ContactsUI.Avatar contact={contact} className="small-rounded-avatar" />
-
-                        {
-                            pres !== "offline" ?
-                                <div className="default-white-button tiny-button">
-                                    <i className="tiny-icon grey-down-arrow"></i>
-                                </div>
-                                :
-                                ""
-                        }
-    
-                        <div className="user-card-data">
-                            <div className="user-card-name small">{avatarMeta.fullName}</div>
-                            <div className="user-card-email small">{contact.m}</div>
-                        </div>
-                    </div>
+                    <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u} />
                 );
             });
             return (

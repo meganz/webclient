@@ -16837,6 +16837,18 @@ span.browsers-update {
 	margin: 30px auto -26px auto;
 	width: 700px;
 }
+.chrome-version-info {
+    color: #e64a4d;
+    display: block;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 20px;
+    margin-top: 10px;
+    text-align: center;
+}
+a.manual-install-link {
+    font-family: 'Open Sans Semibold Italic', Arial;
+}
 .chrome-app-button.new-app {
 	background-image: url(../images/mega/chrome-app1.png);
 	background-repeat: no-repeat;

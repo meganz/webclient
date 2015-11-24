@@ -535,27 +535,7 @@ function init_page() {
     }
     else if (page == 'chrome') {
         parsepage(pages['chrome']);
-        var h = 0;
-        $('.chrome-bottom-block').each(function (i, e) {
-            if ($(e).height() > h) {
-                h = $(e).height();
-            }
-        });
-        $('.chrome-bottom-block').height(h);
-        if (lang !== 'en') {
-            $('.chrome-download-button').css('font-size', '12px');
-        }
-
-        // On the manual download button click
-        $('.chrome-download-button').rebind('click', function() {
-
-            var $this = $(this);
-
-            // Hide the button text and show the mega.co.nz and mega.nz links
-            $this.css('cursor', 'default');
-            $this.find('.initial-state').hide();
-            $this.find('.actual-links').show();
-        });
+        chromepage.init();        
     }
     else if (page == 'key') {
         parsepage(pages['key']);

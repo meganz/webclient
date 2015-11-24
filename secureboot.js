@@ -1371,7 +1371,6 @@ else if (!b_u)
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
         'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
-        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
@@ -1381,7 +1380,10 @@ else if (!b_u)
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1}
+        'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
+        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
+        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1},
+        'version_compare_js': {f:'js/vendor/version-compare.js', n: 'version_compare_js', j:1}
     };
 
     var subpages =
@@ -1403,7 +1405,6 @@ else if (!b_u)
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
         'takedown': ['takedown'],
-        'firefox': ['firefox'],
         'mobile': ['mobile'],
         'sync': ['sync','sync_js'],
         'contact': ['contact'],
@@ -1414,7 +1415,8 @@ else if (!b_u)
         'plugin': ['chrome','firefox'],
         'recover': ['reset','reset_js'],
         'redeem': ['redeem','redeem_js'],
-        'chrome': ['chrome', 'chrome_js']
+        'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
+        'firefox': ['firefox', 'firefox_js', 'version_compare_js']
     };
 
     if (page)

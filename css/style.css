@@ -16846,6 +16846,14 @@ span.browsers-update {
     margin-top: 10px;
     text-align: center;
 }
+.firefox-version-info {
+    color: #e64a4d;
+    display: block;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 20px;
+    margin-bottom: 20px;
+}
 a.manual-install-link {
     font-family: 'Open Sans Semibold Italic', Arial;
 }

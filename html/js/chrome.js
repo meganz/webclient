@@ -3,6 +3,9 @@
  */
 var chromepage = {
     
+    /**
+     * Initialise the Chrome extension page
+     */
     init: function() {
         chromepage.initManualDownloadButton();
         chromepage.fixHeightOfBottomBlocks();
@@ -71,18 +74,18 @@ var chromepage = {
     compareLocalToServerBuildVersion: function(serverBuildVersion) {
         
         // Default message shown if the Chrome extension is not installed
-        var message = 'Download the Chrome extension (v' + serverBuildVersion.chrome + ') below.';
+        var message = 'Download the extension (v' + serverBuildVersion.chrome + ') below.';
                 
-        // If current build information is available (not in development) and currently using the chrome extension
+        // If current build information is available (not in development) and currently using the Chrome extension
         if ((buildVersion.chrome !== '') && (is_extension) && (ua.indexOf('chrome') > -1)) {
             
             // If the currently loaded version is older than the server build
-            if (buildVersion.timestamp < serverBuildVersion.timestamp) {
+            if (versionCompare(buildVersion.chrome, serverBuildVersion.chrome) === -1) {
                 message = 'Looks like your current extension (v' + buildVersion.chrome + ') is out of date. Download the latest (v' + serverBuildVersion.chrome + ') below.';
             }
             else {
                 // Congrats, you're using the current version
-                message = 'Your Chrome extension (v' + serverBuildVersion.chrome + ') is up to date.';
+                message = 'Your extension (v' + serverBuildVersion.chrome + ') is up to date.';
             }
         }
         

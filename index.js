@@ -533,10 +533,6 @@ function init_page() {
         parsepage(pages['register']);
         init_register();
     }
-    else if (page == 'chrome') {
-        parsepage(pages['chrome']);
-        chromepage.init();        
-    }
     else if (page == 'key') {
         parsepage(pages['key']);
         init_key();
@@ -692,21 +688,20 @@ function init_page() {
         parsepage(pages['credits']);
         var html = '';
         $('.credits-main-pad a').sort(function () {
-            return (Math.round(Math.random()) - 0.5)
+            return (Math.round(Math.random()) - 0.5);
         }).each(function (i, e) {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
         mainScroll();
+    }    
+    else if (page == 'chrome') {
+        parsepage(pages['chrome']);
+        chromepage.init();        
     }
     else if (page == 'firefox') {
         parsepage(pages['firefox']);
-        $('.ff-bott-button').rebind('mouseover', function () {
-            $('.ff-icon').addClass('hovered');
-        });
-        $('.ff-bott-button').rebind('mouseout', function () {
-            $('.ff-icon').removeClass('hovered');
-        });
+        firefoxpage.init();
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);

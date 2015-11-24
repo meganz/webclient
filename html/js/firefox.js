@@ -34,7 +34,6 @@ var firefoxpage = {
         
         $.ajax({
             dataType: 'json',
-            jsonp: false,
             url: 'https://mega.nz/current_ver.txt'
         })
         .done(function(result) {

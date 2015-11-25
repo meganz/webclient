@@ -730,7 +730,10 @@ function init_page() {
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
-        init_sync();
+        return megasync.ready(function() {
+            init_sync();
+            mainScroll();
+        });
     }
     else if (page == 'mobile') {
         parsepage(pages['mobile']);
@@ -751,8 +754,10 @@ function init_page() {
     }
     else if (dlid) {
         page = 'download';
-        parsepage(pages['download'], 'download');
-        dlinfo(dlid, dlkey, false);
+        megasync.ready(function() {
+            parsepage(pages['download'], 'download');
+            dlinfo(dlid, dlkey, false);
+        });
     }
     
     /**

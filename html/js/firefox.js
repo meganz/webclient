@@ -32,15 +32,13 @@ var firefoxpage = {
      * Get what build version is currently available from mega.nz live site
      */
     getServerBuildVersion: function() {
-
-        var updateURL = is_chrome_firefox
-            ? mozMEGAExtensionUpdateURL
-            : mega.updateURL;
+        
+        var updateURL = (is_chrome_firefox) ? mozMEGAExtensionUpdateURL : mega.updateURL;
 
         // Fetch the latest current_ver.txt
         mega.utils.xhr(updateURL)
             .done(function(ev, data) {
-                var serverBuildVersion;
+                var serverBuildVersion = null;
 
                 // Parse version info
                 if (is_chrome_firefox) {
@@ -57,8 +55,8 @@ var firefoxpage = {
                     catch (ex) {}
                 }
 
+                // Display information if data was returned
                 if (serverBuildVersion) {
-                    // Display information
                     firefoxpage.compareLocalToServerBuildVersion(serverBuildVersion);
                 }
             });

@@ -10,9 +10,7 @@ var chromepage = {
         chromepage.initManualDownloadButton();
         chromepage.initWebstoreDownloadButton();
         chromepage.fixHeightOfBottomBlocks();
-        if (ua.indexOf('chrome') > 0) {
-            chromepage.getServerBuildVersion();
-        }
+        chromepage.getServerBuildVersion();
     },
 
     /**
@@ -91,7 +89,7 @@ var chromepage = {
         // Fetch the latest current_ver.txt
         mega.utils.xhr(mega.updateURL)
             .done(function(ev, data) {
-                var serverBuildVersion;
+                var serverBuildVersion = null;
 
                 // Parse version info
                 try {
@@ -99,8 +97,8 @@ var chromepage = {
                 }
                 catch (ex) {}
 
-                if (serverBuildVersion) {
-                    // Display information
+                // Display information if data was returned
+                if (serverBuildVersion) {                    
                     chromepage.compareLocalToServerBuildVersion(serverBuildVersion);
                 }
             });

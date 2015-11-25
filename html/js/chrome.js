@@ -87,7 +87,7 @@ var chromepage = {
     getServerBuildVersion: function() {
 
         // Fetch the latest current_ver.txt
-        mega.utils.xhr(mega.updateURL)
+        mega.utils.xhr('https://eu.static.mega.co.nz/3/current_ver.txt')
             .done(function(ev, data) {
                 var serverBuildVersion = null;
 

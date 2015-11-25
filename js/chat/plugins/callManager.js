@@ -263,13 +263,13 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
         buttons: {
             'answer': {
                 'type': 'primary',
-                'classes': 'default-white-button left',
+                'classes': 'default-white-button small-text left',
                 'text': l[7205],
                 'callback': doAnswer
             },
             'reject': {
                 'type': 'secondary',
-                'classes': 'default-white-button left red',
+                'classes': 'default-white-button small-text left red',
                 'text': l[1686],
                 'callback': doCancel
             }
@@ -1410,7 +1410,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
                 buttons: {
                     'reject': {
                         'type': 'secondary',
-                        'classes': 'default-white-button left red',
+                        'classes': 'default-white-button small-text left red',
                         'text': l[1686],
                         'callback': function () {
                             if (session) {

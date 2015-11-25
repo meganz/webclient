@@ -2,7 +2,6 @@
 	height: 100%;
 	position: relative;
 	background-color: #fafafa;
-	overflow: hidden;
 	margin-right: 256px;
 }
 .messages-block::before {

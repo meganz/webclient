@@ -256,7 +256,7 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}, utils: {}, flags: 0, updateURL: 'https://mega.nz/current_ver.txt'};
+var mega = {ui: {}, utils: {}, flags: 0, updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt'};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 

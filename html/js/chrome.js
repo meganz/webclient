@@ -82,12 +82,12 @@ var chromepage = {
     },
 
     /**
-     * Get what build version is currently available from mega.nz live site
+     * Get what build version is currently available from the live site
      */
     getServerBuildVersion: function() {
 
         // Fetch the latest current_ver.txt
-        mega.utils.xhr('https://eu.static.mega.co.nz/3/current_ver.txt')
+        mega.utils.xhr(mega.updateURL + '?time=' + unixtime())
             .done(function(ev, data) {
                 var serverBuildVersion = null;
 

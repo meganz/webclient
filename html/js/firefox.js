@@ -29,11 +29,15 @@ var firefoxpage = {
     },
 
     /**
-     * Get what build version is currently available from mega.nz live site
+     * Get what build version is currently available from the live site
      */
     getServerBuildVersion: function() {
         
-        var updateURL = (is_chrome_firefox) ? mozMEGAExtensionUpdateURL : mega.updateURL;
+        // Use update.rdf URL if in Firefox, or use the static path. Also use a timestamp query param 
+        // to break browser cache. Otherwise subsequent visits to the page don't show a new update.
+        var updateURL = (is_chrome_firefox) ? 
+            mozMEGAExtensionUpdateURL + '&time=' + unixtime() : 
+            mega.updateURL + '?time=' + unixtime();
 
         // Fetch the latest current_ver.txt
         mega.utils.xhr(updateURL)

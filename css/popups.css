@@ -33,7 +33,7 @@
 	margin: 12px 0 0 7px;
 	border: 0;
 	padding: 0;
-	vertical-align: middle;
+	vertical-align: top;
 }
 .add-participant-selector .contacts-search-header input {
 	margin: 12px 0 0 16px;
@@ -53,7 +53,7 @@ color: #666666;
 color: #666666;
 }
 .contacts-search-header > i,  .search-block.emoji-one > i {
-	vertical-align: middle;
+	vertical-align: top;
 	margin: 14px 3px 1px 0;
 }
 .contacts-search-scroll {

@@ -1,3 +1,6 @@
+// Release version information is replaced by the build scripts
+var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
+
 var b_u = 0;
 var apipath;
 var maintenance = false;
@@ -253,7 +256,7 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}, utils: {}, flags: 0};
+var mega = {ui: {}, utils: {}, flags: 0, updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt'};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -934,7 +937,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 19, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 20, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -981,6 +984,12 @@ else if (!b_u)
                 // Prevent InvalidStateError exceptions from indexedDB.open
                 // caused while using Private Browser Mode on Firefox.
                 return false;
+            }
+
+            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1) {
+                // ^ this seems a quirk on latest Chrome (~46)
+                dump.l = 1;
+                errobj = null;
             }
 
             if (~dump.m.indexOf("\n")) {
@@ -1362,16 +1371,19 @@ else if (!b_u)
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
         'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
-        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
-        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},        
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
-        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1}
+        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
+        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
+        'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
+        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
+        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1},
+        'version_compare_js': {f:'js/vendor/version-compare.js', n: 'version_compare_js', j:1}
     };
 
     var subpages =
@@ -1393,7 +1405,6 @@ else if (!b_u)
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
         'takedown': ['takedown'],
-        'firefox': ['firefox'],
         'mobile': ['mobile'],
         'sync': ['sync','sync_js'],
         'contact': ['contact'],
@@ -1401,10 +1412,11 @@ else if (!b_u)
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': ['help_js'],
-        'chrome': ['chrome'],
-        'plugin': ['chrome','firefox'],
-        'recover': ['reset','reset_js'],
-        'redeem': ['redeem','redeem_js']
+        'plugin': ['chrome', 'firefox'],
+        'recover': ['reset', 'reset_js'],
+        'redeem': ['redeem', 'redeem_js'],
+        'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
+        'firefox': ['firefox', 'firefox_js']
     };
 
     if (page)

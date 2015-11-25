@@ -19330,7 +19330,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .tl .pro-recommended {
 	background-image: url(../images/mega/tl/recommended.png);
 }
-.arrow {
+.arrow:not(.grid-header-star) {
 	cursor: pointer;
 	background-position: right top;
 	background-image: url(../images/mega/nw-fm-sprite_v12.svg);

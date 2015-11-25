@@ -235,7 +235,7 @@ MegaSync.prototype.downloadClient = function() {
         }
     });
 
-    if (url === '' || true) {
+    if (url === '') {
         // It's linux!
         this._linuxView();
     } else {

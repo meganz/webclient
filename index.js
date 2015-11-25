@@ -729,8 +729,10 @@ function init_page() {
         });
     }
     else if (page.substr(0, 4) == 'sync') {
-        parsepage(pages['sync']);
+        loadingDialog.show();
         return megasync.ready(function() {
+            loadingDialog.hide();
+            parsepage(pages['sync']);
             init_sync();
             mainScroll();
         });

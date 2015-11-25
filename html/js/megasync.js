@@ -113,7 +113,7 @@ MegaSync.prototype._prepareDownloadUrls = function() {
 
         this._clients = clients;
 
-        for (var i = 0; i < this._listeners.length++; ++i) {
+        for (var i = 0; i < this._listeners.length; ++i) {
             setTimeout(this._listeners[i]);
         }
         this._listeners = null;

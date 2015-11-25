@@ -4,7 +4,7 @@ var syncsel = false;
 var linuxsync;
 
 function init_sync() {
-    linuxsync = megasync.getLinuxReleases();
+    linuxsync = linuxsync || megasync.getLinuxReleases();
     $('.st-apps-icon.mobile').rebind('click', function() {
         document.location.hash = 'mobile';
     });

@@ -123,7 +123,7 @@ var chromepage = {
             }
             else {
                 // They're using the current version
-                message = l[7875].replace('%1', serverBuildVersion.chrome);
+                message = l[7875].replace('%1', buildVersion.chrome);
             }
         }
 

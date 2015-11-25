@@ -1416,7 +1416,7 @@ else if (!b_u)
         'recover': ['reset','reset_js'],
         'redeem': ['redeem','redeem_js'],
         'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
-        'firefox': ['firefox', 'firefox_js', 'version_compare_js']
+        'firefox': ['firefox', 'firefox_js']
     };
 
     if (page)

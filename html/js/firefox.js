@@ -74,15 +74,15 @@ var firefoxpage = {
         var message = l[7873].replace('%1', serverBuildVersion.firefox);
 
         // If current build information is available (not in development) and currently using the Firefox extension
-        if ((buildVersion.firefox !== '') && (is_extension) && (ua.indexOf('firefox') > -1)) {
+        if (is_chrome_firefox) {
 
             // If the currently loaded version is older than the server build
-            if (versionCompare(buildVersion.firefox, serverBuildVersion.firefox) === -1) {
-                message = l[7874].replace('%1', buildVersion.firefox).replace('%2', serverBuildVersion.firefox);;
+            if (Services.vc.compare(mozMEGAExtensionVersion, serverBuildVersion.firefox) < 0) {
+                message = l[7874].replace('%1', mozMEGAExtensionVersion).replace('%2', serverBuildVersion.firefox);
             }
             else {
                 // They're using the current version
-                message = l[7875].replace('%1', serverBuildVersion.firefox);
+                message = l[7875].replace('%1', mozMEGAExtensionVersion);
             }
         }
 

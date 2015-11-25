@@ -10,7 +10,9 @@ var chromepage = {
         chromepage.initManualDownloadButton();
         chromepage.initWebstoreDownloadButton();
         chromepage.fixHeightOfBottomBlocks();
-        chromepage.getServerBuildVersion();
+        if (ua.indexOf('chrome') > 0) {
+            chromepage.getServerBuildVersion();
+        }
     },
 
     /**

@@ -98,7 +98,7 @@ var chromepage = {
                 catch (ex) {}
 
                 // Display information if data was returned
-                if (serverBuildVersion) {                    
+                if (serverBuildVersion) {
                     chromepage.compareLocalToServerBuildVersion(serverBuildVersion);
                 }
             });

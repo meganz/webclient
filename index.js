@@ -694,12 +694,12 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
         mainScroll();
-    }    
-    else if (page == 'chrome') {
-        parsepage(pages['chrome']);
-        chromepage.init();        
     }
-    else if (page == 'firefox') {
+    else if (page === 'chrome') {
+        parsepage(pages['chrome']);
+        chromepage.init();
+    }
+    else if (page === 'firefox') {
         parsepage(pages['firefox']);
         firefoxpage.init();
     }

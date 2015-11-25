@@ -33,10 +33,10 @@ var firefoxpage = {
      */
     getServerBuildVersion: function() {
         
-        // Use update.rdf URL if in Firefox, or use the static path. Also use a timestamp query param 
+        // Use update.rdf URL if in Firefox, or use the static path. Also use a timestamp query param
         // to break browser cache. Otherwise subsequent visits to the page don't show a new update.
-        var updateURL = (is_chrome_firefox) ? 
-            mozMEGAExtensionUpdateURL + '&time=' + unixtime() : 
+        var updateURL = (is_chrome_firefox) ?
+            mozMEGAExtensionUpdateURL + '&time=' + unixtime() :
             mega.updateURL + '?time=' + unixtime();
 
         // Fetch the latest current_ver.txt

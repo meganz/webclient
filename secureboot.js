@@ -1412,9 +1412,9 @@ else if (!b_u)
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': ['help_js'],
-        'plugin': ['chrome','firefox'],
-        'recover': ['reset','reset_js'],
-        'redeem': ['redeem','redeem_js'],
+        'plugin': ['chrome', 'firefox'],
+        'recover': ['reset', 'reset_js'],
+        'redeem': ['redeem', 'redeem_js'],
         'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
         'firefox': ['firefox', 'firefox_js']
     };

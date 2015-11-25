@@ -130,7 +130,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jsbn2.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
 [MegaLogger]: <https://github.com/meganz/megalogger>
 [MegaPix]: <https://github.com/meganz/ios-imagefile-megapixel>
-[nacl-fast.js]: <https://github.com/dchest/tweetnacl-js>
+[nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js>
 [qrcode-orig.js]: <https://github.com/kazuhikoarase/qrcode-generator>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/master/src/qrcode.js>

@@ -1332,6 +1332,7 @@ else if (!b_u)
     jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/chat-messages.css', n: 'chat_messages_css', j:2,w:5,c:1,d:1,cache:1});

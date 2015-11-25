@@ -3908,7 +3908,7 @@ label.iPhoneCheckLabelOff span {
 	overflow: hidden;
 	display: none;
 }
-.content-panel.conversations {
+.conversations .fm-tree-panel .jspPane {
 	min-height:100%;
 	background-image: url(../images/mega/nw-chat-bg.svg);
 }
@@ -4292,6 +4292,14 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .files-grid-view .fm-chat-user-info .nw-contact-status, .fm-blocks-view .fm-chat-user-info .nw-contact-status, .shared-grid-view .fm-chat-user-info .nw-contact-status, .shared-blocks-view .fm-chat-user-info .nw-contact-status, .files-grid-view.contacts-view .nw-contact-status {
 	margin: 4px 6px 0 0px;
+}
+.grid-scrolling-table, .grid-scrolling-table .jspPane {
+    min-height: 100%;
+    background-image: url(../images/mega/grid-bg2.svg);
+	background-position: left top;
+}
+.files-grid-view.fm .grid-scrolling-table, .files-grid-view.fm .grid-scrolling-table .jspPane, .transfer-scrolling-table, transfer-scrolling-table .jspPane {
+    background-image: url(../images/mega/grid-bg.svg);
 }
 .grid-table td, .grid-table-header {
 	overflow: hidden;

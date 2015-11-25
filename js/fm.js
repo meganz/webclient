@@ -5665,17 +5665,20 @@ function transferPanelUI()
     {
         fm_resize_handler();
 
-        var tth = $('.transfer-table-header');
+        var tt = $('.transfer-scrolling-table'),
+              tth = $('.transfer-table-header');
 
         // Show/Hide header if there is no items in transfer list
         if (!$('.transfer-table tr').not('.clone-of-header').length > 0)
         {
             $('.transfer-panel-empty-txt').removeClass('hidden');
+            tt.hide(0);
             tth.hide(0);
         }
         else
         {
             $('.transfer-panel-empty-txt').addClass('hidden');
+            tt.show(0);
             tth.show(0);
         }
 
@@ -6747,11 +6750,11 @@ function sectionUIopen(id) {
     {
         // required tricks to make the conversations work with the old UI HTML/css structure
         if(id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
-            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
-            $('.fm-main.default > .fm-left-panel').hide();
+            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').addClass('hidden');
+            $('.fm-main.default > .fm-left-panel').addClass('hidden');
         } else {
-            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').show();
-            $('.fm-main.default > .fm-left-panel').show();
+            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').removeClass('hidden');
+            $('.fm-main.default > .fm-left-panel').removeClass('hidden');
         }
 
         // new sections UI

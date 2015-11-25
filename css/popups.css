@@ -57,8 +57,13 @@ color: #666666;
 	margin: 14px 3px 1px 0;
 }
 .contacts-search-scroll {
-	min-height: 288px;
+	height: 288px !important;
 	overflow: hidden;
+}
+.contacts-search-scroll .jspPane {
+    min-height: 100%;
+    background-image: url(../images/mega/grid-bg2.svg);
+	background-position: left top;
 }
 .popup .contacts-info.body.contacts-search {
 	height: 48px;

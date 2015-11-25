@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1px" height="48px" viewBox="0 0 1 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4.2 (15857) - http://www.bohemiancoding.com/sketch -->
+    <title>Untitled</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <path d="M0,24 L1,24 L1,48 L0,48 L0,24 Z" id="Fill-50" opacity="0.02" fill="#000000" sketch:type="MSShapeGroup"></path>
+        <path d="M0,0 L1,0 L1,24 L0,24 L0,0 Z" id="Fill-50" fill="#FFFFFF" sketch:type="MSShapeGroup"></path>
+    </g>
+</svg>

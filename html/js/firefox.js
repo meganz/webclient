@@ -7,6 +7,7 @@ var firefoxpage = {
      * Initialise the Chrome extension page
      */
     init: function() {
+        firefoxpage.addHoverToDownloadButton();
         firefoxpage.getServerBuildVersion();
     },
 

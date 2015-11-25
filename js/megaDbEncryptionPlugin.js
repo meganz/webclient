@@ -57,7 +57,7 @@ function MegaDBEncryption(mdbInstance) {
                         });
                 }
                 else {
-                    _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k);
+                    _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, true);
                     promise.resolve();
                 }
             }, function(err) {
@@ -81,10 +81,10 @@ function MegaDBEncryption(mdbInstance) {
             if(k == "__origObj" || k == "id" ||  k === mdbInstance._getTablePk(table)) { return; }
 
             if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k]) {
-                obj[k + "$v"] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey());
+                obj[k + "$v"] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey(), false);
                 obj[k] = hasherFunc(JSON.stringify(v));
             } else {
-                obj[k] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey());
+                obj[k] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey(), false);
             }
             //logger.debug("encrypted: {k=", k, "v=", v, "$v=", obj[k + "$v"], "objk=", obj[k], "}");
         })
@@ -113,12 +113,12 @@ function MegaDBEncryption(mdbInstance) {
                 }
 
                 if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k] && obj[k + "$v"] && decryptedKeys.indexOf(k) === -1) {
-                    obj[k] = JSON.parse(stringcrypt.stringDecrypter(obj[k + "$v"], getEncDecKey()));
+                    obj[k] = JSON.parse(stringcrypt.stringDecrypter(obj[k + "$v"], getEncDecKey()), false);
                     delete obj[k + "$v"];
                     decryptedKeys.push(k);
                 } else {
                     try {
-                        obj[k] = stringcrypt.stringDecrypter(v, getEncDecKey());
+                        obj[k] = stringcrypt.stringDecrypter(v, getEncDecKey(), false);
                         if(obj[k] == "undefined") {
                             obj[k] = undefined;
                         } else {

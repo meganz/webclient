@@ -46,7 +46,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                             buttons: {
                                 'sendFeedback': {
                                     'type': 'primary',
-                                    'classes': 'default-white-button left',
+                                    'classes': 'default-white-button small-text left',
                                     'icon': 'refresh-circle',
                                     'text': __("Send Feedback"),
                                     'callback': function() {
@@ -67,7 +67,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                 },
                                 'noThanks': {
                                     'type': 'secondary',
-                                    'classes': 'default-white-button left red',
+                                    'classes': 'default-white-button small-text left red',
                                     'text': __("No thanks"),
                                     'callback': function() {
                                         megaRoom.messagesBuff.removeMessageById(msgId);

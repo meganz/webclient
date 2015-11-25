@@ -1,0 +1,42 @@
+.fm-dialog-footer {
+    height: 56px;
+    background-color: #F6F6F6;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-border-bottom-left-radius: 7px;
+    -moz-border-radius-bottomleft: 7px;
+    border-bottom-left-radius: 7px;
+    -webkit-border-bottom-right-radius: 7px;
+    -moz-border-radius-bottomright: 7px;
+    border-bottom-right-radius: 7px;
+    padding:12px 12px 0 12px;
+}
+
+/* Send Contact Dialog */
+.fm-dialog.send-contact {
+    width: 644px;
+    margin:-246px 0 0 -322px;
+}
+.fm-dialog .contacts-search-scroll {
+    height: 336px !important;
+}
+.fm-dialog .contacts-search-scroll, .fm-dialog .contacts-search-scroll .jspPane {
+    background-position: 0 -48px;
+}
+.fm-dialog .contacts-info.body.contacts-search {
+    height: 48px;
+	padding: 6px 0;
+	cursor: pointer;
+    background-color: #fafafa;
+}
+.fm-dialog .contacts-info.body.contacts-search:nth-child(odd) {
+   background-color: white;
+}
+.fm-dialog .contacts-info.body.selected {
+    background-color: rgba(240,240,240,1);
+}
+.fm-dialog .contacts-search-header {
+    padding-top: 10px;
+}
+/* End of Send Contact Dialog */

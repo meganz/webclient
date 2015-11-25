@@ -67,7 +67,7 @@
 }
 .default-white-button {
 	display: block;
-	font-size: 13px;
+	font-size: 14px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
@@ -84,6 +84,9 @@
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
+}
+.default-white-button.small-text {
+    font-size: 13px;
 }
 .default-white-button::before {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -105,8 +108,8 @@
 	box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
 }
 .default-white-button:not(.tiny-button) i {
-	margin: 0 6px 1px -5px;
-	vertical-align: middle;
+	margin: 6px 6px 1px -5px;
+	vertical-align: top;
 }
 .red.default-white-button:hover {
 	-webkit-box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
@@ -148,6 +151,9 @@
 }
 .default-white-button.left {
 	margin-right: 8px;
+}
+.default-white-button.right {
+	margin-left: 8px;
 }
 .red {
 	color: #D90007

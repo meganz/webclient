@@ -1,5 +1,7 @@
 .button {
 	display: block;
+}
+.button > i, .button > span {
 	cursor: pointer;
 }
 .link-button {

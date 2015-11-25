@@ -432,7 +432,6 @@ var ConversationPanel = React.createClass({
             isFullscreenModeEnabled: false,
             mouseOverDuringCall: false,
             typedMessage: "",
-            emoticonsPopupIsActive: false,
             currentlyTyping: []
         };
     },
@@ -474,48 +473,17 @@ var ConversationPanel = React.createClass({
 
         room.trigger('RefreshUI');
     },
-    onEmoticonsButtonClick: function(e) {
+    //
+    onEmojiClicked: function(e, slug, meta) {
         var self = this;
-        var $target = $(e.target);
 
-        if ($target.parent().is(".disabled")) {
-            return;
+        var txt = ":" + slug + ":";
+        if (slug.substr(0, 1) == ":" || slug.substr(-1) == ":") {
+            txt = slug;
         }
-        if ($target.is(".disabled")) {
-            return;
-        }
-
-        var hidePopup = function() {
-            if (self.isMounted()) {
-                self.setState({
-                    emoticonsPopupIsActive: false
-                });
-                $(document).unbind('mouseup.emoticonsPopup');
-            }
-        };
-
-
-        if (self.state.emoticonsPopupIsActive === false) {
-            self.setState({
-                emoticonsPopupIsActive: true
-            });
-            $(document).rebind('mouseup.emoticonsPopup', function (e) {
-                if (!$(e.target).is($target)) {
-                    hidePopup();
-                }
-            });
-        } else {
-            hidePopup();
-        }
-
-    },
-    onEmoticonClicked: function(e) {
-        var self = this;
-        var $target = $(e.target);
-        var emoticonText = $target.data('text');
 
         self.setState({
-            typedMessage: self.state.typedMessage + emoticonText
+            typedMessage: self.state.typedMessage + " " + txt + " "
         });
 
         setTimeout(function()
@@ -945,7 +913,7 @@ var ConversationPanel = React.createClass({
         if (textareaHeight != $hiddenDiv.outerHeight()) {
             $textarea.css('height', $hiddenDiv.outerHeight());
 
-            if ($('.chat-textarea-block', $container).outerHeight() >= 139) {
+            if ($hiddenDiv.outerHeight() >= 91) {
                 $pane.jScrollPane({
                     enableKeyboardNavigation:false,
                     showArrows:true,
@@ -1140,8 +1108,6 @@ var ConversationPanel = React.createClass({
         var currentUserResizerClasses = "current-user-resizer";
         var videoMinimiseButtonClasses = "video-minimize-button small-video-reziser";
         var sizeIconClasses = "video-call-button size-icon";
-        var emoticonsPopupClasses = "fm-chat-emotion-popup";
-        var emoticonsPopupButtonClasses = "fm-chat-emotions-icon";
         var messageTextAreaClasses = "messages-textarea";
         var typingElement;
 
@@ -1229,17 +1195,6 @@ var ConversationPanel = React.createClass({
         typedMessage = typedMessage + '<br />';
 
 
-        if (self.state.emoticonsPopupIsActive === true) {
-            emoticonsPopupButtonClasses += " active";
-            emoticonsPopupClasses += " active";
-        } else {
-            emoticonsPopupClasses += " hidden";
-
-            if(room.pubCu25519KeyIsMissing === true) {
-                emoticonsPopupButtonClasses += " disabled";
-            }
-        }
-
         if (self.state.currentlyTyping.length > 0) {
             var names = self.state.currentlyTyping.map((u_h) => {
                 var avatarMeta = generateAvatarMeta(u_h);
@@ -1311,9 +1266,17 @@ var ConversationPanel = React.createClass({
                             <div className="chat-textarea">
                                 <i className="small-icon conversations"></i>
                                 <div className="chat-textarea-buttons">
-                                    <div className="button popup-button" onClick={this.onEmoticonsButtonClick}>
-                                        <i className="small-icon smiling-face"></i>
-                                    </div>
+
+                                    <ButtonsUI.Button
+                                        className="popup-button"
+                                        icon="smiling-face"
+                                        >
+                                        <DropdownsUI.DropdownEmojiSelector
+                                            className="popup emoji-one"
+                                            onClick={self.onEmojiClicked}
+                                            />
+                                    </ButtonsUI.Button>
+
                                     <div className="button popup-button">
                                         <i className="small-icon grey-medium-plus"></i>
                                     </div>

@@ -8,52 +8,26 @@
 var EmoticonsFilter = function(megaChat) {
     var self = this;
 
-    self.emoticonsMap = {
-
-        ':-)': 'smile',
-        ':)': 'smile',
-
-        ';-)': 'wink',
-        ';)': 'wink',
-
-        ':p': 'tongue',
-        ':P': 'tongue',
-        ':-P': 'tongue',
-        ':-p': 'tongue',
-
-        ':D': 'grin',
-        ':d': 'grin',
-
-        ':|': 'confuse',
-        ':-|': 'confuse',
-
-        ':o': 'grasp',
-        ':O': 'grasp',
-
-        ':-(': 'sad',
-        ':(': 'sad',
-
-        ';(': 'cry',
-        ':\'(': 'cry',
-        ';-(': 'cry',
-
-        '(angry)': 'angry',
-
-        '(mega)': 'mega'
-    };
-
     //RegExpEscape
 
     var escapedRegExps = [];
-    $.each(self.emoticonsMap, function(k, v) {
+    $.each(EMOJILIST.EMOJIS, function(slug, meta) {
+        var txt = ":" + slug + ":";
+        if (slug.substr(0, 1) == ":" || slug.substr(-1) == ":") {
+            txt = "(^|\\W)(" + RegExpEscape(slug) + ")(?=(\\s|$))"
+        }
+
         escapedRegExps.push(
-            RegExpEscape(k)
+            txt
         );
     });
 
-    var regExpStr = "(^|\\W)(" + escapedRegExps.join("|") + ")(?=(\\s|$))";
+    var regExpStr = "(" + escapedRegExps.join("|") + ")";
+
+    window.regExpStr = regExpStr;
 
     self.emoticonsRegExp = new RegExp(regExpStr, "gi");
+    window.emoticonsRegExp = self.emoticonsRegExp;
 
     megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);
@@ -80,14 +54,31 @@ EmoticonsFilter.prototype.processMessage = function(e, eventData) {
         return; // ignore, maybe its a system message (or composing/paused composing notification)
     }
 
-    messageContents = messageContents.replace(self.emoticonsRegExp, function(match) {
-        var cssClassName = self.emoticonsMap[$.trim(match.toLowerCase())];
+    var titleAltReplacements = [];
 
-        if(cssClassName) {
-            return '<span class="fm-chat-smile ' + cssClassName + '" title="' + match + '">' + match + '</span>'
+    messageContents = messageContents.replace(self.emoticonsRegExp, function(match) {
+        var foundSlug = $.trim(match.toLowerCase());
+        var textSlug = foundSlug;
+
+        if (foundSlug.substr(0, 1) === ":" && foundSlug.substr(-1, 1) === ":") {
+            foundSlug = foundSlug.substr(1, foundSlug.length - 2);
+        }
+        if (!EMOJILIST.EMOJIS[foundSlug]) {
+            foundSlug = ":" + foundSlug + ":";
+        }
+        var meta = EMOJILIST.EMOJIS[foundSlug];
+
+        if(meta) {
+            var idx = titleAltReplacements.push(htmlentities(textSlug));
+            return '<span class="emojione-' + meta[0] + '" title="[[[$' + idx + ']]]">' + meta[1] + '</span>';
         } else {
             return match;
         }
+    });
+
+    // fix double replace for title=":slug:"...
+    titleAltReplacements.forEach(function(slug, i) {
+        messageContents.replace("[[[$" + i + "]]]", slug);
     });
 
     eventData.message.messageHtml = messageContents;

@@ -107,7 +107,7 @@ color: #666666;
 	margin: 12px 0 0 14px;
 }
 .popup-scroll-area.emoji-one {
-    height: 336px;
+    max-height: 336px;
     position:relative;
     z-index: 10;
     overflow: hidden;

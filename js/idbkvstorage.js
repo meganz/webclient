@@ -55,9 +55,10 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                 promise.linkDoneAndFailTo(
                     fn.apply(self, args)
                 );
-                promise.fail(function __onDbStateReadyFailed() {
-                    self.logger.error("Failed to init IndexedDBKVStorage", arguments);
-                });
+            });
+            self.db.one('onDbStateFailed', function __onDbStateFailed() {
+                self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
+                promise.reject();
             });
         }
         else {

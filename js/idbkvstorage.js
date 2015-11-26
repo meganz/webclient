@@ -25,8 +25,8 @@ var IndexedDBKVStorage = function(name) {
  * @private
  */
 
-IndexedDBKVStorage._requiresDbConn = function(fn) {
-    return function() {
+IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
+    return function __requiresDBConnWrapper() {
         var self = this;
         var args = arguments;
         var promise = new MegaPromise();
@@ -51,15 +51,16 @@ IndexedDBKVStorage._requiresDbConn = function(fn) {
             );
             self.dbName = self.name + "_" + u_handle;
 
-            self.db.one('onDbStateReady', function() {
+            self.db.one('onDbStateReady', function __onDbStateReady() {
                 promise.linkDoneAndFailTo(
                     fn.apply(self, args)
                 );
-                promise.fail(function() {
+                promise.fail(function __onDbStateReadyFailed() {
                     self.logger.error("Failed to init IndexedDBKVStorage", arguments);
                 });
             });
-        } else {
+        }
+        else {
             promise.linkDoneAndFailTo(
                 fn.apply(self, args)
             );
@@ -79,10 +80,10 @@ IndexedDBKVStorage._requiresDbConn = function(fn) {
  *
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function(k, v) {
+IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVSetItem(k, v) {
     var promise = new MegaPromise();
 
-    //console.error("setItem", k, v);
+    // self.logger.debug("setItem", k, v);
 
     this.db.addOrUpdate(
         'kv',
@@ -91,10 +92,10 @@ IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(functi
             'v': v
         }
     )
-        .done(function() {
+        .done(function __setItemDone() {
             promise.resolve([k, v]);
         })
-        .fail(function() {
+        .fail(function __setItemFail() {
             promise.reject([k, v]);
         });
 
@@ -109,21 +110,22 @@ IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(functi
  *
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(function(k) {
+IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVGetItem(k) {
     var promise = new MegaPromise();
 
     this.db.get(
         'kv',
         k
     )
-        .done(function(r) {
-            if(typeof(r) === 'undefined' || r.length === 0) {
+        .done(function __getItemDone(r) {
+            if (typeof(r) === 'undefined' || r.length === 0) {
                 promise.reject();
-            } else {
+            }
+            else {
                 promise.resolve(r.v);
             }
         })
-        .fail(function() {
+        .fail(function __setItemFail() {
             promise.reject();
         });
 
@@ -137,7 +139,7 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
  *
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(function(k) {
+IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVRemoveItem(k) {
     return this.db.remove(
         'kv',
         k
@@ -149,7 +151,7 @@ IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(fun
  *
  * @type {MegaPromise}
  */
-IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function() {
+IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function __IDBKVClear() {
     return this.db.clear(
         'kv'
     );
@@ -163,20 +165,21 @@ IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function
  *
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(function(k) {
+IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVHasItem(k) {
     var promise = new MegaPromise();
     this.db.get(
         'kv',
         k
     )
-        .done(function(r) {
-            if(typeof(r) === 'undefined' || r.length === 0) {
+        .done(function __hasItemDone(r) {
+            if (typeof(r) === 'undefined' || r.length === 0) {
                 promise.reject();
-            } else {
+            }
+            else {
                 promise.resolve();
             }
         })
-        .fail(function() {
+        .fail(function __hasItemFail() {
             promise.reject();
         });
 

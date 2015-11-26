@@ -6,7 +6,7 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [asmCrypto]: JavaScript Cryptographic Library with performance in mind.
 
-> NB: We're using a custom build, created using:
+> NB: We are using a custom, unobfuscated build which was created using:
 > 
 > ```bash
 > git clone https://github.com/vibornoff/asmcrypto.js.git
@@ -22,7 +22,11 @@ Unless otherwise noted, they were released under a [MIT License].
 [Avatar Picker]: A combination of the source files required for the avatar dialog to work.
 
 ---
-[bitcoin-math]: JS math for BTC and Satoshi values.
+[bitcoin-math.js]: JS math for BTC and Satoshi values.
+
+> **This is a fork**, [Compare the changes](https://github.com/dangersalad/bitcoin-math/compare/master...meganz:master)
+>
+> The bitcoin-math library is released under the [BSD 2-Clause License](https://opensource.org/licenses/BSD-2-Clause).
 
 ---
 [db.js]: Wrapper for IndexedDB to make it easier to work against, making it look more like a queryable API.
@@ -119,10 +123,10 @@ Unless otherwise noted, they were released under a [MIT License].
 
 
 [MIT License]: <https://opensource.org/licenses/MIT>
-[asmCrypto]: <https://github.com/vibornoff/asmcrypto.js>
+[asmCrypto]: <https://github.com/vibornoff/asmcrypto.js/tree/v0.0.10>
 [Autolinker]: <https://github.com/gregjacobs/Autolinker.js>
 [Avatar Picker]: <https://bitbucket.org/atlassianlabs/avatar-picker/>
-[bitcoin-math]: <https://github.com/dangersalad/bitcoin-math>
+[bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>

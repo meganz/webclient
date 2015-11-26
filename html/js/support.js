@@ -46,7 +46,6 @@ var support = (function() {
                 msgDialog('warningb', 'Internal error', 'Please resend your message');
             }
         });
-        console.error(opts);
         return false;
     }
 

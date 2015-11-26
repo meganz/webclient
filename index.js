@@ -757,9 +757,13 @@ function init_page() {
     }
     else if (dlid) {
         page = 'download';
-        megasync.ready(function() {
+        loadingDialog.show();
+        return megasync.ready(function() {
+            loadingDialog.hide();
             parsepage(pages['download'], 'download');
             dlinfo(dlid, dlkey, false);
+            topmenuUI();
+            mainScroll();
         });
     }
     

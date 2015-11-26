@@ -755,6 +755,23 @@ function isEphemeral() {
     return (u_type === 0);
 }
 
+/**
+ * Check if the current user doens't have a session, if they don't have
+ * a session we show the login dialog, and when they have a session
+ * we redirect back to the intended page.
+ *
+ * @return {Boolean} True if the login dialog is shown
+ */
+function checkUserLogin() {
+    if (!u_type) {
+        login_next = document.location.hash;
+        document.location.hash = "#login";
+        return true;
+    }
+
+    return false;
+}
+
 
 (function(exportScope) {
     var _lastUserInteractionCache = false;

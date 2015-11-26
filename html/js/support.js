@@ -52,6 +52,9 @@ var support = (function() {
     ns.initUI = function() {
         var html = '';
         var first = true;
+        if (checkUserLogin()) {
+            return;
+        }
         $textarea = $('.support textarea');
         $bottom  = $('.nw-bottom-block');
         $top     = $('.about-top-block');

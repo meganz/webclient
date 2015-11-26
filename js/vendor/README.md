@@ -93,6 +93,8 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [nacl-fast.js]: Port of TweetNaCl cryptographic library to JavaScript.
 
+> This is released into the [public domain](https://en.wikipedia.org/wiki/Public_domain_software).
+
 ---
 [notification.js]: A shim polyfill for adding notifications to browsers which offer limited support.
 
@@ -103,6 +105,8 @@ Unless otherwise noted, they were released under a [MIT License].
 
 ---
 [version-compare.js]: Compares two software version numbers (e.g. "1.7.1" or "1.2b"). This is used to show whether there is a site or extension update available.
+
+> This is released into the [public domain](https://en.wikipedia.org/wiki/Public_domain_software).
 
 ---
 [zxcvbn.js]: A realistic password strength estimator.

@@ -23,7 +23,6 @@
         "with"
     ],
     "disallowIdentifierNames": [
-        "html",
         "append",
         "innerHTML",
         "outerHTML"
@@ -38,7 +37,7 @@
     "requireSpaceAfterBinaryOperators": true,
 
     "disallowMultipleVarDecl": true,
-
+    "disallowTrailingWhitespace": "ignoreEmptyLines",
     "disallowSpacesInsideParentheses": true,
     "disallowEmptyBlocks": true,
 

@@ -9,9 +9,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > NB: We're using a custom build, created using:
 > 
 > ```bash
+> git clone https://github.com/vibornoff/asmcrypto.js.git
+> git checkout v0.0.10
+> npm install
 > grunt --with="common,utils,exports,globals,aes,aes-ecb,aes-cbc,aes-ctr,aes-ccm,aes-gcm,aes-exports,aes-ecb-exports,aes-cbc-exports,aes-ctr-exports,aes-ccm-exports,aes-gcm-exports,hash,sha256,sha256-exports,sha512,sha512-exports,hmac,hmac-sha256,hmac-sha512,hmac-sha256-exports,hmac-sha512-exports,rng,rng-exports,rng-globals,bn,bn-exports,rsa,rsa-raw,rsa-keygen-exports,rsa-raw-exports" devel
 > ```
->
 
 ---
 [Autolinker]: Utility to Automatically Link URLs, Email Addresses, Phone Numbers, Twitter handles, and Hashtags in a given block of text/HTML.

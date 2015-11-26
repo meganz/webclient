@@ -102,6 +102,9 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/jwagner/smartcrop.js/compare/master...meganz:master)
 
 ---
+[version-compare.js]: Compares two software version numbers (e.g. "1.7.1" or "1.2b"). This is used to show whether there is a site or extension update available.
+
+---
 [zxcvbn.js]: A realistic password strength estimator.
 
 
@@ -137,5 +140,5 @@ Unless otherwise noted, they were released under a [MIT License].
 [qrcode-orig.js]: <https://github.com/kazuhikoarase/qrcode-generator>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/master/src/qrcode.js>
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
+[version-compare.js]: <https://gist.github.com/TheDistantSea/8021359>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn>
-

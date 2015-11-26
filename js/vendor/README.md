@@ -124,7 +124,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [asmCrypto]: <https://github.com/vibornoff/asmcrypto.js/tree/v0.0.10>
-[Autolinker]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
+[Autolinker]: <https://github.com/gregjacobs/Autolinker.js>
 [Avatar Picker]: <https://bitbucket.org/atlassianlabs/avatar-picker/>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>

@@ -13315,6 +13315,9 @@ table {
 	min-width: 980px;
 	position: relative;
 }
+.default-select .jspPane {
+    min-width: 0px;
+}
 .st-main-block .notification-popup .jspPane, .main-scroll-block .notification-popup .jspPane {
 	min-width: 0;
 }

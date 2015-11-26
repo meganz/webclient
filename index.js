@@ -734,6 +734,7 @@ function init_page() {
             loadingDialog.hide();
             parsepage(pages['sync']);
             init_sync();
+            topmenuUI();
             mainScroll();
         });
     }

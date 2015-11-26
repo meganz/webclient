@@ -355,6 +355,7 @@ function init_page() {
     else if (page.substr(0, 4) == 'blog' && page.length > 4) {
         blogmonth = page.substr(5, page.length - 2);
         page = 'blog';
+        blogpage = 1;
         parsepage(pages['blog']);
         init_blog();
     }
@@ -533,30 +534,6 @@ function init_page() {
         parsepage(pages['register']);
         init_register();
     }
-    else if (page == 'chrome') {
-        parsepage(pages['chrome']);
-        var h = 0;
-        $('.chrome-bottom-block').each(function (i, e) {
-            if ($(e).height() > h) {
-                h = $(e).height();
-            }
-        });
-        $('.chrome-bottom-block').height(h);
-        if (lang !== 'en') {
-            $('.chrome-download-button').css('font-size', '12px');
-        }
-
-        // On the manual download button click
-        $('.chrome-download-button').rebind('click', function() {
-
-            var $this = $(this);
-
-            // Hide the button text and show the mega.co.nz and mega.nz links
-            $this.css('cursor', 'default');
-            $this.find('.initial-state').hide();
-            $this.find('.actual-links').show();
-        });
-    }
     else if (page == 'key') {
         parsepage(pages['key']);
         init_key();
@@ -716,21 +693,20 @@ function init_page() {
         parsepage(pages['credits']);
         var html = '';
         $('.credits-main-pad a').sort(function () {
-            return (Math.round(Math.random()) - 0.5)
+            return (Math.round(Math.random()) - 0.5);
         }).each(function (i, e) {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
         mainScroll();
     }
-    else if (page == 'firefox') {
+    else if (page === 'chrome') {
+        parsepage(pages['chrome']);
+        chromepage.init();
+    }
+    else if (page === 'firefox') {
         parsepage(pages['firefox']);
-        $('.ff-bott-button').rebind('mouseover', function () {
-            $('.ff-icon').addClass('hovered');
-        });
-        $('.ff-bott-button').rebind('mouseout', function () {
-            $('.ff-icon').removeClass('hovered');
-        });
+        firefoxpage.init();
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);

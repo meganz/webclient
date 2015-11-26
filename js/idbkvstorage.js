@@ -62,9 +62,23 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
             });
         }
         else {
-            promise.linkDoneAndFailTo(
-                fn.apply(self, args)
-            );
+            if (self.db && self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+                promise.linkDoneAndFailTo(
+                    fn.apply(self, args)
+                );
+            }
+            else {
+                self.db.one('onDbStateReady', function __onDbStateReady() {
+                    promise.linkDoneAndFailTo(
+                        fn.apply(self, args)
+                    );
+                });
+                self.db.one('onDbStateFailed', function __onDbStateFailed() {
+                    self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
+                    promise.reject();
+                });
+            }
+
         }
 
         return promise;

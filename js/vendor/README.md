@@ -4,7 +4,7 @@
 Unless otherwise noted, they were released under a [MIT License].
 
 ---
-[asmCrypto]: JavaScript Cryptographic Library with performance in mind.
+[asmcrypto.js]: asmCrypto - JavaScript Cryptographic Library with performance in mind.
 
 > NB: We are using a custom, unobfuscated build which was created using:
 > 
@@ -16,10 +16,12 @@ Unless otherwise noted, they were released under a [MIT License].
 > ```
 
 ---
-[Autolinker]: Utility to Automatically Link URLs, Email Addresses, Phone Numbers, Twitter handles, and Hashtags in a given block of text/HTML.
+[Autolinker.js]: Utility to Automatically Link URLs, Email Addresses, Phone Numbers, Twitter handles, and Hashtags in a given block of text/HTML.
 
 ---
-[Avatar Picker]: A combination of the source files required for the avatar dialog to work.
+[avatar.js]: Avatar Picker - A slick user experience for uploading, translating and cropping images to be used as avatars.
+
+> **This is a fork**, [See the changes](https://github.com/meganz/avatar-picker/commits/master)
 
 ---
 [bitcoin-math.js]: JS math for BTC and Satoshi values.
@@ -44,7 +46,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/ejci/favico.js/compare/master...meganz:master)
 
 ---
-[FileSaver]: An HTML5 saveAs() FileSaver implementation.
+[filesaver.js]: FileSaver.js - An HTML5 saveAs() FileSaver implementation.
 
 ---
 [Int64.js]: Support for representing 64-bit integers in JavaScript.
@@ -123,14 +125,14 @@ Unless otherwise noted, they were released under a [MIT License].
 
 
 [MIT License]: <https://opensource.org/licenses/MIT>
-[asmCrypto]: <https://github.com/vibornoff/asmcrypto.js/tree/v0.0.10>
-[Autolinker]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
-[Avatar Picker]: <https://bitbucket.org/atlassianlabs/avatar-picker/>
+[asmcrypto.js]: <https://github.com/vibornoff/asmcrypto.js/tree/v0.0.10>
+[Autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
+[avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
-[FileSaver]: <http://purl.eligrey.com/github/FileSaver.js>
+[filesaver.js]: <http://purl.eligrey.com/github/FileSaver.js>
 [Int64.js]: <https://github.com/meganz/node-int64>
 [Ion.Sound]: <https://github.com/meganz/ion.sound>
 [jQuery]: <https://github.com/jquery/jquery>

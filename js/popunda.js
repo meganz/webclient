@@ -29,7 +29,7 @@ mega.popunda = {
             return;
         }
         this.$button = button;
-        this.popIndex = parseInt(this.getCookie());
+        this.popIndex = parseInt(this.getCookie()) | 0;
         this.setupPopunder(this.popurls[this.popIndex]);
     },
 
@@ -141,7 +141,7 @@ mega.popunda = {
      */
     setupPopunder: function(sUrl, sConfig) {
         /* jshint -W074 */
-        if (sUrl.length === 0) {
+        if (!sUrl || !sUrl.length) {
             return;
         }
 

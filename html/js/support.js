@@ -29,9 +29,12 @@ var support = (function() {
             t: $subject.find('.active').data('value'),
         }
         if (opts.m.length <= minLetters) {
-            msgDialog('warninga', 'Message too short', 'Please type at least a %d letters'.replace('%d', minLetters), false, function() {
-                $textarea.focus();
-            });
+            msgDialog('warninga', 
+                l[7884], // Message too short
+                l[7885].replace('%d', minLetters), // Your message needs to be at least %d letters long.
+                false, function() {
+                    $textarea.focus();
+                });
             return false;
         }
 
@@ -39,11 +42,18 @@ var support = (function() {
         api_req(opts, {
             callback: function(response) {
                 if (response === 0) {
-                    return msgDialog('warningb', 'Message sent', 'Your message has been sent');
+                    return msgDialog('warningb', 
+                        l[7882],  // Message sent
+                        l[7881]   // Thank you! One of our support consultants will respond to your enquiry as soon as possible. 
+                    );
                 }
 
                 $button.show();
-                msgDialog('warningb', 'Internal error', 'Please resend your message');
+                msgDialog(
+                    'warningb',
+                    l[16], // Internal error
+                    l[7883] // There was an error trying to send your message. Please try to resend it.
+                );
             }
         });
         return false;

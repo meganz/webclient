@@ -2827,7 +2827,15 @@
     "7867": "Nakupi znotraj aplikacij so onemogo\u010deni, prosim omogo\u010dite jih v iOS nastavitvah",
     "7868": "Nalo\u017ei",
     "7869": "Ta e-po\u0161tni naslov je \u017ee bil registriran. Prosim, izberite drug e-po\u0161tni naslov za nadaljevanje.",
-    "7873": "You can download the extension (v%1) below.",
-    "7874": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-    "7875": "Your extension (v%1) is up to date."
+    "7870": "Delitev zapu\u0161\u010dena",
+    "7871": "Delitve zapu\u0161\u010dene",
+    "7872": "Dostop do vseh map, deljenih z vami s strani izbranih [X], bo izgubljen.",
+    "7873": "Spodaj lahko prevzamete dodatek (v%1).",
+    "7874": "Kot ka\u017ee, je va\u0161 trenutni dodatek (v%1) \u017ee zastarel. Spodaj lahko prevzamete zadnjo verzijo (v%2).",
+    "7875": "Va\u0161 dodatek (v%1) je zadnje verzije.",
+    "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
+    "7882": "Message sent",
+    "7883": "There was an error trying to send your message. Please try to resend it.",
+    "7884": "Message too short",
+    "7885": "Your message needs to be at least %d letters long."
 }

@@ -11,6 +11,7 @@
 }
 .chat-content-block {
 	height: 100%;
+    position:relative;
 }
 .chat-right-area {
 	width: 256px;

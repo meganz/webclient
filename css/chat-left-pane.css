@@ -52,7 +52,7 @@
 	background-color: white;
 	border-color: white;
 }
-.unread-messages, .call-duration {
+.unread-messages {
 	position: absolute;
 	right: 12px;
 	text-align: center;
@@ -72,8 +72,21 @@
 	margin: 2px 0 0 0;
 }
 .call-duration {
-	background-color: white;
-	text-align: left;
-	color: #2BA6DE;
-	padding: 0 6px 0 5px;
+	position: absolute;
+	right: 12px;
+    margin: -3px 0 0 0;
+    font-size:20px;
+    line-height:25px;
+    color: white;
+    font-family: 'source_sans_prolight';
+}
+.call-duration span, .call-duration i {
+    vertical-align: top;
+}
+.call-duration i {
+    vertical-align: top;
+    margin: 4px 6px 0 0;
+}
+.call-duration + .conversation-message {
+    margin-right: 100px;
 }

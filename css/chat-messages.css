@@ -20,6 +20,9 @@
 	background: -ms-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
 	background: linear-gradient(to bottom, #fafafa 0%, #eeeeee 100%);
 }
+.messages-block.small-block {
+    height: 240px;
+}
 .messages.scroll-area {
 	position: relative;
 	height: 100%;

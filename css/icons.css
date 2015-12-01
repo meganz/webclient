@@ -1,4 +1,4 @@
-.tiny-icon, .small-icon, .medium-icon {
+.tiny-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon {
 	width: 20px;
 	height: 20px;
 	background-image: url(../images/mega/new-chat-sprite.svg);
@@ -42,6 +42,14 @@
 	width: 28px;
 	height: 28px;
 }
+.semi-big-icon, .small-block .big-icon {
+    width: 32px;
+    height: 32px;
+}
+.big-icon {
+    width: 48px;
+    height: 48px;
+}
 .white-medium-plus {
 	background-position: -2px -1447px;
 }
@@ -56,6 +64,12 @@
 }
 .tiny-icon.grey-down-arrow {
 	background-position: -8px 4px;
+}
+.tiny-icon.grey-minus-icon {
+    background-position: -11px -3609px;
+}
+.tiny-icon.grey-plus-icon, .minimized .tiny-icon.grey-minus-icon {
+    background-position: -51px -3609px;
 }
 .small-icon.audio-call {
 	background-position: -4px -38px;
@@ -128,6 +142,12 @@
     height: 22px;
     
 }
+.small-icon.white-videocam {
+    background-position: -102px -3267px;
+}
+.small-icon.white-microphone {
+    background-position: -28px -3268px;
+}
 .small-icon.clock-icon {
     background-position: -2px -3200px;
 }
@@ -152,7 +172,6 @@
 .small-icon.percents-icon {
     background-position: -212px -3200px;
 }
-
 .square-button.active .small-icon.clock-icon {
     background-position: -2px -3230px;
 }
@@ -318,4 +337,59 @@
 }
 .shared-link.small-icon.youtube {
 	background-position: -14px -40px;
+}
+
+.semi-big-icon.conversations, .small-block .big-icon.conversations {
+    background-position: -161px -3386px;
+}
+.semi-big-icon.conversations-blue, .button.unread .semi-big-icon.conversations, .small-block .big-icon.conversations-blue, .small-block .button.unread .big-icon.conversations {
+    background-position: -201px -3386px;
+}
+.semi-big-icon.microphone, .small-block  .big-icon.microphone{
+    background-position: -161px -3317px;
+}
+.semi-big-icon.crossed-microphone, .button.active .semi-big-icon.microphone, .small-block .big-icon.crossed-microphone, .small-block .button.active .big-icon.microphone {
+   background-position: -201px -3317px;
+}
+.semi-big-icon.videocam, .small-block .big-icon.videocam {
+        background-position: -161px -3446px;
+}
+.semi-big-icon.crossed-videocam, .button.active .semi-big-icon.videocam, .small-block .big-icon.crossed-videocam, .small-block .button.active .big-icon.videocam {
+        background-position: -201px -3446px;
+}
+.semi-big-icon.horizontal-red-handset, .small-block  .big-icon.horizontal-red-handset {
+    background-position: -161px -3494px;
+}
+.semi-big-icon.nwse-resize, .small-block .big-icon.nwse-resize {
+    background-position: -200px -3549px;
+}
+.semi-big-icon.nwse-inset-resize, .button.active .semi-big-icon.nwse-resize, .small-block .big-icon.nwse-inset-resize, .small-block .button.active .big-icon.nwse-resize {
+    background-position: -160px -3549px;
+}
+.big-icon.conversations {
+    background-position: -17px -3375px;
+}
+.big-icon.conversations-blue, .button.unread .big-icon.conversations {
+    background-position: -87px -3375px;
+}
+.big-icon.microphone{
+    background-position: -17px -3305px;
+}
+.big-icon.crossed-microphone, .button.active .big-icon.microphone {
+   background-position: -87px -3306px;
+}
+.big-icon.videocam {
+         background-position: -19px -3435px;
+}
+.big-icon.crossed-videocam, .button.active .big-icon.videocam {
+        background-position: -89px -3435px;
+}
+.big-icon.horizontal-red-handset {
+    background-position: -19px -3485px;
+}
+.big-icon.nwse-resize {
+    background-position: -84px -3537px;
+}
+.big-icon.nwse-inset-resize, .button.active .big-icon.nwse-resize {
+    background-position: -14px -3537px;
 }

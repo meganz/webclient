@@ -26,7 +26,7 @@
 }
 .conversation-message {
 	font-size: 13px;
-	line-height: 21px;
+	line-height: 16px;
 	color: #777777;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
@@ -69,7 +69,7 @@
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	margin: 2px 0 0 0;
+	margin: -1px 0 0 0;
 }
 .call-duration {
 	position: absolute;

@@ -2827,7 +2827,15 @@
     "7867": "\uc778\uc571 \uacb0\uc81c\uac00 \ud574\uc81c\ub418\uc5c8\uc2b5\ub2c8\ub2e4. iOS \uc124\uc815\uc5d0\uc11c \ud65c\uc131\ud654 \ud574\uc8fc\uc138\uc694.",
     "7868": "\uc5c5\ub85c\ub4dc",
     "7869": "\uc774 \uc774\uba54\uc77c \uc8fc\uc18c\ub294 \uc774\ubbf8 \ub4f1\ub85d\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \uc9c4\ud589\ud558\ub824\uba74 \ub2e4\ub978 \uc774\uba54\uc77c \uc8fc\uc18c\ub97c \uc120\ud0dd\ud558\uc138\uc694.",
-    "7873": "You can download the extension (v%1) below.",
-    "7874": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-    "7875": "Your extension (v%1) is up to date."
+    "7870": "\uacf5\uc720 \ub5a0\ub0a8",
+    "7871": "\uacf5\uc720 \ub5a0\ub0a8",
+    "7872": "Access to any folders shared with you by selected [X] will be lost.",
+    "7873": "\ud655\uc7a5 \ud504\ub85c\uadf8\ub7a8 (v%1)\ub97c \uc544\ub798\uc5d0\uc11c \ubc1b\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
+    "7874": "\ud604\uc7ac \ud655\uc7a5 \ud504\ub85c\uadf8\ub7a8 (v%1)\uc774 \uc624\ub798\ub41c \ubc84\uc804\uc785\ub2c8\ub2e4. \ucd5c\uc2e0 \ubc84\uc804 (v%2)\ub97c \uc544\ub798\uc5d0\uc11c \ubc1b\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
+    "7875": "\ud655\uc7a5 \ud504\ub85c\uadf8\ub7a8 (v%1)\uc774 \ucd5c\uc2e0 \uc0c1\ud0dc\uc785\ub2c8\ub2e4.",
+    "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
+    "7882": "Message sent",
+    "7883": "There was an error trying to send your message. Please try to resend it.",
+    "7884": "Message too short",
+    "7885": "Your message needs to be at least %d letters long."
 }

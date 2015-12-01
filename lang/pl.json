@@ -2827,7 +2827,15 @@
     "7867": "Zakupy w aplikacji s\u0105 zablokowane, odblokuj w ustawieniach telefonu.",
     "7868": "Wgrywane",
     "7869": "Adres email zosta\u0142 ju\u017c zarejestrowany. Prosz\u0119 u\u017cy\u0107 innego adresu email aby kontynuowa\u0107.",
-    "7873": "You can download the extension (v%1) below.",
-    "7874": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-    "7875": "Your extension (v%1) is up to date."
+    "7870": "Pozostawione",
+    "7871": "Pozostawione",
+    "7872": "Dost\u0119p do udost\u0119pnionych katalog\u00f3w dla wybranych kontakt\u00f3w [X] zostanie utracony.",
+    "7873": "Poni\u017cej mo\u017cesz pobra\u0107 nowe rozszerzenie (v%1).",
+    "7874": "Wygl\u0105da na to, \u017ce Twoje rozszerzenie (v%1) jest nieaktualne. Mo\u017cesz pobra\u0107 najnowsz\u0105 wersj\u0119 (v%2) poni\u017cej.",
+    "7875": "Twoje rozszerzenie (v%1) jest aktualne.",
+    "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
+    "7882": "Message sent",
+    "7883": "There was an error trying to send your message. Please try to resend it.",
+    "7884": "Message too short",
+    "7885": "Your message needs to be at least %d letters long."
 }

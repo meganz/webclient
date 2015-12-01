@@ -2815,7 +2815,7 @@
     "7855": "[A] datoteka i [B] mapa kopirano",
     "7856": "Da li ste sigurni da \u017eelite premjestiti [A] datoteka i [B] mapa u Ko\u0161 za sme\u0107e?",
     "7857": "Podijeljeno sa %d kontakata",
-    "7858": "Remove sharing",
+    "7858": "Ukloni dijeljenje",
     "7859": "Da li ste sigurni da \u017eelite ukloniti ovo dijeljenje? (Podijeljeno sa 1 kontaktom)",
     "7860": "Da li ste sigurni da \u017eelite ukloniti ovo dijeljenje? (Podijeljeno sa %d kontakata)",
     "7861": "Da li ste sigurni da \u017eelite ukloniti ova dijeljenja? (Podijeljeno sa %d kontakata)",
@@ -2827,7 +2827,15 @@
     "7867": "Kupnja unutar aplikacije je onemogu\u0107ena, molimo omogu\u0107ite u iOS postakvama",
     "7868": "U\u010ditavanja",
     "7869": "Ova email adresa je ve\u0107 registrirana. Molimo odaberite alternativnu email adresu za nastavak.",
-    "7873": "You can download the extension (v%1) below.",
-    "7874": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-    "7875": "Your extension (v%1) is up to date."
+    "7870": "Dijeljenje napu\u0161teno",
+    "7871": "Dijeljenje napu\u0161teno",
+    "7872": "Pristup svim mapama podijeljenih s Vama biti \u0107e izgubljeni ako odaberete [X].",
+    "7873": "Mo\u017eete preuzeti dodatak (v%1) ispod.",
+    "7874": "\u010cini se kako Va\u0161 trenutni dodatak (v%1) nije a\u017euriran. Mo\u017eete preuzeti posljednju nadogradnju (v%2) ispod.",
+    "7875": "Va\u0161 dodatak (v%1) je a\u017euriran.",
+    "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
+    "7882": "Message sent",
+    "7883": "There was an error trying to send your message. Please try to resend it.",
+    "7884": "Message too short",
+    "7885": "Your message needs to be at least %d letters long."
 }

@@ -11189,7 +11189,7 @@
     },
     "7751": {
         "text": "Request accepted",
-        "context": "Success message shown when you acepted a contact request"
+        "context": "Success message shown when you accepted a contact request"
     },
     "7752": {
         "text": "Request cancelled",
@@ -11311,6 +11311,18 @@
         "text": "This email address has already been registered. Please choose an alternative email address to proceed.",
         "context": "A message in an error dialog when the user is trying to change email address. It informs the user that the new email address they entered is already in use and that they must enter a different one."
     },
+    "7870": {
+        "text": "Share left",
+        "context": "Message shown when a share has been left. This is the confirmation message when the user has left the share."
+    },
+    "7871": {
+        "text": "Shares left",
+        "context": "Message shown when some shares have been left.This is the confirmation message when the user has left some shares."
+    },
+    "7872": {
+        "text": "Access to any folders shared with you by selected [X] will be lost.",
+        "context": "This is shown on a confirmation message dialog when removing one or more contacts. The placeholder [X] will be replaced with \"contact\" or \"contacts\" depending on how many contacts are being removed."
+    },
     "7873": {
         "text": "You can download the extension (v%1) below.",
         "context": "This text is on the Chrome or Firefox extension pages and tells the user they can download a specific version of the extension further down the page. The placeholder %1 will be replaced with the version of the extension e.g. \"3.2.8\". So the text would read \"You can download the extension (v3.2.8) below.\""
@@ -11322,5 +11334,25 @@
     "7875": {
         "text": "Your extension (v%1) is up to date.",
         "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
+    },
+    "7881": {
+        "text": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
+        "context": "Message when a given user contacts our support team and the message has been send with success."
+    },
+    "7882": {
+        "text": "Message sent",
+        "context": "Dialog title, when a given support message has been sent to support."
+    },
+    "7883": {
+        "text": "There was an error trying to send your message. Please try to resend it.",
+        "context": "Support page: sending the email failed for some reason"
+    },
+    "7884": {
+        "text": "Message too short",
+        "context": "Support Page: Dialog title - Error message when a message is too short."
+    },
+    "7885": {
+        "text": "Your message needs to be at least %d letters long.",
+        "context": "Error message when a Support message is too short. %d is the placeholder and needs to be keep that way."
     }
 }

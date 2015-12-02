@@ -52,11 +52,11 @@
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
-    webkit-transition: bottom 300ms ease-in-out;
-    -moz-transition: bottom 300ms ease-in-out;
-    -o-transition: bottom 300ms ease-in-out;
+    webkit-transition: bottom 400ms ease-in-out;
+    -moz-transition: bottom 400ms ease-in-out;
+    -o-transition: bottom 400ms ease-in-out;
     -ms-transition: bottom 300ms ease-in-out;
-    transition: bottom 300ms ease-in-out;
+    transition: bottom 400ms ease-in-out;
 }
 .call.local-video.visible-panel, .call.local-audio.visible-panel {
     bottom: 80px;
@@ -110,11 +110,11 @@
     bottom: -72px;
     z-index: 10;
     background-color: rgba(0,0,0,0.9);
-    webkit-transition: all 300ms ease-in-out;
-    -moz-transition: all 300ms ease-in-out;
-    -o-transition: all 300ms ease-in-out;
-    -ms-transition: all 300ms ease-in-out;
-    transition: all 300ms ease-in-out;
+    webkit-transition: all 400ms ease-in-out;
+    -moz-transition: all 400ms ease-in-out;
+    -o-transition: all 400ms ease-in-out;
+    -ms-transition: all 400ms ease-in-out;
+    transition: all 400ms ease-in-out;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
@@ -147,6 +147,7 @@
     margin: 13px 24px 0 24px;
     text-align: center;
     vertical-align: top;
+    position:relative;
 }
 .call.button.hidden {
     display: none;
@@ -157,9 +158,13 @@
     margin: 9px 18px 0 18px;
 }
 .call.button.left {
+    position:absolute;
+    left: 0;
     margin-left: 12px;
 }
 .call.button.right {
+    position:absolute;
+    right: 0;
     margin-right: 12px;
 }
 .small-block .call.button.left {
@@ -202,4 +207,20 @@
     top: 50%;
     margin: -150px 0 0 -150px;
     z-index: 9;
+}
+.call.top-panel .call-duration {
+    display: inline-block;
+    position: static;
+    margin: 8px 0 0 0;
+}
+.call.top-user-info {
+    position:absolute;
+    margin: 14px 0 0 12px;
+}
+.call.top-user-info i {
+    margin:0 0 0 10px;
+}
+.call.button .unread-messages {
+    left: 32px;
+    margin: -3px 0 0 0;
 }

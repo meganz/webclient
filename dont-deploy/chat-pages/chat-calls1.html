@@ -35,7 +35,7 @@
             var $this = $(this);
             $('.call.bottom-panel, .call.local-video, .call.local-audio').removeClass('visible-panel');
             if ($this.hasClass('full-sized-block')) {
-                $('.call.top-panel').addClass('visible-panel');
+                $('.call.top-panel').removeClass('visible-panel');
             }
         })
         
@@ -55,7 +55,7 @@
                 $('.call.bottom-panel, .call.local-video, .call.local-audio').removeClass('visible-panel');
                 $('.call-block').addClass('no-cursor');
                 if ($this.hasClass('full-sized-block')) {
-                    $('.call.top-panel').addClass('visible-panel');
+                    $('.call.top-panel').removeClass('visible-panel');
                 }
                 forceMouseHide = true;
                 setTimeout(function() {
@@ -240,6 +240,14 @@
                      <div class="call semi-big-avatar color6">B</div>
                 </div>
                 
+                <!-- Call Top Panel. Please add "visible-panel" classname when top panel should be displayed. !-->
+                <div class="call top-panel">
+                    <div class="call top-user-info">
+                        <span class="user-card-name white">Bruce Schneier</span><i class="small-icon blue-videocam"></i>
+                    </div>
+                    <div class="call-duration medium blue">00:02</div>
+                </div>
+                
                 <!-- Call Bottom Panel. Please add "visible-panel" classname if bottom panel is visible. !-->
                 <div class="call bottom-panel">
                     <!-- 
@@ -247,22 +255,22 @@
                             Please add "hidden" classname for full-screen mode.
                     !-->
                     <div class="button call left">
-                        <i class="semi-big-icon conversations"></i>
+                        <i class="big-icon conversations"></i>
                     </div>
                     <!-- Please add "active" classname to switch off audio. Or change icon classname on "crossed-microphone" !-->
-                    <div class="button call active">
-                        <i class="semi-big-icon microphone"></i>
+                    <div class="button call">
+                        <i class="big-icon microphone"></i>
                     </div>
                     <!-- Please add "active" classname to switch off audio. Or change icon classname on "crossed-videocam" !-->
                     <div class="button call">
-                        <i class="semi-big-icon videocam"></i>
+                        <i class="big-icon videocam"></i>
                     </div>
                     <div class="button call">
-                        <i class="semi-big-icon horizontal-red-handset"></i>
+                        <i class="big-icon horizontal-red-handset"></i>
                     </div>
                     <!-- Please add "active" classname to switch off audio. Or change icon classname on "nwse-inset-resize" !-->
                     <div class="button call right">
-                        <i class="semi-big-icon nwse-resize"></i>
+                        <i class="big-icon nwse-resize"></i>
                     </div>
                 </div>
                 <!-- End of Call Bottom Panel. !-->

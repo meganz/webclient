@@ -35,7 +35,7 @@
             var $this = $(this);
             $('.call.bottom-panel, .call.local-video, .call.local-audio').removeClass('visible-panel');
             if ($this.hasClass('full-sized-block')) {
-                $('.call.top-panel').addClass('visible-panel');
+                $('.call.top-panel').removeClass('visible-panel');
             }
         })
         
@@ -55,7 +55,7 @@
                 $('.call.bottom-panel, .call.local-video, .call.local-audio').removeClass('visible-panel');
                 $('.call-block').addClass('no-cursor');
                 if ($this.hasClass('full-sized-block')) {
-                    $('.call.top-panel').addClass('visible-panel');
+                    $('.call.top-panel').removeClass('visible-panel');
                 }
                 forceMouseHide = true;
                 setTimeout(function() {
@@ -238,6 +238,14 @@
                         <i class="tiny-icon grey-minus-icon"></i>
                     </div>
                      <div class="call semi-big-avatar color6">B</div>
+                </div>
+                
+                <!-- Call Top Panel. Please add "visible-panel" classname when top panel should be displayed. !-->
+                <div class="call top-panel">
+                    <div class="call top-user-info">
+                        <span class="user-card-name white">Bruce Schneier</span><i class="small-icon blue-videocam"></i>
+                    </div>
+                    <div class="call-duration medium blue">00:02</div>
                 </div>
                 
                 <!-- Call Bottom Panel. Please add "visible-panel" classname when bottom panel should be displayed. !-->

@@ -80,6 +80,13 @@
     color: white;
     font-family: 'source_sans_prolight';
 }
+.call-duration.blue {
+    color: #61D2FF;
+}
+.call-duration.medium {
+    font-size:24px;
+    line-height:31px;
+}
 .call-duration span, .call-duration i {
     vertical-align: top;
 }

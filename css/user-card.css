@@ -57,6 +57,9 @@
 	box-sizing: border-box;
 	position: relative;
 }
+.user-card-name.white {
+    color: white;
+}
 .user-card-email {
 	font-size: 13px;
 	line-height: 16px;

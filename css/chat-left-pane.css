@@ -26,7 +26,7 @@
 }
 .conversation-message {
 	font-size: 13px;
-	line-height: 21px;
+	line-height: 16px;
 	color: #777777;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
@@ -52,7 +52,7 @@
 	background-color: white;
 	border-color: white;
 }
-.unread-messages, .call-duration {
+.unread-messages {
 	position: absolute;
 	right: 12px;
 	text-align: center;
@@ -69,11 +69,31 @@
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	margin: 2px 0 0 0;
+	margin: -1px 0 0 0;
 }
 .call-duration {
-	background-color: white;
-	text-align: left;
-	color: #2BA6DE;
-	padding: 0 6px 0 5px;
+	position: absolute;
+	right: 12px;
+    margin: -6px 0 0 0;
+    font-size:20px;
+    line-height:25px;
+    color: white;
+    font-family: 'source_sans_prolight';
+}
+.call-duration.blue {
+    color: #61D2FF;
+}
+.call-duration.medium {
+    font-size:24px;
+    line-height:31px;
+}
+.call-duration span, .call-duration i {
+    vertical-align: top;
+}
+.call-duration i {
+    vertical-align: top;
+    margin: 4px 6px 0 0;
+}
+.call-duration + .conversation-message {
+    margin-right: 100px;
 }

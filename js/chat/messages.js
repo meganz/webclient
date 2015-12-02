@@ -437,7 +437,9 @@ MessagesBuff.prototype.setLastReceived = function(msgId) {
 
         self.lastDelivered = msgId;
         if (!self.isRetrievingHistory) {
-            self.chatdInt.markMessageAsReceived(self.chatRoom, msgId);
+            if (targetMsg.userId !== u_handle) {
+                self.chatdInt.markMessageAsReceived(self.chatRoom, msgId);
+            }
         }
 
         self.trackDataChange();

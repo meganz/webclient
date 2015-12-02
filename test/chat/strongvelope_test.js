@@ -97,11 +97,16 @@ describe("chat.strongvelope unit test", function() {
         includeParticipants: [],
         excludeParticipants: []
     };
-    var PARTICIPANT_CHANGE_MESSAGE_BIN = atob('AAEAAEBBh/ndnYVhfhamD/l1yph0/ufuZhDU/yn/sOP3l3sqrV3bb8QiJX38OeDJAEWoYZV0IcuP8EbDNXKT1mxJftEPAgAAAQIDAAAM71BrlkBJXmR5xRtMBAAACJYp6Oeu/PccBQAAENp0rdw/Yf2dfMwY6xCJi3QGAAAIQUkAAUFJAAAHAAAGH78adfMY');
+    var PARTICIPANT_CHANGE_MESSAGE_BIN = atob('AAEAAEBBh/ndnYVhfhamD/l1yph0/uf'
+            + 'uZhDU/yn/sOP3l3sqrV3bb8QiJX38OeDJAEWoYZV0IcuP8EbDNXKT1mxJftEPAg'
+            + 'AAAQIDAAAM71BrlkBJXmR5xRtMBAAACJYp6Oeu/PccBQAAENp0rdw/Yf2dfMwY6'
+            + 'xCJi3QGAAAIQUkAAUFJAAAHAAAGH78adfMY');
     var PARTICIPANT_CHANGE_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('QYf53Z2FYX4Wpg/5dcqYdP7n7mYQ1P8p/7Dj95d7Kq1d22/EIiV9/DngyQBFqGGVdCHLj/BGwzVyk9ZsSX7RDw=='),
-        signedContent: atob('AgAAAQIDAAAM71BrlkBJXmR5xRtMBAAACJYp6Oeu/PccBQAAENp0rdw/Yf2dfMwY6xCJi3QGAAAIQUkAAUFJAAAHAAAGH78adfMY'),
+        signature:  atob('QYf53Z2FYX4Wpg/5dcqYdP7n7mYQ1P8p/7Dj95d7Kq1d22/EIiV9'
+            + '/DngyQBFqGGVdCHLj/BGwzVyk9ZsSX7RDw=='),
+        signedContent: atob('AgAAAQIDAAAM71BrlkBJXmR5xRtMBAAACJYp6Oeu/PccBQAAE'
+            + 'Np0rdw/Yf2dfMwY6xCJi3QGAAAIQUkAAUFJAAAHAAAGH78adfMY'),
         type: 0x02,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['lino56789xw'],

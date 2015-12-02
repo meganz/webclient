@@ -120,7 +120,7 @@
     -khtml-opacity: 0;
     opacity: 0;
 }
-.small-block .call.bottom-panel {
+.small-block .call.bottom-panel, .small-block.call.bottom-panel {
     height: 48px;
     bottom: -48px;
 }

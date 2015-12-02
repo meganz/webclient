@@ -16837,6 +16837,26 @@ span.browsers-update {
 	margin: 30px auto -26px auto;
 	width: 700px;
 }
+.chrome-version-info {
+    color: #e64a4d;
+    display: block;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 20px;
+    margin-top: 10px;
+    text-align: center;
+}
+.firefox-version-info {
+    color: #e64a4d;
+    display: block;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 20px;
+    margin-bottom: 20px;
+}
+a.manual-install-link {
+    font-family: 'Open Sans Semibold Italic', Arial;
+}
 .chrome-app-button.new-app {
 	background-image: url(../images/mega/chrome-app1.png);
 	background-repeat: no-repeat;
@@ -16933,6 +16953,23 @@ span.browsers-update {
 	line-height: 21px;
 	color: #3F4646;
 	padding: 14px 0 0 0;
+}
+.chrome-warning {
+    margin-top: 14px;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+.chrome-warning-hover {
+    background-color: #d32600;
+    border-radius: 15px;
+    color: #fff;
+    display: inline-block;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.chrome-warning-hover a.red {
+    color: #fff;
+    font-weight: bold;
 }
 .sync-bottom-txt.linux {
 	text-align: left;

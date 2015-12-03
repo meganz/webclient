@@ -88,7 +88,34 @@ var JScrollPane = React.createClass({
     }
 });
 
+/**
+ * A trick copied from http://jamesknelson.com/rendering-react-components-to-the-document-body/
+ * so that we can render Dialogs into the body or other child element, different then the current component's child.
+ */
+var RenderTo = React.createClass({
+    componentDidMount: function() {
+        this.popup = document.createElement("div");
+        this.props.element.appendChild(this.popup);
+        this._renderLayer();
+    },
+    componentDidUpdate: function() {
+        this._renderLayer();
+    },
+    componentWillUnmount: function() {
+        ReactDOM.unmountComponentAtNode(this.popup);
+        this.props.element.removeChild(this.popup);
+    },
+    _renderLayer: function() {
+        ReactDOM.render(this.props.children, this.popup);
+    },
+    render: function() {
+        // Render a placeholder
+        return null;
+    }
+
+});
 
 module.exports = {
-    JScrollPane
+    JScrollPane,
+    RenderTo
 };

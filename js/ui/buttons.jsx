@@ -13,6 +13,8 @@ var Button = React.createClass({
         return {'focused': false};
     },
     componentWillUpdate: function(nextProps, nextState) {
+        var self = this;
+
         if (nextProps.disabled === true && nextState.focused === true) {
             nextState.focused = false;
         }
@@ -20,6 +22,12 @@ var Button = React.createClass({
         if (this.state.focused != nextState.focused && nextState.focused === true) {
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
             document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
+
+            $(document).rebind('keyup.button' + self.megaInstanceId, function(e) {
+                if (e.keyCode == 27) { // escape key maps to keycode `27`
+                    self.onBlur();
+                }
+            });
 
             // change the focused state to any other buttons in this group
             if (this.props.group) {
@@ -49,6 +57,7 @@ var Button = React.createClass({
             (!e || !$(e.target).parents(".button").is($element))
         ) {
             this.setState({focused: false});
+            $(document).unbind('keyup.button' + this.megaInstanceId);
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         }
 

@@ -5,6 +5,7 @@ var utils = require('./../../ui/utils.jsx');
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
 var ButtonsUI = require('./../../ui/buttons.jsx');
+var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationsUI = require('./../ui/conversations.jsx');
@@ -432,7 +433,8 @@ var ConversationPanel = React.createClass({
             isFullscreenModeEnabled: false,
             mouseOverDuringCall: false,
             typedMessage: "",
-            currentlyTyping: []
+            currentlyTyping: [],
+            attachCloudDialog: false
         };
     },
 
@@ -1234,15 +1236,39 @@ var ConversationPanel = React.createClass({
             // don't do anything.
         }
 
+        var attachCloudDialog = null;
+        if (self.state.attachCloudDialog === true) {
+            attachCloudDialog = <ModalDialogsUI.ModalDialog
+                title={__("Add from your Cloud Drive")}
+                className="add-from-cloud"
+                onClose={(modalDialog) => {
+                    self.setState({'attachCloudDialog': false});
+                }}
+                buttons={[
+                        {
+                            "label": __("Attach"),
+                            "key": "attach",
+                            "onClick": function() {}
+                        },
+                        {
+                            "label": __("Cancel"),
+                            "key": "cancel",
+                            "onClick": function() {}
+                        },
+                ]} />;
+        }
+
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove} data-room-jid={self.props.chatRoom.roomJid.split("@")[0]}>
-                <ConversationRightArea
-                    chatRoom={this.props.chatRoom}
-                    contacts={self.props.contacts}
-                    megaChat={this.props.chatRoom.megaChat}
+                <div className="chat-content-block">
+                    <ConversationRightArea
+                        chatRoom={this.props.chatRoom}
+                        contacts={self.props.contacts}
+                        megaChat={this.props.chatRoom.megaChat}
                     />
 
-                <div className="chat-content-block">
+                    {attachCloudDialog}
+
                     <div className="messages-block">
                         <div className="messages scroll-area">
                             <utils.JScrollPane options={{
@@ -1277,14 +1303,24 @@ var ConversationPanel = React.createClass({
                                             />
                                     </ButtonsUI.Button>
 
-                                    <div className="button popup-button">
-                                        <i className="small-icon grey-medium-plus"></i>
-                                    </div>
+                                    <ButtonsUI.Button
+                                        className="popup-button"
+                                        icon="small-icon grey-medium-plus">
+                                        <DropdownsUI.Dropdown
+                                            className="wide-dropdown attach-to-chat-popup">
+                                            <DropdownsUI.DropdownItem
+                                                icon="grey-cloud" label={__("Add from your Cloud")}
+                                                onClick={(e) => {
+                                                    self.setState({'attachCloudDialog': true});
+                                            }}>
+                                            </DropdownsUI.DropdownItem>
+                                        </DropdownsUI.Dropdown>
+                                    </ButtonsUI.Button>
                                 </div>
                                 <div className="chat-textarea-scroll">
                                     <textarea
                                         className={messageTextAreaClasses}
-                                        placeholder="Write a message..."
+                                        placeholder={__("Write a message...")}
                                         onKeyDown={self.onTypeAreaKeyDown}
                                         onBlur={self.onTypeAreaBlur}
                                         onChange={self.onTypeAreaChange}

@@ -32,8 +32,12 @@ var _propertyTrackChangesVars = {
 };
 window._propertyTrackChangesVars = _propertyTrackChangesVars;
 
+var instanceId = 0;
+
 var MegaRenderMixin = {
     componentDidMount: function() {
+        this.megaInstanceId = instanceId++;
+
         window.addEventListener('resize', this.onResizeDoUpdate);
         window.addEventListener('hashchange', this.onHashChangeDoUpdate);
 

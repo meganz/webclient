@@ -166,6 +166,27 @@ var DropdownContactsSelector = React.createClass({
 
 var DropdownItem = React.createClass({
     mixins: [MegaRenderMixin],
+    getInitialState: function() {
+        return {'isClicked': false}
+    },
+    renderChildren: function () {
+        var self = this;
+        return React.Children.map(this.props.children, function (child) {
+            return React.cloneElement(child, {
+                active: self.state.isClicked
+            });
+        }.bind(this))
+    },
+    onClick: function(e) {
+        var self = this;
+
+        if (this.props.children) {
+            self.setState({'isClicked': !self.state.isClicked});
+
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    },
     render: function() {
         var self = this;
 
@@ -178,13 +199,19 @@ var DropdownItem = React.createClass({
             label = this.props.label;
         }
 
+        var child = null;
+
+        child = <div>
+                {self.renderChildren()}
+            </div>;
 
         return <div
-                    className={"dropdown-item " + this.props.className}
-                    onClick={this.props.onClick ? this.props.onClick : () => {}}
+                    className={"dropdown-item " + self.props.className}
+                    onClick={self.props.onClick ? self.props.onClick : self.onClick}
                 >
                     {icon}
                     {label}
+                    {child}
                 </div>;
     }
 });

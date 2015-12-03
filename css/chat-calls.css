@@ -3,7 +3,7 @@
     height: 100%;
     background-color: #111111;
     text-align: center;
-    position: relative;
+    position: absolute;
     overflow: hidden;
     z-index: 10;
 }
@@ -17,6 +17,7 @@
     height: -webkit-calc(100% -240px);
     height: -moz-calc(100% - 240px);
     height: calc(100% - 240px);
+    position:relative;
 }
 .call-block.full-sized-block {
     position: fixed;
@@ -172,6 +173,9 @@
 }
 .small-block .call.button.right {
     margin-right: 15px;
+}
+.full-sized-block  .call.button.left {
+    display: none;
 }
 .call.button i {
     webkit-transition: opacity 200ms ease-in-out;

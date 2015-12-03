@@ -2833,9 +2833,9 @@
     "7873": "Spodaj lahko prevzamete dodatek (v%1).",
     "7874": "Kot ka\u017ee, je va\u0161 trenutni dodatek (v%1) \u017ee zastarel. Spodaj lahko prevzamete zadnjo verzijo (v%2).",
     "7875": "Va\u0161 dodatek (v%1) je zadnje verzije.",
-    "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
-    "7882": "Message sent",
-    "7883": "There was an error trying to send your message. Please try to resend it.",
-    "7884": "Message too short",
-    "7885": "Your message needs to be at least %d letters long."
+    "7881": "Najlep\u0161a hvala! Nekdo od na\u0161ih podpornikov bo odgovoril na va\u0161o poizvedbo v najkraj\u0161em mo\u017enem \u010dasu.",
+    "7882": "Sporo\u010dilo poslano",
+    "7883": "Pri\u0161lo je do napake pri po\u0161iljanju va\u0161ega sporo\u010dila. Prosim, poskusite poslati ponovno.",
+    "7884": "Sporo\u010dilo je prekratko",
+    "7885": "Va\u0161e sporo\u010dilo mora biti dolgo vsaj %d znakov."
 }

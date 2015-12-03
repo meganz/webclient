@@ -1238,24 +1238,20 @@ var ConversationPanel = React.createClass({
 
         var attachCloudDialog = null;
         if (self.state.attachCloudDialog === true) {
-            attachCloudDialog = <ModalDialogsUI.ModalDialog
-                title={__("Add from your Cloud Drive")}
-                className="add-from-cloud"
-                onClose={(modalDialog) => {
+            var selected = [];
+            attachCloudDialog = <ModalDialogsUI.CloudBrowserDialog
+                onClose={() => {
                     self.setState({'attachCloudDialog': false});
+                    selected = [];
                 }}
-                buttons={[
-                        {
-                            "label": __("Attach"),
-                            "key": "attach",
-                            "onClick": function() {}
-                        },
-                        {
-                            "label": __("Cancel"),
-                            "key": "cancel",
-                            "onClick": function() {}
-                        },
-                ]} />;
+                onSelected={(nodes) => {
+                    selected = nodes;
+                }}
+                onAttachClicked={() => {
+                    self.setState({'attachCloudDialog': false});
+                    console.error("Selected for attaching: ", selected);
+                }}
+            />
         }
 
         return (

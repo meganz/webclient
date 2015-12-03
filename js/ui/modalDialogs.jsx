@@ -32,40 +32,20 @@ var ModalDialog = React.createClass({
     },
     componentWillUnmount: function() {
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+        $(document).unbind('keyup.modalDialog' + this.megaInstanceId);
         $(document.body).removeClass('overlayed');
-    },
-    componentDidUpdate: function() {
-        var self = this;
-
-
-        if(this.getOwnerElement()) {
-            var $element = $(ReactDOM.findDOMNode(this));
-            var parentDomNode = $element.parents('.button');
-            var positionToElement = parentDomNode;
-            var offsetLeft = 0;
-            var $container = $element.parents('.jspPane:first');
-
-            if($container.size() == 0) {
-                $container = $(document.body);
-            }
-
-            $element.css('margin-left','');
-            $element.position({
-                of: positionToElement,
-                my: self.props.positionMy ? self.props.positionMy : "center center",
-                at: self.props.positionAt ? self.props.positionAt : "center center",
-                collision: "flip flip",
-                within: $container
-            });
-        }
     },
     onCloseClicked: function(e) {
         var self = this;
-        $(document).unbind('keyup.modalDialog' + self.megaInstanceId);
 
         if (self.props.onClose) {
             self.props.onClose(self);
         }
+    },
+    renderChildren: function () {
+        return React.Children.map(this.props.children, function (child) {
+            return React.cloneElement(child, {});
+        }.bind(this))
     },
     render: function() {
         var self = this;
@@ -85,12 +65,13 @@ var ModalDialog = React.createClass({
             };
         }
 
-        var buttons = [];
+        var footer = null;
 
         if(self.props.buttons) {
+            var buttons = [];
             self.props.buttons.forEach(function(v) {
                 buttons.push(
-                    <a href="" className="default-white-button right" onClick={(e) => {
+                    <a href="javascript:;" className={"default-white-button right" + (v.className ? " " + v.className : "")} onClick={(e) => {
                         if (v.onClick) {
                             v.onClick(e, self);
                         }
@@ -99,82 +80,302 @@ var ModalDialog = React.createClass({
                     </a>
                 );
             })
+
+            footer = <div className="fm-dialog-footer">
+                {buttons}
+                <div className="clear"></div>
+            </div>;
         }
 
         return (
             <utils.RenderTo element={document.body}>
-                <div>
-                    <div className={classes} style={styles}>
-                        <div className="fm-dialog-close" onClick={self.onCloseClicked}></div>
-                        <div className="fm-dialog-title">{self.props.title}</div>
+                <div className={classes} style={styles}>
+                    <div className="fm-dialog-close" onClick={self.onCloseClicked}></div>
 
-                        <div className="fm-dialog-content">
-                            <div className="fm-breadcrumbs-block">
-                                <a className="fm-breadcrumbs cloud-drive contains-directories">
-                                    <span className="right-arrow-bg">
-                                        <span>Cloud Drive</span>
-                                    </span>
-                                </a>
-                                <div className="clear"></div>
-                            </div>
+                    {
+                        self.props.title ? <div className="fm-dialog-title">{self.props.title}</div> : null
+                    }
 
-                            <table className="grid-table-header fm-dialog-table">
-                                <tbody><tr>
-                                    <th><span className="arrow grid-header-star"></span></th>
-                                    <th><div className="arrow name desc">Name</div></th>
-                                    <th><div className="arrow size">Size</div></th>
-                                </tr>
-                                </tbody></table>
-
-                            <div className="fm-dialog-grid-scroll">
-                                <table className="grid-table fm-dialog-table">
-                                    <tbody><tr className="folder">
-                                        <td>
-                                            <span className="grid-status-icon"></span>
-                                        </td>
-                                        <td>
-                                            <span className="transfer-filtype-icon folder"> </span>
-                                            <span className="tranfer-filetype-txt">Folder</span>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr className="folder">
-                                        <td>
-                                            <span className="grid-status-icon"></span>
-                                        </td>
-                                        <td>
-                                            <span className="transfer-filtype-icon folder"> </span>
-                                            <span className="tranfer-filetype-txt">Folder</span>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span className="grid-status-icon star"></span>
-                                        </td>
-                                        <td>
-                                            <span className="transfer-filtype-icon image"> </span>
-                                            <span className="tranfer-filetype-txt">File</span>
-                                        </td>
-                                        <td>2MB</td>
-                                    </tr>
-                                    </tbody></table>
-                            </div>
-
-
-                        </div>
-
-                        <div className="fm-dialog-footer">
-                            {buttons}
-                            <div className="clear"></div>
-                        </div>
+                    <div className="fm-dialog-content">
+                        {self.renderChildren()}
                     </div>
+
+                    {footer}
                 </div>
             </utils.RenderTo>
         );
     }
 });
 
+var BrowserCol = React.createClass({
+    mixins: [MegaRenderMixin],
+    render: function() {
+        var self = this;
+
+        var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
+
+        if (self.props.sortBy[0] === self.props.id) {
+            classes += " " + self.props.sortBy[1];
+        }
+        return (
+            <th onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                self.props.onClick(self.props.id);
+            }}>
+                <span className={"arrow " + classes}>{self.props.label}</span>
+            </th>
+        );
+    }
+});
+var BrowserEntries = React.createClass({
+    mixins: [MegaRenderMixin],
+    getInitialState: function() {
+        return {
+            'selected': []
+        }
+    },
+    onEntryClick: function(e, node) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.setState({'selected': [node.h]});
+        this.props.onSelected([node.h]);
+    },
+    onEntryDoubleClick: function(e, node) {
+        var self = this;
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (node.t === 1) {
+            // expand folder
+            self.setState({'selected': []});
+            self.props.onSelected([]);
+            self.props.onExpand(node);
+        }
+        else {
+            self.onEntryClick(e, node);
+            self.props.onSelected(self.state.selected);
+            self.props.onAttachClicked(self.state.selected);
+        }
+    },
+    render: function() {
+        var self = this;
+
+        var items = [];
+
+        var entry = self.props.entries;
+        self.props.entries.forEach(function(node) {
+            if (node.t !== 0 && node.t !== 1) {
+                // continue
+                return;
+            }
+
+            var isFolder = node.t === 1;
+            var isSelected = self.state.selected.indexOf(node.h) !== -1;
+
+            items.push(
+                <tr
+                    className={(isFolder ? " folder" :"") + (isSelected ? " ui-selected" : "")}
+                    onClick={(e) => {
+                        self.onEntryClick(e, node);
+                    }}
+                    onDoubleClick={(e) => {
+                        self.onEntryDoubleClick(e, node);
+                    }}
+                    key={node.h}
+                >
+                    <td>
+                        <span className={"grid-status-icon" + (node.fav ? " star" : "")}></span>
+                    </td>
+                    <td>
+                        <span className={"transfer-filtype-icon " + fileIcon(node)}> </span>
+                        <span className={"tranfer-filetype-txt"}>{node.name}</span>
+                    </td>
+                    <td>{!isFolder ? bytesToSize(node.s) : ""}</td>
+                </tr>
+            )
+        });
+        return <utils.JScrollPane className="fm-dialog-grid-scroll">
+            <table className="grid-table fm-dialog-table">
+                <tbody>
+                {items}
+                </tbody>
+            </table>
+        </utils.JScrollPane>;
+    }
+});
+var CloudBrowserDialog = React.createClass({
+    mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            'selectLabel': __("Attach"),
+            'cancelLabel': __("Cancel"),
+        }
+    },
+    getInitialState: function() {
+        return {
+            'sortBy': [
+                'name', 'asc'
+            ],
+            'selected': [],
+            'currentlyViewedEntry': M.RootID
+        }
+    },
+    toggleSortBy: function(colId) {
+        if (this.state.sortBy[0] === colId) {
+            this.setState({'sortBy': [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"]});
+        }
+        else {
+            this.setState({'sortBy': [colId, "asc"]});
+        }
+    },
+    getEntries: function() {
+        var self = this;
+        var entries = [];
+
+        obj_values(M.d).forEach(function(v) {
+            if (v.p === self.state.currentlyViewedEntry) {
+                entries.push(v);
+            }
+        });
+        var sortKey;
+        var order = 1;
+
+        if (self.state.sortBy[0] === "name") {
+            sortKey = "name";
+        }
+        else if(self.state.sortBy[0] === "size") {
+            sortKey = "s";
+        }
+        else if(self.state.sortBy[0] === "grid-header-star") {
+            sortKey = "fav";
+        }
+
+        order = self.state.sortBy[1] === "asc" ? 1 : -1;
+
+        entries.sort(function(a, b) {
+            // compare diff cols by diff methods... (string VS int VS int + undefined)
+            if (sortKey === "name") {
+                return ((a[sortKey] ? a[sortKey] : "").localeCompare(b[sortKey])) * order;
+            }
+            else {
+                var _a = a[sortKey] || 0;
+                var _b = b[sortKey] || 0;
+                if (_a > _b) {
+                    return 1 * order;
+                }
+                if (_a < _b) {
+                    return -1 * order;
+                }
+
+                return 0;
+            }
+        });
+
+        return entries;
+    },
+    onSelected: function(nodes) {
+        this.setState({'selected': nodes});
+        this.props.onSelected(nodes);
+    },
+    onAttachClicked: function() {
+        this.props.onAttachClicked();
+    },
+    render: function() {
+        var self = this;
+
+        var classes = "add-from-cloud " + self.props.className;
+
+        var breadcrumb = [];
+
+        var p = M.d[self.state.currentlyViewedEntry];
+        do {
+            var breadcrumbClasses = "";
+            if (p.h === M.RootID) {
+                breadcrumbClasses += " cloud-drive";
+            }
+            else {
+                breadcrumbClasses += " folder";
+            }
+
+            (function(p) {
+                breadcrumb.unshift(
+                    <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses} key={p.h} onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.setState({'currentlyViewedEntry': p.h, 'selected': []});
+                        self.props.onSelected([]);
+                    }}>
+                        <span className="right-arrow-bg">
+                            <span>{p.h === M.RootID ? __("Cloud Drive") : p.name}</span>
+                        </span>
+                    </a>
+                );
+            })(p);
+        } while (p = M.d[M.d[p.h].p]);
+
+        return (
+            <ModalDialog
+                title={__("Add from your Cloud Drive")}
+                className={classes}
+                onClose={() => {
+                    self.props.onClose(self);
+                }}
+                buttons={[
+                        {
+                            "label": self.props.selectLabel,
+                            "key": "select",
+                            "className": self.state.selected.length === 0 ? "disabled" : null,
+                            "onClick": function(e) {
+                                if (self.state.selected.length > 0) {
+                                    self.props.onSelected(self.state.selected);
+                                    self.props.onAttachClicked();
+                                }
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        },
+                        {
+                            "label": self.props.cancelLabel,
+                            "key": "cancel",
+                            "onClick": function(e) {
+                                self.props.onClose(self);
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        },
+            ]}>
+                <div className="fm-breadcrumbs-block">
+                    {breadcrumb}
+                    <div className="clear"></div>
+                </div>
+
+                <table className="grid-table-header fm-dialog-table">
+                    <tbody>
+                        <tr>
+                            <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                            <BrowserCol id="name" label={__("Name")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                            <BrowserCol id="size" label={__("Size")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <BrowserEntries
+                    entries={self.getEntries()}
+                    onExpand={(node) => {
+                        self.setState({'currentlyViewedEntry': node.h});
+                    }}
+                    onSelected={self.onSelected}
+                    onAttachClicked={self.onAttachClicked}
+                />
+            </ModalDialog>
+        );
+    }
+});
 module.exports = window.ModalDialogUI = {
     ModalDialog,
+    CloudBrowserDialog,
 };

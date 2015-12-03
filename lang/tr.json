@@ -2833,9 +2833,12 @@
     "7873": "A\u015fa\u011f\u0131daki (v%1) uzant\u0131s\u0131n\u0131 indirebilirsiniz.",
     "7874": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
     "7875": "(v%1) uzant\u0131n\u0131z g\u00fcncel.",
+    "7879": "Access to folders shared by [X] was removed.",
+    "7880": "Access to folders was removed.",
     "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
     "7882": "Message sent",
     "7883": "There was an error trying to send your message. Please try to resend it.",
     "7884": "Message too short",
-    "7885": "Your message needs to be at least %d letters long."
+    "7885": "Your message needs to be at least %d letters long.",
+    "7886": "Shared with one contact"
 }

@@ -2833,9 +2833,12 @@
     "7873": "N\u00ed\u017ee m\u016f\u017eete st\u00e1hnout roz\u0161\u00ed\u0159en\u00ed (v%1).",
     "7874": "Vypad\u00e1 to, \u017ee va\u0161e aktu\u00e1ln\u00ed roz\u0161\u00ed\u0159en\u00ed (v%1) je zastaral\u00e9. N\u00ed\u017ee m\u016f\u017eete st\u00e1hnout nejnov\u011bj\u0161\u00ed (v%2).",
     "7875": "Va\u0161e roz\u0161\u00ed\u0159en\u00ed (v%1) je aktu\u00e1ln\u00ed.",
+    "7879": "Access to folders shared by [X] was removed.",
+    "7880": "Access to folders was removed.",
     "7881": "D\u011bkujeme! Jeden z na\u0161ich konzultant\u016f podpory odpov\u00ed na v\u00e1\u0161 dotaz co nejd\u0159\u00edve.",
     "7882": "Zpr\u00e1va odesl\u00e1na",
     "7883": "P\u0159i pokusu o odesl\u00e1n\u00ed va\u0161\u00ed zpr\u00e1vy do\u0161lo k chyb\u011b. Zkuste ji odeslat znovu.",
     "7884": "Zpr\u00e1va je p\u0159\u00edli\u0161 kr\u00e1tk\u00e1",
-    "7885": "Va\u0161e zpr\u00e1va mus\u00ed b\u00fdt dlouh\u00e1 alespo\u0148 %d p\u00edsmen."
+    "7885": "Va\u0161e zpr\u00e1va mus\u00ed b\u00fdt dlouh\u00e1 alespo\u0148 %d p\u00edsmen.",
+    "7886": "Shared with one contact"
 }

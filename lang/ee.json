@@ -2833,9 +2833,12 @@
     "7873": "Laiendit (v%1) saate alla laadida lehe altpoolt.",
     "7874": "Teie praegune laiend (v%1) on vana. Uusima (v%2) saate alla laadida lehe altpoolt.",
     "7875": "Teil on laiendi uusim versioon (v%1).",
+    "7879": "Access to folders shared by [X] was removed.",
+    "7880": "Access to folders was removed.",
     "7881": "Ait\u00e4h! Teiega v\u00f5tab varsti \u00fchendust meie abimeeskonna liige.",
     "7882": "Kiri saadetud",
     "7883": "Kirja saatmisel tekkis viga. Palun proovige uuesti saata.",
     "7884": "Kiri on liiga l\u00fchike",
-    "7885": "Kiri peab sisaldama v\u00e4hemalt %d t\u00e4hem\u00e4rki."
+    "7885": "Kiri peab sisaldama v\u00e4hemalt %d t\u00e4hem\u00e4rki.",
+    "7886": "Shared with one contact"
 }

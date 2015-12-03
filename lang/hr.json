@@ -2833,9 +2833,12 @@
     "7873": "Mo\u017eete preuzeti dodatak (v%1) ispod.",
     "7874": "\u010cini se kako Va\u0161 trenutni dodatak (v%1) nije a\u017euriran. Mo\u017eete preuzeti posljednju nadogradnju (v%2) ispod.",
     "7875": "Va\u0161 dodatak (v%1) je a\u017euriran.",
+    "7879": "Access to folders shared by [X] was removed.",
+    "7880": "Access to folders was removed.",
     "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
     "7882": "Message sent",
     "7883": "There was an error trying to send your message. Please try to resend it.",
     "7884": "Message too short",
-    "7885": "Your message needs to be at least %d letters long."
+    "7885": "Your message needs to be at least %d letters long.",
+    "7886": "Shared with one contact"
 }

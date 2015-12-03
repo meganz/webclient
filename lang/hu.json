@@ -2833,9 +2833,12 @@
     "7873": "Al\u00e1bb let\u00f6ltheti a kieg\u00e9sz\u00edt\u0151t (v%1).",
     "7874": "\u00dagy n\u00e9z ki az \u00d6n jelenlegi kieg\u00e9sz\u00edt\u0151je (v%1) elavult. Al\u00e1bb let\u00f6ltheti a legfrissebbet (v%2).",
     "7875": "Az \u00d6n kieg\u00e9sz\u00edt\u0151je (v%1) napra k\u00e9sz.",
+    "7879": "Access to folders shared by [X] was removed.",
+    "7880": "Access to folders was removed.",
     "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
     "7882": "Message sent",
     "7883": "There was an error trying to send your message. Please try to resend it.",
     "7884": "Message too short",
-    "7885": "Your message needs to be at least %d letters long."
+    "7885": "Your message needs to be at least %d letters long.",
+    "7886": "Shared with one contact"
 }

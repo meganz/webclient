@@ -11335,6 +11335,14 @@
         "text": "Your extension (v%1) is up to date.",
         "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
     },
+    "7879": {
+        "text": "Access to folders shared by [X] was removed.",
+        "context": "This is shown in the Notification dialog when a user removes a contact from their contact list. The placeholder [X] will be replaced with the removed contact's email address."
+    },
+    "7880": {
+        "text": "Access to folders was removed.",
+        "context": "This is shown in the Notification dialog when the email address of a contact is not found and access to the share is lost for some reason (e.g. share removal or contact removal)."
+    },
     "7881": {
         "text": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
         "context": "Message when a given user contacts our support team and the message has been send with success."
@@ -11354,5 +11362,9 @@
     "7885": {
         "text": "Your message needs to be at least %d letters long.",
         "context": "Error message when a Support message is too short. %d is the placeholder and needs to be keep that way."
+    },
+    "7886": {
+        "text": "Shared with one contact",
+        "context": "Text shown to explain that you have shared a folder with one contact."
     }
 }

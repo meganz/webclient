@@ -2833,9 +2833,12 @@
     "7873": "Puedes descargar la extensi\u00f3n (v%1) a continuaci\u00f3n.",
     "7874": "Parece que tu extensi\u00f3n actual (v%1) est\u00e1 obsoleta. Puedes descargar la \u00faltima (v%2) a continuaci\u00f3n.",
     "7875": "Tu extensi\u00f3n (v%1) est\u00e1 actualizada.",
+    "7879": "Access to folders shared by [X] was removed.",
+    "7880": "Access to folders was removed.",
     "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
     "7882": "Message sent",
     "7883": "There was an error trying to send your message. Please try to resend it.",
     "7884": "Message too short",
-    "7885": "Your message needs to be at least %d letters long."
+    "7885": "Your message needs to be at least %d letters long.",
+    "7886": "Shared with one contact"
 }

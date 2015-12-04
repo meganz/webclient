@@ -11188,7 +11188,7 @@
         "context": "Title of one of the filters in \"Contacts requests\" section. When \"Requests\" is selected, it will show all the requests the user has received from other people."
     },
     "7751": {
-        "text": "Request acepted",
+        "text": "Request accepted",
         "context": "Success message shown when you acepted a contact request"
     },
     "7752": {
@@ -11239,6 +11239,14 @@
         "text": "1 folder \u2022 %d files",
         "context": "Subtitle shown on folders that gives information about its content. This case \"{1} folder \u2022 {1+} file\""
     },
+    "7852": {
+        "text": "Transfer cancelled",
+        "context": "A message shown when a file transfer has been cancelled."
+    },
+    "7853": {
+        "text": "[A] already uploaded with the name [B]",
+        "context": "Message shown when the user selects a file from another cloud storage provider that is already uploaded. [A] is the name of the file. [B] is the name of the file already in MEGA."
+    },
     "7854": {
         "text": "[A] files and [B] folders moved",
         "context": "Success message when the user has moved [A] = {1+} files and [B] = {1+} folders, please keep [A] and [B]."
@@ -11247,13 +11255,37 @@
         "text": "[A] files and [B] folders copied",
         "context": "Success message when the user has copied [A] = {1+} files and [B] = {1+} folders. Please keep [A] and [B]."
     },
+    "7856": {
+        "text": "Are you sure you want to move [A] files and [B] folders to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move files and folders to the Rubbish Bin. [A] is a placeholder for 1+ files and [B] is a placeholder for 1+ folders."
+    },
     "7857": {
         "text": "Shared with %d contacts",
         "context": "Message to explain how many contacts the user has shared a folder to. Please keep %d, it will be replaced with a number."
     },
+    "7858": {
+        "text": "Remove sharing",
+        "context": "An alert title shown on the Shared Items section when you want to remove 1 share."
+    },
+    "7859": {
+        "text": "Are you sure you want to remove this share? (Shared with 1 contact)",
+        "context": "Alert message shown on the Shared Items section when the user wants to remove 1 share."
+    },
+    "7860": {
+        "text": "Are you sure you want to remove this share? (Shared with %d contacts)",
+        "context": "Alert message shown on the Shared Items section when the user wants to remove 1 share. The placeholder %d will be replaced with the number of contacts that this file is shared with."
+    },
+    "7861": {
+        "text": "Are you sure you want to remove these shares? (Shared with %d contacts)",
+        "context": "Alert message shown on the Shared Items section when the user wants to remove multiple shares that are shared with multiple contacts."
+    },
     "7862": {
         "text": "Shares removed",
         "context": "Success message shown when some shares have been removed."
+    },
+    "7863": {
+        "text": "You are about to permanently remove [A] files and [B] folders. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when a user wants to remove files and folders. [A] is a placeholder for 1+ files and [B] is a placeholder for 1+ folders."
     },
     "7864": {
         "text": "Rate us",
@@ -11278,5 +11310,17 @@
     "7869": {
         "text": "This email address has already been registered. Please choose an alternative email address to proceed.",
         "context": "A message in an error dialog when the user is trying to change email address. It informs the user that the new email address they entered is already in use and that they must enter a different one."
+    },
+    "7873": {
+        "text": "You can download the extension (v%1) below.",
+        "context": "This text is on the Chrome or Firefox extension pages and tells the user they can download a specific version of the extension further down the page. The placeholder %1 will be replaced with the version of the extension e.g. \"3.2.8\". So the text would read \"You can download the extension (v3.2.8) below.\""
+    },
+    "7874": {
+        "text": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
+        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is not the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.7\". The placeholder %2 will be replaced with the newest version available for download e.g. \"3.2.8\". So the text would read \"It looks like your current extension (v3.2.7) is out of date. You can download the latest (v3.2.8) below.\""
+    },
+    "7875": {
+        "text": "Your extension (v%1) is up to date.",
+        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
     }
 }

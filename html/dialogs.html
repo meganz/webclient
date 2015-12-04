@@ -455,13 +455,33 @@
             </div>
     		<input type="text" id="datepicker" class="fm-dialogs-select expiry-date-select" value="Select date" />
         </div>
-    	<div class="fm-links-dropdown">
+    	<div class="fm-links-dropdown hidden">
         	<div class="fm-link-select-label">[$7649]</div>
-    		<div class="fm-dialogs-select export-link-select full-link"><span></span>[$7651]</div>
+    		<div class="fm-dialogs-select export-link-select full-link"><span></span>[$7651]</div>            
             <div class="fm-dialogs-dropdown export-link-dropdown">
             	<div class="fm-dialogs-dropdown-item public-handle" data-keyoptions="public-handle"><span></span>[$7681]</div>
                 <div class="fm-dialogs-dropdown-item decryption-key" data-keyoptions="decryption-key"><span></span>[$1028]</div>
                 <div class="fm-dialogs-dropdown-item full-link" data-keyoptions="full-link"><span></span>[$7651]</div>
+            </div>
+        </div>
+        <div class="fm-links-export-options">
+            <div class="fm-link-select-label">[$7649]</div>
+            <div class="fm-links-radio-buttons">
+                <div class="separate-link-and-key">
+                    <div class="link-handle">                        
+                        <span class="icon"></span>
+                        <span class="text">Link without key</span>
+                    </div>
+                    <div class="button-separator"></div>
+                    <div class="link-decryption-key">
+                        <span class="icon"></span>
+                        <span class="text">Decryption key</span>
+                    </div>
+                </div>
+                <div class="link-handle-and-key">
+                    <span class="icon"></span>
+                    <span class="text">Link with key</span>
+                </div>
             </div>
         </div>
         <div class="clear"></div>
@@ -470,8 +490,7 @@
     </div>
     <div class="fm-notifications-bottom">
     	<div class="export-description hidden">
-        	MEGA recommends sending the 'Encryption Key' separately from the 'Public Handle'
-            <!-- [$7682] !-->
+        	[$7682]
         </div>
         <div class="fm-dialog-button links-button copy-to-clipboard" id="clipboardbtn1">
           <span></span>

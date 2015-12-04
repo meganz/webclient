@@ -123,7 +123,7 @@ describe("tlvstore unit test", function() {
             assert.strictEqual(ns._logger._log.args[0][1][0],
                                'Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
             assert.strictEqual(ns._logger._log.args[1][1][0],
-                               'Retrying to decode after UTF-8 decoding TLV container.');
+                               'Retrying to decode TLV container legacy style ...');
         });
     });
 

@@ -57,10 +57,13 @@ function MegaDBEncryption(mdbInstance) {
                         });
                 }
                 else {
+                    // Decrypt existing DB session encryption key with master key.
                     _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, true);
                     if (_encDecKeyCache.length !== 16) {
                         logger.info('Retrying to access DB crypto key legacy style ...');
-                        _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, false);
+                        _encDecKeyCache = decodeURIComponent(escape(
+                            decodeURIComponent(escape(data))));
+                        logger.debug('Key length: ' + _encDecKeyCache.length + ' bytes');
                     }
                     promise.resolve();
                 }
@@ -131,12 +134,12 @@ function MegaDBEncryption(mdbInstance) {
                             obj[k] = JSON.parse(obj[k]);
                         }
                     }
-                    catch(e) {
+                    catch (e) {
                         if (e instanceof TypeError) { // TypeError is caused when the data stored in the db is NOT encrypted.
                             obj[k] = v;
                         }
                         else if (e instanceof IllegalArgumentError) {
-                            logger.error('Encrypted IndexedDB inconsistent. Clar local DB and reload.');
+                            logger.error('Encrypted IndexedDB inconsistent. Clear local DB and reload.');
                             throw e;
                         }
                         else {
@@ -178,7 +181,7 @@ function MegaDBEncryption(mdbInstance) {
         try {
             simpleDecryptObjFunction(table, obj);
         }
-        catch(exc) {
+        catch (exc) {
             if (exc.message == "data integrity check failed") {
                 logger.error("data integrity check failed for (will be removed): ", table, obj[mdbInstance._getTablePk(table)], obj);
 

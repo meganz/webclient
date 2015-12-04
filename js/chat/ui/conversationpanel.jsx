@@ -185,40 +185,202 @@ var ConversationMessage = React.createClass({
 
             var displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
 
-            return (
-                <div className="message body" data-id={"id" + message.messageId}>
-                    <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar" />
-                    <div className="message content-area">
-                        <div className="message user-card-name">{displayName}</div>
-                        <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
+            var textContents = message.getContents ? message.getContents() : message.textContents;
 
-                        <ButtonsUI.Button
-                            className="default-white-button tiny-button"
-                            icon="tiny-icon grey-down-arrow">
-                            <DropdownsUI.Dropdown
-                                className="message-dropdown"
-                                onClick={() => {}}
+            if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+                if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+                    textContents = textContents.substr(2, textContents.length);
+
+                    try {
+                        var attachmentMeta = JSON.parse(textContents);
+                    } catch(e) {
+                        return null;
+                    }
+
+                    var files = [];
+
+                    attachmentMeta.forEach(function(v) {
+                        var startDownload = function() {
+                            M.addDownload([v]);
+                        };
+
+                        // cache ALL current attachments, so that we can revoke them later on in an ordered way.
+                        if(message.messageId) {
+                            if (!chatRoom._attachmentsMap) {
+                                chatRoom._attachmentsMap = {};
+                            }
+                            if (!chatRoom._attachmentsMap[v.h]) {
+                                chatRoom._attachmentsMap[v.h] = {};
+                            }
+                            chatRoom._attachmentsMap[v.h][message.messageId] = false;
+                        }
+                        var addToCloudDrive = function() {
+                            M.copyNodes([v], M.RootID, false, function(res) {
+                                if (res === 0) {
+                                    msgDialog(
+                                        'info',
+                                        __("Add to Cloud Drive"),
+                                        __("Attachment added to your Cloud Drive.")
+                                    );
+                                }
+                            });
+                        };
+
+                        var dropdown = null;
+                        if (!message.revoked) {
+                            if (contact.u === u_handle) {
+                                dropdown = <ButtonsUI.Button
+                                    className="default-white-button tiny-button"
+                                    icon="tiny-icon grey-down-arrow">
+                                        <DropdownsUI.Dropdown className="attachments-dropdown">
+                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__("Download")}
+                                                                  onClick={startDownload}/>
+                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__("Add to Cloud Drive")}
+                                                                  onClick={addToCloudDrive}/>
+
+                                        <hr />
+
+                                        <DropdownsUI.DropdownItem icon="red-cross" label={__("Delete")} className="red"
+                                                                  onClick={() => {
+                                                chatRoom.revokeAttachment(v);
+                                            }}/>
+                                    </DropdownsUI.Dropdown>
+                                </ButtonsUI.Button>;
+                            }
+                            else {
+                                dropdown = <ButtonsUI.Button
+                                        className="default-white-button tiny-button"
+                                        icon="tiny-icon grey-down-arrow">
+                                        <DropdownsUI.Dropdown className="attachments-dropdown">
+                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__("Download")}
+                                                                  onClick={startDownload}/>
+                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__("Add to Cloud Drive")}
+                                                                  onClick={addToCloudDrive}/>
+                                    </DropdownsUI.Dropdown>
+                                </ButtonsUI.Button>;
+                            }
+                        }
+
+                        files.push(
+                            <div className="message shared-data" key={v.h}>
+                                <div className="message shared-info">
+                                    <div className="message data-title">
+                                        {v.name}
+                                    </div>
+                                    <div className="message file-size">
+                                        {bytesToSize(v.s)}
+                                    </div>
+                                </div>
+
+                                <div className="data-block-view medium">
+                                    {dropdown}
+
+                                    <div className="data-block-bg">
+                                        <div className={"block-view-file-type " + fileIcon(v)}></div>
+                                    </div>
+                                </div>
+                                <div className="clear"></div>
+
+                            </div>
+                        );
+                    });
+
+
+                    return <div className="message body">
+                        <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
+                        <div className="message content-area">
+                            <div className="message user-card-name">{displayName}</div>
+                            <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
+
+                            <div className="message shared-block">
+                                {files}
+                            </div>
+
+                        </div>
+                    </div>;
+                }
+                else if(textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+                    if (!chatRoom._attachmentsMap) {
+                        chatRoom._attachmentsMap = {};
+                    }
+                    var foundRevokedNode = null;
+
+                    var revokedNode = textContents.substr(2, textContents.length);
+                    if (chatRoom._attachmentsMap[revokedNode]) {
+                        Object.keys(chatRoom._attachmentsMap[revokedNode]).forEach(function(messageId) {
+                            var attachedMsg = chatRoom.messagesBuff.messages[messageId];
+
+                            if (attachedMsg.orderValue < message.orderValue) {
+                                try {
+                                    var attachments = JSON.parse(attachedMsg.textContents.substr(2, attachedMsg.textContents.length));
+                                    attachments.forEach(function(node) {
+                                        if(node.h === revokedNode) {
+                                            foundRevokedNode = node;
+                                        }
+                                    })
+                                } catch(e) {
+                                }
+                                attachedMsg.revoked = true;
+                            }
+                        });
+                    }
+
+                    if (foundRevokedNode) {
+                        return <div className="message body" data-id={"id" + message.messageId}>
+                            <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
+                            <div className="message content-area">
+                                <div className="message user-card-name">{displayName}</div>
+                                <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
+                                <div className="message text-block">
+                                    <em>{__("revoked access to attachment: %s").replace("%s", foundRevokedNode.name)}</em>
+                                </div>
+                            </div>
+                        </div>
+                    } else {
+                      return null;
+                    }
+                }
+                else {
+                    chatRoom.logger.error("Invalid 2nd byte for a management message: ", textContents);
+                    return null;
+                }
+            }
+            else {
+                return (
+                    <div className="message body" data-id={"id" + message.messageId}>
+                        <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
+                        <div className="message content-area">
+                            <div className="message user-card-name">{displayName}</div>
+                            <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
+
+                            <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon grey-down-arrow">
+                                <DropdownsUI.Dropdown
+                                    className="message-dropdown"
+                                    onClick={() => {}}
                                 >
-                                <DropdownsUI.DropdownItem icon="writing-pen" label="Edit" onClick={() => {
-                                    console.error("TBD!");
-                                }} />
-                                <DropdownsUI.DropdownItem icon="quotes" label="Quote" onClick={() => {
-                                    console.error("TBD!");
-                                }} />
+                                    <DropdownsUI.DropdownItem icon="writing-pen" label="Edit" onClick={() => {
+                                        console.error("TBD!");
+                                    }}/>
+                                    <DropdownsUI.DropdownItem icon="quotes" label="Quote" onClick={() => {
+                                        console.error("TBD!");
+                                    }}/>
 
-                                <hr />
+                                    <hr />
 
-                                <DropdownsUI.DropdownItem icon="red-cross" label="Delete" className="red" onClick={() => {
-                                    console.error("TBD!");
-                                }} />
-                            </DropdownsUI.Dropdown>
-                        </ButtonsUI.Button>
+                                    <DropdownsUI.DropdownItem icon="red-cross" label="Delete" className="red" onClick={() => {
+                                        console.error("TBD!");
+                                    }}/>
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>
 
-                        <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}>
+                            <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )
+                );
+            }
         }
         // if this is an inline dialog
         else if (
@@ -1249,7 +1411,10 @@ var ConversationPanel = React.createClass({
                 }}
                 onAttachClicked={() => {
                     self.setState({'attachCloudDialog': false});
-                    console.error("Selected for attaching: ", selected);
+
+                    room.attachNodes(
+                        selected
+                    );
                 }}
             />
         }

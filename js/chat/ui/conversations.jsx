@@ -73,12 +73,27 @@ var ConversationsListItem = React.createClass({
         var lastMessage = this.props.chatRoom.messagesBuff.getLatestTextMessage();
         if(lastMessage) {
             var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
+
+            var renderableSummary = lastMessage.textContents;
+
+            if (lastMessage.isManagement && lastMessage.isManagement()) {
+                renderableSummary = lastMessage.getManagementMessageSummaryText();
+            }
+
             lastMessageDiv =
                 <div>
                     <div className={lastMsgDivClasses}>
-                        {lastMessage.textContents}
+                        {renderableSummary}
                     </div>
                     <div className="date-time">{unixtimeToTimeString(lastMessage.delay)}</div>
+                </div>;
+        } else {
+            var lastMsgDivClasses = "conversation-message";
+            lastMessageDiv =
+                <div>
+                    <div className={lastMsgDivClasses}>
+                        {__("No conversation history")}
+                    </div>
                 </div>;
         }
 

@@ -998,57 +998,23 @@ ChatRoom.prototype.getMediaOptions = function() {
 
 /**
  * Internal method to notify the server that the specified `nodeids` are sent/shared to `users`
- * @param nodeids
- * @param users
+ * @param nodeids {Array}
+ * @param users {Array}
  * @private
  */
 ChatRoom.prototype._sendNodes = function(nodeids, users) {
-    var json = [], apinodes=[];
+    var promises = [];
+    var self = this;
 
-    var $promise = new $.Deferred();
+    users.forEach(function(uh) {
+        nodeids.forEach(function(nodeId) {
+            promises.push(
+                asyncApiReq({'a': 'mcga', 'n': nodeId, 'u': uh, 'id': self.chatId})
+            )
+        })
+    });
 
-    for (var i in nodeids)
-    {
-        var n = M.d[nodeids[i]];
-        if (n)
-        {
-            if (n.t)
-            {
-                var subnodes = fm_getnodes(nodeids[i]);
-                for (var j in subnodes)
-                {
-                    var n2 = M.d[subnodes[j]];
-                    // subnodes retain their parent nodeid to retain the same folder structure
-                    if (n2) json.push(M.cloneChatNode(n2,true));
-                }
-            }
-            // root nodes do not retain their parent nodeid, because they become "root nodes" in the chat - access will be granted to these nodes and subnode access can be determined based on parent node access rights
-
-            json.push(M.cloneChatNode(n));
-            apinodes.push(n.h);
-        }
-    }
-
-
-    this.logger.debug("sendNodes: ", apinodes, apinodes);
-
-    api_req({a:'uq'},
-        {
-            callback2: function() {
-                $promise.resolve(toArray(arguments));
-            },
-            failhandler: function() {
-                $promise.reject(toArray(arguments));
-            },
-            json: json,
-            callback: function(res,ctx)
-            {
-                // check if result is all positive  (should be) and fire off callback:
-                if (ctx.callback2) ctx.callback2(ctx.json);
-            }
-        });
-
-    return $promise;
+    return MegaPromise.allDone(promises);
 };
 
 
@@ -1056,23 +1022,15 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
 /**
  * Attach/share (send as message) file/folder nodes to the chat
  * @param ids
- * @param [message]
  */
-ChatRoom.prototype.attachNodes = function(ids, message) {
+ChatRoom.prototype.attachNodes = function(ids) {
     var self = this;
-    message = message || "";
-
-    return MegaPromise.reject(false); // TODO: This is temp disabled, until we get the API to support it.
-
-    if (!ids || ids.length === 0) {
-        return;
-    }
 
     loadingDialog.show();
 
     var users = [];
 
-    $.each(self.getParticipants(), function(k, v) {
+    $.each(self.getParticipantsExceptMe(), function(k, v) {
         var contact = self.megaChat.getContactFromJid(v);
         if (contact && contact.u) {
             users.push(
@@ -1087,33 +1045,29 @@ ChatRoom.prototype.attachNodes = function(ids, message) {
         ids,
         users
     )
-        .done(function(responses) {
-
-            var attachments = {};
+        .done(function() {
+            var nodesMeta = [];
             $.each(ids, function(k, nodeId) {
                 var node = M.d[nodeId];
-
-                if (node) {
-                    attachments[nodeId] = {
-                        'name': node.name,
-                        'h': nodeId,
-                        's': node.s,
-                        't': node.t,
-                        'sharedWith': users
-                    };
-                } else {
-                    self.logger.warn("Node not accessible, so can't be shared: ", nodeId);
-                }
-            });
-            if (Object.keys(attachments).length > 0) {
-                var messageId = self.sendMessage(message, {
-                    'attachments': attachments
+                nodesMeta.push({
+                    'h': node.h,
+                    'key': node.key,
+                    'name': node.name,
+                    's': node.s,
+                    'mtime': node.mtime,
+                    'ts': node.ts
                 });
-            }
+            });
+
+            // 1b, 1b, JSON
+            self.sendMessage(
+                Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+                Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
+                JSON.stringify(nodesMeta)
+            );
+
             $masterPromise.resolve(
-                messageId,
-                attachments,
-                message
+                ids
             );
         })
         .fail(function(r) {
@@ -1124,6 +1078,17 @@ ChatRoom.prototype.attachNodes = function(ids, message) {
         });
 
     return $masterPromise;
+};
+
+ChatRoom.prototype.revokeAttachment = function(node) {
+    assert(node, 'node is missing.');
+
+    // 1b, 1b, JSON
+    this.sendMessage(
+        Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+        Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT +
+        node.h
+    );
 };
 
 /**

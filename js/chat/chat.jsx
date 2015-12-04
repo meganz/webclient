@@ -267,6 +267,8 @@ var Chat = function() {
 
 makeObservable(Chat);
 
+
+
 Chat.prototype.renderConversationsApp = function () {
     //this.$conversationsAppInstance.forceUpdate();
 };
@@ -291,21 +293,21 @@ Chat.prototype.init = function() {
         self.plugins[k] = new v(self);
     });
 
-    if (!self.filePicker) {
-        self.filePicker = new mega.ui.FilePicker(self.options.filePickerOptions);
-        self.filePicker.bind('doneSelecting', function(e, selection) {
-            if (selection.length === 0) {
-                return;
-            }
-
-            var room = self.getCurrentRoom();
-            if (room) {
-                room.attachNodes(
-                    selection
-                );
-            }
-        })
-    }
+    //if (!self.filePicker) {
+    //    self.filePicker = new mega.ui.FilePicker(self.options.filePickerOptions);
+    //    self.filePicker.bind('doneSelecting', function(e, selection) {
+    //        if (selection.length === 0) {
+    //            return;
+    //        }
+    //
+    //        var room = self.getCurrentRoom();
+    //        if (room) {
+    //            room.attachNodes(
+    //                selection
+    //            );
+    //        }
+    //    })
+    //}
 
     // Karere Events
     this.karere.bind("onPresence", function(e, eventObject) {
@@ -762,27 +764,27 @@ Chat.prototype.init = function() {
             room.callSession.endCall();
         }
     });
-    $(document)
-        .unbind('megaulcomplete.megaChat')
-        .bind('megaulcomplete.megaChat', function(e, target, ulBunch) {
-            // attach to conversation
-            var megaRoomId = self.getPrivateRoomJidFor(
-                self.getJidFromNodeId(target.replace("chat/", ""))
-            )  + "@conference." + self.options.xmppDomain;
-
-            var megaRoom = self.chats[megaRoomId];
-            if (!megaRoom) {
-                self.logger.error("Room not found for file attachment:", target);
-            } else {
-                assert(ulBunch && ulBunch.length > 0, 'empty ulBunch');
-
-                megaRoom.attachNodes(ulBunch);
-
-                setTimeout(function() { // because of the transfer panel close
-                    self.refreshScrollUI();
-                }, 1000);
-            }
-        });
+    //$(document)
+    //    .unbind('megaulcomplete.megaChat')
+    //    .bind('megaulcomplete.megaChat', function(e, target, ulBunch) {
+    //        // attach to conversation
+    //        var megaRoomId = self.getPrivateRoomJidFor(
+    //            self.getJidFromNodeId(target.replace("chat/", ""))
+    //        )  + "@conference." + self.options.xmppDomain;
+    //
+    //        var megaRoom = self.chats[megaRoomId];
+    //        if (!megaRoom) {
+    //            self.logger.error("Room not found for file attachment:", target);
+    //        } else {
+    //            assert(ulBunch && ulBunch.length > 0, 'empty ulBunch');
+    //
+    //            megaRoom.attachNodes(ulBunch);
+    //
+    //            setTimeout(function() { // because of the transfer panel close
+    //                self.refreshScrollUI();
+    //            }, 1000);
+    //        }
+    //    });
 
 
     self.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {

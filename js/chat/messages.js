@@ -20,7 +20,8 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'orderValue': false,
 
             'sent': false,
-            'deleted': false
+            'deleted': false,
+            'revoked': false,
         },
         true,
         vals
@@ -97,7 +98,39 @@ Message.STATE = {
     'SEEN': 6,
     'DELETED': 8
 };
+Message.MANAGEMENT_MESSAGE_TYPES = {
+    "MANAGEMENT": "\0",
+    "ATTACHMENT": "\x10",
+    "REVOKE_ATTACHMENT": "\x11",
+};
 
+
+Message.prototype.isManagement = function() {
+    if (!this.textContents) {
+        return false;
+    }
+    return this.textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT;
+};
+
+/**
+ * To be used when showing a summary of the text message (e.g. a text only repres.)
+ */
+Message.prototype.getManagementMessageSummaryText = function() {
+    if (!this.isManagement()) {
+        return this.textContents;
+    }
+    if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+        var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
+        if (nodes.length === 1) {
+            return __("Attached: " + nodes[0].name);
+        }
+        else {
+            return __("Attached " + nodes.length + " files.");
+        }
+    } else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+        return __("Revoked access to attachments.");
+    }
+};
 
 /**
  * Simple interface/structure wrapper for inline dialogs

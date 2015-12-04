@@ -3016,7 +3016,7 @@ function MegaData()
             return false;
         }
 
-        var a = $.onImportCopyNodes || fm_getcopynodes(cn, t);
+        var a = this.isNodeObject(cn) ? cn : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var ops = {a: 'p', t: t, n: a, i: requesti};
         var s = fm_getsharenodes(t);
         if (s.length > 0) {
@@ -3605,6 +3605,10 @@ function MegaData()
         }
     };
 
+    this.isNodeObject = function(n) {
+        return typeof n === 'object' && Array.isArray(n.key) && n.key.length === 8;
+    };
+
     this.addDownload = function(n, z, preview, zipname)
     {
         delete $.dlhash;
@@ -3654,6 +3658,9 @@ function MegaData()
                     nodes.push(n[i]);
                 }
             }
+            else if (this.isNodeObject(n[i])) {
+                nodes.push(n[i]);
+            }
         }
 
         if (z) {
@@ -3683,8 +3690,14 @@ function MegaData()
         for (var k in nodes) {
             /* jshint -W089 */
             if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
-                dlmanager.logger.error('** CHECK THIS **', 'Invalid node', k, nodes[k]);
-                continue;
+                n = nodes[k];
+                if (this.isNodeObject(n)) {
+                    dlmanager.logger.info('Using plain provided node object.');
+                }
+                else {
+                    dlmanager.logger.error('** CHECK THIS **', 'Invalid node', k, nodes[k]);
+                    continue;
+                }
             }
             path = paths[nodes[k]] || '';
             $.totalDL += n.s;

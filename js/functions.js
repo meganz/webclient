@@ -2443,6 +2443,24 @@ function moveCursortoToEnd(el) {
     $(el).focus();
 }
 
+function asyncApiReq(data) {
+    var $promise = new MegaPromise();
+    api_req(data, {
+        callback: function(r) {
+            if (typeof(r) === 'number') {
+                $promise.reject.apply($promise, arguments);
+            }
+            else {
+                $promise.resolve.apply($promise, arguments);
+            }
+        }
+    });
+
+    //TODO: fail case?! e.g. the exp. backoff failed after waiting for X minutes??
+
+    return $promise;
+}
+
 // Returns pixels position of element relative to document (top left corner)
 function getHtmlElemPos(elem, n) {
     var xPos = 0;

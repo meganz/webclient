@@ -28,7 +28,7 @@ var ChatdIntegration = function(megaChat) {
             self._detachFromChatRoom(chatRoom);
         });
 
-        self.apiReq({a: "mcf"})
+        asyncApiReq({a: "mcf"})
             .done(function(r) {
                 // reopen chats from the MCF response.
                 if (r.c) {
@@ -149,7 +149,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     };
 
     if (!actionPacket.url) {
-        self.apiReq({
+        asyncApiReq({
             a: 'mcurl',
             id: actionPacket.id
         })
@@ -163,25 +163,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     }
 
 };
-
-ChatdIntegration.prototype.apiReq = function(data) {
-    var $promise = new MegaPromise();
-    api_req(data, {
-        callback: function(r) {
-            if (typeof(r) === 'number') {
-                $promise.reject.apply($promise, arguments);
-            }
-            else {
-                $promise.resolve.apply($promise, arguments);
-            }
-        }
-    });
-
-    //TODO: fail case?! e.g. the exp. backoff failed after waiting for X minutes??
-
-    return $promise;
-};
-
 
 
 ChatdIntegration._waitUntilChatIdIsAvailable = function(fn) {
@@ -271,7 +252,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
                 }
             });
 
-            self.waitingChatIdPromises[chatRoom.roomJid] = self.apiReq({
+            self.waitingChatIdPromises[chatRoom.roomJid] = asyncApiReq({
                 'a': 'mcc',
                 'u': userHashes
             })

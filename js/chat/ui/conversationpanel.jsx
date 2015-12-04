@@ -504,7 +504,7 @@ var ConversationMessage = React.createClass({
 var ConversationRightArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
-
+        var self = this;
         var room = this.props.chatRoom;
         var contactJid = room.getParticipantsExceptMe()[0];
         var contact = room.megaChat.getContactFromJid(contactJid);
@@ -556,10 +556,7 @@ var ConversationRightArea = React.createClass({
                                 onClick={() => {}}
                             >
                                 <DropdownsUI.DropdownItem icon="grey-cloud" label="From my Cloud Drive" onClick={() => {
-                                    console.error("TBD!");
-                                }} />
-                                <DropdownsUI.DropdownItem icon="grey-computer" label="From my Computer" onClick={() => {
-                                    console.error("TBD!");
+                                    self.props.onAttachFromCloudClicked();
                                 }} />
                             </DropdownsUI.Dropdown>
                         </ButtonsUI.Button>
@@ -1426,6 +1423,9 @@ var ConversationPanel = React.createClass({
                         chatRoom={this.props.chatRoom}
                         contacts={self.props.contacts}
                         megaChat={this.props.chatRoom.megaChat}
+                        onAttachFromCloudClicked={function() {
+                            self.setState({'attachCloudDialog': true});
+                        }}
                     />
 
                     {attachCloudDialog}

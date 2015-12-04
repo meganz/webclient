@@ -58,6 +58,10 @@ function MegaDBEncryption(mdbInstance) {
                 }
                 else {
                     _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, true);
+                    if (_encDecKeyCache.length !== 16) {
+                        logger.info('Retrying to access DB crypto key legacy style ...');
+                        _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, false);
+                    }
                     promise.resolve();
                 }
             }, function(err) {
@@ -116,18 +120,26 @@ function MegaDBEncryption(mdbInstance) {
                     obj[k] = JSON.parse(stringcrypt.stringDecrypter(obj[k + "$v"], getEncDecKey()), false);
                     delete obj[k + "$v"];
                     decryptedKeys.push(k);
-                } else {
+                }
+                else {
                     try {
                         obj[k] = stringcrypt.stringDecrypter(v, getEncDecKey(), false);
                         if(obj[k] == "undefined") {
                             obj[k] = undefined;
-                        } else {
+                        }
+                        else {
                             obj[k] = JSON.parse(obj[k]);
                         }
-                    } catch(e) {
-                        if(e instanceof TypeError) { // TypeError is caused when the data stored in the db is NOT encrypted.
+                    }
+                    catch(e) {
+                        if (e instanceof TypeError) { // TypeError is caused when the data stored in the db is NOT encrypted.
                             obj[k] = v;
-                        } else {
+                        }
+                        else if (e instanceof IllegalArgumentError) {
+                            logger.error('Encrypted IndexedDB inconsistent. Clar local DB and reload.');
+                            throw e;
+                        }
+                        else {
                             throw e;
                         }
                     }

@@ -87,7 +87,7 @@ var tlvstore = (function () {
         // Consistency checks.
         if ((valueLength !== value.length)
                 || (rest.length !== tlvContainer.length - (keyLength + valueLength + 3))) {
-            ns._logger.warn('Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
+            ns._logger.info('Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
 
             return false;
         }
@@ -123,7 +123,7 @@ var tlvstore = (function () {
 
         if (utf8LegacySafe && (container === false)) {
             // Treat the legacy case and first UTF-8 decode the container content.
-            ns._logger.info('Retrying to decode after UTF-8 decoding TLV container.');
+            ns._logger.info('Retrying to decode TLV container legacy style ...');
 
             return ns.tlvRecordsToContainer(decodeURIComponent(escape(tlvContainer)),
                                             false);

@@ -240,7 +240,7 @@ var ConversationMessage = React.createClass({
 
                                         <hr />
 
-                                        <DropdownsUI.DropdownItem icon="red-cross" label={__("Delete")} className="red"
+                                        <DropdownsUI.DropdownItem icon="red-cross" label={__("Revoke")} className="red"
                                                                   onClick={() => {
                                                 chatRoom.revokeAttachment(v);
                                             }}/>

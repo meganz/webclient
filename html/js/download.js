@@ -91,7 +91,7 @@ function dl_g(res) {
                 ulQueue.pause();
                 dlQueue.pause();
                 uldl_hold = true;
-                $('.download.status-txt, .download-info .text') .safeHTML(escapeHTML(l[1388])).addClass('blue');
+                $('.download.status-txt, .download-info .text').safeHTML(escapeHTML(l[1388])).addClass('blue');
                 $(this).addClass('active');
             }
             else

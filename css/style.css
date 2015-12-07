@@ -9643,16 +9643,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: relative;
 }
 .dlkey-dialog .decryption-key .icon {
-    background-image: url("../images/mega/get-link-icon-sprite-v1.svg");
-    background-position: -32px 0;
+    background-image: url("../images/mega/dialogs-sprite_v6.svg");
+    background-position: -6px -5510px;
     background-repeat: no-repeat;
-    background-size: 204px 23px;
     height: 22px;
     left: 13px;
-    opacity: 0.25;
+    opacity: 0.5;
     position: absolute;
-    top: 2px;
-    width: 23px;
+    top: 5px;
+    width: 24px;
 }
 .dlkey-dialog .decryption-key input {
     text-indent: 36px;
@@ -21923,6 +21922,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #fff;
     border: 1px solid #f2f2f2;
     border-radius: 5px;
+    display: inline-block;
     padding: 0 10px;
     font-size: 13px;
     line-height: 30px;

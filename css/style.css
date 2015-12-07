@@ -13343,9 +13343,199 @@ table {
 	margin: -165px 0 0 -199px;
 }
 .download.content-block {
-	min-width: 412px;
-	margin: -85px 0 0 -206px;
+	width: 412px;
+	margin: -108px 0 0 -206px;
 }
+.download.main-pad {
+    display: table; height: 170px; width: 100%;
+}
+.download.centered-block {
+    display: table-cell; height: 170px; width: 100%; 
+}
+.download .block-view-file-type {
+    float: left;
+    position: static;
+    margin: -1px 0 0 -5px; 
+}
+.download.file-info {
+    margin-left: 95px;
+}
+.download.info-txt.big-txt {
+    font-size:20px; line-height: 25px; color:#333333;  font-family: 'source_sans_prolight';
+}
+.download.info-txt.mid-txt {
+    font-size:14px; line-height: 17px; color:#777777; 
+}
+.download.info-txt.small-txt {
+    font-size:12px; line-height: 14px; color:#777777; 
+}
+.download.info-txt.white {
+    color: white;
+}
+.download.buttons-block {
+    margin: 23px 0 0 0;
+}
+.downloading .download.buttons-block {
+    display: none;
+}
+.download.percents-block {
+    float: right;
+    margin: 7px 0 0 0;
+    display: none;
+    text-align: right;
+}
+.download.percents-txt {
+    font-size: 24px;
+    line-height: 24px;
+    color:#333333;
+    font-family: 'source_sans_prolight'; 
+}
+.download.status-txt {
+    font-size: 12px;
+    line-height: 12px;
+    color:#D90007;
+}
+.download.status-txt.green {
+    color: #31B500;
+}
+.download.status-txt.blue {
+    color: #2BA6DE;
+}
+.button.download-button {
+    width: 200px;
+    height: 64px;
+    background-color: #666666;
+    -moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+    float: left;
+    margin: 0 0 0 12px;
+        padding: 10px 16px 0 16px;
+    -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box; 
+    cursor: pointer;
+    -webkit-transition: background-color 200ms ease-in-out;
+    -moz-transition: background-color 200ms ease-in-out;
+    -o-transition: background-color 200ms ease-in-out;
+    -ms-transition: background-color 200ms ease-in-out;  
+}
+.button.download-button:hover {
+    background-color: #555555;
+}
+.button.download-button.red {
+    background-color: rgba( 217,0,7,0.7);
+}
+.button.download-button.red:hover {
+    background-color: rgba( 217,0,7,1);
+}
+.button.download-button:first-child {
+    margin: 0;
+}
+.download-icon {
+    display: inline-block;
+    float: left;
+    width: 25px;
+    height: 24px;
+    background-image: url(../images/mega/download-sprite-v4@2x.png);
+    background-size: 257px auto;
+    background-repeat:no-repeat;
+    background-position: left top;
+    vertical-align: top;
+}
+.download-icon.cloud-with-arrow {
+    float: left;
+    margin: 14px 0 0 0;
+    width: 28px;
+    height: 25px;
+}
+.download-icon.cloud-with-arrow {
+    float: left;
+    margin: 14px 0 0 0;
+}
+.download-icon.pause-icon {
+    background-position: -2px -49px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
+}
+.download-icon.speed-icon {
+    background-position: -50px -49px;
+}
+.download-icon.clock-icon {
+    background-position: -100px -49px;
+}
+.pause-button:hover .download-icon.pause-icon {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.pause-button.active .download-icon.pause-icon {
+    background-position: -2px -99px;
+}
+.download-info {
+    float: left;
+    margin: 0 21px 0 0;
+}
+.download.pause-button {
+    cursor: pointer;
+    float: left;
+    margin: 0 23px 0 0;
+}
+.download-info .text {
+    color: #333333;
+    font-size: 24px;
+    line-height: 24px;
+    vertical-align: top;
+    padding-left: 6px;
+    font-family: 'source_sans_prolight'; 
+}
+.download-info .text span {
+    color: #777777;
+    font-size: 13px;
+    font-family: 'source_sans_proregular'; 
+    padding: 0 5px 0 3px;
+}
+.download-info .text.blue {
+    color: #2BA6DE;
+    font-size: 12px;
+    font-family: 'source_sans_proregular'; 
+}
+.download.progress-block {
+    height: 16px;
+    background-color: rgba(0,0,0,0.1);
+    -moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+    -webkit-box-sizing: border-box; 
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+    padding:4px;
+    margin: 22px 0 24px 0;
+}
+.download.progress-bar {
+    height: 8px;
+    background-color: white;
+    -moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+    width: 0%;
+}
+.download.message-txt, .download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-unavailable {
+    display: none;
+}
+.downloading .download.in-progress, .downloading .download.percents-block {
+    display: block; 
+}
+
+
 .st-main-button-bl {
 	height: 260px;
 	position: relative;

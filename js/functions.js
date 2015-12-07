@@ -766,7 +766,7 @@ function uplpad(number, length) {
     return str;
 }
 
-function secondsToTime(secs) {
+function secondsToTime(secs, text_format) {
     if (isNaN(secs)) {
         return '--:--:--';
     }
@@ -780,6 +780,11 @@ function secondsToTime(secs) {
     var divisor_for_seconds = divisor_for_minutes % 60;
     var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
     var returnvar = hours + ':' + minutes + ':' + seconds;
+
+    if (text_format) {
+        hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
+        returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
+    } 
     return returnvar;
 }
 

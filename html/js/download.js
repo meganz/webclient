@@ -172,10 +172,10 @@ function dl_g(res) {
             var n = fdl_file.n||'unknown', n_l = n.length;
             $('.file-info .download.info-txt').text(n_l);
             while(n_l-- && $('.download.info-txt.filename').width() > 316) {
-                $('.file-info .download.info-txt').text(str_mtrunc(n,n_l));
+                $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n,n_l));
             }
             if (1 > n_l) $('.file-info .download.info-txt').text(str_mtrunc(n,60));
-            $('.file-info .download.info-txt.very-small').text(bytesToSize(res.s));
+            $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
             $('.info-block .block-view-file-type').addClass(fileIcon({name:fdl_file.n}));
         }
         else mKeyDialog(dlpage_ph);

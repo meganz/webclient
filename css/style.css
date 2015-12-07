@@ -13394,6 +13394,7 @@ table {
     font-size: 12px;
     line-height: 12px;
     color:#D90007;
+    text-transform: lowercase; 
 }
 .download.status-txt.green {
     color: #31B500;
@@ -13436,7 +13437,7 @@ table {
     display: inline-block;
     float: left;
     width: 25px;
-    height: 24px;
+    height: 25px;
     background-image: url(../images/mega/download-sprite-v4@2x.png);
     background-size: 257px auto;
     background-repeat:no-repeat;
@@ -13507,6 +13508,7 @@ table {
     color: #2BA6DE;
     font-size: 12px;
     font-family: 'source_sans_proregular'; 
+    text-transform: lowercase; 
 }
 .download.progress-block {
     height: 16px;
@@ -13531,7 +13533,7 @@ table {
 .download.message-txt, .download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-unavailable {
     display: none;
 }
-.downloading .download.in-progress, .downloading .download.percents-block {
+.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.percents-block {
     display: block; 
 }
 

@@ -91,7 +91,7 @@ function dl_g(res) {
                 ulQueue.pause();
                 dlQueue.pause();
                 uldl_hold = true;
-                $('.download.status-txt, .download-info .text').safeHTML(escapeHTML(l[1388])).addClass('blue');
+                $('.download.status-txt, .download-info .text').safeHTML(escapeHTML(l[1651])).addClass('blue');
                 $(this).addClass('active');
             }
             else
@@ -125,6 +125,7 @@ function dl_g(res) {
             else
             {
                 $('.download-mid-centered-block').addClass('downloading');
+                $('.download.status-txt').safeHTML(escapeHTML(l[819])).removeClass('green');
                 dlmanager.isDownloading = true;
                 dl_queue.push(fdl_queue_var);
                 $.dlhash = window.location.hash;
@@ -168,12 +169,12 @@ function dl_g(res) {
                 onDownloadError: dlerror,
                 onBeforeDownloadComplete: function() { }
             };
-            var n = fdl_file.n||'unknown', l = n.length;
-            $('.file-info .download.info-txt').text(n);
-            while(l-- && $('.download.info-txt.filename').width() > 316) {
-                $('.file-info .download.info-txt').text(str_mtrunc(n,l));
+            var n = fdl_file.n||'unknown', n_l = n.length;
+            $('.file-info .download.info-txt').text(n_l);
+            while(n_l-- && $('.download.info-txt.filename').width() > 316) {
+                $('.file-info .download.info-txt').text(str_mtrunc(n,n_l));
             }
-            if (1 > l) $('.file-info .download.info-txt').text(str_mtrunc(n,60));
+            if (1 > n_l) $('.file-info .download.info-txt').text(str_mtrunc(n,60));
             $('.file-info .download.info-txt.very-small').text(bytesToSize(res.s));
             $('.info-block .block-view-file-type').addClass(fileIcon({name:fdl_file.n}));
         }
@@ -247,6 +248,7 @@ function dlerror(dl,error)
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
+    $('.download.content-block').addClass('downloading');
     if (kbps == 0) return;
     $('.download.temporary-error-txt').addClass('hidden');
     $('.download.icons-block').removeClass('hidden');
@@ -256,7 +258,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
     if (!m)
     {
-        $('.download.content-block').addClass('downloading');
+        $('.download.status-txt').safeHTML(escapeHTML(l[258]));
         $('.download.content-block').removeClass('not-available-temporary');
         $('.download.progress-bar').width(perc + '%');
         $('.download.percents-txt').text(perc + ' %');
@@ -333,10 +335,11 @@ function dlcomplete(id)
     if (d) console.log('dlcomplete',id);
     if (typeof id === 'object') id = id.dl_id;
     $('.download.pause-button').hide();
-    $('.download.content-block').addClass('download-complete');
+    $('.download.content-block').removeClass('downloading').addClass('download-complete');
     $('.download.pause-button').hide();
     $('.download.progress-bar').width('100%');
     $('.download.percents-txt').text('100 %');
+    $('.download.status-txt').safeHTML(escapeHTML(l[1418])).addClass('green');
     if ($('#dlswf_' + id).length > 0)
     {
         $('.fm-dialog-overlay').removeClass('hidden');

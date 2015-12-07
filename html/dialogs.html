@@ -141,10 +141,17 @@
         <div class="clear"></div>
     </div>
     <div class="fm-dialog-body">
-        <div class="fm-dialog-new-folder-input">
-            <div class="fm-dialog-input-clear"></div>
-            <div class="fm-dialog-new-folder-pad">
-                <input name="dialog-new-folder" type="text" placeholder="[$1028]" value="" />
+        <div class="wrapper">
+            <div class="instruction-message">
+                To access the folder/file, you will need its <b>Decryption key</b>.<br>
+                If you do not have it, ask the creator of the link.
+            </div>
+            <div class="fm-dialog-new-folder-input">
+                <div class="fm-dialog-input-clear"></div>
+                <div class="fm-dialog-new-folder-pad decryption-key">
+                    <span class="icon"></span>
+                    <input name="dialog-new-folder" type="text" placeholder="Decryption key" value="" />
+                </div>
             </div>
         </div>
         <div class="default-dialog-bottom">
@@ -152,8 +159,6 @@
         </div>
     </div>
 </div>
-
-
 
 <div class="fm-dialog registration-success registration-page-success hidden">
      <div class="reg-success-icon"></div>

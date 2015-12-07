@@ -9631,6 +9631,32 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	min-width: 440px;
 	margin: -77px 0 0 -220px;
 }
+.dlkey-dialog .wrapper {
+    padding: 10px;
+}
+.dlkey-dialog .instruction-message {
+    color: #777;
+    line-height: 20px;
+    padding: 0 0 20px;
+}
+.dlkey-dialog .decryption-key {
+    position: relative;
+}
+.dlkey-dialog .decryption-key .icon {
+    background-image: url("../images/mega/get-link-icon-sprite-v1.svg");
+    background-position: -32px 0;
+    background-repeat: no-repeat;
+    background-size: 204px 23px;
+    height: 22px;
+    left: 13px;
+    opacity: 0.25;
+    position: absolute;
+    top: 2px;
+    width: 23px;
+}
+.dlkey-dialog .decryption-key input {
+    text-indent: 36px;
+}
 .fm-dialog.rename-dialog {
 	min-width: 360px;
 	margin: -77px 0 0 -180px;
@@ -21885,7 +21911,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-size: 204px 23px;
     height: 22px;
     left: -1px;
-    opacity: 0.7;
+    opacity: 0.55;
     position: absolute;
     top: -4px;
     width: 18px;
@@ -21896,7 +21922,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     opacity: 1;
 }
 .link-handle .text {
-    color: #555;
+    color: #777;
     font-size: 12px;
     padding-left: 25px;
 }
@@ -21915,7 +21941,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-size: 204px 23px;
     height: 22px;
     left: -1px;
-    opacity: 0.7;
+    opacity: 0.55;
     position: absolute;
     top: -6px;
     width: 23px;
@@ -21926,7 +21952,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     opacity: 1;
 }
 .link-decryption-key .text {
-    color: #555;
+    color: #777;
     font-size: 12px;
     padding-left: 31px;
 }
@@ -21945,7 +21971,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-size: 204px 23px;
     height: 22px;
     left: 9px;
-    opacity: 0.7;
+    opacity: 0.55;
     position: absolute;
     top: 3px;
     width: 23px;
@@ -21956,7 +21982,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     opacity: 1;
 }
 .link-handle-and-key .text {
-    color: #555;
+    color: #777;
     font-size: 12px;
     padding-left: 30px;
 }

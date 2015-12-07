@@ -167,14 +167,14 @@ function dl_g(res) {
                 onBeforeDownloadComplete: function() { }
             };
             var n = fdl_file.n||'unknown', l = n.length;
-            $('.new-download-file-title').text(n);
+            $('.file-info .download.info-txt').text(n);
             var cs = $('.new-download-right-block').width() - parseInt($('.new-download-file-info').css('margin-left'));
             while(l-- && $('.new-download-file-title').width() > cs) {
-                $('.new-download-file-title').text(str_mtrunc(n,l));
+                $('.file-info .download.info-txt').text(str_mtrunc(n,l));
             }
-            if (1 > l) $('.new-download-file-title').text(str_mtrunc(n,60));
-            $('.new-download-file-size').text(bytesToSize(res.s));
-            $('.new-download-file-icon').addClass(fileIcon({name:fdl_file.n}));
+            if (1 > l) $('.file-info .download.info-txt').text(str_mtrunc(n,60));
+            $('.file-info .download.info-txt.very-small').text(bytesToSize(res.s));
+            $('.info-block .block-view-file-type').addClass(fileIcon({name:fdl_file.n}));
         }
         else mKeyDialog(dlpage_ph);
     }

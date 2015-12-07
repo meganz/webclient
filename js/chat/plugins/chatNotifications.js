@@ -33,7 +33,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
     megaChat
         .rebind('onRoomCreated.chatNotifications', function(e, megaRoom) {
             var resetChatNotificationCounters = function() {
-                if(megaRoom.isCurrentlyActive) {
+                if (megaRoom.isCurrentlyActive) {
                     var lastSeen = null;
                     megaRoom.messagesBuff.messages.forEach(function (v, k) {
                         if (v.getState && v.getState() === Message.STATE.NOT_SEEN) {
@@ -41,7 +41,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                         }
                     });
 
-                    if(lastSeen) {
+                    if (lastSeen) {
                         megaRoom.messagesBuff.setLastSeen(lastSeen.messageId);
                     }
                     self.notifications.resetCounterGroup(megaRoom.roomJid);
@@ -57,7 +57,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     else if (message.authorContact) {
                         fromContact = message.authorContact;
                     }
-                    else if(message.getFromJid) {
+                    else if (message.getFromJid) {
                         fromContact = megaChat.getContactFromJid(
                             message.getFromJid()
                         );
@@ -67,11 +67,12 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     var icon = avatarMeta.avatarUrl;
                     var n;
 
-                    if(!message.getState || message.getState() === Message.STATE.SEEN) { // halt if already seen.
+                    // halt if already seen.
+                    if (!message.getState || message.getState() === Message.STATE.SEEN || message.revoked === true) {
                         return;
                     }
 
-                    if(message.userId !== u_handle) {
+                    if (message.userId !== u_handle) {
                         n = self.notifications.notify(
                             'incoming-chat-message',
                             {
@@ -93,8 +94,8 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 megaRoom.messagesBuff.removeChangeListener(changeListenerId);
                             }
                         });
-                    } else if(message.type && message.textContents && !message.seen) {
-                        if(message.type === "incoming-call") {
+                    } else if (message.type && message.textContents && !message.seen) {
+                        if (message.type === "incoming-call") {
                             return; // already caught by the onIncomingCall...
                         }
                         n = self.notifications.notify(
@@ -113,7 +114,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                         );
 
                         var changeListener = function() {
-                            if(message.seen === true) {
+                            if (message.seen === true) {
                                 n.setUnread(false);
 
                                 message.removeChangeListener(changeListener);
@@ -122,13 +123,13 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
 
                         message.addChangeListener(changeListener);
                     }
-                    if(n) {
+                    if (n) {
                         // activate/show room when a notification is clicked
                         n.bind('onClick', function(e) {
                             window.focus();
                             megaRoom.activateWindow();
                             megaRoom.show();
-                            if(n.type == "incoming-text-message") {
+                            if (n.type == "incoming-text-message") {
                                 setTimeout(function() {
                                     $('.message-textarea:visible').trigger('focus');
                                 }, 1000);
@@ -169,7 +170,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
 
                     var evtId = generateEventSuffixFromArguments("", "chatNotifStopSoundOut", rand(10000));
                     var stopSound = function(e, session, oldState, newState) {
-                        if(session.sid == sid) {
+                        if (session.sid == sid) {
                             n.forceStopSound();
                             callSession.unbind('StateChanged' + evtId);
                         }
@@ -212,7 +213,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
             });
 
             var changeListener = function() {
-                if(dialogMessage.seen === true) {
+                if (dialogMessage.seen === true) {
                     n.setUnread(false);
 
                     dialogMessage.removeChangeListener(changeListener);
@@ -223,7 +224,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
 
             var evtId = generateEventSuffixFromArguments("", "chatNotifStopSound", rand(10000));
             var stopSound = function(e, session, oldState, newState) {
-                if(session.sid == sid) {
+                if (session.sid == sid) {
                     n.forceStopSound();
                     callSession.unbind('StateChanged' + evtId);
                 }
@@ -241,7 +242,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
         //// link counters
         //self.notifications.rebind("onCounterUpdated.chatNotifications", function(e, notif, group, type) {
         //    var room = megaChat.chats[group];
-        //    if(room) {
+        //    if (room) {
         //        room.unreadCount = notif.getCounterGroup(group);
         //    }
         //});

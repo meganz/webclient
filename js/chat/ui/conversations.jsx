@@ -43,7 +43,7 @@ var ConversationsListItem = React.createClass({
         var roomShortJid = this.props.chatRoom.roomJid.split("@")[0];
 
         var caps = megaChat.karere.getCapabilities(contactJid);
-        if(caps) {
+        if (caps) {
             Object.keys(caps).forEach(function (k) {
                 var v = caps[k];
                 if (v) {
@@ -53,7 +53,7 @@ var ConversationsListItem = React.createClass({
         }
 
         // selected
-        if(this.props.chatRoom.isCurrentlyActive) {
+        if (this.props.chatRoom.isCurrentlyActive) {
             classString += " active";
         }
 
@@ -64,14 +64,14 @@ var ConversationsListItem = React.createClass({
         var unreadCount = this.props.chatRoom.messagesBuff.getUnreadCount();
         var unreadDiv = "";
         var isUnread = false;
-        if(unreadCount > 0) {
+        if (unreadCount > 0) {
             unreadDiv = <div className="unread-messages">{unreadCount}</div>;
             isUnread = true;
         }
 
         var lastMessageDiv = "";
         var lastMessage = this.props.chatRoom.messagesBuff.getLatestTextMessage();
-        if(lastMessage) {
+        if (lastMessage) {
             var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
 
             var renderableSummary = lastMessage.textContents;
@@ -87,7 +87,8 @@ var ConversationsListItem = React.createClass({
                     </div>
                     <div className="date-time">{unixtimeToTimeString(lastMessage.delay)}</div>
                 </div>;
-        } else {
+        }
+        else {
             var lastMsgDivClasses = "conversation-message";
             lastMessageDiv =
                 <div>
@@ -124,7 +125,7 @@ var ConversationsList = React.createClass({
     },
     currentCallClicked: function(e) {
         var activeCallSession = this.props.megaChat.activeCallSession;
-        if(activeCallSession) {
+        if (activeCallSession) {
             this.conversationClicked(activeCallSession.room, e);
         }
     },
@@ -134,7 +135,7 @@ var ConversationsList = React.createClass({
     },
     endCurrentCall: function(e) {
         var activeCallSession = this.props.megaChat.activeCallSession;
-        if(activeCallSession) {
+        if (activeCallSession) {
             activeCallSession.endCall('hangup');
             this.conversationClicked(activeCallSession.room, e);
         }
@@ -147,7 +148,7 @@ var ConversationsList = React.createClass({
             $(window).outerHeight() -  $('#topmenu').outerHeight()
         );
 
-        if($jsp) {
+        if ($jsp) {
             $jsp.reinitialise();
         }
     },
@@ -174,35 +175,37 @@ var ConversationsList = React.createClass({
         var megaChat = this.props.megaChat;
 
         var activeCallSession = megaChat.activeCallSession;
-        if(activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
+        if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
             var room = activeCallSession.room;
             var user = room.getParticipantsExceptMe()[0];
             user = megaChat.getContactFromJid(user);
 
-            if(user) {
+            if (user) {
                 currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
                 currentCallingContactStatusProps['data-jid'] = room.roomJid;
                 callName = room.getRoomTitle();
 
-                if(room.roomJid == megaChat.currentlyOpenedChat) {
+                if (room.roomJid == megaChat.currentlyOpenedChat) {
                     currentCallingContactStatusProps.className += " selected";
                 }
-            } else {
+            }
+            else {
                 currentCallingContactStatusProps.className += ' hidden';
             }
-        } else {
+        }
+        else {
             currentCallingContactStatusProps.className += ' hidden';
         }
 
-        if(!callName) {
+        if (!callName) {
             currentCallingHeaderClasses += " hidden";
         }
         var currConvsList = [];
         this.props.chats.map((chatRoom, k) => {
-            if(chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
+            if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
                 return;
             }
-            if(
+            if (
                 megaChat.activeCallSession &&
                 chatRoom == megaChat.activeCallSession.room &&
                 megaChat.activeCallSession.isActive()
@@ -213,7 +216,7 @@ var ConversationsList = React.createClass({
             var contact = chatRoom.getParticipantsExceptMe()[0];
             contact = chatRoom.megaChat.getContactFromJid(contact);
 
-            if(contact && contact.c === 0) {
+            if (contact && contact.c === 0) {
                 // skip & leave, a non-contact conversation, e.g. contact removed.
                 Soon(function() {
                     chatRoom.destroy();

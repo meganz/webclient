@@ -1081,14 +1081,53 @@ ChatRoom.prototype.attachNodes = function(ids) {
 };
 
 ChatRoom.prototype.revokeAttachment = function(node) {
+    var self = this;
+
     assert(node, 'node is missing.');
 
-    // 1b, 1b, JSON
-    this.sendMessage(
-        Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-        Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT +
-        node.h
-    );
+    var users = [];
+
+    $.each(self.getParticipantsExceptMe(), function(k, v) {
+        var contact = self.megaChat.getContactFromJid(v);
+        if (contact && contact.u) {
+            users.push(
+                contact.u
+            );
+        }
+    });
+
+    loadingDialog.show();
+
+    var allPromises = [];
+
+    users.forEach(function(uh) {
+        allPromises.push(
+            asyncApiReq({
+                'a': 'mcra', 'n': node.h, 'u': uh, 'id': self.chatId
+            })
+        );
+    });
+    MegaPromise.allDone(allPromises)
+        .done(function() {
+            // 1b, 1b, JSON
+            self.sendMessage(
+                Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+                Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT +
+                node.h
+            );
+        })
+        .always(function() {
+            loadingDialog.hide();
+        })
+        .fail(function(r) {
+            msgDialog(
+                'warninga',
+                __("Revoke attachment"),
+                __("Could not revoke access to attachment, error code: %s.").replace("%s", r)
+            );
+        });
+
+    return allPromises;
 };
 
 /**

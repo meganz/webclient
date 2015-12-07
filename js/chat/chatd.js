@@ -112,7 +112,7 @@ Chatd.prototype.addshard = function(chatid, shard, url) {
     this.shards[shard].url = url;
 
     // attempt a connection ONLY if this is a new shard.
-    if(newshard) {
+    if (newshard) {
         this.shards[shard].reconnect();
     }
 
@@ -241,7 +241,7 @@ Chatd.Shard.prototype.reconnect = function() {
 Chatd.Shard.prototype.disconnect = function() {
     var self = this;
 
-    if(self.s) {
+    if (self.s) {
         self.s.close();
     }
     self.s = null;
@@ -491,7 +491,8 @@ Chatd.prototype.join = function(chatid, shard, url) {
 Chatd.prototype.submit = function(chatid, message) {
     if (this.chatidmessages[chatid]) {
         return this.chatidmessages[chatid].submit(message);
-    } else {
+    }
+    else {
         return false;
     }
 };
@@ -796,7 +797,7 @@ Chatd.prototype.unpack32le = function(x) {
 };
 
 // imported functions from crypto.js
-if(typeof('base64urldecode') === 'undefined') {
+if (typeof('base64urldecode') === 'undefined') {
     function base64urldecode(data) {
         data += '=='.substr((2 - data.length * 3) & 3)
 
@@ -812,7 +813,7 @@ if(typeof('base64urldecode') === 'undefined') {
     }
 }
 
-if(typeof('base64urlencode') === 'undefined') {
+if (typeof('base64urlencode') === 'undefined') {
     function base64urlencode(data) {
         if (typeof btoa === 'function') {
             return btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');

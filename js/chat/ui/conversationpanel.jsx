@@ -60,8 +60,16 @@ var ConversationMessage = React.createClass({
         var megaChat = chatRoom.megaChat;
 
         if (!self.onAfterRenderWasTriggered) {
-            chatRoom.trigger("onAfterRenderMessage", self.props.message);
-            self.onAfterRenderWasTriggered = true;
+            var msg = self.props.message;
+            var shouldRender = true;
+            if (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) {
+                shouldRender = false;
+            }
+
+            if (shouldRender) {
+                chatRoom.trigger("onAfterRenderMessage", self.props.message);
+                self.onAfterRenderWasTriggered = true;
+            }
         }
     },
     render: function () {
@@ -116,7 +124,8 @@ var ConversationMessage = React.createClass({
             // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
             if (message.messageHtml) {
                 message.messageHtml = message.messageHtml;
-            } else {
+            }
+            else {
                 message.messageHtml = htmlentities(
                     message.getContents ? message.getContents() : message.textContents
                 ).replace(/\n/gi, "<br/>");
@@ -175,7 +184,8 @@ var ConversationMessage = React.createClass({
                 else if (message.getState() === Message.STATE.DELETED) {
                     labelClass += " deleted";
                     labelText = "deleted";
-                } else {
+                }
+                else {
                     labelClass += " not-sent";
                     labelText = "not sent"
                 }
@@ -205,7 +215,7 @@ var ConversationMessage = React.createClass({
                         };
 
                         // cache ALL current attachments, so that we can revoke them later on in an ordered way.
-                        if(message.messageId) {
+                        if (message.messageId) {
                             if (!chatRoom._attachmentsMap) {
                                 chatRoom._attachmentsMap = {};
                             }
@@ -260,6 +270,11 @@ var ConversationMessage = React.createClass({
                                 </ButtonsUI.Button>;
                             }
                         }
+                        else {
+                            dropdown = <ButtonsUI.Button
+                                className="default-white-button tiny-button disabled"
+                                icon="tiny-icon grey-down-arrow" />;
+                        }
 
                         files.push(
                             <div className="message shared-data" key={v.h}>
@@ -299,7 +314,7 @@ var ConversationMessage = React.createClass({
                         </div>
                     </div>;
                 }
-                else if(textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+                else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
                     if (!chatRoom._attachmentsMap) {
                         chatRoom._attachmentsMap = {};
                     }
@@ -314,31 +329,20 @@ var ConversationMessage = React.createClass({
                                 try {
                                     var attachments = JSON.parse(attachedMsg.textContents.substr(2, attachedMsg.textContents.length));
                                     attachments.forEach(function(node) {
-                                        if(node.h === revokedNode) {
+                                        if (node.h === revokedNode) {
                                             foundRevokedNode = node;
                                         }
                                     })
                                 } catch(e) {
                                 }
                                 attachedMsg.revoked = true;
+                                attachedMsg.seen = true;
                             }
                         });
                     }
 
-                    if (foundRevokedNode) {
-                        return <div className="message body" data-id={"id" + message.messageId}>
-                            <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
-                            <div className="message content-area">
-                                <div className="message user-card-name">{displayName}</div>
-                                <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
-                                <div className="message text-block">
-                                    <em>{__("revoked access to attachment: %s").replace("%s", foundRevokedNode.name)}</em>
-                                </div>
-                            </div>
-                        </div>
-                    } else {
-                      return null;
-                    }
+                    // don't show anything if this is a 'revoke' message
+                    return null;
                 }
                 else {
                     chatRoom.logger.error("Invalid 2nd byte for a management message: ", textContents);
@@ -403,7 +407,8 @@ var ConversationMessage = React.createClass({
                 textMessage = textMessage
                     .replace("[[ ", "<span className=\"grey-color\">")
                     .replace("]]", "</span>");
-            } else {
+            }
+            else {
                 textMessage = textMessage.replace("[X]", htmlentities(generateContactName(contact.u)));
             }
 
@@ -475,7 +480,7 @@ var ConversationMessage = React.createClass({
             }
 
             var buttonsCode;
-            if(buttons.length > 0) {
+            if (buttons.length > 0) {
                 buttonsCode = <div className="buttons-block">
                         {buttons}
                         <div className="clear" />
@@ -620,7 +625,8 @@ var ConversationPanel = React.createClass({
                 self.$messages.one('jsp-initialised', function () {
                     $jsp.scrollToBottom();
                 });
-            } else {
+            }
+            else {
                 self.$messages.one('jsp-initialised', function () {
                     $jsp.scrollToPercentY($jsp.getPercentScrolledY(perc));
                 });
@@ -676,7 +682,8 @@ var ConversationPanel = React.createClass({
                 $(document).rebind('mouseup.startCallPopup', function (e) {
                     hidePopup();
                 });
-            } else {
+            }
+            else {
                 hidePopup();
             }
         }
@@ -699,7 +706,8 @@ var ConversationPanel = React.createClass({
         if (room.callSession) {
             if (room.callSession.getMediaOptions().video) {
                 room.callSession.muteVideo();
-            } else {
+            }
+            else {
                 room.callSession.unmuteVideo();
             }
         }
@@ -710,7 +718,8 @@ var ConversationPanel = React.createClass({
         if (room.callSession) {
             if (room.callSession.getMediaOptions().audio) {
                 room.callSession.muteAudio();
-            } else {
+            }
+            else {
                 room.callSession.unmuteAudio();
             }
         }
@@ -729,7 +738,8 @@ var ConversationPanel = React.createClass({
             }, 200, function() {
                 $target.addClass('active');
             });
-        } else {
+        }
+        else {
             var w = 245;
             if ($target.parent().attr('class').indexOf('current-user-audio-container') >= 1) {
                 w = 184;
@@ -754,7 +764,8 @@ var ConversationPanel = React.createClass({
         if (this.state.isFullscreenModeEnabled) {
             this.setState({isFullscreenModeEnabled: false});
             $(document).fullScreen(false);
-        } else {
+        }
+        else {
             this.setState({isFullscreenModeEnabled: true});
             $(document).fullScreen(true);
         }
@@ -781,7 +792,8 @@ var ConversationPanel = React.createClass({
                 self.iAmTyping = true;
                 room.megaChat.karere.sendIsComposing(room.roomJid);
             }
-        } else if (self.typingTimeout) {
+        }
+        else if (self.typingTimeout) {
             clearTimeout(self.typingTimeout);
         }
 
@@ -816,11 +828,13 @@ var ConversationPanel = React.createClass({
                 self.stoppedTyping();
                 e.preventDefault();
                 return;
-            } else {
+            }
+            else {
                 self.stoppedTyping();
                 e.preventDefault();
             }
-        } else if (key === 13) {
+        }
+        else if (key === 13) {
             if ($.trim(val).length === 0) {
                 self.stoppedTyping();
                 e.preventDefault();
@@ -927,7 +941,8 @@ var ConversationPanel = React.createClass({
 
             if (self.lastScrolledToBottom === true) {
                 $jsp.scrollToBottom();
-            } else {
+            }
+            else {
                 var prevPosY = (
                         $jsp.getContentHeight() - self.lastScrollHeight
                     ) + self.lastScrollPosition;
@@ -1021,7 +1036,8 @@ var ConversationPanel = React.createClass({
             if (self.state.isFullscreenModeEnabled) {
                 $('.fm-chat-block').addClass('fullscreen');
 
-            } else {
+            }
+            else {
                 $('.fm-chat-block').removeClass('fullscreen');
             }
             var $videoElem = $("video#remotevideo_" + room.callSession.sid);
@@ -1042,7 +1058,8 @@ var ConversationPanel = React.createClass({
                 $avscreen.data('isDraggable', true);
             }
 
-        } else {
+        }
+        else {
             // only rmeove the video-call class IF the updated room is the one which was updated
             if (megaChat.currentlyOpenedChat === room.roomJid) {
                 $('.fm-chat-block').removeClass('video-call');
@@ -1104,7 +1121,8 @@ var ConversationPanel = React.createClass({
             self.$messages.css('height', scrollBlockHeight);
             $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
             self.refreshUI(true);
-        } else {
+        }
+        else {
             self.refreshUI(scrollToBottom);
         }
 
@@ -1161,7 +1179,8 @@ var ConversationPanel = React.createClass({
 
         if (callIsActive) {
             startCallButtonClasses += " hidden";
-        } else {
+        }
+        else {
             if (room.callSession && (
                 room.callSession.state === CallSession.STATE.WAITING_RESPONSE_OUTGOING ||
                 room.callSession.state === CallSession.STATE.WAITING_RESPONSE_INCOMING
@@ -1195,12 +1214,14 @@ var ConversationPanel = React.createClass({
                     startCallPopupCss.right = '8px';
                     startCallArrowCss.left = startCallPopup.outerWidth() - (startCallPopupButton.outerWidth() * 0.5)  + 'px';
 
-                } else {
+                }
+                else {
                     startCallPopupCss.right = positionX + 'px';
                     startCallArrowCss.left = '50%';
                 }
 
-            } else {
+            }
+            else {
                 room.megaChat.closeChatPopups();
             }
         }
@@ -1209,9 +1230,14 @@ var ConversationPanel = React.createClass({
         var lastTimeMarker;
         self.props.messagesBuff.messages.forEach(function(v, k) {
             if (v.deleted !== 1 && !v.protocol) {
+                var shouldRender = true;
+                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
+                    shouldRender = false;
+                }
+
                 var curTimeMarker = time2lastSeparator((new Date(v.delay * 1000).toISOString()));
 
-                if(curTimeMarker && lastTimeMarker !== curTimeMarker) {
+                if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
                     lastTimeMarker = curTimeMarker;
                     messagesList.push(
                         <div className="message date-divider" key={v.messageId + "_marker"}>{curTimeMarker}</div>
@@ -1298,7 +1324,8 @@ var ConversationPanel = React.createClass({
                 </div>;
 
                 myContainerClasses += " current-user-video-container";
-            } else {
+            }
+            else {
                 ctrlVideoButtonClasses += " active";
                 myAvatar = <div style={{height: "100%"}} className="my-avatar-text">
                     <ContactsUI.Avatar contact={M.u[u_handle]} imgStyles={{width: "100%"}} />
@@ -1309,7 +1336,8 @@ var ConversationPanel = React.createClass({
 
             if (room.callSession.getMediaOptions().audio) {
                 headerIndicatorAudio += " hidden";
-            } else {
+            }
+            else {
                 ctrlAudioButtonClasses += " active";
             }
 
@@ -1326,7 +1354,8 @@ var ConversationPanel = React.createClass({
                     />;
                 otherUserContainerClasses += " video-call-container";
 
-            } else {
+            }
+            else {
                 otherUsersAvatar = <div className="other-avatar-text">
                     <ContactsUI.Avatar contact={contact} imgStyles={{width: "100%"}} />
                 </div>;
@@ -1336,10 +1365,12 @@ var ConversationPanel = React.createClass({
 
             if (room.callSession.getRemoteMediaOptions().audio) {
 
-            } else {
+            }
+            else {
 
             }
-        } else {
+        }
+        else {
             headerIndicatorAudio += " hidden";
             headerIndicatorVideo += " hidden";
         }
@@ -1347,7 +1378,8 @@ var ConversationPanel = React.createClass({
         if (self.state.localVideoIsMinimized === true) {
             videoMinimiseButtonClasses += " active";
             myContainerClasses += " minimized";
-        } else {
+        }
+        else {
 
         }
 
@@ -1368,7 +1400,8 @@ var ConversationPanel = React.createClass({
             if (names.length > 1) {
                 areMultipleUsersTyping = true;
                 namesDisplay = [names.splice(0, names.length - 1).join(", "), names[0]];
-            } else {
+            }
+            else {
                 areMultipleUsersTyping = false;
                 namesDisplay = [names[0]];
             }
@@ -1391,7 +1424,8 @@ var ConversationPanel = React.createClass({
                     <div className="typing-bounce3"></div>
                 </div>
             </div>;
-        } else {
+        }
+        else {
             // don't do anything.
         }
 
@@ -1508,7 +1542,7 @@ var ConversationPanels = React.createClass({
 
         var conversations = [];
 
-        if(window.location.hash === "#fm/chat") {
+        if (window.location.hash === "#fm/chat") {
             // do we need to "activate" an conversation?
             var activeFound = false;
             self.props.conversations.forEach(function (chatRoom) {
@@ -1541,7 +1575,7 @@ var ConversationPanels = React.createClass({
             // }
         });
 
-        if(conversations.length === 0) {
+        if (conversations.length === 0) {
             var contactsList = [];
             var contactsListOffline = [];
             
@@ -1577,7 +1611,8 @@ var ConversationPanels = React.createClass({
                     </div>
                 </div>
             );
-        } else {
+        }
+        else {
             return (
                 <div className="conversation-panels">
                     {conversations}

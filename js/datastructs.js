@@ -44,7 +44,7 @@ var _arrayAliases = [
 /**
  * Helper Exception to be used for "break"-ing .forEach calls
  */
-if(typeof StopIteration == "undefined") {
+if (typeof StopIteration == "undefined") {
     StopIteration = new Error("StopIteration");
 }
 
@@ -53,7 +53,7 @@ function breakableForEach(arr, cb) {
         return Array.prototype.forEach.call(arr, cb);
     }
     catch(e) {
-        if(e !== StopIteration) {
+        if (e !== StopIteration) {
             throw e;
         }
     }
@@ -74,7 +74,7 @@ var _createObjectDataMethods = function(kls) {
         var res = [];
         self.forEach(function(v, k) {
             var intermediateResult = cb(v, k);
-            if(intermediateResult !== null && intermediateResult !== undefined) {
+            if (intermediateResult !== null && intermediateResult !== undefined) {
                 res.push(intermediateResult);
             }
         });
@@ -86,7 +86,7 @@ var _createObjectDataMethods = function(kls) {
     };
 
     obj.size = function() {
-        return self.keys().length
+        return this.keys().length
     };
 
     obj.hasOwnProperty = function() {
@@ -124,9 +124,10 @@ var _trackedId = 0;
 
 
 var _properJSCmp = function(a, b) {
-    if(Number.isNaN(a) && Number.isNaN(b)) {
+    if (Number.isNaN(a) && Number.isNaN(b)) {
         return true;
-    } else {
+    }
+    else {
         return a == b;
     }
 };
@@ -153,7 +154,7 @@ var _toJS = function() {
 };
 
 var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
-    if(obj.prototype) { // if called on a class...
+    if (obj.prototype) { // if called on a class...
         obj = obj.prototype;
     }
 
@@ -168,21 +169,22 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
     obj.trackDataChange = function() {
         var self = this;
 
-        if(self._dataChangeThrottlingTimer) {
+        if (self._dataChangeThrottlingTimer) {
             clearTimeout(self._dataChangeThrottlingTimer);
         }
 
 
         self._dataChangeThrottlingTimer = setTimeout(function() {
             delete self._dataChangeThrottlingTimer;
-            if(self._dataChangeIndex > MAX_INDEX_NUMBER) {
+            if (self._dataChangeIndex > MAX_INDEX_NUMBER) {
                 self._dataChangeIndex = 0;
-            } else {
+            }
+            else {
                 self._dataChangeIndex++;
             }
 
-            if(implementChangeListener === true) {
-                if(window.RENDER_DEBUG) {
+            if (implementChangeListener === true) {
+                if (window.RENDER_DEBUG) {
                     console.error("changed: ", self);
                 }
                 mBroadcaster.sendMessage(self._getDataChangeEventName(), [self].concat(arguments.length > 0 ? arguments : []));
@@ -190,7 +192,7 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
         }, TRACK_CHANGES_THROTTLING_MS);
 
 
-        if(self._parent && self._parent.trackDataChange) {
+        if (self._parent && self._parent.trackDataChange) {
             self._parent.trackDataChange(); // trigger bubble-like effect, in the order of: child -> parent
         }
     };
@@ -200,7 +202,7 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
         return 'change_' + this._dataChangeTrackedId;
     };
 
-    if(implementChangeListener === true) {
+    if (implementChangeListener === true) {
         obj.addChangeListener = function(cb) {
             cb._changeListenerId = mBroadcaster.addListener(this._getDataChangeEventName(), cb.bind(obj));
             return cb._changeListenerId;
@@ -211,9 +213,10 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
                 'this method/cb was not used as a change listener'
             );
 
-            if(typeof(cb) === 'string') {
+            if (typeof(cb) === 'string') {
                 mBroadcaster.removeListener(cb);
-            } else {
+            }
+            else {
                 mBroadcaster.removeListener(cb._changeListenerId);
             }
         };
@@ -221,13 +224,13 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
 };
 
 var trackPropertyChanges = function(obj, properties, implementChangeListener) {
-    if(obj.prototype) { // if called on a class...
+    if (obj.prototype) { // if called on a class...
         obj = obj.prototype;
     }
 
     manualTrackChangesOnStructure(obj, implementChangeListener);
 
-    if(!obj._data) {
+    if (!obj._data) {
         obj._data = {};
     }
 
@@ -247,7 +250,7 @@ var trackPropertyChanges = function(obj, properties, implementChangeListener) {
     });
 
     obj.set = function(k, v) {
-        if(!_properJSCmp(this._data[k], v)) {
+        if (!_properJSCmp(this._data[k], v)) {
             this.trackDataChange();
         }
         this._data[k] = v;
@@ -282,8 +285,8 @@ _arrayAliases.forEach(function(methodName) {
     MegaDataArray.prototype[methodName] = function() {
         var ret;
         try {
-            if(methodName == "push") {
-                if(
+            if (methodName == "push") {
+                if (
                     arguments.length > 0 &&
                     (typeof(arguments[0]._dataChangeIndex) !== 'undefined') &&
                     !arguments[0]._parent
@@ -291,13 +294,14 @@ _arrayAliases.forEach(function(methodName) {
                     arguments[0]._parent = this;
                 }
             }
-            if(methodName == "forEach") {
+            if (methodName == "forEach") {
                 return breakableForEach(this._data, arguments[0]);
-            } else {
+            }
+            else {
                 ret = this._data[methodName].apply(this._data, arguments);
             }
 
-            if(_arrayMethodsThatAltersData.indexOf(methodName) >= 0) {
+            if (_arrayMethodsThatAltersData.indexOf(methodName) >= 0) {
                 this.trackDataChange([this._data, ret]);
             }
             return ret;
@@ -365,17 +369,17 @@ var MegaDataMap = function(parent) {
 
 MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 
-    if(!k) { debugger; }
+    if (!k) { debugger; }
 
     assert(!!k, "missing key");
 
     var self = this;
 
-    if(typeof(v._dataChangeIndex) != 'undefined' &&  !v._parent) {
+    if (typeof(v._dataChangeIndex) != 'undefined' &&  !v._parent) {
         v._parent = this;
     }
 
-    if(_properJSCmp(self._data[k], v) === true) {
+    if (_properJSCmp(self._data[k], v) === true) {
         return;
     }
 
@@ -386,7 +390,7 @@ MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
             return self._data[k];
         },
         set: function (value) {
-            if(value !== self._data[k]) {
+            if (value !== self._data[k]) {
                 self._data[k] = value;
 
                 self.trackDataChange([self._data, k, v]);
@@ -395,7 +399,7 @@ MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
         enumerable: true
     });
 
-    if(!ignoreTrackDataChange) {
+    if (!ignoreTrackDataChange) {
         self.trackDataChange([self._data, k, v]);
     }
 };
@@ -406,11 +410,11 @@ MegaDataMap.prototype.remove = function(k) {
 
     var v = self._data[k];
 
-    if(v && v._parent && v._parent == this) {
+    if (v && v._parent && v._parent == this) {
         v._parent = null;
     }
 
-    if(v) {
+    if (v) {
         delete self._data[k];
         delete this[k];
     }
@@ -447,7 +451,7 @@ MegaDataSortedMap.prototype.push = function(v) {
     var keyVal = v[self._keyField];
 
     // if already exist, remove previously stored value (e.g. overwrite...)
-    if(self._data[keyVal]) {
+    if (self._data[keyVal]) {
         removeValue(self._sortedVals, keyVal, false);
 
         // clean up the defineProperty
@@ -469,7 +473,7 @@ MegaDataSortedMap.prototype.push = function(v) {
 MegaDataSortedMap.prototype.reorder = function() {
     var self = this;
 
-    if(self._sortField) {
+    if (self._sortField) {
         var sortFields = self._sortField.split(",");
 
         self._sortedVals.sort(function (a, b) {
@@ -503,22 +507,24 @@ MegaDataSortedMap.prototype.reorder = function() {
 
 MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     var self = this;
-    if(self._data[keyValue]) {
+    if (self._data[keyValue]) {
         removeValue(self._sortedVals, keyValue);
         delete self._data[keyValue];
         delete self[keyValue];
         self.reorder();
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 };
 
 MegaDataSortedMap.prototype.exists = function(keyValue) {
     var self = this;
-    if(self._data[keyValue]) {
+    if (self._data[keyValue]) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 };
@@ -532,9 +538,10 @@ MegaDataSortedMap.prototype.getItem = function(num) {
     var self = this;
 
     var foundKeyVal = self._sortedVals[num];
-    if(foundKeyVal) {
+    if (foundKeyVal) {
         return self._data[foundKeyVal];
-    } else {
+    }
+    else {
         return undefined;
     }
 };

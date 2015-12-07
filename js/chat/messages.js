@@ -31,12 +31,13 @@ var Message = function(chatRoom, messagesBuff, vals) {
 };
 
 Message._mockupNonLoadedMessage = function(msgId, msg, orderValueIfNotFound) {
-    if(!msg) {
+    if (!msg) {
         return {
             messageId: msgId,
             orderValue: orderValueIfNotFound
         };
-    } else {
+    }
+    else {
         return msg;
     }
 };
@@ -52,7 +53,7 @@ Message.prototype.getState = function() {
     var lastReceivedMessage = Message._mockupNonLoadedMessage(mb.lastDelivered, mb.messages[mb.lastDelivered], 0);
     var lastSeenMessage = Message._mockupNonLoadedMessage(mb.lastSeen, mb.messages[mb.lastSeen], 0);
 
-    if(self.userId === u_handle) {
+    if (self.userId === u_handle) {
         // can be NOT_SENT, SENT, DELIVERED and DELETED
         if (self.deleted === true) {
             return Message.STATE.DELETED;
@@ -70,7 +71,8 @@ Message.prototype.getState = function() {
             console.error("Was not able to determinate state from pointers [1].");
             return -1;
         }
-    } else {
+    }
+    else {
         // can be NOT_SEEN, SEEN and DELETED
         if (self.deleted === true) {
             return Message.STATE.DELETED;
@@ -111,6 +113,14 @@ Message.prototype.isManagement = function() {
     }
     return this.textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT;
 };
+Message.prototype.isRenderableManagement = function() {
+    if (!this.textContents) {
+        return false;
+    }
+    return this.textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT && (
+            this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT
+        );
+};
 
 /**
  * To be used when showing a summary of the text message (e.g. a text only repres.)
@@ -127,8 +137,9 @@ Message.prototype.getManagementMessageSummaryText = function() {
         else {
             return __("Attached " + nodes.length + " files.");
         }
-    } else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-        return __("Revoked access to attachments.");
+    }
+    else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+        return __("Revoked access to attachment(s).");
     }
 };
 
@@ -331,8 +342,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             self.messages.push(msgObject);
 
-            if(!eventData.isNew) {
-                if(eventData.userId !== u_handle) {
+            if (!eventData.isNew) {
+                if (eventData.userId !== u_handle) {
                     if (self.lastDeliveredMessageRetrieved === true) {
                         // received a message from history, which was NOT marked as received, e.g. was sent during
                         // this user was offline, so -> do proceed and mark it as received automatically
@@ -340,7 +351,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
                     }
                 }
-            } else {
+            }
+            else {
                 // if not from history
                 // mark as received if not sent by me
                 if (eventData.userId !== u_handle) {
@@ -415,11 +427,18 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.addChangeListener(function() {
         var newCounter = 0;
         self.messages.forEach(function(v, k) {
-            if(v.getState && v.getState() === Message.STATE.NOT_SEEN) {
-                newCounter++;
+            if (v.getState && v.getState() === Message.STATE.NOT_SEEN) {
+                var shouldRender = true;
+                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
+                    shouldRender = false;
+                }
+
+                if (shouldRender) {
+                    newCounter++;
+                }
             }
         });
-        if(self._unreadCountCache !== newCounter) {
+        if (self._unreadCountCache !== newCounter) {
             self._unreadCountCache = newCounter;
             self.chatRoom.megaChat.updateSectionUnreadCount();
         }
@@ -452,7 +471,7 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
             };
         }
 
-        if(!lastRecvMessage || lastRecvMessage.orderValue < targetMsg.orderValue) {
+        if (!lastRecvMessage || lastRecvMessage.orderValue < targetMsg.orderValue) {
             self.setLastReceived(msgId);
         }
 
@@ -476,7 +495,8 @@ MessagesBuff.prototype.setLastReceived = function(msgId) {
         }
 
         self.trackDataChange();
-    } else {
+    }
+    else {
         // its totally normal if this branch of code is executed, just don't do nothing
     }
 };
@@ -494,7 +514,8 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
 
     if (self.messagesHistoryIsLoading()) {
         return self.$msgsHistoryLoading;
-    } else {
+    }
+    else {
         self.chatdIsProcessingHistory = true;
         if (!isInitialRetrivalCall) {
             self._currentHistoryPointer -= 32;
@@ -534,7 +555,8 @@ MessagesBuff.prototype.haveMoreHistory = function() {
 
     if (!self.firstMessageId || !self.messages[self.firstMessageId]) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 };
@@ -548,13 +570,13 @@ MessagesBuff.prototype.markAllAsSeen = function() {
     keys.forEach(function(k) {
         var msg = self.messages[k];
 
-        if(msg.userId !== u_handle) {
+        if (msg.userId !== u_handle) {
             lastToBeMarkedAsSeen = k;
             return false; // break?
         }
     });
 
-    if(lastToBeMarkedAsSeen) {
+    if (lastToBeMarkedAsSeen) {
         self.setLastSeen(lastToBeMarkedAsSeen);
     }
 };
@@ -571,7 +593,7 @@ MessagesBuff.prototype.markAllAsReceived = function() {
         lastToBeMarkedAsReceived = k;
     });
 
-    if(lastToBeMarkedAsReceived) {
+    if (lastToBeMarkedAsReceived) {
         self.setLastReceived(lastToBeMarkedAsReceived);
     }
 };
@@ -635,16 +657,21 @@ MessagesBuff.prototype.removeMessageByType = function(type) {
 };
 
 MessagesBuff.prototype.getLatestTextMessage = function() {
-    if(this.messages.length > 0) {
+    if (this.messages.length > 0) {
         var msgs = this.messages;
         for(var i = msgs.length - 1; i >= 0; i--) {
-            if(msgs.getItem(i) && msgs.getItem(i).textContents && msgs.getItem(i).textContents.length > 0) {
-                return msgs.getItem(i);
+            if (msgs.getItem(i) && msgs.getItem(i).textContents && msgs.getItem(i).textContents.length > 0) {
+                var msg = msgs.getItem(i);
+                if (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) {
+                    continue;
+                }
+                return msg;
             }
         }
         // no renderable msgs found
         return false;
-    } else {
+    }
+    else {
         return false;
     }
 };

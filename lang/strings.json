@@ -485,7 +485,7 @@
     },
     "233": {
         "text": "Temporary error, retrying.",
-        "context": "Error message in the file manager while downloading. Will automatically retry,"
+        "context": ""
     },
     "235": {
         "text": "Download",
@@ -865,7 +865,7 @@
     },
     "495": {
         "text": "Storage",
-        "context": "Storage related with the MEGA PRO account level you can subscribe"
+        "context": "Label for Storage space used. Maintain capital letters in each word."
     },
     "496": {
         "text": "Bandwidth",
@@ -3405,7 +3405,7 @@
     },
     "1591": {
         "text": "MEGA folder:",
-        "context": "Label to indicate the user the MEGA folder for a synchronization (String short as possible)"
+        "context": "Label to indicate the user the MEGA folder in which the selected files\/folders will be uploaded (String short as possible)"
     },
     "1592": {
         "text": "Select local folder",
@@ -4233,7 +4233,7 @@
     },
     "1812": {
         "text": "Always upload to this destination",
-        "context": "Label to inform the user upload files\/folder to a default destination. with a checkbox."
+        "context": "Label to let the user select a default upload folder with a checkbox."
     },
     "1813": {
         "text": "MEGA synced folder",
@@ -4869,7 +4869,7 @@
     },
     "2041": {
         "text": "You don't have write permissions in this local folder.",
-        "context": "Message shown when a user is trying to download a file to a local folder without the right permissions."
+        "context": "Message displayed when a user is trying to synchronized a local folder in wich the user has no write permissions."
     },
     "2042": {
         "text": "You don't have write permissions in this folder.",
@@ -4877,11 +4877,11 @@
     },
     "2043": {
         "text": "MEGAsync won't be able to download anything here.",
-        "context": "Label to indicate that MEGAsync won't be able to download anything due to the user doesn't have writhe permissions on the local selected folder."
+        "context": "Message displayed when a user is trying to synchronized a local folder in wich the user has no write permissions."
     },
     "2044": {
         "text": "Do you want to continue?",
-        "context": "Label to indicate if the user wants to continue in spite of the problem occured."
+        "context": "Message of confirmation to continue with the current operation."
     },
     "2045": {
         "text": "Error getting link:",
@@ -7029,7 +7029,7 @@
     },
     "6066": {
         "text": "Logging in...",
-        "context": "Notification message showing a Logging in state. Keep capital letters."
+        "context": "Label displayed when the user is logging in."
     },
     "6067": {
         "text": "Logging out...",
@@ -8544,7 +8544,7 @@
         "context": ""
     },
     "7054": {
-        "text": "Enter a name to exclude from synchronization.\r\n(wildcards * and ? are allowed):",
+        "text": "Enter a name to exclude from synchronization.\n(wildcards * and ? are allowed):",
         "context": "Label to let the user add a new excluded file name. Keep colon."
     },
     "7055": {
@@ -8572,7 +8572,7 @@
         "context": "Label to let the user start MEGAsync on login with a checkbox."
     },
     "7061": {
-        "text": "Show OS X notifications",
+        "text": "Show Mac OS notifications",
         "context": "Label to let the user enable Mac OS desktop notifications with a checkbox."
     },
     "7062": {
@@ -8584,7 +8584,7 @@
         "context": "Message displayed when an error occurs with the remote folder."
     },
     "7064": {
-        "text": "Export Master Key",
+        "text": "Export Key",
         "context": "Button label to export master key of the current user. String as short as possible."
     },
     "7065": {
@@ -11124,8 +11124,8 @@
         "context": "The title of a dialog which will clear the local cache for the current user."
     },
     "7735": {
-        "text": "Backup versions of previously synced files in your computer will be permanently deleted. Please check your backup folders to see if you need to rescue something before continuing.",
-        "context": "A message shown to inform the user about what will happen if they delete their local cache."
+        "text": "Backups of the previous versions of your synced files in your computer will be permanently deleted. Please, check your backup folders to see if you need to rescue something before continuing:",
+        "context": "Message shown to inform the user about the deletion of the local cache and the consecuences"
     },
     "7736": {
         "text": "Do you want to delete your local cache now?",
@@ -11136,8 +11136,8 @@
         "context": "The title of a dialog to clear the remote cache for the current user."
     },
     "7738": {
-        "text": "Backup versions of previously synced files in MEGA will be permanently deleted. Please, check your [A] folder in the Rubbish Bin of your MEGA account to see if you need to rescue something before continuing.",
-        "context": "Message shown to the user about what will happen if they delete their remote cache."
+        "text": "Backups of the previous versions of your synced files in MEGA will be permanently deleted. Please, check your [A] folder in the Rubbish Bin of your MEGA account to see if you need to rescue something before continuing.",
+        "context": "Message shown to inform the user about the deletion of the remote cache and the consecuences"
     },
     "7739": {
         "text": "Do you want to delete your remote cache now?",
@@ -11152,8 +11152,8 @@
         "context": "Button text on the Rubbish Bin page. This button will empty all files and folders currently stored in the rubbish bin."
     },
     "7742": {
-        "text": "Are you sure you want to delete \"%1\"?",
-        "context": "Confirm with the users if they are sure they want to delete the item. Please keep \"%1\" in translation."
+        "text": "Are you sure that you want to delete \"%1\"?",
+        "context": ""
     },
     "7743": {
         "text": "Change Email",
@@ -11189,7 +11189,7 @@
     },
     "7751": {
         "text": "Request accepted",
-        "context": "Success message shown when you acepted a contact request"
+        "context": "Success message shown when you accepted a contact request"
     },
     "7752": {
         "text": "Request cancelled",
@@ -11311,6 +11311,18 @@
         "text": "This email address has already been registered. Please choose an alternative email address to proceed.",
         "context": "A message in an error dialog when the user is trying to change email address. It informs the user that the new email address they entered is already in use and that they must enter a different one."
     },
+    "7870": {
+        "text": "Share left",
+        "context": "Message shown when a share has been left. This is the confirmation message when the user has left the share."
+    },
+    "7871": {
+        "text": "Shares left",
+        "context": "Message shown when some shares have been left.This is the confirmation message when the user has left some shares."
+    },
+    "7872": {
+        "text": "Access to any folders shared with you by selected [X] will be lost.",
+        "context": "This is shown on a confirmation message dialog when removing one or more contacts. The placeholder [X] will be replaced with \"contact\" or \"contacts\" depending on how many contacts are being removed."
+    },
     "7873": {
         "text": "You can download the extension (v%1) below.",
         "context": "This text is on the Chrome or Firefox extension pages and tells the user they can download a specific version of the extension further down the page. The placeholder %1 will be replaced with the version of the extension e.g. \"3.2.8\". So the text would read \"You can download the extension (v3.2.8) below.\""
@@ -11322,5 +11334,69 @@
     "7875": {
         "text": "Your extension (v%1) is up to date.",
         "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
+    },
+    "7879": {
+        "text": "Access to folders shared by [X] was removed.",
+        "context": "This is shown in the Notification dialog when a user removes a contact from their contact list. The placeholder [X] will be replaced with the removed contact's email address."
+    },
+    "7880": {
+        "text": "Access to folders was removed.",
+        "context": "This is shown in the Notification dialog when the email address of a contact is not found and access to the share is lost for some reason (e.g. share removal or contact removal)."
+    },
+    "7881": {
+        "text": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
+        "context": "Message when a given user contacts our support team and the message has been send with success."
+    },
+    "7882": {
+        "text": "Message sent",
+        "context": "Dialog title, when a given support message has been sent to support."
+    },
+    "7883": {
+        "text": "There was an error trying to send your message. Please try to resend it.",
+        "context": "Support page: sending the email failed for some reason"
+    },
+    "7884": {
+        "text": "Message too short",
+        "context": "Support Page: Dialog title - Error message when a message is too short."
+    },
+    "7885": {
+        "text": "Your message needs to be at least %d letters long.",
+        "context": "Error message when a Support message is too short. %d is the placeholder and needs to be keep that way."
+    },
+    "7886": {
+        "text": "Shared with one contact",
+        "context": "Text shown to explain that you have shared a folder with one contact."
+    },
+    "7892": {
+        "text": "There was a problem installing the update. Please try again later or download the last version from:\nhttps:\/\/mega.co.nz\/#sync",
+        "context": "Notification message launched when a problem occurs during the installation of an update. "
+    },
+    "7893": {
+        "text": "Unable to get the filesystem.\nPlease, try again. If the problem persists please contact bug@mega.co.nz",
+        "context": "Message displayed when an error occurs while fetching nodes from the server."
+    },
+    "7944": {
+        "text": "Your account has been blocked. Please contact support@mega.co.nz",
+        "context": "Message displayed when an error occurs (BLOCK ACCOUNT) during a login operation."
+    },
+    "7945": {
+        "text": "To access this folder\/file, you will need its [B]Decryption key[\/B].",
+        "context": "An instruction message on the Enter Decryption Key dialog. This prompts the user that they will need a key to decrypt and access the file or folder. The [B] and [\/B] placeholder tags are used to bolden the text and should not be removed in the translated text. Do however translate the \"Decryption key\" text inside the placeholders."
+    },
+    "7946": {
+        "text": "If you do not have it, ask the creator of the link.",
+        "context": "The second instruction message on the Enter Decryption Key dialog. This prompts the user that if they do not have the decryption key they will need to ask the creator of the link for it."
+    },
+    "7947": {
+        "text": "Link without key",
+        "context": "This is button text on the Get Link dialog. This lets the user get a public file\/folder link without the decryption key e.g. https:\/\/mega.nz\/#!Qo12lSpT."
+    },
+    "7948": {
+        "text": "Link with key",
+        "context": "This is button text on the Get Link dialog. This lets the user get a public file\/folder link with the decryption key e.g. https:\/\/mega.nz\/#!Qo12lSpT!3uv6GhJhAWWH46fcMN2KGRtxc_QSLthcwvAdaA_TjCE."
+    },
+    "7971": {
+        "text": "Decryption key",
+        "context": "This is button text on the Get Link dialog. Also it's used as placeholder text on the Enter Decryption Key dialog. A decryption key is a string of random characters e.g. !3uv6GhJhAWWH46fcMN2KGRtxc_QSLthcwvAdaA_TjCE."
     }
 }

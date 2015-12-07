@@ -2841,12 +2841,13 @@
     "7884": "\u8a0a\u606f\u592a\u77ed",
     "7885": "\u60a8\u7684\u8a0a\u606f\u81f3\u5c11\u9700%d\u500b\u5b57\u6bcd\u9577",
     "7886": "\u5df2\u5206\u4eab\u7d66\u4e00\u500b\u806f\u7d61\u4eba",
-    "7892": "There was a problem installing the update. Please try again later or download the last version from:https:\/\/mega.co.nz\/#sync",
-    "7893": "Unable to get the filesystem.Please, try again. If the problem persists please contact bug@mega.co.nz",
-    "7944": "Your account has been blocked. Please contact support@mega.co.nz",
-    "7945": "To access this folder\/file, you will need its [B]Decryption key[\/B].",
-    "7946": "If you do not have it, ask the creator of the link.",
-    "7947": "Link without key",
-    "7948": "Link with key",
-    "7971": "Decryption key"
+    "7892": "\u6709\u5b89\u88dd\u66f4\u65b0\u7684\u554f\u984c\u3002\u8acb\u7a0d\u5f8c\u518d\u8a66\uff0c\u6216\u4e0b\u8f09\u6700\u65b0\u7248\u672c\uff1ahttps:\/\/mega.co.nz\/#sync",
+    "7893": "\u7121\u6cd5\u9032\u5165\u6a94\u6848\u7cfb\u7d71\u3002\u8acb\u518d\u8a66\u4e00\u6b21\u3002\u82e5\u4ecd\u767c\u751f\u6b64\u554f\u984c\uff0c\u8acb\u8207 bug@mega.co.nz \u806f\u7e6b\u3002",
+    "7944": "\u60a8\u7684\u5e33\u6236\u5df2\u88ab\u5c01\u9396\u3002 \u8acb\u8207 support@mega.co.nz \u806f\u7e6b\u3002",
+    "7945": "\u60a8\u5fc5\u9808\u4f7f\u7528 [B]\u5bc6\u9470[\/B] \u4ee5\u9032\u5165\u6b64\u8cc7\u6599\u593e\/\u6a94\u6848\u3002",
+    "7946": "\u5982\u679c\u60a8\u6c92\u6709\u5bc6\u9470\uff0c\u8acb\u8a62\u554f\u6b64\u9023\u7d50\u7684\u64c1\u6709\u8005\u3002",
+    "7947": "\u4e0d\u9700\u5bc6\u9470\uff0c\u76f4\u63a5\u9023\u7d50",
+    "7948": "\u8f38\u5165\u5bc6\u9470\u4ee5\u9023\u7d50",
+    "7971": "\u89e3\u5bc6\u5bc6\u9470",
+    "7972": "If you do not have the key, contact the creator of the link."
 }

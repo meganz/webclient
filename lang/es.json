@@ -2841,12 +2841,13 @@
     "7884": "Mensaje demasiado corto",
     "7885": "Tu mensaje debe ser de al menos %d caracteres.",
     "7886": "Compartido con un contacto",
-    "7892": "There was a problem installing the update. Please try again later or download the last version from:https:\/\/mega.co.nz\/#sync",
-    "7893": "Unable to get the filesystem.Please, try again. If the problem persists please contact bug@mega.co.nz",
-    "7944": "Your account has been blocked. Please contact support@mega.co.nz",
-    "7945": "To access this folder\/file, you will need its [B]Decryption key[\/B].",
-    "7946": "If you do not have it, ask the creator of the link.",
-    "7947": "Link without key",
-    "7948": "Link with key",
-    "7971": "Decryption key"
+    "7892": "Se ha producido un error al instalar la actualizaci\u00f3n. Por favor int\u00e9ntalo m\u00e1s tarde o descarga la \u00faltima versi\u00f3n de: https:\/\/mega.co.nz\/#sync",
+    "7893": "No se ha podido acceder al sistema de archivos. Por favor, int\u00e9ntalo de nuevo. Si el problema persiste contacta con bug@mega.co.nz",
+    "7944": "Tu cuenta ha sido bloqueada. Por favor, contacta con support@mega.co.nz",
+    "7945": "Para acceder a esta carpeta\/archivo, necesitas su [B]Clave de decriptaci\u00f3n[\/B]",
+    "7946": "Si no lo tienes, p\u00eddeselo al creador del enlace",
+    "7947": "Enlace sin clave",
+    "7948": "Enlace con clave",
+    "7971": "Clave de decriptaci\u00f3n",
+    "7972": "If you do not have the key, contact the creator of the link."
 }

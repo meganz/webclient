@@ -11398,5 +11398,9 @@
     "7971": {
         "text": "Decryption key",
         "context": "This is button text on the Get Link dialog. Also it's used as placeholder text on the Enter Decryption Key dialog. A decryption key is a string of random characters e.g. !3uv6GhJhAWWH46fcMN2KGRtxc_QSLthcwvAdaA_TjCE."
+    },
+    "7972": {
+        "text": "If you do not have the key, contact the creator of the link.",
+        "context": "An instruction message on the Enter Decryption Key dialog. This tells the user to ask the creator of the public file link to get the decryption key if they do not have it already."
     }
 }

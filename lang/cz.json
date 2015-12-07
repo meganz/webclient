@@ -2841,12 +2841,13 @@
     "7884": "Zpr\u00e1va je p\u0159\u00edli\u0161 kr\u00e1tk\u00e1",
     "7885": "Va\u0161e zpr\u00e1va mus\u00ed b\u00fdt dlouh\u00e1 alespo\u0148 %d p\u00edsmen.",
     "7886": "Sd\u00edleno s jedn\u00edm kontaktem",
-    "7892": "There was a problem installing the update. Please try again later or download the last version from:https:\/\/mega.co.nz\/#sync",
-    "7893": "Unable to get the filesystem.Please, try again. If the problem persists please contact bug@mega.co.nz",
-    "7944": "Your account has been blocked. Please contact support@mega.co.nz",
-    "7945": "To access this folder\/file, you will need its [B]Decryption key[\/B].",
-    "7946": "If you do not have it, ask the creator of the link.",
-    "7947": "Link without key",
-    "7948": "Link with key",
-    "7971": "Decryption key"
+    "7892": "Vyskytla se chyba s instalac\u00ed aktualizace. Pros\u00edm, zkuste to znovu, nebo si st\u00e1hn\u011bte aktu\u00e1ln\u00ed verzi z: https:\/\/mega.co.nz\/#sync",
+    "7893": "Nelze se p\u0159ipojit k souborov\u00e9mu syst\u00e9mu.Pros\u00edm, opakujte akci. Pokud probl\u00e9m p\u0159etrv\u00e1v\u00e1, napi\u0161te na bug@mega.co.nz",
+    "7944": "V\u00e1\u0161 \u00fa\u010det byl zablokov\u00e1n. Pros\u00edm, kontaktujte support@mega.co.nz",
+    "7945": "Pro p\u0159\u00edstup k tomuto souboru\/slo\u017ece, pot\u0159ebujete [B]Decryption key[\/B].",
+    "7946": "Pokud kl\u00ed\u010d nem\u00e1te, po\u017e\u00e1dejte o n\u011bj autora odkazu.",
+    "7947": "Odkaz bez kl\u00ed\u010de",
+    "7948": "Odkaz s kl\u00ed\u010dem",
+    "7971": "De\u0161ifrovac\u00ed kl\u00ed\u010d",
+    "7972": "If you do not have the key, contact the creator of the link."
 }

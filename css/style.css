@@ -21922,8 +21922,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .file-link-block {
     background-color: #fff;
     border: 1px solid #f2f2f2;
-    border-radius: 5px;    
-    display: inline-block;    
+    border-radius: 5px;
     padding: 0 10px;
     font-size: 13px;
     line-height: 30px;

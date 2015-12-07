@@ -268,7 +268,7 @@ RtcSession.prototype = {
         return;
     }
 //self.gLocalStream is null
-    self.trigger('local-media-request');
+    self.trigger('local-media-request', {});
     RTC.getUserMediaWithConstraintsAndCallback({audio: true, video: true}, self,
       function(stream) {
           try {
@@ -292,7 +292,7 @@ RtcSession.prototype = {
               var sessStream = RTC.cloneMediaStream(self.gLocalStream, {audio:true, video:true});
               self._onMediaReady(self.gLocalStream);
               self._refLocalStream(options.video); //we must call this after onMediaReady because it will enable the local video display, and that is created in onMediaReady
-              self.trigger('local-media-confirmed');
+              self.trigger('local-media-confirmed', {});
               successCallback.call(self, sessStream);
           } catch(e) {
               self.jingle.onInternalError("_myGetUserMedia: Exception in stream obtained callback", {e:e});
@@ -313,7 +313,7 @@ RtcSession.prototype = {
                 msg = error;
         }
         console.warn("getUserMedia error:", msg);
-        self.trigger('local-media-rejected');
+        self.trigger('local-media-rejected', {});
         var failed = false;
         function fail() {
             failed = true;

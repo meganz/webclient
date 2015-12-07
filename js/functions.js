@@ -1857,6 +1857,12 @@ function mKeyDialog(ph, fl) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
         }
     });
+    
+    // Bolden text on instruction message
+    var $instructionMessage = $('.dlkey-dialog .instruction-message');
+    var instructionText = $instructionMessage.html().replace('[B]', '<b>').replace('[/B]', '</b>');
+    $instructionMessage.html(instructionText);
+    
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
         
         // Trim the input from the user for whitespace, newlines etc on either end

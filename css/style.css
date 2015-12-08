@@ -13351,6 +13351,7 @@ table {
 }
 .download.centered-block {
     display: table-cell; height: 170px; width: 100%; 
+    vertical-align: middle;
 }
 .download .block-view-file-type {
     float: left;
@@ -13530,13 +13531,45 @@ table {
 	border-radius: 4px;
     width: 0%;
 }
-.download.message-txt, .download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-unavailable {
+.download.error-title {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.1px;
+    color: #D22400;
+    font-family: 'Open Sans Semibold Italic', Arial; 
+}
+.download.error-text {
+    font-size: 14px;
+    line-height: 20px;
+    color: #666666;
+    padding: 11px 0 0 0;
+    text-align: justify;
+}
+.download.error-text.error-icon.message {
+    padding-top: 23px;
+}
+.download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon {
+    background-image: url(../images/mega/download-sprite-v4@2x.png);
+    background-size: 257px auto;
+    background-repeat:no-repeat;
+    background-position: -117px -772px;
+    padding-left: 40px;
+}
+ .download.error-text.cross-icon {
+     background-position: -118px -870px;
+     padding-left: 30px;
+ }
+.download.error-text.error-icon {
+     background-position: -200px -646px;
+     padding-top: 0;
+ }
+.download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .na-some-reason  .download.info-block, .na-some-reason .download.buttons-block {
     display: none;
 }
-.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.percents-block {
+.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.percents-block,
+.not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason {
     display: block; 
 }
-
 
 .st-main-button-bl {
 	height: 260px;
@@ -25194,9 +25227,6 @@ body.key.ru .reg-st3-bandwidth, body.key.hu .reg-st3-bandwidth, body.key.sr .reg
 }
 }
 @media only screen and (max-width: 1232px) {
-.ads-right-block, .products-right-block {
-	display: none;
-}
 .transfer-table td:nth-child(5), .transfer-table-header th:nth-child(5) {
 	width: 192px;
 }
@@ -25254,6 +25284,13 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 	height: 20px;
 	line-height: 20px;
 }
+}
+@media only screen and (max-width: 1100px) {
+.ads-right-block, .products-right-block {
+	display: none;
+}
+.download.content-block {
+    margin-left: -56px;
 }
 @media only screen and (max-height:  833px) {
 .ads-tablet .ads-right-bottom-txt, .ads-ipad .ads-right-bottom-txt {

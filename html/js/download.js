@@ -78,9 +78,9 @@ function dl_g(res) {
     loadingDialog.hide();
     $('.download.content-block').removeClass('hidden');
     if (res == ETOOMANY) $('.download.content-block').addClass('not-available-user');
-    else if (typeof res == 'number' && res < 0) $('.download.content-block').addClass('not-available-some-reason');
-    else if (res.e == ETEMPUNAVAIL) $('.download.content-block').addClass('not-available-temporary');
-    else if (res.d) $('.download.content-block').addClass('not-available-some-reason');
+    else if (typeof res == 'number' && res < 0) $('.download.content-block').addClass('na-some-reason');
+    else if (res.e == ETEMPUNAVAIL) $('.download.content-block').addClass('temporary-na');
+    else if (res.d) $('.download.content-block').addClass('na-some-reason');
     else if (res.at)
     {
         $('.download.pause-button').unbind('click');
@@ -180,7 +180,7 @@ function dl_g(res) {
         }
         else mKeyDialog(dlpage_ph);
     }
-    else $('.download.content-block').addClass('not-available-some-reason');
+    else $('.download.content-block').addClass('na-some-reason');
 
     var pf = navigator.platform.toUpperCase();
     if (page.substr(-5) == 'linux') sync_switchOS('linux');
@@ -240,8 +240,8 @@ function dlerror(dl,error)
 
     if (tempe)
     {
-        $('.download.temporary-error-txt').text(tempe);
-        $('.download.temporary-error-txt').removeClass('hidden');
+        $('.download.error-icon').text(tempe);
+        $('.download.error-icon').removeClass('hidden');
         $('.download.icons-block').addClass('hidden');
     }
 }
@@ -250,7 +250,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
     $('.download.content-block').removeClass('download-complete').addClass('downloading');
     if (kbps == 0) return;
-    $('.download.temporary-error-txt').addClass('hidden');
+    $('.download.error-icon').addClass('hidden');
     $('.download.icons-block').removeClass('hidden');
     if (uldl_hold) return false;
     if ((typeof dl_limit_shown != 'undefined') && (dl_limit_shown < new Date().getTime()+20000) && (!m)) bwDialog.close();
@@ -260,7 +260,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     {
         $('.download.status-txt').safeHTML(escapeHTML(l[258]));
         $('.download-info').removeClass('hidden');
-        $('.download.content-block').removeClass('not-available-temporary');
+        $('.download.content-block').removeClass('temporary-na');
         $('.download.progress-bar').width(perc + '%');
         $('.download.percents-txt').text(perc + ' %');
         megatitle(' ' + perc + '%');

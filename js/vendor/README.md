@@ -135,7 +135,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [Int64.js]: <https://github.com/meganz/node-int64>
 [Ion.Sound]: <https://github.com/meganz/ion.sound>
 [jQuery]: <https://github.com/jquery/jquery/blob/2.1.4/dist/jquery.js>
-[jQuery-UI]: <https://github.com/jquery/jquery-ui/>
+[jQuery-UI]: <https://code.jquery.com/ui/1.11.4/jquery-ui.js>
 [jQuery.fullscreen]: <https://github.com/kayahr/jquery-fullscreen-plugin>
 [jQuery.jScrollPane]: <https://github.com/meganz/jScrollPane>
 [jQuery.mousewheel]: <https://github.com/meganz/jquery-mousewheel>

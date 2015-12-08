@@ -93,9 +93,9 @@ function dl_g(res) {
         $('.download-button.to-computer').rebind('click', function(e) {
 
             // If 'msd' (MegaSync download) flag is turned on via the API then ...
-            if (res.msd !== 0) {
+          
                 megasync.isInstalled(function(err, is) {
-                    if (!err || is) {
+                    if (res.msd === 0 && (!err || is)) {
                         $('.megasync-overlay').removeClass('downloading');
                         megasync.download(dlpage_ph, dlpage_key);
                     } else if (fdl_filesize > 1024000) {
@@ -108,7 +108,6 @@ function dl_g(res) {
                         $.dlhash = window.location.hash;
                     }
                 });
-            }
 
             /*
             // If 'msd' (MegaSync download) flag is turned off via the API then ...

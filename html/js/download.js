@@ -91,19 +91,29 @@ function dl_g(res) {
             }
         });
         $('.download-button.to-computer').rebind('click', function(e) {
-            
-            // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
-           
+
+            // If 'msd' (MegaSync download) flag is turned on via the API then ...
             if (res.msd !== 0) {
                 megasync.isInstalled(function(err, is) {
                     if (!err || is) {
-                        
+                        $('.megasync-overlay').removeClass('downloading');
+                        megasync.download(dlpage_ph, dlpage_key);
+                    } else if (fdl_filesize > 1024000) {
+                        $('.megasync-download-overlay').removeClass('hidden');
+                    } else {
+                        $('.download.content-block').addClass('downloading');
+                        $('.download.status-txt').safeHTML(escapeHTML(l[819])).removeClass('green');
+                        dlmanager.isDownloading = true;
+                        dl_queue.push(fdl_queue_var);
+                        $.dlhash = window.location.hash;
                     }
                 });
             }
-            
-            $('.megasync-overlay').removeClass('downloading');
-            megasync.download(dlpage_ph, dlpage_key);
+
+            /*
+            // If 'msd' (MegaSync download) flag is turned off via the API then ...
+            // $('.megasync-overlay').removeClass('downloading');
+            // megasync.download(dlpage_ph, dlpage_key);
 
             // If regular download using Firefox and the total download is over 1GB then show the dialog
             // to use the extension, but not if they've seen the dialog before and ticked the checkbox
@@ -125,7 +135,7 @@ function dl_g(res) {
                 dlmanager.isDownloading = true;
                 dl_queue.push(fdl_queue_var);
                 $.dlhash = window.location.hash;
-            }
+            }*/
         });
 
         $('.download-button.to-cloudrive').unbind('click');

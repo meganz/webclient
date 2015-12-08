@@ -81,7 +81,10 @@ Unless otherwise noted, they were released under a [MIT License].
 [jQuery.QRCode] & [qrcode.js]: query plugin for a pure browser qrcode generation.
 
 ---
-[jsbn.js]: basic BigInteger implementation, just enough for RSA encryption and not much more.  
+[jsbn.js]: Basic BigInteger implementation, just enough for RSA encryption and not much more.
+
+> **This is a fork**, [See the changes](https://github.com/meganz/jsbn.js/commits/master)
+  
 [jsbn2.js]: the rest of the library, including most public BigInteger methods.
 
 > NB: We're shipping a modified jsbn2.js file, _wrapped in a closure and added a code to ONLY export "BigInteger" into the global (window) scope._
@@ -141,7 +144,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jQuery.jScrollPane]: <https://github.com/meganz/jScrollPane>
 [jQuery.mousewheel]: <https://github.com/meganz/jquery-mousewheel>
 [jQuery.QRCode]: <https://github.com/jeromeetienne/jquery-qrcode>
-[jsbn.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
+[jsbn.js]: <https://github.com/meganz/jsbn.js>
 [jsbn2.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
 [MegaLogger]: <https://github.com/meganz/megalogger>
 [MegaPix]: <https://github.com/meganz/ios-imagefile-megapixel>

@@ -131,7 +131,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [db.js]: <https://github.com/meganz/db.js>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
-[filesaver.js]: <http://purl.eligrey.com/github/FileSaver.js>
+[filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
 [Int64.js]: <https://github.com/meganz/node-int64>
 [Ion.Sound]: <https://github.com/meganz/ion.sound>
 [jQuery]: <https://github.com/jquery/jquery>

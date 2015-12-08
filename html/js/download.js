@@ -124,7 +124,7 @@ function dl_g(res) {
             }
             else
             {
-                $('.download-mid-centered-block').addClass('downloading');
+                $('.download.content-block').addClass('downloading');
                 $('.download.status-txt').safeHTML(escapeHTML(l[819])).removeClass('green');
                 dlmanager.isDownloading = true;
                 dl_queue.push(fdl_queue_var);
@@ -248,7 +248,7 @@ function dlerror(dl,error)
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
-    $('.download.content-block').addClass('downloading');
+    $('.download.content-block').removeClass('download-complete').addClass('downloading');
     if (kbps == 0) return;
     $('.download.temporary-error-txt').addClass('hidden');
     $('.download.icons-block').removeClass('hidden');
@@ -259,6 +259,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     if (!m)
     {
         $('.download.status-txt').safeHTML(escapeHTML(l[258]));
+        $('.download-info').removeClass('hidden');
         $('.download.content-block').removeClass('not-available-temporary');
         $('.download.progress-bar').width(perc + '%');
         $('.download.percents-txt').text(perc + ' %');
@@ -334,9 +335,9 @@ function dlcomplete(id)
 {
     if (d) console.log('dlcomplete',id);
     if (typeof id === 'object') id = id.dl_id;
-    $('.download.pause-button').hide();
+
     $('.download.content-block').removeClass('downloading').addClass('download-complete');
-    $('.download.pause-button').hide();
+    $('.download-info').addClass('hidden');
     $('.download.progress-bar').width('100%');
     $('.download.percents-txt').text('100 %');
     $('.download.status-txt').safeHTML(escapeHTML(l[1418])).addClass('green');

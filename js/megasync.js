@@ -384,15 +384,15 @@ MegaSync.prototype.downloadClient = function() {
         }
         this._api({a: "v"});
     }).bind(this), 1000);
-    overlay.show().addClass('downloading');
+    overlay.removeClass('hidden').addClass('downloading');
 
-    $('.megasync-close').rebind('click', function(e) {
-        $('.megasync-overlay').hide();
+    $('.megasync-close', overlay).rebind('click', function(e) {
+        overlay.addClass('hidden');
     });
 
-    $('body').bind('keyup', function(e) {
+    $('body').bind('keyup msd', function(e) {
         if (e.keyCode == 27) {
-            $('.megasync-overlay').hide();
+            $overlay.addClass('hidden');
         }
     });
 

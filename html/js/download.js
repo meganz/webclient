@@ -91,50 +91,23 @@ function dl_g(res) {
             }
         });
         $('.download-button.to-computer').rebind('click', function(e) {
-
-            // If 'msd' (MegaSync download) flag is turned on via the API then ...
-          
-                megasync.isInstalled(function(err, is) {
-                    if (res.msd === 0 && (!err || is)) {
-                        $('.megasync-overlay').removeClass('downloading');
-                        megasync.download(dlpage_ph, dlpage_key);
-                    } else if (fdl_filesize > 1024000) {
-                        $('.megasync-download-overlay').removeClass('hidden');
-                    } else {
-                        $('.download.content-block').addClass('downloading');
-                        $('.download.status-txt').safeHTML(escapeHTML(l[819])).removeClass('green');
-                        dlmanager.isDownloading = true;
-                        dl_queue.push(fdl_queue_var);
-                        $.dlhash = window.location.hash;
-                    }
-                });
-
-            /*
-            // If 'msd' (MegaSync download) flag is turned off via the API then ...
-            // $('.megasync-overlay').removeClass('downloading');
-            // megasync.download(dlpage_ph, dlpage_key);
-
-            // If regular download using Firefox and the total download is over 1GB then show the dialog
-            // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-            if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
-            {
-                firefoxDialog();
-            }
-            else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
-            || (navigator.userAgent.indexOf('MSIE 10') > -1)
-            || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1)))
-            && fdl_filesize > 1048576000 && !localStorage.browserDialog)
-            {
-                browserDialog();
-            }
-            else
-            {
-                $('.download.content-block').addClass('downloading');
-                $('.download.status-txt').safeHTML(escapeHTML(l[819])).removeClass('green');
-                dlmanager.isDownloading = true;
-                dl_queue.push(fdl_queue_var);
-                $.dlhash = window.location.hash;
-            }*/
+            megasync.isInstalled(function(err, is) {
+                // If 'msd' (MegaSync download) flag is turned on and application is installed
+                if (res.msd !== 0 && (!err || is)) 
+                {
+                    $('.megasync-overlay').removeClass('downloading');
+                    megasync.download(dlpage_ph, dlpage_key);
+                } 
+                // If filesize more then 100MB
+                else if (fdl_filesize < 104857600) 
+                {
+                    megasyncOverlay();
+                } 
+                else 
+                {
+                    browserDownload();
+                }
+            });
         });
 
         $('.download-button.to-cloudrive').unbind('click');
@@ -192,6 +165,59 @@ function dl_g(res) {
     else if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
     else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
     else sync_switchOS('windows');
+}
+
+function browserDownload() {
+    // If regular download using Firefox and the total download is over 1GB then show the dialog
+    // to use the extension, but not if they've seen the dialog before and ticked the checkbox
+    if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
+    {
+        firefoxDialog();
+    }
+    else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
+    || (navigator.userAgent.indexOf('MSIE 10') > -1)
+    || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1)))
+    && fdl_filesize > 1048576000 && !localStorage.browserDialog)
+    {
+        browserDialog();
+    }
+    else
+    {
+        $('.download.content-block').addClass('downloading');
+        $('.download.status-txt').safeHTML(escapeHTML(l[819])).removeClass('green');
+        dlmanager.isDownloading = true;
+        dl_queue.push(fdl_queue_var);
+        $.dlhash = window.location.hash;
+    }
+}
+
+// MEGAsync dialog If filesize is too big for downloading through browser
+function megasyncOverlay() {
+    var $this = $('.megasync-overlay');
+
+    $this.addClass('msd-dialog').removeClass('hidden downloading');
+
+    $('.download-button.download', $this).rebind('click',function(e)
+    {
+        $this.removeClass('msd-dialog');
+        megasync.download(dlpage_ph, dlpage_key);
+    });
+
+    $('.download-button.continue', $this).rebind('click',function(e)
+    {
+        $this.addClass('hidden').removeClass('msd-dialog');
+        browserDownload();
+    });
+
+    $('.megasync-close', $this).rebind('click', function(e) {
+        $this.addClass('hidden').removeClass('msd-dialog');
+    });
+
+    $('body').rebind('keyup msd', function(e) {
+        if (e.keyCode == 27) {
+            $this.addClass('hidden').removeClass('msd-dialog');
+        }
+    });
 }
 
 function closedlpopup()

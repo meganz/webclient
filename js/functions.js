@@ -1857,8 +1857,16 @@ function mKeyDialog(ph, fl) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
         }
     });
+    
+    // Bolden text on instruction message
+    var $instructionMessage = $('.dlkey-dialog .instruction-message');
+    var instructionText = $instructionMessage.html().replace('[B]', '<b>').replace('[/B]', '</b>');
+    $instructionMessage.html(instructionText);
+    
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
-        var key = $('.fm-dialog.dlkey-dialog input').val();
+        
+        // Trim the input from the user for whitespace, newlines etc on either end
+        var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
 
         if (key) {
             // Remove the ! from the key which is exported from the export dialog

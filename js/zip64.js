@@ -253,7 +253,7 @@ var ZIPClass = function(totalSize) {
         buf.i16(dosTime);
         buf.i16(dosDate);
     }
-    
+
     self.writeCentralDir = function(filename, size, time, crc32, directory, headerpos) {
         filename = to8(filename)
         var dirRecord = new ZipCentralDirectory();
@@ -484,6 +484,13 @@ function dlZipWriterIOWorker(task, done) {
     this.file_offset += task.data.byteLength;
 
     var buffer = task.data;
+
+    if (file.data) {
+        try {
+            new Uint8Array(file.data, task.offset, buffer.byteLength).set(buffer);
+        }
+        catch (ex) {}
+    }
 
     if (task.offset === 0) {
         var header = this.ZipObject.writeHeader(

@@ -1062,11 +1062,13 @@ function mozClearStartupCache() {
 })(self);
 
 var mozMEGAExtensionVersion;
+var mozMEGAExtensionUpdateURL;
 try {
 	var { AddonManager } = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 	AddonManager.getAddonByID('firefox@mega.co.nz',function(data)
 	{
 		mozMEGAExtensionVersion = data.version;
+		mozMEGAExtensionUpdateURL = data.updateURL;
 		AddonManager = undefined;
 	});
 } catch(e) {}

@@ -6829,14 +6829,26 @@ function balance2pro(callback)
             return false;
         });
 
-        // On Export File Links and Decryption Keys dropdown
-        $('.export-link-dropdown div').rebind('click', function() {
+        // On Export File Links and Decryption Keys
+        var $linkButtons = $('.link-handle, .link-decryption-key, .link-handle-and-key');
+        var $linkHandle = $('.link-handle');
+        
+        // Reset state from previous dialog opens and pre-select the 'Link without key' option by default
+        $linkButtons.removeClass('selected');
+        $linkHandle.addClass('selected');
+        
+        // Add click handler
+        $linkButtons.rebind('click', function() {
 
             var keyOption = $(this).attr('data-keyoptions');
+            var $this = $(this);
+            
+            // Add selected state to button
+            $linkButtons.removeClass('selected');
+            $this.addClass('selected');
 
-            $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
-            $('.export-link-select').html($(this).html());
-            $('.export-link-dropdown').fadeOut(200);
+            // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
+            $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
             $span.text(l[1990]);
 
             // Stop propagation
@@ -6848,6 +6860,7 @@ function balance2pro(callback)
     scope.mega = scope.mega || {};
     scope.mega.Dialog = scope.mega.Dialog || {};
     scope.mega.Dialog.ExportLink = ExportLinkDialog;
+    
 })(jQuery, window);
 
 (function($, scope) {

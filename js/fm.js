@@ -8776,7 +8776,7 @@ function getClipboardLinks() {
 
     var nodeUrlWithPublicHandle, nodeDecryptionKey,
         key, type, fileSize, folderClass, currNode,
-        $dialog = $('.export-links-dialog .export-link-select'),
+        $dialog = $('.export-links-dialog .export-content-block'),
         nodesIds = $.selected,
         links = '';
 
@@ -8888,7 +8888,7 @@ function hideToast (int) {
  */
 function itemExportLinkHtml(item) {
 
-    var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize, folderClass,
+    var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize, folderClass = '',
         html = '';
 
     // Shared item type is folder
@@ -8896,7 +8896,7 @@ function itemExportLinkHtml(item) {
         type = 'F';
         key = u_sharekeys[item.h];
         fileSize = '';
-        folderClass = 'folder-item';
+        folderClass = ' folder-item';
     }
 
     // Shared item type is file
@@ -8909,15 +8909,18 @@ function itemExportLinkHtml(item) {
     fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
     fileUrlKey = key ? '!' + a32_to_base64(key) : '';
 
-    html = '<div class="export-link-item ' + folderClass + '">'
+    html = '<div class="export-link-item' + folderClass + '">'
          +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
          +      '<div class="export-link-text-pad">'
          +          '<div class="export-link-txt">'
          +               '<span class="export-item-title">' + htmlentities(item.name) + '</span><span class="export-link-gray-txt">' + fileSize + '</span>'
          +          '</div>'
          +          '<div id="file-link-block" class="file-link-block">'
-         +              '<span class="file-link-info url" data-pseudo-content="' + l[7681] +'">' + fileUrlWithoutKey + '</span>'
-         +              '<span class="file-link-info key" data-pseudo-content="' + l[1028] +'">' + fileUrlKey + '</span>'
+         +              '<span class="icon"></span>'
+         +              '<span class="file-link-info-wrapper">'
+         +                  '<span class="file-link-info url">' + fileUrlWithoutKey + '</span>'
+         +                  '<span class="file-link-info key">' + fileUrlKey + '</span>'
+         +              '</span>'
          +          '</div>'
          +      '</div>'
          +  '</div>';

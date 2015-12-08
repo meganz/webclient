@@ -176,8 +176,8 @@ function init_page() {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
     }
-    
-    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the 
+
+    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
     // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
     if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
         document.location.hash = 'redeem';
@@ -284,7 +284,7 @@ function init_page() {
             }
         }
     }
-    
+
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
         if (!blogsearch) {
@@ -355,6 +355,7 @@ function init_page() {
     else if (page.substr(0, 4) == 'blog' && page.length > 4) {
         blogmonth = page.substr(5, page.length - 2);
         page = 'blog';
+        blogpage = 1;
         parsepage(pages['blog']);
         init_blog();
     }
@@ -533,30 +534,6 @@ function init_page() {
         parsepage(pages['register']);
         init_register();
     }
-    else if (page == 'chrome') {
-        parsepage(pages['chrome']);
-        var h = 0;
-        $('.chrome-bottom-block').each(function (i, e) {
-            if ($(e).height() > h) {
-                h = $(e).height();
-            }
-        });
-        $('.chrome-bottom-block').height(h);
-        if (lang !== 'en') {
-            $('.chrome-download-button').css('font-size', '12px');
-        }
-
-        // On the manual download button click
-        $('.chrome-download-button').rebind('click', function() {
-
-            var $this = $(this);
-
-            // Hide the button text and show the mega.co.nz and mega.nz links
-            $this.css('cursor', 'default');
-            $this.find('.initial-state').hide();
-            $this.find('.actual-links').show();
-        });
-    }
     else if (page == 'key') {
         parsepage(pages['key']);
         init_key();
@@ -712,21 +689,20 @@ function init_page() {
         parsepage(pages['credits']);
         var html = '';
         $('.credits-main-pad a').sort(function () {
-            return (Math.round(Math.random()) - 0.5)
+            return (Math.round(Math.random()) - 0.5);
         }).each(function (i, e) {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
         mainScroll();
     }
-    else if (page == 'firefox') {
+    else if (page === 'chrome') {
+        parsepage(pages['chrome']);
+        chromepage.init();
+    }
+    else if (page === 'firefox') {
         parsepage(pages['firefox']);
-        $('.ff-bott-button').rebind('mouseover', function () {
-            $('.ff-icon').addClass('hovered');
-        });
-        $('.ff-bott-button').rebind('mouseout', function () {
-            $('.ff-icon').removeClass('hovered');
-        });
+        firefoxpage.init();
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
@@ -754,7 +730,7 @@ function init_page() {
         parsepage(pages['download'], 'download');
         dlinfo(dlid, dlkey, false);
     }
-    
+
     /**
      * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
      */
@@ -762,10 +738,10 @@ function init_page() {
 
         // Get the voucher code from the URL which is 20 characters in length
         var voucherCode = page.substr(7, 20);
-        
+
         // Store in localStorage to be used by the Pro page or when returning from login
         localStorage.setItem('voucher', voucherCode);
-        
+
         // If not logged in, direct them to login or register first
         if (!u_type) {
             login_txt = l[7712];
@@ -785,7 +761,7 @@ function init_page() {
         parsepage(pages['redeem']);
         redeem.init();
     }
-    
+
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
@@ -1671,10 +1647,10 @@ function topmenuUI() {
 
     $('.top-search-input').rebind('keyup', function (e) {
         if (e.keyCode == 13 || folderlink) {
-            
+
             // Add log to see how often they use the search
             api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
-            
+
             var val = $.trim($('.top-search-input').val());
             if (folderlink || val.length > 2 || !asciionly(val)) {
                 if (folderlink) {
@@ -1853,6 +1829,13 @@ window.onhashchange = function() {
     hash = window.location.hash;
     if (hash) {
         page = hash.replace('#', '');
+
+        if (page) {
+            try {
+                page = decodeURIComponent(page);
+            }
+            catch (e) {}
+        }
     }
     else {
         page = '';

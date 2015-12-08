@@ -35,12 +35,15 @@ var useravatar = (function() {
     function registerCssColors() {
         
         var css = '';
+        var color = '';
         
         for (var i in _colors) {
             if (!_colors.hasOwnProperty(i)) {
                 continue;
             }
-            css += '.color' + (parseInt(i) + 1) + ' { background-color: '
+            color = '.color' + (parseInt(i) + 1);
+            css += color + ', .nw-contact-avatar' + color + ', .contacts-avatar' + color 
+                + ', .avatar' + color + ' { background-color: '
                 + _colors[i] + '; }';
         }
         

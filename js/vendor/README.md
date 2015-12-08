@@ -134,7 +134,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
 [Int64.js]: <https://github.com/meganz/node-int64>
 [Ion.Sound]: <https://github.com/meganz/ion.sound>
-[jQuery]: <https://github.com/jquery/jquery>
+[jQuery]: <https://github.com/jquery/jquery/blob/2.1.4/dist/jquery.js>
 [jQuery-UI]: <https://github.com/jquery/jquery-ui/>
 [jQuery.fullscreen]: <https://github.com/kayahr/jquery-fullscreen-plugin>
 [jQuery.jScrollPane]: <https://github.com/meganz/jScrollPane>

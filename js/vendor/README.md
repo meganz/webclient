@@ -145,7 +145,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [MegaLogger]: <https://github.com/meganz/megalogger>
 [MegaPix]: <https://github.com/meganz/ios-imagefile-megapixel>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
-[notification.js]: <https://github.com/MrSwitch/notification.js>
+[notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode-orig.js]: <https://github.com/kazuhikoarase/qrcode-generator>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/master/src/qrcode.js>
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>

@@ -99,7 +99,7 @@ function dl_g(res) {
                     megasync.download(dlpage_ph, dlpage_key);
                 } 
                 // If filesize more then 100MB
-                else if (fdl_filesize < 104857600) 
+                else if (fdl_filesize > 104857600) 
                 {
                     megasyncOverlay();
                 } 

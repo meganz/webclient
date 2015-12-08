@@ -61,19 +61,6 @@ function dl_g(res) {
 
     megaAds.showAds($('#ads-block-frame'));
 
-    // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
-    /*
-    if (res.msd === 0) {
-        megasync.isInstalled(function(err, is) {
-            if (err || !is) {
-                $('.download-button.sync-app').addClass('hidden');
-                $('.regular-download').removeClass('hidden');
-                $('.new-download-red-button').addClass('hidden');
-            }
-        });
-    }
-    */
-
     $('.widget-block').addClass('hidden');
     loadingDialog.hide();
     $('.download.content-block').removeClass('hidden');
@@ -104,10 +91,19 @@ function dl_g(res) {
             }
         });
         $('.download-button.to-computer').rebind('click', function(e) {
-            /*
+            
+            // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
+           
+            if (res.msd !== 0) {
+                megasync.isInstalled(function(err, is) {
+                    if (!err || is) {
+                        
+                    }
+                });
+            }
+            
             $('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
-            */
 
             // If regular download using Firefox and the total download is over 1GB then show the dialog
             // to use the extension, but not if they've seen the dialog before and ticked the checkbox

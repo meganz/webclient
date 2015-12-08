@@ -83,13 +83,9 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [jsbn.js]: Basic BigInteger implementation, just enough for RSA encryption and not much more.
 
-> **This is a fork**, [See the changes](https://github.com/meganz/jsbn.js/commits/master)
+> **This is a fork**, [See the changes](https://github.com/meganz/jsbn.js/commits/master/jsbn.js)
   
-[jsbn2.js]: the rest of the library, including most public BigInteger methods.
-
-> NB: We're shipping a modified jsbn2.js file, _wrapped in a closure and added a code to ONLY export "BigInteger" into the global (window) scope._
-> 
-> JSBN is released under a [BSD license](http://www-cs-students.stanford.edu/~tjw/jsbn/LICENSE).
+[jsbn2.js]: The rest of the library, including most public BigInteger methods.
 
 ---
 [MegaLogger]: Minimalistic JavaScript logging framework, specifically usable for the browser console.

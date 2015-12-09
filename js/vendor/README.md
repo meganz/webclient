@@ -36,6 +36,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/aaronpowell/db.js/compare/master...meganz:master)
 
 ---
+[dcraw.js]: Dave Coffin's raw photo decoder
+
+> NB: This was ported to JavaScript using Emscripten.
+
+---
 [exif-js]: JavaScript library for reading EXIF image metadata.
 
 > **This is a fork**, [Compare the changes](https://github.com/exif-js/exif-js/compare/master...meganz:master)
@@ -54,15 +59,15 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/broofa/node-int64/compare/master...meganz:master)
 
 ---
-[Ion.Sound]: JavaScript plugin for playing sounds and music in browsers
+[ion.sound.js]: JavaScript plugin for playing sounds and music in browsers
 
 > **This is a fork**, [Compare the changes](https://github.com/IonDen/ion.sound/compare/master...meganz:master)
 
 ---
-[jQuery]: jQuery JavaScript Library.
+[jquery-2.1.4.js]: jQuery JavaScript Library.
 
 ---
-[jQuery-UI]: jQuery user interface library.
+[jquery-ui-1.11.4.js]: jQuery-UI - jQuery User Interface library.
 
 ---
 [jQuery.fullscreen]: This jQuery plugin provides a simple to use mechanism to control the new fullscreen mode of modern browsers.
@@ -88,10 +93,10 @@ Unless otherwise noted, they were released under a [MIT License].
 [jsbn2.js]: The rest of the library, including most public BigInteger methods.
 
 ---
-[MegaLogger]: Minimalistic JavaScript logging framework, specifically usable for the browser console.
+[megaLogger.js]: Minimalistic JavaScript logging framework, specifically usable for the browser console.
 
 ---
-[MegaPix]: Mega pixel image rendering library
+[megapix.js]: Mega pixel image rendering library
 
 > **This is a fork**, [Compare the changes](https://github.com/stomita/ios-imagefile-megapixel/compare/master...meganz:master)
 
@@ -129,21 +134,22 @@ Unless otherwise noted, they were released under a [MIT License].
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
+[dcraw.js]: <http://www.cybercom.net/~dcoffin/dcraw/>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
 [filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
 [Int64.js]: <https://github.com/meganz/node-int64>
-[Ion.Sound]: <https://github.com/meganz/ion.sound>
-[jQuery]: <https://github.com/jquery/jquery/blob/2.1.4/dist/jquery.js>
-[jQuery-UI]: <https://code.jquery.com/ui/1.11.4/jquery-ui.js>
+[ion.sound.js]: <https://github.com/meganz/ion.sound>
+[jquery-2.1.4.js]: <https://github.com/jquery/jquery/blob/2.1.4/dist/jquery.js>
+[jquery-ui-1.11.4.js]: <https://code.jquery.com/ui/1.11.4/jquery-ui.js>
 [jQuery.fullscreen]: <https://github.com/kayahr/jquery-fullscreen-plugin>
 [jQuery.jScrollPane]: <https://github.com/meganz/jScrollPane>
 [jQuery.mousewheel]: <https://github.com/meganz/jquery-mousewheel>
 [jQuery.QRCode]: <https://github.com/jeromeetienne/jquery-qrcode>
 [jsbn.js]: <https://github.com/meganz/jsbn.js>
 [jsbn2.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
-[MegaLogger]: <https://github.com/meganz/megalogger>
-[MegaPix]: <https://github.com/meganz/ios-imagefile-megapixel>
+[megaLogger.js]: <https://github.com/meganz/megalogger>
+[megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode-orig.js]: <https://github.com/kazuhikoarase/qrcode-generator>

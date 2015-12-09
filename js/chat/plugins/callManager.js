@@ -484,7 +484,7 @@ CallSession.prototype.onCallEnded = function(e, reason) {
     var self = this;
 
 
-    if (self.room.megaChat._currentCallCounter) {
+    if (self.room._currentCallCounter) {
         self.room.appendMessage(
             new ChatDialogMessage({
                 messageId: 'call-ended-' + self.sid,
@@ -492,7 +492,7 @@ CallSession.prototype.onCallEnded = function(e, reason) {
                 authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
                 delay: unixtime(),
                 cssClasses: ['fm-chat-call-reason-' + reason],
-                currentCallCounter: self.room.megaChat._currentCallCounter
+                currentCallCounter: self.room._currentCallCounter
             })
         );
     }

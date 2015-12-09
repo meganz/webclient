@@ -445,6 +445,9 @@ var ConversationMessage = React.createClass({
             else if (message.type === "call-starting") {
                 message.cssClass = "diagonal-handset blue";
             }
+            else if (message.type === "call-initialising") {
+                message.cssClass = "diagonal-handset blue";
+            }
             else if (message.type === "call-started") {
                 message.cssClass = "diagonal-handset green";
             }

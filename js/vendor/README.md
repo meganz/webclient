@@ -83,7 +83,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/jquery/jquery-mousewheel/compare/master...meganz:master)
 
 ---
-[jQuery.QRCode] & [qrcode.js]: query plugin for a pure browser qrcode generation.
+[jquery.qrcode.js] & [qrcode.js]: jQuery plugin for a pure browser QR code generation.
 
 ---
 [jsbn.js]: Basic BigInteger implementation, just enough for RSA encryption and not much more.
@@ -129,7 +129,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > git checkout 1.0.1
 > npm install
 > nano compile_and_minify.sh
-> Comment out or delete the last 4 lines to prevent minification using Closure compiler
+> Comment out or delete the last 4 lines to prevent minification by the Closure compiler
 > ./compile_and_minify.sh
 > Use output in compiled.js
 > ```
@@ -156,15 +156,14 @@ Unless otherwise noted, they were released under a [MIT License].
 [jQuery.fullscreen]: <https://github.com/kayahr/jquery-fullscreen-plugin>
 [jQuery.jScrollPane]: <https://github.com/meganz/jScrollPane>
 [jQuery.mousewheel]: <https://github.com/meganz/jquery-mousewheel>
-[jQuery.QRCode]: <https://github.com/jeromeetienne/jquery-qrcode>
+[jquery.qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/jquery.qrcode.js>
 [jsbn.js]: <https://github.com/meganz/jsbn.js>
 [jsbn2.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
 [megaLogger.js]: <https://github.com/meganz/megalogger>
 [megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
-[qrcode-orig.js]: <https://github.com/kazuhikoarase/qrcode-generator>
-[qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/master/src/qrcode.js>
+[qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [version-compare.js]: <https://gist.github.com/TheDistantSea/8021359>
-[zxcvbn.js]: <https://github.com/dropbox/zxcvbn>
+[zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>

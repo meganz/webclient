@@ -74,11 +74,10 @@
 	color: #666666;
 }
 .message.small-rounded-avatar {
-	margin: 2px 0 0 0;
+	margin: 3px 0 0 0;
 }
 .message.text-block {
-	padding: 2px 30px 0 0;
-    white-space: pre-wrap;
+	padding: 3px 30px 0 0;
     word-wrap: break-word;
 }
 .small-info-txt .message.text-block {

@@ -78,6 +78,8 @@
 }
 .message.text-block {
 	padding: 2px 30px 0 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 .small-info-txt .message.text-block {
 	font-size: 13px;

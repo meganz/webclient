@@ -607,6 +607,7 @@ var ConversationAudioVideoPanel = React.createClass({
     componentDidUpdate: function() {
         var self = this;
         var $container = $(ReactDOM.findDOMNode(self));
+        var room = self.props.chatRoom;
 
         $container.rebind('mouseover.chatUI', function() {
             var $this = $(this);
@@ -619,9 +620,7 @@ var ConversationAudioVideoPanel = React.createClass({
         $container.rebind('mouseout.chatUI', function() {
             var $this = $(this);
             $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
-            if ($this.hasClass('full-sized-block')) {
-                $('.call.top-panel', $container).removeClass('visible-panel');
-            }
+            $('.call.top-panel', $container).removeClass('visible-panel');
         });
 
 
@@ -640,9 +639,8 @@ var ConversationAudioVideoPanel = React.createClass({
                 idleMouseTimer = setTimeout(function() {
                     $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
                     $container.addClass('no-cursor');
-                    if ($this.hasClass('full-sized-block')) {
-                        $('.call.top-panel', $container).removeClass('visible-panel');
-                    }
+                    $('.call.top-panel', $container).removeClass('visible-panel');
+
                     forceMouseHide = true;
                     setTimeout(function() {
                         forceMouseHide = false;
@@ -650,6 +648,17 @@ var ConversationAudioVideoPanel = React.createClass({
                 }, 2000);
             }
         });
+
+        $(document)
+            .unbind("fullscreenchange.megaChat_" + room.roomJid)
+            .bind("fullscreenchange.megaChat_" + room.roomJid, function() {
+                if (!$(document).fullScreen() && room.isCurrentlyActive) {
+                    self.setState({fullScreenModeEnabled: false});
+                }
+                else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
+                    self.setState({fullScreenModeEnabled: true});
+                }
+            });
     },
     toggleMessages: function(e) {
         e.preventDefault();
@@ -671,10 +680,12 @@ var ConversationAudioVideoPanel = React.createClass({
         e.preventDefault();
         e.stopPropagation();
 
-        $(document).fullScreen(!this.state.fullScreenModeEnabled);
+        var newVal = !this.state.fullScreenModeEnabled;
+        $(document).fullScreen(newVal);
 
         this.setState({
-            'fullScreenModeEnabled': !this.state.fullScreenModeEnabled
+            'fullScreenModeEnabled': newVal,
+            'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
         });
     },
     render: function() {
@@ -755,7 +766,13 @@ var ConversationAudioVideoPanel = React.createClass({
         if(unreadCount > 0) {
             unreadDiv = <div className="unread-messages">{unreadCount}</div>
         }
-        return <div className={"call-block" + (this.state.messagesBlockEnabled === true ? " small-block" : "")}>
+
+        var additionalClass = "";
+        additionalClass = (this.state.fullScreenModeEnabled === true ? " full-sized-block" : "");
+        if (additionalClass.length === 0) {
+            additionalClass = (this.state.messagesBlockEnabled === true ? " small-block" : "");
+        }
+        return <div className={"call-block" + additionalClass}>
             {remotePlayerElement}
             {localPlayerElement}
 
@@ -978,20 +995,6 @@ var ConversationPanel = React.createClass({
             });
         }
     },
-    onToggleFullScreenClicked: function(e) {
-        var self = this;
-        var room = this.props.chatRoom;
-        var $target = e && e.target ? $(e.target) : null;
-
-        if (this.state.isFullscreenModeEnabled) {
-            this.setState({isFullscreenModeEnabled: false});
-            $(document).fullScreen(false);
-        }
-        else {
-            this.setState({isFullscreenModeEnabled: true});
-            $(document).fullScreen(true);
-        }
-    },
     onMouseMoveDuringCall: function(e) {
         var self = this;
 
@@ -1183,6 +1186,9 @@ var ConversationPanel = React.createClass({
             .bind("fullscreenchange.megaChat_" + room.roomJid, function() {
                 if (!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({isFullscreenModeEnabled: false});
+                }
+                else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
+                    self.setState({isFullscreenModeEnabled: true});
                 }
             });
         self.handleWindowResize();
@@ -1572,8 +1578,8 @@ var ConversationPanel = React.createClass({
             />
         }
 
-        var additionalClass = self.state.isFullscreenModeEnabled ? " full-sized-block" : "";
-        if (!additionalClass && self.state.messagesToggledInCall) {
+        var additionalClass = "";
+        if (additionalClass.length === 0 && self.state.messagesToggledInCall) {
             additionalClass = " small-block";
         }
 

@@ -2248,10 +2248,10 @@ var bitcoinDialog = {
 
                 // Update price left to pay
                 var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
-                var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
+                var currentPriceSatoshis = btcmath.toSatoshi(currentPriceBitcoins);
                 var satoshisReceived = notification.payload.received;
                 var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
-                var priceRemainingBitcoins = toBitcoinString(priceRemainingSatoshis);
+                var priceRemainingBitcoins = btcmath.toBitcoinString(priceRemainingSatoshis);
 
                 // If correct amount was received
                 if (satoshisReceived === currentPriceSatoshis) {

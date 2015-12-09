@@ -153,7 +153,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
 [jquery-2.1.4.js]: <https://github.com/jquery/jquery/blob/2.1.4/dist/jquery.js>
 [jquery-ui-1.11.4.js]: <https://code.jquery.com/ui/1.11.4/jquery-ui.js>
-[jquery.fullscreen.js]: <https://github.com/kayahr/jquery-fullscreen-plugin>
+[jquery.fullscreen.js]: <https://github.com/kayahr/jquery-fullscreen-plugin/tree/5c95707f9ebf3d4962e9057b09cc43c10f11c3f4>
 [jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>
 [jquery.mousewheel.js]: <https://github.com/meganz/jquery-mousewheel>
 [jquery.qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/jquery.qrcode.js>

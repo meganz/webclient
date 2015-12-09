@@ -133,6 +133,7 @@ body {
 	overflow: hidden;
 	height: 100%;
 	min-width: 987px;
+    font-family: 'source_sans_proregular', Arial;
 }
 ::selection {
 	background: rgba(0,0,0,0.1);
@@ -165,23 +166,20 @@ a, a:link, a:visited, a:hover, a:active {
 	outline: none;
 	text-decoration: none;
 }
-strong {
+strong, .bold {
 	font-weight: normal;
 	font-family: 'source_sans_prosemibold', Arial;
 }
-input, div, textarea {
+input, textarea {
 	outline: none;
 	-moz-appearance: none;
-	font-family: 'source_sans_proregular', Arial;
+    font-family: 'source_sans_proregular', Arial;
 }
 a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	outline: none;
 }
 .image-scale-hack {
 	transform: rotate( .0001deg );
-}
-.bold {
-	font-family: 'source_sans_probold', Arial;
 }
 .clear {
 	clear: both;

@@ -90,7 +90,7 @@
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
-.call.video-wrapper video, .call.video-wrapper img {
+.call.local-video img, .call.local-video video {
     height: 100%;
 }
 .minimized .call.video-wrapper, .call.local-audio.minimized img {

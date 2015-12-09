@@ -856,4 +856,37 @@
 	<path id="Fill-10_5_" sketch:type="MSShapeGroup" class="st11" d="M-178.5,1845c-0.1,0-0.3,0-0.4-0.1c-0.2-0.2-0.2-0.5,0-0.7l13-13
 		c0.2-0.2,0.5-0.2,0.7,0s0.2,0.5,0,0.7l-13,13C-178.2,1845-178.4,1845-178.5,1845"/>
 </g>
+<g id="Page-1_4_" sketch:type="MSPage">
+	<g id="Group_2_" transform="translate(1.000000, 1.000000)" sketch:type="MSLayerGroup">
+		<path id="Fill-1_28_" sketch:type="MSShapeGroup" class="st6" d="M-2,2216v2l5,4v-10L-2,2216z"/>
+		<path id="Fill-2_11_" sketch:type="MSShapeGroup" class="st6" d="M-12.8,2222.9c0.2,0.1,0.5,0.1,0.8,0.1h6c1.7,0,3-1.3,3-3v-6
+			c0-0.3,0-0.5-0.1-0.8L-12.8,2222.9z"/>
+		<path id="Fill-4_4_" sketch:type="MSShapeGroup" class="st6" d="M-5.2,2211.1c-0.2-0.1-0.5-0.1-0.8-0.1h-6c-1.7,0-3,1.3-3,3v6
+			c0,0.3,0,0.5,0.1,0.8L-5.2,2211.1z"/>
+		<path id="Fill-6_6_" sketch:type="MSShapeGroup" class="st6" d="M-15.5,2224c-0.1,0-0.3,0-0.4-0.1c-0.2-0.2-0.2-0.5,0-0.7l13-13
+			c0.2-0.2,0.5-0.2,0.7,0c0.2,0.2,0.2,0.5,0,0.7l-13,13C-15.2,2224-15.4,2224-15.5,2224"/>
+	</g>
+</g>
+<g id="Page-1_5_" sketch:type="MSPage">
+	<g id="Group_3_" transform="translate(1.000000, 1.000000)" sketch:type="MSLayerGroup">
+		<path id="Fill-1_31_" sketch:type="MSShapeGroup" class="st0" d="M-72,2216v2l5,4v-10L-72,2216z"/>
+		<path id="Fill-2_14_" sketch:type="MSShapeGroup" class="st0" d="M-82.8,2222.9c0.2,0.1,0.5,0.1,0.8,0.1h6c1.6,0,3-1.3,3-3v-6
+			c0-0.3,0-0.5-0.1-0.8L-82.8,2222.9z"/>
+		<path id="Fill-4_5_" sketch:type="MSShapeGroup" class="st0" d="M-75.2,2211.1c-0.2-0.1-0.5-0.1-0.8-0.1h-6c-1.6,0-3,1.3-3,3v6
+			c0,0.3,0,0.5,0.1,0.8L-75.2,2211.1z"/>
+		<path id="Fill-6_7_" sketch:type="MSShapeGroup" class="st0" d="M-85.5,2224c-0.1,0-0.3,0-0.4-0.1c-0.2-0.2-0.2-0.5,0-0.7l13-13
+			c0.2-0.2,0.5-0.2,0.7,0c0.2,0.2,0.2,0.5,0,0.7l-13,13C-85.2,2224-85.4,2224-85.5,2224"/>
+	</g>
+</g>
+<g id="Page-1_6_" sketch:type="MSPage">
+	<g id="Group_4_" transform="translate(1.000000, 1.000000)" sketch:type="MSLayerGroup">
+		<path id="Fill-1_35_" sketch:type="MSShapeGroup" class="st11" d="M38,2216v2l5,4v-10L38,2216z"/>
+		<path id="Fill-2_15_" sketch:type="MSShapeGroup" class="st11" d="M27.2,2222.9c0.2,0.1,0.5,0.1,0.8,0.1h6c1.7,0,3-1.3,3-3v-6
+			c0-0.3,0-0.5-0.1-0.8L27.2,2222.9z"/>
+		<path id="Fill-4_6_" sketch:type="MSShapeGroup" class="st11" d="M34.8,2211.1c-0.2-0.1-0.5-0.1-0.8-0.1h-6c-1.6,0-3,1.3-3,3v6
+			c0,0.3,0,0.5,0.1,0.8L34.8,2211.1z"/>
+		<path id="Fill-6_8_" sketch:type="MSShapeGroup" class="st11" d="M24.5,2224c-0.1,0-0.3,0-0.4-0.1c-0.2-0.2-0.2-0.5,0-0.7l13-13
+			c0.2-0.2,0.5-0.2,0.7,0c0.2,0.2,0.2,0.5,0,0.7l-13,13C24.8,2224,24.6,2224,24.5,2224"/>
+	</g>
+</g>
 </svg>

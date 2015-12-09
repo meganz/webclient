@@ -779,29 +779,7 @@ Chat.prototype.init = function() {
             room.callSession.endCall();
         }
     });
-    //$(document)
-    //    .unbind('megaulcomplete.megaChat')
-    //    .bind('megaulcomplete.megaChat', function(e, target, ulBunch) {
-    //        // attach to conversation
-    //        var megaRoomId = self.getPrivateRoomJidFor(
-    //            self.getJidFromNodeId(target.replace("chat/", ""))
-    //        )  + "@conference." + self.options.xmppDomain;
-    //
-    //        var megaRoom = self.chats[megaRoomId];
-    //        if (!megaRoom) {
-    //            self.logger.error("Room not found for file attachment:", target);
-    //        } else {
-    //            assert(ulBunch && ulBunch.length > 0, 'empty ulBunch');
-    //
-    //            megaRoom.attachNodes(ulBunch);
-    //
-    //            setTimeout(function() { // because of the transfer panel close
-    //                self.refreshScrollUI();
-    //            }, 1000);
-    //        }
-    //    });
-
-
+    
     self.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
         var contact = self.getContactFromJid(presenceEventData.getFromJid());
         M.onlineStatusEvent(contact, presenceEventData.getShow());

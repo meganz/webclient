@@ -34,6 +34,12 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
         .rebind('onRoomCreated.chatNotifications', function(e, megaRoom) {
             var resetChatNotificationCounters = function() {
                 if (megaRoom.isCurrentlyActive) {
+                    var uiElement = $('.conversation-panel[data-room-jid="' + megaRoom.roomJid.split("@")[0] + '"]');
+
+                    if (uiElement.find(".call-block").length > 0 && uiElement.find(".call-block.small-block").length === 0) {
+                        return;
+                    }
+
                     var lastSeen = null;
                     megaRoom.messagesBuff.messages.forEach(function (v, k) {
                         if (v.getState && v.getState() === Message.STATE.NOT_SEEN) {

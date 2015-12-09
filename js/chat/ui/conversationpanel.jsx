@@ -84,7 +84,6 @@ var ConversationMessage = React.createClass({
         var timestamp;
         var timestampInt;
         var textMessage;
-        var authorTextDiv="";
         var messageLabel="";
 
 
@@ -142,8 +141,6 @@ var ConversationMessage = React.createClass({
                 return false;
             }
             textMessage = message.messageHtml;
-
-            authorTextDiv = <span className="chat-username">{contact.m}</span>;
 
 
             if (
@@ -301,7 +298,7 @@ var ConversationMessage = React.createClass({
                     });
 
 
-                    return <div className="message body">
+                    return <div className={message.messageId + " message body"}>
                         <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
                         <div className="message content-area">
                             <div className="message user-card-name">{displayName}</div>
@@ -351,7 +348,7 @@ var ConversationMessage = React.createClass({
             }
             else {
                 return (
-                    <div className="message body" data-id={"id" + message.messageId}>
+                    <div className={message.messageId + " message body"}>
                         <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
                         <div className="message content-area">
                             <div className="message user-card-name">{displayName}</div>
@@ -401,7 +398,7 @@ var ConversationMessage = React.createClass({
                 var tmpMsg = textMessage[0].replace("[X]", htmlentities(generateContactName(contact.u)));
 
                 if (message.currentCallCounter) {
-                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ - " + secToDuration(message.currentCallCounter)) + "]] "
+                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
                 }
                 textMessage = tmpMsg;
                 textMessage = textMessage
@@ -515,6 +512,25 @@ var ConversationRightArea = React.createClass({
         var contact = room.megaChat.getContactFromJid(contactJid);
 
 
+        var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+                            room.startAudioCall();
+                        }}>
+            <i className="small-icon audio-call"></i>
+            {__("Start Audio Call")}
+        </div>;
+
+        var startVideoCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+                            room.startVideoCall();
+                        }}>
+            <i className="small-icon video-call"></i>
+            {__("Start Video Call")}
+        </div>;
+
+
+        if (room.callSession && room.callSession.isActive() === true) {
+            startAudioCallButton = startVideoCallButton = null;
+        }
+
         return <div className="chat-right-area">
             <div className="chat-right-area conversation-details-scroll">
                 <div className="chat-right-pad">
@@ -522,18 +538,8 @@ var ConversationRightArea = React.createClass({
                     <ContactsUI.ContactCard contact={contact} megaChat={room.megaChat} />
 
                     <div className="buttons-block">
-                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                            room.startAudioCall();
-                        }}>
-                            <i className="small-icon audio-call"></i>
-                            {__("Start Audio Call")}
-                        </div>
-                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                            room.startVideoCall();
-                        }}>
-                            <i className="small-icon video-call"></i>
-                            {__("Start Video Call")}
-                        </div>
+                        {startAudioCallButton}
+                        {startVideoCallButton}
 
                         <ButtonsUI.Button
                             className="link-button dropdown-element"
@@ -586,7 +592,222 @@ var ConversationRightArea = React.createClass({
             </div>
         </div>
     }
-})
+});
+
+
+
+var ConversationAudioVideoPanel = React.createClass({
+    mixins: [MegaRenderMixin],
+    getInitialState: function() {
+        return {
+            'messagesBlockEnabled': false,
+            'fullScreenModeEnabled': false
+        }
+    },
+    componentDidUpdate: function() {
+        var self = this;
+        var $container = $(ReactDOM.findDOMNode(self));
+
+        $container.rebind('mouseover.chatUI', function() {
+            var $this = $(this);
+            $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
+            if ($this.hasClass('full-sized-block')) {
+                $('.call.top-panel', $container).addClass('visible-panel');
+            }
+        });
+
+        $container.rebind('mouseout.chatUI', function() {
+            var $this = $(this);
+            $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+            if ($this.hasClass('full-sized-block')) {
+                $('.call.top-panel', $container).removeClass('visible-panel');
+            }
+        });
+
+
+        //Hidding Control panel if cursor is idle
+        var idleMouseTimer;
+        var forceMouseHide = false;
+        $container.rebind('mousemove.chatUI',function(ev) {
+            var $this = $(this);
+            if(!forceMouseHide) {
+                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
+                $container.removeClass('no-cursor');
+                if ($this.hasClass('full-sized-block')) {
+                    $('.call.top-panel', $container).addClass('visible-panel');
+                }
+                clearTimeout(idleMouseTimer);
+                idleMouseTimer = setTimeout(function() {
+                    $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+                    $container.addClass('no-cursor');
+                    if ($this.hasClass('full-sized-block')) {
+                        $('.call.top-panel', $container).removeClass('visible-panel');
+                    }
+                    forceMouseHide = true;
+                    setTimeout(function() {
+                        forceMouseHide = false;
+                    }, 400);
+                }, 2000);
+            }
+        });
+    },
+    toggleMessages: function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+
+        if (this.props.onMessagesToggle) {
+            this.props.onMessagesToggle(
+                !this.state.messagesBlockEnabled
+            );
+        }
+
+        this.setState({
+            'messagesBlockEnabled': !this.state.messagesBlockEnabled
+        });
+
+    },
+    fullScreenModeToggle: function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        $(document).fullScreen(!this.state.fullScreenModeEnabled);
+
+        this.setState({
+            'fullScreenModeEnabled': !this.state.fullScreenModeEnabled
+        });
+    },
+    render: function() {
+        var chatRoom = this.props.chatRoom;
+
+        if (!chatRoom.callSession || !chatRoom.callSession.isActive()) {
+            return null;
+        }
+
+        var participants = chatRoom.getParticipantsExceptMe();
+
+        var displayNames = [];
+
+        participants.forEach(function(v) {
+            displayNames.push(
+                chatRoom.megaChat.getContactNameFromJid(v)
+            );
+        });
+
+
+        var callSession = chatRoom.callSession;
+
+        var remoteCamEnabled = null;
+
+
+        if (callSession.getRemoteMediaOptions().video) {
+            remoteCamEnabled = <i className="small-icon blue-videocam" />;
+        }
+
+
+        var localPlayerElement = null;
+        var remotePlayerElement = null;
+
+        if (callSession.getMediaOptions().video === false) {
+            localPlayerElement = <div className="call local-audio">
+                <ContactsUI.Avatar contact={M.u[u_handle]} className="call semi-big-avatar" />
+            </div>;
+        }
+        else {
+            localPlayerElement = <div className="call local-video">
+                <div className="default-white-button tiny-button call">
+                    <i className="tiny-icon grey-minus-icon" />
+                </div>
+                <video
+                    className="localViewport"
+                    defaultMuted="true"
+                    muted=""
+                    volume="0"
+                    autoPlay="true"
+                    id={"localvideo_" + callSession.sid}
+                    src={callSession.localPlayer.src}
+                />
+            </div>;
+        }
+
+        if (callSession.getRemoteMediaOptions().video === false || !callSession.remotePlayer) {
+            var contact = chatRoom.megaChat.getContactFromJid(participants[0]);
+            remotePlayerElement = <div className="call user-audio">
+                <ContactsUI.Avatar contact={contact}  className="big-avatar" hideVerifiedBadge={true} />
+            </div>;
+        }
+        else {
+            var remotePlayer = callSession.remotePlayer[0];
+            remotePlayerElement = <div className="call user-video">
+                <video
+                    autoPlay="autoplay"
+                    className="rmtViewport rmtVideo"
+                    id={"remotevideo_" + callSession.sid}
+                    ref="remoteVideo"
+                    src={remotePlayer.src}
+                />
+            </div>;
+        }
+
+
+        var unreadDiv = null;
+        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
+        if(unreadCount > 0) {
+            unreadDiv = <div className="unread-messages">{unreadCount}</div>
+        }
+        return <div className={"call-block" + (this.state.messagesBlockEnabled === true ? " small-block" : "")}>
+            {remotePlayerElement}
+            {localPlayerElement}
+
+
+            <div className="call top-panel">
+                <div className="call top-user-info">
+                    <span className="user-card-name white">{displayNames.join(", ")}</span>{remoteCamEnabled}
+                </div>
+                <div
+                    className="call-duration medium blue call-counter"
+                    data-room-jid={chatRoom.roomJid.split("@")[0]}>{
+                        secondsToTime(chatRoom._currentCallCounter)
+                    }
+                </div>
+            </div>
+
+
+            <div className="call bottom-panel">
+                <div className={"button call left" + (unreadDiv ? " unread" : "")} onClick={this.toggleMessages}>
+                    {unreadDiv}
+                    <i className="big-icon conversations"></i>
+                </div>
+                <div className="button call" onClick={function(e) {
+                    if (callSession.getMediaOptions().audio === true) {
+                        callSession.muteAudio();
+                    } else {
+                        callSession.unmuteAudio();
+                    }
+                }}>
+                    <i className={"big-icon " + (callSession.getMediaOptions().audio ? " crossed-microphone" : " microphone")}></i>
+                </div>
+                <div className="button call" onClick={function(e) {
+                    if (callSession.getMediaOptions().video === true) {
+                        callSession.muteVideo();
+                    } else {
+                        callSession.unmuteVideo();
+                    }
+                }}>
+                    <i className={"big-icon " + (callSession.getMediaOptions().video ? " crossed-videocam" : " videocam")}></i>
+                </div>
+                <div className="button call" onClick={function(e) {
+                        chatRoom.callSession.endCall();
+                    }}>
+                    <i className="big-icon horizontal-red-handset"></i>
+                </div>
+                <div className="button call right" onClick={this.fullScreenModeToggle}>
+                    <i className="big-icon nwse-resize"></i>
+                </div>
+            </div>
+        </div>;
+    }
+});
 var ConversationPanel = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
 
@@ -598,7 +819,8 @@ var ConversationPanel = React.createClass({
             mouseOverDuringCall: false,
             typedMessage: "",
             currentlyTyping: [],
-            attachCloudDialog: false
+            attachCloudDialog: false,
+            messagesToggledInCall: false
         };
     },
 
@@ -1030,44 +1252,44 @@ var ConversationPanel = React.createClass({
         var room = this.props.chatRoom;
         var callIsActive = room.callSession && room.callSession.isActive();
 
-        if (callIsActive && room.isCurrentlyActive) {
-            $('.fm-chat-block').addClass('video-call');
-
-            if (self.state.isFullscreenModeEnabled) {
-                $('.fm-chat-block').addClass('fullscreen');
-
-            }
-            else {
-                $('.fm-chat-block').removeClass('fullscreen');
-            }
-            var $videoElem = $("video#remotevideo_" + room.callSession.sid);
-            if ($videoElem.length > 0) {
-                $videoElem[0].play();
-            }
-            var $videoElemLocal = $("video#localvideo_" + room.callSession.sid);
-            if ($videoElemLocal.length > 0) {
-                $videoElemLocal[0].play();
-            }
-
-            var $avscreen = $('.my-av-screen', self.$header);
-            if (!$avscreen.data('isDraggable')) {
-                $avscreen.draggable({
-                    'containment': $avscreen.parents('.chat-call-block'),
-                    'scroll': false
-                });
-                $avscreen.data('isDraggable', true);
-            }
-
-        }
-        else {
-            // only rmeove the video-call class IF the updated room is the one which was updated
-            if (megaChat.currentlyOpenedChat === room.roomJid) {
-                $('.fm-chat-block').removeClass('video-call');
-                $('.fm-chat-block').removeClass('fullscreen');
-            }
-        }
-        // <video/> display change to trigger re-render hack.
-        $('.rmtVideo:visible').css('display', '');
+        //if (callIsActive && room.isCurrentlyActive) {
+        //    $('.fm-chat-block').addClass('video-call');
+        //
+        //    if (self.state.isFullscreenModeEnabled) {
+        //        $('.fm-chat-block').addClass('fullscreen');
+        //
+        //    }
+        //    else {
+        //        $('.fm-chat-block').removeClass('fullscreen');
+        //    }
+        //    var $videoElem = $("video#remotevideo_" + room.callSession.sid);
+        //    if ($videoElem.length > 0) {
+        //        $videoElem[0].play();
+        //    }
+        //    var $videoElemLocal = $("video#localvideo_" + room.callSession.sid);
+        //    if ($videoElemLocal.length > 0) {
+        //        $videoElemLocal[0].play();
+        //    }
+        //
+        //    var $avscreen = $('.my-av-screen', self.$header);
+        //    if (!$avscreen.data('isDraggable')) {
+        //        $avscreen.draggable({
+        //            'containment': $avscreen.parents('.chat-call-block'),
+        //            'scroll': false
+        //        });
+        //        $avscreen.data('isDraggable', true);
+        //    }
+        //
+        //}
+        //else {
+        //    // only rmeove the video-call class IF the updated room is the one which was updated
+        //    if (megaChat.currentlyOpenedChat === room.roomJid) {
+        //        $('.fm-chat-block').removeClass('video-call');
+        //        $('.fm-chat-block').removeClass('fullscreen');
+        //    }
+        //}
+        //// <video/> display change to trigger re-render hack.
+        //$('.rmtVideo:visible').css('display', '');
 
         room.megaChat.updateSectionUnreadCount();
 
@@ -1128,7 +1350,6 @@ var ConversationPanel = React.createClass({
 
         // try to do a .scrollToBottom only once, to trigger the stickToBottom func. of JSP
         if (!self.scrolledToBottom) {
-            //TODO: fixme
             var $messagesPad = $('.messages.main-pad', self.$messages);
             if (
                 $messagesPad.outerHeight() - 1 > $messagesPad.parent().parent().parent().outerHeight()
@@ -1280,108 +1501,9 @@ var ConversationPanel = React.createClass({
             }
         }
 
-        /**
-         * Audio/video UI handling
-         */
-
-        var ctrlAudioButtonClasses = "video-call-button audio-icon";
-        var ctrlVideoButtonClasses = "video-call-button video-icon";
-        var headerIndicatorAudio = "chat-header-indicator muted-audio";
-        var headerIndicatorVideo = "chat-header-indicator muted-video";
-        var myAvatar = <span></span>;
-        var otherUsersAvatar = <span></span>;
-        var myContainerClasses = "my-av-screen";
-        var otherUserContainerClasses = "others-av-screen";
-        var currentUserResizerClasses = "current-user-resizer";
-        var videoMinimiseButtonClasses = "video-minimize-button small-video-reziser";
-        var sizeIconClasses = "video-call-button size-icon";
         var messageTextAreaClasses = "messages-textarea";
         var typingElement;
 
-        // setup ONLY if there is an active call session
-        if (room.callSession && callIsActive) {
-            if (self.state.isFullscreenModeEnabled) {
-                //headerClasses += " fullscreen";
-                sizeIconClasses += " active";
-                if (self.state.mouseOverDuringCall !== true) {
-                    videoControlClasses += " hidden-controls";
-                }
-            }
-
-            // setup, related to my local a/v settings
-            if (room.callSession.getMediaOptions().video) {
-                headerIndicatorVideo += " hidden";
-                myAvatar = <div className="localVideoWrapper">
-                    <video
-                        className="localViewport"
-                        defaultMuted="true"
-                        muted=""
-                        volume="0"
-                        autoPlay="true"
-                        id={"localvideo_" + room.callSession.sid}
-                        src={room.callSession.localPlayer.src}
-                    />
-                </div>;
-
-                myContainerClasses += " current-user-video-container";
-            }
-            else {
-                ctrlVideoButtonClasses += " active";
-                myAvatar = <div style={{height: "100%"}} className="my-avatar-text">
-                    <ContactsUI.Avatar contact={M.u[u_handle]} imgStyles={{width: "100%"}} />
-                </div>;
-                myContainerClasses += " current-user-audio-container";
-                currentUserResizerClasses += " hidden";
-            }
-
-            if (room.callSession.getMediaOptions().audio) {
-                headerIndicatorAudio += " hidden";
-            }
-            else {
-                ctrlAudioButtonClasses += " active";
-            }
-
-            // setup, based on remote user's a/v settings
-            if (room.callSession.getRemoteMediaOptions().video && room.callSession.remotePlayer) {
-                var remotePlayer = room.callSession.remotePlayer[0];
-
-                otherUsersAvatar = <video
-                        autoPlay="autoplay"
-                        className="rmtViewport rmtVideo"
-                        id={"remotevideo_" + room.callSession.sid}
-                        ref="remoteVideo"
-                        src={remotePlayer.src}
-                    />;
-                otherUserContainerClasses += " video-call-container";
-
-            }
-            else {
-                otherUsersAvatar = <div className="other-avatar-text">
-                    <ContactsUI.Avatar contact={contact} imgStyles={{width: "100%"}} />
-                </div>;
-
-                otherUserContainerClasses += " audio-call-container";
-            }
-
-            if (room.callSession.getRemoteMediaOptions().audio) {
-
-            }
-            else {
-
-            }
-        }
-        else {
-            headerIndicatorAudio += " hidden";
-            headerIndicatorVideo += " hidden";
-        }
-
-        if (self.state.localVideoIsMinimized === true) {
-            videoMinimiseButtonClasses += " active";
-            myContainerClasses += " minimized";
-        }
-        else {
-
-        }
 
         // typing area
         var typedMessage = htmlentities(self.state.typedMessage).replace(/\n/g, '<br />');
@@ -1450,6 +1572,11 @@ var ConversationPanel = React.createClass({
             />
         }
 
+        var additionalClass = self.state.isFullscreenModeEnabled ? " full-sized-block" : "";
+        if (!additionalClass && self.state.messagesToggledInCall) {
+            additionalClass = " small-block";
+        }
+
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove} data-room-jid={self.props.chatRoom.roomJid.split("@")[0]}>
                 <div className="chat-content-block">
@@ -1461,19 +1588,32 @@ var ConversationPanel = React.createClass({
                             self.setState({'attachCloudDialog': true});
                         }}
                     />
+                    <ConversationAudioVideoPanel
+                        chatRoom={this.props.chatRoom}
+                        contacts={self.props.contacts}
+                        megaChat={this.props.chatRoom.megaChat}
+                        onMessagesToggle={function(isActive) {
+                            self.setState({
+                                'messagesToggledInCall': isActive
+                            });
+                        }}
+                    />
 
                     {attachCloudDialog}
 
-                    <div className="messages-block">
+
+                    <div className={"messages-block " + additionalClass}>
                         <div className="messages scroll-area">
                             <utils.JScrollPane options={{
-                                enableKeyboardNavigation:false,
-                                showArrows:true,
-                                arrowSize:5,
-                                animateDuration: 70,
-                                animateScroll: false,
-                                maintainPosition: false
-                            }}>
+                                                enableKeyboardNavigation:false,
+                                                showArrows:true,
+                                                arrowSize:5,
+                                                animateDuration: 70,
+                                                animateScroll: false,
+                                                maintainPosition: false
+                                            }}
+                                               messagesToggledInCall={self.state.messagesToggledInCall}
+                                >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
                                         {messagesList}

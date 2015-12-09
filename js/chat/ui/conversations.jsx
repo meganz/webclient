@@ -107,10 +107,10 @@ var ConversationsListItem = React.createClass({
             var activeCamera = null;
 
             if (!mediaOptions.audio) {
-                mutedMicrophone = <i className="small-icon white-microphone"></i>;
+                mutedMicrophone = <i className="small-icon grey-crossed-mic"></i>;
             }
             if (mediaOptions.video) {
-                activeCamera = <i className="small-icon white-videocam"></i>;
+                activeCamera = <i className="small-icon grey-videocam"></i>;
             }
             inCallDiv = <div className="call-duration">
                 {mutedMicrophone}

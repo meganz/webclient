@@ -141,14 +141,20 @@
     width: 22px;
     height: 22px;
 }
-.small-icon.white-videocam {
+.small-icon.white-videocam, .conversations-pane li.active .small-icon.grey-videocam {
     background-position: -102px -3267px;
+}
+.small-icon.grey-videocam {
+    background-position: -212px -3267px;
 }
 .small-icon.blue-videocam {
     background-position: -172px -3267px;
 }
-.small-icon.white-microphone {
+.small-icon.white-crossed-mic, .conversations-pane li.active .small-icon.grey-crossed-mic {
     background-position: -28px -3268px;
+}
+.small-icon.grey-crossed-mic {
+    background-position: -65px -3268px; 
 }
 .small-icon.clock-icon {
     background-position: -2px -3200px;

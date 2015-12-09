@@ -1582,7 +1582,12 @@ var ConversationPanel = React.createClass({
         }
 
         var additionalClass = "";
-        if (additionalClass.length === 0 && self.state.messagesToggledInCall) {
+        if (
+            additionalClass.length === 0 &&
+            self.state.messagesToggledInCall &&
+            room.callSession &&
+            room.callSession.isActive()
+        ) {
             additionalClass = " small-block";
         }
 

@@ -950,8 +950,7 @@ function openTransferpanel()
         $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
         $('.nw-fm-left-icon.transfers').removeClass('paused');
     }*/
-    initTreeScroll();
-    $(window).trigger('resize');
+    // $(window).trigger('resize'); // this will call initTreeScroll();
 
     if ($('table.transfer-table tr').length > 1) {
         $('.transfer-clear-all-icon').removeClass('hidden');
@@ -2865,7 +2864,7 @@ function notificationsUI(close)
     $('.fm-main.notifications').removeClass('hidden');
     $('.notifications .nw-fm-left-icon').removeClass('active');
     $('.fm-main.default').addClass('hidden');
-    $(window).trigger('resize');
+    $.tresizer();
 }
 
 function accountUI()
@@ -4436,23 +4435,6 @@ function gridUI() {
         initTransferScroll();
     };
 
-    $(window).unbind('resize.grid');
-    $(window).bind('resize.grid', function() {
-        if (M.viewmode === 0) {
-            if (M.currentdirid === 'contacts') {
-                $.contactGridHeader();
-                initContactsGridScrolling();
-            } else if (M.currentdirid === 'shares') {
-                initGridScrolling();
-                $.sharedGridHeader();
-            } else {
-                initGridScrolling();
-                $.gridHeader();
-                $.detailsGridHeader();
-            }
-        }
-    });
-
     $('.fm-blocks-view.fm').addClass('hidden');
     $('.fm-chat-block').addClass('hidden');
     $('.shared-blocks-view').addClass('hidden');
@@ -5549,8 +5531,6 @@ function selectddUI() {
         else
             M.addDownload([h]);
     });
-    if (d)
-        console.timeEnd('selectddUI');
 
     if ($.rmInitJSP)
     {
@@ -5561,13 +5541,15 @@ function selectddUI() {
             console.log('jsp:!u', !!jsp);
         delete $.rmInitJSP;
     }
-    $(window).trigger('resize');
+    $.tresizer();
+    if (d) {
+        console.timeEnd('selectddUI');
+    }
 }
 
 function iconUI(aQuiet)
 {
     if (d) console.time('iconUI');
-    $(window).unbind('resize.icon');
 
     $('.fm-files-view-icon.block-view').addClass('active');
     $('.fm-files-view-icon.listing-view').removeClass('active');
@@ -5644,18 +5626,7 @@ function iconUI(aQuiet)
         $.selectddUIgrid = '.file-block-scrolling';
         $.selectddUIitem = 'a';
     }
-    Soon(function iconLazyUI()
-    {
-        selectddUI();
-        $(window).bind('resize.icon', function iconUIonResize()
-        {
-            if (M.viewmode == 1) {
-                if (M.currentdirid == 'contacts') initContactsBlocksScrolling();
-                else if (M.currentdirid == 'shares') initShareBlocksScrolling();
-                else initFileblocksScrolling();
-            }
-        });
-    });
+    selectddUI();
     if (d) console.timeEnd('iconUI');
 }
 
@@ -5663,8 +5634,6 @@ function transferPanelUI()
 {
     $.transferHeader = function()
     {
-        fm_resize_handler();
-
         var tt = $('.transfer-scrolling-table'),
               tth = $('.transfer-table-header');
 
@@ -5711,9 +5680,7 @@ function transferPanelUI()
                     $(this).remove();
                     $.clearTransferPanel();
                     fm_tfsupdate();
-                    Soon(function() {
-                        $(window).trigger('resize');
-                    });
+                    $.tresizer();
                 });
             }
         });
@@ -5793,24 +5760,11 @@ function transferPanelUI()
             }
         });
         initTransferScroll();
-    }
-
-    $(window).rebind('resize.transferpanel', function(e) {
-        $.transferHeader();
-    });
-
-    $(window).rebind('resize.slideshow', function(e) {
-        if (slideshowid && previews[slideshowid]) {
-            previewsrc(previews[slideshowid].src);
-        }
-    });
+    };
 
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
         $('.fmholder').removeClass('transfer-panel-opened');
-        setTimeout(function() {
-            $(window).trigger('resize');
-        }, 200);
     };
 
     $.transferOpen = function(force) {
@@ -5819,7 +5773,7 @@ function transferPanelUI()
             $('.nw-fm-left-icon.transfers').addClass('active');
             notificationsUI(1);
             $('#fmholder').addClass('transfer-panel-opened');
-            $.transferHeader();
+            fm_tfsupdate(); // this will call $.transferHeader();
         }
     };
 
@@ -5832,10 +5786,10 @@ function transferPanelUI()
             $('.transfer-panel-empty-txt').removeClass('hidden');
             $('.transfer-panel-title').html(l[104]);
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
-            fm_tfsupdate();
-            Soon(function() {
-                $(window).trigger('resize');
-            });
+            if (M.currentdirid === 'transfers') {
+                fm_tfsupdate();
+                $.tresizer();
+            }
         }
     };
 
@@ -6545,19 +6499,11 @@ function treeUI()
         return false;
     });
 
-    $(window).unbind('resize.tree');
-    $(window).bind('resize.tree', function() {
-        initTreeScroll();
-    });
-    // setTimeout(initTreeScroll,10);
-    Soon(function()
-    {
-       /**
-        * Let's shoot two birds with a stone, when nodes are moved we need a resize
-        * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
-        */
-        $(window).trigger('resize');
-    });
+    /**
+     * Let's shoot two birds with a stone, when nodes are moved we need a resize
+     * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
+     */
+    $(window).trigger('resize');
 
     if (d) {
         console.timeEnd('treeUI');
@@ -8819,7 +8765,7 @@ function getClipboardLinks() {
 
     var nodeUrlWithPublicHandle, nodeDecryptionKey,
         key, type, fileSize, folderClass, currNode,
-        $dialog = $('.export-links-dialog .export-link-select'),
+        $dialog = $('.export-links-dialog .export-content-block'),
         nodesIds = $.selected,
         links = '';
 
@@ -8931,7 +8877,7 @@ function hideToast (int) {
  */
 function itemExportLinkHtml(item) {
 
-    var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize, folderClass,
+    var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize, folderClass = '',
         html = '';
 
     // Shared item type is folder
@@ -8939,7 +8885,7 @@ function itemExportLinkHtml(item) {
         type = 'F';
         key = u_sharekeys[item.h];
         fileSize = '';
-        folderClass = 'folder-item';
+        folderClass = ' folder-item';
     }
 
     // Shared item type is file
@@ -8952,15 +8898,18 @@ function itemExportLinkHtml(item) {
     fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
     fileUrlKey = key ? '!' + a32_to_base64(key) : '';
 
-    html = '<div class="export-link-item ' + folderClass + '">'
+    html = '<div class="export-link-item' + folderClass + '">'
          +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
          +      '<div class="export-link-text-pad">'
          +          '<div class="export-link-txt">'
          +               '<span class="export-item-title">' + htmlentities(item.name) + '</span><span class="export-link-gray-txt">' + fileSize + '</span>'
          +          '</div>'
          +          '<div id="file-link-block" class="file-link-block">'
-         +              '<span class="file-link-info url" data-pseudo-content="' + l[7681] +'">' + fileUrlWithoutKey + '</span>'
-         +              '<span class="file-link-info key" data-pseudo-content="' + l[1028] +'">' + fileUrlKey + '</span>'
+         +              '<span class="icon"></span>'
+         +              '<span class="file-link-info-wrapper">'
+         +                  '<span class="file-link-info url">' + fileUrlWithoutKey + '</span>'
+         +                  '<span class="file-link-info key">' + fileUrlKey + '</span>'
+         +              '</span>'
          +          '</div>'
          +      '</div>'
          +  '</div>';
@@ -10182,10 +10131,14 @@ function savecomplete(id)
  * This is why we do a on('resize') handler which handles the resize of the generic layout of Mega's FM.
  */
 function fm_resize_handler() {
+    if ($.tresizer.last === -1) {
+        return;
+    }
+    if (d) {
+        console.time('fm_resize_handler');
+    }
     // transfer panel resize logic
-    var right_pane_height = (
-            $('#fmholder').outerHeight() - $('#topmenu').outerHeight()
-    );
+    var right_pane_height = $('#fmholder').outerHeight() - $('#topmenu').outerHeight();
 
     $('.fm-main.default, .fm-main.notifications').css({
         'height': right_pane_height + "px"
@@ -10200,10 +10153,8 @@ function fm_resize_handler() {
     });
 
     // left panel resize logic
-
-    var right_panel_margin = $('.fm-left-panel').outerWidth();
-
     /*
+    var right_panel_margin = $('.fm-left-panel').outerWidth();
      var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
      $('.fm-main.default > div:not(.fm-left-panel)').each(function() {
 
@@ -10213,20 +10164,54 @@ function fm_resize_handler() {
      });
      */
 
-    $(['.files-grid-view .grid-scrolling-table', '.file-block-scrolling', '.contacts-grid-view .contacts-grid-scrolling-table '].join(", ")).css({
-        'width': (
-            $(document.body).outerWidth() - (
-            $('.fm-left-panel').outerWidth()
-            )
-            )
-    });
+    $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
+        ' .contacts-grid-view .contacts-grid-scrolling-table')
+        .css({
+            'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
+        });
 
-    if (M.currentdirid == 'contacts')
-    {
-        if (M.viewmode)
+    initTreeScroll();
+
+    if (M.currentdirid === 'contacts') {
+        if (M.viewmode) {
             initContactsBlocksScrolling();
-        else
+        }
+        else {
+            if ($.contactGridHeader) {
+                $.contactGridHeader();
+            }
             initContactsGridScrolling();
+        }
+    }
+    else if (M.currentdirid === 'shares') {
+        if (M.viewmode) {
+            initShareBlocksScrolling();
+        }
+        else {
+            initGridScrolling();
+            if ($.sharedGridHeader) {
+                $.sharedGridHeader();
+            }
+        }
+    }
+    else if (M.currentdirid === 'transfers') {
+        fm_tfsupdate(); // this will call $.transferHeader();
+    }
+    else {
+        if (M.viewmode) {
+            initFileblocksScrolling();
+        }
+        else {
+            initGridScrolling();
+            if ($.gridHeader) {
+                $.gridHeader();
+                $.detailsGridHeader();
+            }
+        }
+    }
+
+    if (slideshowid && previews[slideshowid]) {
+        previewsrc(previews[slideshowid].src);
     }
 
     if (megaChatIsReady && megaChat.resized) {
@@ -10234,24 +10219,24 @@ function fm_resize_handler() {
     }
 
     var right_blocks_height = right_pane_height - $('.fm-right-header.fm').outerHeight();
-    $('.fm-right-files-block > *:not(.fm-right-header)').css(
-        {
-            'height': right_blocks_height + "px",
-            'min-height': right_blocks_height + "px"
-        });
+    $('.fm-right-files-block > *:not(.fm-right-header)').css({
+        'height': right_blocks_height + "px",
+        'min-height': right_blocks_height + "px"
+    });
 
     $('.fm-right-files-block, .fm-right-account-block').css({
         'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
     });
 
     var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
-    var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
-    $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css(
-        {
-            'height': shared_block_height + "px",
-            'min-height': shared_block_height + "px"
-        });
+    $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
+        'height': shared_block_height + "px",
+        'min-height': shared_block_height + "px"
+    });
 
+    if (d) {
+        console.timeEnd('fm_resize_handler');
+    }
 }
 
 function sharedfolderUI() {

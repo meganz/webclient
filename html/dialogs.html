@@ -141,10 +141,17 @@
         <div class="clear"></div>
     </div>
     <div class="fm-dialog-body">
-        <div class="fm-dialog-new-folder-input">
-            <div class="fm-dialog-input-clear"></div>
-            <div class="fm-dialog-new-folder-pad">
-                <input name="dialog-new-folder" type="text" placeholder="[$1028]" value="" />
+        <div class="wrapper">
+            <div class="instruction-message">
+                [$7945]<br>
+                [$7972]
+            </div>
+            <div class="fm-dialog-new-folder-input">
+                <div class="fm-dialog-input-clear"></div>
+                <div class="fm-dialog-new-folder-pad decryption-key">
+                    <span class="icon"></span>
+                    <input name="dialog-new-folder" type="text" placeholder="[$7971]" value="" />
+                </div>
             </div>
         </div>
         <div class="default-dialog-bottom">
@@ -152,8 +159,6 @@
         </div>
     </div>
 </div>
-
-
 
 <div class="fm-dialog registration-success registration-page-success hidden">
      <div class="reg-success-icon"></div>
@@ -455,13 +460,24 @@
             </div>
     		<input type="text" id="datepicker" class="fm-dialogs-select expiry-date-select" value="Select date" />
         </div>
-    	<div class="fm-links-dropdown">
-        	<div class="fm-link-select-label">[$7649]</div>
-    		<div class="fm-dialogs-select export-link-select full-link"><span></span>[$7651]</div>
-            <div class="fm-dialogs-dropdown export-link-dropdown">
-            	<div class="fm-dialogs-dropdown-item public-handle" data-keyoptions="public-handle"><span></span>[$7681]</div>
-                <div class="fm-dialogs-dropdown-item decryption-key" data-keyoptions="decryption-key"><span></span>[$1028]</div>
-                <div class="fm-dialogs-dropdown-item full-link" data-keyoptions="full-link"><span></span>[$7651]</div>
+        <div class="fm-links-export-options">
+            <div class="fm-link-select-label">[$7649]</div>
+            <div class="fm-links-radio-buttons">
+                <div class="separate-link-and-key">
+                    <div class="link-handle" data-keyoptions="public-handle">
+                        <span class="icon"></span>
+                        <span class="text">[$7947]</span>
+                    </div>
+                    <div class="button-separator"></div>
+                    <div class="link-decryption-key" data-keyoptions="decryption-key">
+                        <span class="icon"></span>
+                        <span class="text">[$7971]</span>
+                    </div>
+                </div>
+                <div class="link-handle-and-key" data-keyoptions="full-link">
+                    <span class="icon"></span>
+                    <span class="text">[$7948]</span>
+                </div>
             </div>
         </div>
         <div class="clear"></div>
@@ -470,8 +486,7 @@
     </div>
     <div class="fm-notifications-bottom">
     	<div class="export-description hidden">
-        	MEGA recommends sending the 'Encryption Key' separately from the 'Public Handle'
-            <!-- [$7682] !-->
+        	[$7682]
         </div>
         <div class="fm-dialog-button links-button copy-to-clipboard" id="clipboardbtn1">
           <span></span>

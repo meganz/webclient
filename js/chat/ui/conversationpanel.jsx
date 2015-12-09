@@ -604,7 +604,8 @@ var ConversationAudioVideoPanel = React.createClass({
     getInitialState: function() {
         return {
             'messagesBlockEnabled': false,
-            'fullScreenModeEnabled': false
+            'fullScreenModeEnabled': false,
+            'localMediaDisplay': true,
         }
     },
     componentDidUpdate: function() {
@@ -691,6 +692,12 @@ var ConversationAudioVideoPanel = React.createClass({
             'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
         });
     },
+    toggleLocalVideoDisplay: function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        this.setState({localMediaDisplay: !this.state.localMediaDisplay});
+    },
     render: function() {
         var chatRoom = this.props.chatRoom;
 
@@ -723,13 +730,19 @@ var ConversationAudioVideoPanel = React.createClass({
         var remotePlayerElement = null;
 
         if (callSession.getMediaOptions().video === false) {
-            localPlayerElement = <div className="call local-audio">
-                <ContactsUI.Avatar contact={M.u[u_handle]} className="call semi-big-avatar" />
+            localPlayerElement = <div className={"call local-audio" + (this.state.localMediaDisplay ? "" : " minimized")}>
+                <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
+                    <i className="tiny-icon grey-minus-icon" />
+                </div>
+                <ContactsUI.Avatar
+                    contact={M.u[u_handle]} className="call semi-big-avatar"
+                    style={{display: !this.state.localMediaDisplay ? "none" : ""}}
+                />
             </div>;
         }
         else {
-            localPlayerElement = <div className="call local-video">
-                <div className="default-white-button tiny-button call">
+            localPlayerElement = <div className={"call local-video" + (this.state.localMediaDisplay ? "" : " minimized")}>
+                <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
                     <i className="tiny-icon grey-minus-icon" />
                 </div>
                 <video
@@ -740,6 +753,7 @@ var ConversationAudioVideoPanel = React.createClass({
                     autoPlay="true"
                     id={"localvideo_" + callSession.sid}
                     src={callSession.localPlayer.src}
+                    style={{display: !this.state.localMediaDisplay ? "none" : ""}}
                 />
             </div>;
         }

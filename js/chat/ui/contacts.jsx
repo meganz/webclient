@@ -52,7 +52,7 @@ var Avatar = React.createClass({
         }
 
         if($avatar.find("img").length > 0) {
-            displayedAvatar = <div className={classes}>
+            displayedAvatar = <div className={classes} style={this.props.style}>
                 {verifiedElement}
                 <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
             </div>;
@@ -61,7 +61,7 @@ var Avatar = React.createClass({
             var colorNum = tempClasses.split("color")[1].split(" ")[0];
             classes += " color" + colorNum;
 
-            displayedAvatar = <div className={classes}>{verifiedElement}<div>{$(useravatar.contact(contact)).text()}</div></div>;
+            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div>{$(useravatar.contact(contact)).text()}</div></div>;
 
 
         }

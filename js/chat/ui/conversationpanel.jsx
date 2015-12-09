@@ -664,12 +664,12 @@ var ConversationAudioVideoPanel = React.createClass({
                 }
             });
 
-        $('.call.local-video, .call.local-audio', $container).draggable({
-            'refreshPositions': false,
+        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
+        $localMediaDisplay.draggable({
+            'refreshPositions': true,
             'containment': $container,
             'scroll': false,
             drag: function(event, ui){
-                console.error(event, ui);
                 var right = Math.max(0, $container.outerWidth() - ui.position.left);
                 var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
 
@@ -681,10 +681,28 @@ var ConversationAudioVideoPanel = React.createClass({
                 ui.offset = {
                     left: 'auto',
                     top: 'auto',
-                    right: right,
-                    bottom: bottom
+                    right: right - ui.helper.outerWidth(),
+                    bottom: bottom - ui.helper.outerHeight()
                 };
+                ui.position.left = 'auto';
+                ui.position.top = 'auto';
+
                 ui.helper.css(ui.offset);
+                $(this).css(ui.offset);
+            }
+        });
+
+        // REposition the $localMediaDisplay if its OUT of the viewport (in case of dragging -> going back to normal size
+        // mode from full screen...)
+        $(window).rebind('resize.chatUI_' + room.roomJid, function(e) {
+            if ($localMediaDisplay.is(":visible")) {
+                var pos = getHtmlElemPos($localMediaDisplay[0]);
+                if (pos.x < 0) {
+                    $localMediaDisplay.css({'right': $container.outerWidth() - $localMediaDisplay.outerWidth()});
+                }
+                if (pos.y < 0) {
+                    $localMediaDisplay.css({'bottom': $container.outerHeight() - $localMediaDisplay.outerHeight()});
+                }
             }
         });
     },

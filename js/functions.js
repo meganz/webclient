@@ -2469,7 +2469,8 @@ function asyncApiReq(data) {
     return $promise;
 }
 
-// Returns pixels position of element relative to document (top left corner)
+// Returns pixels position of element relative to document (top left corner) OR to the parent (IF the parent and the
+// target element are both with position: absolute)
 function getHtmlElemPos(elem, n) {
     var xPos = 0;
     var yPos = 0;

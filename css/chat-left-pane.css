@@ -14,7 +14,9 @@
 }
 .user-card-name.conversation-name {
 	padding: 0 26px 0 0;
-	display: inline-block;
+    float: left;
+        line-height: 21px;
+        max-width: 100%;
 }
 .user-card-name.conversation-name.group {
 	padding: 0;
@@ -26,12 +28,13 @@
 }
 .conversation-message {
 	font-size: 13px;
-	line-height: 16px;
+	line-height: 18px;
 	color: #777777;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	margin: 0 50px 0 0;
+    clear: both;
 }
 .conversation-message.unread {
 	color: #2BA6DE;
@@ -47,6 +50,7 @@
 }
 .conversations-pane li.active .date-time {
 	color: rgba(255,255,255,0.6);
+    line-height: 18px;
 }
 .conversations-pane li.active .user-card-presence {
 	background-color: white;
@@ -55,6 +59,7 @@
 .unread-messages {
 	position: absolute;
 	right: 12px;
+    top: 28px;
 	text-align: center;
 	min-width: 18px;
 	height: 16px;
@@ -69,16 +74,22 @@
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	margin: -1px 0 0 0;
+}
+.conversations-pane li.active .unread-messages {
+    background-color: white;
+    color: #2BA6DE;
 }
 .call-duration {
 	position: absolute;
 	right: 12px;
-    margin: -6px 0 0 0;
+    top: 23px;
     font-size:20px;
     line-height:25px;
-    color: white;
+    color: #777777;
     font-family: 'source_sans_prolight';
+}
+.conversations-pane li.active .call-duration {
+    color: white;
 }
 .call-duration.blue {
     color: #61D2FF;

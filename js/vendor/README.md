@@ -121,7 +121,18 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [zxcvbn.js]: A realistic password strength estimator.
 
-
+> NB: We are using a custom, unobfuscated build which was created using:
+> 
+> ```bash
+> git clone https://github.com/dropbox/zxcvbn.git
+> cd zxcvbn
+> git checkout 1.0.1
+> npm install
+> nano compile_and_minify.sh
+> Comment out or delete the last 4 lines to prevent minification using Closure compiler
+> ./compile_and_minify.sh
+> Use output in compiled.js
+> ```
 
 
 ---

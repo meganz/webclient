@@ -400,16 +400,16 @@ CallSession.prototype.onCallAnswered = function(e) {
 CallSession.prototype._renderInCallUI = function() {
     var self = this;
 
-    self.room.megaChat._currentCallCounter = 0;
-    if (self.room.megaChat._currentCallTimer) {
-        clearInterval(self.room.megaChat._currentCallTimer);
+    self.room._currentCallCounter = 0;
+    if (self.room._currentCallTimer) {
+        clearInterval(self.room._currentCallTimer);
     }
-    self.room.megaChat._currentCallTimer = setInterval(function() {
-        $('.nw-conversations-item.current-calling .chat-time-txt').text(
-            secondsToTime(self.room.megaChat._currentCallCounter)
+    self.room._currentCallTimer = setInterval(function() {
+        $('.call-counter[data-room-jid="' + self.room.roomJid.split("@")[0] + '"]').text(
+            secondsToTime(self.room._currentCallCounter)
         );
 
-        self.room.megaChat._currentCallCounter++;
+        self.room._currentCallCounter++;
     }, 1000);
 
     self.renderCallStartedState();
@@ -612,6 +612,8 @@ CallSession.prototype.onCallTerminated = function(e) {
     if (self.room.callSession === self) {
         delete self.room.callSession;
     }
+
+
     self.renderCallEndedState();
 };
 
@@ -877,12 +879,11 @@ CallSession.prototype.renderCallEndedState = function() {
 
     self.room.getNavElement().show();
 
-    if (self.room.megaChat._currentCallTimer) {
-        clearInterval(self.room.megaChat._currentCallTimer);
+    if (self.room._currentCallTimer) {
+        clearInterval(self.room._currentCallTimer);
     }
 
     self._removeTempMessages();
-    //self.room.trackDataChange();
 };
 
 CallSession.prototype.destroy = function() {

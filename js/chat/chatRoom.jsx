@@ -195,7 +195,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 //            M.renderContacts();
 //        };
 
-        self.messagesBuff.markAllAsSeen();
+        // @TODO: ONLY the visible ones.
+        //self.messagesBuff.markAllAsSeen();
     });
 
 

@@ -36,11 +36,13 @@ var ConversationsListItem = React.createClass({
 
         var classString = "";
 
+        var megaChat = this.props.chatRoom.megaChat;
+        var chatRoom = this.props.chatRoom;
+        var contactJid = chatRoom.getParticipantsExceptMe()[0];
+        var contact = chatRoom.megaChat.getContactFromJid(contactJid);
 
-        var contactJid = this.props.chatRoom.getParticipantsExceptMe()[0];
-        var contact = this.props.chatRoom.megaChat.getContactFromJid(contactJid);
         var id = 'conversation_' + htmlentities(contact.u);
-        var roomShortJid = this.props.chatRoom.roomJid.split("@")[0];
+        var roomShortJid = chatRoom.roomJid.split("@")[0];
 
         var caps = megaChat.karere.getCapabilities(contactJid);
         if (caps) {
@@ -53,24 +55,27 @@ var ConversationsListItem = React.createClass({
         }
 
         // selected
-        if (this.props.chatRoom.isCurrentlyActive) {
+        if (chatRoom.isCurrentlyActive) {
             classString += " active";
         }
 
-        var presenceClass = this.props.chatRoom.megaChat.xmppPresenceToCssClass(
+        var presenceClass = chatRoom.megaChat.xmppPresenceToCssClass(
             contact.presence
         );
 
-        var unreadCount = this.props.chatRoom.messagesBuff.getUnreadCount();
-        var unreadDiv = "";
+        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
+        var unreadDiv = null;
         var isUnread = false;
         if (unreadCount > 0) {
             unreadDiv = <div className="unread-messages">{unreadCount}</div>;
             isUnread = true;
         }
 
-        var lastMessageDiv = "";
-        var lastMessage = this.props.chatRoom.messagesBuff.getLatestTextMessage();
+        var inCallDiv = null;
+
+        var lastMessageDiv = null;
+        var lastMessageDatetimeDiv = null;
+        var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         if (lastMessage) {
             var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
 
@@ -80,13 +85,10 @@ var ConversationsListItem = React.createClass({
                 renderableSummary = lastMessage.getManagementMessageSummaryText();
             }
 
-            lastMessageDiv =
-                <div>
-                    <div className={lastMsgDivClasses}>
+            lastMessageDiv = <div className={lastMsgDivClasses}>
                         {renderableSummary}
-                    </div>
-                    <div className="date-time">{unixtimeToTimeString(lastMessage.delay)}</div>
-                </div>;
+                    </div>;
+            lastMessageDatetimeDiv = <div className="date-time">{unixtimeToTimeString(lastMessage.delay)}</div>;
         }
         else {
             var lastMsgDivClasses = "conversation-message";
@@ -98,6 +100,27 @@ var ConversationsListItem = React.createClass({
                 </div>;
         }
 
+        if (chatRoom.callSession && chatRoom.callSession.isActive() === true) {
+            var mediaOptions = chatRoom.callSession.getMediaOptions();
+
+            var mutedMicrophone = null;
+            var activeCamera = null;
+
+            if (!mediaOptions.audio) {
+                mutedMicrophone = <i className="small-icon white-microphone"></i>;
+            }
+            if (mediaOptions.video) {
+                activeCamera = <i className="small-icon white-videocam"></i>;
+            }
+            inCallDiv = <div className="call-duration">
+                {mutedMicrophone}
+                {activeCamera}
+                <span className="call-counter" data-room-jid={chatRoom.roomJid.split("@")[0]}>{secondsToTime(chatRoom._currentCallCounter)}</span>
+            </div>;
+
+            classString += " call-active";
+        }
+
         var avatarMeta = generateAvatarMeta(contact.u);
 
         return (
@@ -106,8 +129,10 @@ var ConversationsListItem = React.createClass({
                     {avatarMeta.fullName}
                     <span className={"user-card-presence " + presenceClass}></span>
                 </div>
+                {inCallDiv}
                 {unreadDiv}
                 {lastMessageDiv}
+                {lastMessageDatetimeDiv}
             </li>
         );
     }
@@ -203,13 +228,6 @@ var ConversationsList = React.createClass({
         var currConvsList = [];
         this.props.chats.map((chatRoom, k) => {
             if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
-                return;
-            }
-            if (
-                megaChat.activeCallSession &&
-                chatRoom == megaChat.activeCallSession.room &&
-                megaChat.activeCallSession.isActive()
-            ) {
                 return;
             }
 

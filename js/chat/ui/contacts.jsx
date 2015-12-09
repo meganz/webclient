@@ -41,11 +41,15 @@ var Avatar = React.createClass({
         var displayedAvatar;
 
 
-        var verifyState = u_authring.Ed25519[contact.h] || {};
-        var verifiedElement = (
-            verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ?
-                <div className="user-card-verified"></div> : undefined
-        );
+        var verifiedElement = null;
+
+        if (!this.props.hideVerifiedBadge) {
+            var verifyState = u_authring.Ed25519[contact.h] || {};
+            verifiedElement = (
+                verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ?
+                    <div className="user-card-verified"></div> : undefined
+            );
+        }
 
         if($avatar.find("img").length > 0) {
             displayedAvatar = <div className={classes}>

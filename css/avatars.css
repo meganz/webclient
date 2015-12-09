@@ -53,26 +53,41 @@
     border: 0;
     font-size: 76px;
     line-height: 160px;
-    font-family: 'source_sans_proextralight';
 }
-.semi-big-avatar, .medium-avatar, .semi-big-avatar, .big-avatar {
+.medium-avatar, .semi-big-avatar,  .big-avatar {
     display: block;
     width: 184px;
     height: 184px;
     -moz-border-radius: 9px;
     -webkit-border-radius: 9px;
     border-radius: 9px;
-    font-size: 116px;
-    line-height: 184px;
-    font-family: 'source_sans_proextralight';
     background-color: #FF6A19;
-    color: white;
+}
+.semi-big-avatar div,  .big-avatar div {
+    width: 96px;
+    height: 96px;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    background-color: white;
+    position:absolute;
+    left:50%;
+    top: 50%;
+    margin: -48px 0 0 -48px;
+    font-size: 60px;
+    line-height: 96px;
+    font-family: 'source_sans_proextralight';
 }
 .big-avatar {
-    width: 300px;
-    height: 300px;
-    font-size: 180px;
-    line-height: 300px;
+    width: 260px;
+    height: 260px;
+}
+.big-avatar div {
+    width: 146px;
+    height: 146px;
+    margin: -88px 0 0 -88px;
+    font-size: 90px;
+    line-height: 146px;
 }
 .medium-avatar img, .semi-big-avatar img, .big-avatar img {
     width: 100%;

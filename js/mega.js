@@ -568,7 +568,7 @@ function MegaData()
 
         $('.files-grid-view.fm.shared-folder-content').addClass('hidden');
 
-        $(window).trigger('resize');
+        $.tresizer();
     };
     Object.defineProperty(this, 'fsViewSel', {
         value: '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling',
@@ -1169,7 +1169,7 @@ function MegaData()
         $(lSel).unbind('jsp-scroll-y.dynlist');
         $(window).unbind("resize.dynlist");
         sharedfolderUI();// ToDo: Check do we really need this here
-        $(window).trigger('resize');
+        $.tresizer();
 
         hideEmptyGrids();
 
@@ -1579,7 +1579,7 @@ function MegaData()
 
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
-            //$(window).trigger('resize');
+            //$.tresizer();
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -3111,9 +3111,7 @@ function MegaData()
         renderNew();
         this.rubbishIco();
         processmove(j);
-        Soon(function() {
-            $(window).trigger('resize');
-        });
+        $.tresizer();
     };
 
     this.accountSessions = function(cb) {
@@ -4074,14 +4072,14 @@ function MegaData()
                     delete M.tfsdomqueue[i];
                 }
 
-                if (M._tfsDynlistR)
+                /*if (M._tfsDynlistR)
                     clearTimeout(M._tfsDynlistR);
                 M._tfsDynlistR = setTimeout(function()
                 {
                     delete M._tfsDynlistR;
                     Soon(transferPanelUI);
                     Soon(fm_tfsupdate);
-                }, 350);
+                }, 350);*/
                 $(window).trigger('resize');
             }
         }
@@ -4442,10 +4440,10 @@ function MegaData()
             $.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
             delete $.transferprogress['ul_'+ id];
         }
-        $.transferHeader();
+        // $.transferHeader();
         Soon(function() {
             mega.utils.resetUploadDownload();
-            $(window).trigger('resize');
+            $.tresizer();
         });
     }
 
@@ -4802,7 +4800,7 @@ function renderNew() {
         M.sort();
         M.renderMain(true);
         M.renderPath();
-        $(window).trigger('resize');
+        $.tresizer();
     }
 
     if (UItree) {
@@ -6899,14 +6897,26 @@ function balance2pro(callback)
             return false;
         });
 
-        // On Export File Links and Decryption Keys dropdown
-        $('.export-link-dropdown div').rebind('click', function() {
+        // On Export File Links and Decryption Keys
+        var $linkButtons = $('.link-handle, .link-decryption-key, .link-handle-and-key');
+        var $linkHandle = $('.link-handle');
+        
+        // Reset state from previous dialog opens and pre-select the 'Link without key' option by default
+        $linkButtons.removeClass('selected');
+        $linkHandle.addClass('selected');
+        
+        // Add click handler
+        $linkButtons.rebind('click', function() {
 
             var keyOption = $(this).attr('data-keyoptions');
+            var $this = $(this);
+            
+            // Add selected state to button
+            $linkButtons.removeClass('selected');
+            $this.addClass('selected');
 
-            $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
-            $('.export-link-select').html($(this).html());
-            $('.export-link-dropdown').fadeOut(200);
+            // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
+            $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
             $span.text(l[1990]);
 
             // Stop propagation
@@ -6918,6 +6928,7 @@ function balance2pro(callback)
     scope.mega = scope.mega || {};
     scope.mega.Dialog = scope.mega.Dialog || {};
     scope.mega.Dialog.ExportLink = ExportLinkDialog;
+    
 })(jQuery, window);
 
 (function($, scope) {

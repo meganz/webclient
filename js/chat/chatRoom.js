@@ -331,7 +331,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     });
 
     // activity on a specific room (show, hidden, got new message, etc)
-    self.bind('activity', function(e) {
+    self.bind('onAfterRenderMessage', function(e) {
         self.lastActivity = unixtime();
 
         if (self.type === "private") {

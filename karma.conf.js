@@ -60,7 +60,7 @@ module.exports = function(config) {
         'js/vendor/chat/cryptojs-hmac.js',
         'js/vendor/chat/cryptojs-lib-typedarrays.js',
         // Other.
-        'js/vendor/Autolinker.js',
+        'js/vendor/autolinker.js',
         'js/vendor/qrcode.js',
         'js/vendor/bitcoin-math.js',
         'js/vendor/db.js',
@@ -103,7 +103,7 @@ module.exports = function(config) {
         'js/megaDbEncryptionPlugin.js',
         'js/megaDb.js',
         'js/megaKvStorage.js',
-        'js/vendor/Int64.js',
+        'js/vendor/int64.js',
         'js/zip64.js',
         'js/cms.js',
         // Google Import Contacts

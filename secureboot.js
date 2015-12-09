@@ -1222,7 +1222,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
     // Other
-    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/autolinker.js', n: 'mega_js', j:1,w:7});
 
     // Google Import Contacts
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
@@ -1327,7 +1327,7 @@ else if (!b_u)
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/vendor/Int64.js', n: 'int64_js', j:1});
+    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
     jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});

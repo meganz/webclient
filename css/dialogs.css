@@ -49,8 +49,7 @@
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
     height: 30px;
-    padding: 0 0 0 16px;
-    margin: 22px 0 12px 0;
+    padding: 22px 0 8px 16px;
 }
 .fm-dialog .fm-breadcrumbs-block:not(.long-path) .cloud-drive .right-arrow-bg {
     padding: 0 7px 0 8px;
@@ -83,7 +82,7 @@
     background-image: none;
 }
 .fm-dialog-grid-scroll {
-    height: 312px;
+    height: 312px !important;
 }
 .fm-dialog-grid-scroll, .fm-dialog-grid-scroll .jspPane { 
     background-image: url(../images/mega/grid-bg.svg);

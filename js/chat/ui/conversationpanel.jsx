@@ -605,7 +605,7 @@ var ConversationAudioVideoPanel = React.createClass({
         return {
             'messagesBlockEnabled': false,
             'fullScreenModeEnabled': false,
-            'localMediaDisplay': true,
+            'localMediaDisplay': true
         }
     },
     componentDidUpdate: function() {
@@ -663,6 +663,30 @@ var ConversationAudioVideoPanel = React.createClass({
                     self.setState({fullScreenModeEnabled: true});
                 }
             });
+
+        $('.call.local-video, .call.local-audio', $container).draggable({
+            'refreshPositions': false,
+            'containment': $container,
+            'scroll': false,
+            drag: function(event, ui){
+                console.error(event, ui);
+                var right = Math.max(0, $container.outerWidth() - ui.position.left);
+                var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
+
+
+                // contain in the $container
+                right = Math.min(right, $container.outerWidth());
+                bottom = Math.min(bottom, $container.outerHeight());
+
+                ui.offset = {
+                    left: 'auto',
+                    top: 'auto',
+                    right: right,
+                    bottom: bottom
+                };
+                ui.helper.css(ui.offset);
+            }
+        });
     },
     toggleMessages: function(e) {
         e.preventDefault();
@@ -1273,46 +1297,6 @@ var ConversationPanel = React.createClass({
     componentDidUpdate: function() {
         var self = this;
         var room = this.props.chatRoom;
-        var callIsActive = room.callSession && room.callSession.isActive();
-
-        //if (callIsActive && room.isCurrentlyActive) {
-        //    $('.fm-chat-block').addClass('video-call');
-        //
-        //    if (self.state.isFullscreenModeEnabled) {
-        //        $('.fm-chat-block').addClass('fullscreen');
-        //
-        //    }
-        //    else {
-        //        $('.fm-chat-block').removeClass('fullscreen');
-        //    }
-        //    var $videoElem = $("video#remotevideo_" + room.callSession.sid);
-        //    if ($videoElem.length > 0) {
-        //        $videoElem[0].play();
-        //    }
-        //    var $videoElemLocal = $("video#localvideo_" + room.callSession.sid);
-        //    if ($videoElemLocal.length > 0) {
-        //        $videoElemLocal[0].play();
-        //    }
-        //
-        //    var $avscreen = $('.my-av-screen', self.$header);
-        //    if (!$avscreen.data('isDraggable')) {
-        //        $avscreen.draggable({
-        //            'containment': $avscreen.parents('.chat-call-block'),
-        //            'scroll': false
-        //        });
-        //        $avscreen.data('isDraggable', true);
-        //    }
-        //
-        //}
-        //else {
-        //    // only rmeove the video-call class IF the updated room is the one which was updated
-        //    if (megaChat.currentlyOpenedChat === room.roomJid) {
-        //        $('.fm-chat-block').removeClass('video-call');
-        //        $('.fm-chat-block').removeClass('fullscreen');
-        //    }
-        //}
-        //// <video/> display change to trigger re-render hack.
-        //$('.rmtVideo:visible').css('display', '');
 
         room.megaChat.updateSectionUnreadCount();
 

@@ -862,8 +862,7 @@ CallSession.prototype.renderCallStartedState = function() {
     self.room.megaChat.activeCallSession = self;
 
 
-    //self.room.trackDataChange();
-
+    self.room.trackDataChange();
     self._removeTempMessages();
 };
 

@@ -177,7 +177,8 @@ var strongvelope = {};
         ALTER_MEMBERS:      0x02
     };
     var MESSAGE_TYPES = strongvelope.MESSAGE_TYPES;
-
+    var _KEYED_MESSAGES = [MESSAGE_TYPES.GROUP_KEYED,
+                           MESSAGE_TYPES.ALTER_MEMBERS];
 
     /**
      * Determines a new 16-bit date stamp (based on Epoch time stamp).
@@ -639,8 +640,63 @@ var strongvelope = {};
 
 
     /**
-     * Extracts sender keys from a batch of messages into the cache of the
-     * handler
+     * Parses a message and extracts the sender keys.
+     *
+     * @method
+     * @param message {ChatdMessage}
+     *     A message to extract keys from.
+     * @return {Object.<parsedMessage: Object, Array.<Object>|Boolean}
+     *     An objects containing the parsed message and an object mapping a
+     *     keyId to a key. `false` on signature verification error.
+     * @private
+     */
+    strongvelope.ProtocolHandler.prototype._parseAndExtractKeys = function(message) {
+
+        var parsedMessage = ns._parseMessageContent(message.message);
+        var result = { parsedMessage: parsedMessage, senderKeys: {}};
+
+        if (parsedMessage && (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
+            if (ns._verifyMessage(parsedMessage.signedContent,
+                                  parsedMessage.signature,
+                                  pubEd25519[message.userId])) {
+                var isOwnMessage = (message.userId === this.ownHandle);
+                var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
+                // If we sent the message, pick first recipient for getting the
+                // sender key (e. g. for history loading).
+                var keyIndex = isOwnMessage ? 0 : myIndex;
+                var otherHandle = isOwnMessage
+                                ? parsedMessage.recipients[0]
+                                : message.userId;
+                if (keyIndex >= 0) {
+                    // Decrypt message key(s).
+                    var decryptedKeys = this._decryptKeysFor(parsedMessage.keys[keyIndex],
+                                                             parsedMessage.nonce,
+                                                             otherHandle,
+                                                             isOwnMessage);
+                    // Update local sender key cache.
+                    if (!this.participantKeys[message.userId]) {
+                        this.participantKeys[message.userId] = {};
+                    }
+                    for (var i = 0; i < decryptedKeys.length; i++) {
+                        result.senderKeys[parsedMessage.keyIds[i]] = decryptedKeys[i];
+                    }
+                }
+            }
+            else {
+                logger.error('Signature invalid for message from '
+                             + message.userId + ' on ' + message.ts);
+
+                return false;
+            }
+        }
+
+        return result;
+    };
+
+
+    /**
+     * Parses a batch of messages and extracts sender keys into the cache of
+     * the handler.
      *
      * @method
      * @param messages {Array.<ChatdMessage>}
@@ -649,44 +705,30 @@ var strongvelope = {};
      *     An array of all the parsed messages' content.
      * @private
      */
-    strongvelope.ProtocolHandler.prototype._extractKeys = function(messages) {
+    strongvelope.ProtocolHandler.prototype._batchParseAndExtractKeys = function(messages) {
 
-        var message;
-        var parsedMessage;
+        var extracted;
         var parsedMessages = [];
-        var isOwnMessage;
-        var otherHandle;
-        var decryptedKeys;
+        var parsedMessage;
+        var senderKeys;
+        var storedKey;
 
         // Iterate over all messages to extract keys (if present).
         for (var i = 0; i < messages.length; i++) {
-            message = messages[i];
-            parsedMessage = ns._parseMessageContent(message.message);
+            extracted = this._parseAndExtractKeys(messages[i]);
+            parsedMessage = extracted.parsedMessage;
             parsedMessages.push(parsedMessage);
-            if (parsedMessage
-                    && (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED)) {
-                if (ns._verifyMessage(parsedMessage.signedContent,
-                                      parsedMessage.signature,
-                                      pubEd25519[message.userId])) {
-                    isOwnMessage = (message.userId === this.ownHandle);
-                    otherHandle = isOwnMessage
-                                ? parsedMessage.recipients[0]
-                                : message.userId;
-                    // Decrypt message key(s).
-                    decryptedKeys = this._decryptKeysFor(parsedMessage.keys[0],
-                                                         parsedMessage.nonce,
-                                                         otherHandle,
-                                                         isOwnMessage);
-                    if (!this.participantKeys[message.userId]) {
-                        this.participantKeys[message.userId] = {};
+            senderKeys = extracted.senderKeys;
+            for (var keyId in senderKeys) {
+                if (senderKeys.hasOwnProperty(keyId)) {
+                    storedKey = this.participantKeys[messages[i].userId][keyId];
+                    if (storedKey && (storedKey !== senderKeys[keyId])) {
+                        // Bail out on inconsistent information.
+                        logger.error("Mismatching statement on sender's previously sent key.");
+
+                        return false;
                     }
-                    for (var j = 0; j < parsedMessage.keyIds.length; j++) {
-                        this.participantKeys[message.userId][parsedMessage.keyIds[j]] = decryptedKeys[j];
-                    }
-                }
-                else {
-                    logger.error('Signature invalid for message from '
-                                 + message.userId + ' on ' + message.ts);
+                    this.participantKeys[messages[i].userId][keyId] = senderKeys[keyId];
                 }
             }
         }
@@ -712,7 +754,7 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.seed = function(messages) {
 
-        this._extractKeys(messages);
+        this._batchParseAndExtractKeys(messages);
 
         // Find our own most recent (highest) sender key ID.
         var highestKeyId = '';
@@ -754,7 +796,7 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.areMessagesDecryptable = function(messages) {
 
-        var parsedMessages = this._extractKeys(messages);
+        var parsedMessages = this._batchParseAndExtractKeys(messages);
 
         var decryptable = [];
         var participants = {};
@@ -1127,7 +1169,7 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype.encryptTo = function(message, destination) {
 
         // Check we're in a chat with this destination, or a new chat.
-        if (!this.otherParticipants.has(destination)) {
+        if (destination && !this.otherParticipants.has(destination)) {
             if (this.otherParticipants.size === 0) {
                 this.otherParticipants.add(destination);
             }
@@ -1136,6 +1178,12 @@ var strongvelope = {};
 
                 return false;
             }
+        }
+
+        if (this.otherParticipants.size === 0) {
+                logger.warn('No destinations or other participants to send to.');
+
+                return false;
         }
 
         // Assemble main message body and rotate keys if required.
@@ -1184,7 +1232,16 @@ var strongvelope = {};
             }
         }
 
-        var parsedMessage = ns._parseMessageContent(message);
+        // Extract keys, and parse message in the same go.
+        var extractedContent = this._parseAndExtractKeys({ userId: sender, message: message});
+        if (extractedContent === false) {
+            logger.error('Message signature invalid.');
+
+            return false;
+        }
+
+        var parsedMessage = extractedContent.parsedMessage;
+        var senderKeys = extractedContent.senderKeys;
 
         // Bail out on parse error.
         if (parsedMessage === false) {
@@ -1200,22 +1257,9 @@ var strongvelope = {};
             return false;
         }
 
-        // Verify signature.
-        if (!ns._verifyMessage(parsedMessage.signedContent,
-                               parsedMessage.signature,
-                               pubEd25519[sender])) {
-            logger.error('Message signature invalid.');
-
-            return false;
-        }
-
         // TODO: Check legitimacy of operation (moderator set on alter participants).
 
-        // Get sender key.
-        var senderKey;
-        var keyId = parsedMessage.keyIds[0];
-
-        // Now puzzle out keys intended for us only.
+        // Now puzzle out the group composition.
         var isOwnMessage = (sender === this.ownHandle);
         var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
         if ((parsedMessage.recipients.length > 0) && !isOwnMessage) {
@@ -1239,36 +1283,30 @@ var strongvelope = {};
             this.otherParticipants.delete(this.ownHandle);
         }
 
+        // Get sender key.
+        var keyId = parsedMessage.keyIds[0];
+        var senderKey;
+        var storedKey;
         if ((parsedMessage.keys.length > 0) && (parsedMessage.recipients.length > 0)) {
             // If we sent the message, pick first recipient for getting the
             // sender key (e. g. for history loading).
-            var keyIndex = isOwnMessage ? 0 : myIndex;
-            var otherHandle = isOwnMessage
-                            ? parsedMessage.recipients[0]
-                            : sender;
-            // Decrypt message key(s).
-            var decryptedKeys = this._decryptKeysFor(parsedMessage.keys[keyIndex],
-                                                     parsedMessage.nonce,
-                                                     otherHandle,
-                                                     isOwnMessage);
-            senderKey = decryptedKeys[0];
+            senderKey = senderKeys[keyId];
 
             // Update local sender key cache.
-            if (!this.participantKeys[sender]) {
-                this.participantKeys[sender] = {};
-            }
-            var storedKey;
-            var id;
-            for (var i = 0; i < decryptedKeys.length; i++) {
-                id = parsedMessage.keyIds[i];
-                storedKey = this.participantKeys[sender][id];
-                if (storedKey && (storedKey !== decryptedKeys[i])) {
-                    // Bail out on inconsistent information.
-                    logger.error("Mismatching statement on sender's previously sent key.");
+            for (var keyId in senderKeys) {
+                if (senderKeys.hasOwnProperty(keyId)) {
+                    if (!this.participantKeys[sender]) {
+                        this.participantKeys[sender] = {};
+                    }
+                    storedKey = this.participantKeys[sender][keyId];
+                    if (storedKey && (storedKey !== senderKeys[keyId])) {
+                        // Bail out on inconsistent information.
+                        logger.error("Mismatching statement on sender's previously sent key.");
 
-                    return false;
+                        return false;
+                    }
+                    this.participantKeys[sender][keyId] = senderKeys[keyId];
                 }
-                this.participantKeys[sender][id] = decryptedKeys[i];
             }
         }
         else {
@@ -1360,7 +1398,7 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype.batchDecrypt = function(messages, historicMessages) {
 
         // First extract all keys.
-        this._extractKeys(messages);
+        this._parseAndExtractKeys(messages);
 
         // Now attempt to decrypt all messages.
         var decryptedMessages = [];

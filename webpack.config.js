@@ -25,7 +25,12 @@ var webpackConfigs = {
                 {test: /\.less$/, loader: "style!css!less"},
                 //{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
                 //{ test: /\.jsx$/, loaders: ['react-hot', 'jsx?harmony&stripTypes&insertPragma=React.DOM'], exclude: 'node_modules'},
-                {test: /\.jsx$/, loaders: ['react-hot', 'babel-loader?experimental=true&optional=runtime'], exclude: 'node_modules'},
+                //{test: /\.jsx$/, loaders: ['react-hot', 'babel-loader?experimental=true&optional=runtime'], exclude: 'node_modules'},
+                {
+                    test: /\.jsx$/,
+                    loader: 'babel',
+                    exclude: 'node_modules'
+                },
                 {test: /\.json$/, loader: "json"}
             ]
         },
@@ -46,7 +51,7 @@ var webpackConfigs = {
         module: {
             loaders: [
                 {test: /\.less$/, loader: "style!css!less"},
-                {test: /\.jsx$/, loaders: [/*'uglify-loader', */'babel-loader?experimental=true&optional=runtime'], exclude: 'node_modules'},
+                {test: /\.jsx$/, loaders: [/*'uglify-loader', */'babel-loader'], exclude: 'node_modules'},
                 {test: /\.json$/, loader: "json"}
             ]
         },

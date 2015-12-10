@@ -376,8 +376,7 @@ var ConversationMessage = React.createClass({
                                 </DropdownsUI.Dropdown>
                             </ButtonsUI.Button>
 
-                            <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}>
-                            </div>
+                            <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>
                         </div>
                     </div>
                 );

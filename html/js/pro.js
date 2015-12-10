@@ -954,7 +954,7 @@ var proPage = {
         }
 
         // Update depending on recurring or one off payment
-        $('.membership-st2-head.choose-duration').html(durationOrRenewal);
+        //$('.membership-st2-head.choose-duration').html(durationOrRenewal);
         $('.membership-bott-button').html(subscribeOrPurchase);
         $('.membership-bott-descr').html(getTwoMonthsFree);
         $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);

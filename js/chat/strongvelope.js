@@ -273,7 +273,7 @@ var strongvelope = {};
             strongvelope.deriveNonceSecret(nonce).substring(0, NONCE_SIZE));
 
         if ((message !== null) && (typeof message !== 'undefined')) {
-            var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(message)));
+            var clearBytes = asmCrypto.string_to_bytes(to8(message));
             var cipherBytes = asmCrypto.AES_CTR.encrypt(clearBytes, keyBytes, nonceBytes);
             result.ciphertext = asmCrypto.bytes_to_string(cipherBytes);
         }
@@ -310,7 +310,7 @@ var strongvelope = {};
         var clearText = asmCrypto.bytes_to_string(clearBytes);
 
         try {
-            clearText = decodeURIComponent(escape(clearText));
+            clearText = from8(clearText);
         }
         catch (e) {
             if (e instanceof URIError) {

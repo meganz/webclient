@@ -148,8 +148,7 @@ describe("chat.strongvelope unit test", function() {
     describe('en-/decryption', function() {
         describe('_symmetricEncryptMessage', function() {
             it("all parameters given", function() {
-                sandbox.stub(window, 'encodeURIComponent', _echo);
-                sandbox.stub(window, 'unescape', _echo);
+                sandbox.stub(window, 'to8', _echo);
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
                 sandbox.stub(asmCrypto.AES_CTR, 'encrypt').returns('cipher text');
                 sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
@@ -160,8 +159,7 @@ describe("chat.strongvelope unit test", function() {
                     { ciphertext: 'cipher text', key: 'the key', nonce: 'gooniegoogoo' });
                 assert.strictEqual(asmCrypto.string_to_bytes.callCount, 3);
                 assert.strictEqual(ns.deriveNonceSecret.callCount, 1);
-                assert.strictEqual(encodeURIComponent.callCount, 1);
-                assert.strictEqual(unescape.callCount, 1);
+                assert.strictEqual(to8.callCount, 1);
                 assert.strictEqual(asmCrypto.AES_CTR.encrypt.callCount, 1);
                 assert.deepEqual(asmCrypto.AES_CTR.encrypt.args[0],
                     ['forty two', 'the key', 'gooniegoogoo']);
@@ -176,8 +174,7 @@ describe("chat.strongvelope unit test", function() {
             });
 
             it("missing nonce", function() {
-                sandbox.stub(window, 'encodeURIComponent', _echo);
-                sandbox.stub(window, 'unescape', _echo);
+                sandbox.stub(window, 'to8', _echo);
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
                 sandbox.stub(asmCrypto, 'getRandomValues', _copy('gooniegoogoo'));
                 sandbox.stub(asmCrypto.AES_CTR, 'encrypt').returns('cipher text');
@@ -190,15 +187,13 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(asmCrypto.string_to_bytes.callCount, 3);
                 assert.strictEqual(ns.deriveNonceSecret.callCount, 1);
                 assert.strictEqual(asmCrypto.getRandomValues.callCount, 1);
-                assert.strictEqual(encodeURIComponent.callCount, 1);
-                assert.strictEqual(unescape.callCount, 1);
+                assert.strictEqual(to8.callCount, 1);
                 assert.strictEqual(asmCrypto.AES_CTR.encrypt.callCount, 1);
                 assert.strictEqual(asmCrypto.bytes_to_string.callCount, 3);
             });
 
             it("message only", function() {
-                sandbox.stub(window, 'encodeURIComponent', _echo);
-                sandbox.stub(window, 'unescape', _echo);
+                sandbox.stub(window, 'to8', _echo);
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
                 var counter = 0;
                 var _getRandomValues = function(x) {
@@ -218,8 +213,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(asmCrypto.string_to_bytes.callCount, 2);
                 assert.strictEqual(asmCrypto.getRandomValues.callCount, 2);
                 assert.strictEqual(ns.deriveNonceSecret.callCount, 1);
-                assert.strictEqual(encodeURIComponent.callCount, 1);
-                assert.strictEqual(unescape.callCount, 1);
+                assert.strictEqual(to8.callCount, 1);
                 assert.strictEqual(asmCrypto.AES_CTR.encrypt.callCount, 1);
                 assert.strictEqual(asmCrypto.bytes_to_string.callCount, 3);
             });

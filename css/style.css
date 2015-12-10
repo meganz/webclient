@@ -14860,7 +14860,8 @@ h5.main-italic-header {
 }
 .membership-st2-info {
 	float: left;
-	padding-left: 72px;
+	padding-left: 50px;
+    width: 644px;
 }
 .membership-date {
 	float: left;
@@ -15001,12 +15002,6 @@ h5.main-italic-header {
 .membership-payment-pad {
 	padding: 0;
 }
-/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account
-   balance and we want the bottom of the date box to line up with the bottom of the plan box on the left */
-.payment-period {
-	position: absolute;
-	top: 203px;
-}
 .membership-payment-icon {
 	width: 110px;
 	height: 110px;
@@ -15112,9 +15107,9 @@ h5.main-italic-header {
 	-webkit-column-count: 2;
 	-moz-column-count: 2;
 	column-count: 2;
-	-webkit-column-width: 200px;
-	-moz-column-width: 200px;
-	column-width: 200px;
+	-webkit-column-width: 270px;
+	-moz-column-width: 270px;
+	column-width: 270px;
     display: inline-block;
 	padding-top: 5px;
 }
@@ -15122,9 +15117,25 @@ h5.main-italic-header {
 	background: none;
 	font-family: 'source_sans_proregular';
 	padding-left: 0;
+    position: relative;
 }
 .duration-options-list .payment-duration.template {
 	display: none;
+}
+.payment-duration .save-money {
+    background-color: #29c969;
+    border-radius: 8px;
+    color: #fff;
+    display: inline-block;
+    font-size: 13px;
+    line-height: 24px;
+    padding-bottom: 0;
+    padding-left: 14px;
+    padding-right: 14px;
+    margin-left: 20px;
+}
+.payment-duration .save-money.hidden {
+    display: none;
 }
 .membership-bott-price {
 	font-size: 72px;
@@ -15324,9 +15335,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     background-color: #ff4444;
     border-radius: 100%;
     box-shadow: none;
-    height: 11px;
-    margin: 2.5px;
-    width: 11px;
+    height: 12px;
+    margin: 2px;
+    width: 12px;
 }
 .membership-step2 .membership-radio {
     background-color: transparent;
@@ -15373,6 +15384,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 }
 .membership-step2 .membership-info-pad {
     margin-left: 0;
+    position: relative;
 }
 .membership-step2 .membership-st2-head {
     color: #444;
@@ -15399,24 +15411,10 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .membership-step2 .payment-period {
     margin-top: 30px;
 }
-.membership-step2 .save-money {
-    background-color: #29c969;
-    border-radius: 8px;
-    color: #fff;
-    display: inline-block;
-    font-size: 13px;
-    left: -20px;
-    line-height: 24px;
-    padding-bottom: 0;
-    padding-left: 14px;
-    padding-right: 14px;
-    position: relative;
-    top: -9px;
-}
 .membership-step2 .third-section {
     box-sizing: border-box;
     margin: 40px auto 20px;
-    padding: 0 20px 10px 84px;
+    padding: 0 20px 10px 62px;
     position: relative;
     width: 980px;
 }
@@ -15437,6 +15435,36 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     font-size: 13px;
     line-height: 26px;
     max-width: 470px;
+}
+.membership-step2 .provider-show-more {
+    display: table;
+    margin-top: 30px;
+    width: 100%;
+}
+.membership-step2 .provider-show-more .button {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #999;
+    display: table-cell;
+    padding: 3px 15px;
+    white-space: nowrap;
+}
+.membership-step2 .provider-show-more .left-bar,
+.membership-step2 .provider-show-more .right-bar {
+    display: table-cell;
+    width: 50%;
+}
+.membership-step2 .provider-show-more .left-bar {
+    padding-right: 10px;
+}
+.membership-step2 .provider-show-more .right-bar {
+    padding-left: 10px;
+}
+.membership-step2 .provider-show-more .left-bar-grey,
+.membership-step2 .provider-show-more .right-bar-grey {
+    border-top: 1px solid #ececec;
+    position: relative;
+    top: 8px;
 }
 
 .membership-new-offer text {

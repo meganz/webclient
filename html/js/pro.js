@@ -866,6 +866,11 @@ var proPage = {
                 $durationOption.find('.duration').text(monthsWording);
                 $durationOption.find('.price').text(price);
                 
+                // Show amount they will save
+                if (numOfMonths === 12) {
+                    $durationOption.find('.save-money').removeClass('hidden');
+                }
+                
                 // Update the list of duration options
                 $durationOption.appendTo('.duration-options-list');
             }

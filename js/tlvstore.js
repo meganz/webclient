@@ -125,8 +125,7 @@ var tlvstore = (function () {
             // Treat the legacy case and first UTF-8 decode the container content.
             ns._logger.info('Retrying to decode TLV container legacy style ...');
 
-            return ns.tlvRecordsToContainer(decodeURIComponent(escape(tlvContainer)),
-                                            false);
+            return ns.tlvRecordsToContainer(from8(tlvContainer), false);
         }
 
         return container;
@@ -202,7 +201,7 @@ var tlvstore = (function () {
         }
         var keyBytes = asmCrypto.string_to_bytes(key);
         var clearBytes = asmCrypto.string_to_bytes(
-            utf8Convert ? unescape(encodeURIComponent(clearText)) : clearText);
+            utf8Convert ? to8(clearText) : clearText);
         var cipherBytes = cipher.encrypt(clearBytes, keyBytes, nonceBytes,
                                          undefined, tagSize);
 
@@ -242,7 +241,7 @@ var tlvstore = (function () {
                                         undefined, tagSize);
         var clearText = asmCrypto.bytes_to_string(clearBytes);
 
-        return utf8Convert ? decodeURIComponent(escape(clearText)) : clearText;
+        return utf8Convert ? from8(clearText) : clearText;
     };
 
 

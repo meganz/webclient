@@ -1672,7 +1672,7 @@ var stringcrypt = (function() {
      */
     ns.stringEncrypter = function(plain, key, raw) {
         var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
-        var plainBytes = raw ? plain : unescape(encodeURIComponent(plain));
+        var plainBytes = raw ? plain : to8(plain);
         var cipher = tlvstore.blockEncrypt(plainBytes, key, mode, false);
 
         return cipher;
@@ -1695,7 +1695,7 @@ var stringcrypt = (function() {
 
         var plain = tlvstore.blockDecrypt(cipher, key, false);
 
-        return raw ? plain : decodeURIComponent(escape(plain));
+        return raw ? plain : from8(plain);
     };
 
     /**
@@ -1866,14 +1866,14 @@ function mKeyDialog(ph, fl) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
         }
     });
-    
+
     // Bolden text on instruction message
     var $instructionMessage = $('.dlkey-dialog .instruction-message');
     var instructionText = $instructionMessage.html().replace('[B]', '<b>').replace('[/B]', '</b>');
     $instructionMessage.html(instructionText);
-    
+
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
-        
+
         // Trim the input from the user for whitespace, newlines etc on either end
         var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
 

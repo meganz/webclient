@@ -116,7 +116,7 @@
 .red.default-white-button:hover {
 	-webkit-box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
 	-moz-box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
-) box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
+    box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
 }
 .default-white-button.tiny-button {
 	width: 16px;

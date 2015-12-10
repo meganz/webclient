@@ -43,10 +43,10 @@
 .messages.content-area {
 	display: table-cell;
 	vertical-align: bottom;
-	padding: 0 24px 5px 24px;
+	padding: 0 0 5px 0;
 }
 .error.scroll-area .messages.content-area {
-	padding: 0 24px 25px 24px;
+	padding: 0 0 25px 0;
 }
 .messages.notification .header {
 	color: #999999;
@@ -65,7 +65,8 @@
 	padding: 20px 0 15px 0;
 }
 .message.body {
-	padding: 24px 0 0 0;
+	padding: 0 24px 0 24px;
+    margin: 24px 0 0 0;
 }
 .message.content-area {
 	margin: 0 0 0 48px;
@@ -77,7 +78,7 @@
 	margin: 3px 0 0 0;
 }
 .message.text-block {
-	padding: 3px 30px 0 0;
+	padding: 2px 30px 0 0;
     word-wrap: break-word;
 }
 .small-info-txt .message.text-block {
@@ -105,9 +106,9 @@
 }
 .message.date-divider {
 	font-size: 16px;
-	line-height: 20px;
-	color: #2BA6DE;
-	padding: 22px 0 0 47px;
+    line-height: 18px;
+    color: #2BA6DE;
+    padding: 24px 0 0 71px;
 	font-family: 'source_sans_prosemibold';
 }
 .message.content-area > .default-white-button.tiny-button {
@@ -158,4 +159,34 @@
 }
 .message.shared-data {
 	margin: 0 0 4px 0;
+}
+.not-sent.message.body {
+    background-color: rgba(255, 51, 58, 0.7);
+    padding: 9px 24px 12px 24px;
+}
+.not-sent .message.user-card-name, .not-sent .message.text-block {
+    color: white;
+}
+.not-sent .message.date-time {
+    color: rgba(255,255,255,0.84);
+}
+.not-sent .red {
+    color: #E54C51;
+}
+.message.circuit-label {
+    display: block;
+	font-size: 12px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	line-height: 30px;
+    border: 1px solid white;
+	color: white;
+    font-family: 'Open Sans Italic';
+	padding: 0 10px;
+	height: 32px;
+	text-align: center;
+    -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }

@@ -28,7 +28,7 @@
 .chat-textarea-buttons {
 	position: absolute;
 	right: 14px;
-	bottom: 14px;
+	top: 14px;
 }
 .chat-textarea .popup-button {
 	float:right;

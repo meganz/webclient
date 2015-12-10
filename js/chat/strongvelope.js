@@ -467,7 +467,7 @@ var strongvelope = {};
             tlvVariable = _TLV_MAPPING[tlvType];
             value = part.record[1];
 
-            if ((tlvType < lastTlvType) || (typeof tlvVariable === 'undefined') {
+            if ((tlvType < lastTlvType) || (typeof tlvVariable === 'undefined')) {
                 logger.error('Received unexpected TLV type.');
 
                 return false;
@@ -501,8 +501,7 @@ var strongvelope = {};
                     break;
                 default:
                     // For all non-special cases, this will be used.
-                    if (_TLV_MAPPING(tlvtype)
-                    parsedContent[tlvVariable] = part.record[1];
+                    parsedContent[tlvVariable] = value;
             }
 
             rest = part.rest;
@@ -654,7 +653,7 @@ var strongvelope = {};
      * @method
      * @param message {ChatdMessage}
      *     A message to extract keys from.
-     * @return {Object.<parsedMessage: Object, Array.<Object>|Boolean}
+     * @return {{Object.<parsedMessage: Object, senderKeys: Object}|Boolean}
      *     An objects containing the parsed message and an object mapping a
      *     keyId to a key. `false` on signature verification error.
      * @private
@@ -1190,9 +1189,9 @@ var strongvelope = {};
         }
 
         if (this.otherParticipants.size === 0) {
-                logger.warn('No destinations or other participants to send to.');
+            logger.warn('No destinations or other participants to send to.');
 
-                return false;
+            return false;
         }
 
         // Assemble main message body and rotate keys if required.
@@ -1302,19 +1301,19 @@ var strongvelope = {};
             senderKey = senderKeys[keyId];
 
             // Update local sender key cache.
-            for (var keyId in senderKeys) {
-                if (senderKeys.hasOwnProperty(keyId)) {
+            for (var id in senderKeys) {
+                if (senderKeys.hasOwnProperty(id)) {
                     if (!this.participantKeys[sender]) {
                         this.participantKeys[sender] = {};
                     }
-                    storedKey = this.participantKeys[sender][keyId];
-                    if (storedKey && (storedKey !== senderKeys[keyId])) {
+                    storedKey = this.participantKeys[sender][id];
+                    if (storedKey && (storedKey !== senderKeys[id])) {
                         // Bail out on inconsistent information.
                         logger.error("Mismatching statement on sender's previously sent key.");
 
                         return false;
                     }
-                    this.participantKeys[sender][keyId] = senderKeys[keyId];
+                    this.participantKeys[sender][id] = senderKeys[id];
                 }
             }
         }

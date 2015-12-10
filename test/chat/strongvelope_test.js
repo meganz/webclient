@@ -408,6 +408,16 @@ describe("chat.strongvelope unit test", function() {
                 var result = ns._parseMessageContent(REMINDER_MESSAGE_BIN);
                 assert.deepEqual(result, REMINDER_MESSAGE);
             });
+
+            it("unexpected TLV type", function() {
+                sandbox.stub(ns._logger, '_log');
+                var message = INITIAL_MESSAGE_BIN.substring(0, 1)
+                    + String.fromCharCode(0x42) +  INITIAL_MESSAGE_BIN.substring(2);
+                var result = ns._parseMessageContent(message);
+                assert.strictEqual(result, false);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Received unexpected TLV type.');
+            });
         });
     });
 
@@ -505,19 +515,22 @@ describe("chat.strongvelope unit test", function() {
                 // The attribute `keys` just needs to be there to avoid an exception.
                 var history = [
                     { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI01'], keys: ['foo1'], message: 'payload 0' },
+                      recipients: ['you456789xw'],
+                      keyIds: ['AI01'], keys: ['foo1'], message: 'payload 0' },
                     { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AI01'], message: 'payload 1' },
                     { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'], message: 'payload 2' },
                     { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'], keys: ['foo2', 'foo1'], message: 'payload 3' },
+                      recipients: ['you456789xw'],
+                      keyIds: ['AI02', 'AI01'], keys: ['foo2', 'foo1'], message: 'payload 3' },
                     { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'], message: 'payload 4' },
                     { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'], message: 'payload 5' },
                     { userId: 'you456789xw', ts: 1444255639, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['me3456789xw'], keyIds: ['AIf2', 'AIf1'], keys: ['bar2', 'bar1'], message: 'payload 6' },
+                      recipients: ['me3456789xw'],
+                      keyIds: ['AIf2', 'AIf1'], keys: ['bar2', 'bar1'], message: 'payload 6' },
                 ];
                 sandbox.stub(ns, '_verifyMessage').returns(true);
                 var handler = new ns.ProtocolHandler('me3456789xw',
@@ -870,6 +883,18 @@ describe("chat.strongvelope unit test", function() {
                 var result = handler._encryptKeysFor([ROTATED_KEY, KEY], NONCE, 'you456789xw');
                 assert.strictEqual(btoa(result), 'jQSMirQJ2JMwR15lsUf1gXvJWaOX1/CtIYTgNocf7Y8=');
             });
+
+            it("binary, two keys, to self", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'me3456789xw': CU25519_PUB_KEY });
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
+
+                var result = handler._encryptKeysFor([ROTATED_KEY, KEY], NONCE, 'me3456789xw');
+                assert.strictEqual(btoa(result), '8ObnafP2TzOoPkM1E1qh4mFxKp22uPA9d7CUS/GMj5Q=');
+            });
         });
 
         describe('_decryptKeysFor', function() {
@@ -939,6 +964,18 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler._decryptKeysFor(
                     atob('jQSMirQJ2JMwR15lsUf1gXvJWaOX1/CtIYTgNocf7Y8='), NONCE, 'me3456789xw');
+                assert.deepEqual(result, [ROTATED_KEY, KEY]);
+                assert.strictEqual(handler._computeSymmetricKey.args[0][0], 'me3456789xw');
+            });
+
+            it("binary, two kes, own key", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
+
+                var result = handler._decryptKeysFor(
+                    atob('8ObnafP2TzOoPkM1E1qh4mFxKp22uPA9d7CUS/GMj5Q='), NONCE, 'me3456789xw');
                 assert.deepEqual(result, [ROTATED_KEY, KEY]);
                 assert.strictEqual(handler._computeSymmetricKey.args[0][0], 'me3456789xw');
             });

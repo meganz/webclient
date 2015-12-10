@@ -130,6 +130,11 @@ var strongvelope = {};
      *     Participant to be included with this message.
      * @property EXC_PARTICIPANT {Number}
      *     Participant to be excluded with this message.
+     * @property OWN_KEY {Number}
+     *     Own message encryption (sender) key. This is usually not required,
+     *     but will be used if legacy RSA encryption of sender keys is used for
+     *     at least one recipient. This is required to access one's own sender
+     *     key later when re-reading own chat messages later from history.
      */
     strongvelope.TLV_TYPES = {
         _UNUSED_SEPARATOR_: 0x00,
@@ -142,6 +147,7 @@ var strongvelope = {};
         PAYLOAD:            0x07,
         INC_PARTICIPANT:    0x08,
         EXC_PARTICIPANT:    0x09,
+        OWN_KEY:            0x0a,
     };
     var TLV_TYPES = strongvelope.TLV_TYPES;
 
@@ -158,6 +164,7 @@ var strongvelope = {};
         0x07: 'payload',
         0x08: 'includeParticipants',
         0x09: 'excludeParticipants',
+        0x0a: 'ownKey',
     };
 
 
@@ -460,7 +467,7 @@ var strongvelope = {};
             tlvVariable = _TLV_MAPPING[tlvType];
             value = part.record[1];
 
-            if (tlvType < lastTlvType) {
+            if ((tlvType < lastTlvType) || (typeof tlvVariable === 'undefined') {
                 logger.error('Received unexpected TLV type.');
 
                 return false;
@@ -493,7 +500,9 @@ var strongvelope = {};
                     parsedContent[tlvVariable].push(value);
                     break;
                 default:
-                    parsedContent[tlvVariable] = value;
+                    // For all non-special cases, this will be used.
+                    if (_TLV_MAPPING(tlvtype)
+                    parsedContent[tlvVariable] = part.record[1];
             }
 
             rest = part.rest;

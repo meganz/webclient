@@ -622,11 +622,13 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                     if (e.name === 'SecurityError') {
                         logger.error('Could not decrypt private user attribute '
                                      + attribute + ': ' + e.message);
-                        res = EINTERNAL;
                     }
                     else {
-                        throw e;
+                        logger.error('Unexpected exception!', e);
+                        setTimeout(function() { throw e }, 4);
+                        debugger;
                     }
+                    res = EINTERNAL;
                 }
             }
         }

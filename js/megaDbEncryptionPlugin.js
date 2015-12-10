@@ -38,12 +38,17 @@ function MegaDBEncryption(mdbInstance) {
         var promise = new MegaPromise();
 
         mdbServerInstance.getUData('enckey')
-            .then(function(data) {
+            .then(function enckey(data) {
                 logger.debug('getUData.enckey', data);
                 if (!data) {
                     // Generate new encryption key
-                    _encDecKeyCache = stringcrypt.newKey();
-                    data = stringcrypt.stringEncrypter(_encDecKeyCache, u_k, true);
+                    try {
+                        _encDecKeyCache = stringcrypt.newKey();
+                        data = stringcrypt.stringEncrypter(_encDecKeyCache, u_k, true);
+                    }
+                    catch (ex) {
+                        return promise.reject(ex);
+                    }
 
                     mdbInstance.flags |= MegaDB.DB_FLAGS.HASNEWENCKEY;
 
@@ -57,14 +62,20 @@ function MegaDBEncryption(mdbInstance) {
                         });
                 }
                 else {
-                    // Decrypt existing DB session encryption key with master key.
-                    _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, true);
-                    if (_encDecKeyCache.length !== 16) {
-                        logger.info('Retrying to access DB crypto key legacy style ...');
-                        _encDecKeyCache = from8(from8(data));
-                        logger.debug('Key length: ' + _encDecKeyCache.length + ' bytes');
+                    try {
+                        // Decrypt existing DB session encryption key with master key.
+                        _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, true);
+                        if (_encDecKeyCache.length !== 16) {
+                            logger.debug('Invalid Key length: %d bytes', _encDecKeyCache.length);
+                            enckey();
+                        }
+                        else {
+                            promise.resolve();
+                        }
                     }
-                    promise.resolve();
+                    catch (ex) {
+                        promise.reject(ex);
+                    }
                 }
             }, function(err) {
                 promise.reject(err);

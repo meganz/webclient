@@ -205,7 +205,7 @@ Chatd.Shard = function(chatd, shard) {
 
 // is this chatd connection currently active?
 Chatd.Shard.prototype.isOnline = function() {
-    return this.s.readyState == this.s.OPEN;
+    return this.s && this.s.readyState == this.s.OPEN;
 };
 
 Chatd.Shard.prototype.reconnect = function() {

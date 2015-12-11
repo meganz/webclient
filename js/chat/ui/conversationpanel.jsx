@@ -72,6 +72,23 @@ var ConversationMessage = React.createClass({
             }
         }
     },
+    doDelete: function(e, msg) {
+        e.preventDefault(e);
+        e.stopPropagation(e);
+        var chatRoom = this.props.chatRoom;
+        msg.deleted = true;
+        chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
+    },
+    doRetry: function(e, msg) {
+        e.preventDefault(e);
+        e.stopPropagation(e);
+        var chatRoom = this.props.chatRoom;
+
+        chatRoom._sendMessageToTransport(msg)
+            .done(function(internalId) {
+                msg.internalId = internalId;
+            });
+    },
     render: function () {
         var self = this;
         var cssClasses = "message body";
@@ -110,7 +127,10 @@ var ConversationMessage = React.createClass({
             timestampInt = unixtime();
         }
 
+        var additionalClasses = "";
+        var buttonsBlock = null;
         timestamp = unixtimeToTimeString(timestampInt);
+        var messageIsNowBeingSent = false;
 
         // if this is a text msg.
         if (
@@ -144,50 +164,71 @@ var ConversationMessage = React.createClass({
 
 
             if (
-                message instanceof Message ||
+                (message instanceof Message) ||
+                (message instanceof KarereEventObjects.OutgoingMessage) ||
                 (typeof(message.userId) !== 'undefined' && message.userId === u_handle)
             ) {
-                var labelClass = "label text-message";
-                var labelText;
-
                 if (
                     message.getState() === Message.STATE.NULL
                 ) {
-                    labelClass += " error";
-                    labelText = "error"
+                    additionalClasses += " error";
                 }
                 else if (
                     message.getState() === Message.STATE.NOT_SENT
                 ) {
-                    labelClass += " not-sent";
-                    labelText = "not sent"
+                    messageIsNowBeingSent = (unixtime() - message.delay < 5);
+
+
+                    if (!messageIsNowBeingSent) {
+                        message.sending = false;
+                        additionalClasses += " not-sent";
+
+                        buttonsBlock = <div className="buttons-block">
+                            <div className="message circuit-label left">{__("Message not sent")}</div>
+                            <div className="default-white-button right" onClick={(e) => {
+                                self.doRetry(e, message);
+                            }}>{__("Retry")}</div>
+                            <div className="default-white-button right red" onClick={(e) => {
+                                self.doDelete(e, message);
+                            }}>{__("Delete message")}</div>
+                            <div className="clear"></div>
+                        </div>;
+                    }
+                    else {
+                        additionalClasses += " sending";
+
+                        if (!message.sending) {
+                            message.sending = true;
+                            if (self._rerenderTimer) {
+                                clearTimeout(self._rerenderTimer);
+                            }
+                            self._rerenderTimer = setTimeout(function () {
+                                if (message.sending === true) {
+                                    chatRoom.messagesBuff.trackDataChange();
+                                    self.forceUpdate();
+                                }
+                            }, (5 - (unixtime() - message.delay)) * 1000);
+                        }
+                    }
                 }
                 else if (message.getState() === Message.STATE.SENT) {
-                    labelClass += " sent";
-                    labelText = "sent";
+                    additionalClasses += " sent";
                 }
                 else if (message.getState() === Message.STATE.DELIVERED) {
-                    labelClass += " delivered";
-                    labelText = "delivered";
+                    additionalClasses += " delivered";
                 }
                 else if (message.getState() === Message.STATE.NOT_SEEN) {
-                    labelClass += " unread";
-                    labelText = "unread";
+                    additionalClasses += " unread";
                 }
                 else if (message.getState() === Message.STATE.SEEN) {
-                    labelClass += " seen";
-                    labelText = "seen";
+                    additionalClasses += " seen";
                 }
                 else if (message.getState() === Message.STATE.DELETED) {
-                    labelClass += " deleted";
-                    labelText = "deleted";
+                    additionalClasses += " deleted";
                 }
                 else {
-                    labelClass += " not-sent";
-                    labelText = "not sent"
+                    additionalClasses += " not-sent";
                 }
-
-                messageLabel = <span className={labelClass}>{labelText}</span>
             }
 
             var displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
@@ -298,7 +339,7 @@ var ConversationMessage = React.createClass({
                     });
 
 
-                    return <div className={message.messageId + " message body"}>
+                    return <div className={message.messageId + " message body" + additionalClasses}>
                         <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
                         <div className="message content-area">
                             <div className="message user-card-name">{displayName}</div>
@@ -347,36 +388,42 @@ var ConversationMessage = React.createClass({
                 }
             }
             else {
+                var messageActionButtons = null;
+
+                if (message.getState() !== Message.STATE.NOT_SENT) {
+                    messageActionButtons = <ButtonsUI.Button
+                        className="default-white-button tiny-button"
+                        icon="tiny-icon grey-down-arrow">
+                        <DropdownsUI.Dropdown
+                            className="message-dropdown"
+                            onClick={() => {}}
+                        >
+                            <DropdownsUI.DropdownItem icon="writing-pen" label="Edit" onClick={() => {
+                                        console.error("TBD!");
+                                    }}/>
+                            <DropdownsUI.DropdownItem icon="quotes" label="Quote" onClick={() => {
+                                        console.error("TBD!");
+                                    }}/>
+
+                            <hr />
+
+                            <DropdownsUI.DropdownItem icon="red-cross" label="Delete" className="red" onClick={(e) => {
+                                        self.doDelete(e, message);
+                                    }}/>
+                        </DropdownsUI.Dropdown>
+                    </ButtonsUI.Button>
+                }
                 return (
-                    <div className={message.messageId + " message body"}>
+                    <div className={message.messageId + " message body " + additionalClasses}>
                         <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
                         <div className="message content-area">
                             <div className="message user-card-name">{displayName}</div>
                             <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
 
-                            <ButtonsUI.Button
-                                className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
-                                <DropdownsUI.Dropdown
-                                    className="message-dropdown"
-                                    onClick={() => {}}
-                                >
-                                    <DropdownsUI.DropdownItem icon="writing-pen" label="Edit" onClick={() => {
-                                        console.error("TBD!");
-                                    }}/>
-                                    <DropdownsUI.DropdownItem icon="quotes" label="Quote" onClick={() => {
-                                        console.error("TBD!");
-                                    }}/>
-
-                                    <hr />
-
-                                    <DropdownsUI.DropdownItem icon="red-cross" label="Delete" className="red" onClick={() => {
-                                        console.error("TBD!");
-                                    }}/>
-                                </DropdownsUI.Dropdown>
-                            </ButtonsUI.Button>
+                            {messageActionButtons}
 
                             <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>
+                            {buttonsBlock}
                         </div>
                     </div>
                 );
@@ -1579,6 +1626,7 @@ var ConversationPanel = React.createClass({
         if (self.state.attachCloudDialog === true) {
             var selected = [];
             attachCloudDialog = <ModalDialogsUI.CloudBrowserDialog
+                folderSelectNotAllowed={true}
                 onClose={() => {
                     self.setState({'attachCloudDialog': false});
                     selected = [];
@@ -1641,6 +1689,7 @@ var ConversationPanel = React.createClass({
                                                 animateScroll: false,
                                                 maintainPosition: false
                                             }}
+                                               chatRoom={self.props.chatRoom}
                                                messagesToggledInCall={self.state.messagesToggledInCall}
                                 >
                                 <div className="messages main-pad">

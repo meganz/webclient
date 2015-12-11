@@ -94,10 +94,10 @@ Message.prototype.getState = function() {
 Message.STATE = {
     'NULL': 0,
     'NOT_SEEN': 1,
-    'NOT_SENT': 2,
-    'SENT': 3,
-    'DELIVERED': 4,
-    'SEEN': 6,
+    'NOT_SENT': 20,
+    'SENT': 10,
+    'DELIVERED': 30,
+    'SEEN': 40,
     'DELETED': 8
 };
 Message.MANAGEMENT_MESSAGE_TYPES = {

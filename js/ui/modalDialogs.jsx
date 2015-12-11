@@ -8,6 +8,7 @@ var ModalDialog = React.createClass({
     componentDidMount: function() {
         var self = this;
         $(document.body).addClass('overlayed');
+        $('.fm-dialog-overlay').removeClass('hidden');
 
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
@@ -34,6 +35,7 @@ var ModalDialog = React.createClass({
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         $(document).unbind('keyup.modalDialog' + this.megaInstanceId);
         $(document.body).removeClass('overlayed');
+        $('.fm-dialog-overlay').addClass('hidden');
     },
     onCloseClicked: function(e) {
         var self = this;
@@ -51,19 +53,6 @@ var ModalDialog = React.createClass({
         var self = this;
 
         var classes = "fm-dialog " + self.props.className;
-
-
-
-        var styles;
-
-        // calculate and move the popup arrow to the correct position.
-        if (self.getOwnerElement()) {
-            styles = {
-                'zIndex': 125,
-                'position': 'absolute',
-                'width': self.props.styles ? self.props.styles.width : undefined
-            };
-        }
 
         var footer = null;
 
@@ -88,10 +77,9 @@ var ModalDialog = React.createClass({
         }
 
         return (
-            <utils.RenderTo element={document.body}>
-                <div className={classes} style={styles}>
+            <utils.RenderTo element={document.body} className={classes}>
+                <div>
                     <div className="fm-dialog-close" onClick={self.onCloseClicked}></div>
-
                     {
                         self.props.title ? <div className="fm-dialog-title">{self.props.title}</div> : null
                     }
@@ -139,6 +127,11 @@ var BrowserEntries = React.createClass({
         e.stopPropagation();
         e.preventDefault();
 
+        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+            // halt on folder selection
+
+            return;
+        }
         this.setState({'selected': [node.h]});
         this.props.onSelected([node.h]);
     },
@@ -295,12 +288,19 @@ var CloudBrowserDialog = React.createClass({
             var breadcrumbClasses = "";
             if (p.h === M.RootID) {
                 breadcrumbClasses += " cloud-drive";
+
+                if (self.state.currentlyViewedEntry !== M.RootID) {
+                    breadcrumbClasses += " has-next-button";
+                }
             }
             else {
                 breadcrumbClasses += " folder";
             }
 
             (function(p) {
+                if (self.state.currentlyViewedEntry !== p.h) {
+                    breadcrumbClasses += " has-next-button";
+                }
                 breadcrumb.unshift(
                     <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses} key={p.h} onClick={(e) => {
                         e.preventDefault();
@@ -368,6 +368,7 @@ var CloudBrowserDialog = React.createClass({
                     onExpand={(node) => {
                         self.setState({'currentlyViewedEntry': node.h});
                     }}
+                    folderSelectNotAllowed={self.props.folderSelectNotAllowed}
                     onSelected={self.onSelected}
                     onAttachClicked={self.onAttachClicked}
                 />

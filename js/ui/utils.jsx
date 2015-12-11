@@ -75,7 +75,6 @@ var JScrollPane = React.createClass({
         this.onResize();
     },
     render: function () {
-
         return (
             <div className={this.props.className + " jScrollPaneContainer"} {...this.props} onResize={this.onResize}>
                 <div className="jspContainer">
@@ -95,6 +94,10 @@ var JScrollPane = React.createClass({
 var RenderTo = React.createClass({
     componentDidMount: function() {
         this.popup = document.createElement("div");
+        this.popup.className = this.props.className ? this.props.className : "";
+        if (this.props.style) {
+            $(this.popup).css(this.props.style);
+        }
         this.props.element.appendChild(this.popup);
         this._renderLayer();
     },

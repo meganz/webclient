@@ -1214,7 +1214,7 @@ ChatRoom.prototype._flushMessagesQueue = function() {
 
     if (self._messagesQueue.length > 0) {
         $.each(self._messagesQueue, function(k, v) {
-            if (!v) {
+            if (!v || v.deleted) {
                 return; //continue;
             }
 

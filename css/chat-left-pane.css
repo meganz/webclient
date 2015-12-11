@@ -108,3 +108,9 @@
 .call-duration + .conversation-message {
     margin-right: 100px;
 }
+.unread-messages + .call-duration {
+    margin-right: 30px;
+}
+.unread-messages + .call-duration + .conversation-message {
+    margin-right: 130px;
+}

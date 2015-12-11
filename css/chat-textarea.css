@@ -34,9 +34,6 @@
 	float:right;
 	margin: 0 0 0 20px;
 }
-.chat-textarea-scroll {
-	max-height: 140px;
-}
 .chat-textarea-scroll textarea, .chat-textarea-scroll .hidden {
 	font-size: 13px;
 	line-height: 20px;
@@ -47,9 +44,15 @@
 	color: #777777;
 	overflow: hidden;
 	resize: none;
+    word-wrap: break-word;
+}
+.chat-textarea-scroll, .message.textarea-scroll {
 	max-height: 140px;
 }
-.chat-textarea-scroll textarea {
+.message.textarea-block .hidden-block {
+    display: none;
+}
+.chat-textarea-scroll textarea, .message.textarea-block textarea {
 	height: 20px;
 }
 .chat-textarea-scroll textarea::-webkit-input-placeholder {
@@ -65,4 +68,43 @@
 }
 .chat-textarea-scroll textarea:-ms-input-placeholder {
 	color:#CCCCCC;
+}
+.message.textarea-block {
+    border: 1px solid #CCCCCC;
+    min-height: 34px;
+    background-color: white;
+    -moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+    position: relative;
+    top: 5px;
+    margin: 0 0 2px 0;
+    -webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+    padding: 5px 46px 5px 33px;
+}
+.textarea-icon.small-icon {
+    position:absolute;
+    left: 6px;
+    top: 6px;
+}
+.message.textarea-buttons {
+    position:absolute;
+    right: 13px;
+    top: 6px;
+    
+}
+.message.textarea-block textarea, .message.textarea-block .hidden-block {
+    font-size: 14px;
+    line-height: 20px;
+	color: #777777;
+    line-height: 20px;
+	width: 100%;
+	border: 0;
+	padding: 0;
+	margin: 0 0 2px 0;
+	overflow: hidden;
+	resize: none;
+    word-wrap: break-word;
 }

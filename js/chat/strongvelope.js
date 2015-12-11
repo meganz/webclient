@@ -35,6 +35,10 @@ var strongvelope = {};
     // Size in bytes of a key ID.
     var _KEY_ID_SIZE = 4;
 
+    // Size threshold for RSA encrypted sender keys (greater than ... bytes).
+    // (1024 bit RSA key --> 128 byte + 2 byte cipher text).
+    var _RSA_ENCRYPTION_THRESHOLD = 128;
+
     /** Version of the protocol implemented. */
     strongvelope.PROTOCOL_VERSION = 0x00;
     var PROTOCOL_VERSION = strongvelope.PROTOCOL_VERSION;
@@ -175,17 +179,18 @@ var strongvelope = {};
      *     Message containing a sender key (initial, key rotation, key re-send).
      * @property GROUP_CONTINUE {Number}
      *     Message using an existing sender key for encryption.
-     * @property INCLUDE_MEMBER {Number}
-     *     Includes a new participant into the group chat.
+     * @property ALTER_PARTICIPANTS {Number}
+     *     Alters the list of participants for the group chat
+     *     (inclusion and exclusion).
      */
     strongvelope.MESSAGE_TYPES = {
         GROUP_KEYED:        0x00,
         GROUP_FOLLOWUP:     0x01,
-        ALTER_MEMBERS:      0x02
+        ALTER_PARTICIPANTS: 0x02
     };
     var MESSAGE_TYPES = strongvelope.MESSAGE_TYPES;
     var _KEYED_MESSAGES = [MESSAGE_TYPES.GROUP_KEYED,
-                           MESSAGE_TYPES.ALTER_MEMBERS];
+                           MESSAGE_TYPES.ALTER_PARTICIPANTS];
 
     /**
      * Determines a new 16-bit date stamp (based on Epoch time stamp).
@@ -547,11 +552,11 @@ var strongvelope = {};
      * @property {Array.<String>} includeParticipants
      *     Participants to include (as of now participants of group chat).
      *     Only contains elements if the message `type` is
-     *     `strongvelope.MESSAGE_TYPES.ALTER_MEMBERS`.
+     *     `strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS`.
      * @property {Array.<String>} excludeParticipants
      *     Participants to exclude (as of now not participants of group chat
      *     anymore). Only contains elements if the message `type` is
-     *     `strongvelope.MESSAGE_TYPES.ALTER_MEMBERS`.
+     *     `strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS`.
      */
 
 
@@ -928,6 +933,7 @@ var strongvelope = {};
      * @param {String} destination
      *     User handle of the recipient.
      * @returns {String}
+     *     Encrypted sender keys.
      */
     strongvelope.ProtocolHandler.prototype._encryptKeysFor = function(keys, nonce, destination) {
 
@@ -937,6 +943,22 @@ var strongvelope = {};
         for (var i = 0; i < keys.length; i++) {
             clearText += keys[i];
         }
+
+        // Use RSA encryption if no chat key is available.
+        if (!pubCu25519[destination]) {
+            var pubKey = u_pubkeys[destination];
+            if (!pubKey) {
+                logger.warn('No public encryption key (RSA or x25519) available for '
+                            + destination);
+
+                return false;
+            }
+            logger.info('Encrypting sender keys for ' + destination + ' using RSA.');
+
+            return crypt.rsaEncryptString(clearText, pubKey);
+        }
+
+        // Encrypt chat keys.
         var clearBytes = asmCrypto.string_to_bytes(clearText);
         var ivBytes = asmCrypto.string_to_bytes(
             strongvelope.deriveNonceSecret(nonce, destination).substring(0, IV_SIZE));
@@ -971,15 +993,25 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype._decryptKeysFor = function(
             encryptedKeys, nonce, otherParty, iAmSender) {
 
-        var receiver = iAmSender ? otherParty : this.ownHandle;
-        var cipherBytes = asmCrypto.string_to_bytes(encryptedKeys);
-        var ivBytes = asmCrypto.string_to_bytes(
-            strongvelope.deriveNonceSecret(nonce, receiver).substring(0, IV_SIZE));
-        var keyBytes = asmCrypto.string_to_bytes(
-            this._computeSymmetricKey(otherParty).substring(0, KEY_SIZE));
-        var clearBytes = asmCrypto.AES_CBC.decrypt(cipherBytes, keyBytes,
-                                                   false, ivBytes);
-        var clear = asmCrypto.bytes_to_string(clearBytes);
+        var clear = '';
+
+        // Use RSA encryption if encryped with RSA key.
+        if (encryptedKeys.length < _RSA_ENCRYPTION_THRESHOLD) {
+            var receiver = iAmSender ? otherParty : this.ownHandle;
+            var cipherBytes = asmCrypto.string_to_bytes(encryptedKeys);
+            var ivBytes = asmCrypto.string_to_bytes(
+                strongvelope.deriveNonceSecret(nonce, receiver).substring(0, IV_SIZE));
+            var keyBytes = asmCrypto.string_to_bytes(
+                this._computeSymmetricKey(otherParty).substring(0, KEY_SIZE));
+            var clearBytes = asmCrypto.AES_CBC.decrypt(cipherBytes, keyBytes,
+                                                       false, ivBytes);
+            clear = asmCrypto.bytes_to_string(clearBytes);
+        }
+        else {
+            logger.info('Got RSA encrypted sender keys.');
+
+            clear = crypt.rsaDecryptString(encryptedKeys, u_privk);
+        }
 
         assert(clear.length % KEY_SIZE === 0,
                'Length mismatch for decoding sender keys.');
@@ -1022,6 +1054,7 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype._encryptSenderKey = function(nonce) {
 
         var self = this;
+        var needOwnKeyEncryption = false;
 
         if (self.otherParticipants.size === 0) {
             return false;
@@ -1066,15 +1099,31 @@ var strongvelope = {};
                 keysIncluded.push(self.participantKeys[self.ownHandle][self.previousKeyId]);
             }
             encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, destination);
+            if (encryptedKeys.length > _RSA_ENCRYPTION_THRESHOLD) {
+                needOwnKeyEncryption = true;
+            }
             keys += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
                                          encryptedKeys);
         });
+
+        var result = { recipients: recipients, keys: keys, keyIds: keyIds };
+
+        // Add sender key encrypted to self if required.
+        if (needOwnKeyEncryption) {
+            keysIncluded = [senderKey];
+            if (self.previousKeyId) {
+                keysIncluded.push(self.participantKeys[self.ownHandle][self.previousKeyId]);
+            }
+            encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, this.ownHandle);
+            result.ownKey = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.OWN_KEY),
+                                                 encryptedKeys);
+        }
 
         // Reset include/exclude lists before leaving.
         self.includeParticipants.clear();
         self.excludeParticipants.clear();
 
-        return { recipients: recipients, keys: keys, keyIds: keyIds };
+        return result;
     };
 
 
@@ -1132,6 +1181,11 @@ var strongvelope = {};
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
                                             encryptedMessage.ciphertext);
             this._keyEncryptionCount++;
+        }
+
+        // Add sender key encrypted to self if required (on RSA use).
+        if (encryptedKeys && encryptedKeys.ownKey) {
+            content += encryptedKeys.ownKey;
         }
 
         // Update message counters.
@@ -1272,7 +1326,7 @@ var strongvelope = {};
         var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
         if ((parsedMessage.recipients.length > 0) && !isOwnMessage) {
             if (myIndex === -1) {
-                if (parsedMessage.type === MESSAGE_TYPES.ALTER_MEMBERS) {
+                if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS) {
                     this.keyId = null;
                     this.otherParticipants.clear();
                     this.includeParticipants.clear();
@@ -1365,7 +1419,7 @@ var strongvelope = {};
 
         // Take actions on participant changes.
         if (!isOwnMessage
-                && (parsedMessage.type === MESSAGE_TYPES.ALTER_MEMBERS)) {
+                && (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS)) {
             // Update my sender key.
             logger.info('Particpant change received, updating sender key.');
             this.updateSenderKey();
@@ -1503,7 +1557,7 @@ var strongvelope = {};
 
         // Add correct message type to front.
         var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
-                                           String.fromCharCode(MESSAGE_TYPES.ALTER_MEMBERS))
+                                           String.fromCharCode(MESSAGE_TYPES.ALTER_PARTICIPANTS))
                     + assembledMessage.content;
 
         // Add participants to be in- or excluded.

@@ -642,6 +642,51 @@ var crypt = (function () {
     };
 
 
+    /**
+     * Encrypts a cleartext string with the supplied public key.
+     *
+     * @param {String} cleartext
+     *     Clear text to encrypt.
+     * @param {Array} pubkey
+     *     Public encryption key (in the usual internal format used).
+     * @param {Boolean} utf8convert
+     *     Convert cleartext from unicode to UTF-8 before encryption
+     *     (default: false).
+     * @return {String}
+     *     Encrypted cipher text.
+     */
+    ns.rsaEncryptString = function(cleartext, pubkey, utf8convert) {
+
+        cleartext = utf8convert ? to8(cleartext) : cleartext;
+        var lengthString = String.fromCharCode(cleartext.length >> 8)
+                         + String.fromCharCode(cleartext.length & 0xff);
+
+        return crypto_rsaencrypt(lengthString + cleartext, pubkey);
+    };
+
+    /**
+     * Decrypts a ciphertext string with the supplied private key.
+     *
+     * @param {String} ciphertext
+     *     Cipher text to decrypt.
+     * @param {Array} privkey
+     *     Private encryption key (in the usual internal format used).
+     * @param {Boolean} utf8convert
+     *     Convert cleartext from UTF-8 to unicode after decryption
+     *     (default: false).
+     * @return {String}
+     *     Decrypted clear text.
+     */
+    ns.rsaDecryptString = function(ciphertext, privkey, utf8convert) {
+
+        var cleartext = crypto_rsadecrypt(ciphertext, privkey);
+        var length = (cleartext.charCodeAt(0) << 8) | cleartext.charCodeAt(1);
+        cleartext = cleartext.substring(2, length + 2);
+
+        return utf8convert ? from8(cleartext) : cleartext;
+    };
+
+
     return ns;
 }());
 
@@ -2284,6 +2329,17 @@ function api_cachepubkeys(users) {
     return compoundPromise;
 }
 
+/**
+ * Encrypts a cleartext data string to a contact.
+ *
+ * @param {String} user
+ *     User handle of the contact.
+ * @param {String} data
+ *     Clear text to encrypt.
+ * @return {String|Boolean}
+ *     Encrypted cipher text, or `false` in case of unavailability of the RSA
+ *     public key (needs to be obtained/cached beforehand).
+ */
 function encryptto(user, data) {
     var i;
     var pubkey;
@@ -2562,8 +2618,16 @@ function crypto_decodeprivkey(privk) {
     return privkey;
 }
 
-// encrypts cleartext string to the supplied pubkey
-// returns string representing an MPI-formatted big number
+/**
+ * Encrypts a cleartext string with the supplied public key.
+ *
+ * @param {String} cleartext
+ *     Clear text to encrypt.
+ * @param {Array} pubkey
+ *     Public encryption key (in the usual internal format used).
+ * @return {String}
+ *     Encrypted cipher text.
+ */
 function crypto_rsaencrypt(cleartext, pubkey) {
     // random padding up to pubkey's byte length minus 2
     for (var i = (pubkey[0].length) - 2 - cleartext.length; i-- > 0;) {
@@ -2578,8 +2642,16 @@ function crypto_rsaencrypt(cleartext, pubkey) {
     return ciphertext;
 }
 
-// decrypts ciphertext string representing an MPI-formatted big number with the supplied privkey
-// returns cleartext string
+/**
+ * Decrypts a ciphertext string with the supplied private key.
+ *
+ * @param {String} ciphertext
+ *     Cipher text to decrypt.
+ * @param {Array} privkey
+ *     Private encryption key (in the usual internal format used).
+ * @return {String}
+ *     Decrypted clear text.
+ */
 function crypto_rsadecrypt(ciphertext, privkey) {
     var l = (ciphertext.charCodeAt(0) * 256 + ciphertext.charCodeAt(1) + 7) >> 3;
     ciphertext = ciphertext.substr(2, l);

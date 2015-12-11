@@ -15,6 +15,34 @@ describe("chat.strongvelope unit test", function() {
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
     var CU25519_PRIV_KEY = atob('ZMB9oRI87iFj5cwKBvgzwnxxToRAO3L5P1gILfJyEik=');
     var CU25519_PUB_KEY = atob('4BXxF+5ehQKKCCR5x3hP3E0hzYry59jFTM30x9dzWRI=');
+    var RSA_PUB_KEY = [
+        asmCrypto.base64_to_bytes('wT+JSBnBNjgalMGT5hmFHd/N5eyncAA+w1TzFC4PYfB'
+            + 'nbX1CFcx6E7BuB0SqgxbJw3ZsvvowsjRvuo8SNtfmVIz4fZV45pBPxCkeCWonN/'
+            + 'zZZiT3LnYnk1BfnfxfoXtEYRrdVPXAC/VDc9cgy29OXKuuNsREKznb9JFYQUVH9'
+            + 'FM='),
+        asmCrypto.base64_to_bytes('AQAB')
+    ];
+    var RSA_PRIV_KEY = [
+        asmCrypto.base64_to_bytes('wT+JSBnBNjgalMGT5hmFHd/N5eyncAA+w1TzFC4PYfB'
+            + 'nbX1CFcx6E7BuB0SqgxbJw3ZsvvowsjRvuo8SNtfmVIz4fZV45pBPxCkeCWonN/'
+            + 'zZZiT3LnYnk1BfnfxfoXtEYRrdVPXAC/VDc9cgy29OXKuuNsREKznb9JFYQUVH9'
+            + 'FM='),
+        65537,
+        asmCrypto.base64_to_bytes('B1SXqop/j8T1DSuCprnVGNsCfnRJra/0sYgpaFyO7NI'
+            + 'nujmEJjuJbfHFWrU6GprksGtvmJb4/emLS3Jd6IKsE/wRthTLLMgbzGm5rRZ92g'
+            + 'k8XGY3dUrNDsnphFsbIkTVl8n2PX6gdr2hn+rc2zvRupAYkV/smBZX+3pDAcuHo'
+            + '+E='),
+        asmCrypto.base64_to_bytes('7y+NkdfNlnENazteobZ2K0IU7+Mp59BgmrhBl0TvhiA'
+            + '5HkI9WJDIZK67NsDa9QNdJ/NCfmqE/eNkZqFLVq0c+w=='),
+        asmCrypto.base64_to_bytes('ztVHfgrLnINsPFTjMmjgZM6M39QEUsi4erg4s2tJiuI'
+            + 'v29szH1n2HdPKFRIUPnemj48kANvp5XagAAhOb8u2iQ=='),
+        asmCrypto.base64_to_bytes('IniC+aLVUTonye17fOjT7PYQGGZvsqX4VjP51/gqYPU'
+            + 'h5jd7qdjr2H7KImD27Vq3wTswuRFW61QrMxNJzUsTow=='),
+        asmCrypto.base64_to_bytes('TeoqNGD8sskPTOrta1/2qALnLqo/tq/GTvR255/S5G6'
+            + 'weLHqYDUTcckGp0lYNu/73ridZ3VwdvBo9ZorchHbgQ=='),
+        asmCrypto.base64_to_bytes('JhqTYTqT5Dj6YoWHWNHbOz24NmMZUXwDms/MDOBM0Nc'
+            + '0nX6NjLDooFrJZtBMGMgcSQJd4rULuH94+szNGc2GAg==')
+    ];
     var KEY = atob('/+fPkTwBddDWDSA2M1hluA==');
     var NONCE = atob('MTHgl79y+1FFnmnopp4UNA==');
     var KEY_ID = atob('QUkAAA==');
@@ -116,6 +144,9 @@ describe("chat.strongvelope unit test", function() {
         excludeParticipants: ['otto56789xw'],
         payload: atob('H78adfMY')
     };
+    var RSA_ENCRYPTED_KEYS = atob('BAAzD19I72pnZXXRJJXuFrm+90rXuhWiprGpUP/7oxr'
+        + 'yvt6XW6F/ObfgC0Ni+Rc6UhQc6Autwj6IlQMN9QDeVp6r4oJ1jIOoDlGCzLYRP0wQyY'
+        + 'uTVk+cSmsZMKlRocduzt1mNYAS8kozzHoHij8PcH9QG4tpaDCNX4FteQuyIP6hvA==');
 
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
@@ -496,7 +527,7 @@ describe("chat.strongvelope unit test", function() {
 
             it("on user who's been excluded", function() {
                 var message = {
-                    userId: 'papa56789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.ALTER_MEMBERS,
+                    userId: 'papa56789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.ALTER_PARTICIPANTS,
                     recipients: ['lino56789xw'], keyIds: ['AI01'], keys: [], message: 'payload 0'
                 };
                 sandbox.stub(ns, '_verifyMessage').returns(true);
@@ -829,6 +860,7 @@ describe("chat.strongvelope unit test", function() {
             it("single key", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'dummy' });
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
                 sandbox.stub(ns, 'deriveNonceSecret').returns('IV');
                 sandbox.stub(handler, '_computeSymmetricKey').returns(
@@ -846,6 +878,7 @@ describe("chat.strongvelope unit test", function() {
             it("two keys", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'dummy' });
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
                 sandbox.stub(ns, 'deriveNonceSecret').returns('IV');
                 sandbox.stub(handler, '_computeSymmetricKey').returns(
@@ -894,6 +927,42 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler._encryptKeysFor([ROTATED_KEY, KEY], NONCE, 'me3456789xw');
                 assert.strictEqual(btoa(result), '8ObnafP2TzOoPkM1E1qh4mFxKp22uPA9d7CUS/GMj5Q=');
+            });
+
+            it("single key, no chat key", function() {
+                sandbox.stub(ns._logger, '_log');
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'u_pubkeys', { 'you456789xw': 'dummy' });
+                sandbox.stub(crypt, 'rsaEncryptString').returns('ciphertext');
+
+                var result = handler._encryptKeysFor(['a key'], 'gooniegoogoo', 'you456789xw');
+                assert.strictEqual(result, 'ciphertext');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                    'Encrypting sender keys for you456789xw using RSA.');
+            });
+
+            it("binary, two keys, no chat key", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
+                sandbox.stub(window, 'u_pubkeys', { 'you456789xw': RSA_PUB_KEY });
+                sandbox.stub(crypt, 'rsaEncryptString').returns(RSA_ENCRYPTED_KEYS);
+
+                var result = handler._encryptKeysFor([ROTATED_KEY, KEY], NONCE, 'you456789xw');
+                assert.strictEqual(btoa(result), btoa(RSA_ENCRYPTED_KEYS));
+            });
+
+            it("single key, no destination key whatsoever", function() {
+                sandbox.stub(ns._logger, '_log');
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(crypt, 'rsaEncryptString').returns('ciphertext');
+
+                var result = handler._encryptKeysFor(['a key'], 'gooniegoogoo', 'you456789xw');
+                assert.strictEqual(result, false);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                    'No public encryption key (RSA or x25519) available for you456789xw');
             });
         });
 
@@ -979,6 +1048,25 @@ describe("chat.strongvelope unit test", function() {
                 assert.deepEqual(result, [ROTATED_KEY, KEY]);
                 assert.strictEqual(handler._computeSymmetricKey.args[0][0], 'me3456789xw');
             });
+
+            it("single key, no chat key", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(crypt, 'rsaDecryptString').returns('a key67890123456');
+
+                var result = handler._decryptKeysFor(RSA_ENCRYPTED_KEYS, 'gooniegoogoo', 'you456789xw');
+                assert.deepEqual(result, ['a key67890123456']);
+            });
+
+            it("binary, two kes, RSA encrypted", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'u_privk', RSA_PRIV_KEY);
+                sandbox.stub(crypt, 'rsaDecryptString').returns(ROTATED_KEY + KEY);
+
+                var result = handler._decryptKeysFor(RSA_ENCRYPTED_KEYS, NONCE, 'me3456789xw');
+                assert.deepEqual(result, [ROTATED_KEY, KEY]);
+            });
         });
 
         describe('_encryptSenderKey', function() {
@@ -1002,7 +1090,7 @@ describe("chat.strongvelope unit test", function() {
                 });
             });
 
-            it("single recipient, no previous key, no mock", function() {
+            it("single recipient, no previous key, binary", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 var ENCRYPTED_SENDER_KEY = atob('q+J3tvgw2uJ3dFSZcQPWlQ==');
@@ -1092,6 +1180,67 @@ describe("chat.strongvelope unit test", function() {
                 assert.deepEqual(handler.otherParticipants, new Set(['you456789xw', 'lino56789xw']));
                 assert.deepEqual(handler.includeParticipants, new Set());
                 assert.deepEqual(handler.excludeParticipants, new Set());
+            });
+
+            it("two recipients, previous key, RSA for one", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = 'k042';
+                handler.previousKeyId = 'k041';
+                handler.participantKeys['me3456789xw']['k042'] = 'key_42';
+                handler.participantKeys['me3456789xw']['k041'] = 'key_41';
+                handler.otherParticipants = new Set(['you456789xw', 'other6789xw']);
+                sandbox.stub(window, 'base64urldecode', function(dest) {
+                    return dest;
+                });
+                // Just to make something long (> 128 chars) to trigger treating it as RSA.
+                var _LONG_RSA = 'RSARSARSARSARSARSARSARSARSARSARSARSARSARSARSA'
+                    + 'RSARSARSARSARSARSARSARSARSARSARSARSARSARSARSARSARSARSARSARSA';
+                sandbox.stub(handler, '_encryptKeysFor', function(keys, _, to) {
+                    var result = keys + ':' + to;
+                    if (to === 'other6789xw') {
+                        return _LONG_RSA + result;
+                    }
+                    return result;
+                });
+                sandbox.stub(tlvstore, 'toTlvRecord', _toTlvRecord);
+
+                var result = handler._encryptSenderKey('gooniegoogoo');
+                assert.deepEqual(result, {
+                    recipients: '|you456789xw|other6789xw',
+                    keys: '|key_42,key_41:you456789xw|' + _LONG_RSA + 'key_42,key_41:other6789xw',
+                    keyIds: '|k042k041',
+                    ownKey: '|key_42,key_41:me3456789xw'
+                });
+            });
+
+            it("two recipient, previous key, RSA for one, binary", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                var ENCRYPTED_SENDER_KEY = atob('q+J3tvgw2uJ3dFSZcQPWlQ==');
+                handler.keyId = ROTATED_KEY_ID;
+                handler.previousKeyId = KEY_ID;
+                handler.participantKeys['me3456789xw'][ROTATED_KEY_ID] = ROTATED_KEY;
+                handler.participantKeys['me3456789xw'][KEY_ID] = KEY;
+                handler.otherParticipants = new Set(['you456789xw', 'other6789xw']);
+                var _ENCRYPTED_KEYS = atob('jQSMirQJ2JMwR15lsUf1gXvJWaOX1/CtIYTgNocf7Y8=');
+                sandbox.stub(handler, '_encryptKeysFor', function(keys, _, to) {
+                    var result = keys + ':' + to;
+                    if (to === 'other6789xw') {
+                        return RSA_ENCRYPTED_KEYS;
+                    }
+                    return _ENCRYPTED_KEYS;
+                });
+
+                var result = handler._encryptSenderKey(NONCE);
+                assert.deepEqual(result, {
+                    recipients: '\u0004\u0000\u0000\u0008' + base64urldecode('you456789xw')
+                        + '\u0004\u0000\u0000\u0008' + base64urldecode('other6789xw'),
+                    keys: '\u0005\u0000\u0000\u0020' + _ENCRYPTED_KEYS
+                        + '\u0005\u0000\u0000\u0082' + RSA_ENCRYPTED_KEYS,
+                    keyIds: '\u0006\u0000\u0000\u0008' + ROTATED_KEY_ID + KEY_ID,
+                    ownKey: '\u000a\u0000\u0000\u0020' + _ENCRYPTED_KEYS
+                });
             });
         });
 
@@ -1296,6 +1445,36 @@ describe("chat.strongvelope unit test", function() {
                      + '|key_42,key_41:you456789xw|key_42:lino56789xw'
                      + '|k042k041|ciphertext' }
                 );
+                assert.strictEqual(ns._symmetricEncryptMessage.callCount, 1);
+                assert.strictEqual(handler._encryptSenderKey.callCount, 1);
+                assert.strictEqual(tlvstore.toTlvRecord.callCount, 2);
+                assert.strictEqual(handler._sentKeyId, handler.keyId);
+                assert.strictEqual(handler._keyEncryptionCount, 1);
+            });
+
+            it("keyed message, using RSA", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = 'key ID';
+                handler.participantKeys['me3456789xw']['key ID'] = 'sender key';
+                sandbox.stub(window, 'u_handle', 'me3456789xw');
+                sandbox.stub(ns, '_symmetricEncryptMessage').returns(
+                    { key: 'sender key', nonce: 'gooniegoogoo', ciphertext: 'ciphertext' });
+                sandbox.stub(handler, '_encryptSenderKey').returns({
+                    recipients: '|you456789xw',
+                    keys: '|encrypted key',
+                    keyIds: '|key ID',
+                    ownKey: '|encrypted keys to self'
+                });
+                sandbox.stub(tlvstore, 'toTlvRecord', _toTlvRecord);
+                assert.strictEqual(handler._sentKeyId, null);
+
+                var result = handler._assembleBody('Hello!');
+                assert.deepEqual(result, {
+                    keyed: true,
+                    content: '|gooniegoogoo|you456789xw|encrypted key|key ID'
+                           + '|ciphertext|encrypted keys to self'
+                });
                 assert.strictEqual(ns._symmetricEncryptMessage.callCount, 1);
                 assert.strictEqual(handler._encryptSenderKey.callCount, 1);
                 assert.strictEqual(tlvstore.toTlvRecord.callCount, 2);

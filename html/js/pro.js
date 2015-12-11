@@ -660,155 +660,152 @@ var proPage = {
      * Loads the payment gateway options into Payment options section
      */
     loadPaymentGatewayOptions: function() {
-        
-        // All payment gateways for the webclient with options
-        var gatewayOptions = [            
-        {
-            apiGatewayId: 0,
-            displayName: l[487],            // Voucher code
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: true,
-            supportsExpensivePlans: true,
-            cssClass: 'prepaid-balance'
-        },
-        {
-            apiGatewayId: 8,
-            displayName: l[6952],           // Credit card
-            supportsRecurring: true,        // If subscriptions are possible
-            supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
-            supportsAnnualPayment: true,    // Can pay for an annual amount
-            supportsExpensivePlans: true,   // The provider can be used to buy plans other than LITE
-            cssClass: 'credit-card'
-        },        
-        {
-            apiGatewayId: 4,
-            displayName: l[6802],           // Bitcoin
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: true,
-            supportsExpensivePlans: true,
-            cssClass: 'bitcoin'
-        },
-        {
-            apiGatewayId: 5,
-            displayName: l[7109],           // UnionPay
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: true,
-            supportsExpensivePlans: true,
-            cssClass: 'union-pay'
-        },
-        {
-            apiGatewayId: 10,
-            displayName: 'paysafecard',           // Paysafecard
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: true,
-            supportsExpensivePlans: true,  // Prepaid card so we support whatever the user can afford!
-            cssClass: 'paysafecard'
-        },
-        {
-            apiGatewayId: 6,
-            displayName: l[7219] + ' (Fortumo)',           // Mobile (Fortumo)
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: false,
-            supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
-            cssClass: 'fortumo'
-        },
-        {
-            apiGatewayId: 9,
-            displayName: l[7219] + ' (Centili)',           // Mobile (Centili)
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: false,
-            supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
-            cssClass: 'centili'
-        },
-        {
-            apiGatewayId: null,
-            displayName: l[6198],           // Wire transfer
-            supportsRecurring: false,
-            supportsMonthlyPayment: false,  // Accept 1 year, one-time payment only (wire transfer fees are expensive)
-            supportsAnnualPayment: true,
-            supportsExpensivePlans: true,
-            cssClass: 'wire-transfer'
-        }];
-    
-        // Do API request (User Forms of Payment Query) to get the valid list of currently active 
-        // payment providers. Returns an array of active payment providers e.g. [0,2,3,4,5,8].
-        api_req({ a: 'ufpq' }, {
-            callback: function (validGatewayIds) {
+                    
+        // Do API request (User Forms of Payment Query Full) to get the valid list of currently active 
+        // payment providers. Returns an array of objects e.g. 
+        // {
+        //   "gatewayid":11,"gatewayname":"astropayB","type":"subgateway","displayname":"Bradesco",
+        //   "supportsRecurring":0,"supportsMonthlyPayment":1,"supportsAnnualPayment":1,
+        //   "supportsExpensivePlans":1,"extra":{"code":"B"}
+        // }
+        api_req({ a: 'ufpqfull', t: 0 }, {
+            callback: function (gatewayOptions) {
+                console.log('zzzz gatewayOptions', gatewayOptions);
                 
                 // If an API error (negative number) exit early
-                if ((typeof validGatewayIds === 'number') && (validGatewayIds < 0)) {
+                if ((typeof gatewayOptions === 'number') && (gatewayOptions < 0)) {
                     return false;
                 }
                 
-                // Get their plan price from the currently selected duration radio button
-                var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
-                var selectedPlan = membershipPlans[selectedPlanIndex];
-                var selectedPlanNum = selectedPlan[1];
-                var selectedPlanPrice = selectedPlan[5];
+                // Separate into two groups
+                proPage.allGateways = JSON.parse(JSON.stringify(gatewayOptions));
+                proPage.primaryGatewayOptions = gatewayOptions.splice(0, 6);
+                proPage.secondaryGatewayOptions = gatewayOptions;                
                 
-                // Convert to float for numeric comparisons
-                var planPriceFloat = parseFloat(selectedPlanPrice);
-                var balanceFloat = parseFloat(pro_balance);
-                var html = '';
-
-                // Loop through gateway providers (change to use list from API soon)
-                for (var i = 0, length = gatewayOptions.length; i < length; i++) {
-
-                    var gatewayOption = gatewayOptions[i];
-                    var optionChecked = '';
-                    var classChecked = '';
-
-                    // Pre-select the first option in the list
-                    if (!html) {
-                        optionChecked = 'checked="checked" ';
-                        classChecked = ' checked';
-                    }
-                    
-                    // If it's not the wire transfer option and not in the list of enabled gateways skip it
-                    if ((gatewayOption.apiGatewayId !== null) && (validGatewayIds.indexOf(gatewayOption.apiGatewayId) === -1)) {
-                        continue;
-                    }
-                    
-                    var disabledClass = '';
-                    var disabledTitleText = '';
-                    
-                    // Add disabled class if this payment method is not supported for this plan
-                    if ((gatewayOption.supportsExpensivePlans === false) && (selectedPlanNum != 4)) {
-                        disabledClass = ' disabled';
-                        disabledTitleText = ' title="' + l[7162] + '"';
-                    }
-                    
-                    // If their prepay balance is less than 0 they can buy a voucher
-                    if ((gatewayOption.apiGatewayId === 0) && (balanceFloat <= 0)) {
-                        gatewayOption.displayName = l[487];     // Voucher code
-                    }
-                    
-                    // Otherwise if they have account balance, then they can use that
-                    else if ((gatewayOption.apiGatewayId === 0) && (balanceFloat >= planPriceFloat)) {
-                        gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';  // Balance (x.xx)
-                    }
-                    
-                    // Create a radio button with icon for each payment gateway
-                    html += '<div class="payment-method' + disabledClass + '"' + disabledTitleText + '>'
-                         +      '<div class="membership-radio' + classChecked + '">'
-                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" data-supports-annual-payment="' + gatewayOption.supportsAnnualPayment + '" data-supports-expensive-plans="' + gatewayOption.supportsExpensivePlans + '" />'
-                         +          '<div></div>'
-                         +      '</div>'
-                         +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
-                         +          gatewayOption.displayName
-                         +      '</div>'
-                         +  '</div>';
-                }
-
-                // Change radio button states when clicked
-                proPage.initPaymentMethodRadioOptions(html);                
+                // Render the two groups
+                proPage.renderPaymentProviderOptions(proPage.primaryGatewayOptions, 'primary');
+                //proPage.renderPaymentProviderOptions(proPage.secondaryGatewayOptions, 'secondary');
             }
+        });
+    },
+    
+    renderPaymentProviderOptions: function(gatewayOptions, primaryOrSecondary) {
+        
+        console.log('rendering' + primaryOrSecondary, gatewayOptions);
+        
+        // Get their plan price from the currently selected duration radio button
+        var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+        var selectedPlan = membershipPlans[selectedPlanIndex];
+        var selectedPlanNum = selectedPlan[1];
+        var selectedPlanPrice = selectedPlan[5];
+
+        // Convert to float for numeric comparisons
+        var planPriceFloat = parseFloat(selectedPlanPrice);
+        var balanceFloat = parseFloat(pro_balance);
+        var html = '';
+        
+        // Cache the template selector
+        var $template = $('.payment-options-list.primary .payment-method.template');
+        
+        // Loop through gateway providers (change to use list from API soon)
+        for (var i = 0, length = gatewayOptions.length; i < length; i++) {
+
+            var gatewayOption = gatewayOptions[i];          
+            var $gateway = $template.clone();
+
+            console.log('$gatewayHtml template clone', $gateway.prop('outerHTML'));
+
+            // Pre-select the first option in the list
+            if (html === '') {
+                $gateway.find('input').attr('checked', 'checked');
+                $gateway.find('input').addClass('checked');
+                $gateway.find('.membership-radio').addClass('checked');                
+            }
+
+            // Add disabled class if this payment method is not supported for this plan
+            if ((gatewayOption.supportsExpensivePlans === 0) && (selectedPlanNum != 4)) {
+                $gateway.addClass('disabled');
+                $gateway.attr('title', l[7162]);
+            }
+
+            // If their prepay balance is less than 0 they can buy a voucher
+            if ((gatewayOption.gatewayId === 0) && (balanceFloat <= 0)) {
+                gatewayOption.displayName = l[487];     // Voucher code
+            }
+
+            // Otherwise if they have account balance, then they can use that
+            else if ((gatewayOption.gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
+                gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';  // Balance (x.xx)
+            }
+
+            // Get display name from lookup
+            else if (typeof gatewayOption.displayName === 'undefined') {
+                gatewayOption.displayName = 'use lookup';
+            }
+               
+            // Create a radio button with icon for each payment gateway
+            $gateway.removeClass('template');
+            $gateway.find('input').attr('name', gatewayOption.gatewayName);
+            $gateway.find('input').attr('id', gatewayOption.gatewayName);
+            $gateway.find('input').attr('id', gatewayOption.gatewayName);
+            $gateway.find('input').val(gatewayOption.gatewayId);
+            $gateway.find('.provider-icon').addClass(gatewayOption.gatewayName);
+            $gateway.find('.provider-name').text(gatewayOption.displayName);
+
+            // Build the html
+            html += $gateway.prop('outerHTML');
+            
+            /*
+            // Create a radio button with icon for each payment gateway
+            html += '<div class="payment-method' + disabledClass + '"' + disabledTitleText + '>'
+                 +      '<div class="membership-radio' + classChecked + '">'
+                 +          '<input type="radio" name="' + gatewayOption.gatewayName + '" id="' + gatewayOption.gatewayName + '" ' + optionChecked + ' value="' + gatewayOption.gatewayId + '" />'
+                 +          '<div></div>'
+                 +      '</div>'
+                 +      '<div class="payment-icon ' + gatewayOption.gatewayName + '">'
+                 +          gatewayOption.displayName
+                 +      '</div>'
+                 +  '</div>';
+            */
+        }
+        
+        console.log(html);
+        
+        // Update the page
+        $('.membership-step2 .payment-options-list.' + primaryOrSecondary).append(html);
+        
+        // Change radio button states when clicked
+        proPage.initPaymentMethodRadioOptions(html);
+    },
+        
+    /**
+     * Change payment method radio button states when clicked
+     * @param {String} html The radio button html
+     */
+    initPaymentMethodRadioOptions: function(html) {
+
+        var paymentOptionsList = $('.payment-options-list');
+        paymentOptionsList.html(html);
+        paymentOptionsList.find('.payment-method').rebind('click', function(event) {
+
+            var $this = $(this);
+
+            // Don't let the user select this option if it's disabled e.g. disabled because 
+            // they must select a cheaper plan to work with this payment provider e.g. Fortumo
+            if ($this.hasClass('disabled')) {
+                return false;
+            }
+
+            // Remove checked state from all radio inputs
+            paymentOptionsList.find('.membership-radio').removeClass('checked');
+            paymentOptionsList.find('input').prop('checked', false);
+
+            // Add checked state for this radio button
+            $this.find('input').prop('checked', true);        
+            $this.find('.membership-radio').addClass('checked');
+
+            //proPage.updateTextDependingOnRecurring();
+            //proPage.updatePeriodOptionsOnPaymentMethodChange();
         });
     },
     
@@ -1055,47 +1052,7 @@ var proPage = {
             }
         }
     },
-    
-    /**
-     * Change payment method radio button states when clicked
-     * @param {String} html The radio button html
-     */
-    initPaymentMethodRadioOptions: function(html) {
-
-        var paymentOptionsList = $('.payment-options-list');
-        paymentOptionsList.html(html);
-        paymentOptionsList.find('.payment-method').rebind('click', function(event) {
-
-            var $this = $(this);
-            var $bitcoinInstructions = $('.membership-center p');
-
-            // Don't let the user select this option if it's disabled e.g. disabled because 
-            // they must select a cheaper plan to work with this payment provider e.g. Fortumo
-            if ($this.hasClass('disabled')) {
-                return false;
-            }
-
-            // Remove checked state from all radio inputs
-            paymentOptionsList.find('.membership-radio').removeClass('checked');
-            paymentOptionsList.find('input').prop('checked', false);
-
-            // Add checked state for this radio button
-            $this.find('input').prop('checked', true);        
-            $this.find('.membership-radio').addClass('checked');
-
-            // Hide instructions below the purchase button if other option is selected
-            if ($this.find('.membership-radio-label').hasClass('bitcoin')) {
-                $bitcoinInstructions.removeClass('hidden');
-            }
-            else {
-                $bitcoinInstructions.addClass('hidden');
-            }
-
-            proPage.updateTextDependingOnRecurring();
-            proPage.updatePeriodOptionsOnPaymentMethodChange();
-        });
-    },
-    
+        
     /**
      * Gets the wording for the plan subscription duration in months or years
      * @param {Number} numOfMonths The number of months

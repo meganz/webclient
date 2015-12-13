@@ -38,21 +38,35 @@ var Dropdown = React.createClass({
                     collision: "flip flip",
                     within: $container,
                     using: function (obj, info) {
-                        if (info.vertical != "top") {
-                            $(this)
-                                .removeClass("up-arrow")
-                                .addClass("down-arrow");
-                        } else {
-                            $(this)
-                                .removeClass("down-arrow")
-                                .addClass("up-arrow");
+                        var vertOffset = 0;
+                        var horizOffset = 0;
+
+                        if(!self.props.noArrow) {
+                            if (info.vertical != "top") {
+                                $(this)
+                                    .removeClass("up-arrow")
+                                    .addClass("down-arrow");
+                            } else {
+                                $(this)
+                                    .removeClass("down-arrow")
+                                    .addClass("up-arrow");
+                            }
+
+                            var $arrow = $('.dropdown-white-arrow', $element);
+                            vertOffset += (info.vertical == "top" ? $arrow.outerHeight() : 0);
                         }
 
-                        var $arrow = $('.dropdown-white-arrow', $element);
+                        if (self.props.vertOffset) {
+                           vertOffset += (self.props.vertOffset * (info.vertical == "top" ? 1 : -1));
+                        }
+
+                        if (self.props.horizOffset) {
+                            horizOffset += self.props.horizOffset;
+                        }
 
                         $(this).css({
-                            left: (obj.left + (offsetLeft ? offsetLeft/2 : 0)) + 'px',
-                            top: (obj.top + (info.vertical == "top" ? $arrow.outerHeight() : 0)) + 'px'
+                            left: (obj.left + (offsetLeft ? offsetLeft/2 : 0) + horizOffset) + 'px',
+                            top: (obj.top + vertOffset + 'px')
                         });
                     }
                 });
@@ -60,7 +74,7 @@ var Dropdown = React.createClass({
         }
     },
     render: function() {
-        var classes = "dropdown body dropdown-arrow up-arrow " + this.props.className;
+        var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
 
 
         if(this.props.active !== true) {
@@ -83,7 +97,7 @@ var Dropdown = React.createClass({
 
             return (
                 <div className={classes} style={styles}>
-                    <i className="dropdown-white-arrow"></i>
+                    {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
                     {this.props.children}
                 </div>
             );
@@ -232,6 +246,7 @@ var DropdownEmojiSelector = React.createClass({
             searchValue: e.target.value,
             browsingCategory: false
         });
+        $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollTo(0);
     },
     render: function() {
         var self = this;
@@ -313,6 +328,7 @@ var DropdownEmojiSelector = React.createClass({
             if (curCategoryEmojis.length > 0) {
                 emojis.push(
                     <div key={categoryName}>
+                        {emojis.length > 0 ? <div className="clear"></div> : null}
                         <div className="emoji-type-txt">
                             {__(categoryName)}
                         </div>
@@ -357,6 +373,7 @@ var DropdownEmojiSelector = React.createClass({
                         e.preventDefault();
 
                         self.setState({browsingCategory: categoryName, searchValue: ''});
+                        $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollTo(0);
                     }}
                     >
                     <i className={"small-icon " + categoryIcons[categoryName]}></i>

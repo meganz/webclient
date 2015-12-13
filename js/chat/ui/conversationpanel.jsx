@@ -267,8 +267,7 @@ var ConversationMessage = React.createClass({
                         var addToCloudDrive = function() {
                             var tmpNode = clone(v);
                             tmpNode.k = tmpNode.k.split(":")[1];
-                            $.onImportCopyNodes = [tmpNode];
-                            M.copyNodes([tmpNode], M.RootID, false, function(res) {
+                            M.copyNodes(tmpNode, M.RootID, false, function(res) {
                                 if (res === 0) {
                                     msgDialog(
                                         'info',
@@ -286,7 +285,13 @@ var ConversationMessage = React.createClass({
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
                                     icon="tiny-icon grey-down-arrow">
-                                        <DropdownsUI.Dropdown className="attachments-dropdown">
+                                    <DropdownsUI.Dropdown
+                                        className="white-context-menu attachments-dropdown"
+                                        noArrow={true}
+                                        positionMy="left bottom"
+                                        positionAt="right bottom"
+                                        horizOffset={3}
+                                        >
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__("Download")}
                                                                   onClick={startDownload}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__("Add to Cloud Drive")}
@@ -305,7 +310,9 @@ var ConversationMessage = React.createClass({
                                 dropdown = <ButtonsUI.Button
                                         className="default-white-button tiny-button"
                                         icon="tiny-icon grey-down-arrow">
-                                        <DropdownsUI.Dropdown className="attachments-dropdown">
+                                        <DropdownsUI.Dropdown
+                                            className="attachments-dropdown"
+                                        >
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__("Download")}
                                                                   onClick={startDownload}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__("Add to Cloud Drive")}
@@ -401,8 +408,11 @@ var ConversationMessage = React.createClass({
                         className="default-white-button tiny-button"
                         icon="tiny-icon grey-down-arrow">
                         <DropdownsUI.Dropdown
-                            className="message-dropdown"
-                            onClick={() => {}}
+                            className="white-context-menu message-dropdown"
+                            positionMy="right top"
+                            positionAt="right bottom"
+                            vertOffset={3}
+                            noArrow={true}
                         >
                             <DropdownsUI.DropdownItem icon="writing-pen" label="Edit" onClick={() => {
                                         console.error("TBD!");
@@ -1720,6 +1730,7 @@ var ConversationPanel = React.createClass({
                                         >
                                         <DropdownsUI.DropdownEmojiSelector
                                             className="popup emoji-one"
+                                            vertOffset={12}
                                             onClick={self.onEmojiClicked}
                                             />
                                     </ButtonsUI.Button>
@@ -1728,7 +1739,9 @@ var ConversationPanel = React.createClass({
                                         className="popup-button"
                                         icon="small-icon grey-medium-plus">
                                         <DropdownsUI.Dropdown
-                                            className="wide-dropdown attach-to-chat-popup">
+                                            className="wide-dropdown attach-to-chat-popup"
+                                            vertOffset={10}
+                                            >
                                             <DropdownsUI.DropdownItem
                                                 icon="grey-cloud" label={__("Add from your Cloud")}
                                                 onClick={(e) => {

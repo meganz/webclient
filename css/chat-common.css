@@ -81,3 +81,10 @@
 .buttons-block {
 	padding: 11px 0 0 0;
 }
+
+.dropdown.send-files-selector .dropdown-white-arrow {
+	margin-left: -10px !important;
+}
+.dropdown.add-participant-selector .dropdown-white-arrow {
+	margin-left: 0;
+}

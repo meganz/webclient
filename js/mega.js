@@ -3016,7 +3016,7 @@ function MegaData()
             return false;
         }
 
-        var a = this.isNodeObject(cn) ? cn : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
+        var a = this.isNodeObject(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var ops = {a: 'p', t: t, n: a, i: requesti};
         var s = fm_getsharenodes(t);
         if (s.length > 0) {

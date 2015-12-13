@@ -3784,6 +3784,28 @@ function rand_range(a, b) {
     return Math.random() * (b - a) + a;
 };
 
+// http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
+function elementInViewport2(el) {
+    var top = el.offsetTop;
+    var left = el.offsetLeft;
+    var width = el.offsetWidth;
+    var height = el.offsetHeight;
+
+    while(el.offsetParent) {
+        el = el.offsetParent;
+        top += el.offsetTop;
+        left += el.offsetLeft;
+    }
+
+    return (
+        top < (window.pageYOffset + window.innerHeight) &&
+        left < (window.pageXOffset + window.innerWidth) &&
+        (top + height) > window.pageYOffset &&
+        (left + width) > window.pageXOffset
+    );
+}
+
+
 // FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as
 //        the original problem is found and resolved.
 if (typeof sjcl !== 'undefined') {

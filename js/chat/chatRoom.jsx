@@ -1053,6 +1053,9 @@ ChatRoom.prototype.attachNodes = function(ids) {
                 nodesMeta.push({
                     'h': node.h,
                     'key': node.key,
+                    'k': node.k,
+                    'a': node.a,
+                    't': node.t,
                     'name': node.name,
                     's': node.s,
                     'mtime': node.mtime,

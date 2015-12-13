@@ -491,6 +491,8 @@ MessagesBuff.prototype.setLastReceived = function(msgId) {
         if (!self.isRetrievingHistory) {
             if (targetMsg.userId !== u_handle) {
                 self.chatdInt.markMessageAsReceived(self.chatRoom, msgId);
+            } else {
+                // dont do anything.
             }
         }
 

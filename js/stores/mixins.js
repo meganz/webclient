@@ -1,3 +1,4 @@
+var ReactDOM = require("react-dom");
 
 // copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module
 function shallowEqual(objA, objB) {
@@ -35,12 +36,12 @@ window._propertyTrackChangesVars = _propertyTrackChangesVars;
 var instanceId = 0;
 
 var MegaRenderMixin = {
+    //inViewport: false,
     componentDidMount: function() {
         this.megaInstanceId = instanceId++;
 
         window.addEventListener('resize', this.onResizeDoUpdate);
         window.addEventListener('hashchange', this.onHashChangeDoUpdate);
-
 
         // init on data structure change events
         if(this.props) {
@@ -50,10 +51,30 @@ var MegaRenderMixin = {
         if(this.state) {
             this._recurseAddListenersIfNeeded("s", this.state);
         }
+
+        //$(window).rebind(
+        //    'DOMContentLoaded.lazyRenderer' + this.megaInstanceId + ' ' +
+        //    'load.lazyRenderer' + this.megaInstanceId + ' ' +
+        //    'resize.lazyRenderer' + this.megaInstanceId + ' ' +
+        //    'hashchange.lazyRenderer' + this.megaInstanceId + ' ' +
+        //    'scroll.lazyRenderer' + this.megaInstanceId,
+        //    this.requiresLazyRendering
+        //);
+        //
+        //this.requiresLazyRendering();
+    },
+    findDOMNode: function() {
+        return ReactDOM.findDOMNode(this);
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.onResizeDoUpdate);
         window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
+
+        //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.megaInstanceId);
+        //$(window).unbind('load.lazyRenderer' + this.megaInstanceId);
+        //$(window).unbind('resize.lazyRenderer' + this.megaInstanceId);
+        //$(window).unbind('hashchange.lazyRenderer' + this.megaInstanceId);
+        //$(window).unbind('scroll.lazyRenderer' + this.megaInstanceId);
     },
     onResizeDoUpdate: function() {
         if(!this.isMounted() || this._pendingForceUpdate === true) {
@@ -197,6 +218,8 @@ var MegaRenderMixin = {
             "props:", this.props,
             "state:", this.state
         );
+
+
         if(shouldRerender === true) { // (eventually) add listeners to newly added data structures
             if(this.props) {
                 this._recurseAddListenersIfNeeded("p", this.props);
@@ -218,7 +241,7 @@ var MegaRenderMixin = {
         }
     },
     onPropOrStateUpdated: function() {
-        if(window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this.getElementName(), arguments);
+        if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this.getElementName(), arguments);
 
         this.forceUpdateIfChanged();
     },
@@ -232,6 +255,26 @@ var MegaRenderMixin = {
         }
         return rootElement === this ? null : rootElement;
     },
+    //requiresLazyRendering: function() {
+    //    var domNode = this.findDOMNode();
+    //    var wasInViewPort = this.inViewport;
+    //
+    //    if (domNode) {
+    //        this.inViewport = elementInViewport2(domNode);
+    //    }
+    //    else {
+    //        this.inViewport = false;
+    //    }
+    //
+    //    if (wasInViewPort !== this.inViewport) {
+    //        if (!this.inViewport) {
+    //            $(domNode).css({'visibility': 'hidden'});
+    //        }
+    //        else {
+    //            $(domNode).css({'visibility': 'visible'});
+    //        }
+    //    }
+    //},
     getOwnerElement: function() {
         var owner = this._reactInternalInstance._currentElement._owner;
         if(owner) {

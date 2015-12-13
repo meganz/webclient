@@ -205,7 +205,9 @@ var ConversationMessage = React.createClass({
                             self._rerenderTimer = setTimeout(function () {
                                 if (message.sending === true) {
                                     chatRoom.messagesBuff.trackDataChange();
-                                    self.forceUpdate();
+                                    if (self.isMounted()) {
+                                        self.forceUpdate();
+                                    }
                                 }
                             }, (5 - (unixtime() - message.delay)) * 1000);
                         }
@@ -263,7 +265,10 @@ var ConversationMessage = React.createClass({
                             chatRoom._attachmentsMap[v.h][message.messageId] = false;
                         }
                         var addToCloudDrive = function() {
-                            M.copyNodes([v], M.RootID, false, function(res) {
+                            var tmpNode = clone(v);
+                            tmpNode.k = tmpNode.k.split(":")[1];
+                            $.onImportCopyNodes = [tmpNode];
+                            M.copyNodes([tmpNode], M.RootID, false, function(res) {
                                 if (res === 0) {
                                     msgDialog(
                                         'info',
@@ -271,6 +276,7 @@ var ConversationMessage = React.createClass({
                                         __("Attachment added to your Cloud Drive.")
                                     );
                                 }
+                                delete $.onImportCopyNodes;
                             });
                         };
 
@@ -1405,9 +1411,11 @@ var ConversationPanel = React.createClass({
             }
         }
 
-        //// Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
+        // Important. Please insure we have correct height detection for Chat messages block.
+        // We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
         var scrollBlockHeight = (
             $('.chat-content-block', $container).outerHeight() -
+            $('.call-block', $container).outerHeight() -
             $('.chat-textarea-block', $container).outerHeight()
         );
         if (scrollBlockHeight != self.$messages.outerHeight()) {

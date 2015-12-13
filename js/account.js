@@ -626,7 +626,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                     }
                     else {
                         logger.error('Unexpected exception!', e);
-                        setTimeout(function() { throw e }, 4);
+                        setTimeout(function() { throw e; }, 4);
                         debugger;
                     }
                     res = EINTERNAL;

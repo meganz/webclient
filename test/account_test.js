@@ -123,7 +123,7 @@ describe("account unit test", function() {
                 assert.ok(tlvstore.tlvRecordsToContainer.calledWith('fortytwo'));
                 assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
                 assert.strictEqual(_logger.info.args[0][0],
-                                   'Attribute "*keyring" for user "me3456789xw" is "fortytwo".');
+                                   'Attribute "*keyring" for user "me3456789xw" is -- hidden --.');
             });
 
             it("private attribute, failed data integrity check", function() {
@@ -166,8 +166,8 @@ describe("account unit test", function() {
                 assert.strictEqual(aPromise.resolve.callCount, 1);
                 assert.deepEqual(myCallback.callCount, 1);
                 assert.deepEqual(myCallback.args[0][0], expected);
-                assert.match(_logger.info.args[0][0],
-                             /Attribute "\*keyring" for user "me3456789xw" is {"/);
+                assert.strictEqual(_logger.info.args[0][0],
+                                   'Attribute "*keyring" for user "me3456789xw" is -- hidden --.');
             });
 
             it("public attribute", function() {

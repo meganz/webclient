@@ -38,7 +38,7 @@ function MegaDBEncryption(mdbInstance) {
         var promise = new MegaPromise();
 
         mdbServerInstance.getUData('enckey')
-            .then(function enckey(data) {
+            .then(function __enckey(data) {
                 logger.debug('getUData.enckey', data);
                 if (!data) {
                     // Generate new encryption key
@@ -67,7 +67,7 @@ function MegaDBEncryption(mdbInstance) {
                         _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, true);
                         if (_encDecKeyCache.length !== 16) {
                             logger.debug('Invalid Key length: %d bytes', _encDecKeyCache.length);
-                            enckey();
+                            __enckey();
                         }
                         else {
                             promise.resolve();
@@ -192,8 +192,8 @@ function MegaDBEncryption(mdbInstance) {
             simpleDecryptObjFunction(table, obj);
         }
         catch (exc) {
-            if (exc.message == "data integrity check failed") {
-                logger.error("data integrity check failed for (will be removed): ", table, obj[mdbInstance._getTablePk(table)], obj);
+            if (exc.message === "data integrity check failed") {
+                logger.warn("data integrity check failed for (will be removed): ", table, obj[mdbInstance._getTablePk(table)], obj);
 
                 mdbInstance.server.remove(table, obj[mdbInstance._getTablePk(table)]);
                 e.stopPropagation();

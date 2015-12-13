@@ -309,10 +309,14 @@ var strongvelope = {};
      * @param nonce {String}
      *     Nonce to decrypt a message with in a binary string.
      * @returns {String}
-     *     Clear text of message content.
+     *     Clear text of message content, `null` if no cipher text is given.
      * @private
      */
     strongvelope._symmetricDecryptMessage = function(cipher, key, nonce) {
+
+        if ((cipher === null) || (typeof cipher === 'undefined')) {
+            return null;
+        }
 
         var keyBytes = asmCrypto.string_to_bytes(key);
         var nonceBytes = asmCrypto.string_to_bytes(
@@ -995,8 +999,9 @@ var strongvelope = {};
 
         var clear = '';
 
-        // Use RSA encryption if encryped with RSA key.
+        // Check if sender key is encrypted using RSA.
         if (encryptedKeys.length < _RSA_ENCRYPTION_THRESHOLD) {
+            // Using normal chat keys.
             var receiver = iAmSender ? otherParty : this.ownHandle;
             var cipherBytes = asmCrypto.string_to_bytes(encryptedKeys);
             var ivBytes = asmCrypto.string_to_bytes(
@@ -1268,6 +1273,109 @@ var strongvelope = {};
 
 
     /**
+     * Update local sender key cache and get sender key.
+     *
+     * @method
+     * @param {String} sender
+     *     User handle of the message sender.
+     * @param {Object} parsedMessage
+     *     Mapping a keyId to a key.
+     * @param {Object} senderKeys
+     *     Mapping a keyId to a key.
+     * @returns {String|Boolean}
+     *     The sender key used, `false` in case of mismatches with existing
+     *     cached entries.
+     * @private
+     */
+    strongvelope.ProtocolHandler.prototype._getSenderKeyAndUpdateCache = function(
+                sender, parsedMessage, senderKeys) {
+
+        var storedKey;
+        for (var id in senderKeys) {
+            if (!senderKeys.hasOwnProperty(id)) {
+                continue;
+            }
+
+            if (!this.participantKeys[sender]) {
+                this.participantKeys[sender] = {};
+            }
+            storedKey = this.participantKeys[sender][id];
+            if (storedKey && (storedKey !== senderKeys[id])) {
+                // Bail out on inconsistent information.
+                logger.error("Mismatching statement on sender's previously sent key.");
+
+                return false;
+            }
+            this.participantKeys[sender][id] = senderKeys[id];
+        }
+
+        // Get sender key.
+        var senderKey;
+        var keyId = parsedMessage.keyIds[0];
+        if ((parsedMessage.keys.length > 0) && (parsedMessage.recipients.length > 0)) {
+            senderKey = senderKeys[keyId];
+        }
+        else {
+            if (this.participantKeys[sender] && this.participantKeys[sender][keyId]) {
+                senderKey = this.participantKeys[sender][keyId];
+            }
+            else {
+                logger.error('Encryption key for message from ' + sender
+                             + ' with ID ' + base64urlencode(keyId) + ' unavailable.');
+
+                return false;
+            }
+        }
+
+        return senderKey;
+    };
+
+
+    /**
+     * Update group participants on received message.
+     *
+     * @method
+     * @param {String} sender
+     *     User handle of the message sender.
+     * @param {Object} parsedMessage
+     *     User handle of the message sender.
+     * @returns {Boolean}
+     *     `false` in case I am not a participant (any more),
+     *     `true` otherwise.
+     * @private
+     */
+    strongvelope.ProtocolHandler.prototype._updateGroupParticipants = function(
+                sender, parsedMessage) {
+
+        var isOwnMessage = (sender === this.ownHandle);
+        var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
+        if ((parsedMessage.recipients.length > 0) && !isOwnMessage) {
+            if (myIndex === -1) {
+                // I'm not in the list.
+                if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+                    this.keyId = null;
+                    this.otherParticipants.clear();
+                    this.includeParticipants.clear();
+                    this.excludeParticipants.clear();
+                    logger.info('I have been excluded from this chat, cannot read message.');
+                }
+                else {
+                    logger.warn('Incoming chat message not intended for me (not part of chat).');
+                }
+
+                return false;
+            }
+
+            this.otherParticipants = new Set(parsedMessage.recipients);
+            this.otherParticipants.add(sender);
+            this.otherParticipants.delete(this.ownHandle);
+        }
+
+        return true;
+    };
+
+
+    /**
      * Decrypts a message from a sender and (potentially) updates sender keys.
      *
      * @method
@@ -1286,12 +1394,12 @@ var strongvelope = {};
         var self = this;
 
         // Check we're in a chat with this sender, or on a new chat.
-        if (!this.otherParticipants.has(sender) && (sender !== this.ownHandle)) {
-            if (this.otherParticipants.size > 0) {
-                logger.warn('Sender not in current participants: ' + sender);
+        if (!this.otherParticipants.has(sender)
+                && (sender !== this.ownHandle)
+                && (this.otherParticipants.size > 0)) {
+            logger.warn('Sender not in current participants: ' + sender);
 
-                return false;
-            }
+            return false;
         }
 
         // Extract keys, and parse message in the same go.
@@ -1322,77 +1430,22 @@ var strongvelope = {};
         // TODO: Check legitimacy of operation (moderator set on alter participants).
 
         // Now puzzle out the group composition.
-        var isOwnMessage = (sender === this.ownHandle);
-        var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
-        if ((parsedMessage.recipients.length > 0) && !isOwnMessage) {
-            if (myIndex === -1) {
-                if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                    this.keyId = null;
-                    this.otherParticipants.clear();
-                    this.includeParticipants.clear();
-                    this.excludeParticipants.clear();
-                    logger.info('I have been excluded from this chat, cannot read message.');
-                }
-                else {
-                    logger.warn('Incoming chat message not intended for me (not part of chat).');
-                }
-
-                return false;
-            }
-
-            this.otherParticipants = new Set(parsedMessage.recipients);
-            this.otherParticipants.add(sender);
-            this.otherParticipants.delete(this.ownHandle);
+        if (this._updateGroupParticipants(sender, parsedMessage) === false) {
+            return false;
         }
 
         // Get sender key.
-        var keyId = parsedMessage.keyIds[0];
-        var senderKey;
-        var storedKey;
-        if ((parsedMessage.keys.length > 0) && (parsedMessage.recipients.length > 0)) {
-            // If we sent the message, pick first recipient for getting the
-            // sender key (e. g. for history loading).
-            senderKey = senderKeys[keyId];
+        var senderKey = this._getSenderKeyAndUpdateCache(sender, parsedMessage,
+                                                         senderKeys);
 
-            // Update local sender key cache.
-            for (var id in senderKeys) {
-                if (senderKeys.hasOwnProperty(id)) {
-                    if (!this.participantKeys[sender]) {
-                        this.participantKeys[sender] = {};
-                    }
-                    storedKey = this.participantKeys[sender][id];
-                    if (storedKey && (storedKey !== senderKeys[id])) {
-                        // Bail out on inconsistent information.
-                        logger.error("Mismatching statement on sender's previously sent key.");
-
-                        return false;
-                    }
-                    this.participantKeys[sender][id] = senderKeys[id];
-                }
-            }
-        }
-        else {
-            if (this.participantKeys[sender] && this.participantKeys[sender][keyId]) {
-                senderKey = this.participantKeys[sender][keyId];
-            }
-            else {
-                logger.error('Encryption key for message from ' + sender
-                             + ' with ID ' + base64urlencode(keyId) + ' unavailable.');
-
-                return false;
-            }
+        if (senderKey === false) {
+            return false;
         }
 
         // Decrypt message payload.
-        var cleartext;
-        if (typeof parsedMessage.payload !== 'undefined') {
-            cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+        var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
                                                     senderKey,
                                                     parsedMessage.nonce);
-        }
-        else {
-            cleartext = null;
-        }
 
         // Bail out if decryption failed.
         if (cleartext === false) {
@@ -1418,7 +1471,7 @@ var strongvelope = {};
         }
 
         // Take actions on participant changes.
-        if (!isOwnMessage
+        if ((sender !== this.ownHandle)
                 && (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS)) {
             // Update my sender key.
             logger.info('Particpant change received, updating sender key.');

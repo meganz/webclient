@@ -301,6 +301,16 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(result, '');
             });
 
+            it("binary, null message", function() {
+                var result = ns._symmetricDecryptMessage(null, KEY, NONCE);
+                assert.strictEqual(result, null);
+            });
+
+            it("binary, undefined message", function() {
+                var result = ns._symmetricDecryptMessage(undefined, KEY, NONCE);
+                assert.strictEqual(result, null);
+            });
+
             it("decryption fails", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns._symmetricDecryptMessage(atob('J+79wd1gGVjQ'), KEY,

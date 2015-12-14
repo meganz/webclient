@@ -62,6 +62,7 @@
     -webkit-border-radius: 9px;
     border-radius: 9px;
     background-color: #FF6A19;
+    position: relative;
 }
 .semi-big-avatar div,  .big-avatar div {
     width: 96px;
@@ -85,7 +86,7 @@
 .big-avatar div {
     width: 146px;
     height: 146px;
-    margin: -88px 0 0 -88px;
+    margin: -73px 0 0 -73px;
     font-size: 90px;
     line-height: 146px;
 }

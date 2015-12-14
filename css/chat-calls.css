@@ -206,11 +206,11 @@
     top: 4px;
 }
 .call.user-audio {
-    width: 300px;
-    height: 300px;
+    width: 260px;
+    height: 260px;
     left: 50%;
     top: 50%;
-    margin: -150px 0 0 -150px;
+    margin: -130px 0 0 -130px;
     z-index: 9;
 }
 .call.top-panel .call-duration {

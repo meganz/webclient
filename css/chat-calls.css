@@ -54,17 +54,6 @@
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
-    webkit-transition: bottom 400ms ease-in-out;
-    -moz-transition: bottom 400ms ease-in-out;
-    -o-transition: bottom 400ms ease-in-out;
-    -ms-transition: bottom 300ms ease-in-out;
-    transition: bottom 400ms ease-in-out;
-}
-.call.local-video.visible-panel, .call.local-audio.visible-panel {
-    bottom: 80px;
-}
-.small-block .call.local-video.visible-panel, .small-block .call.local-audio.visible-panel {
-    bottom: 56px;
 }
 .call.local-audio {
     width: 184px;
@@ -206,11 +195,11 @@
     top: 4px;
 }
 .call.user-audio {
-    width: 300px;
-    height: 300px;
+    width: 260px;
+    height: 260px;
     left: 50%;
     top: 50%;
-    margin: -150px 0 0 -150px;
+    margin: -130px 0 0 -130px;
     z-index: 9;
 }
 .call.top-panel .call-duration {

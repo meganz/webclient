@@ -290,7 +290,7 @@ var ConversationMessage = React.createClass({
                                         noArrow={true}
                                         positionMy="left bottom"
                                         positionAt="right bottom"
-                                        horizOffset={3}
+                                        horizOffset={4}
                                         >
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__("Download")}
                                                                   onClick={startDownload}/>
@@ -411,7 +411,7 @@ var ConversationMessage = React.createClass({
                             className="white-context-menu message-dropdown"
                             positionMy="right top"
                             positionAt="right bottom"
-                            vertOffset={3}
+                            vertOffset={4}
                             noArrow={true}
                         >
                             <DropdownsUI.DropdownItem icon="writing-pen" label="Edit" onClick={() => {
@@ -464,7 +464,7 @@ var ConversationMessage = React.createClass({
                 }
                 textMessage = tmpMsg;
                 textMessage = textMessage
-                    .replace("[[ ", "<span className=\"grey-color\">")
+                    .replace("[[ ", "<span class=\"grey-color\">")
                     .replace("]]", "</span>");
             }
             else {

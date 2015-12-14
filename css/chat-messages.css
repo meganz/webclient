@@ -190,3 +190,6 @@
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
+.messages.notification {
+    padding: 24px 24px 0 24px;
+}

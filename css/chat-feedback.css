@@ -8,7 +8,7 @@
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	padding: 24px;
-	margin: 29px 0 0 0;
+	margin: 29px 24px 0 24px;
 }
 .feedback.error-header {
 	font-size: 24px;

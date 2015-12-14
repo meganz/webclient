@@ -10497,7 +10497,7 @@ function BigNumber_isProbablePrime ( paranoia ) {
     if ( paranoia <= 2 ) return true;
 
     // Miller-Rabin test
-    // (≤ 4^(-k) false positive probability)
+    // (<= 4^(-k) false positive probability)
     return _BigNumber_isMillerRabinProbablePrime.call( this, paranoia >>> 1 );
 }
 

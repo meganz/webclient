@@ -3057,11 +3057,11 @@ function MegaData()
             return false;
         }
 
-        var mTempNodes = [];
+        nodes = [];
 
         sane = sane.map(function(node) {
             if (!M.d[node.h]) {
-                mTempNodes.push(node.h);
+                nodes.push(node.h);
                 M.d[node.h] = node;
             }
             return node.h;
@@ -3069,11 +3069,11 @@ function MegaData()
 
         this.copyNodes(sane, target, false, callback);
 
-        mTempNodes.forEach(function(handle) {
+        nodes.forEach(function(handle) {
             delete M.d[handle];
         });
 
-        return mTempNodes.length;
+        return nodes.length;
     };
 
 

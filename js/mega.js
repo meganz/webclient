@@ -3329,7 +3329,7 @@ function MegaData()
         $.each(nodes, function(index, value) {
             node = M.d[value];
             if (node && node.ar && (node.fav !== newFavStarState) && !exportLink.isTakenDown(value)) {
-                node.fav = newFavStarState;
+                node.ar.fav = newFavStarState;
                 mkat = enc_attr(node.ar, node.key);
                 attr = ab_to_base64(mkat[0]);
                 key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));

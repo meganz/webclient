@@ -481,8 +481,8 @@ var megaAds = {
     init: function() {
 
         if (this.popAd) {
-            popunda.megaPopunder.popurls = this.popAd;
-            popunda.megaPopunder.init($(".download.buttons-block"));
+            mega.popunda.popurls = this.popAd;
+            mega.popunda.init($(".download.buttons-block"));
         }
 
         // Remove any previous ad containers

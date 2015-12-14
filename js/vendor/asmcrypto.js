@@ -9625,10 +9625,10 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
      *
      * Definition:
      *
-     *  MREDC(A) = A × X (mod N),
-     *  M × X = N × Y + 1,
+     *  MREDC(A) = A x X (mod N),
+     *  M x X = N x Y + 1,
      *
-     * where M = 2^(32*m) such that N < M and A < N×M
+     * where M = 2^(32*m) such that N < M and A < NxM
      *
      * Numbers `X` and `Y` can be calculated using Extended Euclidean Algorithm.
      */

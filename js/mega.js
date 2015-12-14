@@ -3039,6 +3039,44 @@ function MegaData()
         }
     };
 
+    // This function has a special hacky purpose, don't use it if you don't know what it does, use M.copyNodes instead.
+    this.injectNodes = function(nodes, target, callback) {
+        if (!Array.isArray(nodes)) {
+            nodes = [nodes];
+        }
+
+        var sane = nodes.filter(function(node) {
+            return M.isNodeObject(node);
+        });
+
+        if (sane.length !== nodes.length) {
+            console.warn('injectNodes: Found invalid nodes.');
+        }
+
+        if (!sane.length) {
+            return false;
+        }
+
+        var mTempNodes = [];
+
+        sane = sane.map(function(node) {
+            if (!M.d[node.h]) {
+                mTempNodes.push(node.h);
+                M.d[node.h] = node;
+            }
+            return node.h;
+        });
+
+        this.copyNodes(sane, target, false, callback);
+
+        mTempNodes.forEach(function(handle) {
+            delete M.d[handle];
+        });
+
+        return mTempNodes.length;
+    };
+
+
     this.copyNodes = function(cn, t, del, callback) {
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
@@ -6945,17 +6983,17 @@ function balance2pro(callback)
         // On Export File Links and Decryption Keys
         var $linkButtons = $('.link-handle, .link-decryption-key, .link-handle-and-key');
         var $linkHandle = $('.link-handle');
-        
+
         // Reset state from previous dialog opens and pre-select the 'Link without key' option by default
         $linkButtons.removeClass('selected');
         $linkHandle.addClass('selected');
-        
+
         // Add click handler
         $linkButtons.rebind('click', function() {
 
             var keyOption = $(this).attr('data-keyoptions');
             var $this = $(this);
-            
+
             // Add selected state to button
             $linkButtons.removeClass('selected');
             $this.addClass('selected');
@@ -6973,7 +7011,7 @@ function balance2pro(callback)
     scope.mega = scope.mega || {};
     scope.mega.Dialog = scope.mega.Dialog || {};
     scope.mega.Dialog.ExportLink = ExportLinkDialog;
-    
+
 })(jQuery, window);
 
 (function($, scope) {

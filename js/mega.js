@@ -5841,22 +5841,22 @@ function getuid(email) {
  * @returns {String|false} Returns either the user handle or false if it doesn't exist
  */
 function getUserHandleFromEmail(emailAddress) {
+    var foundHandle = false;
 
     // Search known users for matching email address then get the handle of that contact
-    for (var userHandle in M.u) {
+    M.u.forEach(function(c, userHandle) {
         if (
-            M.u.hasOwnProperty(userHandle)
-            && M.u[userHandle]
-            && M.u[userHandle].c
-            && (M.u[userHandle].c !== 0)
-            && (M.u[userHandle].m === emailAddress)
-            ) {
+            M.u[userHandle] &&
+            M.u[userHandle].c &&
+            (M.u[userHandle].c !== 0) &&
+            (M.u[userHandle].m === emailAddress)
+        ) {
 
-            return userHandle;
+            foundHandle = userHandle;
         }
-    };
+    });
 
-    return false;
+    return foundHandle;
 }
 
 /**

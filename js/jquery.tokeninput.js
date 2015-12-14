@@ -7,7 +7,7 @@
         queryParam: "q",
         searchDelay: 200,
         minChars: 1,
-        propertyToSearch: "name",
+        propertyToSearch: "m",
         jsonContainer: null,
         contentType: "json",
         excludeCurrent: false,

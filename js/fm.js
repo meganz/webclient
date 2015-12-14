@@ -1505,14 +1505,14 @@ function getContactsEMails() {
         contacts = [];
 
     // Loop through full contacts
-    for (var i in M.u) {
+    M.u.forEach(function(contact) {
         if (M.u.hasOwnProperty(i)) {
             contact = M.u[i];
-            if (contact.c && (contact.c !== 2) && (contact.m || contact.name)) {
-                contacts.push({ id: contact.m, name: contact.name });
+            if (contact.c && (contact.c !== 2) && (contact.m)) {
+                contacts.push({ id: contact.m, name: contact.m });
             }
         }
-    }
+    });
 
     // Loop through outgoing pending contacts
     for (var k in M.opc) {

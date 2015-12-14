@@ -8553,7 +8553,7 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
      *
      * Exploits the fact:
      *
-     *  X² = ( X0 + X1*B )² = X0² + 2*X0*X1*B + X1²*B²,
+     *  X^2 = ( X0 + X1*B )^2 = X0^2 + 2*X0*X1*B + X1^2*B^2,
      *
      * where B is a power of 2, so:
      *

@@ -53,12 +53,12 @@
 	left: 50%;
 	margin-left: -12px;
 	top: -11px;
-	width: 24px;
+	width: 25px;
 	height: 11px;
 	z-index: 123;
 	background-image: url(../images/mega/new-chat-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -2px -1388px;
+	background-position: -1px -1388px;
 }
 .dropdown-arrow .dropdown-white-arrow {
 	display: block;

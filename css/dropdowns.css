@@ -36,9 +36,9 @@
 	border-radius: 4px;
 }
 .dropdown.body.white-context-menu {
-	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
-	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
-	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.4);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.4);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.4);
 }
 .dropdown.body.wide-dropdown {
 	min-width: 232px;
@@ -56,9 +56,10 @@
 	width: 25px;
 	height: 11px;
 	z-index: 123;
-	background-image: url(../images/mega/new-chat-sprite.svg);
+	background-image: url(../images/mega/chat-static-sprite@2x.png);
+    background-size: 68px auto;
 	background-repeat: no-repeat;
-	background-position: -1px -1388px;
+	background-position: 0px -72px;
 }
 .dropdown-arrow .dropdown-white-arrow {
 	display: block;
@@ -66,7 +67,7 @@
 .down-arrow .dropdown-white-arrow {
 	top: auto;
 	bottom: -11px;
-	background-position: -2px -1416px;
+	background-position: -29px -78px;
 }
 .dropdown-item {
 	height: 32px;

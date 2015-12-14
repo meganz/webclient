@@ -265,9 +265,7 @@ var ConversationMessage = React.createClass({
                             chatRoom._attachmentsMap[v.h][message.messageId] = false;
                         }
                         var addToCloudDrive = function() {
-                            var tmpNode = clone(v);
-                            tmpNode.k = tmpNode.k.split(":")[1];
-                            M.copyNodes(tmpNode, M.RootID, false, function(res) {
+                            M.injectNodes([v], M.RootID, false, function(res) {
                                 if (res === 0) {
                                     msgDialog(
                                         'info',
@@ -275,7 +273,6 @@ var ConversationMessage = React.createClass({
                                         __("Attachment added to your Cloud Drive.")
                                     );
                                 }
-                                delete $.onImportCopyNodes;
                             });
                         };
 

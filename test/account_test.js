@@ -105,6 +105,8 @@ describe("account unit test", function() {
                 assert.strictEqual(myCallback.args[0][0], 'fortytwo');
                 assert.ok(tlvstore.tlvRecordsToContainer.calledWith('fortytwo'));
                 assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
+                assert.strictEqual(_logger.info.args[0][0],
+                                   'Attribute "*keyring" for user "me3456789xw" is -- hidden --.');
             });
 
             it("private attribute, failed data integrity check", function(done) {
@@ -146,6 +148,8 @@ describe("account unit test", function() {
                 assert.strictEqual(aPromise.state(), 'resolved');
                 assert.deepEqual(myCallback.callCount, 1);
                 assert.deepEqual(myCallback.args[0][0], expected);
+                assert.strictEqual(_logger.info.args[0][0],
+                                   'Attribute "*keyring" for user "me3456789xw" is -- hidden --.');
             });
 
             it("public attribute", function() {
@@ -304,7 +308,7 @@ describe("account unit test", function() {
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
-                assert.lengthOf(api_req.args[0][0]['*keyring'], 127);
+                assert.lengthOf(api_req.args[0][0]['*keyring'], 107);
             });
 
             it("private attribute, compact crypto mode", function() {
@@ -322,7 +326,7 @@ describe("account unit test", function() {
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
-                assert.lengthOf(api_req.args[0][0]['*keyring'], 114);
+                assert.lengthOf(api_req.args[0][0]['*keyring'], 94);
             });
         });
     });

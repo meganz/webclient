@@ -2844,10 +2844,13 @@
     "7892": "Nastao je problem prilikom instaliranja a\u017euriranja. Molimo poku\u0161ajte ponovo kasnije ili preuzmite najnoviju verziju sa: https:\/\/mega.co.nz\/#sync",
     "7893": "Nemogu\u0107e dohvatiti datote\u010dni sustav.Molimo poku\u0161ajte ponovno. Ako se problem nastavi molimo kontaktirajte bug@mega.co.nz",
     "7944": "Va\u0161 ra\u010dun je blokiran. Molimo kontaktirajte support@mega.co.nz",
-    "7945": "To access this folder\/file, you will need its [B]Decryption key[\/B].",
-    "7946": "If you do not have it, ask the creator of the link.",
-    "7947": "Link without key",
-    "7948": "Link with key",
-    "7971": "Decryption key",
-    "7972": "If you do not have the key, contact the creator of the link."
+    "7945": "Kako bi pristupili ovoj mapi\/datoteci, trebate njegov [B]Dekripcijski klju\u010d[\/B].",
+    "7946": "Ako ga nemate, upitajte kreatora linka.",
+    "7947": "Link bez klju\u010da",
+    "7948": "Link sa klju\u010dem",
+    "7971": "Dekripcijski klju\u010d",
+    "7972": "Ako nemate klju\u010d, kontaktirajte kreatora linka.",
+    "7973": "sporije preuzimanje u pregledniku",
+    "7975": "svakako",
+    "7976": "Sna\u017eno preporu\u010damo na\u0161 klijent za sinkronizaciju zbog zna\u010dajno pobolj\u0161anih performansi[BG] prilikom preuzimanja velikih datoteka. [A]Preuzimte MEGAsync sada[\/A]."
 }

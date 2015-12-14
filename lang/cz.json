@@ -2849,5 +2849,8 @@
     "7947": "Odkaz bez kl\u00ed\u010de",
     "7948": "Odkaz s kl\u00ed\u010dem",
     "7971": "De\u0161ifrovac\u00ed kl\u00ed\u010d",
-    "7972": "If you do not have the key, contact the creator of the link."
+    "7972": "Pokud nem\u00e1te kl\u00ed\u010d, kontaktujte autora odkazu.",
+    "7973": "pomal\u00e9 stahov\u00e1n\u00ed",
+    "7975": "p\u0159esto",
+    "7976": "D\u016frazn\u011b doporu\u010dujeme pou\u017e\u00edvat na\u0161e synchroniza\u010dn\u00edho klienta, kter\u00fd je optimalizovan\u00fd[BR] pro stahov\u00e1n\u00ed velk\u00fdch soubor\u016f. [A]Get MEGAsync now[\/A]."
 }

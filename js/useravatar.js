@@ -64,7 +64,7 @@ var useravatar = (function() {
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
 
-        $template = window.btoa(unescape(encodeURIComponent($template.html())));
+        $template = window.btoa(to8($template.html()));
         
         return 'data:image/svg+xml;base64,' + $template;
     };

@@ -2849,5 +2849,8 @@
     "7947": "Link tanpa key",
     "7948": "Link dengan key",
     "7971": "Decryption key",
-    "7972": "If you do not have the key, contact the creator of the link."
+    "7972": "Jika anda tidak memiliki key, harap kontak pembuat link.",
+    "7973": "browser download lambat",
+    "7975": "bagaimanapun",
+    "7976": "Kami sangat menyarankan untuk menggunakan sync client kami untuk meningkatkan perfoma[BR] saat mendownload file besar. [A]Dapatkan MEGAsync sekarang[\/A]."
 }

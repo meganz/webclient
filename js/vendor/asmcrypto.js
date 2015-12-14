@@ -3048,7 +3048,7 @@ function sha256_asm ( stdlib, foreign, buffer ) {
         );
     }
 
-    // offset — multiple of 32
+    // offset - multiple of 32
     function _state_to_heap ( output ) {
         output = output|0;
 
@@ -3122,7 +3122,7 @@ function sha256_asm ( stdlib, foreign, buffer ) {
         TOTAL1 = total1;
     }
 
-    // offset — multiple of 64
+    // offset - multiple of 64
     function process ( offset, length ) {
         offset = offset|0;
         length = length|0;
@@ -3147,8 +3147,8 @@ function sha256_asm ( stdlib, foreign, buffer ) {
         return hashed|0;
     }
 
-    // offset — multiple of 64
-    // output — multiple of 32
+    // offset - multiple of 64
+    // output - multiple of 32
     function finish ( offset, length, output ) {
         offset = offset|0;
         length = length|0;
@@ -3315,8 +3315,8 @@ function sha256_asm ( stdlib, foreign, buffer ) {
         TOTAL1 = 0;
     }
 
-    // offset — multiple of 64
-    // output — multiple of 32
+    // offset - multiple of 64
+    // output - multiple of 32
     function hmac_finish ( offset, length, output ) {
         offset = offset|0;
         length = length|0;
@@ -3345,8 +3345,8 @@ function sha256_asm ( stdlib, foreign, buffer ) {
     }
 
     // salt is assumed to be already processed
-    // offset — multiple of 64
-    // output — multiple of 32
+    // offset - multiple of 64
+    // output - multiple of 32
     function pbkdf2_generate_block ( offset, length, block, count, output ) {
         offset = offset|0;
         length = length|0;
@@ -6044,7 +6044,7 @@ function sha512_asm ( stdlib, foreign, buffer ) {
         );
     }
 
-    // offset — multiple of 32
+    // offset - multiple of 32
     function _state_to_heap ( output ) {
         output = output|0;
 
@@ -6175,7 +6175,7 @@ function sha512_asm ( stdlib, foreign, buffer ) {
         TOTAL1 = total1;
     }
 
-    // offset — multiple of 128
+    // offset - multiple of 128
     function process ( offset, length ) {
         offset = offset|0;
         length = length|0;
@@ -6200,8 +6200,8 @@ function sha512_asm ( stdlib, foreign, buffer ) {
         return hashed|0;
     }
 
-    // offset — multiple of 128
-    // output — multiple of 64
+    // offset - multiple of 128
+    // output - multiple of 64
     function finish ( offset, length, output ) {
         offset = offset|0;
         length = length|0;
@@ -6448,8 +6448,8 @@ function sha512_asm ( stdlib, foreign, buffer ) {
         TOTAL1 = 0;
     }
 
-    // offset — multiple of 128
-    // output — multiple of 64
+    // offset - multiple of 128
+    // output - multiple of 64
     function hmac_finish ( offset, length, output ) {
         offset = offset|0;
         length = length|0;
@@ -6494,8 +6494,8 @@ function sha512_asm ( stdlib, foreign, buffer ) {
     }
 
     // salt is assumed to be already processed
-    // offset — multiple of 128
-    // output — multiple of 64
+    // offset - multiple of 128
+    // output - multiple of 64
     function pbkdf2_generate_block ( offset, length, block, count, output ) {
         offset = offset|0;
         length = length|0;
@@ -9478,7 +9478,7 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
 
         // `D` is zero? WTF?!
 
-        // calculate `e` — the power of 2 of the normalization factor
+        // calculate `e` - the power of 2 of the normalization factor
         while ( (d & 0x80000000) == 0 ) {
             d = d << 1;
             e = e + 1|0;

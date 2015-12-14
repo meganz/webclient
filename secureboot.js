@@ -1229,7 +1229,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
     // Other
-    jsl.push({f:'js/vendor/autolinker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
     jsl.push({f:'js/vendor/moment.min.js', n: 'moment_js', j:1,w:1});
 
     // Google Import Contacts

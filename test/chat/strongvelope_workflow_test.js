@@ -11,6 +11,38 @@ describe("chat.strongvelope workflow test", function() {
         return;
     }
 
+    var TEST_MESSAGES = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
+                         "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
+                         'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
+    var RSA_PUB_KEY = [
+        asmCrypto.base64_to_bytes('wT+JSBnBNjgalMGT5hmFHd/N5eyncAA+w1TzFC4PYfB'
+            + 'nbX1CFcx6E7BuB0SqgxbJw3ZsvvowsjRvuo8SNtfmVIz4fZV45pBPxCkeCWonN/'
+            + 'zZZiT3LnYnk1BfnfxfoXtEYRrdVPXAC/VDc9cgy29OXKuuNsREKznb9JFYQUVH9'
+            + 'FM='),
+        asmCrypto.base64_to_bytes('AQAB')
+    ];
+    var RSA_PRIV_KEY = [
+        asmCrypto.base64_to_bytes('wT+JSBnBNjgalMGT5hmFHd/N5eyncAA+w1TzFC4PYfB'
+            + 'nbX1CFcx6E7BuB0SqgxbJw3ZsvvowsjRvuo8SNtfmVIz4fZV45pBPxCkeCWonN/'
+            + 'zZZiT3LnYnk1BfnfxfoXtEYRrdVPXAC/VDc9cgy29OXKuuNsREKznb9JFYQUVH9'
+            + 'FM='),
+        65537,
+        asmCrypto.base64_to_bytes('B1SXqop/j8T1DSuCprnVGNsCfnRJra/0sYgpaFyO7NI'
+            + 'nujmEJjuJbfHFWrU6GprksGtvmJb4/emLS3Jd6IKsE/wRthTLLMgbzGm5rRZ92g'
+            + 'k8XGY3dUrNDsnphFsbIkTVl8n2PX6gdr2hn+rc2zvRupAYkV/smBZX+3pDAcuHo'
+            + '+E='),
+        asmCrypto.base64_to_bytes('7y+NkdfNlnENazteobZ2K0IU7+Mp59BgmrhBl0TvhiA'
+            + '5HkI9WJDIZK67NsDa9QNdJ/NCfmqE/eNkZqFLVq0c+w=='),
+        asmCrypto.base64_to_bytes('ztVHfgrLnINsPFTjMmjgZM6M39QEUsi4erg4s2tJiuI'
+            + 'v29szH1n2HdPKFRIUPnemj48kANvp5XagAAhOb8u2iQ=='),
+        asmCrypto.base64_to_bytes('IniC+aLVUTonye17fOjT7PYQGGZvsqX4VjP51/gqYPU'
+            + 'h5jd7qdjr2H7KImD27Vq3wTswuRFW61QrMxNJzUsTow=='),
+        asmCrypto.base64_to_bytes('TeoqNGD8sskPTOrta1/2qALnLqo/tq/GTvR255/S5G6'
+            + 'weLHqYDUTcckGp0lYNu/73ridZ3VwdvBo9ZorchHbgQ=='),
+        asmCrypto.base64_to_bytes('JhqTYTqT5Dj6YoWHWNHbOz24NmMZUXwDms/MDOBM0Nc'
+            + '0nX6NjLDooFrJZtBMGMgcSQJd4rULuH94+szNGc2GAg==')
+    ];
+
     var assert = chai.assert;
 
     var ns = strongvelope;
@@ -35,7 +67,16 @@ describe("chat.strongvelope workflow test", function() {
         return new Uint8Array(result);
     };
 
-    var _makeParticipant = function(handle) {
+    /**
+     * Makes a participant with all required keys for the system.
+     *
+     * @param {String} handle
+     *     User handle of the new participant.
+     * @param {Boolean} [rsaKey]
+     *     If `true` a (constant) RSA key will be used, and no x25519 key pair
+     *     generated (default: false).
+     */
+    var _makeParticipant = function(handle, rsaKey) {
         if (!window._keyPairs) {
             window._keyPairs = {};
         }
@@ -44,26 +85,35 @@ describe("chat.strongvelope workflow test", function() {
         var signKeyPair;
         if (!_keyPairs[handle]) {
             _keyPairs[handle] = {};
-            dhKeyPair = nacl.box.keyPair();
-            _keyPairs[handle]['Cu25519'] = dhKeyPair;
             signKeyPair = nacl.sign.keyPair();
             _keyPairs[handle]['Ed25519'] = signKeyPair;
+            if (!rsaKey) {
+                dhKeyPair = nacl.box.keyPair();
+                _keyPairs[handle]['Cu25519'] = dhKeyPair;
+            }
         }
         else {
-            dhKeyPair = _keyPairs[handle]['Cu25519'];
             signKeyPair = _keyPairs[handle]['Ed25519'];
+            dhKeyPair = _keyPairs[handle]['Cu25519'];
         }
-        var dhSecretKey = asmCrypto.bytes_to_string(dhKeyPair.secretKey);
-        var dhPublicKey = asmCrypto.bytes_to_string(dhKeyPair.publicKey);
         var signSecretKey = asmCrypto.bytes_to_string(signKeyPair.secretKey).substring(0, 32);
         var signPublicKey = asmCrypto.bytes_to_string(signKeyPair.publicKey);
+        var dhSecretKey;
+        var dhPublicKey;
+        if (!rsaKey) {
+            dhSecretKey = asmCrypto.bytes_to_string(dhKeyPair.secretKey);
+            dhPublicKey = asmCrypto.bytes_to_string(dhKeyPair.publicKey);
+        }
 
         var participant = new strongvelope.ProtocolHandler(handle,
                                                            dhSecretKey,
                                                            signSecretKey,
                                                            signPublicKey);
-        pubCu25519[handle] = dhPublicKey;
         pubEd25519[handle] = signPublicKey;
+        pubCu25519[handle] = dhPublicKey;
+        if (rsaKey) {
+            u_pubkeys[handle] = RSA_PUB_KEY;
+        }
 
         return participant;
     };
@@ -78,10 +128,6 @@ describe("chat.strongvelope workflow test", function() {
 
     describe('1-on-1 chat', function() {
         it("normal operation", function() {
-            var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
-                         "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
-                         'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
-
             sandbox.stub(window, 'pubCu25519', {});
             sandbox.stub(window, 'pubEd25519', {});
 
@@ -103,8 +149,8 @@ describe("chat.strongvelope workflow test", function() {
             var messagesProcessedAlice = 0;
 
             while (messagesProcessedAlice < 50) {
-                for (var i = 0; i < tests.length; i++) {
-                    message = tests[i];
+                for (var i = 0; i < TEST_MESSAGES.length; i++) {
+                    message = TEST_MESSAGES[i];
 
                     // Alice encrypts a message to send to Bob.
                     sent = alice.encryptTo(message, 'bob45678900');
@@ -249,7 +295,7 @@ describe("chat.strongvelope workflow test", function() {
 
             // Charlie sends to the group.
             sender = 'charlie8900';
-            message = 'Howdy partmers!';
+            message = 'Howdy partners!';
             sent = participants[sender].encryptTo(message);
             _checkReceivers(sent, sender, message,
                             participants, activeParticipants);
@@ -276,15 +322,31 @@ describe("chat.strongvelope workflow test", function() {
 
             // Chatty Charlie sends to the group.
             sender = 'charlie8900';
-            var messages = ['42', "Don't panic!", 'Flying Spaghetti Monster',
-                            "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
-                            'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
-            for (var i = 0; i < messages.length; i++) {
-                message = messages[i];
+            for (var i = 0; i < TEST_MESSAGES.length; i++) {
+                message = TEST_MESSAGES[i];
                 sent = participants[sender].encryptTo(message);
                 _checkReceivers(sent, sender, message,
                                 participants, activeParticipants);
             }
+
+            // Delayed Dave (who doesn't have chat keys, yet) is added.
+            // Note: Dave will not respond, but only read new messages.
+            participants['dave5678900'] = _makeParticipant('dave5678900', true);
+            participants['dave5678900'].updateSenderKey();
+            sandbox.stub(window, 'u_privk', RSA_PRIV_KEY);
+            sender = 'alice678900';
+            message = 'Long time no see, Dave.';
+            sent = participants[sender].alterParticipants(['dave5678900'], [], message);
+            activeParticipants.add('dave5678900');
+            _checkReceivers(sent, sender, message,
+                            participants, activeParticipants);
+
+            // Bob sends to the group.
+            sender = 'bob45678900';
+            message = 'Welcome back, mate.';
+            sent = participants[sender].encryptTo(message);
+            _checkReceivers(sent, sender, message,
+                            participants, activeParticipants);
         });
     });
 });

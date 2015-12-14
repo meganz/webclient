@@ -454,7 +454,7 @@ var strongvelope = {};
      *     Contains all message content decoded from binary transport format.
      *     Returns `false` in case of errors.
      */
-    strongvelope._parseMessageContent = function(binaryMessage) {
+    strongvelope._parseMessageContent = function(binaryMessage) { // jshint maxcomplexity: 13
 
         var parsedContent = {
             recipients: [], keys: [], keyIds: [],
@@ -1389,7 +1389,7 @@ var strongvelope = {};
      *     The message content on success, `false` in case of errors.
      */
     strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
-            sender, historicMessage) {
+            sender, historicMessage) { // jshint maxcomplexity: 11
 
         var self = this;
 
@@ -1554,7 +1554,8 @@ var strongvelope = {};
      *     sent (e.g. on an error).
      */
     strongvelope.ProtocolHandler.prototype.alterParticipants = function(
-            includeParticipants, excludeParticipants, message) {
+            includeParticipants, excludeParticipants, message) { // jshint maxcomplexity: 12
+
 
         var errorOut = false;
 
@@ -1584,6 +1585,7 @@ var strongvelope = {};
         }
 
         // Some sanity checking on existing participants to exclude.
+        // jshint -W004
         for (var i = 0; i < excludeParticipants.length; i++) {
             if (excludeParticipants[i] === this.ownHandle) {
                 logger.warn('Cannot exclude myself from a chat.');
@@ -1597,6 +1599,7 @@ var strongvelope = {};
                 this.excludeParticipants.add(excludeParticipants[i]);
             }
         }
+        // jshint +W004
 
         if (errorOut) {
             return false;

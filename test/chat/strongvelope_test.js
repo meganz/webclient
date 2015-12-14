@@ -509,6 +509,7 @@ describe("chat.strongvelope unit test", function() {
                 var result;
                 var message;
 
+                // jshint loopfunc: true
                 for (i = 0; i < history.length; i++) {
                     handler = new ns.ProtocolHandler('me3456789xw',
                         CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
@@ -520,6 +521,7 @@ describe("chat.strongvelope unit test", function() {
                     assert.deepEqual(result.parsedMessage, message);
                     assert.deepEqual(result.senderKeys, compareKeys[i]);
                 }
+                // jshint loopfunc: false
             });
 
             it("bad signature", function() {

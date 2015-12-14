@@ -16,6 +16,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > In our code special UTF-8 characters are removed for better SHA-256 hashing performance so a few comments were changed:
 > 1) Find and replace the special character '—' with a regular hyphen '-'.
 > 2) Find and replace the special character '²' with '^2'.
+> 3) Find and replace the special character '×' with 'x'.
 > ```
 
 ---

@@ -11402,5 +11402,17 @@
     "7972": {
         "text": "If you do not have the key, contact the creator of the link.",
         "context": "An instruction message on the Enter Decryption Key dialog. This tells the user to ask the creator of the public file link to get the decryption key if they do not have it already."
+    },
+    "7973": {
+        "text": "slower browser download",
+        "context": "Part of download button label. Full text is: Continue slower browser download. Please make it as short as possible."
+    },
+    "7975": {
+        "text": "anyway",
+        "context": "Part of download button label. Full text is: Continue anyway. Please make it as short as possible."
+    },
+    "7976": {
+        "text": "We strongly suggest using our sync client for vastly improved performance[BR] downloading large files. [A]Get MEGAsync now[\/A].",
+        "context": "Message recommending users use the sync client to download large files.\r\nPlease keep linkebreak and link tags as it is:\r\n\r\n[BR], [A], [\/A]"
     }
 }

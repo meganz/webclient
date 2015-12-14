@@ -464,7 +464,7 @@ var ConversationMessage = React.createClass({
                 }
                 textMessage = tmpMsg;
                 textMessage = textMessage
-                    .replace("[[ ", "<span className=\"grey-color\">")
+                    .replace("[[ ", "<span class=\"grey-color\">")
                     .replace("]]", "</span>");
             }
             else {

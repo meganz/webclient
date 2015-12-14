@@ -11,13 +11,12 @@ var megasync = (function() {
     var listeners = [];
     var pending;
 
-    /** 
+    /**
      * Internal function
-     * 
+     *
      * Booting processing is done and we are ready,
      * notify our listeners about this event.
-     * 
-     * @return {void}
+     *
      */
     function ready() {
 
@@ -62,7 +61,6 @@ var megasync = (function() {
      * The are many Linux distributions, this function
      * creates an HTML dropdown with the list of distros we support.
      *
-     * @return {void}
      */
     function linuxDropdown() {
 
@@ -164,7 +162,7 @@ var megasync = (function() {
 
         retryTimer = setInterval(function() {
 
-            // The user closed our modal, so we stop checking if the 
+            // The user closed our modal, so we stop checking if the
             // user has MEGASync running
             if ($('.megasync-overlay:visible').length === 0) {
                 lastDownload = null;
@@ -172,7 +170,7 @@ var megasync = (function() {
             }
             SyncAPI({a: "v"});
         }, 1000);
-            
+
         $overlay.show().addClass('downloading');
 
         $('.megasync-close').rebind('click', function(e) {
@@ -180,7 +178,7 @@ var megasync = (function() {
         });
 
         $('body').bind('keyup', function(e) {
-            if (e.keyCode == 27) {
+            if (e.keyCode === 27) {
                 $('.megasync-overlay').hide();
             }
         });
@@ -250,7 +248,7 @@ var megasync = (function() {
 
     /**
      * Exposes an interface where external sections
-     * can subscribe to our `onready` event. 
+     * can subscribe to our `onready` event.
      * This method queue a callback function or executes
      * immediatly if we are already `ready`.
      */
@@ -270,7 +268,7 @@ var megasync = (function() {
     };
 
     /**
-     * Return the most likely Sync Client URL 
+     * Return the most likely Sync Client URL
      * for the current client. This method check the user's
      * Operating System and return the candidates URL.
      *
@@ -284,7 +282,7 @@ var megasync = (function() {
                 os = "mac";
             } else if (pf.indexOf('LINUX') >= 0) {
                 return '';
-            } else  {
+            } else {
                 os = "windows";
             }
         }
@@ -297,7 +295,7 @@ var megasync = (function() {
      *
      * @param {String} pubKey      Public Key (of the file)
      * @param {String} privKey     Private Key of the file
-     * 
+     *
      * @return {Boolean} Always return true
      */
     ns.download = function(pubKey, privKey) {

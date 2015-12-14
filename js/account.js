@@ -199,7 +199,7 @@ function u_logout(logout) {
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
         localStorage.removeItem('agreedToCopyrightWarning');
-        
+
         if (mDBact) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];
@@ -324,7 +324,7 @@ function setpwset(confstring, ctx) {
  *  @param string|AES   password
  *  @param array        encrypted private key (optional)
  *  @param array        private key (optional)
- *  
+ *
  *
  *  @return bool
  */
@@ -563,19 +563,19 @@ function generateAvatarMeta(user_hash) {
 /**
  * Retrieves a user attribute.
  *
- * @param userhandle {string}
+ * @param userhandle {String}
  *     Mega's internal user handle.
- * @param attribute {string}
+ * @param attribute {String}
  *     Name of the attribute.
- * @param pub {bool}
+ * @param pub {Boolean}
  *     True for public attributes (default: true).
- * @param nonHistoric {bool}
+ * @param nonHistoric {Boolean}
  *     True for non-historic attributes (default: false).  Non-historic
  *     attributes will overwrite the value, and not retain previous
  *     values on the API server.
- * @param callback {function}
+ * @param callback {Function}
  *     Callback function to call upon completion (default: none).
- * @param ctx {object}
+ * @param ctx {Object}
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
  * @return {MegaPromise}
@@ -590,8 +590,9 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     var myCtx = ctx || {};
 
     // Assemble property name on Mega API.
+    pub = (pub === false) ? false : true;
     var attributePrefix = '';
-    if (pub === true || pub === undefined) {
+    if (pub === true) {
         attributePrefix = '+';
     }
     else {
@@ -612,17 +613,23 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                 try {
                     var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
                                                                u_k);
-                    res = tlvstore.tlvRecordsToContainer(clearContainer);
+                    res = tlvstore.tlvRecordsToContainer(clearContainer, true);
+
+                    if (res === false) {
+                        res = EINTERNAL;
+                    }
                 }
                 catch (e) {
                     if (e.name === 'SecurityError') {
                         logger.error('Could not decrypt private user attribute '
                                      + attribute + ': ' + e.message);
-                        res = EINTERNAL;
                     }
                     else {
-                        throw e;
+                        logger.error('Unexpected exception!', e);
+                        setTimeout(function() { throw e; }, 4);
+                        debugger;
                     }
+                    res = EINTERNAL;
                 }
             }
         }
@@ -630,8 +637,9 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
         // Another conditional, the result value may have been changed.
         if (typeof res !== 'number') {
             thePromise.resolve(res);
+            var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
             logger.info('Attribute "' + attribute + '" for user "'
-                        + userhandle + '" is ' + JSON.stringify(res) + '.');
+                        + userhandle + '" is ' + loggerValueOutput + '.');
         }
         else {
             // Got back an error (a number).
@@ -684,7 +692,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
  * @param mode {integer}
- *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
+ *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_GCM_12_16).
  * @return {MegaPromise}
  *     A promise that is resolved when the original asynch code is settled.
  *     Can be used to use promises instead of callbacks for asynchronous

@@ -1,16 +1,14 @@
-var popunda = popunda || {};
-
-/** 
+/**
  *  Used to initialise and trigger popunder functionality on the site.
  */
-popunda.megaPopunder = {
-    
+mega.popunda = {
+
     popurls: [""],
     popTimes: 1,
     popIndex: 0,
-    
+
     // Cookies prevent multiple popunders within short periods of time
-    cookieTime:30,
+    cookieTime: 30,
     cookieName: "megapopobjx1",
 
     // To stop multiple popunders in a row
@@ -24,48 +22,42 @@ popunda.megaPopunder = {
 
     /**
      *  Initialises the popunder to launch on a click
-     *  @param {jquery element} button The element to trigger click events from
+     *  @param {JQuery} button The element to trigger click events from
      */
     init: function(button) {
-        if (typeof (button) === 'undefined' || button == null) return;
+        if (typeof(button) === 'undefined' || button === null) {
+            return;
+        }
         this.$button = button;
-
-        var parent = this;
-        popIndex = parseInt(this.getCookie());
-
-        (function () {
-            var addEvent = function (element, event, fn) {
-                if (element.addEventListener)
-                    element.addEventListener(event, fn, false);
-                else if (element.attachEvent)
-                    element.attachEvent("on" + event, fn)
-            };
-            addEvent(window, "load", parent.setupPopunder(parent.popurls[parent.popIndex]) );
-        })();
+        this.popIndex = parseInt(this.getCookie()) | 0;
+        this.setupPopunder(this.popurls[this.popIndex]);
     },
-    
+
     /**
      *  Is flash available?
      */
     hasFlash: function() {
-        return !(!navigator.mimeTypes["application/x-shockwave-flash"]);
+        return Boolean(navigator.mimeTypes["application/x-shockwave-flash"]);
     },
 
     /**
-     *  Set up an object that flags which browser is available, as different behaviour needs to trigger depending on the browser
+     *  Set up an object that flags which browser is available,
+     *  as different behaviour needs to trigger depending on the browser.
      */
     getBrowser: function() {
-        var n = navigator.userAgent.toLowerCase();
+        var ua = navigator.userAgent.toLowerCase();
         var b = {
-            webkit: /webkit/.test(n),
-            mozilla: (/mozilla/.test(n)) && (!/(compatible|webkit)/.test(n)),
-            chrome: /chrome/.test(n),
-            msie: (/msie/.test(n)) && (!/opera/.test(n)),
-            firefox: /firefox/.test(n),
-            safari: (/safari/.test(n) && !(/chrome/.test(n))),
-            opera: /opera/.test(n)
+            webkit: /webkit/.test(ua),
+            mozilla: (/mozilla/.test(ua)) && (!/(compatible|webkit)/.test(ua)),
+            chrome: /chrome/.test(ua),
+            msie: (/msie/.test(ua)) && (!/opera/.test(ua)),
+            firefox: /firefox/.test(ua),
+            safari: (/safari/.test(ua) && !(/chrome/.test(ua))),
+            opera: /opera/.test(ua)
         };
-        b.version = (b.safari) ? (n.match(/.+(?:ri)[\/: ]([\d.]+)/) || [])[1] : (n.match(/.+(?:ox|me|ra|ie)[\/: ]([\d.]+)/) || [])[1];
+        b.version = (b.safari)
+            ? (ua.match(/.+(?:ri)[\/: ]([\d.]+)/) || [])[1]
+            : (ua.match(/.+(?:ox|me|ra|ie)[\/: ]([\d.]+)/) || [])[1];
         b.opera = (navigator.userAgent.match(/Opera|OPR\//) ? true : false);
         return b;
     },
@@ -75,51 +67,57 @@ popunda.megaPopunder = {
      *  @param {integer} cvalue The cookie value
      */
     setCookie: function(cvalue) {
-        var extime  = this.cookieTime;
+        var extime = this.cookieTime;
         var cname = this.cookieName;
         var d = new Date();
-        d.setTime(d.getTime() + (extime*1000));
-        var expires = "expires="+d.toUTCString();
+        d.setTime(d.getTime() + (extime * 1000));
+        var expires = "expires=" + d.toUTCString();
         document.cookie = cname + "=" + cvalue + "; " + expires;
     },
 
     /**
-     *  Get the popunder specific cookie 
+     *  Get the popunder specific cookie
      */
     getCookie: function() {
         var name = this.cookieName + "=";
         var ca = document.cookie.split(';');
-        for(var i=0; i<ca.length; i++) {
+        for (var i = 0; i < ca.length; i++) {
             var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1);
-            if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
         }
         return "";
     },
 
     /**
      *  Bind the event to the entire page
-     *  @param {function} handler The handler function to bind to the document click
+     *  @param {Function} handler The handler function to bind to the document click
      */
-    bindOnDocumentClick: function(handler) {    
+    bindOnDocumentClick: function(handler) {
         var topWindow = self;
-        if (top != self) {
+        if (top !== self) {
             try {
-                if (top.document.location.toString())
+                if (top.document.location.toString()) {
                     topWindow = top;
-            } catch (err) {
+                }
             }
+            catch (err) {}
         }
         if (topWindow.document.addEventListener) {
             topWindow.document.addEventListener("click", handler, false);
-        } else {
+        }
+        else {
             topWindow.document.attachEvent("onclick", handler);
         }
     },
 
     /**
      *  Bind the event to just the button object
-     *  @param {function} handler The handler function to bind to the button click
+     *  @param {Function} handler The handler function to bind to the button click
      */
     bindOnButtonClick: function(handler) {
         this.$button.click(handler);
@@ -130,7 +128,7 @@ popunda.megaPopunder = {
      *  We do not have the ability to do a standard popunder, so we fall back to a sad popup
      */
     triggerAlternatePopunder: function(sUrl) {
-        if (this.block == 0 && this.popIndex < this.popTimes && navigator.cookieEnabled) {
+        if (this.block === 0 && this.popIndex < this.popTimes && navigator.cookieEnabled) {
             this.block = 1;
             this.setCookie(this.popIndex + 1);
             // We have to do a popup in this situation or it screws with the download functionality
@@ -142,38 +140,42 @@ popunda.megaPopunder = {
      *  Sets up the event to launch the window upon a click
      */
     setupPopunder: function(sUrl, sConfig) {
-        if (sUrl.length===0) return;
+        /* jshint -W074 */
+        if (!sUrl || !sUrl.length) {
+            return;
+        }
 
-        sConfig      = (sConfig || {});
-        var sName    = (sConfig.name   || Math.floor((Math.random() * 1000) + 1));
-        var sWidth   = (sConfig.width  || window.outerWidth  || window.innerWidth);
-        var sHeight  = (sConfig.height || (window.outerHeight-100) || window.innerHeight);
+        sConfig = (sConfig || {});
+        var sName = (sConfig.name || Math.floor((Math.random() * 1000) + 1));
+        var sWidth = (sConfig.width || window.outerWidth || window.innerWidth);
+        var sHeight = (sConfig.height || (window.outerHeight - 100) || window.innerHeight);
 
-        var sPosX    = (typeof(sConfig.left) != 'undefined') ? sConfig.left.toString() : window.screenX;
-        var sPosY    = (typeof(sConfig.top)  != 'undefined') ? sConfig.top.toString()  : window.screenY;
+        var sPosX = (typeof(sConfig.left) !== 'undefined') ? sConfig.left.toString() : window.screenX;
+        var sPosY = (typeof(sConfig.top) !== 'undefined') ? sConfig.top.toString() : window.screenY;
 
-        var sOptions = 'toolbar=no,scrollbars=yes,location=yes,statusbar=yes,menubar=no,resizable=1,width=' + sWidth.toString() + ',height=' + sHeight.toString() + ',screenX=' + sPosX + ',screenY=' + sPosY;
+        var sOptions = 'toolbar=no,scrollbars=yes,location=yes,statusbar=yes,menubar=no,resizable=1,width='
+            + sWidth.toString() + ',height=' + sHeight.toString() + ',screenX=' + sPosX + ',screenY=' + sPosY;
 
         var parent = this;
-        var parentWindow  = (top != self && typeof(top.document.location.toString()) === 'string') ? top : self;
+        var parentWindow = (top !== self && typeof(top.document.location.toString()) === 'string') ? top : self;
 
         var listenerEvent = function(e) {
-            if (parent.stopListening==false) return;
+            if (parent.stopListening === false) {
+                return;
+            }
             parent.stopListening = false;
 
-            if (parent.block == 0 && parent.popIndex < parent.popTimes && navigator.cookieEnabled)
-            {
-                if(/*(!parent.getBrowser().webkit || parent.hasFlash()) && */!parent.getBrowser().opera) {
+            if (parent.block === 0 && parent.popIndex < parent.popTimes && navigator.cookieEnabled) {
+                if (!parent.getBrowser().opera) {
                     if (document.readyState === "complete") {
                         parent.popunder = parentWindow.window.open(sUrl, sName, sOptions);
-                        if (parent.popunder)
-                        {
-                            parent.setCookie(popIndex + 1);
+                        if (parent.popunder) {
+                            parent.setCookie(parent.popIndex + 1);
                             parent.triggerSpecialBehaviour();
                         }
                     }
                 }
-                else {     
+                else {
                     parent.triggerAlternatePopunder(sUrl);
                     return false;
                 }
@@ -197,11 +199,20 @@ popunda.megaPopunder = {
             window.self.window.focus();
             window.focus();
 
-            if (browser.chrome) this.doChromePopunder();
-            if (browser.firefox) this.openCloseWindow();
-            if (browser.webkit) this.openCloseTab();
-            if (browser.msie) this.doMsiePopunder();
-        } catch (e) {}
+            if (browser.chrome) {
+                this.doChromePopunder();
+            }
+            if (browser.firefox) {
+                this.openCloseWindow();
+            }
+            if (browser.webkit) {
+                this.openCloseTab();
+            }
+            if (browser.msie) {
+                this.doMsiePopunder();
+            }
+        }
+        catch (e) {}
     },
 
     /**
@@ -219,15 +230,15 @@ popunda.megaPopunder = {
     /**
      *  Specific code for chrome
      */
-    doChromePopunder: function()
-    {
+    doChromePopunder: function() {
+        /* jshint -W107 */
         var fakeLink = document.createElement('A');
         fakeLink.id = 'inffake';
         document.body.appendChild(fakeLink);
         fakeLink.href = "javascript:alert('o')";
         var e = document.createEvent("MouseEvents");
         e.initMouseEvent("click", false, true, window, 0, 0, 0, 0, 0, false, false, true, false, 0, null);
-        setTimeout(function () {
+        setTimeout(function() {
             window.getSelection().empty();
         }, 250);
     },
@@ -247,7 +258,7 @@ popunda.megaPopunder = {
     openCloseTab: function() {
         var nothing = '';
         var ghost = document.createElement("a");
-        ghost.href   = "data:text/html,<scr"+nothing+"ipt>window.close();</scr"+nothing+"ipt>";
+        ghost.href = "data:text/html,<scr" + nothing + "ipt>window.close();</scr" + nothing + "ipt>";
         document.getElementsByTagName("body")[0].appendChild(ghost);
 
         var clk = document.createEvent("MouseEvents");

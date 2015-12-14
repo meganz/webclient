@@ -17,9 +17,6 @@ var JScrollPane = React.createClass({
 
         this.setWidthHeightIfEmpty();
 
-        var $jspContainerReact = $elem.find('.jspContainer');
-        var $jspPaneReact = $elem.find('.jspPane');
-
         $elem.find('.jspContainer').replaceWith(
             function() {
                 return $elem.find('.jspPane').children();
@@ -37,16 +34,12 @@ var JScrollPane = React.createClass({
 
         $elem.jScrollPane(options);
 
-        //$elem.find('.jspContainer').attr('data-reactid', $jspContainerReact.data('reactid'));
-        //$elem.find('.jspPane').attr('data-reactid', $jspPaneReact.data('reactid'));
-
-
-        window.addEventListener('resize', this.onResize);
+        $(window).rebind('resize.jsp' + this.megaInstanceId, this.onResize);
 
         this.onResize();
     },
     componentWillUnmount: function() {
-        window.removeEventListener('resize', this.onResize);
+        $(window).unbind('resize.jsp' + this.megaInstanceId);
     },
     setWidthHeightIfEmpty: function() {
         var $elem = $(ReactDOM.findDOMNode(this));
@@ -58,6 +51,7 @@ var JScrollPane = React.createClass({
         }
     },
     onResize: function() {
+        console.error("hm????!");
         var $elem = $(ReactDOM.findDOMNode(this));
         this.setWidthHeightIfEmpty();
 

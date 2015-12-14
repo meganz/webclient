@@ -1997,6 +1997,8 @@ ChatRoom.prototype.attachNodes = function(ids, message) {
                         'h': nodeId,
                         's': node.s,
                         't': node.t,
+                        'mtime': node.mtime,
+                        'hash': node.hash,
                         'sharedWith': users
                     };
                 } else {

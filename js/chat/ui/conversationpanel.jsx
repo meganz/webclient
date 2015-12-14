@@ -265,7 +265,7 @@ var ConversationMessage = React.createClass({
                             chatRoom._attachmentsMap[v.h][message.messageId] = false;
                         }
                         var addToCloudDrive = function() {
-                            M.injectNodes([v], M.RootID, false, function(res) {
+                            M.injectNodes(v, M.RootID, false, function(res) {
                                 if (res === 0) {
                                     msgDialog(
                                         'info',

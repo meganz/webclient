@@ -1562,13 +1562,29 @@ function dec_attr(attr, key) {
     }
 }
 
+/**
+ * Converts a Unicode string to a UTF-8 cleanly encoded string.
+ *
+ * @param {String} unicode
+ *     Browser's native string encoding.
+ * @return {String}
+ *     UTF-8 encoded string (8-bit characters only).
+ */
 var to8 = firefox_boost ? mozTo8 : function (unicode) {
     return unescape(encodeURIComponent(unicode));
-}
+};
 
+/**
+ * Converts a UTF-8 encoded string to a Unicode string.
+ *
+ * @param {String} utf8
+ *     UTF-8 encoded string (8-bit characters only).
+ * @return {String}
+ *     Browser's native string encoding.
+ */
 var from8 = firefox_boost ? mozFrom8 : function (utf8) {
     return decodeURIComponent(escape(utf8));
-}
+};
 
 function getxhr() {
     return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined')

@@ -2582,7 +2582,7 @@
     "7532": "Il contatto non dispone di una e-mail",
     "7533": "Uscito dalla cartella!",
     "7534": "Solo lettura",
-    "7535": "Opzioni di Sicurezz",
+    "7535": "Opzioni di Sicurezza",
     "7536": "Non hai un account e-mail configurato sul dispositivo",
     "7537": "Opzioni",
     "7538": "Quando abilitato vengono caricate nuove foto e video.",
@@ -2849,5 +2849,8 @@
     "7947": "Link without key",
     "7948": "Link with key",
     "7971": "Decryption key",
-    "7972": "If you do not have the key, contact the creator of the link."
+    "7972": "If you do not have the key, contact the creator of the link.",
+    "7973": "slower browser download",
+    "7975": "anyway",
+    "7976": "We strongly suggest using our sync client for vastly improved performance[BR] downloading large files. [A]Get MEGAsync now[\/A]."
 }

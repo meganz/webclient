@@ -2849,5 +2849,8 @@
     "7947": "Link without key",
     "7948": "Link with key",
     "7971": "Decryption key",
-    "7972": "If you do not have the key, contact the creator of the link."
+    "7972": "If you do not have the key, contact the creator of the link.",
+    "7973": "\u901f\u5ea6\u6162\u7684\u6d4f\u89c8\u5668\u4e0b\u8f7d",
+    "7975": "anyway",
+    "7976": "We strongly suggest using our sync client for vastly improved performance[BR] downloading large files. [A]Get MEGAsync now[\/A]."
 }

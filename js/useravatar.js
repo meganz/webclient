@@ -35,12 +35,15 @@ var useravatar = (function() {
     function registerCssColors() {
         
         var css = '';
+        var color = '';
         
         for (var i in _colors) {
             if (!_colors.hasOwnProperty(i)) {
                 continue;
             }
-            css += '.color' + (parseInt(i) + 1) + ' { background-color: '
+            color = '.color' + (parseInt(i) + 1);
+            css += color + ', .nw-contact-avatar' + color + ', .contacts-avatar' + color 
+                + ', .avatar' + color + ' { background-color: '
                 + _colors[i] + '; }';
         }
         
@@ -61,7 +64,7 @@ var useravatar = (function() {
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
 
-        $template = window.btoa(unescape(encodeURIComponent($template.html())));
+        $template = window.btoa(to8($template.html()));
         
         return 'data:image/svg+xml;base64,' + $template;
     };

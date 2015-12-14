@@ -1514,9 +1514,6 @@ a.blog-button:hover {
 .nw-fm-left-icon.conversations:hover .new-messages-indicator {
 	border-color: #288ab7;
 }
-.nw-fm-left-icon.conversations.active .new-messages-indicator {
-	border-color: rgba(43,166,222,1);
-}
 .top-chat-notification .notification-num {
 	background-color: #2BA6DE;
 }
@@ -4343,7 +4340,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	background-color: white;
 	position: relative;
 	display: block;
-	font-size: 19px;
+	font-size: 24px;
 	line-height: 31px;
 	color: white;
 	text-align: center;

@@ -578,15 +578,19 @@ var ConversationRightArea = React.createClass({
 
 
         var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                            room.startAudioCall();
+                            if (contact.presence && contact.presence !== "offline") {
+                                room.startAudioCall();
+                            }
                         }}>
             <i className="small-icon audio-call"></i>
             {__("Start Audio Call")}
         </div>;
 
         var startVideoCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+                        if (contact.presence && contact.presence !== "offline") {
                             room.startVideoCall();
-                        }}>
+                        }
+                    }}>
             <i className="small-icon video-call"></i>
             {__("Start Video Call")}
         </div>;

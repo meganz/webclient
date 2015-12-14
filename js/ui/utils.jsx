@@ -34,12 +34,12 @@ var JScrollPane = React.createClass({
 
         $elem.jScrollPane(options);
 
-        $(window).rebind('resize.jsp' + this.megaInstanceId, this.onResize);
+        $(window).rebind('resize.jsp' + this.getUniqueId(), this.onResize);
 
         this.onResize();
     },
     componentWillUnmount: function() {
-        $(window).unbind('resize.jsp' + this.megaInstanceId);
+        $(window).unbind('resize.jsp' + this.getUniqueId());
     },
     setWidthHeightIfEmpty: function() {
         var $elem = $(ReactDOM.findDOMNode(this));

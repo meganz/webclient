@@ -107,6 +107,8 @@ var ContactCard = React.createClass({
             </ButtonsUI.Button>;
         }
 
+        //console.error(contact.h, pres);
+
         return <div
                     className={
                         "contacts-info body " +

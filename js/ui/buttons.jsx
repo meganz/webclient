@@ -23,7 +23,7 @@ var Button = React.createClass({
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
             document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
-            $(document).rebind('keyup.button' + self.megaInstanceId, function(e) {
+            $(document).rebind('keyup.button' + self.getUniqueId(), function(e) {
                 if (e.keyCode == 27) { // escape key maps to keycode `27`
                     self.onBlur();
                 }
@@ -57,7 +57,7 @@ var Button = React.createClass({
             (!e || !$(e.target).parents(".button").is($element))
         ) {
             this.setState({focused: false});
-            $(document).unbind('keyup.button' + this.megaInstanceId);
+            $(document).unbind('keyup.button' + this.getUniqueId());
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         }
 

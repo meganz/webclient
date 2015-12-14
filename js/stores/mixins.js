@@ -31,33 +31,44 @@ var _propertyTrackChangesVars = {
     _dataChangedHistory: {},
     _listenersMap: {}
 };
-window._propertyTrackChangesVars = _propertyTrackChangesVars;
 
-var instanceId = 0;
+if (window._propertyTrackChangesVars) {
+    _propertyTrackChangesVars = window._propertyTrackChangesVars;
+}
+else {
+    window._propertyTrackChangesVars = _propertyTrackChangesVars;
+}
+
+window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
 
 var MegaRenderMixin = {
     //inViewport: false,
+    getReactId: function() {
+        return this._reactInternalInstance._rootNodeID;
+    },
+    getUniqueId: function() {
+        return this.getReactId().replace(".", "_");
+    },
     componentDidMount: function() {
-        this.megaInstanceId = instanceId++;
 
         window.addEventListener('resize', this.onResizeDoUpdate);
         window.addEventListener('hashchange', this.onHashChangeDoUpdate);
 
         // init on data structure change events
-        if(this.props) {
+        if (this.props) {
             this._recurseAddListenersIfNeeded("p", this.props);
         }
 
-        if(this.state) {
+        if (this.state) {
             this._recurseAddListenersIfNeeded("s", this.state);
         }
 
         //$(window).rebind(
-        //    'DOMContentLoaded.lazyRenderer' + this.megaInstanceId + ' ' +
-        //    'load.lazyRenderer' + this.megaInstanceId + ' ' +
-        //    'resize.lazyRenderer' + this.megaInstanceId + ' ' +
-        //    'hashchange.lazyRenderer' + this.megaInstanceId + ' ' +
-        //    'scroll.lazyRenderer' + this.megaInstanceId,
+        //    'DOMContentLoaded.lazyRenderer' + this.getUniqueId() + ' ' +
+        //    'load.lazyRenderer' + this.getUniqueId() + ' ' +
+        //    'resize.lazyRenderer' + this.getUniqueId() + ' ' +
+        //    'hashchange.lazyRenderer' + this.getUniqueId() + ' ' +
+        //    'scroll.lazyRenderer' + this.getUniqueId(),
         //    this.requiresLazyRendering
         //);
         //
@@ -70,11 +81,11 @@ var MegaRenderMixin = {
         window.removeEventListener('resize', this.onResizeDoUpdate);
         window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
 
-        //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.megaInstanceId);
-        //$(window).unbind('load.lazyRenderer' + this.megaInstanceId);
-        //$(window).unbind('resize.lazyRenderer' + this.megaInstanceId);
-        //$(window).unbind('hashchange.lazyRenderer' + this.megaInstanceId);
-        //$(window).unbind('scroll.lazyRenderer' + this.megaInstanceId);
+        //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.getUniqueId());
+        //$(window).unbind('load.lazyRenderer' + this.getUniqueId());
+        //$(window).unbind('resize.lazyRenderer' + this.getUniqueId());
+        //$(window).unbind('hashchange.lazyRenderer' + this.getUniqueId());
+        //$(window).unbind('scroll.lazyRenderer' + this.getUniqueId());
     },
     onResizeDoUpdate: function() {
         if(!this.isMounted() || this._pendingForceUpdate === true) {
@@ -96,7 +107,7 @@ var MegaRenderMixin = {
 
 
         if(typeof(map._dataChangeIndex) !== "undefined") {
-            var cacheKey = "" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
+            var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
             if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
                 _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
                     self.onPropOrStateUpdated(map, idx);
@@ -130,7 +141,7 @@ var MegaRenderMixin = {
         }
 
         if(typeof(v._dataChangeIndex) !== "undefined") {
-            var cacheKey = "" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
+            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
 
             if(dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
                 if(window.RENDER_DEBUG) console.error("changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
@@ -139,7 +150,7 @@ var MegaRenderMixin = {
             } else {
                 //console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
             }
-        } else if(typeof v === "object" && v !== null && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+        } else if(typeof v === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
             if(self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
                 foundChanges = true;
             } else {
@@ -188,10 +199,11 @@ var MegaRenderMixin = {
 
         var foundChanges = false;
         mapKeys.forEach(function(k) {
+            foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
+
             if(foundChanges === true) {
                 return false; // break
             }
-            foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
         });
         return foundChanges;
     },
@@ -231,19 +243,14 @@ var MegaRenderMixin = {
 
         return shouldRerender;
     },
-    forceUpdateIfChanged: function() {
+    onPropOrStateUpdated: function() {
+        if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this, this.getElementName(), arguments);
+
         if(!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
-        if(this.shouldComponentUpdate(this.props, this.state) === true) {
-            this.forceUpdate();
-        }
-    },
-    onPropOrStateUpdated: function() {
-        if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this.getElementName(), arguments);
-
-        this.forceUpdateIfChanged();
+        this.forceUpdate();
     },
     getElementName: function() {
         return this.constructor.displayName;

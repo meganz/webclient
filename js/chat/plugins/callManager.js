@@ -111,8 +111,6 @@ CallSession.prototype.isActive = function() {
 
 CallSession.prototype.onLocalStreamReceived = function(e, eventData) {
     var self = this;
-    //$('.my-av-screen video', self.room.$header).remove();
-    //$('.localVideoWrapper', self.room.$header).append(eventData.player);
     self.localPlayer = eventData.player;
     self.localPlayer.play();
 };
@@ -869,10 +867,6 @@ CallSession.prototype.renderCallStartedState = function() {
 CallSession.prototype.renderCallEndedState = function() {
     var self = this;
 
-    $('.drag-handle', self.room.$header).hide();
-
-    self.room.$header.css('height', '');
-
     self.getCallManager().incomingCallDialog.hide();
 
 
@@ -1384,14 +1378,6 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
         var req = chatRoom.megaChat.rtc.startMediaCall(participants[0], mediaOptions);
         session = self.callSessions[req.sid] = new CallSession(chatRoom, req.sid);
 
-
-        $('.btn-chat-cancel-active-call', chatRoom.$header).bind('click.megaChat', function() {
-            if (chatRoom.callSession) {
-                if (chatRoom.callSession.isStarted() || chatRoom.callSession.isStarting()) {
-                    chatRoom.callSession.endCall();
-                }
-            }
-        });
 
 
         chatRoom._resetCallStateInCall();

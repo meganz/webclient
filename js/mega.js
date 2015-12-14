@@ -6368,6 +6368,7 @@ function process_u(u) {
         if (u.hasOwnProperty(i)) {
             if (u[i].c === 1) {
                 u[i].name = u[i].name ? u[i].name : u[i].m;
+
                 u[i].h = u[i].u;
                 u[i].t = 1;
                 u[i].p = 'contacts';

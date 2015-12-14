@@ -13,7 +13,7 @@ var ModalDialog = React.createClass({
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
-        $(document).rebind('keyup.modalDialog' + self.megaInstanceId, function(e) {
+        $(document).rebind('keyup.modalDialog' + self.getUniqueId(), function(e) {
             if (e.keyCode == 27) { // escape key maps to keycode `27`
                 self.onBlur();
             }
@@ -33,7 +33,7 @@ var ModalDialog = React.createClass({
     },
     componentWillUnmount: function() {
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-        $(document).unbind('keyup.modalDialog' + this.megaInstanceId);
+        $(document).unbind('keyup.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
     },

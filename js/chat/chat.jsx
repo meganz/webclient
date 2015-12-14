@@ -614,7 +614,7 @@ Chat.prototype.init = function() {
             else {
                 room = self.chats[meta.roomJid];
                 if (!room) {
-                    [room.$header, room.$messages].forEach(function(v, k) {
+                    [room.$messages].forEach(function(v, k) {
                         $(k).addClass("conv-start")
                             .removeClass("conv-end");
                     });

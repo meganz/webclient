@@ -52,7 +52,10 @@ var MEGA_USER_STRUCT = {
     "presence": undefined,
     "presenceMtime": undefined,
     "displayColor": undefined,
-    "shortName": undefined
+    "shortName": undefined,
+    "firstName": undefined,
+    "lastName": undefined,
+    "ts": undefined
 };
 
 function MegaData()
@@ -97,6 +100,7 @@ function MegaData()
                 return -1;
             else if (a.t < b.t)
                 return 1;
+
             return fn(a, b, d);
         });
         this.sortfn = fn;
@@ -106,7 +110,6 @@ function MegaData()
     this.sort = function()
     {
         this.sortBy(this.sortfn, this.sortd);
-        this.sortBy(this.sortfn, this.sortd);
     };
 
     this.sortReverse = function()
@@ -114,6 +117,7 @@ function MegaData()
         var d = 1;
         if (this.sortd > 0)
             d = -1;
+
         this.sortBy(this.sortfn, d);
     };
 
@@ -267,28 +271,12 @@ function MegaData()
 
     this.sortByInteraction = function(d)
     {
-        this.i_cache = {};
-        this.sortfn = function(a, b, d)
-        {
-            if (!M.i_cache[a.u])
-            {
-                var cs = M.contactstatus(a.u);
-                if (cs.ts == 0)
-                    cs.ts = -1;
-                M.i_cache[a.u] = cs.ts;
-            }
-            if (!M.i_cache[b.u])
-            {
-                var cs = M.contactstatus(b.u);
-                if (cs.ts == 0)
-                    cs.ts = -1;
-                M.i_cache[b.u] = cs.ts;
-            }
-            if (M.i_cache[b.u] < M.i_cache[a.u])
-                return -1 * d;
-            else
-                return 1 * d;
-        }
+        this.sortfn = mega.utils.sortObjFn(
+            function(r) {
+                // Since the M.sort is using a COPY of the data, we need an up-to-date .ts value directly from M.u[...]
+                return M.u[r.h].ts;
+            }, d
+        );
         this.sortd = d;
         this.sort();
     };
@@ -2391,8 +2379,8 @@ function MegaData()
         $('.fm-file-upload span').text(l[99]);
         $('.fm-folder-upload span').text(l[98]);
 
-        $('.fm-right-header.fm').removeClass('long-path');
-        if (M.pathLength() + 260 > $('.fm-right-header.fm').width()) {
+        $('.fm-right-header.fm:visible').removeClass('long-path');
+        if (M.pathLength() + 260 > $('.fm-right-header.fm:visible').width()) {
             $('.fm-right-header.fm').addClass('long-path');
             $('.fm-new-folder span').text('');
             $('.fm-file-upload span').text('');
@@ -2478,7 +2466,7 @@ function MegaData()
         if (n.p && n.p.length === 11 && !M.d[n.p]) {
             var u = this.u[n.p];
             if (u) {
-                u.name = u.m;
+                u.name = u.name ? u.name : u.m;
                 u.h = u.u;
                 u.t = 1;
                 u.p = 'contacts';
@@ -2545,7 +2533,28 @@ function MegaData()
         if (this.d[n.h] && this.d[n.h].shares) {
             n.shares = this.d[n.h].shares;
         }
+
+        // sync data objs M.u <-> M.d
+        if (n.h.length === 11) {
+            if (this.u[n.h] !== n) {
+                if (typeof(this.u[n.h]) === 'undefined') {
+                    M.addUser(n, ignoreDB);
+                }
+                var tmpNode = n;
+                n = this.u[n.h];
+                // merge changes from n->M.u[n.h]
+                Object.keys(tmpNode).forEach(function(k) {
+                    if (k === "name") {
+                        return;
+                    }
+
+                    n[k] = tmpNode[k];
+                });
+            }
+        }
+
         this.d[n.h] = n;
+
         if (typeof newnodes !== 'undefined') {
             newnodes.push(n);
         }
@@ -2894,6 +2903,41 @@ function MegaData()
                 u = this.u[userId];
             } else {
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
+
+                var self = this;
+
+                MegaPromise.allDone([
+                    getUserAttribute(userId, 'firstname', -1),
+                    getUserAttribute(userId, 'lastname', -1)
+                ]).done(function(results) {
+                    var firstName = results[0][0];
+                    var lastName = results[1][0];
+
+                    // -1, -9, -2, etc...
+                    firstName = typeof(firstName) != "string" ? false : firstName;
+                    lastName = typeof(lastName) != "string" ? false : lastName;
+
+                    firstName = firstName ? from8(base64urldecode(firstName)) : "";
+                    lastName = lastName ? from8(base64urldecode(lastName)) : "";
+                    if (firstName.length > 0 && lastName.length > 0) {
+                        self.u[userId].name = firstName + " " + lastName;
+                    }
+                    self.u[userId].firstName = firstName;
+                    self.u[userId].lastName = lastName;
+
+                    if (
+                        typeof $.sortTreePanel !== 'undefined' &&
+                        typeof $.sortTreePanel.contacts !== 'undefined' &&
+                        $.sortTreePanel.contacts.by == 'status'
+                    ) {
+                        M.contacts(); // we need to resort
+                    }
+
+                    if (window.location.hash == "#fm/" + u.u) {
+                        // re-render the contact view page if the presence had changed
+                        contactUI();
+                    }
+                });
             }
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 mDBadd('u', clone(u));
@@ -6323,7 +6367,7 @@ function process_u(u) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {
             if (u[i].c === 1) {
-                u[i].name = u[i].m;
+                u[i].name = u[i].name ? u[i].name : u[i].m;
                 u[i].h = u[i].u;
                 u[i].t = 1;
                 u[i].p = 'contacts';

@@ -569,8 +569,8 @@ var AttribCache = new IndexedDBKVStorage('attrib');
  *     Mega's internal user handle.
  * @param attribute {String}
  *     Name of the attribute.
- * @param pub {Boolean}
- *     True for public attributes (default: true).
+ * @param pub {Boolean|Number}
+ *     True for public attributes (default: true). -1 for "system" attributes (e.g. without prefix)
  * @param nonHistoric {Boolean}
  *     True for non-historic attributes (default: false).  Non-historic
  *     attributes will overwrite the value, and not retain previous
@@ -592,10 +592,13 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     var myCtx = ctx || {};
 
     // Assemble property name on Mega API.
-    pub = (pub === false) ? false : true;
+    pub = typeof(pub) === 'undefined' ? true : pub;
     var attributePrefix = '';
     if (pub === true) {
         attributePrefix = '+';
+    }
+    else if (pub === -1) {
+        attributePrefix = '';
     }
     else {
         attributePrefix = '*';
@@ -866,6 +869,9 @@ function isEphemeral() {
                     _flushLastInteractionData();
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
+
+                    M.u[u_h].ts = parseInt(v.split(":")[1], 10);
+
                     $promise.verify();
                 }
             })
@@ -879,6 +885,9 @@ function isEphemeral() {
                     _flushLastInteractionData();
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
+
+                    M.u[u_h].ts = parseInt(v.split(":")[1], 10);
+
                     $promise.verify();
                 }
                 else {
@@ -928,7 +937,6 @@ function isEphemeral() {
                 $elem.addClass('cloud-drive');
             }
             else if (r[0] === "1" && typeof(megaChat) !== 'undefined') {
-                M.u[u_h].lastChatActivity = ts;
                 var room = megaChat.getPrivateRoom(u_h);
                 if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
                     if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
@@ -987,6 +995,11 @@ function isEphemeral() {
                     .done(function (res) {
                         if (typeof(res) !== 'number') {
                             _lastUserInteractionCache = res;
+                            Object.keys(res).forEach(function(k) {
+                                // prefill in-memory M.u[...] cache!
+                                getLastInteractionWith(k);
+                            });
+
                             // recurse, and return the data from the mem cache
                             $promise.linkDoneAndFailTo(
                                 getLastInteractionWith(u_h)
@@ -1017,6 +1030,16 @@ function isEphemeral() {
             $promise.reject(false);
         }
         else if (_lastUserInteractionCache[u_h]) {
+            if (megaChat) {
+                var chatRoom = megaChat.getPrivateRoom(u_h);
+
+                if (chatRoom) {
+                    var newActivity = parseInt(_lastUserInteractionCache[u_h].split(":")[1], 10);
+                    if (newActivity > chatRoom.lastActivity) {
+                        chatRoom.lastActivity = newActivity;
+                    }
+                }
+            }
             $promise.resolve(_lastUserInteractionCache[u_h]);
         }
         else {

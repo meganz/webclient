@@ -195,7 +195,6 @@ var ConversationsList = React.createClass({
             'data-jid': ''
         };
         var callName;
-        var currentCallingHeaderClasses = "nw-conversations-header call-started";
 
         var megaChat = this.props.megaChat;
 
@@ -222,11 +221,14 @@ var ConversationsList = React.createClass({
             currentCallingContactStatusProps.className += ' hidden';
         }
 
-        if (!callName) {
-            currentCallingHeaderClasses += " hidden";
-        }
+
         var currConvsList = [];
-        this.props.chats.map((chatRoom, k) => {
+
+        var sortedConversations = obj_values(this.props.chats.toJS());
+
+        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+
+        sortedConversations.forEach((chatRoom) => {
             if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
                 return;
             }
@@ -243,8 +245,12 @@ var ConversationsList = React.createClass({
             }
 
             currConvsList.push(
-                <ConversationsListItem key={k} chatRoom={chatRoom} megaChat={megaChat} onConversationClicked={(e) => {
-                    self.conversationClicked(chatRoom, e);
+                <ConversationsListItem
+                    key={chatRoom.roomJid.split("@")[0]}
+                    chatRoom={chatRoom}
+                    megaChat={megaChat}
+                    onConversationClicked={(e) => {
+                        self.conversationClicked(chatRoom, e);
                 }} />
             );
         });
@@ -328,10 +334,6 @@ var ConversationsApp = React.createClass({
                     </div>
                 </div>
                 <div className="fm-right-files-block">
-                    <div className="fm-right-header fm hidden">
-                    </div>
-
-
                     <div className="fm-empty-messages hidden">
                     <div className="fm-empty-pad">
                         <div className="fm-empty-messages-bg"></div>

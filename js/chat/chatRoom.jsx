@@ -50,7 +50,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.roomJid = roomJid;
     this.type = type;
     this.ctime = ctime;
-    this.lastActivity = lastActivity ? lastActivity : ctime;
+    this.lastActivity = lastActivity ? lastActivity : 0;
     this.chatId = chatId;
     this.chatShard = chatShard;
     this.chatdUrl = chatdUrl;
@@ -83,9 +83,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.setState(ChatRoom.STATE.INITIALIZED);
 
     this.isCurrentlyActive = false;
-
-
-    this.$header = $('.fm-right-header[data-room-jid="' + this.roomJid.split("@")[0] + '"]');
 
     // Events
     this.bind('onStateChange', function(e, oldState, newState) {
@@ -166,8 +163,18 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
 
     // activity on a specific room (show, hidden, got new message, etc)
-    self.bind('activity', function(e) {
-        self.lastActivity = unixtime();
+    self.bind('onAfterRenderMessage', function(e, msg) {
+        var ts = msg.delay ? msg.delay : msg.ts;
+        if (!ts) {
+            return;
+        }
+
+        if (self.lastActivity && self.lastActivity > ts) {
+            // this is an old message, DON'T update the lastActivity.
+            return;
+        }
+
+        self.lastActivity = ts;
 
         if (self.type === "private") {
             var targetUserJid = self.getParticipantsExceptMe()[0];
@@ -178,29 +185,21 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             assert(M.u[targetUserNode.u], 'User not found in M.u');
 
             if (targetUserNode) {
-                M.u[targetUserNode.u].lastChatActivity = self.lastActivity;
                 setLastInteractionWith(targetUserNode.u, "1:" + self.lastActivity);
             }
         } else {
             throw new Error("Not implemented");
         }
-
-        if (M.csort === "chat-activity") {
-            // Trigger manual reorder, if M.renderContacts() is called it will remove some important .opened classes
-            self.megaChat.reorderContactTree();
-        }
-
-
-//        if (M.csort === "chat-activity") {
-//            M.renderContacts();
-//        };
-
-        // @TODO: ONLY the visible ones.
-        //self.messagesBuff.markAllAsSeen();
     });
 
 
 
+    self.getParticipantsExceptMe().forEach(function(jid) {
+        var contact = self.megaChat.getContactFromJid(jid);
+        if (contact) {
+            getLastInteractionWith(contact.h);
+        }
+    });
     self.megaChat.trigger('onRoomCreated', [self]);
 
     $(window).rebind("focus." + self.roomJid, function() {
@@ -659,7 +658,6 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 
     self.leave(notifyOtherDevices);
 
-    //self.$header.remove();
     //self.$messages.remove();
 
     var $element = $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
@@ -669,7 +667,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
     var mc = self.megaChat;
     var roomJid = self.roomJid;
 
-    if (roomJid === mc.getCurrentRoomJid() || self.$header.is(":visible")) {
+    if (roomJid === mc.getCurrentRoomJid() || self.$messages.is(":visible")) {
         window.location = "#fm/chat";
         self.hide();
         setTimeout(function() {
@@ -693,8 +691,6 @@ ChatRoom.prototype.show = function() {
     self.megaChat.hideAllChats();
 
     self.isCurrentlyActive = true;
-
-    self.$header = $('.fm-right-header[data-room-jid="' + this.roomJid.split("@")[0] + '"]');
 
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
@@ -1303,10 +1299,6 @@ ChatRoom.prototype._restartConversation = function() {
         });
     });
 
-    if (self.megaChat.plugins.encryptionFilter) {
-        self.megaChat.plugins.encryptionFilter._reinitialiseEncryptionOpQueue(self);
-    }
-
     self.megaChat.sendBroadcastAction("conv-start", {roomJid: self.roomJid, type: self.type, participants: self.getParticipants()});
 };
 
@@ -1324,7 +1316,7 @@ ChatRoom.prototype._conversationEnded = function(userFullJid) {
 
         self.setState(ChatRoom.STATE.ENDED);
 
-        [self.$header, self.$messages].forEach(function(k, v) {
+        [self.$messages].forEach(function(k, v) {
             $(k).addClass("conv-end")
                 .removeClass("conv-start");
         });

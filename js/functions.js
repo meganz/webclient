@@ -3046,6 +3046,63 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+
+/**
+ * Utility that will return a sorting function (can compare numbers OR strings, depending on the data stored in the
+ * obj), that can sort an array of objects.
+ * @param key {String|Function} the name of the property that will be used for the sorting OR a func that will return a
+ * dynamic value for the object
+ * @param [order] {Number} 1 for asc, -1 for desc sorting
+ * @returns {Function}
+ */
+mega.utils.sortObjFn = function(key, order) {
+    if (!order) {
+        order = 1;
+    }
+
+    return function(a, b, tmpOrder) {
+        var currentOrder = tmpOrder ? tmpOrder : order;
+
+        if ($.isFunction(key)) {
+            a = key(a);
+            b = key(b);
+        }
+        else {
+            a = a[key];
+            b = b[key];
+        }
+
+        if (typeof a == 'string' && typeof b == 'string') {
+            return a.localeCompare(b) * currentOrder;
+        }
+        else if (typeof a == 'string' && typeof b == 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof a == 'undefined' && typeof b == 'string') {
+            return -1 * currentOrder;
+        }
+        else if (typeof a == 'number' && typeof b == 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof a == 'undefined' && typeof b == 'number') {
+            return -1 * currentOrder;
+        }
+        else if (typeof a == 'number' && typeof b == 'number') {
+            var _a = a || 0;
+            var _b = b || 0;
+            if (_a > _b) {
+                return 1 * currentOrder;
+            }
+            if (_a < _b) {
+                return -1 * currentOrder;
+            } else {
+                return 0;
+            }
+        }
+        else return 0;
+    }
+};
+
 /**
  * Promise-based XHR request
  * @param {Mixed} aURLOrOptions URL or options

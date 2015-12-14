@@ -2147,7 +2147,7 @@ function fmremove() {
             t = c + ' ' + l[5569];
         }
         else {
-            t = '<strong>' + M.d[$.selected[0]].name + '</strong>';
+            t = '<strong>' + M.u[$.selected[0]].name + '</strong>';
         }
 
         msgDialog('delete-contact', l[1001], l[1002].replace('[X]', t), false, function(e) {
@@ -2171,7 +2171,7 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar span').empty();
         }
         else {
-            var user = M.d[$.selected[0]],
+            var user = M.u[$.selected[0]],
                 avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
@@ -10463,7 +10463,7 @@ function contactUI() {
     if (n && n.u) {
         var u_h = M.currentdirid;
 //        var cs = M.contactstatus(u_h);
-        var user = M.d[u_h];
+        var user = M.u[u_h];
         var avatar = $(useravatar.contact(u_h));
 
         var onlinestatus = M.onlineStatusClass(

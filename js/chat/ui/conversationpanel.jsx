@@ -923,7 +923,7 @@ var ConversationAudioVideoPanel = React.createClass({
                         callSession.unmuteAudio();
                     }
                 }}>
-                    <i className={"big-icon " + (callSession.getMediaOptions().audio ? " crossed-microphone" : " microphone")}></i>
+                    <i className={"big-icon " + (callSession.getMediaOptions().audio ? " microphone" : " crossed-microphone")}></i>
                 </div>
                 <div className="button call" onClick={function(e) {
                     if (callSession.getMediaOptions().video === true) {
@@ -932,7 +932,7 @@ var ConversationAudioVideoPanel = React.createClass({
                         callSession.unmuteVideo();
                     }
                 }}>
-                    <i className={"big-icon " + (callSession.getMediaOptions().video ? " crossed-videocam" : " videocam")}></i>
+                    <i className={"big-icon " + (callSession.getMediaOptions().video ? " videocam" : " crossed-videocam")}></i>
                 </div>
                 <div className="button call" onClick={function(e) {
                         chatRoom.callSession.endCall();
@@ -969,8 +969,6 @@ var ConversationPanel = React.createClass({
         if (room._leaving) {
             return;
         }
-
-        self.$header.attr("data-room-jid", room.roomJid.split("@")[0]);
 
         if (!self.props.chatRoom.isCurrentlyActive) {
             return;
@@ -1216,7 +1214,6 @@ var ConversationPanel = React.createClass({
 
         var $container = $(ReactDOM.findDOMNode(self));
 
-        self.$header = $('.fm-right-header[data-room-jid="' + self.props.chatRoom.roomJid.split("@")[0] + '"]', $container);
         self.$messages = $('.messages.scroll-area > .jScrollPaneContainer', $container);
 
         var droppableConfig = {
@@ -1238,7 +1235,6 @@ var ConversationPanel = React.createClass({
         };
 
         self.$messages.droppable(droppableConfig);
-        self.$header.droppable(droppableConfig);
 
         self.lastScrollPosition = null;
         self.lastScrolledToBottom = true;
@@ -1449,7 +1445,7 @@ var ConversationPanel = React.createClass({
         }
     },
     isActive: function() {
-        return document.hasFocus() && this.$header && this.$header.is(":visible");
+        return document.hasFocus() && this.$messages && this.$messages.is(":visible");
     },
     render: function() {
         var self = this;
@@ -1504,37 +1500,7 @@ var ConversationPanel = React.createClass({
             startCallButtonClasses += " disabled";
         }
 
-        var startCallPopupClasses = "chat-popup fm-start-call-popup";
-        var startCallPopupCss = {};
-        var startCallArrowCss = {};
 
-        if (this.state.startCallPopupIsActive) {
-            var startCallPopup = $('.fm-start-call-popup', self.$header);
-            var startCallPopupButton = $('.fm-start-call', self.$header);
-            var positionX = $('.fm-chat-block').outerWidth() - startCallPopupButton.position().left - (startCallPopupButton.outerWidth() * 0.5) - (startCallPopup.outerWidth() * 0.5);
-
-            if (startCallPopupButton.attr('class').indexOf('active') === -1) {
-                room.megaChat.closeChatPopups();
-                startCallPopupClasses += " active";
-                startCallButtonClasses += " active";
-
-                var $arrow = $('.fm-start-call-popup .fm-send-files-arrow', self.$header);
-
-                if (positionX < 8) {
-                    startCallPopupCss.right = '8px';
-                    startCallArrowCss.left = startCallPopup.outerWidth() - (startCallPopupButton.outerWidth() * 0.5)  + 'px';
-
-                }
-                else {
-                    startCallPopupCss.right = positionX + 'px';
-                    startCallArrowCss.left = '50%';
-                }
-
-            }
-            else {
-                room.megaChat.closeChatPopups();
-            }
-        }
         var messagesList = [];
 
         var lastTimeMarker;

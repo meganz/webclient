@@ -1679,13 +1679,10 @@ Chat.prototype.renderListing = function() {
 
     sectionUIopen('conversations');
 
-    $('.section.conversations .fm-right-header').removeClass('hidden');
-
     self.renderConversationsApp();
 
 
     if (Object.keys(self.chats).length === 0) {
-        console.error("empty!");
         $('.fm-empty-conversations').removeClass('hidden');
     }
     else {
@@ -1699,9 +1696,13 @@ Chat.prototype.renderListing = function() {
         }
         else {
             // show first chat from the conv. list
-            var chatIds = self.chats.keys();
-            if (chatIds.length === 1) {
-                var room = self.chats[chatIds[0]];
+
+            var sortedConversations = obj_values(self.chats.toJS());
+
+            sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+
+            if (sortedConversations.length > 1) {
+                var room = sortedConversations[0];
                 room.setActive();
                 room.show();
                 return true;

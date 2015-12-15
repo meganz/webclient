@@ -47,7 +47,12 @@ var MegaRenderMixin = {
         return this._reactInternalInstance._rootNodeID;
     },
     getUniqueId: function() {
-        return this.getReactId().replace(".", "_");
+        if (!this._reactInternalInstance) {
+            assert(this._uniqueId, 'missing unique id.');
+            return this._uniqueId;
+        }
+        this._uniqueId = this.getReactId().replace(/[^a-zA-Z0-9]/g, "");
+        return this._uniqueId;
     },
     componentDidMount: function() {
 

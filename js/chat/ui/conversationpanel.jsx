@@ -1521,8 +1521,9 @@ var ConversationPanel = React.createClass({
                     );
                 }
 
+
                 messagesList.push(
-                    <ConversationMessage message={v} chatRoom={room} key={v.messageId} />
+                    <ConversationMessage message={v} chatRoom={room} key={v.messageId} contact={contact} />
                 );
             }
         });

@@ -31,10 +31,10 @@
 	font-size: 13px;
 	line-height: 18px;
 	color: #777777;
+    margin: 0 40px 0 0;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	margin: 0 50px 0 0;
     clear: both;
 }
 .conversation-message.unread {

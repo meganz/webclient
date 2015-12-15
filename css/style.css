@@ -27046,6 +27046,7 @@ body, body * {
 .support textarea {
     width: 100%;
     height: 80%;
+    float: left;
 }
 .help2 img[alt="smallx"] {
     max-width: 50px;

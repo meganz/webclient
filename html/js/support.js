@@ -8,16 +8,17 @@ var support = (function() {
     var ns = {};
     var $textarea;
     var $button;
-    var $bottom;
+    var bottomHeight;
     var $subject;
     var $window = $(window);
-    var $top;
+    var headerHeight;
 
     function resizeHandler() {
         if (!$textarea.is(':visible')) {
             return $window.unbind('resize', resizeHandler);
         }
-        var height = $bottom.position().top - $top.height() - 150;
+
+        var height = Math.max(150, $window.height() - bottomHeight - headerHeight - 200);
         $textarea.css('height', height);
         mainScroll();
     }
@@ -39,6 +40,7 @@ var support = (function() {
         }
 
         $button.hide();
+        resizeHandler();
         api_req(opts, {
             callback: function(response) {
                 if (response === 0) {
@@ -49,6 +51,7 @@ var support = (function() {
                 }
 
                 $button.show();
+                resizeHandler();
                 msgDialog(
                     'warningb',
                     l[16], // Internal error
@@ -66,8 +69,8 @@ var support = (function() {
             return;
         }
         $textarea = $('.support textarea');
-        $bottom  = $('.nw-bottom-block');
-        $top     = $('.about-top-block');
+        bottomHeight = $('.nw-bottom-block').height();
+        headerHeight = $('.about-top-block').height();
         $subject = $('#support-subject');
         for (var i in supportSubjects) {
             if (supportSubjects.hasOwnProperty(i)) {

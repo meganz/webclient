@@ -422,7 +422,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 };
 
                 if (!pubCu25519[msgObject.userId]) {
-                    var keyRetrievalPromise = crypt.getPubCu25519(msgObject.userId)
+                    crypt.getPubCu25519(msgObject.userId)
                         .always(function() {
                             _runDecryption();
                         });

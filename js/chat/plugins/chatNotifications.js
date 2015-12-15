@@ -58,6 +58,10 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 .rebind('onAfterRenderMessage.chatNotifications', function(e, message) {
                     var fromContact = null;
                     if (message.userId) {
+                        // contact not found.
+                        if (!M.u[message.userId]) {
+                            return;
+                        }
                         fromContact = M.u[message.userId];
                     }
                     else if (message.authorContact) {

@@ -96,18 +96,19 @@ var ConversationMessage = React.createClass({
         var message = this.props.message;
         var megaChat = this.props.chatRoom.megaChat;
         var chatRoom = this.props.chatRoom;
-        var buttons = [];
         var contact;
         var timestamp;
         var timestampInt;
         var textMessage;
-        var messageLabel="";
-
 
         if (message.authorContact) {
             contact = message.authorContact;
         }
         else if (message.userId) {
+            if (!M.u[message.userId]) {
+                // data is still loading!
+                return null;
+            }
             contact = M.u[message.userId];
         }
         else if (message.getFromJid) {

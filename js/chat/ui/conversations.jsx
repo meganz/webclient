@@ -1,6 +1,3 @@
-// init some stuff
-require('./../../stores/actions.jsx');
-
 // libs
 var React = require("react");
 var ReactDOM = require("react-dom");
@@ -170,8 +167,9 @@ var ConversationsList = React.createClass({
         var $jsp = $container.data('jsp');
 
         $container.height(
-            $(window).outerHeight() -  $('#topmenu').outerHeight()
+            $(window).outerHeight() -  $('#topmenu').outerHeight() - $('.fm-left-menu.conversations').outerHeight()
         );
+
 
         if ($jsp) {
             $jsp.reinitialise();

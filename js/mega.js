@@ -2947,8 +2947,10 @@ function MegaData()
 
                 this.syncUsersFullname(userId);
             }
+
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-                mDBadd('u', clone(u));
+                // convert MegaDataObjects -> JS
+                mDBadd('u', clone(u.toJS ? u.toJS() : u));
             }
         }
     };

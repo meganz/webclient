@@ -28,7 +28,7 @@ var support = (function() {
             a: 'sse', // send support email
             m: $.trim($textarea.val()), // message
             t: $subject.find('.active').data('value'),
-        }
+        };
         if (opts.m.length <= minLetters) {
             msgDialog('warninga', 
                 l[7884], // Message too short

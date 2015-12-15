@@ -128,7 +128,8 @@ describe("chat.strongvelope unit test", function() {
     var PARTICIPANT_CHANGE_MESSAGE_BIN = atob('AAEAAEBBh/ndnYVhfhamD/l1yph0/uf'
             + 'uZhDU/yn/sOP3l3sqrV3bb8QiJX38OeDJAEWoYZV0IcuP8EbDNXKT1mxJftEPAg'
             + 'AAAQIDAAAM71BrlkBJXmR5xRtMBAAACJYp6Oeu/PccBQAAENp0rdw/Yf2dfMwY6'
-            + 'xCJi3QGAAAIQUkAAUFJAAAHAAAGH78adfMY');
+            + 'xCJi3QGAAAIQUkAAUFJAAAHAAAGH78adfMYCAAACJYp6Oeu/PccCQAACKLbaOeu'
+            + '/Pcc');
     var PARTICIPANT_CHANGE_MESSAGE = {
         protocolVersion: 0,
         signature:  atob('QYf53Z2FYX4Wpg/5dcqYdP7n7mYQ1P8p/7Dj95d7Kq1d22/EIiV9'
@@ -457,7 +458,7 @@ describe("chat.strongvelope unit test", function() {
                 var result = ns._parseMessageContent(message);
                 assert.strictEqual(result, false);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Received unexpected TLV type.');
+                                   'Received unexpected TLV type: 66.');
             });
         });
     });
@@ -2216,10 +2217,11 @@ describe("chat.strongvelope unit test", function() {
                 ];
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
-                handler.participantKeys = {
-                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
-                };
-                sandbox.stub(handler, '_parseAndExtractKeys');
+                sandbox.stub(handler, '_batchParseAndExtractKeys', function() {
+                    handler.participantKeys = {
+                        'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
+                    };
+                });
                 sandbox.stub(handler, 'decryptFrom', function(message, sender) {
                     var keyId = message.substring(0, 4);
                     message = message.substring(4);
@@ -2235,7 +2237,7 @@ describe("chat.strongvelope unit test", function() {
                 });
 
                 var result = handler.batchDecrypt(history);
-                assert.strictEqual(handler._parseAndExtractKeys.callCount, 1);
+                assert.strictEqual(handler._batchParseAndExtractKeys.callCount, 1);
                 assert.strictEqual(handler._totalMessagesWithoutSendKey, 0);
                 for (var i = 0; i < history.length; i++) {
                     assert.strictEqual(handler.decryptFrom.args[i][2], true);
@@ -2268,10 +2270,11 @@ describe("chat.strongvelope unit test", function() {
                 ];
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
-                handler.participantKeys = {
-                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
-                };
-                sandbox.stub(handler, '_parseAndExtractKeys');
+                sandbox.stub(handler, '_batchParseAndExtractKeys', function() {
+                    handler.participantKeys = {
+                        'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
+                    };
+                });
                 sandbox.stub(handler, 'decryptFrom', function(message, sender) {
                     var keyId = message.substring(0, 4);
                     message = message.substring(4);
@@ -2287,7 +2290,7 @@ describe("chat.strongvelope unit test", function() {
                 });
 
                 var result = handler.batchDecrypt(history, false);
-                assert.strictEqual(handler._parseAndExtractKeys.callCount, 1);
+                assert.strictEqual(handler._batchParseAndExtractKeys.callCount, 1);
                 for (var i = 0; i < history.length; i++) {
                     assert.strictEqual(handler.decryptFrom.args[i][2], false);
                     if (history[i].message.substring(4) === 'readable') {
@@ -2338,7 +2341,7 @@ describe("chat.strongvelope unit test", function() {
                                    'Cannot exclude myself from a chat.');
             });
 
-            it("include existant", function() {
+            it("include existent", function() {
                 sandbox.stub(ns._logger, '_log');
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
@@ -2350,7 +2353,7 @@ describe("chat.strongvelope unit test", function() {
                                    'User you456789xw already participating, cannot include.');
             });
 
-            it("exclude non-existant", function() {
+            it("exclude non-existent", function() {
                 sandbox.stub(ns._logger, '_log');
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
@@ -2471,7 +2474,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.alterParticipants(['lino56789xw'], ['otto56789xw'], 'Hello!');
                 assert.strictEqual(btoa(result), btoa(PARTICIPANT_CHANGE_MESSAGE_BIN));
-                assert.strictEqual(result.length, 144);
+                assert.strictEqual(result.length, 168);
                 assert.strictEqual(handler.keyId, ROTATED_KEY_ID);
                 assert.strictEqual(handler._sentKeyId, ROTATED_KEY_ID);
                 assert.deepEqual(handler.participantKeys,

@@ -207,7 +207,7 @@ describe("chat.strongvelope workflow test", function() {
             if (!window._messageBuffer) {
                 window._messageBuffer = [];
             }
-            _messageBuffer.push({ userId: sender, message: sent });
+            _messageBuffer.push({ userId: sender, message: sent, ts: Date.now() });
 
             var received;
             var toSend = [];
@@ -225,7 +225,6 @@ describe("chat.strongvelope workflow test", function() {
                         assert.strictEqual(received, false);
                         assert.strictEqual(person.otherParticipants.size, 0);
                     }
-
                     if (received.toSend) {
                         toSend.push([received.toSend, person.ownHandle]);
                     }
@@ -243,12 +242,13 @@ describe("chat.strongvelope workflow test", function() {
             // Uncomment the following to see log messages produced in the process.
             // sandbox.stub(ns._logger, '_log', console.log);
 
+            // jshint -W004
             var participants = {};
 
             var message = '';
             var sent = '';
             var sender = '';
-            var received = {};
+            var result;
             var activeParticipants = new Set(['alice678900']);
             participants['alice678900'] = _makeParticipant('alice678900');
             participants['alice678900'].updateSenderKey();
@@ -310,9 +310,10 @@ describe("chat.strongvelope workflow test", function() {
 
             // Bob re-joins (Bob is now a nervous key rotator).
             participants['bob45678900'] = _makeParticipant('bob45678900');
-            participants['bob45678900'].rotateKeyEvery = 2;
-            participants['bob45678900'].totalMessagesBeforeSendKey = 4;
-            participants['bob45678900'].seed(_messageBuffer);
+            participants['bob45678900'].rotateKeyEvery = 3;
+            participants['bob45678900'].totalMessagesBeforeSendKey = 5;
+            result = participants['bob45678900'].seed(_messageBuffer);
+            assert.strictEqual(result, true);
             sender = 'alice678900';
             message = 'Welcome back, mate.';
             sent = participants[sender].alterParticipants(['bob45678900'], [], message);
@@ -347,6 +348,50 @@ describe("chat.strongvelope workflow test", function() {
             sent = participants[sender].encryptTo(message);
             _checkReceivers(sent, sender, message,
                             participants, activeParticipants);
+
+            // Dave drops out, and re-initialises (seeds) from history.
+            delete participants['dave5678900'];
+            participants['dave5678900'] = _makeParticipant('dave5678900', true);
+            sandbox.stub(window, 'u_privk', RSA_PRIV_KEY);
+            result = participants['dave5678900'].seed(_messageBuffer);
+            // Not sent anything, yet, so seed() returns `false`,
+            // and we need to update the sender key (initialise).
+            assert.strictEqual(result, false);
+            participants['dave5678900'].updateSenderKey();
+
+            // Check some decryptability outcomes of the history.
+            var decryptabileMessages = [
+                false, false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false,
+                true, true];
+            var decryptableParticipants = {
+                'alice678900': 0, 'bob45678900': 0, 'charlie8900': null };
+            result = participants['dave5678900'].areMessagesDecryptable(_messageBuffer, true);
+            assert.strictEqual(result.messages.length, decryptabileMessages.length);
+            for (var i = 0; i < decryptabileMessages.length; i++) {
+                assert.strictEqual(result.messages[i], decryptabileMessages[i],
+                    'mismatching decryptability of message ' + i);
+            }
+            for (var item in decryptableParticipants) {
+                if (!decryptableParticipants.hasOwnProperty(item)) {
+                    continue;
+                }
+                assert.strictEqual(typeof result.participants[item],
+                    typeof decryptableParticipants[item],
+                    'mismatching participant key time stamp of member ' + item);
+            }
+            result = participants['dave5678900'].batchDecrypt(_messageBuffer, true);
+            for (var i = 0; i < decryptabileMessages.length; i++) {
+                if (decryptabileMessages[i]) {
+                    assert.notStrictEqual(result[i], false,
+                        'mismatching decrypted message ' + i);
+                }
+                else {
+                    assert.strictEqual(result[i], decryptabileMessages[i],
+                        'mismatching decrypted message ' + i);
+                }
+            }
+            // jshint +W004
         });
     });
 });

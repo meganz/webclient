@@ -476,8 +476,8 @@ var strongvelope = {};
             tlvVariable = _TLV_MAPPING[tlvType];
             value = part.record[1];
 
-            if ((tlvType < lastTlvType) || (typeof tlvVariable === 'undefined')) {
-                logger.error('Received unexpected TLV type.');
+            if (typeof tlvVariable === 'undefined') {
+                logger.error('Received unexpected TLV type: ' + tlvType + '.');
 
                 return false;
             }
@@ -492,6 +492,8 @@ var strongvelope = {};
                     parsedContent[tlvVariable] = value.charCodeAt(0);
                     break;
                 case TLV_TYPES.RECIPIENT:
+                case TLV_TYPES.INC_PARTICIPANT:
+                case TLV_TYPES.EXC_PARTICIPANT:
                     parsedContent[tlvVariable].push(base64urlencode(value));
                     break;
                 case TLV_TYPES.KEYS:
@@ -503,10 +505,6 @@ var strongvelope = {};
                         parsedContent[tlvVariable].push(keyIds.substring(0, _KEY_ID_SIZE));
                         keyIds = keyIds.substring(_KEY_ID_SIZE);
                     }
-                    break;
-                case TLV_TYPES.INC_PARTICIPANT:
-                case TLV_TYPES.EXC_PARTICIPANT:
-                    parsedContent[tlvVariable].push(value);
                     break;
                 default:
                     // For all non-special cases, this will be used.
@@ -820,21 +818,24 @@ var strongvelope = {};
 
         // Iterate over all messages to extract keys (if present).
         var message;
+        var sender;
         var keyId;
         var haveKey;
-        for (var i = 0; i < parsedMessages.length; i++) {
-            message = parsedMessages[i];
+        for (var i = 0; i < messages.length; i++) {
+            message = messages[i];
+            sender = messages[i].userId;
             if (message) {
-                keyId = message.keyIds[0];
-                haveKey = ((typeof this.participantKeys[message.userId] !== 'undefined')
-                           && (typeof this.participantKeys[message.userId][keyId] !== 'undefined'));
+                keyId = parsedMessages[i].keyIds[0];
+                haveKey = ((typeof this.participantKeys[sender] !== 'undefined')
+                           && (typeof this.participantKeys[sender][keyId] !== 'undefined'));
                 decryptable.push(haveKey);
-                // Track for the smallest time stamp that we've got a key for on the sender.
-                if (!participants[message.userId]) {
-                    participants[message.userId] = null;
+                // Track for the smallest time stamp that we've got a key for
+                // on the sender.
+                if (!participants[sender]) {
+                    participants[sender] = null;
                 }
-                if (haveKey && (!participants[message.userId] || (participants[message.userId] > message.ts))) {
-                    participants[message.userId] = message.ts;
+                if (haveKey && (!participants[sender] || (participants[message.userId] > message.ts))) {
+                    participants[sender] = message.ts;
                 }
             }
             else {
@@ -1141,7 +1142,7 @@ var strongvelope = {};
      * @param {String} message
      *     Data message to encrypt. If `null` or `undefined`, no message payload
      *     will be encoded (i. e. it's a "blind" management message).
-     * @returns {{ keyed: Boolean, content: String }}
+     * @returns {{ keyed: Boolean, content: String, ownKey: String }}
      *     Outgoing message content encoded in TLV records, and a flag
      *     indicating whether the message is keyed.
      */
@@ -1510,15 +1511,16 @@ var strongvelope = {};
      *     Array of objects with message contents on success, `false` in case of
      *     errors.
      */
-    strongvelope.ProtocolHandler.prototype.batchDecrypt = function(messages, historicMessages) {
+    strongvelope.ProtocolHandler.prototype.batchDecrypt = function(messages,
+            historicMessages) {
+
+        historicMessages = (historicMessages === false) ? false : true;
 
         // First extract all keys.
-        this._parseAndExtractKeys(messages);
+        this._batchParseAndExtractKeys(messages);
 
         // Now attempt to decrypt all messages.
         var decryptedMessages = [];
-        historicMessages = (typeof historicMessages === 'undefined') || (historicMessages === true)
-                         ? true : false;
 
         var message;
         for (var i = 0; i < messages.length; i++) {
@@ -1608,23 +1610,24 @@ var strongvelope = {};
         // Update our sender key.
         this.updateSenderKey();
 
+        // Collect participants to be in- or excluded.
+        var participantsInExcluded = '';
+        this.includeParticipants.forEach(function _addIncludedParticipants(item) {
+            participantsInExcluded += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.INC_PARTICIPANT),
+                                                           base64urldecode(item));
+        });
+        this.excludeParticipants.forEach(function _addExcludedParticipants(item) {
+            participantsInExcluded += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.EXC_PARTICIPANT),
+                                                           base64urldecode(item));
+        });
+
         // Assemble main message body and rotate keys if required.
         var assembledMessage = this._assembleBody(message);
 
-        // Add correct message type to front.
+        // Add correct message type to front and put together final content.
         var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
                                            String.fromCharCode(MESSAGE_TYPES.ALTER_PARTICIPANTS))
-                    + assembledMessage.content;
-
-        // Add participants to be in- or excluded.
-        this.includeParticipants.forEach(function _addIncludedParticipants(item) {
-            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.INC_PARTICIPANT),
-                                            base64urldecode(item));
-        });
-        this.excludeParticipants.forEach(function _addExcludedParticipants(item) {
-            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.EXC_PARTICIPANT),
-                                            base64urldecode(item));
-        });
+                    + assembledMessage.content + participantsInExcluded;
 
         // Sign message.
         content = this._signContent(content);

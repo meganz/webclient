@@ -20,8 +20,8 @@ var Button = React.createClass({
         }
 
         if (this.state.focused != nextState.focused && nextState.focused === true) {
-            document.body.removeEventListener('click', this.onBlur);
-            document.body.addEventListener('click', this.onBlur);
+            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+            document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
             $(document).rebind('keyup.button' + self.getUniqueId(), function(e) {
                 if (e.keyCode == 27) { // escape key maps to keycode `27`
@@ -58,7 +58,7 @@ var Button = React.createClass({
         ) {
             this.setState({focused: false});
             $(document).unbind('keyup.button' + this.getUniqueId());
-            document.body.removeEventListener('click', this.onBlur);
+            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         }
 
 
@@ -69,7 +69,7 @@ var Button = React.createClass({
             e.stopPropagation();
             return;
         }
-        
+
         if ($(e.target).is("input,textarea,select")) {
             return
         }
@@ -84,7 +84,7 @@ var Button = React.createClass({
         }
         else if (this.state.focused === true) {
             this.setState({focused: false});
-            document.body.removeEventListener('click', this.onBlur);
+            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         }
     },
     render: function () {

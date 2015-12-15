@@ -92,19 +92,31 @@ var MegaRenderMixin = {
         //$(window).unbind('hashchange.lazyRenderer' + this.getUniqueId());
         //$(window).unbind('scroll.lazyRenderer' + this.getUniqueId());
     },
-    onResizeDoUpdate: function() {
-        if(!this.isMounted() || this._pendingForceUpdate === true) {
+    eventuallyUpdate: function() {
+        var domNode = $(this.findDOMNode());
+        if (!domNode.is(":visible")) {
+            return;
+        }
+        if (!elementInViewport2(domNode[0])) {
             return;
         }
 
         this.forceUpdate();
+    },
+    onResizeDoUpdate: function() {
+        console.error("onResizeDoUpdate", this.getUniqueId());
+        if(!this.isMounted() || this._pendingForceUpdate === true) {
+            return;
+        }
+
+        this.eventuallyUpdate();
     },
     onHashChangeDoUpdate: function() {
         if(!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
-        this.forceUpdate();
+        this.eventuallyUpdate();
     },
     _recurseAddListenersIfNeeded: function(idx, map, depth) {
         var self = this;

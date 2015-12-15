@@ -660,7 +660,7 @@ var proPage = {
      * Loads the payment gateway options into Payment options section
      */
     loadPaymentGatewayOptions: function() {
-                    
+
         // Do API request (User Forms of Payment Query Full) to get the valid list of currently active 
         // payment providers. Returns an array of objects e.g. 
         // {
@@ -707,6 +707,9 @@ var proPage = {
         // Cache the template selector
         var $template = $('.payment-options-list.primary .payment-method.template');
         
+        // Remove existing providers and so they are re-rendered
+        $('.payment-options-list.primary .payment-method:not(.template)').remove();
+        
         // Loop through gateway providers (change to use list from API soon)
         for (var i = 0, length = gatewayOptions.length; i < length; i++) {
 
@@ -739,8 +742,8 @@ var proPage = {
             }
 
             // Get display name from lookup
-            else if (typeof gatewayOption.displayName === 'undefined') {
-                gatewayOption.displayName = 'use lookup';
+            else {
+                gatewayOption.displayName = htmlentities(gatewayOption.displayName);
             }
                
             // Create a radio button with icon for each payment gateway
@@ -750,26 +753,13 @@ var proPage = {
             $gateway.find('input').attr('id', gatewayOption.gatewayName);
             $gateway.find('input').val(gatewayOption.gatewayId);
             $gateway.find('.provider-icon').addClass(gatewayOption.gatewayName);
-            $gateway.find('.provider-name').text(gatewayOption.displayName);
+            $gateway.find('.provider-name').html(gatewayOption.displayName);
 
             // Build the html
             html += $gateway.prop('outerHTML');
-            
-            /*
-            // Create a radio button with icon for each payment gateway
-            html += '<div class="payment-method' + disabledClass + '"' + disabledTitleText + '>'
-                 +      '<div class="membership-radio' + classChecked + '">'
-                 +          '<input type="radio" name="' + gatewayOption.gatewayName + '" id="' + gatewayOption.gatewayName + '" ' + optionChecked + ' value="' + gatewayOption.gatewayId + '" />'
-                 +          '<div></div>'
-                 +      '</div>'
-                 +      '<div class="payment-icon ' + gatewayOption.gatewayName + '">'
-                 +          gatewayOption.displayName
-                 +      '</div>'
-                 +  '</div>';
-            */
         }
         
-        console.log('zzzz', html);
+        console.log('zzzz primaryOrSecondary', primaryOrSecondary);
         
         // Update the page
         $('.membership-step2 .payment-options-list.' + primaryOrSecondary).append(html);

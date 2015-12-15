@@ -15476,7 +15476,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     line-height: 26px;
     vertical-align: middle;
 }
-.membership-step2 .provider-icon {
+.provider-icon {
     background-image: url("../images/mega/payment-provider-icons-v1.png");
     background-position: 0 0;
     background-repeat: no-repeat;
@@ -15549,6 +15549,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.voucher { background-position: 0 -3600px; }
 .provider-icon.wiretransfer { background-position: 0 -3660px; }
 
+.membership-step2 .provider-name {
+    display: inline-block;
+}
 .membership-new-offer text {
 	font-weight: normal;
 }
@@ -25841,8 +25844,7 @@ body.pro:after {
  background-image: url("../images/mega/lang-selection-sprite-v2@2x.png");
  background-size: 92px auto;
 }
-
-.membership-step2 .provider-icon {
+.provider-icon {
     background-image: url("../images/mega/payment-provider-icons-v1@2x.png");
     background-size: 20px auto;
 }

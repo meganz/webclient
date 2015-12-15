@@ -17,6 +17,7 @@
     float: left;
         line-height: 21px;
         max-width: 100%;
+        letter-spacing: -0.05px;
 }
 .user-card-name.conversation-name.group {
 	padding: 0;
@@ -106,11 +107,11 @@
     margin: 4px 6px 0 0;
 }
 .call-duration + .conversation-message {
-    margin-right: 100px;
+    margin-right: 120px;
 }
 .unread-messages + .call-duration {
     margin-right: 30px;
 }
 .unread-messages + .call-duration + .conversation-message {
-    margin-right: 130px;
+    margin-right: 150px;
 }

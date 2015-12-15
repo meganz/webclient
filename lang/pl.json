@@ -2849,5 +2849,8 @@
     "7947": "Link bez klucza",
     "7948": "Link z kluczem",
     "7971": "Klucz deszyfrowania",
-    "7972": "If you do not have the key, contact the creator of the link."
+    "7972": "Je\u017celi nie posiadasz klucza, skontaktuj si\u0119 z autorem linku.",
+    "7973": "wolne pobieranie",
+    "7975": "mimo wszystko",
+    "7976": "Zalecamy korzystanie z naszego programu do synchronizacji, kt\u00f3ry w istotnie zwi\u0119ksza szybko\u015b\u0107 [BR]pobierania du\u017cych plik\u00f3w. [A]Pobierz MEGAsync teraz[\/A]."
 }

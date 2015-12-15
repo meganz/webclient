@@ -38,14 +38,17 @@ function MegaDBEncryption(mdbInstance) {
         var promise = new MegaPromise();
 
         mdbServerInstance.getUData('enckey')
-            .then(function(data) {
+            .then(function __enckey(data) {
                 logger.debug('getUData.enckey', data);
-
                 if (!data) {
                     // Generate new encryption key
-
-                    _encDecKeyCache = stringcrypt.newKey();
-                    data = stringcrypt.stringEncrypter(_encDecKeyCache, u_k);
+                    try {
+                        _encDecKeyCache = stringcrypt.newKey();
+                        data = stringcrypt.stringEncrypter(_encDecKeyCache, u_k, true);
+                    }
+                    catch (ex) {
+                        return promise.reject(ex);
+                    }
 
                     mdbInstance.flags |= MegaDB.DB_FLAGS.HASNEWENCKEY;
 
@@ -59,8 +62,20 @@ function MegaDBEncryption(mdbInstance) {
                         });
                 }
                 else {
-                    _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k);
-                    promise.resolve();
+                    try {
+                        // Decrypt existing DB session encryption key with master key.
+                        _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k, true);
+                        if (_encDecKeyCache.length !== 16) {
+                            logger.debug('Invalid Key length: %d bytes', _encDecKeyCache.length);
+                            __enckey();
+                        }
+                        else {
+                            promise.resolve();
+                        }
+                    }
+                    catch (ex) {
+                        promise.reject(ex);
+                    }
                 }
             }, function(err) {
                 promise.reject(err);
@@ -83,10 +98,10 @@ function MegaDBEncryption(mdbInstance) {
             if(k == "__origObj" || k == "id" ||  k === mdbInstance._getTablePk(table)) { return; }
 
             if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k]) {
-                obj[k + "$v"] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey());
+                obj[k + "$v"] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey(), false);
                 obj[k] = hasherFunc(JSON.stringify(v));
             } else {
-                obj[k] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey());
+                obj[k] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey(), false);
             }
             //logger.debug("encrypted: {k=", k, "v=", v, "$v=", obj[k + "$v"], "objk=", obj[k], "}");
         })
@@ -115,21 +130,29 @@ function MegaDBEncryption(mdbInstance) {
                 }
 
                 if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k] && obj[k + "$v"] && decryptedKeys.indexOf(k) === -1) {
-                    obj[k] = JSON.parse(stringcrypt.stringDecrypter(obj[k + "$v"], getEncDecKey()));
+                    obj[k] = JSON.parse(stringcrypt.stringDecrypter(obj[k + "$v"], getEncDecKey()), false);
                     delete obj[k + "$v"];
                     decryptedKeys.push(k);
-                } else {
+                }
+                else {
                     try {
-                        obj[k] = stringcrypt.stringDecrypter(v, getEncDecKey());
+                        obj[k] = stringcrypt.stringDecrypter(v, getEncDecKey(), false);
                         if(obj[k] == "undefined") {
                             obj[k] = undefined;
-                        } else {
+                        }
+                        else {
                             obj[k] = JSON.parse(obj[k]);
                         }
-                    } catch(e) {
-                        if(e instanceof TypeError) { // TypeError is caused when the data stored in the db is NOT encrypted.
+                    }
+                    catch (e) {
+                        if (e instanceof TypeError) { // TypeError is caused when the data stored in the db is NOT encrypted.
                             obj[k] = v;
-                        } else {
+                        }
+                        else if (e instanceof IllegalArgumentError) {
+                            logger.error('Encrypted IndexedDB inconsistent. Clear local DB and reload.');
+                            throw e;
+                        }
+                        else {
                             throw e;
                         }
                     }
@@ -168,9 +191,9 @@ function MegaDBEncryption(mdbInstance) {
         try {
             simpleDecryptObjFunction(table, obj);
         }
-        catch(exc) {
-            if (exc.message == "data integrity check failed") {
-                logger.error("data integrity check failed for (will be removed): ", table, obj[mdbInstance._getTablePk(table)], obj);
+        catch (exc) {
+            if (exc.message === "data integrity check failed") {
+                logger.warn("data integrity check failed for (will be removed): ", table, obj[mdbInstance._getTablePk(table)], obj);
 
                 mdbInstance.server.remove(table, obj[mdbInstance._getTablePk(table)]);
                 e.stopPropagation();

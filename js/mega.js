@@ -2881,7 +2881,48 @@ function MegaData()
         this.rubNodes = {}
         this.rubbishIco();
         treeUI();
-    }
+    },
+
+    this.syncUsersFullname = function(userId) {
+        var self = this;
+
+        MegaPromise.allDone([
+            getUserAttribute(userId, 'firstname', -1),
+            getUserAttribute(userId, 'lastname', -1)
+        ]).done(function(results) {
+            var firstName = results[0][0];
+            var lastName = results[1][0];
+
+            // -1, -9, -2, etc...
+            firstName = typeof(firstName) != "string" ? false : firstName;
+            lastName = typeof(lastName) != "string" ? false : lastName;
+
+            firstName = firstName ? from8(base64urldecode(firstName)) : "";
+            lastName = lastName ? from8(base64urldecode(lastName)) : "";
+            if (firstName.length > 0 && lastName.length > 0) {
+                self.u[userId].name = firstName + " " + lastName;
+            }
+            self.u[userId].firstName = firstName;
+            self.u[userId].lastName = lastName;
+
+            if (
+                typeof $.sortTreePanel !== 'undefined' &&
+                typeof $.sortTreePanel.contacts !== 'undefined' &&
+                $.sortTreePanel.contacts.by == 'status'
+            ) {
+                M.contacts(); // we need to resort
+            }
+
+            if (window.location.hash == "#fm/" + userId) {
+                // re-render the contact view page if the presence had changed
+                contactUI();
+            }
+            else if (window.location.hash == "#fm/contacts") {
+                // re-render the contact view page if the presence had changed
+                M.openFolder('contacts', true);
+            }
+        });
+    },
 
     /**
      * addUser, updates global .u variable with new user data
@@ -2904,40 +2945,7 @@ function MegaData()
             } else {
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
 
-                var self = this;
-
-                MegaPromise.allDone([
-                    getUserAttribute(userId, 'firstname', -1),
-                    getUserAttribute(userId, 'lastname', -1)
-                ]).done(function(results) {
-                    var firstName = results[0][0];
-                    var lastName = results[1][0];
-
-                    // -1, -9, -2, etc...
-                    firstName = typeof(firstName) != "string" ? false : firstName;
-                    lastName = typeof(lastName) != "string" ? false : lastName;
-
-                    firstName = firstName ? from8(base64urldecode(firstName)) : "";
-                    lastName = lastName ? from8(base64urldecode(lastName)) : "";
-                    if (firstName.length > 0 && lastName.length > 0) {
-                        self.u[userId].name = firstName + " " + lastName;
-                    }
-                    self.u[userId].firstName = firstName;
-                    self.u[userId].lastName = lastName;
-
-                    if (
-                        typeof $.sortTreePanel !== 'undefined' &&
-                        typeof $.sortTreePanel.contacts !== 'undefined' &&
-                        $.sortTreePanel.contacts.by == 'status'
-                    ) {
-                        M.contacts(); // we need to resort
-                    }
-
-                    if (window.location.hash == "#fm/" + u.u) {
-                        // re-render the contact view page if the presence had changed
-                        contactUI();
-                    }
-                });
+                this.syncUsersFullname(userId);
             }
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 mDBadd('u', clone(u));
@@ -3057,11 +3065,11 @@ function MegaData()
             return false;
         }
 
-        var mTempNodes = [];
+        nodes = [];
 
         sane = sane.map(function(node) {
             if (!M.d[node.h]) {
-                mTempNodes.push(node.h);
+                nodes.push(node.h);
                 M.d[node.h] = node;
             }
             return node.h;
@@ -3069,11 +3077,11 @@ function MegaData()
 
         this.copyNodes(sane, target, false, callback);
 
-        mTempNodes.forEach(function(handle) {
+        nodes.forEach(function(handle) {
             delete M.d[handle];
         });
 
-        return mTempNodes.length;
+        return nodes.length;
     };
 
 
@@ -5337,11 +5345,17 @@ function execsc(actionPackets, callback) {
                         M.avatars();
                     });
 
-                } else if (actionPacket.ua[i] == '+puEd255') {
+                }
+                else if (actionPacket.ua[i] == '+puEd255') {
                     // pubEd25519 key was updated!
                     // force finger regen.
                     delete pubEd25519[actionPacket.u];
                     crypt.getPubEd25519(actionPacket.u);
+                }
+                else if (actionPacket.ua[i] === 'firstname' || actionPacket.ua[i] === 'lastname') {
+                    removeItemPromise.done(function() {
+                        M.syncUsersFullname(actionPacket.u);
+                    });
                 }
             }
         }

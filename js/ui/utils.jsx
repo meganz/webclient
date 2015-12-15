@@ -35,7 +35,6 @@ var JScrollPane = React.createClass({
         $elem.jScrollPane(options);
 
         $(window).rebind('resize.jsp' + this.getUniqueId(), this.onResize);
-
         this.onResize();
     },
     componentWillUnmount: function() {

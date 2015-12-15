@@ -129,8 +129,8 @@ var ConversationsListItem = React.createClass({
                     {avatarMeta.fullName}
                     <span className={"user-card-presence " + presenceClass}></span>
                 </div>
-                {inCallDiv}
                 {unreadDiv}
+                {inCallDiv}
                 {lastMessageDiv}
                 {lastMessageDatetimeDiv}
             </li>

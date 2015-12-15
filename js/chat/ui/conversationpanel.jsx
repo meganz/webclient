@@ -33,8 +33,7 @@ var getMessageString;
                 'call-missed': l[7210],
                 'call-rejected': l[5892],
                 'call-canceled': l[5894],
-                'call-started': l[5888],
-                'missing-keys': "User [X] had not logged in recently, so important crypto keys are not yet available. Secure text chat with this user would be enabled as soon as he logs in MEGA again.",
+                'call-started': l[5888]
             };
         }
         return MESSAGE_STRINGS[type];
@@ -486,9 +485,6 @@ var ConversationMessage = React.createClass({
             }
             else if (message.type === "call-timeout") {
                 message.cssClass = "horizontal-handset yellow";
-            }
-            else if (message.type === "missing-keys") {
-                message.cssClass = "diagonal-handset yellow";
             }
             else if (message.type === "call-failed-media") {
                 message.cssClass = "diagonal-handset yellow";

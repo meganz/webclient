@@ -322,19 +322,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             if (contact && contact.u && !pubCu25519[contact.u]) {
                 var keyRetrievalPromise = crypt.getPubCu25519(contact.u);
                 keyRetrievalPromise.fail(function(r) {
-                    if(r === -9) {
-                        chatRoom.pubCu25519KeyIsMissing = true;
-
-                        chatRoom.appendMessage(
-                            new ChatDialogMessage({
-                                messageId: 'key-missing-' + contact.u,
-                                type: 'missing-keys',
-                                authorContact: contact,
-                                delay: unixtime(),
-                                persist: false
-                            })
-                        );
-                    }
                 });
 
                 waitingForPromises.push(
@@ -417,20 +404,33 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         $(chatRoom.messagesBuff).rebind('onNewMessageReceived.chatdStrongvelope', function(e, msgObject) {
             if(msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
-                var decrypted = chatRoom.protocolHandler.decryptFrom(
-                    msgObject.message,
-                    msgObject.userId,
-                    false
-                );
+                var _runDecryption = function() {
+                    var decrypted = chatRoom.protocolHandler.decryptFrom(
+                        msgObject.message,
+                        msgObject.userId,
+                        false
+                    );
 
-                if(decrypted && decrypted.toSend) {
-                    self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
+                    if(decrypted && decrypted.toSend) {
+                        self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
+                    }
+                    if (decrypted && decrypted.payload) {
+                        chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
+                    }  else if (decrypted && !decrypted.payload && decrypted.type === 0) {
+                        chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
+                    }
+                };
+
+                if (!pubCu25519[msgObject.userId]) {
+                    var keyRetrievalPromise = crypt.getPubCu25519(msgObject.userId)
+                        .always(function() {
+                            _runDecryption();
+                        });
+                    return;
                 }
-                if (decrypted && decrypted.payload) {
-                    chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
-                }  else if (decrypted && !decrypted.payload && decrypted.type === 0) {
-                    chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
-                }
+                _runDecryption();
+
+
             }
         });
 

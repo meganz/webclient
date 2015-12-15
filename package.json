@@ -82,7 +82,8 @@
     "sinon": "~1.9.0",
     "uglify-loader": "^1.1.0",
     "webpack": "^1.12.9",
-    "webpack-dev-server": "^1.14.0"
+    "webpack-dev-server": "^1.14.0",
+    "es6-collections": "git+https://github.com/WebReflection/es6-collections"
   },
   "dependencies": {
     "grunt-contrib-uglify": "^0.8.0",

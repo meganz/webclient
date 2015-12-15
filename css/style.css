@@ -15471,83 +15471,83 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 }
 .membership-step2 .provider-details {
     display: inline-block;
-    font-family: "source_sans_prosemibold", Arial;
+    font-family: "source_sans_prosemibold",Arial;
     font-size: 14px;
     line-height: 26px;
-    padding-left: 28px;
     vertical-align: middle;
 }
 .membership-step2 .provider-icon {
-    background-image: url("../images/mega/payment-provider-icons-v1@2x.png");
+    background-image: url("../images/mega/payment-provider-icons-v1.png");
     background-position: 0 0;
     background-repeat: no-repeat;
-    background-size: auto 3620px;
     display: inline-block;
     height: 20px;
+    padding-bottom: 1px;
+    vertical-align: middle;
     width: 20px;
 }
-.provider-icon.astropayAE { background-position: 0 0; } 
-.provider-icon.astropayAG { background-position: 0 -60px; } 
-.provider-icon.astropayAK { background-position: 0 -120px; } 
-.provider-icon.astropayAU { background-position: 0 -180px; } 
-.provider-icon.astropayB { background-position: 0 -240px; } 
-.provider-icon.astropayBB { background-position: 0 -300px; } 
-.provider-icon.astropayBL { background-position: 0 -360px; } 
-.provider-icon.astropayBM { background-position: 0 -400px; } 
-.provider-icon.astropayBV { background-position: 0 -460px; } 
-.provider-icon.astropayBX { background-position: 0 -520px; } 
-.provider-icon.astropayCL { background-position: 0 -580px; } 
-.provider-icon.astropayCM { background-position: 0 -640px; } 
-.provider-icon.astropayCR { background-position: 0 -700px; } 
-.provider-icon.astropayCS { background-position: 0 -760px; } 
-.provider-icon.astropayDA { background-position: 0 -820px; } 
-.provider-icon.astropayDC { background-position: 0 -880px; } 
-.provider-icon.astropayDD { background-position: 0 -940px; } 
-.provider-icon.astropayDM { background-position: 0 -1000px; } 
-.provider-icon.astropayDS { background-position: 0 -1060px; } 
-.provider-icon.astropayEQ { background-position: 0 -1120px; } 
-.provider-icon.astropayEl { background-position: 0 -1180px; } 
-.provider-icon.astropayEX { background-position: 0 -1240px; } 
-.provider-icon.astropayEY { background-position: 0 -1300px; } 
-.provider-icon.astropayGA { background-position: 0 -1360px; } 
-.provider-icon.astropayHI { background-position: 0 -1400px; } 
-.provider-icon.astropayHT { background-position: 0 -1460px; } 
-.provider-icon.astropayI { background-position: 0 -1520px; } 
-.provider-icon.astropayIS { background-position: 0 -1580px; } 
-.provider-icon.astropayJC { background-position: 0 -1640px; } 
-.provider-icon.astropayMC { background-position: 0 -1700px; } 
-.provider-icon.astropayMD { background-position: 0 -1760px; } 
-.provider-icon.astropayMG { background-position: 0 -1820px; } 
-.provider-icon.astropayML { background-position: 0 -1880px; } 
-.provider-icon.astropayNJ { background-position: 0 -1940px; } 
-.provider-icon.astropayNT { background-position: 0 -2000px; } 
-.provider-icon.astropayOC { background-position: 0 -2060px; } 
-.provider-icon.astropayOF { background-position: 0 -2120px; } 
-.provider-icon.astropayOX { background-position: 0 -2180px; } 
-.provider-icon.astropayPC { background-position: 0 -2240px; } 
-.provider-icon.astropayPR { background-position: 0 -2300px; } 
-.provider-icon.astropayRE { background-position: 0 -2360px; } 
-.provider-icon.astropayRL { background-position: 0 -2420px; } 
-.provider-icon.astropayRP { background-position: 0 -2480px; } 
-.provider-icon.astropaySB { background-position: 0 -2540px; } 
-.provider-icon.astropaySP { background-position: 0 -2600px; } 
-.provider-icon.astropaySX { background-position: 0 -2700px; } 
-.provider-icon.astropayTS { background-position: 0 -2760px; } 
-.provider-icon.astropayTT { background-position: 0 -5640px; } 
-.provider-icon.astropayVA { background-position: 0 -5760px; } 
-.provider-icon.astropayVD { background-position: 0 -5880px; } 
-.provider-icon.astropayVI { background-position: 0 -6000px; } 
-.provider-icon.astropayWP { background-position: 0 -6120px; } 
-.provider-icon.bitcoin { background-position: 0 -6240px; } 
-.provider-icon.creditcard { background-position: 0 -6360px; } 
-.provider-icon.fortumo { background-position: 0 -3260px; } 
-.provider-icon.infobip { background-position: 0 -3300px; } 
-.provider-icon.voucher { background-position: 0 -3360px; } 
-.provider-icon.paysafecard { background-position: 0 -3420px; } 
-.provider-icon.dynamicpay { background-position: 0 -3480px; } 
-.provider-icon.tpay { background-position: 0 -3540px; } 
-.provider-icon.wiretransfer { background-position: 0 -3600px; }
-
+.provider-icon.astropay { background-position: 0 0; }
+.provider-icon.astropayAE { background-position: 0 -60px; }
+.provider-icon.astropayAG { background-position: 0 -120px; }
+.provider-icon.astropayAK { background-position: 0 -180px; }
+.provider-icon.astropayAU { background-position: 0 -240px; }
+.provider-icon.astropayB { background-position: 0 -300px; }
+.provider-icon.astropayBB { background-position: 0 -360px; }
+.provider-icon.astropayBL { background-position: 0 -420px; }
+.provider-icon.astropayBM { background-position: 0 -480px; }
+.provider-icon.astropayBV { background-position: 0 -540px; }
+.provider-icon.astropayBX { background-position: 0 -600px; }
+.provider-icon.astropayCL { background-position: 0 -660px; }
+.provider-icon.astropayCM { background-position: 0 -720px; }
+.provider-icon.astropayCR { background-position: 0 -780px; }
+.provider-icon.astropayCS { background-position: 0 -840px; }
+.provider-icon.astropayDA { background-position: 0 -900px; }
+.provider-icon.astropayDC { background-position: 0 -960px; }
+.provider-icon.astropayDD { background-position: 0 -1020px; }
+.provider-icon.astropayDM { background-position: 0 -1080px; }
+.provider-icon.astropayDS { background-position: 0 -1140px; }
+.provider-icon.astropayEl { background-position: 0 -1200px; }
+.provider-icon.astropayEQ { background-position: 0 -1260px; }
+.provider-icon.astropayEX { background-position: 0 -1320px; }
+.provider-icon.astropayEY { background-position: 0 -1380px; }
+.provider-icon.astropayGA { background-position: 0 -1440px; }
+.provider-icon.astropayHI { background-position: 0 -1500px; }
+.provider-icon.astropayI { background-position: 0 -1560px; }
+.provider-icon.astropayHT { background-position: 0 -1620px; }
+.provider-icon.astropayIS { background-position: 0 -1680px; }
+.provider-icon.astropayMC { background-position: 0 -1740px; }
+.provider-icon.astropayMD { background-position: 0 -1800px; }
+.provider-icon.astropayJC { background-position: 0 -1860px; }
+.provider-icon.astropayMG { background-position: 0 -1920px; }
+.provider-icon.astropayML { background-position: 0 -1980px; }
+.provider-icon.astropayNJ { background-position: 0 -2040px; }
+.provider-icon.astropayNT { background-position: 0 -2100px; }
+.provider-icon.astropayOC { background-position: 0 -2160px; }
+.provider-icon.astropayOF { background-position: 0 -2220px; }
+.provider-icon.astropayOX { background-position: 0 -2280px; }
+.provider-icon.astropayPC { background-position: 0 -2340px; }
+.provider-icon.astropayPR { background-position: 0 -2400px; }
+.provider-icon.astropayRE { background-position: 0 -2460px; }
+.provider-icon.astropayRL { background-position: 0 -2520px; }
+.provider-icon.astropayRP { background-position: 0 -2580px; }
+.provider-icon.astropaySB { background-position: 0 -2640px; }
+.provider-icon.astropaySP { background-position: 0 -2700px; }
+.provider-icon.astropaySX { background-position: 0 -2760px; }
+.provider-icon.astropayTT { background-position: 0 -2820px; }
+.provider-icon.astropayTS { background-position: 0 -2880px; }
+.provider-icon.astropayVA { background-position: 0 -2940px; }
+.provider-icon.astropayVD { background-position: 0 -3000px; }
+.provider-icon.bitcoin { background-position: 0 -3060px; }
+.provider-icon.astropayVI { background-position: 0 -3120px; }
+.provider-icon.creditcard { background-position: 0 -3180px; }
+.provider-icon.astropayWP { background-position: 0 -3240px; }
+.provider-icon.dynamicpay { background-position: 0 -3300px; }
+.provider-icon.fortumo { background-position: 0 -3360px; }
+.provider-icon.infobip { background-position: 0 -3420px; }
+.provider-icon.paysafecard { background-position: 0 -3480px; }
+.provider-icon.tpay { background-position: 0 -3540px; }
+.provider-icon.voucher { background-position: 0 -3600px; }
+.provider-icon.wiretransfer { background-position: 0 -3660px; }
 
 .membership-new-offer text {
 	font-weight: normal;
@@ -25840,6 +25840,11 @@ body.pro:after {
 .top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
  background-image: url("../images/mega/lang-selection-sprite-v2@2x.png");
  background-size: 92px auto;
+}
+
+.membership-step2 .provider-icon {
+    background-image: url("../images/mega/payment-provider-icons-v1@2x.png");
+    background-size: 20px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);

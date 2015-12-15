@@ -769,7 +769,7 @@ var proPage = {
             */
         }
         
-        console.log(html);
+        console.log('zzzz', html);
         
         // Update the page
         $('.membership-step2 .payment-options-list.' + primaryOrSecondary).append(html);

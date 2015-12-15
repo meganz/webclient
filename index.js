@@ -538,7 +538,7 @@ function init_page() {
         parsepage(pages['key']);
         init_key();
     }
-    else if (page == 'support') {
+    else if (page === 'support') {
         parsepage(pages['support']);
         support.initUI();
     }

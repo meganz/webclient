@@ -349,11 +349,23 @@ var ConversationMessage = React.createClass({
                     });
 
 
+                    var avatar = null;
+                    var datetime = null;
+                    var name = null;
+                    if (this.props.grouped) {
+                        additionalClasses += " grouped";
+                    } else {
+                        avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                        datetime = <div className="message date-time"
+                                            title={time2date(timestampInt)}>{timestamp}</div>;
+                        name = <div className="message user-card-name">{displayName}</div>;
+                    }
+
                     return <div className={message.messageId + " message body" + additionalClasses}>
-                        <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
+                        {avatar}
                         <div className="message content-area">
-                            <div className="message user-card-name">{displayName}</div>
-                            <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
+                            {name}
+                            {datetime}
 
                             <div className="message shared-block">
                                 {files}
@@ -426,12 +438,25 @@ var ConversationMessage = React.createClass({
                         </DropdownsUI.Dropdown>
                     </ButtonsUI.Button>
                 }
+
+                var avatar = null;
+                var datetime = null;
+                var name = null;
+                if (this.props.grouped) {
+                    additionalClasses += " grouped";
+                } else {
+                    avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                    datetime = <div className="message date-time"
+                                    title={time2date(timestampInt)}>{timestamp}</div>;
+                    name = <div className="message user-card-name">{displayName}</div>;
+                }
+
                 return (
                     <div className={message.messageId + " message body " + additionalClasses}>
-                        <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>
+                        {avatar}
                         <div className="message content-area">
-                            <div className="message user-card-name">{displayName}</div>
-                            <div className="message date-time" title={time2date(timestampInt)}>{timestamp}</div>
+                            {name}
+                            {datetime}
 
                             {messageActionButtons}
 
@@ -1011,7 +1036,7 @@ var ConversationPanel = React.createClass({
 
         setTimeout(function()
         {
-            moveCursortoToEnd($('.chat-textarea:visible')[0]);
+            moveCursortoToEnd($('.chat-textarea:visible textarea')[0]);
         }, 100);
     },
     onStartCallClicked: function(e) {
@@ -1206,6 +1231,10 @@ var ConversationPanel = React.createClass({
             chatRoom.trigger("onChatIsFocused");
         }
     },
+    focusTypeArea: function() {
+        var $container = $(ReactDOM.findDOMNode(this));
+        moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+    },
     componentDidMount: function() {
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
@@ -1375,6 +1404,10 @@ var ConversationPanel = React.createClass({
         room.megaChat.updateSectionUnreadCount();
 
         self.handleWindowResize();
+
+        if (room.isCurrentlyActive) {
+            this.focusTypeArea();
+        }
     },
     handleWindowResize: function(e, scrollToBottom) {
         var $container = $(ReactDOM.findDOMNode(this));
@@ -1453,61 +1486,44 @@ var ConversationPanel = React.createClass({
         var contact = room.megaChat.getContactFromJid(contactJid);
 
         var conversationPanelClasses = "conversation-panel";
-        var messagesClasses = "fm-chat-message-scroll";
-        var endCallClasses = "chat-button fm-end-call";
-        var videoControlClasses = "video-controls";
 
         if (!room.isCurrentlyActive) {
             conversationPanelClasses += " hidden";
         }
 
-        //if (room._conv_ended === true) {
-        //    headerClasses += " conv-ended";
-        //} else {
-        //    headerClasses += " conv-start";
-        //}
 
-        var callIsActive = room.callSession && room.callSession.isActive();
-        if (!callIsActive) {
-            endCallClasses += " hidden";
-        }
+        var avatarMeta = generateAvatarMeta(contact.u);
+        var contactName = avatarMeta.fullName;
 
 
-        var contactId = 'contact_' + htmlentities(contact.u);
-        var contactClassString = "fm-chat-user-info todo-star";
-        contactClassString += " " + room.megaChat.xmppPresenceToCssClass(
-                contact.presence
+        var messagesList = [
+        ];
+
+        if (self.props.messagesBuff.messages.length === 0 || !self.props.messagesBuff.haveMoreHistory()) {
+            messagesList.push(
+                <div className="messages notification" key="initialMsg">
+                    <div className="header">
+                        No chat history with <span>{contactName}</span>
+                    </div>
+                    <div className="info">
+                        Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
+                    </div>
+                </div>
             );
-
-        var startCallButtonClasses = "chat-button btn-chat-call fm-start-call";
-
-        if (callIsActive) {
-            startCallButtonClasses += " hidden";
         }
-        else {
-            if (room.callSession && (
-                room.callSession.state === CallSession.STATE.WAITING_RESPONSE_OUTGOING ||
-                room.callSession.state === CallSession.STATE.WAITING_RESPONSE_INCOMING
-                )
-            ) {
-                startCallButtonClasses += " disabled";
-            }
-        }
-
-        if (!contact.presence) {
-            startCallButtonClasses += " disabled";
-        }
-
-
-        var messagesList = [];
-
         var lastTimeMarker;
+        var lastMessageFrom = null;
+        var lastGroupedMessageTimeStamp = null;
+        var grouped = false;
+
         self.props.messagesBuff.messages.forEach(function(v, k) {
-            if (v.deleted !== 1 && !v.protocol) {
+            if (v.deleted !== 1 && !v.protocol && v.revoked !== true) {
                 var shouldRender = true;
                 if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
                     shouldRender = false;
                 }
+
+
 
                 var curTimeMarker = time2lastSeparator((new Date(v.delay * 1000).toISOString()));
 
@@ -1516,20 +1532,49 @@ var ConversationPanel = React.createClass({
                     messagesList.push(
                         <div className="message date-divider" key={v.messageId + "_marker"}>{curTimeMarker}</div>
                     );
+
+                    grouped = false;
+                    lastMessageFrom = null;
+                    lastGroupedMessageTimeStamp = null;
                 }
 
 
-                messagesList.push(
-                    <ConversationMessage message={v} chatRoom={room} key={v.messageId} contact={contact} />
-                );
+                if (shouldRender === true) {
+                    var userId = v.userId;
+                    var timestamp = v.delay;
+
+                    if (!userId && v.fromJid) {
+                        var contact = room.megaChat.getContactFromJid(v.fromJid);
+                        if (contact && contact.u) {
+                            userId = contact.u;
+                        }
+                    }
+                    // the grouping logic for messages.
+                    if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
+                        if (timestamp - lastGroupedMessageTimeStamp < (5 * 60)) {
+                            grouped = true;
+                        } else {
+                            grouped = false;
+                            lastMessageFrom = userId;
+                            lastGroupedMessageTimeStamp = timestamp;
+                        }
+                    }
+                    else {
+                        grouped = false;
+                        lastMessageFrom = null;
+                        lastGroupedMessageTimeStamp = null;
+                    }
+
+                    messagesList.push(
+                        <ConversationMessage message={v} chatRoom={room} key={v.messageId} contact={contact}
+                                             grouped={grouped}/>
+                    );
+                }
             }
         });
 
 
         if (messagesList.length === 0) {
-            var avatarMeta = generateAvatarMeta(contact.u);
-            var contactName = avatarMeta.fullName;
-
             if (self.props.messagesBuff.haveMessages === true &&
                 self.props.messagesBuff.messagesHistoryIsLoading() === true
             ) {
@@ -1543,15 +1588,7 @@ var ConversationPanel = React.createClass({
                 </div>;
             }
             else {
-
-                messagesList = <div className="messages notification">
-                    <div className="header">
-                        No chat history with <span>{contactName}</span>
-                    </div>
-                    <div className="info">
-                        Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
-                    </div>
-                </div>;
+                // Don't do anything
             }
         }
 

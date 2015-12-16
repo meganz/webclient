@@ -104,7 +104,6 @@ var MegaRenderMixin = {
         this.forceUpdate();
     },
     onResizeDoUpdate: function() {
-        console.error("onResizeDoUpdate", this.getUniqueId());
         if(!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }

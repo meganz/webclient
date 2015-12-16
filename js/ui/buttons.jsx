@@ -53,6 +53,10 @@ var Button = React.createClass({
     onBlur: function(e) {
         var $element = $(ReactDOM.findDOMNode(this));
 
+        if ($(e.target).is($element)) {
+            return;
+        }
+
         if(
             (!e || !$(e.target).parents(".button").is($element))
         ) {
@@ -64,7 +68,17 @@ var Button = React.createClass({
 
     },
     onClick: function(e) {
+        var $element = $(ReactDOM.findDOMNode(this));
+
         if (this.props.disabled === true) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
+        if(
+            $(e.target).parents(".popup").parents('.button').is($element) && this.state.focused === true
+        ) {
             e.preventDefault();
             e.stopPropagation();
             return;
@@ -73,6 +87,7 @@ var Button = React.createClass({
         if ($(e.target).is("input,textarea,select")) {
             return
         }
+
 
         if (this.state.focused === false) {
             if (this.props.onClick) {

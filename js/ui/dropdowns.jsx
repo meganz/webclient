@@ -136,8 +136,8 @@ var DropdownContactsSelector = React.createClass({
             if (self.state.searchValue && self.state.searchValue.length > 0) {
                 // DON'T add to the contacts list if the contact's name or email does not match the search value
                 if (
-                    avatarMeta.fullName.indexOf(self.state.searchValue) === -1 &&
-                    v.m.indexOf(self.state.searchValue) === -1
+                    avatarMeta.fullName.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1 &&
+                    v.m.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1
                 ) {
                     return;
                 }
@@ -334,19 +334,14 @@ var DropdownEmojiSelector = React.createClass({
             if (visibleEmojis === false) {
                 visibleEmojis = self.state.visibleEmojis;
             }
-            Object.keys(EMOJILIST.EMOJI_CATEGORIES).forEach(function (categoryName) {
-                if (
-                    self.state.browsingCategory !== "FREQUENTLY USED" &&
-                    self.state.browsingCategory !== false &&
-                    self.state.browsingCategory != categoryName
-                ) {
-                    return;
-                }
 
+            var searchValue = self.state.searchValue;
+
+            Object.keys(EMOJILIST.EMOJI_CATEGORIES).forEach(function (categoryName) {
                 var curCategoryEmojis = [];
                 Object.keys(EMOJILIST.EMOJI_CATEGORIES[categoryName]).forEach(function (slug) {
-                    if (self.state.searchValue.length > 0) {
-                        if (slug.indexOf(self.state.searchValue) < 0) {
+                    if (searchValue.length > 0) {
+                        if ((":" + slug + ":").indexOf(searchValue) < 0) {
                             return;
                         }
                     }
@@ -405,7 +400,7 @@ var DropdownEmojiSelector = React.createClass({
 
                 if (curCategoryEmojis.length > 0) {
                     emojis.push(
-                        <div key={categoryName}>
+                        <div key={categoryName} data-category-name={categoryName} className="emoji-category-container">
                             {emojis.length > 0 ? <div className="clear"></div> : null}
                             <div className="emoji-type-txt">
                                 {__(categoryName)}
@@ -451,7 +446,11 @@ var DropdownEmojiSelector = React.createClass({
                             e.preventDefault();
 
                             self.setState({browsingCategory: categoryName, searchValue: ''});
-                            $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollTo(0);
+                            $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollToElement(
+                                $('.emoji-category-container[data-category-name="' + categoryName + '"]:visible'),
+                                true,
+                                true
+                            );
                         }}
                     >
                         <i className={"small-icon " + categoryIcons[categoryName]}></i>

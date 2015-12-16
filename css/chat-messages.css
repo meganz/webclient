@@ -193,3 +193,16 @@
 .messages.notification {
     padding: 24px 24px 0 24px;
 }
+.message.body.grouped {
+	padding: 2px 0 0 24px;
+	margin: 0;
+}
+.message.shared-data {
+	margin-bottom: 10px;
+}
+.message.body .default-white-button.tiny-button {
+	position: absolute;
+	right: 16px;
+	float: none;
+	margin: 0;
+}

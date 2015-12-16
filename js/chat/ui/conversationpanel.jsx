@@ -928,7 +928,7 @@ var ConversationAudioVideoPanel = React.createClass({
                 <div
                     className="call-duration medium blue call-counter"
                     data-room-jid={chatRoom.roomJid.split("@")[0]}>{
-                        secondsToTime(chatRoom._currentCallCounter)
+                    secondsToTimeShort(chatRoom._currentCallCounter)
                     }
                 </div>
             </div>

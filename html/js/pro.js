@@ -907,7 +907,15 @@ var proPage = {
                 
                 // Show amount they will save
                 if (numOfMonths === 12) {
+                    
+                    // Calculate the discount price (the current yearly price is 10 months worth)
+                    var priceOneMonth = (price / 10);
+                    var priceTenMonths = (priceOneMonth * 10);
+                    var priceTwelveMonths = (priceOneMonth * 12);
+                    var discount = (priceTwelveMonths - priceTenMonths).toFixed(2);
+                    
                     $durationOption.find('.save-money').removeClass('hidden');
+                    $durationOption.find('.save-money .amount').text(discount);
                 }
                 
                 // Update the list of duration options
@@ -947,8 +955,8 @@ var proPage = {
             $this.find('input').attr('checked', 'checked');
 
             // Update the main price and wording for one-time or recurring
-            //proPage.updateMainPrice(planIndex);
-            //proPage.updateTextDependingOnRecurring();
+            proPage.updateMainPrice(planIndex);
+            proPage.updateTextDependingOnRecurring();
         });
     },
     
@@ -965,8 +973,9 @@ var proPage = {
         var cents = price[1];
 
         // Update main price at the bottom
-        var $mainPrice = $('.main-mid-pad .membership-bott-price');
-        $mainPrice.find('strong').html(dollars + '<span>.' + cents + ' &euro;</span>');
+        $('.membership-step2 .reg-st3-bott-title.price .num').html(
+            dollars + '<span class="small">.' + cents + ' &euro;</span>'
+        );
     },
         
     /**
@@ -1012,8 +1021,8 @@ var proPage = {
         $firstOption.find('input').attr('checked', 'checked');
 
         // Update the text for one-time or recurring
-        //proPage.updateMainPrice(newPlanIndex);
-        //proPage.updateTextDependingOnRecurring();
+        proPage.updateMainPrice(newPlanIndex);
+        proPage.updateTextDependingOnRecurring();
     },
     
     /**

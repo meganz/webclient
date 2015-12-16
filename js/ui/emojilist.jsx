@@ -83,7 +83,7 @@ var EMOJI_CATEGORIES = {
         "ear": ["1F442", "&#x1F442;"],
         "nose": ["1F443", "&#x1F443;"],
         "point_up": ["261D", "&#x261D;"],
-        "v": ["1F479", "&#x270C;"],
+        "v": ["270C", "&#x270C;"],
         "punch": ["1F44A", "&#x1F44A;"],
         "clap": ["1F44F", "&#x1F44F;"],
         "thumbsup": ["1F44D", "&#x1F44D;"],
@@ -95,7 +95,7 @@ var EMOJI_CATEGORIES = {
         "vulcan": ["1F596", "&#x1F596;"],
         "muscle": ["1F4AA", "&#x1F4AA;"],
         "raised_hands": ["1F64C", "&#x1F64C;"],
-        "pray": ["1F479", "&#x1F64F;"],
+        "pray": ["1F64F", "&#x1F64F;"],
         "writing_hand": ["1F58E", "&#x1F58E;"],
     },
     "NATURE": {

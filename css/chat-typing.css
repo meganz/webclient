@@ -1,6 +1,7 @@
 .typing-block {
 	position: absolute;
-	padding: 3px 0 0 71px;
+	padding: 0 0 0 71px;
+    bottom: 6px;
 }
 .typing-text {
 	font-size: 12px;

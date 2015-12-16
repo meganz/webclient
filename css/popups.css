@@ -1,88 +1,111 @@
 .popup.dropdown.body {
-	padding: 0;
+    padding: 0;
 }
 /* Search contacts popup */
 .popup.dropdown.body.contacts-search, .popup.dropdown.body.add-participant-selector {
-	padding: 0 0 7px 0;
+    padding: 0 0 7px 0;
 }
 .popup.add-participant-selector {
-	right: 12px;
-	left: auto !important;
+    right: 12px;
+    left: auto !important;
 }
 .popup.add-participant-selector .dropdown-white-arrow {
-	margin-left: 36px;
+    margin-left: 36px;
 }
 .contacts-search-header {
-	line-height: 48px;
-	height: 48px;
-	font-size: 14px;
-	color: #666666;
-	position: relative;
-	z-index: 10;
-	padding: 0 0 0 104px;
-}
-.add-participant-selector .contacts-search-header, .contacts-search-header.left-aligned  {
-	padding: 0 0 0 40px;
+    line-height: 48px;
+    height: 48px;
+    font-size: 14px;
+    color: #666666;
+    position: relative;
+    z-index: 10;
+    padding: 0 0 0 40px;
 }
 .contacts-search-header input, .search-block.emoji-one input {
-	font-size: 14px;
-	line-height: 24px;
-	color: #666666;
-	width: auto;
-	display: inline-block;
-	margin: 12px 0 0 7px;
-	border: 0;
-	padding: 0;
-	vertical-align: top;
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
+    width: auto;
+    display: inline-block;
+    margin: 12px 0 0 16px;
+    border: 0;
+    padding: 0;
+    vertical-align: top;
+    width: 186px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
-.add-participant-selector .contacts-search-header input, .contacts-search-header.left-aligned input {
-	margin: 12px 0 0 16px;
+.contacts-search .contacts-search-header {
+    text-align: right;
 }
-.contacts-search-header input::-webkit-input-placeholder,  .popup-header.emoji-one input::-webkit-input-placeholder {
+.contacts-search .contacts-search-header input {
+    margin: 12px 40px 0 7px;
+}
+.contacts-search .contacts-search-header input:focus {
+    margin: 12px 95px 0 16px;
+}
+.dropdown.popup input::-webkit-input-placeholder {
 color: #666666;
 }
-.contacts-search-header input:-moz-placeholder,  .popup-header.emoji-one inputt:-moz-placeholder {
+.dropdown.popup input:-moz-placeholder {
 color: #666666;
  opacity: 1;
 }
-.contacts-search-header input::-moz-placeholder,  .popup-header.emoji-one input::-moz-placeholder {
+.dropdown.popup input::-moz-placeholder {
 color: #666666;
  opacity: 1;
 }
-.contacts-search-header input:-ms-input-placeholder,  .popup-header.emoji-one inputt:-ms-input-placeholder {
+.dropdown.popup input:-ms-input-placeholder {
 color: #666666;
 }
-.contacts-search-header > i,  .search-block.emoji-one > i {
-	vertical-align: top;
-	margin: 14px 3px 1px 0;
+ .dropdown.popup input:focus::-webkit-input-placeholder {
+color: #cccccc;
+}
+.dropdown.popup input:-moz-placeholder {
+color: #cccccc;
+ opacity: 1;
+}
+.dropdown.popup input:focus::-moz-placeholder {
+color: #cccccc;
+ opacity: 1;
+}
+.dropdown.popup input:focus:-ms-input-placeholder {
+color: #cccccc;
+}
+.contacts-search-header > i, .search-block.emoji-one > i {
+    vertical-align: top;
+    margin: 14px 3px 1px 0;
 }
 .contacts-search-scroll {
-	height: 288px !important;
-	overflow: hidden;
+    height: 288px !important;
+    overflow: hidden;
 }
 .contacts-search-scroll, .contacts-search-scroll .jspPane {
     background-image: url(../images/mega/grid-bg2.svg);
-	background-position: left top;
+    background-position: left top;
 }
 .contacts-search-scroll .jspPane {
     min-height: 100%;
 }
 .popup .contacts-info.body.contacts-search {
-	height: 48px;
-	padding: 6px 0;
-	cursor: pointer;
+    height: 48px;
+    padding: 6px 0;
+    cursor: pointer;
 }
 .contacts-info.body.contacts-search:nth-child(odd) {
-	background-color: #fafafa;
+    background-color: #fafafa;
 }
 .contacts-search .user-card-presence {
-	margin: 14px 10px 0 14px;
+    margin: 14px 10px 0 14px;
 }
 .contacts-search .user-card-presence {
-	margin: 14px 10px 0 14px;
+    margin: 14px 10px 0 14px;
 }
 .contacts-search .user-card-data {
-	padding: 0 30px 0 79px;
+    padding: 0 30px 0 79px;
 }
 /* End of Search contacts popup */
 
@@ -93,24 +116,24 @@ color: #666666;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    margin:0 12px;
-    position:relative;
+    margin: 0 12px;
+    position: relative;
     z-index: 10;
 }
 .popup-header.emoji-one {
-	padding: 0 0 0 10px;
+    padding: 0 0 0 10px;
 }
 .popup-footer.emoji-one {
     border-top: 1px solid #e5e5e5;
     border-bottom: 0;
     padding: 4px 0 0 0;
 }
- .popup-header.emoji-one input {
-	margin: 12px 0 0 14px;
+.popup-header.emoji-one input {
+    margin: 12px 0 0 14px;
 }
 .popup-scroll-area.emoji-one {
     max-height: 336px;
-    position:relative;
+    position: relative;
     z-index: 10;
     overflow: hidden;
 }

@@ -2,10 +2,10 @@
 	position: absolute;
 	width: 100%;
 	bottom: 0;
-	min-height: 100px;
+	min-height: 72px;
 }
 .chat-textarea {
-	margin: 28px 24px 25px 24px;
+	margin: 0 24px 25px 24px;
 	padding: 15px 84px 13px 48px;
 	min-height: 48px;
 	background-color: white;

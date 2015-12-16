@@ -994,15 +994,15 @@ CallManager.prototype._attachToChat = function(megaChat) {
 
 
     $(megaChat.rtc).on('local-media-request.callManager', function() {
+        console.error(arguments[0].type);
         $('.camera-access').removeClass('hidden');
     });
-    $(megaChat.rtc).on('local-media-confirmed.callManager', function() {
-        $('.camera-access').addClass('hidden');
-    });
-    $(megaChat.rtc).on('local-media-rejected.callManager', function() {
+    $(megaChat.rtc).on('local-media-handled.callManager', function() {
+        console.error(arguments[0].type);
         $('.camera-access').addClass('hidden');
     });
     $(megaChat.rtc).on('local-media-fail.callManager', function() {
+        console.error(arguments[0].type);
         $('.camera-access').addClass('hidden');
     });
 

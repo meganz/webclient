@@ -760,14 +760,25 @@ var ConversationAudioVideoPanel = React.createClass({
 
 
                 // contain in the $container
-                right = Math.min(right, $container.outerWidth());
-                bottom = Math.min(bottom, $container.outerHeight());
+                right = Math.min(right, $container.outerWidth() - 8);
+                bottom = Math.min(bottom, $container.outerHeight() - 8);
+
+                right = right - ui.helper.outerWidth();
+                bottom = bottom - ui.helper.outerHeight();
+
+                if (bottom < (48 + 8)) {
+                    bottom = 48+8;
+                }
+                if (right < 8) {
+                    right = 8;
+                    $(this).addClass('bottom-panel');
+                }
 
                 ui.offset = {
                     left: 'auto',
                     top: 'auto',
-                    right: right - ui.helper.outerWidth(),
-                    bottom: bottom - ui.helper.outerHeight()
+                    right: right,
+                    bottom: bottom
                 };
                 ui.position.left = 'auto';
                 ui.position.top = 'auto';

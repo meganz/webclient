@@ -404,7 +404,7 @@ CallSession.prototype._renderInCallUI = function() {
     }
     self.room._currentCallTimer = setInterval(function() {
         $('.call-counter[data-room-jid="' + self.room.roomJid.split("@")[0] + '"]').text(
-            secondsToTime(self.room._currentCallCounter)
+            secondsToTimeShort(self.room._currentCallCounter)
         );
 
         self.room._currentCallCounter++;
@@ -991,6 +991,20 @@ CallManager.prototype._attachToChat = function(megaChat) {
     $(megaChat.rtc).on('call-ended.callManager', selfBoundRtcEventProxyToRoom);
     $(megaChat.rtc).on('muted.callManager', selfBoundRtcEventProxyToRoom);
     $(megaChat.rtc).on('unmuted.callManager', selfBoundRtcEventProxyToRoom);
+
+
+    $(megaChat.rtc).on('local-media-request.callManager', function() {
+        $('.camera-access').removeClass('hidden');
+    });
+    $(megaChat.rtc).on('local-media-confirmed.callManager', function() {
+        $('.camera-access').addClass('hidden');
+    });
+    $(megaChat.rtc).on('local-media-rejected.callManager', function() {
+        $('.camera-access').addClass('hidden');
+    });
+    $(megaChat.rtc).on('local-media-fail.callManager', function() {
+        $('.camera-access').addClass('hidden');
+    });
 
     megaChat.unbind("onRoomDestroy.callManager");
     megaChat.bind("onRoomDestroy.callManager", function(e, chatRoom) {

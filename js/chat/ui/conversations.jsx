@@ -112,7 +112,7 @@ var ConversationsListItem = React.createClass({
             inCallDiv = <div className="call-duration">
                 {mutedMicrophone}
                 {activeCamera}
-                <span className="call-counter" data-room-jid={chatRoom.roomJid.split("@")[0]}>{secondsToTime(chatRoom._currentCallCounter)}</span>
+                <span className="call-counter" data-room-jid={chatRoom.roomJid.split("@")[0]}>{secondsToTimeShort(chatRoom._currentCallCounter)}</span>
             </div>;
 
             classString += " call-active";

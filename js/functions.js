@@ -784,6 +784,23 @@ function secondsToTime(secs) {
     return returnvar;
 }
 
+function secondsToTimeShort(secs) {
+    var val = secondsToTime(secs);
+
+    if (!val) {
+        return val;
+    }
+
+    if (val.substr(0, 1) === "0") {
+        val = val.substr(1, val.length);
+    }
+    if (val.substr(0, 2) === "0:") {
+        val = val.substr(2, val.length);
+    }
+
+    return val;
+}
+
 function htmlentities(value) {
     if (!value) {
         return '';

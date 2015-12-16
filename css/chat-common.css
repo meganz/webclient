@@ -6,8 +6,9 @@
 }
 .nw-fm-tree-header.conversations .button {
 	position: absolute;
-	right: 14px;
-	top: 14px;
+	right: 12px;
+	top: 12px;
+    padding: 2px;
 }
 .chat-content-block {
 	height: 100%;

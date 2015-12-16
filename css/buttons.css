@@ -129,6 +129,19 @@
 	-khtml-opacity: 0;
 	opacity: 0;
 }
+.default-white-button.tiny-button::after {
+    content: '';
+    display:block;
+    position:absolute;
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+    -webkit-box-sizing: padding-box;
+    -moz-box-sizing: padding-box;
+    box-sizing: padding-box;
+    left: -4px;
+    top: -4px;
+}
 .default-white-button.tiny-button .tiny-icon {
 	margin: 0 auto;
 	display: block;

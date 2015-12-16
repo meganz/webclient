@@ -5891,6 +5891,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	line-height: 23px;
 	vertical-align: top;
 	font-size: 13px;
+    cursor: default;
 }
 .grid-table.shared-with-me td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
 	vertical-align: middle;

@@ -27,9 +27,9 @@ module.exports = function(config) {
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
         'js/vendor/jquery.fullscreen.js',
+        'js/vendor/jquery.qrcode.js',
         'js/jquery.tokeninput.js',
         'js/jquery.misc.js',
-        'js/jquery.qrcode.js',
         'js/jquery.checkboxes.js',
 
         // == Libraries ==
@@ -60,7 +60,7 @@ module.exports = function(config) {
         'js/vendor/chat/cryptojs-hmac.js',
         'js/vendor/chat/cryptojs-lib-typedarrays.js',
         // Other.
-        'js/vendor/Autolinker.js',
+        'js/vendor/autolinker.js',
         'js/vendor/qrcode.js',
         'js/vendor/bitcoin-math.js',
         'js/vendor/db.js',
@@ -104,7 +104,7 @@ module.exports = function(config) {
         'js/vendor/avatar.js',
         'js/countries.js',
         'js/megaKvStorage.js',
-        'js/vendor/Int64.js',
+        'js/vendor/int64.js',
         'js/zip64.js',
         'js/cms.js',
         // Google Import Contacts

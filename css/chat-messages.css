@@ -111,9 +111,6 @@
     padding: 24px 0 0 71px;
 	font-family: 'source_sans_prosemibold';
 }
-.message.content-area > .default-white-button.tiny-button {
-	margin: 22px 0 0 0;
-}
 .message.shared-info {
 	white-space: nowrap;
 	padding: 17px 0 4px 0;
@@ -200,9 +197,9 @@
 .message.shared-data {
 	margin-bottom: 10px;
 }
-.message.body .default-white-button.tiny-button {
+.message.content-area > .default-white-button.tiny-button {
 	position: absolute;
 	right: 16px;
 	float: none;
-	margin: 0;
+	margin: 2px 0 0 0;
 }

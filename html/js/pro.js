@@ -687,23 +687,23 @@ var proPage = {
                 proPage.renderPaymentProviderOptions(proPage.primaryGatewayOptions, 'primary');
                 proPage.renderPaymentProviderOptions(proPage.secondaryGatewayOptions, 'secondary');
                 
-                // Pre-select the first option in the list
-                var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
-                $paymentOption.find('input').attr('checked', 'checked');
-                $paymentOption.find('input').addClass('checked');
-                $paymentOption.find('.membership-radio').addClass('checked');
-
                 // Change radio button states when clicked
                 proPage.initPaymentMethodRadioOptions();
                 
                 // Init the Show more options button
                 $('.provider-show-more').click(function() {
-                    $('.payment-options-list.secondary').toggleClass('hidden');
+                    $('.payment-options-list.secondary').removeClass('hidden');
+                    $(this).hide();
                 });
             }
         });
     },
     
+    /**
+     * Render the payment providers as radio buttons
+     * @param {Object} gatewayOptions The list of gateways from the API
+     * @param {String} primaryOrSecondary Which list to render the gateways into i.e. 'primary' or 'secondary'
+     */
     renderPaymentProviderOptions: function(gatewayOptions, primaryOrSecondary) {
         
         // Get their plan price from the currently selected duration radio button
@@ -737,12 +737,12 @@ var proPage = {
             }
 
             // If their prepay balance is less than 0 they can buy a voucher
-            if ((gatewayOption.gatewayId === 0) && (balanceFloat <= 0)) {
+            if ((gatewayOption.gatewayName === 'voucher') && (balanceFloat <= 0)) {
                 gatewayOption.displayName = l[487];     // Voucher code
             }
 
             // Otherwise if they have account balance, then they can use that
-            else if ((gatewayOption.gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
+            else if ((gatewayOption.gatewayName === 'voucher') && (balanceFloat >= planPriceFloat)) {
                 gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';  // Balance (x.xx)
             }
             
@@ -760,8 +760,7 @@ var proPage = {
             $gateway.removeClass('template');
             $gateway.find('input').attr('name', gatewayOption.gatewayName);
             $gateway.find('input').attr('id', gatewayOption.gatewayName);
-            $gateway.find('input').attr('id', gatewayOption.gatewayName);
-            $gateway.find('input').val(gatewayOption.gatewayId);
+            $gateway.find('input').val(gatewayOption.gatewayName);
             $gateway.find('.provider-icon').addClass(gatewayOption.gatewayName);
             $gateway.find('.provider-name').html(gatewayOption.displayName);
 
@@ -779,6 +778,14 @@ var proPage = {
      */
     initPaymentMethodRadioOptions: function() {
 
+        // Pre-select the first option in the list
+        var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
+        $paymentOption.find('input').attr('checked', 'checked');
+        $paymentOption.find('input').addClass('checked');
+        $paymentOption.find('.membership-radio').addClass('checked');
+        $paymentOption.find('.provider-details').addClass('checked');
+
+        // Add click handler to all payment methods
         var paymentOptionsList = $('.payment-options-list');
         paymentOptionsList.find('.payment-method').rebind('click', function(event) {
 
@@ -792,15 +799,56 @@ var proPage = {
 
             // Remove checked state from all radio inputs
             paymentOptionsList.find('.membership-radio').removeClass('checked');
+            paymentOptionsList.find('.provider-details').removeClass('checked');
             paymentOptionsList.find('input').prop('checked', false);
 
             // Add checked state for this radio button
             $this.find('input').prop('checked', true);        
             $this.find('.membership-radio').addClass('checked');
+            $this.find('.provider-details').addClass('checked');
 
-            //proPage.updateTextDependingOnRecurring();
+            proPage.updateTextDependingOnRecurring();
             //proPage.updatePeriodOptionsOnPaymentMethodChange();
         });
+    },
+        
+    /**
+     * Updates the text on the page depending on the payment option they've selected and 
+     * the duration/period so it is accurate for a recurring subscription or one off payment.
+     */
+    updateTextDependingOnRecurring: function() {
+
+        // Update whether this selected option is recurring or one-time
+        var $selectDurationOption = $('.duration-options-list .membership-radio.checked');
+        var $mainPrice = $('.membership-bott-price');
+        var selectedGatewayName = $('.payment-options-list input:checked').val();
+        var selectedProvider = proPage.allGateways.filter(function(val) {
+            return (val.gatewayName === selectedGatewayName);
+        });
+        
+        var planIndex = $selectDurationOption.parent().attr('data-plan-index');
+        var currentPlan = membershipPlans[planIndex];
+        var numOfMonths = currentPlan[4];
+        var subscribeOrPurchase = (selectedProvider.supportsRecurring) ? l[6172] : l[6190].toLowerCase();
+        var durationOrRenewal = (selectedProvider.supportsRecurring) ? l[6977] : l[6817];
+        var getTwoMonthsFree = (selectedProvider.supportsRecurring) ? l[6978] : l[1148];
+
+        // Set to /month, /year or /one time next to the price
+        if (selectedProvider.supportsRecurring && (numOfMonths === 1)) {
+            $mainPrice.find('.period').text('/' + l[913]);
+        }
+        else if (selectedProvider.supportsRecurring && (numOfMonths > 1)) {
+            $mainPrice.find('.period').text('/' + l[932]);
+        }
+        else {
+            $mainPrice.find('.period').text('/' + l[6809]);
+        }
+
+        // Update depending on recurring or one off payment
+        $('.membership-st2-head.choose-duration').html(durationOrRenewal);
+        $('.membership-bott-button').html(subscribeOrPurchase);
+        $('.membership-bott-descr').html(getTwoMonthsFree);
+        $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
     },
     
     /**
@@ -875,8 +923,8 @@ var proPage = {
         // Get current plan price
         var planIndex = $firstOption.attr('data-plan-index');
 
-        proPage.updateMainPrice(planIndex);
-        proPage.updateTextDependingOnRecurring();
+        //proPage.updateMainPrice(planIndex);
+        //proPage.updateTextDependingOnRecurring();
     },
     
     /**
@@ -899,8 +947,8 @@ var proPage = {
             $this.find('input').attr('checked', 'checked');
 
             // Update the main price and wording for one-time or recurring
-            proPage.updateMainPrice(planIndex);
-            proPage.updateTextDependingOnRecurring();
+            //proPage.updateMainPrice(planIndex);
+            //proPage.updateTextDependingOnRecurring();
         });
     },
     
@@ -920,42 +968,7 @@ var proPage = {
         var $mainPrice = $('.main-mid-pad .membership-bott-price');
         $mainPrice.find('strong').html(dollars + '<span>.' + cents + ' &euro;</span>');
     },
-    
-    /**
-     * Updates the text on the page depending on the payment option they've selected and 
-     * the duration/period so it is accurate for a recurring subscription or one off payment.
-     */
-    updateTextDependingOnRecurring: function() {
-
-        // Update whether this selected option is recurring or one-time
-        var $selectDurationOption = $('.duration-options-list .membership-radio.checked');
-        var $mainPrice = $('.membership-bott-price');
-        var recurring = ($('.payment-options-list input:checked').attr('data-recurring') === 'true') ? true : false;
-        var planIndex = $selectDurationOption.parent().attr('data-plan-index');
-        var currentPlan = membershipPlans[planIndex];
-        var numOfMonths = currentPlan[4];
-        var subscribeOrPurchase = (recurring) ? l[6172] : l[6190].toLowerCase();
-        var durationOrRenewal = (recurring) ? l[6977] : l[6817];
-        var getTwoMonthsFree = (recurring) ? l[6978] : l[1148];
-
-        // Set to /month, /year or /one time next to the price
-        if (recurring && (numOfMonths === 1)) {
-            $mainPrice.find('.period').text('/' + l[913]);
-        }
-        else if (recurring && (numOfMonths > 1)) {
-            $mainPrice.find('.period').text('/' + l[932]);
-        }
-        else {
-            $mainPrice.find('.period').text('/' + l[6809]);
-        }
-
-        // Update depending on recurring or one off payment
-        //$('.membership-st2-head.choose-duration').html(durationOrRenewal);
-        $('.membership-bott-button').html(subscribeOrPurchase);
-        $('.membership-bott-descr').html(getTwoMonthsFree);
-        $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
-    },
-    
+        
     /**
      * Updates the duration/renewal period options if they select a payment method. For example 
      * for the wire transfer option we only want to accept one year one-off payments
@@ -999,8 +1012,8 @@ var proPage = {
         $firstOption.find('input').attr('checked', 'checked');
 
         // Update the text for one-time or recurring
-        proPage.updateMainPrice(newPlanIndex);
-        proPage.updateTextDependingOnRecurring();
+        //proPage.updateMainPrice(newPlanIndex);
+        //proPage.updateTextDependingOnRecurring();
     },
     
     /**

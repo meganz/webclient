@@ -59,7 +59,7 @@
     width: 184px;
 }
 .call.local-video {
-    min-height: 120px;
+    min-height: 184px;
     max-height: 184px;
 }
 .call.local-video.minimized, .call.local-audio.minimized {
@@ -217,4 +217,39 @@
 .call.button .unread-messages {
     left: 32px;
     margin: -3px 0 0 0;
+}
+
+.call.local-video,
+.call.local-audio {
+    webkit-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    -moz-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    -o-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    -ms-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+}
+.call.bottom-aligned {
+    margin-bottom: 0;
+}
+
+.call-block .call.bottom-aligned.visible-panel {
+    margin-bottom: 78px;
+}
+.call-block .call.bottom-aligned.visible-panel.minimized {
+    margin-bottom: 70px;
+}
+
+.call-block.small-block .call.bottom-aligned.visible-panel {
+    margin-bottom: 52px;
+}
+.call-block.small-block .call.bottom-aligned.visible-panel.minimized {
+    margin-bottom: 46px;
+}
+
+.call.local-video.minimized,
+.call.local-audio.minimized {
+    webkit-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+    -moz-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+    -o-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+    -ms-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+    transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
 }

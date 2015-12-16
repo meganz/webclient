@@ -1209,6 +1209,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
     jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+    jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
     jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});

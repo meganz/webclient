@@ -698,8 +698,11 @@ var ConversationAudioVideoPanel = React.createClass({
         var $container = $(ReactDOM.findDOMNode(self));
         var room = self.props.chatRoom;
 
+        var mouseoutThrottling = null;
         $container.rebind('mouseover.chatUI', function() {
             var $this = $(this);
+            clearTimeout(mouseoutThrottling);
+            self.visiblePanel = true;
             $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
             if ($this.hasClass('full-sized-block')) {
                 $('.call.top-panel', $container).addClass('visible-panel');
@@ -708,8 +711,12 @@ var ConversationAudioVideoPanel = React.createClass({
 
         $container.rebind('mouseout.chatUI', function() {
             var $this = $(this);
-            $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
-            $('.call.top-panel', $container).removeClass('visible-panel');
+            clearTimeout(mouseoutThrottling);
+            mouseoutThrottling = setTimeout(function() {
+                self.visiblePanel = false;
+                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+                $('.call.top-panel', $container).removeClass('visible-panel');
+            }, 500);
         });
 
 
@@ -718,14 +725,16 @@ var ConversationAudioVideoPanel = React.createClass({
         var forceMouseHide = false;
         $container.rebind('mousemove.chatUI',function(ev) {
             var $this = $(this);
+            clearTimeout(idleMouseTimer);
             if(!forceMouseHide) {
+                self.visiblePanel = true;
                 $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
                 $container.removeClass('no-cursor');
                 if ($this.hasClass('full-sized-block')) {
                     $('.call.top-panel', $container).addClass('visible-panel');
                 }
-                clearTimeout(idleMouseTimer);
                 idleMouseTimer = setTimeout(function() {
+                    self.visiblePanel = false;
                     $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
                     $container.addClass('no-cursor');
                     $('.call.top-panel', $container).removeClass('visible-panel');
@@ -755,6 +764,10 @@ var ConversationAudioVideoPanel = React.createClass({
             'containment': $container,
             'scroll': false,
             drag: function(event, ui){
+                if ($(this).is(".minimized")) {
+                    return false;
+                }
+
                 var right = Math.max(0, $container.outerWidth() - ui.position.left);
                 var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
 
@@ -766,19 +779,31 @@ var ConversationAudioVideoPanel = React.createClass({
                 right = right - ui.helper.outerWidth();
                 bottom = bottom - ui.helper.outerHeight();
 
-                if (bottom < (48 + 8)) {
-                    bottom = 48+8;
+                var minBottom = $(this).is(".minimized") ? 48 : 8;
+
+                if (bottom < minBottom) {
+                    bottom = minBottom;
+                    $(this).addClass('bottom-aligned');
                 }
+                else {
+                    $(this).removeClass('bottom-aligned');
+                }
+
                 if (right < 8) {
                     right = 8;
-                    $(this).addClass('bottom-panel');
+                    $(this).addClass('right-aligned');
+                }
+                else {
+                    $(this).removeClass('right-aligned');
                 }
 
                 ui.offset = {
                     left: 'auto',
                     top: 'auto',
                     right: right,
-                    bottom: bottom
+                    bottom: bottom,
+                    height: "",
+                    width: ""
                 };
                 ui.position.left = 'auto';
                 ui.position.top = 'auto';
@@ -791,13 +816,15 @@ var ConversationAudioVideoPanel = React.createClass({
         // REposition the $localMediaDisplay if its OUT of the viewport (in case of dragging -> going back to normal size
         // mode from full screen...)
         $(window).rebind('resize.chatUI_' + room.roomJid, function(e) {
-            if ($localMediaDisplay.is(":visible")) {
-                var pos = getHtmlElemPos($localMediaDisplay[0]);
-                if (pos.x < 0) {
-                    $localMediaDisplay.css({'right': $container.outerWidth() - $localMediaDisplay.outerWidth()});
-                }
-                if (pos.y < 0) {
-                    $localMediaDisplay.css({'bottom': $container.outerHeight() - $localMediaDisplay.outerHeight()});
+            if ($container.is(":visible")) {
+                if (!elementInViewport($localMediaDisplay[0])) {
+                    $localMediaDisplay
+                        .addClass('right-aligned')
+                        .addClass('bottom-aligned')
+                        .css({
+                            'right': 8,
+                            'bottom': 8,
+                        });
                 }
             }
         });
@@ -834,6 +861,19 @@ var ConversationAudioVideoPanel = React.createClass({
         e.preventDefault();
         e.stopPropagation();
 
+        var $container = $(ReactDOM.findDOMNode(this));
+        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
+
+        $localMediaDisplay
+            .addClass('right-aligned')
+            .addClass('bottom-aligned')
+            .css({
+                'width': '',
+                'height': '',
+                'right': 8,
+                'bottom': !this.state.localMediaDisplay === true ? 8 : 8
+            });
+
         this.setState({localMediaDisplay: !this.state.localMediaDisplay});
     },
     render: function() {
@@ -867,8 +907,13 @@ var ConversationAudioVideoPanel = React.createClass({
         var localPlayerElement = null;
         var remotePlayerElement = null;
 
+        var visiblePanelClass = "";
+
+        if (this.visiblePanel === true) {
+            visiblePanelClass += " visible-panel";
+        }
         if (callSession.getMediaOptions().video === false) {
-            localPlayerElement = <div className={"call local-audio" + (this.state.localMediaDisplay ? "" : " minimized")}>
+            localPlayerElement = <div className={"call local-audio right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
                 <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
                     <i className="tiny-icon grey-minus-icon" />
                 </div>
@@ -879,7 +924,7 @@ var ConversationAudioVideoPanel = React.createClass({
             </div>;
         }
         else {
-            localPlayerElement = <div className={"call local-video" + (this.state.localMediaDisplay ? "" : " minimized")}>
+            localPlayerElement = <div className={"call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
                 <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
                     <i className="tiny-icon grey-minus-icon" />
                 </div>
@@ -1032,7 +1077,6 @@ var ConversationPanel = React.createClass({
 
         room.trigger('RefreshUI');
     },
-    //
     onEmojiClicked: function(e, slug, meta) {
         var self = this;
 
@@ -1049,117 +1093,6 @@ var ConversationPanel = React.createClass({
         {
             moveCursortoToEnd($('.chat-textarea:visible textarea')[0]);
         }, 100);
-    },
-    onStartCallClicked: function(e) {
-        var self = this;
-
-        if ($(e.target).parent().is(".disabled")) {
-            return;
-        }
-
-        var hidePopup = function() {
-            if (self.isMounted()) {
-                self.setState({
-                    startCallPopupIsActive: false
-                });
-                $(document).unbind('mouseup.startCallPopup');
-            }
-        };
-
-        if (self.props.contact.presence) {
-            if (self.state.startCallPopupIsActive === false) {
-                self.setState({
-                    startCallPopupIsActive: true
-                });
-                $(document).rebind('mouseup.startCallPopup', function (e) {
-                    hidePopup();
-                });
-            }
-            else {
-                hidePopup();
-            }
-        }
-    },
-    onEndCallClicked: function(e) {
-        var room = this.props.chatRoom;
-        if (room.callSession) {
-            room.callSession.endCall('hangup');
-        }
-        // this must be triggered when a call had finished, e.g. from an event from the currently
-        // active callSession
-        this.setState({
-            localVideoIsMinimized: false,
-            isFullscreenModeEnabled: false
-        });
-    },
-    onVideoToggleClicked: function(e) {
-        var self = this;
-        var room = this.props.chatRoom;
-        if (room.callSession) {
-            if (room.callSession.getMediaOptions().video) {
-                room.callSession.muteVideo();
-            }
-            else {
-                room.callSession.unmuteVideo();
-            }
-        }
-    },
-    onAudioToggleClicked: function(e) {
-        var self = this;
-        var room = this.props.chatRoom;
-        if (room.callSession) {
-            if (room.callSession.getMediaOptions().audio) {
-                room.callSession.muteAudio();
-            }
-            else {
-                room.callSession.unmuteAudio();
-            }
-        }
-    },
-    onLocalVideoResizerClicked: function(e) {
-        var self = this;
-        var $target = $(e.target);
-
-        if (!$target.is('.active')) {
-            $target.parent().addClass('minimized');
-            self.setState({localVideoIsMinimized: true});
-            $target.parent().animate({
-                'min-height': '24px',
-                width: 24,
-                height: 24
-            }, 200, function() {
-                $target.addClass('active');
-            });
-        }
-        else {
-            var w = 245;
-            if ($target.parent().attr('class').indexOf('current-user-audio-container') >= 1) {
-                w = 184;
-            }
-
-            self.setState({localVideoIsMinimized: false});
-
-            $target.parent().animate({
-                width: w,
-                height:184
-            }, 200, function() {
-                $target.removeClass('active');
-                $target.parent().css('min-height', '184px');
-            });
-        }
-    },
-    onMouseMoveDuringCall: function(e) {
-        var self = this;
-
-        if (self.state.mouseOverDuringCall === false) {
-            self.setState({'mouseOverDuringCall': true});
-        }
-        if (self._mouseMoveDelay) {
-            clearTimeout(self._mouseMoveDelay);
-        }
-        self._mouseMoveDelay = setTimeout(function() {
-            self.setState({'mouseOverDuringCall': false});
-        }, 2000);
     },
     typing: function() {
         var self = this;
@@ -1554,23 +1487,32 @@ var ConversationPanel = React.createClass({
                     var userId = v.userId;
                     var timestamp = v.delay;
 
-                    if (!userId && v.fromJid) {
-                        var contact = room.megaChat.getContactFromJid(v.fromJid);
-                        if (contact && contact.u) {
-                            userId = contact.u;
+                    if (
+                        v instanceof KarereEventObjects.OutgoingMessage ||
+                        v instanceof Message
+                    ) {
+                        if (!userId && v.fromJid) {
+                            var contact = room.megaChat.getContactFromJid(v.fromJid);
+                            if (contact && contact.u) {
+                                userId = contact.u;
+                            }
                         }
-                    }
-                    // the grouping logic for messages.
-                    if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
-                        if (timestamp - lastGroupedMessageTimeStamp < (5 * 60)) {
-                            grouped = true;
-                        } else {
+                        // the grouping logic for messages.
+                        if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
+                            if (timestamp - lastGroupedMessageTimeStamp < (5 * 60)) {
+                                grouped = true;
+                            } else {
+                                grouped = false;
+                                lastMessageFrom = userId;
+                                lastGroupedMessageTimeStamp = timestamp;
+                            }
+                        }
+                        else {
                             grouped = false;
-                            lastMessageFrom = userId;
-                            lastGroupedMessageTimeStamp = timestamp;
+                            lastMessageFrom = null;
+                            lastGroupedMessageTimeStamp = null;
                         }
-                    }
-                    else {
+                    } else {
                         grouped = false;
                         lastMessageFrom = null;
                         lastGroupedMessageTimeStamp = null;

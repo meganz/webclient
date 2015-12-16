@@ -3823,25 +3823,27 @@ function rand_range(a, b) {
 
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2(el) {
-    var top = el.offsetTop;
-    var left = el.offsetLeft;
-    var width = el.offsetWidth;
-    var height = el.offsetHeight;
-
-    while(el.offsetParent) {
-        el = el.offsetParent;
-        top += el.offsetTop;
-        left += el.offsetLeft;
-    }
-
-    return (
-        top < (window.pageYOffset + window.innerHeight) &&
-        left < (window.pageXOffset + window.innerWidth) &&
-        (top + height) > window.pageYOffset &&
-        (left + width) > window.pageXOffset
-    );
+    return verge.inY(el) || verge.inX(el);
 }
 
+/**
+ * Check if the passed in element (DOMNode) is FULLY visible in the viewport.
+ *
+ * @param el {DOMNode}
+ * @returns {boolean}
+ */
+function elementInViewport(el) {
+    if (!verge.inY(el)) {
+        return false;
+    }
+    if (!verge.inX(el)) {
+        return false;
+    }
+
+    var rect = verge.rectangle(el);
+
+    return !(rect.left < 0 || rect.right < 0 || rect.bottom < 0 || rect.top < 0);
+};
 
 // FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as
 //        the original problem is found and resolved.

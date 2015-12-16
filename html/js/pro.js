@@ -240,6 +240,9 @@ function pro_continue()
 {
     // Selected payment method and package
     var selectedPaymentMethod = $('.payment-options-list input:checked').val();
+    var selectedProvider = proPage.allGateways.filter(function(val) {
+        return (val.gatewayName === selectedPaymentMethod);
+    });
     var selectedProPackageIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
 
     // Set the pro package (used in pro_pay function)
@@ -270,14 +273,18 @@ function pro_continue()
         pro_paymentmethod = selectedPaymentMethod;
         
         // For credit card we show the dialog first, then do the uts/utc calls
-        if (pro_paymentmethod === 'credit-card') {
+        if (pro_paymentmethod === 'creditcard') {
             cardDialog.init();
         }
-        else if (pro_paymentmethod === 'prepaid-balance') {
+        else if (pro_paymentmethod === 'voucher') {
             voucherDialog.init();
         }
-        else if (pro_paymentmethod === 'wire-transfer') {
+        else if (pro_paymentmethod === 'wiretransfer') {
             wireTransferDialog.init();
+        }
+        // If gateway is AstroPay
+        else if (selectedProvider.gatewayId === astroPayDialog.gatewayId) {
+            astroPayDialog.init(selectedProvider, selectedProPackageIndex);
         }
         else {
             // For other methods we do a uts and utc call to get the provider details first
@@ -845,9 +852,7 @@ var proPage = {
         }
 
         // Update depending on recurring or one off payment
-        $('.membership-st2-head.choose-duration').html(durationOrRenewal);
         $('.membership-bott-button').html(subscribeOrPurchase);
-        $('.membership-bott-descr').html(getTwoMonthsFree);
         $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
     },
     
@@ -1087,6 +1092,36 @@ var proPage = {
         }
         
         return monthsWording;
+    }
+};
+
+/**
+ * Code for the AstroPay dialog on the second step of the Pro page
+ */
+var astroPayDialog = {
+    
+    // Andre's constant
+    gatewayId: 11,
+    
+    
+    init: function(selectedProvider, selectedProPackageIndex) {
+        
+        
+    },
+    
+    /**
+     * Display the dialog
+     */
+    showVoucherDialog: function() {
+    
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.fm-dialog.astropay-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        this.$successOverlay = $('.payment-result.success');
+        
+        // Add the styling for the overlay
+        this.$dialog.removeClass('hidden');
+        this.showBackgroundOverlay();
     }
 };
 

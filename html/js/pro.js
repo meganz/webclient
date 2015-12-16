@@ -674,24 +674,39 @@ var proPage = {
                 
                 // If an API error (negative number) exit early
                 if ((typeof gatewayOptions === 'number') && (gatewayOptions < 0)) {
+                    $('.loading-placeholder-text').text('Error while loading, try starting again.');
                     return false;
                 }
                 
-                // Separate into two groups
+                // Separate into two groups, the first group has 6 providers, the second has the rest
                 proPage.allGateways = JSON.parse(JSON.stringify(gatewayOptions));
                 proPage.primaryGatewayOptions = gatewayOptions.splice(0, 6);
                 proPage.secondaryGatewayOptions = gatewayOptions;                
                 
                 // Render the two groups
                 proPage.renderPaymentProviderOptions(proPage.primaryGatewayOptions, 'primary');
-                //proPage.renderPaymentProviderOptions(proPage.secondaryGatewayOptions, 'secondary');
+                proPage.renderPaymentProviderOptions(proPage.secondaryGatewayOptions, 'secondary');
+                
+                // Pre-select the first option in the list
+                var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
+                $paymentOption.find('input').attr('checked', 'checked');
+                $paymentOption.find('input').addClass('checked');
+                $paymentOption.find('.membership-radio').addClass('checked');
+
+                // Change radio button states when clicked
+                proPage.initPaymentMethodRadioOptions();
+                
+                // Init the Show more options button
+                $('.provider-show-more').click(function() {
+                    $('.payment-options-list.secondary').toggleClass('hidden');
+                });
             }
         });
     },
     
     renderPaymentProviderOptions: function(gatewayOptions, primaryOrSecondary) {
         
-        console.log('rendering' + primaryOrSecondary, gatewayOptions);
+        console.log('rendering ' + primaryOrSecondary, gatewayOptions);
         
         // Get their plan price from the currently selected duration radio button
         var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
@@ -708,7 +723,8 @@ var proPage = {
         var $template = $('.payment-options-list.primary .payment-method.template');
         
         // Remove existing providers and so they are re-rendered
-        $('.payment-options-list.primary .payment-method:not(.template)').remove();
+        $('.payment-options-list.' + primaryOrSecondary + ' .payment-method:not(.template)').remove();
+        $('.loading-placeholder-text').hide();
         
         // Loop through gateway providers (change to use list from API soon)
         for (var i = 0, length = gatewayOptions.length; i < length; i++) {
@@ -717,13 +733,6 @@ var proPage = {
             var $gateway = $template.clone();
 
             console.log('$gatewayHtml template clone', $gateway.prop('outerHTML'));
-
-            // Pre-select the first option in the list
-            if (html === '') {
-                $gateway.find('input').attr('checked', 'checked');
-                $gateway.find('input').addClass('checked');
-                $gateway.find('.membership-radio').addClass('checked');                
-            }
 
             // Add disabled class if this payment method is not supported for this plan
             if ((gatewayOption.supportsExpensivePlans === 0) && (selectedPlanNum != 4)) {
@@ -740,8 +749,13 @@ var proPage = {
             else if ((gatewayOption.gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
                 gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';  // Balance (x.xx)
             }
+            
+            // If wire transfer option, need to translate that
+            else if (gatewayOption.gatewayName === 'wiretransfer') {
+                gatewayOption.displayName = l[6198];
+            }
 
-            // Get display name from lookup
+            // Otherwise get display name from what was sent from API
             else {
                 gatewayOption.displayName = htmlentities(gatewayOption.displayName);
             }
@@ -760,22 +774,19 @@ var proPage = {
         }
         
         console.log('zzzz primaryOrSecondary', primaryOrSecondary);
+        console.log('zzzz html to insert', html);
         
         // Update the page
-        $('.membership-step2 .payment-options-list.' + primaryOrSecondary).append(html);
-        
-        // Change radio button states when clicked
-        proPage.initPaymentMethodRadioOptions(html);
+        $(html).appendTo($('.payment-options-list.' + primaryOrSecondary));        
     },
         
     /**
      * Change payment method radio button states when clicked
      * @param {String} html The radio button html
      */
-    initPaymentMethodRadioOptions: function(html) {
+    initPaymentMethodRadioOptions: function() {
 
         var paymentOptionsList = $('.payment-options-list');
-        paymentOptionsList.html(html);
         paymentOptionsList.find('.payment-method').rebind('click', function(event) {
 
             var $this = $(this);

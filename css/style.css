@@ -15038,6 +15038,9 @@ h5.main-italic-header {
 	-moz-column-width: 202px;
 	column-width: 202px;
 }
+.payment-options-list.secondary {
+    margin-top: 20px;
+}
 .payment-options-list .payment-method {
 	cursor: pointer;
 	margin-bottom: 15px;
@@ -15448,6 +15451,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     border: 1px solid #ddd;
     border-radius: 8px;
     color: #999;
+    cursor: pointer;
     display: table-cell;
     padding: 3px 15px;
     white-space: nowrap;
@@ -15506,14 +15510,14 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.astropayDD { background-position: 0 -1020px; }
 .provider-icon.astropayDM { background-position: 0 -1080px; }
 .provider-icon.astropayDS { background-position: 0 -1140px; }
-.provider-icon.astropayEl { background-position: 0 -1200px; }
+.provider-icon.astropayEL { background-position: 0 -1200px; }
 .provider-icon.astropayEQ { background-position: 0 -1260px; }
 .provider-icon.astropayEX { background-position: 0 -1320px; }
 .provider-icon.astropayEY { background-position: 0 -1380px; }
 .provider-icon.astropayGA { background-position: 0 -1440px; }
 .provider-icon.astropayHI { background-position: 0 -1500px; }
 .provider-icon.astropayI { background-position: 0 -1560px; }
-.provider-icon.astropayHT { background-position: 0 -1620px; }
+.provider-icon.astropayH { background-position: 0 -1620px; }
 .provider-icon.astropayIS { background-position: 0 -1680px; }
 .provider-icon.astropayMC { background-position: 0 -1740px; }
 .provider-icon.astropayMD { background-position: 0 -1800px; }

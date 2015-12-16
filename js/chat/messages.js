@@ -237,6 +237,11 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageLastSeen.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
+        if (!chatRoom) {
+            self.logger.warn("Message not found for: ", e, eventData);
+            return;
+        }
+
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.lastSeen = eventData.messageId;
             self.messages.trackDataChange();
@@ -289,6 +294,11 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.chatd.rebind('onMessagesHistoryInfo.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+
+        if (!chatRoom) {
+            self.logger.warn("Message not found for: ", e, eventData);
+            return;
+        }
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.firstMessageId = eventData.oldest;
@@ -366,6 +376,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageCheck.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
+        if (!chatRoom) {
+            self.logger.warn("Message not found for: ", e, eventData);
+            return;
+        }
 
         self.haveMessages = true;
 

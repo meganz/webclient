@@ -38,6 +38,10 @@ var ConversationsListItem = React.createClass({
         var contactJid = chatRoom.getParticipantsExceptMe()[0];
         var contact = chatRoom.megaChat.getContactFromJid(contactJid);
 
+
+        if (!contact) {
+            return null;
+        }
         var id = 'conversation_' + htmlentities(contact.u);
         var roomShortJid = chatRoom.roomJid.split("@")[0];
 

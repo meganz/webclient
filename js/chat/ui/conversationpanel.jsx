@@ -1177,7 +1177,9 @@ var ConversationPanel = React.createClass({
     },
     focusTypeArea: function() {
         var $container = $(ReactDOM.findDOMNode(this));
-        moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+        if($('.chat-textarea:visible textarea:visible', $container).length > 0) {
+            moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+        }
     },
     componentDidMount: function() {
         var self = this;
@@ -1436,6 +1438,9 @@ var ConversationPanel = React.createClass({
         }
 
 
+        if(!contact) {
+            return null;
+        }
         var avatarMeta = generateAvatarMeta(contact.u);
         var contactName = avatarMeta.fullName;
 
@@ -1751,6 +1756,10 @@ var ConversationPanels = React.createClass({
         }
 
         self.props.conversations.forEach(function(chatRoom) {
+            if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
+                return;
+            }
+
             var contact = megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
 
             // XX: Performance trick. However, scroll positions are NOT retained properly when switching conversations,

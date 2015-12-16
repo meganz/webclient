@@ -25,7 +25,7 @@ var ChatdIntegration = function(megaChat) {
         megaChat.rebind("onRoomDestroy.chatdInt", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
 
-            self._detachFromChatRoom(chatRoom);
+            //self._detachFromChatRoom(chatRoom);
         });
 
         asyncApiReq({a: "mcf"})

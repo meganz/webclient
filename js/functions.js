@@ -1036,6 +1036,10 @@ function makeMetaAware(kls) {
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;
 
+        if(!self["_" + prefix]) {
+            return;
+        }
+
         if (prefix && !namespace && !k) {
             delete self["_" + prefix];
         }

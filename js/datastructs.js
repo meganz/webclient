@@ -385,19 +385,24 @@ MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 
     self._data[k] = v;
 
-    Object.defineProperty(this, k, {
-        get: function () {
-            return self._data[k];
-        },
-        set: function (value) {
-            if (value !== self._data[k]) {
-                self._data[k] = value;
+    if (typeof(this[k]) !== 'undefined') {
+        self[k] = v;
+    }
+    else {
+        Object.defineProperty(this, k, {
+            get: function () {
+                return self._data[k];
+            },
+            set: function (value) {
+                if (value !== self._data[k]) {
+                    self._data[k] = value;
 
-                self.trackDataChange([self._data, k, v]);
-            }
-        },
-        enumerable: true
-    });
+                    self.trackDataChange([self._data, k, v]);
+                }
+            },
+            enumerable: true
+        });
+    }
 
     if (!ignoreTrackDataChange) {
         self.trackDataChange([self._data, k, v]);

@@ -197,7 +197,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     self.getParticipantsExceptMe().forEach(function(jid) {
         var contact = self.megaChat.getContactFromJid(jid);
         if (contact) {
-            getLastInteractionWith(contact.h);
+            getLastInteractionWith(contact.u);
         }
     });
     self.megaChat.trigger('onRoomCreated', [self]);
@@ -667,7 +667,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
     var mc = self.megaChat;
     var roomJid = self.roomJid;
 
-    if (roomJid === mc.getCurrentRoomJid() || self.$messages.is(":visible")) {
+    if (roomJid === mc.getCurrentRoomJid() || (self.$messages && self.$messages.is(":visible"))) {
         window.location = "#fm/chat";
         self.hide();
         setTimeout(function() {

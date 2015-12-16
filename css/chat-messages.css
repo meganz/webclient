@@ -35,7 +35,7 @@
     height: 100%;
 }
 .messages.scroll-area .jspVerticalBar {
-    width: 12px;
+    width: 10px;
 }
 .messages.main-pad {
     display: table;

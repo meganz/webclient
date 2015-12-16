@@ -46,7 +46,7 @@
 .messages.content-area {
     display: table-cell;
     vertical-align: bottom;
-    padding: 0 0 32px 0;
+    padding: 0 0 24px 0;
 }
 .error.scroll-area .messages.content-area {
     padding: 0 0 25px 0;
@@ -195,7 +195,6 @@
     padding: 24px 24px 0 24px;
 }
 .message.body.grouped {
-    padding: 2px 0 0 24px;
     margin: 0;
 }
 .message.shared-data {

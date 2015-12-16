@@ -97,7 +97,7 @@ var MegaRenderMixin = {
         if (!domNode.is(":visible")) {
             return;
         }
-        if (!elementInViewport2(domNode[0])) {
+        if (!verge.inX(domNode[0]) && !verge.inY(domNode[0])) {
             return;
         }
 

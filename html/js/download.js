@@ -367,7 +367,6 @@ function dlcomplete(id)
     if (d) console.log('dlcomplete',id);
     if (typeof id === 'object') id = id.dl_id;
 
-    $('.download.content-block').removeClass('downloading').addClass('download-complete');
     $('.download-info').addClass('hidden');
     $('.download.progress-bar').width('100%');
     $('.download.percents-txt').text('100 %');
@@ -406,6 +405,7 @@ function dlcomplete(id)
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
     Soon(mega.utils.resetUploadDownload);
+    $('.download.content-block').removeClass('downloading').addClass('download-complete');
 }
 
 function sync_switchOS(os)

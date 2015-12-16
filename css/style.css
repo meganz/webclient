@@ -15348,7 +15348,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .membership-step2 .membership-radio {
     background-color: transparent;
     border: 1px solid #bbb;
-    margin: 0 22px 0 0;
+    margin: 0 7px 0 0;
 }
 .membership-step2 .membership-radio div {
     background-color: white;
@@ -15486,7 +15486,6 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     background-repeat: no-repeat;
     display: inline-block;
     height: 20px;
-    padding-bottom: 1px;
     vertical-align: middle;
     width: 20px;
 }
@@ -15555,6 +15554,11 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 
 .membership-step2 .provider-name {
     display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 155px;
 }
 .membership-new-offer text {
 	font-weight: normal;

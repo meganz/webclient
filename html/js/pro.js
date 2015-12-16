@@ -706,8 +706,6 @@ var proPage = {
     
     renderPaymentProviderOptions: function(gatewayOptions, primaryOrSecondary) {
         
-        console.log('rendering ' + primaryOrSecondary, gatewayOptions);
-        
         // Get their plan price from the currently selected duration radio button
         var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
         var selectedPlan = membershipPlans[selectedPlanIndex];
@@ -731,8 +729,6 @@ var proPage = {
 
             var gatewayOption = gatewayOptions[i];          
             var $gateway = $template.clone();
-
-            console.log('$gatewayHtml template clone', $gateway.prop('outerHTML'));
 
             // Add disabled class if this payment method is not supported for this plan
             if ((gatewayOption.supportsExpensivePlans === 0) && (selectedPlanNum != 4)) {
@@ -772,9 +768,6 @@ var proPage = {
             // Build the html
             html += $gateway.prop('outerHTML');
         }
-        
-        console.log('zzzz primaryOrSecondary', primaryOrSecondary);
-        console.log('zzzz html to insert', html);
         
         // Update the page
         $(html).appendTo($('.payment-options-list.' + primaryOrSecondary));        

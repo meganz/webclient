@@ -855,15 +855,6 @@ function init_page() {
             }
         }
 
-        if (fminitialized) {
-            if (M.currentdirid == 'account') {
-                accountUI();
-            }
-            else if (M.currentdirid == 'search') {
-                searchFM();
-            }
-        }
-
         if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }

@@ -1,7 +1,7 @@
 var EMOJI_CATEGORIES = {
-    "FREQUENTLY USED": {
-        ":)": ["1F642", "&#x1F642;"],
-    },
+    //"FREQUENTLY USED": {
+    //    ":)": ["1F642", "&#x1F642;"],
+    //},
     "PEOPLE": {
         "slight_smile": ["1F642", "&#x1F642;"],
         "grinning": ["1F600", "&#x1F600;"],

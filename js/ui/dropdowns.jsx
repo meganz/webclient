@@ -240,7 +240,7 @@ var DropdownEmojiSelector = React.createClass({
             'browsingCategory': false,
             'isActive': false,
             'visibleEmojis': [].concat(
-                Object.keys(EMOJILIST.EMOJI_CATEGORIES["FREQUENTLY USED"]),
+                /*Object.keys(EMOJILIST.EMOJI_CATEGORIES["FREQUENTLY USED"]),*/
                 Object.keys(EMOJILIST.EMOJI_CATEGORIES["PEOPLE"])
             )
         }
@@ -283,7 +283,7 @@ var DropdownEmojiSelector = React.createClass({
 
         var inViewport = [];
         $emojis.each(function() {
-            if (elementInViewport2(this)) {
+            if (elementInViewport2Lightweight(this)) {
                 inViewport.push($(this).attr('data-emoji'));
             }
         });
@@ -353,33 +353,34 @@ var DropdownEmojiSelector = React.createClass({
                                 data-emoji={slug}
                                 className="button square-button emoji-one" key={categoryName + "_" + slug}
                                 onMouseEnter={(e) => {
-                                if (self.mouseEnterTimer) {
-                                    clearTimeout(self.mouseEnterTimer);
-                                }
+                                    if (self.mouseEnterTimer) {
+                                        clearTimeout(self.mouseEnterTimer);
+                                    }
 
-                                e.stopPropagation();
-                                e.preventDefault();
+                                    e.stopPropagation();
+                                    e.preventDefault();
 
-                                // delay the .setState change, because of the tons of icons we've, which are re-rendered
-                                // in case of .setState
-                                self.mouseEnterTimer = setTimeout(function() {
-                                    self.setState({'previewEmoji': slug});
-                                }, 75);
-                            }}
+                                    // delay the .setState change, because of the tons of icons we've, which are re-rendered
+                                    // in case of .setState
+                                    self.mouseEnterTimer = setTimeout(function() {
+                                        self.setState({'previewEmoji': slug});
+                                    }, 250);
+                                }}
                                 onMouseLeave={(e) => {
-                                if (self.mouseEnterTimer) {
-                                    clearTimeout(self.mouseEnterTimer);
-                                }
-                                e.stopPropagation();
-                                e.preventDefault();
+                                    if (self.mouseEnterTimer) {
+                                        clearTimeout(self.mouseEnterTimer);
+                                    }
+                                    e.stopPropagation();
+                                    e.preventDefault();
 
-                                self.setState({'previewEmoji': null});
-                            }}
+                                    self.setState({'previewEmoji': null});
+                                }}
                                 onClick={(e) => {
-                                if (self.props.onClick) {
-                                    self.props.onClick(e, slug, meta);
-                                }
-                            }}>
+                                    if (self.props.onClick) {
+                                        self.props.onClick(e, slug, meta);
+                                    }
+                                }}
+                            >
                             <span
                                 className={"emojione-" + meta[0]}
                                 title={":" + slug + ":"}
@@ -414,7 +415,7 @@ var DropdownEmojiSelector = React.createClass({
                 }
             });
             var categoryIcons = {
-                "FREQUENTLY USED": "clock-icon",
+                //"FREQUENTLY USED": "clock-icon",
                 "PEOPLE": "smile-icon",
                 "NATURE": "sun-icon",
                 "FOOD & DRINK": "wineglass-icon",

@@ -245,10 +245,6 @@ function pro_continue()
     })[0];
     var selectedProPackageIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
 
-    console.log('zzzz selectedPaymentMethod', selectedPaymentMethod);
-    console.log('zzzz selectedProvider', selectedProvider);
-    console.log('zzzz selectedProPackageIndex', selectedProPackageIndex);
-
     // Set the pro package (used in pro_pay function)
     selectedProPackage = membershipPlans[selectedProPackageIndex];
 
@@ -275,9 +271,7 @@ function pro_continue()
     }
     else {
         pro_paymentmethod = selectedPaymentMethod;
-        
-        console.log('zzzz selectedProvider', selectedProvider.gatewayId, selectedProvider.gatewayId === astroPayDialog.gatewayId);
-                
+             
         // For credit card we show the dialog first, then do the uts/utc calls
         if (pro_paymentmethod === 'perfunctio') {
             cardDialog.init();
@@ -460,11 +454,11 @@ function pro_pay() {
                             
                             // Otherwise if AstroPay, redirect
                             else if (pro_m === astroPayDialog.gatewayId) {
-                                if (utcResult && utcResult.EUR) {
+                                if (utcResult && utcResult.EUR && utcResult.EUR.url) {
                                     astroPayDialog.redirectToSite(utcResult);
                                 }
                                 else {
-                                    astroPayDialog.showConnectionError();
+                                    astroPayDialog.showConnectionError(utcResult);
                                 }
                             }
                         }
@@ -701,7 +695,6 @@ var proPage = {
         // }
         api_req({ a: 'ufpqfull', t: 0 }, {
             callback: function (gatewayOptions) {
-                console.log('zzzz gatewayOptions', gatewayOptions);
                 
                 // If an API error (negative number) exit early
                 if ((typeof gatewayOptions === 'number') && (gatewayOptions < 0)) {
@@ -1118,6 +1111,7 @@ var proPage = {
     }
 };
 
+
 /**
  * Code for the AstroPay dialog on the second step of the Pro page
  */
@@ -1207,9 +1201,22 @@ var astroPayDialog = {
         
         astroPayDialog.$dialog.find('.fm-dialog-button.accept').rebind('click', function() {
             
-            astroPayDialog.fullName = astroPayDialog.$dialog.find('#astropay-name-field').val();
-            astroPayDialog.taxNumber = astroPayDialog.$dialog.find('#astropay-tax-field').val();
+            // Store the full name and tax number entered
+            astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find('#astropay-name-field').val());
+            astroPayDialog.taxNumber = $.trim(astroPayDialog.$dialog.find('#astropay-tax-field').val());
             
+            // Make sure they entered something
+            if ((astroPayDialog.fullName === '') || (astroPayDialog.fullName === '')) {
+                
+                // Show error dialog with Missing payment details
+                msgDialog('warninga', l[6958], l[6959], '', function() {
+                    astroPayDialog.showBackgroundOverlay();
+                });
+                
+                return false;
+            }
+            
+            // Try redirecting to payment provider
             pro_pay();
         });
     },
@@ -1235,12 +1242,31 @@ var astroPayDialog = {
 
     /**
      * Something has gone wrong just talking to AstroPay
+     * @param {Object} utcResult The result from the UTC API call with error codes
      */
-    showConnectionError: function() {
+    showConnectionError: function(utcResult) {
         
-        msgDialog('warninga', l[7235], l[7233], '', function() {
-            proPage.hideLoadingOverlay();
-            document.location.hash = ''; // Redirect to remove any query parameters from the url
+        // Generic error: Oops, something went wrong...
+        var message = l[47];
+        
+        // Transaction could not be initiated due to connection problems...
+        if (utcResult.EUR.error === -1) {
+            message = l[7233];
+        }
+        
+        // Possibly invalid tax number etc
+        else if (utcResult.EUR.error === -2) {
+            message = l[6959];
+        }
+        
+        // Too many payments within 12 hours
+        else if (utcResult.EUR.error === -18) {
+            message = 'You have too many incomplete payments in the last 12 hours, please complete those payments or try again tomorrow';
+        }
+        
+        // Show error dialog
+        msgDialog('warninga', l[7235], message, '', function() {
+            astroPayDialog.showBackgroundOverlay();
         });
     }
 };

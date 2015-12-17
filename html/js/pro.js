@@ -319,9 +319,9 @@ function pro_pay() {
     else if (pro_paymentmethod === 'perfunctio') {
         cardDialog.closeDialogAndShowProcessing();
     }
-    
+        
     // Otherwise if Union Pay payment, show bouncing coin while loading
-    else if (pro_paymentmethod === 'dynamicpay' || pro_paymentmethod === "paysafecard") {
+    else if (pro_paymentmethod === 'dynamicpay' || pro_paymentmethod === 'paysafecard' || (pro_paymentmethod.indexOf('astropay') > -1)) {
         proPage.showLoadingOverlay('transferring');
     }
     
@@ -339,6 +339,9 @@ function pro_pay() {
             
             // Store the sale ID to check with API later
             saleId = utsResult;
+            
+            // Extra gateway specific details for UTC call
+            var extra = {};
             
             if (typeof saleId == 'number' && saleId < 0)
             {
@@ -374,6 +377,12 @@ function pro_pay() {
                 else if (pro_paymentmethod === 'paysafecard') {
                     pro_m = 10;
                 }
+                else if (pro_paymentmethod.indexOf('astropay') > -1) {
+                    pro_m = astroPayDialog.gatewayId;
+                    extra.bank = astroPayDialog.selectedProvider.extra.code;
+                    extra.cpf = astroPayDialog.taxNumber;
+                    extra.name = astroPayDialog.fullName;
+                }
                 
                 // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
                 // needs a redirect after confirmation action packet it will redirect to the account page.
@@ -388,7 +397,7 @@ function pro_pay() {
                 // s = sale ID
                 // m = pro number
                 // bq = bandwidth quota triggered
-                api_req({ a : 'utc', s: [saleId], m: pro_m, r: proref, bq: fromBandwidthDialog },
+                api_req({ a : 'utc', s: [saleId], m: pro_m, r: proref, bq: fromBandwidthDialog, extra: extra },
                 {
                     callback : function (utcResult)
                     {
@@ -439,13 +448,23 @@ function pro_pay() {
                             }
 
                             // If paysafecard provider then redirect to their site
-                            else if ((pro_m === 10))
+                            else if (pro_m === 10)
                             {
                                 if (utcResult && utcResult.EUR) {
                                     paysafecard.redirectToSite(utcResult);
                                 }
                                 else {
                                     paysafecard.showConnectionError();
+                                }
+                            }
+                            
+                            // Otherwise if AstroPay, redirect
+                            else if (pro_m === astroPayDialog.gatewayId) {
+                                if (utcResult && utcResult.EUR) {
+                                    astroPayDialog.redirectToSite(utcResult);
+                                }
+                                else {
+                                    astroPayDialog.showConnectionError();
                                 }
                             }
                         }
@@ -1181,11 +1200,17 @@ var astroPayDialog = {
         });
     },
     
+    /**
+     * Get the details entered by the user and redirect to AstroPay
+     */
     initConfirmButton: function() {
         
         astroPayDialog.$dialog.find('.fm-dialog-button.accept').rebind('click', function() {
             
-            alert('got here');
+            astroPayDialog.fullName = astroPayDialog.$dialog.find('#astropay-name-field').val();
+            astroPayDialog.taxNumber = astroPayDialog.$dialog.find('#astropay-tax-field').val();
+            
+            pro_pay();
         });
     },
         
@@ -1196,6 +1221,27 @@ var astroPayDialog = {
         
         astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         astroPayDialog.$dialog.addClass('hidden');
+    },
+    
+    /**
+     * Redirect to the site
+     * @param {String} utcResult containing the url to redirect to
+     */
+    redirectToSite: function(utcResult) {
+        
+        var url = utcResult.EUR['url'];
+        window.location = url;
+    },
+
+    /**
+     * Something has gone wrong just talking to AstroPay
+     */
+    showConnectionError: function() {
+        
+        msgDialog('warninga', l[7235], l[7233], '', function() {
+            proPage.hideLoadingOverlay();
+            document.location.hash = ''; // Redirect to remove any query parameters from the url
+        });
     }
 };
 

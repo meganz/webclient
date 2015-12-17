@@ -2117,7 +2117,27 @@
 <div class="fm-dialog astropay-dialog hidden">
     <div class="btn-close-dialog"></div>
     <div class="astropay-dialog-body">
+        <div class="astropay-information">
+            You have selected <span class="provider-icon"></span><span class="provider-name">Pago Facil</span> as 
+            your payment option.
+        </div>
+        <div class="astropay-instructions">
+            Enter your full name and tax number below, before we redirect you off-site to the payment page.
+        </div>
+        <label class="astropay-label" for="astropay-name-field">Full name:</label>
+        <div class="fm-account-input">
+            <input id="astropay-name-field" class="astropay-name-field" type="text" placeholder="Enter your full name here">
+        </div>
         
+        <label class="astropay-label tax" for="astropay-tax-field">Tax number:</label>
+        <div class="fm-account-input">
+            <input id="astropay-tax-field" class="astropay-tax-field" type="text" placeholder="Enter your tax number here">
+        </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button accept"><span>[$870]</span></div>
+        <div class="fm-dialog-button cancel"><span>[$1597]</span></div>
+        <div class="clear"></div>
     </div>
 </div>
 

@@ -15549,7 +15549,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.astropayVI { background-position: 0 -3360px; } 
 .provider-icon.astropayWP { background-position: 0 -3420px; } 
 .provider-icon.bitcoin { background-position: 0 -3480px; } 
-.provider-icon.creditcard { background-position: 0 -3540px; } 
+.provider-icon.perfunctio { background-position: 0 -3540px; } 
 .provider-icon.dynamicpay { background-position: 0 -3600px; } 
 .provider-icon.fortumo { background-position: 0 -3660px; } 
 .provider-icon.infobip { background-position: 0 -3720px; } 
@@ -24192,6 +24192,42 @@ a.voucher-reseller-link {
 	top: 0;
 	width: 157px;
 }
+/* AstroPay dialog */
+.fm-dialog.astropay-dialog {
+    margin-left: -200px;
+    margin-top: -150px;
+    padding-top: 30px;
+    width: 400px;
+}
+.astropay-dialog-body {
+    padding: 15px;
+}
+.astropay-label {
+    color: #444;
+    display: block;
+    font-family: "source_sans_prosemibold";
+    font-size: 13px;
+    letter-spacing: 0.2px;
+}
+.astropay-dialog .fm-account-input {
+    margin-bottom: 20px;
+    margin-top: 5px;
+}
+.astropay-information,
+.astropay-instructions {
+    color: #777;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    line-height: 20px;
+}
+.astropay-instructions {
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+.astropay-dialog .provider-icon {
+    margin: 0 2px;
+}
+
 /* CC payment dialog */
 .fm-dialog.payment-dialog {
 	border: 0 none;

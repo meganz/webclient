@@ -242,8 +242,12 @@ function pro_continue()
     var selectedPaymentMethod = $('.payment-options-list input:checked').val();
     var selectedProvider = proPage.allGateways.filter(function(val) {
         return (val.gatewayName === selectedPaymentMethod);
-    });
+    })[0];
     var selectedProPackageIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+
+    console.log('zzzz selectedPaymentMethod', selectedPaymentMethod);
+    console.log('zzzz selectedProvider', selectedProvider);
+    console.log('zzzz selectedProPackageIndex', selectedProPackageIndex);
 
     // Set the pro package (used in pro_pay function)
     selectedProPackage = membershipPlans[selectedProPackageIndex];
@@ -272,8 +276,10 @@ function pro_continue()
     else {
         pro_paymentmethod = selectedPaymentMethod;
         
+        console.log('zzzz selectedProvider', selectedProvider.gatewayId, selectedProvider.gatewayId === astroPayDialog.gatewayId);
+                
         // For credit card we show the dialog first, then do the uts/utc calls
-        if (pro_paymentmethod === 'creditcard') {
+        if (pro_paymentmethod === 'perfunctio') {
             cardDialog.init();
         }
         else if (pro_paymentmethod === 'voucher') {
@@ -281,10 +287,9 @@ function pro_continue()
         }
         else if (pro_paymentmethod === 'wiretransfer') {
             wireTransferDialog.init();
-        }
-        // If gateway is AstroPay
+        }        
         else if (selectedProvider.gatewayId === astroPayDialog.gatewayId) {
-            astroPayDialog.init(selectedProvider, selectedProPackageIndex);
+            astroPayDialog.init(selectedProvider);
         }
         else {
             // For other methods we do a uts and utc call to get the provider details first
@@ -305,18 +310,18 @@ function pro_pay() {
         showLoadingDialog();
     }
     
-    // If using pre-paid credit show loading dialog
+    // If using account balance show loading dialog
     else if (pro_paymentmethod === 'pro_prepaid') {
         loadingDialog.show();
     }
     
     // Otherwise if credit card payment, show bouncing coin while loading
-    else if (pro_paymentmethod === 'credit-card') {
+    else if (pro_paymentmethod === 'perfunctio') {
         cardDialog.closeDialogAndShowProcessing();
     }
     
     // Otherwise if Union Pay payment, show bouncing coin while loading
-    else if (pro_paymentmethod === 'union-pay' || pro_paymentmethod === "paysafecard") {
+    else if (pro_paymentmethod === 'dynamicpay' || pro_paymentmethod === "paysafecard") {
         proPage.showLoadingOverlay('transferring');
     }
     
@@ -342,16 +347,16 @@ function pro_pay() {
             }
             else
             {
-                if (pro_paymentmethod === 'pro_voucher' || pro_paymentmethod === 'pro_prepaid') {
+                if (pro_paymentmethod === 'voucher' || pro_paymentmethod === 'pro_prepaid') {
                     pro_m = 0;
                 }
                 else if (pro_paymentmethod === 'bitcoin') {
                     pro_m = 4;
                 }
-                else if (pro_paymentmethod === 'credit-card') {
+                else if (pro_paymentmethod === 'perfunctio') {
                     pro_m = 8;
                 }
-                else if (pro_paymentmethod === 'union-pay') {
+                else if (pro_paymentmethod === 'dynamicpay') {
                     pro_m = 5;
                 }
                 else if (pro_paymentmethod === 'fortumo') {
@@ -360,7 +365,7 @@ function pro_pay() {
                     fortumo.redirectToSite(saleId);
                     return false;
                 }
-                else if (pro_paymentmethod === 'centili') {
+                else if (pro_paymentmethod === 'infobip') {
                     // pro_m = 9;
                     // Centili does not do a utc request, we immediately redirect
                     centili.redirectToSite(saleId);
@@ -673,7 +678,7 @@ var proPage = {
         // {
         //   "gatewayid":11,"gatewayname":"astropayB","type":"subgateway","displayname":"Bradesco",
         //   "supportsRecurring":0,"supportsMonthlyPayment":1,"supportsAnnualPayment":1,
-        //   "supportsExpensivePlans":1,"extra":{"code":"B"}
+        //   "supportsExpensivePlans":1,"extra":{"code":"B","taxIdLabel":"CPF"}
         // }
         api_req({ a: 'ufpqfull', t: 0 }, {
             callback: function (gatewayOptions) {
@@ -781,7 +786,6 @@ var proPage = {
         
     /**
      * Change payment method radio button states when clicked
-     * @param {String} html The radio button html
      */
     initPaymentMethodRadioOptions: function() {
 
@@ -831,8 +835,8 @@ var proPage = {
         var selectedGatewayName = $('.payment-options-list input:checked').val();
         var selectedProvider = proPage.allGateways.filter(function(val) {
             return (val.gatewayName === selectedGatewayName);
-        });
-        
+        })[0];
+                
         var planIndex = $selectDurationOption.parent().attr('data-plan-index');
         var currentPlan = membershipPlans[planIndex];
         var numOfMonths = currentPlan[4];
@@ -1100,28 +1104,89 @@ var proPage = {
  */
 var astroPayDialog = {
     
-    // Andre's constant
+    $dialog: null,
+    $backgroundOverlay: null,
+    
+    // Constant for the AstroPay gateway ID
     gatewayId: 11,
     
+    // The provider details
+    selectedProvider: null,
     
-    init: function(selectedProvider, selectedProPackageIndex) {
+    /**
+     * Initialise
+     * @param {Object} selectedProvider
+     * @param {Array} selectedProPackage
+     */
+    init: function(selectedProvider, selectedProPackage) {
         
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.fm-dialog.astropay-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
         
+        // Add the styling for the overlay
+        this.$dialog.removeClass('hidden');
+        this.showBackgroundOverlay();
+        
+        // Store the provider details
+        this.selectedProvider = selectedProvider;
+        
+        // Initalise the rest
+        this.initCloseButton();
+        this.showDialog();
     },
     
     /**
      * Display the dialog
      */
-    showVoucherDialog: function() {
+    showDialog: function() {
     
-        // Cache DOM reference for lookup in other functions
-        this.$dialog = $('.fm-dialog.astropay-dialog');
-        this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$successOverlay = $('.payment-result.success');
+        // Change icon and payment provider name
+        this.$dialog.find('.provider-icon').addClass(this.selectedProvider.gatewayName);
+        this.$dialog.find('.provider-name').text(this.selectedProvider.displayName);
         
-        // Add the styling for the overlay
-        this.$dialog.removeClass('hidden');
-        this.showBackgroundOverlay();
+        // Localise the tax label to their country e.g. GST, CPF
+        var taxLabel = 'Tax number:'.replace('Tax', this.selectedProvider.extra.taxIdLabel);
+        var taxPlaceholder = 'Enter your tax number here'.replace('tax', this.selectedProvider.extra.taxIdLabel);
+        
+        // Change the tax labels
+        this.$dialog.find('.astropay-label.tax').html(taxLabel);
+        this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);
+    },
+    
+    /**
+     * Shows the background overlay
+     */
+    showBackgroundOverlay: function() {
+        
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+    },
+    
+    /**
+     * Functionality for the close button
+     */
+    initCloseButton: function() {
+        
+         // Initialise the close button
+        astroPayDialog.$dialog.find('.btn-close-dialog').rebind('click', function() {
+            
+            // Hide the overlay and dialog
+            astroPayDialog.hideDialog();
+        });
+        
+        // Prevent close of dialog from clicking outside the dialog
+        $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function(event) {
+            event.stopPropagation();
+        });
+    },
+        
+    /**
+     * Hide the overlay and dialog
+     */
+    hideDialog: function() {
+        
+        astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        astroPayDialog.$dialog.addClass('hidden');
     }
 };
 

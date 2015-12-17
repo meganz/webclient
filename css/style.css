@@ -15448,6 +15448,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     margin-top: 30px;
     width: 100%;
 }
+.membership-step2 .provider-show-more.hidden {
+    display: none;
+}
 .membership-step2 .provider-show-more .button {
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -15488,6 +15491,21 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     font-size: 14px;
     line-height: 26px;
     vertical-align: middle;
+}
+.membership-step2 .provider-details .provider-name {
+    display: inline-block;
+    overflow: hidden;
+    padding-bottom: 1px;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 150px;
+}
+.membership-step2 .provider-details.checked .provider-name {
+    font-family: "source_sans_prosemibold", Arial;
+}
+.membership-step2 .provider-details .provider-icon {
+    margin-right: 4px;
 }
 .provider-icon {
     background-image: url("../images/mega/payment-provider-icons-v1.png");
@@ -15565,18 +15583,6 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.tpay { background-position: 0 -3840px; } 
 .provider-icon.voucher { background-position: 0 -3900px; } 
 .provider-icon.wiretransfer { background-position: 0 -3960px; }
-
-.membership-step2 .provider-name {
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-    white-space: nowrap;
-    width: 155px;
-}
-.membership-step2 .provider-details.checked .provider-name {
-    font-family: "source_sans_prosemibold", Arial;
-}
 
 .membership-new-offer text {
 	font-weight: normal;
@@ -24212,13 +24218,14 @@ a.voucher-reseller-link {
     padding: 15px 50px;
 }
 .astropay-dialog .fm-dialog-title {
-    margin-top: -14px;
+    font-size: 17px;
+    margin-top: -15px;
     padding-top: 0;
 }
 .astropay-label {
-    color: #444;
+    color: #777;
     display: block;
-    font-family: "source_sans_prosemibold", sans-serif;
+    font-family: "source_sans_prosemibold",sans-serif;
     font-size: 13px;
     letter-spacing: 0.2px;
 }

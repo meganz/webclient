@@ -698,7 +698,7 @@ var proPage = {
                 
                 // If an API error (negative number) exit early
                 if ((typeof gatewayOptions === 'number') && (gatewayOptions < 0)) {
-                    $('.loading-placeholder-text').text('Error while loading, try starting again.');
+                    $('.loading-placeholder-text').text('Error while loading, try reloading the page.');
                     return false;
                 }
                 
@@ -713,14 +713,30 @@ var proPage = {
                 
                 // Change radio button states when clicked
                 proPage.initPaymentMethodRadioOptions();
-                
-                // Init the Show more options button
-                $('.provider-show-more').click(function() {
-                    $('.payment-options-list.secondary').removeClass('hidden');
-                    $(this).hide();
-                });
+                proPage.initShowMoreOptionsButton();
             }
         });
+    },
+    
+    /**
+     * Initialise the button to show more payment options
+     */
+    initShowMoreOptionsButton: function() {
+        
+        // If there are more than 6 payment options, enable the button to show more
+        if (proPage.allGateways.length > 6) {
+            
+            var $showMoreButton = $('.membership-step2 .provider-show-more');
+            
+            // Show the button
+            $showMoreButton.removeClass('hidden');            
+            
+            // On click show the other payment options and then hide the button
+            $showMoreButton.click(function() {
+                $('.payment-options-list.secondary').removeClass('hidden');
+                $showMoreButton.hide();
+            });
+        }
     },
     
     /**

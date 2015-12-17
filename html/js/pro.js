@@ -1133,6 +1133,7 @@ var astroPayDialog = {
         
         // Initalise the rest
         this.initCloseButton();
+        this.initConfirmButton();
         this.showDialog();
     },
     
@@ -1167,8 +1168,8 @@ var astroPayDialog = {
      */
     initCloseButton: function() {
         
-         // Initialise the close button
-        astroPayDialog.$dialog.find('.btn-close-dialog').rebind('click', function() {
+         // Initialise the close and cancel buttons
+        astroPayDialog.$dialog.find('.fm-dialog-close, .fm-dialog-button.cancel').rebind('click', function() {
             
             // Hide the overlay and dialog
             astroPayDialog.hideDialog();
@@ -1177,6 +1178,14 @@ var astroPayDialog = {
         // Prevent close of dialog from clicking outside the dialog
         $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function(event) {
             event.stopPropagation();
+        });
+    },
+    
+    initConfirmButton: function() {
+        
+        astroPayDialog.$dialog.find('.fm-dialog-button.accept').rebind('click', function() {
+            
+            alert('got here');
         });
     },
         

@@ -7234,10 +7234,10 @@ table {
 	color: #FFA500;
 }
 /* green border */
-.fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active, .fm-verify:hover, .fm-reset-stored-fingerprint:hover, .fm-verify.active, .fm-share-copy:hover, .fm-share-copy.active, .fm-new-folder:hover, .fm-new-folder.active, .create-folder-button:hover, .create-folder-button.active, .add-user-popup-button.add:hover, .add-user-popup-button.add.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button.rename:hover, .rename-dialog-button.rename.active, .fm-dialog-button.notifications-button:hover, .fm-dialog-button.notifications-button.active, .fm-dialog-button.links-button:hover, .fm-dialog-button.links-button.active, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-move-button.active, .fm-dialog-button.dialog-newfolder-button:hover, .fm-dialog-button.dialog-newfolder-button.active, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-copy-button.active, .fm-dialog-button.notification-button.confirm:hover, .fm-dialog-button.notification-button.confirm.active, .contact-request-button.accept:hover, .contact-request-button.accept.active, .fm-dialog-button.fm-dialog-button-green:hover, .fm-dialog-button.fm-dialog-button-green.active, .transfer-pause-icon:hover, .fm-account-save:hover {
+.fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active, .fm-verify:hover, .fm-reset-stored-fingerprint:hover, .fm-verify.active, .fm-share-copy:hover, .fm-share-copy.active, .fm-new-folder:hover, .fm-new-folder.active, .create-folder-button:hover, .create-folder-button.active, .add-user-popup-button.add:hover, .add-user-popup-button.add.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button.rename:hover, .rename-dialog-button.rename.active, .fm-dialog-button.notifications-button:hover, .fm-dialog-button.notifications-button.active, .fm-dialog-button.links-button:hover, .fm-dialog-button.links-button.active, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-move-button.active, .fm-dialog-button.dialog-newfolder-button:hover, .fm-dialog-button.dialog-newfolder-button.active, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-copy-button.active, .fm-dialog-button.notification-button.confirm:hover, .fm-dialog-button.notification-button.confirm.active, .contact-request-button.accept:hover, .contact-request-button.accept.active, .fm-dialog-button.fm-dialog-button-green:hover, .fm-dialog-button.fm-dialog-button-green.active, .transfer-pause-icon:hover, .fm-account-save:hover, .astropay-dialog .fm-dialog-button.accept:hover {
 	background-color: rgba(49,181,0,0.2);
 }
-.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-reset-stored-fingerprint:hover span, .fm-reset-stored-fingerprint.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span, .transfer-pause-icon:hover span, .fm-verify.verified span, .fm-account-save span, .fm-account-save:hover span {
+.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-reset-stored-fingerprint:hover span, .fm-reset-stored-fingerprint.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span, .transfer-pause-icon:hover span, .fm-verify.verified span, .fm-account-save span, .fm-account-save:hover span, .astropay-dialog .fm-dialog-button.accept:hover span {
 	color: rgba(49,181,0,1);
 }
 /* disabled */
@@ -14853,7 +14853,7 @@ h5.main-italic-header {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: center -252px;
 	background-repeat: no-repeat;
 	display: block;
@@ -14872,7 +14872,7 @@ h5.main-italic-header {
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: -292px -401px;
 	background-repeat: no-repeat;
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -14991,7 +14991,7 @@ h5.main-italic-header {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: right -643px;
 	background-repeat: no-repeat;
 	font-size: 14px;
@@ -15006,7 +15006,7 @@ h5.main-italic-header {
 	width: 110px;
 	height: 110px;
 	float: left;
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: -287px -553px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -7px;
@@ -15075,7 +15075,7 @@ h5.main-italic-header {
 	margin: 5px;
 }
 .membership-radio-label {
-	background-image: url("../images/mega/pro-new-sprite-v7.png");
+	background-image: url("../images/mega/pro-new-sprite-v8.png");
 	background-repeat: no-repeat;
 	color: #333333;
 	display: inline-block;
@@ -16734,7 +16734,7 @@ span.browsers-update {
 	height: 181px;
 	float: left;
 	text-align: center;
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: -7px -359px;
 	background-repeat: no-repeat;
 	-moz-box-sizing: border-box;
@@ -24195,23 +24195,26 @@ a.voucher-reseller-link {
 /* AstroPay dialog */
 .fm-dialog.astropay-dialog {
     margin-left: -200px;
-    margin-top: -150px;
+    margin-top: -200px;
     padding-top: 30px;
     width: 400px;
 }
 .astropay-dialog-body {
-    padding: 15px;
+    padding: 15px 50px;
+}
+.astropay-dialog .fm-dialog-title {
+    margin-top: -14px;
+    padding-top: 0;
 }
 .astropay-label {
     color: #444;
     display: block;
-    font-family: "source_sans_prosemibold";
+    font-family: "source_sans_prosemibold", sans-serif;
     font-size: 13px;
     letter-spacing: 0.2px;
 }
 .astropay-dialog .fm-account-input {
-    margin-bottom: 20px;
-    margin-top: 5px;
+    margin: 5px 0 20px 0;
 }
 .astropay-information,
 .astropay-instructions {
@@ -24224,8 +24227,21 @@ a.voucher-reseller-link {
     margin-bottom: 20px;
     margin-top: 20px;
 }
+.astropay-dialog .provider-name {
+    font-family: "source_sans_prosemibold", sans-serif;
+}
 .astropay-dialog .provider-icon {
     margin: 0 2px;
+}
+.astropay-dialog .powered-by-astropay {
+  background-image: url("../images/mega/pro-new-sprite-v8.png");
+  background-position: 0 -638px;
+  background-size: 755px auto;
+  height: 25px;
+  left: 16px;
+  position: absolute;
+  top: 19px;
+  width: 100px;
 }
 
 /* CC payment dialog */
@@ -26264,8 +26280,8 @@ background-size: 50px auto;
  background-image: url(../images/mega/browsers-page@2x.png);
  background-size: 892px auto;
 }
-.pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label {
- background-image: url(../images/mega/pro-new-sprite-v7@2x.png);
+.pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
+ background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
  background-size: 755px auto;
 }
 .sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow, .win-phone-button, .products-top-arrow {

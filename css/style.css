@@ -15457,6 +15457,10 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     padding: 3px 15px;
     white-space: nowrap;
 }
+.membership-step2 .provider-show-more:hover .button {
+    border-color: #ccc;
+    color: #999;
+}
 .membership-step2 .provider-show-more .left-bar,
 .membership-step2 .provider-show-more .right-bar {
     display: table-cell;
@@ -15473,6 +15477,10 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     border-top: 1px solid #ececec;
     position: relative;
     top: 8px;
+}
+.membership-step2 .provider-show-more:hover .left-bar-grey,
+.membership-step2 .provider-show-more:hover .right-bar-grey {
+    border-color: #ddd;
 }
 .membership-step2 .provider-details {
     display: inline-block;
@@ -16868,8 +16876,9 @@ span.browsers-update {
 	color: white;
 }
 .pro-bottom-button:hover, .membership-bott-button:hover {
-	background-color: #D90007;
-	color: white;
+    background-color: #d90007;
+    border-color: #d90007;
+    color: white;
 }
 .pro-bottom-icon-block {
 	margin: 0 0 0 0;

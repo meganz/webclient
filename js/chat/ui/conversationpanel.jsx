@@ -413,7 +413,8 @@ var ConversationMessage = React.createClass({
                 var messageActionButtons = null;
 
                 if (message.getState() !== Message.STATE.NOT_SENT) {
-                    messageActionButtons = <ButtonsUI.Button
+                    messageActionButtons = null;
+                    /*<ButtonsUI.Button
                         className="default-white-button tiny-button"
                         icon="tiny-icon grey-down-arrow">
                         <DropdownsUI.Dropdown
@@ -436,7 +437,7 @@ var ConversationMessage = React.createClass({
                                         self.doDelete(e, message);
                                     }}/>
                         </DropdownsUI.Dropdown>
-                    </ButtonsUI.Button>
+                    </ButtonsUI.Button> */
                 }
 
                 var avatar = null;
@@ -623,13 +624,19 @@ var ConversationRightArea = React.createClass({
             <div className="chat-right-area conversation-details-scroll">
                 <div className="chat-right-pad">
 
-                    <ContactsUI.ContactCard contact={contact} megaChat={room.megaChat} />
+                    <ContactsUI.ContactCard
+                        contact={contact}
+                        megaChat={room.megaChat}
+                        className="right-chat-contact-card"
+                        dropdownPositionMy="right top"
+                        dropdownPositionAt="right bottom"
+                    />
 
                     <div className="buttons-block">
                         {startAudioCallButton}
                         {startVideoCallButton}
 
-                        <ButtonsUI.Button
+                        { null /*<ButtonsUI.Button
                             className="link-button dropdown-element"
                             icon="rounded-grey-plus"
                             label={__("Add participant…")}
@@ -641,7 +648,7 @@ var ConversationRightArea = React.createClass({
                                 className="popup add-participant-selector"
                                 onClick={() => {}}
                                 />
-                        </ButtonsUI.Button>
+                        </ButtonsUI.Button>*/}
 
                         <ButtonsUI.Button
                             className="link-button dropdown-element"
@@ -660,10 +667,7 @@ var ConversationRightArea = React.createClass({
                             </DropdownsUI.Dropdown>
                         </ButtonsUI.Button>
 
-                        <div className="link-button">
-                            <i className="small-icon shared-grey-folder"></i>
-                            {__("Share Folders")}
-                        </div>
+
                         {
                             room.type !== "private" ?
                                 <div className="link-button red" onClick={() => {
@@ -1491,22 +1495,24 @@ var ConversationPanel = React.createClass({
                 if (shouldRender === true) {
                     var userId = v.userId;
                     var timestamp = v.delay;
+                    if (!userId && v.fromJid) {
+                        var contact = room.megaChat.getContactFromJid(v.fromJid);
+                        if (contact && contact.u) {
+                            userId = contact.u;
+                        }
+                    }
 
                     if (
                         v instanceof KarereEventObjects.OutgoingMessage ||
                         v instanceof Message
                     ) {
-                        if (!userId && v.fromJid) {
-                            var contact = room.megaChat.getContactFromJid(v.fromJid);
-                            if (contact && contact.u) {
-                                userId = contact.u;
-                            }
-                        }
+
                         // the grouping logic for messages.
                         if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
                             if (timestamp - lastGroupedMessageTimeStamp < (5 * 60)) {
                                 grouped = true;
-                            } else {
+                            }
+                            else {
                                 grouped = false;
                                 lastMessageFrom = userId;
                                 lastGroupedMessageTimeStamp = timestamp;
@@ -1514,8 +1520,13 @@ var ConversationPanel = React.createClass({
                         }
                         else {
                             grouped = false;
-                            lastMessageFrom = null;
-                            lastGroupedMessageTimeStamp = null;
+                            lastMessageFrom = userId;
+                            if (lastMessageFrom === userId) {
+                                lastGroupedMessageTimeStamp = timestamp;
+                            }
+                            else {
+                                lastGroupedMessageTimeStamp = null;
+                            }
                         }
                     } else {
                         grouped = false;

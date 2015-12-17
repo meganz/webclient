@@ -110,7 +110,10 @@ var ContactCard = React.createClass({
             contextMenu = <ButtonsUI.Button
                 className="default-white-button tiny-button"
                 icon="tiny-icon grey-down-arrow">
-                <DropdownsUI.Dropdown className="contact-card-dropdown">
+                <DropdownsUI.Dropdown className="contact-card-dropdown"
+                    positionAt={self.props.dropdownPositionAt}
+                    positionMy={self.props.dropdownPositionMy}
+                >
                     <DropdownsUI.DropdownItem icon="human-profile" label={__("View Profile")} onClick={() => {
                                     window.location = '#fm/' + contact.u;
                                 }} />

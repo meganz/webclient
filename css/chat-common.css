@@ -55,6 +55,9 @@
 .chat-right-area .big-button {
 	margin: 25px 23px 0 23px;
 }
+.right-chat-contact-card .contact-card-dropdown .dropdown-white-arrow {
+	margin-left: 59px;
+}
 .date-time {
 	font-size: 12px;
 	line-height: 20px;

@@ -611,6 +611,10 @@ CallSession.prototype.onCallTerminated = function(e) {
         delete self.room.callSession;
     }
 
+    if ($(document).fullScreen() && self.room.isCurrentlyActive) {
+        $(document).fullScreen(false);
+    }
+
 
     self.renderCallEndedState();
 };

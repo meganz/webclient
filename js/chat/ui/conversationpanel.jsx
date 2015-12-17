@@ -381,6 +381,7 @@ var ConversationMessage = React.createClass({
                     var foundRevokedNode = null;
 
                     var revokedNode = textContents.substr(2, textContents.length);
+
                     if (chatRoom._attachmentsMap[revokedNode]) {
                         Object.keys(chatRoom._attachmentsMap[revokedNode]).forEach(function(messageId) {
                             var attachedMsg = chatRoom.messagesBuff.messages[messageId];
@@ -1095,6 +1096,7 @@ var ConversationPanel = React.createClass({
 
         setTimeout(function()
         {
+            $('.chat-textarea:visible textarea').click();
             moveCursortoToEnd($('.chat-textarea:visible textarea')[0]);
         }, 100);
     },
@@ -1476,8 +1478,6 @@ var ConversationPanel = React.createClass({
                     shouldRender = false;
                 }
 
-
-
                 var curTimeMarker = time2lastSeparator((new Date(v.delay * 1000).toISOString()));
 
                 if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
@@ -1533,12 +1533,12 @@ var ConversationPanel = React.createClass({
                         lastMessageFrom = null;
                         lastGroupedMessageTimeStamp = null;
                     }
-
-                    messagesList.push(
-                        <ConversationMessage message={v} chatRoom={room} key={v.messageId} contact={contact}
-                                             grouped={grouped}/>
-                    );
                 }
+
+                messagesList.push(
+                    <ConversationMessage message={v} chatRoom={room} key={v.messageId} contact={contact}
+                                         grouped={grouped}/>
+                );
             }
         });
 

@@ -1,9 +1,10 @@
 var syncurl;
 var nautilusurl;
 var syncsel = false;
-var linuxsync = megasync.getLinuxReleases();
+var linuxsync;
 
 function init_sync() {
+    linuxsync = linuxsync || megasync.getLinuxReleases();
     $('.st-apps-icon.mobile').rebind('click', function() {
         document.location.hash = 'mobile';
     });

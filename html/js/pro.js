@@ -1324,13 +1324,16 @@ var astroPayDialog = {
      * Shows a modal dialog that their payment is pending
      */
     showPendingPayment: function() {
+                
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        this.$pendingOverlay = $('.payment-result.success.pending');
         
         // Show the success
-        astroPayDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-        astroPayDialog.$pendingOverlay.removeClass('hidden');
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        this.$pendingOverlay.removeClass('hidden');
         
         // Add click handlers for 'Go to my account' and Close buttons
-        astroPayDialog.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+        this.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
             
             // Hide the overlay
             astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');

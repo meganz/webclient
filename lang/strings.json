@@ -11414,5 +11414,77 @@
     "7976": {
         "text": "We strongly suggest using our sync client for vastly improved performance[BR] downloading large files. [A]Get MEGAsync now[\/A].",
         "context": "Message recommending users use the sync client to download large files.\r\nPlease keep linkebreak and link tags as it is:\r\n\r\n[BR], [A], [\/A]"
+    },
+    "7977": {
+        "text": "Servers are too busy. Please wait...",
+        "context": "Message to display when the app gets frozen because the servers are too busy, it warns the users that it may take a while before it gets response."
+    },
+    "7978": {
+        "text": "Shared with 1 contact",
+        "context": "Message to explain that the user has shared the folder with one contact."
+    },
+    "7979": {
+        "text": "Please write your feedback here:",
+        "context": "Message body of the email that appears when the users tap on \"Send feedback\"."
+    },
+    "7982": {
+        "text": "You have too many incomplete payments in the last 12 hours, please complete those payments or try again tomorrow.",
+        "context": "An error message to be displayed inside a dialog. This means the user has made a payment but it has not been confirmed yet."
+    },
+    "7983": {
+        "text": "Awaiting confirmation",
+        "context": "A title for a full screen dialog. Their payment is awaiting to be confirmed by the system."
+    },
+    "7984": {
+        "text": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you still haven't received your MEGA PRO account within a day after payment please contact us at support@mega.nz.",
+        "context": "A message to be displayed on the payment pending dialog."
+    },
+    "7985": {
+        "text": "Personal details",
+        "context": "Title for the AstroPay payment dialog. This is the section where they enter their name and tax number."
+    },
+    "7986": {
+        "text": "Enter your full name and tax number below, then you will be redirected off-site to the payment page.",
+        "context": "Instruction for the AstroPay payment dialog. The phrase 'tax number' is referring to a Brazilian CPF, Argentinian DNI, Mexican CURP, etc."
+    },
+    "7987": {
+        "text": "Full name",
+        "context": "Label for a text input to ask the user to enter their full name."
+    },
+    "7988": {
+        "text": "Enter your full name",
+        "context": "Placeholder text for a text input field to ask the user to enter their full name."
+    },
+    "7989": {
+        "text": "%1 number",
+        "context": "Label for a text input field to ask the user to enter their tax name. The %1 placeholder will be replaced with the tax code relevant to their country e.g. IRD\/CPF number etc."
+    },
+    "7990": {
+        "text": "Enter your %1 number",
+        "context": "Placeholder text on the AstroPay payment dialog asking the user to enter their tax number. The %1 placeholder will be replaced with their tax code for their country e.g. IRD\/CPF number etc."
+    },
+    "7991": {
+        "text": "You have selected %1 as your payment provider.",
+        "context": "Informational text on the AstroPay payment dialog which tells the user which payment provider they have selected. The %1 placeholder will be replaced with the icon and name of the payment provider e.g. Bradesco, Banco do Brasil etc."
+    },
+    "7992": {
+        "text": "How would you like to pay?",
+        "context": "A title on the second step of the PRO payment page which lets the user choose which payment provider they want to pay with."
+    },
+    "7993": {
+        "text": "Click here to show more payment options...",
+        "context": "A button on the PRO payment page which lets the user show other payment provider options they can pay with."
+    },
+    "7994": {
+        "text": "How long do you want your membership to be?",
+        "context": "A title on the PRO payment page which lets the user choose the duration of their plan."
+    },
+    "7995": {
+        "text": "Are you happy with your payment plan?",
+        "context": "A title on the PRO payment page asking the user if they are happy with the options they have chosen and are ready to move on and make the payment."
+    },
+    "7996": {
+        "text": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+        "context": "An instruction on the PRO payment page. Please do not remove the [S] and [\/S] tags as they will be used to style the word PURCHASE. Do translate the word PURCHASE though which should remain uppercase to match the button text."
     }
 }

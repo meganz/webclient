@@ -3328,13 +3328,22 @@ function accountUI()
                 paymentMethod = l[6952];            // Union Pay
             }
             else if (paymentMethodIndex == 6) {
-                paymentMethod = l[7161];            // Mobile carrier billing
+                paymentMethod = l[7161] + ' (Fortumo)';    // Mobile carrier billing (Fortumo)
             }
             else if (paymentMethodIndex == 7) {
                 paymentMethod = l[6952];            // Credit card
             }
             else if (paymentMethodIndex == 8) {
                 paymentMethod = l[6952];            // Credit card
+            }
+            else if (paymentMethodIndex == 9) {
+                paymentMethod = l[7161] + ' (Centili)';    // Mobile carrier billing (Centili)
+            }
+            else if (paymentMethodIndex == 10) {
+                paymentMethod = 'paysafecard';
+            }
+            else if (paymentMethodIndex == 11) {
+                paymentMethod = 'AstroPay';         // Various AstroPay methods
             }
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method

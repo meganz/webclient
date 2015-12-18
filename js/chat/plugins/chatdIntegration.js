@@ -328,6 +328,15 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     keyRetrievalPromise
                 );
             }
+            if (contact && contact.u && !u_pubkeys[contact.u]) {
+                var keyRetrievalPromise = crypt.getPubRSA(contact.u);
+                keyRetrievalPromise.fail(function(r) {
+                });
+
+                waitingForPromises.push(
+                    keyRetrievalPromise
+                );
+            }
         });
 
         var strongvelopeInitPromise = createTimeoutPromise(function() {
@@ -421,16 +430,20 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     }
                 };
 
+                var promises = [];
                 if (!pubCu25519[msgObject.userId]) {
-                    crypt.getPubCu25519(msgObject.userId)
-                        .always(function() {
-                            _runDecryption();
-                        });
-                    return;
+                    promises.push(
+                        crypt.getPubCu25519(msgObject.userId)
+                    );
+                } if (!u_pubkeys[msgObject.userId]) {
+                    promises.push(
+                        crypt.getPubRSA(msgObject.userId)
+                    );
                 }
-                _runDecryption();
 
-
+                MegaPromise.allDone(promises).always(function() {
+                    _runDecryption();
+                });
             }
         });
 
@@ -514,17 +527,41 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     var destinationUser = chatRoom.megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
     assert(destinationUser, 'user/contact not found!');
 
-    // is this a new (empty) chat?
-    if (
-        chatRoom.protocolHandler.previousKeyId === null &&
-        chatRoom.protocolHandler.keyId === null
-    ) {
-        // new session, gen key!
-        chatRoom.protocolHandler.updateSenderKey();
+    var promises = [];
+    if (!pubCu25519[destinationUser.u]) {
+        promises.push(
+            crypt.getPubCu25519(destinationUser.u)
+        );
+    }
+    if (!u_pubkeys[destinationUser.u]) {
+        promises.push(
+            crypt.getPubRSA(destinationUser.u)
+        );
     }
 
-    var result = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
-    return self.chatd.submit(base64urldecode(chatRoom.chatId), result);
+    var tmpPromise = new MegaPromise();
+
+    var _runEncryption = function() {
+        // is this a new (empty) chat?
+        if (
+            chatRoom.protocolHandler.previousKeyId === null &&
+            chatRoom.protocolHandler.keyId === null
+        ) {
+            // new session, gen key!
+            chatRoom.protocolHandler.updateSenderKey();
+        }
+
+        var result = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
+        tmpPromise.resolve(
+            self.chatd.submit(base64urldecode(chatRoom.chatId), result)
+        );
+    };
+
+    MegaPromise.allDone(promises).always(function() {
+        _runEncryption();
+    });
+
+    return tmpPromise;
 };
 
 ChatdIntegration.prototype.updateMessage = function(chatRoom, num, newMessage) {

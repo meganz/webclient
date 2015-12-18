@@ -340,7 +340,10 @@ MegaPromise.all = function(promisesList) {
  * @returns {MegaPromise}
  */
 MegaPromise.allDone = function(promisesList, timeout) {
-
+    // IF empty, resolve immediately
+    if (promisesList.length === 0) {
+        return MegaPromise.resolve();
+    }
     var totalLeft = promisesList.length;
     var results = [];
     var masterPromise = new MegaPromise();

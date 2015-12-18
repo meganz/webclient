@@ -542,9 +542,7 @@
 						if (dirY !== 0) {
 							jsp.scrollByY(dirY * settings.arrowButtonSpeed);
 						}
-						scrollTimeout = setTimeout(function() {
-							doScroll();
-						}, isFirst ? settings.initialDelay : settings.arrowRepeatFreq);
+						scrollTimeout = setTimeout(doScroll, isFirst ? settings.initialDelay : settings.arrowRepeatFreq);
 						isFirst = false;
 					};
 
@@ -600,9 +598,7 @@
 											cancelClick();
 											return;
 										}
-										scrollTimeout = setTimeout(function() {
-											doScroll();
-										}, isFirst ? settings.initialDelay : settings.trackClickRepeatFreq);
+										scrollTimeout = setTimeout(doScroll, isFirst ? settings.initialDelay : settings.trackClickRepeatFreq);
 										isFirst = false;
 									},
 									cancelClick = function()
@@ -652,9 +648,7 @@
 											cancelClick();
 											return;
 										}
-										scrollTimeout = setTimeout(function() {
-											doScroll();
-										}, isFirst ? settings.initialDelay : settings.trackClickRepeatFreq);
+										scrollTimeout = setTimeout(doScroll, isFirst ? settings.initialDelay : settings.trackClickRepeatFreq);
 										isFirst = false;
 									},
 									cancelClick = function()
@@ -705,9 +699,12 @@
 					destY = dragMaxY;
 				}
 
-				// can't just check if(animate) because false is a valid value that could be passed in...
-				if (animate === undefined) {
-					animate = settings.animateScroll;
+				// allow for devs to prevent the JSP from being scrolled
+				var willScrollYEvent = new $.Event("jsp-will-scroll-y");
+				elem.trigger(willScrollYEvent, [destY]);
+
+				if (willScrollYEvent.isDefaultPrevented()) {
+					return;
 				}
 
 				var tmpVerticalDragPosition = destY || 0;
@@ -717,18 +714,19 @@
 					percentScrolled = destY/ dragMaxY,
 					destTop = -percentScrolled * (contentHeight - paneHeight);
 
+				// can't just check if(animate) because false is a valid value that could be passed in...
+				if (animate === undefined) {
+					animate = settings.animateScroll;
+				}
 				if (animate) {
 					jsp.animate(verticalDrag, 'top', destY,	_positionDragY, function() {
 						elem.trigger('jsp-user-scroll-y', [-destTop, isAtTop, isAtBottom]);
 					});
-
 				} else {
 					verticalDrag.css('top', destY);
 					_positionDragY(destY);
-
 					elem.trigger('jsp-user-scroll-y', [-destTop, isAtTop, isAtBottom]);
 				}
-
 
 			}
 
@@ -768,14 +766,33 @@
 					destX = dragMaxX;
 				}
 
+
+				// allow for devs to prevent the JSP from being scrolled
+				var willScrollXEvent = new $.Event("jsp-will-scroll-x");
+				elem.trigger(willScrollXEvent, [destX]);
+
+				if (willScrollXEvent.isDefaultPrevented()) {
+					return;
+				}
+
+				var tmpHorizontalDragPosition = destX ||0;
+
+				var isAtLeft = tmpHorizontalDragPosition === 0,
+					isAtRight = tmpHorizontalDragPosition == dragMaxX,
+					percentScrolled = destX / dragMaxX,
+					destLeft = -percentScrolled * (contentWidth - paneWidth);
+
 				if (animate === undefined) {
 					animate = settings.animateScroll;
 				}
 				if (animate) {
-					jsp.animate(horizontalDrag, 'left', destX,	_positionDragX);
+					jsp.animate(horizontalDrag, 'left', destX,	_positionDragX, function() {
+						elem.trigger('jsp-user-scroll-x', [-destLeft, isAtLeft, isAtRight]);
+					});
 				} else {
 					horizontalDrag.css('left', destX);
 					_positionDragX(destX);
+					elem.trigger('jsp-user-scroll-x', [-destLeft, isAtLeft, isAtRight]);
 				}
 			}
 
@@ -1348,9 +1365,8 @@
 					//  * prop         - the property that is being animated
 					//  * value        - the value it's being animated to
 					//  * stepCallback - a function that you must execute each time you update the value of the property
-					//  * completeCallback - a function that will be executed after the animation had finished
 					// You can use the default implementation (below) as a starting point for your own implementation.
-					animate: function(ele, prop, value, stepCallback, completeCallback)
+					animate: function(ele, prop, value, stepCallback)
 					{
 						var params = {};
 						params[prop] = value;
@@ -1360,8 +1376,7 @@
 								'duration'	: settings.animateDuration,
 								'easing'	: settings.animateEase,
 								'queue'		: false,
-								'step'		: stepCallback,
-								'complete'	: completeCallback
+								'step'		: stepCallback
 							}
 						);
 					},

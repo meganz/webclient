@@ -10,9 +10,22 @@ var Dropdown = React.createClass({
     mixins: [MegaRenderMixin],
     componentWillUpdate: function(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
-            if (this.props.onActiveChange) {
-                this.props.onActiveChange(nextProps.active);
-            }
+            this.onActiveChange(nextProps.active)
+        }
+    },
+    onActiveChange: function(newVal) {
+        var $element = $(ReactDOM.findDOMNode(this));
+
+        var $scrollables = $element.parents('.jScrollPaneContainer');
+        if (newVal === true) {
+            $element.parents('.jspScrollable').attr('data-scroll-disabled', true);
+        }
+        else {
+            $element.parents('.jspScrollable').removeAttr('data-scroll-disabled');
+        }
+
+        if (this.props.onActiveChange) {
+            this.props.onActiveChange(newVal);
         }
     },
     componentDidUpdate: function() {

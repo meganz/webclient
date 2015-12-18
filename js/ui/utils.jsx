@@ -11,11 +11,13 @@ var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 var JScrollPane = React.createClass({
     mixins: [MegaRenderMixin],
     componentDidMount: function() {
-        var $elem = $(ReactDOM.findDOMNode(this));
+        var self = this;
+        var $elem = $(ReactDOM.findDOMNode(self));
+
 
         $elem.height('100%');
 
-        this.setWidthHeightIfEmpty();
+        self.setWidthHeightIfEmpty();
 
         $elem.find('.jspContainer').replaceWith(
             function() {
@@ -30,14 +32,25 @@ var JScrollPane = React.createClass({
             animateScroll: true,
             container: $('.jspContainer', $elem),
             pane: $('.jspPane', $elem)
-        }, this.props.options);
+        }, self.props.options);
 
         $elem.jScrollPane(options);
+        $elem.rebind('jsp-will-scroll-y.jsp' + self.getUniqueId(), function(e) {
+            if ($elem.attr('data-scroll-disabled') === "true") {
+                e.preventDefault();
+                e.stopPropagation();
 
-        $(window).rebind('resize.jsp' + this.getUniqueId(), this.onResize);
-        this.onResize();
+                return false;
+            }
+        });
+
+        $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize);
+        self.onResize();
     },
     componentWillUnmount: function() {
+        var $elem = $(ReactDOM.findDOMNode(this));
+        $elem.unbind('jsp-will-scroll-y.jsp' + this.getUniqueId());
+
         $(window).unbind('resize.jsp' + this.getUniqueId());
     },
     setWidthHeightIfEmpty: function() {
@@ -51,10 +64,11 @@ var JScrollPane = React.createClass({
     },
     onResize: function() {
         var $elem = $(ReactDOM.findDOMNode(this));
+
         this.setWidthHeightIfEmpty();
 
         var $jsp = $elem.data('jsp');
-        if($jsp) {
+        if ($jsp) {
             $jsp.reinitialise();
         }
     },

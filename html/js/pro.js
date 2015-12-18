@@ -13,12 +13,18 @@ function init_pro()
 {    
     // Detect if there exists a verify get parameter
     var verifyUrlParam = proPage.getUrlParam("verify");
-    if (typeof verifyUrlParam !== 'undefined')
-    {
-        if (verifyUrlParam === "paysafe")
-        {
-            // We are required to do paysafecard verification
+    
+    // If it exists we need to do extra things
+    if (typeof verifyUrlParam !== 'undefined') {
+        
+        // We are required to do paysafecard verification
+        if (verifyUrlParam === "paysafe") {            
             paysafecard.verify();
+        }
+        
+        // Show another dialog
+        if (verifyUrlParam === 'astropay') {
+            astroPayDialog.confirmPayment();
         }
     }
 
@@ -316,6 +322,7 @@ function pro_pay() {
         
     // Otherwise if Union Pay payment, show bouncing coin while loading
     else if (pro_paymentmethod === 'dynamicpay' || pro_paymentmethod === 'paysafecard' || (pro_paymentmethod.indexOf('astropay') > -1)) {
+        
         proPage.showLoadingOverlay('transferring');
     }
     
@@ -371,6 +378,9 @@ function pro_pay() {
                 else if (pro_paymentmethod === 'paysafecard') {
                     pro_m = 10;
                 }
+                
+                
+                // If AstroPay, send extra details
                 else if (pro_paymentmethod.indexOf('astropay') > -1) {
                     pro_m = astroPayDialog.gatewayId;
                     extra.bank = astroPayDialog.selectedProvider.extra.code;
@@ -458,7 +468,8 @@ function pro_pay() {
                                     astroPayDialog.redirectToSite(utcResult);
                                 }
                                 else {
-                                    astroPayDialog.showConnectionError(utcResult);
+                                    proPage.hideLoadingOverlay();
+                                    astroPayDialog.showError(utcResult);
                                 }
                             }
                         }
@@ -963,6 +974,7 @@ var proPage = {
         // Pre-select the first option
         var $firstOption = $('.duration-options-list .payment-duration:not(.template').first();
         $firstOption.find('.membership-radio').addClass('checked');
+        $firstOption.find('.membership-radio-label').addClass('checked');
         $firstOption.find('input').attr('checked', 'checked');
 
         // Get current plan price
@@ -985,10 +997,14 @@ var proPage = {
             var $this = $(this);
             var planIndex = $this.attr('data-plan-index');
 
-            // Remove checked state on the other buttons and add just to the clicked one
+            // Remove checked state on the other buttons
             $durationOptions.find('.membership-radio').removeClass('checked');
+            $durationOptions.find('.membership-radio-label').removeClass('checked');
             $durationOptions.find('input').removeAttr('checked');
+            
+            // Add checked state to just to the clicked one
             $this.find('.membership-radio').addClass('checked');
+            $this.find('.membership-radio-label').addClass('checked');
             $this.find('input').attr('checked', 'checked');
 
             // Update the main price and wording for one-time or recurring
@@ -1145,31 +1161,27 @@ var astroPayDialog = {
     /**
      * Initialise
      * @param {Object} selectedProvider
-     * @param {Array} selectedProPackage
      */
-    init: function(selectedProvider, selectedProPackage) {
+    init: function(selectedProvider) {
         
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.astropay-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        
-        // Add the styling for the overlay
-        this.$dialog.removeClass('hidden');
-        this.showBackgroundOverlay();
-        
+                
         // Store the provider details
         this.selectedProvider = selectedProvider;
         
-        // Initalise the rest
+        // Initalise the rest of the dialog
         this.initCloseButton();
         this.initConfirmButton();
+        this.updateDialogDetails();
         this.showDialog();
     },
     
     /**
-     * Display the dialog
+     * Update the dialog details
      */
-    showDialog: function() {
+    updateDialogDetails: function() {
     
         // Change icon and payment provider name
         this.$dialog.find('.provider-icon').addClass(this.selectedProvider.gatewayName);
@@ -1182,6 +1194,24 @@ var astroPayDialog = {
         // Change the tax labels
         this.$dialog.find('.astropay-label.tax').html(taxLabel);
         this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);
+    },
+    
+    /**
+     * Display the dialog
+     */
+    showDialog: function() {
+        
+        this.$dialog.removeClass('hidden');
+        this.showBackgroundOverlay();
+    },
+           
+    /**
+     * Hide the overlay and dialog
+     */
+    hideDialog: function() {
+        
+        this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        this.$dialog.addClass('hidden');
     },
     
     /**
@@ -1198,7 +1228,7 @@ var astroPayDialog = {
     initCloseButton: function() {
         
          // Initialise the close and cancel buttons
-        astroPayDialog.$dialog.find('.fm-dialog-close, .fm-dialog-button.cancel').rebind('click', function() {
+        this.$dialog.find('.fm-dialog-close, .fm-dialog-button.cancel').rebind('click', function() {
             
             // Hide the overlay and dialog
             astroPayDialog.hideDialog();
@@ -1215,7 +1245,7 @@ var astroPayDialog = {
      */
     initConfirmButton: function() {
         
-        astroPayDialog.$dialog.find('.fm-dialog-button.accept').rebind('click', function() {
+        this.$dialog.find('.fm-dialog-button.accept').rebind('click', function() {
             
             // Store the full name and tax number entered
             astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find('#astropay-name-field').val());
@@ -1233,19 +1263,11 @@ var astroPayDialog = {
             }
             
             // Try redirecting to payment provider
+            astroPayDialog.hideDialog();
             pro_pay();
         });
     },
         
-    /**
-     * Hide the overlay and dialog
-     */
-    hideDialog: function() {
-        
-        astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        astroPayDialog.$dialog.addClass('hidden');
-    },
-    
     /**
      * Redirect to the site
      * @param {String} utcResult containing the url to redirect to
@@ -1260,7 +1282,7 @@ var astroPayDialog = {
      * Something has gone wrong just talking to AstroPay
      * @param {Object} utcResult The result from the UTC API call with error codes
      */
-    showConnectionError: function(utcResult) {
+    showError: function(utcResult) {
         
         // Generic error: Oops, something went wrong...
         var message = l[47];
@@ -1283,7 +1305,12 @@ var astroPayDialog = {
         // Show error dialog
         msgDialog('warninga', l[7235], message, '', function() {
             astroPayDialog.showBackgroundOverlay();
+            astroPayDialog.showDialog();
         });
+    },
+    
+    confirmPayment: function() {
+        
     }
 };
 

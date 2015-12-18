@@ -213,6 +213,13 @@ function pro_next_step() {
         linkHtml = linkHtml.replace('Android', '');
     $otherPaymentProviders.html(linkHtml);
 
+    // Stylise the PURCHASE text in the 3rd instruction
+    var $paymentInstructions = $('.membership-step2 .payment-instructions');
+    var paymentTextHtml = $paymentInstructions.html();
+        paymentTextHtml = paymentTextHtml.replace('[S]', '<span class="purchase">');
+        paymentTextHtml = paymentTextHtml.replace('[/S]', '</span>');
+    $paymentInstructions.html(paymentTextHtml);
+
     // Load payment methods and plan durations
     proPage.loadPaymentGatewayOptions();
 
@@ -1168,7 +1175,7 @@ var astroPayDialog = {
     // The provider details
     selectedProvider: null,
     
-    /**
+    /** 
      * Initialise
      * @param {Object} selectedProvider
      */
@@ -1198,13 +1205,19 @@ var astroPayDialog = {
         this.$dialog.find('.provider-icon').removeClass().addClass('provider-icon ' + this.selectedProvider.gatewayName);
         this.$dialog.find('.provider-name').text(this.selectedProvider.displayName);
         
+        // Add the provider icon and name into the translated string
+        var displayName = htmlentities(this.selectedProvider.displayName);
+        var iconAndName = '<span class="provider-icon"></span><span class="provider-name">' + displayName + '</span>';
+        var information = l[7991].replace('%1', iconAndName);
+        
         // Localise the tax label to their country e.g. GST, CPF
-        var taxLabel = 'Tax number:'.replace('Tax', this.selectedProvider.extra.taxIdLabel);
-        var taxPlaceholder = 'Enter your tax number here'.replace('tax', this.selectedProvider.extra.taxIdLabel);
+        var taxLabel = l[7989].replace('%1', this.selectedProvider.extra.taxIdLabel);
+        var taxPlaceholder = l[7990].replace('%1', this.selectedProvider.extra.taxIdLabel);
         
         // Change the tax labels
+        this.$dialog.find('.astropay-information').html(information);
         this.$dialog.find('.astropay-label.tax').html(taxLabel);
-        this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);
+        this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);        
     },
     
     /**
@@ -1310,7 +1323,7 @@ var astroPayDialog = {
         
         // Too many payments within 12 hours
         else if (utcResult.EUR.error === -18) {
-            message = 'You have too many incomplete payments in the last 12 hours, please complete those payments or try again tomorrow';
+            message = l[7982];
         }
         
         // Show error dialog

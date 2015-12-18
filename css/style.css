@@ -15443,6 +15443,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     line-height: 26px;
     max-width: 470px;
 }
+.membership-step2 .payment-instructions .purchase {
+    color: #ff4444;
+}
 .membership-step2 .provider-show-more {
     display: table;
     margin-top: 30px;

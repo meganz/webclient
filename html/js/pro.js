@@ -208,8 +208,10 @@ function pro_next_step() {
 
     // Add hyperlink to mobile payment providers at top of #pro page step 2
     var $otherPaymentProviders = $('.membership-step2 .other-payment-providers');
-    var html = $otherPaymentProviders.html().replace('[A]', '<a href="#mobile">').replace('[/A]', '</a>');
-    $otherPaymentProviders.html(html);
+    var linkHtml = $otherPaymentProviders.html().replace('[A]', '<a href="#mobile">')
+        linkHtml = linkHtml.replace('[/A]', '</a>');
+        linkHtml = linkHtml.replace('Android', '');
+    $otherPaymentProviders.html(linkHtml);
 
     // Load payment methods and plan durations
     proPage.loadPaymentGatewayOptions();

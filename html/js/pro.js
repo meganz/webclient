@@ -818,6 +818,11 @@ var proPage = {
             else if (gatewayOption.gatewayName === 'wiretransfer') {
                 gatewayOption.displayName = l[6198];
             }
+            
+            // If a mobile payment provider e.g. Centili or Fortumo change text to: Mobile (Centili)
+            else if (gatewayOption.mobilePaymentProvider) {
+                gatewayOption.displayName = l[7219] + ' (' + htmlentities(gatewayOption.displayName) + ')';
+            }
 
             // Otherwise get display name from what was sent from API
             else {

@@ -1255,6 +1255,18 @@ describe("chat.strongvelope unit test", function() {
                     ownKey: '\u000a\u0000\u0000\u0020' + _ENCRYPTED_KEYS
                 });
             });
+
+            it("no chat or RSA available", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = ROTATED_KEY_ID;
+                handler.participantKeys['me3456789xw'][ROTATED_KEY_ID] = ROTATED_KEY;
+                handler.otherParticipants = new Set(['you456789xw']);
+                sandbox.stub(handler, '_encryptKeysFor').returns(false);
+
+                var result = handler._encryptSenderKey(NONCE);
+                assert.strictEqual(result, false);
+            });
         });
 
         describe('_assembleBody', function() {

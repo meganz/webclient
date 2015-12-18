@@ -1092,6 +1092,7 @@ var strongvelope = {};
         var keysIncluded = [];
         var encryptedKeys = '';
         var isNewMember = false;
+        var keyEncryptionError = false;
         self.otherParticipants.forEach(function _memberIterator(destination) {
             isNewMember = self.includeParticipants.has(destination);
 
@@ -1107,7 +1108,7 @@ var strongvelope = {};
             encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, destination);
             if (encryptedKeys === false) {
                 // Something went wrong, and we can't encrypt to that destination.
-                return false;
+                keyEncryptionError = true;
             }
             if (encryptedKeys.length > _RSA_ENCRYPTION_THRESHOLD) {
                 needOwnKeyEncryption = true;
@@ -1115,6 +1116,9 @@ var strongvelope = {};
             keys += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
                                          encryptedKeys);
         });
+        if (keyEncryptionError === true) {
+            return false;
+        }
 
         var result = { recipients: recipients, keys: keys, keyIds: keyIds };
 

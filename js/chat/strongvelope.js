@@ -1105,6 +1105,10 @@ var strongvelope = {};
                 keysIncluded.push(self.participantKeys[self.ownHandle][self.previousKeyId]);
             }
             encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, destination);
+            if (encryptedKeys === false) {
+                // Something went wrong, and we can't encrypt to that destination.
+                return false;
+            }
             if (encryptedKeys.length > _RSA_ENCRYPTION_THRESHOLD) {
                 needOwnKeyEncryption = true;
             }

@@ -24,7 +24,7 @@ function init_pro()
         
         // Show another dialog
         if (verifyUrlParam === 'astropay') {
-            astroPayDialog.confirmPayment();
+            astroPayDialog.showPendingPayment();
         }
     }
 
@@ -1160,6 +1160,7 @@ var astroPayDialog = {
     
     $dialog: null,
     $backgroundOverlay: null,
+    $pendingOverlay: null,
     
     // Constant for the AstroPay gateway ID
     gatewayId: 11,
@@ -1176,6 +1177,7 @@ var astroPayDialog = {
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.astropay-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
+        this.$pendingOverlay = $('.payment-result.success.pending');
                 
         // Store the provider details
         this.selectedProvider = selectedProvider;
@@ -1318,8 +1320,28 @@ var astroPayDialog = {
         });
     },
     
-    confirmPayment: function() {
+    /**
+     * Shows a modal dialog that their payment is pending
+     */
+    showPendingPayment: function() {
         
+        // Show the success
+        astroPayDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        astroPayDialog.$pendingOverlay.removeClass('hidden');
+        
+        // Add click handlers for 'Go to my account' and Close buttons
+        astroPayDialog.$pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+            
+            // Hide the overlay
+            astroPayDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            astroPayDialog.$pendingOverlay.addClass('hidden');
+                        
+            // Make sure it fetches new account data on reload
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+            window.location.hash = 'fm/account/history';
+        });
     }
 };
 

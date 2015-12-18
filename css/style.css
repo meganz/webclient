@@ -24567,6 +24567,10 @@ a.voucher-reseller-link {
 	font-size: 14px;
 	padding-bottom: 35px;
 }
+.payment-result.pending .payment-result-txt {
+    margin: 0 auto;
+    max-width: 700px;
+}
 .failed .payment-result-txt {
 	padding-bottom: 39px;
 }

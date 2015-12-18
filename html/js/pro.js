@@ -213,8 +213,6 @@ function pro_next_step() {
 
     // Load payment methods and plan durations
     proPage.loadPaymentGatewayOptions();
-    proPage.renderPlanDurationOptions();
-    proPage.initPlanDurationClickHandler();
 
     $('.membership-step1').addClass('hidden');
     $('.membership-step2').removeClass('hidden');
@@ -712,19 +710,29 @@ var proPage = {
                     $('.loading-placeholder-text').text('Error while loading, try reloading the page.');
                     return false;
                 }
-                
-                // Separate into two groups, the first group has 6 providers, the second has the rest
+
+                // Make a clone of the array so it can be modified
                 proPage.allGateways = JSON.parse(JSON.stringify(gatewayOptions));
-                proPage.primaryGatewayOptions = gatewayOptions.splice(0, 6);
-                proPage.secondaryGatewayOptions = gatewayOptions;                
-                
+
+                // Separate into two groups, the first group has 6 providers, the second has the rest
+                var primaryGatewayOptions = gatewayOptions.splice(0, 6);
+                var secondaryGatewayOptions = gatewayOptions;
+
+                // Show payment duration e.g. month or year radio options
+                proPage.renderPlanDurationOptions();
+                proPage.initPlanDurationClickHandler();
+
                 // Render the two groups
-                proPage.renderPaymentProviderOptions(proPage.primaryGatewayOptions, 'primary');
-                proPage.renderPaymentProviderOptions(proPage.secondaryGatewayOptions, 'secondary');
-                
+                proPage.renderPaymentProviderOptions(primaryGatewayOptions, 'primary');
+                proPage.renderPaymentProviderOptions(secondaryGatewayOptions, 'secondary');
+
                 // Change radio button states when clicked
                 proPage.initPaymentMethodRadioOptions();
                 proPage.initShowMoreOptionsButton();
+
+                // Update the pricing and whether is a regular payment or subscription
+                proPage.updateMainPrice();
+                proPage.updateTextDependingOnRecurring();
             }
         });
     },
@@ -837,7 +845,7 @@ var proPage = {
 
         // Add click handler to all payment methods
         var paymentOptionsList = $('.payment-options-list');
-        paymentOptionsList.find('.payment-method').rebind('click', function(event) {
+        paymentOptionsList.find('.payment-method').rebind('click', function() {
 
             var $this = $(this);
 
@@ -858,7 +866,7 @@ var proPage = {
             $this.find('.provider-details').addClass('checked');
 
             proPage.updateTextDependingOnRecurring();
-            //proPage.updatePeriodOptionsOnPaymentMethodChange();
+            proPage.updateDurationOptionsOnProviderChange();
         });
     },
         
@@ -976,12 +984,6 @@ var proPage = {
         $firstOption.find('.membership-radio').addClass('checked');
         $firstOption.find('.membership-radio-label').addClass('checked');
         $firstOption.find('input').attr('checked', 'checked');
-
-        // Get current plan price
-        var planIndex = $firstOption.attr('data-plan-index');
-
-        //proPage.updateMainPrice(planIndex);
-        //proPage.updateTextDependingOnRecurring();
     },
     
     /**
@@ -1019,6 +1021,11 @@ var proPage = {
      */
     updateMainPrice: function(planIndex) {
 
+        // If not passed in (e.g. inital load), get it from the currently selected option
+        if (typeof planIndex === 'undefined') {
+            planIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+        }
+
         // Get the current plan price
         var currentPlan = membershipPlans[planIndex];
         var price = currentPlan[5].split('.');
@@ -1035,13 +1042,15 @@ var proPage = {
      * Updates the duration/renewal period options if they select a payment method. For example 
      * for the wire transfer option we only want to accept one year one-off payments
      */
-    updatePeriodOptionsOnPaymentMethodChange: function() {
+    updateDurationOptionsOnProviderChange: function() {
 
         var $durationOptionsList = $('.duration-options-list');
-        var $durationOptions = $durationOptionsList.find('.payment-duration:not(.template)');
-        var supportsMonthlyPayment = ($('.payment-options-list input:checked').attr('data-supports-monthly-payment') === 'true') ? true : false;
-        var supportsAnnualPayment = ($('.payment-options-list input:checked').attr('data-supports-annual-payment') === 'true') ? true : false;
-
+        var $durationOptions = $durationOptionsList.find('.payment-duration:not(.template)');        
+        var selectedGatewayName = $('.payment-options-list input:checked').val();
+        var selectedProvider = proPage.allGateways.filter(function(val) {
+            return (val.gatewayName === selectedGatewayName);
+        })[0];
+        
         // Reset all options, they will be hidden or checked again if necessary below
         $durationOptions.removeClass('hidden');
         $durationOptions.find('.membership-radio').removeClass('checked');
@@ -1055,10 +1064,8 @@ var proPage = {
             var currentPlan = membershipPlans[planIndex];
             var numOfMonths = currentPlan[4];
 
-            // If the currently selected payment option e.g. Wire transfer doesn't support a 1 month payment
-            if (((supportsMonthlyPayment === false) && (numOfMonths === 1)) || ((supportsAnnualPayment === false) && (numOfMonths === 12))) {
-
-                // Hide the option
+            // If the currently selected payment option e.g. Wire transfer doesn't support a 1 month payment hide the option
+            if (((!selectedProvider.supportsMonthlyPayment) && (numOfMonths === 1)) || ((!selectedProvider.supportsAnnualPayment) && (numOfMonths === 12))) {                
                 $(durationOption).addClass('hidden');
             }
             else {
@@ -1184,7 +1191,7 @@ var astroPayDialog = {
     updateDialogDetails: function() {
     
         // Change icon and payment provider name
-        this.$dialog.find('.provider-icon').addClass(this.selectedProvider.gatewayName);
+        this.$dialog.find('.provider-icon').removeClass().addClass('provider-icon ' + this.selectedProvider.gatewayName);
         this.$dialog.find('.provider-name').text(this.selectedProvider.displayName);
         
         // Localise the tax label to their country e.g. GST, CPF

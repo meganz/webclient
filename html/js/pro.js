@@ -804,14 +804,17 @@ var proPage = {
                 $gateway.attr('title', l[7162]);
             }
 
-            // If their prepay balance is less than 0 they can buy a voucher
-            if ((gatewayOption.gatewayName === 'voucher') && (balanceFloat <= 0)) {
-                gatewayOption.displayName = l[487];     // Voucher code
-            }
-
-            // Otherwise if they have account balance, then they can use that
-            else if ((gatewayOption.gatewayName === 'voucher') && (balanceFloat >= planPriceFloat)) {
-                gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';  // Balance (x.xx)
+            // If the voucher/pre-paid balance option
+            if (gatewayOption.gatewayName === 'voucher') {
+                
+                // Show "Balance (x.xx)" if they have enough to purchase this plan
+                if (balanceFloat >= planPriceFloat) {
+                    gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
+                }
+                else {
+                    // Otherwise show "Voucher code"
+                    gatewayOption.displayName = l[487];
+                }
             }
             
             // If wire transfer option, need to translate that
@@ -828,7 +831,7 @@ var proPage = {
             else {
                 gatewayOption.displayName = htmlentities(gatewayOption.displayName);
             }
-               
+                           
             // Create a radio button with icon for each payment gateway
             $gateway.removeClass('template');
             $gateway.find('input').attr('name', gatewayOption.gatewayName);

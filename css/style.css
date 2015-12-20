@@ -24029,16 +24029,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .fm-chat-inline-dialog-button-sendFeedback {
 	margin-left: 4px;
 }
+.fm-dialog.copyrights-dialog {
+	width: 644px;
+	margin: -240px 0 0 -322px;
+}
 /* Voucher dialog */
 .fm-dialog.voucher-dialog {
 	border: 0 none;
 	border-radius: 14px;
 	margin: -176px 0 0 -240px;
 	width: 480px;
-}
-.fm-dialog.copyrights-dialog {
-	width: 644px;
-	margin: -240px 0 0 -322px;
 }
 .voucher-dialog-body {
 	padding: 30px;
@@ -24049,51 +24049,52 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	width: 60px;
 	display: inline-block;
 }
-.voucher-plan-info {
+.voucher-dialog .voucher-plan-info {
 	padding: 0 0 0 15px;
 	display: inline-block;
 	margin-top: 10px;
 	position: absolute;
 }
-.voucher-plan-title, .payment-plan-price {
+.voucher-dialog .voucher-plan-title,
+.voucher-dialog .payment-plan-price {
 	font-size: 36px;
 	line-height: 38px;
 	font-family: 'source_sans_prolight', Helvetica;
 }
-.voucher-plan-txt {
+.voucher-dialog .voucher-plan-txt {
 	color: #9d9d9d;
 	line-height: 14px;
 }
-.voucher-plan-txt span {
+.voucher-dialog .voucher-plan-txt span {
 	font-size: 13px;
 }
-.voucher-plan-price {
+.voucher-dialog .voucher-plan-price {
 	float: right;
 	padding: 26px 10px 0 0;
 	font-size: 36px;
 	font-family: 'source_sans_prolight', Helvetica;
 }
-.voucher-account-balance {
+.voucher-dialog .voucher-account-balance {
 	color: #d90007;
 	float: right;
 	font-family: 'source_sans_prolight', Helvetica;
 	font-size: 36px;
 	padding: 3px 10px 0 0;
 }
-.voucher-account-balance.sufficient-funds {
+.voucher-dialog .voucher-account-balance.sufficient-funds {
 	color: #3aaa5a;
 }
-.voucher-buy-now.sufficient-funds {
+.voucher-dialog .voucher-buy-now.sufficient-funds {
 	border-color: #3aaa5a;
 	color: #3aaa5a;
 	font-weight: bold;
 }
-.voucher-buy-now.sufficient-funds:hover {
+.voucher-dialog .voucher-buy-now.sufficient-funds:hover {
 	background-color: #3aaa5a;
 	border-color: #3aaa5a;
 	color: white;
 }
-.voucher-block {
+.voucher-dialog .voucher-block {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -24101,33 +24102,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	margin: 19px 0 0 0;
 	border-top: 1px solid #F1F1F1;
 }
-.voucher-title {
+.voucher-dialog .voucher-title {
 	letter-spacing: .1px;
 	line-height: 125%;
 	font-family: 'source_sans_probold';
 }
-.voucher-sub-title {
+.voucher-dialog .voucher-sub-title {
 	color: #3D3D3D;
 	letter-spacing: .1px;
 	line-height: 200%;
 	font-family: 'source_sans_prosemibold';
 }
-.voucher-information-help {
+.voucher-dialog .voucher-information-help {
 	margin: 20px 0 0 0;
 	color: #9B9B9B;
 	letter-spacing: .1px;
 	line-height: 20px;
 }
-a.voucher-reseller-link {
+.voucher-dialog a.voucher-reseller-link {
 	font-family: 'source_sans_probold';
 }
-.voucher-dialog-buttons {
+.voucher-dialog .voucher-dialog-buttons {
 	display: table;
 	width: 428px;
 	table-layout: fixed;
 	margin: 7px 0 0 0;
 }
-.voucher-buy-now, .voucher-redeem, .voucher-redeem-now {
+.voucher-dialog .voucher-buy-now,
+.voucher-dialog .voucher-redeem,
+.voucher-dialog .voucher-redeem-now {
 	margin: 24px 0 0 0;
 	height: 32px;
 	border: 2px solid #D90007;
@@ -24153,25 +24156,27 @@ a.voucher-reseller-link {
 	letter-spacing: .2px;
 	overflow: hidden;
 }
-.voucher-buy-now:hover {
+.voucher-dialog .voucher-buy-now:hover {
 	color: white;
 	background-color: #D90007;
 }
-.voucher-redeem, .voucher-redeem-now {
+.voucher-dialog .voucher-redeem,
+.voucher-dialog .voucher-redeem-now {
 	border: 2px solid #6a6a6a;
 	color: #6a6a6a;
 	left: 0;
 	margin: 24px 6px 0 0;
 }
-.voucher-redeem:hover, .voucher-redeem-now:hover {
+.voucher-dialog .voucher-redeem:hover,
+.voucher-dialog .voucher-redeem-now:hover {
 	background-color: #6a6a6a;
 	color: white;
 }
-.voucher-dialog-body .fm-account-input {
+.voucher-dialog .voucher-dialog-body .fm-account-input {
 	margin: 0 0 0 0;
 	display: block;
 }
-.voucher-dialog-td {
+.voucher-dialog .voucher-dialog-td {
 	display: table-cell;
 	overflow: hidden;
 	-webkit-transition: all 200ms ease-in-out;
@@ -24183,26 +24188,26 @@ a.voucher-reseller-link {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
-.redeem .voucher-redeem-now {
+.voucher-dialog .redeem .voucher-redeem-now {
 	margin: 24px 0 0 6px;
 }
-.payment-eurosign {
+.voucher-dialog .payment-eurosign {
 	font-size: 25px;
 }
-.voucher-input-container {
+.voucher-dialog .voucher-input-container {
 	display: none;
 	height: auto;
 	margin-top: 30px;
 	padding-bottom: 35px;
 	position: relative;
 }
-.voucher-input-container .fm-account-input {
+.voucher-dialog .voucher-input-container .fm-account-input {
 	left: 0;
 	position: absolute;
 	top: 0;
 	width: 250px;
 }
-.voucher-input-container .voucher-redeem-now {
+.voucher-dialog .voucher-input-container .voucher-redeem-now {
 	left: auto;
 	margin: 0;
 	position: absolute;

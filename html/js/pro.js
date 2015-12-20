@@ -1189,7 +1189,7 @@ var astroPayDialog = {
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.astropay-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$pendingOverlay = $('.payment-result.success.pending');
+        this.$pendingOverlay = $('.payment-result.pending');
                 
         // Store the provider details
         this.selectedProvider = selectedProvider;
@@ -1344,7 +1344,7 @@ var astroPayDialog = {
     showPendingPayment: function() {
                 
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$pendingOverlay = $('.payment-result.success.pending');
+        this.$pendingOverlay = $('.payment-result.pending');
         
         // Show the success
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -1421,7 +1421,7 @@ var voucherDialog = {
         this.$dialog.find('.voucher-plan-title').text(proPlan);
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
         this.$dialog.find('.voucher-plan-price .price').text(proPrice);
-        this.$dialog.find('.voucher-account-balance .balance').text(balance);
+        this.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
         this.$dialog.find('#voucher-code-input input').val('');
         this.changeColourIfSufficientBalance();
         
@@ -1599,7 +1599,7 @@ var voucherDialog = {
                     pro_balance = balance;
                     
                     // Update dialog details
-                    voucherDialog.$dialog.find('.voucher-account-balance .balance').text(balanceString);
+                    voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balanceString);
                     voucherDialog.changeColourIfSufficientBalance();
                     
                     // Hide voucher input

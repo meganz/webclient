@@ -51,8 +51,8 @@ function renderLinuxOptions(linuxsync) {
             options += '<option value="' + escapeHTML(i) + '" ' +
                 escapeHTML(selected) + '>' + escapeHTML(linuxsync[i].name) + '</option>';
         }
-        loadingDialog.hide();
     }
+    loadingDialog.hide();
     $('.fm-version-select.sync select').safeHTML(options);
 
     $('.fm-version-select.sync select').rebind('change', function(e) {

@@ -268,7 +268,20 @@ var CloudBrowserDialog = React.createClass({
             }
         });
 
-        return entries;
+        // always return first the folders and then the files
+        var files = [];
+        var folders = [];
+
+        entries.forEach(function(v) {
+            if(v.t === 1) {
+                folders.push(v);
+            }
+            else if(v.t === 0) {
+                files.push(v);
+            }
+        });
+
+        return folders.concat(files);
     },
     onSelected: function(nodes) {
         this.setState({'selected': nodes});

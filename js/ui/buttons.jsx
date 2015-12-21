@@ -53,7 +53,7 @@ var Button = React.createClass({
     onBlur: function(e) {
         var $element = $(ReactDOM.findDOMNode(this));
 
-        if (e.target && $(e.target).is($element)) {
+        if (e && e.target && $(e.target).is($element)) {
             return;
         }
 

@@ -837,6 +837,10 @@ var ConversationAudioVideoPanel = React.createClass({
                 }
             }
         });
+
+        $('video', $container).each(function() {
+            $(this)[0].play();
+        });
     },
     toggleMessages: function(e) {
         e.preventDefault();
@@ -933,6 +937,19 @@ var ConversationAudioVideoPanel = React.createClass({
             </div>;
         }
         else {
+            var localPlayerSrc = callSession.localPlayer.src;
+
+            if (!localPlayerSrc) {
+                if (callSession.localPlayer.srcObject) {
+                    localPlayerSrc = URL.createObjectURL(callSession.localPlayer.srcObject);
+                }
+                else if (callSession.localPlayer.mozSrcObject) {
+                    localPlayerSrc = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
+                }
+                else {
+                    console.error("Could not retrieve src object.");
+                }
+            }
             localPlayerElement = <div className={"call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
                 <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
                     <i className="tiny-icon grey-minus-icon" />
@@ -942,10 +959,10 @@ var ConversationAudioVideoPanel = React.createClass({
                     defaultMuted="true"
                     muted=""
                     volume="0"
-                    autoPlay={true}
                     id={"localvideo_" + callSession.sid}
-                    src={callSession.localPlayer.src}
+                    src={localPlayerSrc}
                     style={{display: !this.state.localMediaDisplay ? "none" : ""}}
+
                 />
             </div>;
         }
@@ -958,13 +975,28 @@ var ConversationAudioVideoPanel = React.createClass({
         }
         else {
             var remotePlayer = callSession.remotePlayer[0];
+
+            var remotePlayerSrc = remotePlayer.src;
+
+            if (!remotePlayerSrc) {
+                if (remotePlayer.srcObject) {
+                    remotePlayerSrc = URL.createObjectURL(remotePlayer.srcObject);
+                }
+                else if (remotePlayer.mozSrcObject) {
+                    remotePlayerSrc = URL.createObjectURL(remotePlayer.mozSrcObject);
+                }
+                else {
+                    console.error("Could not retrieve src object.");
+                }
+            }
+
             remotePlayerElement = <div className="call user-video">
                 <video
                     autoPlay={true}
                     className="rmtViewport rmtVideo"
                     id={"remotevideo_" + callSession.sid}
                     ref="remoteVideo"
-                    src={remotePlayer.src}
+                    src={remotePlayerSrc}
                 />
             </div>;
         }
@@ -981,7 +1013,7 @@ var ConversationAudioVideoPanel = React.createClass({
         if (additionalClass.length === 0) {
             additionalClass = (this.state.messagesBlockEnabled === true ? " small-block" : "");
         }
-        return <div className={"call-block" + additionalClass}>
+        return <div className={"call-block" + additionalClass} id="call-block">
             {remotePlayerElement}
             {localPlayerElement}
 

@@ -357,15 +357,14 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.SEEN:
-                self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "' for user '" + base64urlencode(cmd.substr(9, 8)) + "': '" + base64urlencode(cmd.substr(17, 8)) + "'");
+                self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "': '" + base64urlencode(cmd.substr(9, 8)) + "'");
 
-                // @TODO: FIXME!
                 self.chatd.trigger('onMessageLastSeen', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
-                    messageId: base64urlencode(cmd.substr(17, 8))
+                    messageId: base64urlencode(cmd.substr(9, 8))
                 });
 
-                len = 25;
+                len = 17;
                 break;
 
             case Chatd.Opcode.RECEIVED:

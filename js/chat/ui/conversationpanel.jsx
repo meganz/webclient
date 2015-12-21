@@ -75,6 +75,7 @@ var ConversationMessage = React.createClass({
         e.preventDefault(e);
         e.stopPropagation(e);
         var chatRoom = this.props.chatRoom;
+        msg.message = "";
         msg.deleted = true;
         chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
     },
@@ -354,7 +355,8 @@ var ConversationMessage = React.createClass({
                     var name = null;
                     if (this.props.grouped) {
                         additionalClasses += " grouped";
-                    } else {
+                    }
+                    else {
                         avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
                         datetime = <div className="message date-time"
                                             title={time2date(timestampInt)}>{timestamp}</div>;
@@ -446,7 +448,8 @@ var ConversationMessage = React.createClass({
                 var name = null;
                 if (this.props.grouped) {
                     additionalClasses += " grouped";
-                } else {
+                }
+                else {
                     avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
                     datetime = <div className="message date-time"
                                     title={time2date(timestampInt)}>{timestamp}</div>;
@@ -731,7 +734,7 @@ var ConversationAudioVideoPanel = React.createClass({
         $container.rebind('mousemove.chatUI',function(ev) {
             var $this = $(this);
             clearTimeout(idleMouseTimer);
-            if(!forceMouseHide) {
+            if (!forceMouseHide) {
                 self.visiblePanel = true;
                 $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
                 $container.removeClass('no-cursor');
@@ -968,7 +971,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
         var unreadDiv = null;
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
-        if(unreadCount > 0) {
+        if (unreadCount > 0) {
             unreadDiv = <div className="unread-messages">{unreadCount}</div>
         }
 
@@ -1003,7 +1006,8 @@ var ConversationAudioVideoPanel = React.createClass({
                 <div className="button call" onClick={function(e) {
                     if (callSession.getMediaOptions().audio === true) {
                         callSession.muteAudio();
-                    } else {
+                    }
+                    else {
                         callSession.unmuteAudio();
                     }
                 }}>
@@ -1012,7 +1016,8 @@ var ConversationAudioVideoPanel = React.createClass({
                 <div className="button call" onClick={function(e) {
                     if (callSession.getMediaOptions().video === true) {
                         callSession.muteVideo();
-                    } else {
+                    }
+                    else {
                         callSession.unmuteVideo();
                     }
                 }}>
@@ -1183,8 +1188,10 @@ var ConversationPanel = React.createClass({
     },
     focusTypeArea: function() {
         var $container = $(ReactDOM.findDOMNode(this));
-        if($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-            moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
+            if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
+                moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+            }
         }
     },
     componentDidMount: function() {
@@ -1444,7 +1451,7 @@ var ConversationPanel = React.createClass({
         }
 
 
-        if(!contact) {
+        if (!contact) {
             return null;
         }
         var avatarMeta = generateAvatarMeta(contact.u);
@@ -1528,7 +1535,8 @@ var ConversationPanel = React.createClass({
                                 lastGroupedMessageTimeStamp = null;
                             }
                         }
-                    } else {
+                    }
+                    else {
                         grouped = false;
                         lastMessageFrom = null;
                         lastGroupedMessageTimeStamp = null;

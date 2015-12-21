@@ -98,16 +98,19 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
         if (newState === ChatRoom.STATE.PLUGINS_READY) {
             resetStateToReady();
-        } else if (newState === ChatRoom.STATE.JOINED) {
+        }
+        else if (newState === ChatRoom.STATE.JOINED) {
             self.setState(ChatRoom.STATE.PLUGINS_WAIT);
-        } else if (newState === ChatRoom.STATE.PLUGINS_WAIT) {
+        }
+        else if (newState === ChatRoom.STATE.PLUGINS_WAIT) {
             var $event = new $.Event("onPluginsWait");
             self.megaChat.trigger($event, [self]);
 
             if (!$event.isPropagationStopped()) {
                 self.setState(ChatRoom.STATE.PLUGINS_READY);
             }
-        } else if (newState === ChatRoom.STATE.PLUGINS_PAUSED) {
+        }
+        else if (newState === ChatRoom.STATE.PLUGINS_PAUSED) {
             // allow plugins to hold the PLUGINS_WAIT state for MAX 5s
             createTimeoutPromise(function() {
                 return self.state !== ChatRoom.STATE.PLUGINS_PAUSED && self.state !== ChatRoom.STATE.PLUGINS_WAIT
@@ -156,7 +159,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
                         self.setState(ChatRoom.STATE.PLUGINS_READY);
                     }
                 });
-        } else if (newState === ChatRoom.STATE.READY) {
+        }
+        else if (newState === ChatRoom.STATE.READY) {
             self._flushMessagesQueue();
         }
     });
@@ -187,7 +191,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             if (targetUserNode) {
                 setLastInteractionWith(targetUserNode.u, "1:" + self.lastActivity);
             }
-        } else {
+        }
+        else {
             throw new Error("Not implemented");
         }
     });
@@ -203,13 +208,13 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     self.megaChat.trigger('onRoomCreated', [self]);
 
     $(window).rebind("focus." + self.roomJid, function() {
-        if(self.isCurrentlyActive) {
+        if (self.isCurrentlyActive) {
             self.trigger("onChatShown");
         }
     });
 
     self.megaChat.rebind("onRoomDestroy." + self.roomJid, function(e, room) {
-        if(room.roomJid == self.roomJid) {
+        if (room.roomJid == self.roomJid) {
             $(window).rebind("unbind." + self.roomJid);
         }
     });
@@ -272,7 +277,8 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
                 self.megaChat.rtc.updateIceServers(servers);
 
                 $promise.resolve();
-            } else {
+            }
+            else {
                 $promise.resolve();
             }
         })
@@ -369,11 +375,14 @@ ChatRoom.prototype.getCurrentCallType = function() {
 
     if (!self.callSession || self.callSession.isStarted() === false) {
         return false;
-    } else if (opts.video === true && opts.audio === true) {
+    }
+    else if (opts.video === true && opts.audio === true) {
         return "video-call";
-    } else if (opts.video === false && opts.audio === true) {
+    }
+    else if (opts.video === false && opts.audio === true) {
         return "audio-call";
-    } else {
+    }
+    else {
         return "none";
     }
 };
@@ -469,7 +478,8 @@ ChatRoom.prototype.participantExistsInRoom = function(jid, strict, notMe) {
         if (strict && v === jid) {
             result = true;
             return false; // break;
-        } else if (!strict && v.split("/")[0] === jid) {
+        }
+        else if (!strict && v.split("/")[0] === jid) {
             result = true;
             return false; // break;
         }
@@ -574,10 +584,11 @@ ChatRoom.prototype.getParticipantsExceptMe = function(jids) {
  */
 ChatRoom.prototype.getRoomTitle = function() {
     var self = this;
-    if(this.type == "private") {
+    if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
         return self.megaChat.getContactNameFromJid(participants[0]);
-    } else {
+    }
+    else {
         assert(false, "invalid room type");
         return "[invalid room type]";
     }
@@ -591,25 +602,30 @@ ChatRoom.prototype.getRoomTitle = function() {
  */
 ChatRoom.prototype.getRoomIcon = function() {
     var self = this;
-    if(this.type == "private") {
+    if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
         var presence = self.megaChat.karere.getPresence(participants[0]);
 
         var targetClassName = "offline";
-        if(!presence || presence == Karere.PRESENCE.OFFLINE) {
+        if (!presence || presence == Karere.PRESENCE.OFFLINE) {
             targetClassName = "offline";
-        } else if(presence == Karere.PRESENCE.AWAY) {
+        }
+        else if (presence == Karere.PRESENCE.AWAY) {
             targetClassName = "away";
-        } else if(presence == Karere.PRESENCE.BUSY) {
+        }
+        else if (presence == Karere.PRESENCE.BUSY) {
             targetClassName = "busy";
-        } else if(presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
+        }
+        else if (presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
             targetClassName = "online";
-        } else {
+        }
+        else {
             targetClassName = "offline";
         }
 
         return targetClassName;
-    } else {
+    }
+    else {
         assert(false, "invalid room type");
         return "[invalid room type]";
     }
@@ -637,7 +653,8 @@ ChatRoom.prototype.leave = function(notifyOtherDevices) {
         return self.megaChat.karere.leaveChat(self.roomJid).done(function() {
             self.setState(ChatRoom.STATE.LEFT);
         });
-    } else {
+    }
+    else {
         self.setState(ChatRoom.STATE.LEFT);
 
         self.destroyStructure();
@@ -673,7 +690,8 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
         setTimeout(function() {
             self.megaChat.renderListing();
         }, 300);
-    } else {
+    }
+    else {
         self.megaChat.refreshConversations();
     }
     setTimeout(function() {
@@ -702,9 +720,9 @@ ChatRoom.prototype.show = function() {
     //$('.nw-conversations-item').removeClass('selected');
 
 
-    if(self.megaChat.currentlyOpenedChat && self.megaChat.currentlyOpenedChat != self.roomJid) {
+    if (self.megaChat.currentlyOpenedChat && self.megaChat.currentlyOpenedChat != self.roomJid) {
         var oldRoom = self.megaChat.getCurrentRoom();
-        if(oldRoom) {
+        if (oldRoom) {
             oldRoom.hide();
         }
     }
@@ -739,7 +757,8 @@ ChatRoom.prototype.getRoomUrl = function() {
         if (contact) {
             return "#fm/chat/" + contact.u;
         }
-    } else {
+    }
+    else {
         throw new Error("Not implemented");
     }
 };
@@ -776,7 +795,7 @@ ChatRoom.prototype.hide = function() {
 ChatRoom.prototype.appendMessage = function(message) {
     var self = this;
 
-    if(message.deleted) { // deleted messages should not be .append-ed
+    if (message.deleted) { // deleted messages should not be .append-ed
         return false;
     }
 
@@ -807,16 +826,17 @@ ChatRoom.prototype.appendMessage = function(message) {
         //self.logger.debug(self.roomJid.split("@")[0], message.messageId, "This message is already added to the message list (and displayed).");
         return false;
     }
-    if(!message.orderValue) {
+    if (!message.orderValue) {
         // append at the bottom
-        if(self.messages.length > 0) {
+        if (self.messages.length > 0) {
             var prevMsg = self.messagesBuff.messages.getItem(self.messages.length - 1);
-            if(!prevMsg) {
+            if (!prevMsg) {
                 self.logger.error(
                     'self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' +
                     'note that messages may be displayed OUT OF ORDER in the UI.'
                 );
-            } else {
+            }
+            else {
                 message.orderValue = prevMsg.orderValue + 0.1;
             }
         }
@@ -853,7 +873,8 @@ ChatRoom.prototype.getNavElement = function() {
 
     if (self.type === "private") {
         return $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
-    } else {
+    }
+    else {
         throw new Error("Not implemented.");
     }
 };
@@ -934,7 +955,8 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
         self._messagesQueue.push(eventObject);
 
         self.appendMessage(eventObject);
-    } else {
+    }
+    else {
         self._sendMessageToTransport(eventObject)
             .done(function(internalId) {
                 eventObject.internalId = internalId;
@@ -1169,7 +1191,8 @@ ChatRoom.prototype.renderContactTree = function() {
     if (count > 0) {
         $count.text(count);
         $navElement.addClass("unread");
-    } else if (count === 0) {
+    }
+    else if (count === 0) {
         $count.text("");
         $navElement.removeClass("unread");
     }
@@ -1350,7 +1373,8 @@ ChatRoom.prototype._conversationStarted = function(userBareJid) {
             // the other user had joined, mark this conv as started again.
             self._restartConversation();
         }
-    } else {
+    }
+    else {
         // i'd joined
         self.trigger('onConversationStarted');
     }

@@ -31,15 +31,15 @@ var Dropdown = React.createClass({
     componentDidUpdate: function() {
         var self = this;
 
-        if(this.props.active === true) {
-            if(this.getOwnerElement()) {
+        if (this.props.active === true) {
+            if (this.getOwnerElement()) {
                 var $element = $(ReactDOM.findDOMNode(this));
                 var parentDomNode = $element.parents('.button');
                 var positionToElement = parentDomNode;
                 var offsetLeft = 0;
                 var $container = $element.parents('.jspPane:first');
 
-                if($container.size() == 0) {
+                if ($container.size() == 0) {
                     $container = $(document.body);
                 }
 
@@ -54,12 +54,13 @@ var Dropdown = React.createClass({
                         var vertOffset = 0;
                         var horizOffset = 0;
 
-                        if(!self.props.noArrow) {
+                        if (!self.props.noArrow) {
                             if (info.vertical != "top") {
                                 $(this)
                                     .removeClass("up-arrow")
                                     .addClass("down-arrow");
-                            } else {
+                            }
+                            else {
                                 $(this)
                                     .removeClass("down-arrow")
                                     .addClass("up-arrow");
@@ -90,13 +91,14 @@ var Dropdown = React.createClass({
         var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
 
 
-        if(this.props.active !== true) {
+        if (this.props.active !== true) {
             classes += " hidden";
 
             return (
                 <div className={classes}></div>
             );
-        } else {
+        }
+        else {
             var styles;
 
             // calculate and move the popup arrow to the correct position.
@@ -140,7 +142,7 @@ var DropdownContactsSelector = React.createClass({
                 self.props.megaChat.getJidFromNodeId(v.u)
             );
 
-            if(v.c == 0 || v.u == u_handle) {
+            if (v.c == 0 || v.u == u_handle) {
                 return;
             }
 
@@ -157,7 +159,7 @@ var DropdownContactsSelector = React.createClass({
             }
 
 
-            if(pres === "chat") {
+            if (pres === "chat") {
                 pres = "online";
             }
 
@@ -503,7 +505,8 @@ var DropdownEmojiSelector = React.createClass({
 
                 <div className="popup-footer emoji-one">{categoryButtons}</div>
             </div>;
-        } else {
+        }
+        else {
             popupContents = null;
         }
 
@@ -511,7 +514,8 @@ var DropdownEmojiSelector = React.createClass({
             // reset state if the dropdown is hidden
             if (newValue === false) {
                 self.setState(self.getInitialState);
-            } else {
+            }
+            else {
                 self.setState({'isActive': true});
             }
         }}>

@@ -3307,37 +3307,37 @@ function accountUI()
             var paymentMethodIndex = purchaseTransaction[4];
             var paymentMethod = l[428];             // Voucher
 
-            if (paymentMethodIndex == 1) {
+            if (paymentMethodIndex === 1) {
                 paymentMethod = l[1233];            // PayPal
             }
-            else if (paymentMethodIndex == 2) {
+            else if (paymentMethodIndex === 2) {
                 paymentMethod = l[6953];            // iTunes
             }
-            else if (paymentMethodIndex == 3) {
+            else if (paymentMethodIndex === 3) {
                 paymentMethod = l[7188];            // Google
             }
-            else if (paymentMethodIndex == 4) {
+            else if (paymentMethodIndex === 4) {
                 paymentMethod = l[6802];            // Bitcoin
             }
-            else if (paymentMethodIndex == 5) {
+            else if (paymentMethodIndex === 5) {
                 paymentMethod = l[6952];            // Union Pay
             }
-            else if (paymentMethodIndex == 6) {
+            else if (paymentMethodIndex === 6) {
                 paymentMethod = l[7161] + ' (Fortumo)';    // Mobile carrier billing (Fortumo)
             }
-            else if (paymentMethodIndex == 7) {
+            else if (paymentMethodIndex === 7) {
                 paymentMethod = l[6952];            // Credit card
             }
-            else if (paymentMethodIndex == 8) {
+            else if (paymentMethodIndex === 8) {
                 paymentMethod = l[6952];            // Credit card
             }
-            else if (paymentMethodIndex == 9) {
+            else if (paymentMethodIndex === 9) {
                 paymentMethod = l[7161] + ' (Centili)';    // Mobile carrier billing (Centili)
             }
-            else if (paymentMethodIndex == 10) {
+            else if (paymentMethodIndex === 10) {
                 paymentMethod = 'paysafecard';
             }
-            else if (paymentMethodIndex == 11) {
+            else if (paymentMethodIndex === 11) {
                 paymentMethod = 'AstroPay';         // Various AstroPay methods
             }
 

@@ -2890,6 +2890,10 @@ function MegaData()
             getUserAttribute(userId, 'firstname', -1),
             getUserAttribute(userId, 'lastname', -1)
         ]).done(function(results) {
+            if (!self.u[userId]) {
+                return;
+            }
+
             var firstName = results[0][0];
             var lastName = results[1][0];
 

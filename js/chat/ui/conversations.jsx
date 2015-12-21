@@ -277,12 +277,71 @@ var ConversationsApp = React.createClass({
         var room = this.props.megaChat.createAndShowPrivateRoomFor(contact.u);
     },
     componentDidMount: function() {
+        var self = this;
         window.addEventListener('resize', this.handleWindowResize);
+        $(document).rebind('keydown.megaChatTextAreaFocus', function(e) {
+            // prevent recursion!
+            if (e.megaChatHandled) {
+                return;
+            }
+
+            var megaChat = self.props.megaChat;
+            if (megaChat.currentlyOpenedChat) {
+                // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
+                // is visible/active at the moment
+                if (
+                    $(e.target).is(".messages-textarea") ||
+                    $('.fm-dialog:visible').length > 0 ||
+                    $('input:focus,textarea:focus,select:focus').length > 0
+                ) {
+                    return;
+                }
+
+                var $typeArea = $('.messages-textarea:visible');
+                moveCursortoToEnd($typeArea);
+                e.megaChatHandled = true;
+                $typeArea.triggerHandler(e);
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+
+            }
+        });
+
+        $(document).rebind('click.megaChatTextAreaFocus', function(e) {
+            // prevent recursion!
+            if (e.megaChatHandled) {
+                return;
+            }
+
+            var $target = $(e.target);
+
+            var megaChat = self.props.megaChat;
+            if (megaChat.currentlyOpenedChat) {
+                // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
+                // is visible/active at the moment
+                if (
+                    $target.is(".messages-textarea,a,input,textarea,select,button") ||
+                    $('.fm-dialog:visible').length > 0 ||
+                    $('input:focus,textarea:focus,select:focus').length > 0
+                ) {
+                    return;
+                }
+
+                var $typeArea = $('.messages-textarea:visible');
+                $typeArea.focus();
+                e.megaChatHandled = true;
+                moveCursortoToEnd($typeArea);
+                return false;
+
+            }
+        });
         this.handleWindowResize();
 
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
+        $(document).unbind('keypress.megaChatTextAreaFocus');
     },
     componentDidUpdate: function() {
         this.handleWindowResize();

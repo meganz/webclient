@@ -1169,11 +1169,6 @@ function hideTransferToast ($toast,int) {
     clearInterval(int);
 }
 
-function searchFM()
-{
-
-}
-
 function isValidShareLink()
 {
     var valid = true;
@@ -4139,30 +4134,8 @@ function accountUI()
         });
         $('.fm-account-avatar').html(useravatar.contact(u_handle));
 
-        function accountWidth() {
-            var $mainBlock = $('.fm-account-main');
+        $.tresizer();
 
-            if ($mainBlock.width() > 1675) {
-                $mainBlock.addClass('hi-width');
-            }
-            else if ($mainBlock.width() < 920) {
-                $mainBlock.addClass('low-width');
-            } else {
-                $mainBlock.removeClass('low-width hi-width');
-            }
-        }
-
-        accountWidth();
-
-        $(window).unbind('resize.account');
-        $(window).bind('resize.account', function()
-        {
-            accountWidth();
-            if (M.currentdirid && M.currentdirid.substr(0, 7) == 'account')
-                initAccountScroll();
-        });
-
-        initAccountScroll();
     }, 1);
 
     // Show first name or last name
@@ -10162,6 +10135,20 @@ function fm_resize_handler() {
     }
     else if (M.currentdirid === 'transfers') {
         fm_tfsupdate(); // this will call $.transferHeader();
+    }
+    else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
+        var $mainBlock = $('.fm-account-main');
+
+        if ($mainBlock.width() > 1675) {
+            $mainBlock.addClass('hi-width');
+        }
+        else if ($mainBlock.width() < 920) {
+            $mainBlock.addClass('low-width');
+        } else {
+            $mainBlock.removeClass('low-width hi-width');
+        }
+
+        initAccountScroll();
     }
     else {
         if (M.viewmode) {

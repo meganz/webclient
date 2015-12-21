@@ -1195,18 +1195,6 @@ FileUpload.prototype.run = function(done) {
     }
 };
 
-
-/**
- *  Wrap fm_requestfolderid to make it parallel friendly
- */
-var Mkdir = Parallel(function(args, next) {
-    fm_requestfolderid(args[0], args[1], {
-        callback: function(ctx, h) {
-            next(h);
-        }
-    });
-});
-
 function isQueueActive(q) {
     return typeof q.id !== 'undefined';
 }

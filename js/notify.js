@@ -211,6 +211,7 @@ var notify = {
     initNotifyIconClickHandler: function() {
         
         // Add delegated event for when the notifications icon is clicked
+        $('.top-head').off('click', '.cloud-popup-icon');
         $('.top-head').on('click', '.cloud-popup-icon', function() {
             
             // If the popup is already open, then close it

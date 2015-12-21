@@ -46,7 +46,7 @@ function renderLinuxOptions(linuxsync) {
             var name = linuxsync[i].name.replace(' ' + version, '');
             if (ua.indexOf(name.toLowerCase()) > -1 && ua.indexOf(version) > -1) {
                 selected = 'selected';
-                changeLinux(i);
+                changeLinux(linuxsync, i);
             }
             options += '<option value="' + escapeHTML(i) + '" ' +
                 escapeHTML(selected) + '>' + escapeHTML(linuxsync[i].name) + '</option>';
@@ -56,7 +56,7 @@ function renderLinuxOptions(linuxsync) {
     $('.fm-version-select.sync select').safeHTML(options);
 
     $('.fm-version-select.sync select').rebind('change', function(e) {
-            changeLinux($(this).val());
+            changeLinux(linuxsync, $(this).val());
         });
 
     $('.sync-bottom-txt.linux-txt a').rebind('click', function(e) {
@@ -75,7 +75,7 @@ function renderLinuxOptions(linuxsync) {
     $('.sync-radio-buttons input').rebind('change', function(e) {
             if (syncsel) {
                 setTimeout(function() {
-                    changeLinux(syncsel);
+                    changeLinux(linuxsync, syncsel);
                 }, 1);
             }
         });
@@ -174,7 +174,7 @@ function sync_switchOS(os) {
     });
 }
 
-function changeLinux(i) {
+function changeLinux(linuxsync, i) {
     if (linuxsync[i]) {
         if (linuxsync[i]['32']) {
             $('.linux32').parent().show();

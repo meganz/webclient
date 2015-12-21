@@ -214,6 +214,16 @@ var megasync = (function() {
         // about the `sync` (expect a JSON)
         CMS.get('sync', function(err, content) {
             linuxClients = content.object;
+            var linux = 'https://mega.nz/linux/MEGAsync/';
+            linuxClients.forEach(function(val) {
+
+                ['32', '32n', '64', '64n'].forEach(function(platform) {
+
+                    if (val[platform]) {
+                        clients[val.name + " " + platform] = linux + val[platform];
+                    }
+                });
+            });
             next(linuxClients);
         });
     };

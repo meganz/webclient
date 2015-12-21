@@ -169,6 +169,30 @@ KarereEventObjects.ActionMessage.prototype.isEmptyMessage = function() {
     }
 };
 /**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.ActionMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.ActionMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.ActionMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
+};
+/**
  * Event Object `DiscoCapabilities`
  *
  * @param fromJid {string} user's full JID
@@ -593,6 +617,30 @@ KarereEventObjects.IncomingMessage.prototype.isEmptyMessage = function() {
     }
 };
 /**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.IncomingMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.IncomingMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.IncomingMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
+};
+/**
  * Event Object `IncomingPrivateMessage`
  *
  * @param toJid {string} recipient's JID
@@ -842,6 +890,30 @@ KarereEventObjects.IncomingPrivateMessage.prototype.isEmptyMessage = function() 
     }
 };
 /**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.IncomingPrivateMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.IncomingPrivateMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.IncomingPrivateMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
+};
+/**
  * Event Object `InviteMessage`
  *
  * @param toJid {string} recipient's JID
@@ -1007,6 +1079,30 @@ KarereEventObjects.InviteMessage.prototype.isEmptyMessage = function() {
     } else {
         return false;
     }
+};
+/**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.InviteMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.InviteMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.InviteMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
 };
 /**
  * Event Object `OutgoingMessage`
@@ -1312,6 +1408,30 @@ KarereEventObjects.OutgoingMessage.prototype.isEmptyMessage = function() {
     } else {
         return false;
     }
+};
+/**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.OutgoingMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.OutgoingMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.OutgoingMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
 };
 /**
  * Event Object `Ping`
@@ -1718,6 +1838,30 @@ KarereEventObjects.Presence.prototype.isEmptyMessage = function() {
     } else {
         return false;
     }
+};
+/**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.Presence.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.Presence.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.Presence.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
 };
 /**
  * Event Object `StateActiveMessage`

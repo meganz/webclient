@@ -1462,7 +1462,27 @@ var ConversationPanel = React.createClass({
         var messagesList = [
         ];
 
-        if (self.props.messagesBuff.messages.length === 0 || !self.props.messagesBuff.haveMoreHistory()) {
+        if (
+            self.props.messagesBuff.joined === true &&
+            self.props.messagesBuff.haveMessages === true &&
+            self.props.messagesBuff.messagesHistoryIsLoading() === true
+        ) {
+            messagesList.push(
+                <div className="messages notification" key="loading">
+                    <div className="header">
+                        Chat history with <span>{contactName}</span> is now loading...
+                    </div>
+                    <div className="info">
+                        Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
+                    </div>
+                </div>
+            );
+        } else if (
+            self.props.messagesBuff.joined === true && (
+                self.props.messagesBuff.messages.length === 0 ||
+                !self.props.messagesBuff.haveMoreHistory()
+            )
+        ) {
             messagesList.push(
                 <div className="messages notification" key="initialMsg">
                     <div className="header">
@@ -1550,25 +1570,6 @@ var ConversationPanel = React.createClass({
                 );
             }
         });
-
-
-        if (messagesList.length === 0) {
-            if (self.props.messagesBuff.haveMessages === true &&
-                self.props.messagesBuff.messagesHistoryIsLoading() === true
-            ) {
-                messagesList = <div className="messages notification">
-                    <div className="header">
-                        Chat history with <span>{contactName}</span> is now loading...
-                    </div>
-                    <div className="info">
-                        Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
-                    </div>
-                </div>;
-            }
-            else {
-                // Don't do anything
-            }
-        }
 
         var messageTextAreaClasses = "messages-textarea";
         var typingElement;

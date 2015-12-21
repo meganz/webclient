@@ -753,6 +753,10 @@ Chat.prototype.init = function() {
     self.on('onRoomCreated', function(e, room) {
         if (room.type === "private") {
             var jid = room.getParticipantsExceptMe()[0];
+
+            if (!jid) {
+                return;
+            }
             var c = self.getContactFromJid(jid);
 
             if (!c) { return; }

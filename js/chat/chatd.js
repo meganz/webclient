@@ -25,28 +25,28 @@ var Chatd = function(userid, options) {
 
     self.options = $.extend({}, Chatd.DEFAULT_OPTIONS, options);
 
-    //// debug mode
-    //[
-    //    'onMessageUpdated',
-    //    'onMessageConfirm',
-    //    'onMessageReject',
-    //    'onMessageCheck',
-    //    'onMessageModify',
-    //    'onMessageStore',
-    //    'onMessageSeen',
-    //    'onMessageLastSeen',
-    //    'onMessageReceived',
-    //    'onMessageLastReceived',
-    //    'onRetentionChanged',
-    //    'onMessagesHistoryInfo',
-    //    'onMembersUpdated',
-    //    'onMessagesHistoryDone',
-    //    'onMessagesHistoryRequest',
-    //].forEach(function(evt) {
-    //        self.rebind(evt + '.chatd', function(e) {
-    //            console.error(evt, JSON.stringify(arguments[1]));
-    //        });
-    //});
+//    // debug mode
+//    [
+//        'onMessageUpdated',
+//        'onMessageConfirm',
+//        'onMessageReject',
+//        'onMessageCheck',
+//        'onMessageModify',
+//        'onMessageStore',
+//        'onMessageSeen',
+//        'onMessageLastSeen',
+//        'onMessageReceived',
+//        'onMessageLastReceived',
+//        'onRetentionChanged',
+//        'onMessagesHistoryInfo',
+//        'onMembersUpdated',
+//        'onMessagesHistoryDone',
+//        'onMessagesHistoryRequest',
+//    ].forEach(function(evt) {
+//            self.rebind(evt + '.chatd', function(e) {
+//                console.error(evt, JSON.stringify(arguments[1]));
+//            });
+//    });
 };
 
 makeObservable(Chatd);
@@ -211,8 +211,6 @@ Chatd.Shard.prototype.isOnline = function() {
 Chatd.Shard.prototype.reconnect = function() {
     var self = this;
 
-    //console.error("shard reconnect", this.url);
-
     self.s = new WebSocket(this.url);
     self.s.binaryType = "arraybuffer";
 
@@ -361,9 +359,9 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.SEEN:
                 self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "' for user '" + base64urlencode(cmd.substr(9, 8)) + "': '" + base64urlencode(cmd.substr(17, 8)) + "'");
 
+                // @TODO: FIXME!
                 self.chatd.trigger('onMessageLastSeen', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
-                    userId: base64urlencode(cmd.substr(9, 8)),
                     messageId: base64urlencode(cmd.substr(17, 8))
                 });
 
@@ -722,8 +720,6 @@ Chatd.Messages.prototype.store = function(newmsg, userid, msgid, timestamp, msg)
 };
 
 Chatd.prototype.msgmodify = function(chatid, msgid, msg) {
-    //console.error("msgmodify", chatid, msgid, msg);
-
     // an existing message has been modified
     if (this.chatidmessages[chatid]) {
         this.chatidmessages[chatid].msgmodify(msgid, msg);
@@ -820,111 +816,3 @@ if (typeof('base64urlencode') === 'undefined') {
         }
     }
 }
-
-// user-accessible demo code below
-var userid = false; // set by login()
-var chatid = false; // set by join()
-
-function login(u) {
-    if (userid === false) {
-        u = base64urldecode(u);
-
-        if (u.length == 8) {
-            userid = u;
-            console.log('Identity set to ' + base64urlencode(userid) + ', please join chat(s)');
-        }
-        else {
-            console.log('Invalid user handle - please try again');
-        }
-    }
-    else {
-        console.log('Identity already set.');
-    }
-};
-
-function join(c) {
-    if (userid !== false) {
-        c = base64urldecode(c);
-
-        if (c.length == 8) {
-            chatid = c;
-
-            // instantiate Chat in case this is the first ever join
-            if (chatd === false) {
-                chatd = new Chatd(userid);
-            }
-
-            // the chatid, shard and the URL will be supplied by the API
-            chatd.join(chatid, 0, 'ws://31.216.147.155/' + base64urlencode(userid));
-        }
-        else {
-            console.log('Invalid chat handle - please try again');
-        }
-    }
-    else {
-        console.log('Please login() first.')
-    }
-};
-
-function msg(message) {
-    // allocate transactionid for the new message (it must be shown with status "delivering" in the UI;
-    // edits and cancellations at that stage must be applied to the locally queued version that gets
-    // resent until confirmation and then to the confirmed msgid)
-    if (userid !== false) {
-        if (chatid !== false) {
-            return chatd.submit(chatid, message);
-        }
-        else {
-            console.log('Please join() first.');
-        }
-    }
-    else {
-        console.log('Please login() and join() first.');
-    }
-};
-
-function msgupd(num, newmessage) {
-    // a msgupd is only possible up to ten minutes after the indicated (client-supplied) UTC timestamp.
-    if (userid !== false)
-    {
-        if (chatid !== false)
-        {
-            chatd.modify(chatid, num, newmessage);
-        }
-        else {
-            console.log('Please join() first.');
-        }
-    }
-    else {
-        console.log('Please login() and join() first.');
-    }
-};
-
-function hist(n) {
-    console.log("Fetching " + n + " messages of backlog");
-    chatd.hist(chatid, n);
-};
-
-function seen(msgid) {
-    chatd.cmd(Chatd.Opcode.SEEN, chatid, base64urldecode(msgid));
-};
-
-function received(msgid) {
-    chatd.cmd(Chatd.Opcode.RECEIVED, chatid, base64urldecode(msgid));
-};
-
-function retention(time) {
-    chatd.cmd(Chatd.Opcode.RETENTION, chatid, pack32le(time));
-};
-
-console.log("Active demo chathandles: 'j8_ix6_J4D4', 'W21oF18xQ5g'");
-console.log("Active demo userhandles: 'u1Y-FYnYCx8', 'sUzKyanFyt0', '15enfxUCjbk', 'mldS8Edhdww', '9KEVTTjBwww'");
-console.log("Available priv levels: 0 = RDONLY, 1 = RDWR, 2 = FULL, 3 = OPER");
-console.log("- Set your identity: login('userhandle')");
-console.log("- (Re)join a chat and set it as current chat: join('chathandle')");
-console.log("- Send a message to the most recently joined chat: msg('message')");
-console.log("- Edit or delete a recent message that you sent to the current chat: msgupd(num ,'newmessage')");
-console.log("- Retrieve n older messages for the current chat: hist(n)");
-console.log("- Confirm that you have seen all messages up to and including msghandle in the current chat: seen('msghandle')");
-console.log("- Confirm that you have received all messages up to and including msghandle in the current chat: received('msghandle')");
-console.log("- Set the retention policy for the current chat (requires OPER priv): retention(seconds)");

@@ -225,6 +225,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self._unreadCountCache = 0;
 
     self.haveMessages = false;
+    self.joined = false;
 
     self.logger = MegaLogger.getLogger("messagesBuff[" + chatRoom.roomJid.split("@")[0] + "]", {}, chatRoom.logger);
 
@@ -245,6 +246,18 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.lastSeen = eventData.messageId;
             self.messages.trackDataChange();
+        }
+    });
+    self.chatd.rebind('onMembersUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+
+        if (!chatRoom) {
+            self.logger.warn("Message not found for: ", e, eventData);
+            return;
+        }
+
+        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+            self.joined = true;
         }
     });
 

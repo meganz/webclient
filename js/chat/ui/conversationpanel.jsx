@@ -372,6 +372,7 @@ var ConversationMessage = React.createClass({
                             <div className="message shared-block">
                                 {files}
                             </div>
+                            {buttonsBlock}
 
                         </div>
                     </div>;
@@ -941,7 +942,7 @@ var ConversationAudioVideoPanel = React.createClass({
                     defaultMuted="true"
                     muted=""
                     volume="0"
-                    autoPlay="true"
+                    autoPlay={true}
                     id={"localvideo_" + callSession.sid}
                     src={callSession.localPlayer.src}
                     style={{display: !this.state.localMediaDisplay ? "none" : ""}}
@@ -959,7 +960,7 @@ var ConversationAudioVideoPanel = React.createClass({
             var remotePlayer = callSession.remotePlayer[0];
             remotePlayerElement = <div className="call user-video">
                 <video
-                    autoPlay="autoplay"
+                    autoPlay={true}
                     className="rmtViewport rmtVideo"
                     id={"remotevideo_" + callSession.sid}
                     ref="remoteVideo"

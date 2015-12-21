@@ -291,7 +291,8 @@ var ConversationsApp = React.createClass({
                 // is visible/active at the moment
                 if (
                     $(e.target).is(".messages-textarea") ||
-                    $('.fm-dialog:visible').length > 0 ||
+                    ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
+                    $('.fm-dialog:visible,.dropdown:visible').length > 0 ||
                     $('input:focus,textarea:focus,select:focus').length > 0
                 ) {
                     return;
@@ -322,7 +323,8 @@ var ConversationsApp = React.createClass({
                 // is visible/active at the moment
                 if (
                     $target.is(".messages-textarea,a,input,textarea,select,button") ||
-                    $('.fm-dialog:visible').length > 0 ||
+                    ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
+                    $('.fm-dialog:visible,.dropdown:visible').length > 0 ||
                     $('input:focus,textarea:focus,select:focus').length > 0
                 ) {
                     return;

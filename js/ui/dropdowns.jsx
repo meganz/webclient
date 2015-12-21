@@ -398,8 +398,7 @@ var DropdownEmojiSelector = React.createClass({
                             >
                             <span
                                 className={"emojione-" + meta[0]}
-                                title={":" + slug + ":"}
-                                dangerouslySetInnerHTML={{__html: meta[1]}}></span>
+                                title={":" + slug + ":"}>{meta[1]}</span>
                             </div>
                         );
                     }

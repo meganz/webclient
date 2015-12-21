@@ -504,7 +504,7 @@ ChatdIntegration.prototype.retrieveHistory = function(chatRoom, numOfMessages) {
 
 ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
     var self = this;
-    self.chatd.cmd(Chatd.Opcode.SEEN, base64urldecode(chatRoom.chatId), Chatd.Const.UNDEFINED + base64urldecode(msgid));
+    self.chatd.cmd(Chatd.Opcode.SEEN, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
 };
 
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {

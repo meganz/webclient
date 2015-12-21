@@ -125,20 +125,22 @@ function img_placeholder(str, sep, rid, id) {
 /**
  *    Internal function to communicate with the BLOB server.
  *
- *    It makes sure that optimize requests (makes sure we never
+ *    It makes sure to optimize requests (makes sure we never
  *    ask things twice). This is the right place to
  *    cache (perhaps towards localStorage).
  */
 var fetching = {};
+var cmsBackoff = 0;
 function doRequest(id) {
     if (!id) {
         throw new Error("Calling CMS.doRequest without an ID");
     }
     var q = getxhr();
     q.onerror = function() {
-        Later(function() {
+        cmsBackoff = Math.min(cmsBackoff + 5000, 60000);
+        setTimeout(function() {
             doRequest(id);
-        });
+        }, cmsBackoff);
     };
     q.onload = function() {
         for (var i in fetching[id]) {
@@ -147,6 +149,7 @@ function doRequest(id) {
             }
         }
         delete fetching[id];
+        cmsBackoff = 0; /* reset backoff */
     };
     var url = (localStorage.cms || "https://cms.mega.nz/content/") + id;
     q.open("GET", url);

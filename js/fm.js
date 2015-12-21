@@ -1169,11 +1169,6 @@ function hideTransferToast ($toast,int) {
     clearInterval(int);
 }
 
-function searchFM()
-{
-
-}
-
 function isValidShareLink()
 {
     var valid = true;
@@ -3312,29 +3307,38 @@ function accountUI()
             var paymentMethodIndex = purchaseTransaction[4];
             var paymentMethod = l[428];             // Voucher
 
-            if (paymentMethodIndex == 1) {
+            if (paymentMethodIndex === 1) {
                 paymentMethod = l[1233];            // PayPal
             }
-            else if (paymentMethodIndex == 2) {
+            else if (paymentMethodIndex === 2) {
                 paymentMethod = l[6953];            // iTunes
             }
-            else if (paymentMethodIndex == 3) {
+            else if (paymentMethodIndex === 3) {
                 paymentMethod = l[7188];            // Google
             }
-            else if (paymentMethodIndex == 4) {
+            else if (paymentMethodIndex === 4) {
                 paymentMethod = l[6802];            // Bitcoin
             }
-            else if (paymentMethodIndex == 5) {
+            else if (paymentMethodIndex === 5) {
                 paymentMethod = l[6952];            // Union Pay
             }
-            else if (paymentMethodIndex == 6) {
-                paymentMethod = l[7161];            // Mobile carrier billing
+            else if (paymentMethodIndex === 6) {
+                paymentMethod = l[7161] + ' (Fortumo)';    // Mobile carrier billing (Fortumo)
             }
-            else if (paymentMethodIndex == 7) {
+            else if (paymentMethodIndex === 7) {
                 paymentMethod = l[6952];            // Credit card
             }
-            else if (paymentMethodIndex == 8) {
+            else if (paymentMethodIndex === 8) {
                 paymentMethod = l[6952];            // Credit card
+            }
+            else if (paymentMethodIndex === 9) {
+                paymentMethod = l[7161] + ' (Centili)';    // Mobile carrier billing (Centili)
+            }
+            else if (paymentMethodIndex === 10) {
+                paymentMethod = 'paysafecard';
+            }
+            else if (paymentMethodIndex === 11) {
+                paymentMethod = 'AstroPay';         // Various AstroPay methods
             }
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method
@@ -4130,30 +4134,8 @@ function accountUI()
         });
         $('.fm-account-avatar').html(useravatar.contact(u_handle));
 
-        function accountWidth() {
-            var $mainBlock = $('.fm-account-main');
+        $.tresizer();
 
-            if ($mainBlock.width() > 1675) {
-                $mainBlock.addClass('hi-width');
-            }
-            else if ($mainBlock.width() < 920) {
-                $mainBlock.addClass('low-width');
-            } else {
-                $mainBlock.removeClass('low-width hi-width');
-            }
-        }
-
-        accountWidth();
-
-        $(window).unbind('resize.account');
-        $(window).bind('resize.account', function()
-        {
-            accountWidth();
-            if (M.currentdirid && M.currentdirid.substr(0, 7) == 'account')
-                initAccountScroll();
-        });
-
-        initAccountScroll();
     }, 1);
 
     // Show first name or last name
@@ -10153,6 +10135,20 @@ function fm_resize_handler() {
     }
     else if (M.currentdirid === 'transfers') {
         fm_tfsupdate(); // this will call $.transferHeader();
+    }
+    else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
+        var $mainBlock = $('.fm-account-main');
+
+        if ($mainBlock.width() > 1675) {
+            $mainBlock.addClass('hi-width');
+        }
+        else if ($mainBlock.width() < 920) {
+            $mainBlock.addClass('low-width');
+        } else {
+            $mainBlock.removeClass('low-width hi-width');
+        }
+
+        initAccountScroll();
     }
     else {
         if (M.viewmode) {

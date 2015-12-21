@@ -15031,21 +15031,17 @@ h5.main-italic-header {
 	width: 16px;
 }
 .payment-options-list {
-	-webkit-column-count: 3;
-	-moz-column-count: 3;
-	column-count: 3;
-	-webkit-column-width: 202px;
-	-moz-column-width: 202px;
-	column-width: 202px;
+    overflow: hidden;
 }
 .payment-options-list.secondary {
     margin-bottom: 45px;
     margin-top: 20px;
 }
 .payment-options-list .payment-method {
-	cursor: pointer;
-	margin-bottom: 15px;
-	overflow: visible;
+    cursor: pointer;
+    float: left;
+    margin-bottom: 15px;
+    width: 214px;
 }
 .payment-options-list .payment-method.template {
     display: none;

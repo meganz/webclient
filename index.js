@@ -1092,11 +1092,7 @@ function topmenuUI() {
             var cssClass = (proNum == 4) ? 'lite' : 'pro';
 
             // Show the 'Upgrade your account' button in the main menu for all
-            // accounts except for the biggest plan i.e. PRO III
-            if (u_attr.p !== 3) {
-                $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            }
-
+            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
             $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             $('.membership-status-block')

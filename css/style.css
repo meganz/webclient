@@ -7234,10 +7234,10 @@ table {
 	color: #FFA500;
 }
 /* green border */
-.fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active, .fm-verify:hover, .fm-reset-stored-fingerprint:hover, .fm-verify.active, .fm-share-copy:hover, .fm-share-copy.active, .fm-new-folder:hover, .fm-new-folder.active, .create-folder-button:hover, .create-folder-button.active, .add-user-popup-button.add:hover, .add-user-popup-button.add.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button.rename:hover, .rename-dialog-button.rename.active, .fm-dialog-button.notifications-button:hover, .fm-dialog-button.notifications-button.active, .fm-dialog-button.links-button:hover, .fm-dialog-button.links-button.active, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-move-button.active, .fm-dialog-button.dialog-newfolder-button:hover, .fm-dialog-button.dialog-newfolder-button.active, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-copy-button.active, .fm-dialog-button.notification-button.confirm:hover, .fm-dialog-button.notification-button.confirm.active, .contact-request-button.accept:hover, .contact-request-button.accept.active, .fm-dialog-button.fm-dialog-button-green:hover, .fm-dialog-button.fm-dialog-button-green.active, .transfer-pause-icon:hover, .fm-account-save:hover {
+.fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active, .fm-verify:hover, .fm-reset-stored-fingerprint:hover, .fm-verify.active, .fm-share-copy:hover, .fm-share-copy.active, .fm-new-folder:hover, .fm-new-folder.active, .create-folder-button:hover, .create-folder-button.active, .add-user-popup-button.add:hover, .add-user-popup-button.add.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button.rename:hover, .rename-dialog-button.rename.active, .fm-dialog-button.notifications-button:hover, .fm-dialog-button.notifications-button.active, .fm-dialog-button.links-button:hover, .fm-dialog-button.links-button.active, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-move-button.active, .fm-dialog-button.dialog-newfolder-button:hover, .fm-dialog-button.dialog-newfolder-button.active, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-copy-button.active, .fm-dialog-button.notification-button.confirm:hover, .fm-dialog-button.notification-button.confirm.active, .contact-request-button.accept:hover, .contact-request-button.accept.active, .fm-dialog-button.fm-dialog-button-green:hover, .fm-dialog-button.fm-dialog-button-green.active, .transfer-pause-icon:hover, .fm-account-save:hover, .astropay-dialog .fm-dialog-button.accept:hover {
 	background-color: rgba(49,181,0,0.2);
 }
-.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-reset-stored-fingerprint:hover span, .fm-reset-stored-fingerprint.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span, .transfer-pause-icon:hover span, .fm-verify.verified span, .fm-account-save span, .fm-account-save:hover span {
+.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-reset-stored-fingerprint:hover span, .fm-reset-stored-fingerprint.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span, .transfer-pause-icon:hover span, .fm-verify.verified span, .fm-account-save span, .fm-account-save:hover span, .astropay-dialog .fm-dialog-button.accept:hover span {
 	color: rgba(49,181,0,1);
 }
 /* disabled */
@@ -14853,14 +14853,15 @@ h5.main-italic-header {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: center -252px;
 	background-repeat: no-repeat;
 	display: block;
 }
 .membership-st2-info {
 	float: left;
-	padding-left: 72px;
+	padding-left: 50px;
+    width: 644px;
 }
 .membership-date {
 	float: left;
@@ -14871,7 +14872,7 @@ h5.main-italic-header {
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: -292px -401px;
 	background-repeat: no-repeat;
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -14990,7 +14991,7 @@ h5.main-italic-header {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: right -643px;
 	background-repeat: no-repeat;
 	font-size: 14px;
@@ -15001,17 +15002,11 @@ h5.main-italic-header {
 .membership-payment-pad {
 	padding: 0;
 }
-/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account
-   balance and we want the bottom of the date box to line up with the bottom of the plan box on the left */
-.payment-period {
-	position: absolute;
-	top: 203px;
-}
 .membership-payment-icon {
 	width: 110px;
 	height: 110px;
 	float: left;
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: -287px -553px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -7px;
@@ -15036,17 +15031,24 @@ h5.main-italic-header {
 	width: 16px;
 }
 .payment-options-list {
-	-webkit-column-count: 2;
-	-moz-column-count: 2;
-	column-count: 2;
-	-webkit-column-width: 200px;
-	-moz-column-width: 200px;
-	column-width: 200px;
+	-webkit-column-count: 3;
+	-moz-column-count: 3;
+	column-count: 3;
+	-webkit-column-width: 202px;
+	-moz-column-width: 202px;
+	column-width: 202px;
+}
+.payment-options-list.secondary {
+    margin-bottom: 45px;
+    margin-top: 20px;
 }
 .payment-options-list .payment-method {
 	cursor: pointer;
-	margin-bottom: 2px;
+	margin-bottom: 15px;
 	overflow: visible;
+}
+.payment-options-list .payment-method.template {
+    display: none;
 }
 .payment-options-list .payment-method.disabled {
 	cursor: auto;
@@ -15073,7 +15075,7 @@ h5.main-italic-header {
 	margin: 5px;
 }
 .membership-radio-label {
-	background-image: url("../images/mega/pro-new-sprite-v7.png");
+	background-image: url("../images/mega/pro-new-sprite-v8.png");
 	background-repeat: no-repeat;
 	color: #333333;
 	display: inline-block;
@@ -15112,18 +15114,35 @@ h5.main-italic-header {
 	-webkit-column-count: 2;
 	-moz-column-count: 2;
 	column-count: 2;
-	-webkit-column-width: 200px;
-	-moz-column-width: 200px;
-	column-width: 200px;
+	-webkit-column-width: 270px;
+	-moz-column-width: 270px;
+	column-width: 270px;
+    display: inline-block;
 	padding-top: 5px;
 }
 .duration-options-list .payment-duration .membership-radio-label {
 	background: none;
 	font-family: 'source_sans_proregular';
 	padding-left: 0;
+    position: relative;
 }
 .duration-options-list .payment-duration.template {
 	display: none;
+}
+.payment-duration .save-money {
+    background-color: #29c969;
+    border-radius: 8px;
+    color: #fff;
+    display: inline-block;
+    font-size: 13px;
+    line-height: 24px;
+    padding-bottom: 0;
+    padding-left: 14px;
+    padding-right: 14px;
+    margin-left: 20px;
+}
+.payment-duration .save-money.hidden {
+    display: none;
 }
 .membership-bott-price {
 	font-size: 72px;
@@ -15289,9 +15308,285 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .he .membership-new-offer, .ar .membership-new-offer, .fa .membership-new-offer {
 	left: 0;
 }
+
+/* PRO page step 2 */
+.membership-step2 h3.main-italic-header {
+    color: #555;
+    font-size: 21px;
+    letter-spacing: 0.2px;
+    padding-bottom: 6px;
+    text-align: center;
+}
+.membership-step2 .reg-st3-top-txt-block {
+    float: none;
+    max-width: none;
+}
+.membership-step2 .reg-st3-txt.other-payment-providers {
+    color: #aaa;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    text-align: center;
+}
+.membership-step2 .membership-radio.checked {
+    background-color: #fff;
+    border: 1px solid #ff4444;
+    border-radius: 100%;
+    display: inline-block;
+    height: 16px;
+    line-height: 26px;
+    position: relative;
+    vertical-align: middle;
+    width: 16px;
+}
+.membership-step2 .membership-radio.checked div {
+    background-color: #ff4444;
+    border-radius: 100%;
+    box-shadow: none;
+    height: 12px;
+    margin: 2px;
+    width: 12px;
+}
+.membership-step2 .membership-radio {
+    background-color: transparent;
+    border: 1px solid #bbb;
+    margin: 0 7px 0 0;
+}
+.membership-step2 .membership-radio div {
+    background-color: white;
+    border-radius: 100%;
+    height: 15px;
+    width: 15px;
+}
+.membership-step2 .membership-payment-pad .membership-st2-head, .membership-step2 .membership-info-pad .membership-st2-head {
+    color: #444;
+    font-family: "source_sans_prosemibold",sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.4px;
+    padding: 0 0 25px;
+}
+.membership-step2 .pro-gray-block {
+    background-image: linear-gradient(-180deg, #fff 0%, #fafafa 100%);
+}
+.membership-step2 .reg-st3-membership-bl {
+    float: right;
+}
 .membership-step2 .membership-new-offer {
 	display: none;
 }
+.membership-step2 .membership-radio-label {
+    color: #444;
+    font-family: "source_sans_proregular",sans-serif;
+    font-size: 13px;
+}
+.membership-step2 .membership-radio-label.checked {
+    font-family: "source_sans_prosemibold",sans-serif;
+}
+.membership-step2 .membership-radio-label > strong {
+    color: #999;
+    font-family: "source_sans_proregular",sans-serif;
+}
+.membership-step2 .membership-radio-label .hyphen {
+    color: #999;
+    padding: 0 10px;
+}
+.membership-step2 .membership-info-pad {
+    margin-left: 0;
+    position: relative;
+}
+.membership-step2 .membership-st2-head {
+    color: #444;
+    font-family: "source_sans_prosemibold",sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.4px;
+    padding: 0 0 25px;
+    position: relative;
+}
+.membership-step2 .membership-st2-head .number {
+    background-color: #ff3333;
+    border-radius: 100%;
+    color: #fff;
+    font-family: "source_sans_proregular",sans-serif;
+    font-size: 14px;
+    height: 30px;
+    left: -50px;
+    line-height: 28px;
+    position: absolute;
+    text-align: center;
+    top: -3px;
+    width: 30px;
+}
+.membership-step2 .payment-period {
+    margin-top: 30px;
+}
+.membership-step2 .third-section {
+    box-sizing: border-box;
+    margin: 40px auto 20px;
+    padding: 0 20px 10px 62px;
+    position: relative;
+    width: 980px;
+}
+.membership-step2 .membership-bott-button {
+    border: 4px solid #ff3333;
+    color: #ff3333;
+    font-size: 16px;
+    line-height: 55px;
+    margin: 17px 0 0;
+    min-width: 220px;
+    position: absolute;
+    right: 19px;
+    text-transform: uppercase;
+    top: 0;
+}
+.membership-step2 .payment-instructions {
+    color: #555;
+    font-size: 13px;
+    line-height: 26px;
+    max-width: 470px;
+}
+.membership-step2 .payment-instructions .purchase {
+    color: #ff4444;
+}
+.membership-step2 .provider-show-more {
+    display: table;
+    margin-top: 30px;
+    width: 100%;
+}
+.membership-step2 .provider-show-more.hidden {
+    display: none;
+}
+.membership-step2 .provider-show-more .button {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #999;
+    cursor: pointer;
+    display: table-cell;
+    padding: 3px 15px;
+    white-space: nowrap;
+}
+.membership-step2 .provider-show-more:hover .button {
+    border-color: #ccc;
+    color: #999;
+}
+.membership-step2 .provider-show-more .left-bar,
+.membership-step2 .provider-show-more .right-bar {
+    display: table-cell;
+    width: 50%;
+}
+.membership-step2 .provider-show-more .left-bar {
+    padding-right: 10px;
+}
+.membership-step2 .provider-show-more .right-bar {
+    padding-left: 10px;
+}
+.membership-step2 .provider-show-more .left-bar-grey,
+.membership-step2 .provider-show-more .right-bar-grey {
+    border-top: 1px solid #ececec;
+    position: relative;
+    top: 8px;
+}
+.membership-step2 .provider-show-more:hover .left-bar-grey,
+.membership-step2 .provider-show-more:hover .right-bar-grey {
+    border-color: #ddd;
+}
+.membership-step2 .provider-details {
+    display: inline-block;
+    font-family: "source_sans_prosemibold",Arial;
+    font-size: 14px;
+    line-height: 26px;
+    vertical-align: middle;
+}
+.membership-step2 .provider-details .provider-name {
+    display: inline-block;
+    overflow: hidden;
+    padding-bottom: 1px;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 150px;
+}
+.membership-step2 .provider-details.checked .provider-name {
+    font-family: "source_sans_prosemibold", Arial;
+}
+.membership-step2 .provider-details .provider-icon {
+    margin-right: 4px;
+}
+.provider-icon {
+    background-image: url("../images/mega/payment-provider-icons-v1.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 20px;
+    vertical-align: middle;
+    width: 20px;
+}
+.provider-icon.astropay { background-position: 0 0; } 
+.provider-icon.astropayAE { background-position: 0 -60px; } 
+.provider-icon.astropayAK { background-position: 0 -120px; } 
+.provider-icon.astropayAG { background-position: 0 -180px; } 
+.provider-icon.astropayAU { background-position: 0 -240px; } 
+.provider-icon.astropayB { background-position: 0 -300px; } 
+.provider-icon.astropayBB { background-position: 0 -360px; } 
+.provider-icon.astropayBG { background-position: 0 -420px; } 
+.provider-icon.astropayBL { background-position: 0 -480px; } 
+.provider-icon.astropayBM { background-position: 0 -540px; } 
+.provider-icon.astropayBN { background-position: 0 -600px; } 
+.provider-icon.astropayBV { background-position: 0 -660px; } 
+.provider-icon.astropayBX { background-position: 0 -720px; } 
+.provider-icon.astropayCA { background-position: 0 -780px; } 
+.provider-icon.astropayCL { background-position: 0 -840px; } 
+.provider-icon.astropayCM { background-position: 0 -900px; } 
+.provider-icon.astropayCR { background-position: 0 -960px; } 
+.provider-icon.astropayCS { background-position: 0 -1020px; } 
+.provider-icon.astropayDA { background-position: 0 -1080px; } 
+.provider-icon.astropayDC { background-position: 0 -1140px; } 
+.provider-icon.astropayDD { background-position: 0 -1200px; } 
+.provider-icon.astropayDM { background-position: 0 -1260px; } 
+.provider-icon.astropayDS { background-position: 0 -1320px; } 
+.provider-icon.astropayEL { background-position: 0 -1380px; } 
+.provider-icon.astropayEQ { background-position: 0 -1440px; } 
+.provider-icon.astropayEX { background-position: 0 -1500px; } 
+.provider-icon.astropayEY { background-position: 0 -1560px; } 
+.provider-icon.astropayGA { background-position: 0 -1620px; } 
+.provider-icon.astropayH { background-position: 0 -1680px; } 
+.provider-icon.astropayHI { background-position: 0 -1740px; } 
+.provider-icon.astropayI { background-position: 0 -1800px; } 
+.provider-icon.astropayIS { background-position: 0 -1860px; } 
+.provider-icon.astropayJC { background-position: 0 -1920px; } 
+.provider-icon.astropayMC { background-position: 0 -1980px; } 
+.provider-icon.astropayMD { background-position: 0 -2040px; } 
+.provider-icon.astropayMG { background-position: 0 -2100px; } 
+.provider-icon.astropayML { background-position: 0 -2160px; } 
+.provider-icon.astropayNJ { background-position: 0 -2220px; } 
+.provider-icon.astropayNT { background-position: 0 -2280px; } 
+.provider-icon.astropayOC { background-position: 0 -2340px; } 
+.provider-icon.astropayOX { background-position: 0 -2400px; } 
+.provider-icon.astropayPC { background-position: 0 -2460px; } 
+.provider-icon.astropayPF { background-position: 0 -2520px; } 
+.provider-icon.astropayPR { background-position: 0 -2580px; } 
+.provider-icon.astropayRE { background-position: 0 -2640px; } 
+.provider-icon.astropayRL { background-position: 0 -2700px; } 
+.provider-icon.astropayRP { background-position: 0 -2760px; } 
+.provider-icon.astropaySB { background-position: 0 -2820px; } 
+.provider-icon.astropaySI { background-position: 0 -2880px; } 
+.provider-icon.astropaySM { background-position: 0 -2940px; } 
+.provider-icon.astropaySP { background-position: 0 -3000px; } 
+.provider-icon.astropaySX { background-position: 0 -3060px; } 
+.provider-icon.astropayTS { background-position: 0 -3120px; } 
+.provider-icon.astropayTT { background-position: 0 -3180px; } 
+.provider-icon.astropayVA { background-position: 0 -3240px; } 
+.provider-icon.astropayVD { background-position: 0 -3300px; } 
+.provider-icon.astropayVI { background-position: 0 -3360px; } 
+.provider-icon.astropayWP { background-position: 0 -3420px; } 
+.provider-icon.bitcoin { background-position: 0 -3480px; } 
+.provider-icon.perfunctio { background-position: 0 -3540px; } 
+.provider-icon.dynamicpay { background-position: 0 -3600px; } 
+.provider-icon.fortumo { background-position: 0 -3660px; } 
+.provider-icon.infobip { background-position: 0 -3720px; } 
+.provider-icon.paysafecard { background-position: 0 -3780px; } 
+.provider-icon.tpay { background-position: 0 -3840px; } 
+.provider-icon.voucher { background-position: 0 -3900px; } 
+.provider-icon.wiretransfer { background-position: 0 -3960px; }
+
 .membership-new-offer text {
 	font-weight: normal;
 }
@@ -16456,7 +16751,7 @@ span.browsers-update {
 	height: 181px;
 	float: left;
 	text-align: center;
-	background-image: url(../images/mega/pro-new-sprite-v7.png);
+	background-image: url(../images/mega/pro-new-sprite-v8.png);
 	background-position: -7px -359px;
 	background-repeat: no-repeat;
 	-moz-box-sizing: border-box;
@@ -16590,8 +16885,9 @@ span.browsers-update {
 	color: white;
 }
 .pro-bottom-button:hover, .membership-bott-button:hover {
-	background-color: #D90007;
-	color: white;
+    background-color: #d90007;
+    border-color: #d90007;
+    color: white;
 }
 .pro-bottom-icon-block {
 	margin: 0 0 0 0;
@@ -23733,16 +24029,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .fm-chat-inline-dialog-button-sendFeedback {
 	margin-left: 4px;
 }
+.fm-dialog.copyrights-dialog {
+	width: 644px;
+	margin: -240px 0 0 -322px;
+}
 /* Voucher dialog */
 .fm-dialog.voucher-dialog {
 	border: 0 none;
 	border-radius: 14px;
 	margin: -176px 0 0 -240px;
 	width: 480px;
-}
-.fm-dialog.copyrights-dialog {
-	width: 644px;
-	margin: -240px 0 0 -322px;
 }
 .voucher-dialog-body {
 	padding: 30px;
@@ -23753,51 +24049,52 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	width: 60px;
 	display: inline-block;
 }
-.voucher-plan-info {
+.voucher-dialog .voucher-plan-info {
 	padding: 0 0 0 15px;
 	display: inline-block;
 	margin-top: 10px;
 	position: absolute;
 }
-.voucher-plan-title, .payment-plan-price {
+.voucher-dialog .voucher-plan-title,
+.voucher-dialog .payment-plan-price {
 	font-size: 36px;
 	line-height: 38px;
 	font-family: 'source_sans_prolight', Helvetica;
 }
-.voucher-plan-txt {
+.voucher-dialog .voucher-plan-txt {
 	color: #9d9d9d;
 	line-height: 14px;
 }
-.voucher-plan-txt span {
+.voucher-dialog .voucher-plan-txt span {
 	font-size: 13px;
 }
-.voucher-plan-price {
+.voucher-dialog .voucher-plan-price {
 	float: right;
 	padding: 26px 10px 0 0;
 	font-size: 36px;
 	font-family: 'source_sans_prolight', Helvetica;
 }
-.voucher-account-balance {
+.voucher-dialog .voucher-account-balance {
 	color: #d90007;
 	float: right;
 	font-family: 'source_sans_prolight', Helvetica;
 	font-size: 36px;
 	padding: 3px 10px 0 0;
 }
-.voucher-account-balance.sufficient-funds {
+.voucher-dialog .voucher-account-balance.sufficient-funds {
 	color: #3aaa5a;
 }
-.voucher-buy-now.sufficient-funds {
+.voucher-dialog .voucher-buy-now.sufficient-funds {
 	border-color: #3aaa5a;
 	color: #3aaa5a;
 	font-weight: bold;
 }
-.voucher-buy-now.sufficient-funds:hover {
+.voucher-dialog .voucher-buy-now.sufficient-funds:hover {
 	background-color: #3aaa5a;
 	border-color: #3aaa5a;
 	color: white;
 }
-.voucher-block {
+.voucher-dialog .voucher-block {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -23805,33 +24102,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	margin: 19px 0 0 0;
 	border-top: 1px solid #F1F1F1;
 }
-.voucher-title {
+.voucher-dialog .voucher-title {
 	letter-spacing: .1px;
 	line-height: 125%;
 	font-family: 'source_sans_probold';
 }
-.voucher-sub-title {
+.voucher-dialog .voucher-sub-title {
 	color: #3D3D3D;
 	letter-spacing: .1px;
 	line-height: 200%;
 	font-family: 'source_sans_prosemibold';
 }
-.voucher-information-help {
+.voucher-dialog .voucher-information-help {
 	margin: 20px 0 0 0;
 	color: #9B9B9B;
 	letter-spacing: .1px;
 	line-height: 20px;
 }
-a.voucher-reseller-link {
+.voucher-dialog a.voucher-reseller-link {
 	font-family: 'source_sans_probold';
 }
-.voucher-dialog-buttons {
+.voucher-dialog .voucher-dialog-buttons {
 	display: table;
 	width: 428px;
 	table-layout: fixed;
 	margin: 7px 0 0 0;
 }
-.voucher-buy-now, .voucher-redeem, .voucher-redeem-now {
+.voucher-dialog .voucher-buy-now,
+.voucher-dialog .voucher-redeem,
+.voucher-dialog .voucher-redeem-now {
 	margin: 24px 0 0 0;
 	height: 32px;
 	border: 2px solid #D90007;
@@ -23857,25 +24156,27 @@ a.voucher-reseller-link {
 	letter-spacing: .2px;
 	overflow: hidden;
 }
-.voucher-buy-now:hover {
+.voucher-dialog .voucher-buy-now:hover {
 	color: white;
 	background-color: #D90007;
 }
-.voucher-redeem, .voucher-redeem-now {
+.voucher-dialog .voucher-redeem,
+.voucher-dialog .voucher-redeem-now {
 	border: 2px solid #6a6a6a;
 	color: #6a6a6a;
 	left: 0;
 	margin: 24px 6px 0 0;
 }
-.voucher-redeem:hover, .voucher-redeem-now:hover {
+.voucher-dialog .voucher-redeem:hover,
+.voucher-dialog .voucher-redeem-now:hover {
 	background-color: #6a6a6a;
 	color: white;
 }
-.voucher-dialog-body .fm-account-input {
+.voucher-dialog .voucher-dialog-body .fm-account-input {
 	margin: 0 0 0 0;
 	display: block;
 }
-.voucher-dialog-td {
+.voucher-dialog .voucher-dialog-td {
 	display: table-cell;
 	overflow: hidden;
 	-webkit-transition: all 200ms ease-in-out;
@@ -23887,26 +24188,26 @@ a.voucher-reseller-link {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
-.redeem .voucher-redeem-now {
+.voucher-dialog .redeem .voucher-redeem-now {
 	margin: 24px 0 0 6px;
 }
-.payment-eurosign {
+.voucher-dialog .payment-eurosign {
 	font-size: 25px;
 }
-.voucher-input-container {
+.voucher-dialog .voucher-input-container {
 	display: none;
 	height: auto;
 	margin-top: 30px;
 	padding-bottom: 35px;
 	position: relative;
 }
-.voucher-input-container .fm-account-input {
+.voucher-dialog .voucher-input-container .fm-account-input {
 	left: 0;
 	position: absolute;
 	top: 0;
 	width: 250px;
 }
-.voucher-input-container .voucher-redeem-now {
+.voucher-dialog .voucher-input-container .voucher-redeem-now {
 	left: auto;
 	margin: 0;
 	position: absolute;
@@ -23914,6 +24215,59 @@ a.voucher-reseller-link {
 	top: 0;
 	width: 157px;
 }
+/* AstroPay dialog */
+.fm-dialog.astropay-dialog {
+    margin-left: -200px;
+    margin-top: -200px;
+    padding-top: 30px;
+    width: 400px;
+}
+.astropay-dialog-body {
+    padding: 15px 50px;
+}
+.astropay-dialog .fm-dialog-title {
+    font-size: 17px;
+    margin-top: -15px;
+    padding-top: 0;
+}
+.astropay-label {
+    color: #777;
+    display: block;
+    font-family: "source_sans_prosemibold",sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+}
+.astropay-dialog .fm-account-input {
+    margin: 5px 0 20px 0;
+}
+.astropay-information,
+.astropay-instructions {
+    color: #777;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    line-height: 20px;
+}
+.astropay-instructions {
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+.astropay-dialog .provider-name {
+    font-family: "source_sans_prosemibold", sans-serif;
+}
+.astropay-dialog .provider-icon {
+    margin: 0 2px;
+}
+.astropay-dialog .powered-by-astropay {
+  background-image: url("../images/mega/pro-new-sprite-v8.png");
+  background-position: 0 -638px;
+  background-size: 755px auto;
+  height: 25px;
+  left: 16px;
+  position: absolute;
+  top: 19px;
+  width: 100px;
+}
+
 /* CC payment dialog */
 .fm-dialog.payment-dialog {
 	border: 0 none;
@@ -24217,6 +24571,10 @@ a.voucher-reseller-link {
 .payment-result-txt {
 	font-size: 14px;
 	padding-bottom: 35px;
+}
+.payment-result.pending .payment-result-txt {
+    margin: 0 auto;
+    max-width: 700px;
 }
 .failed .payment-result-txt {
 	padding-bottom: 39px;
@@ -24806,9 +25164,6 @@ body.pro:after {
 .step2-block .bandwidth-gradient {
 	padding: 0;
 	height: 358px;
-}
-.step2-block .payment-period {
-	top: 163px;
 }
 .step2-block .membership-bott-price {
 	padding-top: 9px;
@@ -25587,6 +25942,10 @@ body.pro:after {
  background-image: url("../images/mega/lang-selection-sprite-v2@2x.png");
  background-size: 92px auto;
 }
+.provider-icon {
+    background-image: url("../images/mega/payment-provider-icons-v1@2x.png");
+    background-size: 20px auto;
+}
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
@@ -25949,8 +26308,8 @@ background-size: 50px auto;
  background-image: url(../images/mega/browsers-page@2x.png);
  background-size: 892px auto;
 }
-.pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label {
- background-image: url(../images/mega/pro-new-sprite-v7@2x.png);
+.pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
+ background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
  background-size: 755px auto;
 }
 .sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow, .win-phone-button, .products-top-arrow {

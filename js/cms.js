@@ -28,8 +28,8 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         var signature = bytes.slice(3, 67); // 64 bytes, signature
         var version = viewer[0];
         var mime = viewer[1];
-        var label = ab_to_str(bytes.slice(67, viewer[2]+67));
-        var content = bytes.slice(viewer[2]+67);
+        var label = ab_to_str(bytes.slice(67, viewer[2] + 67));
+        var content = bytes.slice(viewer[2] + 67);
     
         if (as === "download") {
             mime = 0;
@@ -70,7 +70,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 break;
             }
         } else {
-            next(true, {error: 'Invalid signature', signature: true} );
+            next(true, { error: 'Invalid signature', signature: true });
         }
     }
     
@@ -85,17 +85,16 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
      *  Call many things in parallel, buffer the results
      *  and give it back once everything is ready
      *
-     *  @param int times
-     *  @param function next
-     *
-     *  @return function
+     *  @param {Number} times
+     *  @param {Function} next     *
+     *  @return {Function}
      */
     function steps(times, next) {
         var responses = new Array(times + 1);
         var done = 0;
         function step_done(i, err, arg) {
             responses[0]   = responses[0] || err;
-            responses[i+1] = arg;
+            responses[i + 1] = arg;
             if (++done === times) {
                 next.apply(null, responses);
             }
@@ -112,7 +111,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
      *  a download
      */
     function dl_placeholder(str, sep, rid, id) {
-        return "'javascript:void(0)' data-cms-dl='"+id+"'";
+        return "'javascript:void(0)' data-cms-dl='" + id + "'";
     }
     
     /**
@@ -122,7 +121,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
      */
     function img_placeholder(str, sep, rid, id) {
         is_img = true;
-        return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'";
+        return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" + id + "'";
     }
     
     /**
@@ -194,7 +193,9 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
     {
         if (_listeners[id]) {
             for (var i in _listeners[id]) {
-                _listeners[id][i]();
+                if (_listeners.hasOwnProperty(i)) {
+                    _listeners[id][i]();
+                }
             }
         }
         CMS.attachEvents();

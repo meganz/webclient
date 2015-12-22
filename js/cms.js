@@ -189,11 +189,10 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         }
     }
     
-    function loaded(id)
-    {
+    function loaded(id) {
         if (_listeners[id]) {
             for (var i in _listeners[id]) {
-                if (_listeners.hasOwnProperty(i)) {
+                if (_listeners[id].hasOwnProperty(i)) {
                     _listeners[id][i]();
                 }
             }

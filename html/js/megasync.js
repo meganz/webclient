@@ -144,9 +144,15 @@ var megasync = (function() {
             }
         });
 
-        if (url === '') {
+        if (url === '' || localStorage.isLinux) {
             // It's linux!
-            linuxDropdown();
+            var $modal = $('.megasync-overlay').hide();
+            loadingDialog.show();
+            ns.getLinuxReleases(function() {
+                loadingDialog.hide();
+                $modal.show();
+                linuxDropdown();
+            });
         } else {
             window.location = url;
         }

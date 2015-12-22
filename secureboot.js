@@ -1373,7 +1373,7 @@ else if (!b_u)
         'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
-        'cms_snapshot_js': { f:'js/vendor/cms_snapshot.js', j: 1},
+        'cms_snapshot_js': {f:'js/vendor/cms_snapshot.js', n: 'cms_snapshot_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},

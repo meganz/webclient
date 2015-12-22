@@ -941,10 +941,12 @@ var ConversationAudioVideoPanel = React.createClass({
 
             if (!localPlayerSrc) {
                 if (callSession.localPlayer.srcObject) {
-                    localPlayerSrc = URL.createObjectURL(callSession.localPlayer.srcObject);
+                    callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.srcObject);
+                    localPlayerSrc = callSession.localPlayer.src;
                 }
                 else if (callSession.localPlayer.mozSrcObject) {
-                    localPlayerSrc = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
+                    callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
+                    localPlayerSrc = callSession.localPlayer.src;
                 }
                 else {
                     console.error("Could not retrieve src object.");
@@ -980,10 +982,12 @@ var ConversationAudioVideoPanel = React.createClass({
 
             if (!remotePlayerSrc) {
                 if (remotePlayer.srcObject) {
-                    remotePlayerSrc = URL.createObjectURL(remotePlayer.srcObject);
+                    remotePlayer.src = URL.createObjectURL(remotePlayer.srcObject);
+                    remotePlayerSrc = remotePlayer.src;
                 }
                 else if (remotePlayer.mozSrcObject) {
-                    remotePlayerSrc = URL.createObjectURL(remotePlayer.mozSrcObject);
+                    remotePlayer.src = URL.createObjectURL(remotePlayer.mozSrcObject);
+                    remotePlayerSrc = remotePlayer.src;
                 }
                 else {
                     console.error("Could not retrieve src object.");
@@ -1521,7 +1525,9 @@ var ConversationPanel = React.createClass({
                         No chat history with <span>{contactName}</span>
                     </div>
                     <div className="info">
-                        Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
+                        Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:<br/>
+                        * Confidentiality - Only the author and intended recipients are able to decipher and read the content;<br/>
+                        * Authenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server.(edited)<br/>
                     </div>
                 </div>
             );

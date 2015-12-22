@@ -138,7 +138,7 @@ function doRequest(id) {
         throw new Error("Calling CMS.doRequest without an ID");
     }
 
-    if (typeof CMS_Cache == "object" && CMS_Cache[id]) {
+    if (typeof CMS_Cache === "object" && CMS_Cache[id]) {
         for (var i in fetching[id]) {
             if (fetching[id].hasOwnProperty(i)) {
                 fetching[id][i][0](null, CMS_Cache[id]); // callback
@@ -151,7 +151,7 @@ function doRequest(id) {
     var q = getxhr();
     q.onerror = function() {
         cmsBackoff = Math.min(cmsBackoff + 2000, 60000);
-        if (cmsFailures++ === 2) {
+        if (++cmsFailures === cmsRetries) {
             return loadSnapshot();
         }
         setTimeout(function() {

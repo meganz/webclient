@@ -8037,6 +8037,30 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .grid-scrolling-table, .contacts-grid-scrolling-table, .grid-scrolling-table .jspContainer, .contacts-grid-scrolling-table .jspContainer, .grid-scrolling-table .jspPane, .contacts-grid-scrolling-table .jspPane {
     width: 100% !important;
 }
+.grid-share-table tr td:nth-child(1) {
+	padding-left: 12px;
+}
+.grid-share-table tr:first-child td:nth-child(2) {
+	width: 70px;
+}
+.grid-share-table tr:first-child td:nth-child(3) {
+	width: 45px;
+}
+.nw-fm-dialog-title, .fm-dialog-title {
+	font-size: 17px;
+	line-height: 21px;
+	color: #999999;
+	padding: 15px 33px 2px 33px;
+	text-align: center;
+	min-height: 38px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow: hidden;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+}
 .fm-tree-folder.contact span.avatar span.fm-chat-verified {
     background-image: url(../images/mega/chat-sprite.png?v=2);
     background-position: 0 0;

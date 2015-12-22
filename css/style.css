@@ -57,7 +57,7 @@
 @font-face {
     font-family: 'Open Sans Italic';
     src: url('../fonts/opensansitalic.eot');
-    src: url('../fonts/opensansitalic.eot?#iefix') format('embedded-opentype'),  url('../fonts/opensansitalic.woff2') format('woff2'),  url('../fonts/opensansitalic.woff') format('woff'),  url('../fonts/opensansitalic.ttf') format('truetype'),  url('../fonts/opensansitalic.svg#open_sansitalic') format('svg');
+    src: url('../fonts/opensansitalic.eot?#iefix') format('embedded-opentype'), url('../fonts/opensansitalic.woff2') format('woff2'), url('../fonts/opensansitalic.woff') format('woff'), url('../fonts/opensansitalic.ttf') format('truetype'), url('../fonts/opensansitalic.svg#open_sansitalic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -8038,28 +8038,28 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 100% !important;
 }
 .grid-share-table tr td:nth-child(1) {
-	padding-left: 12px;
+    padding-left: 12px;
 }
 .grid-share-table tr:first-child td:nth-child(2) {
-	width: 70px;
+    width: 70px;
 }
 .grid-share-table tr:first-child td:nth-child(3) {
-	width: 45px;
+    width: 45px;
 }
 .nw-fm-dialog-title, .fm-dialog-title {
-	font-size: 17px;
-	line-height: 21px;
-	color: #999999;
-	padding: 15px 33px 2px 33px;
-	text-align: center;
-	min-height: 38px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	overflow: hidden;
-	white-space: nowrap;
-	-o-text-overflow: ellipsis;
-	text-overflow: ellipsis;
+    font-size: 17px;
+    line-height: 21px;
+    color: #999999;
+    padding: 15px 33px 2px 33px;
+    text-align: center;
+    min-height: 38px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
 }
 .fm-tree-folder.contact span.avatar span.fm-chat-verified {
     background-image: url(../images/mega/chat-sprite.png?v=2);
@@ -19891,11 +19891,10 @@ span.incoming-call-name {
     top: 8px;
     z-index: 10;
 }
-.contacts-blocks-scrolling .nw-contact-avatar, .nw-contact-block-avatar {
+.contacts-blocks-scrolling .nw-contact-avatar, .nw-contact-block-avatar .avatar-wrapper {
     display: block;
     width: 160px;
     height: 160px;
-    border: 2px solid white;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -19904,31 +19903,25 @@ span.incoming-call-name {
     box-sizing: border-box;
     color: white;
     overflow: hidden;
-    font-size: 76px;
-    line-height: 154px;
+    border: 0;
+    font-size: 96px;
+    line-height: 160px;
     margin: 4px 0 0 4px;
     text-align: center;
-    font-family: 'source_sans_prolight', Arial;
+    font-family: 'source_sans_proextralight', Arial;
     text-transform: uppercase;
     float: none;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
+    position: relative;
 }
-.contacts-blocks-scrolling .nw-contact-avatar img, .nw-contact-block-avatar img, .nw-contact-block-avatar .avatar-wrapper {
-    width: 156px;
-    height: 156px;
-    display: block;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
-}
-.contacts-view .file-block .avatar-wrapper {
-    border: 0;
-}
-.contacts-view .file-block .nw-contact-avatar img {
+.contacts-blocks-scrolling .nw-contact-avatar img, .nw-contact-block-avatar .avatar-wrapper img {
     width: 160px;
     height: 160px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
 }
 .contacts-blocks-scrolling .shared-folder-info-block {
     padding-left: 10px;
@@ -24250,6 +24243,7 @@ body.pro:after {
     background-image: url(../images/mega/encr-sprite@2x_v1.png);
     background-size: 216px;
 }
+}
 /**
  * jQuery UI - Resizable - required classes.
  */
@@ -24395,7 +24389,6 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .blog-new.new-bottom-pages h2, .blog-new-item p span.blog-new-description, .rtl .blog-new-full, .rtl .blog-new-full div p, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .rtl .blog-new-right h1, .rtl a.credits-block, .rtl a.credits-block span, .rtl .new-left-menu-block, .rtl .new-left-menu-link, .rtl .help-block, .rtl .help-block div, .rtl .dev-short-block.help-nw-short-blocks, .rtl c.main-mid-pad.dev-nw, .rtl c.main-mid-pad.dev-nw div, .rtl c.main-mid-pad.dev-nw p, .rtl c.main-mid-pad.dev-nw h1, .rtl c.main-mid-pad.dev-nw h2, .rtl c.main-mid-pad.dev-nw h3, .rtl .new-left-menu-link.dev, .rtl .new-left-menu-link.dev div, .rtl .affiliate-input-block, .rtl .affiliate-input-block input, .rtl .affiliate-input-block select, .rtl .ltr h1, .rtl div.ltr h2, .rtl div.ltr h3, .rtl div.ltr h4, .rtl .ltr p, .rtl div.ltr ul, .rtl .new-right-content-block.sdk div, .rtl .new-right-content-block.doc div, .rtl .new-right-content-block.dev div, .rtl .ltr div, .rtl c.main-mid-pad.investors-nw, .rtl c.main-mid-pad.investors-nw div, .rtl c.main-mid-pad.investors-nw p, .rtl c.main-mid-pad.investors-nw h1, .rtl c.main-mid-pad.investors-nw h2, .rtl c.main-mid-pad.investors-nw h3 {
     direction: ltr;
 }
-
 
 /* frienldy printing */
 @media print {

@@ -37,6 +37,8 @@ var Avatar = React.createClass({
         var $avatar = $(useravatar.contact(contact));
 
         var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
+        
+        var letterClass = 'avatar-letter';
 
         var displayedAvatar;
 
@@ -73,7 +75,7 @@ var Avatar = React.createClass({
             var colorNum = tempClasses.split("color")[1].split(" ")[0];
             classes += " color" + colorNum;
 
-            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div>{$(useravatar.contact(contact)).text()}</div></div>;
+            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={$(useravatar.contact(contact)).text()}></div></div>;
 
 
         }

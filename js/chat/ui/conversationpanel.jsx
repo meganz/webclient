@@ -1527,7 +1527,7 @@ var ConversationPanel = React.createClass({
                     <div className="info">
                         Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:<br/>
                         * Confidentiality - Only the author and intended recipients are able to decipher and read the content;<br/>
-                        * Authenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server.(edited)<br/>
+                        * Authenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server.<br/>
                     </div>
                 </div>
             );

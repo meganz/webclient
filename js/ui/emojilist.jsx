@@ -848,16 +848,19 @@ var EMOJI_CATEGORIES = {
 };
 
 var EMOJIS = {};
+var ORDERED_EMOJIS = [];
 
 Object.keys(EMOJI_CATEGORIES).forEach(function(categoryName) {
     var emojis = EMOJI_CATEGORIES[categoryName];
     Object.keys(emojis).forEach(function(slug) {
         EMOJIS[slug] = emojis[slug];
         EMOJI_CATEGORIES[categoryName][slug] = 1;
+        ORDERED_EMOJIS.push(slug);
     });
 });
 
 module.exports = window.EMOJILIST = {
     EMOJI_CATEGORIES,
-    EMOJIS
+    EMOJIS,
+    ORDERED_EMOJIS
 };

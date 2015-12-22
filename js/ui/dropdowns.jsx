@@ -268,57 +268,71 @@ var DropdownEmojiSelector = React.createClass({
         });
         $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollTo(0);
     },
-    componentDidMount: function() {
-        $(window).rebind(
-            //'DOMContentLoaded.lazyRenderer' + this.getUniqueId() + ' ' +
-            //'load.lazyRenderer' + this.getUniqueId() + ' ' +
-            'resize.lazyRenderer' + this.getUniqueId() + ' ' +
-            //'hashchange.lazyRenderer' + this.getUniqueId() + ' ' +
-            'scroll.lazyRenderer' + this.getUniqueId(),
-            this.requiresLazyRendering
-        );
+    componentDidUpdate: function() {
+        var self = this;
+        var $element = $(self.findDOMNode());
 
-        this.requiresLazyRendering();
-    },
-    componentWillUnmount: function() {
-        //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.getUniqueId());
-        //$(window).unbind('load.lazyRenderer' + this.getUniqueId());
-        $(window).unbind('resize.lazyRenderer' + this.getUniqueId());
-        //$(window).unbind('hashchange.lazyRenderer' + this.getUniqueId());
-        $(window).unbind('scroll.lazyRenderer' + this.getUniqueId());
+        $('.popup-scroll-area.emoji-one', $element).rebind('jsp-user-scroll-y.emojis', function(e, pos) {
+            self.rerender();
+        });
     },
     _getVisibleEmojis: function() {
-        var $container = $('.popup.emoji-one:visible');
+        var self = this;
 
-        var $emojis = $('.button.square-button.emoji-one[data-emoji]', $container);
+        var $element = $('.popup-header.emoji-one:visible').parent();
 
-        if ($emojis.size() === 0) {
+        if (!$element.is(":visible")) {
             return false;
         }
 
-        var inViewport = [];
-        $emojis.each(function() {
-            if (elementInViewport2Lightweight(this)) {
-                inViewport.push($(this).attr('data-emoji'));
-            }
-        });
+        var $jsp = $('.popup-scroll-area.emoji-one', $element).data("jsp");
+        var pos = 0;
+
+        if ($jsp) {
+            pos = $jsp.getContentPositionY();
+        }
+
+        // caching those here, so that we won't trigger w/h calcs from the browser (to slow down this ...)
+        // (w/h + margin)
+        var emojiHeight = 42;
+        var emojiWidth = 42;
+        var emojiContainerWidth = 360;
+        var jspHeight = 336;
+        var bufferRows = 6;
+        var emojisPerRow = Math.floor(emojiContainerWidth / (emojiWidth - 5));
+        var visibleEmojiRows = Math.floor(jspHeight / emojiHeight);
+
+        var emojiList = EMOJILIST.ORDERED_EMOJIS;
+        if (self.state.searchValue && self.state.searchValue.length > 0) {
+            emojiList = [];
+            EMOJILIST.ORDERED_EMOJIS.forEach(function(v) {
+                if (v.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) > -1) {
+                    emojiList.push(v);
+                }
+            })
+        }
+
+
+        var firstEmojiNumber = Math.max(
+            0,
+            Math.ceil((pos/emojiHeight) * emojisPerRow) - Math.floor(bufferRows * emojisPerRow)
+        );
+        var lastEmojiNumber = firstEmojiNumber + Math.ceil(emojisPerRow * (visibleEmojiRows + bufferRows));
+
+        var inViewport = emojiList.slice(
+            Math.max(0, firstEmojiNumber - 1),
+            lastEmojiNumber + 1
+        );
 
         return inViewport;
     },
-    requiresLazyRendering: function(e) {
-        if (!this.isMounted()) {
-            return;
-        }
+    rerender: function() {
+        var self = this;
 
-        var $container = $(this.findDOMNode());
-        if (!$container.is(":visible")) {
-            return;
-        }
+        var inViewport = self._getVisibleEmojis();
 
-        var inViewport = this._getVisibleEmojis();
-
-        if (inViewport !== false) {
-            this.setState({'visibleEmojis': inViewport});
+        if (self.state.visibleEmojis.join(",") != inViewport.join(",")) {
+            self.setState({'visibleEmojis': inViewport});
         }
     },
     render: function() {
@@ -356,7 +370,7 @@ var DropdownEmojiSelector = React.createClass({
                 var curCategoryEmojis = [];
                 Object.keys(EMOJILIST.EMOJI_CATEGORIES[categoryName]).forEach(function (slug) {
                     if (searchValue.length > 0) {
-                        if ((":" + slug + ":").indexOf(searchValue) < 0) {
+                        if ((":" + slug + ":").toLowerCase().indexOf(searchValue.toLowerCase()) < 0) {
                             return;
                         }
                     }

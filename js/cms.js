@@ -2,7 +2,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 
 (function(window, asmCrypto) {
     
-    var signPubKey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
+    var signPubKey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='));
     var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
     var fetching = {};
     var cmsBackoff = 0;
@@ -15,7 +15,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         try {
             return nacl.sign.detached.verify(asmCrypto.string_to_bytes(hash),
                                              asmCrypto.string_to_bytes(signature),
-                                             asmCrypto.string_to_bytes(signPubKey))
+                                             asmCrypto.string_to_bytes(signPubKey));
         } catch (e) {
             /* rubbish data, invalid anyways */
             return false;
@@ -41,7 +41,6 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 content = ab_to_str(content);
                 next(false, { html: content, mime: mime});
                 return loaded(id);
-                break;
     
             case 1:
                 var blob = new Blob([content]);
@@ -100,7 +99,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             if (++done === times) {
                 next.apply(null, responses);
             }
-        };
+        }
     
         return function(id) {
             return step_done.bind(null, parseInt(id));

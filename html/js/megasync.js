@@ -6,53 +6,14 @@ var megasync = (function() {
     var version = 0;
     var lastDownload;
     var retryTimer;
-    var clients;
+    var clients = {
+        windows: 'https://mega.nz/MEGAsyncSetup.exe',
+        mac: 'https://mega.nz/MEGAsyncSetup.dmg'
+    };
+
     var linuxClients;
     var listeners = [];
     var pending;
-
-    /**
-     * Internal function
-     *
-     * Booting processing is done and we are ready,
-     * notify our listeners about this event.
-     *
-     */
-    function ready() {
-
-        for (var i = 0; i < listeners.length; ++i) {
-            setTimeout(listeners[i]);
-        }
-        // Set it to NULL, that means this event already
-        // happened, if someone tries to listen to this event
-        // in the future we will execute it.
-        listeners = null;
-    }
-
-
-    // Talk to the CMS server and get information
-    // about the `sync` (expect a JSON)
-    CMS.get('sync', function(err, content) {
-
-        linuxClients = content.object;
-        
-        clients = {
-            windows: 'https://mega.nz/MEGAsyncSetup.exe',
-            mac: 'https://mega.nz/MEGAsyncSetup.dmg'
-        };
-
-        var linux = 'https://mega.nz/linux/MEGAsync/';
-        linuxClients.forEach(function(val) {
-
-            ['32', '32n', '64', '64n'].forEach(function(platform) {
-
-                if (val[platform]) {
-                    clients[val.name + " " + platform] = linux + val[platform];
-                }
-            });
-        });
-        ready();
-    });
 
     // Linux stuff {{{
     /**
@@ -183,9 +144,15 @@ var megasync = (function() {
             }
         });
 
-        if (url === '') {
+        if (url === '' || localStorage.isLinux) {
             // It's linux!
-            linuxDropdown();
+            var $modal = $('.megasync-overlay').hide();
+            loadingDialog.show();
+            ns.getLinuxReleases(function() {
+                loadingDialog.hide();
+                $modal.show();
+                linuxDropdown();
+            });
         } else {
             window.location = url;
         }
@@ -246,25 +213,25 @@ var megasync = (function() {
     }
     // }}}
 
-    /**
-     * Exposes an interface where external sections
-     * can subscribe to our `onready` event.
-     * This method queue a callback function or executes
-     * immediatly if we are already `ready`.
-     */
-    ns.ready = function(callback) {
+    ns.getLinuxReleases = function(next) {
+        if (linuxClients) next(linuxClients);
 
-        if (listeners instanceof Array) {
-            listeners.push(callback);
-        } else {
-            setTimeout(callback);
-        }
-        return ns;
-    };
+        // Talk to the CMS server and get information
+        // about the `sync` (expect a JSON)
+        CMS.get('sync', function(err, content) {
+            linuxClients = content.object;
+            var linux = 'https://mega.nz/linux/MEGAsync/';
+            linuxClients.forEach(function(val) {
 
-    ns.getLinuxReleases = function() {
+                ['32', '32n', '64', '64n'].forEach(function(platform) {
 
-        return linuxClients;
+                    if (val[platform]) {
+                        clients[val.name + " " + platform] = linux + val[platform];
+                    }
+                });
+            });
+            next(linuxClients);
+        });
     };
 
     /**

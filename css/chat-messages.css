@@ -91,6 +91,7 @@
     margin: 2px 30px 0 0;
     word-wrap: break-word;
     min-height: 20px;
+    position:relative;
 }
 .small-info-txt .message.text-block {
     font-size: 13px;
@@ -212,4 +213,9 @@
     right: 24px;
     float: none;
     margin: 2px 0 0 0;
+}
+.message.text-block .small-blue-spinner {
+    position: absolute;
+    bottom: 3px;
+    right: -30px;
 }

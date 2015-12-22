@@ -3,6 +3,10 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 (function(window, asmCrypto) {
 
 var signPubKey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
+var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
+var fetching = {};
+var cmsBackoff = 0;
+var cmsFailures = 0;
 
 function verify_cms_content(content, signature) {
     var hash = asmCrypto.SHA256.hex(content);
@@ -129,15 +133,27 @@ function img_placeholder(str, sep, rid, id) {
  *    ask things twice). This is the right place to
  *    cache (perhaps towards localStorage).
  */
-var fetching = {};
-var cmsBackoff = 0;
 function doRequest(id) {
     if (!id) {
         throw new Error("Calling CMS.doRequest without an ID");
     }
+
+    if (typeof CMS_Cache == "object" && CMS_Cache[id]) {
+        for (var i in fetching[id]) {
+            if (fetching[id].hasOwnProperty(i)) {
+                fetching[id][i][0](null, CMS_Cache[id]); // callback
+            }
+        }
+        delete fetching[id];
+        return;
+    }
+
     var q = getxhr();
     q.onerror = function() {
-        cmsBackoff = Math.min(cmsBackoff + 5000, 60000);
+        cmsBackoff = Math.min(cmsBackoff + 2000, 60000);
+        if (cmsFailures++ === 2) {
+            return loadSnapshot();
+        }
         setTimeout(function() {
             doRequest(id);
         }, cmsBackoff);
@@ -158,6 +174,22 @@ function doRequest(id) {
 }
 
 var _listeners = {};
+
+function snapshot_ready() {
+    for (var id in fetching) {
+        if (fetching.hasOwnProperty(id)) {
+            doRequest(id);
+        }
+    }
+}
+
+function loadSnapshot() {
+    if (!jsl_loaded['cms_snapshot_js']) {
+        silent_loading = snapshot_ready;
+        jsl.push(jsl2['cms_snapshot_js']);
+        jsl_start();
+    }
+}
 
 function loaded(id)
 {

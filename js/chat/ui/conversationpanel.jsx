@@ -130,6 +130,8 @@ var ConversationMessage = React.createClass({
 
         var additionalClasses = "";
         var buttonsBlock = null;
+        var spinnerElement = null;
+
         timestamp = unixtimeToTimeString(timestampInt);
         var messageIsNowBeingSent = false;
 
@@ -197,6 +199,7 @@ var ConversationMessage = React.createClass({
                     }
                     else {
                         additionalClasses += " sending";
+                        spinnerElement = <div className="small-blue-spinner"></div>;
 
                         if (!message.sending) {
                             message.sending = true;
@@ -373,7 +376,7 @@ var ConversationMessage = React.createClass({
                                 {files}
                             </div>
                             {buttonsBlock}
-
+                            {spinnerElement}
                         </div>
                     </div>;
                 }
@@ -388,6 +391,10 @@ var ConversationMessage = React.createClass({
                     if (chatRoom._attachmentsMap[revokedNode]) {
                         Object.keys(chatRoom._attachmentsMap[revokedNode]).forEach(function(messageId) {
                             var attachedMsg = chatRoom.messagesBuff.messages[messageId];
+
+                            if (!attachedMsg) {
+                                return;
+                            }
 
                             if (attachedMsg.orderValue < message.orderValue) {
                                 try {
@@ -468,6 +475,7 @@ var ConversationMessage = React.createClass({
 
                             <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>
                             {buttonsBlock}
+                            {spinnerElement}
                         </div>
                     </div>
                 );

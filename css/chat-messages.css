@@ -214,8 +214,8 @@
     float: none;
     margin: 2px 0 0 0;
 }
-.message.text-block .small-blue-spinner {
+.message.content-area .small-blue-spinner {
     position: absolute;
-    bottom: 3px;
-    right: -30px;
+    right: 24px;
+    margin-top: -15px;
 }

@@ -1624,7 +1624,7 @@ var strongvelope = {};
                 tempExcludes.add(item);
             }
 
-            // Check whether it is in the exclude list and needs to be removed.
+            // Check whether it is in the include list and needs to be removed.
             if (tempIncludes.has(item)) {
                 tempIncludes.delete(item);
             }

@@ -292,7 +292,7 @@ var ConversationsApp = React.createClass({
                 // is visible/active at the moment
                 if (
                     $(e.target).is(".messages-textarea") ||
-                    e.ctrlKey || event.metaKey || e.which == 19 ||
+                    (e.ctrlKey || event.metaKey || e.which == 19) && (e.keyCode == 67)) ||
                     ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
                     $('.fm-dialog:visible,.dropdown:visible').length > 0 ||
                     $('input:focus,textarea:focus,select:focus').length > 0

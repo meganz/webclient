@@ -660,7 +660,7 @@ var strongvelope = {};
      * @method
      * @param message {ChatdMessage}
      *     A message to extract keys from.
-     * @return {{Object.<parsedMessage: Object, senderKeys: Object}|Boolean}
+     * @return {Object|Boolean}
      *     An objects containing the parsed message and an object mapping a
      *     keyId to a key. `false` on signature verification error.
      * @private

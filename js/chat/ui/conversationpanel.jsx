@@ -1424,14 +1424,14 @@ var ConversationPanel = React.createClass({
         // typeArea resizing
         var $textarea = $('textarea.messages-textarea', $container);
         var textareaHeight =  $textarea.outerHeight();
-        var $hiddenDiv = $('.message-preview.hidden', $container);
+        var $hiddenDiv = $('.message-preview', $container);
         var $pane = $('.chat-textarea-scroll', $container);
         var $jsp;
 
-        if (textareaHeight != $hiddenDiv.outerHeight()) {
-            $textarea.css('height', $hiddenDiv.outerHeight());
+        if (textareaHeight != $hiddenDiv.height()) {
+            $textarea.css('height', $hiddenDiv.height());
 
-            if ($hiddenDiv.outerHeight() >= 91) {
+            if ($hiddenDiv.outerHeight() > 100) {
                 $pane.jScrollPane({
                     enableKeyboardNavigation:false,
                     showArrows:true,
@@ -1790,7 +1790,7 @@ var ConversationPanel = React.createClass({
                                         disabled={room.pubCu25519KeyIsMissing === true ? true : false}
                                         readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
                                         ></textarea>
-                                    <div className="hidden message-preview" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
+                                    <div className="message-preview" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
                                 </div>
                             </div>
                         </div>

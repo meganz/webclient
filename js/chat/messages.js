@@ -556,6 +556,8 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
             -32
         );
 
+        self.messages.trackDataChange();
+
 
         var timeoutPromise = createTimeoutPromise(function() {
             return self.$msgsHistoryLoading.state() !== 'pending'
@@ -565,6 +567,9 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
             })
             .fail(function() {
                 self.$msgsHistoryLoading.reject();
+            })
+            .always(function() {
+                self.messages.trackDataChange();
             });
 
         self.$msgsHistoryLoading.fail(function() {

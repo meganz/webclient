@@ -1782,18 +1782,20 @@ var ConversationPanel = React.createClass({
                                     </ButtonsUI.Button>
                                 </div>
                                 <div className="chat-textarea-scroll">
-                                    <textarea
-                                        className={messageTextAreaClasses}
-                                        placeholder={__("Write a message...")}
-                                        onKeyDown={self.onTypeAreaKeyDown}
-                                        onBlur={self.onTypeAreaBlur}
-                                        onChange={self.onTypeAreaChange}
-                                        value={self.state.typedMessage}
-                                        ref="typearea"
-                                        disabled={room.pubCu25519KeyIsMissing === true ? true : false}
-                                        readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
-                                        ></textarea>
-                                    <div className="message-preview" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
+                                    <div className="textarea-wrapper">
+                                        <textarea
+                                            className={messageTextAreaClasses}
+                                            placeholder={__("Write a message...")}
+                                            onKeyDown={self.onTypeAreaKeyDown}
+                                            onBlur={self.onTypeAreaBlur}
+                                            onChange={self.onTypeAreaChange}
+                                            value={self.state.typedMessage}
+                                            ref="typearea"
+                                            disabled={room.pubCu25519KeyIsMissing === true ? true : false}
+                                            readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
+                                            ></textarea>
+                                        <div className="message-preview" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

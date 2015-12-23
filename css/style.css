@@ -165,6 +165,7 @@ input, textarea {
     outline: none;
     -moz-appearance: none;
     font-family: 'source_sans_proregular', Arial;
+    resize: none;
 }
 a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     outline: none;

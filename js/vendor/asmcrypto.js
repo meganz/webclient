@@ -8553,7 +8553,7 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
      *
      * Exploits the fact:
      *
-     *  X² = ( X0 + X1*B )² = X0² + 2*X0*X1*B + X1²*B²,
+     *  X^2 = ( X0 + X1*B )^2 = X0^2 + 2*X0*X1*B + X1^2*B^2,
      *
      * where B is a power of 2, so:
      *
@@ -9625,10 +9625,10 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
      *
      * Definition:
      *
-     *  MREDC(A) = A × X (mod N),
-     *  M × X = N × Y + 1,
+     *  MREDC(A) = A x X (mod N),
+     *  M x X = N x Y + 1,
      *
-     * where M = 2^(32*m) such that N < M and A < N×M
+     * where M = 2^(32*m) such that N < M and A < NxM
      *
      * Numbers `X` and `Y` can be calculated using Extended Euclidean Algorithm.
      */
@@ -10497,7 +10497,7 @@ function BigNumber_isProbablePrime ( paranoia ) {
     if ( paranoia <= 2 ) return true;
 
     // Miller-Rabin test
-    // (≤ 4^(-k) false positive probability)
+    // (<= 4^(-k) false positive probability)
     return _BigNumber_isMillerRabinProbablePrime.call( this, paranoia >>> 1 );
 }
 

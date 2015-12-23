@@ -1330,7 +1330,6 @@ else if (!b_u)
     jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-    jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
 
     // only used on beta
     if (onBetaW) {
@@ -1340,6 +1339,7 @@ else if (!b_u)
     var jsl2 =
     {
         'about': {f:'html/about.html', n: 'about', j:0},
+        'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
         'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
@@ -1373,6 +1373,7 @@ else if (!b_u)
         'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+        'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
@@ -1400,13 +1401,13 @@ else if (!b_u)
         'register': ['register','register_js'],
         'android': ['android'],
         'resellers': ['resellers'],
-        '!': ['download','download_js'],
+        '!': ['download','download_js', 'megasync_js'],
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
         'takedown': ['takedown'],
         'mobile': ['mobile'],
-        'sync': ['sync','sync_js'],
+        'sync': ['sync','sync_js', 'megasync_js'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],

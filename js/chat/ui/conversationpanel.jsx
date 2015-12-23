@@ -1507,19 +1507,16 @@ var ConversationPanel = React.createClass({
         ];
 
         if (
-            self.props.messagesBuff.joined === true &&
-            self.props.messagesBuff.haveMessages === true &&
-            self.props.messagesBuff.messagesHistoryIsLoading() === true
+            self.props.messagesBuff.messagesHistoryIsLoading() === true ||
+            self.props.messagesBuff.joined === false ||
+            (
+                self.props.messagesBuff.joined === true &&
+                self.props.messagesBuff.haveMessages === true &&
+                self.props.messagesBuff.messagesHistoryIsLoading() === true
+            )
         ) {
             messagesList.push(
-                <div className="messages notification" key="loading">
-                    <div className="header">
-                        Chat history with <span>{contactName}</span> is now loading...
-                    </div>
-                    <div className="info">
-                        Text explaining MEGA’s security model and the possibility of having OTR conversations, something specific enough, ideally between 160-200 characters in English.
-                    </div>
-                </div>
+                <div className="loading-spinner light" key="loadingSpinner"></div>
             );
         } else if (
             self.props.messagesBuff.joined === true && (
@@ -1527,10 +1524,16 @@ var ConversationPanel = React.createClass({
                 !self.props.messagesBuff.haveMoreHistory()
             )
         ) {
+            var headerText = (
+                self.props.messagesBuff.messages.length === 0 ?
+                    __("No chat history with %s") :
+                    __("Conversation with %s")
+            );
+            headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
+
             messagesList.push(
                 <div className="messages notification" key="initialMsg">
-                    <div className="header">
-                        No chat history with <span>{contactName}</span>
+                    <div className="header" dangerouslySetInnerHTML={{__html: headerText}}>
                     </div>
                     <div className="info">
                         Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:<br/>

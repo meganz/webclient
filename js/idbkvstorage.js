@@ -89,8 +89,6 @@ IndexedDBKVStorage._requiresDbConn = function(fn) {
 IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function(k, v) {
     var promise = new MegaPromise();
 
-    //console.error("setItem", k, v);
-
     this.db.addOrUpdate(
         'kv',
         {

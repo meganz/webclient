@@ -59,7 +59,12 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
 
     p.then(function() {
         $promise.resolve.apply($promise, toArray(arguments))
-    }, MegaPromise.getTraceableReject($promise, p));
+    } , (
+            d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
+                MegaPromise.getTraceableReject($promise, p) :
+                undefined
+        )
+    );
 
     return $promise;
 };
@@ -322,7 +327,12 @@ MegaPromise.all = function(promisesList) {
     $.when.apply($, _jQueryPromisesList)
         .then(function() {
             promise.resolve(toArray(arguments));
-        }, MegaPromise.getTraceableReject(promise));
+        }, (
+            d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
+                MegaPromise.getTraceableReject(promise) :
+                undefined
+            )
+        );
 
     return promise;
 };

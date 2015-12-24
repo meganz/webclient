@@ -6,7 +6,7 @@
 }
 .chat-textarea {
     margin: 0 24px 25px 24px;
-    padding: 15px 84px 13px 48px;
+    padding: 15px 78px 13px 48px;
     min-height: 48px;
     background-color: white;
     -moz-border-radius: 4px;
@@ -34,6 +34,9 @@
     float: right;
     margin: 0 0 0 20px;
 }
+.textarea-wrapper {
+    position: relative;
+}
 .chat-textarea-scroll textarea, .message-preview, .message.textarea-scroll textarea {
     font-size: 13px;
     line-height: 20px;
@@ -43,14 +46,15 @@
     margin: 0;
     color: #777777;
     overflow: hidden;
-    resize: none;
     word-wrap: break-word;
     min-height: 20px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     display: block;
 }
 .message-preview {
     position: absolute;
-    width: 100%;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;

@@ -21,7 +21,7 @@ var getMessageString;
         if (!MESSAGE_STRINGS) {
             MESSAGE_STRINGS = {
                 'outgoing-call': l[5891],
-                'incoming-call': "Incoming call from [X]",
+                'incoming-call': l[5893],
                 'call-timeout': l[5890],
                 'call-starting': l[7206],
                 'call-feedback': "To help us improve our service, it would be great if you want to rate how was your call with [X]? ",
@@ -293,7 +293,7 @@ var ConversationMessage = React.createClass({
                                         positionAt="right bottom"
                                         horizOffset={4}
                                         >
-                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__("Download")}
+                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__("Add to Cloud Drive")}
                                                                   onClick={addToCloudDrive}/>
@@ -314,7 +314,7 @@ var ConversationMessage = React.createClass({
                                         <DropdownsUI.Dropdown
                                             className="attachments-dropdown"
                                         >
-                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__("Download")}
+                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__("Add to Cloud Drive")}
                                                                   onClick={addToCloudDrive}/>
@@ -435,7 +435,7 @@ var ConversationMessage = React.createClass({
                             vertOffset={4}
                             noArrow={true}
                         >
-                            <DropdownsUI.DropdownItem icon="writing-pen" label="Edit" onClick={() => {
+                            <DropdownsUI.DropdownItem icon="writing-pen" label={__(l[1342])} onClick={() => {
                                         console.error("TBD!");
                                     }}/>
                             <DropdownsUI.DropdownItem icon="quotes" label="Quote" onClick={() => {
@@ -444,7 +444,7 @@ var ConversationMessage = React.createClass({
 
                             <hr />
 
-                            <DropdownsUI.DropdownItem icon="red-cross" label="Delete" className="red" onClick={(e) => {
+                            <DropdownsUI.DropdownItem icon="red-cross" label={__(l[1730])} className="red" onClick={(e) => {
                                         self.doDelete(e, message);
                                     }}/>
                         </DropdownsUI.Dropdown>
@@ -616,7 +616,7 @@ var ConversationRightArea = React.createClass({
                             }
                         }}>
             <i className="small-icon audio-call"></i>
-            {__("Start Audio Call")}
+            {__(l[5896])}
         </div>;
 
         var startVideoCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
@@ -625,7 +625,7 @@ var ConversationRightArea = React.createClass({
                         }
                     }}>
             <i className="small-icon video-call"></i>
-            {__("Start Video Call")}
+            {__(l[5897])}
         </div>;
 
 
@@ -666,7 +666,7 @@ var ConversationRightArea = React.createClass({
                         <ButtonsUI.Button
                             className="link-button dropdown-element"
                             icon="rounded-grey-up-arrow"
-                            label={__("Send Files…")}
+                            label={__(l[6834]+"…")}
                             >
                             <DropdownsUI.Dropdown
                                 contacts={this.props.contacts}
@@ -1782,20 +1782,22 @@ var ConversationPanel = React.createClass({
                                     </ButtonsUI.Button>
                                 </div>
                                 <div className="chat-textarea-scroll">
-                                    <textarea
-                                        className={messageTextAreaClasses}
-                                        placeholder={__("Write a message...")}
-                                        onKeyDown={self.onTypeAreaKeyDown}
-                                        onBlur={self.onTypeAreaBlur}
-                                        onChange={self.onTypeAreaChange}
-                                        value={self.state.typedMessage}
-                                        ref="typearea"
-                                        disabled={room.pubCu25519KeyIsMissing === true ? true : false}
-                                        readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
-                                        ></textarea>
-                                    <div className="message-preview" dangerouslySetInnerHTML={{
-                                        __html: typedMessage.replace(/\s/g, "&nbsp;")
-                                    }}></div>
+                                    <div className="textarea-wrapper">
+                                        <textarea
+                                            className={messageTextAreaClasses}
+                                            placeholder={__("Write a message...")}
+                                            onKeyDown={self.onTypeAreaKeyDown}
+                                            onBlur={self.onTypeAreaBlur}
+                                            onChange={self.onTypeAreaChange}
+                                            value={self.state.typedMessage}
+                                            ref="typearea"
+                                            disabled={room.pubCu25519KeyIsMissing === true ? true : false}
+                                            readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
+                                            ></textarea>
+                                        <div className="message-preview" dangerouslySetInnerHTML={{
+                                            __html: typedMessage.replace(/\s/g, "&nbsp;")
+                                        }}></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -139,7 +139,7 @@ body {
 input[type="search"], input[type="search"]::-webkit-search-decoration, input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-results-button, input[type="search"]::-webkit-search-results-decoration {
  -webkit-appearance: none;
 }
-.div, span, input, object, texarea {
+div, span, input, object, texarea {
     outline: none;
     resize: none;
 }
@@ -1729,6 +1729,7 @@ a.blog-button:hover {
 .notification-item .avatar-wrapper.avatar {
     width: 48px;
     height: 48px;
+    font-size: 31px;
     line-height: 42px;
     margin: 0;
 }

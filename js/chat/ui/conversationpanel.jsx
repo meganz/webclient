@@ -1793,7 +1793,9 @@ var ConversationPanel = React.createClass({
                                         disabled={room.pubCu25519KeyIsMissing === true ? true : false}
                                         readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
                                         ></textarea>
-                                    <div className="message-preview" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
+                                    <div className="message-preview" dangerouslySetInnerHTML={{
+                                        __html: typedMessage.replace(/\s/g, "&nbsp;")
+                                    }}></div>
                                 </div>
                             </div>
                         </div>

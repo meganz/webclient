@@ -710,6 +710,7 @@
     "1356": "\u0391\u03bd\u03b1\u03c4\u03c1\u03bf\u03c6\u03bf\u03b4\u03cc\u03c4\u03b7\u03c3\u03b7",
     "1357": "\u0391\u03c0\u03bf\u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03b7",
     "1362": "\u0395\u03c0\u03b1\u03bd\u03b1\u03c6\u03bf\u03c1\u03ac \u03b1\u03b3\u03bf\u03c1\u03ce\u03bd",
+    "1364": "\u039e\u03b1\u03bd\u03b1\u03b4\u03bf\u03ba\u03b9\u03bc\u03ac\u03c3\u03c4\u03b5",
     "1367": "\u03a0\u03ac\u03c1\u03c4\u03b5 50 GB \u03b4\u03c9\u03c1\u03b5\u03ac\u03bd, \u03ae \u03b5\u03b3\u03b3\u03c1\u03b1\u03c6\u03b5\u03af\u03c4\u03b5 \u03b3\u03b9\u03b1 \u03ad\u03bd\u03b1 \u03b1\u03c0\u03cc \u03c4\u03b1 Pro \u03c0\u03b1\u03ba\u03ad\u03c4\u03b1 \u03bc\u03b1\u03c2 \u03ba\u03b1\u03b9 \u03bb\u03ac\u03b2\u03b5\u03c4\u03b5 \u03bc\u03ad\u03c7\u03c1\u03b9 4 TB \u03ba\u03c1\u03c5\u03c0\u03c4\u03bf\u03b3\u03c1\u03b1\u03c6\u03b7\u03bc\u03ad\u03bd\u03b7\u03c2 \u03b1\u03c0\u03bf\u03b8\u03ae\u03ba\u03b5\u03c5\u03c3\u03b7\u03c2 \u03be\u03b5\u03ba\u03b9\u03bd\u03ce\u03bd\u03c4\u03b1\u03c2 \u03b1\u03c0\u03cc \u20ac 8,33 \u03c4\u03bf \u03bc\u03ae\u03bd\u03b1.",
     "1368": "\u03ad\u03c9\u03c2 [X]",
     "1369": "\u03ba\u03b1\u03b9 [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Click here to show more payment options...",
     "7994": "How long do you want your membership to be?",
     "7995": "Are you happy with your payment plan?",
-    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase."
+    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "7997": "Chat",
+    "8000": "No conversation history",
+    "8004": "Delete message",
+    "8010": "Search contacts",
+    "8012": "Quote",
+    "8015": "WHISPER MODE",
+    "8023": "Attach"
 }

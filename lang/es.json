@@ -710,6 +710,7 @@
     "1356": "Feedback",
     "1357": "Salir",
     "1362": "Restaurar compras",
+    "1364": "Reintentar",
     "1367": "Consigue 50 GB de forma gratuita, o prueba uno de nuestros paquetes Pro y obt\u00e9n hasta 4 TB de almacenamiento cifrado a partir de 8,33\u20ac al mes.",
     "1368": "hasta [X]",
     "1369": "y [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Pulsa aqui para ver m\u00e1s opciones de pago...",
     "7994": "\u00bfQu\u00e9 duraci\u00f3n de membres\u00eda deseas?",
     "7995": "\u00bfEst\u00e1s satisfecho con tu plan de pagos?",
-    "7996": "Pulsa [S]COMPRAR[\/S] cuando est\u00e9s satisfecho con tus opciones de pago. Se te mostrar\u00e1 un nuevo di\u00e1logo o ser\u00e1s redirigido a una nueva p\u00e1gina para completar tu compra."
+    "7996": "Pulsa [S]COMPRAR[\/S] cuando est\u00e9s satisfecho con tus opciones de pago. Se te mostrar\u00e1 un nuevo di\u00e1logo o ser\u00e1s redirigido a una nueva p\u00e1gina para completar tu compra.",
+    "7997": "Charla",
+    "8000": "No hay historial de conversaciones",
+    "8004": "Eliminar mensaje",
+    "8010": "Buscar contactos",
+    "8012": "Citar",
+    "8015": "MODO SUSURRO",
+    "8023": "Adjuntar"
 }

@@ -710,6 +710,7 @@
     "1356": "Tagasiside",
     "1357": "Logige v\u00e4lja",
     "1362": "Ostude tagasi v\u00f5tmine",
+    "1364": "Proovige uuesti",
     "1367": "Hankige 50GB tasuta v\u00f5i registreeruge m\u00f5ne meie Pro paketi kaudu ning hankige kuni 4 TB kr\u00fcpteeritud pilveruumi, mille hind algab \u20ac8.33 kuus.",
     "1368": "kuni [X]",
     "1369": "ja [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Muude maksev\u00f5imaluste n\u00e4gemiseks vajutage siia...",
     "7994": "Kui kaua peaks teie liikmestaatus kehtima?",
     "7995": "Olete oma makseplaaniga rahul?",
-    "7996": "Kui olete rahul oma maksevalikutega, siis vajutage [S]OSTA[\/S]. Makse l\u00f5petamiseks kuvatakse uus dialoog v\u00f5i suunatakse teisele lehek\u00fcljele."
+    "7996": "Kui olete rahul oma maksevalikutega, siis vajutage [S]OSTA[\/S]. Makse l\u00f5petamiseks kuvatakse uus dialoog v\u00f5i suunatakse teisele lehek\u00fcljele.",
+    "7997": "Vestlus",
+    "8000": "Vestluse ajalugu pole",
+    "8004": "Kustutage s\u00f5num",
+    "8010": "Otsige kontakte",
+    "8012": "Viita",
+    "8015": "PRIVAATNE SUHTLUS",
+    "8023": "Lisa fail"
 }

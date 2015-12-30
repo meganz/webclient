@@ -710,6 +710,7 @@
     "1356": "Feedback",
     "1357": "Logga ut",
     "1362": " \u00c5terst\u00e4ll ink\u00f6p",
+    "1364": "F\u00f6rs\u00f6k igen",
     "1367": "F\u00e5 50 GB gratis, eller registrera dig till ett av v\u00e5ra Pro-paket och f\u00e5 upp till 4 TB krypterad lagring fr\u00e5n \u20ac8.33 per m\u00e5nad.",
     "1368": "upp till [X]",
     "1369": "och [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Click here to show more payment options...",
     "7994": "How long do you want your membership to be?",
     "7995": "Are you happy with your payment plan?",
-    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase."
+    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "7997": "Chat",
+    "8000": "No conversation history",
+    "8004": "Delete message",
+    "8010": "Search contacts",
+    "8012": "Quote",
+    "8015": "WHISPER MODE",
+    "8023": "Attach"
 }

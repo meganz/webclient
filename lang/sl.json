@@ -710,6 +710,7 @@
     "1356": "Povratne informacije",
     "1357": "Odjavi",
     "1362": "Obnovi nakupe",
+    "1364": "Ponovi",
     "1367": "Pridobite 50 GB brezpla\u010dno, ali se prijavite za enega na\u0161ih Pro paketov in pridobite do 4 TB kriptiranega shranjevalnega prostora \u017ee od \u20ac8,33 na mesec.",
     "1368": "do [X]",
     "1369": "in [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Kliknite tu za prikaz drugih pla\u010dilnih mo\u017enosti...",
     "7994": "Kako dolgo \u017eelite, da traja va\u0161a naro\u010dnina?",
     "7995": "Ali ste zadovoljni s svojim pla\u010dilnim planom?",
-    "7996": "Kliknite [S]KUPI[\/S], ko boste zadovoljni z izbranim na\u010dinom pla\u010dila. Prikazalo se bo novo okno ali pa boste preusmerjeni na drugo stran, kjer boste zaklju\u010dili pla\u010dilo."
+    "7996": "Kliknite [S]KUPI[\/S], ko boste zadovoljni z izbranim na\u010dinom pla\u010dila. Prikazalo se bo novo okno ali pa boste preusmerjeni na drugo stran, kjer boste zaklju\u010dili pla\u010dilo.",
+    "7997": "Chat",
+    "8000": "No conversation history",
+    "8004": "Delete message",
+    "8010": "Search contacts",
+    "8012": "Quote",
+    "8015": "WHISPER MODE",
+    "8023": "Attach"
 }

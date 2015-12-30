@@ -710,6 +710,7 @@
     "1356": "Opini\u00e3o",
     "1357": "Sair",
     "1362": "Restaurar pedidos de compra",
+    "1364": "Tentar novamente",
     "1367": "Ganhe 50 GB gr\u00e1tis, ou registre-se em um de nossos pacotes Pro e tenha mais de 4 TB de armazenamento criptografado a partir de \u20ac8.33 por m\u00eas.",
     "1368": "acima de [X]",
     "1369": "e [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Click here to show more payment options...",
     "7994": "How long do you want your membership to be?",
     "7995": "Are you happy with your payment plan?",
-    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase."
+    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "7997": "Chat",
+    "8000": "No conversation history",
+    "8004": "Delete message",
+    "8010": "Search contacts",
+    "8012": "Quote",
+    "8015": "WHISPER MODE",
+    "8023": "Attach"
 }

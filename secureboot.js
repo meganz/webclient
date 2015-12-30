@@ -1,3 +1,6 @@
+// Release version information is replaced by the build scripts
+var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
+
 var b_u = 0;
 var apipath;
 var maintenance = false;
@@ -253,7 +256,7 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}, utils: {}, flags: 0};
+var mega = {ui: {}, utils: {}, flags: 0, updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt'};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -934,7 +937,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 19, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 20, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -981,6 +984,12 @@ else if (!b_u)
                 // Prevent InvalidStateError exceptions from indexedDB.open
                 // caused while using Private Browser Mode on Firefox.
                 return false;
+            }
+
+            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1) {
+                // ^ this seems a quirk on latest Chrome (~46)
+                dump.l = 1;
+                errobj = null;
             }
 
             if (~dump.m.indexOf("\n")) {
@@ -1197,7 +1206,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
-    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+    jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
@@ -1213,7 +1222,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
     // Other
-    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/autolinker.js', n: 'mega_js', j:1,w:7});
 
     // Google Import Contacts
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
@@ -1311,17 +1320,16 @@ else if (!b_u)
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
-    jsl.push({f:'js/vendor/popunda.js', n: 'popunda_js', j:1});
+    jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/vendor/Int64.js', n: 'int64_js', j:1});
+    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-    jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
 
     // only used on beta
     if (onBetaW) {
@@ -1331,6 +1339,7 @@ else if (!b_u)
     var jsl2 =
     {
         'about': {f:'html/about.html', n: 'about', j:0},
+        'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
         'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
@@ -1362,16 +1371,20 @@ else if (!b_u)
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
         'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
-        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+        'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
-        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},        
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
-        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1}
+        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
+        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
+        'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
+        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
+        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1},
+        'version_compare_js': {f:'js/vendor/version-compare.js', n: 'version_compare_js', j:1}
     };
 
     var subpages =
@@ -1388,23 +1401,23 @@ else if (!b_u)
         'register': ['register','register_js'],
         'android': ['android'],
         'resellers': ['resellers'],
-        '!': ['download','download_js'],
+        '!': ['download','download_js', 'megasync_js'],
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
         'takedown': ['takedown'],
-        'firefox': ['firefox'],
         'mobile': ['mobile'],
-        'sync': ['sync','sync_js'],
+        'sync': ['sync','sync_js', 'megasync_js'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': ['help_js'],
-        'chrome': ['chrome'],
-        'plugin': ['chrome','firefox'],
-        'recover': ['reset','reset_js'],
-        'redeem': ['redeem','redeem_js']
+        'plugin': ['chrome', 'firefox'],
+        'recover': ['reset', 'reset_js'],
+        'redeem': ['redeem', 'redeem_js'],
+        'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
+        'firefox': ['firefox', 'firefox_js']
     };
 
     if (page)

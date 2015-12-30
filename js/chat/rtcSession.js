@@ -255,12 +255,19 @@ RtcSession.prototype = {
   NO_DTLS: false, //compat with android
   _myGetUserMedia: function(options, successCallback, errCallback, allowContinueOnFail, sid)
   {
+      var localMediaReqTimer = setTimeout(function() {
+          self.trigger('local-media-request', {});
+      }, 100);
+
     var self = this;
     if (self.gLocalStream)
     {
         var sessStream = RTC.cloneMediaStream(self.gLocalStream, {audio:true, video:true});
         self._refLocalStream(options.video);
         try {
+            clearTimeout(localMediaReqTimer);
+            self.trigger('local-media-handled', {});
+
             successCallback.call(self, sessStream);
         } catch(e) {
             self.jingle.onInternalError("_myGetUserMedia: exception in successCb()", {e:e});
@@ -272,6 +279,9 @@ RtcSession.prototype = {
     RTC.getUserMediaWithConstraintsAndCallback({audio: true, video: true}, self,
       function(stream) {
           try {
+              clearTimeout(localMediaReqTimer);
+              self.trigger('local-media-handled', {});
+
               self.softAssert(stream, "getUserMedia returned null stream");
               self.gLocalStream = stream;
               if (self.gLocalStreamRefcount !== 0) {
@@ -298,50 +308,53 @@ RtcSession.prototype = {
           }
       },
       function(error, e) {
-        var msg;
-        if (!error)
-            msg = e;
-        else {
-            if (typeof error === 'string')
-                msg = error;
-             else if (error.name)
-                msg = error.name;
-             else if (error.code)
-                msg = error.code;
-             else
-                msg = error;
-        }
-        console.warn("getUserMedia error:", msg);
-        var failed = false;
-        function fail() {
-            failed = true;
-            if (errCallback)
-                errCallback(msg);
-        }
-        if (!allowContinueOnFail) {
-            fail();
-            self.trigger('local-media-fail', {error: msg, sid: sid});
-            return;
-        }
+          clearTimeout(localMediaReqTimer);
+          self.trigger('local-media-handled', {});
 
-        var obj = {
-            error: msg,
-            sid: sid,
-            continue: function(cont) {
-                if (failed)
-                    throw new Error("Already handled by failure handler");
-                if (!cont) {
-                    if (errCallback)
-                        errCallback(msg);
-                } else {
-                    self.gLocalStream = null;
-                    self.gLocalStreamRefcount = 0;
-                    self.gLocalVidRefcount = 0;
-                    self.softAssert(!self.gLocalVid, "Could not get local stream, but local video element is not null");
-                    successCallback.call(self, null);
-                }
-            }
-        };
+          var msg;
+          if (!error)
+              msg = e;
+          else {
+              if (typeof error === 'string')
+                  msg = error;
+              else if (error.name)
+                  msg = error.name;
+              else if (error.code)
+                  msg = error.code;
+              else
+                  msg = error;
+          }
+          console.warn("getUserMedia error:", msg);
+          var failed = false;
+          function fail() {
+              failed = true;
+              if (errCallback)
+                  errCallback(msg);
+          }
+          if (!allowContinueOnFail) {
+              fail();
+              self.trigger('local-media-fail', {error: msg, sid: sid});
+              return;
+          }
+
+          var obj = {
+              error: msg,
+              sid: sid,
+              continue: function(cont) {
+                  if (failed)
+                      throw new Error("Already handled by failure handler");
+                  if (!cont) {
+                      if (errCallback)
+                          errCallback(msg);
+                  } else {
+                      self.gLocalStream = null;
+                      self.gLocalStreamRefcount = 0;
+                      self.gLocalVidRefcount = 0;
+                      self.softAssert(!self.gLocalVid, "Could not get local stream, but local video element is not null");
+                      successCallback.call(self, null);
+                  }
+              }
+          };
 /**
      Fired when there was an error getting the media stream from the local camera/mic
      @event "local-media-fail"
@@ -358,9 +371,9 @@ RtcSession.prototype = {
          a boolean property 'wait' must be set on the event's parameter object.
          Otherwise, the call will be aborted as if the function was called with false.
 */
-        self.trigger('local-media-fail', obj);
-        if (!obj.wait)
-            fail();
+          self.trigger('local-media-fail', obj);
+          if (!obj.wait)
+              fail();
       });
  },
 
@@ -621,11 +634,11 @@ RtcSession.prototype = {
                   return;
               }
               /**
-               * A call that we initiated was not answered (neither accepted nor rejected)
-               * within the acceptable timeout.
-               * @event "call-answer-timeout"
-               * @type {Object}
-               */
+              A call that we initiated was not answered (neither accepted nor rejected)
+              within the acceptable timeout.
+              @event "call-answer-timeout"
+              @type {object} Same as the event data object of call-ended, including stats
+             */
               cancelCallRequest(STATE_PEER_ANS_OR_TIMEOUT, 'call-answer-timeout', 'call-unanswered');
           }, self.jingle.callAnswerTimeout);
       } //end set answer timeout
@@ -1401,7 +1414,10 @@ hangupAll: function(reason, text)
  },
     /** generates a dom id for a remote video element for given session id */
  vidIdFromSid: function(sid) {
-     return +"remotevideo_"+sid.substring(0, 10);
+     if (!sid) {
+         throw new Error("vidIdFromSid: sid is undefined");
+     }
+     return "remotevideo_"+sid.substring(0, 10);
  },
 
 /** Returns whether the call or file transfer with the given

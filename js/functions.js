@@ -33,6 +33,10 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     if (!doc) {
         doc = document;
     }
+    if (!markup) {
+        console.error('Empty content passed to parseHTML', arguments);
+        markup = 'no content';
+    }
     if (is_chrome_firefox) {
         try {
             var flags = 0;
@@ -196,52 +200,6 @@ function excludeIntersected(array1, array2) {
     }
 
     return result;
-}
-
-/**
- *  Cascade:
- *
- *  Tiny helper to queue related tasks, in which the output of one function
- *  is the input of the next task. It is asynchronous
- *
- *      function([prevarg, arg], next)
- *
- *  Author: @crodas
- */
-function Cascade(tasks, fnc, done, value) {
-    function scheduler(value) {
-        if (tasks.length === 0) {
-            return done(value);
-        }
-
-        fnc([value, tasks.shift()], scheduler)
-    }
-
-    scheduler(value);
-}
-
-/**
- *  Simple interface to run things in parallel (safely) once, and
- *  get a safe callback
- *
- *  Author: @crodas
- */
-function Parallel(task) {
-    var callbacks = {};
-    return function(args, next) {
-        var id = JSON.stringify(args)
-        if (callbacks[id]) {
-            return callbacks[id].push(next);
-        }
-        callbacks[id] = [next];
-        task(args, function() {
-            var args = arguments;
-            $.each(callbacks[id], function(i, next) {
-                next.apply(null, args);
-            });
-            delete callbacks[id];
-        });
-    };
 }
 
 function asciionly(text) {
@@ -1657,17 +1615,20 @@ var stringcrypt = (function() {
      * Encrypts clear text data to an authenticated ciphertext, armoured with
      * encryption mode indicator and IV.
      *
-     * @param plain {string}
+     * @param plain {String}
      *     Plain data block as (unicode) string.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @param [raw] {Boolean}
+     *     Do not convert plain text to UTF-8 (default: false).
+     * @returns {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      */
-    ns.stringEncrypter = function(plain, key) {
+    ns.stringEncrypter = function(plain, key, raw) {
         var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
-        var plainBytes = unescape(encodeURIComponent(plain));
-        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode);
+        var plainBytes = raw ? plain : to8(plain);
+        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode, false);
+
         return cipher;
     };
 
@@ -1675,16 +1636,20 @@ var stringcrypt = (function() {
      * Decrypts an authenticated cipher text armoured with a mode indicator and IV
      * to clear text data.
      *
-     * @param cipher {string}
+     * @param cipher {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @param [raw] {Boolean}
+     *     Do not convert plain text from UTF-8 (default: false).
+     * @returns {String}
      *     Clear text as (unicode) string.
      */
-    ns.stringDecrypter = function(cipher, key) {
-        var plain = tlvstore.blockDecrypt(cipher, key);
-        return decodeURIComponent(escape(plain));
+    ns.stringDecrypter = function(cipher, key, raw) {
+
+        var plain = tlvstore.blockDecrypt(cipher, key, false);
+
+        return raw ? plain : from8(plain);
     };
 
     /**
@@ -1694,8 +1659,10 @@ var stringcrypt = (function() {
      *     Symmetric key as byte string.
      */
     ns.newKey = function() {
+
         var keyBytes = new Uint8Array(16);
         asmCrypto.getRandomValues(keyBytes);
+
         return asmCrypto.bytes_to_string(keyBytes);
     };
 
@@ -1853,8 +1820,16 @@ function mKeyDialog(ph, fl) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
         }
     });
+
+    // Bolden text on instruction message
+    var $instructionMessage = $('.dlkey-dialog .instruction-message');
+    var instructionText = $instructionMessage.html().replace('[B]', '<b>').replace('[/B]', '</b>');
+    $instructionMessage.html(instructionText);
+
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
-        var key = $('.fm-dialog.dlkey-dialog input').val();
+
+        // Trim the input from the user for whitespace, newlines etc on either end
+        var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
 
         if (key) {
             // Remove the ! from the key which is exported from the export dialog
@@ -3171,7 +3146,8 @@ mega.utils.reload = function megaUtilsReload() {
         u_storage.wasloggedin = true;
 
         if (debug) {
-            u_storage.d = true;
+            u_storage.d = 1;
+            u_storage.minLogLevel = 0;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
                 if (!is_extension) {
@@ -3800,7 +3776,7 @@ if (typeof sjcl !== 'undefined') {
         // Loop through all selected items
         $.each(nodes, function(index, value) {
             node = M.d[value];
-            if (node.ph && node.shares && node.shares.EXP) {
+            if (node.shares && node.shares.EXP) {
                 result = true;
                 return false;// Stop further $.each loop execution
 

@@ -2872,11 +2872,11 @@
     "7994": "\uc5bc\ub9c8\ub098 \uc624\ub798 \ud68c\uc6d0\uad8c\uc744 \uc720\uc9c0\ud558\uace0 \uc2f6\uc73c\uc2e0\uac00\uc694?",
     "7995": "\uacb0\uc81c \uacc4\ud68d\uc5d0 \ub9cc\uc871\ud558\uc2dc\ub098\uc694?",
     "7996": "\uacb0\uc81c \uc635\uc158\uc5d0 \ub9cc\uc871\ud558\uc168\uc744 \ub54c [S]\uacb0\uc81c[\/S]\ub97c \ud074\ub9ad\ud558\uc138\uc694. \uacb0\uc81c\ub97c \uc704\ud574 \uc0c8 \ub300\ud654\ucc3d\uc774 \uc5f4\ub9ac\uac70\ub098 \uc0c8 \ud398\uc774\uc9c0\ub85c \uc774\ub3d9\ub420 \uac83\uc785\ub2c8\ub2e4.",
-    "7997": "Chat",
-    "8000": "No conversation history",
-    "8004": "Delete message",
-    "8010": "Search contacts",
-    "8012": "Quote",
-    "8015": "WHISPER MODE",
-    "8023": "Attach"
+    "7997": "\ub300\ud654",
+    "8000": "\ub300\ud654 \uae30\ub85d \uc5c6\uc74c",
+    "8004": "\uba54\uc2dc\uc9c0 \uc0ad\uc81c",
+    "8010": "\uc5f0\ub77d\ucc98 \uac80\uc0c9",
+    "8012": "\uc778\uc6a9",
+    "8015": "\uadd3\uc18d\ub9d0 \ubaa8\ub4dc",
+    "8023": "\ucca8\ubd80"
 }

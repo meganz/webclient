@@ -57,9 +57,11 @@ if (typeof(Promise) !== "undefined") {
 MegaPromise.asMegaPromiseProxy  = function(p) {
     var $promise = new MegaPromise();
 
-    p.then(function megaPromiseResProxy() {
+    p.then(
+        function megaPromiseResProxy() {
         $promise.resolve.apply($promise, toArray(arguments))
-    } , (
+        },
+        (
             d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
                 MegaPromise.getTraceableReject($promise, p) :
                 function megaPromiseRejProxy() {
@@ -260,8 +262,8 @@ MegaPromise.prototype.linkDoneAndFailTo = function(targetPromise) {
 };
 
 /**
- * Link promise's state to a function's value. E.g. if the function returns a promise that promise's state will be linked
- * to the current fn. If it returns a non-promise-like value it will resolve/reject the current promise's value.
+ * Link promise's state to a function's value. E.g. if the function returns a promise that promise's state will be
+ * linked to the current fn. If it returns a non-promise-like value it will resolve/reject the current promise's value.
  *
  * PS: This is a simple DSL-like helper to save us from duplicating code when using promises :)
  *
@@ -272,10 +274,11 @@ MegaPromise.prototype.linkDoneAndFailToResult = function(cb, context, args) {
 
     var ret = cb.apply(context, args);
 
-    if(ret instanceof MegaPromise) {
+    if (ret instanceof MegaPromise) {
         self.linkDoneTo(ret);
         self.linkFailTo(ret);
-    } else {
+    }
+    else {
         self.resolve(ret);
     }
 

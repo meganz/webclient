@@ -67,7 +67,7 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                     fn.apply(self, args)
                 );
             }
-            else if(self.db.dbState === MegaDB.DB_STATE.OPENING) {
+            else if (self.db.dbState === MegaDB.DB_STATE.OPENING) {
                 self.db.one('onDbStateReady', function() {
                     promise.linkDoneAndFailTo(
                         fn.apply(self, args)
@@ -89,7 +89,7 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
         }
 
         return promise;
-    }
+    };
 };
 
 /**

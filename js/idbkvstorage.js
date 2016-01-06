@@ -67,6 +67,13 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                     fn.apply(self, args)
                 );
             }
+            else if(self.db.dbState === MegaDB.DB_STATE.OPENING) {
+                self.db.one('onDbStateReady', function() {
+                    promise.linkDoneAndFailTo(
+                        fn.apply(self, args)
+                    );
+                });
+            }
             else {
                 self.db.one('onDbStateReady', function __onDbStateReady() {
                     promise.linkDoneAndFailTo(
@@ -97,8 +104,6 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
  */
 IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVSetItem(k, v) {
     var promise = new MegaPromise();
-
-    // self.logger.debug("setItem", k, v);
 
     this.db.addOrUpdate(
         'kv',

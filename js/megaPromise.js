@@ -57,12 +57,14 @@ if (typeof(Promise) !== "undefined") {
 MegaPromise.asMegaPromiseProxy  = function(p) {
     var $promise = new MegaPromise();
 
-    p.then(function() {
+    p.then(function megaPromiseResProxy() {
         $promise.resolve.apply($promise, toArray(arguments))
     } , (
             d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
                 MegaPromise.getTraceableReject($promise, p) :
-                undefined
+                function megaPromiseRejProxy() {
+                    $promise.reject.apply($promise, toArray(arguments));
+                }
         )
     );
 
@@ -325,12 +327,14 @@ MegaPromise.all = function(promisesList) {
     var promise = new MegaPromise();
 
     $.when.apply($, _jQueryPromisesList)
-        .then(function() {
+        .then(function megaPromiseResProxy() {
             promise.resolve(toArray(arguments));
         }, (
             d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
                 MegaPromise.getTraceableReject(promise) :
-                undefined
+                function megaPromiseRejProxy() {
+                    promise.reject.apply(promise, toArray(arguments));
+                }
             )
         );
 

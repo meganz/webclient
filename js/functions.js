@@ -202,52 +202,6 @@ function excludeIntersected(array1, array2) {
     return result;
 }
 
-/**
- *  Cascade:
- *
- *  Tiny helper to queue related tasks, in which the output of one function
- *  is the input of the next task. It is asynchronous
- *
- *      function([prevarg, arg], next)
- *
- *  Author: @crodas
- */
-function Cascade(tasks, fnc, done, value) {
-    function scheduler(value) {
-        if (tasks.length === 0) {
-            return done(value);
-        }
-
-        fnc([value, tasks.shift()], scheduler)
-    }
-
-    scheduler(value);
-}
-
-/**
- *  Simple interface to run things in parallel (safely) once, and
- *  get a safe callback
- *
- *  Author: @crodas
- */
-function Parallel(task) {
-    var callbacks = {};
-    return function(args, next) {
-        var id = JSON.stringify(args)
-        if (callbacks[id]) {
-            return callbacks[id].push(next);
-        }
-        callbacks[id] = [next];
-        task(args, function() {
-            var args = arguments;
-            $.each(callbacks[id], function(i, next) {
-                next.apply(null, args);
-            });
-            delete callbacks[id];
-        });
-    };
-}
-
 function asciionly(text) {
     var rforeign = /[^\u0000-\u007f]/;
     if (rforeign.test(text)) {

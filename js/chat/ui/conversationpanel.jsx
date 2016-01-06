@@ -1834,7 +1834,13 @@ var ConversationPanels = React.createClass({
                 return;
             }
 
-            var contact = megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
+            var otherParticipants = chatRoom.getParticipantsExceptMe();
+
+            if (!otherParticipants || otherParticipants.length === 0) {
+                return;
+            }
+
+            var contact = megaChat.getContactFromJid(otherParticipants[0]);
 
             // XX: Performance trick. However, scroll positions are NOT retained properly when switching conversations,
             // so this should be done some day in the future, after we have more stable product.

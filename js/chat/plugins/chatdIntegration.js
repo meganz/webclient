@@ -229,7 +229,10 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             var userHashes = [];
             chatRoom.getParticipantsExceptMe().forEach(function(v) {
                 var contact = self.megaChat.getContactFromJid(v);
-                assert(contact && contact.u, 'contact with jid ' + v + ' not found.');
+
+                if (!contact) {
+                    return;
+                }
 
                 userHashes.push(
                     {
@@ -252,6 +255,10 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
                 }
             });
 
+            // unknown user.
+            if (userHashes.length === 0) {
+                return;
+            }
             self.waitingChatIdPromises[chatRoom.roomJid] = asyncApiReq({
                 'a': 'mcc',
                 'u': userHashes

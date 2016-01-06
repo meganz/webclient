@@ -236,6 +236,9 @@ var ConversationsList = React.createClass({
             }
 
             var contact = chatRoom.getParticipantsExceptMe()[0];
+            if (!contact) {
+                return;
+            }
             contact = chatRoom.megaChat.getContactFromJid(contact);
 
             if (contact && contact.c === 0) {

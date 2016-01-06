@@ -35,7 +35,7 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
             promise.reject();
             return promise;
         }
-        if (self.dbName != self.name + "_" + u_handle) {
+        if (self.dbName !== self.name + "_" + u_handle) {
             if (self.db && self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
                 self.db.close();
             }

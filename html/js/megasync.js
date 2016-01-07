@@ -1,0 +1,280 @@
+var megasync = (function() {
+
+    var ns = {};
+    var megasyncUrl = "https://localhost.megasyncloopback.mega.nz:6342/";
+    var enabled = false;
+    var version = 0;
+    var lastDownload;
+    var retryTimer;
+    var clients = {
+        windows: 'https://mega.nz/MEGAsyncSetup.exe',
+        mac: 'https://mega.nz/MEGAsyncSetup.dmg'
+    };
+
+    var linuxClients;
+    var listeners = [];
+    var pending;
+
+    // Linux stuff {{{
+    /**
+     * Prepare Linux Dropdown with the list of distro.
+     *
+     * The are many Linux distributions, this function
+     * creates an HTML dropdown with the list of distros we support.
+     *
+     */
+    function linuxDropdown() {
+
+        var is64    = browserdetails().is64bit;
+        var $select = $('.megasync-scr-pad').empty();
+        var $list   = $('.megasync-dropdown-list');
+        $('.megasync-overlay').addClass('linux');
+        linuxClients.forEach(function(client) {
+
+            var icon = client.name.toLowerCase().replace(/[^a-z]/g, '');
+            $('<div/>').addClass('megasync-dropdown-link ' + icon)
+                .text(client.name)
+                .attr('link', ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32")))
+                .appendTo($select);
+        });
+        $('.megasync-dropdown-link').rebind('click', function() {
+
+            $('.megasync-dropdown span').removeClass('active').text($(this).text());
+            $list.addClass('hidden');
+            window.location = $(this).attr('link');
+        });
+        $('.megasync-dropdown span').rebind('click', function() {
+
+            var $this = $(this);
+            if ($this.hasClass('active')) {
+                $this.removeClass('active');
+                $list.addClass('hidden');
+            } else {
+                $this.addClass('active');
+                $list.removeClass('hidden');
+                linuxDropdownResizeHandler();
+            }
+        });
+        $(window).rebind('resize.linuxDropdown', function() {
+
+            linuxDropdownResizeHandler();
+        });
+    }
+
+    /**
+     * Handle window-resize events on the Linux Dropdown
+     */
+    function linuxDropdownResizeHandler() {
+
+        var $pane = $('.megasync-dropdown-scroll');
+        var jsp = $pane.data('jsp');
+        var $list = $('.megasync-dropdown-list');
+        var overlayHeight = $('.megasync-overlay').outerHeight();
+        var listHeight = $('.megasync-scr-pad').outerHeight() + 72;
+        var listPosition = $list.offset().top;
+    
+        if (overlayHeight < (listHeight + listPosition)) {
+            $('.megasync-list-arrow').removeClass('hidden inactive');
+            $pane.height(overlayHeight - listPosition - 72);
+            $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+    
+    
+            $pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
+
+                if (isAtBottom) {
+                    $('.megasync-list-arrow').addClass('inactive');
+                } else {
+                    $('.megasync-list-arrow').removeClass('inactive');
+                }
+            });
+    
+        } else {
+            if (jsp) {
+                jsp.destroy();
+            }
+            $pane.unbind('jsp-arrow-change');
+            $('.megasync-dropdown-scroll').removeAttr('style');
+            $('.megasync-list-arrow').addClass('hidden');
+        }
+    }
+    // }}}
+
+    /**
+     * The user attempted to download the current file using
+     * MEGASync *but* they don't have it running (and most likely not installed)
+     * show we show them a dialog for and we attempt to download the client.
+     *
+     * If the user has Linux we shown them a dropbox with their distros.
+     *
+     * @return {void}
+     */
+    function showDownloadDialog() {
+
+        if (!lastDownload){
+            // An error happened but did not try to download
+            // so we can discard this error
+            return;
+        }
+        var $overlay = $('.megasync-overlay');
+        var url = ns.getMegaSyncUrl();
+        if ($overlay.hasClass('downloading')) {
+            return true;
+        }
+
+        retryTimer = setInterval(function() {
+
+            // The user closed our modal, so we stop checking if the
+            // user has MEGASync running
+            if ($('.megasync-overlay:visible').length === 0) {
+                lastDownload = null;
+                return clearInterval(retryTimer);
+            }
+            SyncAPI({a: "v"});
+        }, 1000);
+
+        $overlay.show().addClass('downloading');
+
+        $('.megasync-close').rebind('click', function(e) {
+            $('.megasync-overlay').hide();
+        });
+
+        $('body').bind('keyup', function(e) {
+            if (e.keyCode === 27) {
+                $('.megasync-overlay').hide();
+            }
+        });
+
+        if (url === '' || localStorage.isLinux) {
+            // It's linux!
+            var $modal = $('.megasync-overlay').hide();
+            loadingDialog.show();
+            ns.getLinuxReleases(function() {
+                loadingDialog.hide();
+                $modal.show();
+                linuxDropdown();
+            });
+        } else {
+            window.location = url;
+        }
+    }
+
+    // API Related things {{{
+    var handler = {
+        v: function(version) {
+
+            enabled = true;
+            version = version;
+            if (lastDownload) {
+                ns.download(lastDownload[0], lastDownload[1]);
+                lastDownload = null;
+            }
+        },
+        error: function(next, ev) {
+            
+            enabled = false;
+            next = (typeof next === "function") ? next : function() {};
+            next(ev || new Error("Internal error"));
+            return showDownloadDialog();
+        }
+    };
+
+
+    function SyncAPI(args, next) {
+
+        mega.utils.xhr({
+            url: megasyncUrl,
+            data: JSON.stringify(args),
+            type: 'json'
+        }).done(function(ev, response) {
+
+            api_handle(next, response);
+        }).fail(function(ev) {
+            handler.error(next, ev);
+        });
+    }
+
+    function api_handle(next, response) {
+
+        next = (typeof next === "function") ? next : function() {};
+        if (response === 0) {
+            // It means "OK". Most likely a "download" API call
+            // was successfully handled.
+            clearInterval(retryTimer);
+            $('body').unbind('keyup');
+            return $('.megasync-overlay').hide().removeClass('downloading');
+        }
+
+        if (typeof response !== "object") {
+            return handler.error(next);
+        }
+
+        console.error(response);
+
+    }
+    // }}}
+
+    ns.getLinuxReleases = function(next) {
+        if (linuxClients) next(linuxClients);
+
+        // Talk to the CMS server and get information
+        // about the `sync` (expect a JSON)
+        CMS.get('sync', function(err, content) {
+            linuxClients = content.object;
+            var linux = 'https://mega.nz/linux/MEGAsync/';
+            linuxClients.forEach(function(val) {
+
+                ['32', '32n', '64', '64n'].forEach(function(platform) {
+
+                    if (val[platform]) {
+                        clients[val.name + " " + platform] = linux + val[platform];
+                    }
+                });
+            });
+            next(linuxClients);
+        });
+    };
+
+    /**
+     * Return the most likely Sync Client URL
+     * for the current client. This method check the user's
+     * Operating System and return the candidates URL.
+     *
+     * @return {Array}
+     */
+    ns.getMegaSyncUrl = function(os) {
+
+        if (!os) {
+            var pf = navigator.platform.toUpperCase();
+            if (pf.indexOf('MAC') >= 0) {
+                os = "mac";
+            } else if (pf.indexOf('LINUX') >= 0) {
+                return '';
+            } else {
+                os = "windows";
+            }
+        }
+        return clients[os] ||  clients['windows'];
+    };
+
+    /**
+     * Talk to MEGASync client and tell it to download
+     * the following file
+     *
+     * @param {String} pubKey      Public Key (of the file)
+     * @param {String} privKey     Private Key of the file
+     *
+     * @return {Boolean} Always return true
+     */
+    ns.download = function(pubKey, privKey) {
+        lastDownload = [pubKey, privKey];
+        SyncAPI({a: "l", h: pubKey, k: privKey});
+        return true;
+    };
+
+    ns.isInstalled = function(next) {
+        SyncAPI({a: "v"}, next);
+    };
+
+    return ns;
+})();
+

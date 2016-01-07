@@ -13,8 +13,13 @@ function WebrtcApi() {
         this.browser = 'firefox';
         this.getUserMedia = navigator.mozGetUserMedia.bind(navigator);
         this.attachMediaStream = function (element, stream) {
-            element[0].mozSrcObject = stream;
-            element[0].play();
+            var elem = element[0];
+            if (elem.mozSrcObject) {
+                elem.mozSrcObject = stream;
+            } else {
+                elem.srcObject = stream;
+            }
+            elem.play();
         };
         this.pc_constraints = {};
 		if (MediaStream.prototype.clone)

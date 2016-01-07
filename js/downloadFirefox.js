@@ -113,11 +113,18 @@ function mozIOSetup(name, path, size, error, success) {
     function setup() {
         try {
             var root; /* jshint -W117 */
-            if (mozPrefs.getBoolPref('askdir')) {
+            if (path && mozIOSetup.lastPath[path]) {
+                root = mozIOSetup.lastPath[path];
+            }
+            else if (mozPrefs.getBoolPref('askdir')) {
                 root = mozFilePicker(name, 2);
             }
             else {
                 root = mozGetDownloadsFolder();
+            }
+
+            if (path) {
+                mozIOSetup.lastPath[path] = root;
             }
             root = root.path;
         }
@@ -145,5 +152,6 @@ function mozIOSetup(name, path, size, error, success) {
         webkitStorageInfo.requestQuota(size, setup);
     });
 }
+mozIOSetup.lastPath = {};
 
 function FlashIO() {}

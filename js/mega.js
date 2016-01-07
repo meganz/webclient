@@ -2965,6 +2965,44 @@ function MegaData()
         }
     };
 
+    // This function has a special hacky purpose, don't use it if you don't know what it does, use M.copyNodes instead.
+    this.injectNodes = function(nodes, target, callback) {
+        if (!Array.isArray(nodes)) {
+            nodes = [nodes];
+        }
+
+        var sane = nodes.filter(function(node) {
+            return M.isNodeObject(node);
+        });
+
+        if (sane.length !== nodes.length) {
+            console.warn('injectNodes: Found invalid nodes.');
+        }
+
+        if (!sane.length) {
+            return false;
+        }
+
+        nodes = [];
+
+        sane = sane.map(function(node) {
+            if (!M.d[node.h]) {
+                nodes.push(node.h);
+                M.d[node.h] = node;
+            }
+            return node.h;
+        });
+
+        this.copyNodes(sane, target, false, callback);
+
+        nodes.forEach(function(handle) {
+            delete M.d[handle];
+        });
+
+        return nodes.length;
+    };
+
+
     this.copyNodes = function(cn, t, del, callback) {
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
@@ -3573,6 +3611,10 @@ function MegaData()
         }
     };
 
+    this.isNodeObject = function(n) {
+        return typeof n === 'object' && Array.isArray(n.key) && n.key.length === 8;
+    };
+
     this.addDownload = function(n, z, preview, zipname)
     {
         delete $.dlhash;
@@ -3622,6 +3664,9 @@ function MegaData()
                     nodes.push(n[i]);
                 }
             }
+            else if (this.isNodeObject(n[i])) {
+                nodes.push(n[i]);
+            }
         }
 
         if (z) {
@@ -3651,8 +3696,14 @@ function MegaData()
         for (var k in nodes) {
             /* jshint -W089 */
             if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
-                dlmanager.logger.error('** CHECK THIS **', 'Invalid node', k, nodes[k]);
-                continue;
+                n = nodes[k];
+                if (this.isNodeObject(n)) {
+                    dlmanager.logger.info('Using plain provided node object.');
+                }
+                else {
+                    dlmanager.logger.error('** CHECK THIS **', 'Invalid node', k, nodes[k]);
+                    continue;
+                }
             }
             path = paths[nodes[k]] || '';
             $.totalDL += n.s;
@@ -6830,17 +6881,17 @@ function balance2pro(callback)
         // On Export File Links and Decryption Keys
         var $linkButtons = $('.link-handle, .link-decryption-key, .link-handle-and-key');
         var $linkHandle = $('.link-handle');
-        
+
         // Reset state from previous dialog opens and pre-select the 'Link without key' option by default
         $linkButtons.removeClass('selected');
         $linkHandle.addClass('selected');
-        
+
         // Add click handler
         $linkButtons.rebind('click', function() {
 
             var keyOption = $(this).attr('data-keyoptions');
             var $this = $(this);
-            
+
             // Add selected state to button
             $linkButtons.removeClass('selected');
             $this.addClass('selected');
@@ -6858,7 +6909,7 @@ function balance2pro(callback)
     scope.mega = scope.mega || {};
     scope.mega.Dialog = scope.mega.Dialog || {};
     scope.mega.Dialog.ExportLink = ExportLinkDialog;
-    
+
 })(jQuery, window);
 
 (function($, scope) {

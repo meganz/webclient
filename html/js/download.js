@@ -64,10 +64,18 @@ function dl_g(res) {
     $('.widget-block').addClass('hidden');
     loadingDialog.hide();
     $('.download.content-block').removeClass('hidden');
-    if (res == ETOOMANY) $('.download.content-block').addClass('not-available-user');
-    else if (typeof res == 'number' && res < 0) $('.download.content-block').addClass('na-some-reason');
-    else if (res.e == ETEMPUNAVAIL) $('.download.content-block').addClass('temporary-na');
-    else if (res.d) $('.download.content-block').addClass('na-some-reason');
+    if (res === ETOOMANY) {
+        $('.download.content-block').addClass('not-available-user');
+    }
+    else if (typeof res === 'number' && res < 0) {
+        $('.download.content-block').addClass('na-some-reason');
+    }
+    else if (res.e === ETEMPUNAVAIL) {
+        $('.download.content-block').addClass('temporary-na');
+    }
+    else if (res.d) {
+        $('.download.content-block').addClass('na-some-reason');
+    }
     else if (res.at)
     {
         $('.download.pause-button').unbind('click');
@@ -152,7 +160,9 @@ function dl_g(res) {
             while(n_l-- && $('.download.info-txt.filename').width() > 316) {
                 $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n,n_l));
             }
-            if (1 > n_l) $('.file-info .download.info-txt').text(str_mtrunc(n,60));
+            if (1 > n_l) {
+                $('.file-info .download.info-txt').text(str_mtrunc(n,60));
+            }
             $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
             $('.info-block .block-view-file-type').addClass(fileIcon({name:fdl_file.n}));
         }
@@ -170,13 +180,13 @@ function dl_g(res) {
 function browserDownload() {
     // If regular download using Firefox and the total download is over 1GB then show the dialog
     // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-    if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
+    if (dlMethod === MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
     {
         firefoxDialog();
     }
     else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
     || (navigator.userAgent.indexOf('MSIE 10') > -1)
-    || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1)))
+    || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') === -1)))
     && fdl_filesize > 1048576000 && !localStorage.browserDialog)
     {
         browserDialog();
@@ -214,7 +224,7 @@ function megasyncOverlay() {
     });
 
     $('body').rebind('keyup msd', function(e) {
-        if (e.keyCode == 27) {
+        if (e.keyCode === 27) {
             $this.addClass('hidden').removeClass('msd-dialog');
         }
     });

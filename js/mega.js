@@ -2369,7 +2369,7 @@ function MegaData()
         $('.fm-file-upload span').text(l[99]);
         $('.fm-folder-upload span').text(l[98]);
 
-        $('.fm-right-header.fm').removeClass('long-path');
+        $('.fm-right-header.fm').removeClass('long-path ultra-long-path');
         if (M.pathLength() + 260 > $('.fm-right-header.fm').width()) {
             $('.fm-right-header.fm').addClass('long-path');
             $('.fm-new-folder span').text('');
@@ -2377,11 +2377,11 @@ function MegaData()
             $('.fm-folder-upload span').text('');
         }
 
-        var el = $('.fm-breadcrumbs-block .fm-breadcrumbs span span');
+        var el = $('.fm-breadcrumbs-block .fm-breadcrumbs span');
         var i = 0;
 
-        while (M.pathLength() + 260 > $('.fm-right-header.fm').width() && i < el.length) {
-            $(el[i]).text('');
+        while (M.pathLength() + 235 > $('.fm-right-header.fm').width() && i < el.length) {
+            $(el[i]).html('');
             i++;
         }
 

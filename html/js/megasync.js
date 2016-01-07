@@ -208,8 +208,13 @@ var megasync = (function() {
             return handler.error(next);
         }
 
-        console.error(response);
+        for (var property in response) {
+            if (response.hasOwnProperty(property) && handler[property]) {
+                handler[property](response[property]);
+            }
+        }
 
+        return next(null, response);
     }
     // }}}
 

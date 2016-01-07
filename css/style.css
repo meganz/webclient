@@ -6855,7 +6855,7 @@ table {
 	background-repeat: no-repeat;
 	background-position: 5px -1000px;
 	cursor: pointer;
-	padding: 0 0 0 44px;
+	padding: 0 0 0 42px;
 	display: block;
 	height: 24px;
 }
@@ -6867,7 +6867,7 @@ table {
 	opacity: 0.5;
 }
 .fm-breadcrumbs .right-arrow-bg span, .fm-share-breadcrumbs .right-arrow-bg span {
-    padding: 0 8px 0 2px;
+    padding: 0 8px 0 4px;
 }
 
 .fm-breadcrumbs.received-requests .right-arrow-bg {

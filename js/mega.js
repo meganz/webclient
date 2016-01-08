@@ -3047,6 +3047,7 @@ function MegaData()
                     renderNew();
                 }
                 if (typeof res === 'number' && res < 0) {
+                    loadingDialog.hide();
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
                 if (ctx.del) {

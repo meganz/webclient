@@ -133,7 +133,7 @@ jQuery.fn.extend({
 	rebind: function(actions, callback) {
 		return this.each(function() {
 			var $this = $(this);
-			$this.unbind(actions);
+			$this.unbind(actions, callback);
 			$this.bind(actions, callback);
 		});
 	}

@@ -129,8 +129,7 @@ function dev_init(sub,reload)
 		$('#a_dev').click();
 	}
 	thirty_pc();
-	$(window).unbind('resize.dev');
-	$(window).bind('resize.dev', thirty_pc);
+	$(window).rebind('resize.dev', thirty_pc);
 	$('.dev-new-delete').unbind('click');
 	$('.dev-new-delete').bind('click', function(e)
 	{

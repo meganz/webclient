@@ -194,6 +194,7 @@ function browserDownload() {
     else
     {
         $('.download.content-block').addClass('downloading');
+        $('.download.percents-txt').text('0 %');
         $('.download.status-txt').safeHTML(escapeHTML(l[819])).removeClass('green');
         dlmanager.isDownloading = true;
         dl_queue.push(fdl_queue_var);

@@ -132,21 +132,22 @@ var megasync = (function() {
             SyncAPI({a: "v"});
         }, 1000);
 
-        $overlay.show().addClass('downloading');
+        $overlay.removeClass('hidden').addClass('downloading');
 
-        $('.megasync-close').rebind('click', function(e) {
-            $('.megasync-overlay').hide();
+        $('.megasync-close', $overlay).rebind('click', function(e) {
+            $overlay.addClass('hidden');
         });
 
-        $('body').bind('keyup', function(e) {
-            if (e.keyCode === 27) {
-                $('.megasync-overlay').hide();
+        $('body').bind('keyup msd', function(e) {
+            if (e.keyCode == 27) {
+                $('.megasync-overlay').addClass('hidden');
+                $overlay.addClass('hidden');
             }
         });
 
         if (url === '' || localStorage.isLinux) {
             // It's linux!
-            var $modal = $('.megasync-overlay').hide();
+            var $modal = $('.megasync-overlay').addClass('hidden');
             loadingDialog.show();
             ns.getLinuxReleases(function() {
                 loadingDialog.hide();
@@ -201,7 +202,7 @@ var megasync = (function() {
             // was successfully handled.
             clearInterval(retryTimer);
             $('body').unbind('keyup');
-            return $('.megasync-overlay').hide().removeClass('downloading');
+            return $('.megasync-overlay').addClass('hidden').removeClass('downloading');
         }
 
         if (typeof response !== "object") {

@@ -183,7 +183,7 @@ function browserDownload() {
     else if (
         (
             (
-                '-ms-scroll-limit' in document.documentElement.style 
+                '-ms-scroll-limit' in document.documentElement.style
                 && '-ms-ime-align' in document.documentElement.stNyle
             )
             || (navigator.userAgent.indexOf('MSIE 10') > -1)
@@ -315,7 +315,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         var bps = kbps*1000;
         var retime = (bytestotal-bytesloaded)/bps;
         $('.download-info.speed-txt .text').html(
-            bytesToSize(bps, 1).split(' ')[0] + '<span>' + bytesToSize(bps, 1, 1).split(' ')[1]+ '/s</span>'
+            bytesToSize(bps, 1).split(' ')[0] + '<span>' + bytesToSize(bps, 1, 1).split(' ')[1] + '/s</span>'
         );
         $('.download-info.time-txt .text').html(secondsToTime(retime, 1));
     }

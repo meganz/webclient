@@ -157,7 +157,7 @@ function dl_g(res) {
                 $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n, n_l));
             }
             if (n_l < 1) {
-                $('.file-info .download.info-txt').text(str_mtrunc(n,60));
+                $('.file-info .download.info-txt').text(str_mtrunc(n, 60));
             }
             $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
             $('.info-block .block-view-file-type').addClass(fileIcon({name:fdl_file.n}));
@@ -176,15 +176,20 @@ function dl_g(res) {
 function browserDownload() {
     // If regular download using Firefox and the total download is over 1GB then show the dialog
     // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-    if (dlMethod === MemoryIO && !localStorage.firefoxDialog 
+    if (dlMethod === MemoryIO && !localStorage.firefoxDialog
             && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
         firefoxDialog();
     }
-    else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
-    || (navigator.userAgent.indexOf('MSIE 10') > -1)
-    || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') === -1)))
-    && fdl_filesize > 1048576000 && !localStorage.browserDialog)
-    {
+    else if (
+        (
+            (
+                '-ms-scroll-limit' in document.documentElement.style 
+                && '-ms-ime-align' in document.documentElement.stNyle
+            )
+            || (navigator.userAgent.indexOf('MSIE 10') > -1)
+            || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') === -1))
+        )
+        && fdl_filesize > 1048576000 && !localStorage.browserDialog) {
         browserDialog();
     }
     else
@@ -309,8 +314,10 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     {
         var bps = kbps*1000;
         var retime = (bytestotal-bytesloaded)/bps;
-        $('.download-info.speed-txt .text').html(bytesToSize(bps,1).split(' ')[0] + '<span>' + bytesToSize(bps,1,1).split(' ')[1]+ '/s</span>');
-        $('.download-info.time-txt .text').html(secondsToTime(retime,1));
+        $('.download-info.speed-txt .text').html(
+            bytesToSize(bps, 1).split(' ')[0] + '<span>' + bytesToSize(bps, 1, 1).split(' ')[1]+ '/s</span>'
+        );
+        $('.download-info.time-txt .text').html(secondsToTime(retime, 1));
     }
     if (page !== 'download' || $.infoscroll)
     {
@@ -318,7 +325,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.widget-block').show();
         $('.widget-circle').attr('class','widget-circle percents-'+perc);
         $('.widget-icon.downloading').removeClass('hidden');
-        $('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
+        $('.widget-speed-block.dlspeed').text(bytesToSize(bps, 1) +'/s');
         $('.widget-block').addClass('active');
     }
 }

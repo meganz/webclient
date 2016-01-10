@@ -153,7 +153,7 @@ function dl_g(res) {
             var n = fdl_file.n || 'unknown';
             var n_l = n.length;
             $('.file-info .download.info-txt').text(n_l);
-            while ~(n_l-- && $('.download.info-txt.filename').width() > 316) {
+            while (n_l-- && $('.download.info-txt.filename').width() > 316) {
                 $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n, n_l));
             }
             if (n_l < 1) {

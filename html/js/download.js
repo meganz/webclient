@@ -101,18 +101,13 @@ function dl_g(res) {
         $('.download-button.to-computer').rebind('click', function(e) {
             megasync.isInstalled(function(err, is) {
                 // If 'msd' (MegaSync download) flag is turned on and application is installed
-                if (res.msd !== 0 && (!err || is)) 
-                {
+                if (res.msd !== 0 && (!err || is)) {
                     $('.megasync-overlay').removeClass('downloading');
                     megasync.download(dlpage_ph, dlpage_key);
-                } 
-                // If filesize more then 100MB
-                else if (fdl_filesize > 104857600) 
-                {
+                } else if (fdl_filesize > 104857600) {
+                    // If filesize more then 100MB
                     megasyncOverlay();
-                } 
-                else 
-                {
+                } else {
                     browserDownload();
                 }
             });
@@ -155,12 +150,13 @@ function dl_g(res) {
                 onDownloadError: dlerror,
                 onBeforeDownloadComplete: function() { }
             };
-            var n = fdl_file.n||'unknown', n_l = n.length;
+            var n = fdl_file.n || 'unknown';
+            var n_l = n.length;
             $('.file-info .download.info-txt').text(n_l);
-            while(n_l-- && $('.download.info-txt.filename').width() > 316) {
-                $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n,n_l));
+            while ~(n_l-- && $('.download.info-txt.filename').width() > 316) {
+                $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n, n_l));
             }
-            if (1 > n_l) {
+            if (n_l < 1) {
                 $('.file-info .download.info-txt').text(str_mtrunc(n,60));
             }
             $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
@@ -180,8 +176,8 @@ function dl_g(res) {
 function browserDownload() {
     // If regular download using Firefox and the total download is over 1GB then show the dialog
     // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-    if (dlMethod === MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
-    {
+    if (dlMethod === MemoryIO && !localStorage.firefoxDialog 
+            && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
         firefoxDialog();
     }
     else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
@@ -208,13 +204,13 @@ function megasyncOverlay() {
 
     $this.addClass('msd-dialog').removeClass('hidden downloading');
 
-    $('.download-button.download', $this).rebind('click',function(e)
+    $('.download-button.download', $this).rebind('click', function(e)
     {
         $this.removeClass('msd-dialog');
         megasync.download(dlpage_ph, dlpage_key);
     });
 
-    $('.download-button.continue', $this).rebind('click',function(e)
+    $('.download-button.continue', $this).rebind('click', function(e)
     {
         $this.addClass('hidden').removeClass('msd-dialog');
         browserDownload();
@@ -260,7 +256,7 @@ function importFile() {
     dl_import = false;
 }
 
-function dlerror(dl,error)
+function dlerror(dl, error)
 {
     var errorstr='';
     var tempe=false;

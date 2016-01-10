@@ -139,7 +139,7 @@ var megasync = (function() {
         });
 
         $('body').bind('keyup msd', function(e) {
-            if (e.keyCode == 27) {
+            if (e.keyCode === 27) {
                 $('.megasync-overlay').addClass('hidden');
                 $overlay.addClass('hidden');
             }

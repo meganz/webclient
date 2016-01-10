@@ -987,7 +987,7 @@ else if (!b_u)
             }
 
             if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1
-                    || String(errobj && errobj.stack).indexOf('<anonymous>:1:1813') !== -1
+                    || String(errobj && errobj.stack).indexOf('<anonymous>:1:18') !== -1
                     || dump.m.indexOf('TypeError: this.get is not a function') !== -1) {
                 // ^ this seems a quirk on latest Chrome (~46+) or a bogus extension
                 dump.l = 1;
@@ -1033,6 +1033,15 @@ else if (!b_u)
                         .replace(omsg, '').replace(re, '')
                         .split("\n").map(String.trim).filter(String)
                         .splice(0,15).map(mTrim).join("\n");
+
+                    if (dump.s.indexOf('Unknown script code:') !== -1
+                        || dump.s.indexOf('(unknown source)') !== -1
+                        || dump.s.indexOf('<anonymous>:1:') !== -1) {
+
+                        console.warn('Got uncaught exception from unknown resource, your MEGA account might be compromised.');
+                        console.error(msg, errobj, errobj && errobj.stack, url, ln);
+                        return false;
+                    }
                 }
             }
             if (cn) dump.c = cn;

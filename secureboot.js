@@ -937,7 +937,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 20, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 21, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -986,10 +986,13 @@ else if (!b_u)
                 return false;
             }
 
-            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1) {
-                // ^ this seems a quirk on latest Chrome (~46)
+            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1
+                    || String(errobj && errobj.stack).indexOf('<anonymous>:1:1813') !== -1
+                    || dump.m.indexOf('TypeError: this.get is not a function') !== -1) {
+                // ^ this seems a quirk on latest Chrome (~46+) or a bogus extension
                 dump.l = 1;
                 errobj = null;
+                dump.m = 'TypeError: this.get(...).querySelectorAll is not a function';
             }
 
             if (~dump.m.indexOf("\n")) {

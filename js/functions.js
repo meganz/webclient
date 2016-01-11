@@ -749,6 +749,11 @@ function htmlentities(value) {
     return $('<div/>').text(value).html();
 }
 
+function numOfBytes(bytes, precision) {
+    var parts = bytesToSize(bytes, precision || 2).split(' ');
+    return { size: parts[0], unit: parts[1] || 'B' };
+}
+
 function bytesToSize(bytes, precision) {
     if (!bytes) {
         return '0';

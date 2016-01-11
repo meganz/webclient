@@ -24,7 +24,7 @@ function dlinfo(ph,key,next)
     {
         $('.fm-dialog.download-dialog').removeClass('hidden');
         $('.fm-dialog.download-dialog').css('left','-1000px');
-        $('.download-save-your-file').html('<object data="' + document.location.origin + '/downloader.swf" id="dlswf_'+ htmlentities(ph) + '" type="application/x-shockwave-flash" height="' + $('.download-save-your-file').height() + '"  width="' + $('.download-save-your-file').width() + '"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworking"><param name=FlashVars value="buttonclick=1" /></object>');
+        $('.download-save-your-file').safeHTML('<object data="' + document.location.origin + '/downloader.swf" id="dlswf_'+ htmlentities(ph) + '" type="application/x-shockwave-flash" height="' + $('.download-save-your-file').height() + '"  width="' + $('.download-save-your-file').width() + '"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworking"><param name=FlashVars value="buttonclick=1" /></object>');
     }
     loadingDialog.show();
     $('.download.content-block').addClass('hidden');
@@ -314,10 +314,11 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     {
         var bps = kbps*1000;
         var retime = (bytestotal-bytesloaded)/bps;
-        $('.download-info.speed-txt .text').html(
-            bytesToSize(bps, 1).split(' ')[0] + '<span>' + bytesToSize(bps, 1, 1).split(' ')[1] + '/s</span>'
+        var speed  = numOfBytes(bps, 1);
+        $('.download-info.speed-txt .text').safeHTML(
+            speed.size + '<span>' + speed.unit + '/s</span>'
         );
-        $('.download-info.time-txt .text').html(secondsToTime(retime, 1));
+        $('.download-info.time-txt .text').safeHTML(secondsToTime(retime, 1));
     }
     if (page !== 'download' || $.infoscroll)
     {
@@ -428,7 +429,7 @@ function sync_switchOS(os)
     {
         syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
         $('.sync-button-txt.small').text(l[1158]);
-        $('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
+        $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
         $('.sync-button').removeClass('mac linux');
         $('.sync-button').attr('href',syncurl);
     }
@@ -440,7 +441,7 @@ function sync_switchOS(os)
         if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');
         if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');
         $('.sync-button-txt.small').text(ostxt);
-        $('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
+        $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
         $('.sync-button').removeClass('windows linux').addClass('mac');
         $('.sync-button').attr('href',syncurl);
     }
@@ -451,7 +452,7 @@ function sync_switchOS(os)
         if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
         if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');
         $('.sync-button-txt.small').text(ostxt);
-        $('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
+        $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
         $('.sync-button').removeClass('mac linux').addClass('linux');
         $('.sync-button').attr('href',syncurl);
 

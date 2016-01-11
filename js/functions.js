@@ -752,12 +752,11 @@ function htmlentities(value) {
 /**
  * Convert bytes sizes into a human-friendly format (KB, MB, GB), pretty
  * similar to `bytesToSize` but this function returns an object
- * (`{ size: 23,3, unit: 'KB' }`) which is easier to consume
+ * (`{ size: "23,33", unit: 'KB' }`) which is easier to consume
  *
- * @param Int bytes        Size in bytes to convert
- * @param Int precision    Precision to show the decimal number
- *
- * @return object 
+ * @param {Number} bytes        Size in bytes to convert
+ * @param {Number} precision    Precision to show the decimal number
+ * @return {Object} Returns an object similar to `{size: "2.1", unit: "MB"}`
  */
 function numOfBytes(bytes, precision) {
 

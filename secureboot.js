@@ -224,12 +224,7 @@ if (!b_u) try
         var pathSuffix = window.location.pathname;
         pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
         // set the staticpath for debug mode
-        if(typeof(tempStaticpath) !== 'undefined') {
-            localStorage.staticpath = tempStaticpath;
-        }
-        else {
-            localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-        }
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
         // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
         if (localStorage.d) {
             console.debug('StaticPath set to "' + localStorage.staticpath + '"');
@@ -1190,17 +1185,17 @@ else if (!b_u)
     jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
+    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
+    jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
     jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
-    jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j:1,w:5});
-
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -1221,7 +1216,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
-    jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
+
 
     // notifications
     jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
@@ -1264,7 +1259,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
     jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1,w:1});
-    
+
     jsl.push({f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1,w:2});
     jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
@@ -1564,7 +1559,8 @@ else if (!b_u)
         {
             if (jsl[i].j === 1) {
                 createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + r);
-            }  else if (jsl[i].j === 2)
+            }
+            else if (jsl[i].j === 2)
             {
                 if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
                     createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + r);

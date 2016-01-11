@@ -25,8 +25,8 @@ var IndexedDBKVStorage = function(name) {
  * @private
  */
 
-IndexedDBKVStorage._requiresDbConn = function(fn) {
-    return function() {
+IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
+    return function __requiresDBConnWrapper() {
         var self = this;
         var args = arguments;
         var promise = new MegaPromise();
@@ -35,7 +35,7 @@ IndexedDBKVStorage._requiresDbConn = function(fn) {
             promise.reject();
             return promise;
         }
-        if (self.dbName != self.name + "_" + u_handle) {
+        if (self.dbName !== self.name + "_" + u_handle) {
             if (self.db && self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
                 self.db.close();
             }
@@ -51,29 +51,45 @@ IndexedDBKVStorage._requiresDbConn = function(fn) {
             );
             self.dbName = self.name + "_" + u_handle;
 
-            self.db.one('onDbStateReady', function() {
+            self.db.one('onDbStateReady', function __onDbStateReady() {
                 promise.linkDoneAndFailTo(
                     fn.apply(self, args)
                 );
             });
-        } else {
-            if(self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+            self.db.one('onDbStateFailed', function __onDbStateFailed() {
+                self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
+                promise.reject();
+            });
+        }
+        else {
+            if (self.db && self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
                 promise.linkDoneAndFailTo(
                     fn.apply(self, args)
                 );
             }
-            else if(self.db.dbState === MegaDB.DB_STATE.OPENING) {
+            else if (self.db.dbState === MegaDB.DB_STATE.OPENING) {
                 self.db.one('onDbStateReady', function() {
                     promise.linkDoneAndFailTo(
                         fn.apply(self, args)
                     );
                 });
             }
+            else {
+                self.db.one('onDbStateReady', function __onDbStateReady() {
+                    promise.linkDoneAndFailTo(
+                        fn.apply(self, args)
+                    );
+                });
+                self.db.one('onDbStateFailed', function __onDbStateFailed() {
+                    self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
+                    promise.reject();
+                });
+            }
 
         }
 
         return promise;
-    }
+    };
 };
 
 /**
@@ -86,7 +102,7 @@ IndexedDBKVStorage._requiresDbConn = function(fn) {
  *
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function(k, v) {
+IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVSetItem(k, v) {
     var promise = new MegaPromise();
 
     this.db.addOrUpdate(
@@ -96,10 +112,10 @@ IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(functi
             'v': v
         }
     )
-        .done(function() {
+        .done(function __setItemDone() {
             promise.resolve([k, v]);
         })
-        .fail(function() {
+        .fail(function __setItemFail() {
             promise.reject([k, v]);
         });
 
@@ -114,21 +130,22 @@ IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(functi
  *
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(function(k) {
+IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVGetItem(k) {
     var promise = new MegaPromise();
 
     this.db.get(
         'kv',
         k
     )
-        .done(function(r) {
-            if(typeof(r) === 'undefined' || r.length === 0) {
+        .done(function __getItemDone(r) {
+            if (typeof(r) === 'undefined' || r.length === 0) {
                 promise.reject();
-            } else {
+            }
+            else {
                 promise.resolve(r.v);
             }
         })
-        .fail(function() {
+        .fail(function __setItemFail() {
             promise.reject();
         });
 
@@ -142,7 +159,7 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
  *
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(function(k) {
+IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVRemoveItem(k) {
     return this.db.remove(
         'kv',
         k
@@ -154,7 +171,7 @@ IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(fun
  *
  * @type {MegaPromise}
  */
-IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function() {
+IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function __IDBKVClear() {
     return this.db.clear(
         'kv'
     );
@@ -168,20 +185,21 @@ IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function
  *
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(function(k) {
+IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVHasItem(k) {
     var promise = new MegaPromise();
     this.db.get(
         'kv',
         k
     )
-        .done(function(r) {
-            if(typeof(r) === 'undefined' || r.length === 0) {
+        .done(function __hasItemDone(r) {
+            if (typeof(r) === 'undefined' || r.length === 0) {
                 promise.reject();
-            } else {
+            }
+            else {
                 promise.resolve();
             }
         })
-        .fail(function() {
+        .fail(function __hasItemFail() {
             promise.reject();
         });
 

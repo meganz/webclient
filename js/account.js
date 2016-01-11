@@ -560,7 +560,8 @@ function generateAvatarMeta(user_hash) {
     return meta;
 }
 
-var AttribCache = new IndexedDBKVStorage('attrib');
+var attribCache = new IndexedDBKVStorage('attrib');
+
 
 /**
  * Retrieves a user attribute.
@@ -587,6 +588,7 @@ var AttribCache = new IndexedDBKVStorage('attrib');
  */
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                           callback, ctx) {
+
     assertUserHandle(userhandle);
     var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
@@ -614,6 +616,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     var cacheKey = userhandle + "_" + attribute;
 
     function settleFunction(res) {
+
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
             if (attribute.charAt(0) === '*') {
@@ -643,7 +646,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
 
         // Another conditional, the result value may have been changed.
         if (typeof res !== 'number') {
-            AttribCache.setItem(cacheKey, res);
+            attribCache.setItem(cacheKey, JSON.stringify(res));
 
             thePromise.resolve(res);
             var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
@@ -670,14 +673,23 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     myCtx.callback = settleFunction;
 
     // check the cache first!
-    AttribCache.getItem(cacheKey)
-        .done(function(v) {
-            thePromise.resolve(v);
+    attribCache.getItem(cacheKey)
+        .done(function __attribCacheGetDone(v) {
+
+            try {
+                var res = JSON.parse(v);
+            }
+            catch (e) {
+                api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+                return;
+            }
+
+            thePromise.resolve(res);
             if (callback) {
-                callback(v, myCtx);
+                callback(res, myCtx);
             }
         })
-        .fail(function() {
+        .fail(function __attribCacheGetFail() {
             // Fire it off.
             api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
         });
@@ -719,7 +731,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
-    var saved_value = value;
+    var savedValue = value;
 
     // Prepare all data needed for the call on the Mega API.
     if (mode === undefined) {
@@ -735,7 +747,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
         attribute = '*' + attribute;
         // The value should be a key/value property container. Let's encode and
         // encrypt it.
-        saved_value = base64urlencode(tlvstore.blockEncrypt(
+        savedValue = base64urlencode(tlvstore.blockEncrypt(
             tlvstore.containerToTlvRecords(value), u_k, mode));
     }
 
@@ -744,15 +756,16 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     var cacheKey = u_handle + "_" + attribute;
 
-    AttribCache.removeItem(cacheKey); // clear when the value is being sent to the API server, during that period
-                                      // the value should be retrieved from the server, because of potential
-                                      // race conditions
+    // clear when the value is being sent to the API server, during that period
+    // the value should be retrieved from the server, because of potential
+    // race conditions
+    attribCache.removeItem(cacheKey);
 
     function settleFunction(res) {
         if (typeof res !== 'number') {
-            AttribCache.setItem(cacheKey, value);
-            
-            logger.info('Setting user attribute "'
+            attribCache.setItem(cacheKey, value);
+
+            console.log('Setting user attribute "'
                         + attribute + '", result: ' + res);
             thePromise.resolve(res);
         }
@@ -774,7 +787,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     // Fire it off.
     var apiCall = {'a': 'up'};
-    apiCall[attribute] = saved_value;
+    apiCall[attribute] = savedValue;
     api_req(apiCall, myCtx);
 
     return thePromise;
@@ -958,7 +971,8 @@ function isEphemeral() {
             );
 
             if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
-                M.contacts(); // we need to resort
+                // we need to resort
+                M.contacts();
             }
         };
 

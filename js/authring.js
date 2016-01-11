@@ -187,7 +187,7 @@ var authring = (function () {
      */
     ns.getContacts = function(keyType) {
         if (ns._PROPERTIES[keyType] === undefined) {
-            logger.error('Unsupporte authentication key type: ' + keyType);
+            logger.error('Unsupported authentication key type: ' + keyType);
 
             return;
         }
@@ -252,7 +252,7 @@ var authring = (function () {
      */
     ns.setContacts = function(keyType, callback) {
         if (ns._PROPERTIES[keyType] === undefined) {
-            logger.error('Unsupporte authentication key type: ' + keyType);
+            logger.error('Unsupported authentication key type: ' + keyType);
             return;
         }
 
@@ -278,7 +278,7 @@ var authring = (function () {
     ns.getContactAuthenticated = function(userhandle, keyType) {
         assertUserHandle(userhandle);
         if (ns._PROPERTIES[keyType] === undefined) {
-            logger.error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupported key type: ' + keyType);
 
             return;
         }
@@ -315,7 +315,7 @@ var authring = (function () {
                                           method, confidence) {
         assertUserHandle(userhandle);
         if (ns._PROPERTIES[keyType] === undefined) {
-            logger.error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupported key type: ' + keyType);
 
             return;
         }
@@ -353,7 +353,7 @@ var authring = (function () {
      */
     ns.computeFingerprint = function(key, keyType, format) {
         if (ns._PROPERTIES[keyType] === undefined) {
-            logger.error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupported key type: ' + keyType);
 
             return;
         }
@@ -404,7 +404,7 @@ var authring = (function () {
             return;
         }
         if (ns._PROPERTIES[keyType] === undefined) {
-            logger.error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupported key type: ' + keyType);
 
             return;
         }
@@ -439,7 +439,7 @@ var authring = (function () {
     ns.verifyKey = function(signature, pubKey, keyType, signPubKey) {
         // Bail out if nothing to do.
         if (ns._PROPERTIES[keyType] === undefined) {
-            logger.error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupported key type: ' + keyType);
 
             return;
         }

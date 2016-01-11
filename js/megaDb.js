@@ -85,7 +85,8 @@ function MegaDB(name, suffix, schema, options) {
 
         self.logger.debug('Opening DB', version, dbOpenOptions);
 
-        self._dbOpenPromise = db.open(dbOpenOptions).then( function( s ) {
+        self._dbOpenPromise = db.open(dbOpenOptions);
+        self._dbOpenPromise.then( function( s ) {
 
             var pluginSetupPromises = obj_values(self.plugins)
                 .map(function(pl) {
@@ -421,13 +422,15 @@ MegaDB.prototype.add = function(tableName, val) {
         }
     });
 
-    return this.server[tableName].add(tempObj)
+    var promise = this.server[tableName].add(tempObj);
+    promise
         .then(function() {
             // get back the .id after .add is done
             if(tempObj[self._getTablePk(tableName)] && tempObj[self._getTablePk(tableName)] != val[self._getTablePk(tableName)]) {
                 val[self._getTablePk(tableName)] = tempObj[self._getTablePk(tableName)];
             }
         });
+    return promise;
 };
 
 MegaDB.prototype.add = _wrapFnWithBeforeAndAfterEvents(

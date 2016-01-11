@@ -1530,7 +1530,8 @@ function RegExpEscape(text) {
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
     return addZeroIfLenLessThen(date.getHours(), 2)
-        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
+        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2)
+        + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
 }
 
 /**
@@ -2352,14 +2353,16 @@ function percent_megatitle() {
     if (d_deg <= 180) {
         $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(' + d_deg + 'deg)');
         $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
-    } else {
+    }
+    else {
         $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
         $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
     }
     if (u_deg <= 180) {
         $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(' + u_deg + 'deg)');
         $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
-    } else {
+    }
+    else {
         $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
         $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
@@ -2982,7 +2985,7 @@ MegaEvents.prototype.on = function(name, callback) {
 function constStateToText(enumMap, state) {
     var txt = false;
     $.each(enumMap, function(k, v) {
-        if(state == v) {
+        if (state == v) {
             txt = k;
 
             return false; // break
@@ -3004,15 +3007,15 @@ function constStateToText(enumMap, state) {
 function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     var checksAvailable = allowedStatesMap[currentState];
     var allowed = false;
-    if(checksAvailable) {
+    if (checksAvailable) {
         checksAvailable.forEach(function(allowedState) {
-            if(allowedState === newState) {
+            if (allowedState === newState) {
                 allowed = true;
                 return false; // break;
             }
         });
     }
-    if(!allowed) {
+    if (!allowed) {
         assert(
             false,
             'State change from: ' + constStateToText(enumMap, currentState) + ' to ' +
@@ -3312,7 +3315,8 @@ mega.utils.reload = function megaUtilsReload() {
         stopapi();
         if (typeof mDB === 'object' && !pfid) {
             mDBreload();
-        } else {
+        }
+        else {
             loadfm(true);
         }
     }

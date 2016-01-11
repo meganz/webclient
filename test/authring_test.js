@@ -54,6 +54,10 @@ describe("authring unit test", function() {
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
+
+        sandbox.stub(attribCache, 'getItem', function() {
+            return MegaPromise.reject();
+        });
     });
 
     afterEach(function() {
@@ -248,7 +252,7 @@ describe("authring unit test", function() {
                 var result = ns.getContacts('DSA');
                 assert.strictEqual(result, undefined);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Unsupporte authentication key type: DSA');
+                                   'Unsupported authentication key type: DSA');
             });
 
             it("authring for RSA", function() {
@@ -307,7 +311,7 @@ describe("authring unit test", function() {
                 var result = ns.setContacts('DSA');
                 assert.strictEqual(result, undefined);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Unsupporte authentication key type: DSA');
+                                   'Unsupported authentication key type: DSA');
             });
         });
     });
@@ -349,7 +353,7 @@ describe("authring unit test", function() {
                 var result = ns.computeFingerprint(RSA_PUB_KEY, 'DSA');
                 assert.strictEqual(result, undefined);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Unsupporte key type: DSA');
+                                   'Unsupported key type: DSA');
             });
         });
 
@@ -367,7 +371,7 @@ describe("authring unit test", function() {
                 var result = ns.signKey(RSA_PUB_KEY, 'DSA');
                 assert.strictEqual(result, undefined);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Unsupporte key type: DSA');
+                                   'Unsupported key type: DSA');
             });
 
             it("no key given", function() {
@@ -416,7 +420,7 @@ describe("authring unit test", function() {
                 var result = ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'DSA', ED25519_PUB_KEY);
                 assert.strictEqual(result, undefined);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Unsupporte key type: DSA');
+                                   'Unsupported key type: DSA');
             });
         });
 
@@ -499,7 +503,7 @@ describe("authring unit test", function() {
                                                     ns.KEY_CONFIDENCE.UNSURE);
             assert.strictEqual(result, undefined);
             assert.strictEqual(ns._logger._log.args[0][1][0],
-                               'Unsupporte key type: DSA');
+                               'Unsupported key type: DSA');
         });
 
         it("normal behaviour Ed25519", function() {
@@ -552,7 +556,7 @@ describe("authring unit test", function() {
             var result = ns.getContactAuthenticated('you456789xw', 'DSA');
             assert.strictEqual(result, undefined);
             assert.strictEqual(ns._logger._log.args[0][1][0],
-                               'Unsupporte key type: DSA');
+                               'Unsupported key type: DSA');
         });
 
         it("unauthenticated contact", function() {

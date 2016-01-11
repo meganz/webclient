@@ -133,7 +133,7 @@ var crypt = (function () {
             myCtx.callback = __settleFunction;
 
             // Fire it off.
-            getUserAttribute(userhandle, 'uk', -1, false, undefined, myCtx);
+            api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
         }
         else {
             var pubKeyPromise = getUserAttribute(userhandle,

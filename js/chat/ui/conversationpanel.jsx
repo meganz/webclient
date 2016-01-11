@@ -9,6 +9,7 @@ var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationsUI = require('./../ui/conversations.jsx');
+var TypingAreaUI = require('./../ui/typingArea.jsx');
 
 
 /**
@@ -1089,7 +1090,6 @@ var ConversationPanel = React.createClass({
             localVideoIsMinimized: false,
             isFullscreenModeEnabled: false,
             mouseOverDuringCall: false,
-            typedMessage: "",
             currentlyTyping: [],
             attachCloudDialog: false,
             messagesToggledInCall: false
@@ -1132,98 +1132,7 @@ var ConversationPanel = React.createClass({
 
         room.trigger('RefreshUI');
     },
-    onEmojiClicked: function(e, slug, meta) {
-        var self = this;
 
-        var txt = ":" + slug + ":";
-        if (slug.substr(0, 1) == ":" || slug.substr(-1) == ":") {
-            txt = slug;
-        }
-
-        self.setState({
-            typedMessage: self.state.typedMessage + " " + txt + " "
-        });
-
-        setTimeout(function()
-        {
-            $('.chat-textarea:visible textarea').click();
-            moveCursortoToEnd($('.chat-textarea:visible textarea')[0]);
-        }, 100);
-    },
-    typing: function() {
-        var self = this;
-        var room = this.props.chatRoom;
-
-        if (!self.typingTimeout) {
-            if (room && room.state === ChatRoom.STATE.READY && !self.iAmTyping) {
-                self.iAmTyping = true;
-                room.megaChat.karere.sendIsComposing(room.roomJid);
-            }
-        }
-        else if (self.typingTimeout) {
-            clearTimeout(self.typingTimeout);
-        }
-
-        self.typingTimeout = setTimeout(function() {
-            self.stoppedTyping();
-        }, 2000);
-    },
-    stoppedTyping: function() {
-        var self = this;
-        var room = this.props.chatRoom;
-
-        if (self.typingTimeout) {
-            clearTimeout(self.typingTimeout);
-            self.typingTimeout = null;
-        }
-
-        if (room && room.state === ChatRoom.STATE.READY && self.iAmTyping === true) {
-            room.megaChat.karere.sendComposingPaused(room.roomJid);
-            self.iAmTyping = false;
-        }
-    },
-    onTypeAreaKeyDown: function(e) {
-        var self = this;
-        var key = e.keyCode || e.which;
-        var element = e.target;
-        var val = element.value;
-
-        if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-            if ($.trim(val).length > 0) {
-                self.props.chatRoom.sendMessage(val);
-                self.setState({typedMessage: ""});
-                self.stoppedTyping();
-                e.preventDefault();
-                return;
-            }
-            else {
-                self.stoppedTyping();
-                e.preventDefault();
-            }
-        }
-        else if (key === 13) {
-            if ($.trim(val).length === 0) {
-                self.stoppedTyping();
-                e.preventDefault();
-            }
-        }
-
-        this.setState({typedMessage: e.target.value});
-    },
-    onTypeAreaBlur: function(e) {
-        var self = this;
-
-        self.stoppedTyping();
-    },
-    onTypeAreaChange: function(e) {
-        var self = this;
-
-        self.setState({typedMessage: e.target.value});
-
-        if ($.trim(e.target.value).length) {
-            self.typing();
-        }
-    },
     onMouseMove: function(e) {
         var self = this;
         var chatRoom = self.props.chatRoom;
@@ -1231,14 +1140,7 @@ var ConversationPanel = React.createClass({
             chatRoom.trigger("onChatIsFocused");
         }
     },
-    focusTypeArea: function() {
-        var $container = $(ReactDOM.findDOMNode(this));
-        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-            if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
-                moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
-            }
-        }
-    },
+
     componentDidMount: function() {
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
@@ -1409,9 +1311,6 @@ var ConversationPanel = React.createClass({
 
         self.handleWindowResize();
 
-        if (room.isCurrentlyActive) {
-            this.focusTypeArea();
-        }
     },
     handleWindowResize: function(e, scrollToBottom) {
         var $container = $(ReactDOM.findDOMNode(this));
@@ -1422,10 +1321,10 @@ var ConversationPanel = React.createClass({
         }
 
         // typeArea resizing
-        var $textarea = $('textarea.messages-textarea', $container);
+        var $textarea = $('.main-typing-area textarea.messages-textarea', $container);
         var textareaHeight =  $textarea.outerHeight();
-        var $hiddenDiv = $('.message-preview', $container);
-        var $pane = $('.chat-textarea-scroll', $container);
+        var $hiddenDiv = $('.main-typing-area .message-preview', $container);
+        var $pane = $('.main-typing-area .chat-textarea-scroll', $container);
         var $jsp;
 
         if (textareaHeight != $hiddenDiv.height()) {
@@ -1620,13 +1519,8 @@ var ConversationPanel = React.createClass({
             }
         });
 
-        var messageTextAreaClasses = "messages-textarea";
         var typingElement;
 
-
-        // typing area
-        var typedMessage = htmlentities(self.state.typedMessage).replace(/\n/g, '<br/>');
-        typedMessage = typedMessage + '<br/>';
 
 
         if (self.state.currentlyTyping.length > 0) {
@@ -1750,28 +1644,22 @@ var ConversationPanel = React.createClass({
 
                         <div className="chat-textarea-block">
                             {typingElement}
-                            <div className="chat-textarea">
-                                <i className="small-icon conversations"></i>
-                                <div className="chat-textarea-buttons">
 
-                                    <ButtonsUI.Button
-                                        className="popup-button"
-                                        icon="smiling-face"
-                                        >
-                                        <DropdownsUI.DropdownEmojiSelector
-                                            className="popup emoji-one"
-                                            vertOffset={12}
-                                            onClick={self.onEmojiClicked}
-                                            />
-                                    </ButtonsUI.Button>
 
+                            <TypingAreaUI.TypingArea
+                                chatRoom={self.props.chatRoom}
+                                className="main-typing-area"
+                                onUpdate={() => {
+                                    self.handleWindowResize();
+                                }}
+                            >
                                     <ButtonsUI.Button
                                         className="popup-button"
                                         icon="small-icon grey-medium-plus">
                                         <DropdownsUI.Dropdown
                                             className="wide-dropdown attach-to-chat-popup"
                                             vertOffset={10}
-                                            >
+                                        >
                                             <DropdownsUI.DropdownItem
                                                 icon="grey-cloud" label={__("Add from your Cloud")}
                                                 onClick={(e) => {
@@ -1780,26 +1668,8 @@ var ConversationPanel = React.createClass({
                                             </DropdownsUI.DropdownItem>
                                         </DropdownsUI.Dropdown>
                                     </ButtonsUI.Button>
-                                </div>
-                                <div className="chat-textarea-scroll">
-                                    <div className="textarea-wrapper">
-                                        <textarea
-                                            className={messageTextAreaClasses}
-                                            placeholder={__("Write a message...")}
-                                            onKeyDown={self.onTypeAreaKeyDown}
-                                            onBlur={self.onTypeAreaBlur}
-                                            onChange={self.onTypeAreaChange}
-                                            value={self.state.typedMessage}
-                                            ref="typearea"
-                                            disabled={room.pubCu25519KeyIsMissing === true ? true : false}
-                                            readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
-                                            ></textarea>
-                                        <div className="message-preview" dangerouslySetInnerHTML={{
-                                            __html: typedMessage.replace(/\s/g, "&nbsp;")
-                                        }}></div>
-                                    </div>
-                                </div>
-                            </div>
+                            </TypingAreaUI.TypingArea>
+
                         </div>
                     </div>
                 </div>

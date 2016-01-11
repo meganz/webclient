@@ -305,8 +305,6 @@ var ConversationsApp = React.createClass({
                     return;
                 }
 
-                console.error(e.ctrlKey, e.metaKey, e.which, e.keyCode);
-
                 var $typeArea = $('.messages-textarea:visible');
                 moveCursortoToEnd($typeArea);
                 e.megaChatHandled = true;

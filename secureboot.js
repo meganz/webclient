@@ -1002,6 +1002,7 @@ else if (!b_u)
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
+            dump.m = dump.m.replace(/\s+/g, ' ');
 
             if (~dump.m.indexOf('took +10s'))
             {
@@ -1035,10 +1036,13 @@ else if (!b_u)
                         .splice(0,15).map(mTrim).join("\n");
 
                     if (dump.s.indexOf('Unknown script code:') !== -1
+                        || dump.s.indexOf('Function code:') !== -1
+                        || dump.s.indexOf('(eval code:') !== -1
                         || dump.s.indexOf('(unknown source)') !== -1
-                        || dump.s.indexOf('<anonymous>:1:') !== -1) {
+                        || /<anonymous>:\d+:/.test(dump.s)) {
 
-                        console.warn('Got uncaught exception from unknown resource, your MEGA account might be compromised.');
+                        console.warn('Got uncaught exception from unknown resource,'
+                            + ' your MEGA account might be compromised.');
                         console.error(msg, errobj, errobj && errobj.stack, url, ln);
                         return false;
                     }

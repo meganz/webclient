@@ -465,6 +465,30 @@ var ConversationMessage = React.createClass({
                     name = <div className="message user-card-name">{displayName}</div>;
                 }
 
+
+                var messageDisplayBlock;
+                if (self.props.isBeingEdited === true) {
+                    messageDisplayBlock = <TypingAreaUI.TypingArea
+                        iconClass="small-icon writing-pen textarea-icon"
+                        initialText={message.textContents}
+                        chatRoom={self.props.chatRoom}
+                        className="edit-typing-area"
+                        onUpdate={() => {
+                                    self.forceUpdate();
+                                }}
+                        onConfirm={(messageContents) => {
+                            if (self.props.onEditDone) {
+                                self.props.onEditDone(messageContents);
+                            }
+                            return true;
+                        }}
+                    >
+                    </TypingAreaUI.TypingArea>;
+                }
+                else {
+                    messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>;
+                }
+
                 return (
                     <div className={message.messageId + " message body " + additionalClasses}>
                         {avatar}
@@ -474,7 +498,7 @@ var ConversationMessage = React.createClass({
 
                             {messageActionButtons}
 
-                            <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>
+                            {messageDisplayBlock}
                             {buttonsBlock}
                             {spinnerElement}
                         </div>
@@ -717,7 +741,7 @@ var ConversationAudioVideoPanel = React.createClass({
         var room = self.props.chatRoom;
 
         var mouseoutThrottling = null;
-        $container.rebind('mouseover.chatUI', function() {
+        $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomJid, function() {
             var $this = $(this);
             clearTimeout(mouseoutThrottling);
             self.visiblePanel = true;
@@ -727,7 +751,7 @@ var ConversationAudioVideoPanel = React.createClass({
             }
         });
 
-        $container.rebind('mouseout.chatUI', function() {
+        $container.rebind('mouseout.chatUI' + self.props.chatRoom.roomJid, function() {
             var $this = $(this);
             clearTimeout(mouseoutThrottling);
             mouseoutThrottling = setTimeout(function() {
@@ -741,7 +765,7 @@ var ConversationAudioVideoPanel = React.createClass({
         //Hidding Control panel if cursor is idle
         var idleMouseTimer;
         var forceMouseHide = false;
-        $container.rebind('mousemove.chatUI',function(ev) {
+        $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomJid,function(ev) {
             var $this = $(this);
             clearTimeout(idleMouseTimer);
             if (!forceMouseHide) {
@@ -1092,7 +1116,8 @@ var ConversationPanel = React.createClass({
             mouseOverDuringCall: false,
             currentlyTyping: [],
             attachCloudDialog: false,
-            messagesToggledInCall: false
+            messagesToggledInCall: false,
+            editingMessageId: false
         };
     },
 
@@ -1145,6 +1170,7 @@ var ConversationPanel = React.createClass({
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
 
+
         var $container = $(ReactDOM.findDOMNode(self));
 
         self.$messages = $('.messages.scroll-area > .jScrollPaneContainer', $container);
@@ -1182,7 +1208,7 @@ var ConversationPanel = React.createClass({
         //    maintainPosition: false
         //});
 
-        self.$messages.rebind('jsp-user-scroll-y.conversationsPanel', function(e, scrollPositionY, isAtTop, isAtBottom) {
+        self.$messages.rebind('jsp-user-scroll-y.conversationsPanel' + self.props.chatRoom.roomJid, function(e, scrollPositionY, isAtTop, isAtBottom) {
             var $jsp = self.$messages.data("jsp");
 
             if (self.lastScrollPosition === scrollPositionY || self.scrolledToBottom !== 1) {
@@ -1211,7 +1237,7 @@ var ConversationPanel = React.createClass({
             self.lastScrollPosition = scrollPositionY;
         });
 
-        self.$messages.rebind('jsp-initialised.conversationsPanel', function(e) {
+        self.$messages.rebind('jsp-initialised.conversationsPanel' + self.props.chatRoom.roomJid, function(e) {
             var $jsp = self.$messages.data("jsp");
 
             if (self.lastScrolledToBottom === true) {
@@ -1291,6 +1317,27 @@ var ConversationPanel = React.createClass({
                 }
             }
         });
+
+
+        $(document).rebind('keyup.megaChatEditTextareaClose' + chatRoom.roomJid, function(e) {
+            console.error(self.state.editingMessageId);
+            if (!self.state.editingMessageId) {
+                return;
+            }
+
+            var megaChat = self.props.chatRoom.megaChat;
+            if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === self.props.chatRoom.roomJid) {
+                console.error(e.keyCode, self.state.editingMessageId);
+
+                if (e.keyCode === 27) {
+                    self.setState({'editingMessageId': false});
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+            }
+        });
     },
     componentWillUnmount: function() {
         var self = this;
@@ -1302,6 +1349,8 @@ var ConversationPanel = React.createClass({
 
         megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
         megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
+
+        $(document).unbind('keyup.megaChatEditTextareaClose' + self.props.chatRoom.roomJid);
     },
     componentDidUpdate: function() {
         var self = this;
@@ -1513,8 +1562,17 @@ var ConversationPanel = React.createClass({
                 }
 
                 messagesList.push(
-                    <ConversationMessage message={v} chatRoom={room} key={v.messageId} contact={contact}
-                                         grouped={grouped}/>
+                    <ConversationMessage
+                        message={v}
+                        chatRoom={room}
+                        key={v.messageId}
+                        contact={contact}
+                        grouped={grouped}
+                        isBeingEdited={self.state.editingMessageId === v.messageId}
+                        onEditDone={(messageContents) => {
+                            self.setState({'editingMessageId': false});
+                        }}
+                        />
                 );
             }
         });
@@ -1651,6 +1709,9 @@ var ConversationPanel = React.createClass({
                                 className="main-typing-area"
                                 onUpdate={() => {
                                     self.handleWindowResize();
+                                }}
+                                onConfirm={(messageContents) => {
+                                    self.props.chatRoom.sendMessage(messageContents);
                                 }}
                             >
                                     <ButtonsUI.Button

@@ -15,7 +15,7 @@ var TypingArea = React.createClass({
 
     getInitialState: function () {
         return {
-            typedMessage: ""
+            typedMessage: this.props.initialText ? this.props.initialText : ""
         };
     },
     onEmojiClicked: function (e, slug, meta) {
@@ -76,8 +76,9 @@ var TypingArea = React.createClass({
 
         if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
             if ($.trim(val).length > 0) {
-                self.props.chatRoom.sendMessage(val);
-                self.setState({typedMessage: ""});
+                if (self.props.onConfirm(val) !== true) {
+                    self.setState({typedMessage: ""});
+                }
                 self.stoppedTyping();
                 e.preventDefault();
                 return;
@@ -109,6 +110,10 @@ var TypingArea = React.createClass({
         if ($.trim(e.target.value).length) {
             self.typing();
         }
+
+        if (self.props.onUpdate) {
+            self.props.onUpdate();
+        }
     },
     focusTypeArea: function () {
         var $container = $(ReactDOM.findDOMNode(this));
@@ -138,10 +143,6 @@ var TypingArea = React.createClass({
         }
 
         self.handleWindowResize();
-
-        if (self.props.onUpdate) {
-            self.props.onUpdate();
-        }
     },
     handleWindowResize: function (e, scrollToBottom) {
         var $container = $(ReactDOM.findDOMNode(this));
@@ -179,6 +180,10 @@ var TypingArea = React.createClass({
                     $textarea.blur();
                     $textarea.focus();
                 }
+            }
+
+            if (self.props.onUpdate) {
+                self.props.onUpdate();
             }
         }
 

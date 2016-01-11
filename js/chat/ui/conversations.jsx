@@ -298,6 +298,7 @@ var ConversationsApp = React.createClass({
                     ((e.ctrlKey || e.metaKey || e.which === 19) && (e.keyCode === 67)) ||
                     e.keyCode === 91 /* cmd+... */ ||
                     e.keyCode === 17 /* ctrl+... */ ||
+                    e.keyCode === 27 /* esc */ ||
                     ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
                     $('.fm-dialog:visible,.dropdown:visible').length > 0 ||
                     $('input:focus,textarea:focus,select:focus').length > 0

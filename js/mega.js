@@ -5335,17 +5335,40 @@ function execsc(actionPackets, callback) {
                     );
                 }
 
+                var cacheFillPromise = new MegaPromise();
                 var removeItemPromise = attribCache.removeItem(
                     actionPacket.u + "_" + actionPacket.ua[i]
-                );
+                ).always(function() {
+                    // refill cache!
+                    var attrib = actionPacket.ua[i];
+                    var isPub = attrib.substr(0, 1) === '+' ? true : false;
+                    var nonHistoric = attrib.substr(1, 1) === '!' ? true : false;
+                    if (attrib.substr(0, 1) === '+' || attrib.substr(0, 1) === '*') {
+                        attrib = attrib.substr(1, attrib.length);
+                    }
+                    if (attrib.substr(0, 1) === '!') {
+                        attrib = attrib.substr(1, attrib.length);
+                    }
+
+                    cacheFillPromise.linkDoneAndFailTo(
+                        getUserAttribute(
+                            actionPacket.u,
+                            attrib,
+                            isPub,
+                            nonHistoric
+                        )
+                    );
+                });
 
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;
 
-                    removeItemPromise.done(function  __actionPacketCacheInvalidateDone() {
+                    MegaPromise.allDone([
+                        removeItemPromise,
+                        cacheFillPromise
+                    ]).done(function  __actionPacketCacheInvalidateDone() {
                         M.avatars();
                     });
-
                 }
                 else if (actionPacket.ua[i] == '+puEd255') {
                     // pubEd25519 key was updated!

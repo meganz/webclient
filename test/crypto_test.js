@@ -20,6 +20,10 @@ describe("crypto unit test", function() {
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
+
+        sandbox.stub(attribCache, 'getItem', function() {
+            return MegaPromise.reject();
+        });
     });
 
     afterEach(function() {
@@ -30,7 +34,7 @@ describe("crypto unit test", function() {
         describe('getPubKeyAattribute()', function() {
             it("RSA key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { resolve: sinon.stub() };
+                var rootPromise = { resolve: sinon.stub(), reject: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 var pubKey = 'the key';
                 sandbox.stub(window, 'crypto_decodepubkey').returns(pubKey);
@@ -75,7 +79,7 @@ describe("crypto unit test", function() {
 
             it("Cu25519 key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { resolve: sinon.stub() };
+                var rootPromise = { resolve: sinon.stub(), reject: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 var attributePromise = { done: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
@@ -95,7 +99,7 @@ describe("crypto unit test", function() {
 
             it("Ed25519 key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { resolve: sinon.stub() };
+                var rootPromise = { resolve: sinon.stub(), reject: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 var attributePromise = { done: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);

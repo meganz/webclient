@@ -562,6 +562,7 @@ function generateAvatarMeta(user_hash) {
 
 var attribCache = new IndexedDBKVStorage('attrib');
 
+
 /**
  * Retrieves a user attribute.
  *
@@ -587,15 +588,19 @@ var attribCache = new IndexedDBKVStorage('attrib');
  */
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                           callback, ctx) {
+
     assertUserHandle(userhandle);
     var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
     // Assemble property name on Mega API.
-    pub = (pub === false) ? false : true;
+    pub = typeof(pub) === 'undefined' ? true : pub;
     var attributePrefix = '';
     if (pub === true) {
         attributePrefix = '+';
+    }
+    else if (pub === -1) {
+        attributePrefix = '';
     }
     else {
         attributePrefix = '*';
@@ -611,6 +616,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     var cacheKey = userhandle + "_" + attribute;
 
     function settleFunction(res) {
+
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
             if (attribute.charAt(0) === '*') {
@@ -640,7 +646,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
 
         // Another conditional, the result value may have been changed.
         if (typeof res !== 'number') {
-            attribCache.setItem(cacheKey, res);
+            attribCache.setItem(cacheKey, JSON.stringify(res));
 
             thePromise.resolve(res);
             var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
@@ -669,9 +675,18 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     // check the cache first!
     attribCache.getItem(cacheKey)
         .done(function __attribCacheGetDone(v) {
-            thePromise.resolve(v);
+
+            try {
+                var res = JSON.parse(v);
+            }
+            catch (e) {
+                api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+                return;
+            }
+
+            thePromise.resolve(res);
             if (callback) {
-                callback(v, myCtx);
+                callback(res, myCtx);
             }
         })
         .fail(function __attribCacheGetFail() {

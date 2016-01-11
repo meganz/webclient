@@ -749,7 +749,18 @@ function htmlentities(value) {
     return $('<div/>').text(value).html();
 }
 
+/**
+ * Convert bytes sizes into a human-friendly format (KB, MB, GB), pretty
+ * similar to `bytesToSize` but this function returns an object
+ * (`{ size: 23,3, unit: 'KB' }`) which is easier to consume
+ *
+ * @param Int bytes        Size in bytes to convert
+ * @param Int precision    Precision to show the decimal number
+ *
+ * @return object 
+ */
 function numOfBytes(bytes, precision) {
+
     var parts = bytesToSize(bytes, precision || 2).split(' ');
     return { size: parts[0], unit: parts[1] || 'B' };
 }

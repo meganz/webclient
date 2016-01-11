@@ -1625,8 +1625,8 @@ var ConversationPanel = React.createClass({
 
 
         // typing area
-        var typedMessage = htmlentities(self.state.typedMessage).replace(/\n/g, '<br />');
-        typedMessage = typedMessage + '<br />';
+        var typedMessage = htmlentities(self.state.typedMessage).replace(/\n/g, '<br/>');
+        typedMessage = typedMessage + '<br/>';
 
 
         if (self.state.currentlyTyping.length > 0) {

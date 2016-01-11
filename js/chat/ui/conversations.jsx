@@ -296,12 +296,16 @@ var ConversationsApp = React.createClass({
                 if (
                     $(e.target).is(".messages-textarea") ||
                     ((e.ctrlKey || e.metaKey || e.which === 19) && (e.keyCode === 67)) ||
+                    e.keyCode === 91 /* cmd+... */ ||
+                    e.keyCode === 17 /* ctrl+... */ ||
                     ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
                     $('.fm-dialog:visible,.dropdown:visible').length > 0 ||
                     $('input:focus,textarea:focus,select:focus').length > 0
                 ) {
                     return;
                 }
+
+                console.error(e.ctrlKey, e.metaKey, e.which, e.keyCode);
 
                 var $typeArea = $('.messages-textarea:visible');
                 moveCursortoToEnd($typeArea);
@@ -349,7 +353,7 @@ var ConversationsApp = React.createClass({
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
-        $(document).unbind('keypress.megaChatTextAreaFocus');
+        $(document).unbind('keydown.megaChatTextAreaFocus');
     },
     componentDidUpdate: function() {
         this.handleWindowResize();

@@ -756,7 +756,7 @@ function htmlentities(value) {
  *
  * @param {Number} bytes        Size in bytes to convert
  * @param {Number} precision    Precision to show the decimal number
- * @return {Object} Returns an object similar to `{size: "2.1", unit: "MB"}`
+ * @returns {Object} Returns an object similar to `{size: "2.1", unit: "MB"}`
  */
 function numOfBytes(bytes, precision) {
 

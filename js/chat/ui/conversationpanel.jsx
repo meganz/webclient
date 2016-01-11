@@ -1320,15 +1320,12 @@ var ConversationPanel = React.createClass({
 
 
         $(document).rebind('keyup.megaChatEditTextareaClose' + chatRoom.roomJid, function(e) {
-            console.error(self.state.editingMessageId);
             if (!self.state.editingMessageId) {
                 return;
             }
 
             var megaChat = self.props.chatRoom.megaChat;
             if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === self.props.chatRoom.roomJid) {
-                console.error(e.keyCode, self.state.editingMessageId);
-
                 if (e.keyCode === 27) {
                     self.setState({'editingMessageId': false});
                     e.preventDefault();

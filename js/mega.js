@@ -5363,12 +5363,15 @@ function execsc(actionPackets, callback) {
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;
 
+                    /* jshint -W083 */
+                    removeItemPromise.done(function  __actionPacketCacheInvalidateDone() {
                     MegaPromise.allDone([
                         removeItemPromise,
                         cacheFillPromise
                     ]).done(function  __actionPacketCacheInvalidateDone() {
                         M.avatars();
                     });
+                    /* jshint +W083 */
                 }
                 else if (actionPacket.ua[i] == '+puEd255') {
                     // pubEd25519 key was updated!

@@ -22,12 +22,8 @@ ifdef SILENT
     SILENT_MAKE = "-s"
 endif
 
-# Can we run a standard browser in headless mode?
-CAN_HEADLESS_BROWSER = (type xvfb-run && ( \
-    type firefox || type iceweasel || \
-    type google-chrome || type chromium || type chromium-browser )) >/dev/null
-
-ifneq ($(CAN_HEADLESS_BROWSER),)
+# If HEADLESS is set, we'll run our browser in headless mode through xvfb-run.
+ifneq ($(HEADLESS),)
     HEADLESS_RUN = "xvfb-run"
 endif
 

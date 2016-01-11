@@ -5364,7 +5364,6 @@ function execsc(actionPackets, callback) {
                     avatars[actionPacket.u] = undefined;
 
                     /* jshint -W083 */
-                    removeItemPromise.done(function  __actionPacketCacheInvalidateDone() {
                     MegaPromise.allDone([
                         removeItemPromise,
                         cacheFillPromise

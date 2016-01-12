@@ -981,6 +981,16 @@ var ConversationAudioVideoPanel = React.createClass({
                     callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
                     localPlayerSrc = callSession.localPlayer.src;
                 }
+                else if (
+                    callSession.getJingleSession() &&
+                    callSession.getJingleSession()._sess &&
+                    callSession.getJingleSession()._sess.localStream
+                ) {
+                    callSession.localPlayer.src = URL.createObjectURL(
+                        callSession.getJingleSession()._sess.localStream
+                    );
+                    localPlayerSrc = callSession.localPlayer.src;
+                }
                 else {
                     console.error("Could not retrieve src object.");
                 }

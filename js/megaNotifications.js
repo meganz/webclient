@@ -247,6 +247,7 @@
 
         if(unread === true || self.options.alwaysPlaySound === true) {
             if(self.options.sound) {
+                ion.sound.stop(self.options.sound);
                 ion.sound.play(self.options.sound, {
                     loop: self.options.soundLoop,
                     volume: self.options.soundVolume !== null ? self.options.soundVolume : self.megaNotifications.options.soundsVolume

@@ -319,7 +319,7 @@ var authring = (function () {
 
             return;
         }
-        if (u_authring[keyType] === undefined) {
+        if (typeof u_authring[keyType] === 'undefined') {
             logger.error('First initialise u_authring by calling authring.getContacts()');
 
             return;
@@ -328,10 +328,18 @@ var authring = (function () {
             // We don't want to track ourself. Let's get out of here.
             return;
         }
-        u_authring[keyType][userhandle] = { fingerprint: fingerprint,
-                                            method: method,
-                                            confidence: confidence };
-        ns.setContacts(keyType);
+
+        var oldRecord = u_authring[keyType][userhandle];
+        if (!oldRecord
+                || (oldRecord.fingerprint !== fingerprint)
+                || (oldRecord.method !== method)
+                || (oldRecord.confidence !== confidence)) {
+            // Need to update the record.
+            u_authring[keyType][userhandle] = { fingerprint: fingerprint,
+                                                method: method,
+                                                confidence: confidence };
+            ns.setContacts(keyType);
+        }
     };
 
 

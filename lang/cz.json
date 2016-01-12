@@ -2873,10 +2873,31 @@
     "7995": "Jste spokojeni z rozvrhem plateb?",
     "7996": "Pokud je v\u0161e v po\u0159\u00e1dku, klikn\u011bt\u011b na [S]KOUPIT[\/S], budete p\u0159esm\u011brov\u00e1n\u00ed na novou str\u00e1nku, kde dokon\u010d\u00edte v\u00e1\u0161 n\u00e1kup.",
     "7997": "Chat",
+    "7998": "Abyste n\u00e1m pomohli vylep\u0161it na\u0161i slu\u017ebu, bylo by skv\u011bl\u00e9, kdybyste n\u00e1m poskytli zp\u011btnou vazbu s [X]?",
     "8000": "\u017d\u00e1dn\u00e1 historie k zobrazen\u00ed",
+    "8001": "\u017d\u00e1dn\u00e1 historie s %s",
+    "8002": "Konverzace s %s",
+    "8003": "Zpr\u00e1va nebyla odesl\u00e1na",
     "8004": "Smazat zpr\u00e1vu",
+    "8005": "P\u0159idat na Cloudov\u00e9 \u00falo\u017ei\u0161t\u011b",
+    "8006": "P\u0159\u00edloha p\u0159id\u00e1na na Cloudov\u00e9 \u00falo\u017ei\u0161t\u011b.",
+    "8007": "P\u0159idat \u00fa\u010dastn\u00edka",
+    "8009": "Napsat zpr\u00e1vu...",
     "8010": "Hledat kontakty",
+    "8011": "P\u0159idat z va\u0161eho Cloudov\u00e9ho \u00falo\u017ei\u0161t\u011b",
     "8012": "Do fronty",
+    "8013": "Z m\u00e9ho Cloudov\u00e9ho \u00falo\u017ei\u0161t\u011b",
+    "8014": "Z po\u010d\u00edta\u010de",
     "8015": "RE\u017dIM \u0160EPT\u00c1N\u00cd",
-    "8023": "P\u0159ilo\u017eit"
+    "8016": "LID\u00c9",
+    "8017": "P\u0158\u00cdRODA",
+    "8018": "J\u00cdDLO A PIT\u00cd",
+    "8019": "OSLAVA",
+    "8020": "AKTIVITY",
+    "8021": "CESTOV\u00c1N\u00cd A M\u00cdSTA",
+    "8022": "OBJEKTY A SYMBOLY",
+    "8023": "P\u0159ilo\u017eit",
+    "alias": {
+        "shared-with-me": 5589
+    }
 }

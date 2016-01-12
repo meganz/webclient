@@ -11495,25 +11495,97 @@
         "text": "Chat",
         "context": "Chat section header"
     },
+    "7998": {
+        "text": "To help us improve our service, it would be great if you could rate your call experience with [X]?",
+        "context": "[X] - username. Please leave it as it is"
+    },
     "8000": {
         "text": "No conversation history",
         "context": "Information if there are no history messages in current chat conversation."
+    },
+    "8001": {
+        "text": "No chat history with %s",
+        "context": "Information if there are no messages in current chat conversation with user %s. Please leave %s as it is."
+    },
+    "8002": {
+        "text": "Conversation with %s",
+        "context": "Chat conversation header with user %s. Please leave %s as it is."
+    },
+    "8003": {
+        "text": "Message not sent",
+        "context": "Notification if message was not sent in chat conversation."
     },
     "8004": {
         "text": "Delete message",
         "context": "Menu item which allows to delete message in chat conversation."
     },
+    "8005": {
+        "text": "Add to Cloud Drive",
+        "context": "Button Label. Allows to save shared file to your Cloud Drive."
+    },
+    "8006": {
+        "text": "Attachment added to your Cloud Drive.",
+        "context": "Information that shared file has beed saved to your Cloud drive."
+    },
+    "8007": {
+        "text": "Add participant...",
+        "context": "Button label. Allows to add contacts in current chat conversation."
+    },
+    "8009": {
+        "text": "Write a message...",
+        "context": "Message box label which shows that user can type message text in this textbox."
+    },
     "8010": {
         "text": "Search contacts",
         "context": "Search contacts section header."
+    },
+    "8011": {
+        "text": "Add from your Cloud Drive",
+        "context": "Button label. Allows to share files(from your Cloud Drive) in chat conversation "
     },
     "8012": {
         "text": "Quote",
         "context": "Button label. It allows to quote user's post in chat conversation."
     },
+    "8013": {
+        "text": "From my Cloud Drive",
+        "context": "Button label. Allows to share files from your Cloud Drive"
+    },
+    "8014": {
+        "text": "From my computer",
+        "context": "Button label. Allows you to share files from your computer"
+    },
     "8015": {
         "text": "WHISPER MODE",
         "context": "Button label. It allows to enter in a private \"whisper\" conversation mode."
+    },
+    "8016": {
+        "text": "PEOPLE",
+        "context": "Chat emotions section where all emotions are related to humans"
+    },
+    "8017": {
+        "text": "NATURE",
+        "context": "Chat emotions section where all emotions are related to nature"
+    },
+    "8018": {
+        "text": "FOOD & DRINK",
+        "context": "Chat emotions section where all emotions are related to food and drink"
+    },
+    "8019": {
+        "text": "CELEBRATION",
+        "context": "Chat emotions section where all emotions are related to celebrations"
+    },
+    "8020": {
+        "text": "ACTIVITY",
+        "context": "Chat emotions section where all emotions are related to activities (such as sport and hobbies)"
+    },
+    "8021": {
+        "text": "TRAVEL & PLACES",
+        "context": "Chat emotions section where all emotions are related to travel and places"
+    },
+    "8022": {
+        "text": "OBJECTS & SYMBOLS",
+        "context": "Chat emotions section where all emotions are related to objects and symbols"
     },
     "8023": {
         "text": "Attach",

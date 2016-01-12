@@ -2873,10 +2873,31 @@
     "7995": "\u0412\u044b \u0434\u043e\u0432\u043e\u043b\u044c\u043d\u044b \u0441\u0432\u043e\u0438\u043c \u0441\u043f\u043e\u0441\u043e\u0431\u043e\u043c \u043e\u043f\u043b\u0430\u0442\u044b?",
     "7996": "\u041d\u0430\u0436\u043c\u0438\u0442\u0435 [S]\u041a\u0423\u041f\u0418\u0422\u042c[\/S], \u0435\u0441\u043b\u0438 \u0432\u044b \u0434\u043e\u0432\u043e\u043b\u044c\u043d\u044b \u0441\u0432\u043e\u0438\u043c \u0441\u043f\u043e\u0441\u043e\u0431\u043e\u043c \u043e\u043f\u043b\u0430\u0442\u044b. \u041f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u043d\u043e\u0432\u043e\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435 \u0438\u043b\u0438 \u043e\u0442\u043a\u0440\u043e\u0435\u0442\u0441\u044f \u043d\u043e\u0432\u0430\u044f \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0430 \u0434\u043b\u044f \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0438\u044f \u043f\u043e\u043a\u0443\u043f\u043a\u0438..",
     "7997": "\u0427\u0430\u0442",
+    "7998": "To help us improve our service, it would be great if you could rate your call experience with [X]?",
     "8000": "\u041d\u0435\u0442 \u0438\u0441\u0442\u043e\u0440\u0438\u0438 \u0440\u0430\u0437\u0433\u043e\u0432\u043e\u0440\u0430",
+    "8001": "No chat history with %s",
+    "8002": "Conversation with %s",
+    "8003": "Message not sent",
     "8004": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435",
+    "8005": "Add to Cloud Drive",
+    "8006": "Attachment added to your Cloud Drive.",
+    "8007": "Add participant...",
+    "8009": "Write a message...",
     "8010": "\u041f\u043e\u0438\u0441\u043a \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043e\u0432",
+    "8011": "Add from your Cloud Drive",
     "8012": "\u0426\u0438\u0442\u0430\u0442\u0430",
+    "8013": "From my Cloud Drive",
+    "8014": "From my computer",
     "8015": "\u0428\u0415\u041f\u041d\u0423\u0422\u042c",
-    "8023": "\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c"
+    "8016": "PEOPLE",
+    "8017": "NATURE",
+    "8018": "FOOD & DRINK",
+    "8019": "CELEBRATION",
+    "8020": "ACTIVITY",
+    "8021": "TRAVEL & PLACES",
+    "8022": "OBJECTS & SYMBOLS",
+    "8023": "\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c",
+    "alias": {
+        "shared-with-me": 5589
+    }
 }

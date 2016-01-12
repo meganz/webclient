@@ -2873,10 +2873,31 @@
     "7995": "Sind Sie mit der gew\u00e4hlten Zahlungsart zufrieden?",
     "7996": "Klicken Sie auf [S]KAUFEN[\/S], sobald Sie die korrekte Option ausgew\u00e4hlt haben. Sie werden dann um weitere Informationen gebeten oder auf die Seite des Zahlungsanbieters weitergeleitet.",
     "7997": "Chat",
+    "7998": "To help us improve our service, it would be great if you could rate your call experience with [X]?",
     "8000": "Keine Nachrichten vorhanden",
+    "8001": "No chat history with %s",
+    "8002": "Conversation with %s",
+    "8003": "Message not sent",
     "8004": "Nachricht l\u00f6schen",
+    "8005": "Add to Cloud Drive",
+    "8006": "Attachment added to your Cloud Drive.",
+    "8007": "Add participant...",
+    "8009": "Write a message...",
     "8010": "Kontakte durchsuchen",
+    "8011": "Add from your Cloud Drive",
     "8012": "Zitieren",
+    "8013": "From my Cloud Drive",
+    "8014": "From my computer",
     "8015": "FL\u00dcSTERMODUS",
-    "8023": "Anh\u00e4ngen"
+    "8016": "PEOPLE",
+    "8017": "NATURE",
+    "8018": "FOOD & DRINK",
+    "8019": "CELEBRATION",
+    "8020": "ACTIVITY",
+    "8021": "TRAVEL & PLACES",
+    "8022": "OBJECTS & SYMBOLS",
+    "8023": "Anh\u00e4ngen",
+    "alias": {
+        "shared-with-me": 5589
+    }
 }

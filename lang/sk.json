@@ -2873,10 +2873,31 @@
     "7995": "Ste spokojn\u00ed so svojim platobn\u00fdm pl\u00e1nom?",
     "7996": "Ke\u010f budete spokojn\u00fd s va\u0161imi platobn\u00fdmi \u00fadajmi, kliknite na [S]K\u00daPI\u0164[\/S]. Objav\u00ed sa v\u00e1m nov\u00e9 dial\u00f3gov\u00e9 okno a budete presmerovan\u00fd na nov\u00fa str\u00e1nku pre dokon\u010denie v\u00e1\u0161ho n\u00e1kupu.",
     "7997": "Chat",
+    "7998": "Ak n\u00e1m chcete pom\u00f4c\u0165 s vylep\u0161ovan\u00edm slu\u017eby, bolo by super keby ste mohli ohodnoti\u0165 sk\u00fasenosti z hovoru s [X].",
     "8000": "\u017diadna hist\u00f3ria konverz\u00e1ci\u00ed",
+    "8001": "\u017diadna hist\u00f3ria chatu s %s",
+    "8002": "Konverz\u00e1cia s %s",
+    "8003": "Message not sent",
     "8004": "Zmaza\u0165 spr\u00e1vu",
+    "8005": "Prida\u0165 do Cloudov\u00e9ho disku",
+    "8006": "Pr\u00edloha pridan\u00e1 do v\u00e1\u0161ho Cloudov\u00e9ho disku",
+    "8007": "Prida\u0165 \u00fa\u010dastn\u00edka",
+    "8009": "Nap\u00ed\u0161te spr\u00e1vu...",
     "8010": "H\u013eada\u0165 kontakty",
+    "8011": "Prida\u0165 z Cloudov\u00e9ho disku",
     "8012": "Cit\u00e1cia",
+    "8013": "Z m\u00f4jho Cloudov\u00e9ho disku",
+    "8014": "Z m\u00f4jho po\u010d\u00edta\u010du",
     "8015": "M\u00d3D \u0160EPKANIA",
-    "8023": "Prilo\u017ei\u0165"
+    "8016": "\u013dUDIA",
+    "8017": "PR\u00cdRODA",
+    "8018": "JEDLO A PITIE",
+    "8019": "OSLAVA",
+    "8020": "AKTIVITA",
+    "8021": "CESTOVANIE A MIESTA",
+    "8022": "OBJEKTY A SYMBOLY",
+    "8023": "Prilo\u017ei\u0165",
+    "alias": {
+        "shared-with-me": 5589
+    }
 }

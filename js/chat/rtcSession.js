@@ -835,7 +835,7 @@ hangupAll: function(reason, text)
     this.softAssert(!this.gLocalVid, "Local stream just obtained, but gLocalVid was not null");
     this.softAssert(this.gLocalVidRefcount <= 0, "Creating gLocalVid, but its refcount is already > 0");
 
-    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" defaultMuted="true" muted="true" volume="0"/>');
+    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" muted="muted" volume="0"/>');
     if (vid.length < 1) {
         throw new Error("Failed to create local video element");
     }

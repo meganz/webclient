@@ -911,16 +911,6 @@ function loginDialog(close) {
     $('.top-dialog-login-button').rebind('click', function (e) {
         tooltiplogin();
     });
-    $('#login-name').rebind('focus', function (e) {
-        if ($(this).val() == l[195]) {
-            $(this).val('');
-        }
-    });
-    $('#login-name').rebind('blur', function (e) {
-        if ($(this).val() == '') {
-            $(this).val(l[195]);
-        }
-    });
     $('.top-login-full').rebind('click', function (e) {
         loginDialog(1);
         document.location.hash = 'login';

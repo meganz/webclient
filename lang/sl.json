@@ -2873,10 +2873,31 @@
     "7995": "Ali ste zadovoljni s svojim pla\u010dilnim planom?",
     "7996": "Kliknite [S]KUPI[\/S], ko boste zadovoljni z izbranim na\u010dinom pla\u010dila. Prikazalo se bo novo okno ali pa boste preusmerjeni na drugo stran, kjer boste zaklju\u010dili pla\u010dilo.",
     "7997": "Pogovor",
+    "7998": "Za izbolj\u0161anje na\u0161ih storitev, ali bi bili pripravljeni ocenilt va\u0161o izku\u0161njo s klicem s\/z [X]?",
     "8000": "Ni zgodovine pogovora",
+    "8001": "Ni zgodovine pogovora s\/z %s",
+    "8002": "Pogovor s\/z %s",
+    "8003": "Sporo\u010dilo ni poslano",
     "8004": "Bri\u0161i sporo\u010dilo",
+    "8005": "Dodaj v oblak",
+    "8006": "Priponka dodana iz va\u0161ega oblaka",
+    "8007": "Dodaj sodelujo\u010dega...",
+    "8009": "Napi\u0161i sporo\u010dilo...",
     "8010": "Prei\u0161\u010di stike",
+    "8011": "Dodaj iz svojega oblaka",
     "8012": "Kvota",
+    "8013": "Iz mojega oblaka",
+    "8014": "Z mojega ra\u010dunalnika",
     "8015": "\u0160EPETAJO\u010c NA\u010cIN",
-    "8023": "Pripni"
+    "8016": "LJUDJE",
+    "8017": "NARAVA",
+    "8018": "HRANA IN PIJA\u010cA",
+    "8019": "PRAZNOVANJE",
+    "8020": "AKTIVNOSTI",
+    "8021": "POTOVANJA IN MESTA",
+    "8022": "PREDMETI IN SIMBOLI",
+    "8023": "Pripni",
+    "alias": {
+        "shared-with-me": 5589
+    }
 }

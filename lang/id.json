@@ -2873,10 +2873,31 @@
     "7995": "Apakah anda puas dengan payment plan anda?",
     "7996": "Klik [S]BELI[\/S] saat anda puas dengan opsi pembayaran anda. Anda akan ditunjukan dialog baru atau diarahkan ke halaman baru untuk menyelesaikan pembelian anda.",
     "7997": "Chat",
+    "7998": "Untuk membantu memperbaiki pelayanan kami, harap nilai pengalaman telepon anda dengan [X]?",
     "8000": "Tidak ada riwayat percakapan",
+    "8001": "Tidak ada riwayat percakapan dengan %s",
+    "8002": "Percakapan dengan %s",
+    "8003": "Pesan tidak terkirim",
     "8004": "Hapus pesan",
+    "8005": "Tambah ke Cloud Drive",
+    "8006": "Lampiran ditambahkan ke Cloud Drive anda.",
+    "8007": "Tambah participant...",
+    "8009": "Tulis pesan...",
     "8010": "Cari kontak",
+    "8011": "Tambah dari Cloud Drive anda",
     "8012": "Quote",
+    "8013": "Dari Cloud Drive saya",
+    "8014": "Dari komputer saya",
     "8015": "MODE WHISPER",
-    "8023": "Lampirkan"
+    "8016": "ORANG",
+    "8017": "ALAM",
+    "8018": "MAKANAN & MINUMAN",
+    "8019": "PERAYAAN",
+    "8020": "AKTIFITAS",
+    "8021": "WISATA & TEMPAT",
+    "8022": "OBJEK & SIMBOL",
+    "8023": "Lampirkan",
+    "alias": {
+        "shared-with-me": 5589
+    }
 }

@@ -2873,10 +2873,31 @@
     "7995": "\uacb0\uc81c \uacc4\ud68d\uc5d0 \ub9cc\uc871\ud558\uc2dc\ub098\uc694?",
     "7996": "\uacb0\uc81c \uc635\uc158\uc5d0 \ub9cc\uc871\ud558\uc168\uc744 \ub54c [S]\uacb0\uc81c[\/S]\ub97c \ud074\ub9ad\ud558\uc138\uc694. \uacb0\uc81c\ub97c \uc704\ud574 \uc0c8 \ub300\ud654\ucc3d\uc774 \uc5f4\ub9ac\uac70\ub098 \uc0c8 \ud398\uc774\uc9c0\ub85c \uc774\ub3d9\ub420 \uac83\uc785\ub2c8\ub2e4.",
     "7997": "\ub300\ud654",
+    "7998": "To help us improve our service, it would be great if you could rate your call experience with [X]?",
     "8000": "\ub300\ud654 \uae30\ub85d \uc5c6\uc74c",
+    "8001": "No chat history with %s",
+    "8002": "Conversation with %s",
+    "8003": "Message not sent",
     "8004": "\uba54\uc2dc\uc9c0 \uc0ad\uc81c",
+    "8005": "Add to Cloud Drive",
+    "8006": "Attachment added to your Cloud Drive.",
+    "8007": "Add participant...",
+    "8009": "Write a message...",
     "8010": "\uc5f0\ub77d\ucc98 \uac80\uc0c9",
+    "8011": "Add from your Cloud Drive",
     "8012": "\uc778\uc6a9",
+    "8013": "From my Cloud Drive",
+    "8014": "From my computer",
     "8015": "\uadd3\uc18d\ub9d0 \ubaa8\ub4dc",
-    "8023": "\ucca8\ubd80"
+    "8016": "PEOPLE",
+    "8017": "NATURE",
+    "8018": "FOOD & DRINK",
+    "8019": "CELEBRATION",
+    "8020": "ACTIVITY",
+    "8021": "TRAVEL & PLACES",
+    "8022": "OBJECTS & SYMBOLS",
+    "8023": "\ucca8\ubd80",
+    "alias": {
+        "shared-with-me": 5589
+    }
 }

@@ -44,9 +44,14 @@ var Button = React.createClass({
         }
     },
     renderChildren: function () {
+        var self = this;
+
         return React.Children.map(this.props.children, function (child) {
             return React.cloneElement(child, {
-                active: this.state.focused
+                active: this.state.focused,
+                closeDropdown: function() {
+                    self.setState({'focused': false});
+                }
             });
         }.bind(this))
     },

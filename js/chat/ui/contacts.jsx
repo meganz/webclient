@@ -1,6 +1,7 @@
 var React = require("react");
 var MegaRenderMixin = require("../../stores/mixins.js").MegaRenderMixin;
 var RenderDebugger = require("../../stores/mixins.js").RenderDebugger;
+var utils = require("../../ui/utils.jsx");
 
 
 var ContactsListItem = React.createClass({
@@ -124,8 +125,6 @@ var ContactCard = React.createClass({
             </ButtonsUI.Button>;
         }
 
-        //console.error(contact.h, pres);
-
         return <div
                     className={
                         "contacts-info body " +
@@ -151,8 +150,88 @@ var ContactCard = React.createClass({
     }
 });
 
+var ContactPickerWidget = React.createClass({
+    mixins: [MegaRenderMixin],
+    getInitialState: function() {
+        return {
+            'searchValue': ''
+        }
+    },
+    onSearchChange: function(e) {
+        var self = this;
+        self.setState({searchValue: e.target.value});
+    },
+    render: function() {
+        var self = this;
+
+        var contacts = [];
+
+        self.props.contacts.forEach(function(v, k) {
+            var pres = self.props.megaChat.karere.getPresence(
+                self.props.megaChat.getJidFromNodeId(v.u)
+            );
+
+            if (v.c == 0 || v.u == u_handle) {
+                return;
+            }
+
+            var avatarMeta = generateAvatarMeta(v.u);
+
+            if (self.state.searchValue && self.state.searchValue.length > 0) {
+                // DON'T add to the contacts list if the contact's name or email does not match the search value
+                if (
+                    avatarMeta.fullName.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1 &&
+                    v.m.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1
+                ) {
+                    return;
+                }
+            }
+
+
+            if (pres === "chat") {
+                pres = "online";
+            }
+
+            var selectedClass = "";
+            if (self.props.selected && self.props.selected.indexOf(v.h) !== -1) {
+                selectedClass = "selected";
+            }
+            contacts.push(
+                <ContactCard
+                    contact={v}
+                    className={"contacts-search " + selectedClass} onClick={(contact, e) => {
+                        self.props.onClick(contact, e);
+                    }}
+                    noContextMenu={true}
+                    key={v.u + "_" + selectedClass}
+                />
+            );
+        });
+
+        return <div>
+            <div className={"contacts-search-header " + this.props.headerClasses}>
+                <i className="small-icon search-icon"></i>
+                <input
+                    type="search"
+                    placeholder={__("Search contacts")}
+                    ref="contactSearchField"
+                    onChange={this.onSearchChange}
+                    value={this.state.searchValue}
+                />
+            </div>
+
+            <utils.JScrollPane className="contacts-search-scroll">
+                <div>
+                    {contacts}
+                </div>
+            </utils.JScrollPane>
+        </div>;
+    }
+});
+
 module.exports = {
     ContactsListItem,
     ContactCard,
-    Avatar
+    Avatar,
+    ContactPickerWidget
 };

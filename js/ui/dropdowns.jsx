@@ -123,72 +123,20 @@ var Dropdown = React.createClass({
 
 var DropdownContactsSelector = React.createClass({
     mixins: [MegaRenderMixin],
-    getInitialState: function() {
-        return {
-            'searchValue': ''
-        }
-    },
-    onSearchChange: function(e) {
-        var self = this;
-        self.setState({searchValue: e.target.value});
-    },
     render: function() {
         var self = this;
 
-        var contacts = [];
-
-        self.props.contacts.forEach(function(v, k) {
-            var pres = self.props.megaChat.karere.getPresence(
-                self.props.megaChat.getJidFromNodeId(v.u)
-            );
-
-            if (v.c == 0 || v.u == u_handle) {
-                return;
-            }
-
-            var avatarMeta = generateAvatarMeta(v.u);
-
-            if (self.state.searchValue && self.state.searchValue.length > 0) {
-                // DON'T add to the contacts list if the contact's name or email does not match the search value
-                if (
-                    avatarMeta.fullName.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1 &&
-                    v.m.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1
-                ) {
-                    return;
-                }
-            }
-
-
-            if (pres === "chat") {
-                pres = "online";
-            }
-
-            contacts.push(
-                <ContactsUI.ContactCard
-                    contact={v} className="contacts-search" onClick={self.props.onClick}
-                    noContextMenu={true}
-                    key={v.u}
-                    />
-            );
-        });
-
-        return <Dropdown className="popup contacts-search" {...self.props} ref="dropdown">
-            <div className="contacts-search-header">
-                <i className="small-icon search-icon"></i>
-                <input
-                    type="search"
-                    placeholder={__("Search contacts")}
-                    ref="contactSearchField"
-                    onChange={this.onSearchChange}
-                    value={this.state.searchValue}
-                    />
+        return <Dropdown className="popup contacts-search" active={this.props.active} closeDropdown={this.props.closeDropdown} ref="dropdown">
+            <div className="popup contacts-search">
+                <ContactsUI.ContactPickerWidget
+                    contacts={this.props.contacts}
+                    megaChat={this.props.megaChat}
+                    onClick={(contact, e) => {
+                            this.props.onClick(contact, e);
+                            this.props.closeDropdown();
+                        }
+                    } />
             </div>
-
-            <utils.JScrollPane className="contacts-search-scroll">
-                <div>
-                    {contacts}
-                </div>
-            </utils.JScrollPane>
         </Dropdown>;
     }
 });
@@ -202,7 +150,10 @@ var DropdownItem = React.createClass({
         var self = this;
         return React.Children.map(this.props.children, function (child) {
             return React.cloneElement(child, {
-                active: self.state.isClicked
+                active: self.state.isClicked,
+                closeDropdown: function() {
+                    self.setState({'isClicked': false});
+                }
             });
         }.bind(this))
     },

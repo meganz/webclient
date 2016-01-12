@@ -1127,7 +1127,8 @@ var ConversationPanel = React.createClass({
             currentlyTyping: [],
             attachCloudDialog: false,
             messagesToggledInCall: false,
-            editingMessageId: false
+            editingMessageId: false,
+            sendContactDialog: false
         };
     },
 
@@ -1651,6 +1652,30 @@ var ConversationPanel = React.createClass({
             />
         }
 
+        var sendContactDialog = null;
+        if (self.state.sendContactDialog === true) {
+            var selected = [];
+            sendContactDialog = <ModalDialogsUI.SelectContactDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                contacts={M.u}
+                onClose={() => {
+                    self.setState({'sendContactDialog': false});
+                    selected = [];
+                }}
+                onSelected={(nodes) => {
+                    selected = nodes;
+                }}
+                onSelectClicked={() => {
+                    self.setState({'sendContactDialog': false});
+
+                    console.error(
+                        selected
+                    );
+                }}
+            />
+        }
+
         var additionalClass = "";
         if (
             additionalClass.length === 0 &&
@@ -1684,6 +1709,7 @@ var ConversationPanel = React.createClass({
                     />
 
                     {attachCloudDialog}
+                    {sendContactDialog}
 
 
                     <div className={"messages-block " + additionalClass}>
@@ -1729,9 +1755,17 @@ var ConversationPanel = React.createClass({
                                             vertOffset={10}
                                         >
                                             <DropdownsUI.DropdownItem
-                                                icon="grey-cloud" label={__("Add from your Cloud")}
+                                                icon="grey-cloud"
+                                                label={__("Add from your Cloud")}
                                                 onClick={(e) => {
                                                     self.setState({'attachCloudDialog': true});
+                                            }}>
+                                            </DropdownsUI.DropdownItem>
+                                            <DropdownsUI.DropdownItem
+                                                icon="square-profile"
+                                                label={__("Send Contact")}
+                                                onClick={(e) => {
+                                                    self.setState({'sendContactDialog': true});
                                             }}>
                                             </DropdownsUI.DropdownItem>
                                         </DropdownsUI.Dropdown>

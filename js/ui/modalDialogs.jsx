@@ -3,6 +3,8 @@ var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 
+var ContactsUI = require('./../chat/ui/contacts.jsx');
+
 var ModalDialog = React.createClass({
     mixins: [MegaRenderMixin],
     componentDidMount: function() {
@@ -368,11 +370,11 @@ var CloudBrowserDialog = React.createClass({
 
                 <table className="grid-table-header fm-dialog-table">
                     <tbody>
-                        <tr>
-                            <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                            <BrowserCol id="name" label={__("Name")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                            <BrowserCol id="size" label={__("Size")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                        </tr>
+                    <tr>
+                        <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                        <BrowserCol id="name" label={__("Name")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                        <BrowserCol id="size" label={__("Size")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                    </tr>
                     </tbody>
                 </table>
 
@@ -390,7 +392,91 @@ var CloudBrowserDialog = React.createClass({
         );
     }
 });
+
+var SelectContactDialog = React.createClass({
+    mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            'selectLabel': __("Send"),
+            'cancelLabel': __("Cancel"),
+        }
+    },
+    getInitialState: function() {
+        return {
+            'selected': []
+        }
+    },
+    onSelected: function(nodes) {
+        this.setState({'selected': nodes});
+        this.props.onSelected(nodes);
+        this.forceUpdate();
+    },
+    onSelectClicked: function() {
+        this.props.onSelectClicked();
+    },
+    render: function() {
+        var self = this;
+
+        var classes = "send-contact " + self.props.className;
+
+
+        return (
+            <ModalDialog
+                title={__("Send Contact")}
+                className={classes}
+                onClose={() => {
+                    self.props.onClose(self);
+                }}
+                buttons={[
+                        {
+                            "label": self.props.selectLabel,
+                            "key": "select",
+                            "className": self.state.selected.length === 0 ? "disabled" : null,
+                            "onClick": function(e) {
+                                if (self.state.selected.length > 0) {
+                                    self.props.onSelected(self.state.selected);
+                                    self.props.onSelectClicked();
+                                }
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        },
+                        {
+                            "label": self.props.cancelLabel,
+                            "key": "cancel",
+                            "onClick": function(e) {
+                                self.props.onClose(self);
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        },
+            ]}>
+            <ContactsUI.ContactPickerWidget
+                megaChat={self.props.megaChat}
+                contacts={self.props.contacts}
+                onClick={(contact, e) => {
+                    var contactHash = contact.h;
+
+                    if (self.state.selected.indexOf(contactHash) === -1) {
+                        self.state.selected.push(contact.h);
+                        self.onSelected(self.state.selected);
+                    }
+                    else {
+                        removeValue(self.state.selected, contactHash);
+                        self.onSelected(self.state.selected);
+                    }
+                }}
+                selected={self.state.selected}
+                headerClasses="left-aligned"
+                />
+            </ModalDialog>
+        );
+    }
+});
+
+
 module.exports = window.ModalDialogUI = {
     ModalDialog,
     CloudBrowserDialog,
+    SelectContactDialog
 };

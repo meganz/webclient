@@ -710,6 +710,7 @@
     "1356": "Povratna informacija",
     "1357": "Odjava",
     "1362": "Obnovite kupovine",
+    "1364": "Ponovite",
     "1367": "Dobijte 50 GB besplatno, ili se prijavite za jedan od na\u0161ih Pro paketa i dobivate 4 TB \u0161ifriranog smje\u0161tajnog prostora za ve\u0107 od 8,33 EUR mjese\u010dno.",
     "1368": "do [X]",
     "1369": "i [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Click here to show more payment options...",
     "7994": "How long do you want your membership to be?",
     "7995": "Are you happy with your payment plan?",
-    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase."
+    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "7997": "Chat",
+    "8000": "No conversation history",
+    "8004": "Delete message",
+    "8010": "Search contacts",
+    "8012": "Quote",
+    "8015": "WHISPER MODE",
+    "8023": "Attach"
 }

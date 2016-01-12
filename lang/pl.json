@@ -710,6 +710,7 @@
     "1356": "Uwagi\/Pomys\u0142y",
     "1357": "Wyloguj si\u0119",
     "1362": "Przywr\u00f3\u0107 zakupy",
+    "1364": "Pon\u00f3w",
     "1367": "Pobierz 50 GB za darmo, lub wybierz jeden z pakiet\u00f3w Pro i zyskaj do 4 TB zaszyfrowanej powierzchni ju\u017c od \u20ac8.33 za miesi\u0105c.",
     "1368": "do [X]",
     "1369": "i [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Kliknij aby rozwin\u0105\u0107 wi\u0119cej opcji p\u0142atno\u015bci...",
     "7994": "Jak d\u0142ugo ma trwa\u0107 okres abonamentowy?",
     "7995": "Czy jeste\u015b zadowolony z wybranego konta?",
-    "7996": "Kliknij [S]KUP[\/S] je\u017celi jeste\u015b zadowolony z wybory formy p\u0142atno\u015bci. Zostaniesz przekierowany do nowego okna w celu zako\u0144czenia p\u0142atno\u015bci."
+    "7996": "Kliknij [S]KUP[\/S] je\u017celi jeste\u015b zadowolony z wybory formy p\u0142atno\u015bci. Zostaniesz przekierowany do nowego okna w celu zako\u0144czenia p\u0142atno\u015bci.",
+    "7997": "Chat",
+    "8000": "Brak historii rozmowy",
+    "8004": "Usu\u0144 wiadomo\u015b\u0107",
+    "8010": "Szukaj kontakt\u00f3w",
+    "8012": "Zapytaj",
+    "8015": "TRYB \"PRYWATNY\"",
+    "8023": "Za\u0142\u0105cz"
 }

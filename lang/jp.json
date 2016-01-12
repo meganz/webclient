@@ -710,6 +710,7 @@
     "1356": "\u30d5\u30a3\u30fc\u30c9\u30d0\u30c3\u30af",
     "1357": "\u30ed\u30b0\u30a2\u30a6\u30c8",
     "1362": "\u8cfc\u5165\u3092\u7d9a\u3051\u308b",
+    "1364": "\u3082\u3046\u4e00\u5ea6\u3084\u308b",
     "1367": "50 GB\u306f\u7121\u6599\u3001\u30d7\u30ed\u306b\u767b\u9332\u3059\u308c\u3070\u6708\u3005\u20ac8.33\u304b\u30894 TB \u307e\u3067\u306e\u6697\u53f7\u5316\u30b9\u30c8\u30ec\u30fc\u30b8\u304c\u304a\u4f7f\u3044\u3044\u305f\u3060\u3051\u307e\u3059\u3002",
     "1368": "[X]\u307e\u3067",
     "1369": "\u305d\u3057\u3066[X]",
@@ -2870,5 +2871,12 @@
     "7993": "Click here to show more payment options...",
     "7994": "How long do you want your membership to be?",
     "7995": "Are you happy with your payment plan?",
-    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase."
+    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "7997": "Chat",
+    "8000": "No conversation history",
+    "8004": "Delete message",
+    "8010": "Search contacts",
+    "8012": "Quote",
+    "8015": "WHISPER MODE",
+    "8023": "Attach"
 }

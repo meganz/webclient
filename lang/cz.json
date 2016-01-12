@@ -710,6 +710,7 @@
     "1356": "Zp\u011btn\u00e1 vazba",
     "1357": "Odhl\u00e1sit se",
     "1362": "Obnovit zakoupen\u00ed",
+    "1364": "Opakovat",
     "1367": "Z\u00edskejte 50\u00a0GB zdarma, nebo si zaregistrujte jeden z na\u0161ich bal\u00ed\u010dk\u016f Pro a z\u00edskejte a\u017e 4\u00a0TB \u0161ifrovan\u00e9ho \u00falo\u017ei\u0161t\u011b za\u010d\u00ednaj\u00edc\u00edho na 8,33\u00a0\u20ac m\u011bs\u00ed\u010dn\u011b.",
     "1368": "a\u017e [X]",
     "1369": "a [X]",
@@ -2834,7 +2835,7 @@
     "7874": "Vypad\u00e1 to, \u017ee va\u0161e aktu\u00e1ln\u00ed roz\u0161\u00ed\u0159en\u00ed (v%1) je zastaral\u00e9. N\u00ed\u017ee m\u016f\u017eete st\u00e1hnout nejnov\u011bj\u0161\u00ed (v%2).",
     "7875": "Va\u0161e roz\u0161\u00ed\u0159en\u00ed (v%1) je aktu\u00e1ln\u00ed.",
     "7879": "P\u0159\u00edstup k slo\u017ek\u00e1m sd\u00edlen\u00fdch od [X] byl odebr\u00e1n",
-    "7880": "P\u0159\u00edstup k slo\u017ek\u00e1m byl odebr\u00e1n",
+    "7880": "P\u0159\u00edstup k slo\u017ek\u00e1m byl odebr\u00e1n.",
     "7881": "D\u011bkujeme! Jeden z na\u0161ich konzultant\u016f podpory odpov\u00ed na v\u00e1\u0161 dotaz co nejd\u0159\u00edve.",
     "7882": "Zpr\u00e1va odesl\u00e1na",
     "7883": "P\u0159i pokusu o odesl\u00e1n\u00ed va\u0161\u00ed zpr\u00e1vy do\u0161lo k chyb\u011b. Zkuste ji odeslat znovu.",
@@ -2870,5 +2871,12 @@
     "7993": "Pro v\u00edce platebn\u00edch mo\u017enost\u00ed klikn\u011bte zde...",
     "7994": "Jak dlouh\u00e9 \u010dlenstv\u00ed byste r\u00e1di?",
     "7995": "Jste spokojeni z rozvrhem plateb?",
-    "7996": "Pokud je v\u0161e v po\u0159\u00e1dku, klikn\u011bt\u011b na [S]KOUPIT[\/S], budete p\u0159esm\u011brov\u00e1n\u00ed na novou str\u00e1nku, kde dokon\u010d\u00edte v\u00e1\u0161 n\u00e1kup."
+    "7996": "Pokud je v\u0161e v po\u0159\u00e1dku, klikn\u011bt\u011b na [S]KOUPIT[\/S], budete p\u0159esm\u011brov\u00e1n\u00ed na novou str\u00e1nku, kde dokon\u010d\u00edte v\u00e1\u0161 n\u00e1kup.",
+    "7997": "Chat",
+    "8000": "\u017d\u00e1dn\u00e1 historie k zobrazen\u00ed",
+    "8004": "Smazat zpr\u00e1vu",
+    "8010": "Hledat kontakty",
+    "8012": "Do fronty",
+    "8015": "RE\u017dIM \u0160EPT\u00c1N\u00cd",
+    "8023": "P\u0159ilo\u017eit"
 }

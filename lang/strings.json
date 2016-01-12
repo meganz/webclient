@@ -1792,11 +1792,11 @@
         "context": "App that will allow the user to sync between folders on his device and MEGA. In some languages the English term might be more appropriate."
     },
     "957": {
-        "text": "Chrome App",
+        "text": "Chrome Extension",
         "context": "an application for the Chrome web browser. In most languages the English translation is probably more appropriate."
     },
     "959": {
-        "text": "Firefox App",
+        "text": "Firefox Extension",
         "context": "an application for the Firefox web browser. In most languages the English translation is probably more appropriate."
     },
     "961": {
@@ -2508,11 +2508,11 @@
         "context": "Extension refers to Browser extension, which is an app that runs in the browser."
     },
     "1174": {
-        "text": "This app will allow you to install MEGA into your browser. It will reduce loading times, improve download performance and strengthen security.",
+        "text": "This extension will allow you to install MEGA into your browser. It will reduce loading times, improve download performance and strengthen security.",
         "context": ""
     },
     "1175": {
-        "text": "Any MEGA URL will be captured by this app and stay local (no JavaScript will be loaded from our servers). Secure (auto-) updates are provided thanks to cryptographic private key signing.",
+        "text": "Any MEGA URL will be captured by this extension and stay local (no JavaScript will be loaded from our servers). Secure (auto-) updates are provided thanks to cryptographic private key signing.",
         "context": ""
     },
     "1176": {
@@ -2842,6 +2842,10 @@
     "1362": {
         "text": "Restore purchases",
         "context": "Button to allow the user to restore a purchase that got interrupted."
+    },
+    "1364": {
+        "text": "Retry",
+        "context": "Button to retry a certain action"
     },
     "1367": {
         "text": "Get 50 GB for free, or sign up for one of our Pro packages and get up to 4 TB of encrypted storage starting at \u20ac8.33 per month.",
@@ -11486,5 +11490,33 @@
     "7996": {
         "text": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
         "context": "An instruction on the PRO payment page. Please do not remove the [S] and [\/S] tags as they will be used to style the word PURCHASE. Do translate the word PURCHASE though which should remain uppercase to match the button text."
+    },
+    "7997": {
+        "text": "Chat",
+        "context": "Chat section header"
+    },
+    "8000": {
+        "text": "No conversation history",
+        "context": "Information if there are no history messages in current chat conversation."
+    },
+    "8004": {
+        "text": "Delete message",
+        "context": "Menu item which allows to delete message in chat conversation."
+    },
+    "8010": {
+        "text": "Search contacts",
+        "context": "Search contacts section header."
+    },
+    "8012": {
+        "text": "Quote",
+        "context": "Button label. It allows to quote user's post in chat conversation."
+    },
+    "8015": {
+        "text": "WHISPER MODE",
+        "context": "Button label. It allows to enter in a private \"whisper\" conversation mode."
+    },
+    "8023": {
+        "text": "Attach",
+        "context": "Button label. It allows to attach selected files for sharing."
     }
 }

@@ -710,6 +710,7 @@
     "1356": "Atsauksm\u0113m",
     "1357": "Iziet",
     "1362": "Atjaunot pirkumus",
+    "1364": "M\u0113\u0123in\u0101t v\u0113lreiz",
     "1367": "Sa\u0146emiet 50 GB bezmaksas, vai izv\u0113lies vienu no m\u016bsu Pro pl\u0101niem un sa\u0146emiet l\u012bdz pat 4 TB \u0161ifr\u0113tu failu uzglab\u0101\u0161anas vietu s\u0101kot no 8,33 \u20ac m\u0113nes\u012b.",
     "1368": "l\u012bdz [X]",
     "1369": "un [X]",
@@ -2870,5 +2871,12 @@
     "7993": "Click here to show more payment options...",
     "7994": "How long do you want your membership to be?",
     "7995": "Are you happy with your payment plan?",
-    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase."
+    "7996": "Click [S]PURCHASE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "7997": "Chat",
+    "8000": "No conversation history",
+    "8004": "Delete message",
+    "8010": "Search contacts",
+    "8012": "Quote",
+    "8015": "WHISPER MODE",
+    "8023": "Attach"
 }

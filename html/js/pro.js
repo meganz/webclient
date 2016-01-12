@@ -1240,7 +1240,7 @@ var proPage = {
     },
     
     /**
-     * Updates the main price at the bottom of the page
+     * Updates the main price
      * @param {Number} planIndex The array index of the plan in membershipPlans
      */
     updateMainPrice: function(planIndex) {
@@ -1255,11 +1255,18 @@ var proPage = {
         var price = currentPlan[5].split('.');
         var dollars = price[0];
         var cents = price[1];
+        
+        // Change the wording to month or year
+        var numOfMonths = currentPlan[4];
+        var monthOrYearWording = (numOfMonths === 1) ? l[931] : l[932];
 
-        // Update main price at the bottom
+        // Update the price of the plan
         $('.membership-step2 .reg-st3-bott-title.price .num').safeHTML(
             dollars + '<span class="small">.' + cents + ' &euro;</span>'
         );
+
+        // Update to /month or /year next to the price box
+        $('.membership-step2 .reg-st3-bott-title.price .period').text('/' + monthOrYearWording);                
     },
         
     /**

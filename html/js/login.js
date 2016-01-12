@@ -3,8 +3,7 @@ var login_email = false;
 
 function dologin() {
     /* jshint -W074 */
-    if ((document.getElementById('login_email').value === '')
-            || (document.getElementById('login_email').value === l[195])) {
+    if ((document.getElementById('login_email').value === '')) {
         alert(l[197]);
     }
     else if (checkMail(document.getElementById('login_email').value)) {
@@ -241,23 +240,11 @@ function init_login() {
         }
     }
 
-    $('#login-name2').rebind('focus', function(e) {
+    $('#login-name2,#login-password2').rebind('focus', function(e) {
         $('.login-register-input.email').addClass('focused');
-        if ($(this).val() === l[195]) {
-            $(this).val('');
-        }
     });
-    $('#login-name2').rebind('blur', function(e) {
+    $('#login-name2,#login-password2').rebind('blur', function(e) {
         $('.login-register-input.email').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[195]);
-        }
-    });
-    $('#login-password2').rebind('focus', function(e) {
-        $('.login-register-input.password').addClass('focused');
-    });
-    $('#login-password2').rebind('blur', function(e) {
-        $('.login-register-input.password').removeClass('focused');
     });
 
     $('#login-password2, #login-name2').rebind('keydown', function(e) {

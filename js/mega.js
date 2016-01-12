@@ -3415,7 +3415,7 @@ function MegaData()
 
         // On first favourite found break the loop
         $.each(nodes, function(index, value) {
-            if (M.d[value].fav) {
+            if (M.d[value] && M.d[value].fav) {
                 result = true;
                 return false;// Break each loop
             }

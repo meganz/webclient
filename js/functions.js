@@ -3747,7 +3747,7 @@ if (typeof sjcl !== 'undefined') {
 
                 // Look for full share
                 if (fullShare) {
-                    shares = M.d[nodes[i]].shares;
+                    shares = M.d[nodes[i]] && M.d[nodes[i]].shares;
 
                     // Look for link share
                     if (linkShare) {

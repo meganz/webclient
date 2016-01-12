@@ -64,7 +64,7 @@ function init_start() {
             }
         });
     }
-    $(window).rebind('resize', function(e) {
+    $(window).rebind('resize.startpage', function(e) {
         if (page === 'start' && $.infoscroll) {
             startscrollIgnore(1000);
             jScrollStart();

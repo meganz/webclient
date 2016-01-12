@@ -1,3 +1,7 @@
+# User/runtime variables
+# For browser-test and headless-browser-test.
+# BROWSER = Firefox
+
 # Site-dependent variables
 NODE_PATH = ./node_modules
 NPM = npm
@@ -18,9 +22,20 @@ ifdef SILENT
     SILENT_MAKE = "-s"
 endif
 
+# If HEADLESS is set, we'll run our browser in headless mode through xvfb-run.
+ifneq ($(HEADLESS),)
+    HEADLESS_RUN = "xvfb-run"
+endif
+
 # If no browser set, run on our custom PhantomJS2.
 ifeq ($(BROWSER),)
     BROWSER = PhantomJS2_custom
+endif
+
+# If no Karma flags set, set a default.
+ifeq ($(KARMA_FLAGS),)
+    # Set to --preprocessors= to show line numbers, otherwise coverage clobbers them.
+    KARMA_FLAGS = "--preprocessors="
 endif
 
 # All browsers to test with on the test-all target.
@@ -36,11 +51,10 @@ test-no-workflows:
 
 test: $(KARMA)
 	@rm -rf test/phantomjs-storage
-	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers $(BROWSER) $(OPTIONS)
+	$(HEADLESS_RUN) $(NODE) $(KARMA) start $(KARMA_FLAGS) karma.conf.js --browsers $(BROWSER) $(OPTIONS)
 
 test-ci: $(KARMA)
-	@rm -rf test/phantomjs-storage
-	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers $(BROWSER) $(OPTIONS)
+	KARMA_FLAGS="--singleRun=true --no-colors" $(MAKE) test
 
 test-all:
 	OPTIONS="--singleRun=true" BROWSER=$(TESTALL_BROWSERS) $(MAKE) $(SILENT_MAKE) test

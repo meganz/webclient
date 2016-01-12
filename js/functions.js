@@ -720,7 +720,7 @@ function uplpad(number, length) {
     return str;
 }
 
-function secondsToTime(secs) {
+function secondsToTime(secs, text_format) {
     if (isNaN(secs)) {
         return '--:--:--';
     }
@@ -734,6 +734,11 @@ function secondsToTime(secs) {
     var divisor_for_seconds = divisor_for_minutes % 60;
     var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
     var returnvar = hours + ':' + minutes + ':' + seconds;
+
+    if (text_format) {
+        hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
+        returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
+    } 
     return returnvar;
 }
 
@@ -742,6 +747,21 @@ function htmlentities(value) {
         return '';
     }
     return $('<div/>').text(value).html();
+}
+
+/**
+ * Convert bytes sizes into a human-friendly format (KB, MB, GB), pretty
+ * similar to `bytesToSize` but this function returns an object
+ * (`{ size: "23,33", unit: 'KB' }`) which is easier to consume
+ *
+ * @param {Number} bytes        Size in bytes to convert
+ * @param {Number} precision    Precision to show the decimal number
+ * @returns {Object} Returns an object similar to `{size: "2.1", unit: "MB"}`
+ */
+function numOfBytes(bytes, precision) {
+
+    var parts = bytesToSize(bytes, precision || 2).split(' ');
+    return { size: parts[0], unit: parts[1] || 'B' };
 }
 
 function bytesToSize(bytes, precision) {
@@ -3727,7 +3747,7 @@ if (typeof sjcl !== 'undefined') {
 
                 // Look for full share
                 if (fullShare) {
-                    shares = M.d[nodes[i]].shares;
+                    shares = M.d[nodes[i]] && M.d[nodes[i]].shares;
 
                     // Look for link share
                     if (linkShare) {

@@ -991,9 +991,9 @@ var ConversationAudioVideoPanel = React.createClass({
                 </div>
                 <video
                     className="localViewport"
-                    defaultMuted="true"
-                    muted=""
-                    volume="0"
+                    defaultMuted={true}
+                    muted={true}
+                    volume={0}
                     id={"localvideo_" + callSession.sid}
                     src={localPlayerSrc}
                     style={{display: !this.state.localMediaDisplay ? "none" : ""}}

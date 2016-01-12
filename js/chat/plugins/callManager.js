@@ -1127,7 +1127,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             self.trigger('CallMissed', [session, eventData]);
         } else if (reason === 'user') {
             //do nothing, we canceled it so we have that handled already, this is just a feedback event
-        } else if (self._isAFailedReason(reason)) {
+        } else if (CallManager._isAFailedReason(reason)) {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text])
         } else {

@@ -3569,7 +3569,7 @@ function MegaData()
 
         // On first favourite found break the loop
         $.each(nodes, function(index, value) {
-            if (M.d[value].fav) {
+            if (M.d[value] && M.d[value].fav) {
                 result = true;
                 return false;// Break each loop
             }
@@ -4359,7 +4359,7 @@ function MegaData()
 
         if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
             $('.megasync-upload-overlay').show();
-            $('.megasync-overlay-continue, .fm-dialog-close').rebind('click', function() {
+            $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', function() {
                 $('.megasync-upload-overlay').hide();
                 M.addUpload(u, true);
                 $(document).unbind('keyup.megasync-upload');
@@ -4369,7 +4369,7 @@ function MegaData()
                 M.addUpload(u, true);
                 $(document).unbind('keyup.megasync-upload');
             });
-            $('.megasync-overlay-download').rebind('click', function() {
+            $('.download-button.light-white.download').rebind('click', function() {
                 $('.megasync-upload-overlay').hide();
                 location.hash = '#sync';
                 $(document).unbind('keyup.megasync-upload');

@@ -660,7 +660,7 @@ var strongvelope = {};
      * @method
      * @param message {ChatdMessage}
      *     A message to extract keys from.
-     * @return {{Object.<parsedMessage: Object, senderKeys: Object}|Boolean}
+     * @return {Object|Boolean}
      *     An objects containing the parsed message and an object mapping a
      *     keyId to a key. `false` on signature verification error.
      * @private
@@ -1570,51 +1570,75 @@ var strongvelope = {};
 
         var errorOut = false;
 
-        includeParticipants = includeParticipants || [];
-        excludeParticipants = excludeParticipants || [];
+        includeParticipants = new Set(includeParticipants || []);
+        excludeParticipants = new Set(excludeParticipants || []);
+
+        var alterIntersection = _setIntersection(includeParticipants,
+                                                 excludeParticipants);
+        var alterJoin = _setJoin(includeParticipants, excludeParticipants);
 
         // General sanity check.
-        if ((includeParticipants.length === 0)
-                && (excludeParticipants.length === 0)) {
+        if (alterJoin.size === 0) {
             logger.warn('No participants to include or exclude.');
+            errorOut = true;
+        }
+        if (alterIntersection.size !== 0) {
+            logger.warn('Overlap in participants to include amd exclude.');
             errorOut = true;
         }
 
         // Some sanity checking on new participants to include.
-        for (var i = 0; i < includeParticipants.length; i++) {
-            if (includeParticipants[i] === this.ownHandle) {
+        var self = this;
+        var tempIncludes = new Set(this.includeParticipants);
+        var tempExcludes = new Set(this.excludeParticipants);
+        includeParticipants.forEach(function _includeIterator(item) {
+            if (item === self.ownHandle) {
                 logger.warn('Cannot include myself to a chat.');
                 errorOut = true;
             }
-            else if (this.otherParticipants.has(includeParticipants[i])) {
-                logger.warn('User ' + includeParticipants[i] + ' already participating, cannot include.');
+            else if (self.otherParticipants.has(item)) {
+                logger.warn('User ' + item + ' already participating, cannot include.');
                 errorOut = true;
             }
             else {
-                this.includeParticipants.add(includeParticipants[i]);
+                tempIncludes.add(item);
             }
-        }
+
+            // Check whether it is in the exclude list and needs to be removed.
+            if (tempExcludes.has(item)) {
+                tempExcludes.delete(item);
+            }
+        });
 
         // Some sanity checking on existing participants to exclude.
         // jshint -W004
-        for (var i = 0; i < excludeParticipants.length; i++) {
-            if (excludeParticipants[i] === this.ownHandle) {
+        excludeParticipants.forEach(function _excludeIterator(item) {
+            if (item === self.ownHandle) {
                 logger.warn('Cannot exclude myself from a chat.');
                 errorOut = true;
             }
-            else if (!this.otherParticipants.has(excludeParticipants[i])) {
-                logger.warn('User ' + excludeParticipants[i] + ' not participating, cannot exclude.');
+            else if (!self.otherParticipants.has(item)) {
+                logger.warn('User ' + item + ' not participating, cannot exclude.');
                 errorOut = true;
             }
             else {
-                this.excludeParticipants.add(excludeParticipants[i]);
+                tempExcludes.add(item);
             }
-        }
+
+            // Check whether it is in the include list and needs to be removed.
+            if (tempIncludes.has(item)) {
+                tempIncludes.delete(item);
+            }
+        });
         // jshint +W004
 
         if (errorOut) {
             return false;
         }
+
+        // Now pivot over tempIncludes/tempExcludes.
+        this.includeParticipants = tempIncludes;
+        this.excludeParticipants = tempExcludes;
 
         // Update our sender key.
         this.updateSenderKey();

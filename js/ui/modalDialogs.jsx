@@ -167,6 +167,10 @@ var BrowserEntries = React.createClass({
                 // continue
                 return;
             }
+            if (!node.name) {
+                // continue
+                return;
+            }
 
             var isFolder = node.t === 1;
             var isSelected = self.state.selected.indexOf(node.h) !== -1;

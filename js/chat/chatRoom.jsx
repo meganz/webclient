@@ -1106,6 +1106,31 @@ ChatRoom.prototype.attachNodes = function(ids) {
     return $masterPromise;
 };
 
+/**
+ * Attach/share (send as message) contact details
+ * @param ids
+ */
+ChatRoom.prototype.attachContacts = function(ids) {
+    var self = this;
+
+    var nodesMeta = [];
+    $.each(ids, function(k, nodeId) {
+        var node = M.d[nodeId];
+        nodesMeta.push({
+            'u': node.u,
+            'email': node.m,
+            'name': node.firstName && node.lastName ? node.firstName + " " + node.lastName : node.m
+        });
+    });
+
+    // 1b, 1b, JSON
+    self.sendMessage(
+        Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+        Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
+        JSON.stringify(nodesMeta)
+    );
+};
+
 ChatRoom.prototype.revokeAttachment = function(node) {
     var self = this;
 

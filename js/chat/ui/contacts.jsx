@@ -30,9 +30,54 @@ var ContactsListItem = React.createClass({
 });
 
 
+var ContactVerified = React.createClass({
+    mixins: [MegaRenderMixin],
+    render: function() {
+        var self = this;
+
+        var contact = this.props.contact;
+
+        var verifiedElement = null;
+
+        if (u_authring && u_authring.Ed25519) {
+            var verifyState = u_authring.Ed25519[contact.u] || {};
+            verifiedElement = (
+                verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ?
+                    <div className={"user-card-verified " + this.props.className}></div> : null
+            );
+        }
+        else {
+            var self = this;
+
+            u_authring.getPubEd25519(contact.u)
+                .done(function() {
+                    if(self.isMounted()) {
+                        self.forceUpdate();
+                    }
+                })
+        }
+
+
+        return verifiedElement;
+    }
+});
+var ContactPresence = React.createClass({
+    mixins: [MegaRenderMixin],
+    render: function() {
+        var self = this;
+        var contact = this.props.contact;
+        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
+
+        return <div className={"user-card-presence " + pres + " " + this.props.className}></div>;
+    }
+});
+
+var _noAvatars = {};
+
 var Avatar = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
+        var self = this;
         var contact = this.props.contact;
 
         var $avatar = $(useravatar.contact(contact));
@@ -47,23 +92,7 @@ var Avatar = React.createClass({
         var verifiedElement = null;
 
         if (!this.props.hideVerifiedBadge) {
-            if (u_authring && u_authring.Ed25519) {
-                var verifyState = u_authring.Ed25519[contact.u] || {};
-                verifiedElement = (
-                    verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ?
-                        <div className="user-card-verified"></div> : undefined
-                );
-            }
-            else {
-                var self = this;
-
-                u_authring.getPubEd25519(contact.u)
-                    .done(function() {
-                        if(self.isMounted()) {
-                            self.forceUpdate();
-                        }
-                    })
-            }
+            verifiedElement = <ContactVerified contact={this.props.contact} className={this.props.verifiedClassName} />
         }
 
         if($avatar.find("img").length > 0) {
@@ -78,6 +107,50 @@ var Avatar = React.createClass({
 
             displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={$(useravatar.contact(contact)).text()}></div></div>;
 
+        }
+
+        return displayedAvatar;
+    }
+});
+
+var AvatarImage = React.createClass({
+    mixins: [MegaRenderMixin, RenderDebugger],
+    render: function() {
+        var contact = this.props.contact;
+
+        var imgUrl = useravatar.imgUrl(contact.u);
+
+        var displayedAvatar;
+
+        displayedAvatar = <img src={imgUrl} style={this.props.imgStyles} className="avatar-img" />;
+
+        if (!avatars[contact.u] && (!_noAvatars[contact.u] || _noAvatars[contact.u] !== true)) {
+            var self = this;
+
+            var loadAvatarPromise;
+            if (!_noAvatars[contact.u]) {
+                loadAvatarPromise = getUserAttribute(contact.u, 'a', true, false);
+            }
+            else {
+                loadAvatarPromise = _noAvatars[contact.u];
+            }
+
+            loadAvatarPromise
+                .done(function(r) {
+                    var blob = new Blob([base64urldecode(r)], {type: 'image/jpeg'});
+                    avatars[contact.u] = {
+                        data: blob,
+                        url: myURL.createObjectURL(blob)
+                    };
+                    useravatar.loaded(contact);
+
+                    delete _noAvatars[contact.u];
+
+                    self.forceUpdate();
+                })
+                .fail(function(e) {
+                    _noAvatars[contact.u] = true;
+                });
 
         }
 
@@ -137,7 +210,7 @@ var ContactCard = React.createClass({
                         }
                     }}
                     >
-                <div className={"user-card-presence " + pres}></div>
+                <ContactPresence contact={contact} className={this.props.presenceClassName}/>
                 <Avatar contact={contact} className="small-rounded-avatar" />
 
                 {contextMenu}
@@ -233,5 +306,8 @@ module.exports = {
     ContactsListItem,
     ContactCard,
     Avatar,
-    ContactPickerWidget
+    ContactPickerWidget,
+    ContactVerified,
+    ContactPresence,
+    AvatarImage
 };

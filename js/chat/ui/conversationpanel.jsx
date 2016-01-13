@@ -381,6 +381,147 @@ var ConversationMessage = React.createClass({
                         </div>
                     </div>;
                 }
+                else if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
+                    textContents = textContents.substr(2, textContents.length);
+
+                    try {
+                        var attachmentMeta = JSON.parse(textContents);
+                    } catch(e) {
+                        return null;
+                    }
+
+                    var contacts = [];
+
+                    attachmentMeta.forEach(function(v) {
+                        var dropdown = null;
+                        if (M.u[v.u]) {
+                            dropdown = <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon grey-down-arrow">
+                                <DropdownsUI.Dropdown
+                                    className="white-context-menu shared-contact-dropdown"
+                                    noArrow={true}
+                                    positionMy="left bottom"
+                                    positionAt="right bottom"
+                                    horizOffset={4}
+                                    >
+                                    <DropdownsUI.DropdownItem
+                                        icon="human-profile"
+                                        label={__("View profile")}
+                                        onClick={() => {
+                                            window.location = "#fm/" + v.u;
+                                        }}
+                                    />
+                                    <hr/>
+                                    { null /*<DropdownsUI.DropdownItem
+                                        icon="rounded-grey-plus"
+                                        label={__("Add to chat")}
+                                        onClick={() => {
+                                            window.location = "#fm/" + v.u;
+                                        }}
+                                    />*/}
+                                    <DropdownsUI.DropdownItem
+                                        icon="conversations"
+                                        label={__("Start new chat")}
+                                        onClick={() => {
+                                            window.location = "#fm/chat/" + v.u;
+                                        }}
+                                    />
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>;
+                        }
+                        else {
+                            dropdown = <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon grey-down-arrow">
+                                <DropdownsUI.Dropdown
+                                    className="white-context-menu shared-contact-dropdown"
+                                    noArrow={true}
+                                    positionMy="left bottom"
+                                    positionAt="right bottom"
+                                    horizOffset={4}
+                                >
+                                    <DropdownsUI.DropdownItem
+                                        icon="rounded-grey-plus"
+                                        label={__("Add contact")}
+                                        onClick={() => {
+                                            M.inviteContact(M.u[u_handle].m, v.email);
+
+                                            // Contact invited
+                                            var title = l[150];
+
+                                            // The user [X] has been invited and will appear in your contact list once
+                                            // accepted."
+                                            var msg = l[5898].replace('[X]', v.email);
+
+
+                                            closeDialog();
+                                            msgDialog('info', title, msg);
+                                        }}
+                                    />
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>;
+                        }
+
+
+                        contacts.push(
+                            <div key={v.u}>
+                                <div className="message shared-info">
+                                    <div className="message data-title">{v.name}</div>
+                                    {
+                                        M.u[v.u] ?
+                                            <ContactsUI.ContactVerified className="big" contact={M.u[v.u]} /> :
+                                            null
+                                    }
+
+                                    <div className="user-card-email">{v.email}</div>
+                                </div>
+                                <div className="message shared-data">
+                                    <div className="data-block-view medium">
+                                        {
+                                            M.u[v.u] ?
+                                                <ContactsUI.ContactPresence className="big" contact={M.u[v.u]} /> :
+                                                null
+                                        }
+                                        {dropdown}
+                                        <div className="data-block-bg">
+                                            <ContactsUI.AvatarImage contact={v} />
+                                        </div>
+                                    </div>
+                                    <div className="clear"></div>
+                                </div>
+                            </div>
+                        );
+                    });
+
+
+                    var avatar = null;
+                    var datetime = null;
+                    var name = null;
+                    if (this.props.grouped) {
+                        additionalClasses += " grouped";
+                    }
+                    else {
+                        avatar = <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar"/>;
+                        datetime = <div className="message date-time"
+                                            title={time2date(timestampInt)}>{timestamp}</div>;
+                        name = <div className="message user-card-name">{displayName}</div>;
+                    }
+
+                    return <div className={message.messageId + " message body" + additionalClasses}>
+                        {avatar}
+                        <div className="message content-area">
+                            {name}
+                            {datetime}
+
+                            <div className="message shared-block">
+                                {contacts}
+                            </div>
+                            {buttonsBlock}
+                            {spinnerElement}
+                        </div>
+                    </div>;
+                }
                 else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
                     if (!chatRoom._attachmentsMap) {
                         chatRoom._attachmentsMap = {};
@@ -525,7 +666,7 @@ var ConversationMessage = React.createClass({
                 }
                 textMessage = tmpMsg;
                 textMessage = textMessage
-                    .replace("[[ ", "<span class=\"grey-color\">")
+                    .replace("[[ ", "<span className=\"grey-color\">")
                     .replace("]]", "</span>");
             }
             else {
@@ -1669,9 +1810,7 @@ var ConversationPanel = React.createClass({
                 onSelectClicked={() => {
                     self.setState({'sendContactDialog': false});
 
-                    console.error(
-                        selected
-                    );
+                    room.attachContacts(selected);
                 }}
             />
         }
@@ -1761,13 +1900,13 @@ var ConversationPanel = React.createClass({
                                                     self.setState({'attachCloudDialog': true});
                                             }}>
                                             </DropdownsUI.DropdownItem>
-                                            <DropdownsUI.DropdownItem
+                                            {null /*<DropdownsUI.DropdownItem
                                                 icon="square-profile"
                                                 label={__("Send Contact")}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
                                             }}>
-                                            </DropdownsUI.DropdownItem>
+                                            </DropdownsUI.DropdownItem> */}
                                         </DropdownsUI.Dropdown>
                                     </ButtonsUI.Button>
                             </TypingAreaUI.TypingArea>

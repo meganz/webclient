@@ -588,7 +588,6 @@ var attribCache = new IndexedDBKVStorage('attrib');
  */
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                           callback, ctx) {
-
     assertUserHandle(userhandle);
     var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};

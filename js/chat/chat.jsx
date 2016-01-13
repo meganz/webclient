@@ -332,15 +332,13 @@ Chat.prototype.init = function() {
             });
         }
 
-        if (eventObject.isMyOwn(self.karere) === false) {
 
-            // update M.u
-            var contact = self.getContactFromJid(eventObject.getFromJid());
-            if (contact) {
-                if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
-                    contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
-                    contact.presenceMtime = eventObject.getDelay();
-                }
+        // update M.u
+        var contact = self.getContactFromJid(eventObject.getFromJid());
+        if (contact) {
+            if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
+                contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
+                contact.presenceMtime = eventObject.getDelay();
             }
         }
 

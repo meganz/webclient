@@ -104,6 +104,7 @@ Message.MANAGEMENT_MESSAGE_TYPES = {
     "MANAGEMENT": "\0",
     "ATTACHMENT": "\x10",
     "REVOKE_ATTACHMENT": "\x11",
+    "CONTACT": "\x12",
 };
 
 
@@ -118,7 +119,8 @@ Message.prototype.isRenderableManagement = function() {
         return false;
     }
     return this.textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT && (
-            this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT
+            this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT ||
+            this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT
         );
 };
 
@@ -132,10 +134,19 @@ Message.prototype.getManagementMessageSummaryText = function() {
     if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __("Attached: " + nodes[0].name);
+            return __("Attached: %s").replace("%s", nodes[0].name);
         }
         else {
-            return __("Attached " + nodes.length + " files.");
+            return __("Attached %s files.").replace("%s", nodes.length);
+        }
+    }
+    else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
+        var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
+        if (nodes.length === 1) {
+            return __("Sent Contact: %s").replace("%s", nodes[0].name);
+        }
+        else {
+            return __("Sent %s Contacts.").replace("%s", nodes.length);
         }
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {

@@ -1,7 +1,11 @@
+// Release version information is replaced by the build scripts
+var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
+
 var b_u = 0;
 var apipath;
 var maintenance = false;
 var androidsplash = false;
+var cookiesDisabled = false;
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
@@ -21,6 +25,7 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
+var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
@@ -155,45 +160,103 @@ if (!b_u) try
         if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
+    }
+    try {
+        if (typeof localStorage === 'undefined' || localStorage === null) {
+            throw new Error('SecurityError: DOM Exception 18');
+        }
         d = !!localStorage.d;
     }
-    if (typeof localStorage == 'undefined') b_u = 1;
-    else
-    {
-        var contenterror = 0;
-        var nocontentcheck = !!localStorage.dd;
-        if (localStorage.dd) {
-             var devhost = window.location.host;
-            // handle subdirs
-            var pathSuffix = window.location.pathname;
-            pathSuffix = pathSuffix.split("/").slice(0,-1).join("/");
-            // set the staticpath for debug mode
-            localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-            // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
-            if (localStorage.d) {
-                console.debug('StaticPath set to "' + localStorage.staticpath + '"');
-            }
+    catch (ex) {
+        cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
+            || ex.message === 'SecurityError: DOM Exception 18';
+
+        if (!cookiesDisabled) {
+            throw ex;
         }
-        staticpath = localStorage.staticpath || geoStaticpath();
-        apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
+
+        // Cookies are disabled, therefore we can't use localStorage.
+        // We could either show the user a message about the issue and let him
+        // enable cookies, or rather setup a tiny polyfill so that they can use
+        // the site even in such case, even though this solution has side effects.
+        Object.defineProperty(window, 'localStorage', {
+            value: Object.create({}, {
+                length:     { get: function() { return Object.keys(this).length; }},
+                key:        { value: function(pos) { return Object.keys(this)[pos]; }},
+                removeItem: { value: function(key) { delete this[key]; }},
+                setItem:    { value: function(key, value) { this[key] = String(value); }},
+                getItem:    { value: function(key) {
+                    if (this.hasOwnProperty(key)) {
+                        return this[key];
+                    }
+                    return null;
+                }},
+                clear: {
+                    value: function() {
+                        var obj = this;
+                        Object.keys(obj).forEach(function(memb) {
+                            if (obj.hasOwnProperty(memb)) {
+                                delete obj[memb];
+                            }
+                        });
+                    }
+                }
+            })
+        });
+        Object.defineProperty(window, 'sessionStorage', {
+            value: localStorage
+        });
+        if (location.host !== 'mega.nz' && !is_karma) {
+            localStorage.jj = localStorage.dd = localStorage.d = 1;
+        }
+        setTimeout(function() {
+            console.warn('Apparently you have Cookies disabled, ' +
+                'please note this session is temporal, ' +
+                'it will die once you close/reload the browser/tab.');
+        }, 4000);
     }
+
+    var contenterror = 0;
+    var nocontentcheck = false;
+    if (localStorage.dd || is_karma) {
+        nocontentcheck = true;
+        var devhost = window.location.host;
+        // handle subdirs
+        var pathSuffix = window.location.pathname;
+        pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
+        // set the staticpath for debug mode
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+        if (localStorage.d) {
+            console.debug('StaticPath set to "' + localStorage.staticpath + '"');
+        }
+    }
+    staticpath = localStorage.staticpath || geoStaticpath();
+    apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 }
 catch(e) {
-    if (!m || e.message !== 'SecurityError: DOM Exception 18') {
+    if (!m || !cookiesDisabled) {
+        var extraInfo = '';
+        if (cookiesDisabled) {
+            extraInfo = "\n\nTip: We've detected this issue is likely related to " +
+                "having Cookies disabled, please check your browser settings.";
+        }
         alert(
-            "Sorry, we were unable to initialize the browser's local storage, "+
-            "either you're using an outdated browser or it's something from our side.\n"+
+            "Sorry, we were unable to initialize the browser's local storage, " +
+            "either you're using an outdated/misconfigured browser or " +
+            "it's something from our side.\n" +
             "\n"+
-            "If you think it's our fault, please report the issue back to us.\n"+
-            "\n"+
-            "Reason: " + (e.message || e)+
+            "If you think it's our fault, please report the issue back to us.\n" +
+            "\n" +
+            "Reason: " + (e.message || e) +
             "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
+            + extraInfo
         );
         b_u = 1;
     }
 }
 
-var mega = {ui: {}, utils: {}, flags: 0};
+var mega = {ui: {}, utils: {}, flags: 0, updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt'};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -874,7 +937,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 18, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 21, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -923,6 +986,15 @@ else if (!b_u)
                 return false;
             }
 
+            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1
+                    || String(errobj && errobj.stack).indexOf('<anonymous>:1:18') !== -1
+                    || dump.m.indexOf('TypeError: this.get is not a function') !== -1) {
+                // ^ this seems a quirk on latest Chrome (~46+) or a bogus extension
+                dump.l = 1;
+                errobj = null;
+                dump.m = 'TypeError: this.get(...).querySelectorAll is not a function';
+            }
+
             if (~dump.m.indexOf("\n")) {
                 var lns = dump.m.split(/\r?\n/).map(String.trim).filter(String);
 
@@ -930,6 +1002,7 @@ else if (!b_u)
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
+            dump.m = dump.m.replace(/\s+/g, ' ');
 
             if (~dump.m.indexOf('took +10s'))
             {
@@ -961,6 +1034,18 @@ else if (!b_u)
                         .replace(omsg, '').replace(re, '')
                         .split("\n").map(String.trim).filter(String)
                         .splice(0,15).map(mTrim).join("\n");
+
+                    if (dump.s.indexOf('Unknown script code:') !== -1
+                        || dump.s.indexOf('Function code:') !== -1
+                        || dump.s.indexOf('(eval code:') !== -1
+                        || dump.s.indexOf('(unknown source)') !== -1
+                        || /<anonymous>:\d+:/.test(dump.s)) {
+
+                        console.warn('Got uncaught exception from unknown resource,'
+                            + ' your MEGA account might be compromised.');
+                        console.error(msg, errobj, errobj && errobj.stack, url, ln);
+                        return false;
+                    }
                 }
             }
             if (cn) dump.c = cn;
@@ -1073,13 +1158,13 @@ else if (!b_u)
      * @returns {String}
      */
     function getLanguageFilePath(language) {
-        
+
         // If the sh1 (filename with hashes) array has been created from deploy script
         if (typeof sh1 !== 'undefined') {
 
             // Search the array
             for (var i = 0, length = sh1.length; i < length; i++) {
-                
+
                 var filePath = sh1[i];
 
                 // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
@@ -1137,7 +1222,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
-    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+    jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
@@ -1153,7 +1238,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
     // Other
-    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/autolinker.js', n: 'mega_js', j:1,w:7});
 
     // Google Import Contacts
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
@@ -1251,17 +1336,16 @@ else if (!b_u)
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
-    jsl.push({f:'js/vendor/popunda.js', n: 'popunda_js', j:1});
+    jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/vendor/Int64.js', n: 'int64_js', j:1});
+    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-    jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
 
     // only used on beta
     if (onBetaW) {
@@ -1272,6 +1356,7 @@ else if (!b_u)
     {
         'about': {f:'html/about.html', n: 'about', j:0},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
+        'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
         'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
@@ -1292,6 +1377,8 @@ else if (!b_u)
         'cancel_js': {f:'html/js/cancel.js', n: 'cancel_js', j:1},
         'reset': {f:'html/reset.html', n: 'reset', j:0},
         'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
+        'change_email_js': {f:'html/js/emailchange.js', n: 'change_email_js', j:1},
+        'change_email': {f:'html/emailchange.html', n: 'change_email', j:0},
         'filesaver': {f:'js/vendor/filesaver.js', n: 'filesaver', j:1},
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
@@ -1301,14 +1388,20 @@ else if (!b_u)
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
         'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
-        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+        'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
+        'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
+        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1}
+        'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
+        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
+        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1},
+        'version_compare_js': {f:'js/vendor/version-compare.js', n: 'version_compare_js', j:1}
     };
 
     var subpages =
@@ -1320,27 +1413,29 @@ else if (!b_u)
         'backup': ['backup','backup_js','filesaver'],
         'recovery': ['recovery','recovery_js'],
         'reset': ['reset','reset_js'],
+        'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js'],
         'android': ['android'],
         'resellers': ['resellers'],
-        '!': ['download','download_js'],
+        '!': ['download','download_js', 'megasync_js'],
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
         'takedown': ['takedown'],
-        'firefox': ['firefox'],
         'mobile': ['mobile'],
-        'sync': ['sync','sync_js'],
+        'sync': ['sync','sync_js', 'megasync_js'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': ['help_js'],
-        'chrome': ['chrome'],
-        'plugin': ['chrome','firefox'],
-        'recover': ['reset','reset_js']
+        'plugin': ['chrome', 'firefox'],
+        'recover': ['reset', 'reset_js'],
+        'redeem': ['redeem', 'redeem_js'],
+        'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
+        'firefox': ['firefox', 'firefox_js']
     };
 
     if (page)
@@ -1650,7 +1745,9 @@ else if (!b_u)
     }
     window.onload = function ()
     {
-        if (!maintenance && !androidsplash) jsl_start();
+        if (!maintenance && !androidsplash && !is_karma) {
+            jsl_start();
+        }
     };
     function jsl_load(xhri)
     {
@@ -1813,6 +1910,9 @@ else if (!b_u)
                 {
                     loginresponse = this.response || this.responseText;
                     if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
+                    else if (parseInt(loginresponse) === -15 /* ESID */) {
+                        loginresponse = -15;
+                    }
                     else loginresponse = false;
                 }
                 catch (e) {}
@@ -1824,10 +1924,10 @@ else if (!b_u)
             loginresponse= false;
             boot_done();
         };
-        
+
         // If using extension this is passed through to the API for the helpdesk tool
         var usingExtension = (is_extension) ? '&ext=1' : '';
-        
+
         lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + usingExtension, true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
@@ -1846,6 +1946,10 @@ else if (!b_u)
         if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
 
         if (u_checked) startMega();
+        else if (loginresponse === -15) {
+            u_logout(true);
+            boot_auth(null, false);
+        }
         else if (loginresponse)
         {
             api_setsid(u_sid);
@@ -1878,10 +1982,10 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-        
+
         // If using extension this is passed through to the API for the helpdesk tool
         var usingExtension = (is_extension) ? '&ext=1' : '';
-        
+
         dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz' + usingExtension, true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }

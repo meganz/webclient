@@ -8,7 +8,7 @@ Secure Boot
 
 secureboot.js loads all the resources from static content servers and verifies its authenticity by checking the cryptographic hash.
 
-*Please note that this is not the exact same secureboot.js as we have online at https://mega.co.nz/secureboot.js. We have an automatic process that generates secureboot.js with its cryptographic hashes and all the versioned resource files (file_X.js / file_X.html) as needed based on this respository before prior to updating the live site.*
+*Please note that this is not the exact same secureboot.js as we have online at https://mega.nz/secureboot.js. We have an automatic process that generates secureboot.js with its cryptographic hashes and all the versioned resource files (file_X.js / file_X.html) as needed based on this repository before prior to updating the live site.*
 
 During development it's essential that your set the following localStorage parameters:
 ```
@@ -17,7 +17,8 @@ localStorage.dd = 1;	// disables the cryptographic hash verification logic
 ```
 There are also various other localStorage parameters that are useful during development:
 ```
-localStorage.d = 1;		// enables logging
+localStorage.d = 1;		// enables vanilla console logging
+localStorage.minLogLevel = 0;	// enables full console logging via MegaLogger
 localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM for element inspection
 ```
 

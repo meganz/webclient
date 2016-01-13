@@ -24,7 +24,11 @@
 <div class="fm-dialog-overlay hidden"></div>
 
 
-
+<div class="fm-dialog awaiting-confirmation hidden">
+    <div class="reg-success-icon"></div>
+    <div class="reg-success-header">[$7699]</div>
+    <div class="reg-success-txt">[$7700]</div>
+</div>
 
 <div class="fm-dialog reset-success hidden">
     <div class="nw-fm-dialog-title">[$1585]</div>
@@ -120,7 +124,7 @@
     <div class="create-folder-pad">
         <div class="create-folder-size-icon short-size"></div>
         <div class="create-folder-input-bl">
-            <input name="dialog-new-folder" type="text" value="[$157]" placeholder="[$157]" autofocus="autofocus"/>
+            <input name="dialog-new-folder" type="text" value="[$157]" placeholder="[$157]" autofocus/>
         </div>
         <div class="create-folder-bottom">
             <div class="fm-dialog-new-folder-button"><span>[$455]</span></div>
@@ -137,10 +141,17 @@
         <div class="clear"></div>
     </div>
     <div class="fm-dialog-body">
-        <div class="fm-dialog-new-folder-input">
-            <div class="fm-dialog-input-clear"></div>
-            <div class="fm-dialog-new-folder-pad">
-                <input name="dialog-new-folder" type="text" placeholder="[$1028]" value="" />
+        <div class="wrapper">
+            <div class="instruction-message">
+                [$7945]<br>
+                [$7972]
+            </div>
+            <div class="fm-dialog-new-folder-input">
+                <div class="fm-dialog-input-clear"></div>
+                <div class="fm-dialog-new-folder-pad decryption-key">
+                    <span class="icon"></span>
+                    <input name="dialog-new-folder" type="text" placeholder="[$7971]" value="" />
+                </div>
             </div>
         </div>
         <div class="default-dialog-bottom">
@@ -148,8 +159,6 @@
         </div>
     </div>
 </div>
-
-
 
 <div class="fm-dialog registration-success registration-page-success hidden">
      <div class="reg-success-icon"></div>
@@ -451,13 +460,24 @@
             </div>
     		<input type="text" id="datepicker" class="fm-dialogs-select expiry-date-select" value="Select date" />
         </div>
-    	<div class="fm-links-dropdown">
-        	<div class="fm-link-select-label">[$7649]</div>
-    		<div class="fm-dialogs-select export-link-select full-link"><span></span>[$7651]</div>
-            <div class="fm-dialogs-dropdown export-link-dropdown">
-            	<div class="fm-dialogs-dropdown-item public-handle" data-keyoptions="public-handle"><span></span>[$7681]</div>
-                <div class="fm-dialogs-dropdown-item decryption-key" data-keyoptions="decryption-key"><span></span>[$1028]</div>
-                <div class="fm-dialogs-dropdown-item full-link" data-keyoptions="full-link"><span></span>[$7651]</div>
+        <div class="fm-links-export-options">
+            <div class="fm-link-select-label">[$7649]</div>
+            <div class="fm-links-radio-buttons">
+                <div class="separate-link-and-key">
+                    <div class="link-handle" data-keyoptions="public-handle">
+                        <span class="icon"></span>
+                        <span class="text">[$7947]</span>
+                    </div>
+                    <div class="button-separator"></div>
+                    <div class="link-decryption-key" data-keyoptions="decryption-key">
+                        <span class="icon"></span>
+                        <span class="text">[$7971]</span>
+                    </div>
+                </div>
+                <div class="link-handle-and-key" data-keyoptions="full-link">
+                    <span class="icon"></span>
+                    <span class="text">[$7948]</span>
+                </div>
             </div>
         </div>
         <div class="clear"></div>
@@ -466,8 +486,7 @@
     </div>
     <div class="fm-notifications-bottom">
     	<div class="export-description hidden">
-        	MEGA recommends sending the 'Encryption Key' separately from the 'Public Handle'
-            <!-- [$7682] !-->
+        	[$7682]
         </div>
         <div class="fm-dialog-button links-button copy-to-clipboard" id="clipboardbtn1">
           <span></span>
@@ -618,6 +637,7 @@
            </div>
         </div>
         <span class="file-status-icon"></span>
+        <span class="link-icon"></span>
         <div class="properties-elements-counter"><span></span></div>
         <div class="properties-file-icon">
         </div>
@@ -1439,17 +1459,42 @@
                         <span class="firstLine">
                             [$6881]
                         </span>
-                        [$6880]
+                        [$7688]
                     </div>
                 </div>
-
+                
+                <!-- Step 1 -->
                 <div class="previousCredentials">
                     <div class="title">[$6883]:</div>
                     <div class="fingerprint"></div>
                 </div>
                 <div class="newCredentials">
-                    <div class="title">[$6858]</div>
+                    <div class="title">[$6858]:</div>
                     <div class="fingerprint"></div>
+                </div>
+                <div class="resetCredentials">
+                    <div class="title">[$7689]:</div>
+                    <div class="description">
+                        [$7690]
+                    </div>
+                    <div class="fm-dialog-button fm-dialog-button-green reset-credentials-button">
+                        <span>[$742]</span>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="postResetCredentials hidden">
+                    <div class="title">[$7691]:</div>
+                    <div class="fingerprint"></div>
+                </div>
+                <div class="verifyCredentials hidden">
+                    <div class="title">[$7692]:</div>
+                    <div class="description">
+                        [$7693]
+                    </div>
+                    <div class="fm-dialog-button fm-dialog-button-green verify-contact-button">
+                        <span>[$1960]...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1510,10 +1555,9 @@
             <div class="fm-account-input">
                 <input class="state-province" type="text" value="" placeholder="[$653]">
             </div>
-            <div class="fm-account-select">
-                <span class="account-select-txt">[$481]</span>
-                <select class="countries">
-                </select>
+            <div class="default-select countries" id="countries">
+                <span>[$481]</span>
+                <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
             </div>
             <div class="fm-account-input code">
                 <input class="post-code" type="text" value="" placeholder="Postal Code">
@@ -1545,15 +1589,15 @@
                 <input class="credit-card-number" type="text" value="" placeholder="Credit Card Number" >
             </div>
             <div class="payment-short-bl triplex first">
-                <div class="fm-account-select"> <span class="account-select-txt">[$913]</span>
-                    <select class="expiry-date-month">
-                    </select>
+                <div class="default-select expiry-date-month" id="expiry-date-month">
+                	<span>[$913]</span>
+                	<div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                 </div>
             </div>
             <div class="payment-short-bl triplex second">
-                <div class="fm-account-select"> <span class="account-select-txt">[$932]</span>
-                    <select class="expiry-date-year">
-                    </select>
+                <div class="default-select expiry-date-year" id="expiry-date-year">
+                	<span>[$932]</span>
+                	<div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                 </div>
             </div>
             <div class="payment-short-bl triplex third">
@@ -1599,6 +1643,20 @@
         <div class="payment-result-txt">[$6950]</div>
         <div class="payment-result-icon"></div>
         <div class="payment-result-button">[$1472]</div>
+    </div>
+</div>
+
+<!-- Pending confirmation -->
+<div class="payment-result pending hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-rusult-header">[$7983]</div>
+        <div class="payment-result-txt">[$7984]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
     </div>
 </div>
 
@@ -1708,7 +1766,7 @@
 <div class="nw-dark-overlay megasync-overlay hidden">
     <div class="megasync-close"></div>
     <div class="megasync-close-txt">[$6951]</div>
-    <div class="megasync-content">
+    <div class="megasync-content features">
         <div class="megasync-logo"></div>
         <div class="megasync-info">
             [$7138]<br/>
@@ -1775,6 +1833,25 @@
             </table>
         </div>
     </div>
+    <div class="megasync-content buttons">
+        <div class="megasync-logo"></div>
+        <div class="megasync-info">
+            We strongly suggest using our sync client for vastly improved performance<br /> downloading large files. <a>Get MEGAsync now</a>.
+        </div>
+        <div class="fm-mega-dialog-pad">
+            <div class="megasync-bottom">
+                <div class="button download-button light-red  download">
+                    <div class="download info-txt big-txt white">[$58]</div>
+                    <div class="download info-txt mid-txt white">[$7084]</div>
+                </div>
+                <div class="button download-button light-white continue">
+                    <div class="download info-txt big-txt black">Continue</div>
+                    <div class="download info-txt mid-txt black">slower browser download</div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="nw-dark-overlay upload-overlay hidden">
@@ -1803,15 +1880,19 @@
             </div>
             <div class="clear"></div>
 
-            <div class="feedback-dialog-bottom">
-                <div class="megasync-overlay-continue"><span>[$7401]</span></div>
-                <div class="megasync-overlay-download"><span>[$7402]</span></div>
+            <div class="megasync-bottom">
+                <div class="button download-button light-red  download">
+                    <div class="download info-txt big-txt white">[$58]</div>
+                    <div class="download info-txt mid-txt white">MEGAsync</div>
+                </div>
+                <div class="button download-button light-white continue">
+                    <div class="download info-txt big-txt black">Continue</div>
+                    <div class="download info-txt mid-txt black">anyway</div>
+                </div>
                 <div class="clear"></div>
             </div>
-
         </div>
     </div>
-
 </div>
 
 <div class="nw-dark-overlay camera-access hidden">
@@ -2046,7 +2127,7 @@
         <div class="clear"></div>
         <div class="voucher-block">
             <div class="voucher-account-balance">
-                <span class="balance">0.00</span>
+                <span class="balance-amount">0.00</span>
                 <span class="payment-eurosign">&euro;</span>
             </div>
             <div class="voucher-sub-title">[$7201]:</div>
@@ -2070,6 +2151,33 @@
     </div>
 </div>
 
+<div class="fm-dialog astropay-dialog hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$7985]</div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>    
+    <div class="astropay-dialog-body">
+        <div class="astropay-information">[$7991]</div>
+        <div class="astropay-instructions">[$7986]</div>
+        <label class="astropay-label" for="astropay-name-field">[$7987]:</label>
+        <div class="fm-account-input">
+            <input id="astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7988]">
+        </div>
+        
+        <label class="astropay-label tax" for="astropay-tax-field">[$7989]:</label>
+        <div class="fm-account-input">
+            <input id="astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7990]">
+        </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button accept"><span>[$870]</span></div>
+        <div class="fm-dialog-button cancel"><span>[$1597]</span></div>
+        <a class="powered-by-astropay" href="https://www.astropay.com/" target="_blank"></a>
+        <div class="clear"></div>
+    </div>
+</div>
+
 <div class="toast-notification common-toast">
     <div class="toast-icon"></div>
   	<div class="toast-body">
@@ -2087,7 +2195,7 @@
     <div class="voucher-dialog-body">
     	<div class="copyrights-dialog-icon"></div>
     	<div class="copyrights-dialog-head">
-        	[$366]
+        	[$7696]
         </div> 
         <p>
         	[$7647] 
@@ -2100,5 +2208,53 @@
         <div class="fm-dialog-button accept"><span>[$7645]</span></div>
         <div class="fm-dialog-button cancel"><span>[$7646]</span></div>
         <div class="clear"></div>
+    </div>
+</div>
+
+<div class="voucher-redeem-dialog hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="account-information">
+        <div class="left-information">            
+            <div class="reg-st3-membership-bl">
+                <div class="membership-pad-bl">
+                    <div class="membership-gray-block">
+                        <div class="reg-st3-membership-icon"></div>
+                        <div class="reg-st3-bott-title plan-name"></div>
+                        <div class="reg-st3-bott-title price">
+                            <span class="num"><span class="dollars"></span><span class="small"><span class="cents"></span> &euro;</span></span><span class="period">/[$913]</span>
+                        </div>
+                    </div>
+                    <div class="reg-st3-storage">
+                        <div class="reg-st3-big-txt">
+                            <span class="quota-amount"></span> <span class="quota-unit"></span>
+                        </div>
+                        <div class="reg-st3-mid-txt">[$495]</div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="reg-st3-bandwidth">
+                        <div class="reg-st3-big-txt">
+                            <span class="quota-amount"></span> <span class="quota-unit"></span>
+                        </div>
+                        <div class="reg-st3-mid-txt">[$496]</div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-information">
+            <div class="title-text">[$7706]</div>
+            <div class="balance-text">[$7707]</div>
+            <div class="complete-upgrade-text">
+                [$7708]<br>
+                [$7709]
+            </div>
+            <div class="buttons">
+                <div class="complete-upgrade-button" data-plan-id="">[$7710]</div>
+                <div class="choose-plan-button">[$7711]</div>
+            </div>
+        </div>
     </div>
 </div>

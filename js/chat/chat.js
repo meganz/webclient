@@ -499,7 +499,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         }
         fullscreenVideoResizing();
 
-        $(window).bind('resize', function ()
+        $(window).rebind('resize.chat', function ()
         {
             if ($('.video-full-container').is(":visible")) {
                 fullscreenVideoResizing();

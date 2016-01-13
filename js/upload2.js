@@ -357,11 +357,8 @@ var ulmanager = {
             });
         }
 
-        var dirs = fm_safepath(file.path);
-
         ASSERT(file.filekey, "*** filekey is missing ***");
 
-        Cascade(dirs, Mkdir, function(dir) {
             var body = {
                 n: file.name
             };
@@ -369,6 +366,7 @@ var ulmanager = {
                 body.c = file.hash;
             }
             var ea = enc_attr(body, file.filekey);
+            var dir = target || file.target || M.RootID;
             var faid = file.faid ? api_getfa(file.faid) : false;
             var req = {
                 a: 'p',
@@ -404,7 +402,6 @@ var ulmanager = {
                 file: file,
                 callback: ulmanager.ulCompletePending2
             });
-        }, target || file.target || M.RootID);
     },
 
     ulGetPostURL: function UM_ul_get_posturl(File) {
@@ -688,30 +685,18 @@ var ulmanager = {
         });
     },
 
-    ulIdentical: function UM_ul_Identical(target, path, hash, size) {
-        /* jshint -W074 */
-        var n = M.d[target];
-        if (!target || !path || !n) {
-            return false;
-        }
-        var p = path.split('/');
-        for (var i in p) {
-            if (p.hasOwnProperty(i)) {
-                if (!n) {
-                    return false;
-                }
-                var foldername = p[i];
-                var h = n.h;
-                n = false;
-                for (var j in M.c[h]) {
-                    if (M.d[j] && M.d[j].name === foldername) {
-                        if (M.d[j].t) {
-                            n = M.d[j];
-                        }
-                        else if (p.length === parseInt(i) + 1
-                                && (hash === M.d[j].hash || size === M.d[j].s)) {
-                            return M.d[j];
-                        }
+    ulIdentical: function UM_ul_Identical(file) {
+        var nodes = M.c[file.target];
+        if (nodes) {
+            for (var node in nodes) {
+                if (nodes.hasOwnProperty(node)) {
+                    node = M.d[node];
+
+                    if (node
+                            && file.size === node.s
+                            && file.name === node.name
+                            && file.hash === node.hash) {
+                        return node;
                     }
                 }
             }
@@ -946,7 +931,8 @@ ChunkUpload.prototype.upload = function() {
 
     if (!this.file) {
         if (d) {
-            this.logger.error('This upload was cancelled while the Encrypter was working,'
+            var logger = this.logger || ulmanager.logger;
+            logger.error('This upload was cancelled while the Encrypter was working,'
                 + ' prevent this aborting it beforehand');
         }
         return;
@@ -1158,17 +1144,27 @@ FileUpload.prototype.run = function(done) {
             }
             file.hash = hash;
             file.ts = ts;
-            var identical = ulmanager.ulIdentical(file.target,
-                file.path || file.name, file.hash, file.size);
-            if (d) {
-                ulmanager.logger.info(file.name, "fingerprint", M.h[hash] || identical);
-            }
-            if (M.h[hash] || identical) {
-                ulmanager.ulDeDuplicate(self, identical);
-            }
-            else {
-                ulmanager.ulStart(self);
-            }
+
+            createFolder(file.target, fm_safepath(file.path), new MegaPromise())
+                .always(function(target) {
+                    if (typeof target === 'number') {
+                        ulmanager.logger.error('createFolder gave ' + target, api_strerror(target));
+                    }
+                    else {
+                        ulmanager.logger.info('createFolder', file.target, target);
+                        file.target = target;
+                    }
+
+                    var identical = ulmanager.ulIdentical(file);
+                    ulmanager.logger.info(file.name, "fingerprint", M.h[hash], identical);
+
+                    if (M.h[hash] || identical) {
+                        ulmanager.ulDeDuplicate(self, identical);
+                    }
+                    else {
+                        ulmanager.ulStart(self);
+                    }
+                });
         });
     }
     catch (e) {
@@ -1198,18 +1194,6 @@ FileUpload.prototype.run = function(done) {
         }
     }
 };
-
-
-/**
- *  Wrap fm_requestfolderid to make it parallel friendly
- */
-var Mkdir = Parallel(function(args, next) {
-    fm_requestfolderid(args[0], args[1], {
-        callback: function(ctx, h) {
-            next(h);
-        }
-    });
-});
 
 function isQueueActive(q) {
     return typeof q.id !== 'undefined';

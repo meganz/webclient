@@ -13,8 +13,13 @@ function WebrtcApi() {
         this.browser = 'firefox';
         this.getUserMedia = navigator.mozGetUserMedia.bind(navigator);
         this.attachMediaStream = function (element, stream) {
-            element[0].mozSrcObject = stream;
-            element[0].play();
+            var elem = element[0];
+            if (elem.mozSrcObject) {
+                elem.mozSrcObject = stream;
+            } else {
+                elem.srcObject = stream;
+            }
+            elem.play();
         };
         this.pc_constraints = {};
 		if (MediaStream.prototype.clone)
@@ -36,10 +41,14 @@ function WebrtcApi() {
         this.pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': 'true'}]}; // enable dtls support for compat with Firefox            
 		this.cloneMediaStream = function(src, what) {
             var stream = new webkitMediaStream;
-			if (what.audio)
-				stream.addTrack(src.getAudioTracks()[0]);
-			if (what.video)
-				stream.addTrack(src.getVideoTracks()[0]);
+            var ats = src.getAudioTracks();
+            if (what.audio && (ats.length > 0)) {
+                stream.addTrack(ats[0]);
+            }
+            var vts = src.getVideoTracks();
+            if (what.video && (vts.length > 0)) {
+                stream.addTrack(vts[0]);
+            }
 			return stream;
 		}
         this.RTCSessionDescription = RTCSessionDescription;

@@ -23,7 +23,6 @@
         "with"
     ],
     "disallowIdentifierNames": [
-        "html",
         "append",
         "innerHTML",
         "outerHTML"
@@ -38,7 +37,7 @@
     "requireSpaceAfterBinaryOperators": true,
 
     "disallowMultipleVarDecl": true,
-
+    "disallowTrailingWhitespace": "ignoreEmptyLines",
     "disallowSpacesInsideParentheses": true,
     "disallowEmptyBlocks": true,
 
@@ -89,7 +88,6 @@
     "requireSpaceAfterLineComment": true,
     "requireLineFeedAtFileEnd": true,
     "disallowMixedSpacesAndTabs": true,
-    "disallowTrailingWhitespace": true,
     "validateIndentation": 4,
 
     "requireSemicolons": true,
@@ -115,6 +113,7 @@
         "doc/**",
         "contrib/**",
         "scripts/**",
+        "rsaasm.js",
         "sjcl.js",
         "fileapi.js",
         "aesasm.js",

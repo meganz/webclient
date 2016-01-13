@@ -10,12 +10,11 @@ function dlinfo(ph,key,next)
     dl_next = next;
     if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
     {
-        //$('.new-download-red-button').html(l[1388].replace('[B]','').replace('[/B]','').replace('[A]','').replace('[/A]',''));
-        $('.new-download-gray-button')
-            .safeHTML(escapeHTML(l[1389])
-                .replace('[B]', '<div class="new-download-button-txt1">')
+        $('.download-button.to-computer')
+            .safeHTML(escapeHTML(l[1388])
+                .replace('[B]', '<div class="download info-txt big-txt white">')
                 .replace('[/B]', '</div>')
-                .replace('[A]', '<div class="new-download-button-txt2">')
+                .replace('[A]', '<div class="download info-txt mid-txt white">')
                 .replace('[/A]', '</div>'));
     }
 
@@ -25,10 +24,10 @@ function dlinfo(ph,key,next)
     {
         $('.fm-dialog.download-dialog').removeClass('hidden');
         $('.fm-dialog.download-dialog').css('left','-1000px');
-        $('.download-save-your-file').html('<object data="' + document.location.origin + '/downloader.swf" id="dlswf_'+ htmlentities(ph) + '" type="application/x-shockwave-flash" height="' + $('.download-save-your-file').height() + '"  width="' + $('.download-save-your-file').width() + '"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworking"><param name=FlashVars value="buttonclick=1" /></object>');
+        $('.download-save-your-file').safeHTML('<object data="' + document.location.origin + '/downloader.swf" id="dlswf_'+ htmlentities(ph) + '" type="application/x-shockwave-flash" height="' + $('.download-save-your-file').height() + '"  width="' + $('.download-save-your-file').width() + '"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworking"><param name=FlashVars value="buttonclick=1" /></object>');
     }
     loadingDialog.show();
-    $('.download-mid-white-block').addClass('hidden');
+    $('.download.content-block').addClass('hidden');
     dlpage_ph   = ph;
     dlpage_key  = key;
     if (dl_res)
@@ -49,7 +48,6 @@ function dlinfo(ph,key,next)
 }
 
 function dl_g(res) {
-
     // Show ad if enabled
     megaAds.ad = res.ad;
     megaAds.popAd = res.popad;
@@ -63,34 +61,32 @@ function dl_g(res) {
 
     megaAds.showAds($('#ads-block-frame'));
 
-    // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
-    if (res.msd === 0) {
-        megasync.isInstalled(function(err, is) {
-            if (err || !is) {
-                $('.new-download-sync-app').addClass('hidden');
-                $('.regular-download').removeClass('hidden');
-                $('.new-download-red-button').addClass('hidden');
-            }
-        });
-    }
-
     $('.widget-block').addClass('hidden');
     loadingDialog.hide();
-    $('.download-mid-white-block').removeClass('hidden');
-    if (res == ETOOMANY) $('.download-mid-centered-block').addClass('not-available-user');
-    else if (typeof res == 'number' && res < 0) $('.download-mid-centered-block').addClass('not-available-some-reason');
-    else if (res.e == ETEMPUNAVAIL) $('.download-mid-centered-block').addClass('not-available-temporary');
-    else if (res.d) $('.download-mid-centered-block').addClass('not-available-some-reason');
+    $('.download.content-block').removeClass('hidden');
+    if (res === ETOOMANY) {
+        $('.download.content-block').addClass('not-available-user');
+    }
+    else if (typeof res === 'number' && res < 0) {
+        $('.download.content-block').addClass('na-some-reason');
+    }
+    else if (res.e === ETEMPUNAVAIL) {
+        $('.download.content-block').addClass('temporary-na');
+    }
+    else if (res.d) {
+        $('.download.content-block').addClass('na-some-reason');
+    }
     else if (res.at)
     {
-        $('.download-pause').unbind('click');
-        $('.download-pause').bind('click',function(e)
+        $('.download.pause-button').unbind('click');
+        $('.download.pause-button').bind('click',function(e)
         {
             if ($(this).attr('class').indexOf('active') == -1)
             {
                 ulQueue.pause();
                 dlQueue.pause();
                 uldl_hold = true;
+                $('.download.status-txt, .download-info .text').safeHTML(l[1651]).addClass('blue');
                 $(this).addClass('active');
             }
             else
@@ -98,39 +94,27 @@ function dl_g(res) {
                 dlQueue.resume();
                 ulQueue.resume();
                 uldl_hold = false;
+                $('.download.status-txt, .download-info .text').removeClass('blue');
                 $(this).removeClass('active');
             }
         });
-        $('.new-download-sync-app').rebind('click', function(e) {
-            $('.megasync-overlay').removeClass('downloading');
-            megasync.download(dlpage_ph, dlpage_key);
+        $('.download-button.to-computer').rebind('click', function(e) {
+            megasync.isInstalled(function(err, is) {
+                // If 'msd' (MegaSync download) flag is turned on and application is installed
+                if (res.msd !== 0 && (!err || is)) {
+                    $('.megasync-overlay').removeClass('downloading');
+                    megasync.download(dlpage_ph, dlpage_key);
+                } else if (fdl_filesize > 104857600) {
+                    // If filesize more then 100MB
+                    megasyncOverlay();
+                } else {
+                    browserDownload();
+                }
+            });
         });
 
-        $('.new-download-red-button, .regular-download').rebind('click', function() {
-
-            // If regular download using Firefox and the total download is over 1GB then show the dialog
-            // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-            if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
-            {
-                firefoxDialog();
-            }
-            else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
-            || (navigator.userAgent.indexOf('MSIE 10') > -1)
-            || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1)))
-            && fdl_filesize > 1048576000 && !localStorage.browserDialog)
-            {
-                browserDialog();
-            }
-            else
-            {
-                dlmanager.isDownloading = true;
-                dl_queue.push(fdl_queue_var);
-                $('.download-mid-centered-block').addClass('downloading');
-                $.dlhash = window.location.hash;
-            }
-        });
-        $('.new-download-gray-button').unbind('click');
-        $('.new-download-gray-button').bind('click',function(e)
+        $('.download-button.to-cloudrive').unbind('click');
+        $('.download-button.to-cloudrive').bind('click',function(e)
         {
             start_import();
         });
@@ -166,25 +150,86 @@ function dl_g(res) {
                 onDownloadError: dlerror,
                 onBeforeDownloadComplete: function() { }
             };
-            var n = fdl_file.n||'unknown', l = n.length;
-            $('.new-download-file-title').text(n);
-            var cs = $('.new-download-right-block').width() - parseInt($('.new-download-file-info').css('margin-left'));
-            while(l-- && $('.new-download-file-title').width() > cs) {
-                $('.new-download-file-title').text(str_mtrunc(n,l));
+            var n = fdl_file.n || 'unknown';
+            var n_l = n.length;
+            $('.file-info .download.info-txt').text(n_l);
+            while (n_l-- && $('.download.info-txt.filename').width() > 316) {
+                $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n, n_l));
             }
-            if (1 > l) $('.new-download-file-title').text(str_mtrunc(n,60));
-            $('.new-download-file-size').text(bytesToSize(res.s));
-            $('.new-download-file-icon').addClass(fileIcon({name:fdl_file.n}));
+            if (n_l < 1) {
+                $('.file-info .download.info-txt').text(str_mtrunc(n, 60));
+            }
+            $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
+            $('.info-block .block-view-file-type').addClass(fileIcon({name:fdl_file.n}));
         }
         else mKeyDialog(dlpage_ph);
     }
-    else $('.download-mid-centered-block').addClass('not-available-some-reason');
+    else $('.download.content-block').addClass('na-some-reason');
 
     var pf = navigator.platform.toUpperCase();
     if (page.substr(-5) == 'linux') sync_switchOS('linux');
     else if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
     else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
     else sync_switchOS('windows');
+}
+
+function browserDownload() {
+    // If regular download using Firefox and the total download is over 1GB then show the dialog
+    // to use the extension, but not if they've seen the dialog before and ticked the checkbox
+    if (dlMethod === MemoryIO && !localStorage.firefoxDialog
+            && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
+        firefoxDialog();
+    }
+    else if (
+        (
+            (
+                '-ms-scroll-limit' in document.documentElement.style
+                && '-ms-ime-align' in document.documentElement.stNyle
+            )
+            || (navigator.userAgent.indexOf('MSIE 10') > -1)
+            || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') === -1))
+        )
+        && fdl_filesize > 1048576000 && !localStorage.browserDialog) {
+        browserDialog();
+    }
+    else
+    {
+        $('.download.content-block').addClass('downloading');
+        $('.download.percents-txt').text('0 %');
+        $('.download.status-txt').safeHTML(l[819]).removeClass('green');
+        dlmanager.isDownloading = true;
+        dl_queue.push(fdl_queue_var);
+        $.dlhash = window.location.hash;
+    }
+}
+
+// MEGAsync dialog If filesize is too big for downloading through browser
+function megasyncOverlay() {
+    var $this = $('.megasync-overlay');
+
+    $this.addClass('msd-dialog').removeClass('hidden downloading');
+
+    $('.download-button.download', $this).rebind('click', function(e)
+    {
+        $this.removeClass('msd-dialog');
+        megasync.download(dlpage_ph, dlpage_key);
+    });
+
+    $('.download-button.continue', $this).rebind('click', function(e)
+    {
+        $this.addClass('hidden').removeClass('msd-dialog');
+        browserDownload();
+    });
+
+    $('.megasync-close', $this).rebind('click', function(e) {
+        $this.addClass('hidden').removeClass('msd-dialog');
+    });
+
+    $('body').rebind('keyup msd', function(e) {
+        if (e.keyCode === 27) {
+            $this.addClass('hidden').removeClass('msd-dialog');
+        }
+    });
 }
 
 function closedlpopup()
@@ -198,7 +243,12 @@ function importFile() {
     api_req({
         a: 'p',
         t: M.RootID,
-        n: [{ ph: dl_import, t: 0, a: dl_attr, k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dlkey))) }]
+        n: [{
+                ph: dl_import,
+                t: 0,
+                a: dl_attr,
+                k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dlkey).slice(0, 8)))
+            }]
     }, {
         // Check response and if over quota show a special warning dialog
         callback: function (result) {
@@ -211,7 +261,7 @@ function importFile() {
     dl_import = false;
 }
 
-function dlerror(dl,error)
+function dlerror(dl, error)
 {
     var errorstr='';
     var tempe=false;
@@ -233,27 +283,29 @@ function dlerror(dl,error)
 
     if (tempe)
     {
-        $('.downloading-txt.temporary-error').text(tempe);
-        $('.downloading-txt.temporary-error').removeClass('hidden');
-        $('.downloadings-icons').addClass('hidden');
+        $('.download.error-icon').text(tempe);
+        $('.download.error-icon').removeClass('hidden');
+        $('.download.icons-block').addClass('hidden');
     }
 }
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
+    $('.download.content-block').removeClass('download-complete').addClass('downloading');
     if (kbps == 0) return;
-    $('.downloading-txt.temporary-error').addClass('hidden');
-    $('.downloadings-icons').removeClass('hidden');
+    $('.download.error-icon').addClass('hidden');
+    $('.download.icons-block').removeClass('hidden');
     if (uldl_hold) return false;
     if ((typeof dl_limit_shown != 'undefined') && (dl_limit_shown < new Date().getTime()+20000) && (!m)) bwDialog.close();
     if (!dl_queue[dl_queue_num].starttime) dl_queue[dl_queue_num].starttime = new Date().getTime()-100;
 
     if (!m)
     {
-        $('.download-mid-centered-block').addClass('downloading');
-        $('.download-mid-centered-block').removeClass('not-available-temporary');
-        $('.downloading-progress-bar').width(perc + '%');
-        $('.new-download-icon').safeHTML('<div>@@<span>%</span></div>', perc);
+        $('.download.status-txt').safeHTML(l[258]);
+        $('.download-info').removeClass('hidden');
+        $('.download.content-block').removeClass('temporary-na');
+        $('.download.progress-bar').width(perc + '%');
+        $('.download.percents-txt').text(perc + ' %');
         megatitle(' ' + perc + '%');
     }
     if (fdl_starttime) var eltime = (new Date().getTime()-fdl_starttime)/1000;
@@ -262,8 +314,11 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     {
         var bps = kbps*1000;
         var retime = (bytestotal-bytesloaded)/bps;
-        $('.downloading-txt.speed').text(bytesToSize(bps,1) +'/s');
-        $('.downloading-txt.time').text(secondsToTime(retime));
+        var speed  = numOfBytes(bps, 1);
+        $('.download-info.speed-txt .text').safeHTML(
+            speed.size + '<span>' + speed.unit + '/s</span>'
+        );
+        $('.download-info.time-txt .text').safeHTML(secondsToTime(retime, 1));
     }
     if (page !== 'download' || $.infoscroll)
     {
@@ -271,7 +326,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.widget-block').show();
         $('.widget-circle').attr('class','widget-circle percents-'+perc);
         $('.widget-icon.downloading').removeClass('hidden');
-        $('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
+        $('.widget-speed-block.dlspeed').text(bytesToSize(bps, 1) +'/s');
         $('.widget-block').addClass('active');
     }
 }
@@ -326,11 +381,11 @@ function dlcomplete(id)
 {
     if (d) console.log('dlcomplete',id);
     if (typeof id === 'object') id = id.dl_id;
-    $('.download-pause').hide();
-    $('.download-mid-centered-block').addClass('download-complete');
-    $('.download-icon-pause').hide();
-    $('.downloading-progress-bar').width('100%');
-    $('.new-download-icon').html('<div>100<span>%</span></div>');
+
+    $('.download-info').addClass('hidden');
+    $('.download.progress-bar').width('100%');
+    $('.download.percents-txt').text('100 %');
+    $('.download.status-txt').safeHTML(l[1418]).addClass('green');
     if ($('#dlswf_' + id).length > 0)
     {
         $('.fm-dialog-overlay').removeClass('hidden');
@@ -365,6 +420,7 @@ function dlcomplete(id)
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
     Soon(mega.utils.resetUploadDownload);
+    $('.download.content-block').removeClass('downloading').addClass('download-complete');
 }
 
 function sync_switchOS(os)
@@ -373,7 +429,7 @@ function sync_switchOS(os)
     {
         syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
         $('.sync-button-txt.small').text(l[1158]);
-        $('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
+        $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
         $('.sync-button').removeClass('mac linux');
         $('.sync-button').attr('href',syncurl);
     }
@@ -385,7 +441,7 @@ function sync_switchOS(os)
         if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');
         if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');
         $('.sync-button-txt.small').text(ostxt);
-        $('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
+        $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
         $('.sync-button').removeClass('windows linux').addClass('mac');
         $('.sync-button').attr('href',syncurl);
     }
@@ -396,7 +452,7 @@ function sync_switchOS(os)
         if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
         if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');
         $('.sync-button-txt.small').text(ostxt);
-        $('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
+        $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
         $('.sync-button').removeClass('mac linux').addClass('linux');
         $('.sync-button').attr('href',syncurl);
 
@@ -440,8 +496,8 @@ var megaAds = {
     init: function() {
 
         if (this.popAd) {
-            popunda.megaPopunder.popurls = this.popAd;
-            popunda.megaPopunder.init($(".new-download-buttons"));
+            mega.popunda.popurls = this.popAd;
+            mega.popunda.init($(".download.buttons-block"));
         }
 
         // Remove any previous ad containers

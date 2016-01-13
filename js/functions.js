@@ -27,10 +27,15 @@ makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
  *     URLs should be processed. Note that this will not work for
  *     XML fragments.
  * @param {boolean} isXML If true, parse the fragment as XML.
+ * @returns {DocumentFragment}
  */
 function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     if (!doc) {
         doc = document;
+    }
+    if (!markup) {
+        console.error('Empty content passed to parseHTML', arguments);
+        markup = 'no content';
     }
     if (is_chrome_firefox) {
         try {
@@ -58,7 +63,12 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
 
     // Either we are not running the Firefox extension or the above parser
     // failed, in such case we try to mimic it using jQuery.parseHTML
-    return $.parseHTML(String(markup), doc);
+    var fragment = doc.createDocumentFragment();
+    $.parseHTML(String(markup), doc)
+        .forEach(function(node) {
+            fragment.appendChild(node);
+        });
+    return fragment;
 }
 parseHTML.baseURIs = {};
 
@@ -98,7 +108,7 @@ function parseHTMLfmt(markup) {
                         var l = this.length;
                         markup = parseHTMLfmt.apply(null, arguments);
                         while (l > i) {
-                            $(this[i++])[origFunc](markup);
+                            $(this[i++])[origFunc](markup.cloneNode(true));
                         }
                         if (is_chrome_firefox) {
                             $('a[data-fxhref]').rebind('click', function() {
@@ -190,52 +200,6 @@ function excludeIntersected(array1, array2) {
     }
 
     return result;
-}
-
-/**
- *  Cascade:
- *
- *  Tiny helper to queue related tasks, in which the output of one function
- *  is the input of the next task. It is asynchronous
- *
- *      function([prevarg, arg], next)
- *
- *  Author: @crodas
- */
-function Cascade(tasks, fnc, done, value) {
-    function scheduler(value) {
-        if (tasks.length === 0) {
-            return done(value);
-        }
-
-        fnc([value, tasks.shift()], scheduler)
-    }
-
-    scheduler(value);
-}
-
-/**
- *  Simple interface to run things in parallel (safely) once, and
- *  get a safe callback
- *
- *  Author: @crodas
- */
-function Parallel(task) {
-    var callbacks = {};
-    return function(args, next) {
-        var id = JSON.stringify(args)
-        if (callbacks[id]) {
-            return callbacks[id].push(next);
-        }
-        callbacks[id] = [next];
-        task(args, function() {
-            var args = arguments;
-            $.each(callbacks[id], function(i, next) {
-                next.apply(null, args);
-            });
-            delete callbacks[id];
-        });
-    };
 }
 
 function asciionly(text) {
@@ -552,15 +516,16 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
-    
+
     useragent = useragent || navigator.userAgent;
     useragent = (' ' + useragent).toLowerCase();
-    
+
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
-    
+    var nameTrans = '';
+
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
@@ -606,7 +571,6 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
-        icon = 'chrome.png';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
@@ -616,7 +580,6 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
-        icon = 'firefox.png';
     }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
@@ -628,10 +591,11 @@ function browserdetails(useragent) {
             || "ActiveXObject" in window) {
         browser = 'Internet Explorer';
     }
-    
+
     // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
-        name = String(l[7684]).replace('%1', browser).replace('%2', os);
+        name = browser + ' on ' + os;
+        nameTrans = String(l[7684]).replace('%1', browser).replace('%2', os);
     }
     else if (os) {
         name = os;
@@ -652,19 +616,20 @@ function browserdetails(useragent) {
             icon = browser.toLowerCase() + '.png';
         }
     }
-    
+
     var browserDetails = {};
     browserDetails.name = name;
+    browserDetails.nameTrans = nameTrans || name;
     browserDetails.icon = icon;
     browserDetails.os = os || '';
     browserDetails.browser = browser;
-    
+
     // Determine if the OS is 64bit
     browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
-    
+
     // Determine if using a browser extension
     browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
-    
+
     return browserDetails;
 }
 
@@ -755,7 +720,7 @@ function uplpad(number, length) {
     return str;
 }
 
-function secondsToTime(secs) {
+function secondsToTime(secs, text_format) {
     if (isNaN(secs)) {
         return '--:--:--';
     }
@@ -769,6 +734,11 @@ function secondsToTime(secs) {
     var divisor_for_seconds = divisor_for_minutes % 60;
     var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
     var returnvar = hours + ':' + minutes + ':' + seconds;
+
+    if (text_format) {
+        hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
+        returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
+    } 
     return returnvar;
 }
 
@@ -777,6 +747,21 @@ function htmlentities(value) {
         return '';
     }
     return $('<div/>').text(value).html();
+}
+
+/**
+ * Convert bytes sizes into a human-friendly format (KB, MB, GB), pretty
+ * similar to `bytesToSize` but this function returns an object
+ * (`{ size: "23,33", unit: 'KB' }`) which is easier to consume
+ *
+ * @param {Number} bytes        Size in bytes to convert
+ * @param {Number} precision    Precision to show the decimal number
+ * @returns {Object} Returns an object similar to `{size: "2.1", unit: "MB"}`
+ */
+function numOfBytes(bytes, precision) {
+
+    var parts = bytesToSize(bytes, precision || 2).split(' ');
+    return { size: parts[0], unit: parts[1] || 'B' };
 }
 
 function bytesToSize(bytes, precision) {
@@ -826,53 +811,6 @@ function bytesToSize(bytes, precision) {
     else {
         return parseInt(bytes) + ' ' + s_b;
     }
-}
-
-function checkPassword(strPassword) {
-    var m_strUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    var m_strLowerCase = "abcdefghijklmnopqrstuvwxyz";
-    var m_strNumber = "0123456789";
-    var m_strCharacters = "!@#$%^&*?_~";
-    var nScore = 0;
-    nScore += countDif(strPassword) * 2;
-    var extra = countDif(strPassword) * strPassword.length / 3;
-    if (extra > 25) {
-        extra = 25;
-    }
-    nScore += extra;
-    var nUpperCount = countContain(strPassword, m_strUpperCase);
-    var nLowerCount = countContain(strPassword, m_strLowerCase);
-    var nLowerUpperCount = nUpperCount + nLowerCount;
-    if (nUpperCount === 0 && nLowerCount !== 0) {
-        nScore += 10;
-    }
-    else if (nUpperCount !== 0 && nLowerCount !== 0) {
-        nScore += 10;
-    }
-    var nNumberCount = countContain(strPassword, m_strNumber);
-    if (nNumberCount === 1) {
-        nScore += 10;
-    }
-    if (nNumberCount >= 3) {
-        nScore += 15;
-    }
-    var nCharacterCount = countContain(strPassword, m_strCharacters);
-    if (nCharacterCount === 1) {
-        nScore += 10;
-    }
-    if (nCharacterCount > 1) {
-        nScore += 10;
-    }
-    if (nNumberCount !== 0 && nLowerUpperCount !== 0) {
-        nScore += 2;
-    }
-    if (nNumberCount !== 0 && nLowerUpperCount !== 0 && nCharacterCount !== 0) {
-        nScore += 3;
-    }
-    if (nNumberCount !== 0 && nUpperCount !== 0 && nLowerCount !== 0 && nCharacterCount !== 0) {
-        nScore += 5;
-    }
-    return nScore;
 }
 
 function showNonActivatedAccountDialog(log) {
@@ -929,28 +867,6 @@ function showOverQuotaDialog() {
     $('.warning-button').click(function() {
         document.location.hash = 'pro';
     });
-}
-
-function countDif(strPassword) {
-    var chararr = [];
-    var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) {
-        if (!chararr[strPassword.charAt(i)]) {
-            chararr[strPassword.charAt(i)] = true;
-            nCount++;
-        }
-    }
-    return nCount;
-}
-
-function countContain(strPassword, strCheck) {
-    var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) {
-        if (strCheck.indexOf(strPassword.charAt(i)) > -1) {
-            nCount++;
-        }
-    }
-    return nCount;
 }
 
 function logincheckboxCheck(ch_id) {
@@ -1719,17 +1635,20 @@ var stringcrypt = (function() {
      * Encrypts clear text data to an authenticated ciphertext, armoured with
      * encryption mode indicator and IV.
      *
-     * @param plain {string}
+     * @param plain {String}
      *     Plain data block as (unicode) string.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @param [raw] {Boolean}
+     *     Do not convert plain text to UTF-8 (default: false).
+     * @returns {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      */
-    ns.stringEncrypter = function(plain, key) {
+    ns.stringEncrypter = function(plain, key, raw) {
         var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
-        var plainBytes = unescape(encodeURIComponent(plain));
-        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode);
+        var plainBytes = raw ? plain : to8(plain);
+        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode, false);
+
         return cipher;
     };
 
@@ -1737,16 +1656,20 @@ var stringcrypt = (function() {
      * Decrypts an authenticated cipher text armoured with a mode indicator and IV
      * to clear text data.
      *
-     * @param cipher {string}
+     * @param cipher {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @param [raw] {Boolean}
+     *     Do not convert plain text from UTF-8 (default: false).
+     * @returns {String}
      *     Clear text as (unicode) string.
      */
-    ns.stringDecrypter = function(cipher, key) {
-        var plain = tlvstore.blockDecrypt(cipher, key);
-        return decodeURIComponent(escape(plain));
+    ns.stringDecrypter = function(cipher, key, raw) {
+
+        var plain = tlvstore.blockDecrypt(cipher, key, false);
+
+        return raw ? plain : from8(plain);
     };
 
     /**
@@ -1756,8 +1679,10 @@ var stringcrypt = (function() {
      *     Symmetric key as byte string.
      */
     ns.newKey = function() {
+
         var keyBytes = new Uint8Array(16);
         asmCrypto.getRandomValues(keyBytes);
+
         return asmCrypto.bytes_to_string(keyBytes);
     };
 
@@ -1915,8 +1840,16 @@ function mKeyDialog(ph, fl) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
         }
     });
+
+    // Bolden text on instruction message
+    var $instructionMessage = $('.dlkey-dialog .instruction-message');
+    var instructionText = $instructionMessage.html().replace('[B]', '<b>').replace('[/B]', '</b>');
+    $instructionMessage.html(instructionText);
+
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
-        var key = $('.fm-dialog.dlkey-dialog input').val();
+
+        // Trim the input from the user for whitespace, newlines etc on either end
+        var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
 
         if (key) {
             // Remove the ! from the key which is exported from the export dialog
@@ -3233,7 +3166,8 @@ mega.utils.reload = function megaUtilsReload() {
         u_storage.wasloggedin = true;
 
         if (debug) {
-            u_storage.d = true;
+            u_storage.d = 1;
+            u_storage.minLogLevel = 0;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
                 if (!is_extension) {
@@ -3255,8 +3189,8 @@ mega.utils.reload = function megaUtilsReload() {
         }
     }
     else {
-        // Show message that this operation will destroy and reload the data stored by MEGA in the browser
-        msgDialog('confirmation', l[761], l[6995], l[6994], function(doIt) {
+        // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
+        msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
                 if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
                     msgDialog('warningb', l[882], l[7157]);
@@ -3658,7 +3592,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 });
 
 /** document.hasFocus polyfill */
-mBroadcaster.addListener('startMega', function() {
+mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {
         var hasFocus = true;
 
@@ -3813,7 +3747,7 @@ if (typeof sjcl !== 'undefined') {
 
                 // Look for full share
                 if (fullShare) {
-                    shares = M.d[nodes[i]].shares;
+                    shares = M.d[nodes[i]] && M.d[nodes[i]].shares;
 
                     // Look for link share
                     if (linkShare) {
@@ -3862,7 +3796,7 @@ if (typeof sjcl !== 'undefined') {
         // Loop through all selected items
         $.each(nodes, function(index, value) {
             node = M.d[value];
-            if (node.ph && node.shares && node.shares.EXP) {
+            if (node.shares && node.shares.EXP) {
                 result = true;
                 return false;// Stop further $.each loop execution
 

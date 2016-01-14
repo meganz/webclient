@@ -209,6 +209,14 @@ var crypt = (function () {
 
 
     /**
+     * Used for caching .getPubKey requests which are in progress (by reusing MegaPromises)
+     *
+     * @type {String, MegaPromise}
+     * @private
+     */
+    ns._pubKeyRetrievalPromises = {};
+
+    /**
      * Caching public key retrieval utility.
      *
      * @param userhandle {string}
@@ -228,8 +236,21 @@ var crypt = (function () {
      */
     ns.getPubKey = function(userhandle, keyType, callback) {
         assertUserHandle(userhandle);
+
+        // if there is already a getPubKey request in progress, return it, instead of creating a brand new one
+        if (ns._pubKeyRetrievalPromises[userhandle + "_" + keyType]) {
+            return ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+        }
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
+
+        // manage the key retrieval cache during the request is being processed
+        ns._pubKeyRetrievalPromises[userhandle + "_" + keyType] = masterPromise;
+
+        // and then clean it up after the request is done.
+        masterPromise.always(function() {
+            ns._pubKeyRetrievalPromises[userhandle + "_" + keyType]
+        });
 
         /** If a callback is passed in, ALWAYS call it when the master promise
          * is resolved. */

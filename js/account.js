@@ -561,7 +561,7 @@ function generateAvatarMeta(user_hash) {
 }
 
 var attribCache = new IndexedDBKVStorage('attrib');
-var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 60000;
+var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2*60*60;
 
 /**
  * Retrieves a user attribute.

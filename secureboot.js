@@ -937,7 +937,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 20, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 21, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -986,10 +986,13 @@ else if (!b_u)
                 return false;
             }
 
-            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1) {
-                // ^ this seems a quirk on latest Chrome (~46)
+            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1
+                    || String(errobj && errobj.stack).indexOf('<anonymous>:1:18') !== -1
+                    || dump.m.indexOf('TypeError: this.get is not a function') !== -1) {
+                // ^ this seems a quirk on latest Chrome (~46+) or a bogus extension
                 dump.l = 1;
                 errobj = null;
+                dump.m = 'TypeError: this.get(...).querySelectorAll is not a function';
             }
 
             if (~dump.m.indexOf("\n")) {
@@ -999,6 +1002,7 @@ else if (!b_u)
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
+            dump.m = dump.m.replace(/\s+/g, ' ');
 
             if (~dump.m.indexOf('took +10s'))
             {
@@ -1030,6 +1034,18 @@ else if (!b_u)
                         .replace(omsg, '').replace(re, '')
                         .split("\n").map(String.trim).filter(String)
                         .splice(0,15).map(mTrim).join("\n");
+
+                    if (dump.s.indexOf('Unknown script code:') !== -1
+                        || dump.s.indexOf('Function code:') !== -1
+                        || dump.s.indexOf('(eval code:') !== -1
+                        || dump.s.indexOf('(unknown source)') !== -1
+                        || /<anonymous>:\d+:/.test(dump.s)) {
+
+                        console.warn('Got uncaught exception from unknown resource,'
+                            + ' your MEGA account might be compromised.');
+                        console.error(msg, errobj, errobj && errobj.stack, url, ln);
+                        return false;
+                    }
                 }
             }
             if (cn) dump.c = cn;

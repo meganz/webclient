@@ -561,7 +561,7 @@ function generateAvatarMeta(user_hash) {
 }
 
 var attribCache = new IndexedDBKVStorage('attrib');
-
+var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 60000;
 
 /**
  * Retrieves a user attribute.
@@ -644,10 +644,19 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
             }
         }
 
+        // cache all returned values, except internal errors...
+        if (res !== EINTERNAL) {
+            var exp = 0;
+            // only add cache expiration for attributes of non-contacts, because contact's attributes would be always
+            // in sync (using actionpackets)
+            if (!M.u[userhandle] && userhandle !== u_handle && M.u[userhandle].c !== 1) {
+                exp = unixtime();
+            }
+            attribCache.setItem(cacheKey, JSON.stringify([res, exp]));
+        }
+
         // Another conditional, the result value may have been changed.
         if (typeof res !== 'number') {
-            attribCache.setItem(cacheKey, JSON.stringify(res));
-
             thePromise.resolve(res);
             var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
             logger.info('Attribute "' + attribute + '" for user "'
@@ -675,18 +684,36 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     // check the cache first!
     attribCache.getItem(cacheKey)
         .done(function __attribCacheGetDone(v) {
-
             try {
                 var res = JSON.parse(v);
+
+                if ($.isArray(res)) {
+                    if (res[1] && res[1] !== 0 && res[1] < unixtime() - ATTRIB_CACHE_NON_CONTACT_EXP_TIME) {
+                        attribCache.removeItem(cacheKey);
+                        api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+                        return;
+                    }
+                    else if (res[0] === ENOENT) {
+                        thePromise.reject(res[0]);
+                        return;
+                    }
+                    else {
+                        thePromise.resolve(res[0]);
+                        return;
+                    }
+                }
+                else {
+                    attribCache.removeItem(cacheKey);
+                    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+                }
             }
             catch (e) {
                 api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
                 return;
             }
 
-            thePromise.resolve(res);
             if (callback) {
-                callback(res, myCtx);
+                callback(res[0], myCtx);
             }
         })
         .fail(function __attribCacheGetFail() {
@@ -763,7 +790,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     function settleFunction(res) {
         if (typeof res !== 'number') {
-            attribCache.setItem(cacheKey, value);
+            attribCache.setItem(cacheKey, [value, 0]);
             
             logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);

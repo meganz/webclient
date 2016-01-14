@@ -1403,14 +1403,6 @@ Chat.prototype.init = function() {
     });
 
 
-    // prefill keys required for a/v calls
-    self.getContacts().forEach(function(contact) {
-        if (contact.c === 1) {
-            crypt.getPubRSA(contact.u);
-        }
-    });
-
-
     self.trigger("onInit");
 };
 

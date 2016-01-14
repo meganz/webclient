@@ -3695,7 +3695,7 @@ function MegaData()
         var ttl = this.getTransferTableLengths();
         for (var k in nodes) {
             /* jshint -W089 */
-            if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
+            if (!nodes.hasOwnProperty(k) || !this.isNodeObject((n = M.d[nodes[k]]))) {
                 n = nodes[k];
                 if (this.isNodeObject(n)) {
                     dlmanager.logger.info('Using plain provided node object.');

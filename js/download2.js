@@ -502,7 +502,7 @@ var dlmanager = {
             var abLen = task.data.byteLength;
             var abDup = dl.data && (is_chrome_firefox & 4) && new Uint8Array(task.data);
 
-            dl.io.write(task.data, task.offset, function() {
+            var ready = function _onWriterReady() {
                 dl.writer.pos += abLen;
                 if (dl.data) {
                     new Uint8Array(
@@ -513,7 +513,17 @@ var dlmanager = {
                 }
 
                 return finish_write(task, done);
-            });
+            };
+
+            try {
+                dl.io.write(task.data, task.offset, ready);
+            }
+            catch (ex) {
+                var logger = dl.writer && dl.writer.logger || dlmanager.logger;
+                logger.error(ex);
+                dlFatalError(dl, ex);
+            }
+
         }, 1, 'download-writer');
 
         dlmanager.throttleByIO(dl.writer);

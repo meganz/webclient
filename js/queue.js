@@ -201,7 +201,12 @@ MegaQueue.prototype.run_in_context = function(task) {
 
                 var done = task[1] || task[0].onQueueDone;
                 if (done) {
-                    done.apply(task[2] || this, [task[0], arguments]);
+                    var len = arguments.length;
+                    var args = Array(len);
+                    while (len--) {
+                        args[len] = arguments[len];
+                    }
+                    done.apply(task[2] || this, [task[0], args]);
                 }
                 if (!this.isEmpty() || $.len(this._qpaused)) {
                     this._process();

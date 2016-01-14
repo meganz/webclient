@@ -25,7 +25,7 @@ var getMessageString;
                 'incoming-call': l[5893],
                 'call-timeout': l[5890],
                 'call-starting': l[7206],
-                'call-feedback': "To help us improve our service, it would be great if you want to rate how was your call with [X]? ",
+                'call-feedback': l[7998],
                 'call-initialising': l[7207],
                 'call-ended': [l[5889], l[7208]],
                 'call-failed-media': l[7204],
@@ -188,13 +188,13 @@ var ConversationMessage = React.createClass({
                         additionalClasses += " not-sent";
 
                         buttonsBlock = <div className="buttons-block">
-                            <div className="message circuit-label left">{__("Message not sent")}</div>
+                            <div className="message circuit-label left">{__(l[8003])}</div>
                             <div className="default-white-button right" onClick={(e) => {
                                 self.doRetry(e, message);
-                            }}>{__("Retry")}</div>
+                            }}>{__(l[1364])}</div>
                             <div className="default-white-button right red" onClick={(e) => {
                                 self.doDelete(e, message);
-                            }}>{__("Delete message")}</div>
+                            }}>{__(l[8004])}</div>
                             <div className="clear"></div>
                         </div>;
                     }
@@ -274,8 +274,8 @@ var ConversationMessage = React.createClass({
                                 if (res === 0) {
                                     msgDialog(
                                         'info',
-                                        __("Add to Cloud Drive"),
-                                        __("Attachment added to your Cloud Drive.")
+                                        __(l[8005]),
+                                        __(l[8006])
                                     );
                                 }
                             });
@@ -296,7 +296,7 @@ var ConversationMessage = React.createClass({
                                         >
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
-                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__("Add to Cloud Drive")}
+                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
                                                                   onClick={addToCloudDrive}/>
 
                                         <hr />
@@ -317,7 +317,7 @@ var ConversationMessage = React.createClass({
                                         >
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
-                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__("Add to Cloud Drive")}
+                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
                                                                   onClick={addToCloudDrive}/>
                                     </DropdownsUI.Dropdown>
                                 </ButtonsUI.Button>;
@@ -580,7 +580,7 @@ var ConversationMessage = React.createClass({
                             <DropdownsUI.DropdownItem icon="writing-pen" label={__(l[1342])} onClick={() => {
                                         console.error("TBD!");
                                     }}/>
-                            <DropdownsUI.DropdownItem icon="quotes" label="Quote" onClick={() => {
+                            <DropdownsUI.DropdownItem icon="quotes" label={__(l[8012])} onClick={() => {
                                         console.error("TBD!");
                                     }}/>
 
@@ -818,7 +818,7 @@ var ConversationRightArea = React.createClass({
                         { null /*<ButtonsUI.Button
                             className="link-button dropdown-element"
                             icon="rounded-grey-plus"
-                            label={__("Add participant…")}
+                            label={__(l[8007])}
                             contacts={this.props.contacts}
                             >
                             <DropdownsUI.DropdownContactsSelector
@@ -840,7 +840,7 @@ var ConversationRightArea = React.createClass({
                                 className="wide-dropdown send-files-selector"
                                 onClick={() => {}}
                             >
-                                <DropdownsUI.DropdownItem icon="grey-cloud" label="From my Cloud Drive" onClick={() => {
+                                <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8013])} onClick={() => {
                                     self.props.onAttachFromCloudClicked();
                                 }} />
                             </DropdownsUI.Dropdown>
@@ -1623,8 +1623,8 @@ var ConversationPanel = React.createClass({
         ) {
             var headerText = (
                 self.props.messagesBuff.messages.length === 0 ?
-                    __("No chat history with %s") :
-                    __("Conversation with %s")
+                    __(l[8001]) :
+                    __(l[8002])
             );
             headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 
@@ -1895,7 +1895,7 @@ var ConversationPanel = React.createClass({
                                         >
                                             <DropdownsUI.DropdownItem
                                                 icon="grey-cloud"
-                                                label={__("Add from your Cloud")}
+                                                label={__(l[8011])}
                                                 onClick={(e) => {
                                                     self.setState({'attachCloudDialog': true});
                                             }}>

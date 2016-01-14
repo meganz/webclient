@@ -559,6 +559,11 @@ function initUI() {
                         if (M.currentdirid === 'shares' && !M.viewmode) {
                             M.openFolder('shares', 1);
                         }
+                    }, function(error) {
+                        if (error === EOVERQUOTA) {
+                            return msgDialog('warninga', l[135], "File cannot be sent as the target user is over their storage quota", '');
+                        }
+                        return msgDialog('warninga', l[135], l[47], api_strerror(error));
                     });
                 }, 50);
             }

@@ -37,6 +37,8 @@ var authring = (function () {
     var logger = MegaLogger.getLogger('authring');
     ns._logger = logger;
 
+    ns._initialisingPromise = false;
+
     /**
      * "Enumeration" of authentication methods. The values in here must fit
      * into 4 bits of a byte.
@@ -319,7 +321,7 @@ var authring = (function () {
 
             return;
         }
-        if (u_authring[keyType] === undefined) {
+        if (typeof u_authring[keyType] === 'undefined') {
             logger.error('First initialise u_authring by calling authring.getContacts()');
 
             return;
@@ -328,10 +330,18 @@ var authring = (function () {
             // We don't want to track ourself. Let's get out of here.
             return;
         }
-        u_authring[keyType][userhandle] = { fingerprint: fingerprint,
-                                            method: method,
-                                            confidence: confidence };
-        ns.setContacts(keyType);
+
+        var oldRecord = u_authring[keyType][userhandle];
+        if (!oldRecord
+                || (oldRecord.fingerprint !== fingerprint)
+                || (oldRecord.method !== method)
+                || (oldRecord.confidence !== confidence)) {
+            // Need to update the record.
+            u_authring[keyType][userhandle] = { fingerprint: fingerprint,
+                                                method: method,
+                                                confidence: confidence };
+            ns.setContacts(keyType);
+        }
     };
 
 
@@ -582,8 +592,25 @@ var authring = (function () {
      *     A promise that is resolved when the original asynch code is settled.
      */
     ns.initAuthenticationSystem = function() {
+        if (ns._initialisingPromise !== false) {
+            if (ns._initialisingPromise === true) {
+                // already initialised!
+                return MegaPromise.resolve();
+            }
+            else if (ns._initialisingPromise instanceof MegaPromise) {
+                // initialisation is in progress, don't initialise more then once and just return the master promise.
+                return ns._initialisingPromise;
+            }
+            else {
+                logger.error(
+                    "Failed to initAuthSystem because of invalid _initialisingPromise state of: ",
+                    ns._initialisingPromise
+                );
+                return MegaPromise.reject();
+            }
+        }
         // The promise to return.
-        var masterPromise = new MegaPromise();
+        var masterPromise = ns._initialisingPromise = new MegaPromise();
 
         // Initialise basic authentication system with Ed25519 keys first.
         var keyringPromise = ns._initKeyringAndEd25519();
@@ -591,16 +618,53 @@ var authring = (function () {
         keyringPromise.done(function __baseAuthSystemDone() {
             var rsaPromise = ns._initKeyPair('RSA');
             var cu25519Promise = ns._initKeyPair('Cu25519');
-            var comboPromise = MegaPromise.all([rsaPromise, cu25519Promise]);
+
+            var prefilledRsaKeysPromise = new MegaPromise();
+            rsaPromise.done(function() {
+                prefilledRsaKeysPromise.linkDoneAndFailTo(
+                    ns._initAndPreloadRSAKeys()
+                );
+            });
+
+            var comboPromise = MegaPromise.all([rsaPromise, cu25519Promise, prefilledRsaKeysPromise]);
+
             masterPromise.linkDoneAndFailTo(comboPromise);
         });
         keyringPromise.fail(function __baseAuthSystemFail() {
             masterPromise.fail();
         });
 
+
+        masterPromise
+            .done(function() {
+                ns._initialisingPromise = true;
+            })
+            .fail(function() {
+                ns._initialisingPromise = false;
+            });
+
         return masterPromise;
     };
 
+
+    /**
+     * Preloads and fills the cache/data structures with all contacts' RSA keys.
+     *
+     * @returns {MegaPromise} promise that will be resolved after all keys are loaded/fetched.
+     * @private
+     */
+    ns._initAndPreloadRSAKeys = function() {
+        var loadingPromises = [];
+        // prefill keys required for a/v calls
+        Object.keys(M.u).forEach(function(contact) {
+            if (contact && contact.u && contact.c === 1) {
+                loadingPromises.push(
+                    crypt.getPubRSA(contact.u)
+                );
+            }
+        });
+        return MegaPromise.allDone(loadingPromises);
+    };
 
     /**
      * Initialises the key ring for private keys and the authentication key

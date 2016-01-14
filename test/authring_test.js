@@ -518,7 +518,7 @@ describe("authring unit test", function() {
             assert.strictEqual(ns.setContacts.args[0][0], 'Ed25519');
         });
 
-        it("normal behaviou RSAr", function() {
+        it("normal behaviou RSA", function() {
             sandbox.stub(u_authring, 'RSA', {});
             sandbox.stub(ns, 'setContacts');
             ns.setContactAuthenticated('you456789xw', RSA_STRING_FINGERPRINT, 'RSA',
@@ -528,6 +528,17 @@ describe("authring unit test", function() {
             assert.deepEqual(u_authring.RSA, expected);
             assert.strictEqual(ns.setContacts.callCount, 1);
             assert.strictEqual(ns.setContacts.args[0][0], 'RSA');
+        });
+
+        it("no change", function() {
+            var expected = {'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
+                                            method: 0, confidence: 0}};
+            sandbox.stub(u_authring, 'Ed25519', expected);
+            sandbox.stub(ns, 'setContacts');
+            ns.setContactAuthenticated('you456789xw', ED25519_STRING_FINGERPRINT, 'Ed25519',
+                                       ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
+            assert.deepEqual(u_authring.Ed25519, expected);
+            assert.strictEqual(ns.setContacts.callCount, 0);
         });
 
         it("don't add self", function() {

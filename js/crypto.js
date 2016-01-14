@@ -1790,6 +1790,9 @@ function api_retry() {
 function api_reqfailed(c, e) {
     if (e === ESID) {
         u_logout(true);
+        Soon(function() {
+            showToast('clipboard', l[19]);
+        });
         document.location.hash = 'login';
     }
     else if (c === 2 && e === ETOOMANY) {

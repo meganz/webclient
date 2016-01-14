@@ -8775,9 +8775,9 @@ function showToast(toastClass, notification) {
     var $toast, interval;
 
     $toast = $('.toast-notification.common-toast');
-    $toast.attr('class', 'toast-notification common-toast ' + toastClass).find('.toast-col:first-child').html(notification);
+    $toast.attr('class', 'toast-notification common-toast ' + toastClass)
+        .find('.toast-col:first-child').safeHTML(notification);
 
-    clearInterval(interval);
     $toast.addClass('visible');
 
     interval = setInterval(function() {

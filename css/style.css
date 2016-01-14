@@ -25403,10 +25403,9 @@ body.pro:after {
     font-size: 13px;
 }
 .main-mid-pad.opensource {
-	padding: 76px 124px
+    padding: 76px 124px 50px;
 }
 .opensource-bg {
-	background-color: #F2F2F2;
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -25446,23 +25445,30 @@ body.pro:after {
 	margin: 0 0 4px 15px;
 	float: left;
 }
+.opensource > p {
+    letter-spacing: 0.2px;
+}
+.opensource-grey-background {
+    background-color: #fafafa;
+}
 .opensource-icons-bl {
-	border-top: 1px solid rgba(0,0,0,0.04);
-	border-bottom: 1px solid rgba(0,0,0,0.04);
-	margin: 44px 0 0 0;
-	padding: 31px 26px 40px 26px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    margin: 0 auto;
+    padding: 31px 26px 100px;
+    width: 847px;
 }
 .opensource-icon-pad {
-	width: 33.333333%;
-	float: left;
-	padding: 22px 0;
-	text-align: center;
+    float: left;
+    padding: 22px 0;
+    text-align: center;
+    width: 25%;
 }
 .opensource-icon {
 	display: block;
 	width: 102px;
 	height: 102px;
-	background-image: url(../images/mega/opensource.png);
+	background-image: url(../images/mega/opensource-v2.png);
 	background-repeat: no-repeat;
 	background-position: center -109px;
 	margin: 0 auto;
@@ -25476,12 +25482,19 @@ body.pro:after {
 .opensource-icon.megasync {
 	background-position: center -529px;
 }
+.opensource-icon.ios {
+	background-position: center -950px;
+}
 .opensource-icon.android {
 	background-position: center -669px;
+}
+.opensource-icon.windowsphone {
+	background-position: center -1090px;
 }
 .opensource-icon.sdk {
 	background-position: center -809px;
 }
+
 a.opensource-icon-txt {
 	display: inline-block;
 	color: #444444;
@@ -26032,8 +26045,8 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
     margin-top: -120px;
 }
 .opensource-top-icon, .opensource-icon {
-    background-image: url(../images/mega/opensource@2x.png);
-    background-size: 102px auto;
+    background-image: url(../images/mega/opensource-v2@2x.png);
+    background-size: 100px auto;
 }
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);

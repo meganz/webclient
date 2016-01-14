@@ -648,7 +648,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
             var exp = 0;
             // only add cache expiration for attributes of non-contacts, because contact's attributes would be always
             // in sync (using actionpackets)
-            if (!M.u[userhandle] && userhandle !== u_handle && M.u[userhandle].c !== 1) {
+            if (userhandle !== u_handle && (!M.u[userhandle] || M.u[userhandle].c !== 1)) {
                 exp = unixtime();
             }
             attribCache.setItem(cacheKey, JSON.stringify([res, exp]));

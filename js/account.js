@@ -699,6 +699,9 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                         return;
                     }
                     else {
+                        if (callback) {
+                            callback(res[0], myCtx);
+                        }
                         thePromise.resolve(res[0]);
                         return;
                     }

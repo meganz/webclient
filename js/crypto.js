@@ -266,8 +266,8 @@ var crypt = (function () {
         if (typeof u_authring === 'undefined'
                 || typeof u_authring[keyType] === 'undefined') {
             // Need to initialise the authentication system (authring).
-            logger.debug('First initialising the ' + keyType + ' authring.');
-            var authringLoadingPromise = authring.getContacts(keyType);
+            logger.debug('Will wait for the authring to initialise first.');
+            var authringLoadingPromise = authring.initAuthenticationSystem();
             masterPromise.linkFailTo(authringLoadingPromise);
             // Now, with the authring loaded, link recursively to getPubKey again.
             authringLoadingPromise.done(function() {

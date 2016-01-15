@@ -791,7 +791,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     function settleFunction(res) {
         if (typeof res !== 'number') {
-            attribCache.setItem(cacheKey, [value, 0]);
+            attribCache.setItem(cacheKey, JSON.stringify([value, 0]));
 
             logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);

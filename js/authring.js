@@ -685,7 +685,8 @@ var authring = (function () {
     ns._initAndPreloadRSAKeys = function() {
         var loadingPromises = [];
         // prefill keys required for a/v calls
-        Object.keys(M.u).forEach(function(contact) {
+        Object.keys(M.u).forEach(function(h) {
+            var contact = M.u[h];
             if (contact && contact.u && contact.c === 1) {
                 loadingPromises.push(
                     crypt.getPubRSA(contact.u)

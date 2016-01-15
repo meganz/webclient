@@ -423,8 +423,8 @@ function MegaData()
         }
 
         var waitingPromises = [];
-        Object.keys(M.c['contacts']).forEach(function(u) {
-            if (!avatars[u]) {
+        M.u.forEach(function(c, u) {
+            if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
                 waitingPromises.push(
                     getUserAttribute(u, 'a', true, false, function (res) {
                         if (typeof res !== 'number' && res.length > 5) {

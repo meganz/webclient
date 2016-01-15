@@ -698,14 +698,31 @@ Chat.prototype.init = function() {
     self.$container = $('.fm-chat-block');
 
 
-    self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={this} contacts={M.u} />;
+    var appContainer = document.querySelector('.section.conversations');
 
-    self.$conversationsAppInstance = ReactDOM.render(
-        self.$conversationsApp,
-        document.querySelector('.section.conversations')
-    );
+    var initAppUI = function() {
+        self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} contacts={M.u} />;
 
-    self.renderConversationsApp();
+        self.$conversationsAppInstance = ReactDOM.render(
+            self.$conversationsApp,
+            document.querySelector('.section.conversations')
+        );
+
+        self.renderConversationsApp();
+    };
+
+    if (!appContainer) {
+       $(window).rebind('hashchange.delayedChatUiInit', function() {
+           appContainer = document.querySelector('.section.conversations');
+           if (appContainer) {
+               initAppUI();
+               $(window).unbind('hashchange.delayedChatUiInit');
+           }
+       });
+    }
+    else {
+        initAppUI();
+    }
 
     $(window)
         .unbind('hashchange.chat')

@@ -49,7 +49,7 @@ var ContactVerified = React.createClass({
         else {
             var self = this;
 
-            u_authring.getPubEd25519(contact.u)
+            crypt.getPubEd25519(contact.u)
                 .done(function() {
                     if(self.isMounted()) {
                         self.forceUpdate();

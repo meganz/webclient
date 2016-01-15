@@ -561,7 +561,7 @@ function generateAvatarMeta(user_hash) {
 }
 
 var attribCache = new IndexedDBKVStorage('attrib');
-var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2*60*60;
+var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
 
 /**
  * Retrieves a user attribute.
@@ -683,8 +683,9 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     // check the cache first!
     attribCache.getItem(cacheKey)
         .done(function __attribCacheGetDone(v) {
+            var res;
             try {
-                var res = JSON.parse(v);
+                res = JSON.parse(v);
 
                 if ($.isArray(res)) {
                     if (res[1] && res[1] !== 0 && res[1] < unixtime() - ATTRIB_CACHE_NON_CONTACT_EXP_TIME) {
@@ -790,7 +791,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     function settleFunction(res) {
         if (typeof res !== 'number') {
             attribCache.setItem(cacheKey, JSON.stringify([value, 0]));
-            
+
             logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);
             thePromise.resolve(res);

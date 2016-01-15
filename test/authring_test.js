@@ -37,20 +37,20 @@ describe("authring unit test", function() {
                                   + 'KqWMI8OX3eXT45+IyWCTTA5yeip/GThvkS8O2HBF'
                                   + 'aNLvSAFq5/5lQG');
 
-    var SERIALISED_RING_ED25519 = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
+    var SERIALISED_RING_ED25519 = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LAg==');
     var RING_ED25519 = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                         method: ns.AUTHENTICATION_METHOD.SEEN,
                                         confidence: ns.KEY_CONFIDENCE.UNSURE},
                         'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
-                                        method: 0x02,
-                                        confidence: 0x04}};
-    var SERIALISED_RING_RSA = atob('me3456789xwY3axay6RacRqupU9LuYTmw+ujfwDKi7jnrvz3HBjdrFrLpFpxGq6lT0u5hObD66N/Qg==');
+                                        method: ns.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED,
+                                        confidence: ns.KEY_CONFIDENCE.UNSURE}};
+    var SERIALISED_RING_RSA = atob('me3456789xwY3axay6RacRqupU9LuYTmw+ujfwDKi7jnrvz3HBjdrFrLpFpxGq6lT0u5hObD66N/Ag==');
     var RING_RSA = {'me3456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
                                     method: ns.AUTHENTICATION_METHOD.SEEN,
                                     confidence: ns.KEY_CONFIDENCE.UNSURE},
                     'you456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
-                                    method: 0x02,
-                                    confidence: 0x04}};
+                                    method: ns.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED,
+                                    confidence: ns.KEY_CONFIDENCE.UNSURE}};
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
@@ -79,35 +79,19 @@ describe("authring unit test", function() {
         });
 
         it("serialise()", function() {
-            var test = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
-                                        method: ns.AUTHENTICATION_METHOD.SEEN,
-                                        confidence: ns.KEY_CONFIDENCE.UNSURE},
-                        'you456789xw': {fingerprint: ED25519_HEX_FINGERPRINT,
-                                        method: 0x02,
-                                        confidence: 0x04}};
-            var expected = 'me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==';
-            assert.strictEqual(btoa(ns.serialise(test)), expected);
+            assert.strictEqual(ns.serialise(RING_ED25519), SERIALISED_RING_ED25519);
         });
 
         it('_splitSingleTAuthRecord()', function() {
-            var tests = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
-            var result = ns._deserialiseRecord(tests);
+            var result = ns._deserialiseRecord(SERIALISED_RING_ED25519);
             assert.strictEqual(result.userhandle, 'me3456789xw');
-            assert.deepEqual(result.value, {fingerprint: ED25519_STRING_FINGERPRINT,
-                                            method: ns.AUTHENTICATION_METHOD.SEEN,
-                                            confidence: ns.KEY_CONFIDENCE.UNSURE});
-            assert.strictEqual(result.rest, base64urldecode('you456789xw') + ED25519_STRING_FINGERPRINT + String.fromCharCode(0x42));
+            assert.deepEqual(result.value, RING_ED25519['me3456789xw']);
+            assert.strictEqual(result.rest,
+                base64urldecode('you456789xw') + ED25519_STRING_FINGERPRINT + String.fromCharCode(0x02));
         });
 
         it('deserialise()', function() {
-            var tests = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
-            var expected = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
-                                            method: ns.AUTHENTICATION_METHOD.SEEN,
-                                            confidence: ns.KEY_CONFIDENCE.UNSURE},
-                            'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
-                                            method: 0x02,
-                                            confidence: 0x04}};
-            assert.deepEqual(ns.deserialise(tests), expected);
+            assert.deepEqual(ns.deserialise(SERIALISED_RING_ED25519), RING_ED25519);
         });
     });
 
@@ -760,15 +744,24 @@ describe("authring unit test", function() {
 
         describe('initAuthenticationSystem()', function() {
             it('works normally', function() {
-                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                sandbox.stub(ns, '_initialisingPromise', false);
+                var masterPromise = {};
+                masterPromise.linkDoneAndFailTo = sinon.stub();
+                masterPromise.done = sinon.stub().returns(masterPromise);
+                masterPromise.fail = sinon.stub().returns(masterPromise);
+                var prefilledRsaKeysPromise = { linkDoneAndFailTo: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise');
+                MegaPromise.onCall(0).returns(masterPromise);
+                MegaPromise.onCall(1).returns(prefilledRsaKeysPromise);
                 sandbox.stub(MegaPromise, 'all').returns('combo');
                 var keyringPromise = { done: sinon.stub(),
                                        fail: sinon.stub() };
                 sandbox.stub(ns, '_initKeyringAndEd25519').returns(keyringPromise);
+                var rsaPromise = { done: sinon.stub() };
                 sandbox.stub(ns, '_initKeyPair');
-                ns._initKeyPair.onCall(0).returns('RSA');
+                ns._initKeyPair.onCall(0).returns(rsaPromise);
                 ns._initKeyPair.onCall(1).returns('Cu25519');
+                sandbox.stub(ns, '_initAndPreloadRSAKeys');
 
                 var result = ns.initAuthenticationSystem();
                 assert.strictEqual(result, masterPromise);
@@ -782,13 +775,26 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns._initKeyPair.callCount, 2);
                 assert.strictEqual(MegaPromise.all.callCount, 1);
                 assert.strictEqual(MegaPromise.all.callCount, 1);
-                assert.deepEqual(MegaPromise.all.args[0][0], ['RSA', 'Cu25519']);
+                assert.deepEqual(MegaPromise.all.args[0][0],
+                        [rsaPromise, 'Cu25519', prefilledRsaKeysPromise]);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'combo');
+                assert.strictEqual(masterPromise.done.callCount, 1);
+                assert.strictEqual(masterPromise.fail.callCount, 1);
+                assert.strictEqual(rsaPromise.done.callCount, 1);
+
+                callback = rsaPromise.done.args[0][0];
+                callback();
+                assert.strictEqual(prefilledRsaKeysPromise.linkDoneAndFailTo.callCount, 1);
+                assert.strictEqual(ns._initAndPreloadRSAKeys.callCount, 1);
             });
 
             it('Ed25519 fails', function() {
-                var masterPromise = { fail: sinon.stub() };
+                sandbox.stub(ns, '_initialisingPromise', false);
+                var masterPromise = {};
+                masterPromise.linkDoneAndFailTo = sinon.stub();
+                masterPromise.done = sinon.stub().returns(masterPromise);
+                masterPromise.fail = sinon.stub().returns(masterPromise);
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 sandbox.stub(MegaPromise, 'all').returns('combo');
                 var keyringPromise = { done: sinon.stub(),
@@ -799,12 +805,14 @@ describe("authring unit test", function() {
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 1);
                 assert.strictEqual(ns._initKeyringAndEd25519.callCount, 1);
+                assert.strictEqual(masterPromise.done.callCount, 1);
+                assert.strictEqual(masterPromise.fail.callCount, 1);
                 assert.strictEqual(keyringPromise.done.callCount, 1);
                 assert.strictEqual(keyringPromise.fail.callCount, 1);
 
                 var callback = keyringPromise.fail.args[0][0];
                 callback();
-                assert.strictEqual(masterPromise.fail.callCount, 1);
+                assert.strictEqual(masterPromise.fail.callCount, 2);
             });
         });
 

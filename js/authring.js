@@ -108,11 +108,11 @@ var authring = (function () {
      * Generates a binary encoded serialisation of an authentication ring
      * object.
      *
-     * @param authring {object}
+     * @param authring {Object}
      *     Object containing (non-nested) authentication records for Mega user
      *     handles (as keys) and `fingerprint`, `method` and `confidence` as
      *     attributes of the `value` object.
-     * @returns {string}
+     * @returns {String}
      *     Single binary encoded serialisation of authentication ring.
      */
     ns.serialise = function(authring) {
@@ -132,11 +132,10 @@ var authring = (function () {
                 continue;
             }
 
-dump('ser', userhandle, record.fingerprint.length, record.method, record.confidence);
             result += this._serialiseRecord(userhandle, record.fingerprint,
                                             record.method, record.confidence);
         }
-dump('-------------');
+
         return result;
     };
 
@@ -145,9 +144,9 @@ dump('-------------');
      * Splits and decodes an authentication record off of a binary keyring
      * serialisation and returns the record and the rest.
      *
-     * @param serialisedRing {string}
+     * @param serialisedRing {String}
      *     Single binary encoded container of authentication records.
-     * @returns {object}
+     * @returns {Object}
      *     Object containing three elements: `userhandle` contains the Mega
      *     user handle, `value` contains an object (with the `fingerprint` in a
      *     byte string, authentication `method` and key `confidence`) and `rest`
@@ -155,6 +154,7 @@ dump('-------------');
      * @private
      */
     ns._deserialiseRecord = function(serialisedRing) {
+
         var userhandle = base64urlencode(serialisedRing.substring(0, 8));
         var fingerprint =  serialisedRing.substring(8, 28);
         var authAttributes = serialisedRing.charCodeAt(28);
@@ -162,10 +162,6 @@ dump('-------------');
         var confidence = (authAttributes >>> 4) & 0x0f;
         var method = authAttributes & 0x0f;
 
-dump('deser', JSON.stringify({ userhandle: userhandle,
-                  fingerprint: fingerprint.length,
-                          method: method,
-                          confidence: confidence }));
         return { userhandle: userhandle,
                  value: { fingerprint: fingerprint,
                           method: method,
@@ -177,14 +173,15 @@ dump('deser', JSON.stringify({ userhandle: userhandle,
     /**
      * Decodes a binary encoded serialisation to an authentication ring object.
      *
-     * @param serialisedRing {string}
+     * @param serialisedRing {String}
      *     Single binary encoded serialisation of authentication records.
-     * @returns {object}
+     * @returns {Object}
      *     Object containing (non-nested) authentication records for Mega user
      *     handles (as keys) and `fingerprint`, `method` and `confidence` as
      *     attributes of the `value` object.
      */
     ns.deserialise = function(serialisedRing) {
+
         var rest = serialisedRing;
         var container = {};
         while (rest.length > 0) {
@@ -199,8 +196,8 @@ dump('deser', JSON.stringify({ userhandle: userhandle,
             }
 
             container[result.userhandle] = result.value;
-// dump('---', JSON.stringify(result.value), result.value.fingerprint.length);
         }
+
         return container;
     };
 

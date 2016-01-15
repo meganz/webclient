@@ -5336,6 +5336,7 @@ function execsc(actionPackets, callback) {
                 }
 
                 var cacheFillPromise = new MegaPromise();
+                /* jshint -W083 */
                 var removeItemPromise = attribCache.removeItem(
                     actionPacket.u + "_" + actionPacket.ua[i]
                 ).always(function() {
@@ -5359,6 +5360,7 @@ function execsc(actionPackets, callback) {
                         )
                     );
                 });
+                /* jshint +W083 */
 
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;

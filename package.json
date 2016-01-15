@@ -57,7 +57,8 @@
     "karma-script-launcher": "~0.1.0",
     "karma-sinon": "~1.0.3",
     "mocha": "~1.17.1",
-    "sinon": "~1.9.0"
+    "sinon": "~1.9.0",
+    "es6-collections": "git+https://github.com/WebReflection/es6-collections"
   },
   "dependencies": {
     "grunt-contrib-uglify": "^0.8.0",

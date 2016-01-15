@@ -145,6 +145,7 @@ var crypt = (function () {
                 logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
                 masterPromise.resolve(result);
             });
+            masterPromise.linkFailTo(pubKeyPromise);
         }
 
         return masterPromise;
@@ -239,7 +240,13 @@ var crypt = (function () {
 
         // if there is already a getPubKey request in progress, return it, instead of creating a brand new one
         if (ns._pubKeyRetrievalPromises[userhandle + "_" + keyType]) {
-            return ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+            var promise = ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+            if (callback) {
+                promise.done(function(res) {
+                    callback(res);
+                });
+            }
+            return promise;
         }
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
@@ -249,7 +256,7 @@ var crypt = (function () {
 
         // and then clean it up after the request is done.
         masterPromise.always(function() {
-            ns._pubKeyRetrievalPromises[userhandle + "_" + keyType]
+            delete ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
         });
 
         /** If a callback is passed in, ALWAYS call it when the master promise

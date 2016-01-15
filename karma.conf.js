@@ -142,6 +142,9 @@ module.exports = function(config) {
         'js/chat/ui/incomingCallDialog.js',
 
         // == Tests ==
+        // Dependency-based load order of library modules.
+        // modules that already follow AMD need included: false
+        {pattern: 'node_modules/es6-collections/es6-collections.js', included: true},
         (process.env.SKIP_WORKFLOWS)
             ? 'test/config/test_workflows_off.js'
             : 'test/config/test_workflows.js',

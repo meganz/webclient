@@ -55,6 +55,7 @@ var authring = (function () {
         FINGERPRINT_COMPARISON: 0x01,
         SIGNATURE_VERIFIED: 0x02
     };
+    var _ALLOWED_AUTHENTICATION_METHODS = new Set([0x00, 0x01, 0x02]);
 
 
     /**
@@ -67,6 +68,7 @@ var authring = (function () {
     ns.KEY_CONFIDENCE = {
         UNSURE: 0x00
     };
+    var _ALLOWED_KEY_CONFIDENCES = new Set([0x00]);
 
     // User property names used for different key types.
     ns._PROPERTIES = { 'Ed25519': 'authring',
@@ -106,24 +108,34 @@ var authring = (function () {
      * Generates a binary encoded serialisation of an authentication ring
      * object.
      *
-     * @param container {object}
+     * @param authring {Object}
      *     Object containing (non-nested) authentication records for Mega user
      *     handles (as keys) and `fingerprint`, `method` and `confidence` as
      *     attributes of the `value` object.
-     * @returns {string}
+     * @returns {String}
      *     Single binary encoded serialisation of authentication ring.
      */
-    ns.serialise = function(container) {
+    ns.serialise = function(authring) {
+
         var result = '';
-        for (var userhandle in container) {
-            if (!container.hasOwnProperty(userhandle)) {
+        var record;
+        for (var userhandle in authring) {
+            if (!authring.hasOwnProperty(userhandle)) {
                 continue;
             }
-            result += this._serialiseRecord(userhandle,
-                                            container[userhandle].fingerprint,
-                                            container[userhandle].method,
-                                            container[userhandle].confidence);
+            record = authring[userhandle];
+
+            // Skip obviously faulty records.
+            if ((record.fingerprint.length % 20 !== 0)
+                    || !_ALLOWED_AUTHENTICATION_METHODS.has(record.method)
+                    || !_ALLOWED_KEY_CONFIDENCES.has(record.confidence)) {
+                continue;
+            }
+
+            result += this._serialiseRecord(userhandle, record.fingerprint,
+                                            record.method, record.confidence);
         }
+
         return result;
     };
 
@@ -132,9 +144,9 @@ var authring = (function () {
      * Splits and decodes an authentication record off of a binary keyring
      * serialisation and returns the record and the rest.
      *
-     * @param serialisedRing {string}
+     * @param serialisedRing {String}
      *     Single binary encoded container of authentication records.
-     * @returns {object}
+     * @returns {Object}
      *     Object containing three elements: `userhandle` contains the Mega
      *     user handle, `value` contains an object (with the `fingerprint` in a
      *     byte string, authentication `method` and key `confidence`) and `rest`
@@ -142,12 +154,14 @@ var authring = (function () {
      * @private
      */
     ns._deserialiseRecord = function(serialisedRing) {
+
         var userhandle = base64urlencode(serialisedRing.substring(0, 8));
         var fingerprint =  serialisedRing.substring(8, 28);
         var authAttributes = serialisedRing.charCodeAt(28);
         var rest = serialisedRing.substring(29);
         var confidence = (authAttributes >>> 4) & 0x0f;
         var method = authAttributes & 0x0f;
+
         return { userhandle: userhandle,
                  value: { fingerprint: fingerprint,
                           method: method,
@@ -159,21 +173,31 @@ var authring = (function () {
     /**
      * Decodes a binary encoded serialisation to an authentication ring object.
      *
-     * @param serialisedRing {string}
+     * @param serialisedRing {String}
      *     Single binary encoded serialisation of authentication records.
-     * @returns {object}
+     * @returns {Object}
      *     Object containing (non-nested) authentication records for Mega user
      *     handles (as keys) and `fingerprint`, `method` and `confidence` as
      *     attributes of the `value` object.
      */
     ns.deserialise = function(serialisedRing) {
+
         var rest = serialisedRing;
         var container = {};
         while (rest.length > 0) {
             var result = ns._deserialiseRecord(rest);
-            container[result.userhandle] = result.value;
             rest = result.rest;
+
+            // Skip obviously faulty records.
+            if ((result.value.fingerprint.length % 20 !== 0)
+                    || !_ALLOWED_AUTHENTICATION_METHODS.has(result.value.method)
+                    || !_ALLOWED_KEY_CONFIDENCES.has(result.value.confidence)) {
+                continue;
+            }
+
+            container[result.userhandle] = result.value;
         }
+
         return container;
     };
 
@@ -333,7 +357,7 @@ var authring = (function () {
 
         var oldRecord = u_authring[keyType][userhandle];
         if (!oldRecord
-                || (oldRecord.fingerprint !== fingerprint)
+                || !ns.equalFingerprints(oldRecord.fingerprint, fingerprint)
                 || (oldRecord.method !== method)
                 || (oldRecord.confidence !== confidence)) {
             // Need to update the record.
@@ -592,13 +616,16 @@ var authring = (function () {
      *     A promise that is resolved when the original asynch code is settled.
      */
     ns.initAuthenticationSystem = function() {
+
+        // Make sure we're initialising only once.
         if (ns._initialisingPromise !== false) {
             if (ns._initialisingPromise === true) {
-                // already initialised!
+                // Already initialised.
                 return MegaPromise.resolve();
             }
             else if (ns._initialisingPromise instanceof MegaPromise) {
-                // initialisation is in progress, don't initialise more then once and just return the master promise.
+                // Initialisation is in progress.
+                // (Don't initialise more than once, return the master promise.)
                 return ns._initialisingPromise;
             }
             else {
@@ -606,9 +633,11 @@ var authring = (function () {
                     "Failed to initAuthSystem because of invalid _initialisingPromise state of: ",
                     ns._initialisingPromise
                 );
+
                 return MegaPromise.reject();
             }
         }
+
         // The promise to return.
         var masterPromise = ns._initialisingPromise = new MegaPromise();
 
@@ -626,14 +655,14 @@ var authring = (function () {
                 );
             });
 
-            var comboPromise = MegaPromise.all([rsaPromise, cu25519Promise, prefilledRsaKeysPromise]);
+            var comboPromise = MegaPromise.all([rsaPromise, cu25519Promise,
+                                                prefilledRsaKeysPromise]);
 
             masterPromise.linkDoneAndFailTo(comboPromise);
         });
         keyringPromise.fail(function __baseAuthSystemFail() {
             masterPromise.fail();
         });
-
 
         masterPromise
             .done(function() {

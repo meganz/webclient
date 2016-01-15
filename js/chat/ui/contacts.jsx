@@ -286,7 +286,7 @@ var ContactPickerWidget = React.createClass({
                 <i className="small-icon search-icon"></i>
                 <input
                     type="search"
-                    placeholder={__("Search contacts")}
+                    placeholder={__(l[8010])}
                     ref="contactSearchField"
                     onChange={this.onSearchChange}
                     value={this.state.searchValue}

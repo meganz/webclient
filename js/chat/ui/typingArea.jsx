@@ -223,7 +223,7 @@ var TypingArea = React.createClass({
                     <div className="textarea-wrapper">
                         <textarea
                             className={messageTextAreaClasses}
-                            placeholder={__("Write a message...")}
+                            placeholder={__(l[8009])}
                             onKeyDown={self.onTypeAreaKeyDown}
                             onBlur={self.onTypeAreaBlur}
                             onChange={self.onTypeAreaChange}

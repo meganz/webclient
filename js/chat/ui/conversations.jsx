@@ -96,7 +96,7 @@ var ConversationsListItem = React.createClass({
             lastMessageDiv =
                 <div>
                     <div className={lastMsgDivClasses}>
-                        {__("No conversation history")}
+                        {__(l[8000])}
                     </div>
                 </div>;
         }
@@ -381,7 +381,7 @@ var ConversationsApp = React.createClass({
 
                     <div className="fm-left-menu conversations">
                         <div className="nw-fm-tree-header conversations">
-                            <span>{__("Chat")}</span>
+                            <span>{__(l[7997])}</span>
 
                             <ButtonsUI.Button
                                 group="conversationsListing"
@@ -409,16 +409,16 @@ var ConversationsApp = React.createClass({
                     <div className="fm-empty-messages hidden">
                     <div className="fm-empty-pad">
                         <div className="fm-empty-messages-bg"></div>
-                        <div className="fm-empty-cloud-txt">No Messages</div>
+                        <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
                         <div className="fm-not-logged-text">
                             <div className="fm-not-logged-description">
                                 Login or create an account to <span className="red">get 50GB FREE</span> and get messages from your friends and coworkers.
                             </div>
                             <div className="fm-not-logged-button login">
-                                Login
+                                {__(l[193])}
                             </div>
                             <div className="fm-not-logged-button create-account">
-                                Create account
+                                {__(l[968])}
                             </div>
                         </div>
                     </div>

@@ -249,7 +249,7 @@ var dlmanager = {
             next: callback,
             dl_key: object.key,
             callback: this.dlGetUrlDone.bind(this)
-        }, n_h ? 1 : 0);
+        }, object.nauth ? 1 : 0);
     },
 
     dlGetUrlDone: function DM_dlGetUrlDone(res, ctx) {

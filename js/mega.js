@@ -3721,6 +3721,7 @@ function MegaData()
                 t: n.mtime || n.ts,
                 p: path,
                 size: n.s,
+                nauth: n_h,
                 onDownloadProgress: this.dlprogress,
                 onDownloadComplete: this.dlcomplete,
                 onBeforeDownloadComplete: this.dlbeforecomplete,

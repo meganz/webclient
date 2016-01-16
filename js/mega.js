@@ -2950,16 +2950,21 @@ function MegaData()
     this.syncUsersFullname = function(userId) {
         var self = this;
 
+        var firstName = null;
+        var lastName = null;
         MegaPromise.allDone([
-            getUserAttribute(userId, 'firstname', -1),
+            getUserAttribute(userId, 'firstname', -1)
+                .done(function(r) {
+                    firstName = r;
+                }),
             getUserAttribute(userId, 'lastname', -1)
+                .done(function(r) {
+                    lastName = r;
+                })
         ]).done(function(results) {
             if (!self.u[userId]) {
                 return;
             }
-
-            var firstName = results[0][0];
-            var lastName = results[1][0];
 
             // -1, -9, -2, etc...
             firstName = typeof(firstName) != "string" ? false : firstName;

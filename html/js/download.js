@@ -90,15 +90,17 @@ function dl_g(res) {
             }
         });
         $('.download-button.with-megasync').rebind('click', function(e) {
-            megasync.isInstalled(function(err, is) {
-                // If 'msd' (MegaSync download) flag is turned on and application is installed
-                if (res.msd !== 0 && (!err || is)) {
-                    $('.megasync-overlay').removeClass('downloading');
-                    megasync.download(dlpage_ph, dlpage_key);
-                } else {
-                    megasyncOverlay();
-                } 
-            });
+            if (!$(this).hasClass('downloading')) {
+                megasync.isInstalled(function(err, is) {
+                    // If 'msd' (MegaSync download) flag is turned on and application is installed
+                    if (res.msd !== 0 && (!err || is)) {
+                        $('.megasync-overlay').removeClass('downloading');
+                        megasync.download(dlpage_ph, dlpage_key);
+                    } else {
+                        megasyncOverlay();
+                    } 
+                });
+            }
         });
 
         $('.download-button.throught-browser').unbind('click');

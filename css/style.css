@@ -13637,13 +13637,13 @@ table {
     background-position: -200px -646px;
     padding-top: 0;
 }
-.download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block {
+.download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block, .megasync-content.features {
     display: none;
 }
-.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason {
+.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
     display: block;
 }
-.megasync-content.slider, .msd-dialog .megasync-content.features, .megasync-close, .megasync-close-txt {
+.megasync-content.slider, .megasync-close, .megasync-close-txt {
     display: none;
 }
 .downloading .megasync-close, .downloading .megasync-close-txt {
@@ -25843,14 +25843,48 @@ a.ui-datepicker-next {
     position: relative;
     min-height: 421px;
 }
+.slide1 .megasync-slider.body-block {
+    left: 0;
+}
+.slide2 .megasync-slider.body-block {
+    left: -656px;
+}
+.slide3 .megasync-slider.body-block {
+    left: -1312px;
+}
 .megasync-slider.body-block {
     width: 1968px;
+    min-height: 421px;
+    position: relative;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
 .megasync-slide {
     width: 656px;
     min-height: 421px;
     float: left;
     position: relative;
+        -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.slide1 .megasync-slide.slide1, .slide2 .megasync-slide.slide2, .slide3 .megasync-slide.slide3 {
+    ilter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.megasync-slide.slide2 {
+    text-align: left;
 }
 .megasync-header {
     height: 98px;
@@ -25957,6 +25991,9 @@ a.ui-datepicker-next {
     left: auto;
     right: 20px;
 }
+.slide1 .megasync-slider.prev, .slide3 .megasync-slider.next {
+    display: none;
+}
 .megasync-controls {
     bottom: 22px;
     width: 100%;
@@ -26007,6 +26044,11 @@ a.ui-datepicker-next {
 .megasync-button.download:hover {
     background-color: #777777;
     color: white;
+}
+.megasync .toast-icon {
+    background-image: url(../images/mega/download-sprite-v5.png);
+    background-position: -6px -192px;
+    background-repeat: no-repeat;
 }
 /* end of MegaSync dialog */
 
@@ -26544,7 +26586,7 @@ body.pro:after {
     background-image: url(../images/mega/language-sprite@2x.png);
     background-size: 18px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button {
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon {
     background-image: url(../images/mega/download-sprite-v5@2x.png);
     background-size: 257px auto;
 }

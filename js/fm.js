@@ -8770,7 +8770,7 @@ function getclipboardkeys() {
  * @param {String} toastClass Custom style for the notification
  * @param {String} notification The text for the toast notification
  */
-function showToast(toastClass, notification) {
+function showToast(toastClass, notification, buttonLabel) {
 
     var $toast, interval;
 
@@ -8783,7 +8783,13 @@ function showToast(toastClass, notification) {
     interval = setInterval(function() {
         hideToast(interval);
     }, 5000);
-
+    
+    if (buttonLabel) {
+        $('.common-toast .toast-button span').safeHTML(buttonLabel);
+    } else {
+        $('.common-toast .toast-button span').safeHTML(l[726]);
+    }
+    
     $('.common-toast .toast-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');

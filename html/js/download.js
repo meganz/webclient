@@ -199,23 +199,50 @@ function browserDownload() {
 
 // MEGAsync dialog If filesize is too big for downloading through browser
 function megasyncOverlay() {
-    var $this = $('.megasync-overlay');
+    var $this = $('.megasync-overlay'), 
+          slidesNum = $('.megasync-controls div').length;
 
     $this.addClass('msd-dialog').removeClass('hidden downloading');
 
     $('.megasync-button.download', $this).rebind('click', function(e)
     {
-        $this.removeClass('msd-dialog');
         megasync.download(dlpage_ph, dlpage_key);
     });
 
+    $('.megasync-slider.button', $this).rebind('click', function()
+    {
+        var activeSlide = parseInt($('.megasync-controls div.active').attr('data-slidernum'));
+
+        $('.megasync-content.slider').removeClass('slide1 slide2 slide3');
+
+        if ($(this).hasClass('prev')) {
+            if (activeSlide > 1) {
+                $('.megasync-controls div.active').removeClass('active').prev().addClass('active');
+                $('.megasync-content.slider').addClass('slide' + (activeSlide - 1));
+            }
+        } else {
+            if (activeSlide < slidesNum) {
+                $('.megasync-controls div.active').removeClass('active').next().addClass('active');
+                $('.megasync-content.slider').addClass('slide' + (activeSlide + 1));
+            }
+        }
+    });
+    
+    $('.megasync-controls div', $this).rebind('click', function()
+    {
+        
+        $('.megasync-content.slider').removeClass('slide1 slide2 slide3').addClass('slide' + $(this).attr('data-slidernum'));
+        $('.megasync-controls div.active').removeClass('active');
+        $(this).addClass('active');
+    });
+
     $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {
-        $this.addClass('hidden').removeClass('msd-dialog');
+        $this.addClass('hidden');
     });
 
     $('body').rebind('keyup msd', function(e) {
         if (e.keyCode === 27) {
-            $this.addClass('hidden').removeClass('msd-dialog');
+            $this.addClass('hidden');
         }
     });
 }

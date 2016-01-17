@@ -227,13 +227,17 @@ function megasyncOverlay() {
             }
         }
     });
-    
+
     $('.megasync-controls div', $this).rebind('click', function()
     {
-        
         $('.megasync-content.slider').removeClass('slide1 slide2 slide3').addClass('slide' + $(this).attr('data-slidernum'));
         $('.megasync-controls div.active').removeClass('active');
         $(this).addClass('active');
+    });
+
+    $('.megasync-info-txt a', $this).rebind('click', function(e) {
+        $this.addClass('hidden');
+        document.location.hash = 'pro';
     });
 
     $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {

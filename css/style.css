@@ -25862,6 +25862,9 @@ a.ui-datepicker-next {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
+.megasync-info-txt a {
+    cursor: pointer;
+}
 .megasync-slide {
     width: 656px;
     min-height: 421px;

@@ -25841,7 +25841,7 @@ a.ui-datepicker-next {
 .megasync-slider.main-block {
     overflow: hidden;
     position: relative;
-    min-height: 421px;
+    min-height: 422px;
 }
 .slide1 .megasync-slider.body-block {
     left: 0;
@@ -25854,7 +25854,7 @@ a.ui-datepicker-next {
 }
 .megasync-slider.body-block {
     width: 1968px;
-    min-height: 421px;
+    min-height: 422px;
     position: relative;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -25867,7 +25867,7 @@ a.ui-datepicker-next {
 }
 .megasync-slide {
     width: 656px;
-    min-height: 421px;
+    min-height: 422px;
     float: left;
     position: relative;
         -webkit-transition: opacity 200ms ease-in-out;
@@ -25905,12 +25905,12 @@ a.ui-datepicker-next {
 }
 .megasync-img2 {
     width: 399px;
-    margin: 0 0 0 17px;
+    margin: 0 0 0 40px;
 }
 .megasync-info-txt {
     position: absolute;
     width: 180px;
-    left: 385px;
+    left: 410px;
     top: 107px;
     font-size: 14px;
     line-height: 18px;
@@ -25936,7 +25936,7 @@ a.ui-datepicker-next {
     background-position: -1px -1178px;
     background-repeat: no-repeat;
     display: inline-block;
-    margin: -22px 0 0 23px;
+    margin: -23px 0 0 23px;
 }
 .megasync-listing {
     padding: 0 0 12px 82px;
@@ -25955,13 +25955,13 @@ a.ui-datepicker-next {
     position: absolute;
     margin: 0 0 0 0;
     background-image: url(../images/mega/download-sprite-v5.png);
-    background-position: 0 -2288px;
+    background-position: 0 -2289px;
 }
 .megasync-icon.blink {
-    background-position: -92px -2288px;
+    background-position: -92px -2289px;
 }
 .megasync-icon.infinity {
-    background-position: -172px -2288px;
+    background-position: -172px -2289px;
 }
 .megasync-listing h3 {
     font-size: 16px;
@@ -25983,7 +25983,7 @@ a.ui-datepicker-next {
     background-image: url(../images/mega/download-sprite-v5.png);
     background-position: -5px -2376px;
     position: absolute;
-    left: 20px;
+    left: 19px;
     top: 50%;
     margin: -2px 0 0 0;
     z-index: 10;
@@ -25992,13 +25992,13 @@ a.ui-datepicker-next {
 .megasync-slider.button.next {
     background-position: -333px -2376px;
     left: auto;
-    right: 20px;
+    right: 19px;
 }
 .slide1 .megasync-slider.prev, .slide3 .megasync-slider.next {
     display: none;
 }
 .megasync-controls {
-    bottom: 22px;
+    bottom: 21px;
     width: 100%;
     position: absolute;
     z-index: 10;

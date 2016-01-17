@@ -203,6 +203,7 @@ var megasync = (function() {
             clearInterval(retryTimer);
             $('body').unbind('keyup');
             showToast('megasync', 'Download added to MEGAsync', 'Open');
+            $('.button.with-megasync .big-txt').text('Downloading');
             return $('.megasync-overlay').addClass('hidden').removeClass('downloading');
         }
 

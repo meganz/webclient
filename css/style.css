@@ -26053,6 +26053,9 @@ a.ui-datepicker-next {
     background-position: -6px -192px;
     background-repeat: no-repeat;
 }
+.megasync .toast-button {
+    display: none;
+}
 /* end of MegaSync dialog */
 
 /* Small font-size settings option */

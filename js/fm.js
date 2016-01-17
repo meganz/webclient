@@ -1101,7 +1101,7 @@ function openTransferpanel()
     }
 }
 
-function showTransferToast(t_type, t_length) {
+function showTransferToast(t_type, t_length, isPaused) {
     if (!$('.fmholder').hasClass('transfer-panel-opened')) {
         var $toast,
             $second_toast,
@@ -1127,8 +1127,11 @@ function showTransferToast(t_type, t_length) {
                 nt_txt = l[7223];
             }
         }
+        if (uldl_hold || isPaused) {
+            nt_txt += '<b> (' + l[1651] + ') </b>';
+        }
 
-        $toast.find('.toast-col:first-child').html(nt_txt);
+        $toast.find('.toast-col:first-child').safeHTML(nt_txt);
 
         if ($second_toast.hasClass('visible')) {
             $second_toast.addClass('second');
@@ -10057,9 +10060,11 @@ function savecomplete(id)
     fm_hideoverlay();
     if (!$.dialog)
         $('#dlswf_' + id).remove();
-    var dl = dlmanager.idToFile(id);
-    M.dlcomplete(dl);
-    dlmanager.cleanupUI(dl, true);
+    var dl = dlmanager.getDownloadByHandle(id);
+    if (dl) {
+        M.dlcomplete(dl);
+        dlmanager.cleanupUI(dl, true);
+    }
 }
 
 /**

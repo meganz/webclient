@@ -25494,12 +25494,18 @@ body.pro:after {
 .opensource-icon.sdk {
 	background-position: center -809px;
 }
-
+.opensource-icon.coming-soon {
+    cursor: default;
+    opacity: 0.5;
+}
 a.opensource-icon-txt {
 	display: inline-block;
 	color: #444444;
 	font-family: 'source_sans_prosemibold';
 	padding: 20px 0 0 0;
+}
+.opensource-icon-txt > span {
+    color: #777;
 }
 .upload-overlay-body {
     width: 100%;

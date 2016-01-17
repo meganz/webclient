@@ -8,15 +8,6 @@ var fdl_queue_var=false;
 function dlinfo(ph,key,next)
 {
     dl_next = next;
-    if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
-    {
-        $('.download-button.to-computer')
-            .safeHTML(escapeHTML(l[1388])
-                .replace('[B]', '<div class="download info-txt big-txt white">')
-                .replace('[/B]', '</div>')
-                .replace('[A]', '<div class="download info-txt mid-txt white">')
-                .replace('[/A]', '</div>'));
-    }
 
     $('.widget-block').addClass('hidden');
     if (!m) init_start();
@@ -98,23 +89,26 @@ function dl_g(res) {
                 $(this).removeClass('active');
             }
         });
-        $('.download-button.to-computer').rebind('click', function(e) {
+        $('.download-button.with-megasync').rebind('click', function(e) {
             megasync.isInstalled(function(err, is) {
                 // If 'msd' (MegaSync download) flag is turned on and application is installed
                 if (res.msd !== 0 && (!err || is)) {
                     $('.megasync-overlay').removeClass('downloading');
                     megasync.download(dlpage_ph, dlpage_key);
-                } else if (fdl_filesize > 104857600) {
-                    // If filesize more then 100MB
-                    megasyncOverlay();
                 } else {
-                    browserDownload();
-                }
+                    megasyncOverlay();
+                } 
             });
         });
 
-        $('.download-button.to-cloudrive').unbind('click');
-        $('.download-button.to-cloudrive').bind('click',function(e)
+        $('.download-button.throught-browser').unbind('click');
+        $('.download-button.throught-browser').bind('click',function(e)
+        {
+            browserDownload();
+        });
+
+        $('.download-button.to-clouddrive').unbind('click');
+        $('.download-button.to-clouddrive').bind('click',function(e)
         {
             start_import();
         });
@@ -209,19 +203,13 @@ function megasyncOverlay() {
 
     $this.addClass('msd-dialog').removeClass('hidden downloading');
 
-    $('.download-button.download', $this).rebind('click', function(e)
+    $('.megasync-button.download', $this).rebind('click', function(e)
     {
         $this.removeClass('msd-dialog');
         megasync.download(dlpage_ph, dlpage_key);
     });
 
-    $('.download-button.continue', $this).rebind('click', function(e)
-    {
-        $this.addClass('hidden').removeClass('msd-dialog');
-        browserDownload();
-    });
-
-    $('.megasync-close', $this).rebind('click', function(e) {
+    $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {
         $this.addClass('hidden').removeClass('msd-dialog');
     });
 

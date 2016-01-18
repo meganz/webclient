@@ -424,8 +424,7 @@ makeMetaAware(Karere);
      * @returns {Karere.CONNECTION_STATE}
      */
     Karere.prototype.getConnectionState = function() {
-        var self = this;
-        return self._connectionState;
+        return this._connectionState;
     };
 
     /**
@@ -764,23 +763,27 @@ makeMetaAware(Karere);
 
         if (self._myPresence === Karere.PRESENCE.OFFLINE) {
             self.logger.warn("Will halt the reconnect operation, my presence is set to 'offline'.");
-            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNTED);
+            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNECTED);
         }
+
+        var state = self.getConnectionState();
+        if (state === Karere.CONNECTION_STATE.DISCONNECTING) {
+            self.forceDisconnect();
+
+            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNECTED);
+        }
+
         if (!self._jid || !self._password) {
             throw new Error("Missing jid or password.");
         }
 
-        if (self.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTING) {
-            self.forceDisconnect();
-
-            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNTED);
-        }
-        else if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING && self._$connectingPromise) {
+        if (state === Karere.CONNECTION_STATE.CONNECTING && self._$connectingPromise) {
             return self._$connectingPromise;
         }
-        else if (
-            self.getConnectionState() !== Karere.CONNECTION_STATE.DISCONNECTED &&
-            self.getConnectionState() !== Karere.CONNECTION_STATE.AUTHFAIL
+
+        if (
+            state !== Karere.CONNECTION_STATE.DISCONNECTED &&
+            state !== Karere.CONNECTION_STATE.AUTHFAIL
         ) {
             throw new Error(
                 "Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect. [[:i]]"
@@ -2819,7 +2822,7 @@ Karere.prototype._connectionRetry = function(immediately) {
         );
     }
     else if (window.d) {
-        self.logger.warn("request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries);
+        console.warn("request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries);
     }
 
     if (!immediately && self._connectionRetries > self.options.maxConnectionRetries) {

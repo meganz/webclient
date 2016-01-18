@@ -1633,9 +1633,9 @@ var ConversationPanel = React.createClass({
                     <div className="header" dangerouslySetInnerHTML={{__html: headerText}}>
                     </div>
                     <div className="info">
-                        Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:<br/>
-                        * Confidentiality - Only the author and intended recipients are able to decipher and read the content;<br/>
-                        * Authenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server.<br/>
+                        {__(l[8080])}<br/>
+                        * {__(l[8081])}<br/>
+                        * {__(l[8082])}<br/>
                     </div>
                 </div>
             );
@@ -1997,9 +1997,9 @@ var ConversationPanels = React.createClass({
                         <div className="empty-pad conversations">
                             <div className="empty-icon conversations"></div>
                             <div className="empty-title" dangerouslySetInnerHTML={{
-                                __html: __('You have no [[Conversations]]')
-                                    .replace("[[", "<span>")
-                                    .replace("]]", "</span>")
+                                __html: __(l[8008])
+                                    .replace("[P]", "<span>")
+                                    .replace("[/P]", "</span>")
                             }}></div>
                         </div>
                     </div>

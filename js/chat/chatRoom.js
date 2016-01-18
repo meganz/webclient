@@ -1933,10 +1933,10 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
     api_req({a:'uq'},
         {
             callback2: function() {
-                $promise.resolve(toArray(arguments));
+                $promise.resolve(toArray.apply(null, arguments));
             },
             failhandler: function() {
-                $promise.reject(toArray(arguments));
+                $promise.reject(toArray.apply(null, arguments));
             },
             json: json,
             callback: function(res,ctx)

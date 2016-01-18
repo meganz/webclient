@@ -442,7 +442,7 @@ makeMetaAware(Karere);
     Karere._exceptionSafeProxy = function(fn, context) {
         return function() {
             try {
-                return fn.apply(context, toArray(arguments));
+                return fn.apply(context, arguments);
             } catch (e) {
                 if (MegaLogger && MegaLogger.rootLogger) {
                     MegaLogger.rootLogger.error("exceptionSafeProxy caught: ", e, e.stack);
@@ -680,8 +680,7 @@ makeMetaAware(Karere);
         var fn = proto[functionName];
         proto[functionName] = function() {
             var self = this;
-
-            var args = toArray(arguments);
+            var args = arguments;
 
             var internalPromises = [];
             var $promise = new MegaPromise();
@@ -726,14 +725,14 @@ makeMetaAware(Karere);
                 .done(function() {
                     fn.apply(self, args)
                         .done(function() {
-                            $promise.resolve.apply($promise, toArray(arguments));
+                            $promise.resolve.apply($promise, arguments);
                         })
                         .fail(function() {
-                            $promise.reject.apply($promise, toArray(arguments));
+                            $promise.reject.apply($promise, arguments);
                         });
                 })
                 .fail(function() {
-                    $promise.reject(toArray(arguments));
+                    $promise.reject.apply($promise, arguments);
                 });
 
             return $promise.always(function() {
@@ -1076,12 +1075,12 @@ makeMetaAware(Karere);
      * Helper method that should be used to proxy Strophe's .fatal and .error methods to actually LOG something to the
      * console.
      */
-    Karere.prototype.error = function() {
+    Karere.prototype.error = function(a1) {
         var additional = "";
-        if (arguments[0] instanceof Error) {
-            additional = arguments[0].stack;
+        if (a1 instanceof Error) {
+            additional = a1.stack;
         }
-        var msg = toArray(arguments).join(" ");
+        var msg = toArray.apply(null, arguments).join(" ");
 
         this.logger.error(msg, additional);
 
@@ -2090,7 +2089,7 @@ makeMetaAware(Karere);
                                 $promise.resolve(roomJid, roomPassword);
                             })
                             .fail(function() {
-                                $promise.reject(toArray(arguments));
+                                $promise.reject(toArray.apply(null, arguments));
                             });
                     }),
                     Karere._exceptionSafeProxy(function() {

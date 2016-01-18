@@ -289,6 +289,16 @@ var DropdownEmojiSelector = React.createClass({
     render: function() {
         var self = this;
 
+        var categoryTranslations = {
+            "PEOPLE": l[8016],
+            "NATURE": l[8017],
+            "FOOD & DRINK": l[8018],
+            "CELEBRATION": l[8019],
+            "ACTIVITY": l[8020],
+            "TRAVEL & PLACES": l[8021],
+            "OBJECTS & SYMBOLS": l[8022]
+        };
+
         var popupContents = null;
 
         if (self.state.isActive === true) {
@@ -383,7 +393,11 @@ var DropdownEmojiSelector = React.createClass({
                         <div key={categoryName} data-category-name={categoryName} className="emoji-category-container">
                             {emojis.length > 0 ? <div className="clear"></div> : null}
                             <div className="emoji-type-txt">
-                                {__(categoryName)}
+                                {
+                                    categoryTranslations[categoryName] ?
+                                        categoryTranslations[categoryName] :
+                                        categoryName
+                                }
                             </div>
 
                             <div className="clear"></div>

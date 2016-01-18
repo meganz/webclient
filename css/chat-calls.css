@@ -58,6 +58,12 @@
 .call.local-audio {
     width: 184px;
 }
+/* video mirroring, applied ONLY to the local video */
+video.localViewport {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+    -moz-transform: rotateY(180deg); /* Firefox */
+}
 .call.local-video {
     min-height: 184px;
     max-height: 184px;

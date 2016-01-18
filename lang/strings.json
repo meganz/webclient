@@ -11990,5 +11990,45 @@
     "8424": {
         "text": "Error opening the default application.",
         "context": "This text is shown when there is an error opening the default application for streaming."
+    },
+    "8425": {
+        "text": "through your browser",
+        "context": "Button label. Full text: Download through your browser. "
+    },
+    "8426": {
+        "text": "[S]MEGAsync:[\/S] Easy automated syncing between your computers and your MEGA cloud drive",
+        "context": "MEGAsync application advantages. As short as possible please. Please leave [S] and [\/S] as it is."
+    },
+    "8427": {
+        "text": "[S]Flexible:[\/S] Sync any folder from your PC to any folder in the cloud. Sync any number of folders in parallel.",
+        "context": "MEGAsync application advantages. As short as possible please. Please leave [S] and [\/S] as it is."
+    },
+    "8428": {
+        "text": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
+        "context": "MEGAsync application advantages. As short as possible please. Please leave [A] and [\/A] as it is."
+    },
+    "8429": {
+        "text": "Faster transfer speeds",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
+    },
+    "8430": {
+        "text": "MEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers.",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
+    },
+    "8431": {
+        "text": "Lean & mean resource usage",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
+    },
+    "8432": {
+        "text": "Run MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
+    },
+    "8433": {
+        "text": "Unlimited file size",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nUnlimited file size.\r\nWhile browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync."
+    },
+    "8434": {
+        "text": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nUnlimited file size.\r\nWhile browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync."
     }
 }

@@ -1111,11 +1111,11 @@ function showTransferToast(t_type, t_length, isPaused) {
     if (!$('.fmholder').hasClass('transfer-panel-opened')) {
         var $toast,
             $second_toast,
-            interval,
+            timer,
             nt_txt;
 
         if (t_type != 'u') {
-            interval = dl_interval;
+            timer = dl_interval;
             $toast = $('.toast-notification.download');
             $second_toast = $('.toast-notification.upload');
             if (t_length > 1) {
@@ -1124,7 +1124,7 @@ function showTransferToast(t_type, t_length, isPaused) {
                 nt_txt = l[7222];
             }
         } else {
-            interval = ul_interval;
+            timer = ul_interval;
             $toast = $('.toast-notification.upload');
             $second_toast = $('.toast-notification.download');
             if (t_length > 1) {
@@ -1143,10 +1143,10 @@ function showTransferToast(t_type, t_length, isPaused) {
             $second_toast.addClass('second');
         }
 
-        clearInterval(interval);
+        clearTimeout(timer);
         $toast.removeClass('second').addClass('visible');
-        interval = setInterval(function() {
-            hideTransferToast($toast,interval);
+        timer = setTimeout(function() {
+            hideTransferToast($toast);
         }, 5000);
 
         $('.transfer .toast-button').rebind('click', function(e)
@@ -1168,21 +1168,20 @@ function showTransferToast(t_type, t_length, isPaused) {
         
         $toast.rebind('mouseover', function(e)
         {
-            clearInterval(interval);
+            clearTimeout(timer);
         });
         $toast.rebind('mouseout', function(e)
         {
-            interval = setInterval(function() {
-                hideTransferToast($toast,interval);
+            timer = setTimeout(function() {
+                hideTransferToast($toast);
             }, 5000);
         });
     }
 }
 
-function hideTransferToast ($toast,int) {
+function hideTransferToast ($toast) {
     $toast.removeClass('visible');
     $('.toast-notification').removeClass('second');
-    clearInterval(int);
 }
 
 function isValidShareLink()
@@ -8825,7 +8824,7 @@ function getclipboardkeys() {
  */
 function showToast(toastClass, notification, buttonLabel) {
 
-    var $toast, interval;
+    var $toast, timeout;
 
     $toast = $('.toast-notification.common-toast');
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
@@ -8833,8 +8832,8 @@ function showToast(toastClass, notification, buttonLabel) {
 
     $toast.addClass('visible');
 
-    interval = setInterval(function() {
-        hideToast(interval);
+    timeout = setTimeout(function() {
+        hideToast();
     }, 5000);
     
     if (buttonLabel) {
@@ -8846,25 +8845,24 @@ function showToast(toastClass, notification, buttonLabel) {
     $('.toast-close-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');
-        clearInterval(interval);
+        clearTimeout(timeout);
     });
 
     $toast.rebind('mouseover', function()
     {
-        clearInterval(interval);
+        clearTimeout(timeout);
     });
 
     $toast.rebind('mouseout', function()
     {
-        interval = setInterval(function() {
-            hideToast(interval);
+        timeout = setTimeout(function() {
+            hideToast();
         }, 5000);
     });
 }
 
-function hideToast (int) {
+function hideToast () {
     $('.toast-notification.common-toast').removeClass('visible');
-    clearInterval(int);
 }
 
 /**

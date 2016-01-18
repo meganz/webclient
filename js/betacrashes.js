@@ -63,10 +63,9 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
 
                 var chatStates = [];
 
-                Object.keys(megaChat.chats).forEach(function (k) {
-                    var v = megaChat.chats[k];
-
+                megaChat.chats.forEach(function (v) {
                     var participants = v.getParticipants();
+                    var k = v.roomJid;
 
                     participants.forEach(function (v, k) {
                         var cc = megaChat.getContactFromJid(v);
@@ -76,11 +75,7 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
                     chatStates.push({
                         'roomUniqueId': k,
                         'roomState': v.getStateAsText(),
-                        'roomParticipants': participants,
-                        'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
-                        'opQueueQueueCount': v.encryptionOpQueue ? v.encryptionOpQueue._queue.length : "not defined",
-                        'opQueueErrRetries': v.encryptionOpQueue ? v.encryptionOpQueue._error_retries : "not defined",
-                        'opQueueCurrentOp': v.encryptionOpQueue && v.encryptionOpQueue._queue.length > 0 ? v.encryptionOpQueue._queue[0][0] : "not defined"
+                        'roomParticipants': participants
                     });
                 });
 

@@ -1553,8 +1553,7 @@ function RegExpEscape(text) {
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
     return addZeroIfLenLessThen(date.getHours(), 2)
-        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2)
-        + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
+        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
 }
 
 /**

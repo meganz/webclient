@@ -114,10 +114,6 @@ function init_page() {
         $('body').attr('class', '');
     }
 
-    if (localStorage.font_size) {
-        $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + localStorage.font_size);
-    }
-
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
 
@@ -276,6 +272,8 @@ function init_page() {
         }
 
         if (!fminitialized) {
+            mega.fmconfigPromise = getFMConfig();
+
             if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
                 mDBstart();
             }

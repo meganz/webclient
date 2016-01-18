@@ -1,6 +1,4 @@
-
 var dlMethod;
-var dl_maxSlots = readLocalStorage('dl_maxSlots', 'int', { min: 1, max: 6, def: 5 });
 
 /* jshint -W003 */
 var dlmanager = {
@@ -1040,7 +1038,7 @@ var dlQueue = new TransferQueue(function _downloader(task, done) {
         return done();
     }
     return task.run(done);
-}, dl_maxSlots, 'downloader');
+}, 4, 'downloader');
 
 // chunk scheduler
 dlQueue.validateTask = function(pzTask) {

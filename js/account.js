@@ -755,6 +755,135 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     return thePromise;
 }
 
+/** Wrapper around getUserAttribute to fetch fmconfig */
+function getFMConfig() {
+    var promise = new MegaPromise();
+    var config = Object(fmconfig);
+
+    getUserAttribute(u_handle, 'fmconfig', false, true)
+        .done(function(result) {
+            result = Object(result);
+            for (var key in result) {
+                if (result.hasOwnProperty(key)) {
+                    try {
+                        fmconfig[key] = JSON.parse(result[key]);
+                    }
+                    catch (ex) {}
+                }
+            }
+
+            setFMConfig.moveLegacySettings();
+
+            if (fmconfig.ul_maxSlots) {
+                ulQueue.setSize(fmconfig.ul_maxSlots);
+            }
+            if (fmconfig.dl_maxSlots) {
+                dlQueue.setSize(fmconfig.dl_maxSlots);
+            }
+            if (fmconfig.font_size) {
+                $('body').removeClass('fontsize1 fontsize2')
+                    .addClass('fontsize' + fmconfig.font_size);
+            }
+            promise.resolve();
+        })
+        .fail(function() {
+            setFMConfig.moveLegacySettings();
+            promise.reject.apply(promise, arguments);
+        });
+
+    return promise;
+}
+
+/** Wrapper around setUserAttribute to store fmconfig */
+function setFMConfig() {
+    /* jshint -W073 */
+    /* jshint -W074 */
+    var promise;
+    var data = {};
+    var config = Object(fmconfig);
+    var logger = MegaLogger.getLogger('setFMConfig');
+
+    // Prepare data for TLV requirements..
+    for (var key in config) {
+        if (config.hasOwnProperty(key)) {
+            var value = config[key];
+
+            if (value || value === 0) {
+
+                // Dont save no longer existing nodes
+                if (key === 'viewmodes' || key === 'sortmodes') {
+                    if (typeof value !== 'object') {
+                        logger.warn('Unexpected type for ' + key);
+                        continue;
+                    }
+
+                    var modes = {};
+                    for (var handle in value) {
+                        if (value.hasOwnProperty(handle)) {
+                            if (handle.length !== 8 || M.d[handle] || handle === 'contacts') {
+                                modes[handle] = value[handle];
+                            }
+                            else {
+                                logger.info('Skipping non-existant node "%s"', handle);
+                            }
+                        }
+                    }
+                    value = modes;
+                }
+
+                if (typeof value === 'object' && !$.len(value)) {
+                    logger.info('Skipping empty object "%s"', key);
+                    continue;
+                }
+
+                try {
+                    data[key] = JSON.stringify(value);
+                }
+                catch (ex) {
+                    logger.error(ex);
+                }
+            }
+            else {
+                logger.info('Skipping empty value for "%s"', key);
+            }
+        }
+    }
+
+    var sdata = JSON.stringify(data);
+    var checksum = MurmurHash3(sdata, 0x7f01e0aa);
+
+    if (localStorage.fmchash === checksum) {
+        return MegaPromise.resolve(EEXIST);
+    }
+    localStorage.fmchash = checksum;
+
+    var dataLen = sdata.length;
+    if (dataLen < 8) {
+        srvlog('setFMConfig: invalid data');
+        promise = MegaPromise.reject(EARGS);
+    }
+    else if (dataLen > 12000) {
+        srvlog('setFMConfig: over quota');
+        promise = MegaPromise.reject(EOVERQUOTA);
+    }
+    else {
+        promise = setUserAttribute('fmconfig', data, false, true);
+    }
+
+    return promise;
+}
+setFMConfig.moveLegacySettings = function() {
+    var ls = ['dl_maxSlots', 'ul_maxSlots', 'ul_maxSpeed', 'use_ssl', 'ul_skipIdentical', 'font_size'];
+
+    ls.forEach(function(pref) {
+        if (localStorage[pref] !== undefined) {
+            if (fmconfig[pref] === undefined) {
+                storefmconfig(pref, parseInt(localStorage[pref]) | 0);
+            }
+        }
+    });
+};
+
 function isNonActivatedAccount() {
     return (!u_privk && typeof (u_attr.p) !== 'undefined'
             && (u_attr.p >= 1 || u_attr.p <= 4));

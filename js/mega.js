@@ -6515,25 +6515,37 @@ function loadfm_done(pfkey, stackPointer) {
 
     if (d > 1) console.error('loadfm_done', stackPointer, is_fm());
 
-    init_chat();
+    var promise = mega.fmconfigPromise || MegaPromise.resolve();
+    delete mega.fmconfigPromise;
 
-    // are we actually on an #fm/* page?
-    if (is_fm() || $('.fm-main.default').is(":visible")) {
-        renderfm();
-    }
+    promise.always(function() {
+        init_chat();
 
-    if (!CMS.isLoading()) {
-        loadingDialog.hide();
-    }
+        // are we actually on an #fm/* page?
+        if (is_fm() || $('.fm-main.default').is(":visible")) {
+            renderfm();
+        }
 
-    watchdog.notify('loadfm_done');
+        if (!CMS.isLoading()) {
+            loadingDialog.hide();
+        }
+
+        watchdog.notify('loadfm_done');
+    });
 }
 
 function storefmconfig(key, value)
 {
-    fmconfig[key] = value;
-    localStorage.fmconfig = JSON.stringify(fmconfig);
-    mBroadcaster.sendMessage('fmconfig:' + key, value);
+    if (fmconfig[key] !== value) {
+        fmconfig[key] = value;
+
+        if (storefmconfig.timer) {
+            clearTimeout(storefmconfig.timer);
+        }
+        storefmconfig.timer = setTimeout(setFMConfig, 20400);
+
+        mBroadcaster.sendMessage('fmconfig:' + key, value);
+    }
 }
 
 function fmtreenode(id, e)

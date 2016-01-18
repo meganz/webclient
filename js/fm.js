@@ -1101,7 +1101,7 @@ function openTransferpanel()
     }
 }
 
-function showTransferToast(t_type, t_length) {
+function showTransferToast(t_type, t_length, isPaused) {
     if (!$('.fmholder').hasClass('transfer-panel-opened')) {
         var $toast,
             $second_toast,
@@ -1127,8 +1127,11 @@ function showTransferToast(t_type, t_length) {
                 nt_txt = l[7223];
             }
         }
+        if (uldl_hold || isPaused) {
+            nt_txt += '<b> (' + l[1651] + ') </b>';
+        }
 
-        $toast.find('.toast-col:first-child').html(nt_txt);
+        $toast.find('.toast-col:first-child').safeHTML(nt_txt);
 
         if ($second_toast.hasClass('visible')) {
             $second_toast.addClass('second');
@@ -6441,7 +6444,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if($(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if($(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -8770,20 +8773,26 @@ function getclipboardkeys() {
  * @param {String} toastClass Custom style for the notification
  * @param {String} notification The text for the toast notification
  */
-function showToast(toastClass, notification) {
+function showToast(toastClass, notification, buttonLabel) {
 
     var $toast, interval;
 
     $toast = $('.toast-notification.common-toast');
-    $toast.attr('class', 'toast-notification common-toast ' + toastClass).find('.toast-col:first-child').html(notification);
+    $toast.attr('class', 'toast-notification common-toast ' + toastClass)
+        .find('.toast-col:first-child').safeHTML(notification);
 
-    clearInterval(interval);
     $toast.addClass('visible');
 
     interval = setInterval(function() {
         hideToast(interval);
     }, 5000);
-
+    
+    if (buttonLabel) {
+        $('.common-toast .toast-button span').safeHTML(buttonLabel);
+    } else {
+        $('.common-toast .toast-button span').safeHTML(l[726]);
+    }
+    
     $('.common-toast .toast-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');
@@ -10057,9 +10066,11 @@ function savecomplete(id)
     fm_hideoverlay();
     if (!$.dialog)
         $('#dlswf_' + id).remove();
-    var dl = dlmanager.idToFile(id);
-    M.dlcomplete(dl);
-    dlmanager.cleanupUI(dl, true);
+    var dl = dlmanager.getDownloadByHandle(id);
+    if (dl) {
+        M.dlcomplete(dl);
+        dlmanager.cleanupUI(dl, true);
+    }
 }
 
 /**

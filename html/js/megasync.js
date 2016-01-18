@@ -202,6 +202,9 @@ var megasync = (function() {
             // was successfully handled.
             clearInterval(retryTimer);
             $('body').unbind('keyup');
+            showToast('megasync', 'Download added to MEGAsync', 'Open');
+            $('.button.with-megasync .big-txt').safeHTML(l[258]);
+            $('.button.with-megasync').addClass('downloading');
             return $('.megasync-overlay').addClass('hidden').removeClass('downloading');
         }
 

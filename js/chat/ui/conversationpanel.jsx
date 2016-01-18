@@ -1623,7 +1623,7 @@ var ConversationPanel = React.createClass({
         ) {
             var headerText = (
                 self.props.messagesBuff.messages.length === 0 ?
-                    __(l[8001]) :
+                    __(l[8002]) :
                     __(l[8002])
             );
             headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");

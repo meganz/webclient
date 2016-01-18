@@ -3656,7 +3656,7 @@ function MegaData()
             + '<td></td>'
             + '<td>' + bytesToSize(node.s) + '</td>'
             + '<td>' + filetype(node.name) + '</td>'
-            + '<td><span class="transfer-status queued">Queued</span></td>'
+            + '<td><span class="transfer-status queued">' + l[7227] + '</span></td>'
             + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
             + '<a class="clear-transfer-icon"></a></td>'
             + '<td><span class="row-number"></span></td>'

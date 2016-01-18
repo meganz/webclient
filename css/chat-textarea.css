@@ -61,7 +61,7 @@
     opacity: 0;
 }
 .message.textarea-block textarea, .message.textarea-scroll .message-preview {
-    font-size: 14px;
+    font-size: 13px;
     margin: 0 0 2px 0;
 }
 .chat-textarea-scroll, .message.textarea-scroll {

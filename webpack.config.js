@@ -17,7 +17,7 @@ var webpackConfigs = {
         output: {
             path: __dirname + "/.",
             publicPath: "/",
-            filename: "bundle.js"
+            filename: "js/chat/bundle.js"
         },
         devtool: "source-map",
         module: {
@@ -46,12 +46,12 @@ var webpackConfigs = {
         output: {
             path: __dirname + "/",
             publicPath: "/",
-            filename: "bundle.js"
+            filename: "js/chat/bundle.js"
         },
         module: {
             loaders: [
                 {test: /\.less$/, loader: "style!css!less"},
-                {test: /\.jsx$/, loaders: [/*'uglify-loader', */'babel-loader'], exclude: 'node_modules'},
+                {test: /\.jsx$/, loaders: ['babel-loader', 'stripcomment-loader'], exclude: 'node_modules'},
                 {test: /\.json$/, loader: "json"}
             ]
         },
@@ -61,19 +61,7 @@ var webpackConfigs = {
                     NODE_ENV: JSON.stringify("production"),
                     BROWSER: JSON.stringify(true)
                 }
-            }),
-            //new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor-[chunkhash].js', Infinity)
-            //new webpack.optimize.DedupePlugin(),
-            //new webpack.optimize.OccurenceOrderPlugin(true),
-            //new webpack.optimize.AggressiveMergingPlugin(),
-            //new webpack.optimize.UglifyJsPlugin({
-            //    output: {
-            //        comments: true,
-            //        beautify: true
-            //    },
-            //    compress: false,
-            //    mangle: false
-            //})
+            })
         ]
     }
 };

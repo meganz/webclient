@@ -396,6 +396,14 @@ TransferQueue.prototype.dispatch = function(gid) {
     return false;
 };
 
+TransferQueue.prototype.isPaused = function(gid) {
+    if (!gid) {
+        return MegaQueue.prototype.isPaused.apply(this, arguments);
+    }
+
+    return Object(GlobalProgress[gid]).paused;
+};
+
 TransferQueue.prototype.pause = function(gid) {
     if (!gid) {
         return MegaQueue.prototype.pause.apply(this, arguments);

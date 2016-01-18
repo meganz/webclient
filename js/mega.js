@@ -3615,6 +3615,61 @@ function MegaData()
         return typeof n === 'object' && Array.isArray(n.key) && n.key.length === 8;
     };
 
+    /** like addToTransferTable, but can take a download object */
+    this.putToTransferTable = function(node, ttl) {
+        var handle = node.h || node.dl_id;
+        node.name = node.name || node.n;
+
+        if (d && console.assert) {
+            console.assert(this.isNodeObject(node), 'Invalid putToTransferTable node.');
+        }
+
+        var gid = 'dl_' + handle;
+        var isPaused = uldl_hold || dlQueue.isPaused(gid);
+
+        var state = '';
+        var pauseTxt = '';
+        if (isPaused) {
+            state = 'paused';
+            pauseTxt = ' (' + l[1651] + ')';
+        }
+
+        var flashhtml = '';
+        if (dlMethod === FlashIO) {
+            flashhtml = '<object width="1" height="1" id="dlswf_'
+                + htmlentities(handle)
+                + '" type="application/x-shockwave-flash">'
+                + '<param name=FlashVars value="buttonclick=1" />'
+                + '<param name="movie" value="' + location.origin + '/downloader.swf"/>'
+                + '<param value="always" name="allowscriptaccess"/>'
+                + '<param name="wmode" value="transparent"/>'
+                + '<param value="all" name="allowNetworking">'
+                + '</object>';
+        }
+
+        this.addToTransferTable(gid, ttl,
+            '<tr id="dl_' + htmlentities(handle) + '">'
+            + '<td><span class="transfer-type download ' + state + '">' + l[373]
+            + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
+            + '<td><span class="transfer-filtype-icon ' + fileIcon(node)
+            + '"></span><span class="tranfer-filetype-txt">' + htmlentities(node.name) + '</span></td>'
+            + '<td></td>'
+            + '<td>' + bytesToSize(node.s) + '</td>'
+            + '<td>' + filetype(node.name) + '</td>'
+            + '<td><span class="transfer-status queued">' + l[7227] + '</span></td>'
+            + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
+            + '<a class="clear-transfer-icon"></a></td>'
+            + '<td><span class="row-number"></span></td>'
+            + '</tr>');
+
+        if (isPaused) {
+            fm_tfspause('dl_' + handle);
+        }
+        if (ttl) {
+            ttl.left--;
+        }
+    };
+
     this.addDownload = function(n, z, preview, zipname)
     {
         delete $.dlhash;
@@ -3734,39 +3789,8 @@ function MegaData()
             added++;
             zipsize += n.s;
 
-            var flashhtml = '';
-            if (dlMethod === FlashIO) {
-                flashhtml = '<object width="1" height="1" id="dlswf_'
-                    + htmlentities(n.h)
-                    + '" type="application/x-shockwave-flash">'
-                    + '<param name=FlashVars value="buttonclick=1" />'
-                    + '<param name="movie" value="' + location.origin + '/downloader.swf"/>'
-                    + '<param value="always" name="allowscriptaccess"/>'
-                    + '<param name="wmode" value="transparent"/>'
-                    + '<param value="all" name="allowNetworking">'
-                    + '</object>';
-            }
-
             if (!z) {
-                this.addToTransferTable('dl_' + n.h, ttl,
-                    '<tr id="dl_' + htmlentities(n.h) + '">'
-                    + '<td><span class="transfer-type download ' + p + '">' + l[373]
-                    + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
-                    + '<td><span class="transfer-filtype-icon ' + fileIcon(n)
-                    + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
-                    + '<td></td>'
-                    + '<td>' + bytesToSize(n.s) + '</td>'
-                    + '<td>' + filetype(n.name) + '</td>'
-                    + '<td><span class="transfer-status queued">Queued</span></td>'
-                    + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
-                    + '<a class="clear-transfer-icon"></a></td>'
-                    + '<td><span class="row-number"></span></td>'
-                    + '</tr>');
-
-                if (uldl_hold) {
-                    fm_tfspause('dl_' + n.h);
-                }
-                ttl.left--;
+                this.putToTransferTable(n, ttl);
             }
         }
 
@@ -3815,23 +3839,27 @@ function MegaData()
 
         if (!preview)
         {
-            if (!z || zipsize) {
-                showTransferToast('d', z ? 1 : added);
-            }
-            openTransferpanel();
-            initGridScrolling();
-            initFileblocksScrolling();
-            initTreeScroll();
+            this.onDownloadAdded(added, uldl_hold, z, zipsize);
             setupTransferAnalysis();
-            Soon(fm_tfsupdate);
-            if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
-                $('.transfer-pause-icon').removeClass('disabled');
-                $('.transfer-clear-completed').removeClass('disabled');
-                $('.transfer-clear-all-icon').removeClass('disabled');
-            }
         }
 
         delete $.dlhash;
+    };
+
+    this.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
+        if (!isZIP || zipSize) {
+            showTransferToast('d', isZIP ? 1 : added, isPaused);
+        }
+        openTransferpanel();
+        initGridScrolling();
+        initFileblocksScrolling();
+        initTreeScroll();
+        Soon(fm_tfsupdate);
+        if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
+            $('.transfer-pause-icon').removeClass('disabled');
+            $('.transfer-clear-completed').removeClass('disabled');
+            $('.transfer-clear-all-icon').removeClass('disabled');
+        }
     };
 
     this.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, force)

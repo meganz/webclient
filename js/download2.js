@@ -120,7 +120,7 @@ var dlmanager = {
     },
 
     getGID: function DM_GetGID(dl) {
-        return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
+        return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + (dl.dl_id || dl.ph);
     },
 
     abort: function DM_abort(gid, keepUI) {
@@ -388,22 +388,19 @@ var dlmanager = {
         return 2;
     },
 
-    idToFile: function DM_IdToFile(id) {
-        var dl = {};
-        for (var i in dl_queue) {
-            if (id === dl_queue[i].id) {
-                dl = dl_queue[i];
-                ASSERT(dl.pos === i, 'dl.pos !== i');
-                break;
+    getDownloadByHandle: function DM_IdToFile(handle) {
+        var dl = null;
+        if (handle) {
+            for (var i in dl_queue) {
+                if (dl_queue.hasOwnProperty(i)) {
+                    var dlh = dl_queue[i].ph || dl_queue[i].id;
+                    if (dlh === handle) {
+                        dl = dl_queue[i];
+                        break;
+                    }
+                }
             }
         }
-        // $.each(dl_queue, function(i, _dl) {
-        // if (id === _dl.id) {
-        // dl = _dl
-        // dl.pos = i
-        // return false;
-        // }
-        // });
         return dl;
     },
 

@@ -1775,7 +1775,6 @@ function MegaData()
                 var $this = $(this);
 
                 if (!$this.is(".active")) {
-                    if ($('.fm-tree-panel .jspPane')) scrollPos = $('.fm-tree-panel .jspPane').position().top;
                     $('.start-chat-button').removeClass('active');
 
                     $('.fm-chat-popup-button', m).removeClass("disabled");
@@ -1786,7 +1785,7 @@ function MegaData()
                     }
 
                     $this.addClass('active');
-                    var y = $this.closest('.nw-contact-item').position().top + 80 + scrollPos;
+                    var y = $this.offset().top - 20;
                     m
                         .css('top', y)
                         .removeClass('hidden')

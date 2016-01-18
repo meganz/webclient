@@ -7,15 +7,6 @@ var fdl_queue_var=false;
 function dlinfo(ph,key,next)
 {
     dl_next = next;
-    if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
-    {
-        $('.download-button.to-computer')
-            .safeHTML(escapeHTML(l[1388])
-                .replace('[B]', '<div class="download info-txt big-txt white">')
-                .replace('[/B]', '</div>')
-                .replace('[A]', '<div class="download info-txt mid-txt white">')
-                .replace('[/A]', '</div>'));
-    }
 
     $('.widget-block').addClass('hidden');
     if (!m) init_start();
@@ -99,19 +90,24 @@ function dl_g(res) {
                 $(this).removeClass('active');
             }
         });
-        $('.download-button.to-computer').rebind('click', function(e) {
-            megasync.isInstalled(function(err, is) {
-                // If 'msd' (MegaSync download) flag is turned on and application is installed
-                if (res.msd !== 0 && (!err || is)) {
-                    $('.megasync-overlay').removeClass('downloading');
-                    megasync.download(dlpage_ph, dlpage_key);
-                } else if (fdl_filesize > 104857600) {
-                    // If filesize more then 100MB
-                    megasyncOverlay();
-                } else {
-                    browserDownload();
-                }
-            });
+        $('.download-button.with-megasync').rebind('click', function(e) {
+            if (!$(this).hasClass('downloading')) {
+                megasync.isInstalled(function(err, is) {
+                    // If 'msd' (MegaSync download) flag is turned on and application is installed
+                    if (res.msd !== 0 && (!err || is)) {
+                        $('.megasync-overlay').removeClass('downloading');
+                        megasync.download(dlpage_ph, dlpage_key);
+                    } else {
+                        megasyncOverlay();
+                    } 
+                });
+            }
+        });
+
+        $('.download-button.throught-browser').unbind('click');
+        $('.download-button.throught-browser').bind('click',function(e)
+        {
+            browserDownload();
         });
 
         $('.download-button.to-cloudrive').rebind('click', start_import);
@@ -201,35 +197,54 @@ function browserDownload() {
 
 // MEGAsync dialog If filesize is too big for downloading through browser
 function megasyncOverlay() {
-    var die = function(keep) {
-        if ($this) {
-            $this.removeClass('msd-dialog');
-            if (keep !== 1) {
-                $this.addClass('hidden');
-                $('body').unbind('keyup.msd');
-                $this = null;
-            }
-        }
-    };
-    var $this = $('.megasync-overlay');
+    var $this = $('.megasync-overlay'), 
+          slidesNum = $('.megasync-controls div').length;
 
     $this.addClass('msd-dialog').removeClass('hidden downloading');
 
-    $('.download-button.download', $this).rebind('click', function(e) {
-        die(1);
+    $('.megasync-button.download', $this).rebind('click', function(e)
+    {
         megasync.download(dlpage_ph, dlpage_key);
     });
 
-    $('.download-button.continue', $this).rebind('click', function(e) {
-        die();
-        browserDownload();
+    $('.megasync-slider.button', $this).rebind('click', function()
+    {
+        var activeSlide = parseInt($('.megasync-controls div.active').attr('data-slidernum'));
+
+        $('.megasync-content.slider').removeClass('slide1 slide2 slide3');
+
+        if ($(this).hasClass('prev')) {
+            if (activeSlide > 1) {
+                $('.megasync-controls div.active').removeClass('active').prev().addClass('active');
+                $('.megasync-content.slider').addClass('slide' + (activeSlide - 1));
+            }
+        } else {
+            if (activeSlide < slidesNum) {
+                $('.megasync-controls div.active').removeClass('active').next().addClass('active');
+                $('.megasync-content.slider').addClass('slide' + (activeSlide + 1));
+            }
+        }
     });
 
-    $('.megasync-close', $this).rebind('click', die);
+    $('.megasync-controls div', $this).rebind('click', function()
+    {
+        $('.megasync-content.slider').removeClass('slide1 slide2 slide3').addClass('slide' + $(this).attr('data-slidernum'));
+        $('.megasync-controls div.active').removeClass('active');
+        $(this).addClass('active');
+    });
+
+    $('.megasync-info-txt a', $this).rebind('click', function(e) {
+        $this.addClass('hidden');
+        document.location.hash = 'pro';
+    });
+
+    $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {
+        $this.addClass('hidden');
+    });
 
     $('body').rebind('keyup.msd', function(e) {
         if (e.keyCode === 27) {
-            die();
+            $this.addClass('hidden');
         }
     });
 }

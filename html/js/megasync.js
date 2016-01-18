@@ -201,7 +201,10 @@ var megasync = (function() {
             // It means "OK". Most likely a "download" API call
             // was successfully handled.
             clearInterval(retryTimer);
-            $('body').unbind('keyup.sdd');
+            $('body').unbind('keyup.ssd');
+            showToast('megasync', 'Download added to MEGAsync', 'Open');
+            $('.button.with-megasync .big-txt').safeHTML(l[258]);
+            $('.button.with-megasync').addClass('downloading');
             return $('.megasync-overlay').addClass('hidden').removeClass('downloading');
         }
 

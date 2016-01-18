@@ -1790,6 +1790,9 @@ function api_retry() {
 function api_reqfailed(c, e) {
     if (e === ESID) {
         u_logout(true);
+        Soon(function() {
+            showToast('clipboard', l[19]);
+        });
         document.location.hash = 'login';
     }
     else if (c === 2 && e === ETOOMANY) {
@@ -4186,6 +4189,7 @@ function api_strerror(errno) {
         if (size <= 8192) {
             var blob = uq_entry[sfn](0, size);
 
+            onTimeout();
             fr.onload = function (e) {
                 var crc;
                 var data = fr.ab ? ab_to_str(fr.result) : e.target.result;

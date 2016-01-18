@@ -6804,6 +6804,16 @@ table {
     float: left;
     height: 30px;
     padding: 12px 0 0 4px;
+    overflow: hidden;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.long-path .fm-breadcrumbs-block {
+    max-width: -webkit-calc(100% - 230px);
+    max-width: -moz-calc(100% - 230px);
+ max- width: calc(100% - 230px);
+    height: 38px;
 }
 .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs {
     display: block;
@@ -6845,7 +6855,7 @@ table {
     background-repeat: no-repeat;
     background-position: 5px -1000px;
     cursor: pointer;
-    padding: 0 8px 0 46px;
+    padding: 0 0 0 42px;
     display: block;
     height: 24px;
 }
@@ -6855,6 +6865,9 @@ table {
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
+}
+.fm-breadcrumbs .right-arrow-bg span, .fm-share-breadcrumbs .right-arrow-bg span {
+    padding: 0 8px 0 4px;
 }
 .fm-breadcrumbs.received-requests .right-arrow-bg {
     background-position: 6px -3146px;
@@ -6955,6 +6968,9 @@ table {
     background-image: url(../images/mega/shared-sprite_v3.svg);
     background-repeat: no-repeat;
     background-position: 2px -622px;
+}
+.ultra-long-path .fm-breadcrumbs.folder .right-arrow-bg, .ultra-long-path .fm-breadcrumbs.shared-folder .right-arrow-bg, .ultra-long-path .fm-breadcrumbs.contact .right-arrow-bg {
+    padding: 0px 8px 0px 32px;
 }
 .fm-breadcrumbs.shared-folder .right-arrow-bg {
     background-position: 2px -542px;

@@ -8818,8 +8818,7 @@ function getclipboardkeys() {
  */
 function showToast(toastClass, notification, buttonLabel) {
 
-    var $toast;
-    var timer;
+    var $toast, interval;
 
     $toast = $('.toast-notification.common-toast');
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
@@ -8827,38 +8826,38 @@ function showToast(toastClass, notification, buttonLabel) {
 
     $toast.addClass('visible');
 
-    timer = setTimeout(function() {
-        hideToast();
+    interval = setInterval(function() {
+        hideToast(interval);
     }, 5000);
     
     if (buttonLabel) {
-        $('.common-toast .toast-button.action span').safeHTML(buttonLabel);
+        $('.common-toast .toast-button span').safeHTML(buttonLabel);
     } else {
-        $('.common-toast .toast-button.action span').safeHTML(l[726]);
+        $('.common-toast .toast-button span').safeHTML(l[726]);
     }
-
+    
     $('.common-toast .toast-button').rebind('click', function()
     {
-        hideToast();
-        clearTimeout(timer);
+        $('.toast-notification').removeClass('visible');
+        clearInterval(interval);
     });
 
     $toast.rebind('mouseover', function()
     {
-        clearTimeout(timer);
+        clearInterval(interval);
     });
 
     $toast.rebind('mouseout', function()
     {
-        clearTimeout(timer);
-        timer = setTimeout(function() {
-            hideToast();
+        interval = setInterval(function() {
+            hideToast(interval);
         }, 5000);
     });
 }
 
-function hideToast () {
+function hideToast (int) {
     $('.toast-notification.common-toast').removeClass('visible');
+    clearInterval(int);
 }
 
 /**

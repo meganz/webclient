@@ -6611,6 +6611,10 @@
         "text": "Image saved",
         "context": ""
     },
+    "5954": {
+        "text": "Error exporting image to  'saved pictures' album. Please try again",
+        "context": ""
+    },
     "5955": {
         "text": "Failed to save image",
         "context": ""
@@ -6665,6 +6669,10 @@
     },
     "5968": {
         "text": "Rename failed",
+        "context": ""
+    },
+    "5969": {
+        "text": "Please fill in your name, e-mail address and password",
         "context": ""
     },
     "5970": {
@@ -6739,6 +6747,10 @@
         "text": "Are you sure you want to move {0} to the rubbish bin?",
         "context": ""
     },
+    "5988": {
+        "text": "Move to rubbish bin?",
+        "context": ""
+    },
     "5989": {
         "text": "Item successfully moved to the rubbish bin",
         "context": ""
@@ -6749,6 +6761,10 @@
     },
     "5991": {
         "text": "Are you sure you want to move {0} items to the rubbish bin?",
+        "context": ""
+    },
+    "5992": {
+        "text": "Move items?",
         "context": ""
     },
     "5993": {
@@ -6787,9 +6803,13 @@
         "text": "Wrong password",
         "context": "Error text shown when you introduce a wrong password on the confirmation proccess"
     },
+    "6002": {
+        "text": "You have selected over 100 items ({0}) to download. Do you want to proceed?",
+        "context": ""
+    },
     "6003": {
         "text": "Download count",
-        "context": ""
+        "context": "The number of downloads."
     },
     "6004": {
         "text": "Do you want to automatically export image files to your photo album after download? You can change this setting on the settings page afterwards. Other file types will only be stored in the local storage of the app.",
@@ -7011,6 +7031,10 @@
         "text": "Resuming session...",
         "context": ""
     },
+    "6060": {
+        "text": "Fetching files & folders... [{0}]",
+        "context": "Progress indicator message when loading nodes from MEGA web service"
+    },
     "6061": {
         "text": "Getting account details...",
         "context": ""
@@ -7042,6 +7066,10 @@
     "6068": {
         "text": "Moving...",
         "context": "Progress indicator message when moving a node to a different parent"
+    },
+    "6069": {
+        "text": "Moving to Rubbish bin...",
+        "context": "Progress indicator message when moving a node to the rubbish bin (trash)"
     },
     "6070": {
         "text": "Pausing transfers...",
@@ -7105,6 +7133,10 @@
     },
     "6087": {
         "text": "your e-mail address",
+        "context": ""
+    },
+    "6088": {
+        "text": "empty folder",
         "context": ""
     },
     "6089": {
@@ -7203,8 +7235,16 @@
         "text": "Canceling...",
         "context": ""
     },
+    "6114": {
+        "text": "Error on transfer",
+        "context": ""
+    },
     "6115": {
         "text": "Finished",
+        "context": ""
+    },
+    "6116": {
+        "text": "Ready",
         "context": ""
     },
     "6117": {
@@ -7249,6 +7289,10 @@
     },
     "6127": {
         "text": "Change PIN Lock",
+        "context": ""
+    },
+    "6128": {
+        "text": "confirm your PIN lock",
         "context": ""
     },
     "6129": {
@@ -7319,6 +7363,18 @@
         "text": "capture",
         "context": ""
     },
+    "6146": {
+        "text": "clean up transfers",
+        "context": ""
+    },
+    "6147": {
+        "text": "clear cache",
+        "context": ""
+    },
+    "6148": {
+        "text": "clear selection",
+        "context": ""
+    },
     "6149": {
         "text": "clipboard",
         "context": ""
@@ -7329,6 +7385,14 @@
     },
     "6152": {
         "text": "Export images to 'saved pictures' album after download",
+        "context": ""
+    },
+    "6153": {
+        "text": "files (ascending)",
+        "context": ""
+    },
+    "6154": {
+        "text": "files (descending)",
         "context": ""
     },
     "6155": {
@@ -7363,6 +7427,10 @@
         "text": "Newest",
         "context": "Sort by option (5\/6). This one order the files by its modification date, newer first"
     },
+    "6163": {
+        "text": "your new PIN lock",
+        "context": ""
+    },
     "6164": {
         "text": "No data to show",
         "context": ""
@@ -7374,6 +7442,10 @@
     "6166": {
         "text": "Oldest",
         "context": "Sort by option (6\/6). This one order the files by its modification date, older first"
+    },
+    "6167": {
+        "text": "pause all",
+        "context": ""
     },
     "6168": {
         "text": "Privacy policy",
@@ -7387,8 +7459,16 @@
         "text": "Sort by",
         "context": "Section title of the \"Sort by\""
     },
+    "6171": {
+        "text": "start\/resume all",
+        "context": ""
+    },
     "6172": {
         "text": "subscribe",
+        "context": ""
+    },
+    "6173": {
+        "text": "Terms of service",
         "context": ""
     },
     "6174": {
@@ -9351,6 +9431,10 @@
         "text": "Thank you for your feedback!\n\nAre you sure you want to cancel your MEGA subscription?",
         "context": "Message of the dialog displayed when a user is trying to cancel a subscription, asking for confirmation to do it."
     },
+    "7274": {
+        "text": "The subscription has not been canceled correctly. Please contact support@mega.nz to cancel your subscription.",
+        "context": "Message of the dialog displayed when the process\/request to cancel a subscription failed."
+    },
     "7275": {
         "text": "Subscription cancellation failed",
         "context": "Title of the dialog displayed when the process\/request to cancel a subscription failed - (String as short as possible)."
@@ -9439,6 +9523,10 @@
         "text": "\/Pages\/",
         "context": "DO NOT NEED TO TRANSLATE"
     },
+    "7297": {
+        "text": "https:\/\/mega.nz\/mobile_terms.html",
+        "context": ""
+    },
     "7298": {
         "text": "Z5dGhQhL",
         "context": "DO NOT NEED TRANSLATION , JUST USE THE ORIGINAL TEXT AS TRANSLATION.\r\n\r\nEach MEGA client application needs a valid key to access the API. Please use a separate key for each of your applications."
@@ -9453,6 +9541,10 @@
     },
     "7301": {
         "text": "previews",
+        "context": ""
+    },
+    "7302": {
+        "text": "windowsphone@mega.nz",
         "context": ""
     },
     "7303": {
@@ -9570,6 +9662,10 @@
     "7331": {
         "text": "Sort",
         "context": "Label for any 'Sort' button, link, text, etc. - (String as short as possible)."
+    },
+    "7332": {
+        "text": "Empty rubbish bin",
+        "context": "Label for any 'Empty rubbish' button, link, text, etc. - (String as short as possible).This indicates an action to clear rubbish bin."
     },
     "7333": {
         "text": "Ok",
@@ -11531,6 +11627,10 @@
         "text": "Add participant...",
         "context": "Button label. Allows to add contacts in current chat conversation."
     },
+    "8008": {
+        "text": "You have no [P]Conversations[\/P]",
+        "context": "Information that you have on any conversation in the Chat section."
+    },
     "8009": {
         "text": "Write a message...",
         "context": "Message box label which shows that user can type message text in this textbox."
@@ -11590,5 +11690,345 @@
     "8023": {
         "text": "Attach",
         "context": "Button label. It allows to attach selected files for sharing."
+    },
+    "8024": {
+        "text": "Awesome!",
+        "context": "Label for any 'Awesome' text, title, etc. - (String as short as possible)."
+    },
+    "8025": {
+        "text": "Cancelling transfer...",
+        "context": "Progress indication message when cancelling a transfer."
+    },
+    "8026": {
+        "text": "Clearing the rubbish bin...",
+        "context": "Progress indication message when clearing the rubbish bin."
+    },
+    "8027": {
+        "text": "Closing all sessions...",
+        "context": "Progress indication message when closing all sessions."
+    },
+    "8028": {
+        "text": "Closing session...",
+        "context": "Progress indication message when closing a session.Please translate using a string as short as possible."
+    },
+    "8029": {
+        "text": "Sending contact request...",
+        "context": "Progress indicator message when sending a contact request."
+    },
+    "8030": {
+        "text": "Deleting contact request...",
+        "context": "Progress indicator message when deleting a contact request."
+    },
+    "8031": {
+        "text": "Reminding contact about the request...",
+        "context": "Progress indicator message when reminding a contact about a contact request."
+    },
+    "8032": {
+        "text": "Removing contact...",
+        "context": "Progress indication message when removing a contact.Please translate using a string as short as possible."
+    },
+    "8033": {
+        "text": "Removing from offline...",
+        "context": "Progress indication message when removing folders\/files from offline."
+    },
+    "8034": {
+        "text": "Removing link...",
+        "context": "Progress indication message when removing a link.Please translate using a string as short as possible."
+    },
+    "8035": {
+        "text": "Accepting contact request...",
+        "context": "Progress indicator message when accepting a contact request."
+    },
+    "8036": {
+        "text": "Denying contact request...",
+        "context": "Progress indicator message when denying a contact request."
+    },
+    "8037": {
+        "text": "Ignoring contact request...",
+        "context": "Progress indicator message when ignoring a contact request."
+    },
+    "8038": {
+        "text": "Saving for offline...",
+        "context": "Progress indication message when saving folders\/files for offline."
+    },
+    "8039": {
+        "text": "Servers too busy. Please wait\u2026",
+        "context": "Message displayed when servers are too busy. Please translate it using strings as short as possible."
+    },
+    "8040": {
+        "text": "Item successfully removed",
+        "context": "Message of the dialog displayed when the program successfully removed a node from the rubbish bin."
+    },
+    "8041": {
+        "text": "Do you want to remove the contact {0}?",
+        "context": "A confirmation dialog message which is displayed when a user wants to remove a contact.\r\nPlease keep the {0} code because is for including the email of the contact to be removed at runtime."
+    },
+    "8042": {
+        "text": "Remove contact?",
+        "context": "Confirmation message for a user to remove a contact. Please translate using a string as short as possible."
+    },
+    "8043": {
+        "text": "The contact invitation could not be sent. Please try again.",
+        "context": "This dialog message is displayed when the process\/request to invite a contact failed."
+    },
+    "8044": {
+        "text": "Failed to invite the contact",
+        "context": "Title of the dialog displayed when the process\/request to invite a contact failed."
+    },
+    "8045": {
+        "text": "User {0} has been invited and will appear on your contact list once they have accepted the invitation.",
+        "context": "Message of the dialog displayed when the process\/request to invite a contact finished successfully. Please keep the translated string as short as possible. Please also keep the placeholder {0}."
+    },
+    "8046": {
+        "text": "MEGA automatic camera uploads",
+        "context": "Description of the task that automatically uploads photos to MEGA. This is seen in the background services Settings screen."
+    },
+    "8047": {
+        "text": "Your account has been updated. Do you want to check the new account details?",
+        "context": "Message of the dialog displayed when the account is updated (upgraded or downgraded)."
+    },
+    "8048": {
+        "text": "Updated account",
+        "context": "Title of the dialog displayed when the account is updated (upgraded or downgraded)."
+    },
+    "8049": {
+        "text": "Our SSL\/TLS certificate can't be verified. You could be affected by a man-in-the-middle attack.",
+        "context": "Message of the dialog displayed when MEGA SSL\/TLS certificate can't be verified (API_ESSL Error)."
+    },
+    "8050": {
+        "text": "The Auto Camera Upload background task has failed. You can re-enable it on the settings page.",
+        "context": "Message of the dialog displayed when the auto camera upload service failed."
+    },
+    "8051": {
+        "text": "Auto Camera Upload failed",
+        "context": "Title of the dialog displayed when the auto camera upload service failed."
+    },
+    "8052": {
+        "text": "Failed to remove the contact {0}. Please try again. [{0}]",
+        "context": "This dialog message is displayed when the process\/request to remove a contact failed.\r\nPreserve the {0} code because is for include the contact email at runtime.\r\nPreserve the [{0}] code because is for include the error code or the error message at runtime."
+    },
+    "8053": {
+        "text": "Failed to remove the contact",
+        "context": "Message of the dialog displayed when the process\/request to remove a contact failed."
+    },
+    "8054": {
+        "text": "Do you want to remove {0} contacts?",
+        "context": "This dialog message is displayed when the program wants confirmation from the user to remove multiple contacts.\r\nPreserve the {0} code because is used for including the number of contacts to be removed at runtime."
+    },
+    "8055": {
+        "text": "Remove contacts?",
+        "context": "Confirmation message displayed when the user wants to remove multiple contacts. (String as short as possible)."
+    },
+    "8056": {
+        "text": "Failed to change password. Please try again.",
+        "context": "This dialog message is displayed when the process\/request to change the MEGA account password failed."
+    },
+    "8057": {
+        "text": "Please fill in your old MEGA password and your new MEGA password.",
+        "context": "Message of the dialog displayed when required fields for changing a password are not filled in."
+    },
+    "8058": {
+        "text": "Failed to close the session. Please try again. [{0}]",
+        "context": "This dialog message is displayed when the process\/request to close or kill all sessions (except the current one) failed.\r\nPreserve the [{0}] code because is for including the error code or the error message at runtime."
+    },
+    "8059": {
+        "text": "The remaining sessions were successfully closed.",
+        "context": "This dialog message is displayed when all the sessions (except the current one) were closed or killed successfully."
+    },
+    "8060": {
+        "text": "The session has been successfully closed.",
+        "context": "This dialog message is displayed when a session has been closed or killed successfully."
+    },
+    "8061": {
+        "text": "Failed to clear the rubbish bin. Please try again.",
+        "context": "This dialog message is displayed when the process\/request to clear the rubbish bin failed."
+    },
+    "8062": {
+        "text": "Are you sure you want to permanently delete all files from the rubbish bin?",
+        "context": "Message of the dialog displayed when a user wants to empty the rubbish bin. The dialog is asking for confirmation to do it."
+    },
+    "8063": {
+        "text": "The rubbish bin has been cleared successfully.",
+        "context": "This dialog message is displayed when the rubbish bin has been cleared successfully."
+    },
+    "8064": {
+        "text": "You are trying to add your own email as a contact.",
+        "context": "This dialog message is displayed when the process\/request to invite a contact failed because the user is trying to use his\/her own email."
+    },
+    "8065": {
+        "text": "Failed to remove link. Please try again.",
+        "context": "A dialog message which is displayed when the process\/request to remove a link failed."
+    },
+    "8066": {
+        "text": "You cannot perform this action. Please connect to the Internet and try again.",
+        "context": "Message of the dialog displayed when the user is trying to perform any online action without an active Internet connection."
+    },
+    "8067": {
+        "text": "View details",
+        "context": "Label for any 'View details' button, link, text, title, etc. i.e. View contact details. Please translate using a string as short as possible."
+    },
+    "8068": {
+        "text": "External power source connected",
+        "context": "Label for the \"External power source connected\" automatic camera upload settings. It means they have plugged the device into a power source to charge the battery."
+    },
+    "8069": {
+        "text": "Upload settings",
+        "context": "Label for the auto camera upload setting options."
+    },
+    "8070": {
+        "text": "Do you want to enable the Auto Camera Uploads service?",
+        "context": "A label asking user if wants to enable the automatic camera uploads service."
+    },
+    "8071": {
+        "text": "Your new password",
+        "context": "Watermark label for the new password field when changing an account password."
+    },
+    "8072": {
+        "text": "Service restrictions",
+        "context": "Label for the auto camera upload service restrictions."
+    },
+    "8073": {
+        "text": "Saved for offline use",
+        "context": "Label for any 'Saved for offline' button, link, text, title, etc to indicate the content has already been saved for offline use."
+    },
+    "8074": {
+        "text": "No files in your cloud drive",
+        "context": "Label for the background of an empty cloud drive page."
+    },
+    "8075": {
+        "text": "No items saved for offline",
+        "context": "Label of the background of an empty transfers page."
+    },
+    "8076": {
+        "text": "No shared folders",
+        "context": "Label for the background of an empty shared folders page - (String as short as possible)."
+    },
+    "8077": {
+        "text": "No downloads",
+        "context": "Label for the background of an empty downloads page. Please translate using a string as short as possible."
+    },
+    "8078": {
+        "text": "No uploads",
+        "context": "Label for the background of an empty uploads page - (String as short as possible)."
+    },
+    "8079": {
+        "text": "Please select a default download folder.",
+        "context": "Default value for the string shown into the preferences page. It will be substituted by the path of the folder selected by the user when selecting a default location for downloads."
+    },
+    "8080": {
+        "text": "Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:",
+        "context": "Full text:\r\n\r\nMega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:\r\n\r\nConfidentiality - Only the author and intended recipients are able to decipher and read the content.\r\n\r\nAuthenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server."
+    },
+    "8081": {
+        "text": "Confidentiality - Only the author and intended recipients are able to decipher and read the content.",
+        "context": "Full text:\r\n\r\nMega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:\r\n\r\nConfidentiality - Only the author and intended recipients are able to decipher and read the content.\r\n\r\nAuthenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server."
+    },
+    "8082": {
+        "text": "Authenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server.",
+        "context": "Full text:\r\n\r\nMega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:\r\n\r\nConfidentiality - Only the author and intended recipients are able to decipher and read the content.\r\n\r\nAuthenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server."
+    },
+    "8407": {
+        "text": "Streaming",
+        "context": "Label for the menu item that opens the dialog to stream files from MEGA."
+    },
+    "8408": {
+        "text": "Streaming from MEGA",
+        "context": "Label of the menu item that opens a dialog to stream files from MEGA."
+    },
+    "8409": {
+        "text": "Stream from MEGA",
+        "context": "Label of the menu item that opens a dialog for streaming files from MEGA"
+    },
+    "8411": {
+        "text": "Only files can be used for streaming.",
+        "context": "A warning message when users try to select a folder for streaming."
+    },
+    "8412": {
+        "text": "Export Master Key",
+        "context": "Title of the dialog box to export the current user's master key"
+    },
+    "8413": {
+        "text": "PRO LITE",
+        "context": "Label to indicate that the current user has a PRO LITE account."
+    },
+    "8415": {
+        "text": "Select media from...",
+        "context": "Label of the button that selects files for streaming."
+    },
+    "8416": {
+        "text": "File info:",
+        "context": "Text just before the information of the file selected for streaming."
+    },
+    "8417": {
+        "text": "Nothing selected",
+        "context": "Text shown when no files have been selected for streaming yet."
+    },
+    "8418": {
+        "text": "Open with:",
+        "context": "Text above the buttons to open a streaming link."
+    },
+    "8419": {
+        "text": "Default application",
+        "context": "Label of the button that opens a streaming link using the default application in the system."
+    },
+    "8420": {
+        "text": "Choose application",
+        "context": "Text of the button that opens a streaming link with a custom application."
+    },
+    "8421": {
+        "text": "Are you sure that you want to stop the streaming?",
+        "context": "This warning message is shown when the dialog to stream files from MEGA is going to be closed and there is a file selected for streaming."
+    },
+    "8422": {
+        "text": "Enter a MEGA file link:",
+        "context": "Text of the dialog for entering a MEGA file link for streaming."
+    },
+    "8423": {
+        "text": "Error generating streaming link",
+        "context": "This text is shown when there is an error generating a streaming link."
+    },
+    "8424": {
+        "text": "Error opening the default application.",
+        "context": "This text is shown when there is an error opening the default application for streaming."
+    },
+    "8425": {
+        "text": "through your browser",
+        "context": "Button label. Full text: Download through your browser. "
+    },
+    "8426": {
+        "text": "[S]MEGAsync:[\/S] Easy automated syncing between your computers and your MEGA cloud drive",
+        "context": "MEGAsync application advantages. As short as possible please. Please leave [S] and [\/S] as it is."
+    },
+    "8427": {
+        "text": "[S]Flexible:[\/S] Sync any folder from your PC to any folder in the cloud. Sync any number of folders in parallel.",
+        "context": "MEGAsync application advantages. As short as possible please. Please leave [S] and [\/S] as it is."
+    },
+    "8428": {
+        "text": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
+        "context": "MEGAsync application advantages. As short as possible please. Please leave [A] and [\/A] as it is."
+    },
+    "8429": {
+        "text": "Faster transfer speeds",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
+    },
+    "8430": {
+        "text": "MEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers.",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
+    },
+    "8431": {
+        "text": "Lean & mean resource usage",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
+    },
+    "8432": {
+        "text": "Run MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
+    },
+    "8433": {
+        "text": "Unlimited file size",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nUnlimited file size.\r\nWhile browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync."
+    },
+    "8434": {
+        "text": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nUnlimited file size.\r\nWhile browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync."
     }
 }

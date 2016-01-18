@@ -443,14 +443,14 @@ Object.defineProperty(this, 'mBroadcaster', {
             var args = Array.prototype.slice.call(arguments, 1);
             var idr = [];
 
-            //if (d) console.log('Broadcasting ' + topic, args);
+            // if (d) console.log('Broadcasting ' + topic, args);
 
             for (var id in this._topics[topic]) {
                 var ev = this._topics[topic][id], rc;
                 try {
                     rc = ev.callback.apply(ev.scope, args);
                 } catch (ex) {
-                    if (d) console.error(ex, ex.stack ? ex.stack : null);
+                    if (d) console.error(ex);
                 }
                 if (ev.once || rc === 0xDEAD)
                     idr.push(id);

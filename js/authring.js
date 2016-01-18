@@ -661,7 +661,7 @@ var authring = (function () {
             masterPromise.linkDoneAndFailTo(comboPromise);
         });
         keyringPromise.fail(function __baseAuthSystemFail() {
-            masterPromise.fail();
+            masterPromise.reject();
         });
 
         masterPromise

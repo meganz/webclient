@@ -329,6 +329,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             if (contact && contact.u && !pubCu25519[contact.u]) {
                 var keyRetrievalPromise = crypt.getPubCu25519(contact.u);
                 keyRetrievalPromise.fail(function(r) {
+                    self.logger.warn("Failed to retrieve pubCu25519 key for: ", contact.u);
                 });
 
                 waitingForPromises.push(
@@ -338,6 +339,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             if (contact && contact.u && !u_pubkeys[contact.u]) {
                 var keyRetrievalPromise = crypt.getPubRSA(contact.u);
                 keyRetrievalPromise.fail(function(r) {
+                    self.logger.warn("Failed to retrieve pubRSA key for: ", contact.u);
                 });
 
                 waitingForPromises.push(
@@ -487,6 +489,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 );
 
                 self.join(chatRoom);
+            })
+            .fail(function() {
+                self.logger.error(
+                    "Failed to pre-load keys before initialising strongvelope. " +
+                    "Can't initialise strongvelope for this chat: ",
+                    chatRoom.roomJid
+                );
             });
     }
 

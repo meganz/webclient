@@ -273,12 +273,26 @@ var crypt = (function () {
         if (typeof u_authring === 'undefined'
                 || typeof u_authring[keyType] === 'undefined') {
             // Need to initialise the authentication system (authring).
-            logger.debug('Will wait for the authring to initialise first.');
+            logger.debug('Will wait for the authring to initialise first.', 'Tried to access: ', userhandle, keyType);
             var authringLoadingPromise = authring.initAuthenticationSystem();
             masterPromise.linkFailTo(authringLoadingPromise);
+
             // Now, with the authring loaded, link recursively to getPubKey again.
             authringLoadingPromise.done(function() {
-                masterPromise.linkDoneAndFailTo(ns.getPubKey(userhandle, keyType));
+                var tmpPromise;
+                // if already cached, swap the request promise!
+                if (ns._pubKeyRetrievalPromises[userhandle + "_" + keyType]) {
+                    tmpPromise = ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+                    delete ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+                }
+
+                var newPromise = ns.getPubKey(userhandle, keyType);
+
+                if (tmpPromise) {
+                    tmpPromise.linkDoneAndFailTo(newPromise);
+                }
+
+                masterPromise.linkDoneAndFailTo(newPromise);
             });
             __callbackAttachAfterDone(masterPromise);
 

@@ -1137,7 +1137,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             nt_txt += '<b> (' + l[1651] + ') </b>';
         }
 
-        $toast.find('.toast-col:first-child').safeHTML(nt_txt);
+        $toast.find('.toast-col:first-child span').safeHTML(nt_txt);
 
         if ($second_toast.hasClass('visible')) {
             $second_toast.addClass('second');
@@ -1159,6 +1159,13 @@ function showTransferToast(t_type, t_length, isPaused) {
             // M.openFolder('transfers', true);
             $('.nw-fm-left-icon.transfers').click();
         });
+        
+        $('.toast-close-button', $toast).rebind('click', function()
+        {
+            $(this).closest('.toast-notification').removeClass('visible');
+            $('.toast-notification').removeClass('second');
+        });
+        
         $toast.rebind('mouseover', function(e)
         {
             clearInterval(interval);
@@ -8822,7 +8829,7 @@ function showToast(toastClass, notification, buttonLabel) {
 
     $toast = $('.toast-notification.common-toast');
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
-        .find('.toast-col:first-child').safeHTML(notification);
+        .find('.toast-col:first-child span').safeHTML(notification);
 
     $toast.addClass('visible');
 
@@ -8831,12 +8838,12 @@ function showToast(toastClass, notification, buttonLabel) {
     }, 5000);
     
     if (buttonLabel) {
-        $('.common-toast .toast-button span').safeHTML(buttonLabel);
+        $('.common-toast .toast-button').safeHTML(buttonLabel);
     } else {
-        $('.common-toast .toast-button span').safeHTML(l[726]);
+        $('.common-toast .toast-button').safeHTML(l[726]);
     }
     
-    $('.common-toast .toast-button').rebind('click', function()
+    $('.toast-close-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');
         clearInterval(interval);

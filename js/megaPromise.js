@@ -29,10 +29,10 @@ function MegaPromise(fn) {
     if (fn) {
         fn(
             function() {
-                self.resolve.apply(self, toArray(arguments));
+                self.resolve.apply(self, arguments);
             },
             function() {
-                self.reject.apply(self, toArray(arguments));
+                self.reject.apply(self, arguments);
             }
         );
     }
@@ -59,13 +59,13 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
 
     p.then(
         function megaPromiseResProxy() {
-        $promise.resolve.apply($promise, toArray(arguments))
+        $promise.resolve.apply($promise, arguments)
         },
         (
             d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
                 MegaPromise.getTraceableReject($promise, p) :
                 function megaPromiseRejProxy() {
-                    $promise.reject.apply($promise, toArray(arguments));
+                    $promise.reject.apply($promise, arguments);
                 }
         )
     );
@@ -103,7 +103,7 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
                 $promise.apply(origPromise, arguments);
             }
             else {
-                $promise.reject.apply($promise, toArray(arguments))
+                $promise.reject.apply($promise, arguments);
             }
         }
         catch(e) {
@@ -185,7 +185,7 @@ MegaPromise.prototype.catch = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.resolve = function() {
-    this._internalPromise.resolve.apply(this._internalPromise, toArray(arguments));
+    this._internalPromise.resolve.apply(this._internalPromise, arguments);
     return this;
 };
 
@@ -195,7 +195,7 @@ MegaPromise.prototype.resolve = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.reject = function() {
-    this._internalPromise.reject.apply(this._internalPromise, toArray(arguments));
+    this._internalPromise.reject.apply(this._internalPromise, arguments);
     return this;
 };
 
@@ -205,7 +205,7 @@ MegaPromise.prototype.reject = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.always = function() {
-    this._internalPromise.always.apply(this._internalPromise, toArray(arguments));
+    this._internalPromise.always.apply(this._internalPromise, arguments);
     return this;
 };
 
@@ -331,12 +331,12 @@ MegaPromise.all = function(promisesList) {
 
     $.when.apply($, _jQueryPromisesList)
         .then(function megaPromiseResProxy() {
-            promise.resolve(toArray(arguments));
+            promise.resolve(toArray.apply(null, arguments));
         }, (
             d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
                 MegaPromise.getTraceableReject(promise) :
                 function megaPromiseRejProxy() {
-                    promise.reject.apply(promise, toArray(arguments));
+                    promise.reject.apply(promise, arguments);
                 }
             )
         );
@@ -365,10 +365,9 @@ MegaPromise.allDone = function(promisesList, timeout) {
     var results = [];
     var masterPromise = new MegaPromise();
     var alwaysCb = function() {
-        totalLeft--;
-        results.push(arguments);
+        results.push(toArray.apply(null, arguments));
 
-        if (totalLeft === 0) {
+        if (--totalLeft === 0) {
             masterPromise.resolve(results);
         }
     };
@@ -405,7 +404,7 @@ MegaPromise.allDone = function(promisesList, timeout) {
  */
 MegaPromise.resolve = function() {
     var p = new MegaPromise();
-    p.resolve.apply(p, toArray(arguments));
+    p.resolve.apply(p, arguments);
 
     return p;
 };
@@ -418,7 +417,7 @@ MegaPromise.resolve = function() {
  */
 MegaPromise.reject = function() {
     var p = new MegaPromise();
-    p.reject.apply(p, toArray(arguments));
+    p.reject.apply(p, arguments);
 
     return p;
 };

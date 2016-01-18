@@ -211,6 +211,7 @@ function u_logout(logout) {
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
         }
+        slideshow(0, 1);
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
         notify.notifications = [];

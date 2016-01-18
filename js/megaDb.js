@@ -331,7 +331,7 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
         if(megaDb instanceof MegaDB.QuerySet) {
             megaDb = self.megaDb;
         }
-        var args = toArray(arguments);
+        var args = arguments;
 
         assert(megaDb.dbState != MegaDB.DB_STATE.CLOSED, "Tried to execute method on a closed database.");
         assert(megaDb.dbState != MegaDB.DB_STATE.FAILED_TO_INITIALIZE, "Tried to execute method on a database which failed to initialize (open).");
@@ -574,7 +574,7 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
                 promise.reject(ar)
             });
         }, function() {
-            promise.reject(arguments);
+            promise.reject(toArray.apply(null, arguments));
         });
 
     return promise;
@@ -645,13 +645,13 @@ MegaDB.prototype.get = function(tableName, val) {
                 } else if($.isArray(result) && result.length > 1) {
                     resolve.apply(null, [result]);
                 }  else {
-                    resolve.apply(null, toArray(arguments));
+                    resolve.apply(null, arguments);
                 }
 
                 // resolve with 1 OR multiple arguments please
             },
             function() {
-                reject.apply(null, toArray(arguments));
+                reject.apply(null, arguments);
             });
     });
     return promise;
@@ -730,7 +730,7 @@ MegaDB.QuerySet = function(megaDb, tableName) {
 
     'only bound upperBound lowerBound filter all modify map'.split(' ').forEach(function (name) {
         self[name] = function() {
-            self._queueOp(name, toArray(arguments));
+            self._queueOp(name, toArray.apply(null, arguments));
 
             return self;
         }

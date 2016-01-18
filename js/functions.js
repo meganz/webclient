@@ -79,12 +79,11 @@ parseHTML.baseURIs = {};
  */
 function parseHTMLfmt(markup) {
     if (arguments.length > 1) {
-        var args = toArray(arguments);
-        var replacer = function(match) {
-            return escapeHTML(args.shift());
-        };
-        args.shift();
-        markup = markup.replace(/@@/g, replacer);
+        var idx = 1;
+        var args = arguments;
+        markup = markup.replace(/@@/g, function() {
+            return escapeHTML(args[idx++]);
+        });
     }
     return parseHTML(markup);
 }
@@ -785,7 +784,7 @@ function secondsToTime(secs, text_format) {
     if (text_format) {
         hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
         returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
-    } 
+    }
     return returnvar;
 }
 
@@ -982,20 +981,17 @@ function funcAlias(context, fn) {
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
  */
 function makeObservable(kls) {
+    var target = kls.prototype || kls;
     var aliases = ['on', 'bind', 'unbind', 'one', 'trigger', 'rebind'];
 
-    $.each(aliases, function(k, v) {
-        if (kls.prototype) {
-            kls.prototype[v] = function() {
-                return $(this)[v].apply($(this), toArray(arguments));
-            }
-        }
-        else {
-            kls[v] = function() {
-                return $(this)[v].apply($(this), toArray(arguments));
-            }
-        }
+    aliases.forEach(function(fn) {
+        target[fn] = function() {
+            var $this = $(this);
+            return $this[fn].apply($this, arguments);
+        };
     });
+
+    target = aliases = kls = undefined;
 }
 
 /**
@@ -1244,11 +1240,18 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 /**
  * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
  *
- * @param val {Arguments}
+ * Please note there is a huge performance degradation when using `arguments` outside their
+ * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
+ *
  * @returns {Array}
  */
-function toArray(val) {
-    return Array.prototype.slice.call(val, val);
+function toArray() {
+    var len = arguments.length;
+    var res = Array(len);
+    while (len--) {
+        res[len] = arguments[len];
+    }
+    return res;
 }
 
 /**
@@ -1596,12 +1599,12 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
         return;
     }
     ctx[fnName] = function() {
-        //loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
-        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray(arguments)));
+        // loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, arguments]);
+        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray.apply(null, arguments)));
 
-        var res = origFn.apply(this, toArray(arguments));
-        //loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
-        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
+        var res = origFn.apply(this, arguments);
+        // loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, arguments, res]);
+        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray.apply(null, arguments)).concat(["returned: ", res]));
 
         return res;
     };
@@ -2582,7 +2585,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
 
     return function() {
         var self = this;
-        var args = toArray(arguments);
+        var args = toArray.apply(null, arguments);
 
         var event = new $.Event("onBefore" + eventSuffix);
         self.trigger(event, args);

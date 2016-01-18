@@ -145,7 +145,7 @@ ClassChunk.prototype.isCancelled = function() {
     var is_cancelled = this.dl.cancelled;
     if (!is_cancelled) {
         if (typeof (this.dl.pos) !== 'number') {
-            this.dl.pos = dlmanager.idToFile(this.dl.id).pos;
+            this.dl.pos = dlmanager.getDownloadByHandle(this.dl.id).pos;
         }
         is_cancelled = !dl_queue[this.dl.pos] || !dl_queue[this.dl.pos].n;
     }

@@ -443,7 +443,7 @@ Object.defineProperty(this, 'mBroadcaster', {
             var args = Array.prototype.slice.call(arguments, 1);
             var idr = [];
 
-            if (d) console.log('Broadcasting ' + topic, args);
+            //if (d) console.log('Broadcasting ' + topic, args);
 
             for (var id in this._topics[topic]) {
                 var ev = this._topics[topic][id], rc;

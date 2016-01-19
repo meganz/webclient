@@ -348,22 +348,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             }
         });
 
-        var strongvelopeInitPromise = createTimeoutPromise(function() {
-            return !!u_handle && !!u_privCu25519 && !!u_privEd25519 && !!u_pubEd25519
-        }, 50, 5000)
-            .fail(function() {
-                self.logger.error(
-                    "Failed to initialise strongvelope protocol handler, because u_* vars were not available in a" +
-                    " timely manner."
-                );
-            });
-
-        waitingForPromises.push(
-            strongvelopeInitPromise
-        );
-
-        // try to init immediately
-        strongvelopeInitPromise.verify();
+        if (authring.hadInitialised() === false) {
+            waitingForPromises.push(
+                authring.initAuthenticationSystem()
+                    .fail(function() {
+                        self.logger.error("Failed to initialise authring.");
+                    })
+            );
+        }
 
         chatRoom.notDecryptedBuffer = {};
 
@@ -494,7 +486,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 self.logger.error(
                     "Failed to pre-load keys before initialising strongvelope. " +
                     "Can't initialise strongvelope for this chat: ",
-                    chatRoom.roomJid
+                    chatRoom.roomJid,
+                    waitingForPromises
                 );
             });
     }

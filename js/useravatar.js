@@ -163,7 +163,6 @@ var useravatar = (function() {
         return _letters(email.substr(0, 2), email, className, element);
     }
 
-    var authringPromise;
 
     /**
      * Check if the current user is verified by the current user. It
@@ -174,16 +173,13 @@ var useravatar = (function() {
         if (u_type !== 3) {
             return;
         }
-        if (!authringPromise) {
-            authringPromise = new MegaPromise();
-            
-            if (u_authring.Ed25519) {
-                authringPromise.resolve();
-            } else {
-                // First load the authentication system.
-                var authSystemPromise = authring.initAuthenticationSystem();
-                authringPromise.linkDoneAndFailTo(authSystemPromise);
-            }
+
+        if(authring.hadInitialised() === false) {
+            var authSystemPromise = authring.initAuthenticationSystem();
+            authSystemPromise.always(isUserVerified_Callback);
+        }
+        else {
+            isUserVerified_Callback();
         }
 
         function isUserVerified_Callback() {
@@ -195,10 +191,6 @@ var useravatar = (function() {
                 $('.avatar-wrapper.' + user.h).addClass('verified');
             }
         }
-
-        setTimeout(function() {
-            authringPromise.done(isUserVerified_Callback);
-        });
     }
 
     /**

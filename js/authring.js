@@ -610,6 +610,15 @@ var authring = (function () {
 
 
     /**
+     * Checks if the authring was initialised (initialised = true, not initialised OR initialising = false)
+     *
+     * @returns {boolean}
+     */
+    ns.hadInitialised = function() {
+        return ns._initialisingPromise === true;
+    };
+
+    /**
      * Initialises the authentication system.
      *
      * @return {MegaPromise}
@@ -655,8 +664,7 @@ var authring = (function () {
                 );
             });
 
-            var comboPromise = MegaPromise.all([rsaPromise, cu25519Promise,
-                                                prefilledRsaKeysPromise]);
+            var comboPromise = MegaPromise.all([rsaPromise, cu25519Promise]);
 
             masterPromise.linkDoneAndFailTo(comboPromise);
         });

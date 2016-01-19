@@ -36,6 +36,15 @@ function MegaPromise(fn) {
             }
         );
     }
+
+    if (MegaPromise.debugPendingPromisesTimeout > 0) {
+        var preStack = mega.utils.getStack();
+        setTimeout(function() {
+            if (self.state() === 'pending') {
+                console.error("Pending promise found: ", self, preStack);
+            }
+        }, MegaPromise.debugPendingPromisesTimeout);
+    }
     return this;
 };
 
@@ -45,6 +54,8 @@ if (typeof(Promise) !== "undefined") {
     MegaPromise._origPromise = undefined;
     window.Promise = MegaPromise;
 }
+
+MegaPromise.debugPendingPromisesTimeout = false;
 
 /**
  * Convert Native and jQuery promises to MegaPromises, by creating a MegaPromise proxy which will be attached

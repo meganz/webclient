@@ -832,7 +832,7 @@ var ConversationRightArea = React.createClass({
                         <ButtonsUI.Button
                             className="link-button dropdown-element"
                             icon="rounded-grey-up-arrow"
-                            label={__(l[6834]+"…")}
+                            label={__(l[6834] + "...")}
                             >
                             <DropdownsUI.Dropdown
                                 contacts={this.props.contacts}
@@ -1972,7 +1972,7 @@ var ConversationPanels = React.createClass({
         if (conversations.length === 0) {
             var contactsList = [];
             var contactsListOffline = [];
-            
+
             self.props.contacts.forEach(function(contact) {
                 if (contact.u === u_handle) { return; }
                 else if (contact.c === 0) { return; }

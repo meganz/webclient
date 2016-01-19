@@ -71,7 +71,7 @@ MegaPromise.debugPendingPromisesTimeout = false;
 /**
  * Set this to true, to enable all promises to store a pre-stack in .stack.
  *
- * @type {boolean|Number}
+ * @type {boolean}
  */
 MegaPromise.debugPreStack = false;
 

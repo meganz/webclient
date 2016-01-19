@@ -282,9 +282,19 @@ var authring = (function () {
             return;
         }
 
-        return setUserAttribute(ns._PROPERTIES[keyType],
-                                { '': ns.serialise(u_authring[keyType]) },
-                                false, true);
+        if (ns.hadInitialised() === false) {
+            var proxyPromise = new MegaPromise();
+
+            ns.initAuthenticationSystem()
+                .done(function() {
+                    proxyPromise.linkDoneAndFailTo(ns.setContacts(keyType));
+                });
+        }
+        else {
+            return setUserAttribute(ns._PROPERTIES[keyType],
+                {'': ns.serialise(u_authring[keyType])},
+                false, true);
+        }
     };
 
 

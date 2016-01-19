@@ -10470,7 +10470,8 @@ function fingerprintDialog(userid) {
                     userid,
                     fingerprint,
                     'Ed25519',
-                    authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON
+                    authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON,
+                    authring.KEY_CONFIDENCE.UNSURE
                 );
 
                 // Change button state to 'Verified'

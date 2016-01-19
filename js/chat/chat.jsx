@@ -13,7 +13,13 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
 (function() {
     chatui = function(id) {
-
+        var userHash = id.replace("chat/", "");
+        if (!M.u[userHash]) {
+            M.currentdirid = "chat";
+            window.location = '#fm/chat';
+            M.openFolder("chat");
+            return;
+        }
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
         hideEmptyGrids();
 
@@ -420,6 +426,26 @@ Chat.prototype.init = function() {
 
         if (meta && meta.type === "private") {
 
+            var otherParticipants = meta.participants;
+            var myBareJid = megaChat.karere.getBareJid();
+
+            var otherParticipant;
+            if (Karere.getNormalizedBareJid(otherParticipants[0]) === megaChat.karere.getBareJid()) {
+                otherParticipant = Karere.getNormalizedBareJid(otherParticipants[0]);
+            }
+            else {
+                otherParticipant = Karere.getNormalizedBareJid(otherParticipants[1]);
+            }
+
+            if (otherParticipant && !self.getContactFromJid(otherParticipant)) {
+                self.logger.debug(
+                    self.karere.getNickname(),
+                    "Got invited to a private room with a non-existing contact. Ignoring: ",
+                    eventObject.getRoomJid(),
+                    roomJid,
+                    "with eventData:", eventObject, " and participants: ", otherParticipants
+                );
+            }
             var bareFromJid = eventObject.getFromJid().split("/")[0];
             self.chats.forEach(function(room, roomJid) {
 

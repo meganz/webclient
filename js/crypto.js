@@ -270,8 +270,11 @@ var crypt = (function () {
             }
         };
 
-        if (typeof u_authring === 'undefined'
-                || typeof u_authring[keyType] === 'undefined') {
+        if (
+                authring.hadInitialised() === false ||
+                typeof u_authring === 'undefined'
+                || typeof u_authring[keyType] === 'undefined'
+        ) {
             // Need to initialise the authentication system (authring).
             logger.debug('Will wait for the authring to initialise first.', 'Tried to access: ', userhandle, keyType);
             var authringLoadingPromise = authring.initAuthenticationSystem();

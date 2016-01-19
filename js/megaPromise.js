@@ -45,6 +45,10 @@ function MegaPromise(fn) {
             }
         }, MegaPromise.debugPendingPromisesTimeout);
     }
+
+    if (MegaPromise.debugPreStack === true) {
+        self.stack = mega.utils.getStack();
+    }
     return this;
 };
 
@@ -55,7 +59,21 @@ if (typeof(Promise) !== "undefined") {
     window.Promise = MegaPromise;
 }
 
+/**
+ * Set this to any number (millisecond) and a timer would check if all promises are resolved in that time. If they are
+ * still in 'pending' state, they will trigger an error (this is a debugging helper, not something that you should
+ * leave on in production code!)
+ *
+ * @type {boolean|Number}
+ */
 MegaPromise.debugPendingPromisesTimeout = false;
+
+/**
+ * Set this to true, to enable all promises to store a pre-stack in .stack.
+ *
+ * @type {boolean|Number}
+ */
+MegaPromise.debugPreStack = false;
 
 /**
  * Convert Native and jQuery promises to MegaPromises, by creating a MegaPromise proxy which will be attached

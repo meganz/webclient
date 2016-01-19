@@ -298,7 +298,7 @@ function init_register() {
     $('#register-password').rebind('focus', function(e) {
         $('.login-register-input.password.first').removeClass('incorrect');
         $('.login-register-input.password.confirm').removeClass('incorrect');
-        $('.login-register-input.password').addClass('focused');
+        $(this).parents('.password').addClass('focused');
     });
     $('#register-password').rebind('blur', function(e) {
         $('.login-register-input.password').removeClass('focused');
@@ -306,10 +306,10 @@ function init_register() {
     });
     $('#register-password2').rebind('focus', function(e) {
         $('.login-register-input.password.confirm').removeClass('incorrect');
-        $('.login-register-input.password2').addClass('focused');
+        $(this).parents('.password').addClass('focused');
     });
     $('#register-password2').rebind('blur', function(e) {
-        $('.login-register-input.password2').removeClass('focused');
+        $(this).parents('.password').removeClass('focused');
     });
     $('.new-registration-checkbox .radio-txt,.register-check').rebind('click.uiCheckboxes', function(e) {
         if ($('.register-check').attr('class').indexOf('checkboxOn') > -1) {

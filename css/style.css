@@ -26365,10 +26365,6 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 .animations-left-container, .animations-right-container {
     margin-top: -120px;
 }
-.opensource-top-icon, .opensource-icon {
-    background-image: url(../images/mega/opensource-v2@2x.png);
-    background-size: 100px auto;
-}
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);
     background-size: 14px auto;
@@ -26793,6 +26789,10 @@ body.pro:after {
 .new-left-menu-icon.help-icon, .help-nw .dev-new-button, .help-listing, .help-short-icon {
     background-image: url(../images/mega/help-new-sprite-v1@2x.png);
     background-size: 886px auto;
+}
+.opensource-top-icon, .opensource-icon {
+    background-image: url(../images/mega/opensource-v2@2x.png);
+    background-size: 100px auto;
 }
 .st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button, .upload-overlay-icon {
     background-image: url(../images/mega/new-startpage-sprite-v2@2x.png);

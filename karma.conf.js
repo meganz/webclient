@@ -13,6 +13,8 @@ module.exports = function(config) {
     // List of files/patterns to load in the browser.
     // {included: false} files are loaded by requirejs
     files: [
+        // Shim for ES6 features some browsers may not have (PhantomJS).
+        {pattern: 'node_modules/es6-shim/es6-shim.js', included: true},
         // == Basic test setup ==
         'test/test_main.js',
         'test/test_utils.js',
@@ -149,7 +151,6 @@ module.exports = function(config) {
         // == Tests ==
         // Dependency-based load order of library modules.
         // modules that already follow AMD need included: false
-        {pattern: 'node_modules/es6-shim/es6-shim.js', included: true},
         (process.env.SKIP_WORKFLOWS)
             ? 'test/config/test_workflows_off.js'
             : 'test/config/test_workflows.js',

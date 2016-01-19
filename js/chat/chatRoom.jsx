@@ -715,7 +715,8 @@ ChatRoom.prototype.show = function() {
     $('.contacts-grid-view').addClass('hidden');
     $('.fm-contacts-blocks-view').addClass('hidden');
 
-    $('.fm-right-files-block').removeClass('hidden');
+    $('.fm-right-files-block[data-reactid]').removeClass('hidden');
+    $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
 
     //$('.nw-conversations-item').removeClass('selected');
 

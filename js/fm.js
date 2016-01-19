@@ -6696,6 +6696,7 @@ function sectionUIopen(id) {
 
         // new sections UI
         $('.section').addClass('hidden');
+
         var repos = function() {
             $('.section.' + id)
                 .height(

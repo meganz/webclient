@@ -26,7 +26,8 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
 
 
-        $('.fm-right-files-block').removeClass('hidden');
+        $('.fm-right-files-block[data-reactid]').removeClass('hidden');
+        $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
 
         megaChat.refreshConversations();
 
@@ -689,11 +690,6 @@ Chat.prototype.init = function() {
         }
         $('.fm-create-chat-button').hide();
     });
-
-    self.$container = $('.fm-chat-block');
-    if (self.$container.parent('.section.conversations .fm-right-files-block').size() == 0) {
-        $('.section.conversations .fm-right-files-block').append(self.$container);
-    }
 
     self.$container = $('.fm-chat-block');
 

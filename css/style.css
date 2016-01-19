@@ -197,8 +197,10 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .white-bg {
     background-color: white;
 }
-.top-head {
+#topmenu, .top-head {
     height: 48px;
+}
+.top-head {
     background-color: #151412;
     position: relative;
 }

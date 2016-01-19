@@ -769,7 +769,7 @@ function uplpad(number, length) {
     return str;
 }
 
-function secondsToTime(secs, text_format) {
+function secondsToTime(secs, html_format) {
     if (isNaN(secs)) {
         return '--:--:--';
     }
@@ -784,7 +784,7 @@ function secondsToTime(secs, text_format) {
     var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
     var returnvar = hours + ':' + minutes + ':' + seconds;
 
-    if (text_format) {
+    if (html_format) {
         hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
         returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
     }
@@ -1507,7 +1507,14 @@ function setTransferStatus(dl, status, ethrow, lock) {
     if (text.length > 44) {
         text = text.substr(0, 42) + '...';
     }
-    $('.transfer-table #' + id + ' td:eq(5)').text(text);
+    if (page === 'download') {
+        $('.download.error-icon').text(text);
+        $('.download.error-icon').removeClass('hidden');
+        $('.download.icons-block').addClass('hidden');
+    }
+    else {
+        $('.transfer-table #' + id + ' td:eq(5)').text(text);
+    }
     if (lock) {
         $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
     }

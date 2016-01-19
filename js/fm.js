@@ -561,7 +561,7 @@ function initUI() {
                         }
                     }, function(error) {
                         if (error === EOVERQUOTA) {
-                            return msgDialog('warninga', l[135], "File cannot be sent as the target user is over their storage quota", '');
+                            return msgDialog('warninga', l[135], l[8435]);
                         }
                         return msgDialog('warninga', l[135], l[47], api_strerror(error));
                     });

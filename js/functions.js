@@ -79,12 +79,11 @@ parseHTML.baseURIs = {};
  */
 function parseHTMLfmt(markup) {
     if (arguments.length > 1) {
-        var args = toArray(arguments);
-        var replacer = function(match) {
-            return escapeHTML(args.shift());
-        };
-        args.shift();
-        markup = markup.replace(/@@/g, replacer);
+        var idx = 1;
+        var args = arguments;
+        markup = markup.replace(/@@/g, function() {
+            return escapeHTML(args[idx++]);
+        });
     }
     return parseHTML(markup);
 }
@@ -459,8 +458,11 @@ function populate_l() {
     l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1371] = l[1371].replace('2014', '2015');
     l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
-    l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');
-
+    l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');    
+    l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
+    
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
@@ -720,7 +722,7 @@ function uplpad(number, length) {
     return str;
 }
 
-function secondsToTime(secs, text_format) {
+function secondsToTime(secs, html_format) {
     if (isNaN(secs)) {
         return '--:--:--';
     }
@@ -735,10 +737,10 @@ function secondsToTime(secs, text_format) {
     var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
     var returnvar = hours + ':' + minutes + ':' + seconds;
 
-    if (text_format) {
+    if (html_format) {
         hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
         returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
-    } 
+    }
     return returnvar;
 }
 
@@ -918,20 +920,17 @@ function funcAlias(context, fn) {
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
  */
 function makeObservable(kls) {
+    var target = kls.prototype || kls;
     var aliases = ['on', 'bind', 'unbind', 'one', 'trigger', 'rebind'];
 
-    $.each(aliases, function(k, v) {
-        if (kls.prototype) {
-            kls.prototype[v] = function() {
-                return $(this)[v].apply($(this), toArray(arguments));
-            }
-        }
-        else {
-            kls[v] = function() {
-                return $(this)[v].apply($(this), toArray(arguments));
-            }
-        }
+    aliases.forEach(function(fn) {
+        target[fn] = function() {
+            var $this = $(this);
+            return $this[fn].apply($this, arguments);
+        };
     });
+
+    target = aliases = kls = undefined;
 }
 
 /**
@@ -1176,11 +1175,18 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 /**
  * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
  *
- * @param val {Arguments}
+ * Please note there is a huge performance degradation when using `arguments` outside their
+ * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
+ *
  * @returns {Array}
  */
-function toArray(val) {
-    return Array.prototype.slice.call(val, val);
+function toArray() {
+    var len = arguments.length;
+    var res = Array(len);
+    while (len--) {
+        res[len] = arguments[len];
+    }
+    return res;
 }
 
 /**
@@ -1433,7 +1439,14 @@ function setTransferStatus(dl, status, ethrow, lock) {
     if (text.length > 44) {
         text = text.substr(0, 42) + '...';
     }
-    $('.transfer-table #' + id + ' td:eq(5)').text(text);
+    if (page === 'download') {
+        $('.download.error-icon').text(text);
+        $('.download.error-icon').removeClass('hidden');
+        $('.download.icons-block').addClass('hidden');
+    }
+    else {
+        $('.transfer-table #' + id + ' td:eq(5)').text(text);
+    }
     if (lock) {
         $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
     }
@@ -1528,12 +1541,12 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
         return;
     }
     ctx[fnName] = function() {
-        //loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
-        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray(arguments)));
+        // loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, arguments]);
+        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray.apply(null, arguments)));
 
-        var res = origFn.apply(this, toArray(arguments));
-        //loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
-        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
+        var res = origFn.apply(this, arguments);
+        // loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, arguments, res]);
+        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray.apply(null, arguments)).concat(["returned: ", res]));
 
         return res;
     };
@@ -2492,7 +2505,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
 
     return function() {
         var self = this;
-        var args = toArray(arguments);
+        var args = toArray.apply(null, arguments);
 
         var event = new $.Event("onBefore" + eventSuffix);
         self.trigger(event, args);

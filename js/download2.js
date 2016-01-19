@@ -120,7 +120,7 @@ var dlmanager = {
     },
 
     getGID: function DM_GetGID(dl) {
-        return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
+        return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + (dl.dl_id || dl.ph);
     },
 
     abort: function DM_abort(gid, keepUI) {
@@ -249,7 +249,7 @@ var dlmanager = {
             next: callback,
             dl_key: object.key,
             callback: this.dlGetUrlDone.bind(this)
-        }, n_h ? 1 : 0);
+        }, object.nauth ? 1 : 0);
     },
 
     dlGetUrlDone: function DM_dlGetUrlDone(res, ctx) {
@@ -388,22 +388,19 @@ var dlmanager = {
         return 2;
     },
 
-    idToFile: function DM_IdToFile(id) {
-        var dl = {};
-        for (var i in dl_queue) {
-            if (id === dl_queue[i].id) {
-                dl = dl_queue[i];
-                ASSERT(dl.pos === i, 'dl.pos !== i');
-                break;
+    getDownloadByHandle: function DM_IdToFile(handle) {
+        var dl = null;
+        if (handle) {
+            for (var i in dl_queue) {
+                if (dl_queue.hasOwnProperty(i)) {
+                    var dlh = dl_queue[i].ph || dl_queue[i].id;
+                    if (dlh === handle) {
+                        dl = dl_queue[i];
+                        break;
+                    }
+                }
             }
         }
-        // $.each(dl_queue, function(i, _dl) {
-        // if (id === _dl.id) {
-        // dl = _dl
-        // dl.pos = i
-        // return false;
-        // }
-        // });
         return dl;
     },
 
@@ -502,7 +499,7 @@ var dlmanager = {
             var abLen = task.data.byteLength;
             var abDup = dl.data && (is_chrome_firefox & 4) && new Uint8Array(task.data);
 
-            dl.io.write(task.data, task.offset, function() {
+            var ready = function _onWriterReady() {
                 dl.writer.pos += abLen;
                 if (dl.data) {
                     new Uint8Array(
@@ -513,7 +510,17 @@ var dlmanager = {
                 }
 
                 return finish_write(task, done);
-            });
+            };
+
+            try {
+                dl.io.write(task.data, task.offset, ready);
+            }
+            catch (ex) {
+                var logger = dl.writer && dl.writer.logger || dlmanager.logger;
+                logger.error(ex);
+                dlFatalError(dl, ex);
+            }
+
         }, 1, 'download-writer');
 
         dlmanager.throttleByIO(dl.writer);

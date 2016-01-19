@@ -1040,7 +1040,7 @@ Chat.prototype.init = function() {
 
 
     this.karere.bind("onChatMessage", function() {
-        self._onChatMessage.apply(self, toArray(arguments));
+        self._onChatMessage.apply(self, arguments);
     });
 
     this.karere.bind("onActionMessage", function(e, eventObject) {
@@ -2205,7 +2205,7 @@ Chat.prototype.openChat = function(jids, type) {
             $promise.resolve(roomJid, self.chats[roomJid]);
         })
         .fail(function() {
-            $promise.reject.apply($promise, toArray(arguments));
+            $promise.reject.apply($promise, arguments);
 
             if (self.chats[$startChatPromise.roomJid]) {
                 self.chats[$startChatPromise.roomJid].destroy(false);

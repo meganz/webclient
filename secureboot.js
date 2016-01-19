@@ -1197,7 +1197,7 @@ else if (!b_u)
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:1});
-    jsl.push({f:'js/vendor/jquery-2.1.4.js', n: 'jquery', j:1, w:10});
+    jsl.push({f:'js/vendor/jquery-2.2.0.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
@@ -1322,6 +1322,7 @@ else if (!b_u)
     jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
     /* end better download */
+
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
@@ -1346,6 +1347,8 @@ else if (!b_u)
     jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
+    jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
 
     // only used on beta
     if (onBetaW) {

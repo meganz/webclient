@@ -1983,6 +1983,10 @@ var ConversationPanels = React.createClass({
                     <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u} />
                 );
             });
+            var emptyMessage = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved' ?
+                l[8008] :
+                l[7006];
+
             return (
                 <div>
                     <div className="chat-right-area">
@@ -1997,7 +2001,7 @@ var ConversationPanels = React.createClass({
                         <div className="empty-pad conversations">
                             <div className="empty-icon conversations"></div>
                             <div className="empty-title" dangerouslySetInnerHTML={{
-                                __html: __(l[8008])
+                                __html: __(emptyMessage)
                                     .replace("[P]", "<span>")
                                     .replace("[/P]", "</span>")
                             }}></div>

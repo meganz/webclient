@@ -1,6 +1,5 @@
 var dlpage_key,dlpage_ph,dl_next;
 var fdl_filename, fdl_filesize, fdl_key, fdl_url, fdl_starttime;
-var fdl_file=false;
 var dl_import=false;
 var dl_attr;
 var fdl_queue_var=false;
@@ -56,9 +55,12 @@ function dl_g(res) {
 
     megaAds.showAds($('#ads-block-frame'));
 
-    $('.widget-block').addClass('hidden');
     loadingDialog.hide();
+    fdl_queue_var = null;
+
+    $('.widget-block').addClass('hidden');
     $('.download.content-block').removeClass('hidden');
+
     if (res === ETOOMANY) {
         $('.download.content-block').addClass('not-available-user');
     }
@@ -105,22 +107,21 @@ function dl_g(res) {
             browserDownload();
         });
 
-        $('.download-button.to-clouddrive').unbind('click');
-        $('.download-button.to-clouddrive').bind('click',function(e)
-        {
-            start_import();
-        });
+        $('.download-button.to-cloudrive').rebind('click', start_import);
 
         var key = dlpage_key;
+        var fdl_file = false;
 
         if (key)
         {
-            var base64key = key;
-            key = base64_to_a32(key);
-            dl_attr = res.at;
-            var dl_a = base64_to_ab(res.at);
-            fdl_file = dec_attr(dl_a,key);
-            fdl_filesize = res.s;
+            var base64key = String(key).trim();
+            key = base64_to_a32(base64key).slice(0, 8);
+            if (key.length === 8) {
+                dl_attr = res.at;
+                var dl_a = base64_to_ab(res.at);
+                fdl_file = dec_attr(dl_a, key);
+                fdl_filesize = res.s;
+            }
         }
         if (fdl_file)
         {
@@ -178,25 +179,21 @@ function browserDownload() {
             && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
         firefoxDialog();
     }
-    else if (
-        (
-            (
-                '-ms-scroll-limit' in document.documentElement.style
-                && '-ms-ime-align' in document.documentElement.stNyle
-            )
-            || (navigator.userAgent.indexOf('MSIE 10') > -1)
-            || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') === -1))
-        )
-        && fdl_filesize > 1048576000 && !localStorage.browserDialog) {
+    else if (browserDialog.isWeak()
+            && fdl_filesize > 1048576000
+            && !localStorage.browserDialog) {
         browserDialog();
     }
     else
     {
         $('.download.content-block').addClass('downloading');
         $('.download.percents-txt').text('0 %');
-        $('.download.status-txt').safeHTML(l[819]).removeClass('green');
-        dlmanager.isDownloading = true;
-        dl_queue.push(fdl_queue_var);
+        $('.download.status-txt').text(l[819]).removeClass('green');
+
+        if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
+            dlmanager.isDownloading = true;
+            dl_queue.push(fdl_queue_var);
+        }
         $.dlhash = window.location.hash;
     }
 }
@@ -248,7 +245,7 @@ function megasyncOverlay() {
         $this.addClass('hidden');
     });
 
-    $('body').rebind('keyup msd', function(e) {
+    $('body').rebind('keyup.msd', function(e) {
         if (e.keyCode === 27) {
             $this.addClass('hidden');
         }
@@ -326,7 +323,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
     if (!m)
     {
-        $('.download.status-txt').safeHTML(l[258]);
+        $('.download.status-txt').text(l[258]);
         $('.download-info').removeClass('hidden');
         $('.download.content-block').removeClass('temporary-na');
         $('.download.progress-bar').width(perc + '%');
@@ -410,7 +407,7 @@ function dlcomplete(id)
     $('.download-info').addClass('hidden');
     $('.download.progress-bar').width('100%');
     $('.download.percents-txt').text('100 %');
-    $('.download.status-txt').safeHTML(l[1418]).addClass('green');
+    $('.download.status-txt').text(l[1418]).addClass('green');
     if ($('#dlswf_' + id).length > 0)
     {
         $('.fm-dialog-overlay').removeClass('hidden');

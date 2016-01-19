@@ -8,7 +8,6 @@ describe("chat messages unit test", function () {
 
     var assert = chai.assert;
 
-
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
     var fakeChatRoom = null;
@@ -63,6 +62,20 @@ describe("chat messages unit test", function () {
 
 
         sandbox.stub(window, 'u_handle', 'u12345689');
+
+        var fakeChatRoomObj = {
+            'STATE': {
+                'JOINING': 123
+            }
+        };
+
+        if (typeof(window.ChatRoom) === 'undefined') {
+            window.ChatRoom = fakeChatRoomObj;
+        }
+        else {
+            sandbox.stub(window, 'ChatRoom', fakeChatRoomObj);
+        }
+
 
         fakeChatRoom = {
             'roomJid': "test1@conf.example.com",

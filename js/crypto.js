@@ -650,6 +650,14 @@ var crypt = (function () {
                                                     method, prevFingerprint,
                                                     newFingerprint) {
 
+        // Log occurrence of this dialog.
+        api_req({
+            a: 'log',
+            e: 99606,
+            m: 'Fingerprint/MITM dialog shown to user for key ' + keyType
+               + ' for user ' + userHandle
+        });
+
         // Keep format consistent
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
@@ -677,12 +685,21 @@ var crypt = (function () {
      *     Type of the public key the signature failed for. One of
      *     'Cu25519' or 'RSA'.)
      */
-    ns._showKeySignatureFailureException = function(userhandle, keyType) {
+    ns._showKeySignatureFailureException = function(userHandle, keyType) {
+
+        // Log occurrence of this dialog.
+        api_req({
+            a: 'log',
+            e: 99607,
+            m: 'Signature failure warning dialog shown to user for key ' + keyType
+               + ' for user ' + userHandle
+        });
+
         // Show warning dialog.
-        mega.ui.KeySignatureWarningDialog.singleton(userhandle, keyType);
+        mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
 
         logger.error(keyType + ' signature does not verify for user '
-                     + userhandle + '!');
+                     + userHandle + '!');
     };
 
 

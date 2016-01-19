@@ -1348,7 +1348,7 @@ else if (!b_u)
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
-    jsl.push({f: 'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+    jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
 
     // only used on beta
     if (onBetaW) {

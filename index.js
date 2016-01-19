@@ -942,6 +942,13 @@ function loginDialog(close) {
         $(this).find('input').focus();
     });
 
+    $('.top-login-input-block.password input,.top-login-input-block.e-mail input').rebind('blur', function() {
+        $(this).parents('.top-login-input-block').removeClass('focused');
+    }).rebind('focus', function() {
+        $(this).parents('.top-login-input-block').addClass('focused');
+    });
+
+
     $('.loginwarning-checkbox,.top-login-warning .radio-txt').rebind('click', function (e) {
         var c = '.loginwarning-checkbox',
             c2 = $(c).attr('class');

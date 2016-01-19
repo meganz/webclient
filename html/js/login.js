@@ -241,10 +241,10 @@ function init_login() {
     }
 
     $('#login-name2,#login-password2').rebind('focus', function(e) {
-        $('.login-register-input.email').addClass('focused');
+        $(this).parents('.login-register-input').addClass('focused');
     });
     $('#login-name2,#login-password2').rebind('blur', function(e) {
-        $('.login-register-input.email').removeClass('focused');
+        $(this).parents('.login-register-input').removeClass('focused');
     });
 
     $('#login-password2, #login-name2').rebind('keydown', function(e) {

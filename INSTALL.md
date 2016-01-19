@@ -38,7 +38,7 @@ easy and efficient. You will get this convenience just by running the
 following:
 
 ```
-./dev_server.sh
+scripts/dev_server.sh
 ```
 
 
@@ -52,13 +52,13 @@ SSH. The required React bundles (see above) are simply generated via a
 script in place after installing the ``npm`` package dependencies:
 
 ```
-install && ./build.sh
+npm install && scripts/build.sh
 ```
 
 When doing updates to that folder on the server, just do a:
 
 ```
-git pull -u && npm install && ./build.sh
+git pull -u && npm install && scripts/build.sh
 ```
 
 That ensures that everything is consistently up to date.

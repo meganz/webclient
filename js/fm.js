@@ -9190,7 +9190,8 @@ function browserDialog(close) {
 
     $('.browsers-top-icon').removeClass('ie9 ie10 safari');
     var bc, bh, bt;
-    if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
+    var type = browserDialog.isWeak();
+    if (type && type.ie11)
     {
         if (page !== 'download' && ('' + page).split('/').shift() !== 'fm')
         {
@@ -9204,7 +9205,7 @@ function browserDialog(close) {
         // else bt = l[886];
         bt = l[1933];
     }
-    else if (navigator.userAgent.indexOf('MSIE 10') > -1)
+    else if (type && type.ie10)
     {
         bc = 'ie10';
         bh = l[884].replace('[X]', 'Internet Explorer 10');
@@ -9213,7 +9214,7 @@ function browserDialog(close) {
         else
             bt = l[886];
     }
-    else if ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1))
+    else if (type && type.safari)
     {
         bc = 'safari';
         bh = l[884].replace('[X]', 'Safari');
@@ -9233,6 +9234,19 @@ function browserDialog(close) {
     $('.browsers-info-header').text(bh);
     $('.browsers-info-header').text(bh);
     $('.browsers-info-header p').text(bt);
+}
+browserDialog.isWeak = function() {
+    var result = {};
+    var ua = String(navigator.userAgent);
+    var style = document.documentElement.style;
+
+    result.ie10 = (ua.indexOf('MSIE 10') > -1);
+    result.ie11 = ('-ms-scroll-limit' in style) && ('-ms-ime-align' in style);
+    result.safari = (ua.indexOf('Safari') > -1) && (ua.indexOf('Chrome') === -1);
+
+    result.weak = result.ie11 || result.ie10 || result.safari;
+
+    return result.weak && result;
 }
 
 function propertiesDialog(close)

@@ -10348,19 +10348,22 @@ function sharedfolderUI() {
     return r;
 }
 
-function userFingerprint(userid, next) {
+function userFingerprint(userid, callback) {
     userid = userid.u || userid;
     var user = M.u[userid];
     if (!user || !user.u) {
-        return next([]);
+        return callback([]);
     }
     if (userid === u_handle) {
         var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex');
-        return next(fprint.toUpperCase().match(/.{4}/g), fprint);
+        return callback(fprint.toUpperCase().match(/.{4}/g), fprint);
     }
     var fingerprintPromise = crypt.getFingerprintEd25519(user.h || userid);
     fingerprintPromise.done(function (response) {
-        next(response.toUpperCase().match(/.{4}/g), response);
+        callback(
+            response.toUpperCase().match(/.{4}/g),
+            response
+        );
     });
 }
 
@@ -10457,17 +10460,27 @@ function fingerprintDialog(userid) {
         // Add log to see how often they verify the fingerprints
         api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
 
+        loadingDialog.show();
         // Generate fingerprint
-        userFingerprint(user, function(fprint, fprintraw) {
+        crypt.getFingerprintEd25519(userid, 'string')
+            .done(function(fingerprint) {
 
-            // Authenticate the contact
-            authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+                // Authenticate the contact
+                authring.setContactAuthenticated(
+                    userid,
+                    fingerprint,
+                    'Ed25519',
+                    authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON
+                );
 
-            // Change button state to 'Verified'
-            $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
+                // Change button state to 'Verified'
+                $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
 
-            closeFngrPrntDialog();
-        });
+                closeFngrPrntDialog();
+            })
+            .always(function() {
+                loadingDialog.hide();
+            });
     });
 
     $('.dialog-skip-button').rebind('click', function() {

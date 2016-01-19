@@ -276,7 +276,7 @@ var authring = (function () {
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      */
-    ns.setContacts = function(keyType, callback) {
+    ns.setContacts = function(keyType) {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported authentication key type: ' + keyType);
             return;

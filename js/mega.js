@@ -3007,7 +3007,7 @@ function MegaData()
      * @param {String} t                Destination node
      * @param {Bool} del                Should we delete the node after copying? (Like a move operation)
      * @param {Callback} callback       Callback function
-     * @param {Callback} callbackError  Callback function for errors, otherwise the default error handling is used (Optional)
+     * @param {Callback} callbackError  Callback function for custom errors handling (Optional)
      */
     this.copyNodes = function(cn, t, del, callback, callbackError) {
         if ($.onImportCopyNodes && t.length === 11) {

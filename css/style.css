@@ -26358,13 +26358,15 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 }
 
 @media only screen and (max-height: 730px) {
-.currentLink img {
-    width: auto !important;
-    max-height: 250px;
+    .currentLink img {
+        width: auto !important;
+        max-height: 250px;
+    }
+    .animations-left-container, .animations-right-container {
+        margin-top: -120px;
+    }
 }
-.animations-left-container, .animations-right-container {
-    margin-top: -120px;
-}
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);
     background-size: 14px auto;

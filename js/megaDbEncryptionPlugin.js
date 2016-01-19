@@ -39,7 +39,7 @@ function MegaDBEncryption(mdbInstance) {
 
         mdbServerInstance.getUData('enckey')
             .then(function __enckey(data) {
-                logger.debug('getUData.enckey', data);
+                //logger.debug('getUData.enckey', data);
                 if (!data) {
                     // Generate new encryption key
                     try {
@@ -167,7 +167,7 @@ function MegaDBEncryption(mdbInstance) {
      * attach those functions to the specific event handlers
      */
     mdbInstance.bind("onBeforeAdd", function(e, table, obj) {
-        logger.debug("onBeforeAdd: ", table, obj);
+        //logger.debug("onBeforeAdd: ", table, obj);
 
         e.returnedValue = [table, clone(obj)];
         simpleEncryptObjFunction(table, e.returnedValue[1]);
@@ -216,7 +216,7 @@ function MegaDBEncryption(mdbInstance) {
     });
 
     mdbInstance.bind("onFilterQuery", function(e, table, filters) {
-        logger.debug("onFilterQuery: ", table, filters);
+        //logger.debug("onFilterQuery: ", table, filters);
         // since filters is an array containing key, value pairs, lets parse them
         for(var i = 0; i<filters.length; i+=2) {
             var k = filters[i];
@@ -233,7 +233,7 @@ function MegaDBEncryption(mdbInstance) {
             filters[i+1] = hasherFunc(JSON.stringify(v));
         };
 
-        logger.debug("filters:", filters);
+        //logger.debug("filters:", filters);
     });
 
     //mdbInstance.bind("onModifyQuery", function(e, table, args) {

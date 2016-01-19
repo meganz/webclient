@@ -601,7 +601,10 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
 MessagesBuff.prototype.haveMoreHistory = function() {
     var self = this;
 
-    if (!self.firstMessageId || !self.messages[self.firstMessageId]) {
+    if (!self.haveMessages) {
+        return false;
+    }
+    else if (!self.firstMessageId || !self.messages[self.firstMessageId]) {
         return true;
     }
     else {

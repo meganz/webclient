@@ -149,7 +149,7 @@ module.exports = function(config) {
         // == Tests ==
         // Dependency-based load order of library modules.
         // modules that already follow AMD need included: false
-        {pattern: 'node_modules/es6-collections/es6-collections.js', included: true},
+        {pattern: 'node_modules/es6-shim/es6-shim.js', included: true},
         (process.env.SKIP_WORKFLOWS)
             ? 'test/config/test_workflows_off.js'
             : 'test/config/test_workflows.js',

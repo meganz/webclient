@@ -41,7 +41,7 @@
     "constant-enum": "^1.0.1",
     "css-loader": "^0.9.1",
     "dateformat": "~1.0.7-1.2.3",
-    "es6-collections": "git+https://github.com/WebReflection/es6-collections",
+    "es6-shim": "~0.34.1",
     "es6-promise": "^2.0.1",
     "eslint": "^1.10.3",
     "eslint-loader": "^1.1.1",

@@ -93,10 +93,27 @@ var ConversationsListItem = React.createClass({
         }
         else {
             var lastMsgDivClasses = "conversation-message";
+
+            /**
+             * Show "Loading" until:
+             * 1. I'd fetched chats from the API.
+             * 2. I'm retrieving history at the moment.
+             * 3. I'd connected to chatd and joined the room.
+              */
+
+            var emptyMessage = (
+                (
+                    megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' ||
+                    chatRoom.messagesBuff.messagesHistoryIsLoading() ||
+                    chatRoom.messagesBuff.joined === false
+                ) ? l[7006] : l[8000]
+            );
+
+
             lastMessageDiv =
                 <div>
                     <div className={lastMsgDivClasses}>
-                        {__(l[8000])}
+                        {__(emptyMessage)}
                     </div>
                 </div>;
         }
@@ -253,6 +270,7 @@ var ConversationsList = React.createClass({
                 <ConversationsListItem
                     key={chatRoom.roomJid.split("@")[0]}
                     chatRoom={chatRoom}
+                    messages={chatRoom.messagesBuff}
                     megaChat={megaChat}
                     onConversationClicked={(e) => {
                         self.conversationClicked(chatRoom, e);

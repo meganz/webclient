@@ -6539,10 +6539,15 @@ function storefmconfig(key, value)
     if (fmconfig[key] !== value) {
         fmconfig[key] = value;
 
-        if (storefmconfig.timer) {
-            clearTimeout(storefmconfig.timer);
+        if (u_type === 3) {
+            if (storefmconfig.timer) {
+                clearTimeout(storefmconfig.timer);
+            }
+            storefmconfig.timer = setTimeout(setFMConfig, 20402);
         }
-        storefmconfig.timer = setTimeout(setFMConfig, 20400);
+        else {
+            localStorage.fmconfig = JSON.stringify(fmconfig);
+        }
 
         mBroadcaster.sendMessage('fmconfig:' + key, value);
     }

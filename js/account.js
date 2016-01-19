@@ -757,8 +757,9 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
 /** Wrapper around getUserAttribute to fetch fmconfig */
 function getFMConfig() {
-    var promise = new MegaPromise();
-    var config = Object(fmconfig);
+    if (!u_handle) {
+        return MegaPromise.reject(EINCOMPLETE);
+    }
 
     getUserAttribute(u_handle, 'fmconfig', false, true)
         .done(function(result) {
@@ -791,6 +792,7 @@ function getFMConfig() {
             promise.reject.apply(promise, arguments);
         });
 
+    var promise = new MegaPromise();
     return promise;
 }
 
@@ -802,6 +804,10 @@ function setFMConfig() {
     var data = {};
     var config = Object(fmconfig);
     var logger = MegaLogger.getLogger('setFMConfig');
+
+    if (!u_handle) {
+        return MegaPromise.reject(EINCOMPLETE);
+    }
 
     // Prepare data for TLV requirements..
     for (var key in config) {
@@ -852,10 +858,10 @@ function setFMConfig() {
     var sdata = JSON.stringify(data);
     var checksum = MurmurHash3(sdata, 0x7f01e0aa);
 
-    if (localStorage.fmchash === checksum) {
+    if (localStorage[u_handle + '_fmchash'] === checksum) {
         return MegaPromise.resolve(EEXIST);
     }
-    localStorage.fmchash = checksum;
+    localStorage[u_handle + '_fmchash'] = checksum;
 
     var dataLen = sdata.length;
     if (dataLen < 8) {

@@ -272,7 +272,9 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            mega.fmconfigPromise = getFMConfig();
+            if (u_type === 3) {
+                mega.fmconfigPromise = getFMConfig();
+            }
 
             if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
                 mDBstart();

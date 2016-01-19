@@ -463,8 +463,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         );
 
         MegaPromise.allDone(
-            waitingForPromises,
-            10000
+            waitingForPromises
         )
             .done(function () {
                 // after all dependencies (data) is initialised, lets init the protocol handler

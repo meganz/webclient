@@ -2997,17 +2997,20 @@
     "8422": "Nh\u1eadp MEGA link:",
     "8423": "L\u1ed7i t\u1ea1o \u0111\u01b0\u1eddng d\u1eabn li\u00ean k\u1ebft cho vi\u1ec7c streaming",
     "8424": "L\u1ed7i khi m\u1edf \u1ee9ng d\u1ee5ng m\u1eb7c \u0111\u1ecbnh.",
-    "8425": "through your browser",
+    "8425": "b\u1eb1ng tr\u00ecnh duy\u1ec7t web",
     "8426": "[S]MEGAsync:[\/S] Easy automated syncing between your computers and your MEGA cloud drive",
-    "8427": "[S]Flexible:[\/S] Sync any folder from your PC to any folder in the cloud. Sync any number of folders in parallel.",
+    "8427": "[S]Linh \u0110\u1ed9ng:[\/S] \u0110\u1ed3ng b\u1ed9 b\u1ea5t k\u00ec th\u01b0 m\u1ee5c n\u00e0o t\u1eeb PC c\u1ee7a b\u1ea1n \u0111\u1ebfn th\u01b0 m\u1ee5c trong \u1ed5 m\u00e2y. \u0110\u1ed3ng b\u1ed9 t\u1ea5t c\u1ea3 s\u1ed1 l\u01b0\u1ee3ng th\u01b0 m\u1ee5c \u0111\u1ed3ng lo\u1ea1t c\u00f9ng m\u1ed9t l\u00fac.",
     "8428": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
-    "8429": "Faster transfer speeds",
-    "8430": "MEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers.",
+    "8429": "V\u1eadn t\u1ed1c t\u1ea3i nhanh h\u01a1n",
+    "8430": "MEGAsync takes full advantage of MEGA's high-powered infrastructure and multi-connection transfers.",
     "8431": "Lean & mean resource usage",
-    "8432": "Run MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
-    "8433": "Unlimited file size",
+    "8432": "Run MEGA's end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
+    "8433": "Kh\u00f4ng gi\u1edbi h\u1ea1n k\u00edch th\u01b0\u1edbc",
     "8434": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
+    "8435": "The file cannot be sent as the target user is over their storage quota.",
+    "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
     "alias": {
-        "shared-with-me": 5589
+        "shared-with-me": 5589,
+        "quota-share-error": 8435
     }
 }

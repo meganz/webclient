@@ -74,6 +74,10 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                     );
                 });
             }
+            else if (self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+                // Most likely, Firefox in incognito mode.
+                return MegaPromise.reject();
+            }
             else {
                 self.db.one('onDbStateReady', function __onDbStateReady() {
                     promise.linkDoneAndFailTo(

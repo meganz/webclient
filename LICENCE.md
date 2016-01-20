@@ -55,6 +55,7 @@ Section 2 -- Grant of Rights
    [https://mega.nz/#terms], Privacy Policy [https://mega.nz/#privacy]
    and Takedown Guidance Policy [https://mega.nz/#takedown].
 
+
 Section 3 -- Limitations
 ------------------------
 
@@ -101,5 +102,6 @@ Section 5 -- General
 
 2. Questions and comments regarding this licence are welcomed and
    should be addressed to [support@mega.nz].
+
 
 Last updated 20 January 2016.

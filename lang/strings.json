@@ -11932,8 +11932,8 @@
         "context": "Default value for the string shown into the preferences page. It will be substituted by the path of the folder selected by the user when selecting a default location for downloads."
     },
     "8080": {
-        "text": "Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:",
-        "context": "Full text:\r\n\r\nMega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:\r\n\r\nConfidentiality - Only the author and intended recipients are able to decipher and read the content.\r\n\r\nAuthenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server."
+        "text": "MEGA protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:",
+        "context": "Full text:\r\n\r\nMEGA protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:\r\n\r\nConfidentiality - Only the author and intended recipients are able to decipher and read the content.\r\n\r\nAuthenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server."
     },
     "8081": {
         "text": "Confidentiality - Only the author and intended recipients are able to decipher and read the content.",

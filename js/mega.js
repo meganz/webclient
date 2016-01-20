@@ -1996,7 +1996,7 @@ function MegaData()
                         ulc = 'class="opened"';
                         expandedc = 'expanded';
                     }
-                    else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h]) {
+                    else if (Object(fmconfig.treenodes).hasOwnProperty(folders[ii].h)) {
                         fmtreenode(folders[ii].h, false);
                     }
                     sharedfolder = '';
@@ -6536,7 +6536,7 @@ function loadfm_done(pfkey, stackPointer) {
 
 function storefmconfig(key, value)
 {
-    if (fmconfig[key] !== value) {
+    if (fmconfig[key] !== value || typeof value === 'object') {
         fmconfig[key] = value;
 
         if (u_type === 3) {

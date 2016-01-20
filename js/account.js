@@ -817,7 +817,7 @@ function setFMConfig() {
             if (value || value === 0) {
 
                 // Dont save no longer existing nodes
-                if (key === 'viewmodes' || key === 'sortmodes') {
+                if (key === 'viewmodes' || key === 'sortmodes' || key === 'treenodes') {
                     if (typeof value !== 'object') {
                         logger.warn('Unexpected type for ' + key);
                         continue;
@@ -858,7 +858,7 @@ function setFMConfig() {
     var sdata = JSON.stringify(data);
     var checksum = MurmurHash3(sdata, 0x7f01e0aa);
 
-    if (localStorage[u_handle + '_fmchash'] === checksum) {
+    if (checksum === parseInt(localStorage[u_handle + '_fmchash'])) {
         return MegaPromise.resolve(EEXIST);
     }
     localStorage[u_handle + '_fmchash'] = checksum;

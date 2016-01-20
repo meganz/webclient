@@ -1358,6 +1358,7 @@ else if (!b_u)
     var jsl2 =
     {
         'about': {f:'html/about.html', n: 'about', j:0},
+        'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
@@ -1409,6 +1410,7 @@ else if (!b_u)
     var subpages =
     {
         'about': ['about'],
+        'sourcecode': ['sourcecode'],
         'terms': ['terms'],
         'credits': ['credits'],
         'backup': ['backup','backup_js','filesaver'],

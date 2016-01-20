@@ -462,6 +462,10 @@ function populate_l() {
     l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
+    l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
+    l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');    
+    l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
+    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');    
     
     l['year'] = new Date().getFullYear();
     date_months = [

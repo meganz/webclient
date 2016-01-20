@@ -15,9 +15,10 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
     chatui = function(id) {
         var userHash = id.replace("chat/", "");
         if (!M.u[userHash]) {
-            M.currentdirid = "chat";
-            window.location = '#fm/chat';
-            M.openFolder("chat");
+            setTimeout(function() {
+                window.location = '#fm/chat';
+                M.openFolder('chat');
+            }, 100);
             return;
         }
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)

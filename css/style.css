@@ -25459,6 +25459,114 @@ body.pro:after {
     white-space: nowrap;
     font-size: 13px;
 }
+.main-mid-pad.opensource {
+    padding: 76px 124px 50px;
+}
+.opensource-bg {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+.opensource-bg::after {
+	background-color: white;
+	width: 1024px;
+	height: inherit;
+	margin: 0 auto;
+	content: '';
+	display: block;
+}
+.opensource-top-icon {
+    background-image: url("../images/mega/opensource-v2.png");
+    background-position: -30px 1px;
+    background-repeat: no-repeat;
+    float: left;
+    height: 46px;
+    margin-left: -1px;
+    width: 44px;
+}
+.opensource hr {
+    background-color: rgba(151, 151, 151, 0.2);
+    border: 0 none;
+    float: left;
+    height: 17px;
+    margin: 12px 0 0 15px;
+    padding: 0;
+    width: 1px;
+}
+.opensource h1 {
+	color: rgba(34,34,34,0.75);
+	font-size: 28px;
+	line-height: 40px;
+	font-family: 'source_sans_prosemibold';
+	padding: 0;
+	margin: 0 0 4px 15px;
+	float: left;
+}
+.opensource > p {
+    letter-spacing: 0.2px;
+}
+.opensource-grey-background {
+    background-color: #fafafa;
+}
+.opensource-icons-bl {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    margin: 0 auto;
+    padding: 31px 26px 100px;
+    width: 847px;
+}
+.opensource-icon-pad {
+    float: left;
+    padding: 22px 0;
+    text-align: center;
+    width: 25%;
+}
+.opensource-icon {
+	display: block;
+	width: 102px;
+	height: 102px;
+	background-image: url(../images/mega/opensource-v2.png);
+	background-repeat: no-repeat;
+	background-position: center -109px;
+	margin: 0 auto;
+}
+.opensource-icon.firefox {
+	background-position: center -249px;
+}
+.opensource-icon.chrome {
+	background-position: center -389px;
+}
+.opensource-icon.megasync {
+	background-position: center -529px;
+}
+.opensource-icon.ios {
+	background-position: center -950px;
+}
+.opensource-icon.android {
+	background-position: center -669px;
+}
+.opensource-icon.windowsphone {
+	background-position: center -1090px;
+}
+.opensource-icon.sdk {
+	background-position: center -809px;
+}
+.opensource-icon.coming-soon {
+    cursor: default;
+    opacity: 0.5;
+}
+a.opensource-icon-txt {
+	display: inline-block;
+	color: #444444;
+	font-family: 'source_sans_prosemibold';
+	padding: 20px 0 0 0;
+}
+a.opensource-icon-txt.coming-soon {
+	cursor: default;
+}
+.opensource-icon-txt > span {
+    color: #777;
+}
 .upload-overlay-body {
     width: 100%;
     position: absolute;
@@ -26253,15 +26361,14 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 }
 
 @media only screen and (max-height: 730px) {
-.currentLink img {
-    width: auto !important;
-    max-height: 250px;
+    .currentLink img {
+        width: auto !important;
+        max-height: 250px;
+    }
+    .animations-left-container, .animations-right-container {
+        margin-top: -120px;
+    }
 }
-.animations-left-container, .animations-right-container {
-    margin-top: -120px;
-}
-}
-
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);
@@ -26687,6 +26794,10 @@ body.pro:after {
 .new-left-menu-icon.help-icon, .help-nw .dev-new-button, .help-listing, .help-short-icon {
     background-image: url(../images/mega/help-new-sprite-v1@2x.png);
     background-size: 886px auto;
+}
+.opensource-top-icon, .opensource-icon {
+    background-image: url(../images/mega/opensource-v2@2x.png);
+    background-size: 100px auto;
 }
 .st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button, .upload-overlay-icon {
     background-image: url(../images/mega/new-startpage-sprite-v2@2x.png);

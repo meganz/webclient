@@ -72,13 +72,13 @@ var megasync = (function() {
         var overlayHeight = $('.megasync-overlay').outerHeight();
         var listHeight = $('.megasync-scr-pad').outerHeight() + 72;
         var listPosition = $list.offset().top;
-    
+
         if (overlayHeight < (listHeight + listPosition)) {
             $('.megasync-list-arrow').removeClass('hidden inactive');
             $pane.height(overlayHeight - listPosition - 72);
             $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-    
-    
+
+
             $pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
 
                 if (isAtBottom) {
@@ -87,7 +87,7 @@ var megasync = (function() {
                     $('.megasync-list-arrow').removeClass('inactive');
                 }
             });
-    
+
         } else {
             if (jsp) {
                 jsp.destroy();
@@ -138,7 +138,7 @@ var megasync = (function() {
             $overlay.addClass('hidden');
         });
 
-        $('body').bind('keyup msd', function(e) {
+        $('body').bind('keyup.sdd', function(e) {
             if (e.keyCode === 27) {
                 $('.megasync-overlay').addClass('hidden');
                 $overlay.addClass('hidden');
@@ -171,7 +171,7 @@ var megasync = (function() {
             }
         },
         error: function(next, ev) {
-            
+
             enabled = false;
             next = (typeof next === "function") ? next : function() {};
             next(ev || new Error("Internal error"));
@@ -201,7 +201,7 @@ var megasync = (function() {
             // It means "OK". Most likely a "download" API call
             // was successfully handled.
             clearInterval(retryTimer);
-            $('body').unbind('keyup');
+            $('body').unbind('keyup.ssd');
             showToast('megasync', 'Download added to MEGAsync', 'Open');
             $('.button.with-megasync .big-txt').safeHTML(l[258]);
             $('.button.with-megasync').addClass('downloading');

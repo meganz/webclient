@@ -56,7 +56,6 @@ def dev(branch_name=''):
     
     # Get the remote path e.g. /var/www/xxx-branch-name
     remote_branch_path = os.path.join(env.target_dir, branch_name)
-    build_chat_bundle(remote_branch_path)
     
     # Clone the repo into /var/www/xxx-branch-name
     # but not the full git history to save on storage space
@@ -73,6 +72,9 @@ def dev(branch_name=''):
             with cd(remote_branch_path):
                 run('git log -1') 
 
+            # Installs dependencies and builds bundles.
+            build_chat_bundle(remote_branch_path)
+            
             # Output beta server test link
             print('\nCloned branch {} to {}'
                   .format(branch_name, remote_branch_path))

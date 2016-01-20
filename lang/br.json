@@ -2997,17 +2997,20 @@
     "8422": "Digite o link de um arquivo MEGA:",
     "8423": "Erro de link de gera\u00e7\u00e3o de streaming",
     "8424": "Erro ao abrir o aplicativo padr\u00e3o.",
-    "8425": "through your browser",
-    "8426": "[S]MEGAsync:[\/S] Easy automated syncing between your computers and your MEGA cloud drive",
-    "8427": "[S]Flexible:[\/S] Sync any folder from your PC to any folder in the cloud. Sync any number of folders in parallel.",
-    "8428": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
-    "8429": "Faster transfer speeds",
-    "8430": "MEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers.",
-    "8431": "Lean & mean resource usage",
-    "8432": "Run MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
-    "8433": "Unlimited file size",
-    "8434": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
+    "8425": "atrav\u00e9s do seu navegador",
+    "8426": "[S]MEGAsync:[\/S] F\u00e1cil sincroniza\u00e7\u00e3o autom\u00e1tica entre seus computadores e sua unidade de nuvem MEGA",
+    "8427": "[S]Flex\u00edvel:[\/ S] sincronizar qualquer pasta do seu PC para qualquer pasta na nuvem. Sincronizar qualquer n\u00famero de pastas em paralelo.",
+    "8428": "Tire vantagem de 50GB de armazenamento em nuvem com uma conta gratuita e ser capaz de criptografar todos os seus arquivos com os nossos generosos [A]planos PRO[\/A].",
+    "8429": "Velocidades de transfer\u00eancia mais r\u00e1pidas",
+    "8430": "MEGAsync tira o m\u00e1ximo partido das transfer\u00eancias de infra-estrutura e multi-liga\u00e7\u00e3o de alta pot\u00eancia da MEGA.",
+    "8431": "Incline-se ao dizer sobre o uso de recursos",
+    "8432": "Execute end-to-end algoritmos de criptografia das MEGA direita para baixo em sua m\u00e1quina sem depender de navegadores mais lentos.",
+    "8433": "Tamanho ilimitado de arquivo",
+    "8434": "Enquanto a tecnologia utilizada em browsers podem limitar o tamanho de suas transfer\u00eancias, voc\u00ea pode baixar e enviar qualquer arquivo com o MEGAsync.",
+    "8435": "The file cannot be sent as the target user is over their storage quota.",
+    "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
     "alias": {
-        "shared-with-me": 5589
+        "shared-with-me": 5589,
+        "quota-share-error": 8435
     }
 }

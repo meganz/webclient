@@ -2997,17 +2997,20 @@
     "8422": "Ange en MEGA-fils l\u00e4nk: ",
     "8423": "Fel vid skapandet av streaming-l\u00e4nk",
     "8424": "Fel n\u00e4r f\u00f6rvalt program skulle \u00f6ppnas.",
-    "8425": "through your browser",
-    "8426": "[S]MEGAsync:[\/S] Easy automated syncing between your computers and your MEGA cloud drive",
-    "8427": "[S]Flexible:[\/S] Sync any folder from your PC to any folder in the cloud. Sync any number of folders in parallel.",
-    "8428": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
-    "8429": "Faster transfer speeds",
-    "8430": "MEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers.",
-    "8431": "Lean & mean resource usage",
-    "8432": "Run MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
-    "8433": "Unlimited file size",
+    "8425": "genom din webbl\u00e4sare",
+    "8426": "[S] MEGAsync: [\/ S] Enkel automatisk synkronisering mellan dina datorer och din MEGA Cloud Drive",
+    "8427": "[S] Flexibel: [\/ S] Synkronisera en mapp fr\u00e5n din dator till n\u00e5gon mapp i molnet. Synkronisera valfritt antal mappar parallellt.",
+    "8428": "Utnyttja 50GB moln lagring med ett gratis konto, kryptera alla dina filer med v\u00e5r gener\u00f6sa [A] PRO planer [\/ A].",
+    "8429": "Snabbare \u00f6verf\u00f6ring",
+    "8430": "MEGAsync drar full nytta av MEGA: s kraftfulla infrastruktur och multi-anslutnings \u00f6verf\u00f6ringar.",
+    "8431": "Lean & mean resursanv\u00e4ndning",
+    "8432": "K\u00f6r MEGA end-to-end-krypteringsalgoritmer hela v\u00e4gen till din dator utan att beh\u00f6va f\u00f6rlita sig p\u00e5 l\u00e5ngsamma webbl\u00e4sare.",
+    "8433": "obegr\u00e4nsad filstorlek",
     "8434": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
+    "8435": "The file cannot be sent as the target user is over their storage quota.",
+    "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
     "alias": {
-        "shared-with-me": 5589
+        "shared-with-me": 5589,
+        "quota-share-error": 8435
     }
 }

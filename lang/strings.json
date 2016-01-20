@@ -1216,7 +1216,7 @@
         "context": ""
     },
     "679": {
-        "text": "All files stored on MEGA are encrypted. All data transfers from and to MEGA are encrypted. And while most cloud storage providers can and do claim the same, MEGA is different \u2013 unlike the industry norm where the cloud storage provider holds the decryption key, with MEGA, you control the encryption, you hold the keys, and you decide who you grant or deny access to your files, without requiring any risky software installs. It\u2019s all happening in your web browser!",
+        "text": "All files stored on MEGA are encrypted. All data transfers from and to MEGA are encrypted. And while most cloud storage providers can and do claim the same, MEGA is different \u2013 unlike the industry norm where the cloud storage provider holds the decryption key, with MEGA, you control the encryption, you hold the keys, and you decide who you grant or deny access to your files, without requiring any risky software installs. It's all happening in your web browser!",
         "context": ""
     },
     "680": {
@@ -7592,7 +7592,7 @@
         "context": "Account closure, warning dialog after user confirm that he want to cancel account."
     },
     "6216": {
-        "text": "If you can\u2019t access your email account, you will need to contact ",
+        "text": "If you can't access your email account, you will need to contact ",
         "context": "Account closure, warning dialog to remind user to contact mega support after he confirms that he wants to cancel account. \r\n\r\n"
     },
     "6217": {
@@ -12012,7 +12012,7 @@
         "context": "MEGAsync application advantages. As short as possible please.\r\n\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
     },
     "8430": {
-        "text": "MEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers.",
+        "text": "MEGAsync takes full advantage of MEGA's high-powered infrastructure and multi-connection transfers.",
         "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
     },
     "8431": {
@@ -12020,8 +12020,8 @@
         "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
     },
     "8432": {
-        "text": "Run MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
-        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
+        "text": "Run MEGA's end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA's end-to-end encryption algorithms right down on your machine without relying on slower browsers."
     },
     "8433": {
         "text": "Unlimited file size",
@@ -12030,5 +12030,13 @@
     "8434": {
         "text": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
         "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nUnlimited file size.\r\nWhile browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync."
+    },
+    "8435": {
+        "text": "The file cannot be sent as the target user is over their storage quota.",
+        "context": "An error message which is shown when we want to share a file with somebody who has used all the storage space in their MEGA account."
+    },
+    "8436": {
+        "text": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+        "context": "In the case of this severe error (located on the contact's side), it's advisable to get in touch with their contact (%1) to find out what may have happened. Then afterwards to have their contact get in touch with MEGA's support team via email."
     }
 }

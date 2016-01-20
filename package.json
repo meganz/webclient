@@ -29,6 +29,15 @@
   "author": "Mega Limited",
   "license": "proprietary",
   "readmeFilename": "README.md",
+  "dependencies": {
+    "grunt-contrib-uglify": "^0.8.0",
+    "relaxed-json": "^0.2.9",
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3",
+    "react-hot-loader": "^1.3.0",
+    "react-immutable-render-mixin": "^0.8.0",
+    "react-transform-hmr": "^1.0.1"
+  },
   "devDependencies": {
     "babel-core": "^6.3.15",
     "babel-loader": "^6.2.0",
@@ -76,19 +85,10 @@
     "less-loader": "^2.0.0",
     "mocha": "~1.17.1",
     "object-assign": "^2.0.0",
-    "react": "^0.14.3",
-    "react-dom": "^0.14.3",
-    "react-hot-loader": "^1.3.0",
-    "react-immutable-render-mixin": "^0.8.0",
-    "react-transform-hmr": "^1.0.1",
     "sinon": "~1.9.0",
     "stripcomment-loader": "^0.1.0",
     "uglify-loader": "^1.1.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
-  },
-  "dependencies": {
-    "grunt-contrib-uglify": "^0.8.0",
-    "relaxed-json": "^0.2.9"
   }
 }

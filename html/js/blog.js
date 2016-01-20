@@ -106,7 +106,7 @@ function blog_load() {
                     if (blogposts[i].by) {
                         by = blogposts[i].by;
                     }
-                    blogcontent += '<div class="blog-new-item">';
+                    blogcontent += '<div class="blog-new-item" data-blogid="' + escapeHTML(blogposts[i].id) + '">';
                     blogcontent += '<h2>' + escapeHTML(blogposts[i].h) + '</h2>';
                     blogcontent += '<div class="blog-new-small">' + acc_time2date(blogposts[i].t) + '</div>';
                     blogcontent += '<div class="blog-new-date-div"></div>';
@@ -115,8 +115,7 @@ function blog_load() {
                         + escapeHTML(blogposts[i].attaches.simg) + '" src="'
                         + escapeHTML(CMS.img(blogposts[i].attaches.simg)) + '" />';
                     blogcontent += '<p><span class="blog-new-description">' + introtxt + '</span>';
-                    blogcontent += '<a data-blogid="' + escapeHTML(blogposts[i].id)
-                        + '" class="blog-new-read-more">Read more</a>';
+                    blogcontent += '<a class="blog-new-read-more">Read more</a>';
                     blogcontent += '<span class="clear"></span></p> </div>';
                 }
                 a++;
@@ -131,8 +130,8 @@ function blog_load() {
         blog_archive();
         blogcontent += blog_pager();
         $('.blog-new-left').safeHTML(blogcontent);
-        $('.blog-new-read-more').rebind('click', function() {
-            location.hash = '#blog_' + $(this).data('blogid');
+        $('.blog-new-read-more, .blog-new-item img, .blog-new-item h2').rebind('click', function() {
+            location.hash = '#blog_' + $(this).parents('.blog-new-item').data('blogid');
         });
         $('.blog-pagination-button').rebind('click', function() {
             var c = $(this).attr('class');

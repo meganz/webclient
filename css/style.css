@@ -2477,6 +2477,11 @@ form {
 a.blog-new-archive-lnk:hover .blog-archive-number {
     background-color: #797979;
 }
+
+.blog-new-item img, .blog-new-item h2 {
+    cursor: pointer;
+}
+
 p .blog-new-read-more, p a.blog-new-read-more {
     display: block;
     height: 30px;

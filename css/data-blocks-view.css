@@ -1,0 +1,82 @@
+.data-block-view {
+	width: 128px;
+	display: block;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	float: left;
+	position: relative;
+	cursor: default;
+	background-color: white;
+	-webkit-transition: all 20ms ease-in-out;
+	-moz-transition: all 20ms ease-in-out;
+	-o-transition: all 20ms ease-in-out;
+	-ms-transition: all 20ms ease-in-out;
+	transition: all 20ms ease-in-out;
+	padding: 4px;
+}
+.data-block-view::before {
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-shadow: 0px 1px 1.5px 0px rgba(0,0,0,0.3);
+	-moz-box-shadow: 0px 1px 1.5px 0px rgba(0,0,0,0.3);
+	box-shadow: 0px 1px 1.5px 0px rgba(0,0,0,0.3);
+	background-color: white;
+}
+.data-block-view.ui-selected, .data-block-view .ui-selecting, .data-block-view.dragover {
+	-webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+	box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+	background-color: rgba(0,0,0,0.1);
+}
+.data-block-bg {
+	height: 120px;
+	display: block;
+	background-color: #FAFAFA;
+	overflow: hidden;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	position: relative;
+	-webkit-transition: all 20ms ease-in-out;
+	-moz-transition: all 20ms ease-in-out;
+	-o-transition: all 20ms ease-in-out;
+	-ms-transition: all 20ms ease-in-out;
+	transition: all 20ms ease-in-out;
+	overflow: hidden;
+}
+.data-block-bg img {
+	width: 100%;
+	height: 100%;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+.data-block-view.active .data-block-bg, .data-block-view:hover .data-block-bg {
+	background-color: rgba(0,0,0,0.05);
+}
+.data-block-view.medium .default-white-button.tiny-button {
+	float: none;
+	position: absolute;
+	z-index: 100;
+	bottom: 9px;
+	right: 9px;
+	margin: 0;
+}
+.data-block-view .user-card-presence {
+	position: absolute;
+	z-index: 10;
+	left: 7px;
+	top: 7px;
+	margin: 0;
+}

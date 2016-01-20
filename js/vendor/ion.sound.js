@@ -85,7 +85,6 @@
         i;
 
 
-
     if (!settings.supported && is_iOS) {
         settings.supported = ["mp3", "mp4", "aac"];
     } else if (!settings.supported) {
@@ -581,6 +580,7 @@
         },
 
         ended: function () {
+            var was_playing = this.playing;
             this.playing = false;
             this.time_ended = new Date().valueOf();
             this.time_played = (this.time_ended - this.time_started) / 1000;
@@ -590,7 +590,7 @@
                 this._ended();
                 this.clear();
 
-                if (this.loop) {
+                if (this.loop && was_playing) {
                     this.loop--;
                     this.play();
                 }

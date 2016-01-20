@@ -144,19 +144,25 @@ var useravatar = (function() {
      * @returns HTML
      */
     function emailAvatar(email, className, element) {
-        
+
+        var found = false;
         // User is an email, we should look if the user
         // exists, if it does exists we use the user Object.
-        for (var u in M.u) {
+        M.u.forEach(function(contact, u) {
             if (M.u[u].m === email) {
                 // Found the user object
-                return ns.contact(M.u[u], className, element);
+                found = ns.contact(M.u[u], className, element);
+                throw StopIteration;
             }
+        });
+
+        if (found) {
+            return found;
         }
+
         return _letters(email.substr(0, 2), email, className, element);
     }
 
-    var authringPromise;
 
     /**
      * Check if the current user is verified by the current user. It
@@ -167,16 +173,13 @@ var useravatar = (function() {
         if (u_type !== 3) {
             return;
         }
-        if (!authringPromise) {
-            authringPromise = new MegaPromise();
-            
-            if (u_authring.Ed25519) {
-                authringPromise.resolve();
-            } else {
-                // First load the authentication system.
-                var authSystemPromise = authring.initAuthenticationSystem();
-                authringPromise.linkDoneAndFailTo(authSystemPromise);
-            }
+
+        if(authring.hadInitialised() === false) {
+            var authSystemPromise = authring.initAuthenticationSystem();
+            authSystemPromise.always(isUserVerified_Callback);
+        }
+        else {
+            isUserVerified_Callback();
         }
 
         function isUserVerified_Callback() {
@@ -188,10 +191,6 @@ var useravatar = (function() {
                 $('.avatar-wrapper.' + user.h).addClass('verified');
             }
         }
-
-        setTimeout(function() {
-            authringPromise.done(isUserVerified_Callback);
-        });
     }
 
     /**
@@ -261,6 +260,10 @@ var useravatar = (function() {
             $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
         }
 
+        if(M.u[user]) {
+            // by updating the M.u[contact] this will trigger some parts in the Chat UI to re-render.
+            M.u[user].avatar = true;
+        }
         var avatar = $(ns.contact(user)).html();
         $('.avatar-wrapper.' + user).empty().html(avatar);
         

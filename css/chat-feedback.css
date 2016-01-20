@@ -1,0 +1,29 @@
+.feedback.round-icon-block {
+	margin: 2px 0 0 0;
+	float: left;
+}
+.feedback.error-notification {
+	background-color: rgba(0,0,0,0.05);
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	padding: 24px;
+	margin: 29px 24px 0 24px;
+}
+.feedback.error-header {
+	font-size: 24px;
+	line-height: 33px;
+	color: #333333;
+	font-family: 'source_sans_prolight';
+	text-align: center;
+	padding: 0 0 25px 0;
+}
+.feedback.info-txt {
+	font-size: 14px;
+	line-height: 20px;
+	color: #666666;
+	padding: 10px 0;
+}
+.error-notification .buttons-block {
+	padding: 17px 0 0 0;
+}

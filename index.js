@@ -56,7 +56,11 @@ function startMega() {
         delete pages['chat'];
     }
     jsl = [];
-    init_page();
+    if(typeof(mega_custom_boot_fn) === 'undefined') {
+        init_page();
+    } else {
+        mega_custom_boot_fn();
+    }
 }
 
 function mainScroll() {

@@ -1,0 +1,261 @@
+.call-block {
+    width: 100%;
+    height: 100%;
+    background-color: #111111;
+    text-align: center;
+    position: absolute;
+    overflow: hidden;
+    z-index: 10;
+}
+.call-block.no-cursor {
+    cursor: none;
+}
+.call-block.small-block {
+    width: -webkit-calc(100% -256px);
+    width: -moz-calc(100% - 256px);
+    width: calc(100% - 256px);
+    height: -webkit-calc(100% -240px);
+    height: -moz-calc(100% - 240px);
+    height: calc(100% - 240px);
+    position:relative;
+}
+.call-block.full-sized-block {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}
+.call.user-video {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.call.user-video video, .call.user-video img {
+    max-height: 100%;
+    max-width: 100%;
+    height: 100%;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.call.local-video, .call.local-audio, .call.user-audio {
+    bottom: 8px;
+    right: 8px;
+    position: absolute !important;
+    z-index: 10;
+    -moz-border-radius: 9px;
+    -webkit-border-radius: 9px;
+    border-radius: 9px;
+    height: 184px;
+    overflow: hidden;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
+}
+.call.local-audio {
+    width: 184px;
+}
+/* video mirroring, applied ONLY to the local video */
+video.localViewport {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+    -moz-transform: rotateY(180deg); /* Firefox */
+}
+.call.local-video {
+    min-height: 184px;
+    max-height: 184px;
+}
+.call.local-video.minimized, .call.local-audio.minimized {
+    width: 24px;
+    height: 24px;
+    min-height: 24px;
+}
+.call.video-wrapper {
+    display: block;
+    height: 100%;
+    text-align: left;
+    overflow: hidden;
+    z-index: 9;
+    position: relative;
+    webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.call.local-video img, .call.local-video video {
+    height: 100%;
+}
+.minimized .call.video-wrapper, .call.local-audio.minimized img {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.call.video.local-viewport {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+}
+.call.bottom-panel, .call.top-panel {
+    position: absolute;
+    width: 100%;
+    height: 72px;
+    bottom: -72px;
+    z-index: 10;
+    background-color: rgba(0,0,0,0.9);
+    webkit-transition: all 400ms ease-in-out;
+    -moz-transition: all 400ms ease-in-out;
+    -o-transition: all 400ms ease-in-out;
+    -ms-transition: all 400ms ease-in-out;
+    transition: all 400ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.small-block .call.bottom-panel, .small-block.call.bottom-panel {
+    height: 48px;
+    bottom: -48px;
+}
+.call.top-panel {
+    height: 48px;
+    top: -48px;
+    bottom: auto;
+}
+.call.bottom-panel.visible-panel, .call.top-panel.visible-panel {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    bottom: 0;
+}
+.call.top-panel.visible-panel {
+    top: 0;
+    bottom: auto;
+}
+.call.button {
+    width: 48px;
+    height: 48px;
+    display: inline-block;
+    margin: 13px 24px 0 24px;
+    text-align: center;
+    vertical-align: top;
+    position:relative;
+}
+.call.button.hidden {
+    display: none;
+}
+.small-block .call.button {
+    width: 32px;
+    height: 32px;
+    margin: 9px 18px 0 18px;
+}
+.call.button.left {
+    position:absolute;
+    left: 0;
+    margin-left: 12px;
+}
+.call.button.right {
+    position:absolute;
+    right: 0;
+    margin-right: 12px;
+}
+.small-block .call.button.left {
+    margin-left: 24px;
+}
+.small-block .call.button.right {
+    margin-right: 15px;
+}
+.full-sized-block  .call.button.left {
+    display: none;
+}
+.call.button i {
+    webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
+}
+.call.button:hover i {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.default-white-button.tiny-button.call {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    position: absolute;
+    z-index: 10;
+    right: 4px;
+    top: 4px;
+}
+.call.user-audio {
+    width: 260px;
+    height: 260px;
+    left: 50%;
+    top: 50%;
+    margin: -130px 0 0 -130px;
+    z-index: 9;
+}
+.call.top-panel .call-duration {
+    display: inline-block;
+    position: static;
+    margin: 8px 0 0 0;
+}
+.call.top-user-info {
+    position:absolute;
+    margin: 14px 0 0 12px;
+}
+.call.top-user-info i {
+    margin:0 0 0 10px;
+}
+.call.button .unread-messages {
+    left: 32px;
+    margin: -3px 0 0 0;
+}
+
+.call.local-video,
+.call.local-audio {
+    webkit-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    -moz-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    -o-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    -ms-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+}
+.call.bottom-aligned {
+    margin-bottom: 0;
+}
+
+.call-block .call.bottom-aligned.visible-panel {
+    margin-bottom: 78px;
+}
+.call-block .call.bottom-aligned.visible-panel.minimized {
+    margin-bottom: 70px;
+}
+
+.call-block.small-block .call.bottom-aligned.visible-panel {
+    margin-bottom: 52px;
+}
+.call-block.small-block .call.bottom-aligned.visible-panel.minimized {
+    margin-bottom: 46px;
+}
+
+.call.local-video.minimized,
+.call.local-audio.minimized {
+    webkit-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+    -moz-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+    -o-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+    -ms-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+    transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+}

@@ -130,7 +130,6 @@ if (!b_u) try
         Cu['import']("resource://gre/modules/Services.jsm");
         XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
-        // d = true;
         (function(global) {
             global.loadSubScript = function(file,scope) {
                 if (global.d) {
@@ -420,7 +419,7 @@ Object.defineProperty(this, 'mBroadcaster', {
         var id = Math.random().toString(26);
         this._topics[topic][id] = options;
 
-        if (d) console.log('Adding broadcast listener', topic, id, options);
+        //if (d) console.log('Adding broadcast listener', topic, id, options);
 
         return id;
     },
@@ -444,7 +443,7 @@ Object.defineProperty(this, 'mBroadcaster', {
             var args = Array.prototype.slice.call(arguments, 1);
             var idr = [];
 
-            if (d) console.log('Broadcasting ' + topic, args);
+            // if (d) console.log('Broadcasting ' + topic, args);
 
             for (var id in this._topics[topic]) {
                 var ev = this._topics[topic][id], rc;
@@ -1199,8 +1198,14 @@ else if (!b_u)
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:1});
     jsl.push({f:'js/vendor/jquery-2.2.0.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
+    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
+    jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
@@ -1215,6 +1220,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
     jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+    jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
     jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
@@ -1226,10 +1232,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
-    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
-    jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
+
 
     // notifications
     jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
@@ -1238,62 +1241,59 @@ else if (!b_u)
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
     // Other
-    jsl.push({f:'js/vendor/autolinker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
+    jsl.push({f:'js/vendor/moment.min.js', n: 'moment_js', j:1,w:1});
 
     // Google Import Contacts
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
     // MEGA CHAT
-    jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1,w:1});
+    jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1,w:1});
+    jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1,w:1});
     jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
 
-    jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'mega_js', j:1, w:7});
-    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'stropheligh_js', j:1, w:4});
+    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1,w:3});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1,w:2});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1,w:2});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1,w:2});
+    jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/base32.js', n: 'base32_js', j:1,w:1});
 
-    // direct transfer deps.
-    jsl.push({f:'js/vendor/chat/cryptojs-core.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
 
+    // MEGA CHAT
+    jsl.push({f:'js/chat/chatd.js', n: 'chatd_js', j:1,w:1});
+
+    jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
+    jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
+    jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
+    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
+    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
+    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1,w:1});
+
+    jsl.push({f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1,w:2});
     jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'attachmentsFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/encryptionFilter.js', n: 'encryptionFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/chatStore.js', n: 'chatstore_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1,w:7});
 
     jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
+    jsl.push({f:'js/connectionRetryManager.js', n: 'crm_js', j:1,w:7});
     jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
-    jsl.push({f:'html/chat.html', n: 'chat', j:0});
-    jsl.push({f:'js/chat/chat.js', n: 'chat_js', j:1,w:7});
-    jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
+    jsl.push({f:'js/chat/messages.js', n: 'chat_messages_Js', j:1,w:1});
+    jsl.push({f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1,w:10});
 
     // END OF MEGA CHAT
 
     // UI Elements
-    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
 
@@ -1339,6 +1339,25 @@ else if (!b_u)
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
     jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+    jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-messages.css', n: 'chat_messages_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-share-links.css', n: 'chat_share_links_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-textarea.css', n: 'chat_textarea_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-typing.css', n: 'chat_typing_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-calls.css', n: 'chat_calls_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
+
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
@@ -1545,6 +1564,7 @@ else if (!b_u)
             elem.src = src;
             return elem;
         };
+
         var createStyleTag = function(id, src) {
             var elem = mCreateElement('link', {type: 'text/css', rel: "stylesheet"}, 'head');
             _queueWaitToBeLoaded(id, elem);

@@ -1,0 +1,106 @@
+.small-rounded-avatar {
+	width: 36px;
+	height: 36px;
+	display: block;
+	font-size: 24px;
+	line-height: 31px;
+	color: white;
+	text-align: center;
+	font-family: 'source_sans_prolight';
+	border: 2px solid white;
+	float: left;
+	background-color: #FF6A19;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    position: relative;
+}
+.avatar-letter::before {
+    position:absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: attr(data-user-letter);
+}
+.small-rounded-avatar img {
+	width: 32px;
+	height: 32px;
+    -moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.offline .small-rounded-avatar, .offline.small-rounded-avatar {
+	background-color: #CCCCCC;
+}
+.offline .small-rounded-avatar img {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+	-webkit-filter: grayscale(100%);
+	-moz-filter: grayscale(100%);
+	-ms-filter: grayscale(100%);
+	-o-filter: grayscale(100%);
+	filter: grayscale(100%);
+	filter: url(grayscale.svg);
+	filter: gray;
+}
+.medium-avatar {
+    width: 160px;
+    height: 160px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    border: 0;
+    font-size: 76px;
+    line-height: 160px;
+}
+.medium-avatar, .semi-big-avatar,  .big-avatar {
+    display: block;
+    width: 184px;
+    height: 184px;
+    -moz-border-radius: 9px;
+    -webkit-border-radius: 9px;
+    border-radius: 9px;
+    background-color: #FF6A19;
+    position: relative;
+}
+.semi-big-avatar div,  .big-avatar div {
+    width: 96px;
+    height: 96px;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    background-color: white;
+    position:absolute;
+    left:50%;
+    top: 50%;
+    margin: -48px 0 0 -48px;
+    font-size: 60px;
+    line-height: 96px;
+    font-family: 'source_sans_proextralight';
+}
+.big-avatar {
+    width: 260px;
+    height: 260px;
+}
+.big-avatar div {
+    width: 146px;
+    height: 146px;
+    margin: -73px 0 0 -73px;
+    font-size: 90px;
+    line-height: 146px;
+}
+.medium-avatar img, .semi-big-avatar img, .big-avatar img {
+    width: 100%;
+    height: 100%;
+    -moz-border-radius: 9px;
+    -webkit-border-radius: 9px;
+    border-radius: 9px;
+}

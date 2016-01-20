@@ -7,7 +7,7 @@
         queryParam: "q",
         searchDelay: 200,
         minChars: 1,
-        propertyToSearch: "name",
+        propertyToSearch: "m",
         jsonContainer: null,
         contentType: "json",
         excludeCurrent: false,
@@ -37,7 +37,7 @@
                 email = item[this.propertyToSearch],
                 type = '';
 
-            $.each(M.u, function (ind, val) {
+            M.u.forEach( function (ind, val) {
                 if (val.m === email) {
                     id = ind;
                     
@@ -62,8 +62,7 @@
             var id, av, avatar,
                 email = item[this.propertyToSearch],
                 type = '';
-            
-            $.each(M.u, function (ind, val) {
+            M.u.forEach( function (ind, val) {
                 if (val.m === email) {
                     id = ind;
                     

@@ -264,12 +264,16 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 }
                 return;
             }
+            var isNew = false;
             if (typeof fetching[id] === "undefined") {
-                doRequest(id);
+                isNew = true;
                 fetching[id] = [];
             }
             next = next || function() {};
             fetching[id].push([next, as]);
+            if (isNew) {
+                doRequest(id);
+            }
         },
     
         on: function(id, callback)

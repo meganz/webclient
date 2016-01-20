@@ -664,6 +664,9 @@ function init_page() {
         $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
         mainScroll();
     }
+    else if (page == 'sourcecode') {
+        parsepage(pages['sourcecode']);
+    }
     else if (page == 'terms') {
         parsepage(pages['terms']);
     }
@@ -1610,6 +1613,9 @@ function topmenuUI() {
         }
         else if (className.indexOf('doc') > -1) {
             document.location.hash = 'doc';
+        }
+        else if (className.indexOf('source-code') > -1) {
+            document.location.hash = 'sourcecode';
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';

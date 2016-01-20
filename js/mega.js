@@ -3159,8 +3159,14 @@ function MegaData()
         return nodes.length;
     };
 
-
-    this.copyNodes = function(cn, t, del, callback) {
+    /**
+     * @param {Array} cn                Array of nodes that needs to be copied
+     * @param {String} t                Destination node
+     * @param {Bool} del                Should we delete the node after copying? (Like a move operation)
+     * @param {Callback} callback       Callback function
+     * @param {Callback} callbackError  Callback function for custom errors handling (Optional)
+     */
+    this.copyNodes = function(cn, t, del, callback, callbackError) {
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
             return false;
@@ -3170,7 +3176,7 @@ function MegaData()
             var keyCachePromise = api_cachepubkeys([t]);
             keyCachePromise.done(function _cachepubkeyscomplete() {
                 if (u_pubkeys[t]) {
-                    M.copyNodes(cn, t);
+                    M.copyNodes(cn, t, del, callback, callbackError);
                 }
                 else {
                     loadingDialog.hide();
@@ -3204,6 +3210,10 @@ function MegaData()
                     renderNew();
                 }
                 if (typeof res === 'number' && res < 0) {
+                    loadingDialog.hide();
+                    if (typeof callbackError === "function") {
+                        return callbackError(res);
+                    }
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
                 if (ctx.del) {

@@ -675,6 +675,7 @@
     "1289": "D\u011bkujeme za kliknut\u00ed na odkaz na pozv\u00e1nku. N\u00ed\u017ee si vytvo\u0159te sv\u016fj \u00fa\u010det zdarma.",
     "1290": "Jejda, toto nejsp\u00ed\u0161 nen\u00ed platn\u00fd odkaz na pozv\u00e1nku. Ji\u017e m\u00e1te registrovan\u00fd \u00fa\u010det?",
     "1291": "Ji\u017e jste kliknuli na odkaz na pozv\u00e1nku. Vytvo\u0159te si \u00fa\u010det.",
+    "1292": "Ji\u017e brzy",
     "1297": "E-mailov\u00e1 adresa je ji\u017e pou\u017e\u00edv\u00e1na.",
     "1298": "P\u0159ihlaste se ke sv\u00e9mu \u00fa\u010dtu.",
     "1301": "Dnes",
@@ -1093,6 +1094,8 @@
     "1884": "Slo\u017eka (%1) nebyla nahr\u00e1na, proto\u017ee je mimo\u0159\u00e1dn\u011b velk\u00e1. D\u011bl\u00e1me tuto kontrolu, aby se zabr\u00e1nilo nahr\u00e1v\u00e1n\u00ed cel\u00fdch spou\u0161t\u011bc\u00edch svazk\u016f, co\u017e je neefektivn\u00ed a nebezpe\u010dn\u00e9.",
     "1885": "%1 slo\u017eek nebylo nahr\u00e1no, proto\u017ee jsou mimo\u0159\u00e1dn\u011b velk\u00e9. D\u011bl\u00e1me tuto kontrolu, aby se zabr\u00e1nilo nahr\u00e1v\u00e1n\u00ed cel\u00fdch spou\u0161t\u011bc\u00edch svazk\u016f, co\u017e je neefektivn\u00ed a nebezpe\u010dn\u00e9.",
     "1888": "Dom\u016f",
+    "1889": "Aplikace pro iOS",
+    "1890": "Aplikace pro Android",
     "1893": "Z\u00edskejte v\u0161echny znalosti o synchronizaci mezi va\u0161imi po\u010d\u00edta\u010di a MEGA.",
     "1898": "Stiskn\u011bte Esc pro zav\u0159en\u00ed",
     "1899": "N\u00e1hled",
@@ -1909,6 +1912,7 @@
     "6227": "Setkal jsem se s p\u0159\u00edli\u0161 mnoha probl\u00e9my",
     "6229": "Rozhran\u00ed je pro m\u011b p\u0159\u00edli\u0161 matouc\u00ed",
     "6234": "LITE",
+    "6240": "Aplikace pro Windows Phone",
     "6508": "Nastaven\u00ed",
     "6690": "P\u0159ejd\u011bte do M\u016fj \u00fa\u010det",
     "6771": "Odstran\u011bn\u00e9 slo\u017eky",
@@ -3009,8 +3013,22 @@
     "8434": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
     "8435": "The file cannot be sent as the target user is over their storage quota.",
     "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+    "8437": "Web Client",
+    "8438": "Source Code Transparency",
+    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
     "alias": {
         "shared-with-me": 5589,
-        "quota-share-error": 8435
+        "quota-share-error": 8435,
+        "coming-soon": 1292,
+        "web-client": 8437,
+        "source-code-transparency": 8438,
+        "ios-app": 1889,
+        "android-app": 1890,
+        "windows-phone-app": 6240,
+        "source-code-intro-1": 8439,
+        "source-code-intro-2": 8440,
+        "source-code-intro-3": 8441
     }
 }

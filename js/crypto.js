@@ -654,7 +654,7 @@ var crypt = (function () {
         api_req({
             a: 'log',
             e: 99606,
-            m: 'Fingerprint/MITM dialog shown to user for key ' + keyType
+            m: 'Fingerprint dialog shown to user for key ' + keyType
                + ' for user ' + userHandle
         });
 
@@ -691,7 +691,7 @@ var crypt = (function () {
         api_req({
             a: 'log',
             e: 99607,
-            m: 'Signature failure warning dialog shown to user for key ' + keyType
+            m: 'Signature/MITM warning dialog shown to user for key ' + keyType
                + ' for user ' + userHandle
         });
 

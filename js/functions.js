@@ -714,6 +714,53 @@ function time2last(timestamp) {
     }
 }
 
+/**
+ * Basic calendar math function (using moment.js) that will return a string, depending on the exact calendar
+ * dates/months ago when the passed `dateString` had happened.
+ *
+ * @param dateString {String|int}
+ * @param [refDate] {String|int}
+ * @returns {String}
+ */
+var time2lastSeparator = function(dateString, refDate) {
+    var momentDate = moment(dateString);
+    var today = moment(refDate ? refDate : undefined).startOf('day');
+    var yesterday = today.clone().subtract(1, 'days');
+    var weekAgo = today.clone().startOf('week').endOf('day');
+    var twoWeeksAgo = today.clone().startOf('week').subtract(1, 'weeks').endOf('day');
+    var thisMonth = today.clone().startOf('month').startOf('day');
+    var thisYearAgo = today.clone().startOf('year');
+
+    if (momentDate.isSame(today, 'd')) {
+        // Today
+        return l[1301];
+    }
+    else if(momentDate.isSame(yesterday, 'd')) {
+        // Yesterday
+        return l[1302];
+    }
+    else if(momentDate.isAfter(weekAgo)) {
+        // This week
+        return l[1303];
+    }
+    else if(momentDate.isAfter(twoWeeksAgo)) {
+        // Last week
+        return l[1304];
+    }
+    else if(momentDate.isAfter(thisMonth)) {
+        // This month
+        return l[1305];
+    }
+    else if(momentDate.isAfter(thisYearAgo)) {
+        // This year
+        return l[1306];
+    }
+    else {
+        // more then 1 year ago...
+        return l[1307];
+    }
+};
+
 function unixtime() {
     return (new Date().getTime() / 1000);
 }
@@ -746,6 +793,23 @@ function secondsToTime(secs, html_format) {
         returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
     }
     return returnvar;
+}
+
+function secondsToTimeShort(secs) {
+    var val = secondsToTime(secs);
+
+    if (!val) {
+        return val;
+    }
+
+    if (val.substr(0, 1) === "0") {
+        val = val.substr(1, val.length);
+    }
+    if (val.substr(0, 2) === "0:") {
+        val = val.substr(2, val.length);
+    }
+
+    return val;
 }
 
 function htmlentities(value) {
@@ -994,6 +1058,10 @@ function makeMetaAware(kls) {
      */
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;
+
+        if(!self["_" + prefix]) {
+            return;
+        }
 
         if (prefix && !namespace && !k) {
             delete self["_" + prefix];
@@ -1499,8 +1567,7 @@ function RegExpEscape(text) {
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
     return addZeroIfLenLessThen(date.getHours(), 2)
-        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2)
-        + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
+        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
 }
 
 /**
@@ -2322,14 +2389,16 @@ function percent_megatitle() {
     if (d_deg <= 180) {
         $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(' + d_deg + 'deg)');
         $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
-    } else {
+    }
+    else {
         $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
         $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
     }
     if (u_deg <= 180) {
         $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(' + u_deg + 'deg)');
         $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
-    } else {
+    }
+    else {
         $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
         $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
@@ -2402,9 +2471,29 @@ function moveCursortoToEnd(el) {
         range.collapse(false);
         range.select();
     }
+    $(el).focus();
 }
 
-// Returns pixels position of element relative to document (top left corner)
+function asyncApiReq(data) {
+    var $promise = new MegaPromise();
+    api_req(data, {
+        callback: function(r) {
+            if (typeof(r) === 'number') {
+                $promise.reject.apply($promise, arguments);
+            }
+            else {
+                $promise.resolve.apply($promise, arguments);
+            }
+        }
+    });
+
+    //TODO: fail case?! e.g. the exp. backoff failed after waiting for X minutes??
+
+    return $promise;
+}
+
+// Returns pixels position of element relative to document (top left corner) OR to the parent (IF the parent and the
+// target element are both with position: absolute)
 function getHtmlElemPos(elem, n) {
     var xPos = 0;
     var yPos = 0;
@@ -2705,58 +2794,58 @@ function generateAnonymousReport() {
     var roomUniqueId = 0;
     var roomUniqueIdMap = {};
 
-    Object.keys(megaChatIsReady && megaChat.chats || {}).forEach(function(k) {
-        var v = megaChat.chats[k];
+    if(megaChatIsReady && megaChat.chats) {
+        megaChat.chats.forEach(function (v, k) {
+            var participants = v.getParticipants();
 
-        var participants = v.getParticipants();
-
-        participants.forEach(function(v, k) {
-            var cc = megaChat.getContactFromJid(v);
-            if (cc && cc.u && !userAnonMap[cc.u]) {
-                userAnonMap[cc.u] = {
-                    anonId: userAnonIdx++ + rand(1000),
-                    pres: megaChat.karere.getPresence(v)
-                };
-            }
-            participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
-        });
-
-        var r = {
-            'roomUniqueId': roomUniqueId,
-            'roomState': v.getStateAsText(),
-            'roomParticipants': participants
-        };
-
-        chatStates[roomUniqueId] = r;
-        roomUniqueIdMap[k] = roomUniqueId;
-        roomUniqueId++;
-    });
-
-    if (report.haveRtc) {
-        Object.keys(megaChat.plugins.callManager.callSessions).forEach(function(k) {
-            var v = megaChat.plugins.callManager.callSessions[k];
+            participants.forEach(function (v, k) {
+                var cc = megaChat.getContactFromJid(v);
+                if (cc && cc.u && !userAnonMap[cc.u]) {
+                    userAnonMap[cc.u] = {
+                        anonId: userAnonIdx++ + rand(1000),
+                        pres: megaChat.karere.getPresence(v)
+                    };
+                }
+                participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
+            });
 
             var r = {
-                'callStats': v.callStats,
-                'state': v.state
+                'roomUniqueId': roomUniqueId,
+                'roomState': v.getStateAsText(),
+                'roomParticipants': participants
             };
 
-            var roomIdx = roomUniqueIdMap[v.room.roomJid];
-            if(!roomIdx) {
-                roomUniqueId += 1; // room which was closed, create new tmp id;
-                roomIdx = roomUniqueId;
-            }
-            if(!chatStates[roomIdx]) {
-                chatStates[roomIdx] = {};
-            }
-            if(!chatStates[roomIdx].callSessions) {
-                chatStates[roomIdx].callSessions = [];
-            }
-            chatStates[roomIdx].callSessions.push(r);
+            chatStates[roomUniqueId] = r;
+            roomUniqueIdMap[k] = roomUniqueId;
+            roomUniqueId++;
         });
-    };
 
-    report.chatRoomState = chatStates;
+        if (report.haveRtc) {
+            Object.keys(megaChat.plugins.callManager.callSessions).forEach(function (k) {
+                var v = megaChat.plugins.callManager.callSessions[k];
+
+                var r = {
+                    'callStats': v.callStats,
+                    'state': v.state
+                };
+
+                var roomIdx = roomUniqueIdMap[v.room.roomJid];
+                if (!roomIdx) {
+                    roomUniqueId += 1; // room which was closed, create new tmp id;
+                    roomIdx = roomUniqueId;
+                }
+                if (!chatStates[roomIdx]) {
+                    chatStates[roomIdx] = {};
+                }
+                if (!chatStates[roomIdx].callSessions) {
+                    chatStates[roomIdx].callSessions = [];
+                }
+                chatStates[roomIdx].callSessions.push(r);
+            });
+        };
+
+        report.chatRoomState = chatStates;
+    };
 
     if (is_chrome_firefox) {
         report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
@@ -2779,7 +2868,7 @@ function generateAnonymousReport() {
     report.totalScriptElements = $("script").length;
 
     report.totalD = Object.keys(M.d).length;
-    report.totalU = Object.keys(M.u).length;
+    report.totalU = M.u.size();
     report.totalC = Object.keys(M.c).length;
     report.totalIpc = Object.keys(M.ipc).length;
     report.totalOpc = Object.keys(M.opc).length;
@@ -2844,6 +2933,10 @@ function generateAnonymousReport() {
         });
 
     return $promise;
+}
+
+function __(s) { //TODO: waiting for @crodas to commit the real __ code.
+    return s;
 }
 
 function MegaEvents() {}
@@ -2926,16 +3019,16 @@ MegaEvents.prototype.on = function(name, callback) {
 
 
 function constStateToText(enumMap, state) {
-    var txt = null;
+    var txt = false;
     $.each(enumMap, function(k, v) {
-        if(state == v) {
+        if (state == v) {
             txt = k;
 
             return false; // break
         }
     });
 
-    return txt;
+    return txt === false ? "(not found: " + state + ")" : txt;
 };
 
 /**
@@ -2950,15 +3043,15 @@ function constStateToText(enumMap, state) {
 function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     var checksAvailable = allowedStatesMap[currentState];
     var allowed = false;
-    if(checksAvailable) {
+    if (checksAvailable) {
         checksAvailable.forEach(function(allowedState) {
-            if(allowedState === newState) {
+            if (allowedState === newState) {
                 allowed = true;
                 return false; // break;
             }
         });
     }
-    if(!allowed) {
+    if (!allowed) {
         assert(
             false,
             'State change from: ' + constStateToText(enumMap, currentState) + ' to ' +
@@ -2966,6 +3059,63 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
         );
     }
 }
+
+
+/**
+ * Utility that will return a sorting function (can compare numbers OR strings, depending on the data stored in the
+ * obj), that can sort an array of objects.
+ * @param key {String|Function} the name of the property that will be used for the sorting OR a func that will return a
+ * dynamic value for the object
+ * @param [order] {Number} 1 for asc, -1 for desc sorting
+ * @returns {Function}
+ */
+mega.utils.sortObjFn = function(key, order) {
+    if (!order) {
+        order = 1;
+    }
+
+    return function(a, b, tmpOrder) {
+        var currentOrder = tmpOrder ? tmpOrder : order;
+
+        if ($.isFunction(key)) {
+            a = key(a);
+            b = key(b);
+        }
+        else {
+            a = a[key];
+            b = b[key];
+        }
+
+        if (typeof a == 'string' && typeof b == 'string') {
+            return a.localeCompare(b) * currentOrder;
+        }
+        else if (typeof a == 'string' && typeof b == 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof a == 'undefined' && typeof b == 'string') {
+            return -1 * currentOrder;
+        }
+        else if (typeof a == 'number' && typeof b == 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof a == 'undefined' && typeof b == 'number') {
+            return -1 * currentOrder;
+        }
+        else if (typeof a == 'number' && typeof b == 'number') {
+            var _a = a || 0;
+            var _b = b || 0;
+            if (_a > _b) {
+                return 1 * currentOrder;
+            }
+            if (_a < _b) {
+                return -1 * currentOrder;
+            } else {
+                return 0;
+            }
+        }
+        else return 0;
+    }
+};
 
 /**
  * Promise-based XHR request
@@ -3201,7 +3351,8 @@ mega.utils.reload = function megaUtilsReload() {
         stopapi();
         if (typeof mDB === 'object' && !pfid) {
             mDBreload();
-        } else {
+        }
+        else {
             loadfm(true);
         }
     }
@@ -3712,6 +3863,50 @@ watchdog.setup();
  */
 function rand_range(a, b) {
     return Math.random() * (b - a) + a;
+};
+
+// http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
+function elementInViewport2Lightweight(el) {
+    var top = el.offsetTop;
+    var left = el.offsetLeft;
+    var width = el.offsetWidth;
+    var height = el.offsetHeight;
+
+    while(el.offsetParent) {
+        el = el.offsetParent;
+        top += el.offsetTop;
+        left += el.offsetLeft;
+    }
+
+    return (
+        top < (window.pageYOffset + window.innerHeight) &&
+        left < (window.pageXOffset + window.innerWidth) &&
+        (top + height) > window.pageYOffset &&
+        (left + width) > window.pageXOffset
+    );
+}
+
+function elementInViewport2(el) {
+    return verge.inY(el) || verge.inX(el);
+}
+
+/**
+ * Check if the passed in element (DOMNode) is FULLY visible in the viewport.
+ *
+ * @param el {DOMNode}
+ * @returns {boolean}
+ */
+function elementInViewport(el) {
+    if (!verge.inY(el)) {
+        return false;
+    }
+    if (!verge.inX(el)) {
+        return false;
+    }
+
+    var rect = verge.rectangle(el);
+
+    return !(rect.left < 0 || rect.right < 0 || rect.bottom < 0 || rect.top < 0);
 };
 
 // FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as

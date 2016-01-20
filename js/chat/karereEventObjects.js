@@ -169,6 +169,30 @@ KarereEventObjects.ActionMessage.prototype.isEmptyMessage = function() {
     }
 };
 /**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.ActionMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.ActionMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.ActionMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
+};
+/**
  * Event Object `DiscoCapabilities`
  *
  * @param fromJid {string} user's full JID
@@ -536,7 +560,7 @@ KarereEventObjects.IncomingMessage.prototype.setDelay = function(val) {
 /**
  * Getter for property `seen`
  *
- * @returns {(boolean|"")} used for notification to track whether we need to notify the message if it was not seen by the user
+ * @returns {(boolean|false)} used for notification to track whether we need to notify the message if it was not seen by the user
  */
 KarereEventObjects.IncomingMessage.prototype.getSeen = function() {
     return this.seen;
@@ -549,7 +573,7 @@ KarereEventObjects.IncomingMessage.prototype.getSeen = function() {
  */
 KarereEventObjects.IncomingMessage.prototype.setSeen = function(val) {
     var oldVal = this.seen;
-    this.seen = val || "";
+    this.seen = val || false;
     if (oldVal != this.seen) {
         jQuery(this).trigger("onChange", [this, "seen", oldVal, this.seen]);
     }
@@ -591,6 +615,30 @@ KarereEventObjects.IncomingMessage.prototype.isEmptyMessage = function() {
     } else {
         return false;
     }
+};
+/**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.IncomingMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.IncomingMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.IncomingMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
 };
 /**
  * Event Object `IncomingPrivateMessage`
@@ -842,6 +890,30 @@ KarereEventObjects.IncomingPrivateMessage.prototype.isEmptyMessage = function() 
     }
 };
 /**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.IncomingPrivateMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.IncomingPrivateMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.IncomingPrivateMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
+};
+/**
  * Event Object `InviteMessage`
  *
  * @param toJid {string} recipient's JID
@@ -1009,6 +1081,30 @@ KarereEventObjects.InviteMessage.prototype.isEmptyMessage = function() {
     }
 };
 /**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.InviteMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.InviteMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.InviteMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
+};
+/**
  * Event Object `OutgoingMessage`
  *
  * @param toJid {string} target user's JID
@@ -1038,7 +1134,9 @@ KarereEventObjects.OutgoingMessage = function(toJid, fromJid, type, messageId, c
 KarereEventObjects.OutgoingMessage.STATE = {
     'SENT': 10,
     'NOT_SENT': 20,
-    'DELIVERED': 30
+    'DELIVERED': 30,
+    'SEEN': 40,
+    'REJECTED': 50
 };
 /**
  * Getter for property `toJid`
@@ -1250,7 +1348,7 @@ KarereEventObjects.OutgoingMessage.prototype.setRoomJid = function(val) {
 /**
  * Getter for property `seen`
  *
- * @returns {(boolean|"")} used for notification to track whether we need to notify the message if it was not seen by the user
+ * @returns {(boolean|false)} used for notification to track whether we need to notify the message if it was not seen by the user
  */
 KarereEventObjects.OutgoingMessage.prototype.getSeen = function() {
     return this.seen;
@@ -1265,7 +1363,7 @@ KarereEventObjects.OutgoingMessage.prototype.getSeen = function() {
  */
 KarereEventObjects.OutgoingMessage.prototype.setSeen = function(val) {
     var oldVal = this.seen;
-    this.seen = val || "";
+    this.seen = val || false;
     if (oldVal != this.seen) {
         jQuery(this).trigger("onSeenChange", [this, oldVal, this.seen]);
     }
@@ -1310,6 +1408,30 @@ KarereEventObjects.OutgoingMessage.prototype.isEmptyMessage = function() {
     } else {
         return false;
     }
+};
+/**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.OutgoingMessage.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.OutgoingMessage.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.OutgoingMessage.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
 };
 /**
  * Event Object `Ping`
@@ -1716,6 +1838,30 @@ KarereEventObjects.Presence.prototype.isEmptyMessage = function() {
     } else {
         return false;
     }
+};
+/**
+ * Returns true if this is an management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.Presence.prototype.isManagement = function() {
+    return Message.prototype.isManagement.apply(this);
+};
+/**
+ * Returns true if this is an renderable management message (alias of Message.isManagement)
+ *
+ * @returns boolean
+ */
+KarereEventObjects.Presence.prototype.isRenderableManagement = function() {
+    return Message.prototype.isRenderableManagement.apply(this);
+};
+/**
+ * Alias of Message.getManagementMessageSummaryText
+ *
+ * @returns string
+ */
+KarereEventObjects.Presence.prototype.getManagementMessageSummaryText = function() {
+    return Message.prototype.getManagementMessageSummaryText.apply(this);
 };
 /**
  * Event Object `StateActiveMessage`

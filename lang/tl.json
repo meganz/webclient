@@ -675,6 +675,7 @@
     "1289": "Salamat sa pag-click sa invitation link. Makikigawa ng inyong free account sa ibaba.",
     "1290": "Naku, hindi yata ito ang valid na invitation link. Nag-register ka na ba para sa account?",
     "1291": "Dati ka ng nag-clik para sa aming invitation link. Makikigawa ng inyong account.",
+    "1292": "Coming Soon",
     "1297": "Ang e-mail address ay nagamit na.",
     "1298": "Mag-log-in sa inyong account.",
     "1301": "Ngayon",
@@ -1093,6 +1094,8 @@
     "1884": "Ang folder na (%1) ay hindi na-upload dahil masyado itong malaki. Ginagawa namin itong pagsisiyasat na ito para maiwasan ang pag-uupload ng buong boot volumes, na masyadong mabagal at delikado.",
     "1885": "%1 folders ay hindi nailagay dahil masyadong malaki ang laman. Ginagawa namin ang sisiyasat na ito upang maiwasan ang paglalagay ng buong boot volumes, na masyadong mabagal at delikado.",
     "1888": "Startpage",
+    "1889": "iOS App",
+    "1890": "Android App",
     "1893": "Makakuha ng kaalaman patungkol sa pagsisync ng mga computers mo at ng MEGA.",
     "1898": "Pindutin ang Esc para magsara",
     "1899": "Pasilip",
@@ -1909,6 +1912,7 @@
     "6227": "Marami akong naranasang problema",
     "6229": "Nalilito akong gamitin ang interface",
     "6234": "LITE",
+    "6240": "Windows Phone App",
     "6508": "Settings",
     "6690": "Pumunta sa My Account",
     "6771": "Mga binurang folders",
@@ -3009,8 +3013,22 @@
     "8434": "Habang ang browser technology ay naglilimit ng file size ng inyong paglilipat, makakasiguro ka naman sa bawat download o upload ng kahit anong file sa pamamagitan ng MEGAsync.",
     "8435": "The file cannot be sent as the target user is over their storage quota.",
     "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+    "8437": "Web Client",
+    "8438": "Source Code Transparency",
+    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
     "alias": {
         "shared-with-me": 5589,
-        "quota-share-error": 8435
+        "quota-share-error": 8435,
+        "coming-soon": 1292,
+        "web-client": 8437,
+        "source-code-transparency": 8438,
+        "ios-app": 1889,
+        "android-app": 1890,
+        "windows-phone-app": 6240,
+        "source-code-intro-1": 8439,
+        "source-code-intro-2": 8440,
+        "source-code-intro-3": 8441
     }
 }

@@ -675,6 +675,7 @@
     "1289": "Davet linkine t\u0131klad\u0131\u011f\u0131n\u0131z i\u00e7in te\u015fekk\u00fcrler. L\u00fctfen a\u015fa\u011f\u0131dan \u00fccretsiz hesab\u0131n\u0131z\u0131 yarat\u0131n.",
     "1290": "Bu link ge\u00e7erli bir davete benzemiyor. Daha \u00f6nceden bir hesap olu\u015fturdunuz mu?",
     "1291": "Daha \u00f6nce bir davet linkine t\u0131klad\u0131n\u0131z. L\u00fctfen hesab\u0131n\u0131z\u0131 olu\u015fturun.",
+    "1292": "Yak\u0131nda",
     "1297": "E-posta adresi zaten kullan\u0131l\u0131yor.",
     "1298": "L\u00fctfen oturum a\u00e7\u0131n.",
     "1301": "Bug\u00fcn",
@@ -1093,6 +1094,8 @@
     "1884": "\u00c7ok b\u00fcy\u00fck oldu\u011fu i\u00e7in klas\u00f6r (%1) y\u00fcklenemedi. Bu kontrol\u00fc, verimsiz ve tehlikeli olan \u00f6ny\u00fckleme birimlerinin y\u00fcklenmesini engellemek i\u00e7in yap\u0131yoruz.",
     "1885": "\u00c7ok b\u00fcy\u00fck oldu\u011fu i\u00e7in %1 klas\u00f6r y\u00fcklenemedi. Bu kontrol\u00fc, verimsiz ve tehlikeli olan \u00f6ny\u00fckleme birimlerinin y\u00fcklenmesini engellemek i\u00e7in yap\u0131yoruz.",
     "1888": "Ana sayfa",
+    "1889": "iOS Uygulamas\u0131",
+    "1890": "Android Uygulamas\u0131",
     "1893": "Bilgisayarlar\u0131n\u0131z ve MEGA aras\u0131nda senkronizasyon yapmak hakk\u0131ndaki t\u00fcm bilgiye sahip olun.",
     "1898": "Kapatmak i\u00e7in Esc'ye bas\u0131n",
     "1899": "\u00d6nizleme",
@@ -1909,6 +1912,7 @@
     "6227": "\u00c7ok fazla sorun ya\u015fad\u0131m",
     "6229": "Aray\u00fcz\u00fc kullan\u0131m a\u00e7\u0131s\u0131ndan \u00e7ok kafa kar\u0131\u015ft\u0131r\u0131c\u0131 buluyorum",
     "6234": "LITE",
+    "6240": "Windows Phone Uygulamas\u0131",
     "6508": "Ayarlar",
     "6690": "Hesab\u0131m'a git",
     "6771": "Silinen klas\u00f6rler",
@@ -3009,8 +3013,22 @@
     "8434": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
     "8435": "The file cannot be sent as the target user is over their storage quota.",
     "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+    "8437": "Web Client",
+    "8438": "Source Code Transparency",
+    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
     "alias": {
         "shared-with-me": 5589,
-        "quota-share-error": 8435
+        "quota-share-error": 8435,
+        "coming-soon": 1292,
+        "web-client": 8437,
+        "source-code-transparency": 8438,
+        "ios-app": 1889,
+        "android-app": 1890,
+        "windows-phone-app": 6240,
+        "source-code-intro-1": 8439,
+        "source-code-intro-2": 8440,
+        "source-code-intro-3": 8441
     }
 }

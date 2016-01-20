@@ -675,6 +675,7 @@
     "1289": "\u8b1d\u8b1d\u60a8\u9ede\u9078\u9080\u8acb\u9023\u7d50\u3002\u8acb\u5efa\u7acb\u4e00\u500b\u514d\u8cbb\u5e33\u865f\u3002",
     "1290": "\u7cdf! \u9019\u4f3c\u4e4e\u4e0d\u662f\u500b\u6709\u6548\u7684\u9080\u8acb\u9023\u7d50\u3002\u60a8\u662f\u5426\u5df2\u8a3b\u518a\u904e\u5e33\u865f?",
     "1291": "\u60a8\u5148\u524d\u5df2\u9ede\u9078\u904e\u9080\u8acb\u9023\u7d50\u3002\u8acb\u5efa\u7acb\u60a8\u7684\u5e33\u865f\u3002",
+    "1292": "\u5373\u5c07\u63a8\u51fa",
     "1297": "\u8a72\u96fb\u5b50\u90f5\u4ef6\u4fe1\u7bb1\u5df2\u5728\u4f7f\u7528\u4e2d\u3002",
     "1298": "\u8acb\u767b\u5165\u60a8\u7684\u5e33\u865f\u3002",
     "1301": "\u4eca\u5929",
@@ -1093,6 +1094,8 @@
     "1884": "\u8cc7\u6599\u593e(%1)\u56e0\u904e\u5927\u800c\u672a\u88ab\u4e0a\u50b3\u3002\u6211\u5011\u9032\u884c\u6b64\u9805\u6aa2\u67e5\u4f86\u9810\u9632\u5927\u91cf\u4e0a\u50b3\uff0c\u4ee5\u514d\u6548\u7387\u904e\u5dee\u6216\u5371\u96aa\u3002",
     "1885": "%1\u8cc7\u6599\u593e\u56e0\u904e\u5927\u800c\u672a\u88ab\u4e0a\u50b3\u3002\u6211\u5011\u9032\u884c\u6b64\u9805\u6aa2\u67e5\u4f86\u9810\u9632\u5927\u91cf\u4e0a\u50b3\uff0c\u4ee5\u514d\u6548\u7387\u904e\u5dee\u6216\u5371\u96aa\u3002",
     "1888": "\u9996\u9801",
+    "1889": "iOS App",
+    "1890": "Android App",
     "1893": "\u66f4\u591a\u95dc\u65bc\u96fb\u8166\u8207MEGA\u540c\u6b65\u3002",
     "1898": "\u6309Esc\u53ef\u95dc\u9589",
     "1899": "\u9810\u89bd",
@@ -1909,6 +1912,7 @@
     "6227": "\u4f7f\u7528\u904e\u7a0b\u4e2d\u9047\u5230\u5f88\u554f\u984c",
     "6229": "\u6211\u89ba\u5f97\u7528\u6236\u754c\u9762\u4f7f\u7528\u8d77\u4f86\u5f88\u6df7\u4e82",
     "6234": "LITE",
+    "6240": "Windows Phone App",
     "6508": "\u8a2d\u5b9a",
     "6690": "\u5230\u6211\u7684\u5e33\u6236",
     "6771": "\u522a\u9664\u7684\u8cc7\u6599\u593e",
@@ -3009,8 +3013,22 @@
     "8434": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
     "8435": "The file cannot be sent as the target user is over their storage quota.",
     "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+    "8437": "Web Client",
+    "8438": "Source Code Transparency",
+    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
     "alias": {
         "shared-with-me": 5589,
-        "quota-share-error": 8435
+        "quota-share-error": 8435,
+        "coming-soon": 1292,
+        "web-client": 8437,
+        "source-code-transparency": 8438,
+        "ios-app": 1889,
+        "android-app": 1890,
+        "windows-phone-app": 6240,
+        "source-code-intro-1": 8439,
+        "source-code-intro-2": 8440,
+        "source-code-intro-3": 8441
     }
 }

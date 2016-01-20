@@ -675,6 +675,7 @@
     "1289": "Obrigado por clicar no link de convite. Por favor, crie sua conta gratuita abaixo.",
     "1290": "Oops, isso n\u00e3o parece ser um link de convite v\u00e1lido. Voc\u00ea j\u00e1 fez o registro da conta?",
     "1291": "Voc\u00ea j\u00e1 clicou no link de convite. Por favor, crie uma conta.",
+    "1292": "Em breve",
     "1297": "Endere\u00e7o de e-mail j\u00e1 est\u00e1 sendo utilizado",
     "1298": "Por favor, entre em sua conta.",
     "1301": "Hoje",
@@ -1093,6 +1094,8 @@
     "1884": "A pasta (%1) n\u00e3o foi enviada porque \u00e9 extremamente grande. N\u00f3s fazemos esta verifica\u00e7\u00e3o para evitar o envio de diret\u00f3rios de boot, o que \u00e9 ineficiente e perigoso. ",
     "1885": "%1 pastas n\u00e3o foram enviadas porque s\u00e3o extremamente grandes. N\u00f3s fazemos esta verifica\u00e7\u00e3o para evitar o envio de diret\u00f3rios de boot, o que \u00e9 ineficiente e perigoso. ",
     "1888": "In\u00edcio",
+    "1889": "iOS App",
+    "1890": "Android App",
     "1893": "Aprenda tudo sobre a sincroniza\u00e7\u00e3o entre seu computador e o MEGA.",
     "1898": "Aperte ESC para fechar",
     "1899": "Preview",
@@ -1909,6 +1912,7 @@
     "6227": "Eu tive muitos problemas",
     "6229": "Eu acho a interface muito confusa de usar",
     "6234": "LITE",
+    "6240": "App para Windows Phone",
     "6508": "Configura\u00e7\u00f5es",
     "6690": "Ir para minha conta",
     "6771": "Pastas deletadas",
@@ -3009,8 +3013,22 @@
     "8434": "Enquanto a tecnologia utilizada em browsers podem limitar o tamanho de suas transfer\u00eancias, voc\u00ea pode baixar e enviar qualquer arquivo com o MEGAsync.",
     "8435": "The file cannot be sent as the target user is over their storage quota.",
     "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+    "8437": "Web Client",
+    "8438": "Source Code Transparency",
+    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
     "alias": {
         "shared-with-me": 5589,
-        "quota-share-error": 8435
+        "quota-share-error": 8435,
+        "coming-soon": 1292,
+        "web-client": 8437,
+        "source-code-transparency": 8438,
+        "ios-app": 1889,
+        "android-app": 1890,
+        "windows-phone-app": 6240,
+        "source-code-intro-1": 8439,
+        "source-code-intro-2": 8440,
+        "source-code-intro-3": 8441
     }
 }

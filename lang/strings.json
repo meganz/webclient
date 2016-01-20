@@ -2703,6 +2703,10 @@
         "text": "You have previously clicked on an invitation link. Please create your account.",
         "context": ""
     },
+    "1292": {
+        "text": "Coming Soon",
+        "context": ""
+    },
     "1297": {
         "text": "E-mail address already in use.",
         "context": ""
@@ -4374,6 +4378,14 @@
     "1888": {
         "text": "Home",
         "context": "Link on the help page to go back to the startpage"
+    },
+    "1889": {
+        "text": "iOS App",
+        "context": "Application for the iOS platform, is probably identical in many languages."
+    },
+    "1890": {
+        "text": "Android App",
+        "context": "Application for the Android platform, is probably identical in many languages."
     },
     "1893": {
         "text": "Get all knowledge about syncing between your computers and MEGA.",
@@ -7638,6 +7650,10 @@
     "6234": {
         "text": "PRO Lite",
         "context": "The new LITE payment plan. This means it is a light or lightweight payment plan compared to the full \/ heavyweight plans with lots of bandwidth and storage (PRO I, PRO II, PRO III)."
+    },
+    "6240": {
+        "text": "Windows Phone App",
+        "context": ""
     },
     "6508": {
         "text": "Settings\r\n",
@@ -12038,5 +12054,25 @@
     "8436": {
         "text": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
         "context": "In the case of this severe error (located on the contact's side), it's advisable to get in touch with their contact (%1) to find out what may have happened. Then afterwards to have their contact get in touch with MEGA's support team via email."
+    },
+    "8437": {
+        "text": "Web Client",
+        "context": "The website client program. E.g. What runs on https:\/\/mega.nz"
+    },
+    "8438": {
+        "text": "Source Code Transparency",
+        "context": "This page heading for the #sourcecode page is about transparency or openness about our source code. This means our source code is available to read and review."
+    },
+    "8439": {
+        "text": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+        "context": "A paragraph on the #opensource page explaining about MEGA's source code licences."
+    },
+    "8440": {
+        "text": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+        "context": "A paragraph on the #opensource page explaining about MEGA's source code repositories.Please keep [A][\/A] , [A2][\/A2] when doing the translation."
+    },
+    "8441": {
+        "text": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
+        "context": "A paragraph on the #opensource page explaining about MEGA's vulnerability (bug) rewards program. Please keep [A][\/A] , [A2][\/A2] when doing the translation."
     }
 }

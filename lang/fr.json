@@ -675,6 +675,7 @@
     "1289": "Merci d'avoir cliqu\u00e9 sur le lien d'invitation. Veuillez cr\u00e9er votre compte gratuit maintenant ci-dessous.",
     "1290": "Oups, il semble que le lien d'inscription n'est pas valide. Avez-vous d\u00e9j\u00e0 cr\u00e9\u00e9 votre compte ?",
     "1291": "Vous avez d\u00e9j\u00e0 cliqu\u00e9 sur un lien d'invitation. Veuillez cr\u00e9er votre compte.",
+    "1292": "Prochainement",
     "1297": "Adresse e-mail d\u00e9j\u00e0 utilis\u00e9e.",
     "1298": "Connectez-vous dans votre compte.",
     "1301": "Aujourd'hui",
@@ -1093,6 +1094,8 @@
     "1884": "Le dossier (%1) n'a pas \u00e9t\u00e9 upload\u00e9 car il est tr\u00e8s volumineux. N'uploadez pas de volumes entiers car c'est inefficace et dangereux.",
     "1885": "%1 dossiers n'ont pas \u00e9t\u00e9 upload\u00e9s car ils sont tr\u00e8s volumineux. N'uploadez pas de volumes entiers car c'est inefficace et dangereux.",
     "1888": "Accueil",
+    "1889": "iOS App",
+    "1890": "Android App",
     "1893": "Tout savoir au sujet de la synchronisation entre votre ordinateur et MEGA.",
     "1898": "Appuyer sur Esc pour fermer",
     "1899": "Aper\u00e7u",
@@ -1909,6 +1912,7 @@
     "6227": "J'ai rencontr\u00e9 trop de probl\u00e8mes.",
     "6229": "Je trouve l'interface trop confuse \u00e0 utiliser",
     "6234": "PRO Lite",
+    "6240": "Application Windows Phone",
     "6508": "Param\u00e8tres",
     "6690": "Rendez-vous dans Mon Compte",
     "6771": "Dossiers supprim\u00e9s",
@@ -3009,8 +3013,22 @@
     "8434": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
     "8435": "The file cannot be sent as the target user is over their storage quota.",
     "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+    "8437": "Web Client",
+    "8438": "Source Code Transparency",
+    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
     "alias": {
         "shared-with-me": 5589,
-        "quota-share-error": 8435
+        "quota-share-error": 8435,
+        "coming-soon": 1292,
+        "web-client": 8437,
+        "source-code-transparency": 8438,
+        "ios-app": 1889,
+        "android-app": 1890,
+        "windows-phone-app": 6240,
+        "source-code-intro-1": 8439,
+        "source-code-intro-2": 8440,
+        "source-code-intro-3": 8441
     }
 }

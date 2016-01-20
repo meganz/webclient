@@ -675,6 +675,7 @@
     "1289": "Kiitos kutsulinkin k\u00e4ytt\u00e4misest\u00e4. Ole hyv\u00e4 ja luo ilmainen k\u00e4ytt\u00e4j\u00e4tilisi alla. ",
     "1290": "Oho, t\u00e4m\u00e4 ei n\u00e4yt\u00e4 oleva kelvollinen kutsulinkki. Oletko jo rekister\u00f6inyt k\u00e4ytt\u00e4j\u00e4tilin?",
     "1291": "Olet jo aiemmin klikannut kutsulinkki\u00e4.  Ole hyv\u00e4 ja luo k\u00e4ytt\u00e4j\u00e4tilisi.",
+    "1292": "Tulossa pian",
     "1297": "S\u00e4hk\u00f6postiosoite on jo k\u00e4yt\u00f6ss\u00e4.",
     "1298": "Ole hyv\u00e4 ja kirjaudu sis\u00e4\u00e4n k\u00e4ytt\u00e4j\u00e4tilillesi.",
     "1301": "T\u00e4n\u00e4\u00e4n",
@@ -1093,6 +1094,8 @@
     "1884": "Kansiota (%1) ei l\u00e4hetetty, koska se on eritt\u00e4in suuri. T\u00e4ll\u00e4 tavalla est\u00e4mme tehottoman ja riskialttiin kokonaisten k\u00e4ynnistysosioiden l\u00e4hett\u00e4misen.",
     "1885": "%1 kansioita ei l\u00e4hetetty, koska ne ovat eritt\u00e4in suuria.  T\u00e4ll\u00e4 tavalla est\u00e4mme tehottoman ja riskialttiin kokonaisten k\u00e4ynnistysosioiden l\u00e4hett\u00e4misen.",
     "1888": "Koti",
+    "1889": "iOS-sovellus",
+    "1890": "Android-sovellus",
     "1893": "Lis\u00e4tietoa tietokoneidesi ja MEGAn v\u00e4lisest\u00e4 synkronoinnista.",
     "1898": "Paina Esc sulkeaksesi",
     "1899": "Esikatselu",
@@ -1909,6 +1912,7 @@
     "6227": "K\u00e4ytt\u00f6kokemukseni on ollut liian ongelmallinen",
     "6229": "K\u00e4ytt\u00f6liittym\u00e4 on liian sekava",
     "6234": "LITE",
+    "6240": "Windows Phone sovellus",
     "6508": "Asetukset",
     "6690": "Mene kohtaan Tilini",
     "6771": "Poista kansiot",
@@ -3009,8 +3013,22 @@
     "8434": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
     "8435": "The file cannot be sent as the target user is over their storage quota.",
     "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+    "8437": "Web Client",
+    "8438": "Source Code Transparency",
+    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
     "alias": {
         "shared-with-me": 5589,
-        "quota-share-error": 8435
+        "quota-share-error": 8435,
+        "coming-soon": 1292,
+        "web-client": 8437,
+        "source-code-transparency": 8438,
+        "ios-app": 1889,
+        "android-app": 1890,
+        "windows-phone-app": 6240,
+        "source-code-intro-1": 8439,
+        "source-code-intro-2": 8440,
+        "source-code-intro-3": 8441
     }
 }

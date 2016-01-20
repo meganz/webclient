@@ -21276,7 +21276,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .copy-dialog-button, .move-dialog-button {
     height: 48px;
-    width: 159px;
+    width: 244px;
     float: left;
     background-color: rgba(0,0,0,0.15);
     background-image: url(../images/mega/nw-fm-sprite_v12.svg);
@@ -21287,8 +21287,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-position: center -368px;
 }
 .copy-dialog-button.shared-with-me, .move-dialog-button.shared-with-me {
-    width: 158px;
     background-position: center -415px;
+    width: 232px;
 }
 .copy-dialog-button.conversations, .move-dialog-button.conversations {
     background-position: center -511px;

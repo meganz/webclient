@@ -107,7 +107,7 @@ function dl_g(res) {
             browserDownload();
         });
 
-        $('.download-button.to-cloudrive').rebind('click', start_import);
+        $('.download-button.to-clouddrive').rebind('click', start_import);
 
         var key = dlpage_key;
         var fdl_file = false;

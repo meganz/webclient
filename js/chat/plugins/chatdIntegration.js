@@ -387,38 +387,55 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             });
 
             if (hist.length > 0) {
-                try {
-                    // .seed result is not used in here, since it returns false, even when some messages can be decrypted
-                    // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
-                    var seedResult = chatRoom.protocolHandler.seed(hist);
-                    //console.error(chatRoom.roomJid, seedResult);
+                var decryptMessages = function() {
+                    try {
+                        // .seed result is not used in here, since it returns false, even when some messages can be decrypted
+                        // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
+                        var seedResult = chatRoom.protocolHandler.seed(hist);
+                        //console.error(chatRoom.roomJid, seedResult);
 
 
-                    var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
-                    decryptedMsgs.forEach(function (v, k) {
-                        if (typeof(v) === undefined) {
-                            return; // skip already decrypted messages
-                        }
+                        var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
+                        decryptedMsgs.forEach(function (v, k) {
+                            if (typeof(v) === undefined) {
+                                return; // skip already decrypted messages
+                            }
 
-                        if (v && v.payload) {
-                            chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
-                            delete chatRoom.notDecryptedBuffer[k];
-                        }
-                        else if (v && v.type === 0) {
-                            // this is a system message
-                            chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
-                        }
-                        else if (v && !v.payload) {
-                            self.logger.error("Could not decrypt: ", v)
-                        }
-                    });
-                } catch (e) {
-                    self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
+                            if (v && v.payload) {
+                                chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
+                                delete chatRoom.notDecryptedBuffer[k];
+                            }
+                            else if (v && v.type === 0) {
+                                // this is a system message
+                                chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
+                            }
+                            else if (v && !v.payload) {
+                                self.logger.error("Could not decrypt: ", v)
+                            }
+                        });
+                    } catch (e) {
+                        self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
+                    }
+
+                    if (seedResult === false && chatRoom.messagesBuff.haveMoreHistory() === true) {
+                        chatRoom.messagesBuff.retrieveChatHistory();
+                    }
+                };
+
+                if(!chatRoom.protocolHandler) {
+                    if (chatRoom.strongvelopeSetupPromises) {
+                        chatRoom.strongvelopeSetupPromises.done(function() {
+                            decryptMessages();
+                        })
+                    }
+                    else {
+                        debugger;
+                    }
+                }
+                else {
+                    decryptMessages();
                 }
 
-                if (seedResult === false && chatRoom.messagesBuff.haveMoreHistory() === true) {
-                    chatRoom.messagesBuff.retrieveChatHistory();
-                }
             }
         });
 
@@ -466,7 +483,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             self._retrieveChatdIdIfRequired(chatRoom)
         );
 
-        MegaPromise.allDone(
+
+        chatRoom.strongvelopeSetupPromises = MegaPromise.allDone(
             waitingForPromises
         )
             .done(function () {

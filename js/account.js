@@ -872,7 +872,7 @@ function isEphemeral() {
                 false,
                 true
             );
-        }, 250);
+        }, 3 * 60000);
     };
 
     /**

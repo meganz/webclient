@@ -200,7 +200,7 @@ var EMOJI_CATEGORIES = {
         "waxing_crescent_moon": ["1F312", "&#x1F312;"],
         "first_quarter_moon": ["1F313", "&#x1F313;"],
         "waxing_gibbous_moon": ["1F314", "&#x1F314;"],
-        "full_moon": ["1F642", "&#x1F315;"],
+        "full_moon": ["1F315", "&#x1F315;"],
         "waning_gibbous_moon": ["1F316", "&#x1F316;"],
         "last_quarter_moon": ["1F317", "&#x1F317;"],
         "waning_crescent_moon": ["1F318", "&#x1F318;"],

@@ -258,6 +258,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     line-height: 23px;
     padding: 0 10px;
     position: relative;
+    cursor: pointer;
 }
 a.nlanguage-lnk:hover {
     border: 2px solid #D31A00;

@@ -1,6 +1,6 @@
 {
   "name": "Mega_Webclient",
-  "version": "3.3.x",
+  "version": "0.0.0",
   "description": "Web Client to access the Mega Cloud Infrastructure",
   "main": "index.js",
   "directories": {
@@ -45,7 +45,7 @@
     "babel-plugin-transform-runtime": "^6.3.13",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
-    "stripcomment-loader": "^0.1.0",
+    "stripcomment-loader": "^0.1.0"
   },
   "devDependencies": {
     "webpack-dev-server": "^1.14.0",

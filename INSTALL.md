@@ -1,14 +1,22 @@
 Install/Deployment
 ==================
 
-The webclient requires `npm`, the Node.js package manager (please
+The webclient requires ``npm``, the Node.js package manager (please
 follow the instructions for installing from http://npmjs.org).  After
-the initial `git clone/pull/update` of the code from the repo.  To
+the initial ``git clone/pull/update`` of the code from the repo.  To
 install the required Node packages (for testing, the UI, code checks,
 etc.) need to run
 
 ```
 npm install
+```
+
+If you're deploying the code somewhere remotely without the need to
+run unit tests, checks, etc., only the ``npm`` packages for
+production are needed.
+
+```
+npm install --production
 ```
 
 This installs the latest required ``npm`` packages. You will *only*
@@ -52,13 +60,13 @@ SSH. The required React bundles (see above) are simply generated via a
 script in place after installing the ``npm`` package dependencies:
 
 ```
-npm install && scripts/build.sh
+npm install --production && scripts/build.sh
 ```
 
 When doing updates to that folder on the server, just do a:
 
 ```
-git pull -u && npm install && scripts/build.sh
+git pull -u && npm install --production && scripts/build.sh
 ```
 
 That ensures that everything is consistently up to date.

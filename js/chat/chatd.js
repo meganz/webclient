@@ -357,6 +357,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.JOIN:
+                self.keepAliveTimerRestart();
                 self.logger.log("Join or privilege change - user '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' with privilege level " + cmd.charCodeAt(17) );
 
                 self.connectionRetryManager.gotConnected();
@@ -372,6 +373,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.OLDMSG:
             case Chatd.Opcode.NEWMSG:
+                self.keepAliveTimerRestart();
                 newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
                 len = self.chatd.unpack32le(cmd.substr(29,4));
                 self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(33,len));
@@ -381,6 +383,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.MSGUPD:
+                self.keepAliveTimerRestart();
                 len = self.chatd.unpack32le(cmd.substr(29,4));
                 self.logger.log("Message '" + base64urlencode(cmd.substr(16,8)) + "' EDIT/DELETION: " + cmd.substr(33,len));
                 len += 33;
@@ -389,6 +392,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.SEEN:
+                self.keepAliveTimerRestart();
                 self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "': '" + base64urlencode(cmd.substr(9, 8)) + "'");
 
                 self.chatd.trigger('onMessageLastSeen', {
@@ -400,6 +404,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.RECEIVED:
+                self.keepAliveTimerRestart();
                 self.logger.log("Newest delivered message on '" + base64urlencode(cmd.substr(1,8)) + "': '" + base64urlencode(cmd.substr(9,8)) + "'");
 
                 self.chatd.trigger('onMessageLastReceived', {
@@ -411,6 +416,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.RETENTION:
+                self.keepAliveTimerRestart();
                 self.logger.log("Retention policy change on '" + base64urlencode(cmd.substr(1,8)) + "' by '" + base64urlencode(cmd.substr(9,8)) + "': " + self.chatd.unpack32le(cmd.substr(17,4)) + " second(s)");
                 self.chatd.trigger('onRetentionChanged', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
@@ -422,6 +428,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.MSGID:
+                self.keepAliveTimerRestart();
                 self.logger.log("Sent message ID confirmed: '" + base64urlencode(cmd.substr(9,8)) + "'");
 
                 self.chatd.msgconfirm(cmd.substr(1,8), cmd.substr(9,8));
@@ -430,6 +437,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
             
             case Chatd.Opcode.RANGE:
+                self.keepAliveTimerRestart();
                 self.logger.log("Known chat message IDs - oldest: '" + base64urlencode(cmd.substr(9,8)) + "' newest: '" + base64urlencode(cmd.substr(17,8)) + "'");
 
                 self.chatd.trigger('onMessagesHistoryInfo', {
@@ -444,6 +452,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.REJECT:
+                self.keepAliveTimerRestart();
                 self.logger.log("Command was rejected: " + self.chatd.unpack32le(cmd.substr(9,4)) + " / " + self.chatd.unpack32le(cmd.substr(13,4)));
 
                 if (self.chatd.unpack32le(cmd.substr(9,4)) == Chatd.Opcode.NEWMSG) {
@@ -455,6 +464,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.HISTDONE:
+                self.keepAliveTimerRestart();
                 self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
 
                 self.chatd.trigger('onMessagesHistoryDone',

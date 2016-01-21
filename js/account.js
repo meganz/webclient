@@ -817,7 +817,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     myCtx.callback = settleFunction;
 
     // Fire it off.
-    var apiCall = {'a': 'up'};
+    var apiCall = {'a': 'up', 'i': requesti};
     apiCall[attribute] = savedValue;
     api_req(apiCall, myCtx);
 

@@ -67,14 +67,10 @@ def dev(branch_name=''):
         
         # If successful
         if result.return_code == 0:
-            
             # Show last commit from the branch
             with cd(remote_branch_path):
                 run('git log -1') 
 
-            # Installs dependencies and builds bundles.
-            build_chat_bundle(remote_branch_path)
-            
             # Output beta server test link
             print('\nCloned branch {} to {}'
                   .format(branch_name, remote_branch_path))
@@ -85,6 +81,9 @@ def dev(branch_name=''):
             print('Branch already exists on beta, updating instead.\n')
             devupdate(branch_name)
 
+        # Installs dependencies and builds bundles.
+        build_chat_bundle(remote_branch_path)
+            
 
 def devupdate(branch_name=''):
     """

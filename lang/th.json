@@ -1328,6 +1328,7 @@
     "5596": "%1$s \u0e08\u0e32\u0e01 %2$s",
     "5597": "\u0e02\u0e32\u0e40\u0e02\u0e49\u0e32",
     "5598": "\u0e02\u0e32\u0e2d\u0e2d\u0e01",
+    "5599": "\u0e25\u0e49\u0e32\u0e07\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e43\u0e19\u0e16\u0e31\u0e07\u0e02\u0e22\u0e30",
     "5600": "\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e42\u0e1f\u0e25\u0e40\u0e14\u0e2d\u0e23\u0e4c\u0e17\u0e35\u0e48\u0e41\u0e0a\u0e23\u0e4c\u0e02\u0e32\u0e40\u0e02\u0e49\u0e32",
     "5601": "\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e42\u0e1f\u0e25\u0e40\u0e14\u0e2d\u0e23\u0e4c\u0e17\u0e35\u0e48\u0e41\u0e0a\u0e23\u0e4c\u0e02\u0e32\u0e2d\u0e2d\u0e01\u0e44\u0e1b",
     "5602": "\u0e2d\u0e2d\u0e1f\u0e44\u0e25\u0e19\u0e4c",
@@ -3018,6 +3019,7 @@
     "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
     "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
     "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
+    "8512": "Read more",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3029,6 +3031,7 @@
         "windows-phone-app": 6240,
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
-        "source-code-intro-3": 8441
+        "source-code-intro-3": 8441,
+        "read-more": 8512
     }
 }

@@ -1328,6 +1328,7 @@
     "5596": "%1$s de %2$s",
     "5597": "PASTA DE ENTRADA",
     "5598": "COMPARTILHAMENTOS",
+    "5599": "Limpar lixeira",
     "5600": "Sem pastas compartilhadas",
     "5601": "Sem pastas compartilhadas",
     "5602": "Dispon\u00edvel offline",
@@ -2899,7 +2900,7 @@
     "7993": "Clique aqui para ver mais op\u00e7\u00f5es de pagamento...",
     "7994": "Quanto tempo voc\u00ea quer a sua associa\u00e7\u00e3o para ser?",
     "7995": "Voc\u00ea est\u00e1 feliz com seu plano de pagamento?",
-    "7996": "Clique [S] COMPRA [\/ S] quando voc\u00ea est\u00e1 feliz com as op\u00e7\u00f5es de pagamento. Voc\u00ea ser\u00e1 mostrado um novo di\u00e1logo ou redirecionado para uma nova p\u00e1gina para concluir a compra.",
+    "7996": "Clique [S] COMPRA [\/S] quando voc\u00ea est\u00e1 feliz com as op\u00e7\u00f5es de pagamento. Voc\u00ea ser\u00e1 mostrado um novo di\u00e1logo ou redirecionado para uma nova p\u00e1gina para concluir a compra.",
     "7997": "Chat",
     "7998": "Para nos ajudar a melhorar o nosso servi\u00e7o, seria \u00f3timo se voc\u00ea pudesse avaliar a sua experi\u00eancia de chamada com [X]?",
     "8000": "N\u00e3o h\u00e1 hist\u00f3rico da conversa",
@@ -3018,6 +3019,7 @@
     "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
     "8440": "Voc\u00ea pode encontrar links para nossos mais populares reposit\u00f3rios de c\u00f3digo fonte abaixo. Para nossas bibliotecas menores voc\u00ea pode encontr\u00e1-los em [A]o osso general GitHub p\u00e1gina[\/A]. Se voc\u00ea gostaria de usar seu c\u00f3digo comercialmente de uma forma que est\u00e1 fora do \u00e2mbito destas licen\u00e7as, por favor[A2] entre em contato conosco[\/A2] para discutir.",
     "8441": "Se voc\u00ea encontrar um bug ou uma falha de seguran\u00e7a em nosso c\u00f3digo, por favor, entre em contato com [A]bugs@mega.nz[\/A], explicando o problema. N\u00f3s temos \u00f3timos programas de recompensas, e o crit\u00e9rio de cadastro est\u00e1 detalhado [A2]aqui[\/A2].",
+    "8512": "Read more",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3029,6 +3031,7 @@
         "windows-phone-app": 6240,
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
-        "source-code-intro-3": 8441
+        "source-code-intro-3": 8441,
+        "read-more": 8512
     }
 }

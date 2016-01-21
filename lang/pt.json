@@ -1328,6 +1328,7 @@
     "5596": "%1$s de %2$s",
     "5597": "A RECEBER",
     "5598": "A ENVIAR",
+    "5599": "Esvaziar o Lixo",
     "5600": "Sem pastas partilhadas recebidas",
     "5601": "Sem pastas partilhadas enviadas",
     "5602": "Dispon\u00edvel em offline",
@@ -3015,9 +3016,10 @@
     "8436": "Existe um problema  com as chaves criptogr\u00e1ficas do seu contacto (%1). Por favor feche este di\u00e1logo e pe\u00e7a ao seu contacto para encerrar a sess\u00e3o e voltar a inici\u00e1-la. Se o problema persistir, poder\u00e1 estar a ser alvo de um ataque man-in-the-middle. Para problemas persistentes, por favor diga ao utilizador para contactar [A]support@mega.nz[\/A] para assist\u00eancia.",
     "8437": "Cliente Web",
     "8438": "Transpar\u00eancia do c\u00f3digo-fonte",
-    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
-    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
-    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
+    "8439": "As aplica\u00e7\u00f5es secund\u00e1rias do nosso cliente est\u00e3o protegidas por uma licen\u00e7a personalizada e as nossas bibliotecas do n\u00facleo (tais como o Kit de Desenvolvimento de Software) est\u00e3o protegidos por uma licen\u00e7a mais permissiva. A licen\u00e7a para cada projecto pode ser encontrada nos reposit\u00f3rios de c\u00f3digo respectivos.",
+    "8440": "Pode encontrar endere\u00e7os para os nossos reposit\u00f3rios de c\u00f3digo mais populares abaixo. Para as nossas bibliotecas mais pequenas pode encontr\u00e1-las em [A]a nossa p\u00e1gina GitHub geral[\/A]. Se pretender usar o nosso c\u00f3digo comercialmente de um modo que est\u00e1 para al\u00e9m do \u00e2mbito destas licen\u00e7as, por favor [A2]contacte-nos[\/A2] para que o possamos considerar.",
+    "8441": "Se encontrar um bug ou falha de seguran\u00e7a no nosso c\u00f3digo, por favor envie um email a [A]bugs@mega.nz[\/A] a expor o problema. Temos um programa generoso financeiramente no que toca \u00e0 identifica\u00e7\u00e3o de vulnerabilidades e os crit\u00e9rios de submiss\u00e3o s\u00e3o explicados [A2]aqui[\/A2].",
+    "8512": "Read more",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3029,6 +3031,7 @@
         "windows-phone-app": 6240,
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
-        "source-code-intro-3": 8441
+        "source-code-intro-3": 8441,
+        "read-more": 8512
     }
 }

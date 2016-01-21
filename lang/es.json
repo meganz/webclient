@@ -1328,6 +1328,7 @@
     "5596": "%1$s de %2$s",
     "5597": "ENTRANTES",
     "5598": "SALIENTES",
+    "5599": "Vaciar Papelera",
     "5600": "No hay carpetas compartidas contigo",
     "5601": "No hay carpetas compartidas con otros",
     "5602": "Disponible sin conexi\u00f3n",
@@ -3018,6 +3019,7 @@
     "8439": "Las aplicaciones cliente est\u00e1n licenciadas bajo una licencia a medida y nuestras librer\u00edas principales (como el Kit de Desarrollo de Software) tienen una licencia m\u00e1s permisiva. La licencia para cada proyecto puede encontrarse en su repositorio de c\u00f3digo correspondiente.",
     "8440": "Puedes ver enlaces a nuestros repositorios de c\u00f3digo m\u00e1s populares a continuaci\u00f3n. Puedes encontrar las librer\u00edas m\u00e1s peque\u00f1as en [A]nuestra cuenta general de GitHub[\/A]. Si quieres utilizar nuestro c\u00f3digo de forma comercial, de una forma que escapa a estas licencias, por favor [A2]contacta con nosotros[\/A2] para discutirlo.",
     "8441": "Si encuentras un bug o fallo de seguridad en nuestro c\u00f3digo, por favor env\u00eda un email a [A]bugs@mega.nz[\/A] explic\u00e1ndonos el problema. Tenemos un programa de premios por vulnerabilidades bien pagado y el criterio de env\u00edo est\u00e1 explicado [A2]aqu\u00ed[\/A].",
+    "8512": "Read more",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3029,6 +3031,7 @@
         "windows-phone-app": 6240,
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
-        "source-code-intro-3": 8441
+        "source-code-intro-3": 8441,
+        "read-more": 8512
     }
 }

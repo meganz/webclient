@@ -1328,6 +1328,7 @@
     "5596": "%1$s \/ %2$s",
     "5597": "\u53d7\u4fe1\u4e2d",
     "5598": "\u9001\u4fe1\u7528",
+    "5599": "\u30b4\u30df\u7bb1\u306f\u7a7a\u3063\u307d",
     "5600": "\u73fe\u5728\u5171\u6709\u30d5\u30a9\u30eb\u30c0\u306e\u53d7\u4fe1\u306a\u3057",
     "5601": "\u73fe\u5728\u5171\u6709\u30d5\u30a9\u30eb\u30c0\u306e\u9001\u4fe1\u306a\u3057",
     "5602": "\u30aa\u30d5\u30e9\u30a4\u30f3\u3067\u5229\u7528\u53ef\u80fd",
@@ -3018,6 +3019,7 @@
     "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
     "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
     "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
+    "8512": "Read more",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3029,6 +3031,7 @@
         "windows-phone-app": 6240,
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
-        "source-code-intro-3": 8441
+        "source-code-intro-3": 8441,
+        "read-more": 8512
     }
 }

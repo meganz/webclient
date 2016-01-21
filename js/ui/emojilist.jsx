@@ -96,7 +96,7 @@ var EMOJI_CATEGORIES = {
         "muscle": ["1F4AA", "&#x1F4AA;"],
         "raised_hands": ["1F64C", "&#x1F64C;"],
         "pray": ["1F64F", "&#x1F64F;"],
-        "writing_hand": ["1F58E", "&#x1F58E;"],
+        "writing_hand": ["1F58E", "&#x1F58E;"]
     },
     "NATURE": {
         "seedling": ["1F331", "&#x1F331;"],
@@ -264,7 +264,7 @@ var EMOJI_CATEGORIES = {
         "cocktail": ["1F378", "&#x1F378;"],
         "beers": ["1F37B", "&#x1F37B;"],
         "beer": ["1F37A", "&#x1F37A;"],
-        "baby_bottle": ["1F37C", "&#x1F37C;"],
+        "baby_bottle": ["1F37C", "&#x1F37C;"]
     },
     "CELEBRATION": {
         "ribbon": ["1F380", "&#x1F380;"],
@@ -305,7 +305,7 @@ var EMOJI_CATEGORIES = {
         "purple_heart": ["1F49C", "&#x1F49C;"],
         "yellow_heart": ["1F49B", "&#x1F49B;"],
         "green_heart": ["1F49A", "&#x1F49A;"],
-        "blue_heart": ["1F499", "&#x1F499;"],
+        "blue_heart": ["1F499", "&#x1F499;"]
     },
     "ACTIVITY": {
         "runner": ["1F3C3", "&#x1F3C3;"],
@@ -362,7 +362,7 @@ var EMOJI_CATEGORIES = {
         "mahjong": ["1F004", "&#x1F004;"],
         "carousel_horse": ["1F3A0", "&#x1F3A0;"],
         "ferris_wheel": ["1F3A1", "&#x1F3A1;"],
-        "roller_coaster": ["1F3A2", "&#x1F3A2;"],
+        "roller_coaster": ["1F3A2", "&#x1F3A2;"]
     },
     "TRAVEL & PLACES": {
         "railway_car": ["1F683", "&#x1F683;"],
@@ -484,7 +484,7 @@ var EMOJI_CATEGORIES = {
         "flag_gr": ["1F1EC-1F1F7", "&#x1F1EC;-&#x1F1F7;"],
         "flag_vn": ["1F1FB-1F1F3", "&#x1F1FB;-&#x1F1F3;"],
         "flag_ad": ["1F1E9-1F1FF", "&#x1F1E9;-&#x1F1FF;"],
-        "flag_tr": ["1F1F9-1F1F7", "&#x1F1F9;-&#x1F1F7;"],
+        "flag_tr": ["1F1F9-1F1F7", "&#x1F1F9;-&#x1F1F7;"]
     },
     "OBJECTS & SYMBOLS": {
         "watch": ["231A", "&#x231A;"],
@@ -643,7 +643,6 @@ var EMOJI_CATEGORIES = {
         "no_entry": ["1F683", "&#x26D4;"],
         "name_badge": ["1F4DB", "&#x1F4DB;"],
         "no_pedestrians": ["1F6B7", "&#x1F6B7;"],
-        "railway_car": ["1F683", "&#x1F683;"],
         "do_not_litter": ["1F6AF", "&#x1F6AF;"],
         "no_bicycles": ["1F6B3", "&#x1F6B3;"],
         "non-potable_water": ["1F6B1", "&#x1F6B1;"],
@@ -683,7 +682,6 @@ var EMOJI_CATEGORIES = {
         "o2": ["1F17E", "&#x1F17E;"],
         "sos": ["1F198", "&#x1F198;"],
         "id": ["1F194", "&#x1F194;"],
-        "railway_car": ["1F683", "&#x1F683;"],
         "parking": ["1F17F", "&#x1F17F;"],
         "wc": ["1F6BE", "&#x1F6BE;"],
         "cool": ["1F192", "&#x1F192;"],
@@ -715,7 +713,6 @@ var EMOJI_CATEGORIES = {
         "arrow_forward": ["25B6", "&#x25B6;"],
         "arrow_backward": ["25C0", "&#x25C0;"],
         "arrow_up_small": ["1F53C", "&#x1F53C;"],
-        "railway_car": ["1F683", "&#x1F683;"],
         "arrow_down_small": ["1F53D", "&#x1F53D;"],
         "fast_forward": ["23E9", "&#x23E9;"],
         "rewind": ["1F683", "&#x23EA;"],
@@ -843,7 +840,7 @@ var EMOJI_CATEGORIES = {
         "clock930": ["1F564", "&#x1F564;"],
         "clock1030": ["1F565", "&#x1F565;"],
         "clock1130": ["1F566", "&#x1F566;"],
-        "clock1230": ["1F567", "&#x1F567;"],
+        "clock1230": ["1F567", "&#x1F567;"]
     }
 };
 

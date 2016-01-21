@@ -12079,6 +12079,110 @@
         "text": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
         "context": "A paragraph on the #opensource page explaining about MEGA's vulnerability (bug) rewards program. Please keep [A][\/A] , [A2][\/A2] when doing the translation."
     },
+    "8442": {
+        "text": "Select files",
+        "context": "Text of the button for user to select files in MEGA. "
+    },
+    "8443": {
+        "text": "Select folder",
+        "context": "Text of the button for user to select a specific folder in MEGA. "
+    },
+    "8444": {
+        "text": "Subscribe",
+        "context": "Text of the button for user  to click to subscribe to a PRO plan."
+    },
+    "8446": {
+        "text": "Are you sure you want to move these items to the Rubbish Bin?",
+        "context": "Confirmation message for moving files\/folders to the Rubbish Bin."
+    },
+    "8454": {
+        "text": "Media Uploads",
+        "context": "Title of the screen where the secondary media images are uploaded"
+    },
+    "8455": {
+        "text": "Share Permissions",
+        "context": "Title of the dialog to choose permissions when sharing."
+    },
+    "8457": {
+        "text": "Transferring\u2026",
+        "context": "Text located in each fragment when a download is in progress. Please keep the \u2026"
+    },
+    "8460": {
+        "text": "Request resent",
+        "context": "Success message for resending a contact invitation."
+    },
+    "8465": {
+        "text": "%d items moved successfully",
+        "context": "Success message for moving items."
+    },
+    "8471": {
+        "text": "Remove shares successfully",
+        "context": "Success message for removing folders."
+    },
+    "8475": {
+        "text": "%d items removed successfully from MEGA",
+        "context": "Success message for moving items from MEGA."
+    },
+    "8481": {
+        "text": "%d files sent successfully",
+        "context": "Success message for sending multiple files"
+    },
+    "8482": {
+        "text": ", %d files failed to send",
+        "context": "Error message when it failed to multiple files."
+    },
+    "8483": {
+        "text": "%d items copied successfully",
+        "context": "Success message for copying multiple files"
+    },
+    "8495": {
+        "text": "Current password is wrong. Please try again.",
+        "context": "Error message when the user types wrong current password to attempt to change his password."
+    },
+    "8497": {
+        "text": "Advanced Features",
+        "context": "Title of advanced setting category for cache and offline files."
+    },
+    "8498": {
+        "text": "Clear Offline Files",
+        "context": "Title of settings preference for clearing offline files."
+    },
+    "8499": {
+        "text": "Currently using %s",
+        "context": "Size of offline files or cache folders"
+    },
+    "8500": {
+        "text": "Calculating\u2026",
+        "context": "Calculating size of offline files or cache folders"
+    },
+    "8501": {
+        "text": "Turn on Camera Uploads",
+        "context": "Settings option to turn on Camera Uploads."
+    },
+    "8504": {
+        "text": "Wrong PIN code, please try again. You have %2d attemps left.",
+        "context": "Error message for typing the wrong pin code."
+    },
+    "8505": {
+        "text": "PIN Codes don't match",
+        "context": "Error message for typing the wrong PIN code (two times)"
+    },
+    "8506": {
+        "text": "Enter your Pin Code",
+        "context": "Title of the screen to unlock screen with pin code."
+    },
+    "8507": {
+        "text": "Re-Enter your PIN Code",
+        "context": "Title of the screen for re-entering PIN code to unlock screen."
+    },
+    "8508": {
+        "text": "Enter your new PIN Code",
+        "context": "Message to unlock screen with PIN code"
+    },
+    "8510": {
+        "text": "All your local data will be deleted and you will be logged out in %d seconds.",
+        "context": "Message when the user  tries 10 failed attempts with wrong PIN codes."
+    },
     "8512": {
         "text": "Read more",
         "context": "Open the whole blog post"

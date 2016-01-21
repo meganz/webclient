@@ -1328,6 +1328,7 @@
     "5596": "%1$s \u043e\u0434 %2$s",
     "5597": "\u041d\u0410\u0414\u041e\u041b\u0410\u0417\u0415\u040b\u0418",
     "5598": "OUTGOING",
+    "5599": "\u041f\u0440\u0430\u0437\u043d\u0430 \u043a\u043e\u0440\u043f\u0430",
     "5600": "\u041d\u0435\u043c\u0430 \u0434\u043e\u043b\u0430\u0437\u0435\u045b\u0438\u0445 \u0448\u0435\u0440\u043e\u0432\u0430\u043d\u0438\u0445 \u0444\u0430\u0458\u043b\u043e\u0432\u0430",
     "5601": "\u041d\u0435\u043c\u0430 outgoing \u0448\u0435\u0440\u043e\u0432\u0430\u043d\u0438\u0445 \u0444\u043e\u043b\u0434\u0435\u0440\u0430",
     "5602": "\u0414\u043e\u0441\u0442\u0443\u043f\u043d\u043e offline",
@@ -3018,6 +3019,7 @@
     "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
     "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
     "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
+    "8512": "Read more",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3029,6 +3031,7 @@
         "windows-phone-app": 6240,
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
-        "source-code-intro-3": 8441
+        "source-code-intro-3": 8441,
+        "read-more": 8512
     }
 }

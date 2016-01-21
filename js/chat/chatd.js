@@ -92,6 +92,7 @@ Chatd.Const = {
     'UNDEFINED' : '\0\0\0\0\0\0\0\0'
 };
 
+Chatd.MAX_KEEPALIVE_DELAY = 60000;
 
 // add a new chatd shard
 Chatd.prototype.addshard = function(chatid, shard, url) {
@@ -136,6 +137,8 @@ Chatd.Shard = function(chatd, shard) {
     self.cmdq = '';
 
     self.logger = new MegaLogger("shard-" + shard, {}, chatd.logger);
+
+    self.keepAliveTimer = null;
 
     self.connectionRetryManager = new ConnectionRetryManager(
         {
@@ -215,6 +218,7 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.binaryType = "arraybuffer";
 
     self.s.onopen = function(e) {
+        self.keepAliveTimerRestart();
         self.logger.log('chatd connection established');
         self.rejoinexisting();
         self.resendpending();
@@ -222,6 +226,7 @@ Chatd.Shard.prototype.reconnect = function() {
 
     self.s.onerror = function(e) {
         self.logger.error("WebSocket error:", e);
+        clearTimeout(self.keepAliveTimer);
         self.connectionRetryManager.doConnectionRetry();
     };
 
@@ -232,6 +237,7 @@ Chatd.Shard.prototype.reconnect = function() {
 
     self.s.onclose = function(e) {
         self.logger.log('chatd connection lost, reconnecting...');
+        clearTimeout(self.keepAliveTimer);
         self.connectionRetryManager.gotDisconnected();
     };
 };
@@ -243,6 +249,8 @@ Chatd.Shard.prototype.disconnect = function() {
         self.s.close();
     }
     self.s = null;
+
+    clearTimeout(self.keepAliveTimer);
 };
 
 Chatd.Shard.prototype.cmd = function(opcode, cmd) {
@@ -306,6 +314,27 @@ Chatd.Shard.prototype.hist = function(chatid, count) {
     this.cmd(Chatd.Opcode.HIST, chatid + this.chatd.pack32le(count));
 };
 
+/**
+ * Will initialise/reset a timer that would force reconnect the shard connection IN case that the keep alive is not
+ * received during a delay of max `Chatd.MAX_KEEPALIVE_DELAY` ms
+ */
+Chatd.Shard.prototype.keepAliveTimerRestart = function() {
+    var self = this;
+
+    if (self.keepAliveTimer) {
+        clearTimeout(self.keepAliveTimer);
+    }
+    self.keepAliveTimer = setTimeout(function() {
+        if (self.s && self.s.readyState === self.s.OPEN) {
+            self.logger.error("Server heartbeat missed/delayed. Will force reconnect.");
+
+            // current connection is active, but the keep alive detected delay of the keep alive. reconnect!
+            self.disconnect();
+            self.reconnect();
+        }
+    }, Chatd.MAX_KEEPALIVE_DELAY);
+};
+
 // inbound command processing
 // multiple commands can appear as one WebSocket frame, but commands never cross frame boundaries
 // CHECK: is this assumption correct on all browsers and under all circumstances?
@@ -321,6 +350,9 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.KEEPALIVE:
                 self.logger.log("Server heartbeat received");
                 self.cmd(Chatd.Opcode.KEEPALIVE, "");
+
+                self.keepAliveTimerRestart();
+
                 len = 1;
                 break;
 

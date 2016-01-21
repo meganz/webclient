@@ -3931,8 +3931,12 @@ function crypto_processkey(me, master_aes, file) {
             }
         }
 
-        var ab = base64_to_ab(file.a);
-        var o = dec_attr(ab, k);
+        if (!file.a) {
+            logger.warn('Missing attribute for node "%s"', file.h, file);
+        }
+
+        var ab = file.a && base64_to_ab(file.a);
+        var o = ab && dec_attr(ab, k);
 
         if (typeof o === 'object') {
             if (typeof o.n === 'string') {

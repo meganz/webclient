@@ -790,28 +790,3 @@ Chatd.prototype.unpack32le = function(x) {
 
     return r;
 };
-
-// imported functions from crypto.js
-if (typeof('base64urldecode') === 'undefined') {
-    function base64urldecode(data) {
-        data += '=='.substr((2 - data.length * 3) & 3)
-
-        if (typeof atob === 'function') {
-            data = data.replace(/\-/g, '+').replace(/_/g, '/').replace(/,/g, '');
-
-            try {
-                return atob(data);
-            } catch (e) {
-                return '';
-            }
-        }
-    }
-}
-
-if (typeof('base64urlencode') === 'undefined') {
-    function base64urlencode(data) {
-        if (typeof btoa === 'function') {
-            return btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-        }
-    }
-}

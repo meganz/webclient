@@ -258,6 +258,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     line-height: 23px;
     padding: 0 10px;
     position: relative;
+    cursor: pointer;
 }
 a.nlanguage-lnk:hover {
     border: 2px solid #D31A00;
@@ -2477,6 +2478,11 @@ form {
 a.blog-new-archive-lnk:hover .blog-archive-number {
     background-color: #797979;
 }
+
+.blog-new-item img, .blog-new-item h2 {
+    cursor: pointer;
+}
+
 p .blog-new-read-more, p a.blog-new-read-more {
     display: block;
     height: 30px;
@@ -21276,7 +21282,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .copy-dialog-button, .move-dialog-button {
     height: 48px;
-    width: 159px;
+    width: 244px;
     float: left;
     background-color: rgba(0,0,0,0.15);
     background-image: url(../images/mega/nw-fm-sprite_v12.svg);
@@ -21287,8 +21293,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-position: center -368px;
 }
 .copy-dialog-button.shared-with-me, .move-dialog-button.shared-with-me {
-    width: 158px;
     background-position: center -415px;
+    width: 232px;
 }
 .copy-dialog-button.conversations, .move-dialog-button.conversations {
     background-position: center -511px;

@@ -188,6 +188,35 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
 
                     callSession.bind('StateChanged' + evtId, stopSound);
                 })
+                .rebind('CallTerminated.chatNotifications', function(e, origEvent, room) {
+                    self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call");
+                    var contact = room.megaChat.getContactFromJid(room.getParticipantsExceptMe()[0]);
+                    var avatarMeta = generateAvatarMeta(contact.u);
+                    var icon = avatarMeta.avatarUrl;
+
+                    var n = self.notifications.notify(
+                        'call-terminated',
+                        {
+                            'sound': 'hang_out',
+                            'group': room.roomJid,
+                            'incrementCounter': false,
+                            'icon': icon,
+                            'params': {
+                                'from': avatarMeta.fullName
+                            }
+                        },
+                        !document.hasFocus()
+                    );
+
+                    n.bind('onClick', function(e) {
+                        window.focus();
+                        room.activateWindow();
+                        room.show();
+                    });
+
+
+                    n.setUnread(false);
+                });
         })
         .rebind('onIncomingCall.chatNotifications', function(e,
              room,
@@ -241,9 +270,6 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
             };
 
             callSession.bind('StateChanged' + evtId, stopSound);
-        })
-        .rebind('onCallTerminated.chatNotifications', function(e, room) {
-            self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call")
         })
         .rebind('onCallAnswered.chatNotifications', function(e, room) {
             self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call")

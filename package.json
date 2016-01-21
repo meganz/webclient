@@ -1,6 +1,6 @@
 {
   "name": "Mega_Webclient",
-  "version": "2.0.0",
+  "version": "3.3.x",
   "description": "Web Client to access the Mega Cloud Infrastructure",
   "main": "index.js",
   "directories": {

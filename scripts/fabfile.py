@@ -63,7 +63,7 @@ def dev(branch_name=''):
         result = run('git clone --depth 1'
                      ' git@code.developers.mega.co.nz:web/webclient.git'
                      ' {} -b {}'.format(branch_name, branch_name),
-                     arn_only=True)
+                     warn_only=True)
         
         # If successful
         if result.return_code == 0:

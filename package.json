@@ -36,16 +36,18 @@
     "react-dom": "^0.14.3",
     "react-hot-loader": "^1.3.0",
     "react-immutable-render-mixin": "^0.8.0",
-    "react-transform-hmr": "^1.0.1"
-  },
-  "devDependencies": {
+    "react-transform-hmr": "^1.0.1",
+    "webpack": "^1.12.9",
+      "webpack-dev-server": "^1.14.0",
     "babel-core": "^6.3.15",
     "babel-loader": "^6.2.0",
     "babel-plugin-react-transform": "^2.0.0-beta1",
     "babel-plugin-transform-react-display-name": "^6.4.0",
     "babel-plugin-transform-runtime": "^6.3.13",
     "babel-preset-es2015": "^6.3.13",
-    "babel-preset-react": "^6.3.13",
+    "babel-preset-react": "^6.3.13"
+  },
+  "devDependencies": {
     "coffee-script": "^1.9.1",
     "constant-enum": "^1.0.1",
     "css-loader": "^0.9.1",
@@ -87,8 +89,6 @@
     "object-assign": "^2.0.0",
     "sinon": "~1.9.0",
     "stripcomment-loader": "^0.1.0",
-    "uglify-loader": "^1.1.0",
-    "webpack": "^1.12.9",
-    "webpack-dev-server": "^1.14.0"
+    "uglify-loader": "^1.1.0"
   }
 }

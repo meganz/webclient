@@ -115,7 +115,7 @@ function blog_load() {
                         + escapeHTML(blogposts[i].attaches.simg) + '" src="'
                         + escapeHTML(CMS.img(blogposts[i].attaches.simg)) + '" />';
                     blogcontent += '<p><span class="blog-new-description">' + introtxt + '</span>';
-                    blogcontent += '<a class="blog-new-read-more">Read more</a>';
+                    blogcontent += '<a class="blog-new-read-more">' + l[8512] + '</a>';
                     blogcontent += '<span class="clear"></span></p> </div>';
                 }
                 a++;

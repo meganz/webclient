@@ -1328,6 +1328,7 @@
     "5596": "%1$s z %2$s",
     "5597": "NADCHODZ\u0104CE",
     "5598": "WYCHODZ\u0104CE",
+    "5599": "Opr\u00f3\u017cnij kosz",
     "5600": "Brak nadchodz\u0105cych katalog\u00f3w",
     "5601": "Brak udost\u0119pnionych katalog\u00f3w",
     "5602": "Dost\u0119pne offline",
@@ -3012,12 +3013,13 @@
     "8433": "Nieograniczony rozmiar plik\u00f3w",
     "8434": "Poniewa\u017c technologia z kt\u00f3rej korzystaj\u0105 przegl\u0105darki ogranicza wielko\u015b\u0107 plik\u00f3w, kt\u00f3re mog\u0105 by\u0107\u00a0przesy\u0142ane, zalecamy pobranie naszej aplikacji MEGAsync.",
     "8435": "Plik nie mo\u017ce zosta\u0107 wys\u0142any poniewa\u017c odbiorca przekroczy\u0142\u00a0dost\u0119pne miejsce na dysku.",
-    "8436": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+    "8436": "Wyst\u0105pi\u0142\u00a0problem z kluczem od kontaktu (%1). Zamknij to okno i popro\u015b i wyglogowanie si\u0119 i zalogowanie ponownie. Je\u017celi problem b\u0119dzie wyst\u0119powa\u0107 oznacza to, \u017ce mo\u017ce to by\u0107 pr\u00f3ba ataku hakerskiego. W takim przypadku popro\u015b u\u017cytkownika o kontakt z [A]support@mega.nz[\/A] w celu rozwi\u0105zania problemu.",
     "8437": "Aplikacja internetowa",
     "8438": "Otwarto\u015b\u0107 kodu \u017ar\u00f3d\u0142owego",
-    "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
-    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8439": "Nasze aplikacje oparte s\u0105 o w\u0142asne licencje, a g\u0142\u00f3wna biblioteka aplikacji (tj. SDK) s\u0105 na bardziej dost\u0119pnych licencjach. Lista dost\u0119pnych licencji umieszczona jest w odpowiednich repozytoriach.",
+    "8440": "Poni\u017cej znajdziesz linki do repozytori\u00f3w najbardziej popularnych element\u00f3w naszych aplikacji. Mniejsze elementy znajdziesz [A]na stronie g\u0142\u00f3wnej GitHub[\/A]. Je\u017celi chcia\u0142by\u015b u\u017cywa\u0107\u00a0naszego kodu komerycjnie prosimy o [A2]kontakt z nami[\/A2] w celu om\u00f3wienia zasad.",
     "8441": "Je\u017celi znajdziesz b\u0142\u0105d lub dziur\u0119 w naszym oprogramowaniu, prosimy o przes\u0142anie do nas maila na [A]bugs@mega.nz[\/A] z opisem problemu. Dla dobrze opisanych problem\u00f3w spe\u0142niaj\u0105ych kryteria opisane [A2]tutaj[\/A2] mamy gratyfikacje pieni\u0119\u017cne.",
+    "8512": "Read more",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3029,6 +3031,7 @@
         "windows-phone-app": 6240,
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
-        "source-code-intro-3": 8441
+        "source-code-intro-3": 8441,
+        "read-more": 8512
     }
 }

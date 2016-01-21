@@ -5315,6 +5315,10 @@
         "text": "OUTGOING",
         "context": "Capital letters. Outgoing shared folders. The title of a tab"
     },
+    "5599": {
+        "text": "Empty Rubbish Bin",
+        "context": "message when there are no files in the Rubbish Bin."
+    },
     "5600": {
         "text": "No incoming shared folders",
         "context": "Title shown when there's no incoming Shared Items"
@@ -12074,5 +12078,9 @@
     "8441": {
         "text": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
         "context": "A paragraph on the #opensource page explaining about MEGA's vulnerability (bug) rewards program. Please keep [A][\/A] , [A2][\/A2] when doing the translation."
+    },
+    "8512": {
+        "text": "Read more",
+        "context": "Open the whole blog post"
     }
 }

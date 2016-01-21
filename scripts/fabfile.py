@@ -54,6 +54,9 @@ def sandbox3():
 
 @task
 def deploy():
+    """
+    Deploys to the web root of a server (only use for beta.mega.nz).
+    """
     with cd(env.target_dir):
         run("touch current_ver.txt")
         run("cat current_ver.txt >> ~/deployer/last_ver.txt")

@@ -3483,10 +3483,18 @@ mega.utils.logout = function megaUtilsLogout() {
                 }
             }
         }, step = 1;
+
         loadingDialog.show();
         if (typeof mDB === 'object' && mDB.drop) {
             step++;
             mFileManagerDB.exec('drop').always(finishLogout);
+        }
+        if (typeof attribCache === 'object' && attribCache.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+            step++;
+            MegaPromise.allDone([
+                attribCache.clear(),
+                attribCache.destroy()
+            ]).always(finishLogout);
         }
         if (u_privk) {
             // Use the 'Session Management Logout' API call to kill the current session

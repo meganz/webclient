@@ -199,6 +199,23 @@ IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function
 });
 
 /**
+ * Destroy cache (and drop db)
+ *
+ * @type {MegaPromise}
+ */
+IndexedDBKVStorage.prototype.destroy = IndexedDBKVStorage._requiresDbConn(function __IDBKVClear() {
+    var self = this;
+    self._memCache = {};
+
+    if (!self.db || self.db.dbState !== MegaDB.DB_STATE.INITIALIZED) {
+        return MegaPromise.resolve();
+    }
+    else {
+        return self.db.drop();
+    }
+});
+
+/**
  * Check if item with key `k` exists in the DB.
  * The returned promise will be resolved IF the item exists OR rejected if the item does NOT exist.
  *

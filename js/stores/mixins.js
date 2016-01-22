@@ -104,14 +104,14 @@ var MegaRenderMixin = {
         this.forceUpdate();
     },
     onResizeDoUpdate: function() {
-        if(!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
         this.eventuallyUpdate();
     },
     onHashChangeDoUpdate: function() {
-        if(!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
@@ -122,7 +122,7 @@ var MegaRenderMixin = {
         depth = depth ? depth : 0;
 
 
-        if(typeof map._dataChangeIndex !== "undefined") {
+        if (typeof map._dataChangeIndex !== "undefined") {
             var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
             if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
                 _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
@@ -130,14 +130,14 @@ var MegaRenderMixin = {
                 });
             }
         }
-        if(depth+1 > MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+        if (depth+1 > MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
             return;
         }
 
         var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
 
         mapKeys.forEach(function(k) {
-            if(map[k]) {
+            if (map[k]) {
                 self._recurseAddListenersIfNeeded(idx + "_" + k, map[k], depth + 1);
             }
         });
@@ -151,30 +151,30 @@ var MegaRenderMixin = {
         // alias
         var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
 
-        if(!v && v === rv) { // null, undefined, false is ok
+        if (!v && v === rv) { // null, undefined, false is ok
             //console.error('r === rv, !v', k, referenceMap, map);
             return false; // continue/skip
         }
 
-        if(typeof v._dataChangeIndex !== "undefined") {
+        if (typeof v._dataChangeIndex !== "undefined") {
             var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
 
-            if(dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
-                if(window.RENDER_DEBUG) console.error("changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
+            if (dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
+                if (window.RENDER_DEBUG) console.error("changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
                 foundChanges = true;
                 dataChangeHistory[cacheKey] = v._dataChangeIndex;
             } else {
                 //console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
             }
-        } else if(typeof v === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
-            if(self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
+        } else if (typeof v === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+            if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
                 foundChanges = true;
             } else {
                 //console.error("NOT (recursive) changed: ", k, v);
             }
-        } else if(v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+        } else if (v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
             v.forEach(function(v, k) {
-                if(self._recursiveSearchForDataChanges(idx, v[k], rv[k], depth + 1) === true) {
+                if (self._recursiveSearchForDataChanges(idx, v[k], rv[k], depth + 1) === true) {
                     foundChanges = true;
                     return false; // break
                 }
@@ -188,24 +188,24 @@ var MegaRenderMixin = {
         var self = this;
         depth = depth || 0;
 
-        if(!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
-        if(!this._wasRendered) {
-            if(window.RENDER_DEBUG) console.error("First time render", self.getElementName(), map, referenceMap);
+        if (!this._wasRendered) {
+            if (window.RENDER_DEBUG) console.error("First time render", self.getElementName(), map, referenceMap);
 
             this._wasRendered = true;
             return true; // first time render, always render the first time
         }
         // quick lookup
-        if(
+        if (
             (map && !referenceMap) ||
             (!map && referenceMap) ||
             (map && referenceMap && !shallowEqual(map, referenceMap))
         ) {
             return true;
-        }  else if(
+        }  else if (
             map.children && referenceMap.children && !shallowEqual(map.children.length, referenceMap.children.length)
         ) {
             return true;
@@ -217,7 +217,7 @@ var MegaRenderMixin = {
         mapKeys.forEach(function(k) {
             foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
 
-            if(foundChanges === true) {
+            if (foundChanges === true) {
                 return false; // break
             }
         });
@@ -225,21 +225,21 @@ var MegaRenderMixin = {
     },
     shouldComponentUpdate: function(nextProps, nextState) {
         var shouldRerender = false;
-        if(!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true) {
             return false;
         }
 
-        if(this.props !== null) {
+        if (this.props !== null) {
             shouldRerender = this._recursiveSearchForDataChanges("p", nextProps, this.props);
         }
-        if(shouldRerender === false && this.state !== null) {
+        if (shouldRerender === false && this.state !== null) {
             shouldRerender = this._recursiveSearchForDataChanges("s", nextState, this.state);
         }
 
-        if(this.getElementName() === "unknown") {
+        if (this.getElementName() === "unknown") {
             debugger;
         }
-        if(window.RENDER_DEBUG) console.error("shouldRerender?",
+        if (window.RENDER_DEBUG) console.error("shouldRerender?",
             shouldRerender,
             "rendered: ", this.getElementName(),
             "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
@@ -248,11 +248,11 @@ var MegaRenderMixin = {
         );
 
 
-        if(shouldRerender === true) { // (eventually) add listeners to newly added data structures
-            if(this.props) {
+        if (shouldRerender === true) { // (eventually) add listeners to newly added data structures
+            if (this.props) {
                 this._recurseAddListenersIfNeeded("p", this.props);
             }
-            if(this.state) {
+            if (this.state) {
                 this._recurseAddListenersIfNeeded("s", this.state);
             }
         }
@@ -262,7 +262,7 @@ var MegaRenderMixin = {
     onPropOrStateUpdated: function() {
         if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this, this.getElementName(), arguments);
 
-        if(!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
@@ -300,7 +300,7 @@ var MegaRenderMixin = {
     //},
     getOwnerElement: function() {
         var owner = this._reactInternalInstance._currentElement._owner;
-        if(owner) {
+        if (owner) {
             return this._reactInternalInstance._currentElement._owner._instance;
         } else {
             return null;
@@ -311,10 +311,10 @@ var MegaRenderMixin = {
 
 var RenderDebugger = {
     componentDidUpdate: function() {
-        if(window.RENDER_DEBUG) {
+        if (window.RENDER_DEBUG) {
             var self = this;
             var getElementName = function() {
-                if(!self.constructor) {
+                if (!self.constructor) {
                     return "unknown";
                 }
                 return self.constructor.displayName;

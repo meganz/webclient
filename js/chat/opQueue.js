@@ -64,7 +64,7 @@ OpQueue.prototype.queue = function(opName, arrArgs, secondArg, thirdArg) {
 OpQueue.prototype.retry = function() {
     var self = this;
 
-    if(self.tickTimer) {
+    if (self.tickTimer) {
         clearTimeout(self.tickTimer);
         self.tickTimer = null;
     }
@@ -87,7 +87,7 @@ OpQueue.prototype.retry = function() {
 OpQueue.prototype.preprocess = function(op) {
     var self = this;
 
-    if(op[0] == "processMessage") {
+    if (op[0] == "processMessage") {
         var $promise1 = new $.Deferred();
         var $promise2 = new $.Deferred();
 
@@ -103,7 +103,7 @@ OpQueue.prototype.preprocess = function(op) {
         self.logger.debug("Processing: ", wireMessage);
 
         var contact = self.megaRoom.megaChat.getContactFromJid(fromBareJid);
-        if(!contact) {
+        if (!contact) {
             self.logger.error("contact not found: ", fromBareJid);
             $combPromise.reject();
             return $combPromise;
@@ -119,13 +119,13 @@ OpQueue.prototype.preprocess = function(op) {
             });
 
         crypt.getPubEd25519(contact.u, function(r) {
-            if(r) {
+            if (r) {
                 try {
                     $promise1.resolve();
                 } catch(e) {
                     self.logger.error("Failed to process message", wireMessage, "with error:", e, e.stack);
                     $promise1.reject();
-                    if(localStorage.stopOnAssertFail) {
+                    if (localStorage.stopOnAssertFail) {
                         debugger;
                     }
                 }
@@ -134,13 +134,13 @@ OpQueue.prototype.preprocess = function(op) {
             }
         });
         crypt.getPubEd25519(contact2.u, function(r) {
-            if(r) {
+            if (r) {
                 try {
                     $promise2.resolve();
                 } catch(e) {
                     self.logger.error("Failed to process message", wireMessage, "with error:", e);
                     $promise2.reject();
-                    if(localStorage.stopOnAssertFail) {
+                    if (localStorage.stopOnAssertFail) {
                         debugger;
                     }
                 }
@@ -170,11 +170,11 @@ OpQueue.prototype.preprocess = function(op) {
 OpQueue.prototype.pop = function() {
     var self = this;
 
-    if(self._queue.length == 0) {
+    if (self._queue.length == 0) {
         return true;
     }
 
-    if(self.$waitPreprocessing && self.$waitPreprocessing.state && self.$waitPreprocessing.state() == "pending") {
+    if (self.$waitPreprocessing && self.$waitPreprocessing.state && self.$waitPreprocessing.state() == "pending") {
         // pause if we are waiting for op preprocessing.
         return true;
     }
@@ -186,45 +186,45 @@ OpQueue.prototype.pop = function() {
     $.when(self.$waitPreprocessing).done(function() {
         self._currentOp = self._queue[0];
 
-        if(self.validateFn(self, self._queue[0])) {
+        if (self.validateFn(self, self._queue[0])) {
             var op = self._queue.shift();
 
-            if($.isArray(op[1])) { // supports combining multiple ops
+            if ($.isArray(op[1])) { // supports combining multiple ops
                 /**
                  * if the next X ops are the same, combine them (call the op, with args = args1 + args2 + args3)
                  */
 
                 var lastRemovedElementId = -1;
                 $.each(self._queue.slice(), function(k, v) {
-                    if(v[0] == op[0]) {
+                    if (v[0] == op[0]) {
                         op[1] = op[1].concat(v[1]);
                         lastRemovedElementId = k;
                     } else {
                         return false;
                     }
                 });
-                if(lastRemovedElementId != -1) {
+                if (lastRemovedElementId != -1) {
                     self._queue = self._queue.splice(lastRemovedElementId + 1);
                 }
             }
 
             // per OP optimisations and safe guards
-            if(op[0] == "exclude") {
+            if (op[0] == "exclude") {
                 // exclude only users who are CURRENTLY in the askeMember members list
                 var op1 = [];
                 $.each(op[1], function(k, v) {
-                    if(self.ctx.askeMember.members.indexOf(v) !== -1) {
+                    if (self.ctx.askeMember.members.indexOf(v) !== -1) {
                         op1.push(
                             v
                         );
                     }
                 });
                 op[1] = op1; // replace
-            } else if(op[0] == "join") {
+            } else if (op[0] == "join") {
                 // join only users who are NOT CURRENTLY in the askeMember members list
                 var op1 = [];
                 $.each(op[1], function(k, v) {
-                    if(self.ctx.askeMember.members.indexOf(v) === -1) {
+                    if (self.ctx.askeMember.members.indexOf(v) === -1) {
                         op1.push(
                             v
                         );
@@ -234,33 +234,33 @@ OpQueue.prototype.pop = function() {
             }
 
 
-            if(op[0] == "processMessage" && op[1].message && typeof mocha == "undefined") {
+            if (op[0] == "processMessage" && op[1].message && typeof mocha == "undefined") {
                 var classify = mpenc.codec.categoriseMessage(op[1].message);
                 self.logger.debug("Will process message with contents: ", mpenc.codec.inspectMessageContent(classify.content));
             }
 
 
-            if(op[1].length == 0 && op[0] != "recover" && op[0] != "quit") {
+            if (op[1].length == 0 && op[0] != "recover" && op[0] != "quit") {
                 self.logger.error("OpQueue will ignore: ", op, "because of not enough arguments.");
             } else {
                 try {
                     self.ctx[op[0]](op[1], op[2], op[3]);
                 } catch(e) {
-                    if(op[0] == "processMessage" || e.name == "TypeError") {
-//                        if(localStorage.stopOnAssertFail) {
+                    if (op[0] == "processMessage" || e.name == "TypeError") {
+//                        if (localStorage.stopOnAssertFail) {
 //                            debugger;
 //                        }
                     }
-                    if((e.message && e.message.indexOf("Authentication of member failed") != -1) && window.d) {
+                    if ((e.message && e.message.indexOf("Authentication of member failed") != -1) && window.d) {
                         self.logger.warn("Because of debug mode and caught Authentication failed, authring will be scrubbed.");
 
                         authring.scrubAuthRing();
 
                         var megaRoom = self.megaRoom;
 
-                        if(megaRoom.iAmRoomOwner() === true) {
+                        if (megaRoom.iAmRoomOwner() === true) {
                             megaRoom.megaChat.plugins.encryptionFilter.syncRoomUsersWithEncMembers(megaRoom, true);
-                        } else if(megaRoom.encryptionHandler.state === 2) {
+                        } else if (megaRoom.encryptionHandler.state === 2) {
                             megaRoom.megaChat.plugins.encryptionFilter._reinitialiseEncryptionOpQueue(megaRoom);
                         }
 
@@ -270,7 +270,7 @@ OpQueue.prototype.pop = function() {
 
                     self.logger.error("OpQueue caught mpenc exception: ", e, op, e.stack ? e.stack : "[no stack]");
 
-                    if(localStorage.mpencDebug) {
+                    if (localStorage.mpencDebug) {
                         debugger;
                     }
                 }
@@ -278,7 +278,7 @@ OpQueue.prototype.pop = function() {
 
             return self.pop();
         } else {
-            if(self._error_retries > self.MAX_ERROR_RETRIES) {
+            if (self._error_retries > self.MAX_ERROR_RETRIES) {
                 self.logger.error("OpQueue will try to recover: ", self._currentOp, self._queue[0]);
                 self._error_retries = 0;
                 self.recoverFailFn(self);
@@ -297,7 +297,7 @@ OpQueue.prototype.pop = function() {
 OpQueue.prototype.destroy = function() {
     var self = this;
 
-    if(self.tickTimer) {
+    if (self.tickTimer) {
         clearTimeout(self.tickTimer);
     }
     self._queue = [];

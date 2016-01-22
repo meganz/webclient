@@ -76,7 +76,7 @@ var uiCheckboxes = function($scope) {
 
         $input
             .rebind('change.uiCheckboxes', function() {
-                if($(this).attr('checked')) {
+                if ($(this).attr('checked')) {
                     $cbxElement.removeClass('checkboxOff');
                     $cbxElement.addClass('checkboxOn');
                     $cbxElement.trigger('onFakeCheckboxChange', [true]);

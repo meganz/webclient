@@ -362,9 +362,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
-                if(v.userId) {
+                if (v.userId) {
                     var msg = v.getContents ? v.getContents() : v.message;
-                    //if(msg && msg.length && msg.length > 0) {
+                    //if (msg && msg.length && msg.length > 0) {
                     //    msg = base64urldecode(msg);
                     //}
 
@@ -422,7 +422,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     }
                 };
 
-                if(!chatRoom.protocolHandler) {
+                if (!chatRoom.protocolHandler) {
                     if (chatRoom.strongvelopeSetupPromises) {
                         chatRoom.strongvelopeSetupPromises.done(function() {
                             decryptMessages();
@@ -440,7 +440,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         });
 
         $(chatRoom.messagesBuff).rebind('onNewMessageReceived.chatdStrongvelope', function(e, msgObject) {
-            if(msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
+            if (msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
                 var _runDecryption = function() {
                     try {
                         var decrypted = chatRoom.protocolHandler.decryptFrom(

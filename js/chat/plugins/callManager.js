@@ -1029,7 +1029,7 @@ CallManager.prototype._attachToChat = function(megaChat) {
  * Suggested by Alex, a simple regexp to detect and find ALL 'reason's for a call failed reasons.
  **/
 CallManager._isAFailedReason = function(reason) {
-    if(!reason || !reason.match) {
+    if (!reason || !reason.match) {
         return false;
     }
     return reason.match(/.*(ice-disconnect|fail|error|security|timeout|xmpp-disconnect).*/) ? 1 : 0;

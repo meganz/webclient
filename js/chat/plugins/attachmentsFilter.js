@@ -25,7 +25,7 @@
 //    var self = this;
 //
 //
-//    if(!eventObject.getMeta() || !eventObject.getMeta().attachments) {
+//    if (!eventObject.getMeta() || !eventObject.getMeta().attachments) {
 //        return; // ignore, this is not an attachments message
 //    }
 //};
@@ -35,7 +35,7 @@
 //
 //    var meta = eventData.message.getMeta();
 //
-//    if(!meta || !meta.attachments) {
+//    if (!meta || !meta.attachments) {
 //        return; // ignore, this is not an attachments message
 //    }
 //
@@ -55,7 +55,7 @@
 //
 //
 //    $.each(attachments, function(k, attachment) {
-//        if(attachment.canceled) {
+//        if (attachment.canceled) {
 //            return; // continue;
 //        }
 //
@@ -76,20 +76,20 @@
 //            '</div>'
 //        );
 //
-//        if(i == 0) {
+//        if (i == 0) {
 //            $element.addClass("main-body");
 //        }
 //
 //        $('.nw-chat-sharing-filename', $element).text(attachment.name);
 //
-//        if(attachment.t == 0) {
+//        if (attachment.t == 0) {
 //            // is file
 //            $('.block-view-file-type', $element).addClass(
 //                fileIcon({'name': attachment.name})
 //            );
 //
 //            $('.nw-chat-sharing-filesize', $element).text(bytesToSize(attachment.s));
-//        } else if(attachment.t == 1) {
+//        } else if (attachment.t == 1) {
 //            // is folder
 //            $('.block-view-file-type', $element).addClass('folder');
 //            $('.nw-chat-sharing-filesize', $element).remove();
@@ -119,7 +119,7 @@
 //
 //    $m.addClass("is-attachment");
 //
-//    if(Object.keys(attachments).length > 1) {
+//    if (Object.keys(attachments).length > 1) {
 //        $('.fm-chat-message', $m)
 //            .addClass('multiple-sharing');
 //

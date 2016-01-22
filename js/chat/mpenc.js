@@ -834,7 +834,7 @@ define('mpenc/helper/utils',[
             }
 
             // If the property is inherited, do not check any more (it must be equal if both objects inherit it).
-            if(!obj1.hasOwnProperty(propName)) {
+            if (!obj1.hasOwnProperty(propName)) {
                 continue;
             }
 
@@ -853,7 +853,7 @@ define('mpenc/helper/utils',[
                 }
             }
             // Normal value comparison for strings and numbers.
-            else if(obj1[propName] !== obj2[propName]) {
+            else if (obj1[propName] !== obj2[propName]) {
                 return false;
             }
         }
@@ -3951,7 +3951,7 @@ define('mpenc/handler',[
                 } else {
                     // Nothing to do, we're done here.
                 }
-                if(keyingMessageResult.newState &&
+                if (keyingMessageResult.newState &&
                         (keyingMessageResult.newState !== oldState)) {
                     // Update the state if required.
                     utils.dummyLogger('DEBUG',

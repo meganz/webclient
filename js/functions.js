@@ -735,23 +735,23 @@ var time2lastSeparator = function(dateString, refDate) {
         // Today
         return l[1301];
     }
-    else if(momentDate.isSame(yesterday, 'd')) {
+    else if (momentDate.isSame(yesterday, 'd')) {
         // Yesterday
         return l[1302];
     }
-    else if(momentDate.isAfter(weekAgo)) {
+    else if (momentDate.isAfter(weekAgo)) {
         // This week
         return l[1303];
     }
-    else if(momentDate.isAfter(twoWeeksAgo)) {
+    else if (momentDate.isAfter(twoWeeksAgo)) {
         // Last week
         return l[1304];
     }
-    else if(momentDate.isAfter(thisMonth)) {
+    else if (momentDate.isAfter(thisMonth)) {
         // This month
         return l[1305];
     }
-    else if(momentDate.isAfter(thisYearAgo)) {
+    else if (momentDate.isAfter(thisYearAgo)) {
         // This year
         return l[1306];
     }
@@ -1059,7 +1059,7 @@ function makeMetaAware(kls) {
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;
 
-        if(!self["_" + prefix]) {
+        if (!self["_" + prefix]) {
             return;
         }
 
@@ -2794,7 +2794,7 @@ function generateAnonymousReport() {
     var roomUniqueId = 0;
     var roomUniqueIdMap = {};
 
-    if(megaChatIsReady && megaChat.chats) {
+    if (megaChatIsReady && megaChat.chats) {
         megaChat.chats.forEach(function (v, k) {
             var participants = v.getParticipants();
 

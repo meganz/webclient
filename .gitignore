@@ -227,6 +227,7 @@ test-results.xml
 .tox
 js/tests/coverage
 test/phantomjs-storage
+js/chat/bundle.js
 
 
 #############

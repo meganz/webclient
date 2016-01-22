@@ -92,6 +92,7 @@ Chatd.Const = {
     'UNDEFINED' : '\0\0\0\0\0\0\0\0'
 };
 
+Chatd.MAX_KEEPALIVE_DELAY = 60000;
 
 // add a new chatd shard
 Chatd.prototype.addshard = function(chatid, shard, url) {
@@ -136,6 +137,8 @@ Chatd.Shard = function(chatd, shard) {
     self.cmdq = '';
 
     self.logger = new MegaLogger("shard-" + shard, {}, chatd.logger);
+
+    self.keepAliveTimer = null;
 
     self.connectionRetryManager = new ConnectionRetryManager(
         {
@@ -215,6 +218,7 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.binaryType = "arraybuffer";
 
     self.s.onopen = function(e) {
+        self.keepAliveTimerRestart();
         self.logger.log('chatd connection established');
         self.rejoinexisting();
         self.resendpending();
@@ -222,6 +226,7 @@ Chatd.Shard.prototype.reconnect = function() {
 
     self.s.onerror = function(e) {
         self.logger.error("WebSocket error:", e);
+        clearTimeout(self.keepAliveTimer);
         self.connectionRetryManager.doConnectionRetry();
     };
 
@@ -232,6 +237,7 @@ Chatd.Shard.prototype.reconnect = function() {
 
     self.s.onclose = function(e) {
         self.logger.log('chatd connection lost, reconnecting...');
+        clearTimeout(self.keepAliveTimer);
         self.connectionRetryManager.gotDisconnected();
     };
 };
@@ -243,6 +249,8 @@ Chatd.Shard.prototype.disconnect = function() {
         self.s.close();
     }
     self.s = null;
+
+    clearTimeout(self.keepAliveTimer);
 };
 
 Chatd.Shard.prototype.cmd = function(opcode, cmd) {
@@ -306,6 +314,27 @@ Chatd.Shard.prototype.hist = function(chatid, count) {
     this.cmd(Chatd.Opcode.HIST, chatid + this.chatd.pack32le(count));
 };
 
+/**
+ * Will initialise/reset a timer that would force reconnect the shard connection IN case that the keep alive is not
+ * received during a delay of max `Chatd.MAX_KEEPALIVE_DELAY` ms
+ */
+Chatd.Shard.prototype.keepAliveTimerRestart = function() {
+    var self = this;
+
+    if (self.keepAliveTimer) {
+        clearTimeout(self.keepAliveTimer);
+    }
+    self.keepAliveTimer = setTimeout(function() {
+        if (self.s && self.s.readyState === self.s.OPEN) {
+            self.logger.error("Server heartbeat missed/delayed. Will force reconnect.");
+
+            // current connection is active, but the keep alive detected delay of the keep alive. reconnect!
+            self.disconnect();
+            self.reconnect();
+        }
+    }, Chatd.MAX_KEEPALIVE_DELAY);
+};
+
 // inbound command processing
 // multiple commands can appear as one WebSocket frame, but commands never cross frame boundaries
 // CHECK: is this assumption correct on all browsers and under all circumstances?
@@ -321,10 +350,14 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.KEEPALIVE:
                 self.logger.log("Server heartbeat received");
                 self.cmd(Chatd.Opcode.KEEPALIVE, "");
+
+                self.keepAliveTimerRestart();
+
                 len = 1;
                 break;
 
             case Chatd.Opcode.JOIN:
+                self.keepAliveTimerRestart();
                 self.logger.log("Join or privilege change - user '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' with privilege level " + cmd.charCodeAt(17) );
 
                 self.connectionRetryManager.gotConnected();
@@ -340,6 +373,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.OLDMSG:
             case Chatd.Opcode.NEWMSG:
+                self.keepAliveTimerRestart();
                 newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
                 len = self.chatd.unpack32le(cmd.substr(29,4));
                 self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(33,len));
@@ -349,6 +383,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.MSGUPD:
+                self.keepAliveTimerRestart();
                 len = self.chatd.unpack32le(cmd.substr(29,4));
                 self.logger.log("Message '" + base64urlencode(cmd.substr(16,8)) + "' EDIT/DELETION: " + cmd.substr(33,len));
                 len += 33;
@@ -357,6 +392,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.SEEN:
+                self.keepAliveTimerRestart();
                 self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "': '" + base64urlencode(cmd.substr(9, 8)) + "'");
 
                 self.chatd.trigger('onMessageLastSeen', {
@@ -368,6 +404,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.RECEIVED:
+                self.keepAliveTimerRestart();
                 self.logger.log("Newest delivered message on '" + base64urlencode(cmd.substr(1,8)) + "': '" + base64urlencode(cmd.substr(9,8)) + "'");
 
                 self.chatd.trigger('onMessageLastReceived', {
@@ -379,6 +416,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.RETENTION:
+                self.keepAliveTimerRestart();
                 self.logger.log("Retention policy change on '" + base64urlencode(cmd.substr(1,8)) + "' by '" + base64urlencode(cmd.substr(9,8)) + "': " + self.chatd.unpack32le(cmd.substr(17,4)) + " second(s)");
                 self.chatd.trigger('onRetentionChanged', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
@@ -390,6 +428,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.MSGID:
+                self.keepAliveTimerRestart();
                 self.logger.log("Sent message ID confirmed: '" + base64urlencode(cmd.substr(9,8)) + "'");
 
                 self.chatd.msgconfirm(cmd.substr(1,8), cmd.substr(9,8));
@@ -398,6 +437,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
             
             case Chatd.Opcode.RANGE:
+                self.keepAliveTimerRestart();
                 self.logger.log("Known chat message IDs - oldest: '" + base64urlencode(cmd.substr(9,8)) + "' newest: '" + base64urlencode(cmd.substr(17,8)) + "'");
 
                 self.chatd.trigger('onMessagesHistoryInfo', {
@@ -412,6 +452,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.REJECT:
+                self.keepAliveTimerRestart();
                 self.logger.log("Command was rejected: " + self.chatd.unpack32le(cmd.substr(9,4)) + " / " + self.chatd.unpack32le(cmd.substr(13,4)));
 
                 if (self.chatd.unpack32le(cmd.substr(9,4)) == Chatd.Opcode.NEWMSG) {
@@ -423,6 +464,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.HISTDONE:
+                self.keepAliveTimerRestart();
                 self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
 
                 self.chatd.trigger('onMessagesHistoryDone',

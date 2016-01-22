@@ -2977,6 +2977,12 @@ function MegaData()
             self.u[userId].firstName = firstName;
             self.u[userId].lastName = lastName;
 
+            if (userId === u_handle) {
+                u_attr.firstname = firstName;
+                u_attr.lastname = lastName;
+
+                $('.user-name').text(u_attr.firstname);
+            }
             if (
                 typeof $.sortTreePanel !== 'undefined' &&
                 typeof $.sortTreePanel.contacts !== 'undefined' &&
@@ -5164,15 +5170,15 @@ function execsc(actionPackets, callback) {
             }
             else if (actionPacket.a === 'ua') {
                 for (var j in actionPacket.ua) {
-                    if (actionPacket.ua[j] === '+a') {
+                    var attributeName = actionPacket.ua[j];
+                    if (attributeName === '+a') {
                         avatars[actionPacket.u] = undefined;
                         loadavatars = true;
                     }
-                    else if (actionPacket.ua[j] === '*authring') {
-                        authring.getContacts('Ed25519');
-                    }
-                    else if (actionPacket.ua[j] === '*authRSA') {
-                        authring.getContacts('RSA');
+                    else if (attributeName === 'firstname' || attributeName === 'lastname') {
+                        removeItemPromise.always(function() {
+                            M.syncUsersFullname(actionPacketUserId);
+                        });
                     }
                 }
             }
@@ -5450,63 +5456,54 @@ function execsc(actionPackets, callback) {
             M.delNode(actionPacket.n);
         }
         else if (actionPacket.a === 'ua' && fminitialized) {
-            for (var i in actionPacket.ua) {
+            for (var j in actionPacket.ua) {
+                var attributeName = actionPacket.ua[j];
+                var actionPacketUserId = actionPacket.u;
+
                 if (d) {
                     console.debug(
                         "Invalidating cache, because of update from action packet:",
-                        actionPacket.u,
-                        actionPacket.ua[i]
+                        actionPacketUserId,
+                        attributeName
                     );
                 }
 
-                var cacheFillPromise = new MegaPromise();
                 /* jshint -W083 */
                 var removeItemPromise = attribCache.removeItem(
-                    actionPacket.u + "_" + actionPacket.ua[i]
-                ).always(function() {
-                    // refill cache!
-                    var attrib = actionPacket.ua[i];
-                    var isPub = attrib.substr(0, 1) === '+' ? true : false;
-                    var nonHistoric = attrib.substr(1, 1) === '!' ? true : false;
-                    if (attrib.substr(0, 1) === '+' || attrib.substr(0, 1) === '*') {
-                        attrib = attrib.substr(1, attrib.length);
-                    }
-                    if (attrib.substr(0, 1) === '!') {
-                        attrib = attrib.substr(1, attrib.length);
-                    }
-
-                    cacheFillPromise.linkDoneAndFailTo(
-                        getUserAttribute(
-                            actionPacket.u,
-                            attrib,
-                            isPub,
-                            nonHistoric
-                        )
-                    );
-                });
+                    actionPacketUserId + "_" + attributeName
+                );
                 /* jshint +W083 */
 
-                if (actionPacket.ua[i] === '+a') {
-                    avatars[actionPacket.u] = undefined;
+                if (attributeName === '+a') {
+                    avatars[actionPacketUserId] = undefined;
 
                     /* jshint -W083 */
-                    MegaPromise.allDone([
-                        removeItemPromise,
-                        cacheFillPromise
-                    ]).done(function  __actionPacketCacheInvalidateDone() {
+                    removeItemPromise.always(function  __actionPacketCacheInvalidateDone() {
                         M.avatars();
                     });
                     /* jshint +W083 */
                 }
-                else if (actionPacket.ua[i] == '+puEd255') {
-                    // pubEd25519 key was updated!
-                    // force finger regen.
-                    delete pubEd25519[actionPacket.u];
-                    crypt.getPubEd25519(actionPacket.u);
+                else if (actionPacket.ua[j] === '*!authring') {
+                    removeItemPromise.always(function() {
+                        authring.getContacts('Ed25519');
+                    });
                 }
-                else if (actionPacket.ua[i] === 'firstname' || actionPacket.ua[i] === 'lastname') {
-                    removeItemPromise.done(function() {
-                        M.syncUsersFullname(actionPacket.u);
+                else if (actionPacket.ua[j] === '*!authRSA') {
+                    removeItemPromise.always(function() {
+                        authring.getContacts('RSA');
+                    });
+                }
+                else if (actionPacket.ua[j] === '*!authCu255') {
+                    removeItemPromise.always(function() {
+                        authring.getContacts('Cu25519');
+                    });
+                }
+                else if (attributeName == '+puEd255') {
+                    removeItemPromise.always(function() {
+                        // pubEd25519 key was updated!
+                        // force fingerprint regen.
+                        delete pubEd25519[actionPacketUserId];
+                        crypt.getPubEd25519(actionPacketUserId);
                     });
                 }
             }

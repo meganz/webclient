@@ -89,12 +89,12 @@ var _createObjectDataMethods = function(kls) {
         return this.keys().length
     };
 
-    obj.hasOwnProperty = function() {
-        return this._data.hasOwnProperty.call(this._data, arguments);
+    obj.hasOwnProperty = function(prop) {
+        return this._data.hasOwnProperty(prop);
     };
 
-    obj.propertyIsEnumerable = function() {
-        return this._data.propertyIsEnumerable.call(this._data, arguments);
+    obj.propertyIsEnumerable = function(prop) {
+        return this._data.propertyIsEnumerable(prop);
     };
 
     obj.destroyStructure = function() {

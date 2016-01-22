@@ -24,8 +24,10 @@ var Button = React.createClass({
             document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
             $(document).rebind('keyup.button' + self.getUniqueId(), function(e) {
-                if (e.keyCode == 27) { // escape key maps to keycode `27`
-                    self.onBlur();
+                if (self.state.focused === true) {
+                    if (e.keyCode == 27) { // escape key maps to keycode `27`
+                        self.onBlur();
+                    }
                 }
             });
 

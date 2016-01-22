@@ -558,6 +558,8 @@ CallSession.prototype.onCallFailed = function(e, reason, txt) {
         })
     );
 
+    self.room.trigger('CallTerminated', [e, self.room]);
+
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 

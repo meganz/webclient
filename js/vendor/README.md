@@ -106,6 +106,9 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/stomita/ios-imagefile-megapixel/compare/master...meganz:master)
 
 ---
+[moment.js]: Parse, validate, manipulate, and display dates in JavaScript.
+
+---
 [nacl-fast.js]: Port of TweetNaCl cryptographic library to JavaScript.
 
 > This is released into the [public domain](https://en.wikipedia.org/wiki/Public_domain_software).
@@ -166,6 +169,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jsbn2.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
 [megaLogger.js]: <https://github.com/meganz/megalogger>
 [megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>
+[moment.js]: <https://github.com/moment/moment/tree/2.10.6>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>

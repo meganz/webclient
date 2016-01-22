@@ -2,6 +2,11 @@
 *.crx
 
 #################
+## Webclient build artifacts
+#################
+js/chat/bundle.js
+
+#################
 ## Eclipse
 #################
 

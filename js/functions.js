@@ -3491,10 +3491,7 @@ mega.utils.logout = function megaUtilsLogout() {
         }
         if (typeof attribCache === 'object' && attribCache.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
             step++;
-            MegaPromise.allDone([
-                attribCache.clear(),
-                attribCache.destroy()
-            ]).always(finishLogout);
+            attribCache.destroy().always(finishLogout);
         }
         if (u_privk) {
             // Use the 'Session Management Logout' API call to kill the current session

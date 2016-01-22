@@ -200,13 +200,6 @@ function u_logout(logout) {
         localStorage.removeItem('registeremail');
         localStorage.removeItem('agreedToCopyrightWarning');
 
-        if (typeof attribCache === 'object' && attribCache.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
-            MegaPromise.allDone([
-                attribCache.clear(),
-                attribCache.destroy()
-            ]);
-        }
-
         if (mDBact) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];

@@ -737,9 +737,10 @@ function init_page() {
     else if (dlid) {
         page = 'download';
         if (typeof fdl_queue_var !== 'undefined') {
-            var $tr = $('.transfer-table tr#dl_' + Object(fdl_queue_var).ph);
+            var handle = Object(fdl_queue_var).ph || '';
+            var $tr = $('.transfer-table tr#dl_' + handle);
             if ($tr.length) {
-                var dl = dlmanager.getDownloadByHandle(fdl_queue_var.ph);
+                var dl = dlmanager.getDownloadByHandle(handle);
                 if (dl) {
                     dl.onDownloadProgress = dlprogress;
                     dl.onDownloadComplete = dlcomplete;

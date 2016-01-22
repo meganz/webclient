@@ -200,6 +200,13 @@ function u_logout(logout) {
         localStorage.removeItem('registeremail');
         localStorage.removeItem('agreedToCopyrightWarning');
 
+        if (typeof attribCache === 'object' && attribCache.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+            MegaPromise.allDone([
+                attribCache.clear(),
+                attribCache.destroy()
+            ]);
+        }
+
         if (mDBact) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];
@@ -817,7 +824,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     myCtx.callback = settleFunction;
 
     // Fire it off.
-    var apiCall = {'a': 'up'};
+    var apiCall = {'a': 'up', 'i': requesti};
     apiCall[attribute] = savedValue;
     api_req(apiCall, myCtx);
 
@@ -930,7 +937,7 @@ function isEphemeral() {
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
 
-                    M.u[u_h].ts = parseInt(v.split(":")[1], 10);
+                    Object(M.u[u_h]).ts = parseInt(v.split(":")[1], 10);
 
                     $promise.verify();
                 }

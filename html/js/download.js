@@ -89,21 +89,22 @@ function dl_g(res) {
         });
         $('.download-button.with-megasync').rebind('click', function(e) {
             if (!$(this).hasClass('downloading')) {
+                loadingDialog.show();
                 megasync.isInstalled(function(err, is) {
                     // If 'msd' (MegaSync download) flag is turned on and application is installed
+                    loadingDialog.hide();
                     if (res.msd !== 0 && (!err || is)) {
                         $('.megasync-overlay').removeClass('downloading');
                         megasync.download(dlpage_ph, dlpage_key);
                     } else {
                         megasyncOverlay();
-                    } 
+                    }
                 });
             }
         });
 
-        $('.download-button.throught-browser').unbind('click');
-        $('.download-button.throught-browser').bind('click',function(e)
-        {
+        $('.download-button.throught-browser').rebind('click', function() {
+            $(this).unbind('click');
             browserDownload();
         });
 
@@ -161,7 +162,14 @@ function dl_g(res) {
                 $('.download.pause-button').addClass('active');
             }
         }
-        else mKeyDialog(dlpage_ph);
+        else {
+            mKeyDialog(dlpage_ph)
+                .fail(function() {
+                    $('.info-block .block-view-file-type').addClass(fileIcon({name:'unknown'}));
+                    $('.file-info .download.info-txt').text('Unknown');
+                    $('.download-button.throught-browser').hide();
+                });
+        }
     }
     else $('.download.content-block').addClass('na-some-reason');
 
@@ -200,7 +208,7 @@ function browserDownload() {
 
 // MEGAsync dialog If filesize is too big for downloading through browser
 function megasyncOverlay() {
-    var $this = $('.megasync-overlay'), 
+    var $this = $('.megasync-overlay'),
           slidesNum = $('.megasync-controls div').length;
 
     $this.addClass('msd-dialog').removeClass('hidden downloading');

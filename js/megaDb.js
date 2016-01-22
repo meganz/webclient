@@ -40,6 +40,8 @@ function MegaDB(name, suffix, schema, options) {
     if (oldHash !== newHash) {
         localStorage[dbName + '_v'] = ++version;
         localStorage[dbName + '_hash'] = newHash;
+
+        this.flags |= MegaDB.DB_FLAGS.DBUPGRADE;
     }
 
     var dbOpenOptions = {
@@ -114,12 +116,15 @@ function MegaDB(name, suffix, schema, options) {
                         }
                         else {
                             err = MegaDB.getRefError(err) || err;
-
-                            if (err.code === DOMException.NOT_FOUND_ERR) {
-                                return __dbBumpVersion(err);
-                            }
                         }
-                        __dbOpenFailed(err);
+                        self.trigger('onDbTransientError', err);
+
+                        if (err.code === DOMException.NOT_FOUND_ERR) {
+                            __dbBumpVersion(err);
+                        }
+                        else {
+                            __dbOpenFailed(err);
+                        }
                     });
             }
             else {
@@ -133,6 +138,7 @@ function MegaDB(name, suffix, schema, options) {
                 dbError = e;
                 self.logger.error('Unexpected error', dbError.reason || dbError);
             }
+            self.trigger('onDbTransientError', dbError);
 
             if (dbError.name === 'VersionError' || dbError.name === 'InvalidAccessError') {
                 self.logger.info(dbError.name + ' (retrying)');
@@ -155,7 +161,7 @@ makeObservable(MegaDB);
  * Static, DB state/flags
  */
 MegaDB.DB_STATE = makeEnum(['OPENING','INITIALIZED','FAILED_TO_INITIALIZE','CLOSED']);
-MegaDB.DB_FLAGS = makeEnum(['HASNEWENCKEY']);
+MegaDB.DB_FLAGS = makeEnum(['DBUPGRADE', 'HASNEWENCKEY']);
 MegaDB.DB_PLUGIN = makeEnum(['ENCRYPTION']);
 
 /**

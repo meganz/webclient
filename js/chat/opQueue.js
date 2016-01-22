@@ -234,7 +234,7 @@ OpQueue.prototype.pop = function() {
             }
 
 
-            if(op[0] == "processMessage" && op[1].message && typeof(mocha) == "undefined") {
+            if(op[0] == "processMessage" && op[1].message && typeof mocha == "undefined") {
                 var classify = mpenc.codec.categoriseMessage(op[1].message);
                 self.logger.debug("Will process message with contents: ", mpenc.codec.inspectMessageContent(classify.content));
             }

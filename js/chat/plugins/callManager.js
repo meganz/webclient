@@ -1449,7 +1449,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
 
         CallManager.assert(
             session instanceof CallSession,
-            'CallManager tried to relay event to a non-session argument:', typeof(session)
+            'CallManager tried to relay event to a non-session argument:', typeof session
         );
 
         if (typeof(session["on" + evtName]) !== 'undefined') { // proxy events to sessions

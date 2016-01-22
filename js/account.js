@@ -601,7 +601,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     var myCtx = ctx || {};
 
     // Assemble property name on Mega API.
-    pub = typeof(pub) === 'undefined' ? true : pub;
+    pub = typeof pub === 'undefined' ? true : pub;
     var attributePrefix = '';
     if (pub === true) {
         attributePrefix = '+';
@@ -987,7 +987,7 @@ function isEphemeral() {
             if (r[0] === "0") {
                 $elem.addClass('cloud-drive');
             }
-            else if (r[0] === "1" && typeof(megaChat) !== 'undefined') {
+            else if (r[0] === "1" && typeof megaChat !== 'undefined') {
                 var room = megaChat.getPrivateRoom(u_h);
                 if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
                     if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
@@ -1045,7 +1045,7 @@ function isEphemeral() {
                     true
                 )
                     .done(function (res) {
-                        if (typeof(res) !== 'number') {
+                        if (typeof res !== 'number') {
                             _lastUserInteractionCache = res;
                             Object.keys(res).forEach(function(k) {
                                 // prefill in-memory M.u[...] cache!

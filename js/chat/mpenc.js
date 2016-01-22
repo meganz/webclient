@@ -1999,7 +1999,7 @@ define('mpenc/codec',[
      */
     ns.encodeMessageContent = function(message, groupKey, privKey, pubKey, paddingSize) {
         var out = ns.encodeTLV(ns.TLV_TYPE.PROTOCOL_VERSION, version.PROTOCOL_VERSION);
-        if (typeof(message) === 'string' || message instanceof String) {
+        if (typeof message === 'string' || message instanceof String) {
             // We're dealing with a message containing user content.
             out += ns.encodeTLV(ns.TLV_TYPE.MESSAGE_TYPE,
                                 ns.MESSAGE_TYPE.PARTICIPANT_DATA);

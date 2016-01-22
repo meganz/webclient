@@ -122,7 +122,7 @@ var MegaRenderMixin = {
         depth = depth ? depth : 0;
 
 
-        if(typeof(map._dataChangeIndex) !== "undefined") {
+        if(typeof map._dataChangeIndex !== "undefined") {
             var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
             if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
                 _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
@@ -156,7 +156,7 @@ var MegaRenderMixin = {
             return false; // continue/skip
         }
 
-        if(typeof(v._dataChangeIndex) !== "undefined") {
+        if(typeof v._dataChangeIndex !== "undefined") {
             var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
 
             if(dataChangeHistory[cacheKey] !== v._dataChangeIndex) {

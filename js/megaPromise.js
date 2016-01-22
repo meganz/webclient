@@ -52,7 +52,7 @@ function MegaPromise(fn) {
     return this;
 };
 
-if (typeof(Promise) !== "undefined") {
+if (typeof Promise !== "undefined") {
     MegaPromise._origPromise = Promise;
 } else {
     MegaPromise._origPromise = undefined;
@@ -91,7 +91,7 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
         $promise.resolve.apply($promise, arguments)
         },
         (
-            d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
+            d && typeof promisesDebug !== 'undefined' && promisesDebug ?
                 MegaPromise.getTraceableReject($promise, p) :
                 function megaPromiseRejProxy() {
                     $promise.reject.apply($promise, arguments);
@@ -362,7 +362,7 @@ MegaPromise.all = function(promisesList) {
         .then(function megaPromiseResProxy() {
             promise.resolve(toArray.apply(null, arguments));
         }, (
-            d && typeof(promisesDebug) !== 'undefined' && promisesDebug ?
+            d && typeof promisesDebug !== 'undefined' && promisesDebug ?
                 MegaPromise.getTraceableReject(promise) :
                 function megaPromiseRejProxy() {
                     promise.reject.apply(promise, arguments);

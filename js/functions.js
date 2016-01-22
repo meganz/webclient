@@ -306,7 +306,7 @@ function easeOutCubic(t, b, c, d) {
 
 function ellipsis(text, location, maxCharacters) {
     if (text.length > 0 && text.length > maxCharacters) {
-        if (typeof(location) === 'undefined') {
+        if (typeof location === 'undefined') {
             location = 'end';
         }
         switch (location) {
@@ -486,7 +486,7 @@ function showmoney(number) {
 
 function getHeight() {
     var myHeight = 0;
-    if (typeof(window.innerWidth) === 'number') {
+    if (typeof window.innerWidth === 'number') {
         myHeight = window.innerHeight;
     }
     else if (document.documentElement
@@ -661,7 +661,7 @@ function time2date(unixtime, ignoretime) {
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
-if (typeof(l) === 'undefined') {
+if (typeof l === 'undefined') {
     l = [];
 }
 
@@ -1403,19 +1403,19 @@ function NOW() {
  *  Global function to help debugging
  */
 function DEBUG2() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         console.warn.apply(console, arguments)
     }
 }
 
 function ERRDEBUG() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         console.error.apply(console, arguments)
     }
 }
 
 function DEBUG() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         (console.debug || console.log).apply(console, arguments)
     }
 }
@@ -1641,7 +1641,7 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
     loggerFn = loggerFn || console.debug;
 
-    if (typeof(parentLogger) === "undefined") {
+    if (typeof parentLogger === "undefined") {
         var logger = new MegaLogger(textPrefix);
     }
     if (!window.callLoggerObjects) {
@@ -1649,10 +1649,10 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
 
     $.each(ctx, function(k, v) {
-        if (typeof(v) === "function") {
+        if (typeof v === "function") {
             callLoggerWrapper(ctx, k, loggerFn, textPrefix, parentLogger);
         }
-        else if (typeof(v) === "object"
+        else if (typeof v === "object"
                 && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
             window.callLoggerObjects.push(v);
             logAllCallsOnObject(v, loggerFn, recursive, textPrefix + ":" + k, parentLogger);
@@ -2478,7 +2478,7 @@ function asyncApiReq(data) {
     var $promise = new MegaPromise();
     api_req(data, {
         callback: function(r) {
-            if (typeof(r) === 'number') {
+            if (typeof r === 'number') {
                 $promise.reject.apply($promise, arguments);
             }
             else {
@@ -2613,7 +2613,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
             }
 
         }
-        if (typeof(event.returnedValue) !== "undefined") {
+        if (typeof event.returnedValue !== "undefined") {
             args = event.returnedValue;
         }
 
@@ -2876,7 +2876,7 @@ function generateAnonymousReport() {
     report.l = lang;
     report.scrnSize = window.screen.availWidth + "x" + window.screen.availHeight;
 
-    if (typeof(window.devicePixelRatio) !== 'undefined') {
+    if (typeof window.devicePixelRatio !== 'undefined') {
         report.pixRatio = window.devicePixelRatio;
     }
 
@@ -2985,9 +2985,9 @@ MegaEvents.prototype.on = function(name, callback) {
         data = $.extend(
             true, {}, {
                 'aid': this.sessionId,
-                'lang': typeof(lang) !== 'undefined' ? lang : null,
+                'lang': typeof lang !== 'undefined' ? lang : null,
                 'browserlang': navigator.language,
-                'u_type': typeof(u_type) !== 'undefined' ? u_type : null
+                'u_type': typeof u_type !== 'undefined' ? u_type : null
             },
             data
         );

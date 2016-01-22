@@ -871,7 +871,7 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
                 if(r.length > 0) {
                     var results = [];
                     r.forEach(function(v, k) {
-                        if(typeof(v) != 'undefined') { // skip undefined, e.g. items removed by .map()
+                        if(typeof v != 'undefined') { // skip undefined, e.g. items removed by .map()
                             results.push(v);
                         }
                     });

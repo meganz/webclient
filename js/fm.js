@@ -4571,7 +4571,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
-            if(typeof(selectionManager) != 'undefined' && selectionManager) {
+            if(typeof selectionManager != 'undefined' && selectionManager) {
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -9466,7 +9466,7 @@ function propertiesDialog(close)
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
 
-    if (typeof(p.t10) === 'undefined' && typeof(p.t11) === 'undefined') {
+    if (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined') {
         $('.properties-small-gray.t10').addClass('hidden');
         $('.propreties-dark-txt.t11').addClass('hidden');
     }

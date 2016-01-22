@@ -4005,13 +4005,6 @@ function MegaData()
             }
         }
 
-        if (!$.transferHeader) {
-            transferPanelUI();
-        }
-        //$('.tranfer-view-icon').addClass('active');
-        //$('.fmholder').addClass('transfer-panel-opened');
-        $.transferHeader();
-
         if (!preview)
         {
             this.onDownloadAdded(added, uldl_hold, z, zipsize);
@@ -4022,6 +4015,11 @@ function MegaData()
     };
 
     this.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
+        if (!$.transferHeader) {
+            transferPanelUI();
+        }
+        $.transferHeader();
+
         if (!isZIP || zipSize) {
             showTransferToast('d', isZIP ? 1 : added, isPaused);
         }

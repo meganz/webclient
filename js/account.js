@@ -937,7 +937,7 @@ function isEphemeral() {
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
 
-                    M.u[u_h].ts = parseInt(v.split(":")[1], 10);
+                    Object(M.u[u_h]).ts = parseInt(v.split(":")[1], 10);
 
                     $promise.verify();
                 }

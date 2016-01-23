@@ -458,15 +458,15 @@ function populate_l() {
     l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1371] = l[1371].replace('2014', '2015');
     l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
-    l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');    
+    l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');
     l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
-    l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');    
+    l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');    
-    
+    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');
+
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
@@ -1324,6 +1324,7 @@ function toArray() {
  */
 function AssertionFailed(message) {
     this.message = message;
+    this.stack = mega.utils.getStack();
 }
 AssertionFailed.prototype = Object.create(Error.prototype);
 AssertionFailed.prototype.name = 'AssertionFailed';

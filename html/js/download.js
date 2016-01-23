@@ -60,6 +60,7 @@ function dl_g(res) {
 
     $('.widget-block').addClass('hidden');
     $('.download.content-block').removeClass('hidden');
+    $('.download-button.to-clouddrive').hide();
 
     if (res === ETOOMANY) {
         $('.download.content-block').addClass('not-available-user');
@@ -108,7 +109,7 @@ function dl_g(res) {
             browserDownload();
         });
 
-        $('.download-button.to-clouddrive').rebind('click', start_import);
+        $('.download-button.to-clouddrive').show().rebind('click', start_import);
 
         var key = dlpage_key;
         var fdl_file = false;

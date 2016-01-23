@@ -3490,7 +3490,7 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             mFileManagerDB.exec('drop').always(finishLogout);
         }
-        if (typeof attribCache === 'object' && attribCache.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+        if (typeof attribCache === 'object' && attribCache.db) {
             step++;
             attribCache.destroy().always(finishLogout);
         }

@@ -61,6 +61,7 @@ function dl_g(res) {
     $('.widget-block').addClass('hidden');
     $('.download.content-block').removeClass('hidden');
     $('.download-button.to-clouddrive').hide();
+    $('.download-button.throught-browser').hide();
 
     if (res === ETOOMANY) {
         $('.download.content-block').addClass('not-available-user');
@@ -103,14 +104,6 @@ function dl_g(res) {
                 });
             }
         });
-
-        $('.download-button.throught-browser').rebind('click', function() {
-            $(this).unbind('click');
-            browserDownload();
-        });
-
-        $('.download-button.to-clouddrive').show().rebind('click', start_import);
-
         var key = dlpage_key;
         var fdl_file = false;
 
@@ -127,6 +120,13 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
+            $('.download-button.throught-browser').show().rebind('click', function() {
+                $(this).unbind('click');
+                browserDownload();
+            });
+
+            $('.download-button.to-clouddrive').show().rebind('click', start_import);
+
             if (dl_next === 2)
             {
                 dlkey = dlpage_key;
@@ -168,7 +168,6 @@ function dl_g(res) {
                 .fail(function() {
                     $('.info-block .block-view-file-type').addClass(fileIcon({name:'unknown'}));
                     $('.file-info .download.info-txt').text('Unknown');
-                    $('.download-button.throught-browser').hide();
                 });
         }
     }

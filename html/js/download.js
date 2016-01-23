@@ -148,15 +148,19 @@ function dl_g(res) {
             };
             var n = fdl_file.n || 'unknown';
             var n_l = n.length;
-            $('.file-info .download.info-txt').text(n_l);
-            while (n_l-- && $('.download.info-txt.filename').width() > 316) {
-                $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n, n_l));
-            }
-            if (n_l < 1) {
-                $('.file-info .download.info-txt').text(str_mtrunc(n, 60));
-            }
+            $('.file-info .download.info-txt.filename').text(n);
             $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
-            $('.info-block .block-view-file-type').addClass(fileIcon({name:fdl_file.n}));
+            $('.info-block .block-view-file-type').addClass(fileIcon({name: n}));
+
+            // XXX: remove this once all browsers support `text-overflow: ellipsis;`
+            Soon(function() {
+                while (n_l-- && $('.download.info-txt.filename').width() > 316) {
+                    $('.file-info .download.info-txt.filename').text(str_mtrunc(n, n_l));
+                }
+                if (n_l < 1) {
+                    $('.file-info .download.info-txt.filename').text(str_mtrunc(n, 37));
+                }
+            });
 
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
                 $('.download.status-txt, .download-info .text').text(l[1651]).addClass('blue');

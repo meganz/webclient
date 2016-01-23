@@ -11694,6 +11694,7 @@ table {
     line-height: 25px;
     color: #333333;
     font-family: 'source_sans_prolight';
+    white-space: nowrap;
 }
 .download.info-txt.mid-txt {
     font-size: 14px;

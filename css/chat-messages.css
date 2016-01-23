@@ -95,6 +95,7 @@
 }
 .message.text-block a {
     color: #2BA6DE;
+    text-decoration: underline;
 }
 .small-info-txt .message.text-block {
     font-size: 13px;

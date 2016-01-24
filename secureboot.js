@@ -1195,7 +1195,19 @@ else if (!b_u)
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
 
+    var requiresEs6Shim = false;
+
     if (window.navigator.userAgent.indexOf("msie") > -1 || "ActiveXObject" in window) {
+        requiresEs6Shim = true;
+    }
+    else if(typeof Set === 'undefined') {
+        requiresEs6Shim = true;
+    }
+    else if(typeof Number.isNaN === 'undefined') {
+        requiresEs6Shim = true;
+    }
+
+    if (requiresEs6Shim) {
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
 

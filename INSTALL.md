@@ -49,6 +49,10 @@ following:
 scripts/dev_server.sh
 ```
 
+Tip: **DON'T use the `http://localhost:8089/webpack-dev-server/` url (because it uses an iframe for webpack, which is
+very annoying) for developing/debugging. Just type in:
+`http://localhost:8089/` (or `http://localhost:8089/dont-deploy/devboot.html`).**
+
 
 Demo/Beta Environment
 ---------------------
@@ -88,3 +92,19 @@ localStorage.jjnocache = 1;
 
 You may find some prepared "``devboot``" HTML files for launch in the
 ``dont-deploy/`` folder.
+
+
+Usual problems and solutions
+----------------------------------------------
+
+1. Generic js errors that something is undefined, can't be called, etc.
+
+Please ensure that you are running newer `nodejs` and `npm` versions
+
+
+
+2. core-js/ related errors, when starting dev_server.sh/build.sh
+
+Please ensure that you are running newer `nodejs` and `npm` versions and then
+just do `rm -rf node_modules && npm cache clear && npm install` and you should be able
+to run the dev_server again

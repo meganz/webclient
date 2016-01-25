@@ -1701,7 +1701,7 @@
     "5996": "\u5f85\u5b9a\u50b3\u8f38",
     "5997": "\u60a8\u6709{0}\u500b\u7b49\u5f85\u50b3\u8f38\u3002\u7b49\u5f85\u50b3\u8f38\u5c07\u88ab\u53d6\u6d88\u3002\u60a8\u78ba\u5b9a\u8981\u9000\u51fa\u55ce\uff1f",
     "5998": "\u60a8\u7684\u8cec\u6236\u5df2\u78ba\u8a8d\u3002\u60a8\u73fe\u5728\u53ef\u4ee5\u767b\u9304\u4e86\u3002",
-    "5999": "\u8cec\u6236\u5df2\u78ba\u8a8d",
+    "5999": "\u5e33\u6236\u5df2\u78ba\u8a8d",
     "6000": "\u60a8\u8f38\u5165\u7684\u5bc6\u78bc\u4e0d\u6b63\u78ba",
     "6001": "\u932f\u8aa4\u5bc6\u78bc",
     "6002": "\u60a8\u5df2\u9078\u4e2d\u8d85\u904e100\u500b\u4e0b\u8f09\u9805\u76ee({0})\u3002\u60a8\u8981\u7e7c\u7e8c\u55ce\uff1f",
@@ -1847,7 +1847,7 @@
     "6146": "\u6e05\u7406\u50b3\u8f38",
     "6147": "\u6e05\u9664\u7f13\u5b58",
     "6148": "\u6e05\u9664\u9078\u64c7",
-    "6149": "\u526a\u8cbc\u677f",
+    "6149": "\u526a\u8cbc\u7c3f",
     "6151": "\u5c0e\u51fa\u842c\u80fd\u79d8\u9470",
     "6152": "\u4e0b\u8f09\u540e\u5c0e\u51fa\u5716\u50cf\u81f3\u201c\u5df2\u4fdd\u5b58\u5716\u50cf\u201d\u76f8\u518a",
     "6153": "\u6587\u4ef6\uff08\u5347\u5e8f\uff09",
@@ -3102,6 +3102,7 @@
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
         "source-code-intro-3": 8441,
-        "read-more": 8512
+        "read-more": 8512,
+        "email-already-exists": 7869
     }
 }

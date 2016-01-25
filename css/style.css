@@ -10616,6 +10616,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.import-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.cloud-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.shared-folder-item:hover, .context-menu-item.move-item:hover, .context-menu-item.move-item.opened, .context-menu-item.rename-item.opened, .context-menu-item.copy-item.opened, .context-menu-item.import-item.opened, .context-menu-item.newfolder-item.opened, .context-menu-item.fileupload-item.opened, .context-menu-item.folderupload-item.opened, .context-menu-item.remove-item.opened, .context-menu-item.removeshare-item.opened, .context-menu-item.clearbin-item.opened, .context-menu-item.addcontact-item.opened, .context-menu-item.reply-item.opened, .context-menu-item.reply-to-all.opened, .context-menu-item.forward-item.opened, .context-menu-item.folder-item.opened, .context-menu-item.cloud-item.opened, .context-menu-item.shared-folder-item.opened {
     background-color: rgba(49,181,0,1);
 }
+context-menu-item.startchat-item:hover, .context-menu-item.startaudio-item:hover, .context-menu-item.startvideo-item:hover {
+    background-color: rgba(29,161,233,1);
+}
 .context-menu-icon, .context-menu-points {
     background-image: url(../images/mega/nw-fm-sprite_v12.svg);
     background-position: left top;
@@ -10747,6 +10750,15 @@ table {
 }
 .remove-item .context-menu-icon, .clearbin-item .context-menu-icon {
     background-position: -3px -4479px;
+}
+.startchat-item .context-menu-icon {
+	background-position: -3px -7018px;
+}
+.startaudio-item .context-menu-icon {
+	background-position: -2px -1799px;
+}
+.startvideo-item .context-menu-icon {
+	background-position: -4px -1764px;
 }
 .removeshare-item .context-menu-icon {
     background-position: -1px -10038px;

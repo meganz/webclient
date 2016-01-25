@@ -524,6 +524,9 @@ var notify = {
             case 'psts':
                 $notificationHtml = notify.renderPayment($notificationHtml, notification);
                 break;
+            case 'ph':
+                $notificationHtml = notify.renderTakedown($notificationHtml, notification);
+                break;
             default:
                 break;
         }
@@ -857,6 +860,36 @@ var notify = {
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notification-username').text(header);      // Use 'Payment info' instead of an email
+        
+        return $notificationHtml;
+    },
+    
+    /**
+     * Processes a takedown notice or counter-notice to restore the file
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     */
+    renderTakedown: function($notificationHtml, notification) {
+        
+        var header = '';
+        var title = '';
+        var folderOrFileHandle = notification.data.h;
+        
+        if (typeof notification.data.down !== 'undefined') {
+            header = 'Link takedown';
+            title = 'One of your public links were taken down.';
+        }
+        else if (typeof notification.data.up !== 'undefined') {
+            header = 'Link reinstated';
+            title = 'One of your taken down public links has been reinstated.';
+        }
+        
+        // Populate other template information
+        $notificationHtml.addClass('nt-payment-notification');
+        $notificationHtml.addClass('clickable');
+        $notificationHtml.find('.notification-info').text(title);
+        $notificationHtml.find('.notification-username').text(header);      // Use 'Link takedown/reinstated' instead
+        $notificationHtml.attr('data-folder-id', folderOrFileHandle);
         
         return $notificationHtml;
     }

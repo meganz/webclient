@@ -1195,7 +1195,7 @@ else if (!b_u)
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
 
-    if (typeof Number.isNaN !== 'function') {
+    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined') {
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
 

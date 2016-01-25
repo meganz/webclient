@@ -203,17 +203,16 @@ IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function
  *
  * @type {MegaPromise}
  */
-IndexedDBKVStorage.prototype.destroy = IndexedDBKVStorage._requiresDbConn(function __IDBKVClear() {
+IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
     var self = this;
     self._memCache = {};
 
-    if (!self.db || self.db.dbState !== MegaDB.DB_STATE.INITIALIZED) {
-        return MegaPromise.resolve();
-    }
-    else {
+    if (self.db && self.db.dbState !== MegaDB.DB_STATE.CLOSED) {
         return self.db.drop();
     }
-});
+
+    return MegaPromise.resolve();
+};
 
 /**
  * Check if item with key `k` exists in the DB.

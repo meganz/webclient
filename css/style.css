@@ -7584,7 +7584,7 @@ table {
     width: 400px;
 }
 .add-user-popup.dialog {
-    z-index: 1200;
+    z-index: 1600;
     left: 50%;
     top: 50%;
     margin: -108px 0 0 -200px;
@@ -8138,7 +8138,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-dialog {
     position: absolute;
-    z-index: 1200;
+    z-index: 1600;
     border: 2px solid rgba(0,0,0,0.15);
     background-color: white;
     -moz-border-radius: 8px;
@@ -8533,7 +8533,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     min-height: 240px;
     margin: -160px 0 0 -150px;
     overflow: hidden;
-    z-index: 1200;
+    z-index: 1600;
 }
 .fm-dialog.generic-dialog .fm-dialog-contents {
     min-height: 120px;
@@ -9602,7 +9602,7 @@ label.radio-txt {
     left: 0;
     bottom: 0;
     padding: 24px;
-    z-index: 1200;
+    z-index: 1600;
     width: 100%;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;

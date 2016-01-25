@@ -152,7 +152,7 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
         k
     )
         .done(function __getItemDone(r) {
-            if (typeof(r) === 'undefined' || r.length === 0) {
+            if (typeof r === 'undefined' || r.length === 0) {
                 promise.reject();
             }
             else {
@@ -235,7 +235,7 @@ IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(functi
         k
     )
         .done(function __hasItemDone(r) {
-            if (typeof(r) === 'undefined' || r.length === 0) {
+            if (typeof r === 'undefined' || r.length === 0) {
                 promise.reject();
             }
             else {

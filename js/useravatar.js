@@ -174,7 +174,7 @@ var useravatar = (function() {
             return;
         }
 
-        if(authring.hadInitialised() === false) {
+        if (authring.hadInitialised() === false) {
             var authSystemPromise = authring.initAuthenticationSystem();
             authSystemPromise.always(isUserVerified_Callback);
         }
@@ -260,7 +260,7 @@ var useravatar = (function() {
             $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
         }
 
-        if(M.u[user]) {
+        if (M.u[user]) {
             // by updating the M.u[contact] this will trigger some parts in the Chat UI to re-render.
             M.u[user].avatar = true;
         }

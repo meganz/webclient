@@ -343,7 +343,7 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
     return function() {
         var self = this;
         var megaDb = this;
-        if(megaDb instanceof MegaDB.QuerySet) {
+        if (megaDb instanceof MegaDB.QuerySet) {
             megaDb = self.megaDb;
         }
         var args = arguments;
@@ -351,9 +351,9 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
         assert(megaDb.dbState != MegaDB.DB_STATE.CLOSED, "Tried to execute method on a closed database.");
         assert(megaDb.dbState != MegaDB.DB_STATE.FAILED_TO_INITIALIZE, "Tried to execute method on a database which failed to initialize (open).");
 
-        if(megaDb.dbState === MegaDB.DB_STATE.INITIALIZED) {
+        if (megaDb.dbState === MegaDB.DB_STATE.INITIALIZED) {
             return fn.apply(self, args);
-        } else if(megaDb.dbState === MegaDB.DB_STATE.OPENING) {
+        } else if (megaDb.dbState === MegaDB.DB_STATE.OPENING) {
             var $promise = new MegaPromise();
 
 
@@ -366,7 +366,7 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
                         self.logger.error("Could not open db: ", e);
                     }
 
-                    if(resultPromise.then) {
+                    if (resultPromise.then) {
                         resultPromise.then(
                             function() {
                                 $promise.resolve.apply($promise, arguments);
@@ -397,7 +397,7 @@ MegaDB.prototype._getTablePk = function(tableName) {
     assert(this.schema[tableName], 'table not found: ' + tableName);
     var tableSchema = this.schema[tableName];
     var k = 'id';
-    if(tableSchema['key'] && tableSchema['key']['keyPath']) {
+    if (tableSchema['key'] && tableSchema['key']['keyPath']) {
         k = tableSchema['key']['keyPath'];
     }
     return k;
@@ -432,7 +432,7 @@ MegaDB.prototype.add = function(tableName, val) {
 
     Object.keys(tempObj).forEach(function(k) {
         // ignore any __privateProperties and
-        if(k.toString().indexOf("__") === 0) {
+        if (k.toString().indexOf("__") === 0) {
             delete tempObj[k];
         }
     });
@@ -441,7 +441,7 @@ MegaDB.prototype.add = function(tableName, val) {
     promise
         .then(function() {
             // get back the .id after .add is done
-            if(tempObj[self._getTablePk(tableName)] && tempObj[self._getTablePk(tableName)] != val[self._getTablePk(tableName)]) {
+            if (tempObj[self._getTablePk(tableName)] && tempObj[self._getTablePk(tableName)] != val[self._getTablePk(tableName)]) {
                 val[self._getTablePk(tableName)] = tempObj[self._getTablePk(tableName)];
             }
         });
@@ -460,7 +460,7 @@ MegaDB.prototype.addOrUpdate = function(tableName, val) {
     var self = this;
 
     var $promise;
-    if(Array.isArray(val)) {
+    if (Array.isArray(val)) {
         var promises = val.map(function(v) {
             return self.addOrUpdate(tableName, v);
         });
@@ -492,7 +492,7 @@ MegaDB.prototype.update = function(tableName, k, val) {
 
     assert(this.server[tableName], 'table not found:' + tableName);
 
-    if(!val && Array.isArray(k)) {
+    if (!val && Array.isArray(k)) {
         val = k;
         k = val[this._getTablePk(tableName)];
     }
@@ -500,7 +500,7 @@ MegaDB.prototype.update = function(tableName, k, val) {
     var tempObj = clone(val);
 
     Object.keys(tempObj).forEach(function(k) {
-        if(k.toString().indexOf("__") === 0) {
+        if (k.toString().indexOf("__") === 0) {
             delete tempObj[k];
         }
     });
@@ -528,9 +528,9 @@ MegaDB.prototype.update = _wrapFnWithBeforeAndAfterEvents(
  * @returns {MegaPromise}
  */
 MegaDB.prototype.remove = function(tableName, id) {
-    if($.isPlainObject(id)) {
+    if ($.isPlainObject(id)) {
         id = id[this._getTablePk(tableName)];
-    } else if(Array.isArray(id)) {
+    } else if (Array.isArray(id)) {
         var self = this;
         return MegaPromise.allDone(id.map(function(v) {
             return self.remove(tableName, v);
@@ -558,7 +558,7 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
     var self = this;
 
     var q = self.query(tableName);
-    if(!value && $.isPlainObject(keyName)) {
+    if (!value && $.isPlainObject(keyName)) {
         Object.keys(keyName).forEach(function(k) {
             var v = keyName[k];
             q = q.filter(k, v);
@@ -573,7 +573,7 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
     q.execute()
         .then(function(r) {
             var promises = [];
-            if(r.length && r.length > 0) { // found
+            if (r.length && r.length > 0) { // found
                 r.forEach(function(v) {
                     promises.push(
                         MegaPromise.asMegaPromiseProxy(
@@ -655,9 +655,9 @@ MegaDB.prototype.get = function(tableName, val) {
             .execute()
             .then(
             function(result) {
-                if($.isArray(result) && result.length == 1) {
+                if ($.isArray(result) && result.length == 1) {
                     resolve.apply(null, [result[0]]);
-                } else if($.isArray(result) && result.length > 1) {
+                } else if ($.isArray(result) && result.length > 1) {
                     resolve.apply(null, [result]);
                 }  else {
                     resolve.apply(null, arguments);
@@ -779,22 +779,22 @@ MegaDB.QuerySet.prototype._queueOp = function(opName, args) {
 MegaDB.QuerySet.prototype._dequeueOps = function(q, opName) {
     var self = this;
     self._ops.forEach(function(v) {
-        if(v[2] === true || v[0] != opName) {
+        if (v[2] === true || v[0] != opName) {
             return; // continue;
         }
 
         var args = v[1];
-        if(opName == "filter") {
+        if (opName == "filter") {
             args = clone(v[1]);
             self.megaDb.trigger("onFilterQuery", [self.tableName, args]);
-        } else if(opName == "modify") {
+        } else if (opName == "modify") {
             args = clone(v[1]);
             self.megaDb.trigger("onModifyQuery", [self.tableName, args]);
         }
         //self.logger.debug("dequeue op:", opName, args);
 
         // if this was a modify() call, then trigger onBeforeUpdate
-        if(opName == "modify") {
+        if (opName == "modify") {
             q = q.map(function(r) {
                 self.megaDb.trigger("onBeforeUpdate", [self.tableName, r[self.megaDb._getTablePk(self.tableName)], r, true]);
                 return r;
@@ -835,7 +835,7 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
                 q = self._dequeueOps(q, opName);
             });
 
-        if(q.only) { // is instanceof db.js IndexQuery, convert to db.js Query (<- no way to do instanceof, because IndexQuery is PRIVATE :|)
+        if (q.only) { // is instanceof db.js IndexQuery, convert to db.js Query (<- no way to do instanceof, because IndexQuery is PRIVATE :|)
             q = q.all();
         }
 
@@ -856,10 +856,10 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
         q = q.map(function(r) {
             var $event = new $.Event("onDbRead");
             megaDb.trigger($event, [tableName, r]);
-            if(!$event.isPropagationStopped()) {
+            if (!$event.isPropagationStopped()) {
                 return r;
             } else {
-                if($event.data && $event.data.errors && $event.data.errors.length > 0) {
+                if ($event.data && $event.data.errors && $event.data.errors.length > 0) {
                     $proxyPromise.reject($event.data.errors);
                 }
                 return undefined;
@@ -874,10 +874,10 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
 
         q.execute()
             .then(function(r) {
-                if(r.length > 0) {
+                if (r.length > 0) {
                     var results = [];
                     r.forEach(function(v, k) {
-                        if(typeof(v) != 'undefined') { // skip undefined, e.g. items removed by .map()
+                        if (typeof v != 'undefined') { // skip undefined, e.g. items removed by .map()
                             results.push(v);
                         }
                     });

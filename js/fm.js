@@ -129,7 +129,7 @@ function initTransferScroll()
 function initTreeScroll()
 {
     /**
-     if(localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
+     if (localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
      {
      $('.fm-left-panel').css({'width': localStorage.leftPaneWidth + "px"});
      }
@@ -664,7 +664,7 @@ function initUI() {
         var c = $(e.target).attr('class');
 
 
-        if($(e.target).attr('data-reactid')) {
+        if ($(e.target).attr('data-reactid')) {
             return; // never return false, if this is an event triggered by a React element....
         }
         if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1)) {
@@ -4571,7 +4571,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
-            if(typeof(selectionManager) != 'undefined' && selectionManager) {
+            if (typeof selectionManager != 'undefined' && selectionManager) {
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -6466,7 +6466,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if($(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length > 0 || $(e.target).parents('.messages.content-area').length > 0 || $(e.target).parents('.chat-right-pad .user-card-data').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if ($(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length > 0 || $(e.target).parents('.messages.content-area').length > 0 || $(e.target).parents('.chat-right-pad .user-card-data').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6545,7 +6545,7 @@ function sectionUIopen(id) {
     }
 
     $('.nw-fm-left-icon').removeClass('active');
-    if(M.hasInboxItems() === true) {
+    if (M.hasInboxItems() === true) {
         $('.nw-fm-left-icon.inbox').removeClass('hidden');
     } else {
         $('.nw-fm-left-icon.inbox').addClass('hidden');
@@ -6691,7 +6691,7 @@ function sectionUIopen(id) {
 
     {
         // required tricks to make the conversations work with the old UI HTML/css structure
-        if(id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
+        if (id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
             $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').addClass('hidden');
             $('.fm-main.default > .fm-left-panel').addClass('hidden');
         } else {
@@ -7076,10 +7076,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
-        if($selectedPlan.is(".pro4")) { plan = 4; }
-        else if($selectedPlan.is(".pro1")) { plan = 1; }
-        else if($selectedPlan.is(".pro2")) { plan = 2; }
-        else if($selectedPlan.is(".pro3")) { plan = 3; }
+        if ($selectedPlan.is(".pro4")) { plan = 4; }
+        else if ($selectedPlan.is(".pro1")) { plan = 1; }
+        else if ($selectedPlan.is(".pro2")) { plan = 2; }
+        else if ($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
             .removeClass('plan1')
@@ -7113,7 +7113,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
 
-    if(!$('.pro-register-dialog').is(':visible')) {
+    if (!$('.pro-register-dialog').is(':visible')) {
         fm_hideoverlay();
     }
 
@@ -8082,7 +8082,7 @@ function initShareDialog() {
       if (txtHeight !== hiddenDiv.outerHeight() ) {
         txt.height(hiddenDiv.outerHeight());
 
-        if( $('.share-message-textarea').outerHeight()>=50) {
+        if ( $('.share-message-textarea').outerHeight()>=50) {
             pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
             api = pane.data('jsp');
             txt.blur();
@@ -8152,7 +8152,7 @@ function closeDialog() {
     var logger = MegaLogger.getLogger('closeDialog');
 
     logger.debug($.dialog);
-    if($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
+    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
     }
@@ -9466,7 +9466,7 @@ function propertiesDialog(close)
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
 
-    if (typeof(p.t10) === 'undefined' && typeof(p.t11) === 'undefined') {
+    if (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined') {
         $('.properties-small-gray.t10').addClass('hidden');
         $('.propreties-dark-txt.t11').addClass('hidden');
     }
@@ -9577,7 +9577,7 @@ function termsDialog(close, pp)
     if (close)
     {
         $('.fm-dialog.terms-dialog').addClass('hidden');
-        if(!$('.pro-register-dialog').is(":visible")) {
+        if (!$('.pro-register-dialog').is(":visible")) {
             fm_hideoverlay();
             $.dialog=false;
         }

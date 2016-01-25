@@ -592,7 +592,9 @@ function pro_pay() {
                 else if (pro_paymentmethod === 'paysafecard') {
                     pro_m = 10;
                 }
-                
+                else if (pro_paymentmethod === 'tpay') {
+                    pro_m = tpay.gatewayId; // 14
+                }
                 
                 // If AstroPay, send extra details
                 else if (pro_paymentmethod.indexOf('astropay') > -1) {
@@ -685,6 +687,11 @@ function pro_pay() {
                                     proPage.hideLoadingOverlay();
                                     astroPayDialog.showError(utcResult);
                                 }
+                            }
+
+                            // If tpay, redirect over there
+                            else if (pro_m === tpay.gatewayId) {
+                                tpay.redirectToSite(utcResult);
                             }
                         }
                     }
@@ -1780,6 +1787,23 @@ var fortumo = {
     redirectToSite: function(utsResult) {
         
         window.location = 'https://megapay.nz/?saleid=' + utsResult;
+    }
+};
+
+/**
+ * Code for tpay mobile payments
+ */
+var tpay = {
+
+    gatewayId: 14,
+
+    /**
+     * Redirect to the site
+     * @param {String} utcResult (a saleid)
+     */
+    redirectToSite: function(utcResult) {
+
+        window.location = 'https://megapay.nz/gwtp.html?provider=tpay&saleid=' + utcResult['EUR']['saleids'] + "&params=" + utcResult['EUR']['params'];
     }
 };
 

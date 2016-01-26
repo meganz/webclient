@@ -1029,7 +1029,7 @@ CallManager.prototype._attachToChat = function(megaChat) {
  * Suggested by Alex, a simple regexp to detect and find ALL 'reason's for a call failed reasons.
  **/
 CallManager._isAFailedReason = function(reason) {
-    if(!reason || !reason.match) {
+    if (!reason || !reason.match) {
         return false;
     }
     return reason.match(/.*(ice-disconnect|fail|error|security|timeout|xmpp-disconnect).*/) ? 1 : 0;
@@ -1449,7 +1449,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
 
         CallManager.assert(
             session instanceof CallSession,
-            'CallManager tried to relay event to a non-session argument:', typeof(session)
+            'CallManager tried to relay event to a non-session argument:', typeof session
         );
 
         if (typeof(session["on" + evtName]) !== 'undefined') { // proxy events to sessions

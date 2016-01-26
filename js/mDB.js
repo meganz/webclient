@@ -243,7 +243,12 @@ mBroadcaster.once('startMega', function __idb_setup() {
                     });
 
                     function __Notify(ev, result) {
-                        ev = new Event(ev);
+                        try {
+                            ev = new Event(ev);
+                        }
+                        catch (ex) { // MSIE
+                            ev = { type: ev };
+                        }
                         Object.defineProperty(ev, 'target', {value: request});
                         Object.defineProperty(request, 'result', {value: result});
 
@@ -347,13 +352,21 @@ var mFileManagerDB = {
         var db = new MegaDB("fm", u_handle, this.schema, { murSeed: 0x800F0001 });
 
         if (mBroadcaster.crossTab.master) {
+            var ieAccessError;
+            if ("ActiveXObject" in window) {
+                db.bind('onDbTransientError', function _onDbTransientError(ev, err) {
+                    if (!(db.flags & MegaDB.DB_FLAGS.DBUPGRADE)) {
+                        ieAccessError = (Object(err).name === 'InvalidAccessError');
+                    }
+                });
+            }
             db.bind('onDbStateReady', function _onDbStateReady() {
                 if (d) console.log('onDbStateReady', arguments);
 
                 var oldVersion = +localStorage['fmdbv_' + u_handle] || this.currentVersion;
                 localStorage['fmdbv_' + u_handle] = this.currentVersion;
 
-                if (oldVersion < this.currentVersion) {
+                if (oldVersion < this.currentVersion && !ieAccessError) {
                     if (d) console.log('fmdb version change');
                     mFileManagerDB.reload();
                 }

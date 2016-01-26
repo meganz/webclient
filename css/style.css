@@ -11694,6 +11694,7 @@ table {
     line-height: 25px;
     color: #333333;
     font-family: 'source_sans_prolight';
+    white-space: nowrap;
 }
 .download.info-txt.mid-txt {
     font-size: 14px;
@@ -11819,6 +11820,7 @@ table {
     left: 300px;
     bottom: 50px;
     padding: 34px 0 0 0;
+    z-index: 1400;
 }
 .button.download-button.down-arrow, .button.download-button.to-clouddrive {
     background-image: url(../images/mega/download-sprite-v6.png);

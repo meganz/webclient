@@ -1032,8 +1032,8 @@ makeMetaAware(Karere);
      * @returns {*}
      */
     Karere.getNormalizedBareJid = function(jid) {
-        if(!jid || !jid.split) {
-            if(d) {
+        if (!jid || !jid.split) {
+            if (d) {
                 console.error("Karere.getNormalizedBareJid got", jid, "instead of a jid.");
             }
         }
@@ -1055,8 +1055,8 @@ makeMetaAware(Karere);
      * @returns {*}
      */
     Karere.getNormalizedFullJid = function(jid) {
-        if(!jid || !jid.split) {
-            if(d) {
+        if (!jid || !jid.split) {
+            if (d) {
                 console.error("Karere.getNormalizedFullJid got", jid, "instead of a jid.");
             }
         }

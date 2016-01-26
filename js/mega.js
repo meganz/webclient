@@ -1560,7 +1560,7 @@ function MegaData()
             treeUI();
 
             if (!megaChatIsDisabled) {
-                if (typeof(megaChat) === 'undefined') {
+                if (typeof megaChat === 'undefined') {
                     // queue for opening the megachat UI WHEN the pubEd keys are loaded
                     // happens, often when the APIs are returning -3
 
@@ -2966,8 +2966,8 @@ function MegaData()
             }
 
             // -1, -9, -2, etc...
-            firstName = typeof(firstName) != "string" ? false : firstName;
-            lastName = typeof(lastName) != "string" ? false : lastName;
+            firstName = typeof firstName != "string" ? false : firstName;
+            lastName = typeof lastName != "string" ? false : lastName;
 
             firstName = firstName ? from8(base64urldecode(firstName)) : "";
             lastName = lastName ? from8(base64urldecode(lastName)) : "";
@@ -4984,7 +4984,7 @@ function renderNew() {
         if (newNode.h.length === 11) {
             newcontact = true;
         }
-        if (typeof(newNode.su) !== 'undefined') {
+        if (typeof newNode.su !== 'undefined') {
             newshare = true;
         }
         if (newNode && newNode.p && newNode.t) {

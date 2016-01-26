@@ -1,4 +1,4 @@
-if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "mega.dev" */|| location.hostname.indexOf("developers.") > -1) {
+if (window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "mega.dev" */|| location.hostname.indexOf("developers.") > -1) {
     if (d)
     {
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -55,7 +55,7 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
             report.id = ids.join(",");
             report.ud = uds;
 
-            if(typeof megaChat !== 'undefined') {
+            if (typeof megaChat !== 'undefined') {
                 report.karereState = megaChat.karere.getConnectionState();
                 report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
                 report.karereServer = megaChat.karere.connection.service;
@@ -98,14 +98,14 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
                     { c : JSON.stringify(dump), v : report, uh: u_handle, ver: window.megaVersion }
                 );
             };
-            if(window.megaVersion) {
+            if (window.megaVersion) {
                 sendReport();
             } else {
                 $.get("./current_ver.txt")
                     .done(function(r) {
                         r = $.trim(r);
-                        if(r.length == 40) {
-                            if(window.megaPrevVersion && window.megaPrevVersion != r) {
+                        if (r.length == 40) {
+                            if (window.megaPrevVersion && window.megaPrevVersion != r) {
                                 alert("You are using an outdated version. Please update!");
                                 window.megaVersion = window.megaPrevVersion;
                             } else {

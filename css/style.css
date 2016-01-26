@@ -4084,17 +4084,17 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
     background-image: url(../images/mega/nw-fm-sprite_v14.svg);
     background-repeat: no-repeat;
-    background-position: center -845px;
+    background-position: center -9911px;
     cursor: pointer;
 }
 .nw-fm-tree-item.contains-folders.selected .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders:hover .nw-fm-arrow-icon {
-    background-position: center -875px;
+    background-position: center -9941px;
 }
 .nw-fm-tree-item.contains-folders.expanded .nw-fm-arrow-icon {
-    background-position: center -784px;
+    background-position: center -9850px;
 }
 .nw-fm-tree-item.contains-folders.selected.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.expanded:hover .nw-fm-arrow-icon {
-    background-position: center -814px;
+    background-position: center -9880px;
 }
 .nw-fm-tree-folder {
     display: block;
@@ -5184,14 +5184,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-position: 0 12px;
 }
 .nw-fm-left-icon.folder-link {
-    background-position: 0 -9754px;
+    background-position: 0 -704px;
     display: none;
 }
 .nw-fm-left-icon.inbox {
-    background-position: 0 -9702px;
+    background-position: 0 -662px;
 }
 .nw-fm-left-icon.inbox:hover, .nw-fm-left-icon.inbox.active {
-    background-position: 0 -9852px;
+    background-position: 0 -752px;
 }
 .active-folder-link .nw-fm-left-icon.folder-link {
     display: block;
@@ -5223,10 +5223,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 36px;
     background-image: url(../images/mega/nw-fm-sprite_v14.svg);
     background-repeat: no-repeat;
-    background-position: center -10008px;
-}
-.nw-fm-left-icon.conversations.active .beta-text, .nw-fm-left-icon.conversations:hover .beta-text {
-    background-position: center -9958px;
+    background-position: center -848px;
 }
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
     background-position: 0 -368px;
@@ -5241,7 +5238,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-position: 0 -511px;
 }
 .nw-fm-left-icon.folder-link.active, .nw-fm-left-icon.folder-link:hover {
-    background-position: 0 -9905px;
+    background-position: 0 -794px;
 }
 .nw-fm-left-icon.inbox:hover .nw-fm-left-border, .nw-fm-left-icon.inbox.active .nw-fm-left-border {
     background-position: 0 -415px;
@@ -5329,7 +5326,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     z-index: 10;
 }
 .settings-icon {
-    background-position: 0 -9588px;
+    background-position: 0 -568px;
 }
 .nw-fm-left-icon.rubbish-bin:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.filled:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active.filled .rubbish-bin-icon, .nw-fm-left-icon.account:hover .settings-icon, .nw-fm-left-icon.account.active .settings-icon, .nw-fm-left-icon.rubbish-bin:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active .rubbish-bin-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
@@ -5339,7 +5336,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-position: 0 -248px;
 }
 .nw-fm-left-icon.account.active .settings-icon, .nw-fm-left-icon.account:hover .settings-icon {
-    background-position: 0 -9648px;
+    background-position: 0 -618px;
 }
 .filled .rubbish-bin-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -22919,7 +22916,7 @@ body.pro:after {
     background-color: rgba(255,255,255,0.8);
 }
 .paused .transfer-bar-overlay div {
-    background-position: center -664px;
+    background-position: center -9680px;
 }
 .nw-dark-overlay {
     background-color: rgba(34,34,34,0.95);

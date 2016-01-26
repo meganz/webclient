@@ -15,46 +15,68 @@ import codecs
 import json
 import glob
 
-FILE_TYPES = ['js', 'jsx', 'json', 'html', 'css']
-CHECK_DIRS = ['js', 'html', 'css', 'lang']
-IGNORE_FILES = ['secureboot.js', 'rsaasm.js']
+HASHING_FILE_TYPES = ['js', 'jsx', 'json', 'html', 'css']
+HASHING_CHECK_DIRS = ['js', 'html', 'css', 'lang']
+HASHING_IGNORE_FILES = ['secureboot.js', 'rsaasm.js']
 
-def get_entries(path, result_files):
+def _get_entries(path, result_files, file_types, ignore_files,
+                 check_dirs=None):
     """
-    Returns a list of matching file entries and directories for the given
-    path.
+    Returns a list of matching file entries and directories as specified.
 
     :param path: File path to search in.
     :param result_files: List to collect all result file paths in.
+    :param file_types: List of file types to check for.
+    :param ignore_files: List of files to ignore.
+    :param check_dirs: List of directories to check. If empty, all directories
+        will be checked.
     :return: A lists containing sub-directories.
     """
-    logging.debug('Collecting entries from directory {}'.format(path))
     entries = os.listdir(path)
     sub_dirs = []
     for item in entries:
-        item_path = os.path.join(path, item)
+        item_path = os.path.normpath(os.path.join(path, item))
         if os.path.isfile(item_path):
-            if item.split('.')[-1] in FILE_TYPES and item not in IGNORE_FILES:
+            if (item.split('.')[-1] in file_types
+                and item_path not in ignore_files):
                 result_files.append(item_path)
         elif os.path.isdir(item_path):
-            if path == '.' and item not in CHECK_DIRS:
+            if path == '.' and check_dirs and item not in check_dirs:
                 continue
             sub_dirs.append(item_path)
 
     return sub_dirs
 
 
-def traverse_directories(dirs, result_files):
+## Check for special characters.
+
+def _get_hashable_entries(path, result_files):
+    """
+    Returns a list of matching file entries and directories that may require
+    hashing for `secureboot.js`.
+
+    :param path: File path to search in.
+    :param result_files: List to collect all result file paths in.
+    :return: A lists containing sub-directories.
+    """
+    logging.debug('Collecting hashable entries from directory {}'
+                  .format(path))
+    return _get_entries(path, result_files, HASHING_FILE_TYPES,
+                        HASHING_IGNORE_FILES, HASHING_CHECK_DIRS)
+
+
+def traverse_directories(dirs, result_files, entries_function):
     """
     Traverses a directory tree to find all fine entries relevant for
-    checking.
+    checking compliance for hashing (for `secureboot.js`)
     
     :param  dirs: List of directories to search in.
     :param result_files: List to collect all result file paths in.
+    :param entries_function: Function to collect entries from a path.
     """
     for item in dirs:
-        sub_dirs = get_entries(item, result_files)
-        traverse_directories(sub_dirs, result_files)
+        sub_dirs = entries_function(item, result_files)
+        traverse_directories(sub_dirs, result_files, entries_function)
     
 
 def analyse_files_for_special_chars(filename):
@@ -85,6 +107,8 @@ def analyse_files_for_special_chars(filename):
     return test_fail
                         
 
+## Check for translation strings.
+
 def check_translation_strings():
     """
     Checks for the presence of all translation strings in all HTML files.
@@ -112,19 +136,26 @@ def check_translation_strings():
     return test_fail
 
 
+## Main matters ...
+
 def main():
+    # Will be set to `True` if any test fails.
+    test_fail = False
+
     # Get files to check for special characters we don't like.
+    logging.info('Checking for non-ASCII characters ...')
     result_files = []
-    traverse_directories(['.'], result_files)
+    traverse_directories(['.'], result_files, _get_hashable_entries)
     
     # Analyse for the special characters.
-    test_fail = False
     for item in result_files:
         test_fail |= analyse_files_for_special_chars(item)
 
 
     # Analyse translation strings.
+    logging.info('Analysing translation strings ...')
     test_fail |= check_translation_strings()
+
 
     # Exit code 1 for any failures.
     if test_fail:

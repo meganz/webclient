@@ -1714,7 +1714,9 @@ function MegaData()
         var i;
 
         for (i in M.c['contacts']) {
-            contacts.push(M.d[i]);
+            if (M.c['contacts'].hasOwnProperty(i)) {
+                contacts.push(M.d[i]);
+            }
         }
 
         if (typeof this.i_cache !== "object") {
@@ -1767,20 +1769,19 @@ function MegaData()
                     onlinestatus = [l[5926], 'offline'];
                 }
 
-                if (!treesearch
-                    || (
+                if (!treesearch || (
                         treesearch
                         && contacts[i].name
                         && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1
                         )
                     ) {
                     html += '<div class="nw-contact-item ui-droppable '
-                        + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
-                        + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                        + htmlentities(contacts[i].name)
-                        + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
-                 }
-                 $('.fm-start-chat-dropdown').addClass('hidden');
+                    + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
+                    + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
+                    + htmlentities(contacts[i].name)
+                    + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                }
+                $('.fm-start-chat-dropdown').addClass('hidden');
             }
         }
 
@@ -1805,7 +1806,8 @@ function MegaData()
 
                     var $userDiv = $this.parent().parent();
                     if ($userDiv.is(".offline")) {
-                        $('.context-menu-item.startaudio-item, .context-menu-item.startvideo-item', m).addClass("disabled");
+                        $('.context-menu-item.startaudio-item, .context-menu-item.startvideo-item', m)
+                            .addClass("disabled");
                     }
 
                     $this.addClass('active');

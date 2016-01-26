@@ -44,7 +44,7 @@
             var avatar;
             var email = item[this.propertyToSearch];
 
-            M.u.forEach( function (contact, contactHandle) {
+            M.u.forEach(function (contact, contactHandle) {
                 if (contact.m === email) {
                     id = contactHandle;
 
@@ -70,7 +70,7 @@
             var avatar;
             var email = item[this.propertyToSearch];
 
-            M.u.forEach( function (contact, contactHandle) {
+            M.u.forEach(function (contact, contactHandle) {
                 if (contact.m === email) {
                     id = contactHandle;
 
@@ -922,7 +922,10 @@
                 callback.call(hidden_input, item);
             }
 
-            $(input).data("settings").local_data.push({ id: item[$(input).data("settings").tokenValue], name: item[$(input).data("settings").tokenValue] });
+            $(input).data("settings").local_data.push({
+                id: item[$(input).data("settings").tokenValue],
+                name: item[$(input).data("settings").tokenValue]
+            });
         }// END of function add_token
 
         // Select a token in the token list

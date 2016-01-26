@@ -109,11 +109,8 @@ var Chat = function() {
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb530n001.karere.mega.nz',
         'fallbackXmppServers': [
-             "https://xmpp270n001.karere.mega.nz/bosh",
-             "https://xmpp270n002.karere.mega.nz/bosh",
-             "https://xmpp270n003.karere.mega.nz/bosh",
-             "https://xmpp270n004.karere.mega.nz/bosh",
-             "https://xmpp270n005.karere.mega.nz/bosh"
+             "https://xmpp270n001.karere.mega.nz/ws",
+             "https://xmpp270n002.karere.mega.nz/ws"
         ],
         'rtcSession': {
             'crypto': {

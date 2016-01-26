@@ -24,7 +24,7 @@
         };
 
         self.options = $.extend(true, {}, defaultOptions, opts);
-        if(self.options.buttonElement) {
+        if (self.options.buttonElement) {
             self.options.buttonElement = $(self.options.buttonElement);
         } else {
             delete self.options.buttonElement;
@@ -50,7 +50,7 @@
     FilePicker.prototype.initGenericEvents = function() {
         var self = this;
 
-        if(self.options.buttonElement) {
+        if (self.options.buttonElement) {
             self.options.buttonElement.unbind('click.megafilepicker');
 
             self.options.buttonElement.bind('click.megafilepicker', function() {
@@ -59,7 +59,7 @@
         }
 
         self.on('selectionUpdate', function() {
-            if(self.selection.length > 0) {
+            if (self.selection.length > 0) {
                 $('.attach-send', self.$picker).addClass('active');
             } else {
                 $('.attach-send', self.$picker).removeClass('active');
@@ -73,16 +73,16 @@
     FilePicker.prototype.show = function() {
         var self = this;
 
-        if(!self.$picker) {
+        if (!self.$picker) {
             self._createPicker();
         }
-        if(self.visible) {
+        if (self.visible) {
             return;
         }
 
         self.visible = true;
 
-        if(self.options.buttonElement) {
+        if (self.options.buttonElement) {
             self.options.buttonElement.addClass('active'); /* required to be visible, before the posY calc for the correct
                                                               re-positioning of the dialog */
 
@@ -98,12 +98,12 @@
         // auto hide on click out of the dialog
         $(document).unbind('mouseup.megafilepicker');
         $(document).bind('mouseup.megafilepicker', function(e) {
-            if($(e.target).parents('.fm-chat-attach-popup').size() == 0 && (!self.options.buttonElement || !$(e.target).is(self.options.buttonElement))) {
+            if ($(e.target).parents('.fm-chat-attach-popup').size() == 0 && (!self.options.buttonElement || !$(e.target).is(self.options.buttonElement))) {
                 self.hide();
             }
         });
 
-        if(!self.$jsp) {
+        if (!self.$jsp) {
             $('.fm-chat-attach-scrolling', self.$picker).jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
 
             self.$jsp = $('.fm-chat-attach-scrolling', self.$picker).data('jsp');
@@ -119,7 +119,7 @@
     FilePicker.prototype.hide = function() {
         var self = this;
 
-        if(!self.visible) {
+        if (!self.visible) {
             return;
         }
         // auto hide on click out of the picker - cleanup
@@ -130,12 +130,12 @@
         self.$picker.addClass('hidden');
         self.$picker.removeClass('active');
 
-        if(self.options.buttonElement) {
+        if (self.options.buttonElement) {
             self.options.buttonElement.removeClass('active');
         }
 
         // cleaup & reset state
-        if(self.$jsp) {
+        if (self.$jsp) {
             self.$jsp.destroy();
         }
         self.$picker.remove();
@@ -150,7 +150,7 @@
      */
     FilePicker.prototype.toggle = function() {
         var self = this;
-        if(self.visible) {
+        if (self.visible) {
             self.hide();
         } else {
             self.show();
@@ -192,7 +192,7 @@
         );
 
 
-        if(self.options.buttonElement) {
+        if (self.options.buttonElement) {
             self.$picker.insertAfter(self.options.buttonElement);
         } else {
             $(document.body).append(self.$picker);
@@ -213,7 +213,7 @@
         var $d = self.$picker;
 
         self.on('repaint', function() {
-            if(self.$jsp) {
+            if (self.$jsp) {
                 self.$jsp.reinitialise();
             }
         });
@@ -262,8 +262,8 @@
                 // this is a select call
                 // lets distinguish the multi select VS single select actions:
                 // 1. multi select
-                if(e.ctrlKey || e.metaKey) {
-                    if(!$this.is(".ui-selected")) {
+                if (e.ctrlKey || e.metaKey) {
+                    if (!$this.is(".ui-selected")) {
                         $this.addClass('ui-selected');
 
 
@@ -281,7 +281,7 @@
 
                         self.trigger('selectionUpdate', [$this.data('k')]);
                     }
-                } else if(e.shiftKey) {
+                } else if (e.shiftKey) {
                     // this flag will be used while looping over the nodes to detect when to START selecting nodes
                     var selectionStarted = self.selection.length == 0 ? true : false;
 
@@ -303,7 +303,7 @@
                     });
 
                     // set firstSelectedNode depending on the current selection
-                    if(self.selection.length == 0) {
+                    if (self.selection.length == 0) {
                         $firstSelectedNode = $('> tr:first', $tbody);
                     } else {
                         $firstSelectedNode = $('> tr.ui-selected:first', $tbody);
@@ -328,7 +328,7 @@
                     lastSelectedNodeIdx = $.inArray($lastSelectedNode.data('k'), availableNodes);
 
                     // swap if down -> top selection should be done;
-                    if(firstSelectedNodeIdx > lastSelectedNodeIdx) {
+                    if (firstSelectedNodeIdx > lastSelectedNodeIdx) {
                         var tmp = firstSelectedNodeIdx;
                         firstSelectedNodeIdx = lastSelectedNodeIdx;
                         lastSelectedNodeIdx = tmp;
@@ -339,13 +339,13 @@
                     $.each($('> tr', $tbody), function(k, item) {
                         var $item = $(item);
 
-                        if(k >= firstSelectedNodeIdx && k <= lastSelectedNodeIdx) {
+                        if (k >= firstSelectedNodeIdx && k <= lastSelectedNodeIdx) {
                             self.selection.push(
                                 $item.data('k')
                             );
                             $item.addClass('ui-selected');
                         }
-                        if(k > lastSelectedNodeIdx) {
+                        if (k > lastSelectedNodeIdx) {
                             return false; //break; if out of range, will save some loops
                         }
                     });
@@ -391,7 +391,7 @@
         var fileNodes = [];
 
         $.each(nodes, function(k, v) {
-            if(v.t == 1) {
+            if (v.t == 1) {
                 dirNodes.push(v);
             } else {
                 fileNodes.push(v);
@@ -423,7 +423,7 @@
             );
 
 
-            if(n.t == 0) {
+            if (n.t == 0) {
                 // is file
                 $('.transfer-filtype-icon', $newNode).addClass(
                     fileIcon(n)
@@ -434,7 +434,7 @@
                 if (n.shares) {
                     var iShareNum = Object.keys(n.shares).length;
                 }
-                if((n.shares && n.shares.EXP && iShareNum > 1)
+                if ((n.shares && n.shares.EXP && iShareNum > 1)
                     || (n.shares && !n.shares.EXP && iShareNum)
                     || M.ps[n.h]) {
                     $('.transfer-filtype-icon', $newNode).addClass(
@@ -465,7 +465,7 @@
 //
             var $item = $('<a class="fm-breadcrumbs"><span class="right-arrow-bg ui-draggable"><span></span></span></a>');
 
-            if(parentNode.h != M.RootID) {
+            if (parentNode.h != M.RootID) {
                 $('span', $item).text(parentNode.name);
                 $item.addClass("folder");
             } else {
@@ -479,7 +479,7 @@
                 self._loadNodes($(this).data('h'));
             });
             $item.addClass("contains-directories");
-            if(!first) {
+            if (!first) {
                 $item.addClass("has-next-button");
             }
             $bcContainer.prepend($item);
@@ -495,7 +495,7 @@
      */
     FilePicker.prototype.destroy = function() {
         var self = this;
-        if(self.$picker) {
+        if (self.$picker) {
             self.$jsp.destroy();
             self.$picker.remove();
             self.$picker = null;

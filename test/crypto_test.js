@@ -15,11 +15,44 @@ describe("crypto unit test", function() {
     // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
     var ED25519_FINGERPRINT = base64urldecode('If4x36FUomFia/hUBG/SJxt77Us');
+    // 1024 bit RSA key pair.
+    var RSA_PUB_KEY = [
+        asmCrypto.base64_to_bytes('wT+JSBnBNjgalMGT5hmFHd/N5eyncAA+w1TzFC4PYfB'
+            + 'nbX1CFcx6E7BuB0SqgxbJw3ZsvvowsjRvuo8SNtfmVIz4fZV45pBPxCkeCWonN/'
+            + 'zZZiT3LnYnk1BfnfxfoXtEYRrdVPXAC/VDc9cgy29OXKuuNsREKznb9JFYQUVH9'
+            + 'FM='),
+        asmCrypto.base64_to_bytes('AQAB')
+    ];
+    var RSA_PRIV_KEY = [
+        asmCrypto.base64_to_bytes('wT+JSBnBNjgalMGT5hmFHd/N5eyncAA+w1TzFC4PYfB'
+            + 'nbX1CFcx6E7BuB0SqgxbJw3ZsvvowsjRvuo8SNtfmVIz4fZV45pBPxCkeCWonN/'
+            + 'zZZiT3LnYnk1BfnfxfoXtEYRrdVPXAC/VDc9cgy29OXKuuNsREKznb9JFYQUVH9'
+            + 'FM='),
+        65537,
+        asmCrypto.base64_to_bytes('B1SXqop/j8T1DSuCprnVGNsCfnRJra/0sYgpaFyO7NI'
+            + 'nujmEJjuJbfHFWrU6GprksGtvmJb4/emLS3Jd6IKsE/wRthTLLMgbzGm5rRZ92g'
+            + 'k8XGY3dUrNDsnphFsbIkTVl8n2PX6gdr2hn+rc2zvRupAYkV/smBZX+3pDAcuHo'
+            + '+E='),
+        asmCrypto.base64_to_bytes('7y+NkdfNlnENazteobZ2K0IU7+Mp59BgmrhBl0TvhiA'
+            + '5HkI9WJDIZK67NsDa9QNdJ/NCfmqE/eNkZqFLVq0c+w=='),
+        asmCrypto.base64_to_bytes('ztVHfgrLnINsPFTjMmjgZM6M39QEUsi4erg4s2tJiuI'
+            + 'v29szH1n2HdPKFRIUPnemj48kANvp5XagAAhOb8u2iQ=='),
+        asmCrypto.base64_to_bytes('IniC+aLVUTonye17fOjT7PYQGGZvsqX4VjP51/gqYPU'
+            + 'h5jd7qdjr2H7KImD27Vq3wTswuRFW61QrMxNJzUsTow=='),
+        asmCrypto.base64_to_bytes('TeoqNGD8sskPTOrta1/2qALnLqo/tq/GTvR255/S5G6'
+            + 'weLHqYDUTcckGp0lYNu/73ridZ3VwdvBo9ZorchHbgQ=='),
+        asmCrypto.base64_to_bytes('JhqTYTqT5Dj6YoWHWNHbOz24NmMZUXwDms/MDOBM0Nc'
+            + '0nX6NjLDooFrJZtBMGMgcSQJd4rULuH94+szNGc2GAg==')
+    ];
 
     var _echo = function(x) { return x; };
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
+
+        sandbox.stub(attribCache, 'getItem', function() {
+            return MegaPromise.reject();
+        });
     });
 
     afterEach(function() {
@@ -30,7 +63,7 @@ describe("crypto unit test", function() {
         describe('getPubKeyAattribute()', function() {
             it("RSA key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { resolve: sinon.stub() };
+                var rootPromise = { resolve: sinon.stub(), reject: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 var pubKey = 'the key';
                 sandbox.stub(window, 'crypto_decodepubkey').returns(pubKey);
@@ -75,7 +108,7 @@ describe("crypto unit test", function() {
 
             it("Cu25519 key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { resolve: sinon.stub() };
+                var rootPromise = { resolve: sinon.stub(), reject: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 var attributePromise = { done: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
@@ -95,7 +128,7 @@ describe("crypto unit test", function() {
 
             it("Ed25519 key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { resolve: sinon.stub() };
+                var rootPromise = { resolve: sinon.stub(), reject: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 var attributePromise = { done: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
@@ -949,6 +982,36 @@ describe("crypto unit test", function() {
                 assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got Ed25519 fingerprint for user "you456789xw": If4x36FUomFia_hUBG_SJxt77Us');
+            });
+        });
+
+        describe('RSA string en/decryption', function() {
+            describe('rsaEncryptString/rsaDecryptString round trips', function() {
+                it("binary values", function() {
+                    var messages = ['Spiegelei', ED25519_PUB_KEY];
+                    var ciphertext;
+                    var cleartext;
+                    for (var i = 0; i < messages.length; i++) {
+                        ciphertext = crypt.rsaEncryptString(messages[i], RSA_PUB_KEY);
+                        assert.strictEqual(ciphertext.length, 1024 / 8 + 2);
+                        cleartext = crypt.rsaDecryptString(ciphertext, RSA_PRIV_KEY);
+                        assert.strictEqual(cleartext, messages[i]);
+                    }
+                });
+
+                it("Unicode and string values", function() {
+                    var messages = ['42', "Don't panic!", 'Flying Spaghetti Monster',
+                                    "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
+                                    'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
+                    var ciphertext;
+                    var cleartext;
+                    for (var i = 0; i < messages.length; i++) {
+                        ciphertext = crypt.rsaEncryptString(messages[i], RSA_PUB_KEY, true);
+                        assert.strictEqual(ciphertext.length, 1024 / 8 + 2);
+                        cleartext = crypt.rsaDecryptString(ciphertext, RSA_PRIV_KEY, true);
+                        assert.strictEqual(cleartext, messages[i]);
+                    }
+                });
             });
         });
     });

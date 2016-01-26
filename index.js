@@ -56,7 +56,11 @@ function startMega() {
         delete pages['chat'];
     }
     jsl = [];
-    init_page();
+    if(typeof(mega_custom_boot_fn) === 'undefined') {
+        init_page();
+    } else {
+        mega_custom_boot_fn();
+    }
 }
 
 function mainScroll() {
@@ -664,6 +668,9 @@ function init_page() {
         $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
         mainScroll();
     }
+    else if (page == 'sourcecode') {
+        parsepage(pages['sourcecode']);
+    }
     else if (page == 'terms') {
         parsepage(pages['terms']);
     }
@@ -711,6 +718,8 @@ function init_page() {
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
         init_sync();
+        topmenuUI();
+        mainScroll();
     }
     else if (page == 'mobile') {
         parsepage(pages['mobile']);
@@ -731,8 +740,23 @@ function init_page() {
     }
     else if (dlid) {
         page = 'download';
+        if (typeof fdl_queue_var !== 'undefined') {
+            var handle = Object(fdl_queue_var).ph || '';
+            var $tr = $('.transfer-table tr#dl_' + handle);
+            if ($tr.length) {
+                var dl = dlmanager.getDownloadByHandle(handle);
+                if (dl) {
+                    dl.onDownloadProgress = dlprogress;
+                    dl.onDownloadComplete = dlcomplete;
+                    dl.onDownloadError = dlerror;
+                    $tr.remove();
+                }
+            }
+        }
         parsepage(pages['download'], 'download');
         dlinfo(dlid, dlkey, false);
+        topmenuUI();
+        mainScroll();
     }
 
     /**
@@ -859,15 +883,23 @@ function init_page() {
             }
         }
 
-        if (fminitialized) {
-            if (M.currentdirid == 'account') {
-                accountUI();
-            }
-            else if (M.currentdirid == 'search') {
-                searchFM();
+        if (typeof fdl_queue_var !== 'undefined') {
+            if (!$('.transfer-table tr#dl_' + Object(fdl_queue_var).ph).length) {
+                var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
+                if (fdl && fdl_queue_var.dlkey === dlpage_key) {
+
+                    Soon(function() {
+                        M.putToTransferTable(fdl);
+                        M.onDownloadAdded(1, dlQueue.isPaused(dlmanager.getGID(fdl)));
+
+                        fdl.onDownloadProgress = M.dlprogress;
+                        fdl.onDownloadComplete = M.dlcomplete;
+                        fdl.onBeforeDownloadComplete = M.dlbeforecomplete;
+                        fdl.onDownloadError = M.dlerror;
+                    });
+                }
             }
         }
-
         if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }
@@ -1093,11 +1125,7 @@ function topmenuUI() {
             var cssClass = (proNum == 4) ? 'lite' : 'pro';
 
             // Show the 'Upgrade your account' button in the main menu for all
-            // accounts except for the biggest plan i.e. PRO III
-            if (u_attr.p !== 3) {
-                $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            }
-
+            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
             $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             $('.membership-status-block')
@@ -1591,6 +1619,9 @@ function topmenuUI() {
         }
         else if (className.indexOf('doc') > -1) {
             document.location.hash = 'doc';
+        }
+        else if (className.indexOf('source-code') > -1) {
+            document.location.hash = 'sourcecode';
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';

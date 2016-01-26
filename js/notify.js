@@ -211,6 +211,7 @@ var notify = {
     initNotifyIconClickHandler: function() {
         
         // Add delegated event for when the notifications icon is clicked
+        $('.top-head').off('click', '.cloud-popup-icon');
         $('.top-head').on('click', '.cloud-popup-icon', function() {
             
             // If the popup is already open, then close it
@@ -306,16 +307,10 @@ var notify = {
 
         // Add the emails from the user's list of known contacts
         if (M && M.u) {
-            for (var userHandle in M.u) {
-                
-                // Skip if not own property
-                if (!M.u.hasOwnProperty(userHandle)) {
-                    continue;
-                }
-                
+            M.u.forEach(function(c, userHandle) {
                 // Add the email
-                notify.userEmails[userHandle] = M.u[userHandle].m;
-            }
+                notify.userEmails[userHandle] = c.m;
+            });
         }
     },
     

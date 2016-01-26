@@ -59,7 +59,7 @@ KarerePing.prototype.startTimer = function() {
         self._currentPingRequest = self.megaChat.karere.sendServerPing();
         self._currentPingRequest
             .fail(function() {
-                self.megaChat.karere._connectionRetry();
+                self.megaChat.karere.connectionRetryManager.doConnectionRetry();
             })
             .always(function() {
                 self._currentPingRequest = false;

@@ -1,0 +1,35 @@
+{
+  "output": "./dont-deploy/ui/out/",
+  "reactDocgen": {
+    "files": [
+      "./dont-deploy/ui/src/**/*.jsx"
+    ]
+  },
+  "title": "MEGA UI Style Guide",
+  "files": [
+    "css/style.css",
+    "css/user-card.css",
+    "css/avatars.css",
+    "css/icons.css",
+    "css/buttons.css",
+    "css/dropdowns.css",
+    "css/popups.css",
+    "css/data-blocks-view.css",
+    "css/chat-messages.css",
+    "css/chat-share-links.css",
+    "css/chat-textarea.css",
+    "css/chat-typing.css",
+    "css/chat-left-pane.css",
+    "css/chat-feedback.css",
+    "css/chat-common.css",
+    "images/*",
+    "images/**",
+    "dont-deploy/ui/boot.js",
+    "secureboot.js",
+    "dont-deploy/ui/sample-data.js"
+  ],
+  "pushstate": false,
+  "babelConfig": {
+    "stage": 0
+  }
+}

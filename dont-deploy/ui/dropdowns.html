@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+</head>
+<body>
+
+
+<script type="text/javascript" src="./boot.js"></script>
+<script type="text/javascript" src="../../secureboot.js"></script>
+<script type="text/javascript" src="./sample-data.js"></script>
+
+<div class="conversationsApp">
+    <script type="text/jsx">
+        <ButtonsUI.Button
+                className="link-button dropdown-element"
+                icon="rounded-grey-plus"
+                label={__("Add participant…")}
+                contacts={sampleData.contacts.singleContact}
+                >
+            <DropdownsUI.DropdownContactsSelector
+                    styles={{
+                                        marginLeft: -12,
+                                        width: 252
+                                    }}
+                    contacts={sampleData.contacts.singleContact}
+                    megaChat={sampleData.megaChat.dummy}
+                    className="add-participant-selector"
+                    onClick={() => {}}
+                    />
+        </ButtonsUI.Button>
+    </script>
+
+</div>
+
+</body>
+</html>

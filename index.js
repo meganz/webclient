@@ -56,7 +56,11 @@ function startMega() {
         delete pages['chat'];
     }
     jsl = [];
-    init_page();
+    if(typeof(mega_custom_boot_fn) === 'undefined') {
+        init_page();
+    } else {
+        mega_custom_boot_fn();
+    }
 }
 
 function mainScroll() {
@@ -660,6 +664,9 @@ function init_page() {
         $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
         mainScroll();
     }
+    else if (page == 'sourcecode') {
+        parsepage(pages['sourcecode']);
+    }
     else if (page == 'terms') {
         parsepage(pages['terms']);
     }
@@ -729,6 +736,19 @@ function init_page() {
     }
     else if (dlid) {
         page = 'download';
+        if (typeof fdl_queue_var !== 'undefined') {
+            var handle = Object(fdl_queue_var).ph || '';
+            var $tr = $('.transfer-table tr#dl_' + handle);
+            if ($tr.length) {
+                var dl = dlmanager.getDownloadByHandle(handle);
+                if (dl) {
+                    dl.onDownloadProgress = dlprogress;
+                    dl.onDownloadComplete = dlcomplete;
+                    dl.onDownloadError = dlerror;
+                    $tr.remove();
+                }
+            }
+        }
         parsepage(pages['download'], 'download');
         dlinfo(dlid, dlkey, false);
         topmenuUI();
@@ -859,6 +879,23 @@ function init_page() {
             }
         }
 
+        if (typeof fdl_queue_var !== 'undefined') {
+            if (!$('.transfer-table tr#dl_' + Object(fdl_queue_var).ph).length) {
+                var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
+                if (fdl && fdl_queue_var.dlkey === dlpage_key) {
+
+                    Soon(function() {
+                        M.putToTransferTable(fdl);
+                        M.onDownloadAdded(1, dlQueue.isPaused(dlmanager.getGID(fdl)));
+
+                        fdl.onDownloadProgress = M.dlprogress;
+                        fdl.onDownloadComplete = M.dlcomplete;
+                        fdl.onBeforeDownloadComplete = M.dlbeforecomplete;
+                        fdl.onDownloadError = M.dlerror;
+                    });
+                }
+            }
+        }
         if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }
@@ -1577,6 +1614,9 @@ function topmenuUI() {
         }
         else if (className.indexOf('doc') > -1) {
             document.location.hash = 'doc';
+        }
+        else if (className.indexOf('source-code') > -1) {
+            document.location.hash = 'sourcecode';
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';

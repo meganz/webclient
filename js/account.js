@@ -211,6 +211,7 @@ function u_logout(logout) {
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
         }
+        slideshow(0, 1);
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
         notify.notifications = [];
@@ -521,8 +522,8 @@ function generateAvatarMeta(user_hash) {
         shortName = contact.shortName;
         color = contact.displayColor;
     }
-    else {
-        $.each(Object.keys(M.u), function (k, v) {
+	else {
+        M.u.forEach(function(k, v) {
             var c = M.u[v];
             var n = generateContactName(v);
 
@@ -560,6 +561,9 @@ function generateAvatarMeta(user_hash) {
     return meta;
 }
 
+var attribCache = new IndexedDBKVStorage('attrib');
+var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
+
 /**
  * Retrieves a user attribute.
  *
@@ -567,8 +571,8 @@ function generateAvatarMeta(user_hash) {
  *     Mega's internal user handle.
  * @param attribute {String}
  *     Name of the attribute.
- * @param pub {Boolean}
- *     True for public attributes (default: true).
+ * @param pub {Boolean|Number}
+ *     True for public attributes (default: true). -1 for "system" attributes (e.g. without prefix)
  * @param nonHistoric {Boolean}
  *     True for non-historic attributes (default: false).  Non-historic
  *     attributes will overwrite the value, and not retain previous
@@ -590,10 +594,13 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     var myCtx = ctx || {};
 
     // Assemble property name on Mega API.
-    pub = (pub === false) ? false : true;
+    pub = typeof pub === 'undefined' ? true : pub;
     var attributePrefix = '';
     if (pub === true) {
         attributePrefix = '+';
+    }
+    else if (pub === -1) {
+        attributePrefix = '';
     }
     else {
         attributePrefix = '*';
@@ -606,7 +613,10 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     // Make the promise to execute the API code.
     var thePromise = new MegaPromise();
 
+    var cacheKey = userhandle + "_" + attribute;
+
     function settleFunction(res) {
+
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
             if (attribute.charAt(0) === '*') {
@@ -632,6 +642,17 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                     res = EINTERNAL;
                 }
             }
+        }
+
+        // cache all returned values, except internal errors...
+        if (res !== EINTERNAL) {
+            var exp = 0;
+            // only add cache expiration for attributes of non-contacts, because contact's attributes would be always
+            // in sync (using actionpackets)
+            if (userhandle !== u_handle && (!M.u[userhandle] || M.u[userhandle].c !== 1)) {
+                exp = unixtime();
+            }
+            attribCache.setItem(cacheKey, JSON.stringify([res, exp]));
         }
 
         // Another conditional, the result value may have been changed.
@@ -660,12 +681,50 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     myCtx.ua = attribute;
     myCtx.callback = settleFunction;
 
-    // @TODO PERF: This may reduce the number of API calls made during the page initialisation if the next line is
-    // replaced with a clever cache (localStorage/sessionStorage/mDB) that will do cache all api_req's related to
-    // attributes and keep it in sync via actionpackets.
+    // check the cache first!
+    attribCache.getItem(cacheKey)
+        .done(function __attribCacheGetDone(v) {
+            var res;
+            try {
+                res = JSON.parse(v);
 
-    // Fire it off.
-    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+                if ($.isArray(res)) {
+                    if (res[1] && res[1] !== 0 && res[1] < unixtime() - ATTRIB_CACHE_NON_CONTACT_EXP_TIME) {
+                        attribCache.removeItem(cacheKey);
+                        api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+                        return;
+                    }
+                    else if (res[0] === ENOENT) {
+                        thePromise.reject(res[0]);
+                        return;
+                    }
+                    else {
+                        if (callback) {
+                            callback(res[0], myCtx);
+                        }
+                        thePromise.resolve(res[0]);
+                        return;
+                    }
+                }
+                else {
+                    attribCache.removeItem(cacheKey);
+                    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+                }
+            }
+            catch (e) {
+                api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+                return;
+            }
+
+            if (callback) {
+                callback(res[0], myCtx);
+            }
+        })
+        .fail(function __attribCacheGetFail() {
+            // Fire it off.
+            api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+        });
+
 
     return thePromise;
 }
@@ -703,6 +762,8 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
+    var savedValue = value;
+
     // Prepare all data needed for the call on the Mega API.
     if (mode === undefined) {
         mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
@@ -717,15 +778,24 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
         attribute = '*' + attribute;
         // The value should be a key/value property container. Let's encode and
         // encrypt it.
-        value = base64urlencode(tlvstore.blockEncrypt(
+        savedValue = base64urlencode(tlvstore.blockEncrypt(
             tlvstore.containerToTlvRecords(value), u_k, mode));
     }
 
     // Make the promise to execute the API code.
     var thePromise = new MegaPromise();
 
+    var cacheKey = u_handle + "_" + attribute;
+
+    // clear when the value is being sent to the API server, during that period
+    // the value should be retrieved from the server, because of potential
+    // race conditions
+    attribCache.removeItem(cacheKey);
+
     function settleFunction(res) {
         if (typeof res !== 'number') {
+            attribCache.setItem(cacheKey, JSON.stringify([value, 0]));
+
             logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);
             thePromise.resolve(res);
@@ -747,8 +817,8 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     myCtx.callback = settleFunction;
 
     // Fire it off.
-    var apiCall = {'a': 'up'};
-    apiCall[attribute] = value;
+    var apiCall = {'a': 'up', 'i': requesti};
+    apiCall[attribute] = savedValue;
     api_req(apiCall, myCtx);
 
     return thePromise;
@@ -802,7 +872,7 @@ function isEphemeral() {
                 false,
                 true
             );
-        }, 250);
+        }, 3 * 60000);
     };
 
     /**
@@ -843,6 +913,9 @@ function isEphemeral() {
                     _flushLastInteractionData();
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
+
+                    M.u[u_h].ts = parseInt(v.split(":")[1], 10);
+
                     $promise.verify();
                 }
             })
@@ -856,6 +929,9 @@ function isEphemeral() {
                     _flushLastInteractionData();
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
+
+                    Object(M.u[u_h]).ts = parseInt(v.split(":")[1], 10);
+
                     $promise.verify();
                 }
                 else {
@@ -904,8 +980,7 @@ function isEphemeral() {
             if (r[0] === "0") {
                 $elem.addClass('cloud-drive');
             }
-            else if (r[0] === "1" && typeof(megaChat) !== 'undefined') {
-                M.u[u_h].lastChatActivity = ts;
+            else if (r[0] === "1" && typeof megaChat !== 'undefined') {
                 var room = megaChat.getPrivateRoom(u_h);
                 if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
                     if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
@@ -927,7 +1002,8 @@ function isEphemeral() {
             );
 
             if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
-                M.contacts(); // we need to resort
+                // we need to resort
+                M.contacts();
             }
         };
 
@@ -962,8 +1038,13 @@ function isEphemeral() {
                     true
                 )
                     .done(function (res) {
-                        if (typeof(res) !== 'number') {
+                        if (typeof res !== 'number') {
                             _lastUserInteractionCache = res;
+                            Object.keys(res).forEach(function(k) {
+                                // prefill in-memory M.u[...] cache!
+                                getLastInteractionWith(k);
+                            });
+
                             // recurse, and return the data from the mem cache
                             $promise.linkDoneAndFailTo(
                                 getLastInteractionWith(u_h)
@@ -994,6 +1075,16 @@ function isEphemeral() {
             $promise.reject(false);
         }
         else if (_lastUserInteractionCache[u_h]) {
+            if (megaChat) {
+                var chatRoom = megaChat.getPrivateRoom(u_h);
+
+                if (chatRoom) {
+                    var newActivity = parseInt(_lastUserInteractionCache[u_h].split(":")[1], 10);
+                    if (newActivity > chatRoom.lastActivity) {
+                        chatRoom.lastActivity = newActivity;
+                    }
+                }
+            }
             $promise.resolve(_lastUserInteractionCache[u_h]);
         }
         else {

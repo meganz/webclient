@@ -72,13 +72,13 @@ var megasync = (function() {
         var overlayHeight = $('.megasync-overlay').outerHeight();
         var listHeight = $('.megasync-scr-pad').outerHeight() + 72;
         var listPosition = $list.offset().top;
-    
+
         if (overlayHeight < (listHeight + listPosition)) {
             $('.megasync-list-arrow').removeClass('hidden inactive');
             $pane.height(overlayHeight - listPosition - 72);
             $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-    
-    
+
+
             $pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
 
                 if (isAtBottom) {
@@ -87,7 +87,7 @@ var megasync = (function() {
                     $('.megasync-list-arrow').removeClass('inactive');
                 }
             });
-    
+
         } else {
             if (jsp) {
                 jsp.destroy();
@@ -132,21 +132,22 @@ var megasync = (function() {
             SyncAPI({a: "v"});
         }, 1000);
 
-        $overlay.show().addClass('downloading');
+        $overlay.removeClass('hidden').addClass('downloading');
 
-        $('.megasync-close').rebind('click', function(e) {
-            $('.megasync-overlay').hide();
+        $('.megasync-close', $overlay).rebind('click', function(e) {
+            $overlay.addClass('hidden');
         });
 
-        $('body').bind('keyup', function(e) {
+        $('body').bind('keyup.sdd', function(e) {
             if (e.keyCode === 27) {
-                $('.megasync-overlay').hide();
+                $('.megasync-overlay').addClass('hidden');
+                $overlay.addClass('hidden');
             }
         });
 
         if (url === '' || localStorage.isLinux) {
             // It's linux!
-            var $modal = $('.megasync-overlay').hide();
+            var $modal = $('.megasync-overlay').addClass('hidden');
             loadingDialog.show();
             ns.getLinuxReleases(function() {
                 loadingDialog.hide();
@@ -170,7 +171,7 @@ var megasync = (function() {
             }
         },
         error: function(next, ev) {
-            
+
             enabled = false;
             next = (typeof next === "function") ? next : function() {};
             next(ev || new Error("Internal error"));
@@ -200,16 +201,24 @@ var megasync = (function() {
             // It means "OK". Most likely a "download" API call
             // was successfully handled.
             clearInterval(retryTimer);
-            $('body').unbind('keyup');
-            return $('.megasync-overlay').hide().removeClass('downloading');
+            $('body').unbind('keyup.ssd');
+            showToast('megasync', 'Download added to MEGAsync', 'Open');
+            $('.button.with-megasync .big-txt').safeHTML(l[258]);
+            $('.button.with-megasync').addClass('downloading');
+            return $('.megasync-overlay').addClass('hidden').removeClass('downloading');
         }
 
         if (typeof response !== "object") {
             return handler.error(next);
         }
 
-        console.error(response);
+        for (var property in response) {
+            if (response.hasOwnProperty(property) && handler[property]) {
+                handler[property](response[property]);
+            }
+        }
 
+        return next(null, response);
     }
     // }}}
 

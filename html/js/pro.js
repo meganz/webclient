@@ -396,7 +396,7 @@ function pro_next_step() {
         showSignupPromptDialog();
         return;
     }
-    else if(isEphemeral()) {
+    else if (isEphemeral()) {
         showRegisterDialog();
         return;
     }
@@ -1240,7 +1240,7 @@ var proPage = {
     },
     
     /**
-     * Updates the main price at the bottom of the page
+     * Updates the main price
      * @param {Number} planIndex The array index of the plan in membershipPlans
      */
     updateMainPrice: function(planIndex) {
@@ -1255,11 +1255,18 @@ var proPage = {
         var price = currentPlan[5].split('.');
         var dollars = price[0];
         var cents = price[1];
+        
+        // Change the wording to month or year
+        var numOfMonths = currentPlan[4];
+        var monthOrYearWording = (numOfMonths === 1) ? l[931] : l[932];
 
-        // Update main price at the bottom
+        // Update the price of the plan
         $('.membership-step2 .reg-st3-bott-title.price .num').safeHTML(
             dollars + '<span class="small">.' + cents + ' &euro;</span>'
         );
+
+        // Update to /month or /year next to the price box
+        $('.membership-step2 .reg-st3-bott-title.price .period').text('/' + monthOrYearWording);                
     },
         
     /**
@@ -2727,7 +2734,7 @@ var doProLogin = function($dialog) {
                 $('#login-email', $dialog).val('');
                 u_type = r;
                 init_page();
-                if(pro_package) {
+                if (pro_package) {
                     var cls = pro_package
                         .replace("_month", "")
                         .replace("_year", "");
@@ -3088,7 +3095,7 @@ var doProRegister = function($dialog) {
             else if (u_type == 0) registeraccount();
         }
     }
-    if(err) {
+    if (err) {
         loadingDialog.hide();
     }
 };
@@ -3131,7 +3138,7 @@ function showLoadingDialog(url) {
         .addClass('active')
         .removeClass('hidden');
 
-    if(url) {
+    if (url) {
         megaAnalytics.log("pro", "proceedingToPaypal");
 
         paypalTimeout = setTimeout(function () {
@@ -3150,7 +3157,7 @@ function redirectToPaypalHide() {
 
 var proceedToPaypal = function() {
 
-    if(pro_package) {
+    if (pro_package) {
         var cls = pro_package
             .replace("_month", "")
             .replace("_year", "");
@@ -3167,7 +3174,7 @@ var proceedToPaypal = function() {
 
 var signupPromptDialog = null;
 var showSignupPromptDialog = function() {
-    if(!signupPromptDialog) {
+    if (!signupPromptDialog) {
         signupPromptDialog = new mega.ui.Dialog({
             'className': 'loginrequired-dialog',
             'closable': true,

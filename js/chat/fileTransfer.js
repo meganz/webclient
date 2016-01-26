@@ -462,7 +462,7 @@ UploadHandler.prototype.sendFileData = function() {
         if (self._hasher)
             self._hasher.process(arrBuf);
         self._dataChan.send(packet);
-        if(self._dataChan.bufferedAmount < UploadHandler.SEND_QUEUE_BYTES_MAX) {
+        if (self._dataChan.bufferedAmount < UploadHandler.SEND_QUEUE_BYTES_MAX) {
  //           console.log("burst mode: output buflen:", self._dataChan.bufferedAmount);
             self.sendFileData();
         }

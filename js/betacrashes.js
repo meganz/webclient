@@ -1,4 +1,4 @@
-if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "mega.dev" */|| location.hostname.indexOf("developers.") > -1) {
+if (window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "mega.dev" */|| location.hostname.indexOf("developers.") > -1) {
     if (d)
     {
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -55,7 +55,7 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
             report.id = ids.join(",");
             report.ud = uds;
 
-            if(typeof megaChat !== 'undefined') {
+            if (typeof megaChat !== 'undefined') {
                 report.karereState = megaChat.karere.getConnectionState();
                 report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
                 report.karereServer = megaChat.karere.connection.service;
@@ -63,10 +63,9 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
 
                 var chatStates = [];
 
-                Object.keys(megaChat.chats).forEach(function (k) {
-                    var v = megaChat.chats[k];
-
+                megaChat.chats.forEach(function (v) {
                     var participants = v.getParticipants();
+                    var k = v.roomJid;
 
                     participants.forEach(function (v, k) {
                         var cc = megaChat.getContactFromJid(v);
@@ -76,11 +75,7 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
                     chatStates.push({
                         'roomUniqueId': k,
                         'roomState': v.getStateAsText(),
-                        'roomParticipants': participants,
-                        'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
-                        'opQueueQueueCount': v.encryptionOpQueue ? v.encryptionOpQueue._queue.length : "not defined",
-                        'opQueueErrRetries': v.encryptionOpQueue ? v.encryptionOpQueue._error_retries : "not defined",
-                        'opQueueCurrentOp': v.encryptionOpQueue && v.encryptionOpQueue._queue.length > 0 ? v.encryptionOpQueue._queue[0][0] : "not defined"
+                        'roomParticipants': participants
                     });
                 });
 
@@ -103,14 +98,14 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
                     { c : JSON.stringify(dump), v : report, uh: u_handle, ver: window.megaVersion }
                 );
             };
-            if(window.megaVersion) {
+            if (window.megaVersion) {
                 sendReport();
             } else {
                 $.get("./current_ver.txt")
                     .done(function(r) {
                         r = $.trim(r);
-                        if(r.length == 40) {
-                            if(window.megaPrevVersion && window.megaPrevVersion != r) {
+                        if (r.length == 40) {
+                            if (window.megaPrevVersion && window.megaPrevVersion != r) {
                                 alert("You are using an outdated version. Please update!");
                                 window.megaVersion = window.megaPrevVersion;
                             } else {

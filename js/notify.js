@@ -307,16 +307,10 @@ var notify = {
 
         // Add the emails from the user's list of known contacts
         if (M && M.u) {
-            for (var userHandle in M.u) {
-                
-                // Skip if not own property
-                if (!M.u.hasOwnProperty(userHandle)) {
-                    continue;
-                }
-                
+            M.u.forEach(function(c, userHandle) {
                 // Add the email
-                notify.userEmails[userHandle] = M.u[userHandle].m;
-            }
+                notify.userEmails[userHandle] = c.m;
+            });
         }
     },
     

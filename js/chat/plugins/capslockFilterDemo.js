@@ -32,10 +32,10 @@ var CapslockFilterDemo = function(megaChat) {
 CapslockFilterDemo.prototype.processMessage = function(e, eventData) {
     var self = this;
 
-    if(eventData.messageHtml) {
+    if (eventData.messageHtml) {
         eventData.messageHtml = eventData.messageHtml.toUpperCase();
     }
-    if(eventData.message) {
+    if (eventData.message) {
         eventData.message = eventData.message.toUpperCase();
     }
 };

@@ -48,7 +48,7 @@ MegaKVStorage.prototype._genBucketName = function(k) {
  */
 MegaKVStorage.prototype.setItem = function(k, v, expiration) {
     var r = this.adapter.setItem(this._genBucketName(k), v);
-    if(expiration) {
+    if (expiration) {
         this.adapter.setItem(this._genBucketName(k) + ".exp", unixtime() + expiration);
     }
     return r;
@@ -74,7 +74,7 @@ MegaKVStorage.prototype.removeItem = function(k) {
 MegaKVStorage.prototype._checkAndRemoveIfExpired = function(k) {
     // check if expired first
     var expiredVal = this.adapter.getItem(this._genBucketName(k) + ".exp");
-    if(expiredVal && expiredVal < unixtime()) {
+    if (expiredVal && expiredVal < unixtime()) {
         this.removeItem(k);
 
         return true;
@@ -91,7 +91,7 @@ MegaKVStorage.prototype._checkAndRemoveIfExpired = function(k) {
  * @returns {*}
  */
 MegaKVStorage.prototype.getItem = function(k, default_val) {
-    if(this._checkAndRemoveIfExpired(k) === true) {
+    if (this._checkAndRemoveIfExpired(k) === true) {
         return default_val;
     }
     var val = this.adapter.getItem(this._genBucketName(k));
@@ -105,7 +105,7 @@ MegaKVStorage.prototype.getItem = function(k, default_val) {
  * @returns {boolean}
  */
 MegaKVStorage.prototype.hasItem = function(k) {
-    if(this._checkAndRemoveIfExpired(k) === true) {
+    if (this._checkAndRemoveIfExpired(k) === true) {
         return false;
     }
     return this.adapter.getItem(this._genBucketName(k)) !== null;
@@ -118,7 +118,7 @@ MegaKVStorage.prototype.hasItem = function(k) {
 MegaKVStorage.prototype.clear = function() {
     for(var i = 0; i < this.adapter.length; i++) {
         var k = this.adapter.key(i);
-        if(k.indexOf(this._genBucketName("")) === 0) {
+        if (k.indexOf(this._genBucketName("")) === 0) {
             this.adapter.removeItem(k);
         }
     }

@@ -2513,7 +2513,7 @@
     "7433": "Enter a valid password",
     "7434": "\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a ",
     "7435": "\u0623\u0646\u0627 \u0623\u062a\u0641\u0642 \u0645\u0639 \u0634\u0631\u0648\u0637 \u062e\u062f\u0645\u0629 MEGA",
-    "7436": "Enter a valid name",
+    "7436": "\u0627\u062f\u062e\u0644 \u0627\u0633\u0645 \u0635\u0627\u0644\u062d",
     "7437": "\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0633\u0631 \u0644\u062a\u0623\u0643\u064a\u062f \u062d\u0633\u0627\u0628\u0643",
     "7438": "You are logged in with another account",
     "7439": "If you agree, the current account will be logged out and all Offline data will be erased. Do you want to continue?",
@@ -3102,6 +3102,7 @@
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
         "source-code-intro-3": 8441,
-        "read-more": 8512
+        "read-more": 8512,
+        "email-already-exists": 7869
     }
 }

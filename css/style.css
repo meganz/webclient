@@ -4444,7 +4444,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     top: 0;
     background-image: url(../images/mega/nw-fm-sprite_v14.svg);
     background-repeat: no-repeat;
-    background-position: -12px -752px;
+    background-position: -12px -9768px;
     cursor: pointer;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -21729,7 +21729,7 @@ a.top-login-forgot-pass {
     text-transform: uppercase;
     background-image: url(../images/mega/nw-fm-sprite_v14.svg);
     background-repeat: no-repeat;
-    background-position: 4px -630px;
+    background-position: 4px -9646px;
     color: rgba(255,255,255,0.7) !important;
     padding-left: 24px;
     background-repeat: no-repeat;
@@ -22903,7 +22903,7 @@ body.pro:after {
     display: block;
     background-image: url(../images/mega/nw-fm-sprite_v14.svg);
     background-repeat: no-repeat;
-    background-position: center -594px;
+    background-position: center -9610px;
     background-color: rgba(255,255,255,0.5);
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;

@@ -33,7 +33,7 @@ KarereEventObjects.ActionMessage.prototype.getToJid = function() {
  * @returns {KarereEventObjects.ActionMessage}
  */
 KarereEventObjects.ActionMessage.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -52,7 +52,7 @@ KarereEventObjects.ActionMessage.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.ActionMessage}
  */
 KarereEventObjects.ActionMessage.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -71,7 +71,7 @@ KarereEventObjects.ActionMessage.prototype.getMessageId = function() {
  * @returns {KarereEventObjects.ActionMessage}
  */
 KarereEventObjects.ActionMessage.prototype.setMessageId = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: messageId, expected string got " + typeof val);
     this.messageId = val;
     return this;
 };
@@ -90,7 +90,7 @@ KarereEventObjects.ActionMessage.prototype.getAction = function() {
  * @returns {KarereEventObjects.ActionMessage}
  */
 KarereEventObjects.ActionMessage.prototype.setAction = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: action, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: action, expected string got " + typeof val);
     this.action = val;
     return this;
 };
@@ -109,7 +109,7 @@ KarereEventObjects.ActionMessage.prototype.getMeta = function() {
  * @returns {KarereEventObjects.ActionMessage}
  */
 KarereEventObjects.ActionMessage.prototype.setMeta = function(val) {
-    assert(val instanceof Object, "Invalid argument passed for: meta, expected Object got " + typeof(val));
+    assert(val instanceof Object, "Invalid argument passed for: meta, expected Object got " + typeof val);
     this.meta = val;
     return this;
 };
@@ -220,7 +220,7 @@ KarereEventObjects.DiscoCapabilities.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.DiscoCapabilities}
  */
 KarereEventObjects.DiscoCapabilities.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -239,7 +239,7 @@ KarereEventObjects.DiscoCapabilities.prototype.getFromUserBareJid = function() {
  * @returns {KarereEventObjects.DiscoCapabilities}
  */
 KarereEventObjects.DiscoCapabilities.prototype.setFromUserBareJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromUserBareJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromUserBareJid, expected string got " + typeof val);
     this.fromUserBareJid = val;
     return this;
 };
@@ -258,7 +258,7 @@ KarereEventObjects.DiscoCapabilities.prototype.getCapabilities = function() {
  * @returns {KarereEventObjects.DiscoCapabilities}
  */
 KarereEventObjects.DiscoCapabilities.prototype.setCapabilities = function(val) {
-    assert(typeof(val) == "object", "Invalid argument passed for: capabilities, expected object got " + typeof(val));
+    assert(typeof val == "object", "Invalid argument passed for: capabilities, expected object got " + typeof val);
     this.capabilities = val;
     return this;
 };
@@ -326,7 +326,7 @@ KarereEventObjects.IncomingMessage.prototype.getToJid = function() {
  */
 KarereEventObjects.IncomingMessage.prototype.setToJid = function(val) {
     var oldVal = this.toJid;
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     if (oldVal != this.toJid) {
         jQuery(this).trigger("onChange", [this, "toJid", oldVal, this.toJid]);
@@ -349,7 +349,7 @@ KarereEventObjects.IncomingMessage.prototype.getFromJid = function() {
  */
 KarereEventObjects.IncomingMessage.prototype.setFromJid = function(val) {
     var oldVal = this.fromJid;
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     if (oldVal != this.fromJid) {
         jQuery(this).trigger("onChange", [this, "fromJid", oldVal, this.fromJid]);
@@ -372,7 +372,7 @@ KarereEventObjects.IncomingMessage.prototype.getType = function() {
  */
 KarereEventObjects.IncomingMessage.prototype.setType = function(val) {
     var oldVal = this.type;
-    assert(typeof(val) == "string", "Invalid argument passed for: type, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: type, expected string got " + typeof val);
     this.type = val;
     if (oldVal != this.type) {
         jQuery(this).trigger("onChange", [this, "type", oldVal, this.type]);
@@ -395,7 +395,7 @@ KarereEventObjects.IncomingMessage.prototype.getRawType = function() {
  */
 KarereEventObjects.IncomingMessage.prototype.setRawType = function(val) {
     var oldVal = this.rawType;
-    assert(typeof(val) == "string", "Invalid argument passed for: rawType, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: rawType, expected string got " + typeof val);
     this.rawType = val;
     if (oldVal != this.rawType) {
         jQuery(this).trigger("onChange", [this, "rawType", oldVal, this.rawType]);
@@ -418,7 +418,7 @@ KarereEventObjects.IncomingMessage.prototype.getMessageId = function() {
  */
 KarereEventObjects.IncomingMessage.prototype.setMessageId = function(val) {
     var oldVal = this.messageId;
-    assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: messageId, expected string got " + typeof val);
     this.messageId = val;
     if (oldVal != this.messageId) {
         jQuery(this).trigger("onChange", [this, "messageId", oldVal, this.messageId]);
@@ -682,7 +682,7 @@ KarereEventObjects.IncomingPrivateMessage.prototype.getToJid = function() {
  * @returns {KarereEventObjects.IncomingPrivateMessage}
  */
 KarereEventObjects.IncomingPrivateMessage.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -701,7 +701,7 @@ KarereEventObjects.IncomingPrivateMessage.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.IncomingPrivateMessage}
  */
 KarereEventObjects.IncomingPrivateMessage.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -720,7 +720,7 @@ KarereEventObjects.IncomingPrivateMessage.prototype.getType = function() {
  * @returns {KarereEventObjects.IncomingPrivateMessage}
  */
 KarereEventObjects.IncomingPrivateMessage.prototype.setType = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: type, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: type, expected string got " + typeof val);
     this.type = val;
     return this;
 };
@@ -739,7 +739,7 @@ KarereEventObjects.IncomingPrivateMessage.prototype.getRawType = function() {
  * @returns {KarereEventObjects.IncomingPrivateMessage}
  */
 KarereEventObjects.IncomingPrivateMessage.prototype.setRawType = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: rawType, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: rawType, expected string got " + typeof val);
     this.rawType = val;
     return this;
 };
@@ -758,7 +758,7 @@ KarereEventObjects.IncomingPrivateMessage.prototype.getMessageId = function() {
  * @returns {KarereEventObjects.IncomingPrivateMessage}
  */
 KarereEventObjects.IncomingPrivateMessage.prototype.setMessageId = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: messageId, expected string got " + typeof val);
     this.messageId = val;
     return this;
 };
@@ -947,7 +947,7 @@ KarereEventObjects.InviteMessage.prototype.getToJid = function() {
  * @returns {KarereEventObjects.InviteMessage}
  */
 KarereEventObjects.InviteMessage.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -966,7 +966,7 @@ KarereEventObjects.InviteMessage.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.InviteMessage}
  */
 KarereEventObjects.InviteMessage.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -985,7 +985,7 @@ KarereEventObjects.InviteMessage.prototype.getRoomJid = function() {
  * @returns {KarereEventObjects.InviteMessage}
  */
 KarereEventObjects.InviteMessage.prototype.setRoomJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: roomJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: roomJid, expected string got " + typeof val);
     this.roomJid = val;
     return this;
 };
@@ -1154,7 +1154,7 @@ KarereEventObjects.OutgoingMessage.prototype.getToJid = function() {
  */
 KarereEventObjects.OutgoingMessage.prototype.setToJid = function(val) {
     var oldVal = this.toJid;
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     if (oldVal != this.toJid) {
         jQuery(this).trigger("onChange", [this, "toJid", oldVal, this.toJid]);
@@ -1177,7 +1177,7 @@ KarereEventObjects.OutgoingMessage.prototype.getFromJid = function() {
  */
 KarereEventObjects.OutgoingMessage.prototype.setFromJid = function(val) {
     var oldVal = this.fromJid;
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     if (oldVal != this.fromJid) {
         jQuery(this).trigger("onChange", [this, "fromJid", oldVal, this.fromJid]);
@@ -1200,7 +1200,7 @@ KarereEventObjects.OutgoingMessage.prototype.getType = function() {
  */
 KarereEventObjects.OutgoingMessage.prototype.setType = function(val) {
     var oldVal = this.type;
-    assert(typeof(val) == "string", "Invalid argument passed for: type, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: type, expected string got " + typeof val);
     this.type = val;
     if (oldVal != this.type) {
         jQuery(this).trigger("onChange", [this, "type", oldVal, this.type]);
@@ -1223,7 +1223,7 @@ KarereEventObjects.OutgoingMessage.prototype.getMessageId = function() {
  */
 KarereEventObjects.OutgoingMessage.prototype.setMessageId = function(val) {
     var oldVal = this.messageId;
-    assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: messageId, expected string got " + typeof val);
     this.messageId = val;
     if (oldVal != this.messageId) {
         jQuery(this).trigger("onChange", [this, "messageId", oldVal, this.messageId]);
@@ -1459,7 +1459,7 @@ KarereEventObjects.Ping.prototype.getToJid = function() {
  * @returns {KarereEventObjects.Ping}
  */
 KarereEventObjects.Ping.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -1478,7 +1478,7 @@ KarereEventObjects.Ping.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.Ping}
  */
 KarereEventObjects.Ping.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -1527,7 +1527,7 @@ KarereEventObjects.PingRequest.prototype.getToJid = function() {
  * @returns {KarereEventObjects.PingRequest}
  */
 KarereEventObjects.PingRequest.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -1546,7 +1546,7 @@ KarereEventObjects.PingRequest.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.PingRequest}
  */
 KarereEventObjects.PingRequest.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -1565,7 +1565,7 @@ KarereEventObjects.PingRequest.prototype.getMessageId = function() {
  * @returns {KarereEventObjects.PingRequest}
  */
 KarereEventObjects.PingRequest.prototype.setMessageId = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: messageId, expected string got " + typeof val);
     this.messageId = val;
     return this;
 };
@@ -1614,7 +1614,7 @@ KarereEventObjects.PingResponse.prototype.getToJid = function() {
  * @returns {KarereEventObjects.PingResponse}
  */
 KarereEventObjects.PingResponse.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -1633,7 +1633,7 @@ KarereEventObjects.PingResponse.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.PingResponse}
  */
 KarereEventObjects.PingResponse.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -1652,7 +1652,7 @@ KarereEventObjects.PingResponse.prototype.getMessageId = function() {
  * @returns {KarereEventObjects.PingResponse}
  */
 KarereEventObjects.PingResponse.prototype.setMessageId = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: messageId, expected string got " + typeof val);
     this.messageId = val;
     return this;
 };
@@ -1707,7 +1707,7 @@ KarereEventObjects.Presence.prototype.getToJid = function() {
  * @returns {KarereEventObjects.Presence}
  */
 KarereEventObjects.Presence.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -1726,7 +1726,7 @@ KarereEventObjects.Presence.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.Presence}
  */
 KarereEventObjects.Presence.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -1893,7 +1893,7 @@ KarereEventObjects.StateActiveMessage.prototype.getToJid = function() {
  * @returns {KarereEventObjects.StateActiveMessage}
  */
 KarereEventObjects.StateActiveMessage.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -1912,7 +1912,7 @@ KarereEventObjects.StateActiveMessage.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.StateActiveMessage}
  */
 KarereEventObjects.StateActiveMessage.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -1999,7 +1999,7 @@ KarereEventObjects.StateComposingMessage.prototype.getToJid = function() {
  * @returns {KarereEventObjects.StateComposingMessage}
  */
 KarereEventObjects.StateComposingMessage.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -2018,7 +2018,7 @@ KarereEventObjects.StateComposingMessage.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.StateComposingMessage}
  */
 KarereEventObjects.StateComposingMessage.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -2105,7 +2105,7 @@ KarereEventObjects.StatePausedMessage.prototype.getToJid = function() {
  * @returns {KarereEventObjects.StatePausedMessage}
  */
 KarereEventObjects.StatePausedMessage.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -2124,7 +2124,7 @@ KarereEventObjects.StatePausedMessage.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.StatePausedMessage}
  */
 KarereEventObjects.StatePausedMessage.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -2213,7 +2213,7 @@ KarereEventObjects.UsersJoined.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.UsersJoined}
  */
 KarereEventObjects.UsersJoined.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -2232,7 +2232,7 @@ KarereEventObjects.UsersJoined.prototype.getToJid = function() {
  * @returns {KarereEventObjects.UsersJoined}
  */
 KarereEventObjects.UsersJoined.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -2269,7 +2269,7 @@ KarereEventObjects.UsersJoined.prototype.getCurrentUsers = function() {
  * @returns {KarereEventObjects.UsersJoined}
  */
 KarereEventObjects.UsersJoined.prototype.setCurrentUsers = function(val) {
-    assert(val instanceof Object, "Invalid argument passed for: currentUsers, expected Object got " + typeof(val));
+    assert(val instanceof Object, "Invalid argument passed for: currentUsers, expected Object got " + typeof val);
     this.currentUsers = val;
     return this;
 };
@@ -2288,7 +2288,7 @@ KarereEventObjects.UsersJoined.prototype.getNewUsers = function() {
  * @returns {KarereEventObjects.UsersJoined}
  */
 KarereEventObjects.UsersJoined.prototype.setNewUsers = function(val) {
-    assert(val instanceof Object, "Invalid argument passed for: newUsers, expected Object got " + typeof(val));
+    assert(val instanceof Object, "Invalid argument passed for: newUsers, expected Object got " + typeof val);
     this.newUsers = val;
     return this;
 };
@@ -2341,7 +2341,7 @@ KarereEventObjects.UsersLeft.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.UsersLeft}
  */
 KarereEventObjects.UsersLeft.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -2360,7 +2360,7 @@ KarereEventObjects.UsersLeft.prototype.getToJid = function() {
  * @returns {KarereEventObjects.UsersLeft}
  */
 KarereEventObjects.UsersLeft.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -2397,7 +2397,7 @@ KarereEventObjects.UsersLeft.prototype.getCurrentUsers = function() {
  * @returns {KarereEventObjects.UsersLeft}
  */
 KarereEventObjects.UsersLeft.prototype.setCurrentUsers = function(val) {
-    assert(val instanceof Object, "Invalid argument passed for: currentUsers, expected Object got " + typeof(val));
+    assert(val instanceof Object, "Invalid argument passed for: currentUsers, expected Object got " + typeof val);
     this.currentUsers = val;
     return this;
 };
@@ -2416,7 +2416,7 @@ KarereEventObjects.UsersLeft.prototype.getLeftUsers = function() {
  * @returns {KarereEventObjects.UsersLeft}
  */
 KarereEventObjects.UsersLeft.prototype.setLeftUsers = function(val) {
-    assert(val instanceof Object, "Invalid argument passed for: leftUsers, expected Object got " + typeof(val));
+    assert(val instanceof Object, "Invalid argument passed for: leftUsers, expected Object got " + typeof val);
     this.leftUsers = val;
     return this;
 };
@@ -2471,7 +2471,7 @@ KarereEventObjects.UsersUpdated.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.UsersUpdated}
  */
 KarereEventObjects.UsersUpdated.prototype.setFromJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: fromJid, expected string got " + typeof val);
     this.fromJid = val;
     return this;
 };
@@ -2490,7 +2490,7 @@ KarereEventObjects.UsersUpdated.prototype.getToJid = function() {
  * @returns {KarereEventObjects.UsersUpdated}
  */
 KarereEventObjects.UsersUpdated.prototype.setToJid = function(val) {
-    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    assert(typeof val == "string", "Invalid argument passed for: toJid, expected string got " + typeof val);
     this.toJid = val;
     return this;
 };
@@ -2527,7 +2527,7 @@ KarereEventObjects.UsersUpdated.prototype.getCurrentUsers = function() {
  * @returns {KarereEventObjects.UsersUpdated}
  */
 KarereEventObjects.UsersUpdated.prototype.setCurrentUsers = function(val) {
-    assert(val instanceof Object, "Invalid argument passed for: currentUsers, expected Object got " + typeof(val));
+    assert(val instanceof Object, "Invalid argument passed for: currentUsers, expected Object got " + typeof val);
     this.currentUsers = val;
     return this;
 };

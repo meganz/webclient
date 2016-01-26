@@ -1,6 +1,7 @@
 // Release version information is replaced by the build scripts
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
+var m;
 var b_u = 0;
 var apipath;
 var maintenance = false;
@@ -12,7 +13,6 @@ var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash, l, d = false;
-var m = isMobile();
 
 var is_electron = false;
 if (typeof process !== 'undefined') {
@@ -29,7 +29,7 @@ var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
-
+var is_mobile = m = isMobile();
 
 function isMobile()
 {
@@ -936,7 +936,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 21, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 22, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -1194,6 +1194,11 @@ else if (!b_u)
 
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+
+    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined') {
+        jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
+    }
+
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:1});
     jsl.push({f:'js/vendor/jquery-2.2.0.js', n: 'jquery', j:1, w:10});
@@ -1242,60 +1247,57 @@ else if (!b_u)
 
     // Other
     jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
-    jsl.push({f:'js/vendor/moment.min.js', n: 'moment_js', j:1,w:1});
+    jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
 
     // Google Import Contacts
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
-    // MEGA CHAT
-    jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1,w:1});
-    jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1,w:1});
-    jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1,w:1});
-    jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
-
-    jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'stropheligh_js', j:1, w:4});
-    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1,w:1});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1,w:3});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1,w:2});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1,w:2});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1,w:2});
-    jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1,w:1});
-    jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1,w:1});
-    jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1,w:1});
-    jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1,w:1});
-    jsl.push({f:'js/vendor/chat/base32.js', n: 'base32_js', j:1,w:1});
-
-
-    // MEGA CHAT
-    jsl.push({f:'js/chat/chatd.js', n: 'chatd_js', j:1,w:1});
-
+    // UI Elements
     jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
     jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
-    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1,w:1});
-
-    jsl.push({f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1,w:2});
-    jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1,w:7});
-
-    jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
-    jsl.push({f:'js/connectionRetryManager.js', n: 'crm_js', j:1,w:7});
-    jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
-    jsl.push({f:'js/chat/messages.js', n: 'chat_messages_Js', j:1,w:1});
-    jsl.push({f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1,w:10});
-
-    // END OF MEGA CHAT
-
-    // UI Elements
     jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
+
+    // MEGA CHAT
+    if (!megaChatIsDisabled || location.host === 'mega.nz') {
+        jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
+        jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
+        jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
+        jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1, w:7});
+
+        jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'stropheligh_js', j:1, w:4});
+        jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1, w:1});
+        jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1, w:3});
+        jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1, w:2});
+        jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1, w:2});
+        jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1, w:2});
+        jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1, w:1});
+        jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1, w:1});
+        jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1, w:1});
+        jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1, w:1});
+        jsl.push({f:'js/vendor/chat/base32.js', n: 'base32_js', j:1, w:1});
+
+        jsl.push({f:'js/chat/chatd.js', n: 'chatd_js', j:1, w:1});
+        jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1, w:1});
+
+        jsl.push({f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1, w:2});
+        jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1, w:7});
+
+        jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1, w:7});
+        jsl.push({f:'js/connectionRetryManager.js', n: 'crm_js', j:1, w:7});
+        jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1, w:7});
+        jsl.push({f:'js/chat/messages.js', n: 'chat_messages_Js', j:1, w:1});
+        jsl.push({f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1, w:10});
+    }
+    // END OF MEGA CHAT
 
     jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});

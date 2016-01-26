@@ -258,6 +258,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     line-height: 23px;
     padding: 0 10px;
     position: relative;
+    cursor: pointer;
 }
 a.nlanguage-lnk:hover {
     border: 2px solid #D31A00;
@@ -2477,6 +2478,11 @@ form {
 a.blog-new-archive-lnk:hover .blog-archive-number {
     background-color: #797979;
 }
+
+.blog-new-item img, .blog-new-item h2 {
+    cursor: pointer;
+}
+
 p .blog-new-read-more, p a.blog-new-read-more {
     display: block;
     height: 30px;
@@ -11688,6 +11694,7 @@ table {
     line-height: 25px;
     color: #333333;
     font-family: 'source_sans_prolight';
+    white-space: nowrap;
 }
 .download.info-txt.mid-txt {
     font-size: 14px;
@@ -11813,6 +11820,7 @@ table {
     left: 300px;
     bottom: 50px;
     padding: 34px 0 0 0;
+    z-index: 1400;
 }
 .button.download-button.down-arrow, .button.download-button.to-clouddrive {
     background-image: url(../images/mega/download-sprite-v6.png);

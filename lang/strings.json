@@ -5315,6 +5315,10 @@
         "text": "OUTGOING",
         "context": "Capital letters. Outgoing shared folders. The title of a tab"
     },
+    "5599": {
+        "text": "Empty Rubbish Bin",
+        "context": "message when there are no files in the Rubbish Bin."
+    },
     "5600": {
         "text": "No incoming shared folders",
         "context": "Title shown when there's no incoming Shared Items"
@@ -12074,5 +12078,289 @@
     "8441": {
         "text": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
         "context": "A paragraph on the #opensource page explaining about MEGA's vulnerability (bug) rewards program. Please keep [A][\/A] , [A2][\/A2] when doing the translation."
+    },
+    "8442": {
+        "text": "Select files",
+        "context": "Text of the button for user to select files in MEGA. "
+    },
+    "8443": {
+        "text": "Select folder",
+        "context": "Text of the button for user to select a specific folder in MEGA. "
+    },
+    "8444": {
+        "text": "Subscribe",
+        "context": "Text of the button for user  to click to subscribe to a PRO plan."
+    },
+    "8445": {
+        "text": "No file or folder selected.",
+        "context": "Message displayed when no file or folder is selected"
+    },
+    "8446": {
+        "text": "Are you sure you want to move these items to the Rubbish Bin?",
+        "context": "Confirmation message for moving files\/folders to the Rubbish Bin."
+    },
+    "8447": {
+        "text": "Are you sure you want to delete these items permanently?",
+        "context": "Confirmation message for removing files\/folders."
+    },
+    "8448": {
+        "text": "Please confirm",
+        "context": "Confirmation message before removing a file."
+    },
+    "8449": {
+        "text": "The Master Key file has been removed.",
+        "context": "Success message when the MasterKey file has been removed."
+    },
+    "8450": {
+        "text": "Please log in to share with MEGA.",
+        "context": "Error message displayed when the user tries to share something to MEGA without logging in."
+    },
+    "8451": {
+        "text": "Problem of retrieving files from the folder.",
+        "context": "Error message when a link to a folder cannot be fetched."
+    },
+    "8452": {
+        "text": "The transfer will be cancelled, are you sure you want to continue?",
+        "context": "Confirmation message for cancelling a transfer."
+    },
+    "8453": {
+        "text": "All transfers will be cancelled, are you sure you want to continue?",
+        "context": "Confirmation message for cancelling all transfers."
+    },
+    "8454": {
+        "text": "Media Uploads",
+        "context": "Title of the screen where the secondary media images are uploaded"
+    },
+    "8455": {
+        "text": "Share Permissions",
+        "context": "Title of the dialog to choose permissions when sharing."
+    },
+    "8456": {
+        "text": "Link without key",
+        "context": "This is button text on the Get Link dialog. This lets the user get a public file\/folder link without the decryption key e.g. https:\/\/mega.nz\/#!Qo12lSpT."
+    },
+    "8457": {
+        "text": "Transferring\u2026",
+        "context": "Text located in each fragment when a download is in progress. Please keep the \u2026"
+    },
+    "8458": {
+        "text": "Touch to show all the transfers",
+        "context": "Hint about how to display all the transfers."
+    },
+    "8459": {
+        "text": "Remove from Offline",
+        "context": "Menu option to remove selected items from offline files\/folders."
+    },
+    "8460": {
+        "text": "Request resent",
+        "context": "Success message for resending a contact invitation."
+    },
+    "8461": {
+        "text": "Reply to the invitation sent",
+        "context": "Success message when replying a contact invitation."
+    },
+    "8462": {
+        "text": "%s is already a contact.",
+        "context": "Error message displayed when trying to invite a contact who is already added."
+    },
+    "8463": {
+        "text": "No permission to send this file.",
+        "context": "Warning message when trying to send a file without full access"
+    },
+    "8464": {
+        "text": "Please choose a destination folder.",
+        "context": "Message displayed when the user tries to move\/copy\/upload a file without choosing a destination folder."
+    },
+    "8465": {
+        "text": "%d items moved successfully",
+        "context": "Success message for moving items."
+    },
+    "8466": {
+        "text": "%d items are not moved successfully.",
+        "context": "Error message displayed it failed to move items."
+    },
+    "8467": {
+        "text": "moved to the Rubbish Bin successfully.",
+        "context": "Success message for moving file\/folder to the Rubbish Bin."
+    },
+    "8468": {
+        "text": "%d items moved to the Rubbish Bin successfully",
+        "context": "Success message for moving files\/folders to the Rubbish Bin. "
+    },
+    "8469": {
+        "text": "%d items are not sent successfully.",
+        "context": "Error message when it failed to send multiple items."
+    },
+    "8470": {
+        "text": "Error. %d process of the sharing is not completed.",
+        "context": "Error message for sharing a folder."
+    },
+    "8471": {
+        "text": "Remove shares successfully",
+        "context": "Success message for removing folders."
+    },
+    "8472": {
+        "text": "Error. %d process of removing shares is not completed.",
+        "context": "Error message when removing shares."
+    },
+    "8473": {
+        "text": "Error. Share failed to remove",
+        "context": "Error message when it failed to remove share."
+    },
+    "8474": {
+        "text": "Folder sharing removed",
+        "context": "Success message for removing a sharing."
+    },
+    "8475": {
+        "text": "%d items removed successfully from MEGA",
+        "context": "Success message for moving items from MEGA."
+    },
+    "8476": {
+        "text": "%d items are not removed successfully.",
+        "context": "Error message when it failed to remove items."
+    },
+    "8477": {
+        "text": "%d folders left successfully",
+        "context": "Success message for leaving folders."
+    },
+    "8478": {
+        "text": "%d folders are not left successfully.",
+        "context": "Error message when it failed to leave multiple folders."
+    },
+    "8479": {
+        "text": "File sent to %d contacts successfully.",
+        "context": "Success message for sending multiple files."
+    },
+    "8480": {
+        "text": "File is not sent to %d contacts.",
+        "context": "Error message for sending a file."
+    },
+    "8481": {
+        "text": "%d files sent successfully.",
+        "context": "Success message for sending multiple files."
+    },
+    "8482": {
+        "text": ", %d files failed to send",
+        "context": "Error message when it failed to multiple files."
+    },
+    "8483": {
+        "text": "%d items copied successfully.",
+        "context": "Success message for copying multiple files."
+    },
+    "8484": {
+        "text": "%d items are not copied.",
+        "context": "Error message when it failed to copy multiple files."
+    },
+    "8485": {
+        "text": "%d contacts removed successfully.",
+        "context": "Success message for removing multiple contacts."
+    },
+    "8486": {
+        "text": "%d contacts are not removed.",
+        "context": "Error message when it failed to remove several contacts."
+    },
+    "8487": {
+        "text": "Folder shared with %d contacts successfully",
+        "context": "Success message for sharing a file with multiple contacts."
+    },
+    "8488": {
+        "text": "File can not be shared with %d contacts.",
+        "context": "Error message for sharing a file with multiple contacts."
+    },
+    "8489": {
+        "text": "%d folders shared successfully.",
+        "context": "Success message for sharing multiple files."
+    },
+    "8490": {
+        "text": "%d folders are not shared.",
+        "context": "Error message when it failed to multiple folders."
+    },
+    "8491": {
+        "text": "The folder is no longer shared",
+        "context": "Success message when removing all the contacts of a shared folder."
+    },
+    "8492": {
+        "text": "Error, the folder is still shared with another contact",
+        "context": "Error message when removing a shared folder that is still shared with another contact."
+    },
+    "8493": {
+        "text": "Please include the decryption key for the link.",
+        "context": "Message of the alert to include the decryption key for the link."
+    },
+    "8494": {
+        "text": "Error happened when executing the action",
+        "context": "Error message while browsing the local filesystem."
+    },
+    "8495": {
+        "text": "Current password is wrong. Please try again.",
+        "context": "Error message when the user types wrong current password to attempt to change his password."
+    },
+    "8496": {
+        "text": "Password doesn't match",
+        "context": "Error message of changing the password."
+    },
+    "8497": {
+        "text": "Advanced Features",
+        "context": "Title of advanced setting category for cache and offline files."
+    },
+    "8498": {
+        "text": "Clear Offline Files",
+        "context": "Title of settings preference for clearing offline files."
+    },
+    "8499": {
+        "text": "Currently using %s",
+        "context": "Size of offline files or cache folders"
+    },
+    "8500": {
+        "text": "Calculating\u2026",
+        "context": "Calculating size of offline files or cache folders"
+    },
+    "8501": {
+        "text": "Turn on Camera Uploads",
+        "context": "Settings option to turn on Camera Uploads."
+    },
+    "8502": {
+        "text": "Reset PIN code",
+        "context": "Settings option of resetting the PIN code."
+    },
+    "8503": {
+        "text": "Your local files will be deleted and you will be logged out after 10 failed attempts.",
+        "context": "Error message for typing the wrong PIN code."
+    },
+    "8504": {
+        "text": "Wrong PIN code, please try again. You have %2d attemps left.",
+        "context": "Error message for typing the wrong pin code."
+    },
+    "8505": {
+        "text": "PIN Codes don't match",
+        "context": "Error message for typing the wrong PIN code (two times)"
+    },
+    "8506": {
+        "text": "Enter your Pin Code",
+        "context": "Title of the screen to unlock screen with pin code."
+    },
+    "8507": {
+        "text": "Re-Enter your PIN Code",
+        "context": "Title of the screen for re-entering PIN code to unlock screen."
+    },
+    "8508": {
+        "text": "Enter your new PIN Code",
+        "context": "Message to unlock screen with PIN code"
+    },
+    "8509": {
+        "text": "Re-Enter your new PIN Code",
+        "context": "Title of the screen asking to input PIN code to unlock the screen again."
+    },
+    "8510": {
+        "text": "All your local data will be deleted and you will be logged out in %d seconds.",
+        "context": "Message when the user  tries 10 failed attempts with wrong PIN codes."
+    },
+    "8511": {
+        "text": "Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account.",
+        "context": "Message displayed when the user wants to upgrade an account that cannot be upgraded and suggest the user to contact MEGA support."
+    },
+    "8512": {
+        "text": "Read more",
+        "context": "Open the whole blog post"
     }
 }

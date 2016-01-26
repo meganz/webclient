@@ -5402,8 +5402,8 @@ function execsc(actionPackets, callback) {
 
             tparentid = false;
             trights = false;
-            //process_f(actionPacket.t.f);
-            async_procnodes = async_procnodes.concat(actionPacket.t.f);
+            __process_f1(actionPacket.t.f);
+            // async_procnodes = async_procnodes.concat(actionPacket.t.f);
         }
         else if (actionPacket.a === 'u') {
             async_treestate.push(actionPacket);

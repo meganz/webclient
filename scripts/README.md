@@ -46,12 +46,13 @@ further information.
 
 ### diffcheck.py
 
-JSHint (for static code analysi) and JSCS (for code style checking)
-can be used on the JavaScript code base. Configuration files for both
-are part of the project (`.jshintrc`, `.jshintignore` and `.jscsrc`)
-to run tests against the existing code base. For that, the right
-JavaScript/node.js modules need to be installed. This can easily be
-done by running
+JSHint (for static code analysi) and JSCS (for code style checking) can be
+used on the JavaScript code base.  Configuration files for both are part of
+the project (`.jshintrc`, `.jshintignore` and `.jscsrc`) to run tests
+against the existing code base.  Furthermore, a tool attempts to catch
+minified code from sneaking into the code base.  For that, the right
+JavaScript/node.js modules need to be installed.  This can easily be done by
+running
 
     npm install
 

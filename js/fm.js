@@ -2160,11 +2160,11 @@ function fmremove() {
             contact = 'contacts';
         }
         else {
-            replaceString = '<strong>' + M.d[$.selected[0]].name + '</strong>';
+            replaceString = '<strong>' + decodeURIComponent(M.d[$.selected[0]].name) + '</strong>';
             contact = 'contact';
         }
 
-        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), 'Access to any folders shared with you by selected [X] will be lost.'.replace('[X]', contact), function(e) {
+        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), l[7872].replace('[X]', contact), function(e) {
             if (e) {
                 for (var i in $.selected) {
                     if (M.c[$.selected[i]]) {

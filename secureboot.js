@@ -1,6 +1,7 @@
 // Release version information is replaced by the build scripts
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
+var m;
 var b_u = 0;
 var apipath;
 var maintenance = false;
@@ -12,7 +13,6 @@ var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash, l, d = false;
-var m = isMobile();
 
 var is_electron = false;
 if (typeof process !== 'undefined') {
@@ -29,7 +29,7 @@ var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
-
+var is_mobile = m = isMobile();
 
 function isMobile()
 {
@@ -1195,7 +1195,7 @@ else if (!b_u)
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
 
-    if (window.navigator.userAgent.indexOf("msie") > -1 || "ActiveXObject" in window) {
+    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined') {
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
 

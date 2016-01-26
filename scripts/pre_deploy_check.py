@@ -5,7 +5,6 @@ Checker to identify some problems pre deployment.
 
 * Checks for non-ASCII characters (code >= 128).
 * Checks for unknown translation strings in HTML files.
-* Checks for minified JavaScript content (via line lengths).
 """
 
 import os

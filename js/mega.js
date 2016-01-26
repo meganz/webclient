@@ -1801,11 +1801,11 @@ function MegaData()
                 if (!$this.is(".active")) {
                     $('.start-chat-button').removeClass('active');
 
-                    $('.fm-chat-popup-button', m).removeClass("disabled");
+                    $('.context-menu-item', m).removeClass("disabled");
 
                     var $userDiv = $this.parent().parent();
                     if ($userDiv.is(".offline")) {
-                        $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
+                        $('.context-menu-item.startaudio-item, .context-menu-item.startvideo-item', m).addClass("disabled");
                     }
 
                     $this.addClass('active');
@@ -1827,8 +1827,7 @@ function MegaData()
                 return false; // stop propagation!
             });
 
-            $('.fm-chat-popup-button.start-chat').unbind('click.treePanel');
-            $('.fm-chat-popup-button.start-chat').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startchat-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1839,8 +1838,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').unbind('click.treePanel');
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startaudio-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1856,8 +1854,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').unbind('click.treePanel');
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startvideo-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();

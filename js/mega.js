@@ -5523,6 +5523,7 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
+            notify.notifyFromActionPacket(actionPacket);
         }
         else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);

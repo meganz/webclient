@@ -364,6 +364,7 @@ var notify = {
         
         // Add click handlers for various notifications
         notify.initShareClickHandler();
+        notify.initTakedownClickHandler();
         notify.initPaymentClickHandler();
         notify.initAcceptContactClickHandler();
     },
@@ -398,6 +399,27 @@ var notify = {
             
             // Open the folder
             M.openFolder(folderId);
+            reselect(true);
+        });
+    },
+    
+    /**
+     * On click of a takedown or restore notice, go to the parent folder
+     */
+    initTakedownClickHandler: function() {
+        
+        // Select the notifications with shares or new files/folders
+        this.$popup.find('.nt-takedown-notification, .nt-takedown-reinstated-notification').rebind('click', function() {
+                        
+            // Get the folder ID from the HTML5 data attribute
+            var folderOrFileId = $(this).attr('data-folder-or-file-id');
+            var parentFolderId = M.d[folderOrFileId].p;
+            
+            // Mark all notifications as seen (because they clicked on a notification within the popup)
+            notify.markAllNotificationsAsSeen();
+            
+            // Open the folder
+            M.openFolder(parentFolderId);
             reselect(true);
         });
     },
@@ -875,15 +897,17 @@ var notify = {
         var title = '';
         var cssClass = '';
         var folderOrFileHandle = notification.data.h;
+        var name = (M.d[folderOrFileHandle].name) ? "'" + htmlentities(M.d[folderOrFileHandle].name) + "'" : '';
+        var fileOrFolder = (M.d[folderOrFileHandle].t === 0) ? 'file' : 'folder';
         
         if (typeof notification.data.down !== 'undefined') {
-            header = 'Link takedown';
-            title = 'One of your public links were taken down.';
+            header = 'Takedown notice';
+            title = 'Your publicly shared ' + fileOrFolder + ' ' + name + ' has been taken down.';
             cssClass = 'nt-takedown-notification';
         }
         else if (typeof notification.data.up !== 'undefined') {
-            header = 'Link reinstated';
-            title = 'One of your taken down public links has been reinstated.';
+            header = 'File reinstated';
+            title = 'Your taken down ' + fileOrFolder + ' ' + name + ' has been reinstated.';
             cssClass = 'nt-takedown-reinstated-notification';
         }
         
@@ -892,7 +916,7 @@ var notify = {
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notification-username').text(header);      // Use 'Link takedown/reinstated' instead
-        $notificationHtml.attr('data-folder-id', folderOrFileHandle);
+        $notificationHtml.attr('data-folder-or-file-id', folderOrFileHandle);
         
         return $notificationHtml;
     }

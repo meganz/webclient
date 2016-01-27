@@ -25,7 +25,7 @@ mega.popunda = {
      *  @param {JQuery} button The element to trigger click events from
      */
     init: function(button) {
-        if (typeof(button) === 'undefined' || button === null) {
+        if (typeof button === 'undefined' || button === null) {
             return;
         }
         this.$button = button;
@@ -150,8 +150,8 @@ mega.popunda = {
         var sWidth = (sConfig.width || window.outerWidth || window.innerWidth);
         var sHeight = (sConfig.height || (window.outerHeight - 100) || window.innerHeight);
 
-        var sPosX = (typeof(sConfig.left) !== 'undefined') ? sConfig.left.toString() : window.screenX;
-        var sPosY = (typeof(sConfig.top) !== 'undefined') ? sConfig.top.toString() : window.screenY;
+        var sPosX = (typeof sConfig.left !== 'undefined') ? sConfig.left.toString() : window.screenX;
+        var sPosY = (typeof sConfig.top !== 'undefined') ? sConfig.top.toString() : window.screenY;
 
         var sOptions = 'toolbar=no,scrollbars=yes,location=yes,statusbar=yes,menubar=no,resizable=1,width='
             + sWidth.toString() + ',height=' + sHeight.toString() + ',screenX=' + sPosX + ',screenY=' + sPosY;

@@ -29,22 +29,51 @@ function MegaPromise(fn) {
     if (fn) {
         fn(
             function() {
-                self.resolve.apply(self, toArray(arguments));
+                self.resolve.apply(self, arguments);
             },
             function() {
-                self.reject.apply(self, toArray(arguments));
+                self.reject.apply(self, arguments);
             }
         );
+    }
+
+    if (MegaPromise.debugPendingPromisesTimeout > 0) {
+        var preStack = mega.utils.getStack();
+        setTimeout(function() {
+            if (self.state() === 'pending') {
+                console.error("Pending promise found: ", self, preStack);
+            }
+        }, MegaPromise.debugPendingPromisesTimeout);
+    }
+
+    if (MegaPromise.debugPreStack === true) {
+        self.stack = mega.utils.getStack();
     }
     return this;
 };
 
-if (typeof(Promise) !== "undefined") {
+if (typeof Promise !== "undefined") {
     MegaPromise._origPromise = Promise;
 } else {
     MegaPromise._origPromise = undefined;
     window.Promise = MegaPromise;
 }
+
+/**
+ * Set this to any number (millisecond) and a timer would check if all promises are resolved in that time. If they are
+ * still in 'pending' state, they will trigger an error (this is a debugging helper, not something that you should
+ * leave on in production code!)
+ *
+ * @type {boolean|Number}
+ */
+MegaPromise.debugPendingPromisesTimeout = false;
+
+/**
+ * Set this to true, to enable all promises to store a pre-stack in .stack.
+ *
+ * @type {boolean}
+ */
+MegaPromise.debugPreStack = false;
 
 /**
  * Convert Native and jQuery promises to MegaPromises, by creating a MegaPromise proxy which will be attached
@@ -57,9 +86,18 @@ if (typeof(Promise) !== "undefined") {
 MegaPromise.asMegaPromiseProxy  = function(p) {
     var $promise = new MegaPromise();
 
-    p.then(function() {
-        $promise.resolve.apply($promise, toArray(arguments))
-    }, MegaPromise.getTraceableReject($promise, p));
+    p.then(
+        function megaPromiseResProxy() {
+        $promise.resolve.apply($promise, arguments)
+        },
+        (
+            d && typeof promisesDebug !== 'undefined' && promisesDebug ?
+                MegaPromise.getTraceableReject($promise, p) :
+                function megaPromiseRejProxy() {
+                    $promise.reject.apply($promise, arguments);
+                }
+        )
+    );
 
     return $promise;
 };
@@ -82,7 +120,7 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
             if (typeof console.group === 'function') {
                 console.group('PROMISE REJECTED');
             }
-            console.error('Promise rejected: ', aResult, origPromise);
+            console.debug('Promise rejected: ', aResult, origPromise);
             console.debug('pre-Stack', preStack);
             console.debug('post-Stack', postStack);
             if (typeof console.groupEnd === 'function') {
@@ -94,7 +132,7 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
                 $promise.apply(origPromise, arguments);
             }
             else {
-                $promise.reject.apply($promise, toArray(arguments))
+                $promise.reject.apply($promise, arguments);
             }
         }
         catch(e) {
@@ -176,7 +214,7 @@ MegaPromise.prototype.catch = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.resolve = function() {
-    this._internalPromise.resolve.apply(this._internalPromise, toArray(arguments));
+    this._internalPromise.resolve.apply(this._internalPromise, arguments);
     return this;
 };
 
@@ -186,7 +224,7 @@ MegaPromise.prototype.resolve = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.reject = function() {
-    this._internalPromise.reject.apply(this._internalPromise, toArray(arguments));
+    this._internalPromise.reject.apply(this._internalPromise, arguments);
     return this;
 };
 
@@ -196,7 +234,7 @@ MegaPromise.prototype.reject = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.always = function() {
-    this._internalPromise.always.apply(this._internalPromise, toArray(arguments));
+    this._internalPromise.always.apply(this._internalPromise, arguments);
     return this;
 };
 
@@ -211,7 +249,7 @@ MegaPromise.prototype.always = function() {
  */
 MegaPromise.prototype.linkDoneTo = function(targetPromise) {
     var self = this;
-    targetPromise.done(function() {
+    targetPromise.then(function() {
         self.resolve.apply(self, arguments);
     });
 
@@ -229,7 +267,7 @@ MegaPromise.prototype.linkDoneTo = function(targetPromise) {
  */
 MegaPromise.prototype.linkFailTo = function(targetPromise) {
     var self = this;
-    targetPromise.fail(function() {
+    targetPromise.then(undefined, function() {
         self.reject.apply(self, arguments);
     });
 
@@ -253,6 +291,30 @@ MegaPromise.prototype.linkDoneAndFailTo = function(targetPromise) {
 };
 
 /**
+ * Link promise's state to a function's value. E.g. if the function returns a promise that promise's state will be
+ * linked to the current fn. If it returns a non-promise-like value it will resolve/reject the current promise's value.
+ *
+ * PS: This is a simple DSL-like helper to save us from duplicating code when using promises :)
+ *
+ * @returns {MegaPromise} current promise, helpful for js call chaining
+ */
+MegaPromise.prototype.linkDoneAndFailToResult = function(cb, context, args) {
+    var self = this;
+
+    var ret = cb.apply(context, args);
+
+    if (ret instanceof MegaPromise) {
+        self.linkDoneTo(ret);
+        self.linkFailTo(ret);
+    }
+    else {
+        self.resolve(ret);
+    }
+
+    return self;
+};
+
+/**
  * Development helper, that will dump the result/state change of this promise to the console
  *
  * @param [msg] {String} optional msg
@@ -262,12 +324,13 @@ MegaPromise.prototype.dumpToConsole = function(msg) {
     var self = this;
 
     if (d) {
-        self.done(function () {
-            console.log("success: ", msg ? msg : arguments, !msg ? null : arguments);
-        });
-        self.fail(function () {
-            console.error("error: ", msg ? msg : arguments, !msg ? null : arguments);
-        });
+        self.then(
+            function () {
+                console.log("success: ", msg ? msg : arguments, !msg ? null : arguments);
+            }, function () {
+                console.error("error: ", msg ? msg : arguments, !msg ? null : arguments);
+            }
+        );
     }
 
     return self;
@@ -296,9 +359,16 @@ MegaPromise.all = function(promisesList) {
     var promise = new MegaPromise();
 
     $.when.apply($, _jQueryPromisesList)
-        .then(function() {
-            promise.resolve(toArray(arguments));
-        }, MegaPromise.getTraceableReject(promise));
+        .then(function megaPromiseResProxy() {
+            promise.resolve(toArray.apply(null, arguments));
+        }, (
+            d && typeof promisesDebug !== 'undefined' && promisesDebug ?
+                MegaPromise.getTraceableReject(promise) :
+                function megaPromiseRejProxy() {
+                    promise.reject.apply(promise, arguments);
+                }
+            )
+        );
 
     return promise;
 };
@@ -316,15 +386,17 @@ MegaPromise.all = function(promisesList) {
  * @returns {MegaPromise}
  */
 MegaPromise.allDone = function(promisesList, timeout) {
-
+    // IF empty, resolve immediately
+    if (promisesList.length === 0) {
+        return MegaPromise.resolve();
+    }
     var totalLeft = promisesList.length;
     var results = [];
     var masterPromise = new MegaPromise();
     var alwaysCb = function() {
-        totalLeft--;
-        results.push(arguments);
+        results.push(toArray.apply(null, arguments));
 
-        if (totalLeft === 0) {
+        if (--totalLeft === 0) {
             masterPromise.resolve(results);
         }
     };
@@ -361,7 +433,7 @@ MegaPromise.allDone = function(promisesList, timeout) {
  */
 MegaPromise.resolve = function() {
     var p = new MegaPromise();
-    p.resolve.apply(p, toArray(arguments));
+    p.resolve.apply(p, arguments);
 
     return p;
 };
@@ -374,7 +446,7 @@ MegaPromise.resolve = function() {
  */
 MegaPromise.reject = function() {
     var p = new MegaPromise();
-    p.reject.apply(p, toArray(arguments));
+    p.reject.apply(p, arguments);
 
     return p;
 };

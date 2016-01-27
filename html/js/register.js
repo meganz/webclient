@@ -134,7 +134,7 @@ function registeraccount() {
                         $('.login-register-input.email .top-loginp-tooltip-txt')
                             .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
                         $('.login-register-input.email').addClass('incorrect');
-                        msgDialog('warninga', 'Error', l[219]);
+                        msgDialog('warninga', 'Error', l[7869]);
                     }
                 }
             }

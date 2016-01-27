@@ -197,6 +197,9 @@
             
         </div>
 
+        <div class="section conversations">
+        </div>
+
         <div class="fm-left-panel">
             <div class="left-pane-drag-handle"></div>
 
@@ -246,10 +249,6 @@
                     <input type="text" value="[$165]" placeholder="[$165]" />
                     <div class="nw-fm-search-icon"></div>
                 </div>
-                <div class="nw-fm-tree-header conversations">
-                    <input type="text" value="[$5902]" placeholder="[$5902]" />
-                    <div class="nw-fm-search-icon"></div>
-                </div>
                 <div class="nw-fm-tree-header rubbish-bin">
                     <input type="text" value="[$168]" placeholder="[$168]" />
                     <div class="nw-fm-search-icon"></div>
@@ -275,18 +274,7 @@
                 </div>
                 <div class="content-panel contacts">
                 </div>
-                <div class="content-panel conversations">
-                    <div class="conversations-container">
 
-                    </div>
-                    <div class="nw-conversations-header call-started hidden">[$6866]</div>
-                    <div class="nw-conversations-item current-calling hidden">
-                        <div class="nw-contact-status"></div>
-                        <div class="chat-cancel-icon"></div>
-                        <div class="chat-time-txt"></div>
-                        <div class="nw-conversations-name"></div>
-                    </div>
-                </div>
                 <div class="content-panel rubbish-bin">
                 </div>
                 <div class="content-panel account">
@@ -363,7 +351,7 @@
                     <div class="create-folder-pad">
                         <div class="create-folder-size-icon full-size"></div>
                         <div class="create-folder-input-bl">
-                            <input type="text" value="[$157]" placeholder="[$157]" autofocus="autofocus"/>
+                            <input type="text" value="[$157]" placeholder="[$157]" autofocus/>
                         </div>
                         <a class="create-folder-button"><span>[$455]</span></a>
                         <div class="clear"></div>
@@ -498,7 +486,7 @@
             <div class="fm-empty-messages hidden">
                 <div class="fm-empty-pad">
                     <div class="fm-empty-messages-bg"></div>
-                    <div class="fm-empty-cloud-txt">[$6870]</div>
+                    <div class="fm-empty-cloud-txt">No Messages</div>
                     <div class="fm-not-logged-text">
                         <div class="fm-not-logged-description">
                             Login or create an account to <span class="red">get 50GB FREE</span> and get messages from your friends and coworkers.
@@ -512,6 +500,7 @@
                     </div>
                 </div>
             </div>
+
 
             <div class="fm-empty-incoming hidden">
                 <div class="fm-empty-pad">
@@ -530,23 +519,7 @@
                     </div>
                 </div>
             </div>
-            <div class="fm-empty-conversations hidden">
-                <div class="fm-empty-pad">
-                    <div class="fm-empty-conversations-bg"></div>
-                    <div class="fm-empty-cloud-txt">[$6772]</div>
-                    <div class="fm-not-logged-text">
-                        <div class="fm-not-logged-description">
-                            Login or create an account to <span class="red">get 50GB FREE</span> and speak with your friends and coworkers.
-                        </div>
-                        <div class="fm-not-logged-button login">
-                            Login
-                        </div>
-                        <div class="fm-not-logged-button create-account">
-                            Create account
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
 
             <div class="files-grid-view fm hidden">
@@ -1456,12 +1429,14 @@
     <div class="toast-notification transfer download">
     	<div class="toast-icon"></div>
   		<div class="toast-body">
-        	<div class="toast-col">
-            </div>
-            <div  class="toast-col">
-            	<div class="toast-button">
-                	<span>[$7224]</span>
+            <div class="toast-col">
+                <span></span>
+                <div class="toast-button">
+                	[$7224]
                 </div>
+            </div>
+            <div class="toast-col">
+                <div class="toast-close-button"></div>
             </div>
         </div>
     </div>
@@ -1470,11 +1445,13 @@
     	<div class="toast-icon"></div>
   		<div class="toast-body">
         	<div class="toast-col">
-            </div>
-            <div  class="toast-col">
-            	<div class="toast-button">
-                	<span>[$7224]</span>
+                <span></span>
+                <div class="toast-button">
+                	[$7224]
                 </div>
+            </div>
+            <div class="toast-col">
+                <div class="toast-close-button"></div>
             </div>
         </div>
     </div>

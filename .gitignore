@@ -2,6 +2,11 @@
 *.crx
 
 #################
+## Webclient build artifacts
+#################
+js/chat/bundle.js
+
+#################
 ## Eclipse
 #################
 
@@ -222,6 +227,7 @@ test-results.xml
 .tox
 js/tests/coverage
 test/phantomjs-storage
+js/chat/bundle.js
 
 
 #############
@@ -236,6 +242,7 @@ test/phantomjs-storage
 
 # JS Docs
 js/docs/
+dont-deploy/ui/out/
 
 # Local diffcheck.py configuration.
 contrib/local_config.py

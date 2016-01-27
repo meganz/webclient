@@ -6,6 +6,7 @@ var b_u = 0;
 var apipath;
 var maintenance = false;
 var androidsplash = false;
+var silent_loading = false;
 var cookiesDisabled = false;
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
@@ -82,42 +83,43 @@ if (!String.trim) {
     };
 }
 
-if (!m) {
-    try {
-        // Browser compatibility
-        // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
-        Object.defineProperty(this, 'megaChatIsDisabled', (function() {
-            var status;
-            return {
-                set: function(val) {
-                    status = val;
-                    if (status) {
-                        $(document.body).addClass("megaChatDisabled");
-                    }
-                    else {
-                        $(document.body).removeClass("megaChatDisabled");
-                    }
-                },
-                get: function() {
-                    return status || localStorage.testChatDisabled
-                        || (localStorage.chatDisabled !== undefined
-                            && localStorage.chatDisabled !== "0");
+try {
+    // Browser compatibility
+    // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
+    Object.defineProperty(this, 'megaChatIsDisabled', (function() {
+        var status;
+        return {
+            set: function(val) {
+                status = val;
+                if (status) {
+                    $(document.body).addClass("megaChatDisabled");
                 }
-            };
-        })());
-        // Check whether Mega Chat is enabled *and* initialized
-        Object.defineProperty(this, 'megaChatIsReady', {
+                else {
+                    $(document.body).removeClass("megaChatDisabled");
+                }
+            },
             get: function() {
-                return !megaChatIsDisabled
-                    && typeof megaChat !== 'undefined'
-                    && megaChat.is_initialized;
+                return status || localStorage.testChatDisabled
+                    || (localStorage.chatDisabled !== undefined
+                        && localStorage.chatDisabled !== "0");
             }
-        });
-    }
-    catch (ex) {
-        console.error(ex);
-        b_u = true;
-    }
+        };
+    })());
+
+    // Check whether Mega Chat is enabled *and* initialized
+    Object.defineProperty(this, 'megaChatIsReady', {
+        get: function() {
+            return !megaChatIsDisabled
+                && typeof megaChat !== 'undefined'
+                && megaChat.is_initialized;
+        }
+    });
+}
+catch (ex) {
+    console.error(ex);
+    window.megaChatIsReady = false;
+    window.megaChatIsDisabled = false;
+    b_u = true;
 }
 
 if (!b_u) try
@@ -308,7 +310,9 @@ if (!b_u && is_extension)
     });
 }
 
-if (b_u) document.location = 'update.html';
+if (b_u && !is_mobile) {
+    document.location = 'update.html';
+}
 
 var ln = {}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español'; ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português Brasil'; ln.vi = 'Tiếng Việt'; ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.pt = 'Português'; ln.he = 'עברית'; ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi'; ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';  ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски'; ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.tl = 'Tagalog';
 var ln2 = {}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.vi = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian'; ln2.fa = 'Farsi'; ln2.tl = 'Tagalog';
@@ -734,6 +738,28 @@ function getxhr() {
     return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
 }
 
+function siteLoadError(error, filename) {
+    var message = ['An error occurred while loading MEGA.'];
+
+    if (error === 1) {
+        message.push('The file "' + filename + '" is corrupt.');
+    }
+    else if (error === 2) {
+        message.push('The file "' + filename + '" could not be loaded.');
+    }
+    else {
+        message.push('Filename: ' + filename + "\nException: " + error);
+    }
+
+    if (!is_extension) {
+        message.push('Please try again later. We apologize for the inconvenience.');
+    }
+    message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
+
+    contenterror = 1;
+    alert(message.join("\n\n"));
+}
+
 if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
@@ -774,7 +800,6 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     document.getElementsByTagName('head')[0].appendChild(tag);
     m=true;
 }
-var silent_loading=false;
 
 if (m)
 {
@@ -937,7 +962,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 22, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 23, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -1263,7 +1288,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
 
     // MEGA CHAT
-    if (!megaChatIsDisabled || location.host === 'mega.nz') {
+    if (location.host === 'mega.nz' || !megaChatIsDisabled) {
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
@@ -1514,7 +1539,8 @@ else if (!b_u)
                         console.log(e.data.text);
                         alert('error');
                     }
-                    if (!nocontentcheck && !compareHashes(e.data.hash, jsl[e.data.jsi].f))
+                    var file = Object(jsl[e.data.jsi]).f || 'unknown.js';
+                    if (!nocontentcheck && !compareHashes(e.data.hash, file))
                     {
                         if (bootstaticpath.indexOf('cdn') > -1)
                         {
@@ -1522,7 +1548,7 @@ else if (!b_u)
                             document.location.reload();
                         }
                         else {
-                            alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[e.data.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
+                            siteLoadError(1, bootstaticpath + file);
                         }
 
                         contenterror = 1;
@@ -1641,8 +1667,7 @@ else if (!b_u)
                         if (String(e) !== "Error: AsmJS modules are not yet supported in XDR serialization."
                                 && file.indexOf('dcraw') === -1) {
 
-                            return alert('An error occurred while loading MEGA.\n\nFilename: '
-                                + file + "\n" + e + '\n\n' + mozBrowserID);
+                            return siteLoadError(e, file);
                         }
                     }
                     step(jsi);
@@ -1657,8 +1682,7 @@ else if (!b_u)
                     {
                         if (!Components.isSuccessCode(s))
                         {
-                            alert('An error occurred while loading MEGA.' +
-                                  ' The file ' + file + ' could not be loaded.');
+                            siteLoadError(2, file);
                         }
                         else
                         {
@@ -1709,7 +1733,12 @@ else if (!b_u)
         xhr_stack[xhri] = getxhr();
         xhr_stack[xhri].onload = function()
         {
-            jsl[this.jsi].text = this.response || this.responseText;
+            try {
+                jsl[this.jsi].text = this.response || this.responseText;
+            }
+            catch (ex) {
+                return siteLoadError(ex, bootstaticpath + Object(jsl[this.jsi]).f);
+            }
 
             if (typeof hash_workers !== 'undefined' && !nocontentcheck)
             {
@@ -1725,7 +1754,7 @@ else if (!b_u)
                     // Compare the hash from the file and the correct hash determined at deployment time
                     if (!compareHashes(hashHex, jsl[this.jsi].f))
                     {
-                        alert('An error occurred while loading MEGA. The file ' + bootstaticpath + jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
+                        siteLoadError(1, jsl[this.jsi].f);
                         contenterror = 1;
                     }
                 }

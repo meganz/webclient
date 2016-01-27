@@ -6974,25 +6974,6 @@ function balance2pro(callback)
             $span = $('.copy-to-clipboard span'),
             toastTxt, doLinks, linksNum, success;
 
-        /**
-         * execCommandUsable
-         *
-         * Native browser 'copy' command using execCommand('copy).
-         * Supported by Chrome42+, FF41+, IE9+, Opera29+
-         * @returns {Boolean}
-         */
-        ExportLinkDialog.prototype.execCommandUsable = function() {
-
-            var result;
-
-            try {
-                result = document.execCommand('copy');
-            }
-            catch (ex) {}
-
-            return result === false;
-        };
-
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
@@ -7051,7 +7032,7 @@ function balance2pro(callback)
         $span.text(l[1990]);
 
         // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || self.execCommandUsable()) {
+        if (is_extension || mega.utils.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
             }

@@ -873,19 +873,22 @@ var notify = {
         
         var header = '';
         var title = '';
+        var cssClass = '';
         var folderOrFileHandle = notification.data.h;
         
         if (typeof notification.data.down !== 'undefined') {
             header = 'Link takedown';
             title = 'One of your public links were taken down.';
+            cssClass = 'nt-takedown-notification';
         }
         else if (typeof notification.data.up !== 'undefined') {
             header = 'Link reinstated';
             title = 'One of your taken down public links has been reinstated.';
+            cssClass = 'nt-takedown-reinstated-notification';
         }
         
         // Populate other template information
-        $notificationHtml.addClass('nt-payment-notification');
+        $notificationHtml.addClass(cssClass);
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notification-username').text(header);      // Use 'Link takedown/reinstated' instead

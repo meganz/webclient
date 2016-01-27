@@ -41,9 +41,9 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/aaronpowell/db.js/compare/master...meganz:master)
 
 ---
-[dcraw.js]: Dave Coffin's raw photo decoder.
+[dcraw.js]: Dave Coffin's raw photo decoder [dcraw.c](http://www.cybercom.net/~dcoffin/dcraw/) ported to JavaScript using [Emscripten]
 
-> NB: This was ported to JavaScript using Emscripten.
+> NB: To compile from C source, fork the repo and run `build.sh`.
 
 ---
 [es6-shim]: ECMAScript 6 compatibility shims for legacy JavaScript engines.
@@ -153,12 +153,13 @@ Unless otherwise noted, they were released under a [MIT License].
 
 
 [MIT License]: <https://opensource.org/licenses/MIT>
+[Emscripten]: <http://emscripten.org/>
 [asmcrypto.js]: <https://github.com/vibornoff/asmcrypto.js/tree/v0.0.10>
 [autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
-[dcraw.js]: <http://www.cybercom.net/~dcoffin/dcraw/>
+[dcraw.js]: <https://github.com/meganz/dcraw.js>
 [es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>

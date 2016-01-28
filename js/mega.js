@@ -1683,16 +1683,25 @@ function MegaData()
                 M.renderPath();
             });
         }
+
+        var newHashLocation;
+
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
             var target = '';
             if (this.currentdirid !== this.RootID) {
                 target = '!' +  this.currentdirid;
             }
-            window.location.hash = '#F!' + pfid + '!' + pfkey + target;
+            newHashLocation = '#F!' + pfid + '!' + pfkey + target;
         }
         else {
-            window.location.hash = '#fm/' + M.currentdirid;
+            newHashLocation = '#fm/' + M.currentdirid;
+        }
+        try {
+            window.location.hash = newHashLocation;
+        }
+        catch (ex) {
+            console.error(ex);
         }
         searchPath();
 

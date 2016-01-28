@@ -2958,28 +2958,48 @@ function MegaData()
     this.syncUsersFullname = function(userId) {
         var self = this;
 
-        var firstName = null;
-        var lastName = null;
+        var lastName = {name: 'last-name', value: null};
+        var firstName = {name: 'first-name', value: null};
         MegaPromise.allDone([
             getUserAttribute(userId, 'firstname', -1)
                 .done(function(r) {
-                    firstName = r;
+                    firstName.value = r;
                 }),
             getUserAttribute(userId, 'lastname', -1)
                 .done(function(r) {
-                    lastName = r;
+                    lastName.value = r;
                 })
         ]).done(function(results) {
             if (!self.u[userId]) {
                 return;
             }
 
-            // -1, -9, -2, etc...
-            firstName = typeof firstName != "string" ? false : firstName;
-            lastName = typeof lastName != "string" ? false : lastName;
+            [firstName, lastName].forEach(function(obj) {
+                // -1, -9, -2, etc...
+                if (typeof obj.value === 'string') {
+                    try {
+                        obj.value = from8(base64urldecode(obj.value));
+                    }
+                    catch (ex) {
+                        obj.value = ex;
+                    }
+                }
 
-            firstName = firstName ? from8(base64urldecode(firstName)) : "";
-            lastName = lastName ? from8(base64urldecode(lastName)) : "";
+                if (typeof obj.value !== 'string' || !obj.value) {
+                    if (d) {
+                        // Inherit the logger for getUserAttribute
+                        var logger = MegaLogger.getLogger('account');
+
+                        logger.debug('Attribute "%s" for user "%s" cannot be decoded: "%s"',
+                                        obj.name, userId, obj.value);
+                    }
+                    obj.value = '';
+                }
+            });
+
+            lastName = lastName.value;
+            firstName = firstName.value;
+
             if (firstName.length > 0 && lastName.length > 0) {
                 self.u[userId].name = firstName + " " + lastName;
             }

@@ -655,19 +655,26 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
             attribCache.setItem(cacheKey, JSON.stringify([res, exp]));
         }
 
+        settleFunctionDone(res);
+    }
+
+    function settleFunctionDone(res, cached) {
+        var tag = cached ? 'Cached ' : '';
+
         // Another conditional, the result value may have been changed.
         if (typeof res !== 'number') {
+            if (d) {
+                var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
+                logger.info(tag + 'Attribute "%s" for user "%s" is %s.',
+                            attribute, userhandle, loggerValueOutput);
+            }
             thePromise.resolve(res);
-            var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
-            logger.info('Attribute "' + attribute + '" for user "'
-                        + userhandle + '" is ' + loggerValueOutput + '.');
         }
         else {
             // Got back an error (a number).
+            logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
+                        attribute, userhandle, res);
             thePromise.reject(res);
-            logger.warn('Warning, attribute "' + attribute
-                        + '" for user "' + userhandle
-                        + '" could not be retrieved: ' + res + '!');
         }
 
         // Finish off if we have a callback.
@@ -681,50 +688,46 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     myCtx.ua = attribute;
     myCtx.callback = settleFunction;
 
+    // Fire off api request unless cached.
+    var doApiReq = function _doApiReq(promise) {
+        if (promise instanceof MegaPromise) {
+            promise.always(function() {
+                doApiReq();
+            });
+        }
+        else {
+            api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+        }
+    };
+
     // check the cache first!
     attribCache.getItem(cacheKey)
+        .fail(doApiReq)
         .done(function __attribCacheGetDone(v) {
-            var res;
+            var result;
+
             try {
-                res = JSON.parse(v);
+                var res = JSON.parse(v);
 
                 if ($.isArray(res)) {
-                    if (res[1] && res[1] !== 0 && res[1] < unixtime() - ATTRIB_CACHE_NON_CONTACT_EXP_TIME) {
-                        attribCache.removeItem(cacheKey);
-                        api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
-                        return;
+                    var exp = res[1];
+
+                    if (!exp || exp > (unixtime() - ATTRIB_CACHE_NON_CONTACT_EXP_TIME)) {
+                        result = res[0];
                     }
-                    else if (res[0] === ENOENT) {
-                        thePromise.reject(res[0]);
-                        return;
-                    }
-                    else {
-                        if (callback) {
-                            callback(res[0], myCtx);
-                        }
-                        thePromise.resolve(res[0]);
-                        return;
-                    }
-                }
-                else {
-                    attribCache.removeItem(cacheKey);
-                    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
                 }
             }
-            catch (e) {
-                api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
-                return;
+            catch (ex) {
+                logger.error(ex);
             }
 
-            if (callback) {
-                callback(res[0], myCtx);
+            if (result === undefined) {
+                doApiReq(attribCache.removeItem(cacheKey));
             }
-        })
-        .fail(function __attribCacheGetFail() {
-            // Fire it off.
-            api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+            else {
+                settleFunctionDone(result, true);
+            }
         });
-
 
     return thePromise;
 }

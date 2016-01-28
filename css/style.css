@@ -18494,7 +18494,9 @@ a.ff-extension-button:hover {
 .search-bottom-menu {
     background-color: #EEEEEE;
     height: 30px;
-    margin-left: 2px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
     padding-left: 13px;
     display: none;
 }

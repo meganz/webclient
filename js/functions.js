@@ -3061,6 +3061,23 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+/**
+ * execCommandUsable
+ *
+ * Native browser 'copy' command using execCommand('copy').
+ * Supported by Chrome42+, FF41+, IE9+, Opera29+
+ * @returns {Boolean}
+ */
+mega.utils.execCommandUsable = function() {
+    var result;
+
+    try {
+        result = document.execCommand('copy');
+    }
+    catch (ex) {}
+
+    return result === false;
+};
 
 /**
  * Utility that will return a sorting function (can compare numbers OR strings, depending on the data stored in the

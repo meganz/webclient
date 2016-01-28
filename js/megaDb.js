@@ -349,7 +349,13 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
         var args = arguments;
 
         if (megaDb.dbState === MegaDB.DB_STATE.INITIALIZED) {
-            return fn.apply(self, args);
+            try {
+                return fn.apply(self, args);
+            }
+            catch (ex) {
+                self.logger.error(ex);
+                return MegaPromise.reject(ex);
+            }
         }
         else if (megaDb.dbState === MegaDB.DB_STATE.OPENING) {
             var $promise = new MegaPromise();
@@ -361,6 +367,7 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
                     } catch(e) {
                         $promise.reject.apply($promise, arguments);
                         self.logger.error("Could not open db: ", e);
+                        return;
                     }
 
                     if (resultPromise.then) {

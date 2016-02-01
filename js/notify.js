@@ -897,17 +897,22 @@ var notify = {
         var title = '';
         var cssClass = '';
         var folderOrFileHandle = notification.data.h;
-        var name = (M.d[folderOrFileHandle].name) ? "'" + htmlentities(M.d[folderOrFileHandle].name) + "'" : '';
-        var fileOrFolder = (M.d[folderOrFileHandle].t === 0) ? 'file' : 'folder';
+        var folderOrFileName = (M.d[folderOrFileHandle].name) ? htmlentities(M.d[folderOrFileHandle].name) : '';
+        var folderOrFile = (M.d[folderOrFileHandle].t === 0) ? l[5557] : l[5561];
         
+        // Takedown notice
+        // Your publicly shared %1 (%2) has been taken down.
         if (typeof notification.data.down !== 'undefined') {
-            header = 'Takedown notice';
-            title = 'Your publicly shared ' + fileOrFolder + ' ' + name + ' has been taken down.';
+            header = l[8521];
+            title = l[8522].replace('%1', folderOrFile).replace('%2', folderOrFileName);
             cssClass = 'nt-takedown-notification';
         }
+        
+        // Takedown reinstated
+        // Your taken down %1 (%2) has been reinstated.
         else if (typeof notification.data.up !== 'undefined') {
-            header = 'File reinstated';
-            title = 'Your taken down ' + fileOrFolder + ' ' + name + ' has been reinstated.';
+            header = l[8524];
+            title = l[8523].replace('%1', folderOrFile).replace('%2', folderOrFileName);
             cssClass = 'nt-takedown-reinstated-notification';
         }
         
@@ -915,7 +920,7 @@ var notify = {
         $notificationHtml.addClass(cssClass);
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
-        $notificationHtml.find('.notification-username').text(header);      // Use 'Link takedown/reinstated' instead
+        $notificationHtml.find('.notification-username').text(header);
         $notificationHtml.attr('data-folder-or-file-id', folderOrFileHandle);
         
         return $notificationHtml;

@@ -3090,6 +3090,13 @@
     "8510": "Todos os seus dados locais ser\u00e3o exclu\u00eddos e voc\u00ea ser\u00e1 desconectado em %d segundos.",
     "8511": "Sua conta n\u00e3o pode ser atualizado a partir do aplicativo. Entre em contato com support@mega.nz para atualizar a sua conta.",
     "8512": "Leia mais",
+    "8513": "MEGA \u00e9 um servi\u00e7o seguro de armazenamento em nuvem com 50 GB de espa\u00e7o gratuito. Ao contr\u00e1rio de outros fornecedores de armazenamento em nuvem, os seus dados s\u00e3o encriptados e desencriptados apenas pelo seu dispositivo e nunca por n\u00f3s.Envie seus arquivos a partir do seu smartphone ou tablet, em seguida, pesquise, armazene, descarregue, transmita, visualize, partilhe, renomeie ou apague seus ficheiros a qualquer hora, a partir de qualquer dispositivo, em qualquer lugar. Compartilhe pastas com seus contatos e veja as atualiza\u00e7\u00f5es dos mesmos em tempo real.O processo de encripta\u00e7\u00e3o significa que a MEGA n\u00e3o pode aceder \u00e0 sua senha ou redefini-la e por isso DEVE memoriz\u00e1-la ou perder\u00e1 o acesso aos seus arquivos armazenados.Dentro do aplicativo voc\u00ea pode atualizar o seu espa\u00e7o de armazenamento e quota de largura de banda com uma assinatura mensal ou anual.Assinatura Pro Lite: \u20ac4.99 (US$4.99) por m\u00eas ou \u20ac49.99 (US$49.99) por ano. Tem direito a 200 GB de espa\u00e7o de armazenamento e 1 TB de largura de banda por m\u00eas.Assinatura Pro I: \u20ac9.99 (US$9.99) por m\u00eas ou \u20ac99.99 (US$99.99) por ano. Tem direito  a 500 GB de espa\u00e7o de armazenamento e 2 TB de largura de banda por m\u00eas.Assinatura Pro II: \u20ac19.99 (US$19.99) por m\u00eas ou \u20ac199.99 (US$199.99) por ano. Tem direito a 2 TB de espa\u00e7o de armazenamento e 4 TB de largura de banda por m\u00eas.Assinatura Pro III: \u20ac29.99 por m\u00eas ou 299.99 por ano. E tem direito  a 4 TB de espa\u00e7o de armazenamento e 8 TB de largura de banda por m\u00eas.Para mais informa\u00e7\u00f5es, v\u00e1 \u00e0 nossa p\u00e1gina:no telem\u00f3vel:  https:\/\/mega.nz\/mobile_terms.html     https:\/\/mega.nz\/mobile_privacy.htmlno computador: https:\/\/mega.nz\/Nota: Para aceder a partir do seu computador aos seus ficheiros MEGA precisa usar os navegadores compat\u00edveis com HTML5 para lidar com os nossos recursos avan\u00e7ados. Recomendamos o Mozilla Firefox e o Google Chrome. No entanto, as vers\u00f5es m\u00f3veis dos navegadores n\u00e3o podem aceder ao sistema de armazenamento em nuvem MEGA.",
+    "8514": "As assinaturas s\u00e3o automaticamente renovadas por per\u00edodos iguais, de igual dura\u00e7\u00e3o e ao mesmo pre\u00e7o que o per\u00edodo inicial escolhido. Voc\u00ea pode anular a renova\u00e7\u00e3o autom\u00e1tica da sua assinatura MEGA at\u00e9 24 horas antes do pr\u00f3ximo pagamento da assinatura fazendo-o atrav\u00e9s da p\u00e1gina de configura\u00e7\u00f5es da sua conta iTunes. Para gerenciar suas assinaturas basta clicar no \u00edcone da App Store no seu aparelho, entrar com seu ID da Apple na parte inferior da p\u00e1gina (se voc\u00ea ainda n\u00e3o o tiver feito) e, em seguida, clicar em Ver ID. Voc\u00ea ser\u00e1 levado \u00e0 p\u00e1gina da sua conta onde rolando para baixo pode gerenciar as suas assinaturas. A partir daqui, voc\u00ea pode selecionar sua assinatura MEGA Pro e ver a sua data de renova\u00e7\u00e3o programada, escolher um pacote de assinatura diferente ou puxar o bot\u00e3o on-off para fora para desativar a renova\u00e7\u00e3o autom\u00e1tica da sua assinatura.",
+    "8515": "Ativar o modo de depura\u00e7\u00e3o",
+    "8516": "Um log ser\u00e1 criado na se\u00e7\u00e3o off-line (MEGAiOS.log).",
+    "8517": "Desativar o modo de depura\u00e7\u00e3o",
+    "8518": "O log (MEGAiOS.log) ser\u00e1 exclu\u00eddo da se\u00e7\u00e3o off-line.",
+    "8519": "Restri\u00e7\u00f5es do sistema operacional",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3102,6 +3109,11 @@
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
         "source-code-intro-3": 8441,
-        "read-more": 8512
+        "read-more": 8512,
+        "email-already-exists": 7869,
+        "takedown-notice": 8521,
+        "takedown-notification-text": 8522,
+        "reinstated-notification-text": 8523,
+        "takedown-reinstated": 8524
     }
 }

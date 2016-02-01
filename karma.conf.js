@@ -45,7 +45,7 @@ module.exports = function(config) {
         'js/vendor/ion.sound.js',
         'js/vendor/favico.js',
         'js/vendor/notification.js',
-        'js/vendor/moment.min.js',
+        'js/vendor/moment.js',
         // Chat libraries.
         'js/chat/mpenc.js',
         'js/vendor/chat/strophe.light.js',

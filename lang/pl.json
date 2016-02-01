@@ -3083,13 +3083,20 @@
     "8503": "Twoje lokalne dane zostan\u0105 usuni\u0119te i zostaniesz wylogowany po 10 nie udanych pr\u00f3bach.",
     "8504": "Wprowadzone z\u0142y kod PIN, spr\u00f3buj ponownie. Pozosta\u0142o Ci %2d pr\u00f3b.",
     "8505": "Kod PIN jest b\u0142\u0119dny",
-    "8506": "Wprowad\u017a kod Pin",
+    "8506": "Wprowad\u017a kod PIN",
     "8507": "Wprowad\u017a kod PIN ponownie",
     "8508": "Wprowad\u017a nowy kod PIN",
     "8509": "Wprowad\u017a nowy kod PIN ponownie",
     "8510": "Wszystkie Twoje lokalne dane zostan\u0105 usuni\u0119te a nast\u0119pnie zostaniesz wylogowany za %d sekund.",
     "8511": "Twoje konto nie mo\u017ce zosta\u0107 zmienione z tej aplikacji. Skontaktuj si\u0119 z support@mega.nz aby dokona\u0107 zmiany.",
     "8512": "Wi\u0119cej",
+    "8513": "MEGA jest bezpieczn\u0105 chmur\u0105 do przechowywania plik\u00f3w z dost\u0119pem do 50 GB pami\u0119ci za darmo. W odr\u00f3\u017cnieniu od innych dostawc\u00f3w, Twoje dane s\u0105 szyfrowane na Twoich urz\u0105dzeniach i nigdy przez nas.Dodawaj pliki ze swojego telefonu lub tableta, a nast\u0119pnie szukach, przechowuj, pobieraj, udost\u0119pniaj, zmieniaj, usuwaj pliki w dowolnym czasie, na dowolnym urz\u0105dzeniu, wsz\u0119dzie. Udost\u0119pniach katalogi ze znajomymi i obserwuj ich aktualizacje w czasie rzyczywistym.Szyfrowanie oznacza, \u017ce nie mo\u017cesz odzyska\u0107 lub zresetowa\u0107 swojego has\u0142a, wi\u0119c MUSISZ je pami\u0119ta\u0107 (chyba, \u017ce jeste\u015b w posiadaniu Klucza G\u0142\u00f3wnego) lub utacisz dost\u0119p do swoich danych.W aplikacji masz mo\u017cliwo\u015b\u0107 zmiany rodzaju konta, subskrypcji i dost\u0119pnej powierzchni.Subskrypjca PRO LITE: za \u20ac4.99 (US$4.99) miesi\u0119cznie lub \u20ac49.99 (US$49.99) rocznie, dostajesz 200 GB pami\u0119ci oraz 1 TB transferu na miesi\u0105c.Subskrypjca PRO I: za \u20ac9.99 (US$9.99) miesi\u0119cznie lub \u20ac99.99 (US$99.99) rocznie, dostajesz 500 GB pami\u0119ci na pliki oraz 2 TB transferu miesi\u0119cznie.Subskrypcja PRO II: za \u20ac19.99 (US$19.99) miesi\u0119cznie lub \u20ac199.99 (US$199.99) rocznie, dostajesz 2 TB pami\u0119cie oraz 4 TB transferu miesi\u0119cznie.Subskrypcja PRO III: za \u20ac29.99 (US$29.99) miesi\u0119cznie lub \u20ac299.99 (US$299.99) rocznie, dostajesz 4 TB pami\u0119ci i 8 GB transferu miesi\u0119cznie.Wi\u0119cej informacji znajdziesz na naszych stronach: Mobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.htmlDesktop - https:\/\/mega.nz\/Uwaga: Przegl\u0105darki na komputerach stacjonarnych wymagaj\u0105 zgodno\u015bci z HTML5 aby wykorzystywa\u0107 wszystkie nasze zaawansowane funkcjonalno\u015bci. Polecamy Mozilla Firefox oraz Google Chrome. Pami\u0119taj, \u017ce mobile przegl\u0105darki nie maj\u0105 dost\u0119pu do wersji internetowej naszej aplikacji.",
+    "8514": "Sukskrypcja odnawiania jest automatycznie po up\u0142ywie terminu wa\u017cno\u015bci konta, z zachowaniem identycznego okresu trwania oraz ceny. Mo\u017cesz wy\u0142\u0105czy\u0107 automatyczne odnawianie subskrypcji MEGA PRO nie po\u017aniej ni\u017c 24 godziny przed terminem wyga\u015bni\u0119cia konta. Dat\u0119 wyga\u015bni\u0119cia mo\u017cesz znale\u017a\u0107 na stronach iTunes. Aby zmieni\u0107 ustawienia subskrypcji, kliknij w App Store a nast\u0119pnie na dole ekranu kliknij \"Zobacz ID\". Zostaniesz przekierowany do strony gdzie na dole znajdziesz link \"Zarz\u0105dzaj subskrypcjami\". Na tej stronie wybierz MEGA PRO a nast\u0119pnie zmie\u0144 ustawienia.",
+    "8515": "Odblokuj tryb DEBUG",
+    "8516": "Plik zostanie utworzony w trybie Offline (MEGAiOS.log)",
+    "8517": "Zablokuj tryb DEBUG",
+    "8518": "Plik (MEGAiOS.log) zostanie usuni\u0119ty z trybu Offline.",
+    "8519": "Ograniczenia us\u0142ugi",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3102,6 +3109,11 @@
         "source-code-intro-1": 8439,
         "source-code-intro-2": 8440,
         "source-code-intro-3": 8441,
-        "read-more": 8512
+        "read-more": 8512,
+        "email-already-exists": 7869,
+        "takedown-notice": 8521,
+        "takedown-notification-text": 8522,
+        "reinstated-notification-text": 8523,
+        "takedown-reinstated": 8524
     }
 }

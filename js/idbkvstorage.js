@@ -152,7 +152,7 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
         k
     )
         .done(function __getItemDone(r) {
-            if (typeof(r) === 'undefined' || r.length === 0) {
+            if (typeof r === 'undefined' || r.length === 0) {
                 promise.reject();
             }
             else {
@@ -203,17 +203,16 @@ IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function
  *
  * @type {MegaPromise}
  */
-IndexedDBKVStorage.prototype.destroy = IndexedDBKVStorage._requiresDbConn(function __IDBKVClear() {
+IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
     var self = this;
     self._memCache = {};
 
-    if (!self.db || self.db.dbState !== MegaDB.DB_STATE.INITIALIZED) {
-        return MegaPromise.resolve();
-    }
-    else {
+    if (self.db && self.db.dbState !== MegaDB.DB_STATE.CLOSED) {
         return self.db.drop();
     }
-});
+
+    return MegaPromise.resolve();
+};
 
 /**
  * Check if item with key `k` exists in the DB.
@@ -235,7 +234,7 @@ IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(functi
         k
     )
         .done(function __hasItemDone(r) {
-            if (typeof(r) === 'undefined' || r.length === 0) {
+            if (typeof r === 'undefined' || r.length === 0) {
                 promise.reject();
             }
             else {

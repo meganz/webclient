@@ -9984,8 +9984,8 @@
         "context": "Helpful tips before starting a call."
     },
     "7418": {
-        "text": "Use headphones or an headset",
-        "context": "Tips (before start call) :\r\n-Use headphones or an headset\r\n-Pause any transfers"
+        "text": "Use headphones or a headset",
+        "context": "Tips (before starting a phone\/video call) :\r\n- Use headphones or a headset\r\n- Pause any transfers"
     },
     "7419": {
         "text": "Pause all transfers",
@@ -12336,7 +12336,7 @@
         "context": "Error message for typing the wrong PIN code (two times)"
     },
     "8506": {
-        "text": "Enter your Pin Code",
+        "text": "Enter your PIN Code",
         "context": "Title of the screen to unlock screen with pin code."
     },
     "8507": {
@@ -12362,5 +12362,33 @@
     "8512": {
         "text": "Read more",
         "context": "Open the whole blog post"
+    },
+    "8513": {
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\n\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\n\nInside the app you can upgrade your storage space & bandwidth quota with a monthly or yearly subscription.\n\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\n\nFor more info, please check our website:\nMobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\nDesktop - https:\/\/mega.nz\/\n\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+        "context": "General description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\n\" AND \"\t\"."
+    },
+    "8514": {
+        "text": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
+        "context": "Specific paragraph shown only on the App Store in iOS"
+    },
+    "8515": {
+        "text": "Enable DEBUG mode",
+        "context": "Alert title shown when the DEBUG mode is enabled"
+    },
+    "8516": {
+        "text": "A log will be created in the Offline section (MEGAiOS.log).",
+        "context": "Alert message shown when the DEBUG mode is enabled"
+    },
+    "8517": {
+        "text": "Disable DEBUG mode",
+        "context": "Alert title shown when the DEBUG mode is disabled"
+    },
+    "8518": {
+        "text": "The log (MEGAiOS.log) will be deleted from the Offline section.",
+        "context": "Alert message shown when the DEBUG mode is disabled"
+    },
+    "8519": {
+        "text": "Operating system restrictions",
+        "context": "Label for the automatic camera upload service restrictions."
     }
 }

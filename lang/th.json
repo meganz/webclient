@@ -2495,7 +2495,7 @@
     "7415": "The email address format is invalid",
     "7416": "Before starting a call, allow your browser access<br \/> to your microphone and camera",
     "7417": "\u0e04\u0e33\u0e41\u0e19\u0e30\u0e19\u0e33:",
-    "7418": "Use headphones or an headset",
+    "7418": "Use headphones or a headset",
     "7419": "\u0e2b\u0e22\u0e38\u0e14\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e22\u0e49\u0e32\u0e22\u0e0a\u0e31\u0e48\u0e27\u0e04\u0e23\u0e32\u0e27\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14",
     "7420": "\u0e01\u0e25\u0e49\u0e2d\u0e07\u0e16\u0e48\u0e32\u0e22\u0e23\u0e39\u0e1b\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e43\u0e0a\u0e49\u0e07\u0e32\u0e19",
     "7421": "\u0e1b\u0e23\u0e30\u0e01\u0e32\u0e28",
@@ -3083,13 +3083,20 @@
     "8503": "Your local files will be deleted and you will be logged out after 10 failed attempts.",
     "8504": "Wrong PIN code, please try again. You have %2d attemps left.",
     "8505": "PIN Codes don't match",
-    "8506": "Enter your Pin Code",
+    "8506": "Enter your PIN Code",
     "8507": "Re-Enter your PIN Code",
     "8508": "Enter your new PIN Code",
     "8509": "Re-Enter your new PIN Code",
     "8510": "All your local data will be deleted and you will be logged out in %d seconds.",
     "8511": "Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account.",
     "8512": "Read more",
+    "8513": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.Upload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.Inside the app you can upgrade your storage space & bandwidth quota with a monthly or yearly subscription.PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.For more info, please check our website:Mobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.htmlDesktop - https:\/\/mega.nz\/Note: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+    "8514": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
+    "8515": "Enable DEBUG mode",
+    "8516": "A log will be created in the Offline section (MEGAiOS.log).",
+    "8517": "Disable DEBUG mode",
+    "8518": "The log (MEGAiOS.log) will be deleted from the Offline section.",
+    "8519": "Operating system restrictions",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3103,6 +3110,10 @@
         "source-code-intro-2": 8440,
         "source-code-intro-3": 8441,
         "read-more": 8512,
-        "email-already-exists": 7869
+        "email-already-exists": 7869,
+        "takedown-notice": 8521,
+        "takedown-notification-text": 8522,
+        "reinstated-notification-text": 8523,
+        "takedown-reinstated": 8524
     }
 }

@@ -3090,6 +3090,13 @@
     "8510": "Tutti i tuoi dati locali verranno cancellati e tu verrai loggato fuori in %d secondi",
     "8511": "Il tuo account non pu\u00f2 essere aggiornato dall'app. Per favore, contatta support@mega.nz per aggiornare il tuo account.",
     "8512": "Leggi di pi\u00f9",
+    "8513": "MEGA \u00e8 un servizio sicuro di Cloud Storage che offre 50 GB di spazio gratuito di archiviazione. A differenza di altri servizi di Cloud Storage, i dati vengono codificati e decodificati esclusivamente dai tuoi dispositivi e non da noi.Carica i tuoi file dallo smartphone o dal tablet e cerca, archivia, scarica, vedi, condividi, rinomina o elimina i file in qualsiasi momento, da qualsiasi dispositivo, ovunque. Condividi cartelle con i tuoi contatti e vedi gli aggiornamenti in tempo reale.Il processo di crittografia ci impedisce  di accedere o di reimpostare la tua password, per cui DEVI ricordarla (a meno che tu non abbia il backup della chiave master) o perderai l'accesso a tutti i tuoi file.All'interno dell'applicazione \u00e8 possibile aumentare lo spazio di archiviazione e la larghezza di banda con un abbonamento mensile o annuale.Abbonamento PRO LITE: 4,99 \u20ac al mese o 49,99 \u20ac l'anno, offre 200 GB di spazio di archiviazione e 1 TB di banda al mese.Abbonamento PRO I: \u20ac 9,99 al mese o 99,99 \u20ac l'anno, offre 500 GB di spazio di archiviazione e 2 TB di banda al mese.Abbonamento PRO II: 19,99 \u20ac al mese o 199,99 \u20ac all'anno, offre 2 TB di spazio di archiviazione e 4 TB di banda al mese.Abbonamento PRO III: 29,99 \u20ac al mese o 299,99 \u20ac all'anno, offre 4 TB di spazio di archiviazione e 8 TB di banda al mese.Per maggiori informazioni, si prega di visitare il nostro sito:Cellulare - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.htmlDesktop - https:\/\/mega.nz\/Nota bene: per accedere ai file dal desktop, MEGA ha bisogno di utilizzare browser compatibili con HTML5 per usare le nostre funzioni avanzate. Si consiglia di usare Mozilla Firefox e Google Chrome. Le versioni per cellulare di questi browser non possono accedere al Cloud Storage di MEGA.",
+    "8514": "L\u2019abbonamento si rinnova automaticamente, con la stessa durata e prezzo rispetto a quanto originariamente scelto. \u00c8 possibile disattivare il rinnovo automatico dell'abbonamento MEGA PRO fino a 24 ore prima del rinnovo programmato nella pagina delle impostazioni di iTunes. Per gestire l\u2019abbonamento, basta andare sull\u2019App Store, accedere con il tuo ID Apple  in fondo alla pagina (se non lo hai gi\u00e0 fatto) e fare clic su \"Visualizza ID Apple.\" Vedrai la pagina con i dettagli dell'account e potrai gestire il tuo abbonamento. Da qui, \u00e8 possibile abbonarsi a MEGA PRO e vedere quando si rinnova, cambiare il tipo di abbonamento o disattivare l'opzione di rinnovo automatico per poter poi annullare l'abbonamento.",
+    "8515": "Enable DEBUG mode",
+    "8516": "A log will be created in the Offline section (MEGAiOS.log).",
+    "8517": "Disable DEBUG mode",
+    "8518": "The log (MEGAiOS.log) will be deleted from the Offline section.",
+    "8519": "Operating system restrictions",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3103,6 +3110,10 @@
         "source-code-intro-2": 8440,
         "source-code-intro-3": 8441,
         "read-more": 8512,
-        "email-already-exists": 7869
+        "email-already-exists": 7869,
+        "takedown-notice": 8521,
+        "takedown-notification-text": 8522,
+        "reinstated-notification-text": 8523,
+        "takedown-reinstated": 8524
     }
 }

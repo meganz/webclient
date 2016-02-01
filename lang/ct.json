@@ -3083,13 +3083,20 @@
     "8503": "\u8f38\u5165\u5bc6\u78bc\u932f\u8aa4\u9054\u5341\u6b21\u5f8c\uff0c\u60a8\u7684\u672c\u6a5f\u8cc7\u6599\u5c07\u88ab\u522a\u9664\uff0c\u4e14\u60a8\u5c07\u88ab\u5f37\u8feb\u767b\u51fa\u3002",
     "8504": "PIN\u78bc\u932f\u8aa4\uff0c\u8acb\u518d\u8a66\u4e00\u6b21\u3002\u60a8\u9084\u6709%2d\u6b21\u5617\u8a66\u7684\u6a5f\u6703\u3002",
     "8505": "PIN\u78bc\u4e0d\u6b63\u78ba",
-    "8506": "\u8acb\u8f38\u5165\u60a8\u7684Pin\u78bc",
+    "8506": "\u8acb\u8f38\u5165\u60a8\u7684PIN\u78bc",
     "8507": "\u8acb\u91cd\u65b0\u8f38\u5165\u60a8\u7684PIN\u78bc",
     "8508": "\u8acb\u8f38\u5165\u60a8\u7684\u65b0PIN\u78bc",
     "8509": "\u8acb\u91cd\u65b0\u8f38\u5165\u60a8\u7684\u65b0PIN\u78bc",
     "8510": "\u60a8\u6240\u6709\u7684\u672c\u6a5f\u8cc7\u6599\u5c07\u88ab\u522a\u9664\uff0c\u60a8\u6703\u5728\uff05d\u79d2\u5167\u88ab\u5f37\u8feb\u767b\u51fa\u3002",
     "8511": "\u60a8\u7684\u5e33\u6236\u7121\u6cd5\u5728\u61c9\u7528\u7a0b\u5f0f\u5167\u5347\u7d1a\uff0c\u8acb\u9023\u7d61support@mega.nz \u4ee5\u5347\u7d1a\u60a8\u7684\u5e33\u6236\u3002",
     "8512": "\u7e7c\u7e8c\u95b1\u8b80",
+    "8513": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.Upload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.Inside the app you can upgrade your storage space & bandwidth quota with a monthly or yearly subscription.PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.For more info, please check our website:Mobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.htmlDesktop - https:\/\/mega.nz\/Note: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+    "8514": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
+    "8515": "\u958b\u555f\u8abf\u8a66\u6a21\u5f0f",
+    "8516": "A log will be created in the Offline section (MEGAiOS.log).",
+    "8517": "\u95dc\u9589\u8abf\u8a66\u6a21\u5f0f",
+    "8518": "The log (MEGAiOS.log) will be deleted from the Offline section.",
+    "8519": "Operating system restrictions",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3103,6 +3110,10 @@
         "source-code-intro-2": 8440,
         "source-code-intro-3": 8441,
         "read-more": 8512,
-        "email-already-exists": 7869
+        "email-already-exists": 7869,
+        "takedown-notice": 8521,
+        "takedown-notification-text": 8522,
+        "reinstated-notification-text": 8523,
+        "takedown-reinstated": 8524
     }
 }

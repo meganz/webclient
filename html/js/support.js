@@ -4,7 +4,7 @@ var support = (function() {
         1: 'Technical Issue',
         2: 'Payment Issue'
     };
-    var minLetters = 50;
+    var minLetters = 10;
     var ns = {};
     var $textarea;
     var $button;
@@ -46,7 +46,11 @@ var support = (function() {
                 if (response === 0) {
                     return msgDialog('warningb',
                         l[7882],  // Message sent
-                        l[7881]   // Thank you! One of our support consultants...
+                        l[7881],   // Thank you! One of our support consultants...
+                        '',
+                        function() {
+                            document.location.href = '#fm';
+                        }
                     );
                 }
 

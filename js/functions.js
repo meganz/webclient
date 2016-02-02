@@ -547,7 +547,8 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('ipad') > 0) {
         os = 'iPad';
     }
-    else if (useragent.indexOf('mac') > 0) {
+    else if (useragent.indexOf('mac') > 0
+            || useragent.indexOf('darwin') > 0) {
         os = 'Apple';
     }
     else if (useragent.indexOf('linux') > 0) {
@@ -559,8 +560,9 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('blackberry') > 0) {
         os = 'Blackberry';
     }
+
     if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
-        browser = 'Spartan';
+        browser = 'Edge';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
@@ -575,6 +577,9 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('maxthon') > 0) {
         browser = 'Maxthon';
     }
+    else if (useragent.indexOf('electron') > 0) {
+        browser = 'Electron';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
@@ -584,17 +589,27 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('palemoon') > 0) {
         browser = 'Palemoon';
     }
+    else if (useragent.indexOf('cyberfox') > 0) {
+        browser = 'Cyberfox';
+    }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
     }
+    else if (useragent.indexOf(' otter/') > 0) {
+        browser = 'Otter';
+    }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
+    }
+    else if (useragent.indexOf('es plugin ') === 1) {
+        icon = 'esplugin.png';
+        browser = 'ES File Explorer';
     }
     else if (useragent.indexOf('megasync') > 0) {
         browser = 'MEGAsync';
     }
     else if (useragent.indexOf('msie') > 0
-            || "ActiveXObject" in window) {
+            || useragent.indexOf('trident') > 0) {
         browser = 'Internet Explorer';
     }
 
@@ -615,7 +630,7 @@ function browserdetails(useragent) {
         icon = 'unknown.png';
     }
     if (!icon && browser) {
-        if (browser === 'Internet Explorer' || browser === 'Spartan') {
+        if (browser === 'Internet Explorer' || browser === 'Edge') {
             icon = 'ie.png';
         }
         else {

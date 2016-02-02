@@ -525,7 +525,7 @@ var notify = {
         }
 
         // Populate other information based on each type of notification
-        switch (notification.type) {            
+        switch (notification.type) {
             case 'ipc':
                 return notify.renderIncomingPendingContact($notificationHtml, notification, userEmail);
             case 'c':
@@ -544,7 +544,7 @@ var notify = {
                 return notify.renderPayment($notificationHtml, notification);
             case 'ph':
                 return notify.renderTakedown($notificationHtml, notification);
-            default:                
+            default:
                 return false;   // If it's a notification type we do not recognise yet
         }
 

@@ -3961,6 +3961,7 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
         $('.rubsched_textopt').rebind('click keyup', function(e) {
             var id = String($(this).attr('id')).split('_')[0];
@@ -3968,6 +3969,7 @@ function accountUI()
             $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
             M.account.rubsched = id.substr(3) + ':' + $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
         $('.rubsched input').rebind('click', function(e) {
             var id = $(this).attr('id');
@@ -3988,6 +3990,7 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
 
         $('.redeem-voucher').unbind('click');

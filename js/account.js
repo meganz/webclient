@@ -615,6 +615,13 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
 
     var cacheKey = userhandle + "_" + attribute;
 
+    /**
+     * getUserAttribute::settleFunction
+     *
+     * Process result from `uga` API request, and cache it.
+     *
+     * @param {Number|Object} res The received result.
+     */
     function settleFunction(res) {
 
         if (typeof res !== 'number') {
@@ -644,11 +651,11 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
             }
         }
 
-        // cache all returned values, except internal errors...
-        if (res !== EINTERNAL) {
+        // Cache all returned values, except errors other than ENOENT
+        if (typeof res !== 'number' || res === ENOENT) {
             var exp = 0;
-            // only add cache expiration for attributes of non-contacts, because contact's attributes would be always
-            // in sync (using actionpackets)
+            // Only add cache expiration for attributes of non-contacts, because
+            // contact's attributes would be always in sync (using actionpackets)
             if (userhandle !== u_handle && (!M.u[userhandle] || M.u[userhandle].c !== 1)) {
                 exp = unixtime();
             }
@@ -658,6 +665,14 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
         settleFunctionDone(res);
     }
 
+    /**
+     * getUserAttribute::settleFunctionDone
+     *
+     * Fullfill the promise with the result/attribute value from either API or cache.
+     *
+     * @param {Number|Object} res    The result/attribute value.
+     * @param {Boolean} cached Whether it came from cache.
+     */
     function settleFunctionDone(res, cached) {
         var tag = cached ? 'Cached ' : '';
 
@@ -688,7 +703,17 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     myCtx.ua = attribute;
     myCtx.callback = settleFunction;
 
-    // Fire off api request unless cached.
+    /**
+     * getUserAttribute::doApiReq
+     *
+     * Perform a `uga` API request If we are unable to retrieve the entry
+     * from the cache. If a MegaPromise is passed as argument, we'll wait
+     * for it to complete before firing the api rquest.
+     *
+     * settleFunction will be used to process the api result.
+     *
+     * @param {MegaPromise} promise Optional promise to wait for.
+     */
     var doApiReq = function _doApiReq(promise) {
         if (promise instanceof MegaPromise) {
             promise.always(function() {
@@ -712,6 +737,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                 if ($.isArray(res)) {
                     var exp = res[1];
 
+                    // Pick the cached entry as long it has no expiry or it hasn't expired
                     if (!exp || exp > (unixtime() - ATTRIB_CACHE_NON_CONTACT_EXP_TIME)) {
                         result = res[0];
                     }

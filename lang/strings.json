@@ -12410,5 +12410,13 @@
     "8524": {
         "text": "Takedown reinstated",
         "context": "The header of a notification indicating that a file or folder that was taken down has now been restored due to a successful counter-notice."
+    },
+    "8525": {
+        "text": "Type your message here",
+        "context": "Placeholder text for the \"Get support\" text field."
+    },
+    "8526": {
+        "text": "Subject",
+        "context": "The subject of a given message."
     }
 }

@@ -3102,6 +3102,8 @@
     "8522": "Your publicly shared %1 (%2) has been taken down.",
     "8523": "Your taken down %1 (%2) has been reinstated.",
     "8524": "Takedown reinstated",
+    "8525": "Type your message here",
+    "8526": "Subject",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3119,6 +3121,9 @@
         "takedown-notice": 8521,
         "takedown-notification-text": 8522,
         "reinstated-notification-text": 8523,
-        "takedown-reinstated": 8524
+        "takedown-reinstated": 8524,
+        "get-support": 516,
+        "type-your-message": 8525,
+        "subject": 8526
     }
 }

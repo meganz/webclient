@@ -1700,6 +1700,7 @@ else if (!b_u)
     }
 
     var xhr_timeout=30000;
+    var urlErrors = {};
 
     function xhr_error()
     {
@@ -1710,8 +1711,19 @@ else if (!b_u)
             bootstaticpath = geoStaticpath(1);
             staticpath = geoStaticpath(1);
         }
-        xhr_progress[this.xhri] = 0;
-        xhr_load(this.url,this.jsi,this.xhri);
+        var url = this.url;
+        var jsi = this.jsi;
+        var xhri = this.xhri;
+        urlErrors[url] = (urlErrors[url] | 0) + 1;
+        if (urlErrors[url] < 20) {
+            setTimeout(function() {
+                xhr_progress[xhri] = 0;
+                xhr_load(url, jsi, xhri);
+            }, urlErrors[url] * 100);
+        }
+        else {
+            siteLoadError(2, this.url);
+        }
     }
 
     function xhr_load(url,jsi,xhri)

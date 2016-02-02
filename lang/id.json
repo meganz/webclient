@@ -3097,6 +3097,11 @@
     "8517": "Matikan mode DEBUG",
     "8518": "Log (MEGAiOS.log) akan dihapus dari section Offline.",
     "8519": "Larangan Operating system",
+    "8520": "[S]Continue[\/S] slower browser download.",
+    "8521": "Takedown notice",
+    "8522": "Your publicly shared %1 (%2) has been taken down.",
+    "8523": "Your taken down %1 (%2) has been reinstated.",
+    "8524": "Takedown reinstated",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

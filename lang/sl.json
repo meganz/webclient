@@ -3097,6 +3097,11 @@
     "8517": "Onemogo\u010di DEBUG na\u010din",
     "8518": "Log datoteka (MEGAiOS.log) bo izbrisana iz mape z datotekami brez povezave.",
     "8519": "Omejitve operacijskega sistema",
+    "8520": "[S]Continue[\/S] slower browser download.",
+    "8521": "Takedown notice",
+    "8522": "Your publicly shared %1 (%2) has been taken down.",
+    "8523": "Your taken down %1 (%2) has been reinstated.",
+    "8524": "Takedown reinstated",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

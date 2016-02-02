@@ -3097,6 +3097,11 @@
     "8517": "DEBUG avslaget",
     "8518": "Loggen (MEGAiOS.log) kommer raderas fr\u00e5n offline sektionen",
     "8519": "Operating system restrictions",
+    "8520": "[S]Continue[\/S] slower browser download.",
+    "8521": "Takedown notice",
+    "8522": "Your publicly shared %1 (%2) has been taken down.",
+    "8523": "Your taken down %1 (%2) has been reinstated.",
+    "8524": "Takedown reinstated",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

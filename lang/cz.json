@@ -3097,6 +3097,11 @@
     "8517": "Zak\u00e1zat re\u017eim LAD\u011aN\u00cd",
     "8518": "Z odd\u00edlu Offline bude odstran\u011bn protokol (MEGAiOS.log).",
     "8519": "Omezen\u00ed opera\u010dn\u00edho syst\u00e9mu",
+    "8520": "[S]Continue[\/S] slower browser download.",
+    "8521": "Takedown notice",
+    "8522": "Your publicly shared %1 (%2) has been taken down.",
+    "8523": "Your taken down %1 (%2) has been reinstated.",
+    "8524": "Takedown reinstated",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

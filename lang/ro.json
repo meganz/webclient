@@ -3097,6 +3097,11 @@
     "8517": "Dezactiveaz\u0103 modul DEPANARE",
     "8518": "Fi\u0219ierul log (MEGAiOS.log) va fi \u015fters din sec\u0163iunea Offline.",
     "8519": "Restric\u0163ii ale sistemului de operare",
+    "8520": "[S]Continue[\/S] slower browser download.",
+    "8521": "Takedown notice",
+    "8522": "Your publicly shared %1 (%2) has been taken down.",
+    "8523": "Your taken down %1 (%2) has been reinstated.",
+    "8524": "Takedown reinstated",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

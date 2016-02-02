@@ -3097,6 +3097,11 @@
     "8517": "Modo DEBUG desactivado",
     "8518": "O relat\u00f3rio (MEGAiOS.log) ser\u00e1 apagado da sec\u00e7\u00e3o Offline.",
     "8519": "Restri\u00e7\u00f5es do sistema operativo",
+    "8520": "[S]Continue[\/S] slower browser download.",
+    "8521": "Takedown notice",
+    "8522": "Your publicly shared %1 (%2) has been taken down.",
+    "8523": "Your taken down %1 (%2) has been reinstated.",
+    "8524": "Takedown reinstated",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

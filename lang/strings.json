@@ -12390,5 +12390,25 @@
     "8519": {
         "text": "Operating system restrictions",
         "context": "Label for the automatic camera upload service restrictions."
+    },
+    "8520": {
+        "text": "[S]Continue[\/S] slower browser download.",
+        "context": "Notification if the user selected slow \"browser download\" instead of downloading with the MEGAsync application. Do not remove the [S] or [\/S] tags."
+    },
+    "8521": {
+        "text": "Takedown notice",
+        "context": "The header of a notification indicating that a file or folder has been taken down due to infringement or other reason."
+    },
+    "8522": {
+        "text": "Your publicly shared %1 (%2) has been taken down.",
+        "context": "The text of a notification indicating that a file or folder has been taken down due to infringement or other reason. The %1 placeholder will be replaced with the text 'file' or 'folder'. The %2 will be replaced with the name of the file or folder."
+    },
+    "8523": {
+        "text": "Your taken down %1 (%2) has been reinstated.",
+        "context": "The text of a notification indicating that a file or folder that was taken down has now been restored due to a successful counter-notice. The %1 placeholder will be replaced with the text 'file' or 'folder'. The %2 will be replaced with the name of the file or folder."
+    },
+    "8524": {
+        "text": "Takedown reinstated",
+        "context": "The header of a notification indicating that a file or folder that was taken down has now been restored due to a successful counter-notice."
     }
 }

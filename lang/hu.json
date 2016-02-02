@@ -3097,6 +3097,11 @@
     "8517": "HIBAKERES\u0150 m\u00f3d letitl\u00e1sa",
     "8518": "The log (MEGAiOS.log) will be deleted from the Offline section.",
     "8519": "Operating system restrictions",
+    "8520": "[S]Continue[\/S] slower browser download.",
+    "8521": "Takedown notice",
+    "8522": "Your publicly shared %1 (%2) has been taken down.",
+    "8523": "Your taken down %1 (%2) has been reinstated.",
+    "8524": "Takedown reinstated",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

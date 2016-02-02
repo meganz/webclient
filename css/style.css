@@ -1804,7 +1804,21 @@ a.blog-button:hover {
     background-position: -10px -153px;
 }
 .nt-payment-notification .notification-avatar-icon {
-    background: url(../images/mega/bitcoin-v4.png) -152px -650px no-repeat;
+    background: url(../images/mega/bitcoin-v5.png) -152px -650px no-repeat;
+    height: 48px;
+    width: 48px;
+    left: 0;
+    top: 0;
+}
+.nt-takedown-notification .notification-avatar-icon {
+    background: url("../images/mega/bitcoin-v5.png") no-repeat scroll -152px -1451px;
+    height: 48px;
+    width: 48px;
+    left: 0;
+    top: 0;
+}
+.nt-takedown-reinstated-notification .notification-avatar-icon {
+    background: url("../images/mega/bitcoin-v5.png") no-repeat scroll 0 -1452px;
     height: 48px;
     width: 48px;
     left: 0;
@@ -8268,7 +8282,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 256px;
 }
 .bitcoin-invoice-dialog .qr-code-mega-icon {
-    background: url(../images/mega/bitcoin-v4.png) 0 -650px no-repeat;
+    background: url(../images/mega/bitcoin-v5.png) 0 -650px no-repeat;
     display: none;
     height: 40.5px;
     left: 143.5px;
@@ -8413,7 +8427,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     padding-right: 5px;
     width: 15px;
     height: 15px;
-    background: url(../images/mega/bitcoin-v4.png) 0 -786px no-repeat;
+    background: url(../images/mega/bitcoin-v5.png) 0 -786px no-repeat;
 }
 .bitcoin-invoice-dialog .clock-icon::before {
     content: '\00a0';
@@ -8471,7 +8485,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
     margin: 0 auto;
     background-position: center -400px;
-    background-image: url("../images/mega/bitcoin-v4.png");
+    background-image: url("../images/mega/bitcoin-v5.png");
     background-repeat: no-repeat;
     height: 200px;
     width: 200px;
@@ -22709,7 +22723,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     width: 130px;
     height: 130px;
     margin: 0 auto;
-    background: url(../images/mega/bitcoin-v4.png) -33px -1048px no-repeat;
+    background: url(../images/mega/bitcoin-v5.png) -33px -1048px no-repeat;
     margin-bottom: 47px;
 }
 .failed .payment-result-icon {
@@ -22762,7 +22776,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     right: 0;
 }
 .payment-close-icon, .overlay-close-icon {
-    background: url(../images/mega/bitcoin-v4.png) -183px -791px no-repeat;
+    background: url(../images/mega/bitcoin-v5.png) -183px -791px no-repeat;
     width: 20px;
     height: 20px;
     margin: 0 auto;
@@ -24402,8 +24416,8 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 body.pro:after {
     content: url(../images/mega/payment-animation@2x.gif);
 }
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon {
-    background-image: url(../images/mega/bitcoin-v4@2x.png);
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar-icon, .nt-takedown-reinstated-notification .notification-avatar-icon {
+    background-image: url(../images/mega/bitcoin-v5@2x.png);
     background-size: 200px auto;
 }
 .top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
@@ -24415,7 +24429,7 @@ body.pro:after {
     background-size: 20px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
-    background-image: url(../images/mega/bitcoin-v4@2x.png);
+    background-image: url(../images/mega/bitcoin-v5@2x.png);
     background-size: 200px auto;
 }
 .icoming-call-button {

@@ -350,7 +350,12 @@ var notify = {
 
             // Update template
             $notificationHtml = notify.updateTemplate($notificationHtml, notification);
-
+            
+            // Skip this notification if it's not one that is recognised
+            if ($notificationHtml === false) {
+                continue;
+            }
+            
             // Build the html
             allNotificationsHtml += $notificationHtml.prop('outerHTML');
         }
@@ -364,6 +369,7 @@ var notify = {
 
         // Add click handlers for various notifications
         notify.initShareClickHandler();
+        notify.initTakedownClickHandler();
         notify.initPaymentClickHandler();
         notify.initAcceptContactClickHandler();
     },
@@ -402,6 +408,27 @@ var notify = {
         });
     },
 
+    /**
+     * On click of a takedown or restore notice, go to the parent folder
+     */
+    initTakedownClickHandler: function() {
+        
+        // Select the notifications with shares or new files/folders
+        this.$popup.find('.nt-takedown-notification, .nt-takedown-reinstated-notification').rebind('click', function() {
+                        
+            // Get the folder ID from the HTML5 data attribute
+            var folderOrFileId = $(this).attr('data-folder-or-file-id');
+            var parentFolderId = M.d[folderOrFileId].p;
+            
+            // Mark all notifications as seen (because they clicked on a notification within the popup)
+            notify.markAllNotificationsAsSeen();
+            
+            // Open the folder
+            M.openFolder(parentFolderId);
+            reselect(true);
+        });
+    },
+    
     /**
      * If they click on a payment notification, then redirect them to the Account History page
      */
@@ -499,36 +526,28 @@ var notify = {
 
         // Populate other information based on each type of notification
         switch (notification.type) {
-
             case 'ipc':
-                $notificationHtml = notify.renderIncomingPendingContact($notificationHtml, notification, userEmail);
-                break;
+                return notify.renderIncomingPendingContact($notificationHtml, notification, userEmail);
             case 'c':
-                $notificationHtml = notify.renderContactChange($notificationHtml, notification);
-                break;
+                return notify.renderContactChange($notificationHtml, notification);
             case 'upci':
-                $notificationHtml = notify.renderUpdatedPendingContactIncoming($notificationHtml, notification, userEmail);
-                break;
+                return notify.renderUpdatedPendingContactIncoming($notificationHtml, notification, userEmail);
             case 'upco':
-                $notificationHtml = notify.renderUpdatedPendingContactOutgoing($notificationHtml, notification);
-                break;
+                return notify.renderUpdatedPendingContactOutgoing($notificationHtml, notification);
             case 'share':
-                $notificationHtml = notify.renderNewShare($notificationHtml, notification, userEmail);
-                break;
+                return notify.renderNewShare($notificationHtml, notification, userEmail);
             case 'dshare':
-                $notificationHtml = notify.renderDeletedShare($notificationHtml, userEmail);
-                break;
+                return notify.renderDeletedShare($notificationHtml, userEmail);
             case 'put':
-                $notificationHtml = notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
-                break;
+                return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
             case 'psts':
-                $notificationHtml = notify.renderPayment($notificationHtml, notification);
-                break;
+                return notify.renderPayment($notificationHtml, notification);
+            case 'ph':
+                return notify.renderTakedown($notificationHtml, notification);
             default:
-                break;
+                return false;   // If it's a notification type we do not recognise yet
         }
 
-        return $notificationHtml;
     },
 
     /**
@@ -858,6 +877,46 @@ var notify = {
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notification-username').text(header);      // Use 'Payment info' instead of an email
 
+        return $notificationHtml;
+    },
+    
+    /**
+     * Processes a takedown notice or counter-notice to restore the file
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     */
+    renderTakedown: function($notificationHtml, notification) {
+        
+        var header = '';
+        var title = '';
+        var cssClass = '';
+        var folderOrFileHandle = notification.data.h;
+        var folderOrFileName = (M.d[folderOrFileHandle].name) ? htmlentities(M.d[folderOrFileHandle].name) : '';
+        var folderOrFile = (M.d[folderOrFileHandle].t === 0) ? l[5557] : l[5561];
+        
+        // Takedown notice
+        // Your publicly shared %1 (%2) has been taken down.
+        if (typeof notification.data.down !== 'undefined') {
+            header = l[8521];
+            title = l[8522].replace('%1', folderOrFile).replace('%2', folderOrFileName);
+            cssClass = 'nt-takedown-notification';
+        }
+        
+        // Takedown reinstated
+        // Your taken down %1 (%2) has been reinstated.
+        else if (typeof notification.data.up !== 'undefined') {
+            header = l[8524];
+            title = l[8523].replace('%1', folderOrFile).replace('%2', folderOrFileName);
+            cssClass = 'nt-takedown-reinstated-notification';
+        }
+        
+        // Populate other template information
+        $notificationHtml.addClass(cssClass);
+        $notificationHtml.addClass('clickable');
+        $notificationHtml.find('.notification-info').text(title);
+        $notificationHtml.find('.notification-username').text(header);
+        $notificationHtml.attr('data-folder-or-file-id', folderOrFileHandle);
+        
         return $notificationHtml;
     }
 };

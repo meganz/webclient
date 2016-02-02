@@ -3249,8 +3249,9 @@ function accountUI()
                 return false;
             }
 
+            var userAgent = el[2];
             var dateTime = htmlentities(time2date(el[0]));
-            var browser = browserdetails(el[2]);
+            var browser = browserdetails(userAgent);
             var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
@@ -3282,7 +3283,10 @@ function accountUI()
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName) + '</span></td>'
+                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent)
+                    + '" src="' + staticpath + 'images/browser/' + browser.icon
+                    + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
+                    + '</span></td>'
                 + '<td>' + ipAddress + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
                 + '<td>' + dateTime + '</td>'
@@ -3301,7 +3305,7 @@ function accountUI()
                 numActiveSessions++;
             }
         });
-        $('.grid-table.sessions').html(html);
+        $('.grid-table.sessions').safeHTML(html);
 
         // Don't show button to close other sessions if there's only the current session
         if (numActiveSessions === 1) {

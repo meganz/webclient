@@ -351,6 +351,11 @@ var notify = {
             // Update template
             $notificationHtml = notify.updateTemplate($notificationHtml, notification);
             
+            // Skip this notification if it's not one that is recognised
+            if ($notificationHtml === false) {
+                continue;
+            }
+            
             // Build the html
             allNotificationsHtml += $notificationHtml.prop('outerHTML');
         }
@@ -520,40 +525,28 @@ var notify = {
         }
         
         // Populate other information based on each type of notification
-        switch (notification.type) {
-            
+        switch (notification.type) {            
             case 'ipc':
-                $notificationHtml = notify.renderIncomingPendingContact($notificationHtml, notification, userEmail);
-                break;
+                return notify.renderIncomingPendingContact($notificationHtml, notification, userEmail);
             case 'c':
-                $notificationHtml = notify.renderContactChange($notificationHtml, notification);
-                break;
+                return notify.renderContactChange($notificationHtml, notification);
             case 'upci':
-                $notificationHtml = notify.renderUpdatedPendingContactIncoming($notificationHtml, notification, userEmail);
-                break;
+                return notify.renderUpdatedPendingContactIncoming($notificationHtml, notification, userEmail);
             case 'upco':
-                $notificationHtml = notify.renderUpdatedPendingContactOutgoing($notificationHtml, notification);
-                break;
+                return notify.renderUpdatedPendingContactOutgoing($notificationHtml, notification);
             case 'share':
-                $notificationHtml = notify.renderNewShare($notificationHtml, notification, userEmail);
-                break;
+                return notify.renderNewShare($notificationHtml, notification, userEmail);
             case 'dshare':
-                $notificationHtml = notify.renderDeletedShare($notificationHtml, userEmail);
-                break;
+                return notify.renderDeletedShare($notificationHtml, userEmail);
             case 'put':
-                $notificationHtml = notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
-                break;
+                return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
             case 'psts':
-                $notificationHtml = notify.renderPayment($notificationHtml, notification);
-                break;
+                return notify.renderPayment($notificationHtml, notification);
             case 'ph':
-                $notificationHtml = notify.renderTakedown($notificationHtml, notification);
-                break;
-            default:
-                break;
+                return notify.renderTakedown($notificationHtml, notification);
+            default:                
+                return false;   // If it's a notification type we do not recognise yet
         }
-        
-        return $notificationHtml;
     },
     
     /**

@@ -86,7 +86,7 @@ var support = (function() {
                 first = false;
             }
         }
-        $subject.find('.default-select-scroll').html(html);
+        $subject.find('.default-select-scroll').safeHTML(html);
         bindDropdownEvents($subject, 1);
         $window.rebind('resize', resizeHandler);
         $button = $('.support a').rebind('click', submit);

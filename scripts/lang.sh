@@ -12,8 +12,8 @@ git pull
 # Change to the lang directory
 cd $(dirname $BASH_SOURCE)/../lang
 
-# Remove the old tar.gz file from Babel
-rm lang.tar.gz
+# Remove all files in the language directory (in case we removed some languages in the code)
+rm *
 
 # Fetch the latest translations from Babel
 wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz

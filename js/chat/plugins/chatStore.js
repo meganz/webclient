@@ -26,7 +26,7 @@ var ChatStore = function(megaChat) {
         var _attachToChat = function() {
             self.attachToChat(megaChat);
 
-            if(self.cleanupInterval) {
+            if (self.cleanupInterval) {
                 clearInterval(self.cleanupInterval);
             }
             self.cleanupInterval = setInterval(function() {
@@ -38,16 +38,16 @@ var ChatStore = function(megaChat) {
             }, 10); // run in different thread.
         };
 
-        if(self.db.dbState === MegaDB.DB_STATE.OPENING) {
+        if (self.db.dbState === MegaDB.DB_STATE.OPENING) {
             self.db.bind("onDbStateReady", function() {
                 _attachToChat();
             });
             self.db.bind("onDbStateFailed", function() {
                 megaChat.unbind("onInit.chatStore");
             });
-        } else if(self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+        } else if (self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
             megaChat.unbind("onInit.chatStore");
-        } else if(self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+        } else if (self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
             _attachToChat();
         }
 
@@ -91,7 +91,7 @@ ChatStore.DBSchema = {
 ChatStore.prototype.attachToChat = function(megaChat) {
     var self = this;
 
-    if(self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+    if (self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
         return;
     }
 
@@ -104,7 +104,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
             .filter('roomJid', megaRoom.roomJid)
             .execute()
             .done(function(results) {
-                if(results.length == 0) { // new room, add it to the already opened rooms.
+                if (results.length == 0) { // new room, add it to the already opened rooms.
                     self.db.add('conversations', {
                         'roomJid': megaRoom.roomJid,
                         'type': megaRoom.type,
@@ -131,7 +131,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                 })
                 .execute()
                 .done(function() {
-                    if(megaRoom._conv_ended === true) {
+                    if (megaRoom._conv_ended === true) {
                         megaRoom.megaChat.trigger("onRoomDestroy.chatStore", megaRoom);
                     }
                 });
@@ -142,7 +142,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
             .filter('toJid', megaRoom.roomJid)
             .execute()
             .done(function(r) {
-                if(r.length && r.length > 0) { // found
+                if (r.length && r.length > 0) { // found
                     r.forEach(function(v) {
                         var outgoingMessage = new KarereEventObjects.OutgoingMessage(
                             /* toJid */ v.toJid,
@@ -171,10 +171,10 @@ ChatStore.prototype.attachToChat = function(megaChat) {
             .filter('roomJid', megaRoom.roomJid)
             .execute()
             .done(function(r) {
-                if(r.length && r.length > 0) { // found
+                if (r.length && r.length > 0) { // found
                     r.forEach(function(v) {
                         var chatMessageObject;
-                        if(Karere.getNormalizedBareJid(v.fromJid) == megaRoom.megaChat.karere.getBareJid()){
+                        if (Karere.getNormalizedBareJid(v.fromJid) == megaRoom.megaChat.karere.getBareJid()){
                             chatMessageObject = new KarereEventObjects.OutgoingMessage(
                                 /* toJid */ v.toJid,
                                 /* fromJid */ v.fromJid,
@@ -226,7 +226,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
             .filter('toJid', outgoingMessage.toJid)
             .execute()
             .done(function(r) {
-                if(r.length === 0) { // not found
+                if (r.length === 0) { // not found
                     self.db.add('outgoingQueue', outgoingMessage);
                 } else {
                     // already queued
@@ -235,7 +235,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
         // sync store with messageQueue
         $(outgoingMessage).unbind("onChange.chatStoreQueue");
         $(outgoingMessage).bind("onChange.chatStoreQueue", function(e, obj, k, oldVal, newVal) {
-            if(k == "meta" && newVal['isDeleted'] === true) {
+            if (k == "meta" && newVal['isDeleted'] === true) {
                 self.db.removeBy('outgoingQueue', {
                     'messageId': obj.messageId,
                     'toJid': obj.toJid
@@ -269,13 +269,13 @@ ChatStore.prototype.attachToChat = function(megaChat) {
             .filter('roomJid', meta.room.roomJid)
             .execute()
             .done(function(r) {
-                if(r.length === 0) { // not found
+                if (r.length === 0) { // not found
                     var msg = meta.message;
 
-                    if(meta.room.encryptionHandler) {
+                    if (meta.room.encryptionHandler) {
                         if (meta.room.encryptionHandler.askeMember.sessionId) {
                             msg.sessionId = meta.room.encryptionHandler.askeMember.sessionId;
-                        } else if(meta.sessionId) {
+                        } else if (meta.sessionId) {
                             msg.sessionId = meta.sessionId;
                         } else {
                             msg.sessionId = null;
@@ -312,7 +312,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
         // sync store with messageQueue
         $(meta.message).unbind("onChange.chatStore");
         $(meta.message).bind("onChange.chatStore", function(e, obj, k, oldVal, newVal) {
-            if(k == "meta" && newVal['isDeleted'] === true) {
+            if (k == "meta" && newVal['isDeleted'] === true) {
                 self.db.removeBy('chatMessages', {
                     'messageId': obj.messageId,
                     'roomJid': meta.room.roomJid
@@ -339,17 +339,17 @@ ChatStore.prototype.restoreConversationsFromDb = function() {
         self.db.query('conversations')
             .execute()
             .done(function(results) {
-                if(results.length == 0) { // no conversations
+                if (results.length == 0) { // no conversations
                     return;
                 } else {
                     $.each(results, function(k, v) {
                         var foundRoom = megaChat.chats[v.roomJid];
 
-                        if(!foundRoom) { // restore room from db, if room not found
-                            if(v.ended) {
+                        if (!foundRoom) { // restore room from db, if room not found
+                            if (v.ended) {
                                 megaChat.trigger("onRoomDestroy.chatStore", v);
                             }
-                            if(Object.keys(v.users).length == 0) {
+                            if (Object.keys(v.users).length == 0) {
                                 megaChat.trigger("onRoomDestroy.chatStore", v);
                                 self.logger.error("Could not restore room: ", v, ", because of missing v.users = {}.");
                                 return;
@@ -359,7 +359,7 @@ ChatStore.prototype.restoreConversationsFromDb = function() {
                             room._conv_ended = v.ended;
 
                             room.setState(ChatRoom.STATE.JOINING);
-                            if(megaChat.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+                            if (megaChat.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
                                 megaChat.karere.joinChat(v.roomJid);
                             } else {
                                 megaChat.karere.one("onConnected.chatStore", function() {
@@ -372,7 +372,7 @@ ChatStore.prototype.restoreConversationsFromDb = function() {
 
                             var participants = room.getParticipantsExceptMe();
                             var c = megaChat.getContactFromJid(participants[0]);
-                            if(c) {
+                            if (c) {
                                 M.u[c.h].lastChatActivity = room.lastActivity;
                             }
                         }
@@ -381,7 +381,7 @@ ChatStore.prototype.restoreConversationsFromDb = function() {
             });
     };
 
-    // if(!boot_done_called) {
+    // if (!boot_done_called) {
         // $(window).bind('MegaLoaded', _restore);
     // } else {
         _restore();
@@ -403,14 +403,14 @@ ChatStore.prototype.cleanup = function() {
         .execute()
         .done(function(r) {
             r.forEach(function(v, k) {
-                if(!msgCount[v.roomJid]) {
+                if (!msgCount[v.roomJid]) {
                     msgCount[v.roomJid] = 0;
                 }
                 msgCount[v.roomJid]++;
             });
 
             Object.keys(msgCount).forEach(function(k) {
-                if(msgCount[k] > maxMessagesCount) {
+                if (msgCount[k] > maxMessagesCount) {
                     self.logger.debug("Cleaning up chat history for room: ", k);
                     self._cleanupMessagesForRoom(k);
                 }
@@ -438,11 +438,11 @@ ChatStore.prototype._cleanupMessagesForRoom = function(roomJid) {
         .filter('roomJid', roomJid)
         .execute()
         .done(function(r) {
-            if(r.length > 0) {
-                if(r[0].sessionId) {
+            if (r.length > 0) {
+                if (r[0].sessionId) {
                     self.db.removeBy('chatMessages', 'sessionId', r[0].sessionId)
                         .done(function (rr) {
-                            if(!rr || rr.length == 0) {
+                            if (!rr || rr.length == 0) {
                                 // for some reason (diff db version), sessionId index not found
                                 self.db.removeBy('chatMessages', 'messageId', r[0].messageId)
                                     .done(function() {

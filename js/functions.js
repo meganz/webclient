@@ -306,7 +306,7 @@ function easeOutCubic(t, b, c, d) {
 
 function ellipsis(text, location, maxCharacters) {
     if (text.length > 0 && text.length > maxCharacters) {
-        if (typeof(location) === 'undefined') {
+        if (typeof location === 'undefined') {
             location = 'end';
         }
         switch (location) {
@@ -458,15 +458,15 @@ function populate_l() {
     l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1371] = l[1371].replace('2014', '2015');
     l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
-    l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');    
+    l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');
     l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
-    l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');    
+    l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');    
-    
+    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');
+
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
@@ -486,7 +486,7 @@ function showmoney(number) {
 
 function getHeight() {
     var myHeight = 0;
-    if (typeof(window.innerWidth) === 'number') {
+    if (typeof window.innerWidth === 'number') {
         myHeight = window.innerHeight;
     }
     else if (document.documentElement
@@ -547,7 +547,8 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('ipad') > 0) {
         os = 'iPad';
     }
-    else if (useragent.indexOf('mac') > 0) {
+    else if (useragent.indexOf('mac') > 0
+            || useragent.indexOf('darwin') > 0) {
         os = 'Apple';
     }
     else if (useragent.indexOf('linux') > 0) {
@@ -559,8 +560,9 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('blackberry') > 0) {
         os = 'Blackberry';
     }
+
     if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
-        browser = 'Spartan';
+        browser = 'Edge';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
@@ -575,6 +577,9 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('maxthon') > 0) {
         browser = 'Maxthon';
     }
+    else if (useragent.indexOf('electron') > 0) {
+        browser = 'Electron';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
@@ -584,17 +589,27 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('palemoon') > 0) {
         browser = 'Palemoon';
     }
+    else if (useragent.indexOf('cyberfox') > 0) {
+        browser = 'Cyberfox';
+    }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
     }
+    else if (useragent.indexOf(' otter/') > 0) {
+        browser = 'Otter';
+    }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
+    }
+    else if (useragent.indexOf('es plugin ') === 1) {
+        icon = 'esplugin.png';
+        browser = 'ES File Explorer';
     }
     else if (useragent.indexOf('megasync') > 0) {
         browser = 'MEGAsync';
     }
     else if (useragent.indexOf('msie') > 0
-            || "ActiveXObject" in window) {
+            || useragent.indexOf('trident') > 0) {
         browser = 'Internet Explorer';
     }
 
@@ -615,7 +630,7 @@ function browserdetails(useragent) {
         icon = 'unknown.png';
     }
     if (!icon && browser) {
-        if (browser === 'Internet Explorer' || browser === 'Spartan') {
+        if (browser === 'Internet Explorer' || browser === 'Edge') {
             icon = 'ie.png';
         }
         else {
@@ -661,7 +676,7 @@ function time2date(unixtime, ignoretime) {
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
-if (typeof(l) === 'undefined') {
+if (typeof l === 'undefined') {
     l = [];
 }
 
@@ -735,23 +750,23 @@ var time2lastSeparator = function(dateString, refDate) {
         // Today
         return l[1301];
     }
-    else if(momentDate.isSame(yesterday, 'd')) {
+    else if (momentDate.isSame(yesterday, 'd')) {
         // Yesterday
         return l[1302];
     }
-    else if(momentDate.isAfter(weekAgo)) {
+    else if (momentDate.isAfter(weekAgo)) {
         // This week
         return l[1303];
     }
-    else if(momentDate.isAfter(twoWeeksAgo)) {
+    else if (momentDate.isAfter(twoWeeksAgo)) {
         // Last week
         return l[1304];
     }
-    else if(momentDate.isAfter(thisMonth)) {
+    else if (momentDate.isAfter(thisMonth)) {
         // This month
         return l[1305];
     }
-    else if(momentDate.isAfter(thisYearAgo)) {
+    else if (momentDate.isAfter(thisYearAgo)) {
         // This year
         return l[1306];
     }
@@ -1059,7 +1074,7 @@ function makeMetaAware(kls) {
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;
 
-        if(!self["_" + prefix]) {
+        if (!self["_" + prefix]) {
             return;
         }
 
@@ -1324,6 +1339,7 @@ function toArray() {
  */
 function AssertionFailed(message) {
     this.message = message;
+    this.stack = mega.utils.getStack();
 }
 AssertionFailed.prototype = Object.create(Error.prototype);
 AssertionFailed.prototype.name = 'AssertionFailed';
@@ -1403,19 +1419,19 @@ function NOW() {
  *  Global function to help debugging
  */
 function DEBUG2() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         console.warn.apply(console, arguments)
     }
 }
 
 function ERRDEBUG() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         console.error.apply(console, arguments)
     }
 }
 
 function DEBUG() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         (console.debug || console.log).apply(console, arguments)
     }
 }
@@ -1641,7 +1657,7 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
     loggerFn = loggerFn || console.debug;
 
-    if (typeof(parentLogger) === "undefined") {
+    if (typeof parentLogger === "undefined") {
         var logger = new MegaLogger(textPrefix);
     }
     if (!window.callLoggerObjects) {
@@ -1649,10 +1665,10 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
 
     $.each(ctx, function(k, v) {
-        if (typeof(v) === "function") {
+        if (typeof v === "function") {
             callLoggerWrapper(ctx, k, loggerFn, textPrefix, parentLogger);
         }
-        else if (typeof(v) === "object"
+        else if (typeof v === "object"
                 && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
             window.callLoggerObjects.push(v);
             logAllCallsOnObject(v, loggerFn, recursive, textPrefix + ":" + k, parentLogger);
@@ -2478,7 +2494,7 @@ function asyncApiReq(data) {
     var $promise = new MegaPromise();
     api_req(data, {
         callback: function(r) {
-            if (typeof(r) === 'number') {
+            if (typeof r === 'number') {
                 $promise.reject.apply($promise, arguments);
             }
             else {
@@ -2613,7 +2629,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
             }
 
         }
-        if (typeof(event.returnedValue) !== "undefined") {
+        if (typeof event.returnedValue !== "undefined") {
             args = event.returnedValue;
         }
 
@@ -2794,7 +2810,7 @@ function generateAnonymousReport() {
     var roomUniqueId = 0;
     var roomUniqueIdMap = {};
 
-    if(megaChatIsReady && megaChat.chats) {
+    if (megaChatIsReady && megaChat.chats) {
         megaChat.chats.forEach(function (v, k) {
             var participants = v.getParticipants();
 
@@ -2876,7 +2892,7 @@ function generateAnonymousReport() {
     report.l = lang;
     report.scrnSize = window.screen.availWidth + "x" + window.screen.availHeight;
 
-    if (typeof(window.devicePixelRatio) !== 'undefined') {
+    if (typeof window.devicePixelRatio !== 'undefined') {
         report.pixRatio = window.devicePixelRatio;
     }
 
@@ -2985,9 +3001,9 @@ MegaEvents.prototype.on = function(name, callback) {
         data = $.extend(
             true, {}, {
                 'aid': this.sessionId,
-                'lang': typeof(lang) !== 'undefined' ? lang : null,
+                'lang': typeof lang !== 'undefined' ? lang : null,
                 'browserlang': navigator.language,
-                'u_type': typeof(u_type) !== 'undefined' ? u_type : null
+                'u_type': typeof u_type !== 'undefined' ? u_type : null
             },
             data
         );
@@ -3060,6 +3076,23 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+/**
+ * execCommandUsable
+ *
+ * Native browser 'copy' command using execCommand('copy').
+ * Supported by Chrome42+, FF41+, IE9+, Opera29+
+ * @returns {Boolean}
+ */
+mega.utils.execCommandUsable = function() {
+    var result;
+
+    try {
+        result = document.execCommand('copy');
+    }
+    catch (ex) {}
+
+    return result === false;
+};
 
 /**
  * Utility that will return a sorting function (can compare numbers OR strings, depending on the data stored in the
@@ -3483,10 +3516,15 @@ mega.utils.logout = function megaUtilsLogout() {
                 }
             }
         }, step = 1;
+
         loadingDialog.show();
         if (typeof mDB === 'object' && mDB.drop) {
             step++;
             mFileManagerDB.exec('drop').always(finishLogout);
+        }
+        if (typeof attribCache === 'object' && attribCache.db) {
+            step++;
+            attribCache.destroy().always(finishLogout);
         }
         if (u_privk) {
             // Use the 'Session Management Logout' API call to kill the current session

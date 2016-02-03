@@ -1,14 +1,22 @@
 Install/Deployment
 ==================
 
-The webclient requires `npm`, the Node.js package manager (please
+The webclient requires ``npm``, the Node.js package manager (please
 follow the instructions for installing from http://npmjs.org).  After
-the initial `git clone/pull/update` of the code from the repo.  To
+the initial ``git clone/pull/update`` of the code from the repo.  To
 install the required Node packages (for testing, the UI, code checks,
 etc.) need to run
 
 ```
 npm install
+```
+
+If you're deploying the code somewhere remotely without the need to
+run unit tests, checks, etc., only the ``npm`` packages for
+production are needed.
+
+```
+npm install --production
 ```
 
 This installs the latest required ``npm`` packages. You will *only*
@@ -41,6 +49,10 @@ following:
 scripts/dev_server.sh
 ```
 
+Tip: **DON'T use the `http://localhost:8089/webpack-dev-server/` url (because it uses an iframe for webpack, which is
+very annoying) for developing/debugging. Just type in:
+`http://localhost:8089/` (or `http://localhost:8089/dont-deploy/devboot.html`).**
+
 
 Demo/Beta Environment
 ---------------------
@@ -52,13 +64,13 @@ SSH. The required React bundles (see above) are simply generated via a
 script in place after installing the ``npm`` package dependencies:
 
 ```
-npm install && scripts/build.sh
+npm install --production && scripts/build.sh
 ```
 
 When doing updates to that folder on the server, just do a:
 
 ```
-git pull -u && npm install && scripts/build.sh
+git pull -u && npm install --production && scripts/build.sh
 ```
 
 That ensures that everything is consistently up to date.
@@ -80,3 +92,19 @@ localStorage.jjnocache = 1;
 
 You may find some prepared "``devboot``" HTML files for launch in the
 ``dont-deploy/`` folder.
+
+
+Usual problems and solutions
+----------------------------------------------
+
+1. Generic js errors that something is undefined, can't be called, etc.
+
+Please ensure that you are running newer `nodejs` and `npm` versions
+
+
+
+2. core-js/ related errors, when starting dev_server.sh/build.sh
+
+Please ensure that you are running newer `nodejs` and `npm` versions and then
+just do `rm -rf node_modules && npm cache clear && npm install` and you should be able
+to run the dev_server again

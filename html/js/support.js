@@ -1,9 +1,5 @@
 var support = (function() {
-    var supportSubjects = {
-        0: l[8527],     // General Inquiry
-        1: l[8528],     // Technical Issue
-        2: l[8529]      // Payment Issue
-    };
+
     var minLetters = 10;
     var ns = {};
     var $textarea;
@@ -77,6 +73,12 @@ var support = (function() {
         headerHeight = $('.about-top-block').height();
         $subject = $('#support-subject');
         
+        var supportSubjects = {
+            0: l[8527],     // General Inquiry
+            1: l[8528],     // Technical Issue
+            2: l[8529]      // Payment Issue
+        };
+        
         for (var i in supportSubjects) {
             if (supportSubjects.hasOwnProperty(i)) {
                 if (first) {
@@ -87,6 +89,7 @@ var support = (function() {
                 first = false;
             }
         }
+        
         $subject.find('.default-select-scroll').safeHTML(html);
         bindDropdownEvents($subject, 1);
         $window.rebind('resize', resizeHandler);

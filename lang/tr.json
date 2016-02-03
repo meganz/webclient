@@ -3104,6 +3104,9 @@
     "8524": "Takedown reinstated",
     "8525": "Type your message here",
     "8526": "Subject",
+    "8527": "General Enquiry",
+    "8528": "Technical Issue",
+    "8529": "Payment Issue",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3124,6 +3127,9 @@
         "takedown-reinstated": 8524,
         "get-support": 516,
         "type-your-message": 8525,
-        "subject": 8526
+        "subject": 8526,
+        "general-inquiry": 8527,
+        "technical-issue": 8528,
+        "payment-issue": 8529
     }
 }

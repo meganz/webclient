@@ -3097,13 +3097,16 @@
     "8517": "Desactivar modo DEBUG",
     "8518": "Se eliminar\u00e1 el log (MEGAiOS.log) de la secci\u00f3n Offline.",
     "8519": "Restricciones del sistema operativo",
-    "8520": "[S]Continue[\/S] slower browser download.",
-    "8521": "Takedown notice",
-    "8522": "Your publicly shared %1 (%2) has been taken down.",
-    "8523": "Your taken down %1 (%2) has been reinstated.",
-    "8524": "Takedown reinstated",
-    "8525": "Type your message here",
-    "8526": "Subject",
+    "8520": "[S]Continar[\/S] descarga lenta de navegador.",
+    "8521": "Aviso de eliminaci\u00f3n",
+    "8522": "Tu compartido p\u00fablico %1 (%2) ha sido eliminado.",
+    "8523": "Tu eliminaci\u00f3n %1 (%2) ha sido revocada.",
+    "8524": "Eliminaci\u00f3n revocada",
+    "8525": "Escribe tu mensaje aqui",
+    "8526": "Asunto",
+    "8527": "General Enquiry",
+    "8528": "Technical Issue",
+    "8529": "Payment Issue",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3124,6 +3127,9 @@
         "takedown-reinstated": 8524,
         "get-support": 516,
         "type-your-message": 8525,
-        "subject": 8526
+        "subject": 8526,
+        "general-inquiry": 8527,
+        "technical-issue": 8528,
+        "payment-issue": 8529
     }
 }

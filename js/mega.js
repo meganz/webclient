@@ -426,7 +426,7 @@ function MegaData()
         M.u.forEach(function(c, u) {
             if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
                 waitingPromises.push(
-                    getUserAttribute(u, 'a', true, false, function (res) {
+                    mega.attr.get(u, 'a', true, false, function (res) {
                         if (typeof res !== 'number' && res.length > 5) {
                             var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
                             avatars[u] = {
@@ -2984,11 +2984,11 @@ function MegaData()
         var lastName = {name: 'lastname', value: null};
         var firstName = {name: 'firstname', value: null};
         MegaPromise.allDone([
-            getUserAttribute(userId, 'firstname', -1)
+            mega.attr.get(userId, 'firstname', -1)
                 .done(function(r) {
                     firstName.value = r;
                 }),
-            getUserAttribute(userId, 'lastname', -1)
+            mega.attr.get(userId, 'lastname', -1)
                 .done(function(r) {
                     lastName.value = r;
                 })
@@ -3010,7 +3010,7 @@ function MegaData()
 
                 if (typeof obj.value !== 'string' || !obj.value) {
                     if (d) {
-                        // Inherit the logger for getUserAttribute
+                        // Inherit the logger for mega.attr.get
                         var logger = MegaLogger.getLogger('account');
 
                         logger.debug('Attribute "%s" for user "%s" cannot be decoded: "%s"',

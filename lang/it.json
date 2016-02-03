@@ -1128,7 +1128,7 @@
     "1934": "Hai dimenticato la password?",
     "1935": "Se disponi di un backup della chiave di crittografia, puoi reimpostare la password selezionando SI. Non ci sono dati saranno persi.",
     "1936": "\u00c8 ancora possibile [A]esportare[\/A] la chiave master se si dispone di una sessione MEGA attiva in un browser di questo o di un altro computer. In caso contrario non \u00e9 possibile decifrare il tuo account esistente, ma \u00e8 possibile creare un nuovo account con lo stesso indirizzo e-mail selezionando NO.",
-    "1937": "\u00bfTienes copia de seguridad de tu clave maestra?",
+    "1937": "Hai un backup della chiave master?",
     "1938": "Ottimo!",
     "1939": "Por favor introduce la direcci\u00f3n de correo electr\u00f3nico a continuaci\u00f3n. Recibir\u00e1s un enlace de recuperaci\u00f3n que te permitir\u00e1 enviar tu clave maestra y restablecer su contrase\u00f1a.",
     "1940": "Invia",
@@ -3102,6 +3102,11 @@
     "8522": "Your publicly shared %1 (%2) has been taken down.",
     "8523": "Your taken down %1 (%2) has been reinstated.",
     "8524": "Takedown reinstated",
+    "8525": "Type your message here",
+    "8526": "Subject",
+    "8527": "General Enquiry",
+    "8528": "Technical Issue",
+    "8529": "Payment Issue",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3119,6 +3124,12 @@
         "takedown-notice": 8521,
         "takedown-notification-text": 8522,
         "reinstated-notification-text": 8523,
-        "takedown-reinstated": 8524
+        "takedown-reinstated": 8524,
+        "get-support": 516,
+        "type-your-message": 8525,
+        "subject": 8526,
+        "general-inquiry": 8527,
+        "technical-issue": 8528,
+        "payment-issue": 8529
     }
 }

@@ -1515,11 +1515,12 @@ function getContactsEMails() {
 
     // Loop through full contacts
     M.u.forEach(function(contact) {
-        if (M.u.hasOwnProperty(i)) {
-            contact = M.u[i];
-            if (contact.c && (contact.c !== 2) && (contact.m)) {
-                contacts.push({ id: contact.m, name: contact.m });
-            }
+        if (
+            contact.c// active contact?
+            && (contact.c !== 2)// Not an account owner?
+            && (contact.m) // email filed exists?
+            ) {
+            contacts.push({ id: contact.m, name: contact.name });
         }
     });
 
@@ -1576,7 +1577,7 @@ function initAddDialogMultiInputPlugin() {
         propertyToSearch: 'id',
         resultsLimit: 5,
         // Prevent showing of drop down list with contacts email addresses
-        // Max allowed email address 254 chars
+        // Max allowed email address is 254 chars
         minChars: 255,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'add',
@@ -7683,7 +7684,7 @@ function initShareDialogMultiInputPlugin() {
             tokenValue: "id",
             propertyToSearch: "id",
             resultsLimit: 5,
-            minChars: 2,
+            minChars: 1,
             accountHolder: (M.u[u_handle] || {}).m || '',
             scrollLocation: 'share',
             // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)

@@ -7,7 +7,12 @@
         queryParam: "q",
         searchDelay: 200,
         minChars: 1,
-        propertyToSearch: "m",
+
+        // ToDo: We can search by id OR name fields,
+        // currently both are the same and they represents a contact email
+        // In the future we should allow search by email and contact name
+        // but first we must be sure that user name is available in M.u.name
+        propertyToSearch: "id",
         jsonContainer: null,
         contentType: "json",
         excludeCurrent: false,
@@ -30,23 +35,24 @@
         addAvatar: true,
         emailCheck: false,
         accountHolder: '',
+        url: '',
         scrollLocation: 'add',
         resultsFormatter: function (item) {
 
-            var id, av, avatar,
-                email = item[this.propertyToSearch],
-                type = '';
+            var id;
+            var av;
+            var avatar;
+            var email = item[this.propertyToSearch];
 
-            M.u.forEach( function (ind, val) {
-                if (val.m === email) {
-                    id = ind;
+            M.u.forEach(function (contact, contactHandle) {
+                if (contact.m === email) {
+                    id = contactHandle;
 
                     return false;
                 }
             });
 
             if (!id) {
-                type = 'email';
                 av = '';
             }
 
@@ -59,18 +65,20 @@
         },
         tokenFormatter: function (item) {
 
-            var id, av, avatar,
-                email = item[this.propertyToSearch],
-                type = '';
-            M.u.forEach( function (ind, val) {
-                if (val.m === email) {
-                    id = ind;
+            var id;
+            var av;
+            var avatar;
+            var email = item[this.propertyToSearch];
+
+            M.u.forEach(function (contact, contactHandle) {
+                if (contact.m === email) {
+                    id = contactHandle;
 
                     return false;
                 }
             });
+
             if (!id) {
-                type = 'email';
                 av = '';
             }
 
@@ -914,7 +922,10 @@
                 callback.call(hidden_input, item);
             }
 
-            $(input).data("settings").local_data.push({id: item[$(input).data("settings").tokenValue], name: item[$(input).data("settings").tokenValue]});
+            $(input).data("settings").local_data.push({
+                id: item[$(input).data("settings").tokenValue],
+                name: item[$(input).data("settings").tokenValue]
+            });
         }// END of function add_token
 
         // Select a token in the token list

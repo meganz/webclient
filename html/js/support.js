@@ -1,17 +1,17 @@
 var support = (function() {
     var supportSubjects = {
-        0: 'General Enquiry',
-        1: 'Technical Issue',
-        2: 'Payment Issue'
+        0: l[8527],     // General Inquiry
+        1: l[8528],     // Technical Issue
+        2: l[8529]      // Payment Issue
     };
     var minLetters = 10;
     var ns = {};
     var $textarea;
-    var $button;
-    var bottomHeight;
+    var $button;    
     var $subject;
     var $window = $(window);
     var headerHeight;
+    var bottomHeight;
 
     function resizeHandler() {
         if (!$textarea.is(':visible')) {
@@ -27,7 +27,7 @@ var support = (function() {
         var opts = {
             a: 'sse', // send support email
             m: $.trim($textarea.val()), // message
-            t: $subject.find('.active').data('value'),
+            t: $subject.find('.active').data('value') // type
         };
         if (opts.m.length <= minLetters) {
             msgDialog('warninga',
@@ -45,8 +45,8 @@ var support = (function() {
             callback: function(response) {
                 if (response === 0) {
                     return msgDialog('warningb',
-                        l[7882],  // Message sent
-                        l[7881],   // Thank you! One of our support consultants...
+                        l[7882], // Message sent
+                        l[7881], // Thank you! One of our support consultants...
                         '',
                         function() {
                             document.location.href = '#fm';
@@ -76,6 +76,7 @@ var support = (function() {
         bottomHeight = $('.nw-bottom-block').height();
         headerHeight = $('.about-top-block').height();
         $subject = $('#support-subject');
+        
         for (var i in supportSubjects) {
             if (supportSubjects.hasOwnProperty(i)) {
                 if (first) {

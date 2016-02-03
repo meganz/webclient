@@ -6080,8 +6080,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
         logger = MegaLogger.getLogger('doShare'),
         childNodesId = [],// Holds complete directory tree starting from nodeId
         usersWithHandle = [],
-        usersWithoutHandle = [],
-        tmpValue, userHandle;
+        usersWithoutHandle = [];
 
     /** Settle function for API set share command. */
     var _shareDone = function(result, users) {
@@ -6141,41 +6140,51 @@ function doShare(nodeId, targets, dontShowShareDialog) {
     childNodesId.push(nodeId);
 
     // Create new lists of users, active (with user handle) and non existing (pending)
-    for (var index in targets) {
-        if (targets.hasOwnProperty(index)) {
-            userHandle = getUserHandleFromEmail(targets[index].u);
-            if (userHandle !== false) {
-                tmpValue = targets[index];
-                tmpValue.u = userHandle; // Switch from email to user handle
-                usersWithHandle.push(tmpValue);
-            }
-            else {
-                usersWithoutHandle.push(targets[index]);
-            }
-        }
-    }
+    targets.forEach(function(value) {
 
-    // Process users with handle === known ones
-    if (usersWithHandle.length) {
-        var sharePromise = api_setshare(nodeId, usersWithHandle, childNodesId);
-        sharePromise.done(function _sharePromiseWithHandleDone(result) {
-            _shareDone(result, usersWithHandle);
-        });
-        masterPromise.linkFailTo(sharePromise);
-    }
+        var email = value.u;
+        var accessRights = value.r;
 
-    // Process targets (users) without handle === unknown ones
-    if (usersWithoutHandle.length) {
-        var sharePromise = api_setshare1({
-            node: nodeId,
-            targets: usersWithoutHandle,
-            sharenodes: childNodesId,
-        });
-        sharePromise.done(function _sharePromiseWithoutHandleDone(result) {
-            _shareDone(result, usersWithoutHandle);
-        });
-        masterPromise.linkFailTo(sharePromise);
-    }
+        // Search by email only don't use handle cause user can re-register account then handle is unusable
+        api_req({ "a": "uk", "u": email }, {
+            targetEmail: email,
+            shareAccessRightsLevel: accessRights,
+            callback: function (result) {
+                if (result.pubk) {
+                    var userHandle = result.u;
+
+                    // 'u' is returned user handle, 'r' is access right
+                    usersWithHandle = [];
+
+                    if (M.u[userHandle] && M.u[userHandle].c !== 0) {
+                        usersWithHandle.push({ 'r': this.shareAccessRightsLevel, 'u': userHandle });
+                    }
+                    else {
+                        usersWithHandle.push({ 'r': this.shareAccessRightsLevel, 'u': userHandle, 'k': result.pubk, 'm': this.targetEmail });
+                    }
+
+                    var sharePromise = api_setshare(nodeId, usersWithHandle, childNodesId);
+                    sharePromise.done(function _sharePromiseWithHandleDone(result) {
+                        _shareDone(result, usersWithHandle);
+                    });
+                    masterPromise.linkFailTo(sharePromise);
+                }
+                else {// NOT ok, user doesn't have account yet
+                    usersWithoutHandle = [];
+                    usersWithoutHandle.push(this.targetEmail);
+                var sharePromise = api_setshare1({
+                    node: nodeId,
+                    targets: usersWithoutHandle,
+                    sharenodes: childNodesId
+                });
+                sharePromise.done(function _sharePromiseWithoutHandleDone(result) {
+                    _shareDone(result, this.targetEmail);
+                });
+                masterPromise.linkFailTo(sharePromise);
+                }
+            }
+         });
+    });
 
     return masterPromise;
 }

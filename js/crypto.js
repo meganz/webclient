@@ -2536,6 +2536,9 @@ function api_setshare1(ctx, params) {
         if (u_pubkeys[req.s[i].u]) {
             req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey, u_pubkeys[req.s[i].u]));
         }
+        if (req.s[i].m != undefined) {
+            req.s[i].u = req.s[i].m;
+        }
     }
 
     ctx.req = req;

@@ -3097,13 +3097,16 @@
     "8517": "Desativar o modo de depura\u00e7\u00e3o",
     "8518": "O log (MEGAiOS.log) ser\u00e1 exclu\u00eddo da se\u00e7\u00e3o off-line.",
     "8519": "Restri\u00e7\u00f5es do sistema operacional",
-    "8520": "[S]Continue[\/S] slower browser download.",
-    "8521": "Takedown notice",
-    "8522": "Your publicly shared %1 (%2) has been taken down.",
-    "8523": "Your taken down %1 (%2) has been reinstated.",
-    "8524": "Takedown reinstated",
-    "8525": "Type your message here",
-    "8526": "Subject",
+    "8520": "[S]Continuar[\/S] com o download mais lento.",
+    "8521": "Aviso de remo\u00e7\u00e3o",
+    "8522": "A pasta p\u00fablica %1 (%2) foi removida por viola\u00e7\u00e3o.",
+    "8523": "A solicita\u00e7\u00e3o de remo\u00e7\u00e3o %1 (%2) foi restaurada.",
+    "8524": "Remo\u00e7\u00e3o restaurada",
+    "8525": "Digite sua mensagem aqui",
+    "8526": "Assunto",
+    "8527": "General Enquiry",
+    "8528": "Technical Issue",
+    "8529": "Payment Issue",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3124,6 +3127,9 @@
         "takedown-reinstated": 8524,
         "get-support": 516,
         "type-your-message": 8525,
-        "subject": 8526
+        "subject": 8526,
+        "general-inquiry": 8527,
+        "technical-issue": 8528,
+        "payment-issue": 8529
     }
 }

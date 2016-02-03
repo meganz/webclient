@@ -561,8 +561,59 @@ function generateAvatarMeta(user_hash) {
     return meta;
 }
 
-var attribCache = new IndexedDBKVStorage('attrib');
 var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
+var attribCache = new IndexedDBKVStorage('attrib');
+
+/**
+ * Process action-packet for attribute updates.
+ *
+ * @param {String}  attrName        Attribute name
+ * @param {String}  userHandle      User handle
+ * @param {Boolean} ownActionPacket Whether the action-packet was issued by myself
+ */
+attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
+    var logger = MegaLogger.getLogger('account');
+    var cacheKey = userHandle + "_" + attrName;
+
+    logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
+
+    var removeItemPromise = attribCache.removeItem(cacheKey);
+
+    removeItemPromise
+        .always(function _uaPacketParser() {
+            if (ownActionPacket) {
+                if (attrName === 'firstname'
+                        || attrName === 'lastname') {
+
+                    M.syncUsersFullname(userHandle);
+                }
+            }
+            else if (attrName === '+a') {
+                avatars[userHandle] = undefined;
+                M.avatars();
+            }
+            else if (attrName === '*!authring') {
+                authring.getContacts('Ed25519');
+            }
+            else if (attrName === '*!authRSA') {
+                authring.getContacts('RSA');
+            }
+            else if (attrName === '*!authCu255') {
+                authring.getContacts('Cu25519');
+            }
+            else if (attrName === '+puEd255') {
+                // pubEd25519 key was updated!
+                // force fingerprint regen.
+                delete pubEd25519[userHandle];
+                crypt.getPubEd25519(userHandle);
+            }
+            else {
+                logger.debug('uaPacketParser: No handler for "%s"', attrName);
+            }
+        });
+
+    return removeItemPromise;
+};
 
 /**
  * Retrieves a user attribute.

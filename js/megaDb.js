@@ -348,14 +348,17 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
         }
         var args = arguments;
 
-        assert(megaDb.dbState != MegaDB.DB_STATE.CLOSED, "Tried to execute method on a closed database.");
-        assert(megaDb.dbState != MegaDB.DB_STATE.FAILED_TO_INITIALIZE, "Tried to execute method on a database which failed to initialize (open).");
-
         if (megaDb.dbState === MegaDB.DB_STATE.INITIALIZED) {
-            return fn.apply(self, args);
-        } else if (megaDb.dbState === MegaDB.DB_STATE.OPENING) {
+            try {
+                return fn.apply(self, args);
+            }
+            catch (ex) {
+                self.logger.error(ex);
+                return MegaPromise.reject(ex);
+            }
+        }
+        else if (megaDb.dbState === MegaDB.DB_STATE.OPENING) {
             var $promise = new MegaPromise();
-
 
             megaDb._dbOpenPromise.then(
                 function() {
@@ -364,6 +367,7 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
                     } catch(e) {
                         $promise.reject.apply($promise, arguments);
                         self.logger.error("Could not open db: ", e);
+                        return;
                     }
 
                     if (resultPromise.then) {
@@ -384,8 +388,18 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
             );
 
             return $promise;
-        } else if (self.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+        }
+        else if (self.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+            megaDb.logger.debug("Tried to execute method on a database which failed to initialize (open).");
             return MegaPromise.reject("Failed to open database.");
+        }
+        else if (self.dbState === MegaDB.DB_STATE.CLOSED) {
+            megaDb.logger.debug("Tried to execute method on a closed database.");
+            return MegaPromise.reject("Database is closed.");
+        }
+        else {
+            megaDb.logger.error("Unexpected database state.");
+            return MegaPromise.reject(ENOENT);
         }
     }
 };

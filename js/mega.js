@@ -469,13 +469,11 @@ function MegaData()
         });
     }
 
-    this.contactstatus = function(h, wantTimeStamp)
-    {
+    this.contactstatus = function(h, wantTimeStamp) {
         var folders = 0;
         var files = 0;
         var ts = 0;
-        if (M.d[h])
-        {
+        if (M.d[h]) {
             if (!wantTimeStamp || !M.d[h].ts) {
                 var a = fm_getnodes(h);
                 for (var i in a) {
@@ -504,57 +502,60 @@ function MegaData()
             }
         }
 
-        return {files: files, folders: folders, ts: ts};
+        return { files: files, folders: folders, ts: ts };
     };
 
-    this.onlineStatusClass = function(os)
-    {
-        if (os == 'dnd')
+    this.onlineStatusClass = function(os) {
+        if (os === 'dnd') {
             return [l[5925], 'busy'];
-        else if (os == 'away')
+        }
+        else if (os === 'away') {
             return [l[5924], 'away'];
-        else if (os == 'chat' || os == 'available')
+        }
+        else if ((os === 'chat') || (os === 'available')) {
             return [l[5923], 'online'];
-        else
+        }
+        else {
             return [l[5926], 'offline'];
+        }
     };
 
-    this.onlineStatusEvent = function(u, status)
-    {
-        if (u && megaChatIsReady)
-        {
+    this.onlineStatusEvent = function(u, status) {
+        if (u && megaChatIsReady) {
             // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
             // user's devices, which is aggregated by Karere already
             status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
             var e = $('.ustatus.' + u.u);
-            if (e.length > 0)
-            {
+            if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
                 $(e).addClass(this.onlineStatusClass(status)[1]);
             }
             var e = $('.fm-chat-user-status.' + u.u);
-            if (e.length > 0)
+            if (e.length > 0) {
                 $(e).html(this.onlineStatusClass(status)[0]);
+            }
+
             if (
                 typeof $.sortTreePanel !== 'undefined' &&
                 typeof $.sortTreePanel.contacts !== 'undefined' &&
-                $.sortTreePanel.contacts.by == 'status'
+                $.sortTreePanel.contacts.by === 'status'
             ) {
                 // we need to resort
                 M.contacts();
             }
 
-            if (window.location.hash == "#fm/" + u.u) {
+            if (window.location.hash === "#fm/" + u.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
             }
         }
     };
 
-    this.emptySharefolderUI = function(lSel)
-    {
-        if (!lSel)
+    this.emptySharefolderUI = function(lSel) {
+        if (!lSel) {
             lSel = this.fsViewSel;
+        }
+
         $(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
         $(lSel).parent().children('table').hide();
 
@@ -562,6 +563,7 @@ function MegaData()
 
         $.tresizer();
     };
+
     Object.defineProperty(this, 'fsViewSel', {
         value: '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling',
         configurable: false
@@ -1683,16 +1685,25 @@ function MegaData()
                 M.renderPath();
             });
         }
+
+        var newHashLocation;
+
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
             var target = '';
             if (this.currentdirid !== this.RootID) {
                 target = '!' +  this.currentdirid;
             }
-            window.location.hash = '#F!' + pfid + '!' + pfkey + target;
+            newHashLocation = '#F!' + pfid + '!' + pfkey + target;
         }
         else {
-            window.location.hash = '#fm/' + M.currentdirid;
+            newHashLocation = '#fm/' + M.currentdirid;
+        }
+        try {
+            window.location.hash = newHashLocation;
+        }
+        catch (ex) {
+            console.error(ex);
         }
         searchPath();
 
@@ -1707,9 +1718,14 @@ function MegaData()
     }
 
     this.contacts = function() {
+
         var contacts = [];
-        for (var i in M.c['contacts']) {
-            contacts.push(M.d[i]);
+        var i;
+
+        for (i in M.c['contacts']) {
+            if (M.c['contacts'].hasOwnProperty(i)) {
+                contacts.push(M.d[i]);
+            }
         }
 
         if (typeof this.i_cache !== "object") {
@@ -1718,17 +1734,20 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
+
                 var cs = M.contactstatus(a.u, true);
+
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
+
                 M.i_cache[a.u] = cs.ts;
-
-
                 cs = M.contactstatus(b.u, true);
+
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
+
                 M.i_cache[b.u] = cs.ts;
 
                 return M.i_cache[a.u] - M.i_cache[b.u]
@@ -1739,27 +1758,40 @@ function MegaData()
             }
         }, sortContactByName);
 
-        var html = '', html2 = '', status = '', img;
-        // status can be: "online"/"away"/"busy"/"offline"
-        for (var i in contacts)
-        {
-            if (contacts[i].u === u_handle) { // don't show my own contact in the contact & conv. lists
-                continue;
-            }
-            var onlinestatus;
+        var html = '';
+        var onlinestatus;
 
-            if (megaChatIsReady) {
-                onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
-            }
-            else {
-                onlinestatus = [l[5926], 'offline'];
-            }
-            if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
-                html += '<div class="nw-contact-item ui-droppable ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
+        // status can be: "online"/"away"/"busy"/"offline"
+        for (i in contacts) {
+            if (contacts.hasOwnProperty(i)) {
+
+                // don't show my own contact in the contact & conv. lists
+                if (contacts[i].u === u_handle) {
+                    continue;
+                }
+
+                if (megaChatIsReady) {
+                    var jId = megaChat.getJidFromNodeId(contacts[i].u);
+                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(jId));
+                }
+                else {
+                    onlinestatus = [l[5926], 'offline'];
+                }
+
+                if (!treesearch || (
+                        treesearch
+                        && contacts[i].name
+                        && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1
+                        )
+                    ) {
+                    html += '<div class="nw-contact-item ui-droppable '
+                    + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                    + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                    + htmlentities(contacts[i].name)
+                    + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                }
+                $('.fm-start-chat-dropdown').addClass('hidden');
             }
-            $('.fm-start-chat-dropdown').addClass('hidden');
         }
 
         $('.content-panel.contacts').html(html);
@@ -1774,14 +1806,17 @@ function MegaData()
 
                 var $this = $(this);
 
+                $.hideContextMenu();
+
                 if (!$this.is(".active")) {
                     $('.start-chat-button').removeClass('active');
 
-                    $('.fm-chat-popup-button', m).removeClass("disabled");
+                    $('.context-menu-item', m).removeClass("disabled");
 
                     var $userDiv = $this.parent().parent();
                     if ($userDiv.is(".offline")) {
-                        $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
+                        $('.context-menu-item.startaudio-item, .context-menu-item.startvideo-item', m)
+                            .addClass("disabled");
                     }
 
                     $this.addClass('active');
@@ -1803,8 +1838,7 @@ function MegaData()
                 return false; // stop propagation!
             });
 
-            $('.fm-chat-popup-button.start-chat').unbind('click.treePanel');
-            $('.fm-chat-popup-button.start-chat').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startchat-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1815,8 +1849,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').unbind('click.treePanel');
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startaudio-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1832,8 +1865,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').unbind('click.treePanel');
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startvideo-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -5523,6 +5555,7 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
+            notify.notifyFromActionPacket(actionPacket);
         }
         else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);
@@ -5675,17 +5708,22 @@ function loadfm(force)
     }
 }
 
-function RightsbyID(id)
-{
-    if (folderlink)
-        return false;
-    if (id.length > 8)
-        return false;
+function RightsbyID(id) {
+
     var p = M.getPath(id);
-    if (p[p.length - 1] == 'contacts' || p[p.length - 1] == 'shares')
+
+    if (folderlink) {
+        return false;
+    }
+    if (id.length > 8) {
+        return false;
+    }
+    if ((p[p.length - 1] === 'contacts') || (p[p.length - 1] === 'shares')) {
         return (M.d[p[p.length - 3]] || {}).r;
-    else
+    }
+    else {
         return 2;
+    }
 }
 
 function isCircular(fromid, toid)
@@ -6983,25 +7021,6 @@ function balance2pro(callback)
             $span = $('.copy-to-clipboard span'),
             toastTxt, doLinks, linksNum, success;
 
-        /**
-         * execCommandUsable
-         *
-         * Native browser 'copy' command using execCommand('copy).
-         * Supported by Chrome42+, FF41+, IE9+, Opera29+
-         * @returns {Boolean}
-         */
-        ExportLinkDialog.prototype.execCommandUsable = function() {
-
-            var result;
-
-            try {
-                result = document.execCommand('copy');
-            }
-            catch (ex) {}
-
-            return result === false;
-        };
-
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
@@ -7060,7 +7079,7 @@ function balance2pro(callback)
         $span.text(l[1990]);
 
         // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || self.execCommandUsable()) {
+        if (is_extension || mega.utils.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
             }

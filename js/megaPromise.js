@@ -27,14 +27,19 @@ function MegaPromise(fn) {
     self._internalPromise = new $.Deferred();
 
     if (fn) {
-        fn(
-            function() {
-                self.resolve.apply(self, arguments);
-            },
-            function() {
-                self.reject.apply(self, arguments);
-            }
-        );
+        var resolve = function() {
+            self.resolve.apply(self, arguments);
+        };
+        var reject = function() {
+            self.reject.apply(self, arguments);
+        };
+
+        try {
+            fn(resolve, reject);
+        }
+        catch (ex) {
+            reject(ex);
+        }
     }
 
     if (MegaPromise.debugPendingPromisesTimeout > 0) {

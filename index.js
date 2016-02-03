@@ -542,6 +542,10 @@ function init_page() {
         parsepage(pages['key']);
         init_key();
     }
+    else if (page === 'support') {
+        parsepage(pages['support']);
+        support.initUI();
+    }
     else if (page == 'contact') {
         parsepage(pages['contact']);
         if (lang == 'ru') {
@@ -1602,9 +1606,10 @@ function topmenuUI() {
         }
         else if (className.indexOf('help') > -1) {
             document.location.hash = 'help';
-        }
-        else if (className.indexOf('contact') > -1) {
+        } else if (className.indexOf('contact') > -1) {
             document.location.hash = 'contact';
+        } else if (className.indexOf('support') > -1) {
+            document.location.hash = 'support';
         }
         else if (className.indexOf('sitemap') > -1) {
             document.location.hash = 'sitemap';

@@ -522,7 +522,7 @@ function generateAvatarMeta(user_hash) {
         shortName = contact.shortName;
         color = contact.displayColor;
     }
-	else {
+    else {
         M.u.forEach(function(k, v) {
             var c = M.u[v];
             var n = generateContactName(v);
@@ -833,6 +833,23 @@ function isEphemeral() {
     return (u_type === 0);
 }
 
+/**
+ * Check if the current user doens't have a session, if they don't have
+ * a session we show the login dialog, and when they have a session
+ * we redirect back to the intended page.
+ *
+ * @return {Boolean} True if the login dialog is shown
+ */
+function checkUserLogin() {
+    if (!u_type) {
+        login_next = document.location.hash;
+        document.location.hash = "#login";
+        return true;
+    }
+
+    return false;
+}
+
 
 (function(exportScope) {
     var _lastUserInteractionCache = false;
@@ -980,9 +997,9 @@ function isEphemeral() {
             if (r[0] === "0") {
                 $elem.addClass('cloud-drive');
             }
-            else if (r[0] === "1" && typeof megaChat !== 'undefined') {
+            else if (r[0] === "1" && megaChatIsReady) {
                 var room = megaChat.getPrivateRoom(u_h);
-                if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
+                if (room && megaChat.plugins && megaChat.plugins.chatNotifications) {
                     if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
                         $elem.addClass('unread-conversations');
                     }
@@ -1075,7 +1092,7 @@ function isEphemeral() {
             $promise.reject(false);
         }
         else if (_lastUserInteractionCache[u_h]) {
-            if (megaChat) {
+            if (megaChatIsReady) {
                 var chatRoom = megaChat.getPrivateRoom(u_h);
 
                 if (chatRoom) {

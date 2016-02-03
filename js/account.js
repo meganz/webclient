@@ -587,6 +587,9 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
 
                     M.syncUsersFullname(userHandle);
                 }
+                else {
+                    logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
+                }
             }
             else if (attrName === '+a') {
                 avatars[userHandle] = undefined;

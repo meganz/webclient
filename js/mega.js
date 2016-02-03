@@ -5220,10 +5220,10 @@ function execsc(actionPackets, callback) {
             }
             else if (actionPacket.a === 'ua') {
                 var attrs = actionPacket.ua;
+                var actionPacketUserId = actionPacket.u;
                 for (var j in attrs) {
                     if (attrs.hasOwnProperty(j)) {
                         var attributeName = attrs[j];
-                        var actionPacketUserId = actionPacket.u;
 
                         if (attributeName === '+a') {
                             avatars[actionPacketUserId] = undefined;
@@ -5510,10 +5510,10 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ua' && fminitialized) {
             var attrs = actionPacket.ua;
+            var actionPacketUserId = actionPacket.u;
             for (var j in attrs) {
                 if (attrs.hasOwnProperty(j)) {
                     var attributeName = attrs[j];
-                    var actionPacketUserId = actionPacket.u;
 
                     attribCache.uaPacketParser(attributeName, actionPacketUserId);
                 }

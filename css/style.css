@@ -12534,6 +12534,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #333333;
     height: 48px;
 }
+.default-select .jspPane {
+    min-width: 0px;
+}
+.st-main-block .notification-popup .jspPane, .main-scroll-block .notification-popup .jspPane {
+	min-width: 0;
+}
 .nw-bottom-column {
     min-width: 169px;
     float: left;
@@ -25097,6 +25103,29 @@ body, body * {
     right: -3px;
     top: -3px;
     float: right;
+}
+
+.support .fm-account-labels {
+    padding-top: 6px
+}
+.support .fm-accout-inputs-blocks {
+    padding-top: 12px
+}
+
+.support .fm-account-labels {
+    width: 30px;
+}
+
+.support #support-subject {
+    width: 100px;
+}
+
+.support textarea {
+    width: 100%;
+    height: 80%;
+    float: left;
+    border: 1px solid #e8e8e8;
+    border-radius: 5px;
 }
 .help2 img[alt="smallx"] {
     max-width: 50px;

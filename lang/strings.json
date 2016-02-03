@@ -12410,5 +12410,25 @@
     "8524": {
         "text": "Takedown reinstated",
         "context": "The header of a notification indicating that a file or folder that was taken down has now been restored due to a successful counter-notice."
+    },
+    "8525": {
+        "text": "Type your message here",
+        "context": "Placeholder text for the \"Get support\" text field."
+    },
+    "8526": {
+        "text": "Subject",
+        "context": "The subject of a given message."
+    },
+    "8527": {
+        "text": "General Enquiry",
+        "context": "A dropdown selection item on the support page. This is for a user to make a general question to the support team."
+    },
+    "8528": {
+        "text": "Technical Issue",
+        "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a technical problem they are having."
+    },
+    "8529": {
+        "text": "Payment Issue",
+        "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a payment problem they are having e.g. missing payment."
     }
 }

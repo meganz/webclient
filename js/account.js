@@ -813,6 +813,55 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
 }
 
 /**
+ * Removes a user attribute for oneself.
+ *
+ * @param attribute {string}
+ *     Name of the attribute.
+ * @param pub {bool}
+ *     True for public attributes (default: true).
+ * @param nonHistoric {bool}
+ *     True for non-historic attributes (default: false).  Non-historic
+ *     attributes will overwrite the value, and not retain previous
+ *     values on the API server.
+ * @return {MegaPromise}
+ *     A promise that is resolved when the original asynch code is settled.
+ */
+function removeUserAttribute(attribute, pub, nonHistoric) {
+    var promise = new MegaPromise();
+    var logger = MegaLogger.getLogger('account');
+
+    if (nonHistoric === true || nonHistoric === 1) {
+        attribute = '!' + attribute;
+    }
+    if (pub === true || pub === undefined) {
+        attribute = '+' + attribute;
+    }
+    else {
+        attribute = '*' + attribute;
+    }
+
+    var cacheKey = u_handle + "_" + attribute;
+
+    attribCache.removeItem(cacheKey)
+        .always(function() {
+            api_req({'a': 'upr', 'ua': attribute}, {
+                callback: function(res) {
+                    if (typeof res !== 'number' || res < 0) {
+                        logger.warn('Error removing user attribute "%s", result: %s!', attribute, res);
+                        promise.reject(res);
+                    }
+                    else {
+                        logger.info('Removed user attribute "%s", result: ' + res, attribute);
+                        promise.resolve();
+                    }
+                }
+            });
+        });
+
+    return promise;
+}
+
+/**
  * Stores a user attribute for oneself.
  *
  * @param attribute {string}

@@ -12,6 +12,7 @@ var IndexedDBKVStorage = function(name) {
     self.db = null;
     self.dbName = null;
     self.logger = new MegaLogger("IDBKVStorage[" + name + "]");
+    self._memCache = {};
 };
 
 
@@ -35,6 +36,7 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
             promise.reject();
             return promise;
         }
+
         if (self.dbName !== self.name + "_" + u_handle) {
             if (self.db && self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
                 self.db.close();
@@ -74,6 +76,10 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                     );
                 });
             }
+            else if (self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+                // Most likely, Firefox in incognito mode.
+                return MegaPromise.reject();
+            }
             else {
                 self.db.one('onDbStateReady', function __onDbStateReady() {
                     promise.linkDoneAndFailTo(
@@ -105,6 +111,8 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
 IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVSetItem(k, v) {
     var promise = new MegaPromise();
 
+    this._memCache[k] = v;
+
     this.db.addOrUpdate(
         'kv',
         {
@@ -131,17 +139,24 @@ IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(functi
  * @returns {MegaPromise}
  */
 IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVGetItem(k) {
+    var self = this;
+
     var promise = new MegaPromise();
 
-    this.db.get(
+    if (typeof(self._memCache[k]) !== 'undefined') {
+        return MegaPromise.resolve(self._memCache[k]);
+    }
+
+    self.db.get(
         'kv',
         k
     )
         .done(function __getItemDone(r) {
-            if (typeof(r) === 'undefined' || r.length === 0) {
+            if (typeof r === 'undefined' || r.length === 0) {
                 promise.reject();
             }
             else {
+                self._memCache[k] = r.v;
                 promise.resolve(r.v);
             }
         })
@@ -160,6 +175,10 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
  * @returns {MegaPromise}
  */
 IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVRemoveItem(k) {
+    if (typeof(this._memCache[k]) !== 'undefined') {
+        delete this._memCache[k];
+    }
+
     return this.db.remove(
         'kv',
         k
@@ -172,10 +191,28 @@ IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(fun
  * @type {MegaPromise}
  */
 IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function __IDBKVClear() {
+    this._memCache = {};
+
     return this.db.clear(
         'kv'
     );
 });
+
+/**
+ * Destroy cache (and drop db)
+ *
+ * @type {MegaPromise}
+ */
+IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
+    var self = this;
+    self._memCache = {};
+
+    if (self.db && self.db.dbState !== MegaDB.DB_STATE.CLOSED) {
+        return self.db.drop();
+    }
+
+    return MegaPromise.resolve();
+};
 
 /**
  * Check if item with key `k` exists in the DB.
@@ -187,12 +224,17 @@ IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function
  */
 IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVHasItem(k) {
     var promise = new MegaPromise();
+
+    if (typeof(this._memCache[k]) !== 'undefined') {
+        return MegaPromise.resolve();
+    }
+
     this.db.get(
         'kv',
         k
     )
         .done(function __hasItemDone(r) {
-            if (typeof(r) === 'undefined' || r.length === 0) {
+            if (typeof r === 'undefined' || r.length === 0) {
                 promise.reject();
             }
             else {

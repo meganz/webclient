@@ -783,10 +783,10 @@ var crc32table = [
 ];
 
 function crc32(data, crc, len) {
-    if (typeof(crc) === "undefined") {
+    if (typeof crc === "undefined") {
         crc = 0;
     }
-    if (typeof(len) === "undefined") {
+    if (typeof len === "undefined") {
         len = data.length;
     }
 

@@ -129,7 +129,7 @@ var AvatarImage = React.createClass({
 
             var loadAvatarPromise;
             if (!_noAvatars[contact.u]) {
-                loadAvatarPromise = getUserAttribute(contact.u, 'a', true, false);
+                loadAvatarPromise = mega.attr.get(contact.u, 'a', true, false);
             }
             else {
                 loadAvatarPromise = _noAvatars[contact.u];

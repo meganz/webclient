@@ -153,7 +153,7 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
                 self.doConnectionRetry(true);
             }
         });
-        if(!self._connectionRetryInProgress) {
+        if (!self._connectionRetryInProgress) {
             self.doConnectionRetry();
         }
     }

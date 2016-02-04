@@ -1318,9 +1318,17 @@ var ConversationPanel = React.createClass({
         }
     },
 
+    handleKeyDown: function(e) {
+        var self = this;
+        var chatRoom = self.props.chatRoom;
+        if (self.isMounted() && chatRoom.isActive()) {
+            chatRoom.trigger("onChatIsFocused");
+        }
+    },
     componentDidMount: function() {
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
+        window.addEventListener('keydown', self.handleKeyDown);
 
 
         var $container = $(ReactDOM.findDOMNode(self));
@@ -1494,6 +1502,7 @@ var ConversationPanel = React.createClass({
         var megaChat = chatRoom.megaChat;
 
         window.removeEventListener('resize', self.handleWindowResize);
+        window.removeEventListener('keydown', self.handleKeyDown);
         $(document).unbind("fullscreenchange.megaChat_" + chatRoom.roomJid);
 
         megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);

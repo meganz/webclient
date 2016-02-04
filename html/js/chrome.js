@@ -47,11 +47,6 @@ var chromepage = {
         // On manual download button click, hide the button text and show the mega.co.nz and mega.nz links
         $('.chrome-download-button').rebind('click', function() {
 
-            // Change button state to show different versions
-            $downloadButton.css('cursor', 'default');
-            $downloadButton.find('.initial-state').hide();
-            $downloadButton.find('.actual-links').show();
-
             // Log that they downloaded via the manual link
             api_req({ a: 'log', e: 99605, m: 'Downloaded Chrome ext via manual link' });
         });

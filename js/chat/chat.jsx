@@ -15,9 +15,10 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
     chatui = function(id) {
         var userHash = id.replace("chat/", "");
         if (!M.u[userHash]) {
-            M.currentdirid = "chat";
-            window.location = '#fm/chat';
-            M.openFolder("chat");
+            setTimeout(function() {
+                window.location = '#fm/chat';
+                M.openFolder('chat');
+            }, 100);
             return;
         }
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
@@ -108,11 +109,8 @@ var Chat = function() {
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb530n001.karere.mega.nz',
         'fallbackXmppServers': [
-             "https://xmpp270n001.karere.mega.nz/bosh",
-             "https://xmpp270n002.karere.mega.nz/bosh",
-             "https://xmpp270n003.karere.mega.nz/bosh",
-             "https://xmpp270n004.karere.mega.nz/bosh",
-             "https://xmpp270n005.karere.mega.nz/bosh"
+             "https://xmpp270n001.karere.mega.nz/ws",
+             "https://xmpp270n002.karere.mega.nz/ws"
         ],
         'rtcSession': {
             'crypto': {
@@ -235,6 +233,15 @@ var Chat = function() {
                     'body': function(notificationObj, params) {
                         return l[5893].replace('[X]', params.from); // You have an incoming call from [X].
                     }
+                },
+                'call-terminated': {
+                    'title': "Call terminated",
+                    'icon': function(notificationObj, params) {
+                        return notificationObj.options.icon;
+                    },
+                    'body': function(notificationObj, params) {
+                        return l[5889].replace('[X]', params.from); // Call with [X] ended.
+                    }
                 }
             },
             'sounds': [
@@ -243,7 +250,8 @@ var Chat = function() {
                 'incoming_chat_message',
                 'incoming_contact_request',
                 'incoming_file_transfer',
-                'incoming_voice_video_call'
+                'incoming_voice_video_call',
+                'hang_out',
             ]
         },
         'chatStoreOptions': {

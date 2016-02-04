@@ -89,12 +89,12 @@ var _createObjectDataMethods = function(kls) {
         return this.keys().length
     };
 
-    obj.hasOwnProperty = function() {
-        return this._data.hasOwnProperty.call(this._data, arguments);
+    obj.hasOwnProperty = function(prop) {
+        return this._data.hasOwnProperty(prop);
     };
 
-    obj.propertyIsEnumerable = function() {
-        return this._data.propertyIsEnumerable.call(this._data, arguments);
+    obj.propertyIsEnumerable = function(prop) {
+        return this._data.propertyIsEnumerable(prop);
     };
 
     obj.destroyStructure = function() {
@@ -209,11 +209,11 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
         };
         obj.removeChangeListener = function(cb) {
             assert(
-                typeof(cb) === 'string' || typeof(cb._changeListenerId) != 'undefined',
+                typeof cb === 'string' || typeof cb._changeListenerId != 'undefined',
                 'this method/cb was not used as a change listener'
             );
 
-            if (typeof(cb) === 'string') {
+            if (typeof cb === 'string') {
                 mBroadcaster.removeListener(cb);
             }
             else {
@@ -375,7 +375,7 @@ MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 
     var self = this;
 
-    if (typeof(v._dataChangeIndex) != 'undefined' &&  !v._parent) {
+    if (typeof v._dataChangeIndex != 'undefined' &&  !v._parent) {
         v._parent = this;
     }
 

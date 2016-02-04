@@ -1365,7 +1365,7 @@ hangupAll: function(reason, text)
         this.trigger('local-video-disabled', {player: this.gLocalVid, sid: sid});
   },
  _enableLocalVid: function(sid) {
-     if(this._localVidEnabled)
+     if (this._localVidEnabled)
          return;
      RTC.attachMediaStream($(this.gLocalVid), this.gLocalStream);
     /**
@@ -1464,7 +1464,7 @@ hangupAll: function(reason, text)
               data: JSON.stringify(data),
               error: function(jqXHR, textStatus, errorThrown) {
                   retryNo++;
-                  if(retryNo < 20) {
+                  if (retryNo < 20) {
                       wait *= 2;
                       setTimeout(function() {
                           req();

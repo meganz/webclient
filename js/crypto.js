@@ -136,7 +136,7 @@ var crypt = (function () {
             api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
         }
         else {
-            var pubKeyPromise = getUserAttribute(userhandle,
+            var pubKeyPromise = mega.attr.get(userhandle,
                                              ns.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                              true, false);
             pubKeyPromise.done(function(result) {
@@ -427,7 +427,7 @@ var crypt = (function () {
         }
         else {
             var pubEd25519KeyPromise = ns.getPubKey(userhandle, 'Ed25519');
-            var signaturePromise = getUserAttribute(userhandle,
+            var signaturePromise = mega.attr.get(userhandle,
                                                     ns.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                     true, false);
 
@@ -1339,14 +1339,14 @@ function rand(n) {
 }
 
 /*
-if(is_chrome_firefox) {
+if (is_chrome_firefox) {
     var nsIRandomGenerator = Cc["@mozilla.org/security/random-generator;1"]
         .createInstance(Ci.nsIRandomGenerator);
 
     var rand = function fx_rand(n) {
         var r = nsIRandomGenerator.generateRandomBytes(4);
         r = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
-        if(r<0) r ^= 0x80000000;
+        if (r<0) r ^= 0x80000000;
         return r % n; // oops, it's not uniformly distributed
     };
 }
@@ -2884,7 +2884,7 @@ is_image.def = {
 is_image.raw = {
     // http://www.sno.phy.queensu.ca/~phil/exiftool/#supported
     // let raw = {}; for(let tr of document.querySelectorAll('.norm.tight.sm.bm tr'))
-    //   if(tr.childNodes.length > 2 && ~tr.childNodes[2].textContent.indexOf('RAW'))
+    //   if (tr.childNodes.length > 2 && ~tr.childNodes[2].textContent.indexOf('RAW'))
     //     raw[tr.childNodes[0].textContent] = tr.childNodes[2].textContent;
     "3FR": "Hasselblad RAW (TIFF-based)",
     "ARW": "Sony Alpha RAW (TIFF-based)",
@@ -3931,8 +3931,12 @@ function crypto_processkey(me, master_aes, file) {
             }
         }
 
-        var ab = base64_to_ab(file.a);
-        var o = dec_attr(ab, k);
+        if (!file.a) {
+            logger.warn('Missing attribute for node "%s"', file.h, file);
+        }
+
+        var ab = file.a && base64_to_ab(file.a);
+        var o = ab && dec_attr(ab, k);
 
         if (typeof o === 'object') {
             if (typeof o.n === 'string') {

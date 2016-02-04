@@ -129,7 +129,7 @@ function initTransferScroll()
 function initTreeScroll()
 {
     /**
-     if(localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
+     if (localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
      {
      $('.fm-left-panel').css({'width': localStorage.leftPaneWidth + "px"});
      }
@@ -664,7 +664,7 @@ function initUI() {
         var c = $(e.target).attr('class');
 
 
-        if($(e.target).attr('data-reactid')) {
+        if ($(e.target).attr('data-reactid')) {
             return; // never return false, if this is an event triggered by a React element....
         }
         if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1)) {
@@ -1164,13 +1164,13 @@ function showTransferToast(t_type, t_length, isPaused) {
             // M.openFolder('transfers', true);
             $('.nw-fm-left-icon.transfers').click();
         });
-        
+
         $('.toast-close-button', $toast).rebind('click', function()
         {
             $(this).closest('.toast-notification').removeClass('visible');
             $('.toast-notification').removeClass('second');
         });
-        
+
         $toast.rebind('mouseover', function(e)
         {
             clearTimeout(timer);
@@ -1515,11 +1515,12 @@ function getContactsEMails() {
 
     // Loop through full contacts
     M.u.forEach(function(contact) {
-        if (M.u.hasOwnProperty(i)) {
-            contact = M.u[i];
-            if (contact.c && (contact.c !== 2) && (contact.m)) {
-                contacts.push({ id: contact.m, name: contact.m });
-            }
+        if (
+            contact.c// active contact?
+            && (contact.c !== 2)// Not an account owner?
+            && (contact.m) // email filed exists?
+            ) {
+            contacts.push({ id: contact.m, name: contact.name });
         }
     });
 
@@ -1576,7 +1577,7 @@ function initAddDialogMultiInputPlugin() {
         propertyToSearch: 'id',
         resultsLimit: 5,
         // Prevent showing of drop down list with contacts email addresses
-        // Max allowed email address 254 chars
+        // Max allowed email address is 254 chars
         minChars: 255,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'add',
@@ -2150,27 +2151,34 @@ function fmremove() {
 
     // Remove contacts from list
     else if (contactcnt) {
-        var t, c = $.selected.length;
+
+        var c = $.selected.length;
+        var replaceString = '';
+        var contact = '';
 
         if (c > 1) {
-            t = c + ' ' + l[5569];
+            replaceString = c + ' ' + l[5569];
+            contact = 'contacts';
         }
         else {
-            t = '<strong>' + M.u[$.selected[0]].name + '</strong>';
+            replaceString = '<strong>' + decodeURIComponent(M.d[$.selected[0]].name) + '</strong>';
+            contact = 'contact';
         }
 
-        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', t), false, function(e) {
+        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), l[7872].replace('[X]', contact),
+        function(e) {
             if (e) {
-                for (var i in $.selected) {
-                    if (M.c[$.selected[i]]) {
-                        for (var sharenode in M.c[$.selected[i]]) {
+                $.selected.forEach(function(selected) {
+
+                    if (M.c[selected]) {
+                        M.c[selected].forEach(function(sharenode) {
                             removeShare(sharenode, 1);
-                        }
+                        });
                     }
 
                     api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
                     M.handleEmptyContactGrid();
-                }
+                });
             }
         });
         if (c > 1) {
@@ -2525,6 +2533,43 @@ function initContextUI() {
 
     $(c + '.remove-item').rebind('click', function() {
         fmremove();
+    });
+
+    $(c + '.startchat-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected[0];
+
+        if (!$this.is(".disabled") && user_handle) {
+            window.location = "#fm/chat/" + user_handle;
+        }
+    });
+
+    $(c + '.startaudio-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected[0];
+        var room;
+
+        if (!$this.is(".disabled") && user_handle) {
+            window.location = "#fm/chat/" + user_handle;
+            room = megaChat.createAndShowPrivateRoomFor(user_handle);
+            if (room) {
+                room.startAudioCall();
+            }
+        }
+    });
+
+    $(c + '.startvideo-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected[0];
+        var room;
+
+        if (!$this.is(".disabled") && user_handle) {
+            window.location = "#fm/chat/" + user_handle;
+            room = megaChat.createAndShowPrivateRoomFor(user_handle);
+            if (room) {
+                room.startVideoCall();
+            }
+        }
     });
 
     $(c + '.removeshare-item').rebind('click', function() {
@@ -3205,8 +3250,9 @@ function accountUI()
                 return false;
             }
 
+            var userAgent = el[2];
             var dateTime = htmlentities(time2date(el[0]));
-            var browser = browserdetails(el[2]);
+            var browser = browserdetails(userAgent);
             var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
@@ -3238,7 +3284,10 @@ function accountUI()
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName) + '</span></td>'
+                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent)
+                    + '" src="' + staticpath + 'images/browser/' + browser.icon
+                    + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
+                    + '</span></td>'
                 + '<td>' + ipAddress + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
                 + '<td>' + dateTime + '</td>'
@@ -3257,7 +3306,7 @@ function accountUI()
                 numActiveSessions++;
             }
         });
-        $('.grid-table.sessions').html(html);
+        $('.grid-table.sessions').safeHTML(html);
 
         // Don't show button to close other sessions if there's only the current session
         if (numActiveSessions === 1) {
@@ -3913,6 +3962,7 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
         $('.rubsched_textopt').rebind('click keyup', function(e) {
             var id = String($(this).attr('id')).split('_')[0];
@@ -3920,6 +3970,7 @@ function accountUI()
             $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
             M.account.rubsched = id.substr(3) + ':' + $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
         $('.rubsched input').rebind('click', function(e) {
             var id = $(this).attr('id');
@@ -3940,6 +3991,7 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
 
         $('.redeem-voucher').unbind('click');
@@ -4139,7 +4191,7 @@ function accountUI()
         $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
             msgDialog('confirmation', l[1756], l[6973], false, function(e) {
                 if (e) {
-                    setUserAttribute('a', 'none', true, false);
+                    mega.attr.set('a', 'none', true, false);
 
                     delete avatars[u_handle];
                     $('.fm-account-avatar').html(useravatar.contact(u_handle));
@@ -4302,7 +4354,7 @@ function avatarDialog(close)
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);
-                setUserAttribute('a', base64urlencode(ab_to_str(data)), true, false);
+                mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
                 var blob = new Blob([data], {type: 'image/jpeg'});
                 avatars[u_handle] =
                     {
@@ -4571,7 +4623,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
-            if(typeof(selectionManager) != 'undefined' && selectionManager) {
+            if (typeof selectionManager != 'undefined' && selectionManager) {
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -5883,7 +5935,7 @@ function getDDhelper()
 /**
  * menuItems
  *
- * Selecte what in context menu will be shown of actions and what not, depends on selected item/s
+ * Select what in context menu will be shown of actions and what not, depends on selected item/s
  * @returns {menuItems.items|Array}
  */
 function menuItems() {
@@ -5896,7 +5948,8 @@ function menuItems() {
         hasExportLink = false,
         sourceRoot = RootbyId($.selected[0]);
 
-    if ($.selected.length === 1 && RightsbyID($.selected[0]) > 1) {
+    // Show Rename action in case that only one item is selected
+    if (($.selected.length === 1) && (RightsbyID($.selected[0]) > 1)) {
         items['.rename-item'] = 1;
     }
 
@@ -5915,26 +5968,36 @@ function menuItems() {
 
     selItem = M.d[$.selected[0]];
 
-    if (selItem && selItem.p.length === 11) {
+    if (selItem && (selItem.p.length === 11)) {
         items['.removeshare-item'] = 1;
     }
     else if (RightsbyID($.selected[0]) > 1) {
         items['.remove-item'] = 1;
     }
 
-    if (selItem && $.selected.length === 1 && selItem.t) {
+    if (selItem && ($.selected.length === 1) && selItem.t) {
         items['.open-item'] = 1;
     }
 
-    if (selItem && $.selected.length === 1 && is_image(selItem)) {
+    if (
+        selItem
+        && ($.selected.length === 1)
+        && is_image(selItem)
+        ) {
         items['.preview-item'] = 1;
     }
 
-    if (selItem && sourceRoot === M.RootID && $.selected.length === 1 && selItem.t && !folderlink) {
+    if (
+        selItem
+        && (sourceRoot === M.RootID)
+        && ($.selected.length === 1)
+        && selItem.t
+        && !folderlink
+        ) {
         items['.sh4r1ng-item'] = 1;
     }
 
-    if (sourceRoot === M.RootID && !folderlink) {
+    if ((sourceRoot === M.RootID) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
 
@@ -5981,14 +6044,15 @@ function menuItems() {
 
 function contextMenuUI(e, ll) {
 
-    var items, v, flt,
-        m = $('.context-menu.files-menu'),
+    var v;
+    var flt;
+    var items = {};
+    var m = $('.context-menu.files-menu');
 
-        // Selection of first child level ONLY of .context-menu-item in .context-menu
-        menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item',
-//            ', .context-menu.files-menu > .context-menu-item',// Selection of .select-all, doesn't belongs to .context-menu-section
-        currNodeClass = $(e.currentTarget).attr('class'),
-        id = $(e.currentTarget).attr('id');
+    // Selection of first child level ONLY of .context-menu-item in .context-menu
+    var menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item';
+    var currNodeClass = $(e.currentTarget).attr('class');
+    var id = $(e.currentTarget).attr('id');
 
     // is contextmenu disabled
     if (localStorage.contextmenu) {
@@ -6021,6 +6085,7 @@ function contextMenuUI(e, ll) {
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
         items = menuItems();
+
         delete items['.download-item'];
         delete items['.zipdownload-item'];
         delete items['.copy-item'];
@@ -6053,9 +6118,17 @@ function contextMenuUI(e, ll) {
             id = undefined;// exist in node list
         }
 
-        // detect and show right menu
-        if (id && id.length === 11) {
-            $(menuCMI).filter('.remove-item').show();// transfer panel
+        // In case that id belongs to contact, 11 char length
+        if (id && (id.length === 11)) {
+            $(menuCMI).filter('.remove-item,.startchat-item,.startaudio-item,.startvideo-item').show();// transfer panel
+
+            $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
+
+            // If selected contact is offline make sure that audio and video calls are forbiden (disabled)
+            if ($('#' + id).find('.offline').length) {
+                $(menuCMI).filter('.startaudio-item').addClass('disabled');
+                $(menuCMI).filter('.startvideo-item').addClass('disabled');
+            }
         }
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1 || currNodeClass.indexOf('folder-link') > -1)) {
             flt = '.properties-item';
@@ -6466,7 +6539,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if($(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length > 0 || $(e.target).parents('.messages.content-area').length > 0 || $(e.target).parents('.chat-right-pad .user-card-data').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if ($(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length > 0 || $(e.target).parents('.messages.content-area').length > 0 || $(e.target).parents('.chat-right-pad .user-card-data').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6545,7 +6618,7 @@ function sectionUIopen(id) {
     }
 
     $('.nw-fm-left-icon').removeClass('active');
-    if(M.hasInboxItems() === true) {
+    if (M.hasInboxItems() === true) {
         $('.nw-fm-left-icon.inbox').removeClass('hidden');
     } else {
         $('.nw-fm-left-icon.inbox').addClass('hidden');
@@ -6691,7 +6764,7 @@ function sectionUIopen(id) {
 
     {
         // required tricks to make the conversations work with the old UI HTML/css structure
-        if(id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
+        if (id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
             $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').addClass('hidden');
             $('.fm-main.default > .fm-left-panel').addClass('hidden');
         } else {
@@ -7076,10 +7149,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
-        if($selectedPlan.is(".pro4")) { plan = 4; }
-        else if($selectedPlan.is(".pro1")) { plan = 1; }
-        else if($selectedPlan.is(".pro2")) { plan = 2; }
-        else if($selectedPlan.is(".pro3")) { plan = 3; }
+        if ($selectedPlan.is(".pro4")) { plan = 4; }
+        else if ($selectedPlan.is(".pro1")) { plan = 1; }
+        else if ($selectedPlan.is(".pro2")) { plan = 2; }
+        else if ($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
             .removeClass('plan1')
@@ -7113,7 +7186,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
 
-    if(!$('.pro-register-dialog').is(':visible')) {
+    if (!$('.pro-register-dialog').is(':visible')) {
         fm_hideoverlay();
     }
 
@@ -7611,7 +7684,7 @@ function initShareDialogMultiInputPlugin() {
             tokenValue: "id",
             propertyToSearch: "id",
             resultsLimit: 5,
-            minChars: 2,
+            minChars: 1,
             accountHolder: (M.u[u_handle] || {}).m || '',
             scrollLocation: 'share',
             // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
@@ -8082,7 +8155,7 @@ function initShareDialog() {
       if (txtHeight !== hiddenDiv.outerHeight() ) {
         txt.height(hiddenDiv.outerHeight());
 
-        if( $('.share-message-textarea').outerHeight()>=50) {
+        if ( $('.share-message-textarea').outerHeight()>=50) {
             pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
             api = pane.data('jsp');
             txt.blur();
@@ -8152,7 +8225,7 @@ function closeDialog() {
     var logger = MegaLogger.getLogger('closeDialog');
 
     logger.debug($.dialog);
-    if($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
+    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
     }
@@ -8841,13 +8914,13 @@ function showToast(toastClass, notification, buttonLabel) {
     timeout = setTimeout(function() {
         hideToast();
     }, 5000);
-    
+
     if (buttonLabel) {
         $('.common-toast .toast-button').safeHTML(buttonLabel);
     } else {
         $('.common-toast .toast-button').safeHTML(l[726]);
     }
-    
+
     $('.toast-close-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');
@@ -9466,7 +9539,7 @@ function propertiesDialog(close)
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
 
-    if (typeof(p.t10) === 'undefined' && typeof(p.t11) === 'undefined') {
+    if (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined') {
         $('.properties-small-gray.t10').addClass('hidden');
         $('.propreties-dark-txt.t11').addClass('hidden');
     }
@@ -9577,7 +9650,7 @@ function termsDialog(close, pp)
     if (close)
     {
         $('.fm-dialog.terms-dialog').addClass('hidden');
-        if(!$('.pro-register-dialog').is(":visible")) {
+        if (!$('.pro-register-dialog').is(":visible")) {
             fm_hideoverlay();
             $.dialog=false;
         }

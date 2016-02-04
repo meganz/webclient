@@ -10,7 +10,7 @@ This test runner will work with both Python 2.7 as well as 3.x.
 
 ## Created: 23 May 2015 Guy Kloss <gk@mega.nz>
 ##
-## (c) 2015 by Mega Limited, Auckland, New Zealand
+## (c) 2015-2016 by Mega Limited, Auckland, New Zealand
 ##     http://mega.nz/
 ##     Simplified (2-clause) BSD License.
 ##
@@ -75,7 +75,8 @@ def get_git_line_sets(base, target):
             # Update our lines if we have target lines.
             if line_range > 0:
                 file_line_mapping[current_file].update(range(start_line,
-                                                             start_line + line_range - 1))
+                                                             start_line
+                                                             + line_range))
 
     return file_line_mapping
 
@@ -176,6 +177,47 @@ def reduce_jscs(file_line_mapping, **extra):
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
     result.append('\n{} code style errors found.'.format(error_count))
+    return '\n\n'.join(result), error_count
+
+
+def reduce_minifiedjs(file_line_mapping, **extra):
+    """
+    Checks changed files for contents of minified JavaScript.
+
+    :param file_line_mapping: Mapping of files with changed lines (obtained
+        `get_git_line_sets()`).
+    :param extra: Optional keyword arguments (none available).
+    :return: A tuple containing the formatted string suitable for output and
+        an integer containing the number of failed rules.
+    """
+    # Get the JavaScript line lengths.
+    logging.info('Checking for minified JavaScript ...')
+    result = ['\nMinification detection output:\n'
+              '==============================']
+    for filename, line_set in file_line_mapping.iteritems():
+        file_path = '/'.join(filename)
+        if (filename[0] not in config.MINIFICATION_CHECK_DIRS
+                or file_path in config.MINIFICATION_IGNORE_FILES):
+            # Ignore this entry.
+            continue
+        with open(file_path, 'r') as fd:
+            # Check line lengths in file.
+            line_number = 0
+            for line in fd.readlines():
+                line_number += 1
+                if line_number not in line_set:
+                    # Not a changed line.
+                    continue
+                line_length = len(line)
+                if line_length > config.MINIFICATION_THRESHOLD:
+                    result.append('Minified code found in file {}, line {}'
+                                  ' (length {})'
+                                  .format(file_path, line_number, line_length))
+
+    # Add the number of errors and return in a nicely formatted way.
+    error_count = len(result) - 1
+    result.append('\n{} possible JavaScript minifications found.'
+                  .format(error_count))
     return '\n\n'.join(result), error_count
 
 
@@ -363,6 +405,7 @@ def main(base, target, norules):
     """
     CHECKER_MAPPING = {'jshint': reduce_jshint,
                        'jscs': reduce_jscs,
+                       'minifiedjs': reduce_minifiedjs,
                        'cppcheck': reduce_cppcheck,
                        'nsiqcppstyle': reduce_nsiqcppstyle,
                        'vera++': reduce_verapp}
@@ -384,7 +427,7 @@ def main(base, target, norules):
 
 if __name__ == '__main__':
     # Set up logging.
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.INFO,
                         format='%(levelname)s\t%(asctime)s %(message)s')
 
     # Setup the command line argument parser.

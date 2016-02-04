@@ -131,15 +131,17 @@ describe("MegaPromise Unit Test", function() {
     it("then passthrough reject", function(done) {
         var v = "";
         var p = new MegaPromise();
-        p.then(function(arg) {
-            v = arg + '-donecb';
+        p
+            .then(function(arg) {
+                v = arg + '-donecb';
 
-            return v;
-        }).then(undefined, function(arg) {
-            v = arg + '-failcb';
+                return v;
+            })
+            .then(undefined, function(arg) {
+                    v = arg + '-failcb';
 
-            return v;
-        });
+                    return v;
+                });
 
         p.reject('rej-arg');
         expect(v).to.eql('rej-arg-failcb');
@@ -150,15 +152,15 @@ describe("MegaPromise Unit Test", function() {
     it("then passthrough resolve", function(done) {
         var v = "";
         var p = new MegaPromise();
-        p.then(function(arg) {
-            v = arg + '-donecb';
-
-            return v;
-        }).then(undefined, function(arg) {
-            v = arg + '-failcb';
-
-            return v;
-        });
+        p
+            .then(function(arg) {
+                v = arg + '-donecb';
+                return v;
+            })
+            .then(undefined, function(arg) {
+                v = arg + '-failcb';
+                return v;
+            });
 
         p.resolve('res-arg');
         expect(v).to.eql('res-arg-donecb');

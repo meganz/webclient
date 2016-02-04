@@ -39,6 +39,25 @@ if (typeof loadingDialog === 'undefined')
     };
 }
 
+// data struct definitions
+var MEGA_USER_STRUCT = {
+    "u": undefined,
+    "c": undefined,
+    "m": undefined,
+    "m2": undefined,
+    "name": undefined,
+    "h": undefined,
+    "t": undefined,
+    "p": undefined,
+    "presence": undefined,
+    "presenceMtime": undefined,
+    "displayColor": undefined,
+    "shortName": undefined,
+    "firstName": undefined,
+    "lastName": undefined,
+    "ts": undefined
+};
+
 function MegaData()
 {
     this.h = {};
@@ -51,7 +70,8 @@ function MegaData()
         this.d = {};
         this.v = [];
         this.c = {};
-        this.u = {};
+        this.u = new MegaDataMap();
+
         this.t = {};
         this.opc = {};
         this.ipc = {};
@@ -65,6 +85,8 @@ function MegaData()
         this.RubbishID = undefined;
         this.InboxID = undefined;
         this.viewmode = 0; // 0 list view, 1 block view
+
+        mBroadcaster.sendMessage("MegaDataReset");
     };
     this.reset();
 
@@ -78,6 +100,7 @@ function MegaData()
                 return -1;
             else if (a.t < b.t)
                 return 1;
+
             return fn(a, b, d);
         });
         this.sortfn = fn;
@@ -87,7 +110,6 @@ function MegaData()
     this.sort = function()
     {
         this.sortBy(this.sortfn, this.sortd);
-        this.sortBy(this.sortfn, this.sortd);
     };
 
     this.sortReverse = function()
@@ -95,6 +117,7 @@ function MegaData()
         var d = 1;
         if (this.sortd > 0)
             d = -1;
+
         this.sortBy(this.sortfn, d);
     };
 
@@ -248,28 +271,12 @@ function MegaData()
 
     this.sortByInteraction = function(d)
     {
-        this.i_cache = {};
-        this.sortfn = function(a, b, d)
-        {
-            if (!M.i_cache[a.u])
-            {
-                var cs = M.contactstatus(a.u);
-                if (cs.ts == 0)
-                    cs.ts = -1;
-                M.i_cache[a.u] = cs.ts;
-            }
-            if (!M.i_cache[b.u])
-            {
-                var cs = M.contactstatus(b.u);
-                if (cs.ts == 0)
-                    cs.ts = -1;
-                M.i_cache[b.u] = cs.ts;
-            }
-            if (M.i_cache[b.u] < M.i_cache[a.u])
-                return -1 * d;
-            else
-                return 1 * d;
-        }
+        this.sortfn = mega.utils.sortObjFn(
+            function(r) {
+                // Since the M.sort is using a COPY of the data, we need an up-to-date .ts value directly from M.u[...]
+                return M.u[r.h].ts;
+            }, d
+        );
         this.sortd = d;
         this.sort();
     };
@@ -326,7 +333,8 @@ function MegaData()
 
         if (d > 0) {
             $('.arrow.' + n).addClass('desc');
-        } else {
+        }
+        else {
             $('.arrow.' + n).addClass('asc');
         }
 
@@ -340,7 +348,8 @@ function MegaData()
 
         if (fmconfig.uisorting) {
             storefmconfig('sorting', {n: n, d: d});
-        } else {
+        }
+        else {
             fmsortmode(M.currentdirid, n, d);
         }
     };
@@ -405,9 +414,6 @@ function MegaData()
         return M.getFilterBy(function(node) { return node.p === M.InboxID; });
     };
 
-    // @TODO PERF: This should use the localStorage/sessionStorage/mDB for caching the avatars and keeping them up to
-    // date by listening and maintaining the local cache via the actionpackets
-    // OR maybe just start using getUserAttribute? (and the cache can be implemented there?)
     this.avatars = function()
     {
         if (!M.c.contacts)
@@ -416,29 +422,39 @@ function MegaData()
             M.c.contacts[u_handle] = 1;
         }
 
-        for (var u in M.c['contacts'])
-            if (!avatars[u])
-            {
-                api_req({a: 'uga', u: u, ua: '+a'},
-                {
-                    u: u,
-                    callback: function(res, ctx)
-                    {
-                        if (typeof res !== 'number' && res.length > 5)
-                        {
+        var waitingPromises = [];
+        M.u.forEach(function(c, u) {
+            if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
+                waitingPromises.push(
+                    mega.attr.get(u, 'a', true, false, function (res) {
+                        if (typeof res !== 'number' && res.length > 5) {
                             var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
-                            avatars[ctx.u] = {
+                            avatars[u] = {
                                 data: blob,
                                 url: myURL.createObjectURL(blob)
                             };
                         }
-                        useravatar.loaded(ctx.u);
-                    }
-                });
+                        useravatar.loaded(u);
+                    })
+                    .fail(function() {
+                        delete avatars[u];
+                        useravatar.loaded(u);
+                    })
+                );
             }
+        });
+
+        MegaPromise
+            .allDone(
+                waitingPromises
+            ).always(function() {
+                // trigger UI refresh
+                M.renderAvatars();
+            });
+
 
         delete M.c.contacts[u_handle];
-    }
+    };
 
     this.renderAvatars = function()
     {
@@ -453,13 +469,11 @@ function MegaData()
         });
     }
 
-    this.contactstatus = function(h, wantTimeStamp)
-    {
+    this.contactstatus = function(h, wantTimeStamp) {
         var folders = 0;
         var files = 0;
         var ts = 0;
-        if (M.d[h])
-        {
+        if (M.d[h]) {
             if (!wantTimeStamp || !M.d[h].ts) {
                 var a = fm_getnodes(h);
                 for (var i in a) {
@@ -482,61 +496,66 @@ function MegaData()
                 if (!M.d[h].ts) {
                     M.d[h].ts = ts;
                 }
-            } else {
+            }
+            else {
                 ts = M.d[h].ts;
             }
         }
 
-        return {files: files, folders: folders, ts: ts};
+        return { files: files, folders: folders, ts: ts };
     };
 
-    this.onlineStatusClass = function(os)
-    {
-        if (os == 'dnd')
+    this.onlineStatusClass = function(os) {
+        if (os === 'dnd') {
             return [l[5925], 'busy'];
-        else if (os == 'away')
+        }
+        else if (os === 'away') {
             return [l[5924], 'away'];
-        else if (os == 'chat' || os == 'available')
+        }
+        else if ((os === 'chat') || (os === 'available')) {
             return [l[5923], 'online'];
-        else
+        }
+        else {
             return [l[5926], 'offline'];
+        }
     };
 
-    this.onlineStatusEvent = function(u, status)
-    {
-        if (u && megaChatIsReady)
-        {
+    this.onlineStatusEvent = function(u, status) {
+        if (u && megaChatIsReady) {
             // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
             // user's devices, which is aggregated by Karere already
             status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
             var e = $('.ustatus.' + u.u);
-            if (e.length > 0)
-            {
+            if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
                 $(e).addClass(this.onlineStatusClass(status)[1]);
             }
             var e = $('.fm-chat-user-status.' + u.u);
-            if (e.length > 0)
+            if (e.length > 0) {
                 $(e).html(this.onlineStatusClass(status)[0]);
+            }
+
             if (
                 typeof $.sortTreePanel !== 'undefined' &&
                 typeof $.sortTreePanel.contacts !== 'undefined' &&
-                $.sortTreePanel.contacts.by == 'status'
+                $.sortTreePanel.contacts.by === 'status'
             ) {
-                M.contacts(); // we need to resort
+                // we need to resort
+                M.contacts();
             }
 
-            if (window.location.hash == "#fm/" + u.u) {
+            if (window.location.hash === "#fm/" + u.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
             }
         }
     };
 
-    this.emptySharefolderUI = function(lSel)
-    {
-        if (!lSel)
+    this.emptySharefolderUI = function(lSel) {
+        if (!lSel) {
             lSel = this.fsViewSel;
+        }
+
         $(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
         $(lSel).parent().children('table').hide();
 
@@ -544,6 +563,7 @@ function MegaData()
 
         $.tresizer();
     };
+
     Object.defineProperty(this, 'fsViewSel', {
         value: '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling',
         configurable: false
@@ -574,14 +594,16 @@ function MegaData()
                 if (M.ipc[id]) {
                     if (M.ipc[id].dts || (M.ipc[id].s && (M.ipc[id].s === 3))) {
                         type = 'deleted';
-                    } else if (M.ipc[id].s && M.ipc[id].s === 1) {
+                    }
+                    else if (M.ipc[id].s && M.ipc[id].s === 1) {
                         type = 'ignored';
                     }
                     trClass = (type !== '') ? ' class="' + type + '"' : '';
                     email = ipc[i].m;
                     if (ipc[i].ps && ipc[i].ps !== 0) {
                         ps = '<span class="contact-request-content">' + ipc[i].ps + ' ' + l[105] + ' ' + l[813] + '</span>';
-                    } else {
+                    }
+                    else {
                         ps = '<span class="contact-request-content">' + l[5851] + '</span>';
                     }
                     html = '<tr id="ipc_' + id + '"' + trClass + '>\n\
@@ -626,12 +648,12 @@ function MegaData()
         // If focus is on contacts tab
         if (M.currentdirid === 'contacts') {
             var haveActiveContact = false;
-            for (var i in M.u) {
-                if (M.u[i].c !== 0 && M.u[i].c !== 2) {
+            M.u.forEach(function(v, k) {
+                if (v.c !== 0 && v.c !== 2) {
                     haveActiveContact = true;
-                    break;
+                    return false; // break
                 }
-            }
+            });
 
             // We do NOT have active contacts, set empty contacts grid
             if (!haveActiveContact) {
@@ -738,7 +760,8 @@ function MegaData()
                 for (var i in e) {
                     if (M.v[e[i][0]] && M.v[e[i][0]].h === e[i][2]) {
                         M.v[e[i][0]].seen = true;
-                    } else {
+                    }
+                    else {
                         if (d > 1) {
                             console.log('desync cached node...', e[i][2]);
                         }
@@ -760,7 +783,8 @@ function MegaData()
                     M.rmSetupUI();
                 }, 750);
                 $(window).trigger('resize');
-            } else {
+            }
+            else {
                 $(lSel).unbind('jsp-scroll-y.dynlist');
             }
         }// flush_cached_nodes END
@@ -783,10 +807,12 @@ function MegaData()
                 // 1. if the current view does not have any nodes, just append it
                 if (aDynCache) {
                     cache.push(aDynCache);
-                } else {
+                }
+                else {
                     $(aTag).append(aHTMLContent);
                 }
-            } else {
+            }
+            else {
                 var j;
                 if ($(aTag + ' #' + aNode.h).length) {
                     files--;
@@ -800,7 +826,8 @@ function MegaData()
                     if (aNode.t) {
                         for (var x = 0, m = cache.length; x < m && cache[x][3]; ++x);
                         cache.splice(x, 0, aDynCache);
-                    } else {
+                    }
+                    else {
                         cache.push(aDynCache);
                     }
                     return;
@@ -809,18 +836,22 @@ function MegaData()
                 if (aUpdate && aPrevNode && $(aTag + ' #' + aPrevNode.h).length) {
                     // 2. if there is a node before the new node in the current view, add it after that node:
                     $(aTag + ' #' + aPrevNode.h).after(aHTMLContent);
-                } else if (aUpdate && aNextNode && $(aTag + ' #' + aNextNode.h).length) {
+                }
+                else if (aUpdate && aNextNode && $(aTag + ' #' + aNextNode.h).length) {
                     // 3. if there is a node after the new node in the current view, add it before that node:
                     $(aTag + ' #' + aNextNode.h).before(aHTMLContent);
-                } else if (aNode.t) {
+                }
+                else if (aNode.t) {
                     // 4. new folder: insert new node before the first folder in the current view
                     $($(aTag + ' ' + aElement)[0]).before(aHTMLContent);
-                } else {// !aNode.t)
+                }
+                else {// !aNode.t)
                     // 5. new file: insert new node before the first file in the current view
                     var a = $(aTag + ' ' + aElement).not('.folder');
                     if (a.length > 0) {
                         $(a[0]).before(aHTMLContent);
-                    } else {
+                    }
+                    else {
                         // 6. if this view does not have any files, insert after the last folder
                         a = $(aTag + ' ' + aElement);
                         $(a[a.length - 1]).after(aHTMLContent);
@@ -889,7 +920,8 @@ function MegaData()
                                     <span class="shared-folder-info">' + htmlentities(node.m) + '</span>\n\
                                 </span>\n\
                             </a>';
-                } else {
+                }
+                else {
                     el = 'tr';
                     t = '.grid-table.contacts';
                     html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
@@ -950,7 +982,8 @@ function MegaData()
                 if (M.v[i].t) {
                     ftype = l[1049];
                     c = ' folder';
-                } else {
+                }
+                else {
                     ftype = filetype(M.v[i].name);
                     s = htmlentities(bytesToSize(M.v[i].s));
                 }
@@ -973,7 +1006,8 @@ function MegaData()
                     if (M.v[i].r === 1) {
                         rights = l[56];
                         rightsclass = ' read-and-write';
-                    } else if (M.v[i].r === 2) {
+                    }
+                    else if (M.v[i].r === 2) {
                         rights = l[57];
                         rightsclass = ' full-access';
                     }
@@ -992,7 +1026,8 @@ function MegaData()
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
                             + contactName + '</span></span></a>';
-                    } else {
+                    }
+                    else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
@@ -1021,7 +1056,8 @@ function MegaData()
                     if (M.v[i].r === 1) {
                         rights = l[56];
                         rightsclass = ' read-and-write';
-                    } else if (M.v[i].r === 2) {
+                    }
+                    else if (M.v[i].r === 2) {
                         rights = l[57];
                         rightsclass = ' full-access';
                     }
@@ -1038,7 +1074,8 @@ function MegaData()
                                     </span>\n\
                                     <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
-                    } else {
+                    }
+                    else {
                         t = '.contacts-details-block .grid-table.shared-with-me';
                         el = 'tr';
                         html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
@@ -1060,7 +1097,8 @@ function MegaData()
                                     </td>\n\
                                 </tr>';
                     }
-                } else {
+                }
+                else {
 
                     if (M.v[i].shares) {
                         iShareNum = Object.keys(M.v[i].shares).length;
@@ -1102,7 +1140,8 @@ function MegaData()
                     else {
                         if (M.lastColumn && M.v[i].p !== "contacts") {
                             time = time2date(M.v[i][M.lastColumn] || M.v[i].ts);
-                        } else {
+                        }
+                        else {
                             time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
                         }
                         t = '.grid-table.fm';
@@ -1187,7 +1226,8 @@ function MegaData()
             else if (M.currentdirid === M.RootID && folderlink) {
                 if (!isValidShareLink()) {
                     $('.fm-invalid-folder').removeClass('hidden');
-                } else {
+                }
+                else {
                     $('.fm-empty-folder-link').removeClass('hidden');
                 }
             }
@@ -1215,7 +1255,8 @@ function MegaData()
             if (this.viewmode === 1) {
                 var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
                 n_cache = r * Math.ceil($('.fm-blocks-view.fm').height() / 164) + r;
-            } else {
+            }
+            else {
                 n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
             }
             if (!n_cache) {
@@ -1224,7 +1265,8 @@ function MegaData()
                     return Soon(function() {
                         M.renderMain(u);
                     });
-            } else {
+            }
+            else {
                 $.rmItemsInView = n_cache;
             }
         }
@@ -1276,7 +1318,8 @@ function MegaData()
                         if (M.viewmode === 1) {
                             var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
                             n = r * Math.ceil($('.fm-blocks-view').height() / 164) - $('.fm-blocks-view.fm a').length;
-                        } else {
+                        }
+                        else {
                             n = 2 + Math.ceil($('.files-grid-view.fm').height() / 24 - $('.files-grid-view.fm tr').length);
                         }
 
@@ -1312,7 +1355,8 @@ function MegaData()
             }
             iconUI(u);
             fm_thumbnails();
-        } else {
+        }
+        else {
             Soon(gridUI);
         }
         Soon(fmtopUI);
@@ -1453,7 +1497,7 @@ function MegaData()
         this.renderInboxTree();
         treeUI();
         if (megaChatIsReady) {
-            megaChat.renderContactTree();
+            // megaChat.renderContactTree();
         }
     };
 
@@ -1477,7 +1521,8 @@ function MegaData()
             fminitialized = true;
             $('.top-search-bl').show();
             mBroadcaster.sendMessage('fm:initialized');
-        } else if (id && id === this.currentdirid && !force) {// Do nothing if same path is choosen
+        }
+        else if (id && id === this.currentdirid && !force) {// Do nothing if same path is choosen
             return false;
         }
         if (id === 'rubbish')
@@ -1501,14 +1546,12 @@ function MegaData()
             else {
                 this.chat = true;
 
-                if (megaChat.renderListing() === true) {
-                    window.location = megaChat.getCurrentRoom().getRoomUrl();
-                    return;
-                }
                 megaChat.refreshConversations();
                 treeUI();
+                megaChat.renderListing();
             }
-        } else if (id && id.substr(0, 7) === 'account')
+        }
+        else if (id && id.substr(0, 7) === 'account')
             accountUI();
         else if (id && id.substr(0, 13) === 'notifications')
             notificationsUI();
@@ -1519,14 +1562,15 @@ function MegaData()
             treeUI();
 
             if (!megaChatIsDisabled) {
-                if(typeof(megaChat) === 'undefined') {
+                if (typeof megaChat === 'undefined') {
                     // queue for opening the megachat UI WHEN the pubEd keys are loaded
                     // happens, often when the APIs are returning -3
 
                     mBroadcaster.once('pubEd25519', function() {
                         chatui(id);
                     });
-                } else {
+                }
+                else {
                     // XX: using the old code...for now
                     chatui(id);
                 }
@@ -1556,7 +1600,7 @@ function MegaData()
 
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
-            $.tresizer();
+            //$.tresizer();
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -1581,9 +1625,11 @@ function MegaData()
             if (typeof fmconfig.uiviewmode !== 'undefined' && fmconfig.uiviewmode) {
                 if (fmconfig.viewmode)
                     viewmode = fmconfig.viewmode;
-            } else if (typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined') {
+            }
+            else if (typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined') {
                 viewmode = fmconfig.viewmodes[id];
-            } else {
+            }
+            else {
                 for (var i in M.v) {
                     if (is_image(M.v[i])) {
                         viewmode = 1;
@@ -1594,11 +1640,14 @@ function MegaData()
             M.viewmode = viewmode;
             if (fmconfig.uisorting && fmconfig.sorting) {
                 M.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
-            } else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
+            }
+            else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
                 M.doSort(fmconfig.sortmodes[id].n, fmconfig.sortmodes[id].d);
-            } else if (M.currentdirid === 'contacts') {
+            }
+            else if (M.currentdirid === 'contacts') {
                 M.doSort('status', 1);
-            } else {
+            }
+            else {
                 M.doSort('name', 1);
             }
 
@@ -1607,7 +1656,8 @@ function MegaData()
                 for (var i in M.opc) {
                     this.v.push(M.opc[i]);
                 }
-            } else if (M.currentdirid === 'ipc') {
+            }
+            else if (M.currentdirid === 'ipc') {
                 this.v = [];
                 for (var i in M.ipc) {
                     this.v.push(M.ipc[i]);
@@ -1635,16 +1685,25 @@ function MegaData()
                 M.renderPath();
             });
         }
+
+        var newHashLocation;
+
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
             var target = '';
             if (this.currentdirid !== this.RootID) {
                 target = '!' +  this.currentdirid;
             }
-            window.location.hash = '#F!' + pfid + '!' + pfkey + target;
+            newHashLocation = '#F!' + pfid + '!' + pfkey + target;
         }
         else {
-            window.location.hash = '#fm/' + M.currentdirid;
+            newHashLocation = '#fm/' + M.currentdirid;
+        }
+        try {
+            window.location.hash = newHashLocation;
+        }
+        catch (ex) {
+            console.error(ex);
         }
         searchPath();
 
@@ -1659,9 +1718,14 @@ function MegaData()
     }
 
     this.contacts = function() {
+
         var contacts = [];
-        for (var i in M.c['contacts']) {
-            contacts.push(M.d[i]);
+        var i;
+
+        for (i in M.c['contacts']) {
+            if (M.c['contacts'].hasOwnProperty(i)) {
+                contacts.push(M.d[i]);
+            }
         }
 
         if (typeof this.i_cache !== "object") {
@@ -1670,17 +1734,20 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
+
                 var cs = M.contactstatus(a.u, true);
+
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
+
                 M.i_cache[a.u] = cs.ts;
-
-
                 cs = M.contactstatus(b.u, true);
+
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
+
                 M.i_cache[b.u] = cs.ts;
 
                 return M.i_cache[a.u] - M.i_cache[b.u]
@@ -1691,32 +1758,46 @@ function MegaData()
             }
         }, sortContactByName);
 
-        var html = '', html2 = '', status = '', img;
-        // status can be: "online"/"away"/"busy"/"offline"
-        for (var i in contacts)
-        {
-            if (contacts[i].u === u_handle) { // don't show my own contact in the contact & conv. lists
-                continue;
-            }
-            var onlinestatus;
+        var html = '';
+        var onlinestatus;
 
-            if (megaChatIsReady) {
-                onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
-            } else {
-                onlinestatus = [l[5926], 'offline'];
-            }
-            if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
-                html += '<div class="nw-contact-item ui-droppable ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
+        // status can be: "online"/"away"/"busy"/"offline"
+        for (i in contacts) {
+            if (contacts.hasOwnProperty(i)) {
+
+                // don't show my own contact in the contact & conv. lists
+                if (contacts[i].u === u_handle) {
+                    continue;
+                }
+
+                if (megaChatIsReady) {
+                    var jId = megaChat.getJidFromNodeId(contacts[i].u);
+                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(jId));
+                }
+                else {
+                    onlinestatus = [l[5926], 'offline'];
+                }
+
+                if (!treesearch || (
+                        treesearch
+                        && contacts[i].name
+                        && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1
+                        )
+                    ) {
+                    html += '<div class="nw-contact-item ui-droppable '
+                    + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                    + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                    + htmlentities(contacts[i].name)
+                    + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                }
+                $('.fm-start-chat-dropdown').addClass('hidden');
             }
-            $('.fm-start-chat-dropdown').addClass('hidden');
         }
 
         $('.content-panel.contacts').html(html);
 
         if (megaChatIsReady) {
-            megaChat.renderContactTree();
+            //megaChat.renderContactTree();
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
@@ -1725,25 +1806,28 @@ function MegaData()
 
                 var $this = $(this);
 
+                $.hideContextMenu();
+
                 if (!$this.is(".active")) {
-                    if ($('.fm-tree-panel .jspPane')) scrollPos = $('.fm-tree-panel .jspPane').position().top;
                     $('.start-chat-button').removeClass('active');
 
-                    $('.fm-chat-popup-button', m).removeClass("disabled");
+                    $('.context-menu-item', m).removeClass("disabled");
 
                     var $userDiv = $this.parent().parent();
                     if ($userDiv.is(".offline")) {
-                        $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
+                        $('.context-menu-item.startaudio-item, .context-menu-item.startvideo-item', m)
+                            .addClass("disabled");
                     }
 
                     $this.addClass('active');
-                    var y = $this.closest('.nw-contact-item').position().top + 80 + scrollPos;
+                    var y = $this.offset().top - 20;
                     m
                         .css('top', y)
                         .removeClass('hidden')
                         .addClass('active')
                         .data("triggeredBy", $this);
-                } else {
+                }
+                else {
                     $this.removeClass('active');
                     m
                         .removeClass('active')
@@ -1754,8 +1838,7 @@ function MegaData()
                 return false; // stop propagation!
             });
 
-            $('.fm-chat-popup-button.start-chat').unbind('click.treePanel');
-            $('.fm-chat-popup-button.start-chat').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startchat-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1766,8 +1849,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').unbind('click.treePanel');
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startaudio-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1783,8 +1865,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').unbind('click.treePanel');
-            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .context-menu-item.startvideo-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1839,11 +1920,11 @@ function MegaData()
 
         var found = false;
 
-        Object.keys(self.u).forEach(function(k) {
-            var v = self.u[k];
+        self.u.forEach(function(v, k) {
             if (v.t == 1 && v.name && v.m == email) {
                 found = v;
-                return false; // break
+                // break
+                return false;
             }
         });
 
@@ -2201,9 +2282,11 @@ function MegaData()
                 {
                     if (aTime > bTime) {
                         return 1 * M.csortd;
-                    } else if (aTime < bTime) {
+                    }
+                    else if (aTime < bTime) {
                         return -1 * M.csortd;
-                    } else {
+                    }
+                    else {
                         return 0;
                     }
                 }
@@ -2230,7 +2313,8 @@ function MegaData()
             if (M.d[id] || id === 'contacts' || id === 'messages' || id === 'shares'
                 || id === M.InboxID || id === 'opc' || id === 'ipc') {
                 a.push(id);
-            } else if (!id || id.length !== 11) {
+            }
+            else if (!id || id.length !== 11) {
                 return [];
             }
 
@@ -2291,34 +2375,43 @@ function MegaData()
                 if (folderlink && M.d[this.RootID]) {
                     name = htmlentities(M.d[this.RootID].name);
                     typeclass = 'folder';
-                } else {
+                }
+                else {
                     name = '';
                     typeclass = 'cloud-drive';
                 }
-            } else if (a2[i] === 'contacts') {
+            }
+            else if (a2[i] === 'contacts') {
                 typeclass = 'contacts';
                 name = l[165];
-            } else if (a2[i] === 'opc') {
+            }
+            else if (a2[i] === 'opc') {
                 typeclass = 'sent-requests';
                 name = l[5862];
-            } else if (a2[i] === 'ipc') {
+            }
+            else if (a2[i] === 'ipc') {
                 typeclass = 'received-requests';
                 name = l[5863];
-            } else if (a2[i] === 'shares') {
+            }
+            else if (a2[i] === 'shares') {
                 typeclass = 'shared-with-me';
                 name = '';
-            } else if (a2[i] === this.RubbishID) {
+            }
+            else if (a2[i] === this.RubbishID) {
                 typeclass = 'rubbish-bin';
                 name = l[167];
-            } else if (a2[i] === 'messages' || a2[i] === M.InboxID) {
+            }
+            else if (a2[i] === 'messages' || a2[i] === M.InboxID) {
                 typeclass = 'messages';
                 name = l[166];
-            } else if (a2[i].length === 11) {
+            }
+            else if (a2[i].length === 11) {
                 var n = M.d[a2[i]];
                 if (n.name)
                     name = htmlentities(n.name);
                 typeclass = 'contact';
-            } else {
+            }
+            else {
                 name = htmlentities(M.d[a2[i]].name);
                 typeclass = 'folder';
             }
@@ -2344,7 +2437,8 @@ function MegaData()
                                                 </span>\n\
                                             </a>');
             $('.search-files-result').addClass('hidden');
-        } else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
+        }
+        else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
             $('.fm-breadcrumbs-block').html('\
                                             <a class="fm-breadcrumbs search contains-directories ui-droppable" id="' + htmlentities(a[i]) + '">\n\
                                                 <span class="right-arrow-bg ui-draggable">\n\
@@ -2354,13 +2448,16 @@ function MegaData()
             $('.search-files-result .search-number').text(M.v.length);
             $('.search-files-result').removeClass('hidden');
             $('.search-files-result').addClass('last-button');
-        } else if (this.currentdirid && this.currentdirid === 'opc') {
+        }
+        else if (this.currentdirid && this.currentdirid === 'opc') {
             DEBUG('Render Path OPC');
             $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
-        } else if (this.currentdirid && this.currentdirid === 'ipc') {
+        }
+        else if (this.currentdirid && this.currentdirid === 'ipc') {
             DEBUG('Render Path IPC');
             $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
-        } else {
+        }
+        else {
             $('.search-files-result').addClass('hidden');
             $('.fm-breadcrumbs-block').html(html);
         }
@@ -2369,8 +2466,8 @@ function MegaData()
         $('.fm-file-upload span').text(l[99]);
         $('.fm-folder-upload span').text(l[98]);
 
-        $('.fm-right-header.fm').removeClass('long-path ultra-long-path');
-        if (M.pathLength() + 260 > $('.fm-right-header.fm').width()) {
+        $('.fm-right-header.fm:visible').removeClass('long-path ultra-long-path');
+        if (M.pathLength() + 260 > $('.fm-right-header.fm:visible').width()) {
             $('.fm-right-header.fm').addClass('long-path');
             $('.fm-new-folder span').text('');
             $('.fm-file-upload span').text('');
@@ -2387,7 +2484,8 @@ function MegaData()
 
         if ($('.fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
             $('.fm-breadcrumbs-block').removeClass('deactivated');
-        } else {
+        }
+        else {
             $('.fm-breadcrumbs-block').addClass('deactivated');
         }
 
@@ -2399,7 +2497,8 @@ function MegaData()
             if (!$('.fm-breadcrumbs-block').hasClass('deactivated')) {
                 if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
                     return false;
-                } else if ((crumbId === 'chatcrumb') || (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/')) {
+                }
+                else if ((crumbId === 'chatcrumb') || (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/')) {
                     return false;
                 }
 
@@ -2449,24 +2548,31 @@ function MegaData()
         if (!M.d[n.p] && n.p !== 'contacts') {
             if (n.sk) {
                 n.p = n.u;
-            } else if (n.su) {
+            }
+            else if (n.su) {
                 n.p = n.su;
             }
         }
         if (n.p && n.p.length === 11 && !M.d[n.p]) {
             var u = this.u[n.p];
             if (u) {
-                u.name = u.m;
+                u.name = u.name ? u.name : u.m;
                 u.h = u.u;
                 u.t = 1;
                 u.p = 'contacts';
                 M.addNode(u);
-            } else {
+            }
+            else {
                 console.log('something went wrong!', n.p, this.u[n.p]);
             }
         }
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('f', clone(n));
+            if (n instanceof MegaDataObject) {
+                mDBadd('f', clone(n.toJS()));
+            }
+            else {
+                mDBadd('f', clone(n));
+            }
         }
         if (n.p) {
             if (typeof this.c[n.p] === 'undefined') {
@@ -2496,11 +2602,13 @@ function MegaData()
             if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k) {
                 if (u_kdnodecache[n.h]) {
                     $.extend(n, u_kdnodecache[n.h]);
-                } else {
+                }
+                else {
                     crypto_processkey(u_handle, u_k_aes, n);
                 }
                 u_nodekeys[n.h] = n.key;
-            } else if (!n.k) {
+            }
+            else if (!n.k) {
                 if (n.a) {
                     if (!missingkeys[n.h]) {
                         missingkeys[n.h] = true;
@@ -2518,16 +2626,38 @@ function MegaData()
         if (this.d[n.h] && this.d[n.h].shares) {
             n.shares = this.d[n.h].shares;
         }
+
+        // sync data objs M.u <-> M.d
+        if (n.h.length === 11) {
+            if (this.u[n.h] !== n) {
+                if (typeof(this.u[n.h]) === 'undefined') {
+                    M.addUser(n, ignoreDB);
+                }
+                var tmpNode = n;
+                n = this.u[n.h];
+                // merge changes from n->M.u[n.h]
+                Object.keys(tmpNode).forEach(function(k) {
+                    if (k === "name") {
+                        return;
+                    }
+
+                    n[k] = tmpNode[k];
+                });
+            }
+        }
+
         this.d[n.h] = n;
+
         if (typeof newnodes !== 'undefined') {
             newnodes.push(n);
         }
+        $(window).trigger("megaNodeAdded", [n]);
     };
 
     this.delNode = function(h) {
 
         function ds(h) {
-
+            $(window).trigger("megaNodeRemoved", [h]);
             removeUInode(h);
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
@@ -2621,13 +2751,15 @@ function MegaData()
 //        }
 
         // Check active contacts
-        var u = M.u;
-        for (var i in u) {
-            if ((M.u[i].m === email) && (M.u[i].c !== 0)) {
-                return -2;
+        var result = 0;
+        M.u.forEach(function(v, k) {
+            if (v.m === email && v.c !== 0) {
+                result = -2;
+                return false; // break;
             }
-        }
-        return 0;
+        });
+
+        return result;
     };
 
     /**
@@ -2674,11 +2806,13 @@ function MegaData()
 
             // Invite already sent, and not expired
             msgDialog('info', '', 'Invite already sent, waiting for response');
-        } else if (errorCode === -10) {
+        }
+        else if (errorCode === -10) {
 
             // User already sent you an invitation
             msgDialog('info', '', 'User already sent you an invitation, check incoming contacts dialog');
-        } else if (errorCode === -2) {
+        }
+        else if (errorCode === -2) {
 
             // User already exist or owner
             msgDialog('info', '', l[1783]);
@@ -2842,7 +2976,83 @@ function MegaData()
         this.rubNodes = {}
         this.rubbishIco();
         treeUI();
-    }
+    },
+
+    this.syncUsersFullname = function(userId) {
+        var self = this;
+
+        var lastName = {name: 'lastname', value: null};
+        var firstName = {name: 'firstname', value: null};
+        MegaPromise.allDone([
+            mega.attr.get(userId, 'firstname', -1)
+                .done(function(r) {
+                    firstName.value = r;
+                }),
+            mega.attr.get(userId, 'lastname', -1)
+                .done(function(r) {
+                    lastName.value = r;
+                })
+        ]).done(function(results) {
+            if (!self.u[userId]) {
+                return;
+            }
+
+            [firstName, lastName].forEach(function(obj) {
+                // -1, -9, -2, etc...
+                if (typeof obj.value === 'string') {
+                    try {
+                        obj.value = from8(base64urldecode(obj.value));
+                    }
+                    catch (ex) {
+                        obj.value = ex;
+                    }
+                }
+
+                if (typeof obj.value !== 'string' || !obj.value) {
+                    if (d) {
+                        // Inherit the logger for mega.attr.get
+                        var logger = MegaLogger.getLogger('account');
+
+                        logger.debug('Attribute "%s" for user "%s" cannot be decoded: "%s"',
+                                        obj.name, userId, obj.value);
+                    }
+                    obj.value = '';
+                }
+            });
+
+            lastName = lastName.value;
+            firstName = firstName.value;
+
+            if (firstName.length > 0 && lastName.length > 0) {
+                self.u[userId].name = firstName + " " + lastName;
+            }
+            self.u[userId].firstName = firstName;
+            self.u[userId].lastName = lastName;
+
+            if (userId === u_handle) {
+                u_attr.firstname = firstName;
+                u_attr.lastname = lastName;
+
+                $('.user-name').text(u_attr.firstname);
+            }
+            if (
+                typeof $.sortTreePanel !== 'undefined' &&
+                typeof $.sortTreePanel.contacts !== 'undefined' &&
+                $.sortTreePanel.contacts.by == 'status'
+            ) {
+                M.contacts(); // we need to resort
+            }
+
+            if (window.location.hash == "#fm/" + userId) {
+                // re-render the contact view page if the presence had changed
+                contactUI();
+            }
+            else if (window.location.hash == "#fm/contacts") {
+                // re-render the contact view page if the presence had changed
+                M.openFolder('contacts', true);
+            }
+        });
+    },
 
     /**
      * addUser, updates global .u variable with new user data
@@ -2862,11 +3072,16 @@ function MegaData()
                     this.u[userId][key] = u[key];
                 }
                 u = this.u[userId];
-            } else {
-                this.u[userId] = u;
             }
+            else {
+                this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
+
+                this.syncUsersFullname(userId);
+            }
+
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-                mDBadd('u', clone(u));
+                // convert MegaDataObjects -> JS
+                mDBadd('u', clone(u.toJS ? u.toJS() : u));
             }
         }
     };
@@ -3002,8 +3217,14 @@ function MegaData()
         return nodes.length;
     };
 
-
-    this.copyNodes = function(cn, t, del, callback) {
+    /**
+     * @param {Array} cn                Array of nodes that needs to be copied
+     * @param {String} t                Destination node
+     * @param {Bool} del                Should we delete the node after copying? (Like a move operation)
+     * @param {Callback} callback       Callback function
+     * @param {Callback} callbackError  Callback function for custom errors handling (Optional)
+     */
+    this.copyNodes = function(cn, t, del, callback, callbackError) {
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
             return false;
@@ -3013,7 +3234,7 @@ function MegaData()
             var keyCachePromise = api_cachepubkeys([t]);
             keyCachePromise.done(function _cachepubkeyscomplete() {
                 if (u_pubkeys[t]) {
-                    M.copyNodes(cn, t);
+                    M.copyNodes(cn, t, del, callback, callbackError);
                 }
                 else {
                     loadingDialog.hide();
@@ -3024,7 +3245,7 @@ function MegaData()
             return false;
         }
 
-        var a = $.onImportCopyNodes || fm_getcopynodes(cn, t);
+        var a = this.isNodeObject(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var ops = {a: 'p', t: t, n: a, i: requesti};
         var s = fm_getsharenodes(t);
         if (s.length > 0) {
@@ -3047,6 +3268,10 @@ function MegaData()
                     renderNew();
                 }
                 if (typeof res === 'number' && res < 0) {
+                    loadingDialog.hide();
+                    if (typeof callbackError === "function") {
+                        return callbackError(res);
+                    }
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
                 if (ctx.del) {
@@ -3062,7 +3287,8 @@ function MegaData()
                 }
                 if (res.f) {
                     process_f(res.f, onCopyNodesDone);
-                } else {
+                }
+                else {
                     onCopyNodesDone();
                 }
             }
@@ -3687,7 +3913,8 @@ function MegaData()
                     var nn = [], pp = {};
                     this.getDownloadFolderNodes(n[i], false, nn, pp);
                     cbs.push(this.addDownload.bind(this, nn, 0x21f9A, pp, M.d[n[i]].name));
-                } else {
+                }
+                else {
                     nf.push(n[i]);
                 }
             }
@@ -3830,13 +4057,6 @@ function MegaData()
             }
         }
 
-        if (!$.transferHeader) {
-            transferPanelUI();
-        }
-        //$('.tranfer-view-icon').addClass('active');
-        //$('.fmholder').addClass('transfer-panel-opened');
-        $.transferHeader();
-
         if (!preview)
         {
             this.onDownloadAdded(added, uldl_hold, z, zipsize);
@@ -3847,6 +4067,11 @@ function MegaData()
     };
 
     this.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
+        if (!$.transferHeader) {
+            transferPanelUI();
+        }
+        $.transferHeader();
+
         if (!isZIP || zipSize) {
             showTransferToast('d', isZIP ? 1 : added, isPaused);
         }
@@ -4542,7 +4767,8 @@ function MegaData()
                     if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
                         window.location.hash = 'fm';
                         return false;
-                    } else {
+                    }
+                    else {
                         window.location.hash = urlParts[2];
                         return false;
                     }
@@ -4782,7 +5008,7 @@ function renderfm()
 
     M.openFolder(M.currentdirid);
     if (megaChatIsReady) {
-        megaChat.renderContactTree();
+        //megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
 
@@ -4810,7 +5036,7 @@ function renderNew() {
         if (newNode.h.length === 11) {
             newcontact = true;
         }
-        if (typeof(newNode.su) !== 'undefined') {
+        if (typeof newNode.su !== 'undefined') {
             newshare = true;
         }
         if (newNode && newNode.p && newNode.t) {
@@ -4856,7 +5082,7 @@ function renderNew() {
         treeUI();
 
         if (megaChatIsReady) {
-            megaChat.renderContactTree();
+            //megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
     }
@@ -4931,6 +5157,9 @@ function execsc(actionPackets, callback) {
 
                 if (megaChatIsReady) {
                     $.each(actionPacket.u, function (k, v) {
+                        if (v.c !== 0) {
+                            crypt.getPubRSA(v.u);
+                        }
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
@@ -4990,14 +5219,19 @@ function execsc(actionPackets, callback) {
                 }
             }
             else if (actionPacket.a === 'ua') {
-                for (var j in actionPacket.ua) {
-                    if (actionPacket.ua[j] === '+a') {
-                        avatars[actionPacket.u] = undefined;
-                        loadavatars = true;
-                    } else if (actionPacket.ua[j] === '*authring') {
-                        authring.getContacts('Ed25519');
-                    } else if (actionPacket.ua[j] === '*authRSA') {
-                        authring.getContacts('RSA');
+                var attrs = actionPacket.ua;
+                var actionPacketUserId = actionPacket.u;
+                for (var j in attrs) {
+                    if (attrs.hasOwnProperty(j)) {
+                        var attributeName = attrs[j];
+
+                        if (attributeName === '+a') {
+                            avatars[actionPacketUserId] = undefined;
+                            loadavatars = true;
+                        }
+                        else if (attributeName === 'firstname' || attributeName === 'lastname') {
+                            attribCache.uaPacketParser(attributeName, actionPacketUserId, true);
+                        }
                     }
                 }
             }
@@ -5025,7 +5259,8 @@ function execsc(actionPackets, callback) {
                 // If access right are undefined then share is deleted
                 if (typeof actionPacket.r == "undefined") {
                     M.delNodeShare(actionPacket.n, actionPacket.u);
-                } else if (M.d[actionPacket.n]
+                }
+                else if (M.d[actionPacket.n]
                     && typeof M.d[actionPacket.n].shares !== 'undefined'
                     && M.d[actionPacket.n].shares[actionPacket.u]
                     || actionPacket.ha == crypto_handleauth(actionPacket.n)) {
@@ -5039,7 +5274,8 @@ function execsc(actionPackets, callback) {
                         ts: actionPacket.ts
                     });
                 }
-            } else {
+            }
+            else {
                 if (typeof actionPacket.n !== 'undefined'
                         && typeof actionPacket.k !== 'undefined'
                         && typeof u_sharekeys[actionPacket.n] === 'undefined') {
@@ -5074,7 +5310,8 @@ function execsc(actionPackets, callback) {
                                 r: 0,
                                 su: ''
                             });
-                        } else {
+                        }
+                        else {
                             M.delNode(actionPacket.n);
                         }
                         if (!folderlink && actionPacket.u !== 'EXP' && fminitialized) {
@@ -5085,7 +5322,8 @@ function execsc(actionPackets, callback) {
                             });
                         }
                         delete u_sharekeys[actionPacket.n];
-                    } else {
+                    }
+                    else {
                         if (d) {
                             console.log('I receive a share, prepare for receiving tree a');
                         }
@@ -5099,7 +5337,8 @@ function execsc(actionPackets, callback) {
                                 r: actionPacket.r,
                                 su: actionPacket.o
                             });
-                        } else {
+                        }
+                        else {
                             if (d) {
                                 console.log('look up other root-share-nodes from this user');
                             }
@@ -5155,7 +5394,8 @@ function execsc(actionPackets, callback) {
             crypto_share_rsa2aes();
 
             M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-        } else if (actionPacket.a === 'k' && !folderlink) {
+        }
+        else if (actionPacket.a === 'k' && !folderlink) {
             if (actionPacket.sr)
                 crypto_procsr(actionPacket.sr);
             else if (actionPacket.cr)
@@ -5217,8 +5457,8 @@ function execsc(actionPackets, callback) {
 
             tparentid = false;
             trights = false;
-            //process_f(actionPacket.t.f);
-            async_procnodes = async_procnodes.concat(actionPacket.t.f);
+            __process_f1(actionPacket.t.f);
+            // async_procnodes = async_procnodes.concat(actionPacket.t.f);
         }
         else if (actionPacket.a === 'u') {
             async_treestate.push(actionPacket);
@@ -5232,10 +5472,10 @@ function execsc(actionPackets, callback) {
 
                 $.each(actionPacket.u, function(k, v) {
                     // hide the context menu if it is currently visible and this contact was removed.
-                    if($.selected && $.selected[0] === v.u) {
+                    if ($.selected && $.selected[0] === v.u) {
                         // was selected
                         $.selected = [];
-                        if($('.context-menu.files-menu').is(":visible")) {
+                        if ($('.context-menu.files-menu').is(":visible")) {
                             $.hideContextMenu();
                         }
                     }
@@ -5258,6 +5498,9 @@ function execsc(actionPackets, callback) {
 
             if (megaChatIsReady) {
                 $.each(actionPacket.u, function(k, v) {
+                    if (v.c !== 0) {
+                        crypt.getPubRSA(v.u);
+                    }
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
             }
@@ -5266,16 +5509,13 @@ function execsc(actionPackets, callback) {
             M.delNode(actionPacket.n);
         }
         else if (actionPacket.a === 'ua' && fminitialized) {
-            for (var i in actionPacket.ua) {
-                if (actionPacket.ua[i] === '+a') {
-                    avatars[actionPacket.u] = undefined;
-                    loadavatars = true;
+            var attrs = actionPacket.ua;
+            var actionPacketUserId = actionPacket.u;
+            for (var j in attrs) {
+                if (attrs.hasOwnProperty(j)) {
+                    var attributeName = attrs[j];
 
-                } else if (actionPacket.ua[i] == '+puEd255') {
-                    // pubEd25519 key was updated!
-                    // force finger regen.
-                    delete pubEd25519[actionPacket.u];
-                    crypt.getPubEd25519(actionPacket.u);
+                    attribCache.uaPacketParser(attributeName, actionPacketUserId);
                 }
             }
         }
@@ -5296,6 +5536,7 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
+            notify.notifyFromActionPacket(actionPacket);
         }
         else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);
@@ -5312,6 +5553,10 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 'psts') {
             proPage.processPaymentReceived(actionPacket);
         }
+        // Action packet for the mcc
+        else if (actionPacket.a === 'mcc') {
+            $(window).trigger('onChatCreatedActionPacket', actionPacket);
+        }
         else {
             if (d) {
                 console.log('not processing this action packet', actionPacket);
@@ -5320,7 +5565,8 @@ function execsc(actionPackets, callback) {
     }
     if (async_procnodes.length) {
         process_f(async_procnodes, onExecSCDone);
-    } else {
+    }
+    else {
         onExecSCDone();
     }
 
@@ -5355,7 +5601,8 @@ function execsc(actionPackets, callback) {
                             if (f.fav) {
                                 $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
                                 $('#' + n.h + '.file-block .file-status-icon').addClass('star');
-                            } else {
+                            }
+                            else {
                                 $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
                                 $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
                             }
@@ -5422,7 +5669,8 @@ function loadfm(force)
     }
     if (loadfm.loaded) {
         Soon(loadfm_done.bind(this, pfkey));
-    } else {
+    }
+    else {
         if (is_fm()) {
             loadingDialog.show();
         }
@@ -5441,17 +5689,22 @@ function loadfm(force)
     }
 }
 
-function RightsbyID(id)
-{
-    if (folderlink)
-        return false;
-    if (id.length > 8)
-        return false;
+function RightsbyID(id) {
+
     var p = M.getPath(id);
-    if (p[p.length - 1] == 'contacts' || p[p.length - 1] == 'shares')
+
+    if (folderlink) {
+        return false;
+    }
+    if (id.length > 8) {
+        return false;
+    }
+    if ((p[p.length - 1] === 'contacts') || (p[p.length - 1] === 'shares')) {
         return (M.d[p[p.length - 3]] || {}).r;
-    else
+    }
+    else {
         return 2;
+    }
 }
 
 function isCircular(fromid, toid)
@@ -5791,15 +6044,17 @@ function createFolder(toid, name, ulparams) {
 }
 
 function getuid(email) {
+    var result = false;
 
-    for (var j in M.u) {
-        if (M.u[j].m === email) {
-            return j;
+    M.u.forEach(function(v, k) {
+        if (v.m == email) {
+            result = k;
+            return false; // break;
         }
-    }
+    });
 
-    return false;
-}
+    return result;
+};
 
 /**
  * Gets the user handle of a contact if they already exist in M.u
@@ -5807,22 +6062,22 @@ function getuid(email) {
  * @returns {String|false} Returns either the user handle or false if it doesn't exist
  */
 function getUserHandleFromEmail(emailAddress) {
+    var foundHandle = false;
 
     // Search known users for matching email address then get the handle of that contact
-    for (var userHandle in M.u) {
+    M.u.forEach(function(c, userHandle) {
         if (
-            M.u.hasOwnProperty(userHandle)
-            && M.u[userHandle]
-            && M.u[userHandle].c
-            && (M.u[userHandle].c !== 0)
-            && (M.u[userHandle].m === emailAddress)
-            ) {
+            M.u[userHandle] &&
+            M.u[userHandle].c &&
+            (M.u[userHandle].c !== 0) &&
+            (M.u[userHandle].m === emailAddress)
+        ) {
 
-            return userHandle;
+            foundHandle = userHandle;
         }
-    };
+    });
 
-    return false;
+    return foundHandle;
 }
 
 /**
@@ -6008,7 +6263,8 @@ function process_f(f, cb, retry)
             __process_f1(ncn);
             if (skn.length) {
                 process_f(f, cb, 1);
-            } else {
+            }
+            else {
                 if (cb) cb(!!newmissingkeys);
             }
             if (d) console.timeEnd('process_f');
@@ -6333,7 +6589,8 @@ function process_u(u) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {
             if (u[i].c === 1) {
-                u[i].name = u[i].m;
+                u[i].name = u[i].name ? u[i].name : u[i].m;
+
                 u[i].h = u[i].u;
                 u[i].t = 1;
                 u[i].p = 'contacts';
@@ -6407,19 +6664,19 @@ function init_chat() {
                     console.error(ex);
                 }
             }
-            try {
+            //try {
                 window.megaChat = new Chat();
                 window.megaChat.init();
 
                 if (fminitialized) {
-                    megaChat.renderContactTree();
+                    //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }
-            }
-            catch (ex) {
-                console.error(ex);
-                megaChatIsDisabled = true;
-            }
+            //}
+            //catch (ex) {
+            //    console.error(ex);
+            //    megaChatIsDisabled = true;
+            //}
         }
     }
     if (folderlink) {
@@ -6428,11 +6685,13 @@ function init_chat() {
     else if (!megaChatIsDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
-        } else {
+        }
+        else {
             mBroadcaster.once('pubEd25519', __init_chat);
             if (d) console.log('Will not initializing chat [branch:2]');
         }
-    } else {
+    }
+    else {
         if (d) console.log('Will not initializing chat [branch:3]');
     }
 }
@@ -6642,13 +6901,17 @@ function clone(obj)
             if (obj.hasOwnProperty(attr)) {
                 if (!(obj[attr] instanceof Object)) {
                     copy[attr] = obj[attr];
-                } else if (obj[attr] instanceof Array) {
+                }
+                else if (obj[attr] instanceof Array) {
                     copy[attr] = clone(obj[attr]);
-                } else if (!isNativeObject(obj[attr])) {
+                }
+                else if (!isNativeObject(obj[attr])) {
                     copy[attr] = clone(obj[attr]);
-                } else if ($.isFunction(obj[attr])) {
+                }
+                else if ($.isFunction(obj[attr])) {
                     copy[attr] = obj[attr];
-                } else {
+                }
+                else {
                     copy[attr] = {};
                 }
             }
@@ -6747,25 +7010,6 @@ function balance2pro(callback)
             $span = $('.copy-to-clipboard span'),
             toastTxt, doLinks, linksNum, success;
 
-        /**
-         * execCommandUsable
-         *
-         * Native browser 'copy' command using execCommand('copy).
-         * Supported by Chrome42+, FF41+, IE9+, Opera29+
-         * @returns {Boolean}
-         */
-        ExportLinkDialog.prototype.execCommandUsable = function() {
-
-            var result;
-
-            try {
-                result = document.execCommand('copy');
-            }
-            catch (ex) {}
-
-            return result === false;
-        };
-
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
@@ -6824,7 +7068,7 @@ function balance2pro(callback)
         $span.text(l[1990]);
 
         // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || self.execCommandUsable()) {
+        if (is_extension || mega.utils.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
             }

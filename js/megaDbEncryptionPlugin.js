@@ -18,7 +18,7 @@ function MegaDBEncryption(mdbInstance) {
     var _encDecKeyCache = null;
     var getEncDecKey = function() {
 
-        if(_encDecKeyCache === null) {
+        if (_encDecKeyCache === null) {
             throw new Error('_encDecKeyCache is not yet initialised');
         }
 
@@ -39,7 +39,7 @@ function MegaDBEncryption(mdbInstance) {
 
         mdbServerInstance.getUData('enckey')
             .then(function __enckey(data) {
-                logger.debug('getUData.enckey', data);
+                //logger.debug('getUData.enckey', data);
                 if (!data) {
                     // Generate new encryption key
                     try {
@@ -95,9 +95,9 @@ function MegaDBEncryption(mdbInstance) {
     var simpleEncryptObjFunction = function(table, obj) {
         Object.keys(obj).forEach(function(k) {
             var v = obj[k];
-            if(k == "__origObj" || k == "id" ||  k === mdbInstance._getTablePk(table)) { return; }
+            if (k == "__origObj" || k == "id" ||  k === mdbInstance._getTablePk(table)) { return; }
 
-            if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k]) {
+            if (mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k]) {
                 obj[k + "$v"] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey(), false);
                 obj[k] = hasherFunc(JSON.stringify(v));
             } else {
@@ -114,10 +114,10 @@ function MegaDBEncryption(mdbInstance) {
      * @param obj {Object} actual object to be encrypted
      */
     var simpleDecryptObjFunction = function(table, obj) {
-        if(obj.__origObj) { // restore if available in plain text
+        if (obj.__origObj) { // restore if available in plain text
             Object.keys(obj.__origObj).forEach(function(k) {
                 var v = obj.__origObj[k];
-                if(k == "__origObj") { return; }
+                if (k == "__origObj") { return; }
 
                 obj[k] = v;
             });
@@ -129,7 +129,7 @@ function MegaDBEncryption(mdbInstance) {
                     return;
                 }
 
-                if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k] && obj[k + "$v"] && decryptedKeys.indexOf(k) === -1) {
+                if (mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k] && obj[k + "$v"] && decryptedKeys.indexOf(k) === -1) {
                     obj[k] = JSON.parse(stringcrypt.stringDecrypter(obj[k + "$v"], getEncDecKey()), false);
                     delete obj[k + "$v"];
                     decryptedKeys.push(k);
@@ -137,7 +137,7 @@ function MegaDBEncryption(mdbInstance) {
                 else {
                     try {
                         obj[k] = stringcrypt.stringDecrypter(v, getEncDecKey(), false);
-                        if(obj[k] == "undefined") {
+                        if (obj[k] == "undefined") {
                             obj[k] = undefined;
                         }
                         else {
@@ -167,7 +167,7 @@ function MegaDBEncryption(mdbInstance) {
      * attach those functions to the specific event handlers
      */
     mdbInstance.bind("onBeforeAdd", function(e, table, obj) {
-        logger.debug("onBeforeAdd: ", table, obj);
+        //logger.debug("onBeforeAdd: ", table, obj);
 
         e.returnedValue = [table, clone(obj)];
         simpleEncryptObjFunction(table, e.returnedValue[1]);
@@ -216,13 +216,13 @@ function MegaDBEncryption(mdbInstance) {
     });
 
     mdbInstance.bind("onFilterQuery", function(e, table, filters) {
-        logger.debug("onFilterQuery: ", table, filters);
+        //logger.debug("onFilterQuery: ", table, filters);
         // since filters is an array containing key, value pairs, lets parse them
         for(var i = 0; i<filters.length; i+=2) {
             var k = filters[i];
             var v = filters[i+1];
 
-            if(k == mdbInstance._getTablePk(table)) { break; }
+            if (k == mdbInstance._getTablePk(table)) { break; }
 
             assert(
                 (mdbInstance.schema[table]['indexes'] && typeof(mdbInstance.schema[table]['indexes'][k]) != 'undefined') ||
@@ -233,14 +233,14 @@ function MegaDBEncryption(mdbInstance) {
             filters[i+1] = hasherFunc(JSON.stringify(v));
         };
 
-        logger.debug("filters:", filters);
+        //logger.debug("filters:", filters);
     });
 
     //mdbInstance.bind("onModifyQuery", function(e, table, args) {
     //    logger.debug("onModifyQuery: ", table, args);
     //
     //    args.forEach(function(modificationObj) {
-    //        if(modificationObj["firstName$v"]) {
+    //        if (modificationObj["firstName$v"]) {
     //            debugger;
     //        }
     //        simpleEncryptObjFunction(table, modificationObj);

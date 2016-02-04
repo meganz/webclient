@@ -41,9 +41,14 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/aaronpowell/db.js/compare/master...meganz:master)
 
 ---
-[dcraw.js]: Dave Coffin's raw photo decoder
+[dcraw.js]: Dave Coffin's raw photo decoder.
 
 > NB: This was ported to JavaScript using Emscripten.
+
+---
+[es6-shim]: ECMAScript 6 compatibility shims for legacy JavaScript engines.
+
+> **This is a fork**, [Compare the changes](https://github.com/paulmillr/es6-shim/compare/master...meganz:master)
 
 ---
 [exif-js]: JavaScript library for reading EXIF image metadata.
@@ -106,6 +111,9 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/stomita/ios-imagefile-megapixel/compare/master...meganz:master)
 
 ---
+[moment.js]: Parse, validate, manipulate, and display dates in JavaScript.
+
+---
 [nacl-fast.js]: Port of TweetNaCl cryptographic library to JavaScript.
 
 > This is released into the [public domain](https://en.wikipedia.org/wiki/Public_domain_software).
@@ -151,6 +159,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
 [dcraw.js]: <http://www.cybercom.net/~dcoffin/dcraw/>
+[es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
 [filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
@@ -166,6 +175,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jsbn2.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
 [megaLogger.js]: <https://github.com/meganz/megalogger>
 [megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>
+[moment.js]: <https://github.com/moment/moment/tree/2.10.6>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>

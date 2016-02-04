@@ -1,6 +1,8 @@
 // Karma configuration.
 
 module.exports = function(config) {
+
+  var specific_tests = process.env.SPECIFIC_TEST ? process.env.SPECIFIC_TEST : {pattern: 'test/**/*_test.js', included: true};
   config.set({
     // Base path, that will be used to resolve files and exclude.
     basePath: '',
@@ -11,6 +13,8 @@ module.exports = function(config) {
     // List of files/patterns to load in the browser.
     // {included: false} files are loaded by requirejs
     files: [
+        // Shim for ES6 features some browsers may not have (PhantomJS).
+        {pattern: 'node_modules/es6-shim/es6-shim.js', included: true},
         // == Basic test setup ==
         'test/test_main.js',
         'test/test_utils.js',
@@ -41,6 +45,7 @@ module.exports = function(config) {
         'js/vendor/ion.sound.js',
         'js/vendor/favico.js',
         'js/vendor/notification.js',
+        'js/vendor/moment.js',
         // Chat libraries.
         'js/chat/mpenc.js',
         'js/vendor/chat/strophe.light.js',
@@ -73,11 +78,15 @@ module.exports = function(config) {
         'secureboot.js',
         'index.js',
         'js/functions.js',
+        'js/datastructs.js',
         'js/mega.js',
         'js/vendor/megaLogger.js',
         'js/tlvstore.js',
         'js/crypto.js',
         'js/megaPromise.js',
+        'js/idbkvstorage.js',
+        'js/megaDbEncryptionPlugin.js',
+        'js/megaDb.js',
         'js/paycrypt.js',
         'js/account.js',
         'js/authring.js',
@@ -100,8 +109,6 @@ module.exports = function(config) {
         'js/megaNotifications.js',
         'js/vendor/avatar.js',
         'js/countries.js',
-        'js/megaDbEncryptionPlugin.js',
-        'js/megaDb.js',
         'js/megaKvStorage.js',
         'js/vendor/int64.js',
         'js/zip64.js',
@@ -136,15 +143,18 @@ module.exports = function(config) {
         'js/chat/plugins/callManager.js',
         'js/chat/karereEventObjects.js',
         'js/chat/karere.js',
-        'js/chat/chat.js',
-        'js/chat/chatRoom.js',
+        //'js/chat/chat.js',
+        //'js/chat/chatRoom.js',
+        'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
 
         // == Tests ==
+        // Dependency-based load order of library modules.
+        // modules that already follow AMD need included: false
         (process.env.SKIP_WORKFLOWS)
             ? 'test/config/test_workflows_off.js'
             : 'test/config/test_workflows.js',
-        {pattern: 'test/**/*_test.js', included: true}
+        specific_tests
     ],
 
     // List of files to exclude.

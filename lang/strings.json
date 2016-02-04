@@ -1216,7 +1216,7 @@
         "context": ""
     },
     "679": {
-        "text": "All files stored on MEGA are encrypted. All data transfers from and to MEGA are encrypted. And while most cloud storage providers can and do claim the same, MEGA is different \u2013 unlike the industry norm where the cloud storage provider holds the decryption key, with MEGA, you control the encryption, you hold the keys, and you decide who you grant or deny access to your files, without requiring any risky software installs. It\u2019s all happening in your web browser!",
+        "text": "All files stored on MEGA are encrypted. All data transfers from and to MEGA are encrypted. And while most cloud storage providers can and do claim the same, MEGA is different \u2013 unlike the industry norm where the cloud storage provider holds the decryption key, with MEGA, you control the encryption, you hold the keys, and you decide who you grant or deny access to your files, without requiring any risky software installs. It's all happening in your web browser!",
         "context": ""
     },
     "680": {
@@ -2701,6 +2701,10 @@
     },
     "1291": {
         "text": "You have previously clicked on an invitation link. Please create your account.",
+        "context": ""
+    },
+    "1292": {
+        "text": "Coming Soon",
         "context": ""
     },
     "1297": {
@@ -4375,6 +4379,14 @@
         "text": "Home",
         "context": "Link on the help page to go back to the startpage"
     },
+    "1889": {
+        "text": "iOS App",
+        "context": "Application for the iOS platform, is probably identical in many languages."
+    },
+    "1890": {
+        "text": "Android App",
+        "context": "Application for the Android platform, is probably identical in many languages."
+    },
     "1893": {
         "text": "Get all knowledge about syncing between your computers and MEGA.",
         "context": "Intro text for the category \"Sync client\""
@@ -5302,6 +5314,10 @@
     "5598": {
         "text": "OUTGOING",
         "context": "Capital letters. Outgoing shared folders. The title of a tab"
+    },
+    "5599": {
+        "text": "Empty Rubbish Bin",
+        "context": "message when there are no files in the Rubbish Bin."
     },
     "5600": {
         "text": "No incoming shared folders",
@@ -7592,7 +7608,7 @@
         "context": "Account closure, warning dialog after user confirm that he want to cancel account."
     },
     "6216": {
-        "text": "If you can\u2019t access your email account, you will need to contact ",
+        "text": "If you can't access your email account, you will need to contact ",
         "context": "Account closure, warning dialog to remind user to contact mega support after he confirms that he wants to cancel account. \r\n\r\n"
     },
     "6217": {
@@ -7638,6 +7654,10 @@
     "6234": {
         "text": "PRO Lite",
         "context": "The new LITE payment plan. This means it is a light or lightweight payment plan compared to the full \/ heavyweight plans with lots of bandwidth and storage (PRO I, PRO II, PRO III)."
+    },
+    "6240": {
+        "text": "Windows Phone App",
+        "context": ""
     },
     "6508": {
         "text": "Settings\r\n",
@@ -9964,8 +9984,8 @@
         "context": "Helpful tips before starting a call."
     },
     "7418": {
-        "text": "Use headphones or an headset",
-        "context": "Tips (before start call) :\r\n-Use headphones or an headset\r\n-Pause any transfers"
+        "text": "Use headphones or a headset",
+        "context": "Tips (before starting a phone\/video call) :\r\n- Use headphones or a headset\r\n- Pause any transfers"
     },
     "7419": {
         "text": "Pause all transfers",
@@ -11916,8 +11936,8 @@
         "context": "Default value for the string shown into the preferences page. It will be substituted by the path of the folder selected by the user when selecting a default location for downloads."
     },
     "8080": {
-        "text": "Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:",
-        "context": "Full text:\r\n\r\nMega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:\r\n\r\nConfidentiality - Only the author and intended recipients are able to decipher and read the content.\r\n\r\nAuthenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server."
+        "text": "MEGA protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:",
+        "context": "Full text:\r\n\r\nMEGA protects your chat with end-to-end (user controlled) encryption providing essential safety assurances:\r\n\r\nConfidentiality - Only the author and intended recipients are able to decipher and read the content.\r\n\r\nAuthenticity - There is an assurance that the message received was authored by the stated sender, and its content has not been tampered with during transport or on the server."
     },
     "8081": {
         "text": "Confidentiality - Only the author and intended recipients are able to decipher and read the content.",
@@ -12012,7 +12032,7 @@
         "context": "MEGAsync application advantages. As short as possible please.\r\n\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
     },
     "8430": {
-        "text": "MEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers.",
+        "text": "MEGAsync takes full advantage of MEGA's high-powered infrastructure and multi-connection transfers.",
         "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
     },
     "8431": {
@@ -12020,8 +12040,8 @@
         "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
     },
     "8432": {
-        "text": "Run MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
-        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
+        "text": "Run MEGA's end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
+        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA's end-to-end encryption algorithms right down on your machine without relying on slower browsers."
     },
     "8433": {
         "text": "Unlimited file size",
@@ -12030,5 +12050,385 @@
     "8434": {
         "text": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
         "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nUnlimited file size.\r\nWhile browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync."
+    },
+    "8435": {
+        "text": "The file cannot be sent as the target user is over their storage quota.",
+        "context": "An error message which is shown when we want to share a file with somebody who has used all the storage space in their MEGA account."
+    },
+    "8436": {
+        "text": "There is a problem with your contact's (%1) cryptographic keys. Please close this dialog and ask your contact to log out then log in again. If the problem persists, there may be a man-in-the-middle attack in progress. For ongoing problems, please tell the user to contact [A]support@mega.nz[\/A]  for assistance.",
+        "context": "In the case of this severe error (located on the contact's side), it's advisable to get in touch with their contact (%1) to find out what may have happened. Then afterwards to have their contact get in touch with MEGA's support team via email."
+    },
+    "8437": {
+        "text": "Web Client",
+        "context": "The website client program. E.g. What runs on https:\/\/mega.nz"
+    },
+    "8438": {
+        "text": "Source Code Transparency",
+        "context": "This page heading for the #sourcecode page is about transparency or openness about our source code. This means our source code is available to read and review."
+    },
+    "8439": {
+        "text": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
+        "context": "A paragraph on the #opensource page explaining about MEGA's source code licences."
+    },
+    "8440": {
+        "text": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+        "context": "A paragraph on the #opensource page explaining about MEGA's source code repositories.Please keep [A][\/A] , [A2][\/A2] when doing the translation."
+    },
+    "8441": {
+        "text": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
+        "context": "A paragraph on the #opensource page explaining about MEGA's vulnerability (bug) rewards program. Please keep [A][\/A] , [A2][\/A2] when doing the translation."
+    },
+    "8442": {
+        "text": "Select files",
+        "context": "Text of the button for user to select files in MEGA. "
+    },
+    "8443": {
+        "text": "Select folder",
+        "context": "Text of the button for user to select a specific folder in MEGA. "
+    },
+    "8444": {
+        "text": "Subscribe",
+        "context": "Text of the button for user  to click to subscribe to a PRO plan."
+    },
+    "8445": {
+        "text": "No file or folder selected.",
+        "context": "Message displayed when no file or folder is selected"
+    },
+    "8446": {
+        "text": "Are you sure you want to move these items to the Rubbish Bin?",
+        "context": "Confirmation message for moving files\/folders to the Rubbish Bin."
+    },
+    "8447": {
+        "text": "Are you sure you want to delete these items permanently?",
+        "context": "Confirmation message for removing files\/folders."
+    },
+    "8448": {
+        "text": "Please confirm",
+        "context": "Confirmation message before removing a file."
+    },
+    "8449": {
+        "text": "The Master Key file has been removed.",
+        "context": "Success message when the MasterKey file has been removed."
+    },
+    "8450": {
+        "text": "Please log in to share with MEGA.",
+        "context": "Error message displayed when the user tries to share something to MEGA without logging in."
+    },
+    "8451": {
+        "text": "Problem of retrieving files from the folder.",
+        "context": "Error message when a link to a folder cannot be fetched."
+    },
+    "8452": {
+        "text": "The transfer will be cancelled, are you sure you want to continue?",
+        "context": "Confirmation message for cancelling a transfer."
+    },
+    "8453": {
+        "text": "All transfers will be cancelled, are you sure you want to continue?",
+        "context": "Confirmation message for cancelling all transfers."
+    },
+    "8454": {
+        "text": "Media Uploads",
+        "context": "Title of the screen where the secondary media images are uploaded"
+    },
+    "8455": {
+        "text": "Share Permissions",
+        "context": "Title of the dialog to choose permissions when sharing."
+    },
+    "8456": {
+        "text": "Link without key",
+        "context": "This is button text on the Get Link dialog. This lets the user get a public file\/folder link without the decryption key e.g. https:\/\/mega.nz\/#!Qo12lSpT."
+    },
+    "8457": {
+        "text": "Transferring\u2026",
+        "context": "Text located in each fragment when a download is in progress. Please keep the \u2026"
+    },
+    "8458": {
+        "text": "Touch to show all the transfers",
+        "context": "Hint about how to display all the transfers."
+    },
+    "8459": {
+        "text": "Remove from Offline",
+        "context": "Menu option to remove selected items from offline files\/folders."
+    },
+    "8460": {
+        "text": "Request resent",
+        "context": "Success message for resending a contact invitation."
+    },
+    "8461": {
+        "text": "Reply to the invitation sent",
+        "context": "Success message when replying a contact invitation."
+    },
+    "8462": {
+        "text": "%s is already a contact.",
+        "context": "Error message displayed when trying to invite a contact who is already added."
+    },
+    "8463": {
+        "text": "No permission to send this file.",
+        "context": "Warning message when trying to send a file without full access"
+    },
+    "8464": {
+        "text": "Please choose a destination folder.",
+        "context": "Message displayed when the user tries to move\/copy\/upload a file without choosing a destination folder."
+    },
+    "8465": {
+        "text": "%d items moved successfully",
+        "context": "Success message for moving items."
+    },
+    "8466": {
+        "text": "%d items are not moved successfully.",
+        "context": "Error message displayed it failed to move items."
+    },
+    "8467": {
+        "text": "moved to the Rubbish Bin successfully.",
+        "context": "Success message for moving file\/folder to the Rubbish Bin."
+    },
+    "8468": {
+        "text": "%d items moved to the Rubbish Bin successfully",
+        "context": "Success message for moving files\/folders to the Rubbish Bin. "
+    },
+    "8469": {
+        "text": "%d items are not sent successfully.",
+        "context": "Error message when it failed to send multiple items."
+    },
+    "8470": {
+        "text": "Error. %d process of the sharing is not completed.",
+        "context": "Error message for sharing a folder."
+    },
+    "8471": {
+        "text": "Remove shares successfully",
+        "context": "Success message for removing folders."
+    },
+    "8472": {
+        "text": "Error. %d process of removing shares is not completed.",
+        "context": "Error message when removing shares."
+    },
+    "8473": {
+        "text": "Error. Share failed to remove",
+        "context": "Error message when it failed to remove share."
+    },
+    "8474": {
+        "text": "Folder sharing removed",
+        "context": "Success message for removing a sharing."
+    },
+    "8475": {
+        "text": "%d items removed successfully from MEGA",
+        "context": "Success message for moving items from MEGA."
+    },
+    "8476": {
+        "text": "%d items are not removed successfully.",
+        "context": "Error message when it failed to remove items."
+    },
+    "8477": {
+        "text": "%d folders left successfully",
+        "context": "Success message for leaving folders."
+    },
+    "8478": {
+        "text": "%d folders are not left successfully.",
+        "context": "Error message when it failed to leave multiple folders."
+    },
+    "8479": {
+        "text": "File sent to %d contacts successfully.",
+        "context": "Success message for sending multiple files."
+    },
+    "8480": {
+        "text": "File is not sent to %d contacts.",
+        "context": "Error message for sending a file."
+    },
+    "8481": {
+        "text": "%d files sent successfully.",
+        "context": "Success message for sending multiple files."
+    },
+    "8482": {
+        "text": ", %d files failed to send",
+        "context": "Error message when it failed to multiple files."
+    },
+    "8483": {
+        "text": "%d items copied successfully.",
+        "context": "Success message for copying multiple files."
+    },
+    "8484": {
+        "text": "%d items are not copied.",
+        "context": "Error message when it failed to copy multiple files."
+    },
+    "8485": {
+        "text": "%d contacts removed successfully.",
+        "context": "Success message for removing multiple contacts."
+    },
+    "8486": {
+        "text": "%d contacts are not removed.",
+        "context": "Error message when it failed to remove several contacts."
+    },
+    "8487": {
+        "text": "Folder shared with %d contacts successfully",
+        "context": "Success message for sharing a file with multiple contacts."
+    },
+    "8488": {
+        "text": "File can not be shared with %d contacts.",
+        "context": "Error message for sharing a file with multiple contacts."
+    },
+    "8489": {
+        "text": "%d folders shared successfully.",
+        "context": "Success message for sharing multiple files."
+    },
+    "8490": {
+        "text": "%d folders are not shared.",
+        "context": "Error message when it failed to multiple folders."
+    },
+    "8491": {
+        "text": "The folder is no longer shared",
+        "context": "Success message when removing all the contacts of a shared folder."
+    },
+    "8492": {
+        "text": "Error, the folder is still shared with another contact",
+        "context": "Error message when removing a shared folder that is still shared with another contact."
+    },
+    "8493": {
+        "text": "Please include the decryption key for the link.",
+        "context": "Message of the alert to include the decryption key for the link."
+    },
+    "8494": {
+        "text": "Error happened when executing the action",
+        "context": "Error message while browsing the local filesystem."
+    },
+    "8495": {
+        "text": "Current password is wrong. Please try again.",
+        "context": "Error message when the user types wrong current password to attempt to change his password."
+    },
+    "8496": {
+        "text": "Password doesn't match",
+        "context": "Error message of changing the password."
+    },
+    "8497": {
+        "text": "Advanced Features",
+        "context": "Title of advanced setting category for cache and offline files."
+    },
+    "8498": {
+        "text": "Clear Offline Files",
+        "context": "Title of settings preference for clearing offline files."
+    },
+    "8499": {
+        "text": "Currently using %s",
+        "context": "Size of offline files or cache folders"
+    },
+    "8500": {
+        "text": "Calculating\u2026",
+        "context": "Calculating size of offline files or cache folders"
+    },
+    "8501": {
+        "text": "Turn on Camera Uploads",
+        "context": "Settings option to turn on Camera Uploads."
+    },
+    "8502": {
+        "text": "Reset PIN code",
+        "context": "Settings option of resetting the PIN code."
+    },
+    "8503": {
+        "text": "Your local files will be deleted and you will be logged out after 10 failed attempts.",
+        "context": "Error message for typing the wrong PIN code."
+    },
+    "8504": {
+        "text": "Wrong PIN code, please try again. You have %2d attemps left.",
+        "context": "Error message for typing the wrong pin code."
+    },
+    "8505": {
+        "text": "PIN Codes don't match",
+        "context": "Error message for typing the wrong PIN code (two times)"
+    },
+    "8506": {
+        "text": "Enter your PIN Code",
+        "context": "Title of the screen to unlock screen with pin code."
+    },
+    "8507": {
+        "text": "Re-Enter your PIN Code",
+        "context": "Title of the screen for re-entering PIN code to unlock screen."
+    },
+    "8508": {
+        "text": "Enter your new PIN Code",
+        "context": "Message to unlock screen with PIN code"
+    },
+    "8509": {
+        "text": "Re-Enter your new PIN Code",
+        "context": "Title of the screen asking to input PIN code to unlock the screen again."
+    },
+    "8510": {
+        "text": "All your local data will be deleted and you will be logged out in %d seconds.",
+        "context": "Message when the user  tries 10 failed attempts with wrong PIN codes."
+    },
+    "8511": {
+        "text": "Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account.",
+        "context": "Message displayed when the user wants to upgrade an account that cannot be upgraded and suggest the user to contact MEGA support."
+    },
+    "8512": {
+        "text": "Read more",
+        "context": "Open the whole blog post"
+    },
+    "8513": {
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\n\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\n\nInside the app you can upgrade your storage space & bandwidth quota with a monthly or yearly subscription.\n\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\n\nFor more info, please check our website:\nMobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\nDesktop - https:\/\/mega.nz\/\n\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+        "context": "General description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\n\" AND \"\t\"."
+    },
+    "8514": {
+        "text": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
+        "context": "Specific paragraph shown only on the App Store in iOS"
+    },
+    "8515": {
+        "text": "Enable DEBUG mode",
+        "context": "Alert title shown when the DEBUG mode is enabled"
+    },
+    "8516": {
+        "text": "A log will be created in the Offline section (MEGAiOS.log).",
+        "context": "Alert message shown when the DEBUG mode is enabled"
+    },
+    "8517": {
+        "text": "Disable DEBUG mode",
+        "context": "Alert title shown when the DEBUG mode is disabled"
+    },
+    "8518": {
+        "text": "The log (MEGAiOS.log) will be deleted from the Offline section.",
+        "context": "Alert message shown when the DEBUG mode is disabled"
+    },
+    "8519": {
+        "text": "Operating system restrictions",
+        "context": "Label for the automatic camera upload service restrictions."
+    },
+    "8520": {
+        "text": "[S]Continue[\/S] slower browser download.",
+        "context": "Notification if the user selected slow \"browser download\" instead of downloading with the MEGAsync application. Do not remove the [S] or [\/S] tags."
+    },
+    "8521": {
+        "text": "Takedown notice",
+        "context": "The header of a notification indicating that a file or folder has been taken down due to infringement or other reason."
+    },
+    "8522": {
+        "text": "Your publicly shared %1 (%2) has been taken down.",
+        "context": "The text of a notification indicating that a file or folder has been taken down due to infringement or other reason. The %1 placeholder will be replaced with the text 'file' or 'folder'. The %2 will be replaced with the name of the file or folder."
+    },
+    "8523": {
+        "text": "Your taken down %1 (%2) has been reinstated.",
+        "context": "The text of a notification indicating that a file or folder that was taken down has now been restored due to a successful counter-notice. The %1 placeholder will be replaced with the text 'file' or 'folder'. The %2 will be replaced with the name of the file or folder."
+    },
+    "8524": {
+        "text": "Takedown reinstated",
+        "context": "The header of a notification indicating that a file or folder that was taken down has now been restored due to a successful counter-notice."
+    },
+    "8525": {
+        "text": "Type your message here",
+        "context": "Placeholder text for the \"Get support\" text field."
+    },
+    "8526": {
+        "text": "Subject",
+        "context": "The subject of a given message."
+    },
+    "8527": {
+        "text": "General Enquiry",
+        "context": "A dropdown selection item on the support page. This is for a user to make a general question to the support team."
+    },
+    "8528": {
+        "text": "Technical Issue",
+        "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a technical problem they are having."
+    },
+    "8529": {
+        "text": "Payment Issue",
+        "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a payment problem they are having e.g. missing payment."
     }
 }

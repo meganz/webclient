@@ -129,7 +129,7 @@ function initTransferScroll()
 function initTreeScroll()
 {
     /**
-     if(localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
+     if (localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
      {
      $('.fm-left-panel').css({'width': localStorage.leftPaneWidth + "px"});
      }
@@ -193,7 +193,7 @@ function cacheselect()
 
 function hideEmptyGrids() {
     $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-invalid-folder').addClass('hidden');
-    $('.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
+    $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 }
 
@@ -559,6 +559,11 @@ function initUI() {
                         if (M.currentdirid === 'shares' && !M.viewmode) {
                             M.openFolder('shares', 1);
                         }
+                    }, function(error) {
+                        if (error === EOVERQUOTA) {
+                            return msgDialog('warninga', l[135], l[8435]);
+                        }
+                        return msgDialog('warninga', l[135], l[47], api_strerror(error));
                     });
                 }, 50);
             }
@@ -657,8 +662,14 @@ function initUI() {
         if ($.hideTopMenu)
             $.hideTopMenu(e);
         var c = $(e.target).attr('class');
-        if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1))
+
+
+        if ($(e.target).attr('data-reactid')) {
+            return; // never return false, if this is an event triggered by a React element....
+        }
+        if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1)) {
             return false;
+        }
 
     });
 
@@ -1105,11 +1116,11 @@ function showTransferToast(t_type, t_length, isPaused) {
     if (!$('.fmholder').hasClass('transfer-panel-opened')) {
         var $toast,
             $second_toast,
-            interval,
+            timer,
             nt_txt;
 
         if (t_type != 'u') {
-            interval = dl_interval;
+            timer = dl_interval;
             $toast = $('.toast-notification.download');
             $second_toast = $('.toast-notification.upload');
             if (t_length > 1) {
@@ -1118,7 +1129,7 @@ function showTransferToast(t_type, t_length, isPaused) {
                 nt_txt = l[7222];
             }
         } else {
-            interval = ul_interval;
+            timer = ul_interval;
             $toast = $('.toast-notification.upload');
             $second_toast = $('.toast-notification.download');
             if (t_length > 1) {
@@ -1131,16 +1142,16 @@ function showTransferToast(t_type, t_length, isPaused) {
             nt_txt += '<b> (' + l[1651] + ') </b>';
         }
 
-        $toast.find('.toast-col:first-child').safeHTML(nt_txt);
+        $toast.find('.toast-col:first-child span').safeHTML(nt_txt);
 
         if ($second_toast.hasClass('visible')) {
             $second_toast.addClass('second');
         }
 
-        clearInterval(interval);
+        clearTimeout(timer);
         $toast.removeClass('second').addClass('visible');
-        interval = setInterval(function() {
-            hideTransferToast($toast,interval);
+        timer = setTimeout(function() {
+            hideTransferToast($toast);
         }, 5000);
 
         $('.transfer .toast-button').rebind('click', function(e)
@@ -1153,23 +1164,29 @@ function showTransferToast(t_type, t_length, isPaused) {
             // M.openFolder('transfers', true);
             $('.nw-fm-left-icon.transfers').click();
         });
+
+        $('.toast-close-button', $toast).rebind('click', function()
+        {
+            $(this).closest('.toast-notification').removeClass('visible');
+            $('.toast-notification').removeClass('second');
+        });
+
         $toast.rebind('mouseover', function(e)
         {
-            clearInterval(interval);
+            clearTimeout(timer);
         });
         $toast.rebind('mouseout', function(e)
         {
-            interval = setInterval(function() {
-                hideTransferToast($toast,interval);
+            timer = setTimeout(function() {
+                hideTransferToast($toast);
             }, 5000);
         });
     }
 }
 
-function hideTransferToast ($toast,int) {
+function hideTransferToast ($toast) {
     $toast.removeClass('visible');
     $('.toast-notification').removeClass('second');
-    clearInterval(int);
 }
 
 function isValidShareLink()
@@ -1497,14 +1514,15 @@ function getContactsEMails() {
         contacts = [];
 
     // Loop through full contacts
-    for (var i in M.u) {
-        if (M.u.hasOwnProperty(i)) {
-            contact = M.u[i];
-            if (contact.c && (contact.c !== 2) && (contact.m || contact.name)) {
-                contacts.push({ id: contact.m, name: contact.name });
-            }
+    M.u.forEach(function(contact) {
+        if (
+            contact.c// active contact?
+            && (contact.c !== 2)// Not an account owner?
+            && (contact.m) // email filed exists?
+            ) {
+            contacts.push({ id: contact.m, name: contact.name });
         }
-    }
+    });
 
     // Loop through outgoing pending contacts
     for (var k in M.opc) {
@@ -1559,7 +1577,7 @@ function initAddDialogMultiInputPlugin() {
         propertyToSearch: 'id',
         resultsLimit: 5,
         // Prevent showing of drop down list with contacts email addresses
-        // Max allowed email address 254 chars
+        // Max allowed email address is 254 chars
         minChars: 255,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'add',
@@ -2133,27 +2151,34 @@ function fmremove() {
 
     // Remove contacts from list
     else if (contactcnt) {
-        var t, c = $.selected.length;
+
+        var c = $.selected.length;
+        var replaceString = '';
+        var contact = '';
 
         if (c > 1) {
-            t = c + ' ' + l[5569];
+            replaceString = c + ' ' + l[5569];
+            contact = 'contacts';
         }
         else {
-            t = '<strong>' + M.d[$.selected[0]].name + '</strong>';
+            replaceString = '<strong>' + decodeURIComponent(M.d[$.selected[0]].name) + '</strong>';
+            contact = 'contact';
         }
 
-        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', t), false, function(e) {
+        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), l[7872].replace('[X]', contact),
+        function(e) {
             if (e) {
-                for (var i in $.selected) {
-                    if (M.c[$.selected[i]]) {
-                        for (var sharenode in M.c[$.selected[i]]) {
+                $.selected.forEach(function(selected) {
+
+                    if (M.c[selected]) {
+                        M.c[selected].forEach(function(sharenode) {
                             removeShare(sharenode, 1);
-                        }
+                        });
                     }
 
                     api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
                     M.handleEmptyContactGrid();
-                }
+                });
             }
         });
         if (c > 1) {
@@ -2163,7 +2188,7 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar span').empty();
         }
         else {
-            var user = M.d[$.selected[0]],
+            var user = M.u[$.selected[0]],
                 avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
@@ -2508,6 +2533,43 @@ function initContextUI() {
 
     $(c + '.remove-item').rebind('click', function() {
         fmremove();
+    });
+
+    $(c + '.startchat-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected[0];
+
+        if (!$this.is(".disabled") && user_handle) {
+            window.location = "#fm/chat/" + user_handle;
+        }
+    });
+
+    $(c + '.startaudio-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected[0];
+        var room;
+
+        if (!$this.is(".disabled") && user_handle) {
+            window.location = "#fm/chat/" + user_handle;
+            room = megaChat.createAndShowPrivateRoomFor(user_handle);
+            if (room) {
+                room.startAudioCall();
+            }
+        }
+    });
+
+    $(c + '.startvideo-item').rebind('click', function() {
+        var $this = $(this);
+        var user_handle = $.selected[0];
+        var room;
+
+        if (!$this.is(".disabled") && user_handle) {
+            window.location = "#fm/chat/" + user_handle;
+            room = megaChat.createAndShowPrivateRoomFor(user_handle);
+            if (room) {
+                room.startVideoCall();
+            }
+        }
     });
 
     $(c + '.removeshare-item').rebind('click', function() {
@@ -2868,6 +2930,7 @@ function accountUI()
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
+    $('.section.conversations').addClass('hidden');
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
@@ -3187,8 +3250,9 @@ function accountUI()
                 return false;
             }
 
+            var userAgent = el[2];
             var dateTime = htmlentities(time2date(el[0]));
-            var browser = browserdetails(el[2]);
+            var browser = browserdetails(userAgent);
             var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
@@ -3220,7 +3284,10 @@ function accountUI()
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName) + '</span></td>'
+                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent)
+                    + '" src="' + staticpath + 'images/browser/' + browser.icon
+                    + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
+                    + '</span></td>'
                 + '<td>' + ipAddress + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
                 + '<td>' + dateTime + '</td>'
@@ -3239,7 +3306,7 @@ function accountUI()
                 numActiveSessions++;
             }
         });
-        $('.grid-table.sessions').html(html);
+        $('.grid-table.sessions').safeHTML(html);
 
         // Don't show button to close other sessions if there's only the current session
         if (numActiveSessions === 1) {
@@ -3898,6 +3965,7 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
         $('.rubsched_textopt').rebind('click keyup', function(e) {
             var id = String($(this).attr('id')).split('_')[0];
@@ -3905,6 +3973,7 @@ function accountUI()
             $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
             M.account.rubsched = id.substr(3) + ':' + $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
         $('.rubsched input').rebind('click', function(e) {
             var id = $(this).attr('id');
@@ -3925,6 +3994,7 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+            initAccountScroll(1);
         });
 
         $('.redeem-voucher').unbind('click');
@@ -4124,7 +4194,8 @@ function accountUI()
         $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
             msgDialog('confirmation', l[1756], l[6973], false, function(e) {
                 if (e) {
-                    api_req({'a': 'up', '+a':'none'});
+                    mega.attr.set('a', 'none', true, false);
+
                     delete avatars[u_handle];
                     $('.fm-account-avatar').html(useravatar.contact(u_handle));
                     $('.fm-avatar img').attr('src', useravatar.mine());
@@ -4286,7 +4357,7 @@ function avatarDialog(close)
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);
-                api_req({'a': 'up', '+a': base64urlencode(ab_to_str(data))});
+                mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
                 var blob = new Blob([data], {type: 'image/jpeg'});
                 avatars[u_handle] =
                     {
@@ -4555,7 +4626,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
-            if(typeof(selectionManager) != 'undefined' && selectionManager) {
+            if (typeof selectionManager != 'undefined' && selectionManager) {
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -5614,17 +5685,20 @@ function transferPanelUI()
 {
     $.transferHeader = function()
     {
-        var tth = $('.transfer-table-header');
+        var tt = $('.transfer-scrolling-table'),
+              tth = $('.transfer-table-header');
 
         // Show/Hide header if there is no items in transfer list
         if (!$('.transfer-table tr').not('.clone-of-header').length > 0)
         {
             $('.transfer-panel-empty-txt').removeClass('hidden');
+            tt.hide(0);
             tth.hide(0);
         }
         else
         {
             $('.transfer-panel-empty-txt').addClass('hidden');
+            tt.show(0);
             tth.show(0);
         }
 
@@ -5864,7 +5938,7 @@ function getDDhelper()
 /**
  * menuItems
  *
- * Selecte what in context menu will be shown of actions and what not, depends on selected item/s
+ * Select what in context menu will be shown of actions and what not, depends on selected item/s
  * @returns {menuItems.items|Array}
  */
 function menuItems() {
@@ -5877,7 +5951,8 @@ function menuItems() {
         hasExportLink = false,
         sourceRoot = RootbyId($.selected[0]);
 
-    if ($.selected.length === 1 && RightsbyID($.selected[0]) > 1) {
+    // Show Rename action in case that only one item is selected
+    if (($.selected.length === 1) && (RightsbyID($.selected[0]) > 1)) {
         items['.rename-item'] = 1;
     }
 
@@ -5896,26 +5971,36 @@ function menuItems() {
 
     selItem = M.d[$.selected[0]];
 
-    if (selItem && selItem.p.length === 11) {
+    if (selItem && (selItem.p.length === 11)) {
         items['.removeshare-item'] = 1;
     }
     else if (RightsbyID($.selected[0]) > 1) {
         items['.remove-item'] = 1;
     }
 
-    if (selItem && $.selected.length === 1 && selItem.t) {
+    if (selItem && ($.selected.length === 1) && selItem.t) {
         items['.open-item'] = 1;
     }
 
-    if (selItem && $.selected.length === 1 && is_image(selItem)) {
+    if (
+        selItem
+        && ($.selected.length === 1)
+        && is_image(selItem)
+        ) {
         items['.preview-item'] = 1;
     }
 
-    if (selItem && sourceRoot === M.RootID && $.selected.length === 1 && selItem.t && !folderlink) {
+    if (
+        selItem
+        && (sourceRoot === M.RootID)
+        && ($.selected.length === 1)
+        && selItem.t
+        && !folderlink
+        ) {
         items['.sh4r1ng-item'] = 1;
     }
 
-    if (sourceRoot === M.RootID && !folderlink) {
+    if ((sourceRoot === M.RootID) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
 
@@ -5962,14 +6047,15 @@ function menuItems() {
 
 function contextMenuUI(e, ll) {
 
-    var items, v, flt,
-        m = $('.context-menu.files-menu'),
+    var v;
+    var flt;
+    var items = {};
+    var m = $('.context-menu.files-menu');
 
-        // Selection of first child level ONLY of .context-menu-item in .context-menu
-        menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item',
-//            ', .context-menu.files-menu > .context-menu-item',// Selection of .select-all, doesn't belongs to .context-menu-section
-        currNodeClass = $(e.currentTarget).attr('class'),
-        id = $(e.currentTarget).attr('id');
+    // Selection of first child level ONLY of .context-menu-item in .context-menu
+    var menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item';
+    var currNodeClass = $(e.currentTarget).attr('class');
+    var id = $(e.currentTarget).attr('id');
 
     // is contextmenu disabled
     if (localStorage.contextmenu) {
@@ -6002,6 +6088,7 @@ function contextMenuUI(e, ll) {
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
         items = menuItems();
+
         delete items['.download-item'];
         delete items['.zipdownload-item'];
         delete items['.copy-item'];
@@ -6034,9 +6121,17 @@ function contextMenuUI(e, ll) {
             id = undefined;// exist in node list
         }
 
-        // detect and show right menu
-        if (id && id.length === 11) {
-            $(menuCMI).filter('.remove-item').show();// transfer panel
+        // In case that id belongs to contact, 11 char length
+        if (id && (id.length === 11)) {
+            $(menuCMI).filter('.remove-item,.startchat-item,.startaudio-item,.startvideo-item').show();// transfer panel
+
+            $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
+
+            // If selected contact is offline make sure that audio and video calls are forbiden (disabled)
+            if ($('#' + id).find('.offline').length) {
+                $(menuCMI).filter('.startaudio-item').addClass('disabled');
+                $(menuCMI).filter('.startvideo-item').addClass('disabled');
+            }
         }
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1 || currNodeClass.indexOf('folder-link') > -1)) {
             flt = '.properties-item';
@@ -6447,7 +6542,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if($(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if ($(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length > 0 || $(e.target).parents('.messages.content-area').length > 0 || $(e.target).parents('.chat-right-pad .user-card-data').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6526,7 +6621,7 @@ function sectionUIopen(id) {
     }
 
     $('.nw-fm-left-icon').removeClass('active');
-    if(M.hasInboxItems() === true) {
+    if (M.hasInboxItems() === true) {
         $('.nw-fm-left-icon.inbox').removeClass('hidden');
     } else {
         $('.nw-fm-left-icon.inbox').addClass('hidden');
@@ -6544,7 +6639,7 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account').addClass(tmpId);
-    $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
+    $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
     $('.fm-main').removeClass('active-folder-link');
@@ -6579,9 +6674,10 @@ function sectionUIopen(id) {
 
     if (id !== 'conversations') {
         $('.fm-right-header').removeClass('hidden');
-        $('.fm-chat-block').hide();
+        $('.fm-chat-block').addClass('hidden');
+        $('.section.conversations').addClass('hidden');
     } else {
-        $('.fm-chat-block').show();
+        $('.section.conversations').removeClass('hidden');
     }
 
     if (
@@ -6665,8 +6761,40 @@ function sectionUIopen(id) {
             break;
     }
 
-    if (!folderlink)
-        $('.nw-tree-panel-header span').text(headertxt);
+    if (!folderlink) {
+        $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header span').text(headertxt);
+    }
+
+    {
+        // required tricks to make the conversations work with the old UI HTML/css structure
+        if (id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
+            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').addClass('hidden');
+            $('.fm-main.default > .fm-left-panel').addClass('hidden');
+        } else {
+            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').removeClass('hidden');
+            $('.fm-main.default > .fm-left-panel').removeClass('hidden');
+        }
+
+        // new sections UI
+        $('.section').addClass('hidden');
+
+        var repos = function() {
+            $('.section.' + id)
+                .height(
+                $(window).outerHeight() - $('#topmenu').outerHeight() - $('.transfer-panel').outerHeight()
+            )
+        };
+
+        $(window)
+            .unbind('resize.section')
+            .bind('resize.section', function() {
+                repos();
+            });
+
+        repos();
+        $('.section.' + id).removeClass('hidden');
+    }
+
 
     if ($.fah_abort_timer) {
         clearTimeout($.fah_abort_timer);
@@ -7024,10 +7152,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
-        if($selectedPlan.is(".pro4")) { plan = 4; }
-        else if($selectedPlan.is(".pro1")) { plan = 1; }
-        else if($selectedPlan.is(".pro2")) { plan = 2; }
-        else if($selectedPlan.is(".pro3")) { plan = 3; }
+        if ($selectedPlan.is(".pro4")) { plan = 4; }
+        else if ($selectedPlan.is(".pro1")) { plan = 1; }
+        else if ($selectedPlan.is(".pro2")) { plan = 2; }
+        else if ($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
             .removeClass('plan1')
@@ -7061,7 +7189,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
 
-    if(!$('.pro-register-dialog').is(':visible')) {
+    if (!$('.pro-register-dialog').is(':visible')) {
         fm_hideoverlay();
     }
 
@@ -7559,7 +7687,7 @@ function initShareDialogMultiInputPlugin() {
             tokenValue: "id",
             propertyToSearch: "id",
             resultsLimit: 5,
-            minChars: 2,
+            minChars: 1,
             accountHolder: (M.u[u_handle] || {}).m || '',
             scrollLocation: 'share',
             // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
@@ -8030,7 +8158,7 @@ function initShareDialog() {
       if (txtHeight !== hiddenDiv.outerHeight() ) {
         txt.height(hiddenDiv.outerHeight());
 
-        if( $('.share-message-textarea').outerHeight()>=50) {
+        if ( $('.share-message-textarea').outerHeight()>=50) {
             pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
             api = pane.data('jsp');
             txt.blur();
@@ -8100,7 +8228,7 @@ function closeDialog() {
     var logger = MegaLogger.getLogger('closeDialog');
 
     logger.debug($.dialog);
-    if($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
+    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
     }
@@ -8778,46 +8906,45 @@ function getclipboardkeys() {
  */
 function showToast(toastClass, notification, buttonLabel) {
 
-    var $toast, interval;
+    var $toast, timeout;
 
     $toast = $('.toast-notification.common-toast');
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
-        .find('.toast-col:first-child').safeHTML(notification);
+        .find('.toast-col:first-child span').safeHTML(notification);
 
     $toast.addClass('visible');
 
-    interval = setInterval(function() {
-        hideToast(interval);
+    timeout = setTimeout(function() {
+        hideToast();
     }, 5000);
 
     if (buttonLabel) {
-        $('.common-toast .toast-button span').safeHTML(buttonLabel);
+        $('.common-toast .toast-button').safeHTML(buttonLabel);
     } else {
-        $('.common-toast .toast-button span').safeHTML(l[726]);
+        $('.common-toast .toast-button').safeHTML(l[726]);
     }
 
-    $('.common-toast .toast-button').rebind('click', function()
+    $('.toast-close-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');
-        clearInterval(interval);
+        clearTimeout(timeout);
     });
 
     $toast.rebind('mouseover', function()
     {
-        clearInterval(interval);
+        clearTimeout(timeout);
     });
 
     $toast.rebind('mouseout', function()
     {
-        interval = setInterval(function() {
-            hideToast(interval);
+        timeout = setTimeout(function() {
+            hideToast();
         }, 5000);
     });
 }
 
-function hideToast (int) {
+function hideToast () {
     $('.toast-notification.common-toast').removeClass('visible');
-    clearInterval(int);
 }
 
 /**
@@ -9415,7 +9542,7 @@ function propertiesDialog(close)
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
 
-    if (typeof(p.t10) === 'undefined' && typeof(p.t11) === 'undefined') {
+    if (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined') {
         $('.properties-small-gray.t10').addClass('hidden');
         $('.propreties-dark-txt.t11').addClass('hidden');
     }
@@ -9526,7 +9653,7 @@ function termsDialog(close, pp)
     if (close)
     {
         $('.fm-dialog.terms-dialog').addClass('hidden');
-        if(!$('.pro-register-dialog').is(":visible")) {
+        if (!$('.pro-register-dialog').is(":visible")) {
             fm_hideoverlay();
             $.dialog=false;
         }
@@ -10302,19 +10429,22 @@ function sharedfolderUI() {
     return r;
 }
 
-function userFingerprint(userid, next) {
+function userFingerprint(userid, callback) {
     userid = userid.u || userid;
     var user = M.u[userid];
     if (!user || !user.u) {
-        return next([]);
+        return callback([]);
     }
     if (userid === u_handle) {
         var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex');
-        return next(fprint.toUpperCase().match(/.{4}/g), fprint);
+        return callback(fprint.toUpperCase().match(/.{4}/g), fprint);
     }
     var fingerprintPromise = crypt.getFingerprintEd25519(user.h || userid);
     fingerprintPromise.done(function (response) {
-        next(response.toUpperCase().match(/.{4}/g), response);
+        callback(
+            response.toUpperCase().match(/.{4}/g),
+            response
+        );
     });
 }
 
@@ -10411,17 +10541,28 @@ function fingerprintDialog(userid) {
         // Add log to see how often they verify the fingerprints
         api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
 
+        loadingDialog.show();
         // Generate fingerprint
-        userFingerprint(user, function(fprint, fprintraw) {
+        crypt.getFingerprintEd25519(userid, 'string')
+            .done(function(fingerprint) {
 
-            // Authenticate the contact
-            authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+                // Authenticate the contact
+                authring.setContactAuthenticated(
+                    userid,
+                    fingerprint,
+                    'Ed25519',
+                    authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON,
+                    authring.KEY_CONFIDENCE.UNSURE
+                );
 
-            // Change button state to 'Verified'
-            $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
+                // Change button state to 'Verified'
+                $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
 
-            closeFngrPrntDialog();
-        });
+                closeFngrPrntDialog();
+            })
+            .always(function() {
+                loadingDialog.hide();
+            });
     });
 
     $('.dialog-skip-button').rebind('click', function() {
@@ -10444,7 +10585,7 @@ function contactUI() {
     if (n && n.u) {
         var u_h = M.currentdirid;
 //        var cs = M.contactstatus(u_h);
-        var user = M.d[u_h];
+        var user = M.u[u_h];
         var avatar = $(useravatar.contact(u_h));
 
         var onlinestatus = M.onlineStatusClass(

@@ -136,7 +136,7 @@ var crypt = (function () {
             api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
         }
         else {
-            var pubKeyPromise = getUserAttribute(userhandle,
+            var pubKeyPromise = mega.attr.get(userhandle,
                                              ns.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                              true, false);
             pubKeyPromise.done(function(result) {
@@ -145,6 +145,7 @@ var crypt = (function () {
                 logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
                 masterPromise.resolve(result);
             });
+            masterPromise.linkFailTo(pubKeyPromise);
         }
 
         return masterPromise;
@@ -209,6 +210,14 @@ var crypt = (function () {
 
 
     /**
+     * Used for caching .getPubKey requests which are in progress (by reusing MegaPromises)
+     *
+     * @type {String, MegaPromise}
+     * @private
+     */
+    ns._pubKeyRetrievalPromises = {};
+
+    /**
      * Caching public key retrieval utility.
      *
      * @param userhandle {string}
@@ -228,8 +237,27 @@ var crypt = (function () {
      */
     ns.getPubKey = function(userhandle, keyType, callback) {
         assertUserHandle(userhandle);
+
+        // if there is already a getPubKey request in progress, return it, instead of creating a brand new one
+        if (ns._pubKeyRetrievalPromises[userhandle + "_" + keyType]) {
+            var promise = ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+            if (callback) {
+                promise.done(function(res) {
+                    callback(res);
+                });
+            }
+            return promise;
+        }
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
+
+        // manage the key retrieval cache during the request is being processed
+        ns._pubKeyRetrievalPromises[userhandle + "_" + keyType] = masterPromise;
+
+        // and then clean it up after the request is done.
+        masterPromise.always(function() {
+            delete ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+        });
 
         /** If a callback is passed in, ALWAYS call it when the master promise
          * is resolved. */
@@ -242,15 +270,31 @@ var crypt = (function () {
             }
         };
 
-        if (typeof u_authring === 'undefined'
-                || typeof u_authring[keyType] === 'undefined') {
+        if (
+                authring.hadInitialised() === false ||
+                typeof u_authring === 'undefined'
+        ) {
             // Need to initialise the authentication system (authring).
-            logger.debug('First initialising the ' + keyType + ' authring.');
-            var authringLoadingPromise = authring.getContacts(keyType);
+            logger.debug('Will wait for the authring to initialise first.', 'Tried to access: ', userhandle, keyType);
+            var authringLoadingPromise = authring.initAuthenticationSystem();
             masterPromise.linkFailTo(authringLoadingPromise);
+
             // Now, with the authring loaded, link recursively to getPubKey again.
             authringLoadingPromise.done(function() {
-                masterPromise.linkDoneAndFailTo(ns.getPubKey(userhandle, keyType));
+                var tmpPromise;
+                // if already cached, swap the request promise!
+                if (ns._pubKeyRetrievalPromises[userhandle + "_" + keyType]) {
+                    tmpPromise = ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+                    delete ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
+                }
+
+                var newPromise = ns.getPubKey(userhandle, keyType);
+
+                if (tmpPromise) {
+                    tmpPromise.linkDoneAndFailTo(newPromise);
+                }
+
+                masterPromise.linkDoneAndFailTo(newPromise);
             });
             __callbackAttachAfterDone(masterPromise);
 
@@ -383,7 +427,7 @@ var crypt = (function () {
         }
         else {
             var pubEd25519KeyPromise = ns.getPubKey(userhandle, 'Ed25519');
-            var signaturePromise = getUserAttribute(userhandle,
+            var signaturePromise = mega.attr.get(userhandle,
                                                     ns.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                     true, false);
 
@@ -606,6 +650,14 @@ var crypt = (function () {
                                                     method, prevFingerprint,
                                                     newFingerprint) {
 
+        // Log occurrence of this dialog.
+        api_req({
+            a: 'log',
+            e: 99606,
+            m: 'Fingerprint dialog shown to user for key ' + keyType
+               + ' for user ' + userHandle
+        });
+
         // Keep format consistent
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
@@ -633,12 +685,66 @@ var crypt = (function () {
      *     Type of the public key the signature failed for. One of
      *     'Cu25519' or 'RSA'.)
      */
-    ns._showKeySignatureFailureException = function(userhandle, keyType) {
+    ns._showKeySignatureFailureException = function(userHandle, keyType) {
+
+        // Log occurrence of this dialog.
+        api_req({
+            a: 'log',
+            e: 99607,
+            m: 'Signature/MITM warning dialog shown to user for key ' + keyType
+               + ' for user ' + userHandle
+        });
+
         // Show warning dialog.
-        mega.ui.KeySignatureWarningDialog.singleton(userhandle, keyType);
+        mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
 
         logger.error(keyType + ' signature does not verify for user '
-                     + userhandle + '!');
+                     + userHandle + '!');
+    };
+
+
+    /**
+     * Encrypts a cleartext string with the supplied public key.
+     *
+     * @param {String} cleartext
+     *     Clear text to encrypt.
+     * @param {Array} pubkey
+     *     Public encryption key (in the usual internal format used).
+     * @param {Boolean} utf8convert
+     *     Convert cleartext from unicode to UTF-8 before encryption
+     *     (default: false).
+     * @return {String}
+     *     Encrypted cipher text.
+     */
+    ns.rsaEncryptString = function(cleartext, pubkey, utf8convert) {
+
+        cleartext = utf8convert ? to8(cleartext) : cleartext;
+        var lengthString = String.fromCharCode(cleartext.length >> 8)
+                         + String.fromCharCode(cleartext.length & 0xff);
+
+        return crypto_rsaencrypt(lengthString + cleartext, pubkey);
+    };
+
+    /**
+     * Decrypts a ciphertext string with the supplied private key.
+     *
+     * @param {String} ciphertext
+     *     Cipher text to decrypt.
+     * @param {Array} privkey
+     *     Private encryption key (in the usual internal format used).
+     * @param {Boolean} utf8convert
+     *     Convert cleartext from UTF-8 to unicode after decryption
+     *     (default: false).
+     * @return {String}
+     *     Decrypted clear text.
+     */
+    ns.rsaDecryptString = function(ciphertext, privkey, utf8convert) {
+
+        var cleartext = crypto_rsadecrypt(ciphertext, privkey);
+        var length = (cleartext.charCodeAt(0) << 8) | cleartext.charCodeAt(1);
+        cleartext = cleartext.substring(2, length + 2);
+
+        return utf8convert ? from8(cleartext) : cleartext;
     };
 
 
@@ -1233,14 +1339,14 @@ function rand(n) {
 }
 
 /*
-if(is_chrome_firefox) {
+if (is_chrome_firefox) {
     var nsIRandomGenerator = Cc["@mozilla.org/security/random-generator;1"]
         .createInstance(Ci.nsIRandomGenerator);
 
     var rand = function fx_rand(n) {
         var r = nsIRandomGenerator.generateRandomBytes(4);
         r = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
-        if(r<0) r ^= 0x80000000;
+        if (r<0) r ^= 0x80000000;
         return r % n; // oops, it's not uniformly distributed
     };
 }
@@ -2303,6 +2409,17 @@ function api_cachepubkeys(users) {
     return compoundPromise;
 }
 
+/**
+ * Encrypts a cleartext data string to a contact.
+ *
+ * @param {String} user
+ *     User handle of the contact.
+ * @param {String} data
+ *     Clear text to encrypt.
+ * @return {String|Boolean}
+ *     Encrypted cipher text, or `false` in case of unavailability of the RSA
+ *     public key (needs to be obtained/cached beforehand).
+ */
 function encryptto(user, data) {
     var i;
     var pubkey;
@@ -2581,8 +2698,16 @@ function crypto_decodeprivkey(privk) {
     return privkey;
 }
 
-// encrypts cleartext string to the supplied pubkey
-// returns string representing an MPI-formatted big number
+/**
+ * Encrypts a cleartext string with the supplied public key.
+ *
+ * @param {String} cleartext
+ *     Clear text to encrypt.
+ * @param {Array} pubkey
+ *     Public encryption key (in the usual internal format used).
+ * @return {String}
+ *     Encrypted cipher text.
+ */
 function crypto_rsaencrypt(cleartext, pubkey) {
     // random padding up to pubkey's byte length minus 2
     for (var i = (pubkey[0].length) - 2 - cleartext.length; i-- > 0;) {
@@ -2597,8 +2722,16 @@ function crypto_rsaencrypt(cleartext, pubkey) {
     return ciphertext;
 }
 
-// decrypts ciphertext string representing an MPI-formatted big number with the supplied privkey
-// returns cleartext string
+/**
+ * Decrypts a ciphertext string with the supplied private key.
+ *
+ * @param {String} ciphertext
+ *     Cipher text to decrypt.
+ * @param {Array} privkey
+ *     Private encryption key (in the usual internal format used).
+ * @return {String}
+ *     Decrypted clear text.
+ */
 function crypto_rsadecrypt(ciphertext, privkey) {
     var l = (ciphertext.charCodeAt(0) * 256 + ciphertext.charCodeAt(1) + 7) >> 3;
     ciphertext = ciphertext.substr(2, l);
@@ -2751,7 +2884,7 @@ is_image.def = {
 is_image.raw = {
     // http://www.sno.phy.queensu.ca/~phil/exiftool/#supported
     // let raw = {}; for(let tr of document.querySelectorAll('.norm.tight.sm.bm tr'))
-    //   if(tr.childNodes.length > 2 && ~tr.childNodes[2].textContent.indexOf('RAW'))
+    //   if (tr.childNodes.length > 2 && ~tr.childNodes[2].textContent.indexOf('RAW'))
     //     raw[tr.childNodes[0].textContent] = tr.childNodes[2].textContent;
     "3FR": "Hasselblad RAW (TIFF-based)",
     "ARW": "Sony Alpha RAW (TIFF-based)",
@@ -3798,8 +3931,12 @@ function crypto_processkey(me, master_aes, file) {
             }
         }
 
-        var ab = base64_to_ab(file.a);
-        var o = dec_attr(ab, k);
+        if (!file.a) {
+            logger.warn('Missing attribute for node "%s"', file.h, file);
+        }
+
+        var ab = file.a && base64_to_ab(file.a);
+        var o = ab && dec_attr(ab, k);
 
         if (typeof o === 'object') {
             if (typeof o.n === 'string') {

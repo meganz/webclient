@@ -56,7 +56,11 @@ function startMega() {
         delete pages['chat'];
     }
     jsl = [];
-    init_page();
+    if(typeof(mega_custom_boot_fn) === 'undefined') {
+        init_page();
+    } else {
+        mega_custom_boot_fn();
+    }
 }
 
 function mainScroll() {
@@ -538,6 +542,10 @@ function init_page() {
         parsepage(pages['key']);
         init_key();
     }
+    else if (page === 'support') {
+        parsepage(pages['support']);
+        support.initUI();
+    }
     else if (page == 'contact') {
         parsepage(pages['contact']);
         if (lang == 'ru') {
@@ -660,6 +668,9 @@ function init_page() {
         $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
         mainScroll();
     }
+    else if (page == 'sourcecode') {
+        parsepage(pages['sourcecode']);
+    }
     else if (page == 'terms') {
         parsepage(pages['terms']);
     }
@@ -730,9 +741,10 @@ function init_page() {
     else if (dlid) {
         page = 'download';
         if (typeof fdl_queue_var !== 'undefined') {
-            var $tr = $('.transfer-table tr#dl_' + Object(fdl_queue_var).ph);
+            var handle = Object(fdl_queue_var).ph || '';
+            var $tr = $('.transfer-table tr#dl_' + handle);
             if ($tr.length) {
-                var dl = dlmanager.getDownloadByHandle(fdl_queue_var.ph);
+                var dl = dlmanager.getDownloadByHandle(handle);
                 if (dl) {
                     dl.onDownloadProgress = dlprogress;
                     dl.onDownloadComplete = dlcomplete;
@@ -1594,9 +1606,10 @@ function topmenuUI() {
         }
         else if (className.indexOf('help') > -1) {
             document.location.hash = 'help';
-        }
-        else if (className.indexOf('contact') > -1) {
+        } else if (className.indexOf('contact') > -1) {
             document.location.hash = 'contact';
+        } else if (className.indexOf('support') > -1) {
+            document.location.hash = 'support';
         }
         else if (className.indexOf('sitemap') > -1) {
             document.location.hash = 'sitemap';
@@ -1606,6 +1619,9 @@ function topmenuUI() {
         }
         else if (className.indexOf('doc') > -1) {
             document.location.hash = 'doc';
+        }
+        else if (className.indexOf('source-code') > -1) {
+            document.location.hash = 'sourcecode';
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';

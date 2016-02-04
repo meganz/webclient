@@ -396,7 +396,7 @@ function pro_next_step() {
         showSignupPromptDialog();
         return;
     }
-    else if(isEphemeral()) {
+    else if (isEphemeral()) {
         showRegisterDialog();
         return;
     }
@@ -2734,7 +2734,7 @@ var doProLogin = function($dialog) {
                 $('#login-email', $dialog).val('');
                 u_type = r;
                 init_page();
-                if(pro_package) {
+                if (pro_package) {
                     var cls = pro_package
                         .replace("_month", "")
                         .replace("_year", "");
@@ -3095,7 +3095,7 @@ var doProRegister = function($dialog) {
             else if (u_type == 0) registeraccount();
         }
     }
-    if(err) {
+    if (err) {
         loadingDialog.hide();
     }
 };
@@ -3138,7 +3138,7 @@ function showLoadingDialog(url) {
         .addClass('active')
         .removeClass('hidden');
 
-    if(url) {
+    if (url) {
         megaAnalytics.log("pro", "proceedingToPaypal");
 
         paypalTimeout = setTimeout(function () {
@@ -3157,7 +3157,7 @@ function redirectToPaypalHide() {
 
 var proceedToPaypal = function() {
 
-    if(pro_package) {
+    if (pro_package) {
         var cls = pro_package
             .replace("_month", "")
             .replace("_year", "");
@@ -3174,7 +3174,7 @@ var proceedToPaypal = function() {
 
 var signupPromptDialog = null;
 var showSignupPromptDialog = function() {
-    if(!signupPromptDialog) {
+    if (!signupPromptDialog) {
         signupPromptDialog = new mega.ui.Dialog({
             'className': 'loginrequired-dialog',
             'closable': true,

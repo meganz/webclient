@@ -60,6 +60,8 @@ function dl_g(res) {
 
     $('.widget-block').addClass('hidden');
     $('.download.content-block').removeClass('hidden');
+    $('.download-button.to-clouddrive').hide();
+    $('.download-button.throught-browser').hide();
 
     if (res === ETOOMANY) {
         $('.download.content-block').addClass('not-available-user');
@@ -89,26 +91,19 @@ function dl_g(res) {
         });
         $('.download-button.with-megasync').rebind('click', function(e) {
             if (!$(this).hasClass('downloading')) {
+                loadingDialog.show();
                 megasync.isInstalled(function(err, is) {
                     // If 'msd' (MegaSync download) flag is turned on and application is installed
+                    loadingDialog.hide();
                     if (res.msd !== 0 && (!err || is)) {
                         $('.megasync-overlay').removeClass('downloading');
                         megasync.download(dlpage_ph, dlpage_key);
                     } else {
                         megasyncOverlay();
-                    } 
+                    }
                 });
             }
         });
-
-        $('.download-button.throught-browser').unbind('click');
-        $('.download-button.throught-browser').bind('click',function(e)
-        {
-            browserDownload();
-        });
-
-        $('.download-button.to-cloudrive').rebind('click', start_import);
-
         var key = dlpage_key;
         var fdl_file = false;
 
@@ -125,6 +120,13 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
+            $('.download-button.throught-browser').show().rebind('click', function() {
+                $(this).unbind('click');
+                browserDownload();
+            });
+
+            $('.download-button.to-clouddrive').show().rebind('click', start_import);
+
             if (dl_next === 2)
             {
                 dlkey = dlpage_key;
@@ -146,22 +148,32 @@ function dl_g(res) {
             };
             var n = fdl_file.n || 'unknown';
             var n_l = n.length;
-            $('.file-info .download.info-txt').text(n_l);
-            while (n_l-- && $('.download.info-txt.filename').width() > 316) {
-                $('.file-info .download.info-txt.small-txt').text(str_mtrunc(n, n_l));
-            }
-            if (n_l < 1) {
-                $('.file-info .download.info-txt').text(str_mtrunc(n, 60));
-            }
+            $('.file-info .download.info-txt.filename').text(n);
             $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
-            $('.info-block .block-view-file-type').addClass(fileIcon({name:fdl_file.n}));
+            $('.info-block .block-view-file-type').addClass(fileIcon({name: n}));
+
+            // XXX: remove this once all browsers support `text-overflow: ellipsis;`
+            Soon(function() {
+                while (n_l-- && $('.download.info-txt.filename').width() > 316) {
+                    $('.file-info .download.info-txt.filename').text(str_mtrunc(n, n_l));
+                }
+                if (n_l < 1) {
+                    $('.file-info .download.info-txt.filename').text(str_mtrunc(n, 37));
+                }
+            });
 
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
                 $('.download.status-txt, .download-info .text').text(l[1651]).addClass('blue');
                 $('.download.pause-button').addClass('active');
             }
         }
-        else mKeyDialog(dlpage_ph);
+        else {
+            mKeyDialog(dlpage_ph)
+                .fail(function() {
+                    $('.info-block .block-view-file-type').addClass(fileIcon({name:'unknown'}));
+                    $('.file-info .download.info-txt').text('Unknown');
+                });
+        }
     }
     else $('.download.content-block').addClass('na-some-reason');
 
@@ -200,7 +212,7 @@ function browserDownload() {
 
 // MEGAsync dialog If filesize is too big for downloading through browser
 function megasyncOverlay() {
-    var $this = $('.megasync-overlay'), 
+    var $this = $('.megasync-overlay'),
           slidesNum = $('.megasync-controls div').length;
 
     $this.addClass('msd-dialog').removeClass('hidden downloading');

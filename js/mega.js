@@ -6165,7 +6165,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
         var accessRights = value.r;
 
         // Search by email only don't use handle cause user can re-register account then handle is unusable
-        api_req({ "a": "uk", "u": email }, {
+        api_req({ 'a': 'uk', 'u': email }, {
             targetEmail: email,
             shareAccessRightsLevel: accessRights,
             callback: function (result) {
@@ -6188,18 +6188,19 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                     });
                     masterPromise.linkFailTo(sharePromise);
                 }
-                else {// NOT ok, user doesn't have account yet
+                else {
+                    // NOT ok, user doesn't have account yet
                     usersWithoutHandle = [];
                     usersWithoutHandle.push(this.targetEmail);
-                var sharePromise = api_setshare1({
-                    node: nodeId,
-                    targets: usersWithoutHandle,
-                    sharenodes: childNodesId
-                });
-                sharePromise.done(function _sharePromiseWithoutHandleDone(result) {
-                    _shareDone(result, this.targetEmail);
-                });
-                masterPromise.linkFailTo(sharePromise);
+                    var sharePromise = api_setshare1({
+                        node: nodeId,
+                        targets: usersWithoutHandle,
+                        sharenodes: childNodesId
+                    });
+                    sharePromise.done(function _sharePromiseWithoutHandleDone(result) {
+                        _shareDone(result, this.targetEmail);
+                    });
+                    masterPromise.linkFailTo(sharePromise);
                 }
             }
          });

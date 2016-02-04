@@ -426,7 +426,7 @@ function MegaData()
         M.u.forEach(function(c, u) {
             if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
                 waitingPromises.push(
-                    getUserAttribute(u, 'a', true, false, function (res) {
+                    mega.attr.get(u, 'a', true, false, function (res) {
                         if (typeof res !== 'number' && res.length > 5) {
                             var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
                             avatars[u] = {
@@ -2981,28 +2981,48 @@ function MegaData()
     this.syncUsersFullname = function(userId) {
         var self = this;
 
-        var firstName = null;
-        var lastName = null;
+        var lastName = {name: 'lastname', value: null};
+        var firstName = {name: 'firstname', value: null};
         MegaPromise.allDone([
-            getUserAttribute(userId, 'firstname', -1)
+            mega.attr.get(userId, 'firstname', -1)
                 .done(function(r) {
-                    firstName = r;
+                    firstName.value = r;
                 }),
-            getUserAttribute(userId, 'lastname', -1)
+            mega.attr.get(userId, 'lastname', -1)
                 .done(function(r) {
-                    lastName = r;
+                    lastName.value = r;
                 })
         ]).done(function(results) {
             if (!self.u[userId]) {
                 return;
             }
 
-            // -1, -9, -2, etc...
-            firstName = typeof firstName != "string" ? false : firstName;
-            lastName = typeof lastName != "string" ? false : lastName;
+            [firstName, lastName].forEach(function(obj) {
+                // -1, -9, -2, etc...
+                if (typeof obj.value === 'string') {
+                    try {
+                        obj.value = from8(base64urldecode(obj.value));
+                    }
+                    catch (ex) {
+                        obj.value = ex;
+                    }
+                }
 
-            firstName = firstName ? from8(base64urldecode(firstName)) : "";
-            lastName = lastName ? from8(base64urldecode(lastName)) : "";
+                if (typeof obj.value !== 'string' || !obj.value) {
+                    if (d) {
+                        // Inherit the logger for mega.attr.get
+                        var logger = MegaLogger.getLogger('account');
+
+                        logger.debug('Attribute "%s" for user "%s" cannot be decoded: "%s"',
+                                        obj.name, userId, obj.value);
+                    }
+                    obj.value = '';
+                }
+            });
+
+            lastName = lastName.value;
+            firstName = firstName.value;
+
             if (firstName.length > 0 && lastName.length > 0) {
                 self.u[userId].name = firstName + " " + lastName;
             }
@@ -5199,16 +5219,19 @@ function execsc(actionPackets, callback) {
                 }
             }
             else if (actionPacket.a === 'ua') {
-                for (var j in actionPacket.ua) {
-                    var attributeName = actionPacket.ua[j];
-                    if (attributeName === '+a') {
-                        avatars[actionPacket.u] = undefined;
-                        loadavatars = true;
-                    }
-                    else if (attributeName === 'firstname' || attributeName === 'lastname') {
-                        removeItemPromise.always(function() {
-                            M.syncUsersFullname(actionPacketUserId);
-                        });
+                var attrs = actionPacket.ua;
+                var actionPacketUserId = actionPacket.u;
+                for (var j in attrs) {
+                    if (attrs.hasOwnProperty(j)) {
+                        var attributeName = attrs[j];
+
+                        if (attributeName === '+a') {
+                            avatars[actionPacketUserId] = undefined;
+                            loadavatars = true;
+                        }
+                        else if (attributeName === 'firstname' || attributeName === 'lastname') {
+                            attribCache.uaPacketParser(attributeName, actionPacketUserId, true);
+                        }
                     }
                 }
             }
@@ -5486,55 +5509,13 @@ function execsc(actionPackets, callback) {
             M.delNode(actionPacket.n);
         }
         else if (actionPacket.a === 'ua' && fminitialized) {
-            for (var j in actionPacket.ua) {
-                var attributeName = actionPacket.ua[j];
-                var actionPacketUserId = actionPacket.u;
+            var attrs = actionPacket.ua;
+            var actionPacketUserId = actionPacket.u;
+            for (var j in attrs) {
+                if (attrs.hasOwnProperty(j)) {
+                    var attributeName = attrs[j];
 
-                if (d) {
-                    console.debug(
-                        "Invalidating cache, because of update from action packet:",
-                        actionPacketUserId,
-                        attributeName
-                    );
-                }
-
-                /* jshint -W083 */
-                var removeItemPromise = attribCache.removeItem(
-                    actionPacketUserId + "_" + attributeName
-                );
-                /* jshint +W083 */
-
-                if (attributeName === '+a') {
-                    avatars[actionPacketUserId] = undefined;
-
-                    /* jshint -W083 */
-                    removeItemPromise.always(function  __actionPacketCacheInvalidateDone() {
-                        M.avatars();
-                    });
-                    /* jshint +W083 */
-                }
-                else if (actionPacket.ua[j] === '*!authring') {
-                    removeItemPromise.always(function() {
-                        authring.getContacts('Ed25519');
-                    });
-                }
-                else if (actionPacket.ua[j] === '*!authRSA') {
-                    removeItemPromise.always(function() {
-                        authring.getContacts('RSA');
-                    });
-                }
-                else if (actionPacket.ua[j] === '*!authCu255') {
-                    removeItemPromise.always(function() {
-                        authring.getContacts('Cu25519');
-                    });
-                }
-                else if (attributeName == '+puEd255') {
-                    removeItemPromise.always(function() {
-                        // pubEd25519 key was updated!
-                        // force fingerprint regen.
-                        delete pubEd25519[actionPacketUserId];
-                        crypt.getPubEd25519(actionPacketUserId);
-                    });
+                    attribCache.uaPacketParser(attributeName, actionPacketUserId);
                 }
             }
         }

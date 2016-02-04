@@ -510,7 +510,7 @@ var mFileManagerDB = {
         else if (this.schema[aTable]) {
             var promise;
 
-            if (d) console.log('fmdb query', aCommand, aTable, aData, l);
+            if (d) console.log('fmdb query', aCommand, aTable, aData, lock);
 
             try {
                 if (aCommand === 'add') {

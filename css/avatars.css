@@ -9,7 +9,6 @@
 	font-family: 'source_sans_prolight';
 	border: 2px solid white;
 	float: left;
-	background-color: #FF6A19;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -76,7 +75,6 @@
     -moz-border-radius: 9px;
     -webkit-border-radius: 9px;
     border-radius: 9px;
-    background-color: #FF6A19;
     position: relative;
 }
 .semi-big-avatar .avatar-letter, .medium-avatar .avatar-letter, .big-avatar .avatar-letter {

@@ -23,6 +23,7 @@
 }
 .avatar-letter::before {
     position:absolute;
+    text-align: center;
     left: 0;
     width: 100%;
     height: 100%;
@@ -61,7 +62,14 @@
     font-size: 76px;
     line-height: 160px;
 }
-.medium-avatar, .semi-big-avatar,  .big-avatar {
+.medium-avatar.share {
+    width: 120px;
+    height: 120px;
+}
+.medium-avatar.share .user-card-verified {
+    display: none;
+}
+.semi-big-avatar,  .big-avatar {
     display: block;
     width: 184px;
     height: 184px;
@@ -71,7 +79,7 @@
     background-color: #FF6A19;
     position: relative;
 }
-.semi-big-avatar div,  .big-avatar div {
+.semi-big-avatar .avatar-letter, .medium-avatar .avatar-letter, .big-avatar .avatar-letter {
     width: 96px;
     height: 96px;
     -moz-border-radius: 100%;
@@ -90,14 +98,14 @@
     width: 260px;
     height: 260px;
 }
-.big-avatar div {
+.big-avatar .avatar-letter {
     width: 146px;
     height: 146px;
     margin: -73px 0 0 -73px;
     font-size: 90px;
     line-height: 146px;
 }
-.medium-avatar img, .semi-big-avatar img, .big-avatar img {
+.medium-avatar img, .semi-big-avatar img, .medium-avatar img, .big-avatar img {
     width: 100%;
     height: 100%;
     -moz-border-radius: 9px;

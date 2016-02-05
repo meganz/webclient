@@ -46,7 +46,8 @@
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-htmlmin": "^0.4.0",
     "grunt-htmljson": "^0.1.1",
-    "webpack": "^1.12.9"
+    "webpack": "^1.12.9",
+    "relaxed-json": "^0.2.9"
   },
   "devDependencies": {
     "webpack-dev-server": "^1.14.0",

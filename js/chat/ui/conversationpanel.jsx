@@ -393,6 +393,8 @@ var ConversationMessage = React.createClass({
                     var contacts = [];
 
                     attachmentMeta.forEach(function(v) {
+                        var contact = M.u && M.u[v.u] ? M.u[v.u] : v;
+                        var contactEmail = contact.email ? contact.email : contact.m;
 
                         var deleteButtonOptional = null;
 
@@ -408,10 +410,10 @@ var ConversationMessage = React.createClass({
 
                         }
                         var dropdown = null;
-                        if (M.u[v.u]) {
+                        if (M.u[contact.u]) {
                             // Only show this dropdown in case this user is a contact, e.g. don't show it if thats me
                             // OR it is a share contact, etc.
-                            if (M.u[v.u].c === 1) {
+                            if (contact.c === 1) {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
                                     icon="tiny-icon grey-down-arrow">
@@ -426,7 +428,7 @@ var ConversationMessage = React.createClass({
                                             icon="human-profile"
                                             label={__("View profile")}
                                             onClick={() => {
-                                                window.location = "#fm/" + v.u;
+                                                window.location = "#fm/" + contact.u;
                                             }}
                                         />
                                         <hr/>
@@ -434,14 +436,14 @@ var ConversationMessage = React.createClass({
                                          icon="rounded-grey-plus"
                                          label={__("Add to chat")}
                                          onClick={() => {
-                                         window.location = "#fm/" + v.u;
+                                         window.location = "#fm/" + contact.u;
                                          }}
                                          />*/}
                                         <DropdownsUI.DropdownItem
                                             icon="conversations"
                                             label={__("Start new chat")}
                                             onClick={() => {
-                                                window.location = "#fm/chat/" + v.u;
+                                                window.location = "#fm/chat/" + contact.u;
                                             }}
                                         />
                                         {deleteButtonOptional ? <hr /> : null}
@@ -465,14 +467,14 @@ var ConversationMessage = React.createClass({
                                         icon="rounded-grey-plus"
                                         label={__("Add contact")}
                                         onClick={() => {
-                                            M.inviteContact(M.u[u_handle].m, v.email);
+                                            M.inviteContact(M.u[u_handle].m, contactEmail);
 
                                             // Contact invited
                                             var title = l[150];
 
                                             // The user [X] has been invited and will appear in your contact list once
                                             // accepted."
-                                            var msg = l[5898].replace('[X]', v.email);
+                                            var msg = l[5898].replace('[X]', contactEmail);
 
 
                                             closeDialog();
@@ -485,29 +487,28 @@ var ConversationMessage = React.createClass({
                             </ButtonsUI.Button>;
                         }
 
-
                         contacts.push(
-                            <div key={v.u}>
+                            <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{v.name}</div>
+                                    <div className="message data-title">{contact.name}</div>
                                     {
-                                        M.u[v.u] ?
-                                            <ContactsUI.ContactVerified className="big" contact={M.u[v.u]} /> :
+                                        M.u[contact.u] ?
+                                            <ContactsUI.ContactVerified className="big" contact={contact} /> :
                                             null
                                     }
 
-                                    <div className="user-card-email">{v.email}</div>
+                                    <div className="user-card-email">{contactEmail}</div>
                                 </div>
                                 <div className="message shared-data">
                                     <div className="data-block-view medium">
                                         {
-                                            M.u[v.u] ?
-                                                <ContactsUI.ContactPresence className="big" contact={M.u[v.u]} /> :
+                                            M.u[contact.u] ?
+                                                <ContactsUI.ContactPresence className="big" contact={contact} /> :
                                                 null
                                         }
                                         {dropdown}
                                         <div className="data-block-bg">
-                                            <ContactsUI.Avatar contact={M.u[u_handle]} className="medium-avatar share" contact={v} />
+                                            <ContactsUI.Avatar contact={M.u[u_handle]} className="medium-avatar share" contact={contact} />
                                         </div>
                                     </div>
                                     <div className="clear"></div>

@@ -145,7 +145,7 @@ Chatd.Shard = function(chatd, shard) {
             functions: {
                 reconnect: function(connectionRetryManager) {
                     //console.error("reconnect was called");
-                    self.reconnect();
+                    return self.reconnect();
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -153,7 +153,7 @@ Chatd.Shard = function(chatd, shard) {
                  */
                 forceDisconnect: function(connectionRetryManager) {
                     //console.error("forceDisconnect was called");
-                    self.disconnect();
+                    return self.disconnect();
                 },
                 /**
                  * Should return true or false depending on the current state of this connection, e.g. (connected || connecting)

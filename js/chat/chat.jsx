@@ -1003,6 +1003,9 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
  */
 Chat.prototype.destroy = function(isLogout) {
     var self = this;
+
+    self.karere.destroying = true;
+
     //
     //localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
     //localStorage.megaChatPresenceMtime = unixtime();
@@ -1024,15 +1027,23 @@ Chat.prototype.destroy = function(isLogout) {
 
     self.karere.connectionRetryManager.resetConnectionRetries();
 
-    return self.karere.disconnect()
-        .done(function() {
-            self.karere = new Karere({
-                'clientName': 'mc',
-                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
-            });
 
-            self.is_initialized = false;
+    self.karere.connectionRetryManager.options.functions.forceDisconnect();
+
+    if (
+        self.plugins.chatdIntegration &&
+        self.plugins.chatdIntegration.chatd &&
+        self.plugins.chatdIntegration.chatd.shards
+    ) {
+        var shards = self.plugins.chatdIntegration.chatd.shards;
+        Object.keys(shards).forEach(function(k) {
+            shards[k].connectionRetryManager.options.functions.forceDisconnect();
         });
+    }
+
+    self.is_initialized = false;
+
+    return MegaPromise.resolve();
 };
 
 /**

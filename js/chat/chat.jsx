@@ -1006,6 +1006,9 @@ Chat.prototype.destroy = function(isLogout) {
 
     self.karere.destroying = true;
 
+    // unmount the UI elements, to reduce any unneeded.
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
+
     //
     //localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
     //localStorage.megaChatPresenceMtime = unixtime();

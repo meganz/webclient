@@ -868,7 +868,7 @@ function checkUserLogin() {
     var moveLegacySettings = function() {
         var prefs = [
             'dl_maxSlots', 'ul_maxSlots', 'ul_maxSpeed', 'use_ssl',
-            'ul_skipIdentical', 'font_size'
+            'ul_skipIdentical', 'font_size', 'leftPaneWidth'
         ];
 
         prefs.forEach(function(pref) {
@@ -1019,7 +1019,6 @@ function checkUserLogin() {
                 waiter.resolve();
             })
             .fail(function() {
-                moveLegacySettings();
                 waiter.reject.apply(waiter, arguments);
             });
 
@@ -1061,6 +1060,10 @@ function checkUserLogin() {
      */
     ns.set = function _setConfigValue(key, value) {
         fmconfig[key] = value;
+
+        if (d) {
+            logger.debug('Setting value for key "%s"', key, value);
+        }
 
         if (u_type === 3) {
             if (timer) {

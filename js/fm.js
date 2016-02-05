@@ -819,10 +819,10 @@ function initUI() {
         'handle': '.left-pane-drag-handle'
     });
 
-    if (localStorage.leftPaneWidth) {
+    if (fmconfig.leftPaneWidth) {
         lPane.width(Math.min(
             $.leftPaneResizable.options.maxWidth,
-            Math.max($.leftPaneResizable.options.minWidth, localStorage.leftPaneWidth)
+            Math.max($.leftPaneResizable.options.minWidth, fmconfig.leftPaneWidth)
             ));
     }
 
@@ -10767,6 +10767,12 @@ function FMResizablePane(element, opts) {
     {
         var $handle = $(opts.handle, $element);
 
+        if (d) {
+            if (!$handle.length) {
+                console.warn('FMResizablePane: Element not found: ' + opts.handle);
+            }
+        }
+
         $handle.addClass('ui-resizable-handle ui-resizable-' + opts.direction);
 
         var resizable_opts = {
@@ -10791,13 +10797,13 @@ function FMResizablePane(element, opts) {
                     $element.css(css_attrs);
 
                     if (opts.persistanceKey) {
-                        localStorage[opts.persistanceKey] = JSON.stringify(css_attrs);
+                        mega.config.set(opts.persistanceKey, css_attrs);
                     }
                 } else {
                     css_attrs[size_attr] = ui.size[size_attr];
                     $element.css(css_attrs);
                     if (opts.persistanceKey) {
-                        localStorage[opts.persistanceKey] = JSON.stringify(ui.size[size_attr]);
+                        mega.config.set(opts.persistanceKey, ui.size[size_attr]);
                     }
                 }
 

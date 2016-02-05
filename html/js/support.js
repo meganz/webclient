@@ -11,7 +11,7 @@ var support = (function() {
 
     function resizeHandler() {
         if (!$textarea.is(':visible')) {
-            return $window.unbind('resize', resizeHandler);
+            return $window.unbind('resize.support-textarea', resizeHandler);
         }
 
         var height = Math.max(150, $window.height() - bottomHeight - headerHeight - 200);
@@ -45,7 +45,7 @@ var support = (function() {
                         l[7881], // Thank you! One of our support consultants...
                         '',
                         function() {
-                            document.location.href = '#fm';
+                            document.location.href = '#fm/' + M.RootID;
                         }
                     );
                 }
@@ -92,7 +92,7 @@ var support = (function() {
         
         $subject.find('.default-select-scroll').safeHTML(html);
         bindDropdownEvents($subject, 1);
-        $window.rebind('resize', resizeHandler);
+        $window.rebind('resize.support-textarea', resizeHandler);
         $button = $('.support a').rebind('click', submit);
         resizeHandler();
     };

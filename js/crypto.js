@@ -136,7 +136,7 @@ var crypt = (function () {
             api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
         }
         else {
-            var pubKeyPromise = getUserAttribute(userhandle,
+            var pubKeyPromise = mega.attr.get(userhandle,
                                              ns.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                              true, false);
             pubKeyPromise.done(function(result) {
@@ -427,7 +427,7 @@ var crypt = (function () {
         }
         else {
             var pubEd25519KeyPromise = ns.getPubKey(userhandle, 'Ed25519');
-            var signaturePromise = getUserAttribute(userhandle,
+            var signaturePromise = mega.attr.get(userhandle,
                                                     ns.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                     true, false);
 

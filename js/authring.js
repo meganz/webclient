@@ -221,7 +221,7 @@ var authring = (function () {
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
 
-        var attributePromise = getUserAttribute(u_handle, ns._PROPERTIES[keyType],
+        var attributePromise = mega.attr.get(u_handle, ns._PROPERTIES[keyType],
                                                 false, true);
 
         attributePromise.done(function _attributePromiseResolve(result) {
@@ -291,7 +291,7 @@ var authring = (function () {
                 });
         }
         else {
-            return setUserAttribute(ns._PROPERTIES[keyType],
+            return mega.attr.set(ns._PROPERTIES[keyType],
                 {'': ns.serialise(u_authring[keyType])},
                 false, true);
         }
@@ -727,7 +727,7 @@ var authring = (function () {
         var masterPromise = new MegaPromise();
 
         // Load private keys.
-        var attributePromise = getUserAttribute(u_handle, 'keyring', false, false);
+        var attributePromise = mega.attr.get(u_handle, 'keyring', false, false);
         attributePromise.done(function __attributePromiseResolve(result) {
             // Set local values.
             u_keyring = result;
@@ -767,9 +767,9 @@ var authring = (function () {
                 pubEd25519[u_handle] = u_pubEd25519;
 
                 // Store private keyring and public key.
-                var keyringPromise = setUserAttribute('keyring', u_keyring,
+                var keyringPromise = mega.attr.set('keyring', u_keyring,
                                                       false, false);
-                var pubkeyPromise = setUserAttribute('puEd255',
+                var pubkeyPromise = mega.attr.set('puEd255',
                                                      base64urlencode(u_pubEd25519),
                                                      true, false);
                 var authringPromise = authring.getContacts('Ed25519');
@@ -824,11 +824,11 @@ var authring = (function () {
         u_attr[crypt.PUBKEY_ATTRIBUTE_MAPPING[keyType]] = pubKey;
         crypt.getPubKeyCacheMapping(keyType)[u_handle] = pubKey;
         var pubKeySignature = ns.signKey(pubKey, keyType);
-        var keyringPromise = setUserAttribute('keyring', u_keyring, false, false);
-        var pubkeyPromise = setUserAttribute(crypt.PUBKEY_ATTRIBUTE_MAPPING[keyType],
+        var keyringPromise = mega.attr.set('keyring', u_keyring, false, false);
+        var pubkeyPromise = mega.attr.set(crypt.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                              base64urlencode(pubKey),
                                              true, false);
-        var signaturePromise = setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
+        var signaturePromise = mega.attr.set(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                 base64urlencode(pubKeySignature),
                                                 true, false);
         var authringPromise = authring.getContacts(keyType);
@@ -867,7 +867,7 @@ var authring = (function () {
         if (privKey) {
             // Fire off various API calls we need downstream.
             var authringPromise = ns.getContacts(keyType);
-            var signaturePromise = getUserAttribute(u_handle,
+            var signaturePromise = mega.attr.get(u_handle,
                                                     crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                     true, false);
 
@@ -921,7 +921,7 @@ var authring = (function () {
                     else {
                         // Signature fails, make a good one and save it.
                         var pubKeySignature = authring.signKey(pubKey, keyType);
-                        var setSignaturePromise = setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
+                        var setSignaturePromise = mega.attr.set(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                                    base64urlencode(pubKeySignature),
                                                                    true, false);
                         var comboPromise = MegaPromise.all([authringPromise,
@@ -932,7 +932,7 @@ var authring = (function () {
                 else {
                     // Signature undefined.
                     signature = authring.signKey(pubKey, keyType);
-                    setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
+                    mega.attr.set(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
                                      base64urlencode(signature),
                                      true, false);
                     masterPromise.resolve();
@@ -989,7 +989,7 @@ var authring = (function () {
             return;
         }
 
-        var attributePromise = getUserAttribute(u_handle,
+        var attributePromise = mega.attr.get(u_handle,
                                                 crypt.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                                 true, false);
 
@@ -1001,7 +1001,7 @@ var authring = (function () {
             else {
                 logger.info('Need to update ' + keyType + ' pub key.');
                 masterPromise.linkDoneAndFailTo(
-                    setUserAttribute(crypt.PUBKEY_ATTRIBUTE_MAPPING[keyType],
+                    mega.attr.set(crypt.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                      base64urlencode(pubKey),
                                      true, false));
             }
@@ -1009,7 +1009,7 @@ var authring = (function () {
         attributePromise.fail(function(result) {
             logger.warn('Could not get my ' + keyType + ' pub key, setting it now.');
             masterPromise.linkDoneAndFailTo(
-                setUserAttribute(crypt.PUBKEY_ATTRIBUTE_MAPPING[keyType],
+                mega.attr.set(crypt.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                  base64urlencode(pubKey),
                                  true, false));
         });

@@ -4191,7 +4191,7 @@ function accountUI()
         $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
             msgDialog('confirmation', l[1756], l[6973], false, function(e) {
                 if (e) {
-                    setUserAttribute('a', 'none', true, false);
+                    mega.attr.set('a', 'none', true, false);
 
                     delete avatars[u_handle];
                     $('.fm-account-avatar').html(useravatar.contact(u_handle));
@@ -4354,7 +4354,7 @@ function avatarDialog(close)
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);
-                setUserAttribute('a', base64urlencode(ab_to_str(data)), true, false);
+                mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
                 var blob = new Blob([data], {type: 'image/jpeg'});
                 avatars[u_handle] =
                     {

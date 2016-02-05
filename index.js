@@ -277,7 +277,7 @@ function init_page() {
 
         if (!fminitialized) {
             if (u_type === 3) {
-                mega.fmconfigPromise = getFMConfig();
+                mega.config.fetch();
             }
 
             if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {

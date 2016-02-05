@@ -347,7 +347,7 @@ function MegaData()
         M.sortingBy = [n, d];
 
         if (fmconfig.uisorting) {
-            storefmconfig('sorting', {n: n, d: d});
+            mega.config.set('sorting', {n: n, d: d});
         }
         else {
             fmsortmode(M.currentdirid, n, d);
@@ -6774,10 +6774,7 @@ function loadfm_done(pfkey, stackPointer) {
 
     if (d > 1) console.error('loadfm_done', stackPointer, is_fm());
 
-    var promise = mega.fmconfigPromise || MegaPromise.resolve();
-    delete mega.fmconfigPromise;
-
-    promise.always(function() {
+    mega.config.ready(function() {
         init_chat();
 
         // are we actually on an #fm/* page?
@@ -6791,25 +6788,6 @@ function loadfm_done(pfkey, stackPointer) {
 
         watchdog.notify('loadfm_done');
     });
-}
-
-function storefmconfig(key, value)
-{
-    if (fmconfig[key] !== value || typeof value === 'object') {
-        fmconfig[key] = value;
-
-        if (u_type === 3) {
-            if (storefmconfig.timer) {
-                clearTimeout(storefmconfig.timer);
-            }
-            storefmconfig.timer = setTimeout(setFMConfig, 20402);
-        }
-        else {
-            localStorage.fmconfig = JSON.stringify(fmconfig);
-        }
-
-        mBroadcaster.sendMessage('fmconfig:' + key, value);
-    }
 }
 
 function fmtreenode(id, e)
@@ -6836,7 +6814,7 @@ function fmtreenode(id, e)
         });
         delete treenodes[id];
     }
-    storefmconfig('treenodes', treenodes);
+    mega.config.set('treenodes', treenodes);
 }
 
 function fmsortmode(id, n, d)
@@ -6848,7 +6826,7 @@ function fmsortmode(id, n, d)
         delete sortmodes[id];
     else
         sortmodes[id] = {n: n, d: d};
-    storefmconfig('sortmodes', sortmodes);
+    mega.config.set('sortmodes', sortmodes);
 }
 
 function fmviewmode(id, e)
@@ -6860,7 +6838,7 @@ function fmviewmode(id, e)
         viewmodes[id] = 1;
     else
         viewmodes[id] = 0;
-    storefmconfig('viewmodes', viewmodes);
+    mega.config.set('viewmodes', viewmodes);
 }
 
 function fm_requestfolderid(h, name, ulparams)

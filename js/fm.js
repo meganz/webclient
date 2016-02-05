@@ -593,7 +593,7 @@ function initUI() {
         cacheselect();
         if ($(this).attr('class').indexOf('listing-view') > -1) {
             if (fmconfig.uiviewmode) {
-                storefmconfig('viewmode', 0);
+                mega.config.set('viewmode', 0);
             }
             else {
                 fmviewmode(M.currentdirid, 0);
@@ -602,7 +602,7 @@ function initUI() {
         }
         else {
             if (fmconfig.uiviewmode) {
-                storefmconfig('viewmode', 1);
+                mega.config.set('viewmode', 1);
             }
             else {
                 fmviewmode(M.currentdirid, 1);
@@ -3617,44 +3617,44 @@ function accountUI()
 
             if (M.account.dl_maxSlots)
             {
-                storefmconfig('dl_maxSlots', M.account.dl_maxSlots);
+                mega.config.set('dl_maxSlots', M.account.dl_maxSlots);
                 dlQueue.setSize(fmconfig.dl_maxSlots);
                 delete M.account.dl_maxSlots;
             }
             if (M.account.ul_maxSlots)
             {
-                storefmconfig('ul_maxSlots', M.account.ul_maxSlots);
+                mega.config.set('ul_maxSlots', M.account.ul_maxSlots);
                 ulQueue.setSize(fmconfig.ul_maxSlots);
                 delete M.account.ul_maxSlots;
             }
             if (typeof M.account.ul_maxSpeed !== 'undefined')
             {
-                storefmconfig('ul_maxSpeed', M.account.ul_maxSpeed);
+                mega.config.set('ul_maxSpeed', M.account.ul_maxSpeed);
                 delete M.account.ul_maxSpeed;
             }
             if (typeof M.account.use_ssl !== 'undefined')
             {
-                storefmconfig('use_ssl', M.account.use_ssl);
+                mega.config.set('use_ssl', M.account.use_ssl);
                 localStorage.use_ssl = M.account.use_ssl;
                 use_ssl = M.account.use_ssl;
             }
             if (typeof M.account.ul_skipIdentical !== 'undefined')
             {
-                storefmconfig('ul_skipIdentical', M.account.ul_skipIdentical);
+                mega.config.set('ul_skipIdentical', M.account.ul_skipIdentical);
                 delete M.account.ul_skipIdentical;
             }
 
             if (typeof M.account.uisorting !== 'undefined') {
-                storefmconfig('uisorting', M.account.uisorting);
+                mega.config.set('uisorting', M.account.uisorting);
             }
             if (typeof M.account.uiviewmode !== 'undefined') {
-                storefmconfig('uiviewmode', M.account.uiviewmode);
+                mega.config.set('uiviewmode', M.account.uiviewmode);
             }
             if (typeof M.account.rubsched !== 'undefined') {
-                storefmconfig('rubsched', M.account.rubsched);
+                mega.config.set('rubsched', M.account.rubsched);
             }
             if (typeof M.account.font_size !== 'undefined') {
-                storefmconfig('font_size', M.account.font_size);
+                mega.config.set('font_size', M.account.font_size);
                 $('body').removeClass('fontsize1 fontsize2')
                     .addClass('fontsize' + fmconfig.font_size);
                 delete M.account.font_size;
@@ -3832,17 +3832,26 @@ function accountUI()
         });
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;
-        if ((fmconfig.ul_maxSpeed | 0) === 0)
+        if ((fmconfig.ul_maxSpeed | 0) === 0) {
             i = 1;
-        else if (fmconfig.ul_maxSpeed == -1)
+        }
+        else if (fmconfig.ul_maxSpeed === -1) {
             i = 2;
-        else
+        }
+        else {
             $('#ulspeedvalue').val(Math.floor(fmconfig.ul_maxSpeed / 1024));
+        }
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
         if (fmconfig.font_size) {
-            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
-            $('#fontsize' + fmconfig.font_size).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
+            $('.uifontsize input')
+                .removeClass('radioOn').addClass('radioOff')
+                .parent()
+                .removeClass('radioOn').addClass('radioOff');
+            $('#fontsize' + fmconfig.font_size)
+                .removeClass('radioOff').addClass('radioOn')
+                .parent()
+                .removeClass('radioOff').addClass('radioOn');
         }
         $('.ulspeedradio input').unbind('click');
         $('.ulspeedradio input').bind('click', function(e)
@@ -3887,8 +3896,9 @@ function accountUI()
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
         var i = 5;
-        if (fmconfig.ul_skipIdentical)
+        if (fmconfig.ul_skipIdentical) {
             i = 4;
+        }
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
         $('.ulskip input').unbind('click');

@@ -587,140 +587,6 @@ function checkUserLogin() {
     return false;
 }
 
-/** Wrapper around getUserAttribute to fetch fmconfig */
-function getFMConfig() {
-    if (!u_handle) {
-        return MegaPromise.reject(EINCOMPLETE);
-    }
-
-    getUserAttribute(u_handle, 'fmconfig', false, true)
-        .done(function(result) {
-            result = Object(result);
-            for (var key in result) {
-                if (result.hasOwnProperty(key)) {
-                    try {
-                        fmconfig[key] = JSON.parse(result[key]);
-                    }
-                    catch (ex) {}
-                }
-            }
-
-            setFMConfig.moveLegacySettings();
-
-            if (fmconfig.ul_maxSlots) {
-                ulQueue.setSize(fmconfig.ul_maxSlots);
-            }
-            if (fmconfig.dl_maxSlots) {
-                dlQueue.setSize(fmconfig.dl_maxSlots);
-            }
-            if (fmconfig.font_size) {
-                $('body').removeClass('fontsize1 fontsize2')
-                    .addClass('fontsize' + fmconfig.font_size);
-            }
-            promise.resolve();
-        })
-        .fail(function() {
-            setFMConfig.moveLegacySettings();
-            promise.reject.apply(promise, arguments);
-        });
-
-    var promise = new MegaPromise();
-    return promise;
-}
-
-/** Wrapper around setUserAttribute to store fmconfig */
-function setFMConfig() {
-    /* jshint -W073 */
-    /* jshint -W074 */
-    var promise;
-    var data = {};
-    var config = Object(fmconfig);
-    var logger = MegaLogger.getLogger('setFMConfig');
-
-    if (!u_handle) {
-        return MegaPromise.reject(EINCOMPLETE);
-    }
-
-    // Prepare data for TLV requirements..
-    for (var key in config) {
-        if (config.hasOwnProperty(key)) {
-            var value = config[key];
-
-            if (value || value === 0) {
-
-                // Dont save no longer existing nodes
-                if (key === 'viewmodes' || key === 'sortmodes' || key === 'treenodes') {
-                    if (typeof value !== 'object') {
-                        logger.warn('Unexpected type for ' + key);
-                        continue;
-                    }
-
-                    var modes = {};
-                    for (var handle in value) {
-                        if (value.hasOwnProperty(handle)) {
-                            if (handle.length !== 8 || M.d[handle] || handle === 'contacts') {
-                                modes[handle] = value[handle];
-                            }
-                            else {
-                                logger.info('Skipping non-existant node "%s"', handle);
-                            }
-                        }
-                    }
-                    value = modes;
-                }
-
-                if (typeof value === 'object' && !$.len(value)) {
-                    logger.info('Skipping empty object "%s"', key);
-                    continue;
-                }
-
-                try {
-                    data[key] = JSON.stringify(value);
-                }
-                catch (ex) {
-                    logger.error(ex);
-                }
-            }
-            else {
-                logger.info('Skipping empty value for "%s"', key);
-            }
-        }
-    }
-
-    var sdata = JSON.stringify(data);
-    var checksum = MurmurHash3(sdata, 0x7f01e0aa);
-
-    if (checksum === parseInt(localStorage[u_handle + '_fmchash'])) {
-        return MegaPromise.resolve(EEXIST);
-    }
-    localStorage[u_handle + '_fmchash'] = checksum;
-
-    var dataLen = sdata.length;
-    if (dataLen < 8) {
-        srvlog('setFMConfig: invalid data');
-        promise = MegaPromise.reject(EARGS);
-    }
-    else if (dataLen > 12000) {
-        srvlog('setFMConfig: over quota');
-        promise = MegaPromise.reject(EOVERQUOTA);
-    }
-    else {
-        promise = setUserAttribute('fmconfig', data, false, true);
-    }
-
-    return promise;
-}
-setFMConfig.moveLegacySettings = function() {
-    var ls = ['dl_maxSlots', 'ul_maxSlots', 'ul_maxSpeed', 'use_ssl', 'ul_skipIdentical', 'font_size'];
-
-    ls.forEach(function(pref) {
-        if (localStorage[pref] !== undefined) {
-            if (fmconfig[pref] === undefined) {
-                storefmconfig(pref, parseInt(localStorage[pref]) | 0);
-            }
-        }
-    });
-};
 
 (function(exportScope) {
     var _lastUserInteractionCache = false;
@@ -986,6 +852,235 @@ setFMConfig.moveLegacySettings = function() {
 })(window);
 
 
+
+(function _userConfig() {
+    "use strict";
+
+    var timer;
+    var waiter;
+    var ns = {};
+    var logger = MegaLogger.getLogger('account.config');
+
+    /**
+     * Move former/legacy settings stored in localStorage
+     * @private
+     */
+    var moveLegacySettings = function() {
+        var prefs = [
+            'dl_maxSlots', 'ul_maxSlots', 'ul_maxSpeed', 'use_ssl',
+            'ul_skipIdentical', 'font_size'
+        ];
+
+        prefs.forEach(function(pref) {
+            if (localStorage[pref] !== undefined) {
+                if (fmconfig[pref] === undefined) {
+                    mega.config.set(pref, parseInt(localStorage[pref]) | 0);
+                }
+            }
+        });
+    };
+
+    /**
+     * Pick the global `fmconfig` and sanitize it before
+     * sending it to the server, as per TLV requirements.
+     * @private
+     */
+    var getConfig = function() {
+        var result = {};
+        var config = Object(fmconfig);
+        var nodes = { viewmodes: 1, sortmodes: 1, treenodes: 1 };
+
+        var isValid = function(handle) {
+            return handle.length !== 8 || M.d[handle] || handle === 'contacts';
+        };
+
+        for (var key in config) {
+            if (!config.hasOwnProperty(key)) {
+                continue;
+            }
+            var value = config[key];
+
+            if (!value && value !== 0) {
+                logger.info('Skipping empty value for "%s"', key);
+                continue;
+            }
+
+            // Dont save no longer existing nodes
+            if (nodes[key]) {
+                if (typeof value !== 'object') {
+                    logger.warn('Unexpected type for ' + key);
+                    continue;
+                }
+
+                var modes = {};
+                for (var handle in value) {
+                    if (value.hasOwnProperty(handle)
+                            && isValid(handle)) {
+                        modes[handle] = value[handle];
+                    }
+                    else {
+                        logger.info('Skipping non-existant node "%s"', handle);
+                    }
+                }
+                value = modes;
+            }
+
+            if (typeof value === 'object' && !$.len(value)) {
+                logger.info('Skipping empty object "%s"', key);
+                continue;
+            }
+
+            try {
+                result[key] = JSON.stringify(value);
+            }
+            catch (ex) {
+                logger.error(ex);
+            }
+        }
+
+        return result;
+    };
+
+    /**
+     * Wrapper around mega.attr.set to store fmconfig on the server, encrypted.
+     * @private
+     */
+    var store = function() {
+        if (!u_handle) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+        var config = getConfig();
+        var hash = JSON.stringify(config);
+        var len = hash.length;
+
+        // generate checkum/hash for the config
+        hash = MurmurHash3(hash, 0x7f01e0aa);
+
+        // dont store it unless it has changed
+        if (hash === parseInt(localStorage[u_handle + '_fmchash'])) {
+            return MegaPromise.resolve(EEXIST);
+        }
+        localStorage[u_handle + '_fmchash'] = hash;
+
+        var promise;
+        if (len < 8) {
+            srvlog('config.set: invalid data');
+            promise = MegaPromise.reject(EARGS);
+        }
+        else if (len > 12000) {
+            srvlog('config.set: over quota');
+            promise = MegaPromise.reject(EOVERQUOTA);
+        }
+        else {
+            promise = mega.attr.set('fmconfig', config, false, true);
+        }
+
+        return promise;
+    };
+
+    /**
+     * Fetch server-side config.
+     * @return {MegaPromise}
+     */
+    ns.fetch = function _fetchConfig() {
+        if (!u_handle) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        // if already running/pending
+        if (waiter) {
+            return waiter;
+        }
+        waiter = new MegaPromise();
+
+        mega.attr.get(u_handle, 'fmconfig', false, true)
+            .always(moveLegacySettings)
+            .done(function(result) {
+                result = Object(result);
+                for (var key in result) {
+                    if (result.hasOwnProperty(key)) {
+                        try {
+                            mega.config.set(key, JSON.parse(result[key]));
+                        }
+                        catch (ex) {}
+                    }
+                }
+
+                if (fmconfig.ul_maxSlots) {
+                    ulQueue.setSize(fmconfig.ul_maxSlots);
+                }
+                if (fmconfig.dl_maxSlots) {
+                    dlQueue.setSize(fmconfig.dl_maxSlots);
+                }
+                if (fmconfig.font_size) {
+                    $('body').removeClass('fontsize1 fontsize2')
+                        .addClass('fontsize' + fmconfig.font_size);
+                }
+                waiter.resolve();
+            })
+            .fail(function() {
+                moveLegacySettings();
+                waiter.reject.apply(waiter, arguments);
+            });
+
+        return waiter;
+    };
+
+    /**
+     * Wrap a callback to be executed when the fetch's wait promise is resolved.
+     * @param {Function} callback function
+     */
+    ns.ready = function _onConfigReady(callback) {
+        if (waiter) {
+            logger.debug('Waiting to receive fmconfig...');
+
+            waiter.always(function() {
+                callback();
+                waiter = null;
+            });
+        }
+        else {
+            Soon(callback);
+        }
+    };
+
+    /**
+     * Retrieve configuration value.
+     * (We'll keep using the global `fmconfig` for now)
+     *
+     * @param {String} key Configuration key
+     */
+    ns.get = function _getConfigValue(key) {
+        return fmconfig[key];
+    };
+
+    /**
+     * Store configuration value
+     * @param {String} key   Configuration key
+     * @param {String} value Configuration value
+     */
+    ns.set = function _setConfigValue(key, value) {
+        fmconfig[key] = value;
+
+        if (u_type === 3) {
+            if (timer) {
+                clearTimeout(timer);
+            }
+            // through a timer to prevent floods
+            timer = setTimeout(store, 20402);
+        }
+        else {
+            localStorage.fmconfig = JSON.stringify(fmconfig);
+        }
+
+        mBroadcaster.sendMessage('fmconfig:' + key, value);
+    };
+
+    Object.defineProperty(mega, 'config', {
+        value: Object.freeze(ns)
+    });
+
+})(this);
 
 (function _userAttributeHandling() {
     "use strict";

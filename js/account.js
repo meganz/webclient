@@ -1111,10 +1111,7 @@ function checkUserLogin() {
         if (pub === true || pub === undefined) {
             attribute = '+' + attribute;
         }
-        else if (pub === -1) {
-            attribute = attribute;
-        }
-        else {
+        else if (pub !== -1) {
             attribute = '*' + attribute;
         }
 

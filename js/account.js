@@ -881,6 +881,9 @@ function checkUserLogin() {
         if (pub === true || pub === undefined) {
             attribute = '+' + attribute;
         }
+        if (pub === -1) {
+            attribute = attribute;
+        }
         else {
             attribute = '*' + attribute;
         }

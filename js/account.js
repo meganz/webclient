@@ -1107,12 +1107,17 @@ function checkUserLogin() {
         if (nonHistoric === true || nonHistoric === 1) {
             attribute = '!' + attribute;
         }
+
         if (pub === true || pub === undefined) {
             attribute = '+' + attribute;
+        }
+        else if (pub === -1) {
+            attribute = attribute;
         }
         else {
             attribute = '*' + attribute;
         }
+
         return attribute;
     };
 

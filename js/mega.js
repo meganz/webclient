@@ -6107,32 +6107,36 @@ function doShare(nodeId, targets, dontShowShareDialog) {
         // Loose comparison is important (incoming JSON).
         if (result.r && result.r[0] == '0') {
             for (var i in result.u) {
-                M.addUser(result.u[i]);
+                if (result.u.hasOwnProperty(i)) {
+                    M.addUser(result.u[i]);
+                }
             }
 
             for (var k in result.r) {
-                if (result.r[k] === 0) {
-                    var rights = users[k].r;
-                    var user = users[k].u;
+                if (result.r.hasOwnProperty(k)) {
+                    if ((result.r[k] === 0) && users && users[k] && users[k].u) {
+                        var rights = users[k].r;
+                        var user = users[k].u;
 
-                    if (user.indexOf('@') >= 0) {
-                        user = getuid(users[k].u);
-                    }
+                        if (user.indexOf('@') >= 0) {
+                            user = getuid(users[k].u);
+                        }
 
-                    // A pending share may not have a corresponding user and should not be added
-                    // A pending share can also be identified by a user who is only a '0' contact
-                    // level (passive)
-                    if (M.u[user] && M.u[user].c !== 0) {
-                        M.nodeShare(nodeId, {
-                            h: nodeId,
-                            r: rights,
-                            u: user,
-                            ts: unixtime()
-                        });
-                        setLastInteractionWith(user, "0:" + unixtime());
-                    }
-                    else {
-                        logger.debug('invalid user:', user, M.u[user], users[k]);
+                        // A pending share may not have a corresponding user and should not be added
+                        // A pending share can also be identified by a user who is only a '0' contact
+                        // level (passive)
+                        if (M.u[user] && M.u[user].c !== 0) {
+                            M.nodeShare(nodeId, {
+                                h: nodeId,
+                                r: rights,
+                                u: user,
+                                ts: unixtime()
+                            });
+                            setLastInteractionWith(user, "0:" + unixtime());
+                        }
+                        else {
+                            logger.debug('invalid user:', user, M.u[user], users[k]);
+                        }
                     }
                 }
             }
@@ -6164,8 +6168,8 @@ function doShare(nodeId, targets, dontShowShareDialog) {
         var email = value.u;
         var accessRights = value.r;
 
-        // Search by email only don't use handle cause user can re-register account then handle is unusable
-        api_req({ 'a': 'uk', 'u': email }, {
+        // Search by email only don't use handle cause user can re-register account
+        api_req({ 'a': 'uk', 'u': email, 'i': requesti }, {
             targetEmail: email,
             shareAccessRightsLevel: accessRights,
             callback: function (result) {
@@ -6191,7 +6195,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                 else {
                     // NOT ok, user doesn't have account yet
                     usersWithoutHandle = [];
-                    usersWithoutHandle.push(this.targetEmail);
+                    usersWithoutHandle.push({ 'r': this.shareAccessRightsLevel, 'u': this.targetEmail });
                     var sharePromise = api_setshare1({
                         node: nodeId,
                         targets: usersWithoutHandle,
@@ -6203,7 +6207,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                     masterPromise.linkFailTo(sharePromise);
                 }
             }
-         });
+        });
     });
 
     return masterPromise;

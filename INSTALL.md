@@ -25,6 +25,11 @@ or required versions) have changed. Its important to run this command
 after you pull changes from the repo if the actual ``package.json``
 may has changed.
 
+Note: Generally "production" will mean that no externally *used*
+packages will be pulled in. In our case "production" means to pull in
+everything that is used to *build* the production dependencies, which
+is much leaner than the full development install.
+
 
 Development Environment
 -----------------------
@@ -49,9 +54,10 @@ following:
 scripts/dev_server.sh
 ```
 
-Tip: **DON'T use the `http://localhost:8089/webpack-dev-server/` url (because it uses an iframe for webpack, which is
-very annoying) for developing/debugging. Just type in:
-`http://localhost:8089/` (or `http://localhost:8089/dont-deploy/devboot.html`).**
+Tip: **DON'T use the `http://localhost:8089/webpack-dev-server/` url
+(because it uses an iframe for webpack, which is very annoying) for
+developing/debugging. Just type in: `http://localhost:8089/` (or
+`http://localhost:8089/dont-deploy/devboot.html`).**
 
 
 Demo/Beta Environment
@@ -83,11 +89,11 @@ The webclient will also require some ``localStorage`` variables set so
 that it works as expected:
 
 ```
-localStorage.d = 1;
-localStorage.dd = 1;
-localStorage.jj = 1;
+localStorage.d = '1';
+localStorage.dd = '1';
+localStorage.jj = '1';
 // Will add a ?r=Date() to enforce browser cache to be disabled.
-localStorage.jjnocache = 1;
+localStorage.jjnocache = '1';
 ```
 
 You may find some prepared "``devboot``" HTML files for launch in the
@@ -99,12 +105,16 @@ Usual problems and solutions
 
 1. Generic js errors that something is undefined, can't be called, etc.
 
+Please ensure that you are running newer `nodejs` and `npm` versions.
+
+
+2. core-js/ related errors, when starting `dev_server.sh`/`build.sh`
+
 Please ensure that you are running newer `nodejs` and `npm` versions
+and then just do
 
+```
+rm -rf node_modules && npm cache clear && npm install
+```
 
-
-2. core-js/ related errors, when starting dev_server.sh/build.sh
-
-Please ensure that you are running newer `nodejs` and `npm` versions and then
-just do `rm -rf node_modules && npm cache clear && npm install` and you should be able
-to run the dev_server again
+and you should be able to run the `dev_server.sh` again.

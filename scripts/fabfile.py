@@ -74,7 +74,7 @@ def _build_chat_bundle(target_dir):
     the React bundle.
     """
     with cd(target_dir):
-        run("npm install")
+        run("npm install --production")
         run("scripts/build.sh")
 
 

@@ -866,6 +866,9 @@ var ConversationRightArea = React.createClass({
                                 <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8013])} onClick={() => {
                                     self.props.onAttachFromCloudClicked();
                                 }} />
+                                <DropdownsUI.DropdownItem icon="grey-computer" label={__(l[8014])} onClick={() => {
+                                    self.props.onAttachFromComputerClicked();
+                                }} />
                             </DropdownsUI.Dropdown>
                         </ButtonsUI.Button>
 
@@ -1296,6 +1299,9 @@ var ConversationPanel = React.createClass({
         };
     },
 
+    uploadFromComputer: function() {
+        $('#fileselect3').trigger('click')
+    },
     refreshUI: function(scrollToBottom) {
         var self = this;
         var room = self.props.chatRoom;
@@ -1864,6 +1870,9 @@ var ConversationPanel = React.createClass({
                         chatRoom={this.props.chatRoom}
                         contacts={self.props.contacts}
                         megaChat={this.props.chatRoom.megaChat}
+                        onAttachFromComputerClicked={function() {
+                            self.uploadFromComputer();
+                        }}
                         onAttachFromCloudClicked={function() {
                             self.setState({'attachCloudDialog': true});
                         }}
@@ -1930,6 +1939,12 @@ var ConversationPanel = React.createClass({
                                                 label={__(l[8011])}
                                                 onClick={(e) => {
                                                     self.setState({'attachCloudDialog': true});
+                                            }} />
+                                            <DropdownsUI.DropdownItem
+                                                icon="grey-computer"
+                                                label={__(l[8014])}
+                                                onClick={(e) => {
+                                                    self.uploadFromComputer();
                                             }} />
                                             <DropdownsUI.DropdownItem
                                                 icon="square-profile"

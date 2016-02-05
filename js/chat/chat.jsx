@@ -1732,7 +1732,7 @@ Chat.prototype.renderListing = function() {
             // have last opened chat, which is active
             self.chats[self.lastOpenedChat].setActive();
             self.chats[self.lastOpenedChat].show();
-            return true;
+            return self.chats[self.lastOpenedChat];
         }
         else {
             // show first chat from the conv. list
@@ -1745,7 +1745,7 @@ Chat.prototype.renderListing = function() {
                 var room = sortedConversations[0];
                 room.setActive();
                 room.show();
-                return true;
+                return room;
             }
             else {
                 $('.fm-empty-conversations').removeClass('hidden');

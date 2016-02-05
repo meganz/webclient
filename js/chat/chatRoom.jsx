@@ -1046,8 +1046,6 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
 ChatRoom.prototype.attachNodes = function(ids) {
     var self = this;
 
-    loadingDialog.show();
-
     var users = [];
 
     $.each(self.getParticipantsExceptMe(), function(k, v) {
@@ -1099,9 +1097,6 @@ ChatRoom.prototype.attachNodes = function(ids) {
         })
         .fail(function(r) {
             $masterPromise.reject(r);
-        })
-        .always(function() {
-            loadingDialog.hide();
         });
 
     return $masterPromise;

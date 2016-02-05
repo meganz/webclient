@@ -1506,6 +1506,8 @@ function MegaData()
     };
 
     this.openFolder = function(id, force, chat) {
+        var newHashLocation;
+
         $('.fm-right-account-block').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
@@ -1548,7 +1550,11 @@ function MegaData()
 
                 megaChat.refreshConversations();
                 treeUI();
-                megaChat.renderListing();
+                var room = megaChat.renderListing();
+
+                if (room) {
+                    newHashLocation = room.getRoomUrl();
+                }
             }
         }
         else if (id && id.substr(0, 7) === 'account')
@@ -1686,7 +1692,6 @@ function MegaData()
             });
         }
 
-        var newHashLocation;
 
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
@@ -1697,7 +1702,10 @@ function MegaData()
             newHashLocation = '#F!' + pfid + '!' + pfkey + target;
         }
         else {
-            newHashLocation = '#fm/' + M.currentdirid;
+            // new hash location can be altered already by the chat logic in the previous lines in this func
+            if (!newHashLocation) {
+                newHashLocation = '#fm/' + M.currentdirid;
+            }
         }
         try {
             window.location.hash = newHashLocation;

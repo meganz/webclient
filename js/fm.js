@@ -3240,8 +3240,12 @@ function accountUI()
                 return -1;
         });
 
-        $('.grid-table.sessions tr').remove();
-        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th><th class="no-border session-status">' + l[7664] + '</th><th class="no-border logout-column">&nbsp;</th></tr>';
+        $('#sessions-table-container').empty();
+        var html =
+            '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
+            '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
+            '<th class="no-border session-status">' + l[7664] + '</th>' +
+            '<th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
 
         $(account.sessions).each(function(i, el) {
@@ -3306,7 +3310,7 @@ function accountUI()
                 numActiveSessions++;
             }
         });
-        $('.grid-table.sessions').safeHTML(html);
+        $('#sessions-table-container').safeHTML(html + '</table>');
 
         // Don't show button to close other sessions if there's only the current session
         if (numActiveSessions === 1) {

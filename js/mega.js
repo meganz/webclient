@@ -5283,6 +5283,8 @@ function execsc(actionPackets, callback) {
                     if (!actionPacket.k) {
                         // XXX: We need to find out which API call is causing it
                         //      (it might be a bug in the SDK or the webclient)
+                        // How to reproduce: Delete folder with pending shares,
+                        // on client side we will have this situation
                         srvlog('Got share action-packet with no key.');
                     }
                     else {

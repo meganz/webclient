@@ -1835,9 +1835,8 @@ function api_proc(q) {
         q.url = apipath + q.service
               + '?id=' + (q.seqno++)
               + '&' + q.sid
-              + '&domain=meganz'                    // Coming from mega.nz
-              + '&lang=' + lang                     // Their selected language
-              + (is_extension ? '&ext=1' : '');     // Using browser extension
+              + '&lang=' + lang      // Their selected language
+              + mega.urlParams();    // Additional parameters
 
         if (typeof q.cmds[q.i][0] === 'string') {
             q.url += '&' + q.cmds[q.i][0];

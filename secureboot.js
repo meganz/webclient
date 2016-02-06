@@ -257,7 +257,61 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}, utils: {}, flags: 0, updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt'};
+var mega = {
+    ui: {},
+    flags: 0,
+    utils: {},
+    updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
+    browserBrand: [
+        0, 'Torch', 'Epic'
+    ],
+
+    /** Get browser brancd internal ID */
+    getBrowserBrandID: function() {
+        if (Object(window.chrome).torch) {
+            return 1;
+        }
+        else {
+            var plugins = Object(navigator.plugins);
+            var len = plugins.length | 0;
+
+            while (len--) {
+                var plugin = Object(plugins[len]);
+
+                // XXX: This plugin might be shown in other browsers than Epic,
+                //      hence we check for chrome.webstore since it won't appear
+                //      in Google Chrome, although it might does in other forks?
+                if (plugin.name === 'Epic Privacy Browser Installer') {
+                    return Object(window.chrome).webstore ? 2 : 0;
+                }
+            }
+        }
+
+        return 0;
+    },
+
+    /** Parameters to append to API requests */
+    urlParams: function() {
+        if (!this._urlParams) {
+            var params = '&domain=meganz'; // domain origin
+
+            // If using extension this is passed through to the API for the helpdesk tool
+            if (is_extension) {
+                params += '&ext=1';
+            }
+
+            // Append browser brand for easier troubleshoting
+            var brand = this.getBrowserBrandID();
+            if (brand) {
+                params += '&bb=' + parseInt(brand);
+            }
+
+            this._urlParams = params;
+        }
+
+        return this._urlParams;
+    }
+};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -1993,10 +2047,7 @@ else if (!b_u)
             boot_done();
         };
 
-        // If using extension this is passed through to the API for the helpdesk tool
-        var usingExtension = (is_extension) ? '&ext=1' : '';
-
-        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + usingExtension, true);
+        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
     function boot_auth(u_ctx,r)
@@ -2051,10 +2102,7 @@ else if (!b_u)
             boot_done();
         };
 
-        // If using extension this is passed through to the API for the helpdesk tool
-        var usingExtension = (is_extension) ? '&ext=1' : '';
-
-        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz' + usingExtension, true);
+        dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
 }

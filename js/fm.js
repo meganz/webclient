@@ -9295,7 +9295,7 @@ function browserDialog(close) {
         }
         // IE11
         bc = 'ie10';
-        bh = l[884].replace('[X]', 'IE 11');
+        bh = l[884].replace('[X]', type.edge ? 'Edge' : 'IE 11');
         // if (page == 'download') bt = l[1933];
         // else bt = l[886];
         bt = l[1933];
@@ -9337,9 +9337,10 @@ browserDialog.isWeak = function() {
 
     result.ie10 = (ua.indexOf('MSIE 10') > -1);
     result.ie11 = ('-ms-scroll-limit' in style) && ('-ms-ime-align' in style);
+    result.edge = /\sEdge\/\d/.test(ua);
     result.safari = (ua.indexOf('Safari') > -1) && (ua.indexOf('Chrome') === -1);
 
-    result.weak = result.ie11 || result.ie10 || result.safari;
+    result.weak = result.edge || result.ie11 || result.ie10 || result.safari;
 
     return result.weak && result;
 }

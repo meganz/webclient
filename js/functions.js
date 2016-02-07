@@ -3620,7 +3620,7 @@ function mCleanestLogout(aUserHandle) {
 
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
-    var RUBSCHED_WAITPROC = 120 * 1000;
+    var RUBSCHED_WAITPROC =  20 * 1000;
     var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
@@ -3695,7 +3695,12 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
             console.time('rubsched');
         }
 
-        var nodes = Object.keys(M.c[M.RubbishID] || {}), rubnodes = [];
+        // Watch how long this is running
+        var startTime = Date.now();
+
+        // Get nodes in the Rubbish-bin
+        var nodes = Object.keys(M.c[M.RubbishID] || {});
+        var rubnodes = [];
 
         for (var i in nodes) {
             var node = M.d[nodes[i]];
@@ -3725,6 +3730,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                     if (handler.ready(node, xval)) {
                         break;
                     }
+
+                    // Abort if this has been running for too long..
+                    if ((Date.now() - startTime) > 7000) {
+                        break;
+                    }
                 }
             }
 
@@ -3732,6 +3742,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
             if (handles.length) {
                 var inRub = (M.RubbishID === M.currentrootid);
+
+                if (inRub) {
+                    // Flush cached nodes
+                    $(window).trigger('dynlist.flush');
+                }
 
                 handles.map(function(handle) {
                     M.delNode(handle);

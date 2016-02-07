@@ -1070,7 +1070,7 @@ function checkUserLogin() {
                 clearTimeout(timer);
             }
             // through a timer to prevent floods
-            timer = setTimeout(store, 20402);
+            timer = setTimeout(store, 9701);
         }
         else {
             localStorage.fmconfig = JSON.stringify(fmconfig);

@@ -8832,47 +8832,50 @@ function moveDialog() {
  * @returns {String} links URLs or decryption keys for selected items separated with newline '\n'.
  */
 function getClipboardLinks() {
+    var key;
+    var type;
+    var links = [];
+    var handles = $.selected;
+    var $dialog = $('.export-links-dialog .export-content-block');
+    var modeFull = $dialog.hasClass('full-link');
+    var modePublic = $dialog.hasClass('public-handle');
+    var modeDecKey = $dialog.hasClass('decryption-key');
 
-    var nodeUrlWithPublicHandle, nodeDecryptionKey,
-        key, type, fileSize, folderClass, currNode,
-        $dialog = $('.export-links-dialog .export-content-block'),
-        nodesIds = $.selected,
-        links = '';
+    for (var i in handles) {
+        if (handles.hasOwnProperty(i)) {
+            var node = M.d[handles[i]];
 
-    for (var i in nodesIds) {
-        currNode = M.d[nodesIds[i]];
-        if (currNode.ph) {// Only nodes with public handle
-            if (currNode.t) {// Folder
-                type = 'F';
-                key = u_sharekeys[currNode.h];
-                fileSize = '';
-                folderClass = 'folder-item';
-            }
-            else {// File
-                type = '';
-                key = currNode.key;
-                fileSize = htmlentities(bytesToSize(currNode.s));
-            }
+            // Only nodes with public handle
+            if (node && node.ph) {
+                if (node.t) {
+                    // Folder
+                    type = 'F';
+                    key = u_sharekeys[node.h];
+                }
+                else {
+                    // File
+                    type = '';
+                    key = node.key;
+                }
 
-            nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + htmlentities(currNode.ph);
-            nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
+                var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
+                var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
 
-            // Check export/public link dialog drop down list selected option
-            if ($dialog.hasClass('full-link')) {
-                links += nodeUrlWithPublicHandle + nodeDecryptionKey;
+                // Check export/public link dialog drop down list selected option
+                if (modeFull) {
+                    links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
+                }
+                else if (modePublic) {
+                    links.push(nodeUrlWithPublicHandle);
+                }
+                else if (modeDecKey) {
+                    links.push(nodeDecryptionKey);
+                }
             }
-            else if ($dialog.hasClass('public-handle')) {
-                links += nodeUrlWithPublicHandle;
-            }
-            else if ($dialog.hasClass('decryption-key')) {
-                links += nodeDecryptionKey;
-            }
-
-            links += '\n';
         }
     }
 
-    return links;
+    return links.join("\n");
 }
 
 function getclipboardkeys() {

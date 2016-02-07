@@ -2537,7 +2537,7 @@ function initContextUI() {
 
     $(c + '.startchat-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected[0];
+        var user_handle = $.selected && $.selected[0];
 
         if (!$this.is(".disabled") && user_handle) {
             window.location = "#fm/chat/" + user_handle;
@@ -2546,7 +2546,7 @@ function initContextUI() {
 
     $(c + '.startaudio-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected[0];
+        var user_handle = $.selected && $.selected[0];
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
@@ -2560,7 +2560,7 @@ function initContextUI() {
 
     $(c + '.startvideo-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected[0];
+        var user_handle = $.selected && $.selected[0];
         var room;
 
         if (!$this.is(".disabled") && user_handle) {

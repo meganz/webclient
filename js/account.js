@@ -185,11 +185,7 @@ function u_logout(logout) {
             localStorage.removeItem("audioVideoScreenSize");
 
             if (megaChatIsReady) {
-                megaChat.destroy( /* isLogout: */ true).always(function () {
-                    window.megaChat = new Chat();
-                    localStorage.removeItem("megaChatPresence");
-                    localStorage.removeItem("megaChatPresenceMtime");
-                });
+                megaChat.destroy( /* isLogout: */ true);
 
                 localStorage.removeItem("megaChatPresence");
                 localStorage.removeItem("megaChatPresenceMtime");

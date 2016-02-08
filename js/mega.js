@@ -6183,7 +6183,11 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                         usersWithHandle.push({ 'r': this.shareAccessRightsLevel, 'u': userHandle });
                     }
                     else {
-                        usersWithHandle.push({ 'r': this.shareAccessRightsLevel, 'u': userHandle, 'k': result.pubk, 'm': this.targetEmail });
+                        usersWithHandle.push({
+                            'r': this.shareAccessRightsLevel,
+                            'u': userHandle, 'k': result.pubk,
+                            'm': this.targetEmail
+                        });
                     }
 
                     var sharePromise = api_setshare(nodeId, usersWithHandle, childNodesId);

@@ -300,6 +300,17 @@ function inputblur(id, defaultvalue, pw) {
     }
 }
 
+
+/**
+ * Check if something (val) is a string.
+ *
+ * @param val
+ * @returns {boolean}
+ */
+function isString(val) {
+    return (typeof val === 'string' || val instanceof String);
+};
+
 function easeOutCubic(t, b, c, d) {
     return c * ((t = t / d - 1) * t * t + 1) + b;
 }

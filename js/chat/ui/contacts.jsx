@@ -137,11 +137,14 @@ var AvatarImage = React.createClass({
 
             loadAvatarPromise
                 .done(function(r) {
-                    var blob = new Blob([base64urldecode(r)], {type: 'image/jpeg'});
-                    avatars[contact.u] = {
-                        data: blob,
-                        url: myURL.createObjectURL(blob)
-                    };
+                    if (typeof r !== 'number' && r.length > 5) {
+                        var blob = new Blob([str_to_ab(base64urldecode(r))], {type: 'image/jpeg'});
+                        avatars[contact.u] = {
+                            data: blob,
+                            url: myURL.createObjectURL(blob)
+                        };
+                    }
+
                     useravatar.loaded(contact);
 
                     delete _noAvatars[contact.u];
@@ -274,8 +277,11 @@ var ContactPickerWidget = React.createClass({
             contacts.push(
                 <ContactCard
                     contact={v}
-                    className={"contacts-search " + selectedClass} onClick={(contact, e) => {
-                        self.props.onClick(contact, e);
+                    className={"contacts-search " + selectedClass}
+                    onClick={(contact, e) => {
+                        if (self.props.onClick) {
+                            self.props.onClick(contact, e);
+                        }
                     }}
                     noContextMenu={true}
                     key={v.u + "_" + selectedClass}

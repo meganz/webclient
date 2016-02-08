@@ -1506,6 +1506,8 @@ function MegaData()
     };
 
     this.openFolder = function(id, force, chat) {
+        var newHashLocation;
+
         $('.fm-right-account-block').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
@@ -1548,7 +1550,11 @@ function MegaData()
 
                 megaChat.refreshConversations();
                 treeUI();
-                megaChat.renderListing();
+                var room = megaChat.renderListing();
+
+                if (room) {
+                    newHashLocation = room.getRoomUrl();
+                }
             }
         }
         else if (id && id.substr(0, 7) === 'account')
@@ -1686,7 +1692,6 @@ function MegaData()
             });
         }
 
-        var newHashLocation;
 
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
@@ -1697,7 +1702,10 @@ function MegaData()
             newHashLocation = '#F!' + pfid + '!' + pfkey + target;
         }
         else {
-            newHashLocation = '#fm/' + M.currentdirid;
+            // new hash location can be altered already by the chat logic in the previous lines in this func
+            if (!newHashLocation) {
+                newHashLocation = '#fm/' + M.currentdirid;
+            }
         }
         try {
             window.location.hash = newHashLocation;
@@ -3648,6 +3656,76 @@ function MegaData()
         });
 
         return result;
+    };
+
+    this.getNode = function(idOrObj) {
+        if (isString(idOrObj) === true && M.d[idOrObj]) {
+            return M.d[idOrObj];
+        }
+        else if (idOrObj && typeof(idOrObj.t) !== 'undefined') {
+            return idOrObj;
+        }
+        else {
+            return false;
+        }
+    };
+
+    /**
+     * Can be used to be passed to ['nodeId', {nodeObj}].every(...).
+     *
+     * @param element
+     * @param index
+     * @param array
+     * @returns {boolean}
+     * @private
+     */
+    this._everyTypeFile = function(element, index, array) {
+        var node = M.getNode(element);
+        return node && node.t === 0;
+    };
+
+    /**
+     * Can be used to be passed to ['nodeId', {nodeObj}].every(...).
+     *
+     * @param element
+     * @param index
+     * @param array
+     * @returns {boolean}
+     * @private
+     */
+    this._everyTypeFolder = function(element, index, array) {
+        var node = M.getNode(element);
+        return node && node.t === 1;
+    };
+
+    /**
+     * Will return true/false if the passed node Id/node object/array of nodeids or objects is/are all files.
+     *
+     * @param nodesId {String|Object|Array}
+     * @returns {boolean}
+     */
+    this.isFile = function(nodesId) {
+        var nodes = nodesId;
+        if (!Array.isArray(nodesId)) {
+            nodes = [nodesId];
+        }
+
+        return nodes.every(this._everyTypeFile);
+    };
+
+    /**
+     * Will return true/false if the passed node Id/node object/array of nodeids or objects is/are all folders.
+     *
+     * @param nodesId {String|Object|Array}
+     * @returns {boolean}
+     */
+    this.isFolder = function(nodesId) {
+        var nodes = nodesId;
+        if (!Array.isArray(nodesId)) {
+            nodes = [nodesId];
+        }
+
+        return nodes.every(this._everyTypeFolder);
     };
 
     this.nodeShare = function(h, s, ignoreDB) {

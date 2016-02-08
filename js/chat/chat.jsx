@@ -835,6 +835,24 @@ Chat.prototype.init = function() {
     });
 
 
+
+    $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
+        if (ul_target.indexOf("chat/") > -1) {
+            var contactHash = ul_target.replace("chat/", "");
+            if (!contactHash) {
+                return;
+            }
+
+            var chatRoom = megaChat.getPrivateRoom(contactHash);
+
+            if (!chatRoom) {
+                return;
+            }
+
+            chatRoom.attachNodes(uploads);
+        }
+    });
+
     self.trigger("onInit");
 };
 
@@ -1732,7 +1750,7 @@ Chat.prototype.renderListing = function() {
             // have last opened chat, which is active
             self.chats[self.lastOpenedChat].setActive();
             self.chats[self.lastOpenedChat].show();
-            return true;
+            return self.chats[self.lastOpenedChat];
         }
         else {
             // show first chat from the conv. list
@@ -1745,7 +1763,7 @@ Chat.prototype.renderListing = function() {
                 var room = sortedConversations[0];
                 room.setActive();
                 room.show();
-                return true;
+                return room;
             }
             else {
                 $('.fm-empty-conversations').removeClass('hidden');

@@ -6173,6 +6173,9 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             targetEmail: email,
             shareAccessRightsLevel: accessRights,
             callback: function (result) {
+
+                var sharePromise = new MegaPromise();
+
                 if (result.pubk) {
                     var userHandle = result.u;
 
@@ -6190,7 +6193,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                         });
                     }
 
-                    var sharePromise = api_setshare(nodeId, usersWithHandle, childNodesId);
+                    sharePromise = api_setshare(nodeId, usersWithHandle, childNodesId);
                     sharePromise.done(function _sharePromiseWithHandleDone(result) {
                         _shareDone(result, usersWithHandle);
                     });
@@ -6200,7 +6203,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                     // NOT ok, user doesn't have account yet
                     usersWithoutHandle = [];
                     usersWithoutHandle.push({ 'r': this.shareAccessRightsLevel, 'u': this.targetEmail });
-                    var sharePromise = api_setshare1({
+                    sharePromise = api_setshare1({
                         node: nodeId,
                         targets: usersWithoutHandle,
                         sharenodes: childNodesId

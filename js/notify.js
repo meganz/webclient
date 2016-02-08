@@ -157,6 +157,7 @@ var notify = {
     countAndShowNewNotifications: function() {
 
         var newNotifications = 0;
+        var $popup = $(notify.$popupNum);
 
         // Loop through the notifications
         for (var i = 0; i < notify.notifications.length; i++) {
@@ -169,13 +170,11 @@ var notify = {
 
         // If there is a new notification, show the red circle with the number of notifications in it
         if (newNotifications >= 1) {
-            notify.$popupNum.removeClass('hidden');
-            notify.$popupNum.html(newNotifications);
+            $popup.removeClass('hidden').text(newNotifications);
         }
         else {
             // Otherwise hide it
-            notify.$popupNum.addClass('hidden');
-            notify.$popupNum.html(newNotifications);
+            $popup.addClass('hidden').text(newNotifications);
         }
 
         // Update page title
@@ -350,12 +349,12 @@ var notify = {
 
             // Update template
             $notificationHtml = notify.updateTemplate($notificationHtml, notification);
-            
+
             // Skip this notification if it's not one that is recognised
             if ($notificationHtml === false) {
                 continue;
             }
-            
+
             // Build the html
             allNotificationsHtml += $notificationHtml.prop('outerHTML');
         }
@@ -412,23 +411,23 @@ var notify = {
      * On click of a takedown or restore notice, go to the parent folder
      */
     initTakedownClickHandler: function() {
-        
+
         // Select the notifications with shares or new files/folders
         this.$popup.find('.nt-takedown-notification, .nt-takedown-reinstated-notification').rebind('click', function() {
-                        
+
             // Get the folder ID from the HTML5 data attribute
             var folderOrFileId = $(this).attr('data-folder-or-file-id');
             var parentFolderId = M.d[folderOrFileId].p;
-            
+
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
-            
+
             // Open the folder
             M.openFolder(parentFolderId);
             reselect(true);
         });
     },
-    
+
     /**
      * If they click on a payment notification, then redirect them to the Account History page
      */
@@ -879,51 +878,59 @@ var notify = {
 
         return $notificationHtml;
     },
-    
+
     /**
      * Processes a takedown notice or counter-notice to restore the file
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
      * @param {Object} notification
      */
     renderTakedown: function($notificationHtml, notification) {
-        
+
         var header = '';
         var title = '';
         var cssClass = '';
-        var folderOrFileHandle = notification.data.h;
-        var folderOrFileName = (M.d[folderOrFileHandle].name) ? htmlentities(M.d[folderOrFileHandle].name) : '';
-        var folderOrFile = (M.d[folderOrFileHandle].t === 0) ? l[5557] : l[5561];
-        
+        var handle = notification.data.h;
+        var node = M.d[handle] || {};
+        var name = (node.name) ? '(' + notify.shortenNodeName(node.name) + ')' : '';
+        var type = (node.t === 0) ? l[5557] : l[5561];
+
         // Takedown notice
         // Your publicly shared %1 (%2) has been taken down.
         if (typeof notification.data.down !== 'undefined') {
             header = l[8521];
-            title = l[8522].replace('%1', folderOrFile).replace('%2', folderOrFileName);
+            title = l[8522].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-notification';
         }
-        
+
         // Takedown reinstated
         // Your taken down %1 (%2) has been reinstated.
         else if (typeof notification.data.up !== 'undefined') {
             header = l[8524];
-            title = l[8523].replace('%1', folderOrFile).replace('%2', folderOrFileName);
+            title = l[8523].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-reinstated-notification';
         }
-        
+
         // Populate other template information
         $notificationHtml.addClass(cssClass);
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notification-username').text(header);
-        $notificationHtml.attr('data-folder-or-file-id', folderOrFileHandle);
-        
+        $notificationHtml.attr('data-folder-or-file-id', handle);
+
         return $notificationHtml;
+    },
+    
+    /**
+     * Truncates long file or folder names to 30 characters
+     * @param {String} name The file or folder name
+     * @returns {String} Returns a string similar to 'reallylongfilename...'
+     */
+    shortenNodeName: function(name) {
+     
+        if (name.length > 30) {
+            name = name.substr(0, 30) + '...';
+        }
+        
+        return htmlentities(name);
     }
 };
-
-/**
- * Tests
- *
- * IPC action packet:
- * notify.notifyFromActionPacket({ a: "ipc", p: "mkwfd6Fpwsk", m: "test+401@mega.co.nz", msg: "Hello, join me on MEGA and get acce...", ps: 0, ts: 1439427955, uts: 1439427955, i: "6ZWnwU8ujK" });
- */

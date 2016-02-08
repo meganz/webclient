@@ -263,7 +263,7 @@ var Chat = function() {
 
     this.plugins = {};
 
-    if (!megaChatIsDisabled) {
+    if (!window.megaChatIsDisabled) {
         try {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
@@ -273,7 +273,7 @@ var Chat = function() {
         }
         catch (e) {
             console.error(e);
-            megaChatIsDisabled = true;
+            window.megaChatIsDisabled = true;
         }
     }
 

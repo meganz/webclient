@@ -4051,20 +4051,20 @@ if (typeof sjcl !== 'undefined') {
      */
     Share.prototype.hasExportLink = function(nodes) {
 
-        var result = false,
-            node;
+        if (typeof nodes === 'string') {
+            nodes = [nodes];
+        }
 
         // Loop through all selected items
-        $.each(nodes, function(index, value) {
-            node = M.d[value];
-            if (node.shares && node.shares.EXP) {
-                result = true;
-                return false;// Stop further $.each loop execution
+        for (var i in nodes) {
+            var node = M.d[nodes[i]];
 
+            if (node && Object(node.shares).EXP) {
+                return true;
             }
-        });
+        }
 
-        return result;
+        return false;
     };
 
     /**
@@ -4156,66 +4156,5 @@ if (typeof sjcl !== 'undefined') {
     };
 
     // export
-    scope.mega = scope.mega || {};
     scope.mega.Share = Share;
-})(jQuery, window);
-
-(function($, scope) {
-    /**
-     * Nodes related operations.
-     *
-     * @param opts {Object}
-     *
-     * @constructor
-     */
-    var Nodes = function(opts) {
-
-        var self = this;
-        var defaultOptions = {
-        };
-
-        self.options = $.extend(true, {}, defaultOptions, opts);    };
-
-    /**
-     * getChildNodes
-     *
-     * Loops through all subdirs of given node, as result gives array of subdir nodes.
-     * @param {String} id: node id.
-     * @param {Array} nodesId.
-     * @returns {Array} Child nodes id.
-     */
-    Nodes.prototype.getChildNodes = function(id, nodesId) {
-
-        var self = this;
-
-        var subDirs = nodesId;
-
-        if (subDirs) {
-            if (subDirs.indexOf(id) === -1) {
-                subDirs.push(id);
-            }
-        }
-        else {
-            // Make subDirs an array
-            subDirs = [id];
-        }
-
-        for (var item in M.c[id]) {
-            if (M.c[id].hasOwnProperty(item)) {
-
-                // Prevent duplication
-                if (subDirs && subDirs.indexOf(item) === -1) {
-                    subDirs.push(item);
-                }
-
-                self.getChildNodes(item, subDirs);
-            }
-        }
-
-        return subDirs;
-    };
-
-    // export
-    scope.mega = scope.mega || {};
-    scope.mega.Nodes = Nodes;
 })(jQuery, window);

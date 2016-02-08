@@ -1731,7 +1731,7 @@ function MegaData()
         var i;
 
         for (i in M.c['contacts']) {
-            if (M.c['contacts'].hasOwnProperty(i)) {
+            if (M.d.hasOwnProperty(i)) {
                 contacts.push(M.d[i]);
             }
         }
@@ -2379,13 +2379,13 @@ function MegaData()
         }
 
         for (var i in a2) {
+            name = '';
             if (a2[i] === this.RootID) {
                 if (folderlink && M.d[this.RootID]) {
                     name = htmlentities(M.d[this.RootID].name);
                     typeclass = 'folder';
                 }
                 else {
-                    name = '';
                     typeclass = 'cloud-drive';
                 }
             }
@@ -2413,15 +2413,17 @@ function MegaData()
                 typeclass = 'messages';
                 name = l[166];
             }
-            else if (a2[i].length === 11) {
-                var n = M.d[a2[i]];
-                if (n.name)
-                    name = htmlentities(n.name);
-                typeclass = 'contact';
-            }
             else {
-                name = htmlentities(M.d[a2[i]].name);
-                typeclass = 'folder';
+                var n = M.d[a2[i]];
+                if (n && n.name) {
+                    name = htmlentities(n.name);
+                }
+                if (a2[i].length === 11) {
+                    typeclass = 'contact';
+                }
+                else {
+                    typeclass = 'folder';
+                }
             }
             html = '<a class="fm-breadcrumbs ' + typeclass + ' contains-directories ' + hasnext + ' ui-droppable" id="path_' + htmlentities(a2[i]) + '">\n\
                         <span class="right-arrow-bg ui-draggable">\n\
@@ -5769,14 +5771,12 @@ function loadfm(force)
 
 function RightsbyID(id) {
 
+    if (folderlink || !id || id.length > 8) {
+        return false;
+    }
+
     var p = M.getPath(id);
 
-    if (folderlink) {
-        return false;
-    }
-    if (id.length > 8) {
-        return false;
-    }
     if ((p[p.length - 1] === 'contacts') || (p[p.length - 1] === 'shares')) {
         return (M.d[p[p.length - 3]] || {}).r;
     }

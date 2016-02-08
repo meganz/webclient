@@ -2236,10 +2236,13 @@ function fmremove() {
             // Contains complete directory structure of selected nodes, their ids
             dirTree = [];
 
-            var nodes = new mega.Nodes({});
-            $.each($.selected, function(index, value){
-                dirTree = $.merge(dirTree, nodes.getChildNodes(value, null));
-            });
+            for (var i in $.selected) {
+                if ($.selected.hasOwnProperty(i)) {
+                    var nodes = fm_getnodes($.selected[i], 1);
+                    nodes.unshift($.selected[i]);
+                    dirTree = dirTree.concat(nodes);
+                }
+            }
 
             var share = new mega.Share({});
             delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';

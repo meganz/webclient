@@ -1729,6 +1729,11 @@ a.blog-button:hover {
     text-transform: uppercase;
     font-family: 'source_sans_prolight';
 }
+.nt-takedown-notification .notification-avatar,
+.nt-takedown-reinstated-notification .notification-avatar {
+    margin-top: -24px;
+    top: 50%;
+}
 .notification-item .avatar-wrapper.avatar {
     width: 48px;
     height: 48px;
@@ -1851,11 +1856,11 @@ a.blog-button:hover {
     width: 205px;
 }
 .notification-content {
-    display: table-cell;
-    height: 64px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    display: block;
+    min-height: 64px;
     padding: 8px 8px 6px 0;
     vertical-align: middle;
 }
@@ -1865,12 +1870,12 @@ a.blog-button:hover {
     min-height: 20px;
 }
 .notification-info {
+    color: #666666;
     display: block;
     font-size: 13px;
-    color: #666666;
-    padding: 0;
     line-height: 16px;
     padding: 1px 0;
+    word-wrap: break-word;
 }
 .nt-popup .notification-info {
     height: 40px;

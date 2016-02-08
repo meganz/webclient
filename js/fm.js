@@ -2256,7 +2256,7 @@ function fmremove() {
                             if (dirTree.hasOwnProperty(selection)) {
 
                                 // Remove regular/full share
-                                for (var share in M.d[dirTree[selection]].shares) {
+                                for (var share in Object(M.d[dirTree[selection]]).shares) {
                                     if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
                                         api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
                                         M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);

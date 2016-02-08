@@ -157,6 +157,7 @@ var notify = {
     countAndShowNewNotifications: function() {
 
         var newNotifications = 0;
+        var $popup = $(notify.$popupNum);
 
         // Loop through the notifications
         for (var i = 0; i < notify.notifications.length; i++) {
@@ -169,13 +170,11 @@ var notify = {
 
         // If there is a new notification, show the red circle with the number of notifications in it
         if (newNotifications >= 1) {
-            notify.$popupNum.removeClass('hidden');
-            notify.$popupNum.html(newNotifications);
+            $popup.removeClass('hidden').text(newNotifications);
         }
         else {
             // Otherwise hide it
-            notify.$popupNum.addClass('hidden');
-            notify.$popupNum.html(newNotifications);
+            $popup.addClass('hidden').text(newNotifications);
         }
 
         // Update page title

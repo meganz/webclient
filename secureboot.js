@@ -961,7 +961,7 @@ else if (!b_u)
     })(console);
 
     Object.defineProperty(window, "__cd_v", { value : 23, writable : false });
-    if (!d || onBetaW)
+    if (!d && location.protocol !== 'file:' || onBetaW)
     {
         var __cdumps = [], __cd_t;
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)

@@ -4040,20 +4040,20 @@ if (typeof sjcl !== 'undefined') {
      */
     Share.prototype.hasExportLink = function(nodes) {
 
-        var result = false,
-            node;
+        if (typeof nodes === 'string') {
+            nodes = [nodes];
+        }
 
         // Loop through all selected items
-        $.each(nodes, function(index, value) {
-            node = M.d[value];
-            if (node.shares && node.shares.EXP) {
-                result = true;
-                return false;// Stop further $.each loop execution
+        for (var i in nodes) {
+            var node = M.d[nodes[i]];
 
+            if (node && Object(node.shares).EXP) {
+                return true;
             }
-        });
+        }
 
-        return result;
+        return false;
     };
 
     /**

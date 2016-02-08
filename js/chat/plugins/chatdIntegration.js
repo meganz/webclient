@@ -44,6 +44,9 @@ var ChatdIntegration = function(megaChat) {
             })
     });
 
+    megaChat.rebind("onDestroy.chatdInt", function(e) {
+        self.chatd.destroyed = true;
+    });
 
     $(window).rebind('onChatCreatedActionPacket.chatdInt', function(e, actionPacket) {
         self.openChatFromApi(actionPacket);

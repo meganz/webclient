@@ -11,6 +11,12 @@ var Chatd = function(userid, options) {
     // maps chatids to the Message object
     self.chatidmessages = {};
 
+    /**
+     * Set to true when this chatd instance is (being) destroyed
+     * @type {boolean}
+     */
+    self.destroyed = false;
+
     // random starting point for the new message transaction ID
     // FIXME: use cryptographically strong PRNG instead
     // CHECK: is this sufficiently collision-proof? a collision would have to occur in the same second for the same userid.
@@ -197,7 +203,7 @@ Chatd.Shard = function(chatd, shard) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        localStorage.megaChatPresence === "unavailable"
+                        self.chatd.destroyed === true || localStorage.megaChatPresence === "unavailable"
                     );
                 }
             }
@@ -236,7 +242,7 @@ Chatd.Shard.prototype.reconnect = function() {
     };
 
     self.s.onclose = function(e) {
-        self.logger.log('chatd connection lost, reconnecting...');
+        self.logger.log('chatd connection lost, will eventually reconnect...');
         clearTimeout(self.keepAliveTimer);
         self.connectionRetryManager.gotDisconnected();
     };

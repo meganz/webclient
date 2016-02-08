@@ -1005,6 +1005,7 @@ Chat.prototype.destroy = function(isLogout) {
     var self = this;
 
     self.karere.destroying = true;
+    self.trigger('onDestroy', [isLogout]);
 
     // unmount the UI elements, to reduce any unneeded.
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);

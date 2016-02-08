@@ -835,6 +835,24 @@ Chat.prototype.init = function() {
     });
 
 
+
+    $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
+        if (ul_target.indexOf("chat/") > -1) {
+            var contactHash = ul_target.replace("chat/", "");
+            if (!contactHash) {
+                return;
+            }
+
+            var chatRoom = megaChat.getPrivateRoom(contactHash);
+
+            if (!chatRoom) {
+                return;
+            }
+
+            chatRoom.attachNodes(uploads);
+        }
+    });
+
     self.trigger("onInit");
 };
 

@@ -3658,6 +3658,76 @@ function MegaData()
         return result;
     };
 
+    this.getNode = function(idOrObj) {
+        if (isString(idOrObj) === true && M.d[idOrObj]) {
+            return M.d[idOrObj];
+        }
+        else if (idOrObj && typeof(idOrObj.t) !== 'undefined') {
+            return idOrObj;
+        }
+        else {
+            return false;
+        }
+    };
+
+    /**
+     * Can be used to be passed to ['nodeId', {nodeObj}].every(...).
+     *
+     * @param element
+     * @param index
+     * @param array
+     * @returns {boolean}
+     * @private
+     */
+    this._everyTypeFile = function(element, index, array) {
+        var node = M.getNode(element);
+        return node && node.t === 0;
+    };
+
+    /**
+     * Can be used to be passed to ['nodeId', {nodeObj}].every(...).
+     *
+     * @param element
+     * @param index
+     * @param array
+     * @returns {boolean}
+     * @private
+     */
+    this._everyTypeFolder = function(element, index, array) {
+        var node = M.getNode(element);
+        return node && node.t === 1;
+    };
+
+    /**
+     * Will return true/false if the passed node Id/node object/array of nodeids or objects is/are all files.
+     *
+     * @param nodesId {String|Object|Array}
+     * @returns {boolean}
+     */
+    this.isFile = function(nodesId) {
+        var nodes = nodesId;
+        if (!Array.isArray(nodesId)) {
+            nodes = [nodesId];
+        }
+
+        return nodes.every(this._everyTypeFile);
+    };
+
+    /**
+     * Will return true/false if the passed node Id/node object/array of nodeids or objects is/are all folders.
+     *
+     * @param nodesId {String|Object|Array}
+     * @returns {boolean}
+     */
+    this.isFolder = function(nodesId) {
+        var nodes = nodesId;
+        if (!Array.isArray(nodesId)) {
+            nodes = [nodesId];
+        }
+
+        return nodes.every(this._everyTypeFolder);
+    };
+
     this.nodeShare = function(h, s, ignoreDB) {
         if (this.d[h]) {
             if (typeof this.d[h].shares === 'undefined') {

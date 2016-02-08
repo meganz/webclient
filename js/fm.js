@@ -394,6 +394,18 @@ function initUI() {
             }
             else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0))
                 dd = 'download';
+            else if (
+                $(e.target).is('ul.conversations-pane > li') ||
+                $(e.target).parents('ul.conversations-pane > li').size() > 0 ||
+                $(e.target).is('.messages-block')
+            ) {
+                if (M.isFile(ids)) {
+                    dd = 'chat-attach';
+                }
+                else {
+                    dd = 'noop';
+                }
+            }
             else
             {
                 var t = $(e.target).attr('id');
@@ -467,6 +479,9 @@ function initUI() {
                         treeUIexpand(h, 1);
                     else if ($(e.target).hasClass('nw-conversations-item'))
                         $(e.target).click();
+                    else if ($(e.target).is('ul.conversations-pane > li')) {
+                        $(e.target).click();
+                    }
                 }
             }, 890);
 
@@ -486,8 +501,9 @@ function initUI() {
                     $.draggingClass = ('dndc-to-shared');
                 else if (~c.indexOf('contacts'))
                     $.draggingClass = ('dndc-to-contacts');
-                /*else if (~c.indexOf('conversations'))
-                    $.draggingClass = ('dndc-to-conversations');*/
+                else if (~c.indexOf('conversations')) {
+                    $.draggingClass = ('dndc-to-conversations');
+                }
                 else if (~c.indexOf('cloud-drive'))
                     $.draggingClass = ('dndc-to-conversations'); // TODO: cursor, please?
                 else
@@ -501,6 +517,9 @@ function initUI() {
                         $(e.target).click()
                     }, 920);
                 }
+            }
+            else if (dd === 'chat-attach') {
+                $.draggingClass = ('dndc-to-conversations');
             }
             // else $('.dragger-block').addClass('drag');
             else {
@@ -518,22 +537,22 @@ function initUI() {
         }
         // if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
+
         if ((a === 'drop') && dd) {
             if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }
-            /*else if ($(e.target).hasClass('nw-conversations-item'))
-            {
+            else if (
+                $(e.target).hasClass('nw-conversations-item') ||
+                dd === 'chat-attach'
+            ) {
                 nRevert();
 
                 // drop over a chat window
                 var currentRoom = megaChat.getCurrentRoom();
                 assert(currentRoom, 'Current room missing - this drop action should be impossible.');
                 currentRoom.attachNodes(ids);
-
-                if (d)
-                    console.error('TODO: dragging to the chat', currentRoom);
-            }*/
+            }
             else if (dd === 'move') {
                 nRevert(t !== M.RubbishID);
                 $.moveids = ids;
@@ -6514,12 +6533,14 @@ function treeUI()
 
     $(
         '.fm-tree-panel .nw-fm-tree-item,' +
-        ' .rubbish-bin,' +
-        ' .fm-breadcrumbs,' +
-        ' .nw-fm-left-icons-panel .nw-fm-left-icon,' +
-        ' .shared-with-me tr,' +
-        ' .nw-conversations-item,' +
-        ' .nw-contact-item'
+        '.rubbish-bin,' +
+        '.fm-breadcrumbs,' +
+        '.nw-fm-left-icons-panel .nw-fm-left-icon,' +
+        '.shared-with-me tr,' +
+        '.nw-conversations-item,' +
+        'ul.conversations-pane > li,' +
+        '.messages-block,' +
+        '.nw-contact-item'
     ).droppable({
             tolerance: 'pointer',
             drop: function(e, ui)

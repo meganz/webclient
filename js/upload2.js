@@ -600,26 +600,6 @@ var ulmanager = {
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;
             ulmanager.ulCompletePending(ctx.target);
-
-            var contactHash = ctx.file.target.replace("chat/", "");
-            if (!contactHash) {
-                return;
-            }
-
-            var chatRoom = megaChat.getPrivateRoom(contactHash);
-
-            if (!chatRoom) {
-                return;
-            }
-
-            var ids = [];
-            res.f.forEach(function(n) {
-                ids.push(
-                    n.h
-                )
-            });
-
-            chatRoom.attachNodes(ids);
         }
         else {
             var fileName = ctx.file.name;

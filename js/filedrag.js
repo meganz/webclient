@@ -203,7 +203,7 @@
                     (RightsbyID(M.currentdirid || '') | 0) < 1
                 )
             ) &&
-            M.currentdirid.indexOf("chat/") === -1
+            String(M.currentdirid).indexOf("chat/") === -1
         ) {
             msgDialog('warningb', l[1676], l[1023]);
             return true;

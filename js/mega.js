@@ -8,6 +8,22 @@ if (localStorage.fmconfig) {
     fmconfig = JSON.parse(localStorage.fmconfig);
 }
 
+(function() {
+   // Set up the MegaLogger's root logger
+    MegaLogger.rootLogger = new MegaLogger(
+        "",
+        {
+            onCritical: function(msg) {
+                srvlog(msg);
+            },
+            isEnabled: function() {
+                return typeof(d) !== 'undefined' && d === "1";
+            }
+        },
+        false
+    );
+})();
+
 if (typeof seqno === 'undefined')
     var seqno = Math.floor(Math.random() * 1000000000);
 if (typeof n_h === 'undefined')

@@ -1228,8 +1228,8 @@ else if (!b_u)
     jsl.push({f:'js/vendor/jquery-2.2.0.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
-    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});

@@ -891,14 +891,14 @@ var notify = {
         var cssClass = '';
         var handle = notification.data.h;
         var node = M.d[handle] || {};
-        var name = (node.name) ? htmlentities(node.name) : '';
+        var name = (node.name) ? '(' + notify.shortenNodeName(node.name) + ')' : '';
         var type = (node.t === 0) ? l[5557] : l[5561];
 
         // Takedown notice
         // Your publicly shared %1 (%2) has been taken down.
         if (typeof notification.data.down !== 'undefined') {
             header = l[8521];
-            title = l[8522].replace('%1', type).replace('%2', name);
+            title = l[8522].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-notification';
         }
 
@@ -906,7 +906,7 @@ var notify = {
         // Your taken down %1 (%2) has been reinstated.
         else if (typeof notification.data.up !== 'undefined') {
             header = l[8524];
-            title = l[8523].replace('%1', type).replace('%2', name);
+            title = l[8523].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-reinstated-notification';
         }
 
@@ -918,12 +918,19 @@ var notify = {
         $notificationHtml.attr('data-folder-or-file-id', handle);
 
         return $notificationHtml;
+    },
+    
+    /**
+     * Truncates long file or folder names to 30 characters
+     * @param {String} name The file or folder name
+     * @returns {String} Returns a string similar to 'reallylongfilename...'
+     */
+    shortenNodeName: function(name) {
+     
+        if (name.length > 30) {
+            name = name.substr(0, 30) + '...';
+        }
+        
+        return htmlentities(name);
     }
 };
-
-/**
- * Tests
- *
- * IPC action packet:
- * notify.notifyFromActionPacket({ a: "ipc", p: "mkwfd6Fpwsk", m: "test+401@mega.co.nz", msg: "Hello, join me on MEGA and get acce...", ps: 0, ts: 1439427955, uts: 1439427955, i: "6ZWnwU8ujK" });
- */

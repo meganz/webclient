@@ -263,7 +263,7 @@ var Chat = function() {
 
     this.plugins = {};
 
-    if (!megaChatIsDisabled) {
+    if (!window.megaChatIsDisabled) {
         try {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
@@ -273,7 +273,7 @@ var Chat = function() {
         }
         catch (e) {
             console.error(e);
-            megaChatIsDisabled = true;
+            window.megaChatIsDisabled = true;
         }
     }
 
@@ -835,6 +835,24 @@ Chat.prototype.init = function() {
     });
 
 
+
+    $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
+        if (ul_target.indexOf("chat/") > -1) {
+            var contactHash = ul_target.replace("chat/", "");
+            if (!contactHash) {
+                return;
+            }
+
+            var chatRoom = megaChat.getPrivateRoom(contactHash);
+
+            if (!chatRoom) {
+                return;
+            }
+
+            chatRoom.attachNodes(uploads);
+        }
+    });
+
     self.trigger("onInit");
 };
 
@@ -1003,6 +1021,13 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
  */
 Chat.prototype.destroy = function(isLogout) {
     var self = this;
+
+    self.karere.destroying = true;
+    self.trigger('onDestroy', [isLogout]);
+
+    // unmount the UI elements, to reduce any unneeded.
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
+
     //
     //localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
     //localStorage.megaChatPresenceMtime = unixtime();
@@ -1024,15 +1049,23 @@ Chat.prototype.destroy = function(isLogout) {
 
     self.karere.connectionRetryManager.resetConnectionRetries();
 
-    return self.karere.disconnect()
-        .done(function() {
-            self.karere = new Karere({
-                'clientName': 'mc',
-                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
-            });
 
-            self.is_initialized = false;
+    self.karere.connectionRetryManager.options.functions.forceDisconnect();
+
+    if (
+        self.plugins.chatdIntegration &&
+        self.plugins.chatdIntegration.chatd &&
+        self.plugins.chatdIntegration.chatd.shards
+    ) {
+        var shards = self.plugins.chatdIntegration.chatd.shards;
+        Object.keys(shards).forEach(function(k) {
+            shards[k].connectionRetryManager.options.functions.forceDisconnect();
         });
+    }
+
+    self.is_initialized = false;
+
+    return MegaPromise.resolve();
 };
 
 /**
@@ -1732,7 +1765,7 @@ Chat.prototype.renderListing = function() {
             // have last opened chat, which is active
             self.chats[self.lastOpenedChat].setActive();
             self.chats[self.lastOpenedChat].show();
-            return true;
+            return self.chats[self.lastOpenedChat];
         }
         else {
             // show first chat from the conv. list
@@ -1745,7 +1778,7 @@ Chat.prototype.renderListing = function() {
                 var room = sortedConversations[0];
                 room.setActive();
                 room.show();
-                return true;
+                return room;
             }
             else {
                 $('.fm-empty-conversations').removeClass('hidden');

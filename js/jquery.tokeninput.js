@@ -851,7 +851,7 @@
                 var doubleEmail = $.grep($(input).data("settings").local_data, function(row) {
                     var property = $(input).data("settings").propertyToSearch,
                         tokenValue = $(input).data("settings").tokenValue;
-                    return row[property].toLowerCase().indexOf(item[tokenValue].toLowerCase()) > -1;
+                    return coerceToString(row[property]).toLowerCase().indexOf(item[tokenValue].toLowerCase()) > -1;
                 });
 
                 // Prevent further execution if email is duplicated

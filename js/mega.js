@@ -1506,6 +1506,8 @@ function MegaData()
     };
 
     this.openFolder = function(id, force, chat) {
+        var newHashLocation;
+
         $('.fm-right-account-block').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
@@ -1548,7 +1550,11 @@ function MegaData()
 
                 megaChat.refreshConversations();
                 treeUI();
-                megaChat.renderListing();
+                var room = megaChat.renderListing();
+
+                if (room) {
+                    newHashLocation = room.getRoomUrl();
+                }
             }
         }
         else if (id && id.substr(0, 7) === 'account')
@@ -1686,7 +1692,6 @@ function MegaData()
             });
         }
 
-        var newHashLocation;
 
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
@@ -1697,7 +1702,10 @@ function MegaData()
             newHashLocation = '#F!' + pfid + '!' + pfkey + target;
         }
         else {
-            newHashLocation = '#fm/' + M.currentdirid;
+            // new hash location can be altered already by the chat logic in the previous lines in this func
+            if (!newHashLocation) {
+                newHashLocation = '#fm/' + M.currentdirid;
+            }
         }
         try {
             window.location.hash = newHashLocation;
@@ -1723,7 +1731,7 @@ function MegaData()
         var i;
 
         for (i in M.c['contacts']) {
-            if (M.c['contacts'].hasOwnProperty(i)) {
+            if (M.d.hasOwnProperty(i)) {
                 contacts.push(M.d[i]);
             }
         }
@@ -2371,13 +2379,13 @@ function MegaData()
         }
 
         for (var i in a2) {
+            name = '';
             if (a2[i] === this.RootID) {
                 if (folderlink && M.d[this.RootID]) {
                     name = htmlentities(M.d[this.RootID].name);
                     typeclass = 'folder';
                 }
                 else {
-                    name = '';
                     typeclass = 'cloud-drive';
                 }
             }
@@ -2405,15 +2413,17 @@ function MegaData()
                 typeclass = 'messages';
                 name = l[166];
             }
-            else if (a2[i].length === 11) {
-                var n = M.d[a2[i]];
-                if (n.name)
-                    name = htmlentities(n.name);
-                typeclass = 'contact';
-            }
             else {
-                name = htmlentities(M.d[a2[i]].name);
-                typeclass = 'folder';
+                var n = M.d[a2[i]];
+                if (n && n.name) {
+                    name = htmlentities(n.name);
+                }
+                if (a2[i].length === 11) {
+                    typeclass = 'contact';
+                }
+                else {
+                    typeclass = 'folder';
+                }
             }
             html = '<a class="fm-breadcrumbs ' + typeclass + ' contains-directories ' + hasnext + ' ui-droppable" id="path_' + htmlentities(a2[i]) + '">\n\
                         <span class="right-arrow-bg ui-draggable">\n\
@@ -3648,6 +3658,76 @@ function MegaData()
         });
 
         return result;
+    };
+
+    this.getNode = function(idOrObj) {
+        if (isString(idOrObj) === true && M.d[idOrObj]) {
+            return M.d[idOrObj];
+        }
+        else if (idOrObj && typeof(idOrObj.t) !== 'undefined') {
+            return idOrObj;
+        }
+        else {
+            return false;
+        }
+    };
+
+    /**
+     * Can be used to be passed to ['nodeId', {nodeObj}].every(...).
+     *
+     * @param element
+     * @param index
+     * @param array
+     * @returns {boolean}
+     * @private
+     */
+    this._everyTypeFile = function(element, index, array) {
+        var node = M.getNode(element);
+        return node && node.t === 0;
+    };
+
+    /**
+     * Can be used to be passed to ['nodeId', {nodeObj}].every(...).
+     *
+     * @param element
+     * @param index
+     * @param array
+     * @returns {boolean}
+     * @private
+     */
+    this._everyTypeFolder = function(element, index, array) {
+        var node = M.getNode(element);
+        return node && node.t === 1;
+    };
+
+    /**
+     * Will return true/false if the passed node Id/node object/array of nodeids or objects is/are all files.
+     *
+     * @param nodesId {String|Object|Array}
+     * @returns {boolean}
+     */
+    this.isFile = function(nodesId) {
+        var nodes = nodesId;
+        if (!Array.isArray(nodesId)) {
+            nodes = [nodesId];
+        }
+
+        return nodes.every(this._everyTypeFile);
+    };
+
+    /**
+     * Will return true/false if the passed node Id/node object/array of nodeids or objects is/are all folders.
+     *
+     * @param nodesId {String|Object|Array}
+     * @returns {boolean}
+     */
+    this.isFolder = function(nodesId) {
+        var nodes = nodesId;
+        if (!Array.isArray(nodesId)) {
+            nodes = [nodesId];
+        }
+
+        return nodes.every(this._everyTypeFolder);
     };
 
     this.nodeShare = function(h, s, ignoreDB) {
@@ -5691,14 +5771,12 @@ function loadfm(force)
 
 function RightsbyID(id) {
 
+    if (folderlink || !id || id.length > 8) {
+        return false;
+    }
+
     var p = M.getPath(id);
 
-    if (folderlink) {
-        return false;
-    }
-    if (id.length > 8) {
-        return false;
-    }
     if ((p[p.length - 1] === 'contacts') || (p[p.length - 1] === 'shares')) {
         return (M.d[p[p.length - 3]] || {}).r;
     }
@@ -6099,8 +6177,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
         logger = MegaLogger.getLogger('doShare'),
         childNodesId = [],// Holds complete directory tree starting from nodeId
         usersWithHandle = [],
-        usersWithoutHandle = [],
-        tmpValue, userHandle;
+        usersWithoutHandle = [];
 
     /** Settle function for API set share command. */
     var _shareDone = function(result, users) {
@@ -6108,32 +6185,36 @@ function doShare(nodeId, targets, dontShowShareDialog) {
         // Loose comparison is important (incoming JSON).
         if (result.r && result.r[0] == '0') {
             for (var i in result.u) {
-                M.addUser(result.u[i]);
+                if (result.u.hasOwnProperty(i)) {
+                    M.addUser(result.u[i]);
+                }
             }
 
             for (var k in result.r) {
-                if (result.r[k] === 0) {
-                    var rights = users[k].r;
-                    var user = users[k].u;
+                if (result.r.hasOwnProperty(k)) {
+                    if ((result.r[k] === 0) && users && users[k] && users[k].u) {
+                        var rights = users[k].r;
+                        var user = users[k].u;
 
-                    if (user.indexOf('@') >= 0) {
-                        user = getuid(users[k].u);
-                    }
+                        if (user.indexOf('@') >= 0) {
+                            user = getuid(users[k].u);
+                        }
 
-                    // A pending share may not have a corresponding user and should not be added
-                    // A pending share can also be identified by a user who is only a '0' contact
-                    // level (passive)
-                    if (M.u[user] && M.u[user].c !== 0) {
-                        M.nodeShare(nodeId, {
-                            h: nodeId,
-                            r: rights,
-                            u: user,
-                            ts: unixtime()
-                        });
-                        setLastInteractionWith(user, "0:" + unixtime());
-                    }
-                    else {
-                        logger.debug('invalid user:', user, M.u[user], users[k]);
+                        // A pending share may not have a corresponding user and should not be added
+                        // A pending share can also be identified by a user who is only a '0' contact
+                        // level (passive)
+                        if (M.u[user] && M.u[user].c !== 0) {
+                            M.nodeShare(nodeId, {
+                                h: nodeId,
+                                r: rights,
+                                u: user,
+                                ts: unixtime()
+                            });
+                            setLastInteractionWith(user, "0:" + unixtime());
+                        }
+                        else {
+                            logger.debug('invalid user:', user, M.u[user], users[k]);
+                        }
                     }
                 }
             }
@@ -6160,41 +6241,59 @@ function doShare(nodeId, targets, dontShowShareDialog) {
     childNodesId.push(nodeId);
 
     // Create new lists of users, active (with user handle) and non existing (pending)
-    for (var index in targets) {
-        if (targets.hasOwnProperty(index)) {
-            userHandle = getUserHandleFromEmail(targets[index].u);
-            if (userHandle !== false) {
-                tmpValue = targets[index];
-                tmpValue.u = userHandle; // Switch from email to user handle
-                usersWithHandle.push(tmpValue);
-            }
-            else {
-                usersWithoutHandle.push(targets[index]);
-            }
-        }
-    }
+    targets.forEach(function(value) {
 
-    // Process users with handle === known ones
-    if (usersWithHandle.length) {
-        var sharePromise = api_setshare(nodeId, usersWithHandle, childNodesId);
-        sharePromise.done(function _sharePromiseWithHandleDone(result) {
-            _shareDone(result, usersWithHandle);
-        });
-        masterPromise.linkFailTo(sharePromise);
-    }
+        var email = value.u;
+        var accessRights = value.r;
 
-    // Process targets (users) without handle === unknown ones
-    if (usersWithoutHandle.length) {
-        var sharePromise = api_setshare1({
-            node: nodeId,
-            targets: usersWithoutHandle,
-            sharenodes: childNodesId,
+        // Search by email only don't use handle cause user can re-register account
+        api_req({ 'a': 'uk', 'u': email, 'i': requesti }, {
+            targetEmail: email,
+            shareAccessRightsLevel: accessRights,
+            callback: function (result) {
+
+                var sharePromise = new MegaPromise();
+
+                if (result.pubk) {
+                    var userHandle = result.u;
+
+                    // 'u' is returned user handle, 'r' is access right
+                    usersWithHandle = [];
+
+                    if (M.u[userHandle] && M.u[userHandle].c !== 0) {
+                        usersWithHandle.push({ 'r': this.shareAccessRightsLevel, 'u': userHandle });
+                    }
+                    else {
+                        usersWithHandle.push({
+                            'r': this.shareAccessRightsLevel,
+                            'u': userHandle, 'k': result.pubk,
+                            'm': this.targetEmail
+                        });
+                    }
+
+                    sharePromise = api_setshare(nodeId, usersWithHandle, childNodesId);
+                    sharePromise.done(function _sharePromiseWithHandleDone(result) {
+                        _shareDone(result, usersWithHandle);
+                    });
+                    masterPromise.linkFailTo(sharePromise);
+                }
+                else {
+                    // NOT ok, user doesn't have account yet
+                    usersWithoutHandle = [];
+                    usersWithoutHandle.push({ 'r': this.shareAccessRightsLevel, 'u': this.targetEmail });
+                    sharePromise = api_setshare1({
+                        node: nodeId,
+                        targets: usersWithoutHandle,
+                        sharenodes: childNodesId
+                    });
+                    sharePromise.done(function _sharePromiseWithoutHandleDone(result) {
+                        _shareDone(result, this.targetEmail);
+                    });
+                    masterPromise.linkFailTo(sharePromise);
+                }
+            }
         });
-        sharePromise.done(function _sharePromiseWithoutHandleDone(result) {
-            _shareDone(result, usersWithoutHandle);
-        });
-        masterPromise.linkFailTo(sharePromise);
-    }
+    });
 
     return masterPromise;
 }

@@ -394,6 +394,18 @@ function initUI() {
             }
             else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0))
                 dd = 'download';
+            else if (
+                $(e.target).is('ul.conversations-pane > li') ||
+                $(e.target).parents('ul.conversations-pane > li').size() > 0 ||
+                $(e.target).is('.messages-block')
+            ) {
+                if (M.isFile(ids)) {
+                    dd = 'chat-attach';
+                }
+                else {
+                    dd = 'noop';
+                }
+            }
             else
             {
                 var t = $(e.target).attr('id');
@@ -467,6 +479,9 @@ function initUI() {
                         treeUIexpand(h, 1);
                     else if ($(e.target).hasClass('nw-conversations-item'))
                         $(e.target).click();
+                    else if ($(e.target).is('ul.conversations-pane > li')) {
+                        $(e.target).click();
+                    }
                 }
             }, 890);
 
@@ -486,8 +501,9 @@ function initUI() {
                     $.draggingClass = ('dndc-to-shared');
                 else if (~c.indexOf('contacts'))
                     $.draggingClass = ('dndc-to-contacts');
-                /*else if (~c.indexOf('conversations'))
-                    $.draggingClass = ('dndc-to-conversations');*/
+                else if (~c.indexOf('conversations')) {
+                    $.draggingClass = ('dndc-to-conversations');
+                }
                 else if (~c.indexOf('cloud-drive'))
                     $.draggingClass = ('dndc-to-conversations'); // TODO: cursor, please?
                 else
@@ -501,6 +517,9 @@ function initUI() {
                         $(e.target).click()
                     }, 920);
                 }
+            }
+            else if (dd === 'chat-attach') {
+                $.draggingClass = ('dndc-to-conversations');
             }
             // else $('.dragger-block').addClass('drag');
             else {
@@ -518,22 +537,22 @@ function initUI() {
         }
         // if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
+
         if ((a === 'drop') && dd) {
             if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }
-            /*else if ($(e.target).hasClass('nw-conversations-item'))
-            {
+            else if (
+                $(e.target).hasClass('nw-conversations-item') ||
+                dd === 'chat-attach'
+            ) {
                 nRevert();
 
                 // drop over a chat window
                 var currentRoom = megaChat.getCurrentRoom();
                 assert(currentRoom, 'Current room missing - this drop action should be impossible.');
                 currentRoom.attachNodes(ids);
-
-                if (d)
-                    console.error('TODO: dragging to the chat', currentRoom);
-            }*/
+            }
             else if (dd === 'move') {
                 nRevert(t !== M.RubbishID);
                 $.moveids = ids;
@@ -2236,10 +2255,13 @@ function fmremove() {
             // Contains complete directory structure of selected nodes, their ids
             dirTree = [];
 
-            var nodes = new mega.Nodes({});
-            $.each($.selected, function(index, value){
-                dirTree = $.merge(dirTree, nodes.getChildNodes(value, null));
-            });
+            for (var i in $.selected) {
+                if ($.selected.hasOwnProperty(i)) {
+                    var nodes = fm_getnodes($.selected[i], 1);
+                    nodes.unshift($.selected[i]);
+                    dirTree = dirTree.concat(nodes);
+                }
+            }
 
             var share = new mega.Share({});
             delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
@@ -2256,7 +2278,7 @@ function fmremove() {
                             if (dirTree.hasOwnProperty(selection)) {
 
                                 // Remove regular/full share
-                                for (var share in M.d[dirTree[selection]].shares) {
+                                for (var share in Object(M.d[dirTree[selection]]).shares) {
                                     if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
                                         api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
                                         M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
@@ -2537,7 +2559,7 @@ function initContextUI() {
 
     $(c + '.startchat-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected[0];
+        var user_handle = $.selected && $.selected[0];
 
         if (!$this.is(".disabled") && user_handle) {
             window.location = "#fm/chat/" + user_handle;
@@ -2546,7 +2568,7 @@ function initContextUI() {
 
     $(c + '.startaudio-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected[0];
+        var user_handle = $.selected && $.selected[0];
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
@@ -2560,7 +2582,7 @@ function initContextUI() {
 
     $(c + '.startvideo-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected[0];
+        var user_handle = $.selected && $.selected[0];
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
@@ -6514,12 +6536,14 @@ function treeUI()
 
     $(
         '.fm-tree-panel .nw-fm-tree-item,' +
-        ' .rubbish-bin,' +
-        ' .fm-breadcrumbs,' +
-        ' .nw-fm-left-icons-panel .nw-fm-left-icon,' +
-        ' .shared-with-me tr,' +
-        ' .nw-conversations-item,' +
-        ' .nw-contact-item'
+        '.rubbish-bin,' +
+        '.fm-breadcrumbs,' +
+        '.nw-fm-left-icons-panel .nw-fm-left-icon,' +
+        '.shared-with-me tr,' +
+        '.nw-conversations-item,' +
+        'ul.conversations-pane > li,' +
+        '.messages-block,' +
+        '.nw-contact-item'
     ).droppable({
             tolerance: 'pointer',
             drop: function(e, ui)
@@ -8832,47 +8856,50 @@ function moveDialog() {
  * @returns {String} links URLs or decryption keys for selected items separated with newline '\n'.
  */
 function getClipboardLinks() {
+    var key;
+    var type;
+    var links = [];
+    var handles = $.selected;
+    var $dialog = $('.export-links-dialog .export-content-block');
+    var modeFull = $dialog.hasClass('full-link');
+    var modePublic = $dialog.hasClass('public-handle');
+    var modeDecKey = $dialog.hasClass('decryption-key');
 
-    var nodeUrlWithPublicHandle, nodeDecryptionKey,
-        key, type, fileSize, folderClass, currNode,
-        $dialog = $('.export-links-dialog .export-content-block'),
-        nodesIds = $.selected,
-        links = '';
+    for (var i in handles) {
+        if (handles.hasOwnProperty(i)) {
+            var node = M.d[handles[i]];
 
-    for (var i in nodesIds) {
-        currNode = M.d[nodesIds[i]];
-        if (currNode.ph) {// Only nodes with public handle
-            if (currNode.t) {// Folder
-                type = 'F';
-                key = u_sharekeys[currNode.h];
-                fileSize = '';
-                folderClass = 'folder-item';
-            }
-            else {// File
-                type = '';
-                key = currNode.key;
-                fileSize = htmlentities(bytesToSize(currNode.s));
-            }
+            // Only nodes with public handle
+            if (node && node.ph) {
+                if (node.t) {
+                    // Folder
+                    type = 'F';
+                    key = u_sharekeys[node.h];
+                }
+                else {
+                    // File
+                    type = '';
+                    key = node.key;
+                }
 
-            nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + htmlentities(currNode.ph);
-            nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
+                var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
+                var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
 
-            // Check export/public link dialog drop down list selected option
-            if ($dialog.hasClass('full-link')) {
-                links += nodeUrlWithPublicHandle + nodeDecryptionKey;
+                // Check export/public link dialog drop down list selected option
+                if (modeFull) {
+                    links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
+                }
+                else if (modePublic) {
+                    links.push(nodeUrlWithPublicHandle);
+                }
+                else if (modeDecKey) {
+                    links.push(nodeDecryptionKey);
+                }
             }
-            else if ($dialog.hasClass('public-handle')) {
-                links += nodeUrlWithPublicHandle;
-            }
-            else if ($dialog.hasClass('decryption-key')) {
-                links += nodeDecryptionKey;
-            }
-
-            links += '\n';
         }
     }
 
-    return links;
+    return links.join("\n");
 }
 
 function getclipboardkeys() {

@@ -1729,6 +1729,11 @@ a.blog-button:hover {
     text-transform: uppercase;
     font-family: 'source_sans_prolight';
 }
+.nt-takedown-notification .notification-avatar,
+.nt-takedown-reinstated-notification .notification-avatar {
+    margin-top: -24px;
+    top: 50%;
+}
 .notification-item .avatar-wrapper.avatar {
     width: 48px;
     height: 48px;
@@ -1851,11 +1856,11 @@ a.blog-button:hover {
     width: 205px;
 }
 .notification-content {
-    display: table-cell;
-    height: 64px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    display: block;
+    min-height: 64px;
     padding: 8px 8px 6px 0;
     vertical-align: middle;
 }
@@ -1865,12 +1870,12 @@ a.blog-button:hover {
     min-height: 20px;
 }
 .notification-info {
+    color: #666666;
     display: block;
     font-size: 13px;
-    color: #666666;
-    padding: 0;
     line-height: 16px;
     padding: 1px 0;
+    word-wrap: break-word;
 }
 .nt-popup .notification-info {
     height: 40px;
@@ -11158,34 +11163,34 @@ table {
     font-family: 'source_sans_prolight';
     line-height: 94px;
 }
-.fm-account-avatar .color1, .semi-big-avatar.color1, .big-avatar.color1 {
+.fm-account-avatar .color1, .semi-big-avatar.color1, .big-avatar.color1, .medium-avatar.color1 {
     color: #FF6A19;
 }
-.fm-account-avatar .color2, .semi-big-avatar.color2, .big-avatar.color2 {
+.fm-account-avatar .color2, .semi-big-avatar.color2, .big-avatar.color2, .medium-avatar.color2 {
     color: #5856d6;
 }
-.fm-account-avatar .color3, .semi-big-avatar.color3, .big-avatar.color3 {
+.fm-account-avatar .color3, .semi-big-avatar.color3, .big-avatar.color3, .medium-avatar.color3 {
     color: #007aff;
 }
-.fm-account-avatar .color4, .semi-big-avatar.color4, .big-avatar.color4 {
+.fm-account-avatar .color4, .semi-big-avatar.color4, .big-avatar.color4, .medium-avatar.color4 {
     color: #34aadc;
 }
-.fm-account-avatar .color5, .semi-big-avatar.color5, .big-avatar.color5 {
+.fm-account-avatar .color5, .semi-big-avatar.color5, .big-avatar.color5, .medium-avatar.color5 {
     color: #5ac8fa;
 }
-.fm-account-avatar .color6, .semi-big-avatar.color6, .big-avatar.color6 {
+.fm-account-avatar .color6, .semi-big-avatar.color6, .big-avatar.color6, .medium-avatar.color6 {
     color: #4cd964;
 }
-.fm-account-avatar .color7, .semi-big-avatar.color7, .big-avatar.color7 {
+.fm-account-avatar .color7, .semi-big-avatar.color7, .big-avatar.color7, .medium-avatar.color7 {
     color: #ff1a53;
 }
-.fm-account-avatar .color8, .semi-big-avatar.color8, .big-avatar.color8 {
+.fm-account-avatar .color8, .semi-big-avatar.color8, .big-avatar.color8, .medium-avatar.color8 {
     color: #d90007;
 }
-.fm-account-avatar .color9, .semi-big-avatar.color9, .big-avatar.color9 {
+.fm-account-avatar .color9, .semi-big-avatar.color9, .big-avatar.color9, .medium-avatar.color9 {
     color: #ff9500;
 }
-.fm-account-avatar .color10, .semi-big-avatar.color10, .big-avatar.color10 {
+.fm-account-avatar .color10, .semi-big-avatar.color10, .big-avatar.color10, .medium-avatar.color10 {
     color: #ffcc00;
 }
 .fm-account-bg {

@@ -961,7 +961,7 @@ else if (!b_u)
     })(console);
 
     Object.defineProperty(window, "__cd_v", { value : 23, writable : false });
-    if (!d || onBetaW)
+    if (!d && location.protocol !== 'file:' || onBetaW)
     {
         var __cdumps = [], __cd_t;
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -1072,6 +1072,11 @@ else if (!b_u)
                 }
             }
             if (cn) dump.c = cn;
+
+            if (/Access to '.*' from script denied/.test(dump.m)) {
+                console.error(dump.m, dump);
+                return false;
+            }
 
             if (ln == 0 && !dump.s)
             {
@@ -1570,7 +1575,9 @@ else if (!b_u)
             }
             i++;
         }
+        hashdata = null;
     }
+    asmCryptoSha256Js = null;
 
     if (jj)
     {
@@ -1637,7 +1644,11 @@ else if (!b_u)
         jsl_total = 0;
         jsl_perc = 0;
         jsli=0;
-        for (var i = jsl.length; i--;) if (!jsl[i].text) jsl_total += jsl[i].w || 1;
+        for (var i = jsl.length; i--;) {
+            if (jsl[i] && !jsl[i].text) {
+                jsl_total += jsl[i].w || 1;
+            }
+        }
         if (fx_startup_cache)
         {
             var step = function(jsi)

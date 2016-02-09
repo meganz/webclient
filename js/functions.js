@@ -2231,6 +2231,8 @@ function setupTransferAnalysis() {
     if ($.mTransferAnalysis) {
         return;
     }
+    var PROC_INTERVAL = 4.2 * 60 * 1000;
+    var logger = MegaLogger.getLogger('TransferAnalysis');
 
     var prev = {},
         tlen = {},
@@ -2244,98 +2246,46 @@ function setupTransferAnalysis() {
             var tp = $.transferprogress;
 
             for (var i in tp) {
-                var q = (i[0] === 'u' ? ulQueue : dlQueue);
-                if (!GlobalProgress[i] || GlobalProgress[i].paused
-                        || tp[i][0] === tp[i][1] || q.isPaused() || q._qpaused[i]) {
-                    delete prev[i];
-                }
-                else if (prev[i] && prev[i] === tp[i][0]) {
-                    var p = tp[i],
-                        t = i[0] === 'u' ? 'Upload' : 'Download',
-                        r = '',
-                        data = [];
-                    var s = GlobalProgress[i].speed,
-                        w = GlobalProgress[i].working || [];
-                    var c = p[0] + '/' + p[1] + '-' + Math.floor(p[0] / p[1] * 100) + '%';
-                    var u = w.map(function(c) {
-                        var x = c.xhr || {};
-                        return ['' + c, x.__failed, x.__timeout,
-                            !!x.listener, x.__id, x.readyState > 1 && x.status];
-                    });
+                if (tp.hasOwnProperty(i)) {
+                    var currentlyTransfered = tp[i][0];
+                    var totalToBeTransfered = tp[i][1];
+                    var currenTransferSpeed = tp[i][2];
 
-                    if (d) {
-                        console.warn(i + ' might be stuck, checking...', c, w.length, u);
+                    var finished = (currentlyTransfered === totalToBeTransfered);
+
+                    if (finished) {
+                        logger.info('Transfer "%s" has finished. \uD83D\uDC4D', i);
+                        continue;
                     }
 
-                    if (w.length) {
-                        var j = w.length;
-                        while (j--) {
-                            /**
-                             * if there's a timer, no need to call on_error ourselves
-                             * since the chunk will get restarted there by the xhr
-                             */
-                            var stuck = w[j].xhr && !w[j].xhr.__timeout;
-                            if (stuck) {
-                                var chunk_id = '' + w[j],
-                                    n = u[j];
+                    var transfer = Object(GlobalProgress[i]);
 
-                                if (w[j].dl && w[j].dl.lasterror) {
-                                    r = '[DLERR' + w[j].dl.lasterror + ']';
-                                }
-                                else if (w[j].srverr) {
-                                    r = '[SRVERR' + (w[j].srverr - 1) + ']';
-                                }
+                    if (transfer.paused || !transfer.started) {
+                        logger.info('Transfer "%s" is not active.', i, transfer);
+                        continue;
+                    }
 
-                                try {
-                                    w[j].on_error(0, {}, 'Stuck');
-                                }
-                                catch (e) {
-                                    n.push(e.message);
-                                }
+                    if (prev[i] && prev[i] === currentlyTransfered) {
+                        var type = (i[0] === 'u'
+                            ? 'Upload'
+                            : (i[0] === 'z' ? 'ZIP' : 'Download'));
 
-                                if (!chunks[chunk_id]) {
-                                    chunks[chunk_id] = 1;
-                                    data.push(n);
-                                }
-                            }
-                        }
+                        srvlog(type + ' transfer seems stuck.');
 
-                        if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1)) {
-                            r = s ? '[TIMEOUT]' : '[ETHERR]';
-                            data = ['Chunks are taking too long to complete... ', u];
-                        }
+                        logger.warn('Transfer "%s" had no progress for the last minutes...', i, transfer);
                     }
                     else {
-                        r = '[!]';
-                        data = 'GlobalProgress.' + i + ' exists with no working chunks.';
-                    }
+                        logger.info('Transfer "%s" is in progress... %d% completed', i,
+                            Math.floor(currentlyTransfered / totalToBeTransfered * 100));
 
-                    if (data.length) {
-                        var udata = {
-                            i: i,
-                            p: c,
-                            d: data,
-                            j: [prev, tlen],
-                            s: s
-                        };
-                        if (i[0] === 'z') {
-                            t = 'zip' + t;
-                        }
-                        console.error(t + ' stuck. ' + r, i, udata);
-                        if (!d) {
-                            srvlog(t + ' Stuck. ' + r, udata);
-                        }
+                        time[i] = Date.now();
+                        tlen[i] = Math.max(tlen[i] | 0, currentlyTransfered);
+                        prev[i] = currentlyTransfered;
                     }
-                    delete prev[i];
-                }
-                else {
-                    time[i] = Date.now();
-                    tlen[i] = Math.max(tlen[i] || 0, tp[i][0]);
-                    prev[i] = tp[i][0];
                 }
             }
         }
-    }, mXHRTimeoutMS * 1.2);
+    }, PROC_INTERVAL);
 }
 
 function percent_megatitle() {
@@ -3331,7 +3281,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
-        clearXhr(); /* destroy all xhr */
+        clearTransferXHRs(); /* destroy all xhr */
 
         $('.transfer-pause-icon').addClass('disabled');
         $('.nw-fm-left-icon.transfers').removeClass('transfering');

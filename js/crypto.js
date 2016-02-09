@@ -1647,12 +1647,6 @@ var from8 = firefox_boost ? mozFrom8 : function (utf8) {
     return decodeURIComponent(escape(utf8));
 };
 
-function getxhr() {
-    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined')
-        ? new XDomainRequest()
-        : new XMLHttpRequest();
-}
-
 // API command queueing
 // All commands are executed in sequence, with no overlap
 // @@@ user warning after backoff > 1000

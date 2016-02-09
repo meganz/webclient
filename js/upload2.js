@@ -786,7 +786,7 @@ ChunkUpload.prototype.abort = function() {
         clearTimeout(this.oet);
     }
     if (this.xhr) {
-        this.xhr.xhr_cleanup(0x9ffe);
+        this.xhr.abort(this.xhr.ABORT_CLEANUP);
     }
     if (GlobalProgress[this.gid]) {
         removeValue(GlobalProgress[this.gid].working, this, 1);
@@ -797,15 +797,15 @@ ChunkUpload.prototype.abort = function() {
     delete this.xhr;
 };
 
-ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
+ChunkUpload.prototype.onXHRprogress = function(xhrEvent) {
     if (!this.file || !this.file.progress || this.file.abort) {
         return this.done && this.done();
     }
-    this.file.progress[this.start] = args[0].loaded;
+    this.file.progress[this.start] = xhrEvent.loaded;
     this.updateprogress();
 };
 
-ChunkUpload.prototype.on_error = function(args, xhr, reason) {
+ChunkUpload.prototype.onXHRerror = function(args, xhr, reason) {
     if (this.file && !this.file.abort && this.file.progress) {
         this.file.progress[this.start] = 0;
         this.updateprogress();
@@ -823,13 +823,16 @@ ChunkUpload.prototype.on_error = function(args, xhr, reason) {
     this.done();
 }
 
-ChunkUpload.prototype.on_ready = function(args, xhr) {
+ChunkUpload.prototype.onXHRready = function(xhrEvent) {
     if (!this.file || !this.file.progress) {
         if (d) {
             this.logger.error('Upload aborted...', this);
         }
         return Soon(this.done.bind(this));
     }
+    var xhr = xhrEvent.target;
+    xhrEvent = undefined;
+
     if (xhr.status === 200 && typeof xhr.response === 'string' && xhr.statusText === 'OK') {
         var response = xhr.response;
         if (response.length > 27) {
@@ -886,7 +889,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
             var estr = ulmanager.ulStrError(response);
             this.logger.error("Invalid upload response: ", response, estr);
             if (estr !== "EKEY") {
-                return this.on_error("$FATAL", null,
+                return this.onXHRerror("$FATAL", null,
                     (estr ? (estr + " error")
                     : "IUR[" + String(response).trim().substr(0, 5) + "]"));
             }
@@ -911,7 +914,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
     var self = this;
     this.oet = setTimeout(function() {
         if (!oIsFrozen(self)) {
-            self.on_error(null, xhr, errstr);
+            self.onXHRerror(null, xhr, errstr);
         }
         self = undefined;
     }, 1950 + Math.floor(Math.random() * 2e3));
@@ -953,7 +956,7 @@ ChunkUpload.prototype.upload = function() {
         return;
     }
 
-    xhr = getXhr(this);
+    xhr = getTransferXHR(this);
     url = dlmanager.uChangePort(this.file.posturl + this.suffix, this.altport ? 8080 : 0);
     xhr._murl = url;
 
@@ -962,6 +965,7 @@ ChunkUpload.prototype.upload = function() {
     }
 
     xhr.open('POST', url);
+    xhr.responseType = 'text';
     xhr.send(this.bytes.buffer);
 
     this.xhr = xhr;
@@ -1248,23 +1252,6 @@ ulQueue.poke = function(file, meth) {
         file.completion = [];
         file.owner = new FileUpload(file);
         ulQueue[meth || 'push'](file.owner);
-    }
-};
-
-ulQueue.stuck = function() {
-    // Check certain conditions to make sure the workaround isn't worse than the problem...
-    if (ulQueue._running === 1
-            && ulQueue._limit > 1 && ulQueue._queue.length && ulQueue._queue[0][0] instanceof FileUpload) {
-        if (ASSERT(ulQueue._pending.length === 1, 'Invalid ulQueue pending state')) {
-            var chunk = ulQueue._pending[0];
-            if (ASSERT(chunk instanceof ChunkUpload, 'Invalid pending chunk')) {
-                var id = ulmanager.getGID(chunk.ul);
-                $('.transfer-table #' + id + ' td:eq(0)').text('Internal Error (0x7f023)');
-                $('.transfer-table #' + id).attr('id', 'STUCKed_' + id);
-                srvlog('Upload automatically aborted on stuck detection');
-                ulmanager.abort(id);
-            }
-        }
     }
 };
 

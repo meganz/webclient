@@ -734,8 +734,15 @@ function init_storage ( storage ) {
     return storage;
 }
 
-function getxhr() {
-    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
+if (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') {
+    window.getxhr = function _getxhr() {
+        return new XDomainRequest();
+    };
+}
+else {
+    window.getxhr = function _getxhr() {
+        return new XMLHttpRequest();
+    };
 }
 
 function siteLoadError(error, filename) {
@@ -1336,7 +1343,7 @@ else if (!b_u)
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1});
     }
     /* better download */
-    jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
+    jsl.push({f:'js/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
     jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)

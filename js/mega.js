@@ -8,21 +8,17 @@ if (localStorage.fmconfig) {
     fmconfig = JSON.parse(localStorage.fmconfig);
 }
 
-(function() {
-   // Set up the MegaLogger's root logger
-    MegaLogger.rootLogger = new MegaLogger(
-        "",
-        {
-            onCritical: function(msg) {
-                srvlog(msg);
-            },
-            isEnabled: function() {
-                return typeof(d) !== 'undefined' && d === "1";
-            }
+// Set up the MegaLogger's root logger
+MegaLogger.rootLogger = new MegaLogger(
+    "",
+    {
+        onCritical: function(msg) {
+            srvlog(msg);
         },
-        false
-    );
-})();
+        isEnabled: !!window.d
+    },
+    false
+);
 
 if (typeof seqno === 'undefined')
     var seqno = Math.floor(Math.random() * 1000000000);

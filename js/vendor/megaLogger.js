@@ -31,10 +31,10 @@
      */
     var getStorageCacheValue = function(k) {
         if (!storageCache.hasOwnProperty(k)) {
-            if (typeof(sessionStorage[k]) !== 'undefined') {
+            if (typeof(sessionStorage) !== 'undefined' && k in sessionStorage) {
                 storageCache[k] = sessionStorage[k];
             }
-            else if (typeof(localStorage[k]) !== 'undefined') {
+            else if (typeof(localStorage) !== 'undefined' && k in localStorage) {
                 storageCache[k] = localStorage[k];
             }
             else {
@@ -73,6 +73,7 @@
         if (typeof(parentLogger) === 'object') {
             parentLogger = parentLogger.name;
         }
+
         if (typeof(MegaLogger.rootLogger) === "undefined" && parentLogger !== false) {
             MegaLogger.rootLogger = new MegaLogger("", {
                 isEnabled: getStorageCacheValue('d') == 1
@@ -99,6 +100,7 @@
      * @static
      */
     MegaLogger.LEVELS = {
+        'CRITICAL': 50,
         'ERROR': 40,
         'WARN': 30,
         'INFO': 20,
@@ -113,6 +115,7 @@
      * @static
      */
     var _intToLevel = {
+        '50': 'CRITICAL',
         '40': 'ERROR',
         '30': 'WARN',
         '20': 'INFO',
@@ -158,6 +161,7 @@
     MegaLogger.DEFAULT_OPTIONS = {
         'colorsEnabled': _environmentHaveSupportForColors(), /* use this only in browsers */
         'levelColors': {
+            'CRITICAL': '#930025',
             'ERROR': '#ff0000',
             'DEBUG': '#0000ff',
             'WARN': '#C25700',
@@ -172,13 +176,20 @@
 
             if (level === MegaLogger.LEVELS.DEBUG) {
                 fn = "debug";
-            } else if (level === MegaLogger.LEVELS.LOG) {
+            }
+            else if (level === MegaLogger.LEVELS.LOG) {
                 fn = "log";
-            } else if (level === MegaLogger.LEVELS.INFO) {
+            }
+            else if (level === MegaLogger.LEVELS.INFO) {
                 fn = "info";
-            } else if (level === MegaLogger.LEVELS.WARN) {
+            }
+            else if (level === MegaLogger.LEVELS.WARN) {
                 fn = "warn";
-            } else if (level === MegaLogger.LEVELS.ERROR) {
+            }
+            else if (level === MegaLogger.LEVELS.ERROR) {
+                fn = "error";
+            }
+            else if (level === MegaLogger.LEVELS.CRITICAL) {
                 fn = "error";
             }
 
@@ -329,7 +340,7 @@
 
             options.transport.call(this, level, args);
 
-            if (level === MegaLogger.LEVELS.ERROR && typeof(mocha) === "undefined") {
+            if (level === MegaLogger.LEVELS.CRITICAL && typeof(mocha) === "undefined") {
                 var text;
                 // convert back to plain text before sending to the server
                 if (options.colorsEnabled) {
@@ -350,7 +361,10 @@
 
                 var fn = "error";
 
-                var callbackName = "on" + fn.substr(0, 1).toUpperCase() + fn.substr(1);
+                var callbackName = "on" +
+                                    (levelName.toLowerCase()).substr(0, 1).toUpperCase() +
+                                    levelName.toLowerCase().substr(1);
+
                 if (this.options[callbackName]) {
                     this.options[callbackName].apply(this, [text]);
                 }
@@ -385,6 +399,16 @@
      */
     MegaLogger.prototype.error = function() {
         this._log(MegaLogger.LEVELS.ERROR, toArray(arguments));
+    };
+
+    /**
+     * Logs a message with a log level CRITICAL
+     *
+     * @param {...*}
+     * @public
+     */
+    MegaLogger.prototype.critical = function() {
+        this._log(MegaLogger.LEVELS.CRITICAL, toArray(arguments));
     };
 
     /**

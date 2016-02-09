@@ -330,7 +330,7 @@ var strongvelope = {};
         }
         catch (e) {
             if (e instanceof URIError) {
-                logger.error('Could not decrypt message, probably a wrong key/nonce.');
+                logger.critical('Could not decrypt message, probably a wrong key/nonce.');
 
                 return false;
             }
@@ -477,7 +477,7 @@ var strongvelope = {};
             value = part.record[1];
 
             if (typeof tlvVariable === 'undefined') {
-                logger.error('Received unexpected TLV type: ' + tlvType + '.');
+                logger.critical('Received unexpected TLV type: ' + tlvType + '.');
 
                 return false;
             }
@@ -517,7 +517,7 @@ var strongvelope = {};
 
         if ((parsedContent.recipients.length > 0)
                 && (parsedContent.recipients.length !== parsedContent.keys.length)) {
-            logger.error('Number of keys does not match number of recipients.');
+            logger.critical('Number of keys does not match number of recipients.');
 
             return false;
         }
@@ -698,6 +698,7 @@ var strongvelope = {};
                 }
             }
             else {
+                logger.critical('Signature invalid for message from *** on ***');
                 logger.error('Signature invalid for message from '
                              + message.userId + ' on ' + message.ts);
 
@@ -739,7 +740,7 @@ var strongvelope = {};
                     storedKey = this.participantKeys[messages[i].userId][keyId];
                     if (storedKey && (storedKey !== senderKeys[keyId])) {
                         // Bail out on inconsistent information.
-                        logger.error("Mismatching statement on sender's previously sent key.");
+                        logger.critical("Mismatching statement on sender's previously sent key.");
 
                         return false;
                     }
@@ -873,6 +874,7 @@ var strongvelope = {};
             }
             else {
                 if (counter >= 0xffff) {
+                    logger.critical('This should hardly happen, but 2^16 keys were used for the day. Bailing out!');
                     throw new Error('This should hardly happen, but 2^16 keys were used for the day. Bailing out!');
                 }
                 counter = (counter + 1) & 0xffff;
@@ -912,7 +914,7 @@ var strongvelope = {};
 
         var pubKey = pubCu25519[userhandle];
         if (!pubKey) {
-            logger.error('No cached chat key for user: ' + userhandle);
+            logger.critical('No cached chat key for user!');
             throw new Error('No cached chat key for user!');
         }
         var sharedSecret = nacl.scalarMult(
@@ -1311,7 +1313,7 @@ var strongvelope = {};
             storedKey = this.participantKeys[sender][id];
             if (storedKey && (storedKey !== senderKeys[id])) {
                 // Bail out on inconsistent information.
-                logger.error("Mismatching statement on sender's previously sent key.");
+                logger.critical("Mismatching statement on sender's previously sent key.");
 
                 return false;
             }
@@ -1329,6 +1331,7 @@ var strongvelope = {};
                 senderKey = this.participantKeys[sender][keyId];
             }
             else {
+                logger.critical('Encryption key for message from *** with ID *** unavailable.');
                 logger.error('Encryption key for message from ' + sender
                              + ' with ID ' + base64urlencode(keyId) + ' unavailable.');
 
@@ -1414,7 +1417,7 @@ var strongvelope = {};
         // Extract keys, and parse message in the same go.
         var extractedContent = this._parseAndExtractKeys({ userId: sender, message: message});
         if (extractedContent === false) {
-            logger.error('Message signature invalid.');
+            logger.critical('Message signature invalid.');
 
             return false;
         }
@@ -1424,14 +1427,14 @@ var strongvelope = {};
 
         // Bail out on parse error.
         if (parsedMessage === false) {
-            logger.error('Incoming message not usable.');
+            logger.critical('Incoming message not usable.');
 
             return false;
         }
 
         // Verify protocol version.
         if (parsedMessage.protocolVersion !== PROTOCOL_VERSION) {
-            logger.error('Message not compatible with current protocol version.');
+            logger.critical('Message not compatible with current protocol version.');
 
             return false;
         }

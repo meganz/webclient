@@ -184,7 +184,17 @@ var ConversationsList = React.createClass({
         }
     },
     handleWindowResize: function() {
-        var $container = $(document.querySelector('.content-panel.conversations').parentNode.parentNode.parentNode);
+        var contentPanelConversations = document.querySelector('.content-panel.conversations');
+        if (
+            !contentPanelConversations ||
+            !contentPanelConversations.parentNode ||
+            !contentPanelConversations.parentNode.parentNode ||
+            !contentPanelConversations.parentNode.parentNode.parentNode
+        ) {
+            // UI element is being destroyed, e.g. on log out.
+            return;
+        }
+        var $container = $(contentPanelConversations.parentNode.parentNode.parentNode);
         var $jsp = $container.data('jsp');
 
         $container.height(

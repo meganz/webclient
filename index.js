@@ -118,10 +118,6 @@ function init_page() {
         $('body').attr('class', '');
     }
 
-    if (localStorage.font_size) {
-        $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + localStorage.font_size);
-    }
-
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
 
@@ -280,6 +276,10 @@ function init_page() {
         }
 
         if (!fminitialized) {
+            if (u_type === 3) {
+                mega.config.fetch();
+            }
+
             if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
                 mDBstart();
             }
@@ -541,6 +541,10 @@ function init_page() {
     else if (page == 'key') {
         parsepage(pages['key']);
         init_key();
+    }
+    else if (page === 'support') {
+        parsepage(pages['support']);
+        support.initUI();
     }
     else if (page == 'contact') {
         parsepage(pages['contact']);
@@ -1587,9 +1591,10 @@ function topmenuUI() {
         }
         else if (className.indexOf('help') > -1) {
             document.location.hash = 'help';
-        }
-        else if (className.indexOf('contact') > -1) {
+        } else if (className.indexOf('contact') > -1) {
             document.location.hash = 'contact';
+        } else if (className.indexOf('support') > -1) {
+            document.location.hash = 'support';
         }
         else if (className.indexOf('sitemap') > -1) {
             document.location.hash = 'sitemap';

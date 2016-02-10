@@ -9984,8 +9984,8 @@
         "context": "Helpful tips before starting a call."
     },
     "7418": {
-        "text": "Use headphones or an headset",
-        "context": "Tips (before start call) :\r\n-Use headphones or an headset\r\n-Pause any transfers"
+        "text": "Use headphones or a headset",
+        "context": "Tips (before starting a phone\/video call) :\r\n- Use headphones or a headset\r\n- Pause any transfers"
     },
     "7419": {
         "text": "Pause all transfers",
@@ -12336,7 +12336,7 @@
         "context": "Error message for typing the wrong PIN code (two times)"
     },
     "8506": {
-        "text": "Enter your Pin Code",
+        "text": "Enter your PIN Code",
         "context": "Title of the screen to unlock screen with pin code."
     },
     "8507": {
@@ -12362,5 +12362,105 @@
     "8512": {
         "text": "Read more",
         "context": "Open the whole blog post"
+    },
+    "8513": {
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\n\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\n\nInside the app you can upgrade your storage space & bandwidth quota with a monthly or yearly subscription.\n\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\n\nFor more info, please check our website:\nMobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\nDesktop - https:\/\/mega.nz\/\n\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+        "context": "General description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\n\" AND \"\t\"."
+    },
+    "8514": {
+        "text": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
+        "context": "Specific paragraph shown only on the App Store in iOS"
+    },
+    "8515": {
+        "text": "Enable DEBUG mode",
+        "context": "Alert title shown when the DEBUG mode is enabled"
+    },
+    "8516": {
+        "text": "A log will be created in the Offline section (MEGAiOS.log).",
+        "context": "Alert message shown when the DEBUG mode is enabled"
+    },
+    "8517": {
+        "text": "Disable DEBUG mode",
+        "context": "Alert title shown when the DEBUG mode is disabled"
+    },
+    "8518": {
+        "text": "The log (MEGAiOS.log) will be deleted from the Offline section.",
+        "context": "Alert message shown when the DEBUG mode is disabled"
+    },
+    "8519": {
+        "text": "Operating system restrictions",
+        "context": "Label for the automatic camera upload service restrictions."
+    },
+    "8520": {
+        "text": "[S]Continue[\/S] slower browser download.",
+        "context": "Notification if the user selected slow \"browser download\" instead of downloading with the MEGAsync application. Do not remove the [S] or [\/S] tags."
+    },
+    "8521": {
+        "text": "Takedown notice",
+        "context": "The header of a notification indicating that a file or folder has been taken down due to infringement or other reason."
+    },
+    "8522": {
+        "text": "Your publicly shared %1 (%2) has been taken down.",
+        "context": "The text of a notification indicating that a file or folder has been taken down due to infringement or other reason. The %1 placeholder will be replaced with the text 'file' or 'folder'. The %2 will be replaced with the name of the file or folder."
+    },
+    "8523": {
+        "text": "Your taken down %1 (%2) has been reinstated.",
+        "context": "The text of a notification indicating that a file or folder that was taken down has now been restored due to a successful counter-notice. The %1 placeholder will be replaced with the text 'file' or 'folder'. The %2 will be replaced with the name of the file or folder."
+    },
+    "8524": {
+        "text": "Takedown reinstated",
+        "context": "The header of a notification indicating that a file or folder that was taken down has now been restored due to a successful counter-notice."
+    },
+    "8525": {
+        "text": "Type your message here",
+        "context": "Placeholder text for the \"Get support\" text field."
+    },
+    "8526": {
+        "text": "Subject",
+        "context": "The subject of a given message."
+    },
+    "8527": {
+        "text": "General Enquiry",
+        "context": "A dropdown selection item on the support page. This is for a user to make a general question to the support team."
+    },
+    "8528": {
+        "text": "Technical Issue",
+        "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a technical problem they are having."
+    },
+    "8529": {
+        "text": "Payment Issue",
+        "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a payment problem they are having e.g. missing payment."
+    },
+    "8531": {
+        "text": "Invalid link",
+        "context": "This message is displayed when the user clicks on an invalid hyperlink."
+    },
+    "8532": {
+        "text": "To access this folder\/file, you will need its Decryption key. If you do not have the key, contact the creator of the link.",
+        "context": "Alert message shown when you tap on a encrypted file\/folder link that can't be opened because it doesn't include the key to see its contents."
+    },
+    "8533": {
+        "text": "Invalid decryption key",
+        "context": "An alert message displayed when the user inputs an invalid decryption key."
+    },
+    "8534": {
+        "text": "Unavailable link",
+        "context": "This error title is shown when you open a file or folder link and it is no longer available."
+    },
+    "8535": {
+        "text": "MEGA will be changing its Terms of Service on the [B]20th February 2016[\/B]. Please read our anniversary blog post for more information.",
+        "context": "This string is a notification letting users know that our terms of service are changing. Please leave the [B] and [\/B] placeholder tags in place."
+    },
+    "8536": {
+        "text": "Thank you for using MEGA.",
+        "context": "A message within a public service announcement notification to thank users for using MEGA."
+    },
+    "8537": {
+        "text": "Important notice:",
+        "context": "A title for an important notification to all users."
+    },
+    "8538": {
+        "text": "View blog post",
+        "context": "Label on a button taking the user to a blog post."
     }
 }

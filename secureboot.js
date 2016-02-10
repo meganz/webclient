@@ -6,6 +6,7 @@ var b_u = 0;
 var apipath;
 var maintenance = false;
 var androidsplash = false;
+var silent_loading = false;
 var cookiesDisabled = false;
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
@@ -82,42 +83,43 @@ if (!String.trim) {
     };
 }
 
-if (!m) {
-    try {
-        // Browser compatibility
-        // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
-        Object.defineProperty(this, 'megaChatIsDisabled', (function() {
-            var status;
-            return {
-                set: function(val) {
-                    status = val;
-                    if (status) {
-                        $(document.body).addClass("megaChatDisabled");
-                    }
-                    else {
-                        $(document.body).removeClass("megaChatDisabled");
-                    }
-                },
-                get: function() {
-                    return status || localStorage.testChatDisabled
-                        || (localStorage.chatDisabled !== undefined
-                            && localStorage.chatDisabled !== "0");
+try {
+    // Browser compatibility
+    // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
+    Object.defineProperty(this, 'megaChatIsDisabled', (function() {
+        var status;
+        return {
+            set: function(val) {
+                status = val;
+                if (status) {
+                    $(document.body).addClass("megaChatDisabled");
                 }
-            };
-        })());
-        // Check whether Mega Chat is enabled *and* initialized
-        Object.defineProperty(this, 'megaChatIsReady', {
+                else {
+                    $(document.body).removeClass("megaChatDisabled");
+                }
+            },
             get: function() {
-                return !megaChatIsDisabled
-                    && typeof megaChat !== 'undefined'
-                    && megaChat.is_initialized;
+                return status || localStorage.testChatDisabled
+                    || (localStorage.chatDisabled !== undefined
+                        && localStorage.chatDisabled !== "0");
             }
-        });
-    }
-    catch (ex) {
-        console.error(ex);
-        b_u = true;
-    }
+        };
+    })());
+
+    // Check whether Mega Chat is enabled *and* initialized
+    Object.defineProperty(this, 'megaChatIsReady', {
+        get: function() {
+            return !megaChatIsDisabled
+                && typeof megaChat !== 'undefined'
+                && megaChat.is_initialized;
+        }
+    });
+}
+catch (ex) {
+    console.error(ex);
+    window.megaChatIsReady = false;
+    window.megaChatIsDisabled = false;
+    b_u = true;
 }
 
 if (!b_u) try
@@ -255,7 +257,61 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}, utils: {}, flags: 0, updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt'};
+var mega = {
+    ui: {},
+    flags: 0,
+    utils: {},
+    updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
+    browserBrand: [
+        0, 'Torch', 'Epic'
+    ],
+
+    /** Get browser brancd internal ID */
+    getBrowserBrandID: function() {
+        if (Object(window.chrome).torch) {
+            return 1;
+        }
+        else {
+            var plugins = Object(navigator.plugins);
+            var len = plugins.length | 0;
+
+            while (len--) {
+                var plugin = Object(plugins[len]);
+
+                // XXX: This plugin might be shown in other browsers than Epic,
+                //      hence we check for chrome.webstore since it won't appear
+                //      in Google Chrome, although it might does in other forks?
+                if (plugin.name === 'Epic Privacy Browser Installer') {
+                    return Object(window.chrome).webstore ? 2 : 0;
+                }
+            }
+        }
+
+        return 0;
+    },
+
+    /** Parameters to append to API requests */
+    urlParams: function() {
+        if (!this._urlParams) {
+            var params = '&domain=meganz'; // domain origin
+
+            // If using extension this is passed through to the API for the helpdesk tool
+            if (is_extension) {
+                params += '&ext=1';
+            }
+
+            // Append browser brand for easier troubleshoting
+            var brand = this.getBrowserBrandID();
+            if (brand) {
+                params += '&bb=' + parseInt(brand);
+            }
+
+            this._urlParams = params;
+        }
+
+        return this._urlParams;
+    }
+};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -308,7 +364,9 @@ if (!b_u && is_extension)
     });
 }
 
-if (b_u) document.location = 'update.html';
+if (b_u && !is_mobile) {
+    document.location = 'update.html';
+}
 
 var ln = {}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español'; ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português Brasil'; ln.vi = 'Tiếng Việt'; ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.pt = 'Português'; ln.he = 'עברית'; ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi'; ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';  ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски'; ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.tl = 'Tagalog';
 var ln2 = {}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.vi = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian'; ln2.fa = 'Farsi'; ln2.tl = 'Tagalog';
@@ -734,6 +792,28 @@ function getxhr() {
     return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
 }
 
+function siteLoadError(error, filename) {
+    var message = ['An error occurred while loading MEGA.'];
+
+    if (error === 1) {
+        message.push('The file "' + filename + '" is corrupt.');
+    }
+    else if (error === 2) {
+        message.push('The file "' + filename + '" could not be loaded.');
+    }
+    else {
+        message.push('Filename: ' + filename + "\nException: " + error);
+    }
+
+    if (!is_extension) {
+        message.push('Please try again later. We apologize for the inconvenience.');
+    }
+    message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
+
+    contenterror = 1;
+    alert(message.join("\n\n"));
+}
+
 if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
@@ -774,7 +854,6 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     document.getElementsByTagName('head')[0].appendChild(tag);
     m=true;
 }
-var silent_loading=false;
 
 if (m)
 {
@@ -785,13 +864,12 @@ if (m)
     link.href = staticpath + 'css/mobile-app.css';
     document.head.appendChild(link);
     // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
-    document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-txt" id="m_desc"></div><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
+    document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-head-txt" id="m_desc"></div><br /><br /><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
     if (window.location.hash.substr(1,4) == 'blog') mobileblog=1;
     if (ua.indexOf('windows phone') > -1 /*&& ua.indexOf('iemobile') > -1*/)
     {
         app='zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
         document.body.className = 'wp full-mode supported';
-        document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
     }
     else if (ua.indexOf('android') > -1)
     {
@@ -816,7 +894,6 @@ if (m)
     {
         app='http://appworld.blackberry.com/webstore/content/46810890/';
         document.body.className = 'blackberry full-mode supported';
-        document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
     }
     else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
     {
@@ -824,7 +901,6 @@ if (m)
         // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
         app='https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
-        document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
 
         var ver = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
         if (ver) {
@@ -836,15 +912,15 @@ if (m)
     }
     else document.body.className = 'another-os full-mode unsupported';
 
+    document.getElementById('m_title').innerHTML = 'Due to our advanced end-to-end encryption we do not yet support mobile browsers.';
     if (app)
     {
         document.getElementById('m_appbtn').href = app;
-        document.getElementById('m_title').innerHTML = 'Install the free MEGA app';
+        document.getElementById('m_desc').innerHTML = 'To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.';
     }
     else
     {
-        document.getElementById('m_title').innerHTML = 'A dedicated app for your device will be available soon.';
-        document.getElementById('m_desc').innerHTML = 'Follow us on Twitter or Facebook for updates.';
+        document.getElementById('m_desc').innerHTML = 'To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.';
     }
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
@@ -854,13 +930,14 @@ if (m)
         }
 
         if (app) {
-            document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile.';
+            document.getElementById('m_desc').innerHTML = 'To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.';
+
             document.getElementById('m_appbtn').href += '&referrer=link';
         }
         if (ua.indexOf('chrome') > -1)
         {
             if (intent) {
-                document.getElementById('m_title').innerHTML
+                document.getElementById('m_desc').innerHTML
                     += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
             }
             else {
@@ -937,8 +1014,8 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 22, writable : false });
-    if (!d || onBetaW)
+    Object.defineProperty(window, "__cd_v", { value : 23, writable : false });
+    if (!d && location.protocol !== 'file:' || onBetaW)
     {
         var __cdumps = [], __cd_t;
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -1049,6 +1126,11 @@ else if (!b_u)
                 }
             }
             if (cn) dump.c = cn;
+
+            if (/Access to '.*' from script denied/.test(dump.m)) {
+                console.error(dump.m, dump);
+                return false;
+            }
 
             if (ln == 0 && !dump.s)
             {
@@ -1205,8 +1287,8 @@ else if (!b_u)
     jsl.push({f:'js/vendor/jquery-2.2.0.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
-    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
@@ -1263,7 +1345,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
 
     // MEGA CHAT
-    if (!megaChatIsDisabled || location.host === 'mega.nz') {
+    if (location.host === 'mega.nz' || !megaChatIsDisabled) {
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
@@ -1417,6 +1499,8 @@ else if (!b_u)
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
+        'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
+        'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
@@ -1451,6 +1535,7 @@ else if (!b_u)
         'takedown': ['takedown'],
         'mobile': ['mobile'],
         'sync': ['sync','sync_js', 'megasync_js'],
+        'support': ['support_js', 'support'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
@@ -1514,7 +1599,8 @@ else if (!b_u)
                         console.log(e.data.text);
                         alert('error');
                     }
-                    if (!nocontentcheck && !compareHashes(e.data.hash, jsl[e.data.jsi].f))
+                    var file = Object(jsl[e.data.jsi]).f || 'unknown.js';
+                    if (!nocontentcheck && !compareHashes(e.data.hash, file))
                     {
                         if (bootstaticpath.indexOf('cdn') > -1)
                         {
@@ -1522,7 +1608,7 @@ else if (!b_u)
                             document.location.reload();
                         }
                         else {
-                            alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[e.data.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
+                            siteLoadError(1, bootstaticpath + file);
                         }
 
                         contenterror = 1;
@@ -1543,7 +1629,9 @@ else if (!b_u)
             }
             i++;
         }
+        hashdata = null;
     }
+    asmCryptoSha256Js = null;
 
     if (jj)
     {
@@ -1610,7 +1698,11 @@ else if (!b_u)
         jsl_total = 0;
         jsl_perc = 0;
         jsli=0;
-        for (var i = jsl.length; i--;) if (!jsl[i].text) jsl_total += jsl[i].w || 1;
+        for (var i = jsl.length; i--;) {
+            if (jsl[i] && !jsl[i].text) {
+                jsl_total += jsl[i].w || 1;
+            }
+        }
         if (fx_startup_cache)
         {
             var step = function(jsi)
@@ -1641,8 +1733,7 @@ else if (!b_u)
                         if (String(e) !== "Error: AsmJS modules are not yet supported in XDR serialization."
                                 && file.indexOf('dcraw') === -1) {
 
-                            return alert('An error occurred while loading MEGA.\n\nFilename: '
-                                + file + "\n" + e + '\n\n' + mozBrowserID);
+                            return siteLoadError(e, file);
                         }
                     }
                     step(jsi);
@@ -1657,8 +1748,7 @@ else if (!b_u)
                     {
                         if (!Components.isSuccessCode(s))
                         {
-                            alert('An error occurred while loading MEGA.' +
-                                  ' The file ' + file + ' could not be loaded.');
+                            siteLoadError(2, file);
                         }
                         else
                         {
@@ -1678,6 +1768,7 @@ else if (!b_u)
     }
 
     var xhr_timeout=30000;
+    var urlErrors = {};
 
     function xhr_error()
     {
@@ -1688,8 +1779,19 @@ else if (!b_u)
             bootstaticpath = geoStaticpath(1);
             staticpath = geoStaticpath(1);
         }
-        xhr_progress[this.xhri] = 0;
-        xhr_load(this.url,this.jsi,this.xhri);
+        var url = this.url;
+        var jsi = this.jsi;
+        var xhri = this.xhri;
+        urlErrors[url] = (urlErrors[url] | 0) + 1;
+        if (urlErrors[url] < 20) {
+            setTimeout(function() {
+                xhr_progress[xhri] = 0;
+                xhr_load(url, jsi, xhri);
+            }, urlErrors[url] * 100);
+        }
+        else {
+            siteLoadError(2, this.url);
+        }
     }
 
     function xhr_load(url,jsi,xhri)
@@ -1709,7 +1811,12 @@ else if (!b_u)
         xhr_stack[xhri] = getxhr();
         xhr_stack[xhri].onload = function()
         {
-            jsl[this.jsi].text = this.response || this.responseText;
+            try {
+                jsl[this.jsi].text = this.response || this.responseText;
+            }
+            catch (ex) {
+                return siteLoadError(ex, bootstaticpath + Object(jsl[this.jsi]).f);
+            }
 
             if (typeof hash_workers !== 'undefined' && !nocontentcheck)
             {
@@ -1725,7 +1832,7 @@ else if (!b_u)
                     // Compare the hash from the file and the correct hash determined at deployment time
                     if (!compareHashes(hashHex, jsl[this.jsi].f))
                     {
-                        alert('An error occurred while loading MEGA. The file ' + bootstaticpath + jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
+                        siteLoadError(1, jsl[this.jsi].f);
                         contenterror = 1;
                     }
                 }
@@ -1951,10 +2058,7 @@ else if (!b_u)
             boot_done();
         };
 
-        // If using extension this is passed through to the API for the helpdesk tool
-        var usingExtension = (is_extension) ? '&ext=1' : '';
-
-        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + usingExtension, true);
+        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
     function boot_auth(u_ctx,r)
@@ -2009,10 +2113,7 @@ else if (!b_u)
             boot_done();
         };
 
-        // If using extension this is passed through to the API for the helpdesk tool
-        var usingExtension = (is_extension) ? '&ext=1' : '';
-
-        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz' + usingExtension, true);
+        dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
 }

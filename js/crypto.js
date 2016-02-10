@@ -136,7 +136,7 @@ var crypt = (function () {
             api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
         }
         else {
-            var pubKeyPromise = getUserAttribute(userhandle,
+            var pubKeyPromise = mega.attr.get(userhandle,
                                              ns.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                              true, false);
             pubKeyPromise.done(function(result) {
@@ -427,7 +427,7 @@ var crypt = (function () {
         }
         else {
             var pubEd25519KeyPromise = ns.getPubKey(userhandle, 'Ed25519');
-            var signaturePromise = getUserAttribute(userhandle,
+            var signaturePromise = mega.attr.get(userhandle,
                                                     ns.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                     true, false);
 
@@ -1835,9 +1835,8 @@ function api_proc(q) {
         q.url = apipath + q.service
               + '?id=' + (q.seqno++)
               + '&' + q.sid
-              + '&domain=meganz'                    // Coming from mega.nz
-              + '&lang=' + lang                     // Their selected language
-              + (is_extension ? '&ext=1' : '');     // Using browser extension
+              + '&lang=' + lang      // Their selected language
+              + mega.urlParams();    // Additional parameters
 
         if (typeof q.cmds[q.i][0] === 'string') {
             q.url += '&' + q.cmds[q.i][0];
@@ -2535,6 +2534,9 @@ function api_setshare1(ctx, params) {
     for (i = req.s.length; i--;) {
         if (u_pubkeys[req.s[i].u]) {
             req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey, u_pubkeys[req.s[i].u]));
+        }
+        if (typeof req.s[i].m !== 'undefined') {
+            req.s[i].u = req.s[i].m;
         }
     }
 

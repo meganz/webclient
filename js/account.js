@@ -1462,15 +1462,14 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
 
     removeItemPromise
         .always(function _uaPacketParser() {
-            if (ownActionPacket) {
-                if (attrName === 'firstname'
-                        || attrName === 'lastname') {
+            if (attrName === 'firstname'
+                    || attrName === 'lastname') {
 
-                    M.syncUsersFullname(userHandle);
-                }
-                else {
-                    logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
-                }
+                M.syncUsersFullname(userHandle);
+            }
+            else if (ownActionPacket) {
+                // atm only first/last name is processed throguh own-action-packet
+                logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
             }
             else if (attrName === '+a') {
                 avatars[userHandle] = undefined;

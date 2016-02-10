@@ -12430,5 +12430,37 @@
     "8529": {
         "text": "Payment Issue",
         "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a payment problem they are having e.g. missing payment."
+    },
+    "8531": {
+        "text": "Invalid link",
+        "context": "This message is displayed when the user clicks on an invalid hyperlink."
+    },
+    "8532": {
+        "text": "To access this folder\/file, you will need its Decryption key. If you do not have the key, contact the creator of the link.",
+        "context": "Alert message shown when you tap on a encrypted file\/folder link that can't be opened because it doesn't include the key to see its contents."
+    },
+    "8533": {
+        "text": "Invalid decryption key",
+        "context": "An alert message displayed when the user inputs an invalid decryption key."
+    },
+    "8534": {
+        "text": "Unavailable link",
+        "context": "This error title is shown when you open a file or folder link and it is no longer available."
+    },
+    "8535": {
+        "text": "MEGA will be changing its Terms of Service on the [B]20th February 2016[\/B]. Please read our anniversary blog post for more information.",
+        "context": "This string is a notification letting users know that our terms of service are changing. Please leave the [B] and [\/B] placeholder tags in place."
+    },
+    "8536": {
+        "text": "Thank you for using MEGA.",
+        "context": "A message within a public service announcement notification to thank users for using MEGA."
+    },
+    "8537": {
+        "text": "Important notice:",
+        "context": "A title for an important notification to all users."
+    },
+    "8538": {
+        "text": "View blog post",
+        "context": "Label on a button taking the user to a blog post."
     }
 }

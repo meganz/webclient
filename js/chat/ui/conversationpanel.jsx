@@ -838,7 +838,7 @@ var ConversationRightArea = React.createClass({
                         {startAudioCallButton}
                         {startVideoCallButton}
 
-                        { null /*<ButtonsUI.Button
+                        <ButtonsUI.Button
                             className="link-button dropdown-element"
                             icon="rounded-grey-plus"
                             label={__(l[8007])}
@@ -848,9 +848,9 @@ var ConversationRightArea = React.createClass({
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}
                                 className="popup add-participant-selector"
-                                onClick={() => {}}
+                                onClick={this.props.onAddParticipantSelected}
                                 />
-                        </ButtonsUI.Button>*/}
+                        </ButtonsUI.Button>
 
                         <ButtonsUI.Button
                             className="link-button dropdown-element"
@@ -1875,6 +1875,9 @@ var ConversationPanel = React.createClass({
                         }}
                         onAttachFromCloudClicked={function() {
                             self.setState({'attachCloudDialog': true});
+                        }}
+                        onAddParticipantSelected={function(contact, e) {
+                            console.error(contact, e);
                         }}
                     />
                     <ConversationAudioVideoPanel

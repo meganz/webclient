@@ -262,7 +262,7 @@ var useravatar = (function() {
 
         if (M.u[user]) {
             // by updating the M.u[contact] this will trigger some parts in the Chat UI to re-render.
-            M.u[user].avatar = true;
+            M.u[user].lastUpdated = unixtime();
         }
         var avatar = $(ns.contact(user)).html();
         $('.avatar-wrapper.' + user).empty().html(avatar);

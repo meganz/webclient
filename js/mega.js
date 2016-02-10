@@ -67,7 +67,8 @@ var MEGA_USER_STRUCT = {
     "shortName": undefined,
     "firstName": undefined,
     "lastName": undefined,
-    "ts": undefined
+    "ts": undefined,
+    "lastUpdated": undefined
 };
 
 function MegaData()

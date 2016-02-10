@@ -6982,7 +6982,7 @@ function renameDialog() {
         $('.rename-dialog input').bind('focus', function() {
             var selEnd;
             $(this).closest('.rename-dialog').addClass('focused');
-            var d = $(this).val().indexOf('.');
+            var d = $(this).val().lastIndexOf('.');
             if (d > -1) {
                 selEnd = d;
             }

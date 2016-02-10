@@ -359,7 +359,7 @@ function MegaData()
         M.sortingBy = [n, d];
 
         if (fmconfig.uisorting) {
-            storefmconfig('sorting', {n: n, d: d});
+            mega.config.set('sorting', {n: n, d: d});
         }
         else {
             fmsortmode(M.currentdirid, n, d);
@@ -2097,7 +2097,7 @@ function MegaData()
                         ulc = 'class="opened"';
                         expandedc = 'expanded';
                     }
-                    else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h]) {
+                    else if (Object(fmconfig.treenodes).hasOwnProperty(folders[ii].h)) {
                         fmtreenode(folders[ii].h, false);
                     }
                     sharedfolder = '';
@@ -5375,6 +5375,8 @@ function execsc(actionPackets, callback) {
                     if (!actionPacket.k) {
                         // XXX: We need to find out which API call is causing it
                         //      (it might be a bug in the SDK or the webclient)
+                        // How to reproduce: Delete folder with pending shares,
+                        // on client side we will have this situation
                         srvlog('Got share action-packet with no key.');
                     }
                     else {
@@ -6885,25 +6887,20 @@ function loadfm_done(pfkey, stackPointer) {
 
     if (d > 1) console.error('loadfm_done', stackPointer, is_fm());
 
-    init_chat();
+    mega.config.ready(function() {
+        init_chat();
 
-    // are we actually on an #fm/* page?
-    if (is_fm() || $('.fm-main.default').is(":visible")) {
-        renderfm();
-    }
+        // are we actually on an #fm/* page?
+        if (is_fm() || $('.fm-main.default').is(":visible")) {
+            renderfm();
+        }
 
-    if (!CMS.isLoading()) {
-        loadingDialog.hide();
-    }
+        if (!CMS.isLoading()) {
+            loadingDialog.hide();
+        }
 
-    watchdog.notify('loadfm_done');
-}
-
-function storefmconfig(key, value)
-{
-    fmconfig[key] = value;
-    localStorage.fmconfig = JSON.stringify(fmconfig);
-    mBroadcaster.sendMessage('fmconfig:' + key, value);
+        watchdog.notify('loadfm_done');
+    });
 }
 
 function fmtreenode(id, e)
@@ -6930,7 +6927,7 @@ function fmtreenode(id, e)
         });
         delete treenodes[id];
     }
-    storefmconfig('treenodes', treenodes);
+    mega.config.set('treenodes', treenodes);
 }
 
 function fmsortmode(id, n, d)
@@ -6942,7 +6939,7 @@ function fmsortmode(id, n, d)
         delete sortmodes[id];
     else
         sortmodes[id] = {n: n, d: d};
-    storefmconfig('sortmodes', sortmodes);
+    mega.config.set('sortmodes', sortmodes);
 }
 
 function fmviewmode(id, e)
@@ -6954,7 +6951,7 @@ function fmviewmode(id, e)
         viewmodes[id] = 1;
     else
         viewmodes[id] = 0;
-    storefmconfig('viewmodes', viewmodes);
+    mega.config.set('viewmodes', viewmodes);
 }
 
 function fm_requestfolderid(h, name, ulparams)

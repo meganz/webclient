@@ -612,7 +612,7 @@ function initUI() {
         cacheselect();
         if ($(this).attr('class').indexOf('listing-view') > -1) {
             if (fmconfig.uiviewmode) {
-                storefmconfig('viewmode', 0);
+                mega.config.set('viewmode', 0);
             }
             else {
                 fmviewmode(M.currentdirid, 0);
@@ -621,7 +621,7 @@ function initUI() {
         }
         else {
             if (fmconfig.uiviewmode) {
-                storefmconfig('viewmode', 1);
+                mega.config.set('viewmode', 1);
             }
             else {
                 fmviewmode(M.currentdirid, 1);
@@ -838,10 +838,10 @@ function initUI() {
         'handle': '.left-pane-drag-handle'
     });
 
-    if (localStorage.leftPaneWidth) {
+    if (fmconfig.leftPaneWidth) {
         lPane.width(Math.min(
             $.leftPaneResizable.options.maxWidth,
-            Math.max($.leftPaneResizable.options.minWidth, localStorage.leftPaneWidth)
+            Math.max($.leftPaneResizable.options.minWidth, fmconfig.leftPaneWidth)
             ));
     }
 
@@ -3262,8 +3262,12 @@ function accountUI()
                 return -1;
         });
 
-        $('.grid-table.sessions tr').remove();
-        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th><th class="no-border session-status">' + l[7664] + '</th><th class="no-border logout-column">&nbsp;</th></tr>';
+        $('#sessions-table-container').empty();
+        var html =
+            '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
+            '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
+            '<th class="no-border session-status">' + l[7664] + '</th>' +
+            '<th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
 
         $(account.sessions).each(function(i, el) {
@@ -3328,7 +3332,7 @@ function accountUI()
                 numActiveSessions++;
             }
         });
-        $('.grid-table.sessions').safeHTML(html);
+        $('#sessions-table-container').safeHTML(html + '</table>');
 
         // Don't show button to close other sessions if there's only the current session
         if (numActiveSessions === 1) {
@@ -3639,44 +3643,47 @@ function accountUI()
 
             if (M.account.dl_maxSlots)
             {
-                localStorage.dl_maxSlots = M.account.dl_maxSlots;
-                dl_maxSlots = M.account.dl_maxSlots;
-                dlQueue.setSize(dl_maxSlots);
+                mega.config.set('dl_maxSlots', M.account.dl_maxSlots);
+                dlQueue.setSize(fmconfig.dl_maxSlots);
+                delete M.account.dl_maxSlots;
             }
             if (M.account.ul_maxSlots)
             {
-                localStorage.ul_maxSlots = M.account.ul_maxSlots;
-                ul_maxSlots = M.account.ul_maxSlots;
-                ulQueue.setSize(ul_maxSlots);
+                mega.config.set('ul_maxSlots', M.account.ul_maxSlots);
+                ulQueue.setSize(fmconfig.ul_maxSlots);
+                delete M.account.ul_maxSlots;
             }
             if (typeof M.account.ul_maxSpeed !== 'undefined')
             {
-                localStorage.ul_maxSpeed = M.account.ul_maxSpeed;
-                ul_maxSpeed = M.account.ul_maxSpeed;
+                mega.config.set('ul_maxSpeed', M.account.ul_maxSpeed);
+                delete M.account.ul_maxSpeed;
             }
             if (typeof M.account.use_ssl !== 'undefined')
             {
+                mega.config.set('use_ssl', M.account.use_ssl);
                 localStorage.use_ssl = M.account.use_ssl;
                 use_ssl = M.account.use_ssl;
             }
             if (typeof M.account.ul_skipIdentical !== 'undefined')
             {
-                localStorage.ul_skipIdentical = M.account.ul_skipIdentical;
-                ul_skipIdentical = M.account.ul_skipIdentical;
+                mega.config.set('ul_skipIdentical', M.account.ul_skipIdentical);
+                delete M.account.ul_skipIdentical;
             }
 
             if (typeof M.account.uisorting !== 'undefined') {
-                storefmconfig('uisorting', M.account.uisorting);
+                mega.config.set('uisorting', M.account.uisorting);
             }
             if (typeof M.account.uiviewmode !== 'undefined') {
-                storefmconfig('uiviewmode', M.account.uiviewmode);
+                mega.config.set('uiviewmode', M.account.uiviewmode);
             }
             if (typeof M.account.rubsched !== 'undefined') {
-                storefmconfig('rubsched', M.account.rubsched);
+                mega.config.set('rubsched', M.account.rubsched);
             }
             if (typeof M.account.font_size !== 'undefined') {
-                localStorage.font_size = M.account.font_size;
-                font_size = M.account.font_size;
+                mega.config.set('font_size', M.account.font_size);
+                $('body').removeClass('fontsize1 fontsize2')
+                    .addClass('fontsize' + fmconfig.font_size);
+                delete M.account.font_size;
             }
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
@@ -3836,14 +3843,14 @@ function accountUI()
             accountUI();
         });
         $("#slider-range-max").slider({
-            min: 1, max: 6, range: "min", value: dl_maxSlots, slide: function(e, ui)
+            min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4, slide: function(e, ui)
             {
                 M.account.dl_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
             }
         });
         $("#slider-range-max2").slider({
-            min: 1, max: 6, range: "min", value: ul_maxSlots, slide: function(e, ui)
+            min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4, slide: function(e, ui)
             {
                 M.account.ul_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
@@ -3851,17 +3858,26 @@ function accountUI()
         });
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;
-        if (ul_maxSpeed == 0)
+        if ((fmconfig.ul_maxSpeed | 0) === 0) {
             i = 1;
-        else if (ul_maxSpeed == -1)
+        }
+        else if (fmconfig.ul_maxSpeed === -1) {
             i = 2;
-        else
-            $('#ulspeedvalue').val(Math.floor(ul_maxSpeed / 1024));
+        }
+        else {
+            $('#ulspeedvalue').val(Math.floor(fmconfig.ul_maxSpeed / 1024));
+        }
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        if (localStorage.font_size) {
-            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
-            $('#fontsize' + localStorage.font_size).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
+        if (fmconfig.font_size) {
+            $('.uifontsize input')
+                .removeClass('radioOn').addClass('radioOff')
+                .parent()
+                .removeClass('radioOn').addClass('radioOff');
+            $('#fontsize' + fmconfig.font_size)
+                .removeClass('radioOff').addClass('radioOn')
+                .parent()
+                .removeClass('radioOff').addClass('radioOn');
         }
         $('.ulspeedradio input').unbind('click');
         $('.ulspeedradio input').bind('click', function(e)
@@ -3906,8 +3922,9 @@ function accountUI()
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
         var i = 5;
-        if (ul_skipIdentical)
+        if (fmconfig.ul_skipIdentical) {
             i = 4;
+        }
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
         $('.ulskip input').unbind('click');
@@ -9305,7 +9322,7 @@ function browserDialog(close) {
         }
         // IE11
         bc = 'ie10';
-        bh = l[884].replace('[X]', 'IE 11');
+        bh = l[884].replace('[X]', type.edge ? 'Edge' : 'IE 11');
         // if (page == 'download') bt = l[1933];
         // else bt = l[886];
         bt = l[1933];
@@ -9347,9 +9364,10 @@ browserDialog.isWeak = function() {
 
     result.ie10 = (ua.indexOf('MSIE 10') > -1);
     result.ie11 = ('-ms-scroll-limit' in style) && ('-ms-ime-align' in style);
+    result.edge = /\sEdge\/\d/.test(ua);
     result.safari = (ua.indexOf('Safari') > -1) && (ua.indexOf('Chrome') === -1);
 
-    result.weak = result.ie11 || result.ie10 || result.safari;
+    result.weak = result.edge || result.ie11 || result.ie10 || result.safari;
 
     return result.weak && result;
 }
@@ -10781,6 +10799,12 @@ function FMResizablePane(element, opts) {
     {
         var $handle = $(opts.handle, $element);
 
+        if (d) {
+            if (!$handle.length) {
+                console.warn('FMResizablePane: Element not found: ' + opts.handle);
+            }
+        }
+
         $handle.addClass('ui-resizable-handle ui-resizable-' + opts.direction);
 
         var resizable_opts = {
@@ -10805,13 +10829,13 @@ function FMResizablePane(element, opts) {
                     $element.css(css_attrs);
 
                     if (opts.persistanceKey) {
-                        localStorage[opts.persistanceKey] = JSON.stringify(css_attrs);
+                        mega.config.set(opts.persistanceKey, css_attrs);
                     }
                 } else {
                     css_attrs[size_attr] = ui.size[size_attr];
                     $element.css(css_attrs);
                     if (opts.persistanceKey) {
-                        localStorage[opts.persistanceKey] = JSON.stringify(ui.size[size_attr]);
+                        mega.config.set(opts.persistanceKey, ui.size[size_attr]);
                     }
                 }
 

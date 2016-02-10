@@ -1,16 +1,4 @@
-
-var ul_maxSpeed = 0;
 var uldl_hold = false;
-var ul_skipIdentical = 1;
-var ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 });
-
-if (localStorage.ul_maxSpeed) {
-    ul_maxSpeed = parseInt(localStorage.ul_maxSpeed);
-}
-
-if (localStorage.ul_skipIdentical) {
-    ul_skipIdentical = parseInt(localStorage.ul_skipIdentical);
-}
 
 /* jshint -W003 */
 var ulmanager = {
@@ -464,7 +452,7 @@ var ulmanager = {
             api_req({
                 a: 'u',
                 ssl: use_ssl,
-                ms: ul_maxSpeed,
+                ms: fmconfig.ul_maxSpeed | 0,
                 s: cfile.size,
                 r: cfile.retries,
                 e: cfile.ul_lastreason
@@ -631,7 +619,7 @@ var ulmanager = {
     ulDeDuplicate: function UM_ul_deduplicate(File, identical) {
         var n;
         var uq = File.ul;
-        if (identical && ul_skipIdentical) {
+        if (identical && fmconfig.ul_skipIdentical) {
             n = identical;
         }
         else if (!M.h[uq.hash] && !identical) {
@@ -655,7 +643,7 @@ var ulmanager = {
         }, {
             uq: uq,
             n: n,
-            skipfile: (ul_skipIdentical && identical),
+            skipfile: (fmconfig.ul_skipIdentical && identical),
             callback: function(res, ctx) {
                 if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
                     ctx.uq.repair = ctx.n.key;
@@ -1204,7 +1192,7 @@ var ulQueue = new TransferQueue(function _workerUploader(task, done) {
         ulQueue.logger.info('worker_uploader', task, done);
     }
     task.run(done);
-}, ul_maxSlots, 'uploader');
+}, 4, 'uploader');
 
 ulQueue.poke = function(file, meth) {
     if (file.owner) {

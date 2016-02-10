@@ -4300,7 +4300,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     margin: 20px 2px 0 12px;
 }
 .files-grid-view .fm-chat-user-info .nw-contact-status, .fm-blocks-view .fm-chat-user-info .nw-contact-status, .shared-grid-view .fm-chat-user-info .nw-contact-status, .shared-blocks-view .fm-chat-user-info .nw-contact-status, .files-grid-view.contacts-view .nw-contact-status {
-    margin: 4px 6px 0 0px;
+    margin: 8px 6px 0 0px;
 }
 .grid-scrolling-table, .grid-scrolling-table .jspPane {
     min-height: 100%;
@@ -19901,9 +19901,13 @@ span.incoming-call-name {
 .icoming-call-button.video-call:hover {
     background-color: rgba(6,160,236,1);
 }
-.shared-with-me .nw-contact-avatar, .contacts-view td .nw-contact-avatar, .contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar {
+.contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar {
     position: absolute;
-    margin: -1px 0 0 0;
+    margin: -2px 0 0 0;
+}
+.shared-with-me .nw-contact-avatar {
+    position: absolute;
+    margin: 3px 0 0 0;
 }
 .shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info, .contact-requests-grid td .fm-chat-user-info, .sent-requests-grid td .fm-chat-user-info {
     float: none;
@@ -20713,6 +20717,10 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-image: url(../images/mega/dialogs-sprite_v6.svg);
     background-repeat: no-repeat;
     background-position: center -535px;
+        -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-color: transparent;
 }
 .gmail .search-avatar, .gmail .nw-contact-avatar {
     background-color: #DD4B39 !important;

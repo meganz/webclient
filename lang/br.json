@@ -3107,6 +3107,14 @@
     "8527": "Assuntos gerais",
     "8528": "Assuntos t\u00e9cnicos",
     "8529": "Problemas com pagamento",
+    "8531": "Link inv\u00e1lido",
+    "8532": "Para acessar esta pasta\/arquivo, voc\u00ea precisa da chave de decodifica\u00e7\u00e3o. Se voc\u00ea n\u00e3o possui a chave, entre em contato com o criador da pasta\/arquivo.",
+    "8533": "Chave de decodifica\u00e7\u00e3o inv\u00e1lida",
+    "8534": "Link indispon\u00edvel",
+    "8535": "MEGA far\u00e1 altera\u00e7\u00f5es ao Termos de Servi\u00e7o em [B]20 de Fevereiro de 2016[\/B]. Por favor, leia nosso post de anivers\u00e1rio no blog, para obter mais informa\u00e7\u00f5es.",
+    "8536": "Obrigado por usar o MEGA.",
+    "8537": "Aviso importante:",
+    "8538": "Ver post no blog",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3130,6 +3138,10 @@
         "subject": 8526,
         "general-inquiry": 8527,
         "technical-issue": 8528,
-        "payment-issue": 8529
+        "payment-issue": 8529,
+        "changing-terms-psa": 8535,
+        "thank-you-for-using-mega": 8536,
+        "important-notice": 8537,
+        "view-blog-post": 8538
     }
 }

@@ -3107,6 +3107,14 @@
     "8527": "Genel Bilgi",
     "8528": "Teknik Sorun",
     "8529": "\u00d6deme Sorunu",
+    "8531": "Invalid link",
+    "8532": "To access this folder\/file, you will need its Decryption key. If you do not have the key, contact the creator of the link.",
+    "8533": "Invalid decryption key",
+    "8534": "Unavailable link",
+    "8535": "MEGA will be changing its Terms of Service on the [B]20th February 2016[\/B]. Please read our anniversary blog post for more information.",
+    "8536": "Thank you for using MEGA.",
+    "8537": "Important notice:",
+    "8538": "View blog post",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3130,6 +3138,10 @@
         "subject": 8526,
         "general-inquiry": 8527,
         "technical-issue": 8528,
-        "payment-issue": 8529
+        "payment-issue": 8529,
+        "changing-terms-psa": 8535,
+        "thank-you-for-using-mega": 8536,
+        "important-notice": 8537,
+        "view-blog-post": 8538
     }
 }

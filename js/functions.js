@@ -533,15 +533,27 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
-
-    useragent = useragent || navigator.userAgent;
-    useragent = (' ' + useragent).toLowerCase();
-
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
     var nameTrans = '';
+    var current = false;
+    var brand = false;
+
+    if (useragent === undefined || useragent === ua) {
+        current = true;
+        useragent = ua;
+    }
+    useragent = (' ' + useragent).toLowerCase();
+
+    if (current) {
+        brand = mega.getBrowserBrandID();
+    }
+    else if (useragent.indexOf('~:') !== -1) {
+        brand = useragent.match(/~:(\d+)/);
+        brand = brand && brand.pop() | 0;
+    }
 
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
@@ -572,7 +584,10 @@ function browserdetails(useragent) {
         os = 'Blackberry';
     }
 
-    if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
+    if (mega.browserBrand[brand]) {
+        browser = mega.browserBrand[brand];
+    }
+    else if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
         browser = 'Edge';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
@@ -591,17 +606,41 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('electron') > 0) {
         browser = 'Electron';
     }
-    else if (useragent.indexOf('chrome') > 0) {
-        browser = 'Chrome';
-    }
-    else if (useragent.indexOf('safari') > 0) {
-        browser = 'Safari';
-    }
     else if (useragent.indexOf('palemoon') > 0) {
         browser = 'Palemoon';
     }
     else if (useragent.indexOf('cyberfox') > 0) {
         browser = 'Cyberfox';
+    }
+    else if (useragent.indexOf('waterfox') > 0) {
+        browser = 'Waterfox';
+    }
+    else if (useragent.indexOf('iceweasel') > 0) {
+        browser = 'Iceweasel';
+    }
+    else if (useragent.indexOf('seamonkey') > 0) {
+        browser = 'SeaMonkey';
+    }
+    else if (useragent.indexOf('lunascape') > 0) {
+        browser = 'Lunascape';
+    }
+    else if (useragent.indexOf(' iron/') > 0) {
+        browser = 'Iron';
+    }
+    else if (useragent.indexOf('avant browser') > 0) {
+        browser = 'Avant';
+    }
+    else if (useragent.indexOf('polarity') > 0) {
+        browser = 'Polarity';
+    }
+    else if (useragent.indexOf('k-meleon') > 0) {
+        browser = 'K-Meleon';
+    }
+    else if (useragent.indexOf('chrome') > 0) {
+        browser = 'Chrome';
+    }
+    else if (useragent.indexOf('safari') > 0) {
+        browser = 'Safari';
     }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
@@ -649,20 +688,34 @@ function browserdetails(useragent) {
         }
     }
 
-    var browserDetails = {};
-    browserDetails.name = name;
-    browserDetails.nameTrans = nameTrans || name;
-    browserDetails.icon = icon;
-    browserDetails.os = os || '';
-    browserDetails.browser = browser;
+    var details = {};
+    details.name = name;
+    details.nameTrans = nameTrans || name;
+    details.icon = icon;
+    details.os = os || '';
+    details.browser = browser;
 
     // Determine if the OS is 64bit
-    browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
+    details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 
     // Determine if using a browser extension
-    browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    details.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
 
-    return browserDetails;
+    // Determine core engine.
+    if (useragent.indexOf('webkit') > 0) {
+        details.engine = 'Webkit';
+    }
+    else if (useragent.indexOf('trident') > 0) {
+        details.engine = 'Trident';
+    }
+    else if (useragent.indexOf('gecko') > 0) {
+        details.engine = 'Gecko';
+    }
+    else {
+        details.engine = 'Unknown';
+    }
+
+    return details;
 }
 
 function countrydetails(isocode) {
@@ -1401,8 +1454,16 @@ function assert(test) {
  *     Throws an exception on something that does not seem to be a user handle.
  */
 var assertUserHandle = function(userHandle) {
-    assert(base64urldecode(userHandle).length === 8,
-       'This seems not to be a user handle: ' + userHandle);
+    try {
+        if (typeof userHandle !== 'string'
+                || base64urldecode(userHandle).length !== 8) {
+
+            throw 1;
+        }
+    }
+    catch (ex) {
+        assert(false, 'This seems not to be a user handle: ' + userHandle);
+    }
 };
 
 
@@ -2527,37 +2588,6 @@ function disableDescendantFolders(id, pref) {
     return true;
 }
 
-function ucfirst(str) {
-    //  discuss at: http://phpjs.org/functions/ucfirst/
-    // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // bugfixed by: Onno Marsman
-    // improved by: Brett Zamir (http://brett-zamir.me)
-    //   example 1: ucfirst('kevin van zonneveld');
-    //   returns 1: 'Kevin van zonneveld'
-
-    str += '';
-    var f = str.charAt(0)
-        .toUpperCase();
-    return f + str.substr(1);
-}
-
-function readLocalStorage(name, type, val) {
-    var v;
-    if (localStorage[name]) {
-        var f = 'parse' + ucfirst(type);
-        v = localStorage[name];
-
-        if (typeof window[f] === "function") {
-            v = window[f](v);
-        }
-
-        if (val && ((val.min && val.min > v) || (val.max && val.max < v))) {
-            v = null;
-        }
-    }
-    return v || (val && val.def);
-}
-
 function obj_values(obj) {
     var vals = [];
 
@@ -3551,7 +3581,7 @@ function mCleanestLogout(aUserHandle) {
 
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
-    var RUBSCHED_WAITPROC = 120 * 1000;
+    var RUBSCHED_WAITPROC =  20 * 1000;
     var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
@@ -3626,7 +3656,12 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
             console.time('rubsched');
         }
 
-        var nodes = Object.keys(M.c[M.RubbishID] || {}), rubnodes = [];
+        // Watch how long this is running
+        var startTime = Date.now();
+
+        // Get nodes in the Rubbish-bin
+        var nodes = Object.keys(M.c[M.RubbishID] || {});
+        var rubnodes = [];
 
         for (var i in nodes) {
             var node = M.d[nodes[i]];
@@ -3656,6 +3691,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                     if (handler.ready(node, xval)) {
                         break;
                     }
+
+                    // Abort if this has been running for too long..
+                    if ((Date.now() - startTime) > 7000) {
+                        break;
+                    }
                 }
             }
 
@@ -3663,6 +3703,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
             if (handles.length) {
                 var inRub = (M.RubbishID === M.currentrootid);
+
+                if (inRub) {
+                    // Flush cached nodes
+                    $(window).trigger('dynlist.flush');
+                }
 
                 handles.map(function(handle) {
                     M.delNode(handle);

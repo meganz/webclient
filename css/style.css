@@ -24236,7 +24236,7 @@ a.ui-datepicker-next {
     background: -moz-linear-gradient(top, #ffffff 0%, #eeeeee 100%);
     background: -webkit-linear-gradient(top, #ffffff 0%, #eeeeee 100%);
     background: linear-gradient(to bottom, #ffffff 0%, #eeeeee 100%);
-    padding: 25px 24px;
+    padding: 25px 23px;
     display: none;
     position: absolute;
     bottom: 0;
@@ -24246,8 +24246,6 @@ a.ui-datepicker-next {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     border-top: 1px solid rgba(0,0,0,0.05);
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
     min-width: 987px;
 }
 .notification .bottom-info.body {
@@ -24291,7 +24289,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 0 50px 0 22px;
+    padding: 0 50px 0 23px;
     font-size: 0;
     line-height: 0;
     height: 70px;

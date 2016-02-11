@@ -3960,13 +3960,18 @@ function rand_range(a, b) {
 };
 
 /**
- *  Invoke the password manager in Chrome.
+ * Invoke the password manager in Chrome.
  *
- *  A few things needs to happen for this
+ * There are some requirements for this function work propertly:
  *
  *  1. The username/password needs to be in a <form/>
  *  2. The form needs to be filled and visible when this function is called
- *  3. After this function is called in the next second the form needs to be gone
+ *  3. After this function is called, within the next second the form needs to be gone
+ *
+ * As an example take a look at the `tooltiplogin()` function in `index.js`.
+ *
+ * @param {String|Object} form jQuery selector of the form
+ * @return {Bool}   True if the password manager can be called.
  *
  */
 function passwordManager(form) {

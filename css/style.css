@@ -24254,7 +24254,6 @@ a.ui-datepicker-next {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     border-top: 1px solid rgba(0,0,0,0.05);
-    min-width: 987px;
 }
 .notification .bottom-info.body {
     display: table;

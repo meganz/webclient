@@ -12,8 +12,14 @@ if (localStorage.fmconfig) {
 MegaLogger.rootLogger = new MegaLogger(
     "",
     {
-        onCritical: function(msg) {
-            srvlog(msg);
+        onCritical: function(msg, pkg) {
+            if (typeof pkg === 'string') {
+                pkg = pkg.split('[').shift();
+                if (pkg) {
+                    msg = '[' + pkg + '] ' + msg;
+                }
+            }
+            srvlog(msg, 0, 1);
         },
         isEnabled: !!window.d
     },

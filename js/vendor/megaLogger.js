@@ -31,30 +31,26 @@
      */
     var getStorageCacheValue = function(k) {
         if (!storageCache.hasOwnProperty(k)) {
+            var value;
+
             if (typeof(sessionStorage) !== 'undefined' && k in sessionStorage) {
-                storageCache[k] = sessionStorage[k];
+                value = sessionStorage[k];
             }
             else if (typeof(localStorage) !== 'undefined' && k in localStorage) {
-                storageCache[k] = localStorage[k];
+                value = localStorage[k];
             }
-            else {
-                storageCache[k] = undefined;
+
+            if (value !== undefined) {
+                try {
+                    value = JSON.parse(value);
+                }
+                catch (ex) {}
             }
+
+            storageCache[k] = value;
         }
         return storageCache[k];
     };
-
-    /**
-     * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
-     *
-     * @private
-     * @param val {Arguments}
-     * @returns {Array}
-     */
-    function toArray(val) {
-        return Array.prototype.slice.call(val);
-    }
-
 
     /**
      * Mega Logger
@@ -200,21 +196,17 @@
         },
         'muteList': function() {
             var cached = getStorageCacheValue("muteList");
-            if(cached) {
-                return JSON.parse(cached);
+            if (cached !== undefined) {
+                return cached;
             }
-            else {
-                return [];
-            }
+            return [];
         },
         'minLogLevel': function() {
             var cached = getStorageCacheValue("minLogLevel");
-            if(cached) {
-                return JSON.parse(cached);
+            if (cached !== undefined) {
+                return cached;
             }
-            else {
-                return MegaLogger.LEVELS.INFO;
-            }
+            return MegaLogger.LEVELS.INFO;
         },
         /**
          * Warning: This will use tons of CPU because of the trick of
@@ -275,8 +267,9 @@
      * @param args {*}
      * @private
      */
-    MegaLogger.prototype._log = function(level, args) {
+    MegaLogger.prototype._log = function() {
         var options = this.options;
+        var level = this._level;
 
         // check min log level
         if (level < options.minLogLevel()) {
@@ -288,7 +281,14 @@
             var logLine;
             var logStyle = "";
             var logSeparator = ' - ';
+            var logPath = this._getLoggerPath();
             var levelName = _intToLevel[level] || "unknown";
+
+            var len = arguments.length;
+            var args = Array(len);
+            while (len--) {
+                args[len] = arguments[len];
+            }
 
             if (options.printDate !== false) {
                 logDate = options.dateFormatter(new Date());
@@ -297,7 +297,7 @@
                 }
             }
 
-            logLine = (logDate || '') + this._getLoggerPath() + logSeparator + levelName;
+            logLine = (logDate || '') + logPath + logSeparator + levelName;
 
             // Append the first argument as long it's a string to support substitutions
             if (typeof args[0] === 'string') {
@@ -351,26 +351,32 @@
                 if (logDate) {
                     args[0] = args[0].substr(args[0].indexOf(logSeparator) + logSeparator.length);
                 }
+                // remove level (and trailing space)
+                args[0] = args[0].substr(args[0].indexOf(levelName) + levelName.length + 1);
 
-                try {
-                    text = JSON.stringify(args);
+                // if a single item, send it as-is
+                if (args.length === 1) {
+                    text = args[0];
                 }
-                catch (e) {
-                    text = args.join(' ');
+                else {
+                    try {
+                        text = JSON.stringify(args);
+                    }
+                    catch (e) {
+                        text = args.join(' ');
+                    }
                 }
-
-                var fn = "error";
 
                 var callbackName = "on" +
-                                    (levelName.toLowerCase()).substr(0, 1).toUpperCase() +
-                                    levelName.toLowerCase().substr(1);
+                                    levelName.substr(0, 1) +
+                                    levelName.substr(1).toLowerCase();
 
                 if (this.options[callbackName]) {
-                    this.options[callbackName].apply(this, [text]);
+                    this.options[callbackName].call(this, text, logPath);
                 }
 
                 if (MegaLogger.rootLogger.options[callbackName]) {
-                    MegaLogger.rootLogger.options[callbackName].apply(this, [text]);
+                    MegaLogger.rootLogger.options[callbackName].call(this, text, logPath);
                 }
             }
         }
@@ -398,7 +404,8 @@
      * @public
      */
     MegaLogger.prototype.error = function() {
-        this._log(MegaLogger.LEVELS.ERROR, toArray(arguments));
+        this._level = MegaLogger.LEVELS.ERROR;
+        this._log.apply(this, arguments);
     };
 
     /**
@@ -408,7 +415,8 @@
      * @public
      */
     MegaLogger.prototype.critical = function() {
-        this._log(MegaLogger.LEVELS.CRITICAL, toArray(arguments));
+        this._level = MegaLogger.LEVELS.CRITICAL;
+        this._log.apply(this, arguments);
     };
 
     /**
@@ -418,7 +426,8 @@
      * @public
      */
     MegaLogger.prototype.warn = function() {
-        this._log(MegaLogger.LEVELS.WARN, toArray(arguments));
+        this._level = MegaLogger.LEVELS.WARN;
+        this._log.apply(this, arguments);
     };
 
     /**
@@ -428,7 +437,8 @@
      * @public
      */
     MegaLogger.prototype.info = function() {
-        this._log(MegaLogger.LEVELS.INFO, toArray(arguments));
+        this._level = MegaLogger.LEVELS.INFO;
+        this._log.apply(this, arguments);
     };
 
     /**
@@ -438,7 +448,8 @@
      * @public
      */
     MegaLogger.prototype.log = function() {
-        this._log(MegaLogger.LEVELS.LOG, toArray(arguments));
+        this._level = MegaLogger.LEVELS.LOG;
+        this._log.apply(this, arguments);
     };
 
     /**
@@ -448,7 +459,8 @@
      * @public
      */
     MegaLogger.prototype.debug = function() {
-        this._log(MegaLogger.LEVELS.DEBUG, toArray(arguments));
+        this._level = MegaLogger.LEVELS.DEBUG;
+        this._log.apply(this, arguments);
     };
 
 

@@ -95,7 +95,10 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
-        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk', 'flags'];
+        var exclude = [
+            'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen'
+        ];
 
         for (var n in u_attr) {
             if (exclude.indexOf(n) == -1) {
@@ -121,11 +124,28 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
-        // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
-        if ((typeof u_attr.flags !== 'undefined') && (typeof u_attr.flags.mcs !== 'undefined')) {
-            localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
+        // Flags is a generic object for various things
+        if (typeof u_attr.flags !== 'undefined') {
+            
+            // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
+            if (typeof u_attr.flags.psa !== 'undefined') {
+                
+                var last = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : 0;
+                
+                // Set the values we need to know if the psa should be shown
+                psa.setInitialValues(u_attr.flags.psa, last);
+                
+                // Attempt to set event handlers. If the elements we need haven't loaded yet, then the other 
+                // psa.init() in index.js will add them. If that one ran first, then no problem.
+                psa.init();
+            }
+            
+            // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
+            if (typeof u_attr.flags.mcs !== 'undefined') {
+                localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
+            }
         }
-
+        
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
         }

@@ -3485,7 +3485,7 @@ function MegaData()
             });
 
             this.accountSessions();
-
+            
             api_req({a: 'ug'}, {
                 cb: cb,
                 account: account,

@@ -78,38 +78,6 @@ function mainScroll() {
     }
 }
 
-// fmholder and startholder height depends of bottom notification height
-function holderSize() {
-    if ($('body').hasClass('notification')) {
-        var notificationSize = $('.bottom-info.body').outerHeight(),
-              bodyHeight = $('body').outerHeight();
-        if (notificationSize > 120) {
-            $('.fmholder').height(bodyHeight - notificationSize);
-        }
-    } 
-}
-
-// Bottom notification init
-function notificationInit() {
-    if (!localStorage.hidenotification) {
-        $('body').addClass('notification');
-        holderSize();
-        $(window).rebind('resize.bottomNotification', function () {
-            holderSize();
-        });
-        $('.bottom-info.button').rebind('click', function () {
-            $('body').removeClass('notification');
-            $('.fmholder').css('height', '');
-            localStorage.hidenotification = 1;
-            $(window).trigger('resize');
-            
-            if ($(this).hasClass('terms')) {
-                document.location.hash = 'terms';
-            }
-        })
-    }
-}
-
 function scrollMenu() {
     $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
         if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
@@ -147,8 +115,9 @@ function init_page() {
     }
     else {
         $('body').attr('class', '');
-        // Bottom notification init
-        notificationInit();
+        
+        // Attach event handlers to psa notification elements.
+        psa.init();
     }
 
     // Add language class to body for CSS fixes for specific language strings
@@ -705,12 +674,6 @@ function init_page() {
         parsepage(pages['sourcecode']);
     }
     else if (page == 'terms') {
-        // Hide bottom notification
-        if (!localStorage.hidenotification) {
-            $('body').removeClass('notification');
-            $('.fmholder').css('height', '');
-            localStorage.hidenotification = 1;
-        }
         parsepage(pages['terms']);
     }
     else if (page == 'takedown') {

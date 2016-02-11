@@ -1031,6 +1031,7 @@ function tooltiplogin() {
                 alert(l[730]);
             }
             else if (r) {
+                passwordManager('#form_login_header');
                 u_type = r;
                 if (login_next) {
                     document.location.hash = login_next;

@@ -193,6 +193,7 @@ function pagelogin() {
                 }
                 else if (r) {
                     u_type = r;
+                    passwordManager('#login_form');
                     if (login_next) {
                         document.location.hash = login_next;
                     }

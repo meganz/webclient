@@ -3959,6 +3959,32 @@ function rand_range(a, b) {
     return Math.random() * (b - a) + a;
 };
 
+/**
+ *  Invoke the password manager in Chrome.
+ *
+ *  A few things needs to happen for this
+ *
+ *  1. The username/password needs to be in a <form/>
+ *  2. The form needs to be filled and visible when this function is called
+ *  3. After this function is called in the next second the form needs to be gone
+ *
+ */
+function passwordManager(form) {
+    if (typeof history !== "object") {
+        return false;
+    }
+    $(form).rebind('submit', function() {
+        return false;
+    }).submit();
+    setTimeout(function() {
+        var path  = document.location.pathname;
+        var title = document.title;
+        history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
+        history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+    }, 1000);
+    return true;
+}
+
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2Lightweight(el) {
     var top = el.offsetTop;

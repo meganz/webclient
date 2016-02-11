@@ -131,6 +131,7 @@ var DropdownContactsSelector = React.createClass({
                 <ContactsUI.ContactPickerWidget
                     contacts={this.props.contacts}
                     megaChat={this.props.megaChat}
+                    exclude={this.props.exclude}
                     onClick={(contact, e) => {
                             this.props.onClick(contact, e);
                             this.props.closeDropdown();

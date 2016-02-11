@@ -843,10 +843,15 @@ var ConversationRightArea = React.createClass({
                             icon="rounded-grey-plus"
                             label={__(l[8007])}
                             contacts={this.props.contacts}
+                            disabled={
+                                /* Disable in case I don't have any more contacts to add ... */
+                                (room.getContactParticipantsExceptMe().length + 1) === this.props.contacts.length
+                            }
                             >
                             <DropdownsUI.DropdownContactsSelector
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}
+                                exclude={room.getContactParticipantsExceptMe()}
                                 className="popup add-participant-selector"
                                 onClick={this.props.onAddParticipantSelected}
                                 />
@@ -874,7 +879,7 @@ var ConversationRightArea = React.createClass({
 
 
                         {
-                            room.type !== "private" ?
+                            room.type === "group" ?
                                 <div className="link-button red" onClick={() => {
                                    room.leaveChat(true);
                                 }}>
@@ -1877,7 +1882,15 @@ var ConversationPanel = React.createClass({
                             self.setState({'attachCloudDialog': true});
                         }}
                         onAddParticipantSelected={function(contact, e) {
-                            console.error(contact, e);
+                            var megaChat = self.props.chatRoom.megaChat;
+                            var newUserJid = megaChat.getJidFromNodeId(contact.u);
+
+                            megaChat.openChat(
+                                self.props.chatRoom.getParticipants().concat(
+                                    [newUserJid]
+                                ),
+                                "group"
+                            );
                         }}
                     />
                     <ConversationAudioVideoPanel

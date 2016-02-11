@@ -2566,7 +2566,7 @@ function asyncApiReq(data) {
     var $promise = new MegaPromise();
     api_req(data, {
         callback: function(r) {
-            if (typeof r === 'number') {
+            if (typeof r === 'number' && r !== 0) {
                 $promise.reject.apply($promise, arguments);
             }
             else {

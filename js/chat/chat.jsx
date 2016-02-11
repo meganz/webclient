@@ -823,12 +823,7 @@ Chat.prototype.init = function() {
 
     $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
         if (ul_target.indexOf("chat/") > -1) {
-            var contactHash = ul_target.replace("chat/", "");
-            if (!contactHash) {
-                return;
-            }
-
-            var chatRoom = megaChat.getPrivateRoom(contactHash);
+            var chatRoom = megaChat.getRoomFromUrlHash(ul_target);
 
             if (!chatRoom) {
                 return;
@@ -839,6 +834,19 @@ Chat.prototype.init = function() {
     });
 
     self.trigger("onInit");
+};
+
+Chat.prototype.getRoomFromUrlHash = function(urlHash) {
+    if (urlHash.indexOf("#") === 0) {
+        urlHash = urlHash.subtr(1, urlHash.length);
+    }
+    var contactHash = urlHash.replace("chat/", "");
+    if (!contactHash) {
+        return;
+    }
+
+    var chatRoom = this.getPrivateRoom(contactHash);
+    return chatRoom;
 };
 
 /**
@@ -1355,7 +1363,7 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
         roomJid = self.generatePrivateRoomName(jids);
     }
     else {
-        roomJid = self._generateNewRoomIdx();
+        roomJid = self.generateGroupRoomName(jids);
     }
 
     var roomFullJid = roomJid + "@" + self.karere.options.mucDomain;
@@ -1475,6 +1483,25 @@ Chat.prototype.generatePrivateRoomName = function(jids) {
     var newJids = clone(jids);
     newJids.sort();
     var roomName = "prv";
+    $.each(newJids, function(k, jid) {
+        roomName = roomName + jid.split("@")[0];
+    });
+
+    roomName = base32.encode(asmCrypto.SHA256.bytes(roomName).subarray(0, 16));
+    return roomName;
+};
+
+/**
+ * Used to generate unique room JID for group chats.
+ *
+ * @param jids {Array} of BARE jids
+ * @returns {string}
+ */
+Chat.prototype.generateGroupRoomName = function(jids) {
+    var self = this;
+    var newJids = clone(jids);
+    newJids.sort();
+    var roomName = "grp";
     $.each(newJids, function(k, jid) {
         roomName = roomName + jid.split("@")[0];
     });
@@ -1823,22 +1850,27 @@ Chat.prototype.createAndShowPrivateRoomFor = function(h) {
  */
 Chat.prototype._destroyAllChatsFromChatd = function() {
     var self = this;
-    self.chats.forEach(function(v, k) {
-        if (v.chatId) {
-            v.getParticipantsExceptMe().forEach(function(jid) {
+
+    asyncApiReq({'a': 'mcf'}).done(function(r) {
+        r.c.forEach(function(chatRoomMeta) {
+            if (chatRoomMeta.g === 1) {
+                console.error("Destroying: ", chatRoomMeta.id, chatRoomMeta.g, chatRoomMeta.u);
+                chatRoomMeta.u.forEach(function (u) {
+                    if (u.u !== u_handle) {
+                        api_req({
+                            a: 'mcr',
+                            id: chatRoomMeta.id,
+                            u: u.u
+                        });
+                    }
+                });
                 api_req({
                     a: 'mcr',
-                    id: v.chatId,
-                    u: self.getContactFromJid(jid).u
+                    id: chatRoomMeta.id,
+                    u: u_handle
                 });
-            });
-            // finally, remove myself from the chat
-            api_req({
-                a: 'mcr',
-                id: v.chatId,
-                u: u_handle
-            });
-        }
+            }
+        })
     });
 };
 

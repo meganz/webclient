@@ -226,7 +226,6 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.onopen = function(e) {
         self.keepAliveTimerRestart();
         self.logger.log('chatd connection established');
-        self.rejoinexisting();
         self.resendpending();
     };
 
@@ -275,15 +274,6 @@ Chatd.Shard.prototype.cmd = function(opcode, cmd) {
     }
 };
 
-// rejoin all open chats after reconnection (this is mandatory)
-Chatd.Shard.prototype.rejoinexisting = function() {
-    for (var c in this.chatids) {
-        // rejoin chat and immediately set the locally buffered message range
-        this.join(c);
-        this.chatd.range(c);
-    }
-};
-
 // resend all unconfirmed messages (this is mandatory)
 Chatd.Shard.prototype.resendpending = function() {
     var self = this;
@@ -294,6 +284,9 @@ Chatd.Shard.prototype.resendpending = function() {
 
 // send JOIN
 Chatd.Shard.prototype.join = function(chatid) {
+    console.error(
+        "JOIN", base64urlencode(chatid), base64urlencode(this.chatd.userid)
+    );
     this.cmd(Chatd.Opcode.JOIN, chatid + this.chatd.userid + String.fromCharCode(Chatd.Priv.NOCHANGE));
 };
 

@@ -48,7 +48,7 @@ var ChatdIntegration = function(megaChat) {
         self.chatd.destroyed = true;
     });
 
-    $(window).rebind('onChatCreatedActionPacket.chatdInt', function(e, actionPacket) {
+    $(window).rebind('onChatUpdatedActionPacket.chatdInt', function(e, actionPacket) {
         self.openChatFromApi(actionPacket);
     });
 
@@ -118,9 +118,14 @@ ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     var self = this;
 
+    if (actionPacket.g === 1) {
+        return;
+    }
+
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
-        self.logger.error("actionPacket returned no chat participants: ", chatParticipants);
+        self.logger.error("actionPacket returned no chat participants: ", chatParticipants, ", removing chat.");
+        //TODO: remove/destroy chat?
     }
     var chatJids = [];
     Object.keys(chatParticipants).forEach(function(k) {
@@ -134,12 +139,27 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
         return;
     }
 
-    var roomJid = self.megaChat.generatePrivateRoomName(chatJids) + "@conference." + megaChat.options.xmppDomain;
+    var roomJid;
+    if (actionPacket.g !== 1) {
+        roomJid = self.megaChat.generatePrivateRoomName(chatJids);
+    }
+    else {
+        roomJid = self.megaChat.generateGroupRoomName(chatJids);
+    }
+    roomJid += "@conference." + megaChat.options.xmppDomain;
 
     var chatRoom = self.megaChat.chats[roomJid];
     var finishProcess = function() {
+
         if (!chatRoom) {
-            self.megaChat.openChat(chatJids, "private", actionPacket.id, actionPacket.cs, actionPacket.url, false);
+            self.megaChat.openChat(
+                chatJids,
+                actionPacket.g === 1 ? "group" : "private",
+                actionPacket.id,
+                actionPacket.cs,
+                actionPacket.url,
+                false
+            );
 
         }
         else {
@@ -151,7 +171,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
         }
     };
 
-    if (!actionPacket.url) {
+    if (!actionPacket.url && (!chatRoom || !chatRoom.chatdUrl)) {
         asyncApiReq({
             a: 'mcurl',
             id: actionPacket.id
@@ -264,6 +284,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             }
             self.waitingChatIdPromises[chatRoom.roomJid] = asyncApiReq({
                 'a': 'mcc',
+                'g': chatRoom.type === "group" ? 1 : 0,
                 'u': userHashes
             })
                 .always(function() {
@@ -300,9 +321,9 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         var args = arguments;
 
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
-        if (!self.chatd.chatidshard[chatIdDecoded]) {
+        if (!self.chatd.chatidshard[chatIdDecoded] || !self.chatd.chatidshard[chatIdDecoded].isOnline()) {
             createTimeoutPromise(function() {
-                return !!self.chatd.chatidshard[chatIdDecoded]
+                return !!self.chatd.chatidshard[chatIdDecoded] && self.chatd.chatidshard[chatIdDecoded]
             }, 100, 10000)
                 .done(function() {
                     masterPromise.linkDoneAndFailToResult(fn, self, args);

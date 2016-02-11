@@ -245,6 +245,11 @@ var ContactPickerWidget = React.createClass({
         var contacts = [];
 
         self.props.contacts.forEach(function(v, k) {
+            if (self.props.exclude && self.props.exclude.indexOf(v.u) > -1) {
+                // continue;
+                return;
+            }
+
             var pres = self.props.megaChat.karere.getPresence(
                 self.props.megaChat.getJidFromNodeId(v.u)
             );

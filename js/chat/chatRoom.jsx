@@ -19,7 +19,6 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
 var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
     var self = this;
 
-
     this.logger = MegaLogger.getLogger("room[" + roomJid + "]", {}, megaChat.logger);
 
     this.megaChat = megaChat;
@@ -575,6 +574,26 @@ ChatRoom.prototype.getParticipantsExceptMe = function(jids) {
     jidsWithoutMyself.splice($.inArray(self.megaChat.karere.getBareJid(), jidsWithoutMyself), 1);
 
     return jidsWithoutMyself;
+};
+
+
+/**
+ * Used to conver participants (from jids) -> contacts (as user hashes).
+ *
+ * @param [jids] {Array} optional list of jids to be used for converting -> contact list (if not passed, the current
+ * room jids would be used)
+ * @returns {Array} array of user hashes with the participants in the room
+ */
+ChatRoom.prototype.getContactParticipantsExceptMe = function(jids) {
+    var self = this;
+    var participantJids = self.getParticipantsExceptMe(jids);
+
+    return participantJids.map((jid) => {
+        var contactHash = megaJidToUserId(jid);
+        if (contactHash) {
+            return contactHash;
+        }
+    });
 };
 
 /**

@@ -1536,7 +1536,7 @@ function srvlog(msg, data, silent) {
     if (!silent && d) {
         console.error(msg, data);
     }
-    if (!d || onBetaW) {
+    if (typeof window.onerror === 'function') {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
     }
 }
@@ -1596,8 +1596,8 @@ function removeValue(array, value, can_fail) {
 function setTransferStatus(dl, status, ethrow, lock) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
-    if (text.length > 44) {
-        text = text.substr(0, 42) + '...';
+    if (text.length > 48) {
+        text = text.substr(0, 48) + "\u2026";
     }
     if (page === 'download') {
         $('.download.error-icon').text(text);
@@ -1637,6 +1637,15 @@ function dlFatalError(dl, error, ethrow) {
     else {
         Later(firefoxDialog);
     }
+
+    // Log the fatal error
+    Soon(function() {
+        error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
+
+        srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+    });
+
+    // Set transfer status and abort it
     setTransferStatus(dl, error, ethrow, true);
     dlmanager.abort(dl);
 }

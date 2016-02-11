@@ -1,4 +1,5 @@
 (function _xhrTransfersLogic(global) {
+    "use strict";
 
     var xhrTimeout = parseInt(localStorage.xhrTimeout) || (2 * 60 * 1000);
     var logger = MegaLogger.getLogger('xhr2');
@@ -62,7 +63,7 @@
                     var result = self.listener.onXHRready(ev);
 
                     if (debug) {
-                        logger.debug('onXHRready', result);
+                        _logger.debug('onXHRready', result);
                     }
 
                     // We have finished with this request, cleanup

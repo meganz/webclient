@@ -381,6 +381,8 @@
                                             WRITERR_DIAGTITLE,
                                             'Your browser storage for MEGA is full. ' +
                                             'Your download will continue automatically after you free up some space.');
+
+                                        srvlog('Out of HTML5 Offline Storage space.');
                                     }
                                     failed = true;
                                     dl_ack_write();
@@ -461,7 +463,12 @@
                 /* reset error flag */
                 failed = false;
                 /* retry */
-                dl_fw.seek(dl_position);
+                try {
+                    dl_fw.seek(dl_position);
+                }
+                catch (e) {
+                    return dlFatalError(dl, e);
+                }
                 if (d) {
                     logger.info('IO: error, retrying');
                 }

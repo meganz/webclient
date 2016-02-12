@@ -22,13 +22,13 @@ var psa = {
                 
         // If logged in and completed registration fully, show a Public Service Announcement.
         // Only show the announcement if they have not seen the current announcement
-        if ((u_type === 3) && (page.indexOf('pro') === -1) && (this.lastSeenAnnounceNum < this.currentAnnounceNum)) {
+        if ((u_type === 3) && (page.indexOf('pro') === -1) && (psa.lastSeenAnnounceNum < psa.currentAnnounceNum)) {
             
             // Show the announcement
-            this.prefillAnnouncementDetails();
-            this.addCloseButtonHandler();
-            this.addMoreInfoButtonHandler();
-            this.showAnnouncement();
+            psa.prefillAnnouncementDetails();
+            psa.addCloseButtonHandler();
+            psa.addMoreInfoButtonHandler();
+            psa.showAnnouncement();
         }
         
         // Otherwise if the PSA is currently visible, then hide it. This prevents bug after seeing an announcement and 
@@ -48,11 +48,11 @@ var psa = {
         // If they have a stored value on the API that contains which 
         // announcement they have seen then decrypt it and set it
         if (lastSeenAttr !== 0) {
-            this.lastSeenAnnounceNum = this.decryptAttribute(lastSeenAttr);
+            psa.lastSeenAnnounceNum = psa.decryptAttribute(lastSeenAttr);
         }
         
         // Set the current announcement number
-        this.currentAnnounceNum = currentAnnounceNum;
+        psa.currentAnnounceNum = currentAnnounceNum;
     },
     
     /**
@@ -148,8 +148,11 @@ var psa = {
             // Get the page link for this announcement
             var pageLink = $(this).attr('data-continue-link');
             
+            // Convert to string because method expects a string
+            var currentAnnounceNumStr = String(psa.currentAnnounceNum);
+            
             // Store that they have seen it on the API side
-            var savePromise = mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnounceNum) }, false, true);
+            var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
             
             // Redirect to page after save
             savePromise.done(function(result) {
@@ -169,9 +172,9 @@ var psa = {
         $(window).unbind('resize.bottomNotification');
         
         // Save last seen announcement number for page changes 
-        this.lastSeenAnnounceNum = this.currentAnnounceNum;
+        psa.lastSeenAnnounceNum = psa.currentAnnounceNum;
         
-        // No longer visible
+        // Set to no longer visible
         psa.visible = false;
     },
     

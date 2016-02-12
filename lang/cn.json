@@ -2161,7 +2161,7 @@
     "7051": ":",
     "7052": "\/MEGAsync \u4e0a\u4f20",
     "7053": "\u60a8\u5df2\u7ecf\u5728\u540c\u6b65\u60a8\u7684\u6574\u4e2a\u4e91\u76d8.",
-    "7054": "Enter a name to exclude from synchronization.(wildcards * and ? are allowed):",
+    "7054": "Enter a name to exclude from synchronization.(wildcards * and? are allowed):",
     "7055": "The new excluded file names will be taken into accountwhen the application starts again.",
     "7056": "HTTP",
     "7057": "\u5f3a\u5236\u5168\u626b\u63cf",
@@ -3115,6 +3115,8 @@
     "8536": "Thank you for using MEGA.",
     "8537": "Important notice:",
     "8538": "View blog post",
+    "8539": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
+    "8540": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

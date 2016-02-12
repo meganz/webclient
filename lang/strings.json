@@ -12462,5 +12462,13 @@
     "8538": {
         "text": "View blog post",
         "context": "Label on a button taking the user to a blog post."
+    },
+    "8539": {
+        "text": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
+        "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
+    },
+    "8540": {
+        "text": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
+        "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
     }
 }

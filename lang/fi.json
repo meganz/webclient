@@ -2161,7 +2161,7 @@
     "7051": ":",
     "7052": "\/MEGAsync L\u00e4hetykset",
     "7053": "Olet jo synkronoimassa koko Pilvilevy\u00e4si.",
-    "7054": "Sy\u00f6t\u00e4 synkronoinnista pois j\u00e4tett\u00e4v\u00e4 nimi. (Jokerit * ja ? ovat sallittuja):",
+    "7054": "Sy\u00f6t\u00e4 synkronoinnista pois j\u00e4tett\u00e4v\u00e4 nimi. (Jokerit * ja? ovat sallittuja):",
     "7055": "Uudet ei-sis\u00e4llytett\u00e4v\u00e4t tiedostonimet huomioidaan kun sovellus k\u00e4ynnistyy uudelleen.",
     "7056": "HTTP",
     "7057": "Pakota t\u00e4ysi uudelleenskannaus",
@@ -3115,6 +3115,8 @@
     "8536": "Thank you for using MEGA.",
     "8537": "Important notice:",
     "8538": "View blog post",
+    "8539": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
+    "8540": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -897,6 +897,12 @@ if (m)
     }
     else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
     {
+        app = document.querySelector('meta[name="apple-itunes-app"]');
+        if (app) {
+            app.setAttribute('content',
+                'app-id=706857885, app-argument=mega://' + window.location.hash);
+        }
+
         // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
         // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
         app='https://itunes.apple.com/app/mega/id706857885';

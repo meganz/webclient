@@ -95,7 +95,10 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
-        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk', 'flags'];
+        var exclude = [
+            'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen'
+        ];
 
         for (var n in u_attr) {
             if (exclude.indexOf(n) == -1) {
@@ -121,11 +124,26 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
-        // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
-        if ((typeof u_attr.flags !== 'undefined') && (typeof u_attr.flags.mcs !== 'undefined')) {
-            localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
+        // Flags is a generic object for various things
+        if (typeof u_attr.flags !== 'undefined') {
+            
+            // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
+            if (typeof u_attr.flags.psa !== 'undefined') {
+                
+                // Get the last seen announcement private attribute
+                var currentAnnounceNum = u_attr.flags.psa;
+                var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : 0;
+                
+                // Set the values we need to know if the PSA should be shown, then show the announcement
+                psa.setInitialValues(currentAnnounceNum, lastSeenAttr);
+            }
+            
+            // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
+            if (typeof u_attr.flags.mcs !== 'undefined') {
+                localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
+            }
         }
-
+        
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
         }
@@ -255,7 +273,7 @@ function u_setrsa(rsakey) {
                         var user = {
                             u: u_attr.u,
                             c: u_attr.c,
-                            m: u_attr.email,
+                            m: u_attr.email
                         };
                         process_u([user]);
 

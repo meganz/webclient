@@ -6815,21 +6815,6 @@ function sectionUIopen(id) {
 
         // new sections UI
         $('.section').addClass('hidden');
-
-        var repos = function() {
-            $('.section.' + id)
-                .height(
-                $(window).outerHeight() - $('#topmenu').outerHeight() - $('.transfer-panel').outerHeight()
-            )
-        };
-
-        $(window)
-            .unbind('resize.section')
-            .bind('resize.section', function() {
-                repos();
-            });
-
-        repos();
         $('.section.' + id).removeClass('hidden');
     }
 
@@ -10273,12 +10258,6 @@ function fm_resize_handler() {
     if (d) {
         console.time('fm_resize_handler');
     }
-    // transfer panel resize logic
-    var right_pane_height = $('#fmholder').outerHeight() - $('#topmenu').outerHeight();
-
-    $('.fm-main.default, .fm-main.notifications').css({
-        'height': right_pane_height + "px"
-    });
 
     $('.transfer-scrolling-table').css({
         'height': (
@@ -10368,11 +10347,6 @@ function fm_resize_handler() {
         megaChat.resized();
     }
 
-    var right_blocks_height = right_pane_height - $('.fm-right-header.fm').outerHeight();
-    $('.fm-right-files-block > *:not(.fm-right-header)').css({
-        'height': right_blocks_height + "px",
-        'min-height': right_blocks_height + "px"
-    });
 
     $('.fm-right-files-block, .fm-right-account-block').css({
         'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"

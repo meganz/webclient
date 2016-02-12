@@ -1,7 +1,7 @@
 .tiny-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite.svg);
+    background-image: url(../images/mega/new-chat-sprite-v1.svg);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite.svg);
+    background-image: url(../images/mega/new-chat-sprite-v1.svg);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -280,7 +280,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite.svg);
+    background-image: url(../images/mega/new-chat-sprite-v1.svg);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
@@ -371,6 +371,12 @@
 }
 .semi-big-icon.nwse-inset-resize, .button.active .semi-big-icon.nwse-resize, .small-block .big-icon.nwse-inset-resize, .small-block .button.active .big-icon.nwse-resize {
     background-position: -160px -3549px;
+}
+.semi-big-icon.grey-lock {
+    background-position: -3px -3710px;
+}
+.semi-big-icon.grey-tick {
+    background-position: -3px -3770px;
 }
 .big-icon.conversations {
     background-position: -17px -3375px;

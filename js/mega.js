@@ -5630,7 +5630,11 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
-            notify.notifyFromActionPacket(actionPacket);
+            
+            // Not applicable so don't return anything or it will show a blank notification
+            if (typeof actionPacket.up !== 'undefined' && typeof actionPacket.down !== 'undefined') {
+                notify.notifyFromActionPacket(actionPacket);
+            }
         }
         else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);

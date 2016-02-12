@@ -965,7 +965,9 @@ if (m)
             document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
         }
     }
-    else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
+    else if (window.location.hash.substr(1, 7) == 'confirm'
+            || window.location.hash.substr(1, 9) == 'newsignup'
+            || window.location.hash.substr(1, 7) == 'account')
     {
         var i = 0;
         if (ua.indexOf('windows phone') > -1) {

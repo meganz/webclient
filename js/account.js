@@ -130,14 +130,16 @@ function u_checklogin3a(res, ctx) {
             // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
             if (typeof u_attr.flags.psa !== 'undefined') {
                 
-                var last = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : 0;
+                console.log('zzzz got to u_checklogin3a');
+                console.log('zzzz u_attr', u_attr['*!lastPsaSeen']);
+                console.log('zzzz u_attr.flags.psa', u_attr.flags.psa);
                 
-                // Set the values we need to know if the psa should be shown
-                psa.setInitialValues(u_attr.flags.psa, last);
+                // Get the last seen announcement private attribute
+                var currentAnnouncementNum = u_attr.flags.psa;
+                var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : 0;
                 
-                // Attempt to set event handlers. If the elements we need haven't loaded yet, then the other 
-                // psa.init() in index.js will add them. If that one ran first, then no problem.
-                psa.init();
+                // Set the values we need to know if the PSA should be shown, then show the announcement
+                psa.setInitialValues(currentAnnouncementNum, lastSeenAttr);
             }
             
             // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on

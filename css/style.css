@@ -24317,16 +24317,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     padding: 0;
     margin: 0;
 }
-.bottom-info.content p {
+.bottom-info.content .messageA, .bottom-info.content .messageB {
     color: #666666;
     font-size: 14px;
     line-height: 18px;
     padding: 8px 0 0 0;
     margin: 0;
-}
-.bottom-info.content p strong {
-    color: #333333;
-    font-family: 'source_sans_probold';
 }
 .bottom-info.button {
     height: 32px;

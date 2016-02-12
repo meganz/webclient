@@ -115,8 +115,11 @@ function init_page() {
     }
     else {
         $('body').attr('class', '');
-        
-        // Attach event handlers to psa notification elements.
+    }
+    
+    // If logged in and completed registration, show a Public Service Announcement (if they have not seen it already)
+    if ((u_type === 3) && (page.indexOf('pro') === -1)) {
+        console.log('zzzz got to init_page');
         psa.init();
     }
 

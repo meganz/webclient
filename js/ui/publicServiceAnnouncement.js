@@ -6,36 +6,59 @@
  */
 var psa = {
     
-    $psaContainer: null,
+    lastSeenAnnouncementNum: 0,
     currentAnnouncementNum: 0,
-    psaClass: '',
-    privateAttr: 0,
     
+    /**
+     * Show the dialog if they have not seen the announcement yet
+     */
     init: function() {
-             
-        this.$psaContainer = $('.public-service-anouncement');
         
-        var myLastSeenAnnouncementNum = this.privateAttr !== 0 ? this.decryptAttr(this.privateAttr) : 0;
-          myLastSeenAnnouncementNum = 0;
-        
-        if (myLastSeenAnnouncementNum < this.currentAnnouncementNum) {
+        // Only show the announcement if they have not seen the current announcement
+        if (this.lastSeenAnnouncementNum < this.currentAnnouncementNum) {
             
+            console.log('zzzz showing dialog');
+            
+            this.prefillAnnouncementDetails();
             this.showAnnouncement();
             this.addCloseButtonHandler();
+            this.addMoreInfoButtonHandler();
         }
     },
     
-    setInitialValues: function(currentAnnouncementNum, privateAttr) {
-        this.currentAnnouncementNum = currentAnnouncementNum; 
-        this.privateAttr = privateAttr;
+    /**
+     * Sets the current announcement number and last seen announcement number
+     * @param {Number} currentAnnouncementNum A number sent by the API
+     * @param {type} lastSeenAttr A private attribute to be decrypted which contains a number
+     */
+    setInitialValues: function(currentAnnouncementNum, lastSeenAttr) {
+        
+        console.log('zzzz currentAnnouncementNum', currentAnnouncementNum);
+        console.log('zzzz lastSeenAttr', lastSeenAttr);
+        
+        // If they have a stored value on the API that contains which 
+        // announcement they have seen then decrypt it and set it
+        if (lastSeenAttr !== 0) {
+            this.lastSeenAnnouncementNum = this.decryptAttribute(lastSeenAttr);
+        }
+        
+        console.log('zzzz currentAnnouncementNum from API', currentAnnouncementNum);
+        
+        // testing code
+        this.lastSeenAnnouncementNum = 0;
+        currentAnnouncementNum = 1;
+        
+        console.log('zzzz currentAnnouncementNum', currentAnnouncementNum);
+        console.log('zzzz lastSeenAnnouncementNum', this.lastSeenAnnouncementNum);
+        
+        // Set the current announcement number
+        this.currentAnnouncementNum = currentAnnouncementNum;
     },
     
     /**
      * Shows the announcement
      */
     showAnnouncement: function() {
-            
-        this.psaClass = 'notification';
         
         // Show the PSA
         $('body').addClass('notification');
@@ -49,35 +72,89 @@ var psa = {
         });        
     },
     
-    decryptAttr: function(attr) {
-        var clearContainer = tlvstore.blockDecrypt(base64urldecode(attr), u_k);
-        attr = tlvstore.tlvRecordsToContainer(clearContainer, true);
+    /**
+     * Update the details of the announcement depending on the current one
+     */
+    prefillAnnouncementDetails: function() {
         
-        return parseInt(attr.num);
+        // Current announcement - to be fetched from the CMS in future
+        var announcement = {
+            title: l[8537],         // Important notice:
+            messageA: l[8535],      // Mega will be changing its terms...
+            messageB: l[8536],      // Thank you for using MEGA
+            buttonText: l[8538],    // View Blog Post
+            buttonLink: 'blog_36'   // Blog 36 has more details about the TOS changes
+        };
+        
+        // Replace bold text
+        announcement.messageA = announcement.messageA.replace('[B]', '<b>').replace('[/B]', '</b>');
+        
+        // Populate the details
+        var $psa = $('.public-service-anouncement');
+        $psa.find('.title').safeHTML(announcement.title);
+        $psa.find('.messageA').safeHTML(announcement.messageA);
+        $psa.find('.messageB').safeHTML(announcement.messageB);
+        $psa.find('.view-more-info').safeHTML(announcement.buttonText);
+        $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
     },
     
+    /**
+     * Decrypt the private user attribute
+     * @param {String} attr A Base64 encoded private attribute as a string
+     * @returns {Number} Returns an integer containing the last announcement number they have seen
+     */
+    decryptAttribute: function(attr) {
+        
+        // Decode, decrypt, convert from TLV into a JS object, then get the number
+        var clearContainer = tlvstore.blockDecrypt(base64urldecode(attr), u_k);
+        var decryptedAttr = tlvstore.tlvRecordsToContainer(clearContainer, true);
+        var lastSeenAnnouncementNum = parseInt(decryptedAttr.num);
+        
+        return lastSeenAnnouncementNum;
+    },
+    
+    /**
+     * Adds the close button functionality
+     */
     addCloseButtonHandler: function() {
-        console.log("andre say hi");
-        psa.$psaContainer.find('.bottom-info.button.close').rebind('click', function() {            
+          
+        // Use delegated event in case the HTML elements are not loaded yet
+        $('body').off('click', '.public-service-anouncement .button.close');
+        $('body').on('click', '.public-service-anouncement .button.close', function() {
             
-            console.log('hi there');
+            // Hide the banner
             psa.hideAnnouncement();
             
-            // Store on API side
-            mega.attr.set('lastPsaSeen', { "num": ""+psa.currentAnnouncementNum }, false, true);        
+            // Store that they have seen it on the API side
+            mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnouncementNum) }, false, true);        
         });
     },
     
+    /**
+     * Adds the functionality for the view more info button
+     */
     addMoreInfoButtonHandler: function() {
         
-        psa.$psaContainer.find('.bottom-info.button.red').rebind('click', function() {            
+        // Use delegated event in case the HTML elements are not loaded yet
+        $('body').off('click', '.public-service-anouncement .button.view-more-info');
+        $('body').on('click', '.public-service-anouncement .button.view-more-info', function() {
+            
+            // Hide the banner
             psa.hideAnnouncement();
             
-            // Store on API side
-            mega.attr.set('lastPsaSeen', { "num": ""+psa.currentAnnouncementNum }, false, true);
+            // Get the page link for this announcement
+            var pageLink = $(this).attr('data-continue-link');
             
-            // Redirect to page
-            location.href = '#blog_36';
+            // Store that they have seen it on the API side
+            var savePromise = mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnouncementNum) }, false, true);
+            
+            // Redirect to page after save
+            savePromise.done(function(result) {
+                
+                console.log('zzzz promise done result', result);
+                
+                document.location.hash = pageLink;
+            });
         });
     },
     
@@ -86,32 +163,14 @@ var psa = {
      */
     hideAnnouncement: function() {
         
+        // Hide the announcement
         $('body').removeClass('notification');
         $('.fmholder').css('height', '');
         $(window).unbind('resize.bottomNotification');
+        
+        // Save last seen announcement number for page changes 
+        this.lastSeenAnnouncementNum = this.currentAnnouncementNum;
     },
-    
-    /*
-    // Bottom notification init
-    notificationInit: function() {
-        if (!localStorage.hidenotification) {
-            $('body').addClass('notification');
-            psa.resizeContainerHeights();
-            $(window).rebind('resize.bottomNotification', function () {
-                psa.resizeContainerHeights();
-            });
-            $('.bottom-info.button').rebind('click', function () {
-                $('body').removeClass('notification');
-                $('.fmholder').css('height', '');
-                localStorage.hidenotification = 1;
-                $(window).trigger('resize');
-
-                if ($(this).hasClass('terms')) {
-                    document.location.hash = 'terms';
-                }
-            });
-        }
-    },*/
     
     /**
      * Resize the fmholder and startholder container heights 

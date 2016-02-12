@@ -963,7 +963,12 @@ function checkUserLogin() {
         if (!u_handle) {
             return MegaPromise.reject(EINCOMPLETE);
         }
+
         var config = getConfig();
+        if (!$.len(config)) {
+            return MegaPromise.reject(ENOENT);
+        }
+
         var hash = JSON.stringify(config);
         var len = hash.length;
 

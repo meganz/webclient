@@ -1,7 +1,7 @@
 /**
- * This file handles the Public Service Announcements. One announcement will 
- * appear at the bottom of the page in an overlay at a time. The announcements 
- * come from a hard coded list initially. Once a user has seen an announcement 
+ * This file handles the Public Service Announcements. One announcement will
+ * appear at the bottom of the page in an overlay at a time. The announcements
+ * come from a hard coded list initially. Once a user has seen an announcement
  * they will mark it as read on the API server.
  */
 var psa = {
@@ -31,7 +31,7 @@ var psa = {
             psa.showAnnouncement();
         }
         
-        // Otherwise if the PSA is currently visible, then hide it. This prevents bug after seeing an announcement and 
+        // Otherwise if the PSA is currently visible, then hide it. This prevents bug after seeing an announcement and
         // immediately visiting the #pro page which would show the raised file manager with whitespace underneath.
         else if (psa.visible) {
             psa.hideAnnouncement();
@@ -45,7 +45,7 @@ var psa = {
      */
     setInitialValues: function(currentAnnounceNum, lastSeenAttr) {
                 
-        // If they have a stored value on the API that contains which 
+        // If they have a stored value on the API that contains which
         // announcement they have seen then decrypt it and set it
         if (lastSeenAttr !== 0) {
             psa.lastSeenAnnounceNum = psa.decryptAttribute(lastSeenAttr);
@@ -129,7 +129,7 @@ var psa = {
             psa.hideAnnouncement();
             
             // Store that they have seen it on the API side
-            mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnounceNum) }, false, true);        
+            mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnounceNum) }, false, true);
         });
     },
     
@@ -171,7 +171,7 @@ var psa = {
         $('.fmholder').css('height', '');
         $(window).unbind('resize.bottomNotification');
         
-        // Save last seen announcement number for page changes 
+        // Save last seen announcement number for page changes
         psa.lastSeenAnnounceNum = psa.currentAnnounceNum;
         
         // Set to no longer visible
@@ -179,7 +179,7 @@ var psa = {
     },
     
     /**
-     * Resize the fmholder and startholder container heights 
+     * Resize the fmholder and startholder container heights
      * because they depend on the bottom notification height
      */
     resizeFileManagerHeight: function() {
@@ -193,6 +193,6 @@ var psa = {
             if (notificationSize > 120) {
                 $('.fmholder').height(bodyHeight - notificationSize);
             }
-        } 
+        }
     }
 };

@@ -382,10 +382,7 @@ var ConversationsApp = React.createClass({
         this.handleWindowResize();
     },
     handleWindowResize: function() {
-        // we don't need sutoms styles
-        //var $container = $(ReactDOM.findDOMNode(this));
-
-        //$container.height($(window).outerHeight() -  $('#topmenu').outerHeight());
+        
     },
     render: function() {
         var self = this;

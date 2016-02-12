@@ -96,7 +96,7 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
         var exclude = [
-            'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 
+            'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
             'ts', 'u', 'currk', 'flags', '*!lastPsaSeen'
         ];
 

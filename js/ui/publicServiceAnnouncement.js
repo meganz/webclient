@@ -6,39 +6,53 @@
  */
 var psa = {
     
-    lastSeenAnnouncementNum: 0,
-    currentAnnouncementNum: 0,
+    /** What the last announcement was that the user has seen */
+    lastSeenAnnounceNum: 0,
+    
+    /** What the current announcement is from the API */
+    currentAnnounceNum: 0,
+    
+    /** If the PSA is currently being shown */
+    visible: false,
     
     /**
      * Show the dialog if they have not seen the announcement yet
      */
     init: function() {
-        
+                
+        // If logged in and completed registration fully, show a Public Service Announcement.
         // Only show the announcement if they have not seen the current announcement
-        if (this.lastSeenAnnouncementNum < this.currentAnnouncementNum) {
-                        
+        if ((u_type === 3) && (page.indexOf('pro') === -1) && (this.lastSeenAnnounceNum < this.currentAnnounceNum)) {
+            
+            // Show the announcement
             this.prefillAnnouncementDetails();
-            this.showAnnouncement();
             this.addCloseButtonHandler();
             this.addMoreInfoButtonHandler();
+            this.showAnnouncement();
+        }
+        
+        // Otherwise if the PSA is currently visible, then hide it. This prevents bug after seeing an announcement and 
+        // immediately visiting the #pro page which would show the raised file manager with whitespace underneath.
+        else if (psa.visible) {
+            psa.hideAnnouncement();
         }
     },
     
     /**
      * Sets the current announcement number and last seen announcement number
-     * @param {Number} currentAnnouncementNum A number sent by the API
+     * @param {Number} currentAnnounceNum A number sent by the API
      * @param {type} lastSeenAttr A private attribute to be decrypted which contains a number
      */
-    setInitialValues: function(currentAnnouncementNum, lastSeenAttr) {
+    setInitialValues: function(currentAnnounceNum, lastSeenAttr) {
                 
         // If they have a stored value on the API that contains which 
         // announcement they have seen then decrypt it and set it
         if (lastSeenAttr !== 0) {
-            this.lastSeenAnnouncementNum = this.decryptAttribute(lastSeenAttr);
+            this.lastSeenAnnounceNum = this.decryptAttribute(lastSeenAttr);
         }
         
         // Set the current announcement number
-        this.currentAnnouncementNum = currentAnnouncementNum;
+        this.currentAnnounceNum = currentAnnounceNum;
     },
     
     /**
@@ -55,7 +69,10 @@ var psa = {
         // If the window is resized, change the height again
         $(window).rebind('resize.bottomNotification', function() {
             psa.resizeFileManagerHeight();
-        });        
+        });
+        
+        // Currently being shown
+        psa.visible = true;
     },
     
     /**
@@ -81,7 +98,7 @@ var psa = {
         $psa.find('.messageA').safeHTML(announcement.messageA);
         $psa.find('.messageB').safeHTML(announcement.messageB);
         $psa.find('.view-more-info').safeHTML(announcement.buttonText);
-        $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
+        $psa.find('.view-more-info').attr('data-continue-link', htmlentities(announcement.buttonLink));
     },
     
     /**
@@ -94,9 +111,9 @@ var psa = {
         // Decode, decrypt, convert from TLV into a JS object, then get the number
         var clearContainer = tlvstore.blockDecrypt(base64urldecode(attr), u_k);
         var decryptedAttr = tlvstore.tlvRecordsToContainer(clearContainer, true);
-        var lastSeenAnnouncementNum = parseInt(decryptedAttr.num);
+        var lastSeenAnnounceNum = parseInt(decryptedAttr.num);
         
-        return lastSeenAnnouncementNum;
+        return lastSeenAnnounceNum;
     },
     
     /**
@@ -112,7 +129,7 @@ var psa = {
             psa.hideAnnouncement();
             
             // Store that they have seen it on the API side
-            mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnouncementNum) }, false, true);        
+            mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnounceNum) }, false, true);        
         });
     },
     
@@ -132,7 +149,7 @@ var psa = {
             var pageLink = $(this).attr('data-continue-link');
             
             // Store that they have seen it on the API side
-            var savePromise = mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnouncementNum) }, false, true);
+            var savePromise = mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnounceNum) }, false, true);
             
             // Redirect to page after save
             savePromise.done(function(result) {
@@ -152,7 +169,10 @@ var psa = {
         $(window).unbind('resize.bottomNotification');
         
         // Save last seen announcement number for page changes 
-        this.lastSeenAnnouncementNum = this.currentAnnouncementNum;
+        this.lastSeenAnnounceNum = this.currentAnnounceNum;
+        
+        // No longer visible
+        psa.visible = false;
     },
     
     /**

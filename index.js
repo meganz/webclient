@@ -117,11 +117,9 @@ function init_page() {
         $('body').attr('class', '');
     }
     
-    // If logged in and completed registration, show a Public Service Announcement (if they have not seen it already)
-    if ((u_type === 3) && (page.indexOf('pro') === -1)) {
-        psa.init();
-    }
-
+    // Initialise the Public Service Announcement system
+    psa.init();
+    
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
 

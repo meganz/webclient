@@ -131,11 +131,11 @@ function u_checklogin3a(res, ctx) {
             if (typeof u_attr.flags.psa !== 'undefined') {
                 
                 // Get the last seen announcement private attribute
-                var currentAnnouncementNum = u_attr.flags.psa;
+                var currentAnnounceNum = u_attr.flags.psa;
                 var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : 0;
                 
                 // Set the values we need to know if the PSA should be shown, then show the announcement
-                psa.setInitialValues(currentAnnouncementNum, lastSeenAttr);
+                psa.setInitialValues(currentAnnounceNum, lastSeenAttr);
             }
             
             // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on

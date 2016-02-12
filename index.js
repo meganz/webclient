@@ -114,10 +114,12 @@ function init_page() {
         $('body').attr('class', 'not-logged');
     }
     else {
-        // Todo: check if cleaning the whole class is ok..
         $('body').attr('class', '');
     }
-
+    
+    // Initialise the Public Service Announcement system
+    psa.init();
+    
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
 

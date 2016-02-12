@@ -2161,7 +2161,7 @@
     "7051": ":",
     "7052": "\/MEGAsync \uc5c5\ub85c\ub4dc",
     "7053": "\uc774\ubbf8 \ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c \uc804\uccb4\uc640 \ub3d9\uae30\ud654\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4.",
-    "7054": "\ub3d9\uae30\ud654\uc5d0\uc11c \uc81c\uc678\ud560 \uc774\ub984\uc744 \uc785\ub825\ud558\uc138\uc694. (\uc640\uc77c\ub4dc\uce74\ub4dc * \uc640 ? \uac00 \uac00\ub2a5\ud569\ub2c8\ub2e4):",
+    "7054": "\ub3d9\uae30\ud654\uc5d0\uc11c \uc81c\uc678\ud560 \uc774\ub984\uc744 \uc785\ub825\ud558\uc138\uc694. (\uc640\uc77c\ub4dc\uce74\ub4dc * \uc640? \uac00 \uac00\ub2a5\ud569\ub2c8\ub2e4):",
     "7055": "\uc0c8\ub85c \ucd94\uac00\ub41c \uc81c\uc678 \ud30c\uc77c \ubaa9\ub85d\uc740 \uc5b4\ud50c\ub9ac\ucf00\uc774\uc158\uc774 \ub2e4\uc2dc \uc2dc\uc791\ud560 \ub54c \uacc4\uc815\uc5d0 \uc801\uc6a9\ub429\ub2c8\ub2e4.",
     "7056": "HTTP",
     "7057": "\uc804\uccb4 \uac80\uc0ac \uc218\ud589",
@@ -3115,6 +3115,8 @@
     "8536": "Thank you for using MEGA.",
     "8537": "Important notice:",
     "8538": "View blog post",
+    "8539": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
+    "8540": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

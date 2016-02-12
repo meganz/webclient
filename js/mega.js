@@ -12,8 +12,14 @@ if (localStorage.fmconfig) {
 MegaLogger.rootLogger = new MegaLogger(
     "",
     {
-        onCritical: function(msg) {
-            srvlog(msg);
+        onCritical: function(msg, pkg) {
+            if (typeof pkg === 'string') {
+                pkg = pkg.split('[').shift();
+                if (pkg) {
+                    msg = '[' + pkg + '] ' + msg;
+                }
+            }
+            srvlog(msg, 0, 1);
         },
         isEnabled: !!window.d
     },
@@ -3485,7 +3491,7 @@ function MegaData()
             });
 
             this.accountSessions();
-
+            
             api_req({a: 'ug'}, {
                 cb: cb,
                 account: account,
@@ -5630,7 +5636,11 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
-            notify.notifyFromActionPacket(actionPacket);
+            
+            // Not applicable so don't return anything or it will show a blank notification
+            if (typeof actionPacket.up !== 'undefined' && typeof actionPacket.down !== 'undefined') {
+                notify.notifyFromActionPacket(actionPacket);
+            }
         }
         else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);

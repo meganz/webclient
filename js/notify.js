@@ -909,6 +909,10 @@ var notify = {
             title = l[8523].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-reinstated-notification';
         }
+        else {
+            // Not applicable so don't return anything or it will show a blank notification
+            return false;
+        }
 
         // Populate other template information
         $notificationHtml.addClass(cssClass);

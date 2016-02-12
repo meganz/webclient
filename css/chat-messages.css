@@ -70,7 +70,27 @@
     font-size: 16px;
     line-height: 20px;
     color: #999999;
-    padding: 20px 0 15px 0;
+    padding: 20px 0 22px 0;
+}
+.messages.notification .info > span {
+    padding: 0 0 16px 0;
+    display:block;
+}
+.messages.notification .info p {
+    font-size: 14px;
+    line-height: 18px;
+    position: relative;
+    padding: 24px 0 0 48px;
+    margin: 0;
+}
+.messages.notification .info p i {
+    position:absolute;
+    left: 0;
+    margin:4px 0 0 0;
+}
+.messages.notification .info p strong {
+    display:block;
+    color:#666666;
 }
 .message.body {
     padding: 0 24px 0 24px;

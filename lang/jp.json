@@ -3115,6 +3115,8 @@
     "8536": "Thank you for using MEGA.",
     "8537": "Important notice:",
     "8538": "View blog post",
+    "8539": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
+    "8540": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

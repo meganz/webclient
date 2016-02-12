@@ -130,10 +130,6 @@ function u_checklogin3a(res, ctx) {
             // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
             if (typeof u_attr.flags.psa !== 'undefined') {
                 
-                console.log('zzzz got to u_checklogin3a');
-                console.log('zzzz u_attr', u_attr['*!lastPsaSeen']);
-                console.log('zzzz u_attr.flags.psa', u_attr.flags.psa);
-                
                 // Get the last seen announcement private attribute
                 var currentAnnouncementNum = u_attr.flags.psa;
                 var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : 0;
@@ -277,7 +273,7 @@ function u_setrsa(rsakey) {
                         var user = {
                             u: u_attr.u,
                             c: u_attr.c,
-                            m: u_attr.email,
+                            m: u_attr.email
                         };
                         process_u([user]);
 

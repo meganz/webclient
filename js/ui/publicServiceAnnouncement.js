@@ -16,9 +16,7 @@ var psa = {
         
         // Only show the announcement if they have not seen the current announcement
         if (this.lastSeenAnnouncementNum < this.currentAnnouncementNum) {
-            
-            console.log('zzzz showing dialog');
-            
+                        
             this.prefillAnnouncementDetails();
             this.showAnnouncement();
             this.addCloseButtonHandler();
@@ -32,24 +30,12 @@ var psa = {
      * @param {type} lastSeenAttr A private attribute to be decrypted which contains a number
      */
     setInitialValues: function(currentAnnouncementNum, lastSeenAttr) {
-        
-        console.log('zzzz currentAnnouncementNum', currentAnnouncementNum);
-        console.log('zzzz lastSeenAttr', lastSeenAttr);
-        
+                
         // If they have a stored value on the API that contains which 
         // announcement they have seen then decrypt it and set it
         if (lastSeenAttr !== 0) {
             this.lastSeenAnnouncementNum = this.decryptAttribute(lastSeenAttr);
         }
-        
-        console.log('zzzz currentAnnouncementNum from API', currentAnnouncementNum);
-        
-        // testing code
-        this.lastSeenAnnouncementNum = 0;
-        currentAnnouncementNum = 1;
-        
-        console.log('zzzz currentAnnouncementNum', currentAnnouncementNum);
-        console.log('zzzz lastSeenAnnouncementNum', this.lastSeenAnnouncementNum);
         
         // Set the current announcement number
         this.currentAnnouncementNum = currentAnnouncementNum;
@@ -150,9 +136,6 @@ var psa = {
             
             // Redirect to page after save
             savePromise.done(function(result) {
-                
-                console.log('zzzz promise done result', result);
-                
                 document.location.hash = pageLink;
             });
         });

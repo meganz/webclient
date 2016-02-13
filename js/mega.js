@@ -1043,7 +1043,8 @@ function MegaData()
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
+                            + htmlentities(rightsclass) + '"></span><span class="file-settings-icon">'
+                            + '</span><span class="file-icon-area">'
                             + '<span class="block-view-file-type folder"></span></span>'
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
@@ -1055,16 +1056,24 @@ function MegaData()
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
-                            + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
-                            + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '">'
+                            + '<td width="30"><span class="grid-status-icon ' + htmlentities(star)
+                            + '"></span></td><td><div class="shared-folder-icon"></div>'
+                            + '<div class="shared-folder-info-block"><div class="shared-folder-name">'
+                            + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">'
+                            + htmlentities(contains)
                             + '</div></div> </td><td width="240">'
-                                 + avatar
+                            + avatar
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
-                            + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
-                            + fullContactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
-                            + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
-                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td><td class="grid-url-header-nw"><a class="grid-url-arrow"></a></td></tr>';
+                            + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div>'
+                            + '<div class="fm-chat-user">'
+                            + fullContactName + '</div><div class="nw-contact-status"></div>'
+                            + '<div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h))
+                            + '">' + htmlentities(onlinestatus[0])
+                            + '</div><div class="clear"></div></div></td><td width="270">'
+                            + '<div class="shared-folder-access'
+                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td>'
+                            + '<td class="grid-url-header-nw"><a class="grid-url-arrow"></a></td></tr>';
                     }
                 }
 

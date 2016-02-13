@@ -76,11 +76,11 @@ if (typeof loadingDialog === 'undefined')
  * @property {String} name
  *     Combines users First and Last name defined in user profile.
  *     If First and Last name in user profile are undefined holds users email.
- *     Can be used like index field for search contacts in share dialog at least
+ *     It's used at least like index field for search contacts in share dialog.
  *     It combines `firstname` and `lastname` of user attributes.
  * @property {String} h
- *     Holds user handle, value equal to 'u' param. Used when synching with M.d,
- *     deeply rooted in code. should not be removed.
+ *     Holds user handle, value equal to 'u' param. Used only when synching with
+ *     M.d, deeply rooted in code. should not be removed.
  *     Reason behind it should be searched in file/folders caching structure,
  *     'h' represents file/folder "handle" as base64 URL encoded 64-bit value.
  * @property {Number} t

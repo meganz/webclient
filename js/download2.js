@@ -791,11 +791,13 @@ var dlmanager = {
     },
 
     isMEGAsyncRunning: function() {
+        var timeout = 200;
         var logger = this.logger;
         var promise = new MegaPromise();
 
         var resolve = function() {
             if (promise) {
+                loadingDialog.hide();
                 logger.debug('isMEGAsyncRunning: YUP');
 
                 promise.resolve.apply(promise, arguments);
@@ -804,31 +806,39 @@ var dlmanager = {
         };
         var reject = function(e) {
             if (promise) {
+                loadingDialog.hide();
                 logger.debug('isMEGAsyncRunning: NOPE', e);
 
                 promise.reject.apply(promise, arguments);
                 promise = undefined;
             }
         };
+        var loader = function() {
+            if (typeof megasync === 'undefined') {
+                return reject(EACCESS);
+            }
+            megasync.isInstalled(function(err, is) {
+                if (err || !is) {
+                    reject(err || ENOENT);
+                }
+                else {
+                    resolve(megasync);
+                }
+            });
+        };
 
+        loadingDialog.show();
         logger.debug('isMEGAsyncRunning: checking...');
 
-        mega.utils.require('megasync_js')
-            .always(function() {
-                if (typeof megasync === 'undefined') {
-                    return reject(EACCESS);
-                }
-                megasync.isInstalled(function(err, is) {
-                    if (err || !is) {
-                        reject(err || ENOENT);
-                    }
-                    else {
-                        resolve(megasync);
-                    }
-                });
-            });
+        if (typeof megasync === 'undefined') {
+            timeout = 4000;
+            mega.utils.require('megasync_js').always(loader);
+        }
+        else {
+            loader();
+        }
 
-        setTimeout(reject, 200);
+        setTimeout(reject, timeout);
 
         return promise;
     }

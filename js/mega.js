@@ -1030,7 +1030,12 @@ function MegaData()
                         rightsclass = ' full-access';
                     }
 
-                    var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
+                    // Handle of initial share owner
+                    var ownersHandle = M.v[i].su;
+                    var fullContactName = (M.d[ownersHandle].firstName && M.d[ownersHandle].lastName)
+                        ? M.d[ownersHandle].firstName + " " + M.d[ownersHandle].lastName
+                        : M.d[ownersHandle].m;
+
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
@@ -1043,7 +1048,7 @@ function MegaData()
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + contactName + '</span></span></a>';
+                            + fullContactName + '</span></span></a>';
                     }
                     else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
@@ -1057,7 +1062,7 @@ function MegaData()
                                  + avatar
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
-                            + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
+                            + fullContactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
                             + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td><td class="grid-url-header-nw"><a class="grid-url-arrow"></a></td></tr>';
                     }

@@ -3491,7 +3491,7 @@ function MegaData()
             });
 
             this.accountSessions();
-            
+
             api_req({a: 'ug'}, {
                 cb: cb,
                 account: account,
@@ -3994,7 +3994,55 @@ function MegaData()
         }
     };
 
-    this.addDownload = function(n, z, preview, zipname)
+    this.addDownload = function(n, z, preview) {
+        var args = arguments;
+        var webdl = function() {
+            M._addDownload.apply(M, args);
+            args = undefined;
+        };
+
+        if (z || preview) {
+            return webdl();
+        }
+
+        dlmanager.isMEGAsyncRunning()
+            .done(function(sync) {
+                var cmd = {
+                    a: 'd',
+                    auth: folderlink ? u_h : u_sid
+                };
+                var files = [];
+
+                for (var i in n) {
+                    if (n.hasOwnProperty(i)) {
+                        var node = M.d[n[i]];
+
+                        if (node) {
+                            files.push({
+                                t: node.t,
+                                h: node.h,
+                                p: node.p,
+                                n: btoa(node.name),
+                                s: node.s,
+                                ts: node.mtime || node.ts,
+                                k: a32_to_base64(node.key)
+                            });
+                        }
+                    }
+                }
+
+                cmd.f = files;
+
+                sync.megaSyncRequest(cmd)
+                    .done(function() {
+                        showToast('megasync', 'Download added to MEGAsync', 'Open');
+                    })
+                    .fail(webdl);
+            })
+            .fail(webdl);
+    };
+
+    this._addDownload = function(n, z, preview, zipname)
     {
         delete $.dlhash;
         var path;
@@ -5636,7 +5684,7 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
-            
+
             // Not applicable so don't return anything or it will show a blank notification
             if (typeof actionPacket.up !== 'undefined' && typeof actionPacket.down !== 'undefined') {
                 notify.notifyFromActionPacket(actionPacket);

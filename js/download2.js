@@ -788,6 +788,49 @@ var dlmanager = {
         }
         quota[t] += chunksize;
         localStorage.q = JSON.stringify(quota);
+    },
+
+    isMEGAsyncRunning: function() {
+        var logger = this.logger;
+        var promise = new MegaPromise();
+
+        var resolve = function() {
+            if (promise) {
+                logger.debug('isMEGAsyncRunning: YUP');
+
+                promise.resolve.apply(promise, arguments);
+                promise = undefined;
+            }
+        };
+        var reject = function(e) {
+            if (promise) {
+                logger.debug('isMEGAsyncRunning: NOPE', e);
+
+                promise.reject.apply(promise, arguments);
+                promise = undefined;
+            }
+        };
+
+        logger.debug('isMEGAsyncRunning: checking...');
+
+        mega.utils.require('megasync_js')
+            .always(function() {
+                if (typeof megasync === 'undefined') {
+                    return reject(EACCESS);
+                }
+                megasync.isInstalled(function(err, is) {
+                    if (err || !is) {
+                        reject(err || ENOENT);
+                    }
+                    else {
+                        resolve(megasync);
+                    }
+                });
+            });
+
+        setTimeout(reject, 200);
+
+        return promise;
     }
 };
 

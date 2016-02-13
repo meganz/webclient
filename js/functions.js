@@ -3508,7 +3508,7 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
 mega.utils.require = function megaUtilsRequire() {
     var files = [];
 
-    toArray(arguments).forEach(function(file) {
+    toArray.apply(null, arguments).forEach(function(file) {
 
         // If a plain filename, inject it into jsl2
         // XXX: Likely this will have a conflict with our current build script

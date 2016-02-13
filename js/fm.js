@@ -5271,8 +5271,8 @@ function UIkeyevents() {
             addNewContact($('.add-user-popup-button.add'));
         }
 
-        else if (e.keyCode == 13 && $.dialog == 'rename') {
-            dorename();
+        else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
+            doRename();
         }
         else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
@@ -6942,9 +6942,12 @@ function renameDialog() {
         });
 
         $('.rename-dialog-button.rename').rebind('click', function() {
+
             var c = $('.rename-dialog').attr('class');
-            if (c && c.indexOf('active') > -1)
-                dorename();
+
+            if (c && (c.indexOf('active') > -1)) {
+                doRename();
+            }
         });
 
         var n = M.d[$.selected[0]];
@@ -7012,18 +7015,23 @@ function renameDialog() {
     }
 }
 
-function dorename()
-{
-    if ($('.rename-dialog input').val() !== '')
-    {
-        var h = $.selected[0];
-        var n = M.d[h];
+/* @type {function} doRename
+ *
+ * On context menu rename
+ */
+function doRename() {
+
+    var nn = encodeURIComponent($('.rename-dialog input').val());
+    var h = $.selected[0];
+    var n = M.d[h];
+
+    if (nn !== '') {
         if (n) {
-            var nn = $('.rename-dialog input').val();
-            if (nn !== n.name) {
+            if (n && (nn !== n.name)) {
                 M.rename(h, nn);
             }
         }
+
         $.dialog = false;
         $('.rename-dialog').addClass('hidden');
         fm_hideoverlay();

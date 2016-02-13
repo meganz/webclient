@@ -3491,7 +3491,7 @@ function MegaData()
             });
 
             this.accountSessions();
-            
+
             api_req({a: 'ug'}, {
                 cb: cb,
                 account: account,
@@ -3576,24 +3576,33 @@ function MegaData()
         }
     };
 
-    this.rename = function(h, name)
-    {
-        if (M.d[h])
-        {
+    this.rename = function(h, name) {
+        if (M.d[h]) {
             var n = M.d[h];
-            if (n && n.ar)
-            {
+
+            if (n && n.ar) {
                 n.ar.n = name;
+
                 var mkat = enc_attr(n.ar, n.key);
                 var attr = ab_to_base64(mkat[0]);
                 var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
-                M.nodeAttr({h: h, name: name, a: attr});
-                api_req({a: 'a', n: h, attr: attr, key: key, i: requesti});
+
+                M.nodeAttr({ h: h, name: name, a: attr });
+                api_req({ a: 'a', n: h, attr: attr, key: key, i: requesti });
+
+                // DOM update, left and right panel in 'Cloud Drive' tab
                 $('.grid-table.fm #' + h + ' .tranfer-filetype-txt').text(name);
                 $('#' + h + '.file-block .file-block-title').text(name);
+
+                // DOM update, left and right panel in "Shared with me' tab
                 $('#treea_' + h + ' span:nth-child(2)').text(name);
-                if ($('#path_' + h).length > 0)
+                $('#' + h + ' .shared-folder-info-block .shared-folder-name').text(name);
+
+                // DOM update, breadcrumbs in 'Shared with me' tab
+                if ($('#path_' + h).length > 0) {
                     M.renderPath();
+                }
+
                 $(document).trigger('MegaNodeRename', [h, name]);
             }
         }
@@ -5636,7 +5645,7 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
-            
+
             // Not applicable so don't return anything or it will show a blank notification
             if (typeof actionPacket.up !== 'undefined' && typeof actionPacket.down !== 'undefined') {
                 notify.notifyFromActionPacket(actionPacket);

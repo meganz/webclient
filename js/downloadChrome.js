@@ -382,7 +382,7 @@
                                             'Your browser storage for MEGA is full. ' +
                                             'Your download will continue automatically after you free up some space.');
 
-                                        srvlog('Out of HTML5 Offline Storage space.');
+                                        srvlog('Out of HTML5 Offline Storage space (write)');
                                     }
                                     failed = true;
                                     dl_ack_write();
@@ -409,6 +409,8 @@
 
                 if (aFail === -1) {
                     if (!$.msgDialog) {
+                        srvlog('Out of HTML5 Offline Storage space (open)');
+
                         msgDialog('warningb', WRITERR_DIAGTITLE,
                             'Your available browser storage for MEGA cannot ' +
                             'handle this download size, please free up some disk space.');
@@ -435,6 +437,8 @@
         };
 
         this.abort = function(err) {
+            logger.debug('abort', err, wTimer, dl_id, dl_fw);
+
             if (wTimer) {
                 clearTimeout(wTimer);
             }
@@ -513,6 +517,8 @@
         };
 
         this.download = function(name, path) {
+            logger.debug('download', name, path, dl_fw, zfileEntry);
+
             document.getElementById('dllink').download = name;
             document.getElementById('dllink').href = zfileEntry.toURL();
             if (!is_chrome_firefox) {
@@ -527,9 +533,15 @@
             dl_filename = filename;
             dl_chunks = chunks;
             dl_chunksizes = sizes;
-            this.fsInitOp();
+
+            // Try to free space before starting the download.
+            free_space(this.fsInitOp.bind(this), 50);
         };
     };
+
+    if (window.d) {
+        window.free_space = free_space;
+    }
 
     if (navigator.webkitGetUserMedia) {
         mBroadcaster.once('startMega', function __setup_fs() {

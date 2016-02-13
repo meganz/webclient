@@ -1664,8 +1664,8 @@ var ConversationPanel = React.createClass({
                     __(l[8002]) :
                     __(l[8002])
             ),
-            firstParagraph = '<strong>' + l[8081].replace(/ -| —/g, '.</strong>'),
-            secondParagraph = '<strong>' + l[8082].replace(/ -| —/g, '.</strong>');
+            firstParagraph = '<strong>' + l[8081].replace(/ -| -/g, '.</strong>'),
+            secondParagraph = '<strong>' + l[8082].replace(/ -| -/g, '.</strong>');
 
             headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 

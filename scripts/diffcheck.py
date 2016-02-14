@@ -99,8 +99,12 @@ def reduce_jshint(file_line_mapping, **extra):
     logging.info('Obtaining JSHint output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
+    files_to_test = [os.path.join(*x)
+                     for x in file_line_mapping.keys()
+                     if x[-1].split('.')[-1] in ['js', 'jsx']]
     command = config.JSHINT_COMMAND.format(binary=config.JSHINT_BIN,
-                                           rules=rules)
+                                           rules=rules,
+                                           files=' '.join(files_to_test))
     output = None
     try:
         output = subprocess.check_output(command.split())
@@ -147,8 +151,10 @@ def reduce_jscs(file_line_mapping, **extra):
     logging.info('Obtaining JSCS output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
+    files_to_test = ' '.join([os.path.join(*x)
+                              for x in file_line_mapping.keys()])
     command = config.JSCS_COMMAND.format(binary=config.JSCS_BIN,
-                                         rules=rules)
+                                         rules=rules, files=files_to_test)
     output = None
     try:
         output = subprocess.check_output(command.split())

@@ -897,6 +897,12 @@ if (m)
     }
     else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
     {
+        app = document.querySelector('meta[name="apple-itunes-app"]');
+        if (app) {
+            app.setAttribute('content',
+                'app-id=706857885, app-argument=mega://' + window.location.hash);
+        }
+
         // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
         // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
         app='https://itunes.apple.com/app/mega/id706857885';
@@ -959,7 +965,9 @@ if (m)
             document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
         }
     }
-    else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
+    else if (window.location.hash.substr(1, 7) == 'confirm'
+            || window.location.hash.substr(1, 9) == 'newsignup'
+            || window.location.hash.substr(1, 7) == 'account')
     {
         var i = 0;
         if (ua.indexOf('windows phone') > -1) {

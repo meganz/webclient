@@ -4051,7 +4051,7 @@ function MegaData()
 
         if (z) {
             z = ++dlmanager.dlZipID;
-            if (M.d[n[0]] && M.d[n[0]].t) {
+            if (M.d[n[0]] && M.d[n[0]].t && M.d[n[0]].name) {
                 zipname = M.d[n[0]].name + '.zip';
             }
             else {

@@ -362,10 +362,10 @@ function MegaData()
         }
         M.sortRules[n](d);
 
-        M.sortingBy = [n, d];
+        M.sortmode = {n: n, d: d};
 
         if (fmconfig.uisorting) {
-            mega.config.set('sorting', {n: n, d: d});
+            mega.config.set('sorting', M.sortmode);
         }
         else {
             fmsortmode(M.currentdirid, n, d);
@@ -3491,7 +3491,7 @@ function MegaData()
             });
 
             this.accountSessions();
-            
+
             api_req({a: 'ug'}, {
                 cb: cb,
                 account: account,
@@ -3645,8 +3645,8 @@ function MegaData()
             }
         });
 
-        if (toRenderMain && M.sortingBy && (M.sortingBy[0] === 'fav')) {
-            M.doSort('fav', M.sortingBy[1]);
+        if (toRenderMain && M.sortmode && (M.sortmode.n === 'fav')) {
+            M.doSort('fav', M.sortmode.d);
             M.renderMain();
         }
     };
@@ -5636,7 +5636,7 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
-            
+
             // Not applicable so don't return anything or it will show a blank notification
             if (typeof actionPacket.up !== 'undefined' && typeof actionPacket.down !== 'undefined') {
                 notify.notifyFromActionPacket(actionPacket);
@@ -6938,6 +6938,8 @@ function fmtreenode(id, e)
         delete treenodes[id];
     }
     mega.config.set('treenodes', treenodes);
+
+    M.treenodes = JSON.stringify(treenodes);
 }
 
 function fmsortmode(id, n, d)

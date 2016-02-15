@@ -3115,8 +3115,8 @@
     "8536": "D\u011bkujeme, \u017ee pou\u017e\u00edv\u00e1te MEGA",
     "8537": "D\u016fle\u017eit\u00e9 ozn\u00e1men\u00ed",
     "8538": "Zobrazit p\u0159\u00edsp\u011bvek blogu",
-    "8539": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
-    "8540": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
+    "8539": "[S]Pravost.[\/S] Syst\u00e9m zaji\u0161\u0165uje, \u017ee p\u0159ijat\u00e1 data jsou od zobrazen\u00e9ho odes\u00edlatele a \u017ee s jejich obsah nebylo b\u011bhem p\u0159enosu manipulov\u00e1no.",
+    "8540": "[S]D\u016fv\u011brnost.[\/S] Pouze autor a ur\u010den\u00ed p\u0159\u00edjemci jsou schopni de\u0161ifrovat a \u010d\u00edst obsah.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

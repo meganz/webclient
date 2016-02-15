@@ -3115,8 +3115,8 @@
     "8536": "Dzi\u0119kujemy za korzystanie z MEGA.",
     "8537": "Wa\u017cne:",
     "8538": "Zobacz wpis",
-    "8539": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
-    "8540": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
+    "8539": "[S]Autentyczno\u015b\u0107.[\/S] System zapewnia, \u017ce dostarczone dane do odbiorcy nie zosta\u0142y zmienione w trakcie przesy\u0142ania.",
+    "8540": "[S]Poufno\u015b\u0107.[\/S] Tylko autor i odbiorcy s\u0105 upowa\u017cnieni do przegl\u0105dania zawarto\u015bci.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

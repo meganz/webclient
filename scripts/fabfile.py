@@ -76,6 +76,7 @@ def _build_chat_bundle(target_dir):
     with cd(target_dir):
         run("npm install --production")
         run("scripts/build.sh")
+        run("rm -rf node_modules")
 
 
 @task

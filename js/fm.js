@@ -1309,7 +1309,7 @@ function removeUInode(h) {
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
             if (!hasItems) {
-                if (sharedfolderUI()) {
+                if (sharedFolderUI()) {
                     M.emptySharefolderUI();
                 }
                 else {
@@ -7021,14 +7021,14 @@ function renameDialog() {
  */
 function doRename() {
 
-    var nn = encodeURIComponent($('.rename-dialog input').val());
-    var h = $.selected[0];
-    var n = M.d[h];
+    var itemName = encodeURIComponent($('.rename-dialog input').val());
+    var handle = $.selected[0];
+    var nodeData = M.d[handle];
 
-    if (nn !== '') {
-        if (n) {
-            if (n && (nn !== n.name)) {
-                M.rename(h, nn);
+    if (itemName !== '') {
+        if (nodeData) {
+            if (nodeData && (itemName !== nodeData.name)) {
+                M.rename(handle, itemName);
             }
         }
 
@@ -10371,66 +10371,80 @@ function fm_resize_handler() {
     }
 }
 
-function sharedfolderUI() {
+function sharedFolderUI() {
 
-    var c,
-        n = M.d[M.currentdirid],
-        r = false;
+    var nodeData = M.d[M.currentdirid];
+    var browsingSharedContent = false;
+    var c;
 
+    // Browsing shared content
     if ($('.shared-details-block').length > 0) {
+
         $('.shared-details-block .shared-folder-content').unwrap();
         $('.shared-folder-content').removeClass('shared-folder-content');
         $('.shared-top-details').remove();
-        r = true;
+        browsingSharedContent = true;
     }
 
-    if (!n || n.p.length !== 11) {
-        n = null;
+    // Checks it's not a contact, contacts handles are 11 chars long
+    // file/folder handles are 8 chars long
+    if (!nodeData || (nodeData.p.length !== 11)) {
 
+        // [<current selection handle>, 'owners handle', 'tab name']
         var p = M.getPath(M.currentdirid);
+        nodeData = null;
+
         if (p[p.length - 1] === 'shares') {
             c = M.d[p[0]];
-            n = M.d[p[p.length - 3]];
+            nodeData = M.d[p[p.length - 3]];
 
-            if (!n || n.p.length !== 11) {
-                n = 0;
+            if (!nodeData || (nodeData.p.length !== 11)) {
+                nodeData = 0;
             }
         }
     }
 
-    if (n) {
-        var u_h = n.p;
-        var user = M.d[u_h];
-        avatar = useravatar.contact(user, 'nw-contact-avatar');
+    if (nodeData) {
 
-        var rights = l[55], rightsclass = ' read-only';
-        if (n.r === 1) {
+        var rights = l[55];
+        var rightsclass = ' read-only';
+        var rightPanelView = '.files-grid-view.fm';
+
+        // Handle of initial share owner
+        var ownersHandle = nodeData.su;
+        var fullOwnersName = (M.d[ownersHandle].firstName && M.d[ownersHandle].lastName)
+            ? M.d[ownersHandle].firstName + " " + M.d[ownersHandle].lastName
+            : M.d[ownersHandle].m;
+        var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
+
+        // Access rights
+        if (nodeData.r === 1) {
             rights = l[56];
             rightsclass = ' read-and-write';
-        } else if (n.r === 2) {
+        }
+        else if (nodeData.r === 2) {
             rights = l[57];
             rightsclass = ' full-access';
         }
 
-        var e = '.files-grid-view.fm';
-        if (M.viewmode === 1)
-            e = '.fm-blocks-view.fm';
+        if (M.viewmode === 1) {
+            rightPanelView = '.fm-blocks-view.fm';
+        }
 
-        var nameStr = user && user.name ? htmlentities(user.name) : "N/a";
+        $(rightPanelView).wrap('<div class="shared-details-block"></div>');
 
-        $(e).wrap('<div class="shared-details-block"></div>');
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
                 +'<div class="shared-details-icon"></div>'
                 +'<div class="shared-details-info-block">'
                     +'<div class="shared-details-pad">'
-                        +'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
+                        +'<div class="shared-details-folder-name">'+ htmlentities(nodeData.name) +'</div>'
                         +'<a href="javascript:;" class="grid-url-arrow"></a>'
                         +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
                         +'<div class="clear"></div>'
                         + avatar
                         +'<div class="fm-chat-user-info">'
-                            +'<div class="fm-chat-user">' + nameStr + '</div>'
+                            +'<div class="fm-chat-user">' + fullOwnersName + '</div>'
                         +'</div>'
                     +'</div>'
                     +'<div class="shared-details-buttons">'
@@ -10442,7 +10456,8 @@ function sharedfolderUI() {
                     +'<div class="clear"></div>'
                 +'</div>'
             +'</div>');
-        $(e).addClass('shared-folder-content');
+
+        $(rightPanelView).addClass('shared-folder-content');
 
         Soon(function() {
             $(window).trigger('resize');
@@ -10450,7 +10465,7 @@ function sharedfolderUI() {
         });
     }
 
-    return r;
+    return browsingSharedContent;
 }
 
 function userFingerprint(userid, callback) {

@@ -1213,7 +1213,7 @@ function MegaData()
         lSel = this.fsViewSel;
         $(lSel).unbind('jsp-scroll-y.dynlist');
         $(window).unbind("resize.dynlist");
-        sharedfolderUI();// ToDo: Check do we really need this here
+        sharedFolderUI();
         $.tresizer();
 
         hideEmptyGrids();
@@ -1637,7 +1637,7 @@ function MegaData()
         $('.nw-fm-tree-item').removeClass('opened');
 
         if (this.chat) {
-            sharedfolderUI(); // remove shares-specific UI
+            sharedFolderUI(); // remove shares-specific UI
             //$.tresizer();
         }
         else if (id === undefined && folderlink) {
@@ -2343,34 +2343,53 @@ function MegaData()
     };
 
     this.getPath = function(id) {
-        var a = [];
-        var g = 1;
-        while (g) {
-            if (id === 'contacts' && a.length > 1) {
+
+        var result = [];
+        var loop = true;
+
+        while (loop) {
+            if ((id === 'contacts') && (result.length > 1)) {
                 id = 'shares';
             }
 
-            if (M.d[id] || id === 'contacts' || id === 'messages' || id === 'shares'
-                || id === M.InboxID || id === 'opc' || id === 'ipc') {
-                a.push(id);
+            if (
+                M.d[id]
+                || (id === 'contacts')
+                || (id === 'messages')
+                || (id === 'shares')
+                || (id === M.InboxID)
+                || (id === 'opc')
+                || (id === 'ipc')
+                ) {
+                result.push(id);
             }
-            else if (!id || id.length !== 11) {
+            else if (!id || (id.length !== 11)) {
                 return [];
             }
 
-            if (id === this.RootID || id === 'contacts' || id === 'shares'
-                || id === 'messages' || id === this.RubbishID || id === this.InboxID
-                || id === 'opc' || id === 'ipc') {
-                g = 0;
+            if (
+                (id === this.RootID)
+                || (id === 'contacts')
+                || (id === 'shares')
+                || (id === 'messages')
+                || (id === this.RubbishID)
+                || (id === this.InboxID)
+                || (id === 'opc')
+                || (id === 'ipc')
+                ) {
+                loop = false;
             }
-            if (g) {
+
+            if (loop) {
                 if (!(this.d[id] && this.d[id].p)) {
                     break;
                 }
+
                 id = this.d[id].p;
             }
         }
-        return a;
+
+        return result;
     };
 
     this.pathLength = function()
@@ -3590,34 +3609,42 @@ function MegaData()
         }
     };
 
-    this.rename = function(h, name) {
-        if (M.d[h]) {
-            var n = M.d[h];
+    this.rename = function(itemHandle, newItemName) {
 
-            if (n && n.ar) {
-                n.ar.n = name;
+        var newValue = decodeURIComponent(newItemName);
 
-                var mkat = enc_attr(n.ar, n.key);
+        if (M.d[itemHandle]) {
+            var nodeData = M.d[itemHandle];
+
+            if (nodeData && nodeData.ar) {
+
+                // Update global var with newest data
+                nodeData.ar.n = newValue;
+
+                var mkat = enc_attr(nodeData.ar, nodeData.key);
                 var attr = ab_to_base64(mkat[0]);
                 var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
 
-                M.nodeAttr({ h: h, name: name, a: attr });
-                api_req({ a: 'a', n: h, attr: attr, key: key, i: requesti });
+                M.nodeAttr({ h: itemHandle, name: newValue, a: attr });
+                api_req({ a: 'a', n: itemHandle, attr: attr, key: key, i: requesti });
 
                 // DOM update, left and right panel in 'Cloud Drive' tab
-                $('.grid-table.fm #' + h + ' .tranfer-filetype-txt').text(name);
-                $('#' + h + '.file-block .file-block-title').text(name);
+                $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newValue);
+                $('#' + itemHandle + '.file-block .file-block-title').text(newValue);
 
                 // DOM update, left and right panel in "Shared with me' tab
-                $('#treea_' + h + ' span:nth-child(2)').text(name);
-                $('#' + h + ' .shared-folder-info-block .shared-folder-name').text(name);
+                $('#treea_' + itemHandle + ' span:nth-child(2)').text(newValue);
+                $('#' + itemHandle + ' .shared-folder-info-block .shared-folder-name').text(newValue);
+
+                // DOM update, right panel view during browsing shared content
+                $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newValue);
 
                 // DOM update, breadcrumbs in 'Shared with me' tab
-                if ($('#path_' + h).length > 0) {
+                if ($('#path_' + itemHandle).length > 0) {
                     M.renderPath();
                 }
 
-                $(document).trigger('MegaNodeRename', [h, name]);
+                $(document).trigger('MegaNodeRename', [itemHandle, newValue]);
             }
         }
     };
@@ -5699,7 +5726,7 @@ function execsc(actionPackets, callback) {
 
     function onExecSCDone() {
         if (async_treestate.length) {
-            async_treestate.forEach(function(actionPacket) {
+            async_treestate.forEach(function(actionPacket, index) {
                 var n = M.d[actionPacket.n];
                 if (d) console.log('updateTreeState', n, actionPacket);
                 if (n) {
@@ -5707,22 +5734,11 @@ function execsc(actionPackets, callback) {
                         h : actionPacket.n,
                         k : actionPacket.k,
                         a : actionPacket.at
-                    }, newpath = 0;
+                    };
                     crypto_processkey(u_handle, u_k_aes, f);
                     if (f.key) {
                         if (f.name !== n.name) {
-                            $('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
-                            $('#' + n.h + '.file-block .file-block-title').text(f.name);
-                            $('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
-
-                            if (M.currentdirid === 'shares') {
-                                $('#' + n.h + ' .shared-folder-name').text(f.name);
-                            }
-
-                            //@@@Todo: reposition elements according to sorting (if sorted by name)
-                            if ($('#path_' + n.h).length > 0) {
-                                newpath = 1;
-                            }
+                            M.rename(n.h, f.name);
                         }
                         if (f.fav !== n.fav) {
                             if (f.fav) {
@@ -5741,13 +5757,13 @@ function execsc(actionPackets, callback) {
                             key : f.key,
                             a : actionPacket.at
                         });
-                        if (newpath) {
-                            M.renderPath();
-                        }
                     }
                     if (actionPacket.cr) {
                         crypto_proccr(actionPacket.cr);
                     }
+
+                    // Remove processed item from the queue
+                    async_treestate.splice(index, 1);
                 }
             });
         }

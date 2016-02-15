@@ -5793,17 +5793,20 @@ function loadfm(force)
     }
 }
 
-function RightsbyID(id)
-{
-    if (folderlink)
+function RightsbyID(id) {
+
+    if (folderlink || (id && id.length > 8)) {
         return false;
-    if (id.length > 8)
-        return false;
+    }
+
     var p = M.getPath(id);
-    if (p[p.length - 1] == 'contacts' || p[p.length - 1] == 'shares')
+
+    if ((p[p.length - 1] === 'contacts') || (p[p.length - 1] === 'shares')) {
         return (M.d[p[p.length - 3]] || {}).r;
-    else
+    }
+    else {
         return 2;
+    }
 }
 
 function isCircular(fromid, toid)

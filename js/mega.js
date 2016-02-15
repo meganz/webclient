@@ -5795,7 +5795,7 @@ function loadfm(force)
 
 function RightsbyID(id) {
 
-    if (folderlink || !id || id.length > 8) {
+    if (folderlink || (id && id.length > 8)) {
         return false;
     }
 

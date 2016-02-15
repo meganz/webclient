@@ -176,6 +176,8 @@ var psa = {
         
         // Set to no longer visible
         psa.visible = false;
+
+        $(window).trigger('resize');
     },
     
     /**

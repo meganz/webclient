@@ -168,8 +168,13 @@ var psa = {
         
         // Hide the announcement
         $('body').removeClass('notification');
+        
+        // Reset file manager height
         $('.fmholder').css('height', '');
         $(window).unbind('resize.bottomNotification');
+        
+        // Trigger resize so that full content in the file manager is visible after closing
+        $(window).trigger('resize');
         
         // Save last seen announcement number for page changes
         psa.lastSeenAnnounceNum = psa.currentAnnounceNum;

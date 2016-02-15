@@ -1049,7 +1049,7 @@ function MegaData()
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + fullContactName + '</span></span></a>';
+                            + htmlentities(fullContactName) + '</span></span></a>';
                     }
                     else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
@@ -1067,7 +1067,7 @@ function MegaData()
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div>'
                             + '<div class="fm-chat-user">'
-                            + fullContactName + '</div><div class="nw-contact-status"></div>'
+                            + htmlentities(fullContactName) + '</div><div class="nw-contact-status"></div>'
                             + '<div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h))
                             + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270">'

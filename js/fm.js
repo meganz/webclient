@@ -10443,7 +10443,7 @@ function sharedFolderUI() {
                         +'<div class="clear"></div>'
                         + avatar
                         +'<div class="fm-chat-user-info">'
-                            +'<div class="fm-chat-user">' + fullOwnersName + '</div>'
+                            +'<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
                         +'</div>'
                     +'</div>'
                     +'<div class="shared-details-buttons">'

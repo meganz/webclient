@@ -52,8 +52,8 @@ VERAPP_RULES = ['F001', 'F002',
 
 
 # Command line configuration.
-JSHINT_COMMAND = '{binary} {rules} .'
-JSCS_COMMAND = '{binary} {rules} .'
+JSHINT_COMMAND = '{binary} {rules} {files}'
+JSCS_COMMAND = '{binary} {rules} {files}'
 
 CPPCHECK_COMMAND = ("{command}"
                     " --template={{file}};{{line}};{{severity}};{{id}};{{message}}"

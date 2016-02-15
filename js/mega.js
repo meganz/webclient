@@ -362,10 +362,10 @@ function MegaData()
         }
         M.sortRules[n](d);
 
-        M.sortingBy = [n, d];
+        M.sortmode = {n: n, d: d};
 
         if (fmconfig.uisorting) {
-            mega.config.set('sorting', {n: n, d: d});
+            mega.config.set('sorting', M.sortmode);
         }
         else {
             fmsortmode(M.currentdirid, n, d);
@@ -3695,8 +3695,8 @@ function MegaData()
             }
         });
 
-        if (toRenderMain && M.sortingBy && (M.sortingBy[0] === 'fav')) {
-            M.doSort('fav', M.sortingBy[1]);
+        if (toRenderMain && M.sortmode && (M.sortmode.n === 'fav')) {
+            M.doSort('fav', M.sortmode.d);
             M.renderMain();
         }
     };
@@ -4101,7 +4101,7 @@ function MegaData()
 
         if (z) {
             z = ++dlmanager.dlZipID;
-            if (M.d[n[0]] && M.d[n[0]].t) {
+            if (M.d[n[0]] && M.d[n[0]].t && M.d[n[0]].name) {
                 zipname = M.d[n[0]].name + '.zip';
             }
             else {
@@ -5834,7 +5834,7 @@ function loadfm(force)
 
 function RightsbyID(id) {
 
-    if (folderlink || !id || id.length > 8) {
+    if (folderlink || (id && id.length > 8)) {
         return false;
     }
 
@@ -6977,6 +6977,8 @@ function fmtreenode(id, e)
         delete treenodes[id];
     }
     mega.config.set('treenodes', treenodes);
+
+    M.treenodes = JSON.stringify(treenodes);
 }
 
 function fmsortmode(id, n, d)

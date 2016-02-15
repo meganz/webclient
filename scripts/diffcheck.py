@@ -56,7 +56,14 @@ def get_git_line_sets(base, target):
     # Get the Git output for the desired diff.
     logging.info('Extracting relevant lines from Git diff ...')
     command = 'git diff -U0 {} {}'.format(base, target)
-    output = subprocess.check_output(command.split())
+    try:
+        output = subprocess.check_output(command.split())
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('Git not installed. Install it first.')
+        else:
+            logging.error('Error calling Git: {}'.format(ex))
+        return {}
     diff = output.decode('latin1').split('\n')
 
     # Hunt down lines of changes for different files.
@@ -99,8 +106,12 @@ def reduce_jshint(file_line_mapping, **extra):
     logging.info('Obtaining JSHint output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
+    files_to_test = [os.path.join(*x)
+                     for x in file_line_mapping.keys()
+                     if x[-1].split('.')[-1] in ['js', 'jsx']]
     command = config.JSHINT_COMMAND.format(binary=config.JSHINT_BIN,
-                                           rules=rules)
+                                           rules=rules,
+                                           files=' '.join(files_to_test))
     output = None
     try:
         output = subprocess.check_output(command.split())
@@ -108,6 +119,13 @@ def reduce_jshint(file_line_mapping, **extra):
         # JSHint found something, so it has returned an error code.
         # But we still want the output in the same fashion.
         output = ex.output
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('JSHint not installed.'
+                          ' Try to do so with `npm install`.')
+        else:
+            logging.error('Error calling JSHint: {}'.format(ex))
+        return '*** JSHint: {} ***'.format(ex), 0
     output = output.decode('utf8').split('\n')
 
     # Go through output and collect only relevant lines to the result.
@@ -147,8 +165,10 @@ def reduce_jscs(file_line_mapping, **extra):
     logging.info('Obtaining JSCS output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
+    files_to_test = ' '.join([os.path.join(*x)
+                              for x in file_line_mapping.keys()])
     command = config.JSCS_COMMAND.format(binary=config.JSCS_BIN,
-                                         rules=rules)
+                                         rules=rules, files=files_to_test)
     output = None
     try:
         output = subprocess.check_output(command.split())
@@ -156,6 +176,13 @@ def reduce_jscs(file_line_mapping, **extra):
         # JSCS found something, so it has returned an error code.
         # But we still want the output in the same fashion.
         output = ex.output
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('JSCS not installed.'
+                          ' Try to do so with `npm install`.')
+        else:
+            logging.error('Error calling JSCS: {}'.format(ex))
+        return '*** JSCS: {} ***'.format(ex), 0
     output = output.decode('utf8').split('\n\n')
 
     # Go through output and collect only relevant lines to the result.

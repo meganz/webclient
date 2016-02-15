@@ -4434,7 +4434,7 @@ function gridUI() {
 
     $.gridHeader = function() {
         var headerColumn = '';
-        $('.grid-table tbody tr:first-child td').each(function(i, e) {
+        $('.grid-table tbody tr:first-child td:visible').each(function(i, e) {
             headerColumn = $('.grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
@@ -6070,7 +6070,6 @@ function menuItems() {
     items['.refresh-item'] = 1;
 
     if (folderlink) {
-        delete items['.properties-item'];
         delete items['.copy-item'];
         delete items['.add-star-item'];
         if (u_type) {
@@ -6173,9 +6172,9 @@ function contextMenuUI(e, ll) {
             flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
-                if (M.v.length) {
-                    flt += ',.zipdownload-item,.download-item';
-                }
+            }
+            if (M.v.length) {
+                flt += ',.zipdownload-item,.download-item';
             }
             $.selected = [M.RootID];
             $(menuCMI).filter(flt).show();

@@ -45,15 +45,15 @@ if (typeof loadingDialog === 'undefined')
     var loadingDialog = {};
     loadingDialog.show = function()
     {
-        $('.dark-overlay').show();
+        $('.light-overlay').removeClass('hidden');
         //$('body').addClass('overlayed');
-        $('.loading-spinner').show();
+        $('.loading-spinner').removeClass('hidden');
     };
     loadingDialog.hide = function()
     {
-        $('.dark-overlay').hide();
+        $('.light-overlay').addClass('hidden');
         //$('body').removeClass('overlayed');
-        $('.loading-spinner').hide();
+        $('.loading-spinner').addClass('hidden');
     };
 }
 

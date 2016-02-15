@@ -5301,6 +5301,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 100%;
     height: 100%;
 }
+.light-overlay {
+    background-color: rgba(255,255,255,0.5);
+    z-index: 1300;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
 .nw-fm-left-icon.rubbish-bin, .nw-fm-left-icon.account {
     height: 48px;
     width: 48px;
@@ -12047,7 +12056,7 @@ table {
     margin: -130px 0 0 -130px;
 }
 .st-main-button-icon, .st-main-button-icon-hovered {
-    background-image: url(../images/mega/new-startpage-sprite-v3.png);
+    background-image: url(../images/mega/new-startpage-spite-v4.png);
     background-position: center 60px;
     background-repeat: no-repeat;
     width: 260px;
@@ -12071,7 +12080,7 @@ table {
     width: 130px;
     height: 100px;
     position: absolute;
-    background-image: url(../images/mega/new-startpage-sprite-v3.png);
+    background-image: url(../images/mega/new-startpage-spite-v4.png);
     background-position: center -545px;
     background-repeat: no-repeat;
     left: 285px;
@@ -12089,7 +12098,7 @@ table {
 }
 .st-main-logo {
     height: 120px;
-    background-image: url(../images/mega/new-startpage-sprite-v3.png);
+    background-image: url(../images/mega/new-startpage-spite-v4.png);
     background-position: center -786px;
     background-repeat: no-repeat;
     margin: 12px 0 25px 0;
@@ -12162,7 +12171,7 @@ table {
     height: 29px;
     width: 29px;
     display: inline-block;
-    background-image: url(../images/mega/new-startpage-sprite-v3.png);
+    background-image: url(../images/mega/new-startpage-spite-v4.png);
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -12199,7 +12208,7 @@ table {
     border-radius: 12px;
     font-size: 13px;
     margin: 8px 0 0 0;
-    background-image: url(../images/mega/new-startpage-sprite-v3.png);
+    background-image: url(../images/mega/new-startpage-spite-v4.png);
     background-position: center -1397px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -23583,7 +23592,7 @@ a.opensource-icon-txt.coming-soon {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/new-startpage-sprite-v3.png);
+    background-image: url(../images/mega/new-startpage-spite-v4.png);
     background-position: center -940px;
     background-repeat: no-repeat;
     height: 210px;
@@ -24311,7 +24320,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 .bottom-info.icon {
     width: 66px;
     height: 66px;
-    background-image: url(../images/mega/new-startpage-sprite-v3.png);
+    background-image: url(../images/mega/new-startpage-spite-v4.png);
     background-position: 1px -1468px;
     background-repeat: no-repeat;
 }
@@ -24972,8 +24981,8 @@ body.pro:after {
     background-image: url(../images/mega/opensource-v2@2x.png);
     background-size: 100px auto;
 }
-.st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button, .upload-overlay-icon, .bottom-info.icon {
-    background-image: url(../images/mega/new-startpage-sprite-v3@2x.png);
+.st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button, .upload-overlay-icon, .bottom-info.icon, .loading-info li::after {
+    background-image: url(../images/mega/new-startpage-sprite-v4@2x.png);
     background-size: 356px auto;
 }
 .powered-logo, .powered-arrow {

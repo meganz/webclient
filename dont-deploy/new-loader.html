@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Chat one on one</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../css/user-card.css" />
+<link rel="stylesheet" type="text/css" href="../css/avatars.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css" />
+<link rel="stylesheet" type="text/css" href="../css/buttons.css" />
+<link rel="stylesheet" type="text/css" href="../css/dropdowns.css" />
+<link rel="stylesheet" type="text/css" href="../css/popups.css" />
+<link rel="stylesheet" type="text/css" href="../css/spinners.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-messages.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-textarea.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-typing.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-left-pane.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-feedback.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-common.css" />
+<script type="text/javascript" src="../js/vendor/jquery-2.2.0.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function ()
+{
+    var count = 0, count2 = 0;
+    setTimeout(function() { $('.loading-spinner').addClass('active'); }, 1000);
+    
+    setInterval(function() {
+        ++count;
+        count2 = count;
+        if (!$('.loading-info').hasClass('active')) {
+            $('.loading-info').addClass('active');
+        }
+        $('.loading-info li').addClass('loaded');
+        $('.loading-info').prepend('<li >Updating file list ' + count2 + '</li>');
+
+        
+    }, 2000); 
+    
+});
+</script>
+</head>
+
+<body>
+
+<div class="loading-spinner">
+    <div class="main-loader"></div>
+    <ul class="loading-info">
+    </ul>
+</div>
+  
+</div>
+</body>
+</html>

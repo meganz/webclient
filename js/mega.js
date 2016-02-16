@@ -5784,7 +5784,7 @@ function loadfm(force)
             loadfm.loading = true;
             var sp = new Error('loadfm-stack-pointer');
             setTimeout(function __lazyLoadFM() {
-                api_req({a:'f',c:1,r:1},{
+                api_req({a:'f',c:1,r:1,ca:1},{
                     callback: loadfm_callback,
                     stackPointer: sp
                 },n_h ? 1 : 0);

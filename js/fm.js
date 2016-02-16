@@ -10434,27 +10434,27 @@ function sharedFolderUI() {
 
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
-                +'<div class="shared-details-icon"></div>'
-                +'<div class="shared-details-info-block">'
-                    +'<div class="shared-details-pad">'
-                        +'<div class="shared-details-folder-name">'+ htmlentities(nodeData.name) +'</div>'
-                        +'<a href="javascript:;" class="grid-url-arrow"></a>'
-                        +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
-                        +'<div class="clear"></div>'
+                + '<div class="shared-details-icon"></div>'
+                + '<div class="shared-details-info-block">'
+                    + '<div class="shared-details-pad">'
+                        + '<div class="shared-details-folder-name">' + htmlentities(nodeData.name) + '</div>'
+                        + '<a href="javascript:;" class="grid-url-arrow"></a>'
+                        + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
+                        + '<div class="clear"></div>'
                         + avatar
-                        +'<div class="fm-chat-user-info">'
-                            +'<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
-                        +'</div>'
-                    +'</div>'
-                    +'<div class="shared-details-buttons">'
-                        +'<div class="fm-leave-share"><span>Leave share</span></div>'
-                        +'<div class="fm-share-copy"><span>Copy</span></div>'
-                        +'<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
-                        +'<div class="clear"></div>'
-                    +'</div>'
-                    +'<div class="clear"></div>'
-                +'</div>'
-            +'</div>');
+                        + '<div class="fm-chat-user-info">'
+                            + '<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
+                        + '</div>'
+                    + '</div>'
+                    + '<div class="shared-details-buttons">'
+                        + '<div class="fm-leave-share"><span>' + l[5866] + '</span></div>'
+                        + '<div class="fm-share-copy"><span>' + l[63] + '</span></div>'
+                        + '<div class="fm-share-download"><span class="fm-chatbutton-arrow">' + l[58] + '</span></div>'
+                        + '<div class="clear"></div>'
+                    + '</div>'
+                    + '<div class="clear"></div>'
+                + '</div>'
+            + '</div>');
 
         $(rightPanelView).addClass('shared-folder-content');
 

@@ -12056,7 +12056,7 @@ table {
     margin: -130px 0 0 -130px;
 }
 .st-main-button-icon, .st-main-button-icon-hovered {
-    background-image: url(../images/mega/new-startpage-spite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: center 60px;
     background-repeat: no-repeat;
     width: 260px;
@@ -12080,7 +12080,7 @@ table {
     width: 130px;
     height: 100px;
     position: absolute;
-    background-image: url(../images/mega/new-startpage-spite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: center -545px;
     background-repeat: no-repeat;
     left: 285px;
@@ -12098,7 +12098,7 @@ table {
 }
 .st-main-logo {
     height: 120px;
-    background-image: url(../images/mega/new-startpage-spite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: center -786px;
     background-repeat: no-repeat;
     margin: 12px 0 25px 0;
@@ -12171,7 +12171,7 @@ table {
     height: 29px;
     width: 29px;
     display: inline-block;
-    background-image: url(../images/mega/new-startpage-spite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -12208,7 +12208,7 @@ table {
     border-radius: 12px;
     font-size: 13px;
     margin: 8px 0 0 0;
-    background-image: url(../images/mega/new-startpage-spite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: center -1397px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -23592,7 +23592,7 @@ a.opensource-icon-txt.coming-soon {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/new-startpage-spite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: center -940px;
     background-repeat: no-repeat;
     height: 210px;
@@ -24320,7 +24320,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 .bottom-info.icon {
     width: 66px;
     height: 66px;
-    background-image: url(../images/mega/new-startpage-spite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: 1px -1468px;
     background-repeat: no-repeat;
 }
@@ -24559,489 +24559,7 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 }
 }
 
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.try-new-close {
-    background-image: url(../images/mega/close-white-icon@2x.png);
-    background-size: 14px auto;
-}
-body.pro:after {
-    content: url(../images/mega/payment-animation@2x.gif);
-}
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar-icon, .nt-takedown-reinstated-notification .notification-avatar-icon {
-    background-image: url(../images/mega/bitcoin-v5@2x.png);
-    background-size: 200px auto;
-}
-.top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url(../images/mega/lang-selection-sprite-v2@2x.png);
-    background-size: 92px auto;
-}
-.provider-icon {
-    background-image: url(../images/mega/payment-provider-icons-v1@2x.png);
-    background-size: 20px auto;
-}
-.fm-dialog.cancel-subscription-st2 .blue-success-icon {
-    background-image: url(../images/mega/bitcoin-v5@2x.png);
-    background-size: 200px auto;
-}
-.icoming-call-button {
-    background-image: url(../images/mega/chat-sprite@2x.png?v=2);
-    background-size: 72px auto;
-}
-.slideshow-progress {
-    background-image: url(../images/mega/gallery-pr-bar@2x.png);
-    background-size: 222px auto;
-}
-.slideshow-icon, .slideshow-download span, .slideshow-prev-icon, .slideshow-next-icon, .slideshow-pending, .slideshow-error-icon, .slideshow-error-button, .slideshow-progress-icon {
-    background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
-    background-size: 276px auto;
-}
-.fm-share-empty {
-    background-image: url(../images/mega/share-folder@2x.png?v=1);
-    background-size: 200px auto;
-}
-.sync-top-logo, .sync-short-block li, .sync-help-center {
-    background-image: url(../images/mega/sync-nw-v3@2x.png);
-    background-size: 168px auto;
-}
-.sync-main-img {
-    background-image: url(../images/mega/img_sync_@2x.png);
-    background-size: 700px auto;
-}
-.top-context-close {
-    background-image: url(../images/mega/context-top@2x.png);
-    background-size: 27px auto;
-}
-.ff-extension-icon, .ff-extension-button {
-    background-image: url(../images/mega/firefox-sprite@2x.png);
-    background-size: 90px auto;
-}
-.download-megasync-dialog .icon {
-    background-image: url(../images/mega/sync-nw-v3@2x.png);
-    background-size: 168px auto;
-}
-.st-green-note {
-    background-image: url(../images/mega/en/start-green-note@2x.png);
-    background-size: 180px auto;
-}
-.ct .st-green-note {
-    background-image: url(../images/mega/ct/start-green-note@2x.png);
-}
-.ru .st-green-note {
-    background-image: url(../images/mega/ru/start-green-note@2x.png);
-}
-.es .st-green-note {
-    background-image: url(../images/mega/es/start-green-note@2x.png);
-}
-.fr .st-green-note {
-    background-image: url(../images/mega/fr/start-green-note@2x.png);
-}
-.de .st-green-note {
-    background-image: url(../images/mega/de/start-green-note@2x.png);
-}
-.it .st-green-note {
-    background-image: url(../images/mega/it/start-green-note@2x.png);
-}
-.br .st-green-note {
-    background-image: url(../images/mega/br/start-green-note@2x.png);
-}
-.mi .st-green-note {
-    background-image: url(../images/mega/mi/start-green-note@2x.png);
-}
-.vn .st-green-note {
-    background-image: url(../images/mega/vn/start-green-note@2x.png);
-}
-.nl .st-green-note {
-    background-image: url(../images/mega/nl/start-green-note@2x.png);
-}
-.ar .st-green-note {
-    background-image: url(../images/mega/ar/start-green-note@2x.png);
-}
-.pt .st-green-note {
-    background-image: url(../images/mega/pt/start-green-note@2x.png);
-}
-.he .st-green-note {
-    background-image: url(../images/mega/he/start-green-note@2x.png);
-}
-.pl .st-green-note {
-    background-image: url(../images/mega/pl/start-green-note@2x.png);
-}
-.ca .st-green-note {
-    background-image: url(../images/mega/ca/start-green-note@2x.png);
-}
-.eu .st-green-note {
-    background-image: url(../images/mega/eu/start-green-note@2x.png);
-}
-.sk .st-green-note {
-    background-image: url(../images/mega/sk/start-green-note@2x.png);
-}
-.af .st-green-note {
-    background-image: url(../images/mega/af/start-green-note@2x.png);
-}
-.cz .st-green-note {
-    background-image: url(../images/mega/cz/start-green-note@2x.png);
-}
-.ro .st-green-note {
-    background-image: url(../images/mega/ro/start-green-note@2x.png);
-}
-.fi .st-green-note {
-    background-image: url(../images/mega/fi/start-green-note@2x.png);
-}
-.no .st-green-note {
-    background-image: url(../images/mega/no/start-green-note@2x.png);
-}
-.dk .st-green-note {
-    background-image: url(../images/mega/dk/start-green-note@2x.png);
-}
-.ka .st-green-note {
-    background-image: url(../images/mega/ka/start-green-note@2x.png);
-}
-.tr .st-green-note {
-    background-image: url(../images/mega/tr/start-green-note@2x.png);
-}
-.be .st-green-note {
-    background-image: url(../images/mega/be/start-green-note@2x.png);
-}
-.cy .st-green-note {
-    background-image: url(../images/mega/cy/start-green-note@2x.png);
-}
-.ee .st-green-note {
-    background-image: url(../images/mega/ee/start-green-note@2x.png);
-}
-.fa .st-green-note {
-    background-image: url(../images/mega/fa/start-green-note@2x.png);
-}
-.hi .st-green-note {
-    background-image: url(../images/mega/hi/start-green-note@2x.png);
-}
-.mk .st-green-note {
-    background-image: url(../images/mega/mk/start-green-note@2x.png);
-}
-.ms .st-green-note {
-    background-image: url(../images/mega/ms/start-green-note@2x.png);
-}
-.se .st-green-note {
-    background-image: url(../images/mega/se/start-green-note@2x.png);
-}
-.sr .st-green-note {
-    background-image: url(../images/mega/sr/start-green-note@2x.png);
-}
-.tl .st-green-note {
-    background-image: url(../images/mega/tl/start-green-note@2x.png);
-}
-.pro-recommended {
-    background-image: url(../images/mega/en/recommended@2x.png);
-    background-size: 108px auto;
-}
-.en .pro-recommended {
-    background-image: url(../images/mega/en/recommended@2x.png);
-}
-.af .pro-recommended {
-    background-image: url(../images/mega/af/recommended@2x.png);
-}
-.ar .pro-recommended {
-    background-image: url(../images/mega/ar/recommended@2x.png);
-}
-.bg .pro-recommended {
-    background-image: url(../images/mega/bg/recommended@2x.png);
-}
-.br .pro-recommended {
-    background-image: url(../images/mega/br/recommended@2x.png);
-}
-.bs .pro-recommended {
-    background-image: url(../images/mega/bs/recommended@2x.png);
-}
-.cn .pro-recommended {
-    background-image: url(../images/mega/cn/recommended@2x.png);
-}
-.ct .pro-recommended {
-    background-image: url(../images/mega/ct/recommended@2x.png);
-}
-.cz .pro-recommended {
-    background-image: url(../images/mega/cz/recommended@2x.png);
-}
-.br .pro-recommended {
-    background-image: url(../images/mega/br/recommended@2x.png);
-}
-.de .pro-recommended {
-    background-image: url(../images/mega/de/recommended@2x.png);
-}
-.dk .pro-recommended {
-    background-image: url(../images/mega/dk/recommended@2x.png);
-}
-.el .pro-recommended {
-    background-image: url(../images/mega/el/recommended@2x.png);
-}
-.es .pro-recommended {
-    background-image: url(../images/mega/es/recommended@2x.png);
-}
-.et .pro-recommended {
-    background-image: url(../images/mega/et/recommended@2x.png);
-}
-.eu .pro-recommended {
-    background-image: url(../images/mega/eu/recommended@2x.png);
-}
-.fi .pro-recommended {
-    background-image: url(../images/mega/fi/recommended@2x.png);
-}
-.fr .pro-recommended {
-    background-image: url(../images/mega/fr/recommended@2x.png);
-}
-.gl .pro-recommended {
-    background-image: url(../images/mega/gl/recommended@2x.png);
-}
-.he .pro-recommended {
-    background-image: url(../images/mega/he/recommended@2x.png);
-}
-.hr .pro-recommended {
-    background-image: url(../images/mega/hr/recommended@2x.png);
-}
-.hu .pro-recommended {
-    background-image: url(../images/mega/hu/recommended@2x.png);
-}
-.id .pro-recommended {
-    background-image: url(../images/mega/id/recommended@2x.png);
-}
-.it .pro-recommended {
-    background-image: url(../images/mega/it/recommended@2x.png);
-}
-.jp .pro-recommended {
-    background-image: url(../images/mega/jp/recommended@2x.png);
-}
-.kr .pro-recommended {
-    background-image: url(../images/mega/kr/recommended@2x.png);
-}
-.lt .pro-recommended {
-    background-image: url(../images/mega/lt/recommended@2x.png);
-}
-.lv .pro-recommended {
-    background-image: url(../images/mega/lv/recommended@2x.png);
-}
-.nl .pro-recommended {
-    background-image: url(../images/mega/nl/recommended@2x.png);
-}
-.no .pro-recommended {
-    background-image: url(../images/mega/no/recommended@2x.png);
-}
-.pl .pro-recommended {
-    background-image: url(../images/mega/pl/recommended@2x.png);
-}
-.pt .pro-recommended {
-    background-image: url(../images/mega/pt/recommended@2x.png);
-}
-.ro .pro-recommended {
-    background-image: url(../images/mega/ro/recommended@2x.png);
-}
-.ru .pro-recommended {
-    background-image: url(../images/mega/ru/recommended@2x.png);
-}
-.sk .pro-recommended {
-    background-image: url(../images/mega/sk/recommended@2x.png);
-}
-.sl .pro-recommended {
-    background-image: url(../images/mega/sl/recommended@2x.png);
-}
-.th .pro-recommended {
-    background-image: url(../images/mega/th/recommended@2x.png);
-}
-.tr .pro-recommended {
-    background-image: url(../images/mega/tr/recommended@2x.png);
-}
-.uk .pro-recommended {
-    background-image: url(../images/mega/uk/recommended@2x.png);
-}
-.br .pro-recommended {
-    background-image: url(../images/mega/br/recommended@2x.png);
-}
-.ka .pro-recommended {
-    background-image: url(../images/mega/ka/recommended@2x.png);
-}
-.be .pro-recommended {
-    background-image: url(../images/mega/be/recommended@2x.png);
-}
-.cy .pro-recommended {
-    background-image: url(../images/mega/cy/recommended@2x.png);
-}
-.ee .pro-recommended {
-    background-image: url(../images/mega/ee/recommended@2x.png);
-}
-.fa .pro-recommended {
-    background-image: url(../images/mega/fa/recommended@2x.png);
-}
-.hi .pro-recommended {
-    background-image: url(../images/mega/hi/recommended@2x.png);
-}
-.mk .pro-recommended {
-    background-image: url(../images/mega/mk/recommended@2x.png);
-}
-.ms .pro-recommended {
-    background-image: url(../images/mega/ms/recommended@2x.png);
-}
-.se .pro-recommended {
-    background-image: url(../images/mega/se/recommended@2x.png);
-}
-.sr .pro-recommended {
-    background-image: url(../images/mega/sr/recommended@2x.png);
-}
-.tl .pro-recommended {
-    background-image: url(../images/mega/tl/recommended@2x.png);
-}
-.register-info-icon {
-    background-image: url(../images/mega/register-info@2x.png);
-    background-size: 120px auto;
-}
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contacts-sorting-by.active, .contacts-sorting-type.active, .fm-version-select, .active .fm-dialog-input-clear, .fm-share-add-contacts, .fm-share-pointer, .fm-share-contacts-search, .fm-share-dropdown, .fm-share-permissions-block, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
-    background-image: url(../images/mega/main-sprite@2x.png?v=7);
-    background-size: 50px auto;
-}
-.nlanguage-tooltip-bg, .nlanguage-bottom {
-    background-image: url(../images/mega/language-sprite@2x.png);
-    background-size: 18px auto;
-}
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon, .toast-close-button {
-    background-image: url(../images/mega/download-sprite-v6@2x.png);
-    background-size: 257px auto;
-}
-.active.new-start-arrow-button, .st-red-header, .st-quote-left, .st-quote-right, .st-privacy-tool-icon, .st-membership-icon, .st-devices-icon, .st-os-icons, .st-cloud-icon, .st-mobile-apps-icon, .st-member-ship-right-bl, .st-apps-icon {
-    background-image: url(../images/mega/new-start-full1@2x.png);
-    background-size: 930px auto;
-}
-.green-circle, .blue-circle, .game-circle {
-    background-image: url(../images/mega/rounded-progressbars@2x.png);
-    background-size: 64px auto;
-}
-.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password {
-    background-image: url(../images/mega/top-login-sprite@2x_v4.png);
-    background-size: 48px auto;
-}
-.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .toast-icon {
-    background-image: url(../images/mega/register-big-sprite-v7@2x.png);
-    background-size: 200px auto;
-}
-.reg-st5-key-gen, .reg-st5-info-icon {
-    background-image: url(../images/mega/reg-st5-rounded@2x.png);
-    background-size: 140px auto;
-}
-.terms-agent-info, p.privacy-list {
-    background-image: url(../images/mega/terms-icons@2x.png);
-    background-size: 14px auto;
-}
-.team-social-icon {
-    background-image: url(../images/mega/about-sprite@2x.png);
-    background-size: 72px auto;
-}
-.browsers-notification, .safari .browsers-logo-lnk, .ie .browsers-logo-lnk {
-    background-image: url(../images/mega/browsers-page@2x.png);
-    background-size: 892px auto;
-}
-.pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
-    background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
-    background-size: 755px auto;
-}
-.sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow, .win-phone-button, .products-top-arrow {
-    background-image: url(../images/mega/mobile-sprite-v6@2x.png?v=4);
-    background-size: 836px auto;
-}
-.privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
-    background-image: url(../images/mega/privacy-sprite@2x.png);
-    background-size: 130px auto;
-}
-.widget-circle, .widget-arrows, .widget-icon, .widget-arrow {
-    background-image: url(../images/mega/widjet-progress@2x.png);
-    background-size: 40px auto;
-}
-.image-explorer-container .image-explorer-scale-slider-wrapper:before, .image-explorer-container .image-explorer-scale-slider-wrapper:after {
-    background-image: url(../images/mega/avatar-zoom@2x.png);
-    background-size: 367px auto;
-}
-.new-affiliate-bg1, .new-affiliate-right-bg, .new-affialite-mid-bg, ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.cannt-ul li span, .new-affiliate-icon, .new-affiliate-star, .affiliate-input-block.select {
-    background-image: url(../images/mega/new-affiliate-sprite@2x.png);
-    background-size: 1500px auto;
-}
-.contact-new-title, .contact-new-button, a.contact-new-button {
-    background-image: url(../images/mega/contact-new-sprite@2x.png);
-    background-size: 541px auto;
-}
-.new-left-menu-icon, .dev-short-bl-icon, .dev-new-button, .dev-new-table-icon, .dev-new-app-settings, .dev-no-apps-txt, .dev-new-app-big-icon, .new-left-submenu-item, .new-bottom-pages .new-right-content-block li {
-    background-image: url(../images/mega/sdk-sprite@2x.png);
-    background-size: 904px auto;
-}
-.investors-nw.new-bottom-pages .new-right-content-block li {
-    background-image: url(../images/mega/bottom-sprite_v2.svg);
-    background-size: auto;
-}
-.blog-new-search, .social-icon, .social-arrow, .rss-view-all, .blog-new-forward, .blog-new-back, .blog-plus-sign, .blog-minus-sign, .blog-new-arrow, .blog-new-positive, .blog-new-negative, .blog-new-strong-recomend, .blog-new-recomend, .blog-new-not-recomend, .blog-pagination-button.to-the-beggining, .blog-pagination-button.previous, .blog-pagination-button.to-the-end, .blog-pagination-button.next, .fm-breadcrumbs.calendar {
-    background-image: url(../images/mega/blog-new-sprite@2x_v2.png);
-    background-size: 217px auto;
-}
-.new-left-menu-icon.help-icon, .help-nw .dev-new-button, .help-listing, .help-short-icon {
-    background-image: url(../images/mega/help-new-sprite-v1@2x.png);
-    background-size: 886px auto;
-}
-.opensource-top-icon, .opensource-icon {
-    background-image: url(../images/mega/opensource-v2@2x.png);
-    background-size: 100px auto;
-}
-.st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button, .upload-overlay-icon, .bottom-info.icon, .loading-info li::after {
-    background-image: url(../images/mega/new-startpage-sprite-v4@2x.png);
-    background-size: 356px auto;
-}
-.powered-logo, .powered-arrow {
-    background-image: url(../images/mega/instra-sprite@2x.png);
-    background-size: 158px auto;
-}
-.new-bottom-pages .blog-new-full p.strong-paragraph.new-blog-icon {
-    background-image: url(../images/mega/blogs/blog-post-sprite1@2x.png);
-    background-size: 36px auto;
-}
-.warning-green-icon {
-    background-position: center -50px;
-    background-size: 60px auto;
-}
-.fm-empty-search-bg, .fm-empty-messages-bg {
-    background-image: url(../images/mega/empty@2x.png);
-    background-size: 300px auto;
-}
-.membership-icon-old {
-    background-image: url(../images/mega/membership-spite@2x.png);
-    background-size: 83px auto;
-}
-.account-set-bg1, .account-slider, a.account-slider, a.account-slider:link, a.account-slider:visited, a.account-slider:hover, a.account-slider:active, .ui-slider-handle.ui-state-default.ui-corner-all, .account-set-green-bg, .ui-slider-range.ui-widget-header.ui-slider-range-min {
-    background-image: url(../images/mega/account-sliders@2x.png);
-    background-size: 490px auto;
-}
-.blog-article li, .blog-new-full ul li, .sync li, .affiliate li, .pro li {
-    background-image: url(../images/mega/dev-point-new.png);
-    background-size: 39px auto;
-}
-.blog-new-full ul ul li {
-    background-image: url(../images/mega/dev-point-gray-new.png);
-    background-size: 39px auto;
-}
-.radioOn {
-    background-position: 0 2px;
-    background-size: 16px auto;
-}
-.radioOff {
-    background-position: 0 -28px;
-    background-size: 16px auto;
-}
-.fm-bandwidth-icon, .fm-bandwidth-dashed {
-    background-image: url(../images/mega/quota-sprite@2x.png);
-    background-size: 240px auto;
-}
-.chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-app-button.new-app, .chrome-download-button, a.chrome-download-button {
-    background-image: url(../images/mega/chrome-app1@2x.png);
-    background-size: 700px auto;
-}
-.chrome-download-button:hover, a.chrome-download-button:hover {
-    background-image: url(../images/mega/mobile-sprite-v6@2x.png?v=4);
-    background-size: 836px auto;
-}
-.backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon, .login-register-input.green-tick {
-    background-image: url(../images/mega/encr-sprite@2x_v1.png);
-    background-size: 216px;
-}
-}
+
 /**
  * jQuery UI - Resizable - required classes.
  */
@@ -25128,6 +24646,7 @@ body.pro:after {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+
 /**
  * Left Pane - Resize Handle styling
  */
@@ -25154,62 +24673,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     -khtml-opacity: 0.1;
     opacity: 0.1;
 }
-body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .default-select select, .rtl .fm-version-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button, .rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
-    direction: rtl;
-}
-.rtl .nlanguage-bottom {
-    padding: 12px 30px 0 20px;
-    float: left;
-    background-position: right -252px;
-}
-.rtl .blog-new-search input, .rtl .new-bottom-pages.affiliate h1, .rtl .new-affiliate-mid-header, .rtl .top-login-input-block input, .rtl .affiliate-input-block input, .rtl input, .rtl select, .rtl .select div {
-    text-align: left;
-}
-.rtl .dev-new-button, .rtl .copyrights-bottom div.checkdiv {
-    float: right;
-}
-.rtl .terms-agent-info {
-    padding: 0 32px 0 32px;
-}
-.rtl .terms-agent-info.name {
-    background-position: right 6px;
-}
-.rtl .terms-agent-info.adress {
-    background-position: right -101px;
-}
-.rtl .terms-agent-info.email {
-    margin: 0;
-    background-position: right -229px;
-}
-.rtl .copyrights-bottom .new-registration-checkbox .radio-txt {
-    margin: -1px 35px 0 0;
-}
-.rtl .blog-new.new-bottom-pages h2, .blog-new-item p span.blog-new-description, .rtl .blog-new-full, .rtl .blog-new-full div p, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .rtl .blog-new-right h1, .rtl a.credits-block, .rtl a.credits-block span, .rtl .new-left-menu-block, .rtl .new-left-menu-link, .rtl .help-block, .rtl .help-block div, .rtl .dev-short-block.help-nw-short-blocks, .rtl c.main-mid-pad.dev-nw, .rtl c.main-mid-pad.dev-nw div, .rtl c.main-mid-pad.dev-nw p, .rtl c.main-mid-pad.dev-nw h1, .rtl c.main-mid-pad.dev-nw h2, .rtl c.main-mid-pad.dev-nw h3, .rtl .new-left-menu-link.dev, .rtl .new-left-menu-link.dev div, .rtl .affiliate-input-block, .rtl .affiliate-input-block input, .rtl .affiliate-input-block select, .rtl .ltr h1, .rtl div.ltr h2, .rtl div.ltr h3, .rtl div.ltr h4, .rtl .ltr p, .rtl div.ltr ul, .rtl .new-right-content-block.sdk div, .rtl .new-right-content-block.doc div, .rtl .new-right-content-block.dev div, .rtl .ltr div, .rtl c.main-mid-pad.investors-nw, .rtl c.main-mid-pad.investors-nw div, .rtl c.main-mid-pad.investors-nw p, .rtl c.main-mid-pad.investors-nw h1, .rtl c.main-mid-pad.investors-nw h2, .rtl c.main-mid-pad.investors-nw h3 {
-    direction: ltr;
-}
 
-/* frienldy printing */
-@media print {
-/* remove all single page styles */
-body, body * {
-    visibility: hidden;
-    height: auto !important;
-    overflow: visible !important;
-    max-width: 100% !important;
-}
-.main-mid-pad * {
-    visibility: visible;
-}
-.main-mid-pad {
-    visibility: visible;
-    float: none !important;
-    left: 0px;
-    top: 0px;
-    width: 100% !important;
-    position: absolute !important;
-    overflow: visible !important;
-}
-}
+/**
+ * Random CSS. TODO move css to correct place
+ */
 #rubsched_options {
     border-left: 1px dashed #333 !important;
     margin-left: 7px !important;

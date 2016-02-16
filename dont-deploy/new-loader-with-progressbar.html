@@ -33,23 +33,45 @@ $(document).ready(function ()
     $('.loader-percents').removeAttr('style');
         
     //All timeouts are just for demo
-    var count = 0;
     setTimeout(function() { 
-        
         $('.loading-spinner').addClass('active'); 
-    
     }, 1000);
     
-    setInterval(function() {
-        ++count;
-        $('.loading-info li').addClass('loaded').removeClass('loading');
-        $('.loading-info').prepend('<li>Updating file list ' + count + '</li>');
-        
-        // Important to add duration for nice animation
-        $('.loading-info li:not(.loaded)').addClass('loading', 10);
-        
-    }, 2000); 
+    // Step 1
+    setTimeout(function() {
+        $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+        $('.loading-info li.step1').addClass('loading');
+    }, 3000);
     
+    // Step 2
+    setTimeout(function() {
+        $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+        $('.loading-info li.step2').addClass('loading');
+        $('.loader-progressbar').addClass('active'); 
+        
+        var count = 0,
+              timer = 0;
+        
+        // Progressbar demo
+        timer = setInterval(function() {
+            ++count;
+            if (count === 100) {
+                clearInterval(timer);
+            } else {
+                $('.loader-percents').width(count + '%');
+            }
+        }, 50); 
+        
+    }, 5000);
+    
+    // Step 3
+    setTimeout(function() {
+        $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+        $('.loading-info li.step3').addClass('loading');
+        $('.loader-progressbar').removeClass('active'); 
+    }, 10000);
+   
+
 });
 </script>
 </head>
@@ -59,6 +81,9 @@ $(document).ready(function ()
 <div class="loading-spinner">
     <div class="main-loader"></div>
     <ul class="loading-info">
+        <li class="step3">Decrypting</li>
+        <li class="step2">Receiving account data</li>
+        <li class="step1">Requesting account data</li>
     </ul>
     <div class="loader-progressbar">
         <div class="loader-percents"></div>

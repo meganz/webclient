@@ -46,15 +46,18 @@ if (typeof loadingDialog === 'undefined')
     loadingDialog.show = function()
     {
         $('.light-overlay').removeClass('hidden');
-        //$('body').addClass('overlayed');
-        $('.loading-spinner').removeClass('hidden');
+        
+        $('.loading-spinner').addClass('active');
     };
     loadingDialog.hide = function()
     {
         $('.light-overlay').addClass('hidden');
-        //$('body').removeClass('overlayed');
-        $('.loading-spinner').addClass('hidden');
-    };
+        
+        $('.loading-spinner').removeClass('active'); 
+        $('.loading-info li').removeClass('loading loaded');
+        $('.loader-progressbar').removeClass('active'); 
+        $('.loader-percents').removeAttr('style');
+   };
 }
 
 // data struct definitions

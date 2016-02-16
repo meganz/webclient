@@ -1784,6 +1784,7 @@ function api_proc(q) {
 	
 	q.xhr.onprogress = function (evt)
 	{	
+		var progressperc;
 		if (this.getResponseHeader('Original-Content-Length') == 0) return false;
 		else if (evt.loaded == 0) progressperc=0;
 		else progressperc = evt.loaded/this.getResponseHeader('Original-Content-Length')*100;

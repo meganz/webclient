@@ -1053,7 +1053,8 @@ function tooltiplogin() {
                     document.location.hash = login_next;
                 }
                 else if (page !== 'login') {
-                    window.onhashchange();
+                    page = document.location.hash.substr(1);
+                    init_page();
                 }
                 else {
                     document.location.hash = 'fm';

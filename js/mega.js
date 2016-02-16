@@ -46,13 +46,15 @@ if (typeof loadingDialog === 'undefined')
     loadingDialog.show = function()
     {
         $('.light-overlay').removeClass('hidden');
-        
+
+        // Show new loader
         $('.loading-spinner').addClass('active');
     };
     loadingDialog.hide = function()
     {
         $('.light-overlay').addClass('hidden');
-        
+
+        // Hide new loader
         $('.loading-spinner').removeClass('active'); 
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active'); 

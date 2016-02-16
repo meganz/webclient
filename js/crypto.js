@@ -1783,8 +1783,10 @@ function api_proc(q) {
     };
 	
 	q.xhr.onprogress = function (evt)
-	{		
-		var progressperc = evt.loaded/this.getResponseHeader('Original-Content-Length')*100;
+	{	
+		if (this.getResponseHeader('Original-Content-Length') == 0) return false;
+		else if (evt.loaded == 0) progressperc=0;
+		else progressperc = evt.loaded/this.getResponseHeader('Original-Content-Length')*100;
 		var ctxs = this.q.ctxs[this.q.i];
 		for (var i = 0; i < ctxs.length; i++) {
 			var ctx = ctxs[i];

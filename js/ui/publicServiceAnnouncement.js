@@ -30,7 +30,7 @@ var psa = {
             psa.decryptPrivateAttribute();
             
             // Only show the announcement if they have not seen the current announcement
-            if (psa.lastSeenAnnounceNum < psa.currentAnnounceNum) {
+            if ((psa.lastSeenAnnounceNum < psa.currentAnnounceNum) || (localStorage.alwaysShowPsa === '1')) {
 
                 // Show the announcement
                 psa.prefillAnnouncementDetails();

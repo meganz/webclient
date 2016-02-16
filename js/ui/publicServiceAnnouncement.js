@@ -127,9 +127,8 @@ var psa = {
             }
             catch (exception) {
                 
-                // Log the failure which not serious as the last seen announce number is already at 0 by default
-                var logger = MegaLogger.getLogger('psa');
-                logger.warn('Failed to decrypt private attribute for PSA last seen announce number');
+                // Set the last seen to the current one so the announcement won't show
+                psa.lastSeenAnnounceNum = psa.currentAnnounceNum;
             }
         }
     },
@@ -172,10 +171,20 @@ var psa = {
             // Store that they have seen it on the API side
             var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
             
-            // Redirect to page after save
-            savePromise.done(function(result) {
-                document.location.hash = pageLink;
-            });
+            // If they are still loading their account (the loading animation is visible)
+            if ($('.dark-overlay').is(':visible')) {
+                
+                // Open a new tab (and hopefully don't trigger popup blocker)
+                window.open('https://mega.nz/#' + pageLink, '_blank');
+            }
+            else {
+                // Otherwise their account is loaded, so redirect normally after save
+                savePromise.done(function(result) {
+
+                    // Redirect normally
+                    document.location.hash = pageLink;
+                });
+            }
         });
     },
     

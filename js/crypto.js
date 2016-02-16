@@ -1737,7 +1737,7 @@ function api_init(channel, service) {
     };
 }
 
-function api_req(request, context, channel) {
+function api_req(request, context, channel, pcb) {
     if (typeof channel === 'undefined') {
         channel = 0;
     }
@@ -1781,6 +1781,20 @@ function api_proc(q) {
             api_reqerror(q, -3);
         }
     };
+	
+	q.xhr.onprogress = function (evt)
+	{		
+		var progressperc = evt.loaded/this.getResponseHeader('Original-Content-Length')*100;
+		var ctxs = this.q.ctxs[this.q.i];
+		for (var i = 0; i < ctxs.length; i++) {
+			var ctx = ctxs[i];
+
+			if (typeof ctx.progress === 'function') 
+			{
+				ctx.progress(progressperc);
+			}
+		}
+	};
 
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {

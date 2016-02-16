@@ -10371,7 +10371,7 @@ function fm_resize_handler() {
 }
 
 function sharedFolderUI() {
-/* jshint -W074 */
+    /* jshint -W074 */
     var nodeData = M.d[M.currentdirid];
     var browsingSharedContent = false;
     var c;
@@ -10465,7 +10465,7 @@ function sharedFolderUI() {
     }
 
     return browsingSharedContent;
-/* jshint -W074 */
+    /* jshint -W074 */
 }
 
 function userFingerprint(userid, callback) {

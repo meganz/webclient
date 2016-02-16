@@ -53,6 +53,11 @@ var psa = {
         
         // Set the current announcement number
         psa.currentAnnounceNum = currentAnnounceNum;
+        
+        /*/ Uncomment to test viewing announcement
+        psa.lastSeenAnnounceNum = 0;
+        psa.currentAnnounceNum = 1;
+        //*/
     },
     
     /**

@@ -28,8 +28,8 @@
     text-align: center;
 }  
 .loading-spinner .main-loader {
-    width: 0;
-    height: 0;
+    width: 72px;
+    height: 72px;
     background-color: #282828;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
@@ -41,14 +41,19 @@
     position: absolute;
     left: 50%;
     top: 0;
-    margin: 0;
+    margin: -36px 0 0 -36px;
+}
+.loading-spinner.init .main-loader {
     -webkit-transition: all 300ms ease-in-out;
     -moz-transition: all 300ms ease-in-out;
     -o-transition: all 300ms ease-in-out;
     -ms-transition: all 300ms ease-in-out;
     transition: all 300ms ease-in-out;
+    width: 0;
+    height: 0;
+    margin:0;
 }
-.loading-spinner.active .main-loader {
+.loading-spinner.init.active .main-loader {
     width: 72px;
     height: 72px;
     margin: -36px 0 0 -36px;

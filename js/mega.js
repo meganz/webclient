@@ -45,17 +45,27 @@ if (typeof loadingDialog === 'undefined')
     var loadingDialog = {};
     loadingDialog.show = function()
     {
-        $('.light-overlay').removeClass('hidden');
-
-        // Show new loader
-        $('.loading-spinner').addClass('active');
+        $('.dark-overlay').show();
+        $('.loading-spinner').removeClass('hidden').addClass('active');
     };
     loadingDialog.hide = function()
     {
-        $('.light-overlay').addClass('hidden');
-
-        // Hide new loader
-        $('.loading-spinner').removeClass('active'); 
+        $('.dark-overlay').hide();
+        $('.loading-spinner').addClass('hidden').removeClass('active');
+   };
+}
+if (typeof loadingInitDialog === 'undefined')
+{
+    var loadingInitDialog = {};
+   loadingInitDialog.show = function()
+    {
+        $('.light-overlay').show();
+        $('.loading-spinner').removeClass('hidden').addClass('init active');
+    };
+    loadingInitDialog.hide = function()
+    {
+        $('.light-overlay').hide();
+        $('.loading-spinner').addClass('hidden').removeClass('init active');
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active'); 
         $('.loader-percents').removeAttr('style');

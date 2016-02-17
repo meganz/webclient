@@ -46,15 +46,63 @@ if (typeof loadingDialog === 'undefined')
     loadingDialog.show = function()
     {
         $('.dark-overlay').show();
-        //$('body').addClass('overlayed');
-        $('.loading-spinner').show();
+        $('.loading-spinner').removeClass('hidden').addClass('active');
     };
     loadingDialog.hide = function()
     {
         $('.dark-overlay').hide();
-        //$('body').removeClass('overlayed');
-        $('.loading-spinner').hide();
+        $('.loading-spinner').addClass('hidden').removeClass('active');
+   };
+}
+if (typeof loadingInitDialog === 'undefined')
+{
+    var loadingInitDialog = {};
+	loadingInitDialog.progress = false;
+	
+	loadingInitDialog.show = function()
+    {
+		this.hide();		
+        $('.light-overlay').show();
+        $('.loading-spinner').removeClass('hidden').addClass('init active');
     };
+	loadingInitDialog.step1 = function()
+    {
+        $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+        $('.loading-info li.step1').addClass('loading');
+    };
+	loadingInitDialog.step2 = function(progress)
+    {		
+		if (this.progress == false)
+		{
+			$('.loading-info li.loading').addClass('loaded').removeClass('loading');
+			$('.loading-info li.step2').addClass('loading');
+			$('.loader-progressbar').addClass('active');
+            
+            // If the PSA is visible reposition the account loading bar
+            psa.repositionAccountLoadingBar();
+		}
+		if (progress) $('.loader-percents').width(progress + '%');		
+		this.progress=true;		
+    };
+	loadingInitDialog.step3 = function()
+    {
+		if (this.progress)
+		{
+			$('.loading-info li.loading').addClass('loaded').removeClass('loading');
+			$('.loading-info li.step3').addClass('loading');
+			$('.loader-progressbar').removeClass('active').css('bottom', 0);            
+		}
+    };
+    loadingInitDialog.hide = function()
+    {
+		this.progress=false;
+        $('.light-overlay').hide();
+        $('.loading-spinner').addClass('hidden').removeClass('init active');
+        $('.loading-info li').removeClass('loading loaded');
+        $('.loader-progressbar').removeClass('active');
+		$('.loader-percents').width('0%');
+        $('.loader-percents').removeAttr('style');
+   };
 }
 
 // data struct definitions
@@ -5777,6 +5825,7 @@ function loadfm(force)
     else {
         if (is_fm()) {
             loadingDialog.show();
+			
         }
         if (!loadfm.loading) {
             M.reset();
@@ -5784,8 +5833,17 @@ function loadfm(force)
             loadfm.loading = true;
             var sp = new Error('loadfm-stack-pointer');
             setTimeout(function __lazyLoadFM() {
+				
+				loadingDialog.hide();
+				loadingInitDialog.show();
+				loadingInitDialog.step1();
+				
                 api_req({a:'f',c:1,r:1,ca:1},{
                     callback: loadfm_callback,
+					progress:	function(perc)
+					{
+						loadingInitDialog.step2(parseInt(perc));
+					},
                     stackPointer: sp
                 },n_h ? 1 : 0);
             }, 350);
@@ -6820,6 +6878,10 @@ function init_chat() {
 }
 
 function loadfm_callback(res, ctx) {
+	
+	
+	loadingInitDialog.step3();
+
 
     if (pfkey) {
         if (res.f && res.f[0]) {
@@ -6907,6 +6969,7 @@ function loadfm_done(pfkey, stackPointer) {
 
         if (!CMS.isLoading()) {
             loadingDialog.hide();
+			loadingInitDialog.hide();
         }
 
         watchdog.notify('loadfm_done');

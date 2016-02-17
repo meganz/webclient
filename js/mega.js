@@ -46,15 +46,63 @@ if (typeof loadingDialog === 'undefined')
     loadingDialog.show = function()
     {
         $('.dark-overlay').show();
-        //$('body').addClass('overlayed');
-        $('.loading-spinner').show();
+        $('.loading-spinner').removeClass('hidden').addClass('active');
     };
     loadingDialog.hide = function()
     {
         $('.dark-overlay').hide();
-        //$('body').removeClass('overlayed');
-        $('.loading-spinner').hide();
+        $('.loading-spinner').addClass('hidden').removeClass('active');
+   };
+}
+if (typeof loadingInitDialog === 'undefined')
+{
+    var loadingInitDialog = {};
+	loadingInitDialog.progress = false;
+	
+	loadingInitDialog.show = function()
+    {
+		this.hide();		
+        $('.light-overlay').show();
+        $('.loading-spinner').removeClass('hidden').addClass('init active');
     };
+	loadingInitDialog.step1 = function()
+    {
+        $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+        $('.loading-info li.step1').addClass('loading');
+    };
+	loadingInitDialog.step2 = function(progress)
+    {		
+		if (this.progress == false)
+		{
+			$('.loading-info li.loading').addClass('loaded').removeClass('loading');
+			$('.loading-info li.step2').addClass('loading');
+			$('.loader-progressbar').addClass('active');
+            
+            // If the PSA is visible reposition the account loading bar
+            psa.repositionAccountLoadingBar();
+		}
+		if (progress) $('.loader-percents').width(progress + '%');		
+		this.progress=true;		
+    };
+	loadingInitDialog.step3 = function()
+    {
+		if (this.progress)
+		{
+			$('.loading-info li.loading').addClass('loaded').removeClass('loading');
+			$('.loading-info li.step3').addClass('loading');
+			$('.loader-progressbar').removeClass('active').css('bottom', 0);            
+		}
+    };
+    loadingInitDialog.hide = function()
+    {
+		this.progress=false;
+        $('.light-overlay').hide();
+        $('.loading-spinner').addClass('hidden').removeClass('init active');
+        $('.loading-info li').removeClass('loading loaded');
+        $('.loader-progressbar').removeClass('active');
+		$('.loader-percents').width('0%');
+        $('.loader-percents').removeAttr('style');
+   };
 }
 
 // data struct definitions
@@ -362,10 +410,10 @@ function MegaData()
         }
         M.sortRules[n](d);
 
-        M.sortingBy = [n, d];
+        M.sortmode = {n: n, d: d};
 
         if (fmconfig.uisorting) {
-            mega.config.set('sorting', {n: n, d: d});
+            mega.config.set('sorting', M.sortmode);
         }
         else {
             fmsortmode(M.currentdirid, n, d);
@@ -3645,8 +3693,8 @@ function MegaData()
             }
         });
 
-        if (toRenderMain && M.sortingBy && (M.sortingBy[0] === 'fav')) {
-            M.doSort('fav', M.sortingBy[1]);
+        if (toRenderMain && M.sortmode && (M.sortmode.n === 'fav')) {
+            M.doSort('fav', M.sortmode.d);
             M.renderMain();
         }
     };
@@ -4121,7 +4169,7 @@ function MegaData()
 
         if (z) {
             z = ++dlmanager.dlZipID;
-            if (M.d[n[0]] && M.d[n[0]].t) {
+            if (M.d[n[0]] && M.d[n[0]].t && M.d[n[0]].name) {
                 zipname = M.d[n[0]].name + '.zip';
             }
             else {
@@ -5847,6 +5895,7 @@ function loadfm(force)
     else {
         if (is_fm()) {
             loadingDialog.show();
+			
         }
         if (!loadfm.loading) {
             M.reset();
@@ -5854,8 +5903,17 @@ function loadfm(force)
             loadfm.loading = true;
             var sp = new Error('loadfm-stack-pointer');
             setTimeout(function __lazyLoadFM() {
-                api_req({a:'f',c:1,r:1},{
+				
+				loadingDialog.hide();
+				loadingInitDialog.show();
+				loadingInitDialog.step1();
+				
+                api_req({a:'f',c:1,r:1,ca:1},{
                     callback: loadfm_callback,
+					progress:	function(perc)
+					{
+						loadingInitDialog.step2(parseInt(perc));
+					},
                     stackPointer: sp
                 },n_h ? 1 : 0);
             }, 350);
@@ -5865,7 +5923,7 @@ function loadfm(force)
 
 function RightsbyID(id) {
 
-    if (folderlink || !id || id.length > 8) {
+    if (folderlink || (id && id.length > 8)) {
         return false;
     }
 
@@ -6890,6 +6948,10 @@ function init_chat() {
 }
 
 function loadfm_callback(res, ctx) {
+	
+	
+	loadingInitDialog.step3();
+
 
     if (pfkey) {
         if (res.f && res.f[0]) {
@@ -6977,6 +7039,7 @@ function loadfm_done(pfkey, stackPointer) {
 
         if (!CMS.isLoading()) {
             loadingDialog.hide();
+			loadingInitDialog.hide();
         }
 
         watchdog.notify('loadfm_done');
@@ -7008,6 +7071,8 @@ function fmtreenode(id, e)
         delete treenodes[id];
     }
     mega.config.set('treenodes', treenodes);
+
+    M.treenodes = JSON.stringify(treenodes);
 }
 
 function fmsortmode(id, n, d)

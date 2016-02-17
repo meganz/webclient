@@ -2273,6 +2273,25 @@ mSpawnWorker.prototype = {
                 console.timeEnd(reply.jid);
             }
 
+            // Don't report `newmissingkeys` unless there are *new* missing keys
+            if (job.newmissingkeys) {
+                try {
+                    var keys = Object.keys(missingkeys).sort();
+                    var hash = MurmurHash3(JSON.stringify(keys));
+                    var prop = u_handle + '_lastMissingKeysHash';
+
+                    if (localStorage[prop] !== hash) {
+                        localStorage[prop] = hash;
+                    }
+                    else {
+                        job.newmissingkeys = false;
+                    }
+                }
+                catch (ex) {
+                    console.error(ex);
+                }
+            }
+
             delete this.jobs[reply.jid];
             job.callback(job.result, job);
         }

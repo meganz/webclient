@@ -116,10 +116,10 @@ function init_page() {
     else {
         $('body').attr('class', '');
     }
-    
+
     // Initialise the Public Service Announcement system
     psa.init();
-    
+
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
 
@@ -278,7 +278,7 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            if (u_type === 3) {
+            if (u_type === 3 && !folderlink) {
                 mega.config.fetch();
             }
 
@@ -1053,6 +1053,7 @@ function tooltiplogin() {
                     document.location.hash = login_next;
                 }
                 else if (page !== 'login') {
+                    page = document.location.hash.substr(1);
                     init_page();
                 }
                 else {
@@ -1683,11 +1684,19 @@ function topmenuUI() {
         $('.top-search-bl').removeClass('contains-value');
     });
 
-    $('.top-search-input').rebind('keyup', function (e) {
+    $('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
         if (e.keyCode == 13 || folderlink) {
 
-            // Add log to see how often they use the search
-            api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+            if (folderlink) {
+                // Flush cached nodes, if any
+                $(window).trigger('dynlist.flush');
+            }
+
+            if (!folderlink || !_topSearchHandler.logFired) {
+                // Add log to see how often they use the search
+                api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+                _topSearchHandler.logFired = true;
+            }
 
             var val = $.trim($('.top-search-input').val());
             if (folderlink || val.length > 2 || !asciionly(val)) {

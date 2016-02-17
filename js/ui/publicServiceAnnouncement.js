@@ -6,10 +6,13 @@
  */
 var psa = {
     
-    /** What the last announcement was that the user has seen */
+    /** The private attribute (Base64 string) storing which announcement the user has seen (not decrypted yet) */
+    lastSeenAttr: null,
+    
+    /** The last announcement that the user has seen */
     lastSeenAnnounceNum: 0,
     
-    /** What the current announcement is from the API */
+    /** The current announcement number from the API */
     currentAnnounceNum: 0,
     
     /** If the PSA is currently being shown */
@@ -19,16 +22,22 @@ var psa = {
      * Show the dialog if they have not seen the announcement yet
      */
     init: function() {
-                
-        // If logged in and completed registration fully, show a Public Service Announcement.
-        // Only show the announcement if they have not seen the current announcement
-        if ((u_type === 3) && (page.indexOf('pro') === -1) && (psa.lastSeenAnnounceNum < psa.currentAnnounceNum)) {
+        
+        // If logged in and completed registration fully
+        if ((u_type === 3) && (page.indexOf('pro') === -1)) {
+                    
+            // Decrypt the attribute which stores which announcement they have seen
+            psa.decryptPrivateAttribute();
             
-            // Show the announcement
-            psa.prefillAnnouncementDetails();
-            psa.addCloseButtonHandler();
-            psa.addMoreInfoButtonHandler();
-            psa.showAnnouncement();
+            // Only show the announcement if they have not seen the current announcement
+            if ((psa.lastSeenAnnounceNum < psa.currentAnnounceNum) || (localStorage.alwaysShowPsa === '1')) {
+
+                // Show the announcement
+                psa.prefillAnnouncementDetails();
+                psa.addCloseButtonHandler();
+                psa.addMoreInfoButtonHandler();
+                psa.showAnnouncement();
+            }
         }
         
         // Otherwise if the PSA is currently visible, then hide it. This prevents bug after seeing an announcement and
@@ -47,9 +56,7 @@ var psa = {
                 
         // If they have a stored value on the API that contains which
         // announcement they have seen then decrypt it and set it
-        if (lastSeenAttr !== 0) {
-            psa.lastSeenAnnounceNum = psa.decryptAttribute(lastSeenAttr);
-        }
+        psa.lastSeenAttr = lastSeenAttr;
         
         // Set the current announcement number
         psa.currentAnnounceNum = currentAnnounceNum;
@@ -66,9 +73,10 @@ var psa = {
         // Move the file manager up
         psa.resizeFileManagerHeight();
         
-        // If the window is resized, change the height again
+        // If the window is resized
         $(window).rebind('resize.bottomNotification', function() {
             psa.resizeFileManagerHeight();
+            psa.repositionAccountLoadingBar();
         });
         
         // Currently being shown
@@ -103,17 +111,27 @@ var psa = {
     
     /**
      * Decrypt the private user attribute
-     * @param {String} attr A Base64 encoded private attribute as a string
      * @returns {Number} Returns an integer containing the last announcement number they have seen
      */
-    decryptAttribute: function(attr) {
+    decryptPrivateAttribute: function() {
         
-        // Decode, decrypt, convert from TLV into a JS object, then get the number
-        var clearContainer = tlvstore.blockDecrypt(base64urldecode(attr), u_k);
-        var decryptedAttr = tlvstore.tlvRecordsToContainer(clearContainer, true);
-        var lastSeenAnnounceNum = parseInt(decryptedAttr.num);
-        
-        return lastSeenAnnounceNum;
+        // If the private attribute has been set on the API
+        if (psa.lastSeenAttr !== null) {
+            
+            try {
+                // Try decode, decrypt, convert from TLV into a JS object, then get the number
+                var clearContainer = tlvstore.blockDecrypt(base64urldecode(psa.lastSeenAttr), u_k);
+                var decryptedAttr = tlvstore.tlvRecordsToContainer(clearContainer, true);
+                
+                // Set the announcement number
+                psa.lastSeenAnnounceNum = parseInt(decryptedAttr.num);
+            }
+            catch (exception) {
+                
+                // Set the last seen to the current one so the announcement won't show
+                psa.lastSeenAnnounceNum = psa.currentAnnounceNum;
+            }
+        }
     },
     
     /**
@@ -154,10 +172,20 @@ var psa = {
             // Store that they have seen it on the API side
             var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
             
-            // Redirect to page after save
-            savePromise.done(function(result) {
-                document.location.hash = pageLink;
-            });
+            // If they are still loading their account (the loading animation is visible)
+            if ($('.dark-overlay').is(':visible') || $('.light-overlay').is(':visible')) {
+                
+                // Open a new tab (and hopefully don't trigger popup blocker)
+                window.open('https://mega.nz/#' + pageLink, '_blank');
+            }
+            else {
+                // Otherwise their account is loaded, so redirect normally after save
+                savePromise.done(function(result) {
+
+                    // Redirect normally
+                    document.location.hash = pageLink;
+                });
+            }
         });
     },
     
@@ -166,10 +194,18 @@ var psa = {
      */
     hideAnnouncement: function() {
         
+        // Move the progress bar back to the 0 position
+        $('.loader-progressbar').css('bottom', 0);
+                
         // Hide the announcement
         $('body').removeClass('notification');
+        
+        // Reset file manager height
         $('.fmholder').css('height', '');
         $(window).unbind('resize.bottomNotification');
+        
+        // Trigger resize so that full content in the file manager is visible after closing
+        $(window).trigger('resize');
         
         // Save last seen announcement number for page changes
         psa.lastSeenAnnounceNum = psa.currentAnnounceNum;
@@ -193,6 +229,24 @@ var psa = {
             if (notificationSize > 120) {
                 $('.fmholder').height(bodyHeight - notificationSize);
             }
+        }
+    },
+    
+    /**
+     * Repositions the account loading bar so it is above the PSA if it is being shown
+     */
+    repositionAccountLoadingBar: function() {
+                
+        // If the PSA is visible
+        if (psa.visible) {
+
+            // Move the progress bar up above the PSA otherwise it's not visible
+            var psaHeight = $('.public-service-anouncement').outerHeight();
+            $('.loader-progressbar').css('bottom', psaHeight);
+        }
+        else {
+            // Reset to the bottom
+            $('.loader-progressbar').css('bottom', 0);
         }
     }
 };

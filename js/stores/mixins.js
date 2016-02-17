@@ -56,7 +56,7 @@ var MegaRenderMixin = {
     },
     componentDidMount: function() {
 
-        window.addEventListener('resize', this.onResizeDoUpdate);
+        $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
         window.addEventListener('hashchange', this.onHashChangeDoUpdate);
 
         // init on data structure change events
@@ -83,7 +83,7 @@ var MegaRenderMixin = {
         return ReactDOM.findDOMNode(this);
     },
     componentWillUnmount: function() {
-        window.removeEventListener('resize', this.onResizeDoUpdate);
+        $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
         window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
 
         //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.getUniqueId());

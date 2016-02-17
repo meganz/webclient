@@ -1651,7 +1651,7 @@ var ConversationPanel = React.createClass({
             )
         ) {
             messagesList.push(
-                <div className="loading-spinner light" key="loadingSpinner"></div>
+                <div className="loading-spinner light active" key="loadingSpinner"><div className="main-loader"></div></div>
             );
         } else if (
             self.props.messagesBuff.joined === true && (

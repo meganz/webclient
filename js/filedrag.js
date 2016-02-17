@@ -211,8 +211,7 @@
 
         if (page == 'start') {
             if ($('#fmholder').html() == '') {
-                $('#fmholder').html('<div id="topmenu"></div>'
-                    + translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
+                $('#fmholder').html(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
             start_out();
             setTimeout(function() {

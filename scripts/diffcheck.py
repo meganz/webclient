@@ -41,7 +41,6 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 PATH_SPLITTER = re.compile(r'\\|/')
 
-
 def get_git_line_sets(base, target):
     """
     Obtains the Git diff between the base and target to identify the lines that
@@ -199,7 +198,7 @@ def reduce_jscs(file_line_mapping, **extra):
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list.
             if line_no in file_line_mapping[file_name]:
-                result.append(item)
+                result.append(item[:500])
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
@@ -221,7 +220,7 @@ def reduce_minifiedjs(file_line_mapping, **extra):
     logging.info('Checking for minified JavaScript ...')
     result = ['\nMinification detection output:\n'
               '==============================']
-    for filename, line_set in file_line_mapping.iteritems():
+    for filename, line_set in file_line_mapping.items():
         file_path = '/'.join(filename)
         if (filename[0] not in config.MINIFICATION_CHECK_DIRS
                 or file_path in config.MINIFICATION_IGNORE_FILES):

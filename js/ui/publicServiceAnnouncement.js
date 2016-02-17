@@ -173,7 +173,7 @@ var psa = {
             var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
             
             // If they are still loading their account (the loading animation is visible)
-            if ($('.dark-overlay').is(':visible')) {
+            if ($('.dark-overlay').is(':visible') || $('.light-overlay').is(':visible')) {
                 
                 // Open a new tab (and hopefully don't trigger popup blocker)
                 window.open('https://mega.nz/#' + pageLink, '_blank');

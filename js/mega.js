@@ -76,7 +76,10 @@ if (typeof loadingInitDialog === 'undefined')
 		{
 			$('.loading-info li.loading').addClass('loaded').removeClass('loading');
 			$('.loading-info li.step2').addClass('loading');
-			$('.loader-progressbar').addClass('active');	
+			$('.loader-progressbar').addClass('active');
+            
+            // If the PSA is visible reposition the account loading bar
+            psa.repositionAccountLoadingBar();
 		}
 		if (progress) $('.loader-percents').width(progress + '%');		
 		this.progress=true;		
@@ -87,7 +90,7 @@ if (typeof loadingInitDialog === 'undefined')
 		{
 			$('.loading-info li.loading').addClass('loaded').removeClass('loading');
 			$('.loading-info li.step3').addClass('loading');
-			$('.loader-progressbar').removeClass('active');
+			$('.loader-progressbar').removeClass('active').css('bottom', 0);            
 		}
     };
     loadingInitDialog.hide = function()

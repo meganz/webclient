@@ -73,9 +73,10 @@ var psa = {
         // Move the file manager up
         psa.resizeFileManagerHeight();
         
-        // If the window is resized, change the height again
+        // If the window is resized
         $(window).rebind('resize.bottomNotification', function() {
             psa.resizeFileManagerHeight();
+            psa.repositionAccountLoadingBar();
         });
         
         // Currently being shown
@@ -193,6 +194,9 @@ var psa = {
      */
     hideAnnouncement: function() {
         
+        // Move the progress bar back to the 0 position
+        $('.loader-progressbar').css('bottom', 0);
+                
         // Hide the announcement
         $('body').removeClass('notification');
         
@@ -225,6 +229,24 @@ var psa = {
             if (notificationSize > 120) {
                 $('.fmholder').height(bodyHeight - notificationSize);
             }
+        }
+    },
+    
+    /**
+     * Repositions the account loading bar so it is above the PSA if it is being shown
+     */
+    repositionAccountLoadingBar: function() {
+                
+        // If the PSA is visible
+        if (psa.visible) {
+
+            // Move the progress bar up above the PSA otherwise it's not visible
+            var psaHeight = $('.public-service-anouncement').outerHeight();
+            $('.loader-progressbar').css('bottom', psaHeight);
+        }
+        else {
+            // Reset to the bottom
+            $('.loader-progressbar').css('bottom', 0);
         }
     }
 };

@@ -1785,14 +1785,13 @@ function api_proc(q) {
 	q.xhr.onprogress = function (evt)
 	{
 		var progressperc = 0, bytes = 0;
-		if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) bytes = evt.total;		
-		else bytes=this.getResponseHeader('Original-Content-Length');
-		if (bytes == 0) return false;
+		bytes = evt.total;		
+		if (!bytes) bytes=this.getResponseHeader('Original-Content-Length');		
+		if (!bytes) return false;
 		else if (evt.loaded > 0) progressperc = evt.loaded/bytes*100;		
 		var ctxs = this.q.ctxs[this.q.i];
 		for (var i = 0; i < ctxs.length; i++) {
 			var ctx = ctxs[i];
-
 			if (typeof ctx.progress === 'function') 
 			{
 				ctx.progress(progressperc);

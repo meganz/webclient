@@ -7024,7 +7024,7 @@ function doRename() {
     if (itemName !== '') {
         if (nodeData) {
             if (nodeData && (itemName !== nodeData.name)) {
-                M.rename(handle, encodeURIComponent(itemName));
+                M.rename(handle, itemName);
             }
         }
 

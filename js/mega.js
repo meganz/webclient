@@ -3609,8 +3609,7 @@ function MegaData()
 
     this.rename = function(itemHandle, newItemName) {
 
-        var newValue = decodeURIComponent(newItemName);
-//        var newValue = newItemName;
+        var newValue = htmlentities(newItemName);
 
         if (M.d[itemHandle]) {
             var nodeData = M.d[itemHandle];
@@ -5725,7 +5724,7 @@ function execsc(actionPackets, callback) {
 
     function onExecSCDone() {
         if (async_treestate.length) {
-            async_treestate.forEach(function(actionPacket, index) {
+            async_treestate.forEach(function(actionPacket) {
                 var n = M.d[actionPacket.n];
                 if (d) console.log('updateTreeState', n, actionPacket);
                 if (n) {
@@ -5760,11 +5759,11 @@ function execsc(actionPackets, callback) {
                     if (actionPacket.cr) {
                         crypto_proccr(actionPacket.cr);
                     }
-
-                    // Remove processed item from the queue
-                    async_treestate.splice(index, 1);
                 }
             });
+
+            // Remove processed item from the queue
+            async_treestate = [];
         }
         if (newnodes.length > 0 && fminitialized) {
             renderNew();

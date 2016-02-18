@@ -222,8 +222,7 @@ def reduce_minifiedjs(file_line_mapping, **extra):
               '==============================']
     for filename, line_set in file_line_mapping.items():
         file_path = '/'.join(filename)
-        if (filename[0] not in config.MINIFICATION_CHECK_DIRS
-                or file_path in config.MINIFICATION_IGNORE_FILES):
+        if file_path in config.MINIFICATION_IGNORE_FILES:
             # Ignore this entry.
             continue
         with open(file_path, 'r') as fd:

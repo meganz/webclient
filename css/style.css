@@ -1853,7 +1853,7 @@ a.blog-button:hover {
     padding: 0;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 335px;
+    width: 280px;
 }
 .notification-content {
     -webkit-box-sizing: border-box;

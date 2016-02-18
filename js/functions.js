@@ -545,6 +545,9 @@ function browserdetails(useragent) {
         current = true;
         useragent = ua;
     }
+    if (Object(useragent).details !== undefined) {
+        return useragent.details;
+    }
     useragent = (' ' + useragent).toLowerCase();
 
     if (current) {

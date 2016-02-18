@@ -1032,9 +1032,7 @@ function MegaData()
 
                     // Handle of initial share owner
                     var ownersHandle = M.v[i].su;
-                    var fullContactName = (M.d[ownersHandle].firstName && M.d[ownersHandle].lastName)
-                        ? M.d[ownersHandle].firstName + " " + M.d[ownersHandle].lastName
-                        : M.d[ownersHandle].m;
+                    var fullContactName = mega.utils.fullUsername(ownersHandle);
 
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
@@ -3612,6 +3610,7 @@ function MegaData()
     this.rename = function(itemHandle, newItemName) {
 
         var newValue = decodeURIComponent(newItemName);
+//        var newValue = newItemName;
 
         if (M.d[itemHandle]) {
             var nodeData = M.d[itemHandle];

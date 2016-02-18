@@ -6941,10 +6941,7 @@ function renameDialog() {
         });
 
         $('.rename-dialog-button.rename').rebind('click', function() {
-
-            var c = $('.rename-dialog').attr('class');
-
-            if (c && (c.indexOf('active') > -1)) {
+            if ($('.rename-dialog').hasClass('active')) {
                 doRename();
             }
         });
@@ -7020,14 +7017,14 @@ function renameDialog() {
  */
 function doRename() {
 
-    var itemName = encodeURIComponent($('.rename-dialog input').val());
+    var itemName = $('.rename-dialog input').val();
     var handle = $.selected[0];
     var nodeData = M.d[handle];
 
     if (itemName !== '') {
         if (nodeData) {
             if (nodeData && (itemName !== nodeData.name)) {
-                M.rename(handle, itemName);
+                M.rename(handle, encodeURIComponent(itemName));
             }
         }
 
@@ -10370,6 +10367,24 @@ function fm_resize_handler() {
     }
 }
 
+/*
+ * fullUsername
+ *
+ * @param {String} userHandle
+ * @returns {String} result An first and last user name or email
+ */
+mega.utils.fullUsername = function username(userHandle) {
+
+    // User name
+    var result = '';
+
+    result = (M.d[userHandle].firstName && M.d[userHandle].lastName)
+        ? M.d[userHandle].firstName + " " + M.d[userHandle].lastName
+        : M.d[userHandle].m;
+
+    return result;
+};
+
 function sharedFolderUI() {
     /* jshint -W074 */
     var nodeData = M.d[M.currentdirid];
@@ -10411,9 +10426,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var fullOwnersName = (M.d[ownersHandle].firstName && M.d[ownersHandle].lastName)
-            ? M.d[ownersHandle].firstName + " " + M.d[ownersHandle].lastName
-            : M.d[ownersHandle].m;
+        var fullOwnersName = mega.utils.fullUsername(ownersHandle);
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
         // Access rights
@@ -10437,7 +10450,7 @@ function sharedFolderUI() {
                 + '<div class="shared-details-icon"></div>'
                 + '<div class="shared-details-info-block">'
                     + '<div class="shared-details-pad">'
-                        + '<div class="shared-details-folder-name">' + htmlentities(nodeData.name) + '</div>'
+                        + '<div class="shared-details-folder-name">' + htmlentities((c||nodeData).name) + '</div>'
                         + '<a href="javascript:;" class="grid-url-arrow"></a>'
                         + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
                         + '<div class="clear"></div>'

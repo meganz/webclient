@@ -8920,7 +8920,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
     background-color: #F6F6F6;
-    height: 32px;
+    height: 56px;
     -webkit-border-bottom-left-radius: 7px;
     -moz-border-radius-bottomleft: 7px;
     border-bottom-left-radius: 7px;
@@ -8930,6 +8930,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: relative;
     padding: 0 12px;
 }
+.notification-popup .fm-notifications-bottom {
+     height: 32px;
+ }
 .browsers-dialog .fm-notifications-bottom {
     padding: 0 20px 0 14px;
 }

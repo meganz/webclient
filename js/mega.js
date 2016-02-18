@@ -40,69 +40,63 @@ if (typeof Ext === 'undefined')
     var Ext = false;
 if (typeof ie9 === 'undefined')
     var ie9 = false;
-if (typeof loadingDialog === 'undefined')
-{
+if (typeof loadingDialog === 'undefined') {
     var loadingDialog = {};
-    loadingDialog.show = function()
-    {
+    loadingDialog.show = function() {
         $('.dark-overlay').show();
         $('.loading-spinner').removeClass('hidden').addClass('active');
     };
-    loadingDialog.hide = function()
-    {
+    loadingDialog.hide = function() {
         $('.dark-overlay').hide();
         $('.loading-spinner').addClass('hidden').removeClass('active');
    };
 }
-if (typeof loadingInitDialog === 'undefined')
-{
+if (typeof loadingInitDialog === 'undefined') {
     var loadingInitDialog = {};
-	loadingInitDialog.progress = false;
-	
-	loadingInitDialog.show = function()
-    {
-		this.hide();		
+    loadingInitDialog.progress = false;
+    loadingInitDialog.active = false;
+
+    loadingInitDialog.show = function() {
+        this.hide();
         $('.light-overlay').show();
         $('.loading-spinner').removeClass('hidden').addClass('init active');
+        this.active = true;
     };
-	loadingInitDialog.step1 = function()
-    {
+    loadingInitDialog.step1 = function() {
         $('.loading-info li.loading').addClass('loaded').removeClass('loading');
         $('.loading-info li.step1').addClass('loading');
     };
-	loadingInitDialog.step2 = function(progress)
-    {		
-		if (this.progress == false)
-		{
-			$('.loading-info li.loading').addClass('loaded').removeClass('loading');
-			$('.loading-info li.step2').addClass('loading');
-			$('.loader-progressbar').addClass('active');
-            
+    loadingInitDialog.step2 = function(progress) {
+        if (this.progress === false) {
+            $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+            $('.loading-info li.step2').addClass('loading');
+            $('.loader-progressbar').addClass('active');
+
             // If the PSA is visible reposition the account loading bar
             psa.repositionAccountLoadingBar();
-		}
-		if (progress) $('.loader-percents').width(progress + '%');		
-		this.progress=true;		
+        }
+        if (progress) {
+            $('.loader-percents').width(progress + '%');
+        }
+        this.progress = true;
     };
-	loadingInitDialog.step3 = function()
-    {
-		if (this.progress)
-		{
-			$('.loading-info li.loading').addClass('loaded').removeClass('loading');
-			$('.loading-info li.step3').addClass('loading');
-			$('.loader-progressbar').removeClass('active').css('bottom', 0);            
-		}
+    loadingInitDialog.step3 = function() {
+        if (this.progress) {
+            $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+            $('.loading-info li.step3').addClass('loading');
+            $('.loader-progressbar').removeClass('active').css('bottom', 0);
+        }
     };
-    loadingInitDialog.hide = function()
-    {
-		this.progress=false;
+    loadingInitDialog.hide = function() {
+        this.active = false;
+        this.progress = false;
         $('.light-overlay').hide();
         $('.loading-spinner').addClass('hidden').removeClass('init active');
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
-		$('.loader-percents').width('0%');
+        $('.loader-percents').width('0%');
         $('.loader-percents').removeAttr('style');
-   };
+    };
 }
 
 // data struct definitions
@@ -5825,7 +5819,7 @@ function loadfm(force)
     else {
         if (is_fm()) {
             loadingDialog.show();
-			
+
         }
         if (!loadfm.loading) {
             M.reset();
@@ -5833,17 +5827,16 @@ function loadfm(force)
             loadfm.loading = true;
             var sp = new Error('loadfm-stack-pointer');
             setTimeout(function __lazyLoadFM() {
-				
-				loadingDialog.hide();
-				loadingInitDialog.show();
-				loadingInitDialog.step1();
-				
+
+                loadingDialog.hide();
+                loadingInitDialog.show();
+                loadingInitDialog.step1();
+
                 api_req({a:'f',c:1,r:1,ca:1},{
                     callback: loadfm_callback,
-					progress:	function(perc)
-					{
-						loadingInitDialog.step2(parseInt(perc));
-					},
+                    progress: function(perc) {
+                        loadingInitDialog.step2(parseInt(perc));
+                    },
                     stackPointer: sp
                 },n_h ? 1 : 0);
             }, 350);
@@ -6878,9 +6871,9 @@ function init_chat() {
 }
 
 function loadfm_callback(res, ctx) {
-	
-	
-	loadingInitDialog.step3();
+
+
+    loadingInitDialog.step3();
 
 
     if (pfkey) {
@@ -6969,7 +6962,7 @@ function loadfm_done(pfkey, stackPointer) {
 
         if (!CMS.isLoading()) {
             loadingDialog.hide();
-			loadingInitDialog.hide();
+            loadingInitDialog.hide();
         }
 
         watchdog.notify('loadfm_done');

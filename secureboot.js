@@ -2086,6 +2086,13 @@ else if (!b_u)
 
         if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
 
+        // turn the `ua` (userAgent) string into an object which holds the browser details
+        try {
+            ua = Object(ua);
+            ua.details = Object.create(browserdetails(ua));
+        }
+        catch (e) {}
+
         if (u_checked) startMega();
         else if (loginresponse === -15) {
             u_logout(true);

@@ -1846,7 +1846,8 @@ a.blog-button:hover {
 }
 .notification-username {
     display: block;
-    font-family: "source_sans_prosemibold",Arial;
+    font-family: "source_sans_prosemibold", Arial;
+    font-size: 14px;
     line-height: 16px;
     overflow: hidden;
     padding: 0;

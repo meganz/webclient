@@ -1846,13 +1846,14 @@ a.blog-button:hover {
 }
 .notification-username {
     display: block;
+    font-family: "source_sans_prosemibold", Arial;
     font-size: 14px;
     line-height: 16px;
     overflow: hidden;
     padding: 0;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 205px;
+    width: 280px;
 }
 .notification-content {
     -webkit-box-sizing: border-box;
@@ -8919,7 +8920,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
     background-color: #F6F6F6;
-    height: 56px;
+    height: 32px;
     -webkit-border-bottom-left-radius: 7px;
     -moz-border-radius-bottomleft: 7px;
     border-bottom-left-radius: 7px;

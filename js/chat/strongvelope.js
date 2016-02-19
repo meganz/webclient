@@ -797,57 +797,6 @@ var strongvelope = {};
 
 
     /**
-     * Checks whether messages passed in in an array are decryptable.
-     *
-     * @method
-     * @param messages {Array.<ChatdMessage>}
-     *     Array of (most recent) batch of chat message history.
-     * @return {Object}
-     *     An object containing a boolean array attribute `messages` flagging
-     *     each element of the input array parameter as decryptable (`null`
-     *     if it can't be parsed).  An attribute `participants` is an object
-     *     giving for each sender of the batch (as key) the earliest time stamp
-     *     of decryptability, `null` if not.
-     */
-    strongvelope.ProtocolHandler.prototype.areMessagesDecryptable = function(messages) {
-
-        var parsedMessages = this._batchParseAndExtractKeys(messages);
-
-        var decryptable = [];
-        var participants = {};
-
-        // Iterate over all messages to extract keys (if present).
-        var message;
-        var sender;
-        var keyId;
-        var haveKey;
-        for (var i = 0; i < messages.length; i++) {
-            message = messages[i];
-            sender = messages[i].userId;
-            if (message) {
-                keyId = parsedMessages[i].keyIds[0];
-                haveKey = ((typeof this.participantKeys[sender] !== 'undefined')
-                           && (typeof this.participantKeys[sender][keyId] !== 'undefined'));
-                decryptable.push(haveKey);
-                // Track for the smallest time stamp that we've got a key for
-                // on the sender.
-                if (!participants[sender]) {
-                    participants[sender] = null;
-                }
-                if (haveKey && (!participants[sender] || (participants[message.userId] > message.ts))) {
-                    participants[sender] = message.ts;
-                }
-            }
-            else {
-                decryptable.push(null);
-            }
-        }
-
-        return { messages: decryptable, participants: participants };
-    };
-
-
-    /**
      * Refreshes our own sender key. This method is also to be used to
      * initialise a new ProtocolHandler for a new chat session that is *not*
      * primed via historic messages.

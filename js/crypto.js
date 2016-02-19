@@ -1782,6 +1782,55 @@ function api_proc(q) {
         }
     };
 
+    // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
+    if (loadingInitDialog.active) {
+        var needProgress = false;
+
+        // check whether this channel queue will need the progress
+        var ctxs = q.ctxs[q.i];
+        var idx = ctxs.length;
+        while (idx--) {
+            var ctx = ctxs[idx];
+
+            if (typeof ctx.progress === 'function') {
+                needProgress = true;
+                break;
+            }
+        }
+
+        if (needProgress) {
+            q.xhr.onprogress = function (evt) {
+                var progressPercent = 0;
+                var bytes = evt.total || this.totalBytes;
+
+                if (!bytes) {
+                    // This may throws an exception if the header doesn't exists
+                    try {
+                        bytes = this.getResponseHeader('Original-Content-Length');
+                        this.totalBytes = bytes;
+                    }
+                    catch (e) {}
+                }
+                if (!bytes) {
+                    return false;
+                }
+                if (evt.loaded > 0) {
+                    progressPercent = evt.loaded / bytes * 100;
+                }
+
+                var ctxs = this.q.ctxs[this.q.i];
+                var idx = ctxs.length;
+                while (idx--) {
+                    var ctx = ctxs[idx];
+
+                    if (typeof ctx.progress === 'function') {
+                        ctx.progress(progressPercent);
+                    }
+                }
+            };
+        }
+    }
+
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {
             var t;

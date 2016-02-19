@@ -197,10 +197,6 @@ var ConversationsList = React.createClass({
         var $container = $(contentPanelConversations.parentNode.parentNode.parentNode);
         var $jsp = $container.data('jsp');
 
-        $container.height(
-            $(window).outerHeight() -  $('#topmenu').outerHeight() - $('.fm-left-menu.conversations').outerHeight()
-        );
-
 
         if ($jsp) {
             $jsp.reinitialise();
@@ -386,11 +382,7 @@ var ConversationsApp = React.createClass({
         this.handleWindowResize();
     },
     handleWindowResize: function() {
-        var $container = $(ReactDOM.findDOMNode(this));
-
-        $container.height(
-            $(window).outerHeight() -  $('#topmenu').outerHeight()
-        );
+        
     },
     render: function() {
         var self = this;

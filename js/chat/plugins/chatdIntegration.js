@@ -118,10 +118,6 @@ ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     var self = this;
 
-    if (actionPacket.g === 1) {
-        return;
-    }
-
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
         self.logger.error("actionPacket returned no chat participants: ", chatParticipants, ", removing chat.");
@@ -321,9 +317,9 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         var args = arguments;
 
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
-        if (!self.chatd.chatidshard[chatIdDecoded] || !self.chatd.chatidshard[chatIdDecoded].isOnline()) {
+        if (!self.chatd.chatIdShard[chatIdDecoded]) {
             createTimeoutPromise(function() {
-                return !!self.chatd.chatidshard[chatIdDecoded] && self.chatd.chatidshard[chatIdDecoded]
+                return !!self.chatd.chatIdShard[chatIdDecoded]
             }, 100, 10000)
                 .done(function() {
                     masterPromise.linkDoneAndFailToResult(fn, self, args);

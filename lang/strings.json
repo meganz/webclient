@@ -12462,5 +12462,161 @@
     "8538": {
         "text": "View blog post",
         "context": "Label on a button taking the user to a blog post."
+    },
+    "8539": {
+        "text": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
+        "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
+    },
+    "8540": {
+        "text": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
+        "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
+    },
+    "8543": {
+        "text": "There are no contacts in the account. Please add them on the Contacts screen.",
+        "context": "When a user wants to share a folder but does not have any contact yet."
+    },
+    "8544": {
+        "text": "All the items in the rubbish bin will be deleted",
+        "context": "Confirmation message displayed when removing all the items in the rubbish bin."
+    },
+    "8545": {
+        "text": "Remember my decision and don't ask me again",
+        "context": "Text next to a checkbox that allows remembering the decision of the user. The translation should be as short as possible."
+    },
+    "8546": {
+        "text": "You are about to enable an option that could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
+        "context": "Information for the user about the consequences of disabling a security check of MEGAsync."
+    },
+    "8547": {
+        "text": "I don't care",
+        "context": "Text for a button that, when clicked, will disable an important security check of MEGAsync. The text should be as short as possible. If it's not possible to provide a short translation, it can be translated as: Ignore."
+    },
+    "8548": {
+        "text": "Permissions for new folders and files",
+        "context": "Title of the dialog that allows to change the default permissions for new files and folders created by MEGAsync."
+    },
+    "8549": {
+        "text": "Numeric value:",
+        "context": "A numeric value that represents the permissions that will be applied to new files and folders."
+    },
+    "8550": {
+        "text": "Group permissions:",
+        "context": "Label just before the new group permissions that will be applied to new files and folders."
+    },
+    "8551": {
+        "text": "Public permissions:",
+        "context": "A label just before the new public permissions that will be applied to new files and folders."
+    },
+    "8552": {
+        "text": "Files and folders have an owner and belong to a group of users. Using this dialog you can grant different access permission for new files and folders created by MEGAsync to users that belong to the same group and to the rest of the users in the computer. If you don't need to change them, please leave them on the default permissions for security reasons.",
+        "context": "Information for users in the dialog that allows to change permissions of new files and folders created by MEGAsync."
+    },
+    "8553": {
+        "text": "Read",
+        "context": "Text next to a checkbox that allows granting read permissions for new files and folder."
+    },
+    "8554": {
+        "text": "Write",
+        "context": "Text next to a checkbox that allows granting write permissions for new files and folders."
+    },
+    "8555": {
+        "text": "Execution",
+        "context": "Text next to a checkbox that allows granting execution permissions for new files and folder. The execute permission grants the ability to execute a file."
+    },
+    "8556": {
+        "text": "Don't use HTTP",
+        "context": "Text next to a checkbox that allows disabling the HTTP protocol for transfers."
+    },
+    "8557": {
+        "text": "Enable this option only if your transfers don't start. In normal circumstances HTTP is satisfactory as all transfers are already encrypted.",
+        "context": "Information message next to a checkbox that allows for disabling the HTTP protocol for transfers."
+    },
+    "8558": {
+        "text": "MEGA v1 app is no longer supported",
+        "context": "A string that will appear on the app telling the user that the app is not gonna be updated again"
+    },
+    "8559": {
+        "text": "Please install our new app MEGA v3 with a new design and new features!",
+        "context": "Message to tell the users that they should install the new app"
+    },
+    "8560": {
+        "text": "You will have to enter your credentials (login and password) in the new app. If you don't remember your password, please Export your Master Key before uninstalling the v1 app.",
+        "context": "Message shown to tell the users that they should export the master key before uninstalling the old app"
+    },
+    "8561": {
+        "text": "If you have an active subscription on the v1 app, please cancel it on Google Play and subscribe again on the v3 app when the current subscription expires. Don't worry, you will keep your PRO status on the new app until it expires.",
+        "context": "Message shown to PRO users using v1 app telling them that they should cancel their subscriptions on v1 and subscribe again on v3"
+    },
+    "8562": {
+        "text": "[Pricing may vary slightly depending on your country of residence and payment method.]",
+        "context": "A line to include on the Windows Phone app description in the store to indicate that the prices may vary depending on several factors. Please keep the characters \"[\" and \"]\" at the beginning and the end of the string."
+    },
+    "8563": {
+        "text": "You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help change your mind.",
+        "context": "A dialog message displayed when a user is trying to cancel a subscription and it asks them to send a feedback message."
+    },
+    "8564": {
+        "text": "You don't have access to the path '{0}'. Please select another one and try again.",
+        "context": "A dialog message which is displayed in cases that the app or the user doesn't have access to a folder path in the device memory. For example to download a file\/folder, create a new folder, etc.\r\nPlease preserve the '{0}' code because is for including the file\/folder path at runtime."
+    },
+    "8565": {
+        "text": "The name of the file '{0}' is not valid or has illegal characters. Please change it and try again.",
+        "context": "A dialog message displayed in cases that a file name is not valid or has illegal characters.\r\nPlease preserve the '{0}' code because is for including the filename at runtime."
+    },
+    "8566": {
+        "text": "Invalid file name",
+        "context": "Title of the dialog displayed in cases that the file name is not valid or has illegal characters - (String as short as possible)."
+    },
+    "8567": {
+        "text": "The path of the file\/folder '{0}' is too long. Please change it and try again.",
+        "context": "A message on a dialog which is displayed in cases that the file\/folder path is too long.\r\nPreserve the '{0}' code because it is for including the file\/folder name at runtime."
+    },
+    "8568": {
+        "text": "Path too long",
+        "context": "The title of a dialog which displayed in cases that the file\/folder path is too long."
+    },
+    "8569": {
+        "text": "The name or path of the folder '{0}' is not valid or has illegal characters. Please change it and try again.",
+        "context": "A dialog message displayed in cases that a folder name or path is not valid or has illegal characters.\r\nPreserve the '{0}' code because it is for including the file name at runtime."
+    },
+    "8570": {
+        "text": "Invalid name or path",
+        "context": "Title of the dialog displayed in cases that the file name or path is not valid or has illegal characters - (String as short as possible)."
+    },
+    "8571": {
+        "text": "Failed to select the folder. Please try again or select another folder.",
+        "context": "A message on a dialog which is displayed when the process to select a folder failed."
+    },
+    "8572": {
+        "text": "Canceling subscription...",
+        "context": "A progress indicator message when canceling a subscription."
+    },
+    "8573": {
+        "text": "Changing password...",
+        "context": "A progress indicator message when changing the MEGA account password."
+    },
+    "8574": {
+        "text": "Confirm account",
+        "context": "Label for any 'Confirm account' button, link, text, title, etc. - (String as short as possible)."
+    },
+    "8575": {
+        "text": "Folder name:",
+        "context": "Text to show when a user wants to create a new folder to type the name for the new folder."
+    },
+    "8576": {
+        "text": "Close session",
+        "context": "Label for any 'Close session' button, link, etc. - (String as short as possible)."
+    },
+    "8577": {
+        "text": "Requesting account data",
+        "context": "Stage 1 of 3 when a user is loading his account in the web app. This is the stage where the request has been made but no response has been made by the server yet."
+    },
+    "8578": {
+        "text": "Receiving account data",
+        "context": "Stage 2 of 3 when a user is loading his account in the web app. This is the stage where the server response is being transferred to the web app."
+    },
+    "8579": {
+        "text": "Decrypting",
+        "context": "Stage 3 of 3 when a user is loading his account in the web app. This is the stage where the request has completed and the web app is decrypting the data."
     }
 }

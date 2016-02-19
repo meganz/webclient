@@ -545,6 +545,9 @@ function browserdetails(useragent) {
         current = true;
         useragent = ua;
     }
+    if (Object(useragent).details !== undefined) {
+        return useragent.details;
+    }
     useragent = (' ' + useragent).toLowerCase();
 
     if (current) {
@@ -2262,6 +2265,25 @@ mSpawnWorker.prototype = {
         if (++job.done === this.nworkers) {
             if (d) {
                 console.timeEnd(reply.jid);
+            }
+
+            // Don't report `newmissingkeys` unless there are *new* missing keys
+            if (job.newmissingkeys) {
+                try {
+                    var keys = Object.keys(missingkeys).sort();
+                    var hash = MurmurHash3(JSON.stringify(keys));
+                    var prop = u_handle + '_lastMissingKeysHash';
+
+                    if (localStorage[prop] !== hash) {
+                        localStorage[prop] = hash;
+                    }
+                    else {
+                        job.newmissingkeys = false;
+                    }
+                }
+                catch (ex) {
+                    console.error(ex);
+                }
             }
 
             delete this.jobs[reply.jid];

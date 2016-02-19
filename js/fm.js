@@ -4434,7 +4434,7 @@ function gridUI() {
 
     $.gridHeader = function() {
         var headerColumn = '';
-        $('.grid-table tbody tr:first-child td').each(function(i, e) {
+        $('.grid-table tbody tr:first-child td:visible').each(function(i, e) {
             headerColumn = $('.grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
@@ -6070,7 +6070,6 @@ function menuItems() {
     items['.refresh-item'] = 1;
 
     if (folderlink) {
-        delete items['.properties-item'];
         delete items['.copy-item'];
         delete items['.add-star-item'];
         if (u_type) {
@@ -6173,9 +6172,9 @@ function contextMenuUI(e, ll) {
             flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
-                if (M.v.length) {
-                    flt += ',.zipdownload-item,.download-item';
-                }
+            }
+            if (M.v.length) {
+                flt += ',.zipdownload-item,.download-item';
             }
             $.selected = [M.RootID];
             $(menuCMI).filter(flt).show();
@@ -6815,21 +6814,6 @@ function sectionUIopen(id) {
 
         // new sections UI
         $('.section').addClass('hidden');
-
-        var repos = function() {
-            $('.section.' + id)
-                .height(
-                $(window).outerHeight() - $('#topmenu').outerHeight() - $('.transfer-panel').outerHeight()
-            )
-        };
-
-        $(window)
-            .unbind('resize.section')
-            .bind('resize.section', function() {
-                repos();
-            });
-
-        repos();
         $('.section.' + id).removeClass('hidden');
     }
 
@@ -6982,7 +6966,7 @@ function renameDialog() {
         $('.rename-dialog input').bind('focus', function() {
             var selEnd;
             $(this).closest('.rename-dialog').addClass('focused');
-            var d = $(this).val().indexOf('.');
+            var d = $(this).val().lastIndexOf('.');
             if (d > -1) {
                 selEnd = d;
             }
@@ -10273,12 +10257,6 @@ function fm_resize_handler() {
     if (d) {
         console.time('fm_resize_handler');
     }
-    // transfer panel resize logic
-    var right_pane_height = $('#fmholder').outerHeight() - $('#topmenu').outerHeight();
-
-    $('.fm-main.default, .fm-main.notifications').css({
-        'height': right_pane_height + "px"
-    });
 
     $('.transfer-scrolling-table').css({
         'height': (
@@ -10368,11 +10346,6 @@ function fm_resize_handler() {
         megaChat.resized();
     }
 
-    var right_blocks_height = right_pane_height - $('.fm-right-header.fm').outerHeight();
-    $('.fm-right-files-block > *:not(.fm-right-header)').css({
-        'height': right_blocks_height + "px",
-        'min-height': right_blocks_height + "px"
-    });
 
     $('.fm-right-files-block, .fm-right-account-block').css({
         'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"

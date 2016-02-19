@@ -13,7 +13,7 @@ import os
 
 # Checkers to run. Available options for checkers are:
 # "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++"
-checkers = ['jshint', 'jscs', 'minifiedjs']
+checkers = ['minifiedjs', 'jshint', 'jscs']
 
 # Extra options for designated checkers.
 # This configuration needs an entry for every encountered checker if the
@@ -52,8 +52,8 @@ VERAPP_RULES = ['F001', 'F002',
 
 
 # Command line configuration.
-JSHINT_COMMAND = '{binary} {rules} .'
-JSCS_COMMAND = '{binary} {rules} .'
+JSHINT_COMMAND = '{binary} {rules} {files}'
+JSCS_COMMAND = '{binary} {rules} {files}'
 
 CPPCHECK_COMMAND = ("{command}"
                     " --template={{file}};{{line}};{{severity}};{{id}};{{message}}"

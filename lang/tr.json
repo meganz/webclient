@@ -3154,6 +3154,10 @@
     "8577": "Hesap verileri isteniyor",
     "8578": "Hesap verileri al\u0131n\u0131yor",
     "8579": "\u015eifre \u00e7\u00f6z\u00fcl\u00fcyor",
+    "8580": "File import failed [{0}]",
+    "8584": "Requesting folder data",
+    "8585": "Receiving folder data",
+    "8586": "Decrypting folder data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

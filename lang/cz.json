@@ -3154,6 +3154,10 @@
     "8577": "Vy\u017eadov\u00e1n\u00ed dat \u00fa\u010dtu",
     "8578": "Z\u00edsk\u00e1v\u00e1n\u00ed dat \u00fa\u010dtu",
     "8579": "De\u0161ifrov\u00e1n\u00ed",
+    "8580": "File import failed [{0}]",
+    "8584": "Requesting folder data",
+    "8585": "Receiving folder data",
+    "8586": "Decrypting folder data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

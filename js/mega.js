@@ -55,8 +55,17 @@ if (typeof loadingInitDialog === 'undefined') {
     var loadingInitDialog = {};
     loadingInitDialog.progress = false;
     loadingInitDialog.active = false;
-
-    loadingInitDialog.show = function() {
+    loadingInitDialog.show = function() {		
+		if (pfid) {			
+			$('.loading-spinner .step1').text(l[8584]);
+			$('.loading-spinner .step2').text(l[8585]);
+			$('.loading-spinner .step3').text(l[8586]);
+		}
+		else {
+			$('.loading-spinner .step1').text(l[8577]);
+			$('.loading-spinner .step2').text(l[8578]);
+			$('.loading-spinner .step3').text(l[8579]);
+		}
         this.hide();
         $('.light-overlay').show();
         $('.loading-spinner').removeClass('hidden').addClass('init active');

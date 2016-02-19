@@ -3154,6 +3154,10 @@
     "8577": "\u05de\u05d1\u05e7\u05e9 \u05de\u05d9\u05d3\u05e2 \u05e2\u05dc \u05d4\u05d7\u05e9\u05d1\u05d5\u05df",
     "8578": "\u05de\u05e7\u05d1\u05dc \u05de\u05d9\u05d3\u05e2 \u05e2\u05dc \u05d4\u05d7\u05e9\u05d1\u05d5\u05df",
     "8579": "\u05de\u05e4\u05e2\u05e0\u05d7",
+    "8580": "File import failed [{0}]",
+    "8584": "Requesting folder data",
+    "8585": "Receiving folder data",
+    "8586": "Decrypting folder data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

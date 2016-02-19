@@ -1811,12 +1811,12 @@ function api_proc(q) {
                     }
                     catch (e) {}
                 }
-                if (!bytes) {
+                if (!bytes || bytes < 10) {
                     return false;
                 }
                 if (evt.loaded > 0) {
                     progressPercent = evt.loaded / bytes * 100;
-                }
+                }			
 
                 var ctxs = this.q.ctxs[this.q.i];
                 var idx = ctxs.length;

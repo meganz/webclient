@@ -3154,6 +3154,10 @@
     "8577": "Beg\u00e4r kontodetaljer",
     "8578": "Mottager kontodetaljer",
     "8579": "Dekrypterar",
+    "8580": "File import failed [{0}]",
+    "8584": "Requesting folder data",
+    "8585": "Receiving folder data",
+    "8586": "Decrypting folder data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

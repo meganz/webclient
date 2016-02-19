@@ -317,7 +317,7 @@ describe("chat.strongvelope unit test", function() {
                 var result = ns._symmetricDecryptMessage(atob('J+79wd1gGVjQ'), KEY,
                     atob('NTHgl79y+1FFnmnopp4UNA=='));
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Could not decrypt message, probably a wrong key/nonce.');
             });
         });
@@ -457,7 +457,7 @@ describe("chat.strongvelope unit test", function() {
                     + String.fromCharCode(0x42) +  INITIAL_MESSAGE_BIN.substring(2);
                 var result = ns._parseMessageContent(message);
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Received unexpected TLV type: 66.');
             });
         });
@@ -864,7 +864,9 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(window, 'pubCu25519', {});
                 assert.throws(function() { handler._computeSymmetricKey('you456789xw'); },
                               'No cached chat key for user!');
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
+                                   'No cached chat key for user!');
+                assert.strictEqual(ns._logger._log.args[1][0],
                                    'No cached chat key for user: you456789xw');
             });
         });
@@ -951,7 +953,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler._encryptKeysFor(['a key'], 'gooniegoogoo', 'you456789xw');
                 assert.strictEqual(result, 'ciphertext');
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                     'Encrypting sender keys for you456789xw using RSA.');
             });
 
@@ -974,7 +976,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler._encryptKeysFor(['a key'], 'gooniegoogoo', 'you456789xw');
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                     'No public encryption key (RSA or x25519) available for you456789xw');
             });
         });
@@ -1547,7 +1549,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.encryptTo('Hello!', 'you456789xw');
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                     'Destination not in current participants: you456789xw');
             });
 
@@ -1559,7 +1561,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.encryptTo('Hello!');
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                     'No destinations or other participants to send to.');
             });
 
@@ -1883,7 +1885,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                     'Sender not in current participants: me3456789xw');
             });
 
@@ -1923,7 +1925,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Incoming message not usable.');
             });
 
@@ -1940,7 +1942,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Message not compatible with current protocol version.');
             });
 
@@ -1953,7 +1955,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Message signature invalid.');
             });
 
@@ -2022,7 +2024,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler.otherParticipants.size, 0);
                 assert.strictEqual(handler.includeParticipants.size, 0);
                 assert.strictEqual(handler.excludeParticipants.size, 0);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'I have been excluded from this chat, cannot read message.');
             });
 
@@ -2044,7 +2046,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler.otherParticipants.size, 0);
                 assert.strictEqual(handler.includeParticipants.size, 0);
                 assert.strictEqual(handler.excludeParticipants.size, 0);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'I have been excluded from this chat, cannot read message.');
             });
 
@@ -2106,7 +2108,9 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
+                                   'Encryption key for message from *** with ID *** unavailable.');
+                assert.strictEqual(ns._logger._log.args[1][0],
                                    'Encryption key for message from me3456789xw with ID QUkAAA unavailable.');
             });
 
@@ -2124,7 +2128,9 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
+                                   'Encryption key for message from *** with ID *** unavailable.');
+                assert.strictEqual(ns._logger._log.args[1][0],
                                    'Encryption key for message from me3456789xw with ID QUkAAA unavailable.');
             });
 
@@ -2325,7 +2331,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.alterParticipants([], []);
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'No participants to include or exclude.');
             });
 
@@ -2337,7 +2343,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.alterParticipants(['me3456789xw'], []);
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Cannot include myself to a chat.');
             });
 
@@ -2349,7 +2355,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.alterParticipants([], ['me3456789xw']);
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Cannot exclude myself from a chat.');
             });
 
@@ -2361,7 +2367,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.alterParticipants(['you456789xw'], []);
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'User you456789xw already participating, cannot include.');
             });
 
@@ -2373,7 +2379,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.alterParticipants([], ['other6789xw']);
                 assert.strictEqual(result, false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'User other6789xw not participating, cannot exclude.');
             });
 

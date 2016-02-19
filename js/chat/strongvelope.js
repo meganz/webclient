@@ -915,6 +915,7 @@ var strongvelope = {};
         var pubKey = pubCu25519[userhandle];
         if (!pubKey) {
             logger.critical('No cached chat key for user!');
+            logger.error('No cached chat key for user: ' + userhandle);
             throw new Error('No cached chat key for user!');
         }
         var sharedSecret = nacl.scalarMult(

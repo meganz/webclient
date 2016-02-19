@@ -278,7 +278,7 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            if (u_type === 3 && !folderlink) {
+            if (u_type === 3 && !pfid && !folderlink) {
                 mega.config.fetch();
             }
 

@@ -561,6 +561,10 @@ function browserdetails(useragent) {
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
+    else if (useragent.indexOf('windows phone') > 0) {
+        icon = 'wp.png';
+        os = 'Windows Phone';
+    }
     else if (useragent.indexOf('windows') > 0) {
         os = 'Windows';
     }
@@ -579,9 +583,6 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('linux') > 0) {
         os = 'Linux';
-    }
-    else if (useragent.indexOf('linux') > 0) {
-        os = 'MEGAsync';
     }
     else if (useragent.indexOf('blackberry') > 0) {
         os = 'Blackberry';
@@ -673,7 +674,7 @@ function browserdetails(useragent) {
     }
     else if (os) {
         name = os;
-        icon = os.toLowerCase() + '.png';
+        icon = icon || (os.toLowerCase() + '.png');
     }
     else if (browser) {
         name = browser;

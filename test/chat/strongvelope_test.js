@@ -787,6 +787,7 @@ describe("chat.strongvelope unit test", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 handler.keyId = KEY_ID;
+                handler._sentKeyId = handler.keyId;
                 handler.participantKeys = { 'me3456789xw': { 'AI\u0000\u0000': KEY} };
                 handler._keyEncryptionCount = 16;
                 sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
@@ -804,6 +805,7 @@ describe("chat.strongvelope unit test", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 handler.keyId = 'AI\u00ff\u00ff';
+                handler._sentKeyId = handler.keyId;
                 handler.participantKeys = { 'me3456789xw': { 'AI\u00ff\u00ff': KEY} };
                 handler._keyEncryptionCount = 16;
                 sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
@@ -813,10 +815,10 @@ describe("chat.strongvelope unit test", function() {
             });
 
             it("key rotation with new day", function() {
-
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 handler.keyId = KEY_ID;
+                handler._sentKeyId = KEY_ID;
                 handler.participantKeys = { 'me3456789xw': { 'AI\u0000\u0000': KEY} };
                 handler._keyEncryptionCount = 16;
                 sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
@@ -828,6 +830,27 @@ describe("chat.strongvelope unit test", function() {
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
                     { 'AI\u0000\u0000': KEY, 'AJ\u0000\u0000': ROTATED_KEY });
                 assert.strictEqual(handler._keyEncryptionCount, 0);
+            });
+
+            it("avoid multiple, successive rotations", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = KEY_ID;
+                handler._sentKeyId = handler.keyId;
+                handler.participantKeys = { 'me3456789xw': { 'AI\u0000\u0000': KEY} };
+                sandbox.stub(ns, '_dateStampNow').returns(16713);
+                handler.updateSenderKey();
+                var rotatedKeyId = handler.keyId;
+                var rotatedKey = handler.participantKeys['me3456789xw'][rotatedKeyId];
+                assert.notStrictEqual(handler.keyId, KEY_ID);
+                assert.notStrictEqual(rotatedKey, KEY);
+                assert.strictEqual(handler.previousKeyId, KEY_ID);
+
+                // Now do it again.
+                handler.updateSenderKey();
+                assert.strictEqual(handler.keyId, rotatedKeyId);
+                assert.strictEqual(handler.participantKeys['me3456789xw'][rotatedKeyId], rotatedKey);
+                assert.strictEqual(handler.previousKeyId, KEY_ID);
             });
         });
 

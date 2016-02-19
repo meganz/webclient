@@ -100,7 +100,6 @@ var strongvelope = {};
     };
 
 
-
     /**
      * "Enumeration" of TLV types used for the chat message transport container.
      *
@@ -860,6 +859,12 @@ var strongvelope = {};
         var dateStamp;
         var counter;
 
+        if (this.keyId && (this.keyId !== this._sentKeyId)) {
+            // We can return early, as our current sender key has not even been
+            // sent to other participants, yet.
+            return;
+        }
+
         if (this.keyId) {
             // Juggle the key IDs.
             this.previousKeyId = this.keyId;
@@ -1455,7 +1460,6 @@ var strongvelope = {};
             return false;
         }
 
-
         // Decrypt message payload.
         var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
                                                     senderKey,
@@ -1570,7 +1574,6 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.alterParticipants = function(
             includeParticipants, excludeParticipants, message) { // jshint maxcomplexity: 12
-
 
         var errorOut = false;
 

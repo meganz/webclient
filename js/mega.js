@@ -6936,7 +6936,7 @@ function loadfm_callback(res, ctx) {
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
-        loadfm_done(pfkey, ctx.stackPointer);
+        // loadfm_done(pfkey, ctx.stackPointer);
 
         if (res.cr) {
             crypto_procmcr(res.cr);

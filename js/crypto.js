@@ -2048,10 +2048,10 @@ function getsc(fm, initialNotify) {
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
-                    if (ctx.fm) {
+                    // if (ctx.fm) {
                         // mDBloaded = true;
                         loadfm_done();
-                    }
+                    // }
 
                     // After the first SC request all subsequent requests can generate notifications
                     notify.initialLoadComplete = true;

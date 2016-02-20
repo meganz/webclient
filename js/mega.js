@@ -6823,6 +6823,7 @@ function init_chat() {
     function __init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
+
             try {
                 // Prevent known Strophe exceptions...
                 if (!Strophe.Websocket.prototype._unsafeOnIdle) {
@@ -6844,19 +6845,19 @@ function init_chat() {
                     console.error(ex);
                 }
             }
-            //try {
-                window.megaChat = new Chat();
-                window.megaChat.init();
+
+            var _chat = new Chat();
+
+            // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
+            if (!window.megaChatIsDisabled) {
+                window.megaChat = _chat;
+                megaChat.init();
 
                 if (fminitialized) {
                     //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }
-            //}
-            //catch (ex) {
-            //    console.error(ex);
-            //    megaChatIsDisabled = true;
-            //}
+            }
         }
     }
     if (folderlink) {

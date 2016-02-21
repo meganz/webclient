@@ -1343,6 +1343,18 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
     var $promise = new MegaPromise();
 
     if (type === "private") {
+        // validate that ALL jids are contacts
+        var allValid = true;
+        jids.forEach(function(jid) {
+            var contact = self.getContactFromJid(jid);
+            if (!contact || (contact.c !== 1 && contact.c !== 2)) {
+                allValid = false;
+                return false;
+            }
+        });
+        if (allValid === false) {
+            return MegaPromise.reject();
+        }
         var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
         var roomJid = $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain;
         if (self.chats[roomJid]) {

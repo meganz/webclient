@@ -8471,6 +8471,13 @@ function copyDialog() {
     $('.copy-dialog .dialog-newfolder-button').rebind('click', function() {
 
         $('.copy-dialog').addClass('arrange-to-back');
+        var dest = $(this).parents('.fm-dialog').find('.active .nw-fm-tree-item.selected');
+        if (dest.length) {
+            $.cftarget = dest.attr('id').replace(/[^_]+_/, '');
+        } else {
+            /* No folder is selected, "New Folder" must create a new folder in Root */
+            $.cftarget = M.RootID;
+        }
         createFolderDialog();
 
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');

@@ -7030,6 +7030,14 @@ function dorename()
 }
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    var extraButton = String(type).split(':');
+    if (extraButton.length === 1) {
+        extraButton = null;
+    }
+    else {
+        type = extraButton.shift();
+        extraButton = extraButton.join(':');
+    }
     $.msgDialog = type;
     $.warningCallback = callback;
 
@@ -7059,7 +7067,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             }
         });
     }
-    if (type === 'delete-contact') {
+    else if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
@@ -7080,16 +7088,38 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         });
     }
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {
-        $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="fm-dialog-button notification-button"><span>@@</span></div>' +
-                '<div class="clear"></div>', l[81]);
+        if (extraButton) {
+            $('#msgDialog .fm-notifications-bottom')
+                .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
+                    '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+                    '<div class="clear"></div>', l[81], extraButton);
 
-        $('#msgDialog .fm-dialog-button').bind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-            }
-        });
+            $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+                closeMsg();
+                if ($.warningCallback) {
+                    $.warningCallback(false);
+                }
+            });
+            $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+                closeMsg();
+                if ($.warningCallback) {
+                    $.warningCallback(true);
+                }
+            });
+        }
+        else {
+            $('#msgDialog .fm-notifications-bottom')
+                .safeHTML('<div class="fm-dialog-button notification-button"><span>@@</span></div>' +
+                    '<div class="clear"></div>', l[81]);
+
+            $('#msgDialog .fm-dialog-button').bind('click', function() {
+                closeMsg();
+                if ($.warningCallback) {
+                    $.warningCallback(true);
+                }
+            });
+        }
+
         $('#msgDialog .icon').addClass('fm-notification-icon');
         if (type === 'warninga') {
             $('#msgDialog').addClass('warning-dialog-a');

@@ -11,7 +11,7 @@ var dlmanager = {
     dlDoneThreshold: 3,
     // How many queue IO we want before pausing the XHR fetching,
     // useful when we have internet faster than our IO
-    ioThrottleLimit: 8,
+    ioThrottleLimit: 6,
     ioThrottlePaused: false,
     fetchingFile: false,
     dlLastQuotaWarning: 0,

@@ -1624,7 +1624,10 @@ function setTransferStatus(dl, status, ethrow, lock) {
 
 function dlFatalError(dl, error, ethrow) {
     var m = 'This issue should be resolved ';
-    if (navigator.webkitGetUserMedia) {
+    if (ethrow === -0xDEADBEEF) {
+        ethrow = false;
+    }
+    else if (navigator.webkitGetUserMedia) {
         m += 'exiting from Incognito mode.';
         msgDialog('warninga', l[1676], m, error);
     }

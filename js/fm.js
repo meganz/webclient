@@ -4279,7 +4279,7 @@ function accountUI()
         msgDialog('confirmation', l[6181], l[1974], false, function(event) {
             if (event) {
                 loadingDialog.show();
-                api_req({ a: 'erm', m: M.u[u_handle].m, t: 21 }, {
+                api_req({ a: 'erm', m: Object(M.u[u_handle]).m, t: 21 }, {
                     callback: function(res) {
                         loadingDialog.hide();
                         if (res === ENOENT) {
@@ -6250,7 +6250,9 @@ function disableCircularTargets(pref) {
     for (var s in $.selected) {
         if ($.selected.hasOwnProperty(s)) {
             nodeId = $.selected[s];
-            $(pref + nodeId).addClass('disabled');
+            if (M.d[nodeId]) {
+                $(pref + nodeId).addClass('disabled');
+            }
 
             if (M.d[nodeId] && M.d[nodeId].p) {
 

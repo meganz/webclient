@@ -1846,13 +1846,14 @@ a.blog-button:hover {
 }
 .notification-username {
     display: block;
+    font-family: "source_sans_prosemibold", Arial;
     font-size: 14px;
     line-height: 16px;
     overflow: hidden;
     padding: 0;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 205px;
+    width: 280px;
 }
 .notification-content {
     -webkit-box-sizing: border-box;
@@ -6696,6 +6697,7 @@ table {
 .fm-right-files-block, .fm-right-account-block {
     height: 100%;
     margin-left: 304px;
+    position: relative;
 }
 .fm-right-header, .fm-tranfers-header {
     padding-right: 8px;
@@ -8929,6 +8931,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: relative;
     padding: 0 12px;
 }
+.notification-popup .fm-notifications-bottom {
+     height: 32px;
+ }
 .browsers-dialog .fm-notifications-bottom {
     padding: 0 20px 0 14px;
 }
@@ -24219,8 +24224,12 @@ a.ui-datepicker-next {
 }
 .empty-block {
     height: 100%;
-    position: relative;
+    position: absolute;
     min-height: 380px;
+        width: 100%;
+    width: -webkit-calc(100% -256px);
+    width: -moz-calc(100% - 256px);
+    width: calc(100% - 256px);
     overflow: hidden;
 }
 .empty-pad {
@@ -24246,7 +24255,7 @@ a.ui-datepicker-next {
     color: #777777;
 }
 .empty-pad.conversations {
-    margin-top: -168px;
+    margin-top: -125px;
 }
 .empty-icon.conversations {
     background-position: center 0px;

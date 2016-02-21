@@ -136,7 +136,7 @@ function u_checklogin3a(res, ctx) {
         catch (e) {
             console.error('Error decoding private RSA key', e);
         }
-        
+
         // Flags is a generic object for various things
         if (typeof u_attr.flags !== 'undefined') {
 
@@ -1108,15 +1108,26 @@ function checkUserLogin() {
             logger.debug('Setting value for key "%s"', key, value);
         }
 
-        if (u_type === 3 && !folderlink) {
-            if (timer) {
-                clearTimeout(timer);
+        var push = function() {
+            if (u_type === 3 && !pfid && !folderlink) {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                // through a timer to prevent floods
+                timer = setTimeout(store, 9701);
             }
-            // through a timer to prevent floods
-            timer = setTimeout(store, 9701);
+            else {
+                localStorage.fmconfig = JSON.stringify(fmconfig);
+                timer = null;
+            }
+        };
+
+        if (fminitialized) {
+            Soon(push);
         }
-        else {
-            localStorage.fmconfig = JSON.stringify(fmconfig);
+        else if (timer !== -MMH_SEED) {
+            timer = -MMH_SEED;
+            mBroadcaster.once('fm:initialized', push);
         }
 
         mBroadcaster.sendMessage('fmconfig:' + key, value);

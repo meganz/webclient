@@ -306,9 +306,10 @@ var notify = {
 
         // Add the emails from the user's list of known contacts
         if (M && M.u) {
-            M.u.forEach(function(c, userHandle) {
+            M.u.forEach(function(contact, userHandle) {
+                                
                 // Add the email
-                notify.userEmails[userHandle] = c.m;
+                notify.userEmails[userHandle] = contact.m;
             });
         }
     },
@@ -509,13 +510,16 @@ var notify = {
             avatar = useravatar.contact(userEmail);
         }
 
+        // Get the user's name if we have it, otherwise user their email
+        var displayNameOrEmail = notify.getDisplayName(userEmail);
+
         // Escape email address
         userEmail = htmlentities(userEmail);
 
         // Update common template variables
         $notificationHtml.attr('id', notification.id);
         $notificationHtml.find('.notification-date').text(date);
-        $notificationHtml.find('.notification-username').text(userEmail);
+        $notificationHtml.find('.notification-username').text(displayNameOrEmail);
         $notificationHtml.find('.notification-avatar').prepend(avatar);
 
         // Add read status
@@ -546,7 +550,6 @@ var notify = {
             default:
                 return false;   // If it's a notification type we do not recognise yet
         }
-
     },
 
     /**
@@ -936,5 +939,36 @@ var notify = {
         }
         
         return htmlentities(name);
+    },
+    
+    /**
+     * Gets a display name for the notification. If available it will use the user or contact's name.
+     * If the name is unavailable (e.g. a new contact request) then it will use the email address.
+     * @param {String} email The email address e.g. ed@fredom.press
+     * @returns {String} Returns the name and email as a string e.g. "Ed Snowden (ed@fredom.press)" or just the email
+     */
+    getDisplayName: function(email) {
+        
+        // Use the email by default
+        var displayName = email;
+        
+        // Search through contacts for the email address
+        if (M && M.u) {
+            M.u.forEach(function(contact) {
+                
+                // If the email is found
+                if ((contact.m === email) && contact.firstName && contact.lastName) {
+                    
+                    // Set the name and email
+                    displayName = contact.firstName + ' ' + contact.lastName + ' (' + email + ')';
+                    
+                    // Exit foreach loop
+                    return true;
+                }
+            });
+        }
+        
+        // Escape and return
+        return htmlentities(displayName);
     }
 };

@@ -1456,7 +1456,7 @@ var strongvelope = {};
             this.otherParticipants = _setJoin(this.otherParticipants,
                 this.includeParticipants);
             this.otherParticipants.delete(this.ownHandle);
-            this.excludeParticipants.forEach(function _removeEcludeIterator(item) {
+            this.excludeParticipants.forEach(function _removeExcludeIterator(item) {
                 self.otherParticipants.delete(item);
             });
         }

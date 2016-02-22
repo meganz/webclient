@@ -4279,7 +4279,7 @@ function accountUI()
         msgDialog('confirmation', l[6181], l[1974], false, function(event) {
             if (event) {
                 loadingDialog.show();
-                api_req({ a: 'erm', m: M.u[u_handle].m, t: 21 }, {
+                api_req({ a: 'erm', m: Object(M.u[u_handle]).m, t: 21 }, {
                     callback: function(res) {
                         loadingDialog.hide();
                         if (res === ENOENT) {
@@ -6253,7 +6253,9 @@ function disableCircularTargets(pref) {
     for (var s in $.selected) {
         if ($.selected.hasOwnProperty(s)) {
             nodeId = $.selected[s];
-            $(pref + nodeId).addClass('disabled');
+            if (M.d[nodeId]) {
+                $(pref + nodeId).addClass('disabled');
+            }
 
             if (M.d[nodeId] && M.d[nodeId].p) {
 
@@ -7033,6 +7035,14 @@ function dorename()
 }
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    var extraButton = String(type).split(':');
+    if (extraButton.length === 1) {
+        extraButton = null;
+    }
+    else {
+        type = extraButton.shift();
+        extraButton = extraButton.join(':');
+    }
     $.msgDialog = type;
     $.warningCallback = callback;
 
@@ -7062,7 +7072,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             }
         });
     }
-    if (type === 'delete-contact') {
+    else if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
@@ -7083,16 +7093,38 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         });
     }
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {
-        $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="fm-dialog-button notification-button"><span>@@</span></div>' +
-                '<div class="clear"></div>', l[81]);
+        if (extraButton) {
+            $('#msgDialog .fm-notifications-bottom')
+                .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
+                    '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+                    '<div class="clear"></div>', l[81], extraButton);
 
-        $('#msgDialog .fm-dialog-button').bind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-            }
-        });
+            $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+                closeMsg();
+                if ($.warningCallback) {
+                    $.warningCallback(false);
+                }
+            });
+            $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+                closeMsg();
+                if ($.warningCallback) {
+                    $.warningCallback(true);
+                }
+            });
+        }
+        else {
+            $('#msgDialog .fm-notifications-bottom')
+                .safeHTML('<div class="fm-dialog-button notification-button"><span>@@</span></div>' +
+                    '<div class="clear"></div>', l[81]);
+
+            $('#msgDialog .fm-dialog-button').bind('click', function() {
+                closeMsg();
+                if ($.warningCallback) {
+                    $.warningCallback(true);
+                }
+            });
+        }
+
         $('#msgDialog .icon').addClass('fm-notification-icon');
         if (type === 'warninga') {
             $('#msgDialog').addClass('warning-dialog-a');
@@ -8474,6 +8506,13 @@ function copyDialog() {
     $('.copy-dialog .dialog-newfolder-button').rebind('click', function() {
 
         $('.copy-dialog').addClass('arrange-to-back');
+        var dest = $(this).parents('.fm-dialog').find('.active .nw-fm-tree-item.selected');
+        if (dest.length) {
+            $.cftarget = dest.attr('id').replace(/[^_]+_/, '');
+        } else {
+            /* No folder is selected, "New Folder" must create a new folder in Root */
+            $.cftarget = M.RootID;
+        }
         createFolderDialog();
 
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');

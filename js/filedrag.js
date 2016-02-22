@@ -86,7 +86,6 @@
 
             if (t.attr('class') == "nw-fm-tree-folder") {
                 t.css('background-color', 'rgba(222,222,10,0.3)');
-                $.onDroppedTreeFolder = t.parent().attr('id').split('_').pop();
             }
         }
     }
@@ -196,16 +195,23 @@
         $($.ddhelper).remove();
         $.ddhelper = undefined;
 
-        if (folderlink || (M.currentdirid !== 'transfers'
-                && (RightsbyID(M.currentdirid || '') | 0) < 1)) {
+        if (
+            (
+                folderlink ||
+                (
+                    M.currentdirid !== 'transfers' &&
+                    (RightsbyID(M.currentdirid || '') | 0) < 1
+                )
+            ) &&
+            String(M.currentdirid).indexOf("chat/") === -1
+        ) {
             msgDialog('warningb', l[1676], l[1023]);
             return true;
         }
 
         if (page == 'start') {
             if ($('#fmholder').html() == '') {
-                $('#fmholder').html('<div id="topmenu"></div>'
-                    + translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
+                $('#fmholder').html(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
             start_out();
             setTimeout(function() {
@@ -214,6 +220,12 @@
         }
         else {
             $('span.nw-fm-tree-folder').css('background-color', '');
+
+            var target = $(e.target);
+            if (target.hasClass("nw-fm-tree-folder")) {
+                var handle = target.parent().attr('id').split('_').pop();
+                $.onDroppedTreeFolder = M.d[handle] && handle;
+            }
         }
 
         var dataTransfer = e.dataTransfer;

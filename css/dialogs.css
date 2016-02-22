@@ -1,0 +1,95 @@
+.fm-dialog-footer {
+    height: 56px;
+    background-color: #F6F6F6;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-border-bottom-left-radius: 7px;
+    -moz-border-radius-bottomleft: 7px;
+    border-bottom-left-radius: 7px;
+    -webkit-border-bottom-right-radius: 7px;
+    -moz-border-radius-bottomright: 7px;
+    border-bottom-right-radius: 7px;
+    padding:12px 12px 0 12px;
+}
+
+/* Send Contact Dialog */
+.fm-dialog.send-contact {
+    width: 644px;
+    margin:-246px 0 0 -322px;
+}
+.fm-dialog .contacts-search-scroll {
+    height: 336px !important;
+}
+.fm-dialog .contacts-search-scroll, .fm-dialog .contacts-search-scroll .jspPane {
+    background-position: 0 -48px;
+}
+.fm-dialog .contacts-info.body.contacts-search {
+    height: 48px;
+	padding: 6px 0;
+	cursor: pointer;
+    background-color: #fafafa;
+}
+.fm-dialog .contacts-info.body.contacts-search:nth-child(odd) {
+   background-color: white;
+}
+.fm-dialog .contacts-info.body.contacts-search.selected {
+    background-color: rgba(240,240,240,1);
+}
+.fm-dialog .contacts-search-header {
+    padding-top: 10px;
+}
+/* End of Send Contact Dialog */
+
+/* Add From Cloud Dialog */
+.fm-dialog.add-from-cloud {
+    width: 644px;
+    margin:-246px 0 0 -322px;
+}
+.fm-dialog .fm-breadcrumbs-block {
+    float: none;
+    height: 40px;
+    margin: 0 0 19px 0;
+    padding: 22px 0 0 16px;
+}
+.fm-dialog .fm-breadcrumbs-block:not(.long-path) .cloud-drive .right-arrow-bg {
+    padding: 0 7px 0 8px;
+    background-image: none;
+}
+.fm-dialog .fm-breadcrumbs .right-arrow-bg {
+    font-size: 13px;
+}
+.fm-dialog .fm-breadcrumbs:first-child .right-arrow-bg span {
+    display: block;
+}
+.fm-dialog .long-path .fm-breadcrumbs .right-arrow-bg span {
+    display: none;
+}
+ .fm-dialog-table.grid-table tr:nth-child(odd) td {
+    background-color: rgba(255,255,255,1);
+ }
+  .fm-dialog-table.grid-table tr:nth-child(even) td {
+    background-color: rgba(250,250,250,1);
+ }
+.fm-dialog-table.grid-table-header th:nth-child(1), .fm-dialog-table.grid-table td:nth-child(1) {
+    width: 50px;
+    padding: 0 0 0 3px;
+}
+.fm-dialog-table.grid-table-header th:nth-child(2), .fm-dialog-table.grid-table td:nth-child(2) {
+    width: 476px;
+}
+.fm-dialog-table.grid-table-header th:nth-child(3), .fm-dialog-table.grid-table td:nth-child(3) {
+    width: 114px;
+    background-image: none;
+}
+.fm-dialog-grid-scroll {
+    height: 312px !important;
+}
+.fm-dialog-grid-scroll, .fm-dialog-grid-scroll .jspPane { 
+    background-image: url(../images/mega/grid-bg.svg);
+    background-position:0 -24px;
+}
+ .fm-dialog-table.grid-table tr.ui-selected td {
+    background-color: rgba(233,233,233,1);
+}
+/* End of Add From Cloud Dialog */

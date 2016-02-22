@@ -1,0 +1,117 @@
+.conversations-pane {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+.conversations-pane li {
+	padding: 8px 12px;
+	display: block;
+	height: 72px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+.user-card-name.conversation-name {
+	padding: 0 26px 0 0;
+    float: left;
+        line-height: 21px;
+        max-width: 100%;
+        letter-spacing: -0.05px;
+}
+.user-card-name.conversation-name.group {
+	padding: 0;
+}
+.conversation-name .user-card-presence {
+	margin: 6px 0 0 0;
+	position: absolute;
+	right: 8px;
+}
+.conversation-message {
+	font-size: 13px;
+	line-height: 18px;
+	color: #777777;
+    margin: 0 40px 0 0;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow: hidden;
+    clear: both;
+}
+.conversation-message.unread {
+	color: #2BA6DE;
+}
+.conversations-pane li.active {
+	background-color: #65bbe2;
+}
+.conversations-pane li.active .user-card-name {
+	color: white;
+}
+.conversations-pane li.active .conversation-message {
+	color: rgba(255,255,255,0.8);
+}
+.conversations-pane li.active .date-time {
+	color: rgba(255,255,255,0.6);
+    line-height: 18px;
+}
+.conversations-pane li.active .user-card-presence {
+	background-color: white;
+	border-color: white;
+}
+.unread-messages {
+	position: absolute;
+	right: 12px;
+    top: 28px;
+	text-align: center;
+	min-width: 18px;
+	height: 16px;
+	font-size: 11px;
+	line-height: 16px;
+	padding: 0 6px;
+	background-color: #2BA6DE;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	color: white;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.conversations-pane li.active .unread-messages {
+    background-color: white;
+    color: #2BA6DE;
+}
+.call-duration {
+	position: absolute;
+	right: 12px;
+    top: 23px;
+    font-size:20px;
+    line-height:25px;
+    color: #777777;
+    font-family: 'source_sans_prolight';
+}
+.conversations-pane li.active .call-duration {
+    color: white;
+}
+.call-duration.blue {
+    color: #61D2FF;
+}
+.call-duration.medium {
+    font-size:24px;
+    line-height:31px;
+}
+.call-duration span, .call-duration i {
+    vertical-align: top;
+}
+.call-duration i {
+    vertical-align: top;
+    margin: 4px 6px 0 0;
+}
+.call-duration + .conversation-message {
+    margin-right: 120px;
+}
+.unread-messages + .call-duration {
+    margin-right: 30px;
+}
+.unread-messages + .call-duration + .conversation-message {
+    margin-right: 150px;
+}

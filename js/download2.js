@@ -1,6 +1,4 @@
-
 var dlMethod;
-var dl_maxSlots = readLocalStorage('dl_maxSlots', 'int', { min: 1, max: 6, def: 5 });
 
 /* jshint -W003 */
 var dlmanager = {
@@ -13,7 +11,7 @@ var dlmanager = {
     dlDoneThreshold: 3,
     // How many queue IO we want before pausing the XHR fetching,
     // useful when we have internet faster than our IO
-    ioThrottleLimit: 15,
+    ioThrottleLimit: 6,
     ioThrottlePaused: false,
     fetchingFile: false,
     dlLastQuotaWarning: 0,
@@ -120,7 +118,7 @@ var dlmanager = {
     },
 
     getGID: function DM_GetGID(dl) {
-        return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
+        return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + (dl.dl_id || dl.ph);
     },
 
     abort: function DM_abort(gid, keepUI) {
@@ -249,7 +247,7 @@ var dlmanager = {
             next: callback,
             dl_key: object.key,
             callback: this.dlGetUrlDone.bind(this)
-        }, n_h ? 1 : 0);
+        }, object.nauth ? 1 : 0);
     },
 
     dlGetUrlDone: function DM_dlGetUrlDone(res, ctx) {
@@ -388,22 +386,19 @@ var dlmanager = {
         return 2;
     },
 
-    idToFile: function DM_IdToFile(id) {
-        var dl = {};
-        for (var i in dl_queue) {
-            if (id === dl_queue[i].id) {
-                dl = dl_queue[i];
-                ASSERT(dl.pos === i, 'dl.pos !== i');
-                break;
+    getDownloadByHandle: function DM_IdToFile(handle) {
+        var dl = null;
+        if (handle) {
+            for (var i in dl_queue) {
+                if (dl_queue.hasOwnProperty(i)) {
+                    var dlh = dl_queue[i].ph || dl_queue[i].id;
+                    if (dlh === handle) {
+                        dl = dl_queue[i];
+                        break;
+                    }
+                }
             }
         }
-        // $.each(dl_queue, function(i, _dl) {
-        // if (id === _dl.id) {
-        // dl = _dl
-        // dl.pos = i
-        // return false;
-        // }
-        // });
         return dl;
     },
 
@@ -502,7 +497,7 @@ var dlmanager = {
             var abLen = task.data.byteLength;
             var abDup = dl.data && (is_chrome_firefox & 4) && new Uint8Array(task.data);
 
-            dl.io.write(task.data, task.offset, function() {
+            var ready = function _onWriterReady() {
                 dl.writer.pos += abLen;
                 if (dl.data) {
                     new Uint8Array(
@@ -513,7 +508,17 @@ var dlmanager = {
                 }
 
                 return finish_write(task, done);
-            });
+            };
+
+            try {
+                dl.io.write(task.data, task.offset, ready);
+            }
+            catch (ex) {
+                var logger = dl.writer && dl.writer.logger || dlmanager.logger;
+                logger.error(ex);
+                dlFatalError(dl, ex);
+            }
+
         }, 1, 'download-writer');
 
         dlmanager.throttleByIO(dl.writer);
@@ -783,6 +788,74 @@ var dlmanager = {
         }
         quota[t] += chunksize;
         localStorage.q = JSON.stringify(quota);
+    },
+
+    isMEGAsyncRunning: function(minVersion) {
+        var timeout = 200;
+        var logger = this.logger;
+        var promise = new MegaPromise();
+
+        var resolve = function() {
+            if (promise) {
+                loadingDialog.hide();
+                logger.debug('isMEGAsyncRunning: YUP');
+
+                promise.resolve.apply(promise, arguments);
+                promise = undefined;
+            }
+        };
+        var reject = function(e) {
+            if (promise) {
+                loadingDialog.hide();
+                logger.debug('isMEGAsyncRunning: NOPE', e);
+
+                promise.reject.apply(promise, arguments);
+                promise = undefined;
+            }
+        };
+        var loader = function() {
+            if (typeof megasync === 'undefined') {
+                return reject(EACCESS);
+            }
+            megasync.isInstalled(function(err, is) {
+                if (err || !is) {
+                    reject(err || ENOENT);
+                }
+                else {
+                    // if a min version is required, check for it
+                    if (minVersion) {
+                        var runningVersion = mega.utils.vtol(is.v);
+
+                        if (typeof minVersion !== 'number'
+                                || parseInt(minVersion) !== minVersion) {
+
+                            minVersion = mega.utils.vtol(minVersion);
+                        }
+
+                        if (runningVersion < minVersion) {
+                            return reject(ERANGE);
+                        }
+                    }
+
+                    resolve(megasync);
+                }
+            });
+        };
+
+        loadingDialog.show();
+        logger.debug('isMEGAsyncRunning: checking...');
+
+        if (typeof megasync === 'undefined') {
+            timeout = 4000;
+            mega.utils.require('megasync_js').always(loader);
+        }
+        else {
+            loader();
+        }
+
+        setTimeout(reject, timeout);
+
+        return promise;
     }
 };
 
@@ -1043,7 +1116,7 @@ var dlQueue = new TransferQueue(function _downloader(task, done) {
         return done();
     }
     return task.run(done);
-}, dl_maxSlots, 'downloader');
+}, 4, 'downloader');
 
 // chunk scheduler
 dlQueue.validateTask = function(pzTask) {

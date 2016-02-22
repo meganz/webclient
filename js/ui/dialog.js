@@ -79,7 +79,7 @@
     Dialog.prototype._initGenericEvents = function() {
         var self = this;
 
-        if(self.options.focusable) {
+        if (self.options.focusable) {
             $('input, textarea, select', self.$dialog).rebind('focus.dialog' + self._getEventSuffix(),function() {
                 self.$dialog.addClass('focused');
             });
@@ -87,26 +87,26 @@
                 self.$dialog.removeClass('focused');
             });
         }
-        if(self.options.closable) {
+        if (self.options.closable) {
             $('.fm-dialog-close', self.$dialog).rebind('click.dialog' + self._getEventSuffix(), function() {
                 self.hide();
             });
         }
-        if(self.options.expandable) {
+        if (self.options.expandable) {
             $(self.options.expandableButtonClass, self.$dialog).rebind('click.dialog' + self._getEventSuffix(), function() {
                 self.toggleExpandCollapse();
             });
         }
-        if(self.options.title) {
+        if (self.options.title) {
             $('.nw-fm-dialog-title', self.$dialog).text(self.options.title);
         }
 
         // link dialog size with the textareas when/if resized by the user using the native resize func
         $('textarea', self.$dialog)
             .bind('mouseup mousemove',function(){
-                if(this.oldwidth  === null){this.oldwidth  = this.style.width;}
-                if(this.oldheight === null){this.oldheight = this.style.height;}
-                if(this.style.width != this.oldwidth || this.style.height != this.oldheight){
+                if (this.oldwidth  === null){this.oldwidth  = this.style.width;}
+                if (this.oldheight === null){this.oldheight = this.style.height;}
+                if (this.style.width != this.oldwidth || this.style.height != this.oldheight){
                     $(this).resize();
                     this.oldwidth  = this.style.width;
                     this.oldheight = this.style.height;
@@ -148,7 +148,7 @@
             });
         }
 
-        if(self.options.buttons.length > 0) {
+        if (self.options.buttons.length > 0) {
             self.options.buttons.forEach(function(buttonMeta, k) {
                 if (self.options.defaultButtonStyle) {
                     var $button = $('<div class="fm-dialog-button"><span></span></div>');
@@ -184,12 +184,12 @@
     Dialog.prototype.reposition = function() {
         var self = this;
 
-        if(!self.visible) {
+        if (!self.visible) {
             return;
         }
 
-        if(self.options.expandable) {
-            if(!self.expanded && self.$toggleButton) {
+        if (self.options.expandable) {
+            if (!self.expanded && self.$toggleButton) {
                 self.$dialog.position({
                     'my': 'center bottom',
                     'at': 'center top-10', /* the only hardcoded value, the arrow height */
@@ -232,10 +232,10 @@
     Dialog.prototype.show = function($toggleButton) {
         var self = this;
 
-        if(self.visible) {
+        if (self.visible) {
             return;
         }
-        if(!self.$dialog.css('z-index')) {
+        if (!self.$dialog.css('z-index')) {
             self.$dialog.css('z-index', dialogIdx + startingZIndex);
         }
 
@@ -245,26 +245,26 @@
 
         self.$dialog.removeClass('hidden');
 
-        if($toggleButton) {
+        if ($toggleButton) {
             self.collapse($toggleButton);
             $toggleButton.addClass('active');
         }
-        if(self.options.closable) {
+        if (self.options.closable) {
             $(document.body).rebind('mousedown.dialogClose' + self.dialogIdx, function(e) {
-                if($(self.$dialog).find(e.target).length == 0 && $(self.$dialog).is(e.target) === false && !$(self.$dialog).is(".fm-mega-dialog")) {
+                if ($(self.$dialog).find(e.target).length == 0 && $(self.$dialog).is(e.target) === false && !$(self.$dialog).is(".fm-mega-dialog")) {
                     self.hide();
                     return false;
                 }
             });
         }
-        if(self.options.closableByEsc) {
+        if (self.options.closableByEsc) {
             $(document).rebind('keyup.' + self.options.className, function(evt) {
                 if (evt.keyCode == 27) {
                     self.hide();
                 }
             });
         }
-        if(!self.options.expandable || self.options.requiresOverlay) {
+        if (!self.options.expandable || self.options.requiresOverlay) {
             self._showOverlay();
         }
 
@@ -282,31 +282,31 @@
     Dialog.prototype.hide = function() {
         var self = this;
 
-        if(!self.visible) {
+        if (!self.visible) {
             return;
         }
-        if(self.$toggleButton) {
+        if (self.$toggleButton) {
             self.$toggleButton.removeClass('active');
         }
 
         self.visible = false;
         self.$toggleButton = null;
 
-        if(self.options.expandable && self.expanded) {
+        if (self.options.expandable && self.expanded) {
             self.collapse();
         }
 
-        if(self.options.closable) {
+        if (self.options.closable) {
             $(document.body).unbind('mousedown.dialogClose' + self.dialogIdx);
         }
 
-        if(self.options.closableByEsc) {
+        if (self.options.closableByEsc) {
             $(document).unbind('keyup.' + self.options.className);
         }
 
         self.$dialog.addClass('hidden');
 
-        if(!self.options.expandable && self.options.requiresOverlay) {
+        if (!self.options.expandable && self.options.requiresOverlay) {
             self._hideOverlay();
         }
 
@@ -322,7 +322,7 @@
         var self = this;
         self.$toggleButton = $($toggleButton);
 
-        if(self.visible) {
+        if (self.visible) {
             self.hide();
         } else {
             self.show(self.$toggleButton);
@@ -345,11 +345,11 @@
 
         self._hideOverlay();
 
-        if($toggleButton) {
+        if ($toggleButton) {
             self.$toggleButton = $toggleButton;
         }
 
-        if(self.$toggleButton) {
+        if (self.$toggleButton) {
             self.$toggleButton.addClass('active');
         }
 
@@ -373,7 +373,7 @@
             .removeClass("short-size")
             .addClass("full-size");
 
-        if(self.$toggleButton) {
+        if (self.$toggleButton) {
             self.$toggleButton.removeClass('active');
         }
 
@@ -406,7 +406,7 @@
      */
     Dialog.prototype.toggleExpandCollapse = function() {
         var self = this;
-        if(self.expanded) {
+        if (self.expanded) {
             self.collapse();
         } else {
             self.expand();
@@ -418,10 +418,10 @@
      */
     Dialog.prototype.destroy = function() {
         var self = this;
-        if(self.visible) {
+        if (self.visible) {
             self.hide();
         }
-        if(self.$dialog) {
+        if (self.$dialog) {
             self.$dialog.remove();
         }
     };

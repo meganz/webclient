@@ -1,0 +1,248 @@
+.messages-block {
+    height: 100%;
+    position: relative;
+    background-color: #fafafa;
+    margin-right: 256px;
+}
+.messages-block::before {
+    display: block;
+    content: '';
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height: 390px;
+    background: #fafafa;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlZWVlZWUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fafafa), color-stop(100%, #eeeeee));
+    background: -webkit-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
+    background: -o-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
+    background: -ms-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
+    background: linear-gradient(to bottom, #fafafa 0%, #eeeeee 100%);
+}
+.messages-block.small-block {
+    height: 240px;
+}
+.messages.scroll-area {
+    position: relative;
+    height: 100%;
+    height: -webkit-calc(100% - 72px);
+    height: -moz-calc(100% - 72px);
+    height: calc(100% - 72px);
+    overflow: hidden;
+}
+.messages.error.scroll-area {
+    height: 100%;
+}
+.messages.scroll-area .jspVerticalBar {
+    width: 10px;
+}
+.messages.scroll-area .jspPane {
+    height: 100%;
+    display: table;
+}
+
+.messages.main-pad {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    height: 100%;
+}
+.messages.content-area {
+    display: table-cell;
+    vertical-align: bottom;
+    padding: 0 0 24px 0;
+}
+.error.scroll-area .messages.content-area {
+    padding: 0 0 25px 0;
+}
+.messages.notification .header {
+    color: #999999;
+    font-size: 24px;
+    line-height: 31px;
+    font-family: 'source_sans_prolight';
+    padding: 0 0 15px 0;
+}
+.messages.notification .header span {
+    color: #666666;
+}
+.messages.notification .info {
+    font-size: 16px;
+    line-height: 20px;
+    color: #999999;
+    padding: 20px 0 22px 0;
+}
+.messages.notification .info > span {
+    padding: 0 0 16px 0;
+    display:block;
+}
+.messages.notification .info p {
+    font-size: 14px;
+    line-height: 18px;
+    position: relative;
+    padding: 24px 0 0 48px;
+    margin: 0;
+}
+.messages.notification .info p i {
+    position:absolute;
+    left: 0;
+    margin:4px 0 0 0;
+}
+.messages.notification .info p strong {
+    display:block;
+    color:#666666;
+}
+.message.body {
+    padding: 0 24px 0 24px;
+    margin: 24px 0 0 0;
+    position: relative;
+    clear: both;
+}
+.message.content-area {
+    margin: 0 0 0 48px;
+    font-size: 13px;
+    line-height: 20px;
+    color: #666666;
+}
+.message.small-rounded-avatar {
+    margin: 3px 0 0 0;
+}
+.message.text-block {
+    margin: 2px 30px 0 0;
+    word-wrap: break-word;
+    min-height: 20px;
+    position:relative;
+}
+.message.text-block a {
+    color: #2BA6DE;
+    text-decoration: underline;
+}
+.message.text-block a:hover {
+    text-decoration: none;
+}
+.small-info-txt .message.text-block {
+    font-size: 13px;
+    line-height: 14px;
+    color: #999999;
+    margin: 0 30px 0 0;
+}
+.small-info-txt.message.content-area {
+    padding: 2px 0 6px 0;
+}
+.message .dark-grey-txt {
+    color: #666666;
+}
+.message.date-time {
+    font-size: 13px;
+    line-height: 18px;
+    display: table-cell;
+    color: rgba(153,153,153,0.84);
+}
+.message.user-card-name {
+    display: table-cell;
+    padding: 0 10px 0 0;
+    color: rgba(51,51,51,0.84);
+}
+.message.date-divider {
+    font-size: 16px;
+    line-height: 18px;
+    color: #2BA6DE;
+    padding: 24px 0 0 71px;
+    font-family: 'source_sans_prosemibold';
+}
+.message.shared-info {
+    white-space: nowrap;
+    padding: 17px 0 4px 0;
+}
+.message.shared-info:first-child {
+    padding: 1px 0 4px 0;
+}
+.message.shared-info .user-card-email {
+    padding: 0 0 4px 0;
+}
+.message.content-area .user-card-verified.big {
+    display: inline-block;
+    margin: 3px 0 0 -58px;
+    float: none;
+    position: absolute;
+}
+.message.data-title {
+    font-size: 13px;
+    line-height: 20px;
+    font-family: 'Open Sans Italic';
+    display: inline-block;
+    color: #2BA6DE;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0 70px 0 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.message.data-title.red {
+    color: rgba(217,0,7,0.7);
+}
+.message.file-size {
+    font-size: 13px;
+    line-height: 20px;
+    margin: 1px 0 0 -60px;
+    display: inline-block;
+    vertical-align: top;
+    color: #666666;
+}
+.message.shared-data {
+    margin: 0 0 4px 0;
+}
+.not-sent.message.body {
+    background-color: rgba(255, 51, 58, 0.7);
+    padding: 9px 24px 12px 24px;
+}
+.not-sent .message.user-card-name, .not-sent .message.text-block {
+    color: white;
+}
+.not-sent .message.date-time {
+    color: rgba(255,255,255,0.84);
+}
+.not-sent .red {
+    color: #E54C51;
+}
+.message.circuit-label {
+    display: block;
+    font-size: 12px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    line-height: 30px;
+    border: 1px solid white;
+    color: white;
+    font-family: 'Open Sans Italic';
+    padding: 0 10px;
+    height: 32px;
+    text-align: center;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.messages.notification {
+    padding: 24px 24px 0 24px;
+}
+.message.body.grouped {
+    margin: 0;
+}
+.message.shared-data {
+    margin-bottom: 10px;
+}
+.message.content-area > .default-white-button.tiny-button {
+    position: absolute;
+    right: 24px;
+    float: none;
+    margin: 2px 0 0 0;
+}
+.message.content-area .small-blue-spinner {
+    position: absolute;
+    right: 24px;
+    margin-top: -15px;
+}

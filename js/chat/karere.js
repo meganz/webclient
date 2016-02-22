@@ -11,7 +11,7 @@ Strophe.Bosh.prototype._hitError = Strophe.Websocket.prototype._hitError = funct
     var self = this;
     var karere = this._conn.karere;
 
-    karere._connectionRetry(reqStatus);
+    karere.connectionRetryManager.doConnectionRetry(reqStatus);
 };
 
 /**
@@ -46,6 +46,8 @@ var Karere = function(user_options) {
     Strophe.fatal = function (msg) { self.error(msg); };
     Strophe.error = function (msg) { self.error(msg); };
 
+    self.destroying = false;
+
     // initialize the connection state
     self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
 
@@ -53,6 +55,8 @@ var Karere = function(user_options) {
     $(window).on("unload", function() {
 
         if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+            self.destroying = true;
+
             var msg = $pres({
                 type: 'unavailable'
             });
@@ -85,8 +89,6 @@ var Karere = function(user_options) {
     self._waitForPresenceCache = {};
 
     self._triggeredActions = {};
-
-    self._lastConnectionRetryTime = false;
 
     self.bind("onPresence", function(e, eventObject) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
@@ -182,10 +184,6 @@ var Karere = function(user_options) {
 
     // cleanup after disconnecting
     self.bind("onDisconnected", function() {
-        if (self._$connectingPromise && self._$connectingPromise.state() === 'pending') {
-            self._$connectingPromise.reject();
-        }
-
         Object.keys(self._presenceBareCache).forEach(function(k) {
             delete self._presenceBareCache[k];
 
@@ -211,19 +209,71 @@ var Karere = function(user_options) {
     });
 
 
-    self._connectionRetries = 0;
-
     self.bind("onConnected", function() {
-        self._connectionRetries = 0; // reset connection retries
-
-        // stop any timer which is running to try to reconnect (which should not happen, but since Karere is async...
-        // race condition may trigger a .reconnect() by a timer)
-        if (self._connectionRetryInProgress) {
-            clearTimeout(self._connectionRetryInProgress);
-        }
+        self.connectionRetryManager.gotConnected();
     });
 
-    // helper functions for simple way of storing/caching some meta info
+    self.connectionRetryManager = new ConnectionRetryManager(
+        {
+            functions: {
+                reconnect: function(connectionRetryManager) {
+                    //console.error("reconnect was called");
+                    return self.forceReconnect();
+                },
+                /**
+                 * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 */
+                forceDisconnect: function(connectionRetryManager) {
+                    //console.error("forceDisconnect was called");
+                    return self.forceDisconnect();
+                },
+                /**
+                 * Should return true or false depending on the current state of this connection, e.g. (connected || connecting)
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 * @returns {bool}
+                 */
+                isConnectedOrConnecting: function(connectionRetryManager) {
+                    return (
+                        self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED ||
+                        self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING
+                    );
+                },
+                /**
+                 * Should return true/false if the current state === CONNECTED
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 * @returns {bool}
+                 */
+                isConnected: function(connectionRetryManager) {
+                    return (
+                        self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED
+                    );
+                },
+                /**
+                 * Should return true/false if the current state === DISCONNECTED
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 * @returns {bool}
+                 */
+                isDisconnected: function(connectionRetryManager) {
+                    return (
+                        self.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED
+                    );
+                },
+                /**
+                 * Should return true IF the user had forced the connection to go offline
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 * @returns {bool}
+                 */
+                isUserForcedDisconnect: function(connectionRetryManager) {
+                    return (
+                        self.destroying === true || localStorage.megaChatPresence === "unavailable"
+                    );
+                }
+            }
+        },
+        self.logger
+    );
+
     return this;
 };
 
@@ -259,7 +309,7 @@ Karere.DEFAULTS = {
         "muc#roomconfig_passwordprotectedroom": 0,
         "muc#roomconfig_maxusers": 200,
         "muc#roomconfig_whois": "anyone",
-        "muc#roomconfig_membersonly": 1,
+        "muc#roomconfig_membersonly": 0,
         "muc#roomconfig_moderatedroom": 1,
         "members_by_default": 1,
         "muc#roomconfig_changesubject": 0,
@@ -294,41 +344,6 @@ Karere.DEFAULTS = {
      * However, what is the timeout that should be used to determinate if the connect operation had timed out?
      */
     connectionRequiredTimeout: 13000,
-
-
-    /**
-     * Timeout when connecting
-     */
-    connectTimeout: 15000,
-
-
-    /**
-     * Connection retry delay in ms (reconnection will be triggered with a timeout calculated as:
-     * self._connectionRetries * this value)
-     */
-    reconnectDelay: 750,
-
-    /**
-     * Multipliers used in a rand(retryFuzzinesFactors[0], retryFuzzinesFactors[1])
-     * to add randomness to the connection retry timers.
-     */
-    retryFuzzinesFactors: [0.7, 1.3],
-
-    /**
-     * 10 mins timeout after the maxConnectionRetries is reached.
-     */
-    restartConnectionRetryTimeout: (10 * 1000 * 60),
-
-    /**
-     * Minimum milliseconds after which a mousemove will trigger a connection retry.
-     */
-    connectionRetryFloorVal: 5000,
-
-
-    /**
-     * Maximum connection retry in case of error OR timeout
-     */
-    maxConnectionRetries: 50,
 
     /**
      * Timeout waiting for a ping response from user (note: using client-to-client xmpp ping)
@@ -424,8 +439,7 @@ makeMetaAware(Karere);
      * @returns {Karere.CONNECTION_STATE}
      */
     Karere.prototype.getConnectionState = function() {
-        var self = this;
-        return self._connectionState;
+        return this._connectionState;
     };
 
     /**
@@ -442,7 +456,7 @@ makeMetaAware(Karere);
     Karere._exceptionSafeProxy = function(fn, context) {
         return function() {
             try {
-                return fn.apply(context, toArray(arguments));
+                return fn.apply(context, arguments);
             } catch (e) {
                 if (MegaLogger && MegaLogger.rootLogger) {
                     MegaLogger.rootLogger.error("exceptionSafeProxy caught: ", e, e.stack);
@@ -553,7 +567,9 @@ makeMetaAware(Karere);
                         self.trigger('onConnectionClosed');
 
                         if (arguments[1] === "system-shutdown" || arguments[1] === "improper-addressing") {
-                            self._connectionRetry();
+                            self.connectionRetryManager.doConnectionRetry(arguments[1]);
+                        } else {
+                            self.connectionRetryManager.gotDisconnected();
                         }
                     }
                     else if (status === Karere.CONNECTION_STATE.AUTHFAIL) {
@@ -562,24 +578,19 @@ makeMetaAware(Karere);
                         $promise.reject(status);
                         self.trigger('onAuthfail');
                         self.trigger('onConnectionClosed');
+                        self.connectionRetryManager.gotDisconnected();
                     }
                     else if (status === Karere.CONNECTION_STATE.DISCONNECTING) {
                         self.logger.warn(self.getNickname(), 'Karere is disconnecting.');
-
-                        if (self._connectionRetries >= self.options.maxConnectionRetries) {
-                            $promise.reject(status);
-                        }
 
                         self.trigger('onDisconnecting');
                     }
                     else if (status === Karere.CONNECTION_STATE.DISCONNECTED) {
                         self.logger.info(self.getNickname(), 'Karere is disconnected.');
 
-                        if (self._connectionRetries >= self.options.maxConnectionRetries) {
-                            $promise.reject(status);
-                        }
                         self.trigger('onDisconnected');
                         self.trigger('onConnectionClosed');
+                        self.connectionRetryManager.gotDisconnected();;
                     }
                     else if (status === Karere.CONNECTION_STATE.CONNECTED) {
                         self.logger.info(self.getNickname(), 'Karere is connected.');
@@ -600,7 +611,7 @@ makeMetaAware(Karere);
                             Karere._exceptionSafeProxy(self._onIncomingIq, self), null, 'iq', null, null,  null
                         );
 
-                        self._connectionRetries = 0; // reset connection errors
+                        self.connectionRetryManager.gotConnected();
 
 
                         self.trigger('onConnected');
@@ -637,15 +648,7 @@ makeMetaAware(Karere);
 
 
 
-        self._$connectingPromise = createTimeoutPromise(function() {
-            return self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED;
-        }, 100, self.options.connectTimeout, undefined, remoteBoshServiceUrlPromise)
-            .always(function() {
-                delete self._$connectingPromise;
-            })
-            .fail(function() {
-                self._connectionRetry();
-            });
+        self._$connectingPromise = self.connectionRetryManager.startedConnecting(remoteBoshServiceUrlPromise);
 
         // sync the _$connectionPromise in realtime with the original $promise
         $promise
@@ -680,8 +683,7 @@ makeMetaAware(Karere);
         var fn = proto[functionName];
         proto[functionName] = function() {
             var self = this;
-
-            var args = toArray(arguments);
+            var args = arguments;
 
             var internalPromises = [];
             var $promise = new MegaPromise();
@@ -726,14 +728,14 @@ makeMetaAware(Karere);
                 .done(function() {
                     fn.apply(self, args)
                         .done(function() {
-                            $promise.resolve.apply($promise, toArray(arguments));
+                            $promise.resolve.apply($promise, arguments);
                         })
                         .fail(function() {
-                            $promise.reject.apply($promise, toArray(arguments));
+                            $promise.reject.apply($promise, arguments);
                         });
                 })
                 .fail(function() {
-                    $promise.reject(toArray(arguments));
+                    $promise.reject.apply($promise, arguments);
                 });
 
             return $promise.always(function() {
@@ -765,23 +767,27 @@ makeMetaAware(Karere);
 
         if (self._myPresence === Karere.PRESENCE.OFFLINE) {
             self.logger.warn("Will halt the reconnect operation, my presence is set to 'offline'.");
-            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNTED);
+            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNECTED);
         }
+
+        var state = self.getConnectionState();
+        if (state === Karere.CONNECTION_STATE.DISCONNECTING) {
+            self.forceDisconnect();
+
+            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNECTED);
+        }
+
         if (!self._jid || !self._password) {
             throw new Error("Missing jid or password.");
         }
 
-        if (self.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTING) {
-            self.forceDisconnect();
-
-            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNTED);
-        }
-        else if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING && self._$connectingPromise) {
+        if (state === Karere.CONNECTION_STATE.CONNECTING && self._$connectingPromise) {
             return self._$connectingPromise;
         }
-        else if (
-            self.getConnectionState() !== Karere.CONNECTION_STATE.DISCONNECTED &&
-            self.getConnectionState() !== Karere.CONNECTION_STATE.AUTHFAIL
+
+        if (
+            state !== Karere.CONNECTION_STATE.DISCONNECTED &&
+            state !== Karere.CONNECTION_STATE.AUTHFAIL
         ) {
             throw new Error(
                 "Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect. [[:i]]"
@@ -853,8 +859,6 @@ makeMetaAware(Karere);
             self.forceDisconnect();
         }
 
-        clearTimeout(self._connectionRetryInProgress);
-
         self._disconnectTimeoutPromise = createTimeoutPromise(
             function() {
                 return (
@@ -875,20 +879,6 @@ makeMetaAware(Karere);
             });
 
         return self._disconnectTimeoutPromise;
-    };
-
-    /**
-     * Use this method to force Karere to reset the connection retry count and stop any active/waiting attempts to
-     * re-connect
-     */
-    Karere.prototype.resetConnectionRetries = function() {
-        var self = this;
-
-        self._connectionRetries = 0;
-        clearTimeout(self._connectionRetryInProgress);
-        if (self._$connectingPromise) {
-            self._$connectingPromise.reject();
-        }
     };
 }
 
@@ -1046,6 +1036,12 @@ makeMetaAware(Karere);
      * @returns {*}
      */
     Karere.getNormalizedBareJid = function(jid) {
+        if (!jid || !jid.split) {
+            if (d) {
+                console.error("Karere.getNormalizedBareJid got", jid, "instead of a jid.");
+            }
+        }
+
         if (jid.indexOf("conference.") !== -1 && jid.indexOf("/") !== -1) {
             jid = jid.split("/")[1].split("__")[0] + "@" + jid.split("@")[1].split("/")[0].replace("conference.", "");
         }
@@ -1063,6 +1059,11 @@ makeMetaAware(Karere);
      * @returns {*}
      */
     Karere.getNormalizedFullJid = function(jid) {
+        if (!jid || !jid.split) {
+            if (d) {
+                console.error("Karere.getNormalizedFullJid got", jid, "instead of a jid.");
+            }
+        }
         if (jid.indexOf("conference.") !== -1) {
             jid = jid.split("/")[1].split("__")[0] +
                         "@" +
@@ -1076,12 +1077,12 @@ makeMetaAware(Karere);
      * Helper method that should be used to proxy Strophe's .fatal and .error methods to actually LOG something to the
      * console.
      */
-    Karere.prototype.error = function() {
+    Karere.prototype.error = function(a1) {
         var additional = "";
-        if (arguments[0] instanceof Error) {
-            additional = arguments[0].stack;
+        if (a1 instanceof Error) {
+            additional = a1.stack;
         }
-        var msg = toArray(arguments).join(" ");
+        var msg = toArray.apply(null, arguments).join(" ");
 
         this.logger.error(msg, additional);
 
@@ -2090,7 +2091,7 @@ makeMetaAware(Karere);
                                 $promise.resolve(roomJid, roomPassword);
                             })
                             .fail(function() {
-                                $promise.reject(toArray(arguments));
+                                $promise.reject(toArray.apply(null, arguments));
                             });
                     }),
                     Karere._exceptionSafeProxy(function() {
@@ -2797,106 +2798,11 @@ makeMetaAware(Karere);
             self.logger.warn("Not connected");
         }
     };
+
+    Karere.prototype.getMyPresence = function() {
+        return this._myPresence;
+    };
 }
-
-
-/**
- * Private method used to force a connection retry
- *
- * @private
- */
-Karere.prototype._connectionRetry = function(immediately) {
-    var self = this;
-
-    if (!self._connectionRetries) {
-        self._connectionRetries = 0;
-    }
-    self._connectionRetries++;
-
-
-    if (self.logger) {
-        self.logger.warn(
-            "request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries
-        );
-    }
-    else if (window.d) {
-        self.logger.warn("request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries);
-    }
-
-    if (!immediately && self._connectionRetries > self.options.maxConnectionRetries) {
-        self._connectionRetries = 0;
-        self.forceDisconnect();
-
-        self._connectionRetryInProgress = setTimeout(function() {
-            if (
-                self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED &&
-                self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTING
-            ) {
-                self.reconnect();
-            }
-        }, self.options.restartConnectionRetryTimeout);
-
-        self.logger.warn(
-            "Reached max connection retries. Resetting counters and doing a bigger delay: ",
-            self.options.restartConnectionRetryTimeout
-        );
-
-
-        self._lastConnectionRetryTime = unixtime();
-
-    }
-    else {
-        self.forceDisconnect();
-
-        var connectionRetryTimeout = (
-            self._connectionRetries * self.options.reconnectDelay
-        );
-        if (self._connectionRetries === 0 || immediately === true) {
-            // start imidiately
-            connectionRetryTimeout = 0;
-        }
-
-        // add some randomness
-        connectionRetryTimeout = (
-            connectionRetryTimeout * rand_range(
-                self.options.retryFuzzinesFactors[0], self.options.retryFuzzinesFactors[1]
-            )
-        );
-
-        if (self._connectionRetryInProgress) {
-            clearTimeout(
-                self._connectionRetryInProgress
-            );
-        }
-        self._connectionRetryInProgress = setTimeout(function() {
-            if (
-                self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED &&
-                self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTING
-            ) {
-                self.reconnect();
-            }
-        }, connectionRetryTimeout);
-
-
-        self._lastConnectionRetryTime = unixtime();
-
-    }
-};
-
-Karere.prototype._connectionRetryUI = function() {
-    var self = this;
-
-    if (
-        self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED &&
-        (unixtime() - self._lastConnectionRetryTime) > (self.options.connectionRetryFloorVal / 1000)
-    ) {
-        //self.logger.warn("Will do a forced connection retry immediately because of UI interaction.");
-        self._connectionRetry(true);
-        return true;
-    } else {
-        return false;
-    }
-};
 
 /**
  * Wrap all methods which require a connection to actually use the ._requiresConnectionWrapper helper

@@ -56,4 +56,54 @@ var testutils = {};
     };
 
 
+    /**
+     * Determines equality of two sets.
+     *
+     * @param {Set} set1
+     *     First set for comparison.
+     * @param {Set} set2
+     *     Second set for comparison.
+     * @return {Boolean}
+     *     `true` if sets are equal, `false` otherwise.
+     */
+    ns.isSetEqual = function(set1, set2) {
+
+        var result = true;
+
+        if (set1.size !== set2.size) {
+            result = false;
+        }
+
+        set1.forEach(function _setEqualityIterator(item) {
+            if (!set2.has(item)) {
+                result = false;
+            }
+        });
+
+        return result;
+    };
+
+
+    if (!Array.from) {
+        /**
+         * Iterates over an iterable and returns an Array object.
+         *
+         * Polyfill for PhantomJS, which doesn't have Array.from.
+         *
+         * @param {Object} anIterable
+         *     An iterable (containing the `forEach()` method) to convert.
+         * @return {Array}
+         *     Array representation.
+         */
+        Array.from = function(anIterable) {
+
+            var result = [];
+
+            anIterable.forEach(function _iterableToArrayIterator(item) {
+                result.push(item);
+            });
+
+            return result;
+        };
+    }
 }());

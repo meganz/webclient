@@ -1,6 +1,8 @@
 // Karma configuration.
 
 module.exports = function(config) {
+
+  var specific_tests = process.env.SPECIFIC_TEST ? process.env.SPECIFIC_TEST : {pattern: 'test/**/*_test.js', included: true};
   config.set({
     // Base path, that will be used to resolve files and exclude.
     basePath: '',
@@ -11,6 +13,8 @@ module.exports = function(config) {
     // List of files/patterns to load in the browser.
     // {included: false} files are loaded by requirejs
     files: [
+        // Shim for ES6 features some browsers may not have (PhantomJS).
+        {pattern: 'node_modules/es6-shim/es6-shim.js', included: true},
         // == Basic test setup ==
         'test/test_main.js',
         'test/test_utils.js',
@@ -22,14 +26,14 @@ module.exports = function(config) {
         'node_modules/indexeddbshim/dist/indexeddbshim.js',
 
         // == Basics ==
-        'js/vendor/jquery-2.1.4.js',
+        'js/vendor/jquery-2.2.0.js',
         'js/vendor/jquery-ui-1.11.4.js',
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
         'js/vendor/jquery.fullscreen.js',
+        'js/vendor/jquery.qrcode.js',
         'js/jquery.tokeninput.js',
         'js/jquery.misc.js',
-        'js/jquery.qrcode.js',
         'js/jquery.checkboxes.js',
 
         // == Libraries ==
@@ -41,8 +45,8 @@ module.exports = function(config) {
         'js/vendor/ion.sound.js',
         'js/vendor/favico.js',
         'js/vendor/notification.js',
+        'js/vendor/moment.js',
         // Chat libraries.
-        'js/chat/mpenc.js',
         'js/vendor/chat/strophe.light.js',
         'js/vendor/chat/strophe.disco.js',
         'js/vendor/chat/strophe.jingle.js',
@@ -54,13 +58,8 @@ module.exports = function(config) {
         'js/vendor/chat/wildemitter.patched.js',
         'js/vendor/chat/hark.patched.js',
         'js/vendor/chat/base32.js',
-        // Direct transfer dependencies.
-        'js/vendor/chat/cryptojs-core.js',
-        'js/vendor/chat/cryptojs-sha1.js',
-        'js/vendor/chat/cryptojs-hmac.js',
-        'js/vendor/chat/cryptojs-lib-typedarrays.js',
         // Other.
-        'js/vendor/Autolinker.js',
+        'js/vendor/autolinker.js',
         'js/vendor/qrcode.js',
         'js/vendor/bitcoin-math.js',
         'js/vendor/db.js',
@@ -73,11 +72,15 @@ module.exports = function(config) {
         'secureboot.js',
         'index.js',
         'js/functions.js',
-        'js/mega.js',
+        'js/datastructs.js',
         'js/vendor/megaLogger.js',
+        'js/mega.js',
         'js/tlvstore.js',
         'js/crypto.js',
         'js/megaPromise.js',
+        'js/idbkvstorage.js',
+        'js/megaDbEncryptionPlugin.js',
+        'js/megaDb.js',
         'js/paycrypt.js',
         'js/account.js',
         'js/authring.js',
@@ -100,10 +103,8 @@ module.exports = function(config) {
         'js/megaNotifications.js',
         'js/vendor/avatar.js',
         'js/countries.js',
-        'js/megaDbEncryptionPlugin.js',
-        'js/megaDb.js',
         'js/megaKvStorage.js',
-        'js/vendor/Int64.js',
+        'js/vendor/int64.js',
         'js/zip64.js',
         'js/cms.js',
         // Google Import Contacts
@@ -122,29 +123,25 @@ module.exports = function(config) {
 
         // Our chat code.
         'js/chat/strongvelope.js',
-        'js/chat/opQueue.js',
         'js/chat/rtcStats.js',
         'js/chat/rtcSession.js',
-        'js/chat/fileTransfer.js',
         'js/chat/plugins/urlFilter.js',
         'js/chat/plugins/emoticonsFilter.js',
-        'js/chat/plugins/attachmentsFilter.js',
-        'js/chat/plugins/encryptionFilter.js',
-        'js/chat/plugins/chatStore.js',
         'js/chat/plugins/chatNotifications.js',
         'js/chat/plugins/callFeedback.js',
         'js/chat/plugins/callManager.js',
         'js/chat/karereEventObjects.js',
         'js/chat/karere.js',
-        'js/chat/chat.js',
-        'js/chat/chatRoom.js',
+        'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
 
         // == Tests ==
+        // Dependency-based load order of library modules.
+        // modules that already follow AMD need included: false
         (process.env.SKIP_WORKFLOWS)
             ? 'test/config/test_workflows_off.js'
             : 'test/config/test_workflows.js',
-        {pattern: 'test/**/*_test.js', included: true}
+        specific_tests
     ],
 
     // List of files to exclude.

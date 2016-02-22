@@ -36,47 +36,46 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
             megaRoom
                 .unbind('call-ended.CallFeedback')
                 .bind('call-ended.CallFeedback', function(e, eventData) {
-                    var from = megaChat.getContactNameFromJid(eventData.peer);
-                    var $dialog = megaRoom.generateInlineDialog(
-                        "call-feedback",
-                        "",
-                        "call-feedback",
-                        "To help us improve our service, it would be great if you want to rate how was your call with " + from + "? ",
-                        [],
-                        {
-                            'sendFeedback': {
-                                'type': 'primary',
-                                'text': "Send Feedback",
-                                'callback': function() {
-                                    var feedbackDialog = mega.ui.FeedbackDialog.singleton(
-                                        $(this),
-                                        undefined,
-                                        "call-ended"
-                                    );
+                    var msgId = 'call-feedback' + unixtime();
+                    megaRoom.appendMessage(
+                        new ChatDialogMessage({
+                            messageId: msgId,
+                            type: 'call-feedback',
+                            authorContact: megaChat.getContactFromJid(eventData.peer),
+                            delay: unixtime(),
+                            buttons: {
+                                'sendFeedback': {
+                                    'type': 'primary',
+                                    'classes': 'default-white-button small-text left',
+                                    'icon': 'refresh-circle',
+                                    'text': __("Send Feedback"),
+                                    'callback': function() {
+                                        var feedbackDialog = mega.ui.FeedbackDialog.singleton(
+                                            $(this),
+                                            undefined,
+                                            "call-ended"
+                                        );
+                                        feedbackDialog._type = "call-ended";
+                                        feedbackDialog.bind('onHide.callEnded', function() {
 
-                                    feedbackDialog.bind('onHide.callEnded', function() {
+                                            megaRoom.messagesBuff.removeMessageById(msgId);
+                                            megaRoom.trigger('resize');
 
-                                        $dialog.remove();
+                                            feedbackDialog.unbind('onHide.callEnded');
+                                        });
+                                    }
+                                },
+                                'noThanks': {
+                                    'type': 'secondary',
+                                    'classes': 'default-white-button small-text left red',
+                                    'text': __("No thanks"),
+                                    'callback': function() {
+                                        megaRoom.messagesBuff.removeMessageById(msgId);
                                         megaRoom.trigger('resize');
-
-                                        feedbackDialog.unbind('onHide.callEnded');
-                                    });
-                                }
-                            },
-                            'noThanks': {
-                                'type': 'secondary',
-                                'text': "No thanks",
-                                'callback': function() {
-                                    $dialog.remove();
-
-                                    megaRoom.trigger('resize');
+                                    }
                                 }
                             }
-                        }
-                    );
-
-                    megaRoom.appendDomMessage(
-                        $dialog
+                        })
                     );
                 });
         });

@@ -40,7 +40,7 @@
             preload: self.options.soundsPreload
         });
 
-        if(self.options.showFaviconCounter) {
+        if (self.options.showFaviconCounter) {
             assert(Favico, 'Favico.js is missing.');
 
 
@@ -106,7 +106,7 @@
 
         var evt = new $.Event('onBeforeNotificationCreated');
         self.trigger(evt, [type, options, unread]);
-        if(evt.isPropagationStopped()) {
+        if (evt.isPropagationStopped()) {
             return self;
         }
 
@@ -123,7 +123,7 @@
             notification
         );
 
-        if(!self._counters[options.group] && options.incrementCounter) {
+        if (!self._counters[options.group] && options.incrementCounter) {
             self._counters[options.group] = 0;
         }
 
@@ -143,17 +143,17 @@
         var oldVal = self._counters[group];
 
         self._notifications.forEach(function(notification) {
-            if(notification.options.group === group) {
-                if(!type || type === notification.type) {
+            if (notification.options.group === group) {
+                if (!type || type === notification.type) {
                     notification.setUnread(false, true);
                 }
             }
         });
 
-        if(self._counters[group] !== 0) {
+        if (self._counters[group] !== 0) {
             self._counters[group] = 0;
         }
-        if(oldVal != self._counters[group]) {
+        if (oldVal != self._counters[group]) {
             self.trigger("onCounterUpdated", [self, group, type]);
         }
         return this;
@@ -169,13 +169,13 @@
     MegaNotifications.prototype.decreaseCounterGroup = function(group, notificationObj) {
         var oldVal = this._counters[group];
 
-        if(this._counters[group] > 0) {
+        if (this._counters[group] > 0) {
             this._counters[group]--;
         } else {
             this._counters[group] = 0;
         }
 
-        if(oldVal != this._counters[group]) {
+        if (oldVal != this._counters[group]) {
             this.trigger("onCounterUpdated", [this, group, notificationObj]);
         }
         return this;
@@ -191,16 +191,16 @@
     MegaNotifications.prototype.increaseCounterGroup = function(group, notificationObj) {
         var oldVal = this._counters[group];
 
-        if(!this._counters[group]) {
+        if (!this._counters[group]) {
             this._counters[group] = 0;
         }
 
-        if(this._counters[group] >= 0) {
+        if (this._counters[group] >= 0) {
             this._counters[group]++;
         } else {
             this._counters[group] = 0;
         }
-        if(oldVal != this._counters[group]) {
+        if (oldVal != this._counters[group]) {
             this.trigger("onCounterUpdated", [this, group, notificationObj]);
         }
         return this;
@@ -213,7 +213,7 @@
      * @returns {Integer|undefined}
      */
     MegaNotifications.prototype.getCounterGroup = function(group) {
-        if(!this._counters[group]) {
+        if (!this._counters[group]) {
             return 0;
         } else {
             return this._counters[group];
@@ -241,12 +241,13 @@
 
         self.megaNotifications.trigger('onNotificationCreated', self);
 
-        if(options.incrementCounter === true) {
+        if (options.incrementCounter === true) {
             self.setUnread(unread);
         }
 
-        if(unread === true || self.options.alwaysPlaySound === true) {
-            if(self.options.sound) {
+        if (unread === true || self.options.alwaysPlaySound === true) {
+            if (self.options.sound) {
+                ion.sound.stop(self.options.sound);
                 ion.sound.play(self.options.sound, {
                     loop: self.options.soundLoop,
                     volume: self.options.soundVolume !== null ? self.options.soundVolume : self.megaNotifications.options.soundsVolume
@@ -254,9 +255,11 @@
             }
         }
 
-        if(unread === true) {
+        if (unread === true) {
             self._showDesktopNotification();
         }
+
+        self.megaNotifications.trigger('onAfterNotificationCreated', self);
 
         return self;
     };
@@ -276,22 +279,22 @@
         var oldVal = self.unread;
         self.unread = val;
 
-        if(val === true && self.options.incrementCounter === true) {
+        if (val === true && self.options.incrementCounter === true) {
             self.megaNotifications.increaseCounterGroup(self.options.group, this);
-        } else if(val === false && this.options.incrementCounter === true) {
+        } else if (val === false && this.options.incrementCounter === true) {
             self.megaNotifications.decreaseCounterGroup(self.options.group, this);
         }
 
-        if(self.options.soundLoop === true) {
-            if(!self.options.alwaysPlaySound) {
+        if (self.options.soundLoop === true) {
+            if (!self.options.alwaysPlaySound) {
                 ion.sound.stop(self.options.sound);
             }
         }
-        if(!val && self._desktopNotification) {
+        if (!val && self._desktopNotification) {
             self._desktopNotification.close();
         }
 
-        if(!silentUpdate && oldVal != val) {
+        if (!silentUpdate && oldVal != val) {
             self.megaNotifications.trigger('onUnreadChanged', [self, val]);
         }
 
@@ -301,7 +304,7 @@
 
     MegaNotification.prototype.forceStopSound = function() {
         var self = this;
-        if(self.options.sound) {
+        if (self.options.sound) {
             ion.sound.stop(self.options.sound);
         }
     };
@@ -313,8 +316,8 @@
      */
     MegaNotification.prototype._showDesktopNotification = function() {
         var self = this;
-        if(self.megaNotifications.options.desktopNotifications) {
-            if(Notification.permission !== 'granted') {
+        if (self.megaNotifications.options.desktopNotifications) {
+            if (Notification.permission !== 'granted') {
                 Notification.requestPermission();
             }
 
@@ -322,7 +325,7 @@
             var params = self.options.params;
 
             var textMessage = self.megaNotifications.options.textMessages[self.type];
-            if(textMessage) {
+            if (textMessage) {
                 var title = $.isFunction(textMessage.title) ? textMessage.title(self, params) : textMessage.title;
                 var body = $.isFunction(textMessage.body) ? textMessage.body(self, params) : textMessage.body;
                 var icon = $.isFunction(textMessage.icon) ? textMessage.icon(self, params) : textMessage.icon;
@@ -337,6 +340,7 @@
                     self.trigger('onClick');
                 };
                 self._desktopNotification.onclose = function() {
+                    delete self._desktopNotification;
                     self.setUnread(false);
                     self.trigger('onClose');
                 };

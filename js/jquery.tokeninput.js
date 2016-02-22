@@ -7,7 +7,12 @@
         queryParam: "q",
         searchDelay: 200,
         minChars: 1,
-        propertyToSearch: "name",
+
+        // ToDo: We can search by id OR name fields,
+        // currently both are the same and they represents a contact email
+        // In the future we should allow search by email and contact name
+        // but first we must be sure that user name is available in M.u.name
+        propertyToSearch: "id",
         jsonContainer: null,
         contentType: "json",
         excludeCurrent: false,
@@ -30,53 +35,55 @@
         addAvatar: true,
         emailCheck: false,
         accountHolder: '',
+        url: '',
         scrollLocation: 'add',
         resultsFormatter: function (item) {
-            
-            var id, av, avatar,
-                email = item[this.propertyToSearch],
-                type = '';
 
-            $.each(M.u, function (ind, val) {
-                if (val.m === email) {
-                    id = ind;
-                    
+            var id;
+            var av;
+            var avatar;
+            var email = item[this.propertyToSearch];
+
+            M.u.forEach(function (contact, contactHandle) {
+                if (contact.m === email) {
+                    id = contactHandle;
+
                     return false;
                 }
             });
 
             if (!id) {
-                type = 'email';
                 av = '';
             }
 
             avatar = useravatar.contact(id || email, 'nw-contact-avatar', 'span');
-            
+
             return '<li class="share-search-result">' + (this.addAvatar ? avatar : '')
                     + '<span class="fm-chat-user-info"><span class="fm-chat-user">'
                     + (this.enableHTML ? email : _escapeHTML(email))
                     + '</span><span class="fm-chat-user-email">email</span></span><span class="clear"></span></li>';
         },
         tokenFormatter: function (item) {
-            
-            var id, av, avatar,
-                email = item[this.propertyToSearch],
-                type = '';
-            
-            $.each(M.u, function (ind, val) {
-                if (val.m === email) {
-                    id = ind;
-                    
+
+            var id;
+            var av;
+            var avatar;
+            var email = item[this.propertyToSearch];
+
+            M.u.forEach(function (contact, contactHandle) {
+                if (contact.m === email) {
+                    id = contactHandle;
+
                     return false;
                 }
             });
+
             if (!id) {
-                type = 'email';
                 av = '';
             }
 
             avatar = useravatar.contact(id || email, 'search-avatar', 'span');
-            
+
             return '<li class="share-added-contact">'
                     + (this.addAvatar ? avatar : '')
                     + (this.enableHTML ? email : _escapeHTML(email)) + '</li>';
@@ -184,7 +191,7 @@
             }
             return false;
         },
-        
+
         // Clears items from multi-input box, UI elements
         clearOnCancel: function() {
             if (this.data("tokenInputObject")) {
@@ -232,19 +239,19 @@
                 return tmpInput;
             }
         },
-        
+
         // Removes contact from dropdownlist, don't interfere with UI elements
         removeFromDDL: function(item) {
-            
+
             var $settings = {},
                 ld, tokenValue;
-            
+
             if ($(this).data("settings")) {
-                
+
                 $settings = $(this).data("settings");
                 ld = $settings.local_data;
                 tokenValue = $settings.tokenValue;
-                
+
                 // Loop through local data
                 for (var n in ld) {
                     if (ld[n][tokenValue] === item[tokenValue]) {
@@ -253,19 +260,19 @@
                     }
                 }
             }
-            
+
             return false;
         },
-        
+
         // Add contacts to drop down list, doesn't interfere with UI elements
         addToDDL: function(items) {
 
             var localData = [],
                 tokenValue,
                 found = false;
-            
+
             if ($(this).data("settings")) {
-                
+
                 localData = $(this).data("settings").local_data;
                 tokenValue = $(this).data("settings").tokenValue;
 
@@ -273,11 +280,11 @@
                 for (var i in items) {
                     if (items.hasOwnProperty(i)) {
                         found = false;
-                        
+
                         // Loop through list of item currently available in drop down box
                         for (var n in localData) {
                             if (localData.hasOwnProperty(n)) {
-                                
+
                                 // In case that we have item in drop down list, skip and continue search for missing one
                                 if (localData[n][tokenValue] === items[i][tokenValue]) {
                                     found = true;
@@ -293,7 +300,7 @@
                     }
                 }
             }
-            
+
             return false;
         }
     };
@@ -334,19 +341,19 @@
             }
         }
         else if (typeof (url_or_data) === "object") {
-            
+
             // Set the local data to search through
             $(input).data("settings").local_data = url_or_data;
         }
 
         // Build class names
         if ($(input).data("settings").classes) {
-            
+
             // Use custom class names
             $(input).data("settings").classes = $.extend({}, DEFAULT_CLASSES, $(input).data("settings").classes);
         }
         else if ($(input).data("settings").theme) {
-            
+
             // Use theme-suffixed default class names
             $(input).data("settings").classes = {};
             $.each(DEFAULT_CLASSES, function(key, value) {
@@ -402,10 +409,10 @@
             })
             .bind("keyup keydown blur update", resize_input)
             .keydown(function(event) {
-                
+
                 var previous_token,
                     next_token;
-                    
+
                 switch (event.keyCode) {
                     case KEY.LEFT:
                     case KEY.RIGHT:
@@ -416,7 +423,7 @@
                             next_token = input_token.next();
 
                             if ((previous_token.length && previous_token.get(0) === selected_token) || (next_token.length && next_token.get(0) === selected_token)) {
-                                
+
                                 // Check if there is a previous/next token and it is selected
                                 if (event.keyCode === KEY.LEFT || event.keyCode === KEY.UP) {
                                     deselect_token($(selected_token), POSITION.BEFORE);
@@ -426,18 +433,18 @@
                                 }
                             }
                             else if ((event.keyCode === KEY.LEFT || event.keyCode === KEY.UP) && previous_token.length) {
-                                
+
                                 // We are moving left, select the previous token if it exists
                                 select_token($(previous_token.get(0)));
                             }
                             else if ((event.keyCode === KEY.RIGHT || event.keyCode === KEY.DOWN) && next_token.length) {
-                                
+
                                 // We are moving right, select the next token if it exists
                                 select_token($(next_token.get(0)));
                             }
                         }
                         else {
-                            
+
                             var dropdown_item = null;
 
                             if (event.keyCode === KEY.DOWN || event.keyCode === KEY.RIGHT) {
@@ -461,7 +468,7 @@
                         break;
 
                     case KEY.BACKSPACE:
-                        
+
                         previous_token = input_token.prev();
 
                         if (this.value.length === 0) {
@@ -491,7 +498,7 @@
                     case KEY.ENTER:
                     case KEY.NUMPAD_ENTER:
                     case KEY.COMMA:
-                        
+
                         if (this.value.length) {
                             if (selected_dropdown_item) {
                                 add_token($(selected_dropdown_item).data("tokeninput"));
@@ -514,13 +521,13 @@
                                 }
                             }
                         }
-                        
+
                         // If users press enter/return on empty input field behave like done/share button is clicked
                         else {
                             addContactToFolderShare();
                             addNewContact($('.add-user-popup-button.add'));
                         }
-                        
+
                         return false;
 
                     case KEY.ESCAPE:
@@ -662,7 +669,7 @@
                 }
             });
         };
-        
+
         this.add = function(item) {
             add_token(item);
         };
@@ -743,10 +750,10 @@
         }
 
         function add_freetagging_tokens() {
-            
+
             var value = $.trim(input_box.val()).replace(/\s|\n/gi, ''),
                 tokens = value.split($(input).data("settings").tokenDelimiter);
-            
+
             $.each(tokens, function(i, token) {
                 if (!token) {
                     return;
@@ -809,13 +816,13 @@
 
         // Add a token to the token list based on user input
         function add_token(item) {
-            
+
             var callback = $(input).data("settings").onAdd;
 
             if ($(input).data("settings").emailCheck) {
-                
+
                 var isValidEmail = IsEmail(item[$(input).data("settings").tokenValue]);
-                
+
                 // Prevent further execution if email format is wrong
                 if (!isValidEmail) {
                     var cb = $(input).data("settings").onEmailCheck;
@@ -840,13 +847,13 @@
             }
 
             if ($(input).data("settings").preventDoublet) {
-                
+
                 var doubleEmail = $.grep($(input).data("settings").local_data, function(row) {
                     var property = $(input).data("settings").propertyToSearch,
                         tokenValue = $(input).data("settings").tokenValue;
-                    return row[property].toLowerCase().indexOf(item[tokenValue].toLowerCase()) > -1;
+                    return coerceToString(row[property]).toLowerCase().indexOf(item[tokenValue].toLowerCase()) > -1;
                 });
-                
+
                 // Prevent further execution if email is duplicated
                 if (doubleEmail.length) {
                     select_token(item);
@@ -898,7 +905,7 @@
             // Insert the new tokens
             if ($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit && isValidEmail) {
                 insert_token(item);
-                
+
                 // Remove the placeholder so it's not seen after you've added a token
                 input_box.attr("placeholder", null);
                 checkTokenLimit();
@@ -909,13 +916,16 @@
 
             // Don't show the help dropdown, they've got the idea
             hide_dropdown();
-            
+
             // Execute the onAdd callback if defined
             if ($.isFunction(callback)) {
                 callback.call(hidden_input, item);
             }
 
-            $(input).data("settings").local_data.push({id: item[$(input).data("settings").tokenValue], name: item[$(input).data("settings").tokenValue]});
+            $(input).data("settings").local_data.push({
+                id: item[$(input).data("settings").tokenValue],
+                name: item[$(input).data("settings").tokenValue]
+            });
         }// END of function add_token
 
         // Select a token in the token list
@@ -966,12 +976,12 @@
 
         // Delete a token from the token list
         function delete_token(token) {
-            
+
             // Remove the id from the saved list
             var token_data = $.data(token.get(0), "tokeninput"),
                 callback = $(input).data("settings").onDelete,
                 index = token.prevAll().length;
-            
+
             if (index > selected_token_index) {
                 index--;
             }
@@ -985,7 +995,7 @@
 
             // Remove this token from the saved list
             saved_tokens = saved_tokens.slice(0, index).concat(saved_tokens.slice(index + 1));
-            
+
             if (saved_tokens.length === 0) {
                 input_box.attr("placeholder", settings.placeholder);
             }
@@ -1020,7 +1030,7 @@
 
         // Delete a token from the token list
         function delete_all_tokens(token) {
-            
+
             // Remove the id from the saved list
             var token_data = $.data(token.get(0), "tokeninput");
 
@@ -1037,7 +1047,7 @@
 
             // Remove this token from the saved list
             saved_tokens = saved_tokens.slice(0, index).concat(saved_tokens.slice(index + 1));
-            
+
             if (saved_tokens.length === 0) {
                 input_box.attr("placeholder", settings.placeholder);
             }
@@ -1267,11 +1277,11 @@
 
         // Do the actual search
         function run_search(query) {
-            
+
             var cache_key = query + computeURL(),
 //                cached_results = cache.get(cache_key);
                 cached_results;
-            
+
             if (cached_results) {
                 if ($.isFunction($(input).data("settings").onCachedResult)) {
                     cached_results = $(input).data("settings").onCachedResult.call(hidden_input, cached_results);
@@ -1279,7 +1289,7 @@
                 populate_dropdown(query, cached_results);
             }
             else {
-                
+
                 // Are we doing an ajax search or local data search?
                 if ($(input).data("settings").url) {
                     var url = computeURL();
@@ -1342,10 +1352,10 @@
                     // Make the request
                     $.ajax(ajax_params);
                 }
-                
+
                 // Do the search through local data
                 else if ($(input).data("settings").local_data) {
-                    
+
                     var results = $.grep($(input).data("settings").local_data, function(row) {
                         return row[$(input).data("settings").propertyToSearch].toLowerCase().indexOf(query.toLowerCase()) > -1;
                     });

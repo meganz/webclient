@@ -25,7 +25,9 @@ var JinglePlugin = {
         this.jingleAutoAcceptTimeout = 25000;
         this.apiTimeout = 20000;
         this.eventHandler = this;
-        this.ftManager = new FileTransferManager(this);
+        if (typeof(FileTransferManager) !== 'undefined') {
+            this.ftManager = new FileTransferManager(this);
+        }
 // Callbacks called by the connection.jingle object
         this.onIncomingCallRequest = function(from, reqStillValid, ansFunc){};
         this.onCallCanceled = function(info) {};

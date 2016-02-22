@@ -243,7 +243,12 @@ mBroadcaster.once('startMega', function __idb_setup() {
                     });
 
                     function __Notify(ev, result) {
-                        ev = new Event(ev);
+                        try {
+                            ev = new Event(ev);
+                        }
+                        catch (ex) { // MSIE
+                            ev = { type: ev };
+                        }
                         Object.defineProperty(ev, 'target', {value: request});
                         Object.defineProperty(request, 'result', {value: result});
 
@@ -347,13 +352,21 @@ var mFileManagerDB = {
         var db = new MegaDB("fm", u_handle, this.schema, { murSeed: 0x800F0001 });
 
         if (mBroadcaster.crossTab.master) {
+            var ieAccessError;
+            if ("ActiveXObject" in window) {
+                db.bind('onDbTransientError', function _onDbTransientError(ev, err) {
+                    if (!(db.flags & MegaDB.DB_FLAGS.DBUPGRADE)) {
+                        ieAccessError = (Object(err).name === 'InvalidAccessError');
+                    }
+                });
+            }
             db.bind('onDbStateReady', function _onDbStateReady() {
                 if (d) console.log('onDbStateReady', arguments);
 
                 var oldVersion = +localStorage['fmdbv_' + u_handle] || this.currentVersion;
                 localStorage['fmdbv_' + u_handle] = this.currentVersion;
 
-                if (oldVersion < this.currentVersion) {
+                if (oldVersion < this.currentVersion && !ieAccessError) {
                     if (d) console.log('fmdb version change');
                     mFileManagerDB.reload();
                 }
@@ -390,6 +403,8 @@ var mFileManagerDB = {
 
         this.db = db;
         this.state = this.STATE_WORKING;
+
+        this._reset(u_handle);
     },
 
     fetch: function mFileManagerDB_fetch(aTables) {
@@ -485,15 +500,17 @@ var mFileManagerDB = {
     },
 
     query: function mFileManagerDB_query(aCommand, aTable, aData) {
+        var u_handle = this.userHandle;
+        var lock = (parseInt(localStorage['fmdblock_' + u_handle]) | 0) + 1;
+        localStorage['fmdblock_' + u_handle] = lock;
+
         if (!(this.db && this.db.server)) {
-            throw new Error("No database connection.");
+            console.warn("No database connection.");
         }
         else if (this.schema[aTable]) {
-            var u_handle = this.db.suffix, promise;
-            var l = (+localStorage['fmdblock_' + u_handle] | 0) + 1;
-            localStorage['fmdblock_' + u_handle] = l;
+            var promise;
 
-            if (d) console.log('fmdb query', aCommand, aTable, aData, l);
+            if (d) console.log('fmdb query', aCommand, aTable, aData, lock);
 
             try {
                 if (aCommand === 'add') {
@@ -546,13 +563,7 @@ var mFileManagerDB = {
                 if (expunge) {
                     this.state = this.STATE_WAITING;
                     delete this.db;
-
-                    if (mFileManagerDB.addQueueTimer) {
-                        clearTimeout(mFileManagerDB.addQueueTimer);
-                        delete mFileManagerDB.addQueue;
-                        delete mFileManagerDB.addQueueTimer;
-                        localStorage['fmdblock_' + u_handle] = 0xBADF;
-                    }
+                    this._reset(null);
                 }
             }
             else {
@@ -597,6 +608,18 @@ var mFileManagerDB = {
     _loadfm: function mFileManagerDB__loadfm(aDBInstance) {
         this._setstate(aDBInstance);
         mBroadcaster.sendMessage('mFileManagerDB.done', loadfm) || loadfm();
+    },
+
+    _reset: function mFileManagerDB__reset(userHandle) {
+        if (mFileManagerDB.addQueueTimer) {
+            clearTimeout(mFileManagerDB.addQueueTimer);
+            delete mFileManagerDB.addQueue;
+            delete mFileManagerDB.addQueueTimer;
+            localStorage['fmdblock_' + this.userHandle] = 0xBADF;
+        }
+        if (userHandle !== null) {
+            this.userHandle = userHandle;
+        }
     },
 
     _setstate: function mFileManagerDB__setstate(aDBInstance) {

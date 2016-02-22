@@ -79,12 +79,11 @@ parseHTML.baseURIs = {};
  */
 function parseHTMLfmt(markup) {
     if (arguments.length > 1) {
-        var args = toArray(arguments);
-        var replacer = function(match) {
-            return escapeHTML(args.shift());
-        };
-        args.shift();
-        markup = markup.replace(/@@/g, replacer);
+        var idx = 1;
+        var args = arguments;
+        markup = markup.replace(/@@/g, function() {
+            return escapeHTML(args[idx++]);
+        });
     }
     return parseHTML(markup);
 }
@@ -202,52 +201,6 @@ function excludeIntersected(array1, array2) {
     return result;
 }
 
-/**
- *  Cascade:
- *
- *  Tiny helper to queue related tasks, in which the output of one function
- *  is the input of the next task. It is asynchronous
- *
- *      function([prevarg, arg], next)
- *
- *  Author: @crodas
- */
-function Cascade(tasks, fnc, done, value) {
-    function scheduler(value) {
-        if (tasks.length === 0) {
-            return done(value);
-        }
-
-        fnc([value, tasks.shift()], scheduler)
-    }
-
-    scheduler(value);
-}
-
-/**
- *  Simple interface to run things in parallel (safely) once, and
- *  get a safe callback
- *
- *  Author: @crodas
- */
-function Parallel(task) {
-    var callbacks = {};
-    return function(args, next) {
-        var id = JSON.stringify(args)
-        if (callbacks[id]) {
-            return callbacks[id].push(next);
-        }
-        callbacks[id] = [next];
-        task(args, function() {
-            var args = arguments;
-            $.each(callbacks[id], function(i, next) {
-                next.apply(null, args);
-            });
-            delete callbacks[id];
-        });
-    };
-}
-
 function asciionly(text) {
     var rforeign = /[^\u0000-\u007f]/;
     if (rforeign.test(text)) {
@@ -347,13 +300,24 @@ function inputblur(id, defaultvalue, pw) {
     }
 }
 
+
+/**
+ * Check if something (val) is a string.
+ *
+ * @param val
+ * @returns {boolean}
+ */
+function isString(val) {
+    return (typeof val === 'string' || val instanceof String);
+};
+
 function easeOutCubic(t, b, c, d) {
     return c * ((t = t / d - 1) * t * t + 1) + b;
 }
 
 function ellipsis(text, location, maxCharacters) {
     if (text.length > 0 && text.length > maxCharacters) {
-        if (typeof(location) === 'undefined') {
+        if (typeof location === 'undefined') {
             location = 'end';
         }
         switch (location) {
@@ -506,6 +470,13 @@ function populate_l() {
     l[1371] = l[1371].replace('2014', '2015');
     l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
     l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');
+    l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
+    l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
+    l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');
+    l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
+    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -526,7 +497,7 @@ function showmoney(number) {
 
 function getHeight() {
     var myHeight = 0;
-    if (typeof(window.innerWidth) === 'number') {
+    if (typeof window.innerWidth === 'number') {
         myHeight = window.innerHeight;
     }
     else if (document.documentElement
@@ -562,18 +533,37 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
-
-    useragent = useragent || navigator.userAgent;
-    useragent = (' ' + useragent).toLowerCase();
-
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
     var nameTrans = '';
+    var current = false;
+    var brand = false;
+
+    if (useragent === undefined || useragent === ua) {
+        current = true;
+        useragent = ua;
+    }
+    if (Object(useragent).details !== undefined) {
+        return useragent.details;
+    }
+    useragent = (' ' + useragent).toLowerCase();
+
+    if (current) {
+        brand = mega.getBrowserBrandID();
+    }
+    else if (useragent.indexOf('~:') !== -1) {
+        brand = useragent.match(/~:(\d+)/);
+        brand = brand && brand.pop() | 0;
+    }
 
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
+    }
+    else if (useragent.indexOf('windows phone') > 0) {
+        icon = 'wp.png';
+        os = 'Windows Phone';
     }
     else if (useragent.indexOf('windows') > 0) {
         os = 'Windows';
@@ -587,20 +577,22 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('ipad') > 0) {
         os = 'iPad';
     }
-    else if (useragent.indexOf('mac') > 0) {
+    else if (useragent.indexOf('mac') > 0
+            || useragent.indexOf('darwin') > 0) {
         os = 'Apple';
     }
     else if (useragent.indexOf('linux') > 0) {
         os = 'Linux';
     }
-    else if (useragent.indexOf('linux') > 0) {
-        os = 'MEGAsync';
-    }
     else if (useragent.indexOf('blackberry') > 0) {
         os = 'Blackberry';
     }
-    if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
-        browser = 'Spartan';
+
+    if (mega.browserBrand[brand]) {
+        browser = mega.browserBrand[brand];
+    }
+    else if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
+        browser = 'Edge';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
@@ -615,26 +607,63 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('maxthon') > 0) {
         browser = 'Maxthon';
     }
+    else if (useragent.indexOf('electron') > 0) {
+        browser = 'Electron';
+    }
+    else if (useragent.indexOf('palemoon') > 0) {
+        browser = 'Palemoon';
+    }
+    else if (useragent.indexOf('cyberfox') > 0) {
+        browser = 'Cyberfox';
+    }
+    else if (useragent.indexOf('waterfox') > 0) {
+        browser = 'Waterfox';
+    }
+    else if (useragent.indexOf('iceweasel') > 0) {
+        browser = 'Iceweasel';
+    }
+    else if (useragent.indexOf('seamonkey') > 0) {
+        browser = 'SeaMonkey';
+    }
+    else if (useragent.indexOf('lunascape') > 0) {
+        browser = 'Lunascape';
+    }
+    else if (useragent.indexOf(' iron/') > 0) {
+        browser = 'Iron';
+    }
+    else if (useragent.indexOf('avant browser') > 0) {
+        browser = 'Avant';
+    }
+    else if (useragent.indexOf('polarity') > 0) {
+        browser = 'Polarity';
+    }
+    else if (useragent.indexOf('k-meleon') > 0) {
+        browser = 'K-Meleon';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
     }
-    else if (useragent.indexOf('palemoon') > 0) {
-        browser = 'Palemoon';
-    }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
     }
+    else if (useragent.indexOf(' otter/') > 0) {
+        browser = 'Otter';
+    }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
+    }
+    else if (useragent.indexOf('es plugin ') === 1) {
+        icon = 'esplugin.png';
+        browser = 'ES File Explorer';
     }
     else if (useragent.indexOf('megasync') > 0) {
         browser = 'MEGAsync';
     }
     else if (useragent.indexOf('msie') > 0
-            || "ActiveXObject" in window) {
+            || useragent.indexOf('trident') > 0) {
         browser = 'Internet Explorer';
     }
 
@@ -645,7 +674,7 @@ function browserdetails(useragent) {
     }
     else if (os) {
         name = os;
-        icon = os.toLowerCase() + '.png';
+        icon = icon || (os.toLowerCase() + '.png');
     }
     else if (browser) {
         name = browser;
@@ -655,7 +684,7 @@ function browserdetails(useragent) {
         icon = 'unknown.png';
     }
     if (!icon && browser) {
-        if (browser === 'Internet Explorer' || browser === 'Spartan') {
+        if (browser === 'Internet Explorer' || browser === 'Edge') {
             icon = 'ie.png';
         }
         else {
@@ -663,20 +692,34 @@ function browserdetails(useragent) {
         }
     }
 
-    var browserDetails = {};
-    browserDetails.name = name;
-    browserDetails.nameTrans = nameTrans || name;
-    browserDetails.icon = icon;
-    browserDetails.os = os || '';
-    browserDetails.browser = browser;
+    var details = {};
+    details.name = name;
+    details.nameTrans = nameTrans || name;
+    details.icon = icon;
+    details.os = os || '';
+    details.browser = browser;
 
     // Determine if the OS is 64bit
-    browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
+    details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 
     // Determine if using a browser extension
-    browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    details.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
 
-    return browserDetails;
+    // Determine core engine.
+    if (useragent.indexOf('webkit') > 0) {
+        details.engine = 'Webkit';
+    }
+    else if (useragent.indexOf('trident') > 0) {
+        details.engine = 'Trident';
+    }
+    else if (useragent.indexOf('gecko') > 0) {
+        details.engine = 'Gecko';
+    }
+    else {
+        details.engine = 'Unknown';
+    }
+
+    return details;
 }
 
 function countrydetails(isocode) {
@@ -701,7 +744,7 @@ function time2date(unixtime, ignoretime) {
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
-if (typeof(l) === 'undefined') {
+if (typeof l === 'undefined') {
     l = [];
 }
 
@@ -754,6 +797,53 @@ function time2last(timestamp) {
     }
 }
 
+/**
+ * Basic calendar math function (using moment.js) that will return a string, depending on the exact calendar
+ * dates/months ago when the passed `dateString` had happened.
+ *
+ * @param dateString {String|int}
+ * @param [refDate] {String|int}
+ * @returns {String}
+ */
+var time2lastSeparator = function(dateString, refDate) {
+    var momentDate = moment(dateString);
+    var today = moment(refDate ? refDate : undefined).startOf('day');
+    var yesterday = today.clone().subtract(1, 'days');
+    var weekAgo = today.clone().startOf('week').endOf('day');
+    var twoWeeksAgo = today.clone().startOf('week').subtract(1, 'weeks').endOf('day');
+    var thisMonth = today.clone().startOf('month').startOf('day');
+    var thisYearAgo = today.clone().startOf('year');
+
+    if (momentDate.isSame(today, 'd')) {
+        // Today
+        return l[1301];
+    }
+    else if (momentDate.isSame(yesterday, 'd')) {
+        // Yesterday
+        return l[1302];
+    }
+    else if (momentDate.isAfter(weekAgo)) {
+        // This week
+        return l[1303];
+    }
+    else if (momentDate.isAfter(twoWeeksAgo)) {
+        // Last week
+        return l[1304];
+    }
+    else if (momentDate.isAfter(thisMonth)) {
+        // This month
+        return l[1305];
+    }
+    else if (momentDate.isAfter(thisYearAgo)) {
+        // This year
+        return l[1306];
+    }
+    else {
+        // more then 1 year ago...
+        return l[1307];
+    }
+};
+
 function unixtime() {
     return (new Date().getTime() / 1000);
 }
@@ -766,7 +856,7 @@ function uplpad(number, length) {
     return str;
 }
 
-function secondsToTime(secs) {
+function secondsToTime(secs, html_format) {
     if (isNaN(secs)) {
         return '--:--:--';
     }
@@ -780,7 +870,29 @@ function secondsToTime(secs) {
     var divisor_for_seconds = divisor_for_minutes % 60;
     var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
     var returnvar = hours + ':' + minutes + ':' + seconds;
+
+    if (html_format) {
+        hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
+        returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
+    }
     return returnvar;
+}
+
+function secondsToTimeShort(secs) {
+    var val = secondsToTime(secs);
+
+    if (!val) {
+        return val;
+    }
+
+    if (val.substr(0, 1) === "0") {
+        val = val.substr(1, val.length);
+    }
+    if (val.substr(0, 2) === "0:") {
+        val = val.substr(2, val.length);
+    }
+
+    return val;
 }
 
 function htmlentities(value) {
@@ -788,6 +900,21 @@ function htmlentities(value) {
         return '';
     }
     return $('<div/>').text(value).html();
+}
+
+/**
+ * Convert bytes sizes into a human-friendly format (KB, MB, GB), pretty
+ * similar to `bytesToSize` but this function returns an object
+ * (`{ size: "23,33", unit: 'KB' }`) which is easier to consume
+ *
+ * @param {Number} bytes        Size in bytes to convert
+ * @param {Number} precision    Precision to show the decimal number
+ * @returns {Object} Returns an object similar to `{size: "2.1", unit: "MB"}`
+ */
+function numOfBytes(bytes, precision) {
+
+    var parts = bytesToSize(bytes, precision || 2).split(' ');
+    return { size: parts[0], unit: parts[1] || 'B' };
 }
 
 function bytesToSize(bytes, precision) {
@@ -944,20 +1071,17 @@ function funcAlias(context, fn) {
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
  */
 function makeObservable(kls) {
+    var target = kls.prototype || kls;
     var aliases = ['on', 'bind', 'unbind', 'one', 'trigger', 'rebind'];
 
-    $.each(aliases, function(k, v) {
-        if (kls.prototype) {
-            kls.prototype[v] = function() {
-                return $(this)[v].apply($(this), toArray(arguments));
-            }
-        }
-        else {
-            kls[v] = function() {
-                return $(this)[v].apply($(this), toArray(arguments));
-            }
-        }
+    aliases.forEach(function(fn) {
+        target[fn] = function() {
+            var $this = $(this);
+            return $this[fn].apply($this, arguments);
+        };
     });
+
+    target = aliases = kls = undefined;
 }
 
 /**
@@ -1017,6 +1141,10 @@ function makeMetaAware(kls) {
      */
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;
+
+        if (!self["_" + prefix]) {
+            return;
+        }
 
         if (prefix && !namespace && !k) {
             delete self["_" + prefix];
@@ -1202,11 +1330,18 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 /**
  * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
  *
- * @param val {Arguments}
+ * Please note there is a huge performance degradation when using `arguments` outside their
+ * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
+ *
  * @returns {Array}
  */
-function toArray(val) {
-    return Array.prototype.slice.call(val, val);
+function toArray() {
+    var len = arguments.length;
+    var res = Array(len);
+    while (len--) {
+        res[len] = arguments[len];
+    }
+    return res;
 }
 
 /**
@@ -1272,6 +1407,7 @@ function toArray(val) {
  */
 function AssertionFailed(message) {
     this.message = message;
+    this.stack = mega.utils.getStack();
 }
 AssertionFailed.prototype = Object.create(Error.prototype);
 AssertionFailed.prototype.name = 'AssertionFailed';
@@ -1322,8 +1458,16 @@ function assert(test) {
  *     Throws an exception on something that does not seem to be a user handle.
  */
 var assertUserHandle = function(userHandle) {
-    assert(base64urldecode(userHandle).length === 8,
-       'This seems not to be a user handle: ' + userHandle);
+    try {
+        if (typeof userHandle !== 'string'
+                || base64urldecode(userHandle).length !== 8) {
+
+            throw 1;
+        }
+    }
+    catch (ex) {
+        assert(false, 'This seems not to be a user handle: ' + userHandle);
+    }
 };
 
 
@@ -1351,19 +1495,19 @@ function NOW() {
  *  Global function to help debugging
  */
 function DEBUG2() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         console.warn.apply(console, arguments)
     }
 }
 
 function ERRDEBUG() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         console.error.apply(console, arguments)
     }
 }
 
 function DEBUG() {
-    if (typeof(d) !== "undefined" && d) {
+    if (typeof d !== "undefined" && d) {
         (console.debug || console.log).apply(console, arguments)
     }
 }
@@ -1396,7 +1540,7 @@ function srvlog(msg, data, silent) {
     if (!silent && d) {
         console.error(msg, data);
     }
-    if (!d || onBetaW) {
+    if (typeof window.onerror === 'function') {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
     }
 }
@@ -1456,10 +1600,17 @@ function removeValue(array, value, can_fail) {
 function setTransferStatus(dl, status, ethrow, lock) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
-    if (text.length > 44) {
-        text = text.substr(0, 42) + '...';
+    if (text.length > 48) {
+        text = text.substr(0, 48) + "\u2026";
     }
-    $('.transfer-table #' + id + ' td:eq(5)').text(text);
+    if (page === 'download') {
+        $('.download.error-icon').text(text);
+        $('.download.error-icon').removeClass('hidden');
+        $('.download.icons-block').addClass('hidden');
+    }
+    else {
+        $('.transfer-table #' + id + ' td:eq(5)').text(text);
+    }
     if (lock) {
         $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
     }
@@ -1473,7 +1624,10 @@ function setTransferStatus(dl, status, ethrow, lock) {
 
 function dlFatalError(dl, error, ethrow) {
     var m = 'This issue should be resolved ';
-    if (navigator.webkitGetUserMedia) {
+    if (ethrow === -0xDEADBEEF) {
+        ethrow = false;
+    }
+    else if (navigator.webkitGetUserMedia) {
         m += 'exiting from Incognito mode.';
         msgDialog('warninga', l[1676], m, error);
     }
@@ -1490,6 +1644,15 @@ function dlFatalError(dl, error, ethrow) {
     else {
         Later(firefoxDialog);
     }
+
+    // Log the fatal error
+    Soon(function() {
+        error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
+
+        srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+    });
+
+    // Set transfer status and abort it
     setTransferStatus(dl, error, ethrow, true);
     dlmanager.abort(dl);
 }
@@ -1508,8 +1671,7 @@ function RegExpEscape(text) {
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
     return addZeroIfLenLessThen(date.getHours(), 2)
-        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2)
-        + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
+        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
 }
 
 /**
@@ -1554,12 +1716,12 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
         return;
     }
     ctx[fnName] = function() {
-        //loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
-        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray(arguments)));
+        // loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, arguments]);
+        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray.apply(null, arguments)));
 
-        var res = origFn.apply(this, toArray(arguments));
-        //loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
-        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
+        var res = origFn.apply(this, arguments);
+        // loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, arguments, res]);
+        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray.apply(null, arguments)).concat(["returned: ", res]));
 
         return res;
     };
@@ -1583,7 +1745,7 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
     loggerFn = loggerFn || console.debug;
 
-    if (typeof(parentLogger) === "undefined") {
+    if (typeof parentLogger === "undefined") {
         var logger = new MegaLogger(textPrefix);
     }
     if (!window.callLoggerObjects) {
@@ -1591,10 +1753,10 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
 
     $.each(ctx, function(k, v) {
-        if (typeof(v) === "function") {
+        if (typeof v === "function") {
             callLoggerWrapper(ctx, k, loggerFn, textPrefix, parentLogger);
         }
-        else if (typeof(v) === "object"
+        else if (typeof v === "object"
                 && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
             window.callLoggerObjects.push(v);
             logAllCallsOnObject(v, loggerFn, recursive, textPrefix + ":" + k, parentLogger);
@@ -1661,17 +1823,20 @@ var stringcrypt = (function() {
      * Encrypts clear text data to an authenticated ciphertext, armoured with
      * encryption mode indicator and IV.
      *
-     * @param plain {string}
+     * @param plain {String}
      *     Plain data block as (unicode) string.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @param [raw] {Boolean}
+     *     Do not convert plain text to UTF-8 (default: false).
+     * @returns {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
      */
-    ns.stringEncrypter = function(plain, key) {
+    ns.stringEncrypter = function(plain, key, raw) {
         var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
-        var plainBytes = unescape(encodeURIComponent(plain));
-        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode);
+        var plainBytes = raw ? plain : to8(plain);
+        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode, false);
+
         return cipher;
     };
 
@@ -1679,16 +1844,20 @@ var stringcrypt = (function() {
      * Decrypts an authenticated cipher text armoured with a mode indicator and IV
      * to clear text data.
      *
-     * @param cipher {string}
+     * @param cipher {String}
      *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
-     * @param key {string}
+     * @param key {String}
      *     Encryption key as byte string.
-     * @returns {string}
+     * @param [raw] {Boolean}
+     *     Do not convert plain text from UTF-8 (default: false).
+     * @returns {String}
      *     Clear text as (unicode) string.
      */
-    ns.stringDecrypter = function(cipher, key) {
-        var plain = tlvstore.blockDecrypt(cipher, key);
-        return decodeURIComponent(escape(plain));
+    ns.stringDecrypter = function(cipher, key, raw) {
+
+        var plain = tlvstore.blockDecrypt(cipher, key, false);
+
+        return raw ? plain : from8(plain);
     };
 
     /**
@@ -1698,8 +1867,10 @@ var stringcrypt = (function() {
      *     Symmetric key as byte string.
      */
     ns.newKey = function() {
+
         var keyBytes = new Uint8Array(16);
         asmCrypto.getRandomValues(keyBytes);
+
         return asmCrypto.bytes_to_string(keyBytes);
     };
 
@@ -1857,8 +2028,16 @@ function mKeyDialog(ph, fl) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
         }
     });
+
+    // Bolden text on instruction message
+    var $instructionMessage = $('.dlkey-dialog .instruction-message');
+    var instructionText = $instructionMessage.html().replace('[B]', '<b>').replace('[/B]', '</b>');
+    $instructionMessage.html(instructionText);
+
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
-        var key = $('.fm-dialog.dlkey-dialog input').val();
+
+        // Trim the input from the user for whitespace, newlines etc on either end
+        var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
 
         if (key) {
             // Remove the ! from the key which is exported from the export dialog
@@ -2101,6 +2280,25 @@ mSpawnWorker.prototype = {
                 console.timeEnd(reply.jid);
             }
 
+            // Don't report `newmissingkeys` unless there are *new* missing keys
+            if (job.newmissingkeys) {
+                try {
+                    var keys = Object.keys(missingkeys).sort();
+                    var hash = MurmurHash3(JSON.stringify(keys));
+                    var prop = u_handle + '_lastMissingKeysHash';
+
+                    if (localStorage[prop] !== hash) {
+                        localStorage[prop] = hash;
+                    }
+                    else {
+                        job.newmissingkeys = false;
+                    }
+                }
+                catch (ex) {
+                    console.error(ex);
+                }
+            }
+
             delete this.jobs[reply.jid];
             job.callback(job.result, job);
         }
@@ -2129,6 +2327,8 @@ function setupTransferAnalysis() {
     if ($.mTransferAnalysis) {
         return;
     }
+    var PROC_INTERVAL = 4.2 * 60 * 1000;
+    var logger = MegaLogger.getLogger('TransferAnalysis');
 
     var prev = {},
         tlen = {},
@@ -2142,98 +2342,46 @@ function setupTransferAnalysis() {
             var tp = $.transferprogress;
 
             for (var i in tp) {
-                var q = (i[0] === 'u' ? ulQueue : dlQueue);
-                if (!GlobalProgress[i] || GlobalProgress[i].paused
-                        || tp[i][0] === tp[i][1] || q.isPaused() || q._qpaused[i]) {
-                    delete prev[i];
-                }
-                else if (prev[i] && prev[i] === tp[i][0]) {
-                    var p = tp[i],
-                        t = i[0] === 'u' ? 'Upload' : 'Download',
-                        r = '',
-                        data = [];
-                    var s = GlobalProgress[i].speed,
-                        w = GlobalProgress[i].working || [];
-                    var c = p[0] + '/' + p[1] + '-' + Math.floor(p[0] / p[1] * 100) + '%';
-                    var u = w.map(function(c) {
-                        var x = c.xhr || {};
-                        return ['' + c, x.__failed, x.__timeout,
-                            !!x.listener, x.__id, x.readyState > 1 && x.status];
-                    });
+                if (tp.hasOwnProperty(i)) {
+                    var currentlyTransfered = tp[i][0];
+                    var totalToBeTransfered = tp[i][1];
+                    var currenTransferSpeed = tp[i][2];
 
-                    if (d) {
-                        console.warn(i + ' might be stuck, checking...', c, w.length, u);
+                    var finished = (currentlyTransfered === totalToBeTransfered);
+
+                    if (finished) {
+                        logger.info('Transfer "%s" has finished. \uD83D\uDC4D', i);
+                        continue;
                     }
 
-                    if (w.length) {
-                        var j = w.length;
-                        while (j--) {
-                            /**
-                             * if there's a timer, no need to call on_error ourselves
-                             * since the chunk will get restarted there by the xhr
-                             */
-                            var stuck = w[j].xhr && !w[j].xhr.__timeout;
-                            if (stuck) {
-                                var chunk_id = '' + w[j],
-                                    n = u[j];
+                    var transfer = Object(GlobalProgress[i]);
 
-                                if (w[j].dl && w[j].dl.lasterror) {
-                                    r = '[DLERR' + w[j].dl.lasterror + ']';
-                                }
-                                else if (w[j].srverr) {
-                                    r = '[SRVERR' + (w[j].srverr - 1) + ']';
-                                }
+                    if (transfer.paused || !transfer.started) {
+                        logger.info('Transfer "%s" is not active.', i, transfer);
+                        continue;
+                    }
 
-                                try {
-                                    w[j].on_error(0, {}, 'Stuck');
-                                }
-                                catch (e) {
-                                    n.push(e.message);
-                                }
+                    if (prev[i] && prev[i] === currentlyTransfered) {
+                        var type = (i[0] === 'u'
+                            ? 'Upload'
+                            : (i[0] === 'z' ? 'ZIP' : 'Download'));
 
-                                if (!chunks[chunk_id]) {
-                                    chunks[chunk_id] = 1;
-                                    data.push(n);
-                                }
-                            }
-                        }
+                        srvlog(type + ' transfer seems stuck.');
 
-                        if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1)) {
-                            r = s ? '[TIMEOUT]' : '[ETHERR]';
-                            data = ['Chunks are taking too long to complete... ', u];
-                        }
+                        logger.warn('Transfer "%s" had no progress for the last minutes...', i, transfer);
                     }
                     else {
-                        r = '[!]';
-                        data = 'GlobalProgress.' + i + ' exists with no working chunks.';
-                    }
+                        logger.info('Transfer "%s" is in progress... %d% completed', i,
+                            Math.floor(currentlyTransfered / totalToBeTransfered * 100));
 
-                    if (data.length) {
-                        var udata = {
-                            i: i,
-                            p: c,
-                            d: data,
-                            j: [prev, tlen],
-                            s: s
-                        };
-                        if (i[0] === 'z') {
-                            t = 'zip' + t;
-                        }
-                        console.error(t + ' stuck. ' + r, i, udata);
-                        if (!d) {
-                            srvlog(t + ' Stuck. ' + r, udata);
-                        }
+                        time[i] = Date.now();
+                        tlen[i] = Math.max(tlen[i] | 0, currentlyTransfered);
+                        prev[i] = currentlyTransfered;
                     }
-                    delete prev[i];
-                }
-                else {
-                    time[i] = Date.now();
-                    tlen[i] = Math.max(tlen[i] || 0, tp[i][0]);
-                    prev[i] = tp[i][0];
                 }
             }
         }
-    }, mXHRTimeoutMS * 1.2);
+    }, PROC_INTERVAL);
 }
 
 function percent_megatitle() {
@@ -2314,14 +2462,16 @@ function percent_megatitle() {
     if (d_deg <= 180) {
         $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(' + d_deg + 'deg)');
         $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
-    } else {
+    }
+    else {
         $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
         $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
     }
     if (u_deg <= 180) {
         $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(' + u_deg + 'deg)');
         $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
-    } else {
+    }
+    else {
         $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
         $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
@@ -2394,9 +2544,29 @@ function moveCursortoToEnd(el) {
         range.collapse(false);
         range.select();
     }
+    $(el).focus();
 }
 
-// Returns pixels position of element relative to document (top left corner)
+function asyncApiReq(data) {
+    var $promise = new MegaPromise();
+    api_req(data, {
+        callback: function(r) {
+            if (typeof r === 'number') {
+                $promise.reject.apply($promise, arguments);
+            }
+            else {
+                $promise.resolve.apply($promise, arguments);
+            }
+        }
+    });
+
+    //TODO: fail case?! e.g. the exp. backoff failed after waiting for X minutes??
+
+    return $promise;
+}
+
+// Returns pixels position of element relative to document (top left corner) OR to the parent (IF the parent and the
+// target element are both with position: absolute)
 function getHtmlElemPos(elem, n) {
     var xPos = 0;
     var yPos = 0;
@@ -2453,37 +2623,6 @@ function disableDescendantFolders(id, pref) {
     return true;
 }
 
-function ucfirst(str) {
-    //  discuss at: http://phpjs.org/functions/ucfirst/
-    // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // bugfixed by: Onno Marsman
-    // improved by: Brett Zamir (http://brett-zamir.me)
-    //   example 1: ucfirst('kevin van zonneveld');
-    //   returns 1: 'Kevin van zonneveld'
-
-    str += '';
-    var f = str.charAt(0)
-        .toUpperCase();
-    return f + str.substr(1);
-}
-
-function readLocalStorage(name, type, val) {
-    var v;
-    if (localStorage[name]) {
-        var f = 'parse' + ucfirst(type);
-        v = localStorage[name];
-
-        if (typeof window[f] === "function") {
-            v = window[f](v);
-        }
-
-        if (val && ((val.min && val.min > v) || (val.max && val.max < v))) {
-            v = null;
-        }
-    }
-    return v || (val && val.def);
-}
-
 function obj_values(obj) {
     var vals = [];
 
@@ -2501,7 +2640,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
 
     return function() {
         var self = this;
-        var args = toArray(arguments);
+        var args = toArray.apply(null, arguments);
 
         var event = new $.Event("onBefore" + eventSuffix);
         self.trigger(event, args);
@@ -2516,7 +2655,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
             }
 
         }
-        if (typeof(event.returnedValue) !== "undefined") {
+        if (typeof event.returnedValue !== "undefined") {
             args = event.returnedValue;
         }
 
@@ -2697,58 +2836,58 @@ function generateAnonymousReport() {
     var roomUniqueId = 0;
     var roomUniqueIdMap = {};
 
-    Object.keys(megaChatIsReady && megaChat.chats || {}).forEach(function(k) {
-        var v = megaChat.chats[k];
+    if (megaChatIsReady && megaChat.chats) {
+        megaChat.chats.forEach(function (v, k) {
+            var participants = v.getParticipants();
 
-        var participants = v.getParticipants();
-
-        participants.forEach(function(v, k) {
-            var cc = megaChat.getContactFromJid(v);
-            if (cc && cc.u && !userAnonMap[cc.u]) {
-                userAnonMap[cc.u] = {
-                    anonId: userAnonIdx++ + rand(1000),
-                    pres: megaChat.karere.getPresence(v)
-                };
-            }
-            participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
-        });
-
-        var r = {
-            'roomUniqueId': roomUniqueId,
-            'roomState': v.getStateAsText(),
-            'roomParticipants': participants
-        };
-
-        chatStates[roomUniqueId] = r;
-        roomUniqueIdMap[k] = roomUniqueId;
-        roomUniqueId++;
-    });
-
-    if (report.haveRtc) {
-        Object.keys(megaChat.plugins.callManager.callSessions).forEach(function(k) {
-            var v = megaChat.plugins.callManager.callSessions[k];
+            participants.forEach(function (v, k) {
+                var cc = megaChat.getContactFromJid(v);
+                if (cc && cc.u && !userAnonMap[cc.u]) {
+                    userAnonMap[cc.u] = {
+                        anonId: userAnonIdx++ + rand(1000),
+                        pres: megaChat.karere.getPresence(v)
+                    };
+                }
+                participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
+            });
 
             var r = {
-                'callStats': v.callStats,
-                'state': v.state
+                'roomUniqueId': roomUniqueId,
+                'roomState': v.getStateAsText(),
+                'roomParticipants': participants
             };
 
-            var roomIdx = roomUniqueIdMap[v.room.roomJid];
-            if(!roomIdx) {
-                roomUniqueId += 1; // room which was closed, create new tmp id;
-                roomIdx = roomUniqueId;
-            }
-            if(!chatStates[roomIdx]) {
-                chatStates[roomIdx] = {};
-            }
-            if(!chatStates[roomIdx].callSessions) {
-                chatStates[roomIdx].callSessions = [];
-            }
-            chatStates[roomIdx].callSessions.push(r);
+            chatStates[roomUniqueId] = r;
+            roomUniqueIdMap[k] = roomUniqueId;
+            roomUniqueId++;
         });
-    };
 
-    report.chatRoomState = chatStates;
+        if (report.haveRtc) {
+            Object.keys(megaChat.plugins.callManager.callSessions).forEach(function (k) {
+                var v = megaChat.plugins.callManager.callSessions[k];
+
+                var r = {
+                    'callStats': v.callStats,
+                    'state': v.state
+                };
+
+                var roomIdx = roomUniqueIdMap[v.room.roomJid];
+                if (!roomIdx) {
+                    roomUniqueId += 1; // room which was closed, create new tmp id;
+                    roomIdx = roomUniqueId;
+                }
+                if (!chatStates[roomIdx]) {
+                    chatStates[roomIdx] = {};
+                }
+                if (!chatStates[roomIdx].callSessions) {
+                    chatStates[roomIdx].callSessions = [];
+                }
+                chatStates[roomIdx].callSessions.push(r);
+            });
+        };
+
+        report.chatRoomState = chatStates;
+    };
 
     if (is_chrome_firefox) {
         report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
@@ -2771,7 +2910,7 @@ function generateAnonymousReport() {
     report.totalScriptElements = $("script").length;
 
     report.totalD = Object.keys(M.d).length;
-    report.totalU = Object.keys(M.u).length;
+    report.totalU = M.u.size();
     report.totalC = Object.keys(M.c).length;
     report.totalIpc = Object.keys(M.ipc).length;
     report.totalOpc = Object.keys(M.opc).length;
@@ -2779,7 +2918,7 @@ function generateAnonymousReport() {
     report.l = lang;
     report.scrnSize = window.screen.availWidth + "x" + window.screen.availHeight;
 
-    if (typeof(window.devicePixelRatio) !== 'undefined') {
+    if (typeof window.devicePixelRatio !== 'undefined') {
         report.pixRatio = window.devicePixelRatio;
     }
 
@@ -2838,6 +2977,10 @@ function generateAnonymousReport() {
     return $promise;
 }
 
+function __(s) { //TODO: waiting for @crodas to commit the real __ code.
+    return s;
+}
+
 function MegaEvents() {}
 MegaEvents.prototype.trigger = function(name, args) {
     if (!(this._events && this._events.hasOwnProperty(name))) {
@@ -2884,9 +3027,9 @@ MegaEvents.prototype.on = function(name, callback) {
         data = $.extend(
             true, {}, {
                 'aid': this.sessionId,
-                'lang': typeof(lang) !== 'undefined' ? lang : null,
+                'lang': typeof lang !== 'undefined' ? lang : null,
                 'browserlang': navigator.language,
-                'u_type': typeof(u_type) !== 'undefined' ? u_type : null
+                'u_type': typeof u_type !== 'undefined' ? u_type : null
             },
             data
         );
@@ -2918,16 +3061,16 @@ MegaEvents.prototype.on = function(name, callback) {
 
 
 function constStateToText(enumMap, state) {
-    var txt = null;
+    var txt = false;
     $.each(enumMap, function(k, v) {
-        if(state == v) {
+        if (state == v) {
             txt = k;
 
             return false; // break
         }
     });
 
-    return txt;
+    return txt === false ? "(not found: " + state + ")" : txt;
 };
 
 /**
@@ -2942,15 +3085,15 @@ function constStateToText(enumMap, state) {
 function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     var checksAvailable = allowedStatesMap[currentState];
     var allowed = false;
-    if(checksAvailable) {
+    if (checksAvailable) {
         checksAvailable.forEach(function(allowedState) {
-            if(allowedState === newState) {
+            if (allowedState === newState) {
                 allowed = true;
                 return false; // break;
             }
         });
     }
-    if(!allowed) {
+    if (!allowed) {
         assert(
             false,
             'State change from: ' + constStateToText(enumMap, currentState) + ' to ' +
@@ -2958,6 +3101,80 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
         );
     }
 }
+
+/**
+ * execCommandUsable
+ *
+ * Native browser 'copy' command using execCommand('copy').
+ * Supported by Chrome42+, FF41+, IE9+, Opera29+
+ * @returns {Boolean}
+ */
+mega.utils.execCommandUsable = function() {
+    var result;
+
+    try {
+        result = document.execCommand('copy');
+    }
+    catch (ex) {}
+
+    return result === false;
+};
+
+/**
+ * Utility that will return a sorting function (can compare numbers OR strings, depending on the data stored in the
+ * obj), that can sort an array of objects.
+ * @param key {String|Function} the name of the property that will be used for the sorting OR a func that will return a
+ * dynamic value for the object
+ * @param [order] {Number} 1 for asc, -1 for desc sorting
+ * @returns {Function}
+ */
+mega.utils.sortObjFn = function(key, order) {
+    if (!order) {
+        order = 1;
+    }
+
+    return function(a, b, tmpOrder) {
+        var currentOrder = tmpOrder ? tmpOrder : order;
+
+        if ($.isFunction(key)) {
+            a = key(a);
+            b = key(b);
+        }
+        else {
+            a = a[key];
+            b = b[key];
+        }
+
+        if (typeof a == 'string' && typeof b == 'string') {
+            return a.localeCompare(b) * currentOrder;
+        }
+        else if (typeof a == 'string' && typeof b == 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof a == 'undefined' && typeof b == 'string') {
+            return -1 * currentOrder;
+        }
+        else if (typeof a == 'number' && typeof b == 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof a == 'undefined' && typeof b == 'number') {
+            return -1 * currentOrder;
+        }
+        else if (typeof a == 'number' && typeof b == 'number') {
+            var _a = a || 0;
+            var _b = b || 0;
+            if (_a > _b) {
+                return 1 * currentOrder;
+            }
+            if (_a < _b) {
+                return -1 * currentOrder;
+            } else {
+                return 0;
+            }
+        }
+        else return 0;
+    }
+};
 
 /**
  * Promise-based XHR request
@@ -3129,7 +3346,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
-        clearXhr(); /* destroy all xhr */
+        clearTransferXHRs(); /* destroy all xhr */
 
         $('.transfer-pause-icon').addClass('disabled');
         $('.nw-fm-left-icon.transfers').removeClass('transfering');
@@ -3193,7 +3410,8 @@ mega.utils.reload = function megaUtilsReload() {
         stopapi();
         if (typeof mDB === 'object' && !pfid) {
             mDBreload();
-        } else {
+        }
+        else {
             loadfm(true);
         }
     }
@@ -3309,6 +3527,60 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
 };
 
 /**
+ * Resources loader through our secureboot mechanism
+ * @param {...*} var_args  Resources to load, either plain filenames or jsl2 members
+ * @return {MegaPromise}
+ */
+mega.utils.require = function megaUtilsRequire() {
+    var files = [];
+
+    toArray.apply(null, arguments).forEach(function(file) {
+
+        // If a plain filename, inject it into jsl2
+        // XXX: Likely this will have a conflict with our current build script
+        if (!jsl2[file]) {
+            var filename = file.replace(/^.*\//, '');
+            var extension = filename.split('.').pop().toLowerCase();
+            var name = filename.replace(/\./g, '_');
+            var type;
+            var result;
+
+            if (extension === 'html') {
+                type = 0;
+            }
+            else if (extension === 'js') {
+                type = 1;
+            }
+            else if (extension === 'css') {
+                type = 2;
+            }
+
+            jsl2[name] = { f: file, n: name, j: type };
+            file = name;
+        }
+
+        if (!jsl_loaded[jsl2[file].n]) {
+            files.push(jsl2[file]);
+        }
+    });
+
+    if (files.length === 0) {
+        // Everything is already loaded
+        return MegaPromise.resolve();
+    }
+
+    Array.prototype.push.apply(jsl, files);
+
+    var promise = new MegaPromise();
+    silent_loading = function() {
+        promise.resolve();
+    };
+    jsl_start();
+
+    return promise;
+};
+
+/**
  *  Kill session and Logout
  */
 mega.utils.logout = function megaUtilsLogout() {
@@ -3324,10 +3596,15 @@ mega.utils.logout = function megaUtilsLogout() {
                 }
             }
         }, step = 1;
+
         loadingDialog.show();
         if (typeof mDB === 'object' && mDB.drop) {
             step++;
             mFileManagerDB.exec('drop').always(finishLogout);
+        }
+        if (typeof attribCache === 'object' && attribCache.db) {
+            step++;
+            attribCache.destroy().always(finishLogout);
         }
         if (u_privk) {
             // Use the 'Session Management Logout' API call to kill the current session
@@ -3339,6 +3616,33 @@ mega.utils.logout = function megaUtilsLogout() {
 
     });
 }
+
+/**
+ * Convert a version string (eg, 2.1.1) to an integer, for easier comparison
+ * @param {String}  version The version string
+ * @param {Boolean} hex     Whether give an hex result
+ * @return {Number|String}
+ */
+mega.utils.vtol = function megaUtilsVTOL(version, hex) {
+    version = String(version).split('.');
+
+    while (version.length < 4) {
+        version.push(0);
+    }
+
+    version = ((version[0] | 0) & 0xff) << 24 |
+              ((version[1] | 0) & 0xff) << 16 |
+              ((version[2] | 0) & 0xff) <<  8 |
+              ((version[3] | 0) & 0xff);
+
+    version >>>= 0;
+
+    if (hex) {
+        return version.toString(16);
+    }
+
+    return version;
+};
 
 /**
  * Perform a normal logout
@@ -3393,7 +3697,7 @@ function mCleanestLogout(aUserHandle) {
 
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
-    var RUBSCHED_WAITPROC = 120 * 1000;
+    var RUBSCHED_WAITPROC =  20 * 1000;
     var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
@@ -3468,7 +3772,12 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
             console.time('rubsched');
         }
 
-        var nodes = Object.keys(M.c[M.RubbishID] || {}), rubnodes = [];
+        // Watch how long this is running
+        var startTime = Date.now();
+
+        // Get nodes in the Rubbish-bin
+        var nodes = Object.keys(M.c[M.RubbishID] || {});
+        var rubnodes = [];
 
         for (var i in nodes) {
             var node = M.d[nodes[i]];
@@ -3498,6 +3807,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                     if (handler.ready(node, xval)) {
                         break;
                     }
+
+                    // Abort if this has been running for too long..
+                    if ((Date.now() - startTime) > 7000) {
+                        break;
+                    }
                 }
             }
 
@@ -3505,6 +3819,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
             if (handles.length) {
                 var inRub = (M.RubbishID === M.currentrootid);
+
+                if (inRub) {
+                    // Flush cached nodes
+                    $(window).trigger('dynlist.flush');
+                }
 
                 handles.map(function(handle) {
                     M.delNode(handle);
@@ -3706,6 +4025,50 @@ function rand_range(a, b) {
     return Math.random() * (b - a) + a;
 };
 
+// http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
+function elementInViewport2Lightweight(el) {
+    var top = el.offsetTop;
+    var left = el.offsetLeft;
+    var width = el.offsetWidth;
+    var height = el.offsetHeight;
+
+    while(el.offsetParent) {
+        el = el.offsetParent;
+        top += el.offsetTop;
+        left += el.offsetLeft;
+    }
+
+    return (
+        top < (window.pageYOffset + window.innerHeight) &&
+        left < (window.pageXOffset + window.innerWidth) &&
+        (top + height) > window.pageYOffset &&
+        (left + width) > window.pageXOffset
+    );
+}
+
+function elementInViewport2(el) {
+    return verge.inY(el) || verge.inX(el);
+}
+
+/**
+ * Check if the passed in element (DOMNode) is FULLY visible in the viewport.
+ *
+ * @param el {DOMNode}
+ * @returns {boolean}
+ */
+function elementInViewport(el) {
+    if (!verge.inY(el)) {
+        return false;
+    }
+    if (!verge.inX(el)) {
+        return false;
+    }
+
+    var rect = verge.rectangle(el);
+
+    return !(rect.left < 0 || rect.right < 0 || rect.bottom < 0 || rect.top < 0);
+};
+
 // FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as
 //        the original problem is found and resolved.
 if (typeof sjcl !== 'undefined') {
@@ -3756,7 +4119,7 @@ if (typeof sjcl !== 'undefined') {
 
                 // Look for full share
                 if (fullShare) {
-                    shares = M.d[nodes[i]].shares;
+                    shares = M.d[nodes[i]] && M.d[nodes[i]].shares;
 
                     // Look for link share
                     if (linkShare) {
@@ -3799,20 +4162,20 @@ if (typeof sjcl !== 'undefined') {
      */
     Share.prototype.hasExportLink = function(nodes) {
 
-        var result = false,
-            node;
+        if (typeof nodes === 'string') {
+            nodes = [nodes];
+        }
 
         // Loop through all selected items
-        $.each(nodes, function(index, value) {
-            node = M.d[value];
-            if (node.shares && node.shares.EXP) {
-                result = true;
-                return false;// Stop further $.each loop execution
+        for (var i in nodes) {
+            var node = M.d[nodes[i]];
 
+            if (node && Object(node.shares).EXP) {
+                return true;
             }
-        });
+        }
 
-        return result;
+        return false;
     };
 
     /**
@@ -3904,66 +4267,5 @@ if (typeof sjcl !== 'undefined') {
     };
 
     // export
-    scope.mega = scope.mega || {};
     scope.mega.Share = Share;
-})(jQuery, window);
-
-(function($, scope) {
-    /**
-     * Nodes related operations.
-     *
-     * @param opts {Object}
-     *
-     * @constructor
-     */
-    var Nodes = function(opts) {
-
-        var self = this;
-        var defaultOptions = {
-        };
-
-        self.options = $.extend(true, {}, defaultOptions, opts);    };
-
-    /**
-     * getChildNodes
-     *
-     * Loops through all subdirs of given node, as result gives array of subdir nodes.
-     * @param {String} id: node id.
-     * @param {Array} nodesId.
-     * @returns {Array} Child nodes id.
-     */
-    Nodes.prototype.getChildNodes = function(id, nodesId) {
-
-        var self = this;
-
-        var subDirs = nodesId;
-
-        if (subDirs) {
-            if (subDirs.indexOf(id) === -1) {
-                subDirs.push(id);
-            }
-        }
-        else {
-            // Make subDirs an array
-            subDirs = [id];
-        }
-
-        for (var item in M.c[id]) {
-            if (M.c[id].hasOwnProperty(item)) {
-
-                // Prevent duplication
-                if (subDirs && subDirs.indexOf(item) === -1) {
-                    subDirs.push(item);
-                }
-
-                self.getChildNodes(item, subDirs);
-            }
-        }
-
-        return subDirs;
-    };
-
-    // export
-    scope.mega = scope.mega || {};
-    scope.mega.Nodes = Nodes;
 })(jQuery, window);

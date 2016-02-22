@@ -284,11 +284,15 @@ function MegaData()
     {
         this.sortfn = function(a, b, d)
         {
-            var usera = M.d[a.p], userb = M.d[b.p];
-            if (typeof usera.name == 'string' && typeof userb.name == 'string')
+            var usera = Object(M.d[a.p]);
+            var userb = Object(M.d[b.p]);
+
+            if (typeof usera.name === 'string' && typeof userb.name === 'string') {
                 return usera.name.localeCompare(userb.name) * d;
-            else
+            }
+            else {
                 return -1;
+            }
         }
         this.sortd = d;
         this.sort();

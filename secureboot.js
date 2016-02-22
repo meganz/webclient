@@ -1029,8 +1029,12 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 23, writable : false });
-    if (!d && location.protocol !== 'file:' || onBetaW)
+    Object.defineProperty(window, "__cd_v", { value : 24, writable : false });
+
+    // Do not report exceptions if this build is older than 20 days
+    var exTimeLeft = ((buildVersion.timestamp + (20 * 86400)) * 1000) > Date.now();
+
+    if (!d && exTimeLeft && (location.host === 'mega.nz' || is_extension || onBetaW))
     {
         var __cdumps = [], __cd_t;
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -1070,6 +1074,7 @@ else if (!b_u)
             if (~dump.m.indexOf('[[:i]]')) {
                 return false;
             }
+
             if ((mega.flags & window.MEGAFLAG_MDBOPEN)
                     && (dump.m === 'InvalidStateError'
                         || (dump.m === 'UnknownError'))) {
@@ -1095,6 +1100,14 @@ else if (!b_u)
                 }
             }
             dump.m = dump.m.replace(/\s+/g, ' ');
+
+            if (!window.jsl_done) {
+                // Alert the user if there was an uncaught exception while
+                // loading the site, this should only happen on some fancy
+                // browsers other than what we use during development, and
+                // hopefully they'll report it back to us for troubleshoot
+                return siteLoadError(dump.m, url);
+            }
 
             if (~dump.m.indexOf('took +10s'))
             {
@@ -1292,13 +1305,8 @@ else if (!b_u)
 
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-
-    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined') {
-        jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
-    }
-
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-    jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:1});
+    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
     jsl.push({f:'js/vendor/jquery-2.2.0.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
@@ -1317,7 +1325,6 @@ else if (!b_u)
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
-    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/vendor/jquery-ui-1.11.4.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
@@ -1400,11 +1407,8 @@ else if (!b_u)
     jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
-    if (is_extension)
-    {
-        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1});
-    }
-    /* better download */
+
+    // Transfers
     jsl.push({f:'js/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
     jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
@@ -1421,8 +1425,8 @@ else if (!b_u)
     jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
     jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
-    /* end better download */
 
+    // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
@@ -1470,7 +1474,23 @@ else if (!b_u)
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
+
+
+
+    // We need to keep a consistent order in loaded resources, so that if users
+    // send us logs we won't get different line numbers on stack-traces from
+    // different browsers. Hence, do NOT add more jsl entries after this block,
+    // unless they're optional (such as polyfills) or third-party resources.
+
     jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+    jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
+
+    if (is_extension) {
+        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
+    }
+    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined') {
+        jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
+    }
 
     // only used on beta
     if (onBetaW) {

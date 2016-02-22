@@ -44,6 +44,9 @@ var ChatdIntegration = function(megaChat) {
             })
     });
 
+    megaChat.rebind("onDestroy.chatdInt", function(e) {
+        self.chatd.destroyed = true;
+    });
 
     $(window).rebind('onChatCreatedActionPacket.chatdInt', function(e, actionPacket) {
         self.openChatFromApi(actionPacket);
@@ -297,9 +300,9 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         var args = arguments;
 
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
-        if (!self.chatd.chatidshard[chatIdDecoded]) {
+        if (!self.chatd.chatIdShard[chatIdDecoded]) {
             createTimeoutPromise(function() {
-                return !!self.chatd.chatidshard[chatIdDecoded]
+                return !!self.chatd.chatIdShard[chatIdDecoded]
             }, 100, 10000)
                 .done(function() {
                     masterPromise.linkDoneAndFailToResult(fn, self, args);

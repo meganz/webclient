@@ -100,7 +100,6 @@ var strongvelope = {};
     };
 
 
-
     /**
      * "Enumeration" of TLV types used for the chat message transport container.
      *
@@ -330,7 +329,7 @@ var strongvelope = {};
         }
         catch (e) {
             if (e instanceof URIError) {
-                logger.error('Could not decrypt message, probably a wrong key/nonce.');
+                logger.critical('Could not decrypt message, probably a wrong key/nonce.');
 
                 return false;
             }
@@ -477,7 +476,7 @@ var strongvelope = {};
             value = part.record[1];
 
             if (typeof tlvVariable === 'undefined') {
-                logger.error('Received unexpected TLV type: ' + tlvType + '.');
+                logger.critical('Received unexpected TLV type: ' + tlvType + '.');
 
                 return false;
             }
@@ -517,7 +516,7 @@ var strongvelope = {};
 
         if ((parsedContent.recipients.length > 0)
                 && (parsedContent.recipients.length !== parsedContent.keys.length)) {
-            logger.error('Number of keys does not match number of recipients.');
+            logger.critical('Number of keys does not match number of recipients.');
 
             return false;
         }
@@ -698,6 +697,7 @@ var strongvelope = {};
                 }
             }
             else {
+                logger.critical('Signature invalid for message from *** on ***');
                 logger.error('Signature invalid for message from '
                              + message.userId + ' on ' + message.ts);
 
@@ -739,7 +739,7 @@ var strongvelope = {};
                     storedKey = this.participantKeys[messages[i].userId][keyId];
                     if (storedKey && (storedKey !== senderKeys[keyId])) {
                         // Bail out on inconsistent information.
-                        logger.error("Mismatching statement on sender's previously sent key.");
+                        logger.critical("Mismatching statement on sender's previously sent key.");
 
                         return false;
                     }
@@ -797,57 +797,6 @@ var strongvelope = {};
 
 
     /**
-     * Checks whether messages passed in in an array are decryptable.
-     *
-     * @method
-     * @param messages {Array.<ChatdMessage>}
-     *     Array of (most recent) batch of chat message history.
-     * @return {Object}
-     *     An object containing a boolean array attribute `messages` flagging
-     *     each element of the input array parameter as decryptable (`null`
-     *     if it can't be parsed).  An attribute `participants` is an object
-     *     giving for each sender of the batch (as key) the earliest time stamp
-     *     of decryptability, `null` if not.
-     */
-    strongvelope.ProtocolHandler.prototype.areMessagesDecryptable = function(messages) {
-
-        var parsedMessages = this._batchParseAndExtractKeys(messages);
-
-        var decryptable = [];
-        var participants = {};
-
-        // Iterate over all messages to extract keys (if present).
-        var message;
-        var sender;
-        var keyId;
-        var haveKey;
-        for (var i = 0; i < messages.length; i++) {
-            message = messages[i];
-            sender = messages[i].userId;
-            if (message) {
-                keyId = parsedMessages[i].keyIds[0];
-                haveKey = ((typeof this.participantKeys[sender] !== 'undefined')
-                           && (typeof this.participantKeys[sender][keyId] !== 'undefined'));
-                decryptable.push(haveKey);
-                // Track for the smallest time stamp that we've got a key for
-                // on the sender.
-                if (!participants[sender]) {
-                    participants[sender] = null;
-                }
-                if (haveKey && (!participants[sender] || (participants[message.userId] > message.ts))) {
-                    participants[sender] = message.ts;
-                }
-            }
-            else {
-                decryptable.push(null);
-            }
-        }
-
-        return { messages: decryptable, participants: participants };
-    };
-
-
-    /**
      * Refreshes our own sender key. This method is also to be used to
      * initialise a new ProtocolHandler for a new chat session that is *not*
      * primed via historic messages.
@@ -858,6 +807,12 @@ var strongvelope = {};
 
         var dateStamp;
         var counter;
+
+        if (this.keyId && (this.keyId !== this._sentKeyId)) {
+            // We can return early, as our current sender key has not even been
+            // sent to other participants, yet.
+            return;
+        }
 
         if (this.keyId) {
             // Juggle the key IDs.
@@ -873,6 +828,7 @@ var strongvelope = {};
             }
             else {
                 if (counter >= 0xffff) {
+                    logger.critical('This should hardly happen, but 2^16 keys were used for the day. Bailing out!');
                     throw new Error('This should hardly happen, but 2^16 keys were used for the day. Bailing out!');
                 }
                 counter = (counter + 1) & 0xffff;
@@ -912,6 +868,7 @@ var strongvelope = {};
 
         var pubKey = pubCu25519[userhandle];
         if (!pubKey) {
+            logger.critical('No cached chat key for user!');
             logger.error('No cached chat key for user: ' + userhandle);
             throw new Error('No cached chat key for user!');
         }
@@ -1311,7 +1268,7 @@ var strongvelope = {};
             storedKey = this.participantKeys[sender][id];
             if (storedKey && (storedKey !== senderKeys[id])) {
                 // Bail out on inconsistent information.
-                logger.error("Mismatching statement on sender's previously sent key.");
+                logger.critical("Mismatching statement on sender's previously sent key.");
 
                 return false;
             }
@@ -1329,6 +1286,7 @@ var strongvelope = {};
                 senderKey = this.participantKeys[sender][keyId];
             }
             else {
+                logger.critical('Encryption key for message from *** with ID *** unavailable.');
                 logger.error('Encryption key for message from ' + sender
                              + ' with ID ' + base64urlencode(keyId) + ' unavailable.');
 
@@ -1414,7 +1372,7 @@ var strongvelope = {};
         // Extract keys, and parse message in the same go.
         var extractedContent = this._parseAndExtractKeys({ userId: sender, message: message});
         if (extractedContent === false) {
-            logger.error('Message signature invalid.');
+            logger.critical('Message signature invalid.');
 
             return false;
         }
@@ -1424,14 +1382,14 @@ var strongvelope = {};
 
         // Bail out on parse error.
         if (parsedMessage === false) {
-            logger.error('Incoming message not usable.');
+            logger.critical('Incoming message not usable.');
 
             return false;
         }
 
         // Verify protocol version.
         if (parsedMessage.protocolVersion !== PROTOCOL_VERSION) {
-            logger.error('Message not compatible with current protocol version.');
+            logger.critical('Message not compatible with current protocol version.');
 
             return false;
         }
@@ -1450,7 +1408,6 @@ var strongvelope = {};
         if (senderKey === false) {
             return false;
         }
-
 
         // Decrypt message payload.
         var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
@@ -1566,7 +1523,6 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.alterParticipants = function(
             includeParticipants, excludeParticipants, message) { // jshint maxcomplexity: 12
-
 
         var errorOut = false;
 

@@ -300,6 +300,17 @@ function inputblur(id, defaultvalue, pw) {
     }
 }
 
+
+/**
+ * Check if something (val) is a string.
+ *
+ * @param val
+ * @returns {boolean}
+ */
+function isString(val) {
+    return (typeof val === 'string' || val instanceof String);
+};
+
 function easeOutCubic(t, b, c, d) {
     return c * ((t = t / d - 1) * t * t + 1) + b;
 }
@@ -522,18 +533,37 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
-
-    useragent = useragent || navigator.userAgent;
-    useragent = (' ' + useragent).toLowerCase();
-
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
     var nameTrans = '';
+    var current = false;
+    var brand = false;
+
+    if (useragent === undefined || useragent === ua) {
+        current = true;
+        useragent = ua;
+    }
+    if (Object(useragent).details !== undefined) {
+        return useragent.details;
+    }
+    useragent = (' ' + useragent).toLowerCase();
+
+    if (current) {
+        brand = mega.getBrowserBrandID();
+    }
+    else if (useragent.indexOf('~:') !== -1) {
+        brand = useragent.match(/~:(\d+)/);
+        brand = brand && brand.pop() | 0;
+    }
 
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
+    }
+    else if (useragent.indexOf('windows phone') > 0) {
+        icon = 'wp.png';
+        os = 'Windows Phone';
     }
     else if (useragent.indexOf('windows') > 0) {
         os = 'Windows';
@@ -547,20 +577,22 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('ipad') > 0) {
         os = 'iPad';
     }
-    else if (useragent.indexOf('mac') > 0) {
+    else if (useragent.indexOf('mac') > 0
+            || useragent.indexOf('darwin') > 0) {
         os = 'Apple';
     }
     else if (useragent.indexOf('linux') > 0) {
         os = 'Linux';
     }
-    else if (useragent.indexOf('linux') > 0) {
-        os = 'MEGAsync';
-    }
     else if (useragent.indexOf('blackberry') > 0) {
         os = 'Blackberry';
     }
-    if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
-        browser = 'Spartan';
+
+    if (mega.browserBrand[brand]) {
+        browser = mega.browserBrand[brand];
+    }
+    else if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
+        browser = 'Edge';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
@@ -575,26 +607,63 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('maxthon') > 0) {
         browser = 'Maxthon';
     }
+    else if (useragent.indexOf('electron') > 0) {
+        browser = 'Electron';
+    }
+    else if (useragent.indexOf('palemoon') > 0) {
+        browser = 'Palemoon';
+    }
+    else if (useragent.indexOf('cyberfox') > 0) {
+        browser = 'Cyberfox';
+    }
+    else if (useragent.indexOf('waterfox') > 0) {
+        browser = 'Waterfox';
+    }
+    else if (useragent.indexOf('iceweasel') > 0) {
+        browser = 'Iceweasel';
+    }
+    else if (useragent.indexOf('seamonkey') > 0) {
+        browser = 'SeaMonkey';
+    }
+    else if (useragent.indexOf('lunascape') > 0) {
+        browser = 'Lunascape';
+    }
+    else if (useragent.indexOf(' iron/') > 0) {
+        browser = 'Iron';
+    }
+    else if (useragent.indexOf('avant browser') > 0) {
+        browser = 'Avant';
+    }
+    else if (useragent.indexOf('polarity') > 0) {
+        browser = 'Polarity';
+    }
+    else if (useragent.indexOf('k-meleon') > 0) {
+        browser = 'K-Meleon';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
     }
-    else if (useragent.indexOf('palemoon') > 0) {
-        browser = 'Palemoon';
-    }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
     }
+    else if (useragent.indexOf(' otter/') > 0) {
+        browser = 'Otter';
+    }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
+    }
+    else if (useragent.indexOf('es plugin ') === 1) {
+        icon = 'esplugin.png';
+        browser = 'ES File Explorer';
     }
     else if (useragent.indexOf('megasync') > 0) {
         browser = 'MEGAsync';
     }
     else if (useragent.indexOf('msie') > 0
-            || "ActiveXObject" in window) {
+            || useragent.indexOf('trident') > 0) {
         browser = 'Internet Explorer';
     }
 
@@ -605,7 +674,7 @@ function browserdetails(useragent) {
     }
     else if (os) {
         name = os;
-        icon = os.toLowerCase() + '.png';
+        icon = icon || (os.toLowerCase() + '.png');
     }
     else if (browser) {
         name = browser;
@@ -615,7 +684,7 @@ function browserdetails(useragent) {
         icon = 'unknown.png';
     }
     if (!icon && browser) {
-        if (browser === 'Internet Explorer' || browser === 'Spartan') {
+        if (browser === 'Internet Explorer' || browser === 'Edge') {
             icon = 'ie.png';
         }
         else {
@@ -623,20 +692,34 @@ function browserdetails(useragent) {
         }
     }
 
-    var browserDetails = {};
-    browserDetails.name = name;
-    browserDetails.nameTrans = nameTrans || name;
-    browserDetails.icon = icon;
-    browserDetails.os = os || '';
-    browserDetails.browser = browser;
+    var details = {};
+    details.name = name;
+    details.nameTrans = nameTrans || name;
+    details.icon = icon;
+    details.os = os || '';
+    details.browser = browser;
 
     // Determine if the OS is 64bit
-    browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
+    details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 
     // Determine if using a browser extension
-    browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    details.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
 
-    return browserDetails;
+    // Determine core engine.
+    if (useragent.indexOf('webkit') > 0) {
+        details.engine = 'Webkit';
+    }
+    else if (useragent.indexOf('trident') > 0) {
+        details.engine = 'Trident';
+    }
+    else if (useragent.indexOf('gecko') > 0) {
+        details.engine = 'Gecko';
+    }
+    else {
+        details.engine = 'Unknown';
+    }
+
+    return details;
 }
 
 function countrydetails(isocode) {
@@ -1375,8 +1458,16 @@ function assert(test) {
  *     Throws an exception on something that does not seem to be a user handle.
  */
 var assertUserHandle = function(userHandle) {
-    assert(base64urldecode(userHandle).length === 8,
-       'This seems not to be a user handle: ' + userHandle);
+    try {
+        if (typeof userHandle !== 'string'
+                || base64urldecode(userHandle).length !== 8) {
+
+            throw 1;
+        }
+    }
+    catch (ex) {
+        assert(false, 'This seems not to be a user handle: ' + userHandle);
+    }
 };
 
 
@@ -2177,6 +2268,25 @@ mSpawnWorker.prototype = {
                 console.timeEnd(reply.jid);
             }
 
+            // Don't report `newmissingkeys` unless there are *new* missing keys
+            if (job.newmissingkeys) {
+                try {
+                    var keys = Object.keys(missingkeys).sort();
+                    var hash = MurmurHash3(JSON.stringify(keys));
+                    var prop = u_handle + '_lastMissingKeysHash';
+
+                    if (localStorage[prop] !== hash) {
+                        localStorage[prop] = hash;
+                    }
+                    else {
+                        job.newmissingkeys = false;
+                    }
+                }
+                catch (ex) {
+                    console.error(ex);
+                }
+            }
+
             delete this.jobs[reply.jid];
             job.callback(job.result, job);
         }
@@ -2549,37 +2659,6 @@ function disableDescendantFolders(id, pref) {
     }
 
     return true;
-}
-
-function ucfirst(str) {
-    //  discuss at: http://phpjs.org/functions/ucfirst/
-    // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // bugfixed by: Onno Marsman
-    // improved by: Brett Zamir (http://brett-zamir.me)
-    //   example 1: ucfirst('kevin van zonneveld');
-    //   returns 1: 'Kevin van zonneveld'
-
-    str += '';
-    var f = str.charAt(0)
-        .toUpperCase();
-    return f + str.substr(1);
-}
-
-function readLocalStorage(name, type, val) {
-    var v;
-    if (localStorage[name]) {
-        var f = 'parse' + ucfirst(type);
-        v = localStorage[name];
-
-        if (typeof window[f] === "function") {
-            v = window[f](v);
-        }
-
-        if (val && ((val.min && val.min > v) || (val.max && val.max < v))) {
-            v = null;
-        }
-    }
-    return v || (val && val.def);
 }
 
 function obj_values(obj) {
@@ -3061,6 +3140,23 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+/**
+ * execCommandUsable
+ *
+ * Native browser 'copy' command using execCommand('copy').
+ * Supported by Chrome42+, FF41+, IE9+, Opera29+
+ * @returns {Boolean}
+ */
+mega.utils.execCommandUsable = function() {
+    var result;
+
+    try {
+        result = document.execCommand('copy');
+    }
+    catch (ex) {}
+
+    return result === false;
+};
 
 /**
  * Utility that will return a sorting function (can compare numbers OR strings, depending on the data stored in the
@@ -3558,7 +3654,7 @@ function mCleanestLogout(aUserHandle) {
 
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
-    var RUBSCHED_WAITPROC = 120 * 1000;
+    var RUBSCHED_WAITPROC =  20 * 1000;
     var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
@@ -3633,7 +3729,12 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
             console.time('rubsched');
         }
 
-        var nodes = Object.keys(M.c[M.RubbishID] || {}), rubnodes = [];
+        // Watch how long this is running
+        var startTime = Date.now();
+
+        // Get nodes in the Rubbish-bin
+        var nodes = Object.keys(M.c[M.RubbishID] || {});
+        var rubnodes = [];
 
         for (var i in nodes) {
             var node = M.d[nodes[i]];
@@ -3663,6 +3764,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                     if (handler.ready(node, xval)) {
                         break;
                     }
+
+                    // Abort if this has been running for too long..
+                    if ((Date.now() - startTime) > 7000) {
+                        break;
+                    }
                 }
             }
 
@@ -3670,6 +3776,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
             if (handles.length) {
                 var inRub = (M.RubbishID === M.currentrootid);
+
+                if (inRub) {
+                    // Flush cached nodes
+                    $(window).trigger('dynlist.flush');
+                }
 
                 handles.map(function(handle) {
                     M.delNode(handle);
@@ -4008,20 +4119,20 @@ if (typeof sjcl !== 'undefined') {
      */
     Share.prototype.hasExportLink = function(nodes) {
 
-        var result = false,
-            node;
+        if (typeof nodes === 'string') {
+            nodes = [nodes];
+        }
 
         // Loop through all selected items
-        $.each(nodes, function(index, value) {
-            node = M.d[value];
-            if (node.shares && node.shares.EXP) {
-                result = true;
-                return false;// Stop further $.each loop execution
+        for (var i in nodes) {
+            var node = M.d[nodes[i]];
 
+            if (node && Object(node.shares).EXP) {
+                return true;
             }
-        });
+        }
 
-        return result;
+        return false;
     };
 
     /**
@@ -4113,66 +4224,5 @@ if (typeof sjcl !== 'undefined') {
     };
 
     // export
-    scope.mega = scope.mega || {};
     scope.mega.Share = Share;
-})(jQuery, window);
-
-(function($, scope) {
-    /**
-     * Nodes related operations.
-     *
-     * @param opts {Object}
-     *
-     * @constructor
-     */
-    var Nodes = function(opts) {
-
-        var self = this;
-        var defaultOptions = {
-        };
-
-        self.options = $.extend(true, {}, defaultOptions, opts);    };
-
-    /**
-     * getChildNodes
-     *
-     * Loops through all subdirs of given node, as result gives array of subdir nodes.
-     * @param {String} id: node id.
-     * @param {Array} nodesId.
-     * @returns {Array} Child nodes id.
-     */
-    Nodes.prototype.getChildNodes = function(id, nodesId) {
-
-        var self = this;
-
-        var subDirs = nodesId;
-
-        if (subDirs) {
-            if (subDirs.indexOf(id) === -1) {
-                subDirs.push(id);
-            }
-        }
-        else {
-            // Make subDirs an array
-            subDirs = [id];
-        }
-
-        for (var item in M.c[id]) {
-            if (M.c[id].hasOwnProperty(item)) {
-
-                // Prevent duplication
-                if (subDirs && subDirs.indexOf(item) === -1) {
-                    subDirs.push(item);
-                }
-
-                self.getChildNodes(item, subDirs);
-            }
-        }
-
-        return subDirs;
-    };
-
-    // export
-    scope.mega = scope.mega || {};
-    scope.mega.Nodes = Nodes;
 })(jQuery, window);

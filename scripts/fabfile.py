@@ -143,7 +143,7 @@ def dev(branch_name=''):
         boot_html = ('sandbox3' if env.host_string == SANDBOX3_HOST
                      else 'devboot-beta')
         print('Test link:\n    https://{host}/{branch_name}'
-                '/dont-deploy/{boot_html}.html?apipath=prod'
+                '/dont-deploy/sandbox3.html?apipath=prod'
                 .format(host=host_name,
                         branch_name=branch_name,
                         boot_html=boot_html))

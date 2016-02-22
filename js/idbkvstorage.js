@@ -64,23 +64,20 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
             });
         }
         else {
-            if (self.db && self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+            if (!self.db || self.db.dbState === MegaDB.DB_STATE.CLOSED) {
+                promise.reject(ENOENT);
+            }
+            else if (self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
                 promise.linkDoneAndFailTo(
                     fn.apply(self, args)
                 );
             }
-            else if (self.db.dbState === MegaDB.DB_STATE.OPENING) {
-                self.db.one('onDbStateReady', function() {
-                    promise.linkDoneAndFailTo(
-                        fn.apply(self, args)
-                    );
-                });
-            }
             else if (self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
                 // Most likely, Firefox in incognito mode.
-                return MegaPromise.reject();
+                promise.reject(EACCESS);
             }
             else {
+                // If it's OPENING state, wait for either success or failure
                 self.db.one('onDbStateReady', function __onDbStateReady() {
                     promise.linkDoneAndFailTo(
                         fn.apply(self, args)
@@ -88,7 +85,7 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                 });
                 self.db.one('onDbStateFailed', function __onDbStateFailed() {
                     self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
-                    promise.reject();
+                    promise.reject(EFAILED);
                 });
             }
 

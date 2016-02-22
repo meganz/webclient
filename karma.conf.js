@@ -47,7 +47,6 @@ module.exports = function(config) {
         'js/vendor/notification.js',
         'js/vendor/moment.js',
         // Chat libraries.
-        'js/chat/mpenc.js',
         'js/vendor/chat/strophe.light.js',
         'js/vendor/chat/strophe.disco.js',
         'js/vendor/chat/strophe.jingle.js',
@@ -59,11 +58,6 @@ module.exports = function(config) {
         'js/vendor/chat/wildemitter.patched.js',
         'js/vendor/chat/hark.patched.js',
         'js/vendor/chat/base32.js',
-        // Direct transfer dependencies.
-        'js/vendor/chat/cryptojs-core.js',
-        'js/vendor/chat/cryptojs-sha1.js',
-        'js/vendor/chat/cryptojs-hmac.js',
-        'js/vendor/chat/cryptojs-lib-typedarrays.js',
         // Other.
         'js/vendor/autolinker.js',
         'js/vendor/qrcode.js',
@@ -79,8 +73,8 @@ module.exports = function(config) {
         'index.js',
         'js/functions.js',
         'js/datastructs.js',
-        'js/mega.js',
         'js/vendor/megaLogger.js',
+        'js/mega.js',
         'js/tlvstore.js',
         'js/crypto.js',
         'js/megaPromise.js',
@@ -129,22 +123,15 @@ module.exports = function(config) {
 
         // Our chat code.
         'js/chat/strongvelope.js',
-        'js/chat/opQueue.js',
         'js/chat/rtcStats.js',
         'js/chat/rtcSession.js',
-        'js/chat/fileTransfer.js',
         'js/chat/plugins/urlFilter.js',
         'js/chat/plugins/emoticonsFilter.js',
-        'js/chat/plugins/attachmentsFilter.js',
-        'js/chat/plugins/encryptionFilter.js',
-        'js/chat/plugins/chatStore.js',
         'js/chat/plugins/chatNotifications.js',
         'js/chat/plugins/callFeedback.js',
         'js/chat/plugins/callManager.js',
         'js/chat/karereEventObjects.js',
         'js/chat/karere.js',
-        //'js/chat/chat.js',
-        //'js/chat/chatRoom.js',
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
 

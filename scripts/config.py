@@ -13,7 +13,7 @@ import os
 
 # Checkers to run. Available options for checkers are:
 # "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++"
-checkers = ['jshint', 'jscs', 'minifiedjs']
+checkers = ['minifiedjs', 'jshint', 'jscs']
 
 # Extra options for designated checkers.
 # This configuration needs an entry for every encountered checker if the
@@ -37,7 +37,6 @@ NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 JSHINT_RULES = '--verbose'
 JSCS_RULES = '--verbose'
 MINIFICATION_FILE_TYPES = ['js', 'jsx']
-MINIFICATION_CHECK_DIRS = ['js', 'html']
 MINIFICATION_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js']
 MINIFICATION_THRESHOLD = 200 # Max chars per line to trigger.
 # Vera++ rules like this should be superseded by a "profile", but it
@@ -52,8 +51,8 @@ VERAPP_RULES = ['F001', 'F002',
 
 
 # Command line configuration.
-JSHINT_COMMAND = '{binary} {rules} .'
-JSCS_COMMAND = '{binary} {rules} .'
+JSHINT_COMMAND = '{binary} {rules} {files}'
+JSCS_COMMAND = '{binary} {rules} {files}'
 
 CPPCHECK_COMMAND = ("{command}"
                     " --template={{file}};{{line}};{{severity}};{{id}};{{message}}"

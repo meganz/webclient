@@ -1,20 +1,25 @@
 function init_backup() {
-    $('#backup_keyinput').val(a32_to_base64(u_k));
+    var key = a32_to_base64(u_k);
+
+    $('#backup_keyinput').val(key);
     $('#backup_keyinput').rebind('click', function() {
         $(this).select();
     });
 
     $('.backup-download-button').rebind('click', function() {
-        var blob = new Blob([a32_to_base64(u_k)], {
+        var blob = new Blob([key], {
             type: "text/plain;charset=utf-8"
         });
         saveAs(blob, 'MEGA-MASTERKEY.txt');
     });
 
-    if (is_extension) {
+    if (is_extension || mega.utils.execCommandUsable()) {
         $('.backup-input-button').rebind('mouseover', function() {
+            $('#backup_keyinput').select();
+        });
+        $('.backup-input-button').rebind('click', function() {
             if (is_chrome_firefox) {
-                mozSetClipboard(a32_to_base64(u_k));
+                mozSetClipboard(key);
             }
             else {
                 $('#backup_keyinput').select();
@@ -22,7 +27,7 @@ function init_backup() {
             }
         });
     }
-    else {
+    else if (flashIsEnabled()) {
         $('.backup-input-button')
             .html(escapeHTML(l[63]) +
                 '<object data="OneClipboard.swf" id="clipboardswf_backup" width="100%" height="26" ' +
@@ -34,7 +39,17 @@ function init_backup() {
             '</object>');
 
         $('.backup-input-button').rebind('mouseover', function() {
-            $('#clipboardswf_backup')[0].setclipboardtext(a32_to_base64(u_k));
+            var obj = $('#clipboardswf_backup')[0];
+            if (obj && typeof obj.setclipboardtext === 'function') {
+                obj.setclipboardtext(key);
+            }
         });
+    }
+    else {
+        // hide copy to clipboard otherwise
+        var input = $('#backup_keyinput').parent();
+        var header = input.prev();
+        input.hide();
+        header.hide();
     }
 }

@@ -4,8 +4,9 @@
     -khtml-opacity: 0.5;
     opacity: 0.5;
 }
-.section {
+.section, .conversationsApp {
     width: 100%;
+    height: 100% !important;
 }
 .nw-fm-tree-header.conversations .button {
     position: absolute;
@@ -15,7 +16,7 @@
 }
 .conversation-panels, .conversation-panel {
     box-sizing: border-box;
-    height: 100% !important;
+    height: 100%;
     position: relative;
 }
 .chat-content-block {

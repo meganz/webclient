@@ -3618,6 +3618,33 @@ mega.utils.logout = function megaUtilsLogout() {
 }
 
 /**
+ * Convert a version string (eg, 2.1.1) to an integer, for easier comparison
+ * @param {String}  version The version string
+ * @param {Boolean} hex     Whether give an hex result
+ * @return {Number|String}
+ */
+mega.utils.vtol = function megaUtilsVTOL(version, hex) {
+    version = String(version).split('.');
+
+    while (version.length < 4) {
+        version.push(0);
+    }
+
+    version = ((version[0] | 0) & 0xff) << 24 |
+              ((version[1] | 0) & 0xff) << 16 |
+              ((version[2] | 0) & 0xff) <<  8 |
+              ((version[3] | 0) & 0xff);
+
+    version >>>= 0;
+
+    if (hex) {
+        return version.toString(16);
+    }
+
+    return version;
+};
+
+/**
  * Perform a normal logout
  *
  * @param {Function} aCallback optional

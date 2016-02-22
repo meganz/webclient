@@ -4060,7 +4060,7 @@ function MegaData()
             return webdl();
         }
 
-        dlmanager.isMEGAsyncRunning()
+        dlmanager.isMEGAsyncRunning(0x02010100)
             .done(function(sync) {
                 var cmd = {
                     a: 'd',

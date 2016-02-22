@@ -790,7 +790,7 @@ var dlmanager = {
         localStorage.q = JSON.stringify(quota);
     },
 
-    isMEGAsyncRunning: function() {
+    isMEGAsyncRunning: function(minVersion) {
         var timeout = 200;
         var logger = this.logger;
         var promise = new MegaPromise();
@@ -822,6 +822,21 @@ var dlmanager = {
                     reject(err || ENOENT);
                 }
                 else {
+                    // if a min version is required, check for it
+                    if (minVersion) {
+                        var runningVersion = mega.utils.vtol(is.v);
+
+                        if (typeof minVersion !== 'number'
+                                || parseInt(minVersion) !== minVersion) {
+
+                            minVersion = mega.utils.vtol(minVersion);
+                        }
+
+                        if (runningVersion < minVersion) {
+                            return reject(ERANGE);
+                        }
+                    }
+
                     resolve(megasync);
                 }
             });

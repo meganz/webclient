@@ -1540,7 +1540,7 @@ function srvlog(msg, data, silent) {
     if (!silent && d) {
         console.error(msg, data);
     }
-    if (!d || onBetaW) {
+    if (typeof window.onerror === 'function') {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
     }
 }
@@ -1600,8 +1600,8 @@ function removeValue(array, value, can_fail) {
 function setTransferStatus(dl, status, ethrow, lock) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
-    if (text.length > 44) {
-        text = text.substr(0, 42) + '...';
+    if (text.length > 48) {
+        text = text.substr(0, 48) + "\u2026";
     }
     if (page === 'download') {
         $('.download.error-icon').text(text);
@@ -1624,7 +1624,10 @@ function setTransferStatus(dl, status, ethrow, lock) {
 
 function dlFatalError(dl, error, ethrow) {
     var m = 'This issue should be resolved ';
-    if (navigator.webkitGetUserMedia) {
+    if (ethrow === -0xDEADBEEF) {
+        ethrow = false;
+    }
+    else if (navigator.webkitGetUserMedia) {
         m += 'exiting from Incognito mode.';
         msgDialog('warninga', l[1676], m, error);
     }
@@ -1641,6 +1644,15 @@ function dlFatalError(dl, error, ethrow) {
     else {
         Later(firefoxDialog);
     }
+
+    // Log the fatal error
+    Soon(function() {
+        error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
+
+        srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+    });
+
+    // Set transfer status and abort it
     setTransferStatus(dl, error, ethrow, true);
     dlmanager.abort(dl);
 }
@@ -2315,6 +2327,8 @@ function setupTransferAnalysis() {
     if ($.mTransferAnalysis) {
         return;
     }
+    var PROC_INTERVAL = 4.2 * 60 * 1000;
+    var logger = MegaLogger.getLogger('TransferAnalysis');
 
     var prev = {},
         tlen = {},
@@ -2328,98 +2342,46 @@ function setupTransferAnalysis() {
             var tp = $.transferprogress;
 
             for (var i in tp) {
-                var q = (i[0] === 'u' ? ulQueue : dlQueue);
-                if (!GlobalProgress[i] || GlobalProgress[i].paused
-                        || tp[i][0] === tp[i][1] || q.isPaused() || q._qpaused[i]) {
-                    delete prev[i];
-                }
-                else if (prev[i] && prev[i] === tp[i][0]) {
-                    var p = tp[i],
-                        t = i[0] === 'u' ? 'Upload' : 'Download',
-                        r = '',
-                        data = [];
-                    var s = GlobalProgress[i].speed,
-                        w = GlobalProgress[i].working || [];
-                    var c = p[0] + '/' + p[1] + '-' + Math.floor(p[0] / p[1] * 100) + '%';
-                    var u = w.map(function(c) {
-                        var x = c.xhr || {};
-                        return ['' + c, x.__failed, x.__timeout,
-                            !!x.listener, x.__id, x.readyState > 1 && x.status];
-                    });
+                if (tp.hasOwnProperty(i)) {
+                    var currentlyTransfered = tp[i][0];
+                    var totalToBeTransfered = tp[i][1];
+                    var currenTransferSpeed = tp[i][2];
 
-                    if (d) {
-                        console.warn(i + ' might be stuck, checking...', c, w.length, u);
+                    var finished = (currentlyTransfered === totalToBeTransfered);
+
+                    if (finished) {
+                        logger.info('Transfer "%s" has finished. \uD83D\uDC4D', i);
+                        continue;
                     }
 
-                    if (w.length) {
-                        var j = w.length;
-                        while (j--) {
-                            /**
-                             * if there's a timer, no need to call on_error ourselves
-                             * since the chunk will get restarted there by the xhr
-                             */
-                            var stuck = w[j].xhr && !w[j].xhr.__timeout;
-                            if (stuck) {
-                                var chunk_id = '' + w[j],
-                                    n = u[j];
+                    var transfer = Object(GlobalProgress[i]);
 
-                                if (w[j].dl && w[j].dl.lasterror) {
-                                    r = '[DLERR' + w[j].dl.lasterror + ']';
-                                }
-                                else if (w[j].srverr) {
-                                    r = '[SRVERR' + (w[j].srverr - 1) + ']';
-                                }
+                    if (transfer.paused || !transfer.started) {
+                        logger.info('Transfer "%s" is not active.', i, transfer);
+                        continue;
+                    }
 
-                                try {
-                                    w[j].on_error(0, {}, 'Stuck');
-                                }
-                                catch (e) {
-                                    n.push(e.message);
-                                }
+                    if (prev[i] && prev[i] === currentlyTransfered) {
+                        var type = (i[0] === 'u'
+                            ? 'Upload'
+                            : (i[0] === 'z' ? 'ZIP' : 'Download'));
 
-                                if (!chunks[chunk_id]) {
-                                    chunks[chunk_id] = 1;
-                                    data.push(n);
-                                }
-                            }
-                        }
+                        srvlog(type + ' transfer seems stuck.');
 
-                        if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1)) {
-                            r = s ? '[TIMEOUT]' : '[ETHERR]';
-                            data = ['Chunks are taking too long to complete... ', u];
-                        }
+                        logger.warn('Transfer "%s" had no progress for the last minutes...', i, transfer);
                     }
                     else {
-                        r = '[!]';
-                        data = 'GlobalProgress.' + i + ' exists with no working chunks.';
-                    }
+                        logger.info('Transfer "%s" is in progress... %d% completed', i,
+                            Math.floor(currentlyTransfered / totalToBeTransfered * 100));
 
-                    if (data.length) {
-                        var udata = {
-                            i: i,
-                            p: c,
-                            d: data,
-                            j: [prev, tlen],
-                            s: s
-                        };
-                        if (i[0] === 'z') {
-                            t = 'zip' + t;
-                        }
-                        console.error(t + ' stuck. ' + r, i, udata);
-                        if (!d) {
-                            srvlog(t + ' Stuck. ' + r, udata);
-                        }
+                        time[i] = Date.now();
+                        tlen[i] = Math.max(tlen[i] | 0, currentlyTransfered);
+                        prev[i] = currentlyTransfered;
                     }
-                    delete prev[i];
-                }
-                else {
-                    time[i] = Date.now();
-                    tlen[i] = Math.max(tlen[i] || 0, tp[i][0]);
-                    prev[i] = tp[i][0];
                 }
             }
         }
-    }, mXHRTimeoutMS * 1.2);
+    }, PROC_INTERVAL);
 }
 
 function percent_megatitle() {
@@ -3384,7 +3346,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
-        clearXhr(); /* destroy all xhr */
+        clearTransferXHRs(); /* destroy all xhr */
 
         $('.transfer-pause-icon').addClass('disabled');
         $('.nw-fm-left-icon.transfers').removeClass('transfering');
@@ -3562,6 +3524,60 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
             console.warn('Cannot neuter ArrayBuffer', ab, ex);
         }
     }
+};
+
+/**
+ * Resources loader through our secureboot mechanism
+ * @param {...*} var_args  Resources to load, either plain filenames or jsl2 members
+ * @return {MegaPromise}
+ */
+mega.utils.require = function megaUtilsRequire() {
+    var files = [];
+
+    toArray.apply(null, arguments).forEach(function(file) {
+
+        // If a plain filename, inject it into jsl2
+        // XXX: Likely this will have a conflict with our current build script
+        if (!jsl2[file]) {
+            var filename = file.replace(/^.*\//, '');
+            var extension = filename.split('.').pop().toLowerCase();
+            var name = filename.replace(/\./g, '_');
+            var type;
+            var result;
+
+            if (extension === 'html') {
+                type = 0;
+            }
+            else if (extension === 'js') {
+                type = 1;
+            }
+            else if (extension === 'css') {
+                type = 2;
+            }
+
+            jsl2[name] = { f: file, n: name, j: type };
+            file = name;
+        }
+
+        if (!jsl_loaded[jsl2[file].n]) {
+            files.push(jsl2[file]);
+        }
+    });
+
+    if (files.length === 0) {
+        // Everything is already loaded
+        return MegaPromise.resolve();
+    }
+
+    Array.prototype.push.apply(jsl, files);
+
+    var promise = new MegaPromise();
+    silent_loading = function() {
+        promise.resolve();
+    };
+    jsl_start();
+
+    return promise;
 };
 
 /**

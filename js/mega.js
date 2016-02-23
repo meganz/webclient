@@ -1105,7 +1105,7 @@ function MegaData()
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="50"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
                             + '</div></div> </td><td width="240">'
@@ -1152,7 +1152,7 @@ function MegaData()
                         t = '.contacts-details-block .grid-table.shared-with-me';
                         el = 'tr';
                         html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
-                                    <td width="30">\n\
+                                    <td width="50">\n\
                                         <span class="grid-status-icon"></span>\n\
                                     </td>\n\
                                     <td>\n\
@@ -1220,7 +1220,7 @@ function MegaData()
                         t = '.grid-table.fm';
                         el = 'tr';
                         html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
-                                    <td width="30">\n\
+                                    <td width="50">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\

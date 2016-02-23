@@ -1875,6 +1875,7 @@ describe("chat.strongvelope unit test", function() {
             });
 
             it("alter participants, me included, one excluded", function() {
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'u_handle', 'lino56789xw');
                 var handler = new ns.ProtocolHandler(u_handle,
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
@@ -1908,15 +1909,17 @@ describe("chat.strongvelope unit test", function() {
                     { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY });
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
                     { 'AI\u0000\u0001': ROTATED_KEY });
-                assert.ok(testutils.isSetEqual(handler.otherParticipants,
+                assert.ok(setutils.equal(handler.otherParticipants,
                     new Set(['me3456789xw'])),
                     'mismatching other participants on handler');
-                assert.ok(testutils.isSetEqual(handler.includeParticipants,
+                assert.ok(setutils.equal(handler.includeParticipants,
                     new Set(['lino56789xw'])),
                     'mismatching included participants');
-                assert.ok(testutils.isSetEqual(handler.excludeParticipants,
+                assert.ok(setutils.equal(handler.excludeParticipants,
                     new Set(['otto56789xw'])),
                     'mismatching excluded participants');
+                assert.strictEqual(ns._logger._log.args[0][0],
+                    'Particpant change received, updating sender key.');
             });
 
             it("alter participants, one included, me excluded", function() {
@@ -1940,7 +1943,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler.includeParticipants.size, 0);
                 assert.strictEqual(handler.excludeParticipants.size, 0);
                 assert.strictEqual(ns._logger._log.args[0][0],
-                                   'I have been excluded from this chat, cannot read message.');
+                    'I have been excluded from this chat, cannot read message.');
             });
 
             it("alter participants, one included, one excluded, not a member", function() {
@@ -1962,7 +1965,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler.includeParticipants.size, 0);
                 assert.strictEqual(handler.excludeParticipants.size, 0);
                 assert.strictEqual(ns._logger._log.args[0][0],
-                                   'I have been excluded from this chat, cannot read message.');
+                    'I am not participating in this chat, cannot read message.');
             });
 
             it("followup message", function() {

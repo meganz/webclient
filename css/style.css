@@ -485,26 +485,26 @@ input[type="checkbox"] {
     border-radius: 2px;
     position: relative;
 }
- .checkboxOn::before, .checkboxOff::before, .checkboxOn::after, .checkboxOn::after.checkboxOff::after {
- position:absolute;
- -moz-border-radius: 2px;
--webkit-border-radius: 2px;
-border-radius: 2px;
-width:16px;
-height: 16px;
- -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
- -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
- box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-display:block;
-content:"";
+.checkboxOn::before, .checkboxOff::before, .checkboxOn::after, .checkboxOff::after {
+    position: absolute;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    width: 16px;
+    height: 16px;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    display: block;
+    content: "";
 }
-.checkboxOn::after.checkboxOff::after {
- -webkit-box-shadow: none;
- -moz-box-shadow: none;
- box-shadow: none;
- width: 12px;
-height: 12px;
-margin: 2.5px;
+.checkboxOn::after, .checkboxOff::after {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    width: 12px;
+    height: 12px;
+    margin: 2.5px;
 }
 .checkboxOn::after {
     background-position: -2px -8557px;

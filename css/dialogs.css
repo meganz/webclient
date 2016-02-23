@@ -10,13 +10,12 @@
     -webkit-border-bottom-right-radius: 7px;
     -moz-border-radius-bottomright: 7px;
     border-bottom-right-radius: 7px;
-    padding:12px 12px 0 12px;
+    padding: 12px 12px 0 12px;
 }
-
 /* Send Contact Dialog */
 .fm-dialog.send-contact {
     width: 644px;
-    margin:-246px 0 0 -322px;
+    margin: -246px 0 0 -322px;
 }
 .fm-dialog .contacts-search-scroll {
     height: 336px !important;
@@ -26,12 +25,12 @@
 }
 .fm-dialog .contacts-info.body.contacts-search {
     height: 48px;
-	padding: 6px 0;
-	cursor: pointer;
+    padding: 6px 0;
+    cursor: pointer;
     background-color: #fafafa;
 }
 .fm-dialog .contacts-info.body.contacts-search:nth-child(odd) {
-   background-color: white;
+    background-color: white;
 }
 .fm-dialog .contacts-info.body.contacts-search.selected {
     background-color: rgba(240,240,240,1);
@@ -44,7 +43,7 @@
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
     width: 644px;
-    margin:-246px 0 0 -322px;
+    margin: -246px 0 0 -322px;
 }
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
@@ -65,12 +64,12 @@
 .fm-dialog .long-path .fm-breadcrumbs .right-arrow-bg span {
     display: none;
 }
- .fm-dialog-table.grid-table tr:nth-child(odd) td {
+.fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);
- }
-  .fm-dialog-table.grid-table tr:nth-child(even) td {
+}
+.fm-dialog-table.grid-table tr:nth-child(even) td {
     background-color: rgba(250,250,250,1);
- }
+}
 .fm-dialog-table.grid-table-header th:nth-child(1), .fm-dialog-table.grid-table td:nth-child(1) {
     width: 50px;
     padding: 0 0 0 3px;
@@ -85,11 +84,49 @@
 .fm-dialog-grid-scroll {
     height: 312px !important;
 }
-.fm-dialog-grid-scroll, .fm-dialog-grid-scroll .jspPane { 
+.fm-dialog-grid-scroll, .fm-dialog-grid-scroll .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
-    background-position:0 -24px;
+    background-position: 0 -24px;
 }
- .fm-dialog-table.grid-table tr.ui-selected td {
+.fm-dialog-table.grid-table tr.ui-selected td {
     background-color: rgba(233,233,233,1);
 }
 /* End of Add From Cloud Dialog */
+
+
+/* Delete message dialog */
+.fm-dialog.delete-message {
+    width: 484px;
+    margin: -134px 0 0 -242px;
+}
+.dialog.secondary-header {
+    text-align: center;
+    padding: 16px 24px 0 24px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #666666;
+}
+.message.body.dialog-wraper {
+    border: 1px solid rgba(0,0,0,0.05);
+    background-color: rgba(0,0,0,0.02);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    margin: 24px 12px;
+    padding: 14px 15px 13px 15px;
+}
+.dialog-wraper .message.text-block {
+    margin-right: 0;
+}
+.dialog-wraper .message.text-block {
+    font-size: 14px;
+    color: #666666;
+}
+.footer-checkbox {
+    float: left;
+    margin: -12px 0 0 0;
+}
+/* End of Delete message dialog */

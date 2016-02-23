@@ -41,7 +41,6 @@
     height: 100%;
     display: table;
 }
-
 .messages.main-pad {
     display: table;
     width: 100%;
@@ -74,7 +73,7 @@
 }
 .messages.notification .info > span {
     padding: 0 0 16px 0;
-    display:block;
+    display: block;
 }
 .messages.notification .info p {
     font-size: 14px;
@@ -84,13 +83,13 @@
     margin: 0;
 }
 .messages.notification .info p i {
-    position:absolute;
+    position: absolute;
     left: 0;
-    margin:4px 0 0 0;
+    margin: 4px 0 0 0;
 }
 .messages.notification .info p strong {
-    display:block;
-    color:#666666;
+    display: block;
+    color: #666666;
 }
 .message.body {
     padding: 0 24px 0 24px;
@@ -105,13 +104,18 @@
     color: #666666;
 }
 .message.small-rounded-avatar {
-    margin: 3px 0 0 0;
+    margin: 1px 0 0 0;
 }
 .message.text-block {
     margin: 2px 30px 0 0;
     word-wrap: break-word;
     min-height: 20px;
-    position:relative;
+    position: relative;
+}
+.message.text-block em {
+    font-family: 'Open Sans Italic';
+    color: #2BA6DE;
+    color: rgba(43,166,222,0.7);
 }
 .message.text-block a {
     color: #2BA6DE;

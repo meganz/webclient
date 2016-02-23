@@ -958,6 +958,35 @@ var strongvelope = {};
      */
 
 
+
+    /**
+     * Tracks the participant set from others, included and excluded participant
+     * sets.
+     *
+     * @private
+     * @param {Set} otherParticipants
+     *     Currently tracked other participants.
+     * @param {Set} includeParticipants
+     *     Currently tracked participants to include.
+     * @param {Set} excludeParticipants
+     *     Currently tracked participants to exclude.
+     * @returns {Set}
+     *     Expected set of other participants after altering participation.
+     */
+    strongvelope.ProtocolHandler.prototype._trackParticipants = function(
+        otherParticipants, includeParticipants, excludeParticipants) {
+
+        var trackedParticipants = new Set(otherParticipants);
+        excludeParticipants.forEach(function _excludeParticipantsIterator(item) {
+            trackedParticipants.delete(item);
+        });
+        trackedParticipants = setutils.join(
+            trackedParticipants, includeParticipants);
+        trackedParticipants.delete(this.ownHandle);
+
+        return trackedParticipants;
+    };
+
     /**
      * Encrypts the sender key to the recipients as needed.
      *
@@ -978,13 +1007,9 @@ var strongvelope = {};
             return false;
         }
 
-        // Update participants list.
-        self.otherParticipants = setutils.join(self.otherParticipants,
-            self.includeParticipants);
-        var index = -1;
-        self.excludeParticipants.forEach(function _excludeParticipantsIterator(item) {
-            self.otherParticipants.delete(item);
-        });
+        // Update participants set.
+        this.otherParticipants = this._trackParticipants(this.otherParticipants,
+            this.includeParticipants, this.excludeParticipants);
 
         var recipients = '';
         var keys = '';
@@ -1344,7 +1369,6 @@ var strongvelope = {};
         }
 
         // TODO: Check legitimacy of operation (moderator set on alter participants).
-
         // Now puzzle out the group composition from a keyed message.
         var otherParticipants = this._getOtherParticipantsFromMessage(
             sender, parsedMessage);
@@ -1388,11 +1412,6 @@ var strongvelope = {};
             excludeParticipants: []
         };
 
-        if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
-                && (result.sender !== this.ownHandle)) {
-            result.toSend = this.encryptTo(null, sender);
-        }
-
         // Update counter.
         if (!historicMessage && (result.sender !== this.ownHandle)) {
             this._totalMessagesWithoutSendKey++;
@@ -1415,26 +1434,38 @@ var strongvelope = {};
                 // Excluded participants must not be in otherParticipants.
                 return false;
             }
+
             if (this._inUse) {
                 // Sanity check whether everything matches up.
-                var myCheckParticipants = new Set(this.otherParticipants);
-                myCheckParticipants.add(this.ownHandle);
-                myCheckParticipants = setutils.join(myCheckParticipants.
-                    parsedMessage.includeParticipants);
-                new Set(parsedMessage.excludeParticipants).forEach(function _setRemoveIterator(item) {
-                    myCheckParticipants.delete(item);
-                });
-                var messageCheckParticipants = new Set(otherParticipants);
-                messageCheckParticipants.add(this.ownHandle);
+                var myCheckParticipants = this._trackParticipants(
+                    this.otherParticipants, parsedMessage.includeParticipants,
+                    parsedMessage.excludeParticipants);
+                var messageCheckParticipants = new Set(parsedMessage.recipients);
+                messageCheckParticipants.add(sender);
+                messageCheckParticipants.delete(this.ownHandle);
                 if (!setutils.equal(myCheckParticipants, messageCheckParticipants)) {
-                    logging.critical('Participant group in chat does not match up with expectation!');
-                    logging.error('Expected group: '
+                    logger.critical('Participant group in chat does not match up with expectation!');
+                    logger.error('Expected group: '
                         + JSON.stringify(Array.from(myCheckParticipants))
                         + '; group from message: '
                         + JSON.stringify(Array.from(messageCheckParticipants)));
 
                     return false;
                 }
+
+                // Enact changes.
+                // Remove stuff from own tracking sets.
+                parsedMessage.excludeParticipants.forEach(function _excludeIterator(item) {
+                    self.includeParticipants.delete(item);
+                });
+                parsedMessage.includeParticipants.forEach(function _excludeIterator(item) {
+                    self.excludeParticipants.delete(item);
+                });
+                // Join own with new in/exclusion sets.
+                this.includeParticipants = setutils.join(
+                    this.includeParticipants, parsedMessage.includeParticipants);
+                this.excludeParticipants = setutils.join(
+                    this.excludeParticipants, parsedMessage.excludeParticipants);
             }
             else {
                 // Update other participants list.
@@ -1460,11 +1491,21 @@ var strongvelope = {};
                 this.otherParticipants = otherParticipants;
                 this._inUse = true;
             }
-            else if (!setutils.equal(this.otherParticipants.size, otherParticipants.size)) {
-                // There's a mitmatch between what we're thinking the other
-                // members are and what the message thinks they are.
-                return false;
+            else {
+                var trackedParticipants = this._trackParticipants(
+                    this.otherParticipants, this.includeParticipants, this.excludeParticipants);
+                if (!setutils.equal(trackedParticipants, otherParticipants)) {
+                    // There's a mismatch between what we're thinking the other
+                    // members are and what the message thinks they are.
+                    return false;
+                }
             }
+        }
+
+        // Prepare a key reminder if required.
+        if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
+                && (result.sender !== this.ownHandle)) {
+            result.toSend = this.encryptTo(null, sender);
         }
 
         return result;

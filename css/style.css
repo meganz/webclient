@@ -511,6 +511,9 @@ margin: 2.5px;
     background-image: url(../images/mega/main-sprite.png?v=7);
     background-repeat: no-repeat;
 }
+.fm-dialog .checkboxOff, .fm-dialog .checkboxOn {
+    margin: 20px 12px 0 7px;
+}
 .top-login-popup .checkboxOn, .top-login-popup .checkboxOff {
     margin: 15px 12px 0 1px;
 }

@@ -1040,7 +1040,7 @@ function MegaData()
         function renderLayout(u, n_cache) {
             var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
-                sExportLink, sLinkIcon, takenDown, takenDownTitle,
+                sExportLink, sLinkIcon, additionClass, titleTooltip, fName, fIcon,
                 iShareNum = 0,
                 s, ftype, c, cc, star;
 
@@ -1186,26 +1186,39 @@ function MegaData()
                         ? true : false;
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
-                    takenDown = '';
-                    takenDownTitle = '';
+                    additionClass = '';
+                    titleTooltip = '';
+                    fName = htmlentities(M.v[i].name);
+                    fIcon = fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name});
 
                     if (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) {
-                        takenDown = 'taken-down';
-                        takenDownTitle = (M.v[i].t === 1) ? l[7705] : l[7704];
+                        additionClass = 'taken-down';
+                        titleTooltip = (M.v[i].t === 1) ? l[7705] : l[7704];
                     }
+
+                    /*
+                    // Undecryptable file indicators
+                    if (undecryptable) {
+                        additionClass = 'undecryptable';
+                        titleTooltip = 'We are waiting for the cryptographic key to this file';
+                        fName = 'undecrypted file';
+                        fIcon = 'generic';
+                        ftype = l[7381];
+                    }
+                    */
 
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
+                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
                                     </span>\n\
-                                    <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
+                                    <span class="file-block-title">' + fName + '</span>\n\
                                 </a>';
                     }
 
@@ -1219,13 +1232,13 @@ function MegaData()
                         }
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
                                     <td width="50">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
                                         <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"> </span>\n\
-                                        <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
+                                        <span class="tranfer-filetype-txt">' + fName + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
                                     <td width="130">' + ftype + '</td>\n\

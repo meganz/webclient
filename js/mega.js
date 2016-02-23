@@ -4049,7 +4049,77 @@ function MegaData()
         }
     };
 
-    this.addDownload = function(n, z, preview, zipname)
+    this.addDownload = function(n, z, preview) {
+        var args = arguments;
+        var webdl = function() {
+            M.addWebDownload.apply(M, args);
+            args = undefined;
+        };
+
+        if (z || preview) {
+            return webdl();
+        }
+
+        dlmanager.isMEGAsyncRunning(0x02010100)
+            .done(function(sync) {
+                var cmd = {
+                    a: 'd',
+                    auth: folderlink ? M.RootID : u_sid
+                };
+                var files = [];
+
+                var addNode = function(node) {
+                    var item = {
+                        t: node.t,
+                        h: node.h,
+                        p: node.p,
+                        n: base64urlencode(node.name),
+                    };
+                    if (!node.t) {
+                        item.s = node.s;
+                        item.ts = node.mtime || node.ts;
+                        if (Object(node.key).length) {
+                            item.k = a32_to_base64(node.key);
+                        }
+                    }
+                    files.push(item);
+
+                    if (node.t) {
+                        foreach(fm_getnodes(node.h));
+                    }
+                };
+
+                var foreach = function(nodes) {
+                    for (var i in nodes) {
+                        if (nodes.hasOwnProperty(i)) {
+                            var node = M.d[nodes[i]];
+
+                            if (node) {
+                                addNode(node);
+                            }
+                        }
+                    }
+                };
+
+                foreach(n);
+
+                if (!files.length) {
+                    console.error('No files...');
+                    return webdl();
+                }
+
+                cmd.f = files;
+
+                sync.megaSyncRequest(cmd)
+                    .done(function() {
+                        showToast('megasync', 'Download added to MEGAsync', 'Open');
+                    })
+                    .fail(webdl);
+            })
+            .fail(webdl);
+    };
+
+    this.addWebDownload = function(n, z, preview, zipname)
     {
         delete $.dlhash;
         var path;
@@ -6827,6 +6897,7 @@ function init_chat() {
     function __init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
+
             try {
                 // Prevent known Strophe exceptions...
                 if (!Strophe.Websocket.prototype._unsafeOnIdle) {
@@ -6848,19 +6919,19 @@ function init_chat() {
                     console.error(ex);
                 }
             }
-            //try {
-                window.megaChat = new Chat();
-                window.megaChat.init();
+
+            var _chat = new Chat();
+
+            // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
+            if (!window.megaChatIsDisabled) {
+                window.megaChat = _chat;
+                megaChat.init();
 
                 if (fminitialized) {
                     //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }
-            //}
-            //catch (ex) {
-            //    console.error(ex);
-            //    megaChatIsDisabled = true;
-            //}
+            }
         }
     }
     if (folderlink) {

@@ -59,7 +59,7 @@ ClassChunk.prototype.abort = function() {
         clearTimeout(this.oet);
     }
     if (this.xhr) {
-        this.xhr.xhr_cleanup(0x9ffe);
+        this.xhr.abort(this.xhr.ABORT_CLEANUP);
     }
     if (this.Progress) {
         removeValue(this.Progress.working, this, 1);
@@ -172,21 +172,19 @@ ClassChunk.prototype.finish_download = function() {
     }
 };
 
-// XHR::on_progress
-ClassChunk.prototype.on_progress = function(args) {
+ClassChunk.prototype.onXHRprogress = function(xhrEvent) {
     if (!this.Progress.data[this.xid] || this.isCancelled()) {
         return;
     }
     // if (args[0].loaded) this.Progress.data[this.xid][0] = args[0].loaded;
     // this.updateProgress(!!args[0].zSaaDc ? 0x9a : 0);
-    this.Progress.data[this.xid][0] = args[0].loaded;
+    this.Progress.data[this.xid][0] = xhrEvent.loaded;
     this.updateProgress();
 };
 
-// XHR::on_error
-ClassChunk.prototype.on_error = function(args, xhr) {
+ClassChunk.prototype.onXHRerror = function(args, xhr) {
     if (d) {
-        dlmanager.logger.error('ClassChunk.on_error', this.task && this.task.chunk_id, args, xhr, this);
+        dlmanager.logger.error('ClassChunk.onXHRerror', this.task && this.task.chunk_id, args, xhr, this);
     }
     if (this.isCancelled()) {
         ASSERT(0, 'This chunk should have been destroyed before reaching XHR.onerror..');
@@ -204,12 +202,12 @@ ClassChunk.prototype.on_error = function(args, xhr) {
     }, 3950 + Math.floor(Math.random() * 2e3));
 };
 
-// XHR::on_ready
-ClassChunk.prototype.on_ready = function(args, xhr) {
+ClassChunk.prototype.onXHRready = function(xhrEvent) {
     var r;
     if (this.isCancelled()) {
         return;
     }
+    var xhr = xhrEvent.target;
     try {
         r = xhr.response || {};
     }
@@ -248,7 +246,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
                 dlFatalError(this.dl, e);
             }
         }
-        return 0xDEAD;
+        return Object(this.xhr).ABORT_EINTERNAL;
     }
 };
 
@@ -278,7 +276,7 @@ ClassChunk.prototype.run = function(task_done) {
     if (d) {
         dlmanager.logger.info(this + " Fetching ", this.url);
     }
-    this.xhr = getXhr(this);
+    this.xhr = getTransferXHR(this);
     this.xhr._murl = this.url;
 
     this.xhr.open('POST', this.url, true);

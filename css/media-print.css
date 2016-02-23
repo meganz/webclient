@@ -5,11 +5,19 @@
         visibility: hidden;
         overflow: visible !important;
         max-width: 100% !important;
-        padding-top: 0px !important;
     }
 
     .top-head, .nw-bottom-block .nw-bottom-pad, .nw-bottom-block .nw-bottom-social {
         display: none;
+        height: 0px;
+    }
+
+    .new-left-menu-block {
+        padding-top: 0px !important;
+    }
+
+    .nw-bottom-block {
+        height: 48px;
     }
 
     .jspPane * {

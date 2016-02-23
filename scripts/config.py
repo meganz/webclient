@@ -39,6 +39,7 @@ JSCS_RULES = '--verbose'
 MINIFICATION_FILE_TYPES = ['js', 'jsx']
 MINIFICATION_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js']
 MINIFICATION_THRESHOLD = 200 # Max chars per line to trigger.
+
 # Vera++ rules like this should be superseded by a "profile", but it
 # doesn't work well, yet, on Vera++ v1.2 :-(
 # For rules, look here:

@@ -1,17 +1,20 @@
-var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
+(function(scope) {
 
-(function(window, asmCrypto) {
-    
-    var signPubKey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='));
+    var signPubKey = null;
     var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
     var fetching = {};
     var cmsBackoff = 0;
     var cmsFailures = 0;
-    
+    var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
+
     function verify_cms_content(content, signature) {
         var hash = asmCrypto.SHA256.hex(content);
         signature = ab_to_str(signature);
-    
+
+        if (signPubKey === null) {
+            signPubKey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='));
+        }
+
         try {
             return nacl.sign.detached.verify(asmCrypto.string_to_bytes(hash),
                                              asmCrypto.string_to_bytes(signature),
@@ -21,33 +24,33 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             return false;
         }
     }
-    
+
     function process_cms_response(bytes, next, as, id) {
         var viewer = new Uint8Array(bytes);
-    
+
         var signature = bytes.slice(3, 67); // 64 bytes, signature
         var version = viewer[0];
         var mime = viewer[1];
         var label = ab_to_str(bytes.slice(67, viewer[2] + 67));
         var content = bytes.slice(viewer[2] + 67);
-    
+
         if (as === "download") {
             mime = 0;
         }
-    
+
         if (verify_cms_content(content, signature)) {
             switch (mime) {
             case 3: // html
                 content = ab_to_str(content);
                 next(false, { html: content, mime: mime});
                 return loaded(id);
-    
+
             case 1:
                 var blob = new Blob([content]);
-                content = window.URL.createObjectURL(blob);
+                content = myURL.createObjectURL(blob);
                 next(false, { url: content, mime: mime});
                 return loaded(id);
-    
+
             case 2:
                 try {
                     content = JSON.parse(ab_to_str(content));
@@ -57,7 +60,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 }
                 next(false, { object: content, mime: mime});
                 return loaded(id);
-    
+
             default:
                 var io = new MemoryIO("temp", {});
                 io.begin = function() {};
@@ -73,12 +76,12 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             next(true, { error: 'Invalid signature', signature: true });
         }
     }
-    
+
     var assets = {};
     var booting = false;
-    
+
     var is_img;
-    
+
     /**
      *  Steps
      *
@@ -99,12 +102,12 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 next.apply(null, responses);
             }
         }
-    
+
         return function(id) {
             return step_done.bind(null, parseInt(id));
         };
     }
-    
+
     /**
      *  Rewrite links. Basically this links
      *  shouldn't trigger the `CMS.get` and force
@@ -113,7 +116,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
     function dl_placeholder(str, sep, rid, id) {
         return "'javascript:void(0)' data-cms-dl='" + id + "'";
     }
-    
+
     /**
      *  Images placeholder. Replace *all* the images
      *  with a placeholder until the image is fully loaded from
@@ -123,7 +126,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         is_img = true;
         return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" + id + "'";
     }
-    
+
     /**
      *    Internal function to communicate with the BLOB server.
      *
@@ -135,7 +138,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         if (!id) {
             throw new Error("Calling CMS.doRequest without an ID");
         }
-    
+
         if (typeof CMS_Cache === "object" && CMS_Cache[id]) {
             for (var i in fetching[id]) {
                 if (fetching[id].hasOwnProperty(i)) {
@@ -145,7 +148,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             delete fetching[id];
             return;
         }
-    
+
         var q = getxhr();
         q.onerror = function() {
             cmsBackoff = Math.min(cmsBackoff + 2000, 60000);
@@ -170,9 +173,9 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         q.responseType = 'arraybuffer';
         q.send();
     }
-    
+
     var _listeners = {};
-    
+
     function snapshot_ready() {
         for (var id in fetching) {
             if (fetching.hasOwnProperty(id)) {
@@ -180,7 +183,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             }
         }
     }
-    
+
     function loadSnapshot() {
         if (!jsl_loaded['cms_snapshot_js']) {
             silent_loading = snapshot_ready;
@@ -188,7 +191,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             jsl_start();
         }
     }
-    
+
     function loaded(id) {
         if (_listeners[id]) {
             for (var i in _listeners[id]) {
@@ -199,18 +202,18 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         }
         CMS.attachEvents();
     }
-    
+
     var curType;
     var curCallback;
     var reRendered = {};
-    
+
     var CMS = {
         watch: function(type, callback)
         {
             curType = type;
             curCallback = callback;
         },
-    
+
         reRender: function(type, nodeId)
         {
             if (type === curType && !reRendered[nodeId]) {
@@ -218,11 +221,11 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 curCallback(nodeId);
             }
         },
-    
+
         isLoading: function() {
             return Object.keys(fetching).length > 0;
         },
-    
+
         attachEvents: function() {
             $('*[data-cms-dl],.cms-asset-download').rebind('click', function(e) {
                 var $this  = $(this);
@@ -230,20 +233,20 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 if (!target) {
                     return;
                 }
-    
+
                 e.preventDefault();
-    
+
                 loadingDialog.show();
                 CMS.get(target, function() {
                     loadingDialog.hide();
                 }, 'download');
-    
+
                 return false;
             });
         },
-    
+
         loaded: loaded,
-    
+
         img: function(id) {
             if (!assets[id]) {
                 this.get(id, function(err, obj) {
@@ -275,7 +278,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 doRequest(id);
             }
         },
-    
+
         on: function(id, callback)
         {
             if (!_listeners[id]) {
@@ -283,7 +286,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             }
             _listeners[id].push(callback);
         },
-    
+
         imgLoader: function(html, id) {
             if (!assets[id]) {
                 is_img = false;
@@ -291,7 +294,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
                 html = html.replace(new RegExp('([\'"])(i:(' + id + '))([\'"])', 'g'), img_placeholder);
                 // replace download links
                 html = html.replace(new RegExp('([\'"])(d:(' + id + '))([\'"])', 'g'), dl_placeholder);
-    
+
                 if (is_img) {
                     this.get(id);
                 }
@@ -301,11 +304,11 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             return html;
         }
     };
-    
-    /* Make it public */
-    window.CMS = CMS;
 
-})(this, asmCrypto)
+    /* Make it public */
+    scope.CMS = CMS;
+
+})(this);
 
 CMS.on('corporate', function()
 {

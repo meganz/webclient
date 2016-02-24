@@ -2369,7 +2369,7 @@
     "7278": "Te rug\u0103m s\u0103 ne oferi feedbackul t\u0103u. Mersi.",
     "7279": "Eroare la upgradarea contului",
     "7280": "Cont upgradat",
-    "7281": "E\u015fec la ob\u0163inerea de metode de plat\u0103 disponibile. Te rug\u0103m s\u0103 re\u00eencerci. {{0}]",
+    "7281": "E\u015fec la ob\u0163inerea de metode de plat\u0103 disponibile. Te rug\u0103m s\u0103 re\u00eencerci. [{0}]",
     "7282": "Eroare la ob\u0163inerea metodelor de plat\u0103",
     "7283": "E\u015fec la ob\u0163inerea URL-ului de plat\u0103. Te rug\u0103m s\u0103 re\u00eencerci [{0}]",
     "7284": "Ob\u0163inerea URL-ului pentru plat\u0103 a e\u015fuat",
@@ -2668,7 +2668,7 @@
     "7588": "Te rug\u0103m s\u0103 completezi numele, adresa de e-mail \u015fi parola MEGA.",
     "7589": "Mu\u0163i elementul \u00een co\u015ful de gunoi?",
     "7590": "Mu\u0163i elementele \u00een co\u015ful de gunoi?",
-    "7591": "Ai selectat peste {0} elemente ({0}) pentru desc\u0103rcare. Dore\u015fti s\u0103 continui?",
+    "7591": "Ai selectat peste {0} elemente ({1}) pentru desc\u0103rcare. Dore\u015fti s\u0103 continui?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Se preiau fi\u015fierele \u015fi folderele... [{0}]",
@@ -3154,6 +3154,13 @@
     "8577": "Requesting account data",
     "8578": "Receiving account data",
     "8579": "Decrypting",
+    "8580": "File import failed [{0}]",
+    "8584": "Requesting folder data",
+    "8585": "Receiving folder data",
+    "8586": "Decrypting folder data",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3182,6 +3189,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

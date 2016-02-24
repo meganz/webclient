@@ -2668,7 +2668,7 @@
     "7588": "Vul alstublieft uw naam, e-mailadres en uw MEGA wachtwoord in.",
     "7589": "Item verplaatsen naar prullenbak?",
     "7590": "Items verplaatsen naar prullenbak?",
-    "7591": "U heeft meer dan {0} items geselecteerd ({0}) om te downloaden. Wilt u doorgaan?",
+    "7591": "U heeft meer dan {0} items geselecteerd ({1}) om te downloaden. Wilt u doorgaan?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Bestanden en mappen worden opgehaald...[{0}]",
@@ -3154,6 +3154,13 @@
     "8577": "Requesting account data",
     "8578": "Receiving account data",
     "8579": "Decrypting",
+    "8580": "File import failed [{0}]",
+    "8584": "Requesting folder data",
+    "8585": "Receiving folder data",
+    "8586": "Decrypting folder data",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3182,6 +3189,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

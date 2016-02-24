@@ -41,6 +41,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             chatId: undefined,
             chatdUrl: undefined,
             chatShard: undefined,
+            members: [],
+            membersLoaded: false
         },
         true
     );
@@ -190,6 +192,23 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             if (targetUserNode) {
                 setLastInteractionWith(targetUserNode.u, "1:" + self.lastActivity);
             }
+        }
+        else if (self.type === "group") {
+            var contactHash;
+            if (msg.authorContact) {
+                contactHash = msg.authorContact.h;
+            }
+            else if (msg.userId) {
+                contactHash = M.u[msg.userId];
+            }
+            else if (msg.getFromJid) {
+                contactHash = megaChat.getContactHashFromJid(msg.getFromJid());
+            }
+
+
+            assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
+
+            //TODO: last interaction for group chat
         }
         else {
             throw new Error("Not implemented");
@@ -608,8 +627,14 @@ ChatRoom.prototype.getRoomTitle = function() {
         return self.megaChat.getContactNameFromJid(participants[0]);
     }
     else {
-        assert(false, "invalid room type");
-        return "[invalid room type]";
+        var participants = self.getParticipantsExceptMe();
+        var names = participants.map(function(jid) {
+            var contactHash = self.megaChat.getContactHashFromJid(jid);
+            if (contactHash && M.u[contactHash]) {
+                return M.u[contactHash].name ? M.u[contactHash].name : "non contact";
+            }
+        });
+        return names.join(", ");
     }
 };
 
@@ -663,7 +688,13 @@ ChatRoom.prototype.leave = function(notifyOtherDevices) {
 
 
     if (notifyOtherDevices === true) {
-        self.megaChat.sendBroadcastAction(self.roomJid, "conv-end", {roomJid: self.roomJid});
+        if (self.type == "group") {
+            $(self).trigger('onLeaveChatRequested');
+        }
+        else {
+            self.logger.error("Can't leave room of type: " + self.type);
+            return;
+        }
     }
 
 
@@ -778,8 +809,11 @@ ChatRoom.prototype.getRoomUrl = function() {
             return "#fm/chat/" + contact.u;
         }
     }
+    else if (self.type === "group") {
+            return "#fm/chat/g/" + self.roomJid.split("@")[0];
+    }
     else {
-        throw new Error("Not implemented");
+        throw new Error("Can't get room url for unknown room type.");
     }
 };
 
@@ -891,12 +925,7 @@ ChatRoom.prototype.refreshUI = function() {
 ChatRoom.prototype.getNavElement = function() {
     var self = this;
 
-    if (self.type === "private") {
-        return $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
-    }
-    else {
-        throw new Error("Not implemented.");
-    }
+    return $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
 };
 
 
@@ -1354,19 +1383,6 @@ ChatRoom.prototype._restartConversation = function() {
 
         self.trigger('onConversationStarted');
     }
-
-
-    self.getParticipantsExceptMe().forEach(function(v) {
-
-        self.megaChat.karere.addUserToChat(self.roomJid, Karere.getNormalizedBareJid(v), undefined, self.type, {
-            'ctime': self.ctime,
-            'invitationType': 'resume',
-            'participants': self.users,
-            'users': self.megaChat.karere.getUsersInChat(self.roomJid)
-        });
-    });
-
-    self.megaChat.sendBroadcastAction("conv-start", {roomJid: self.roomJid, type: self.type, participants: self.getParticipants()});
 };
 
 ChatRoom.prototype._conversationEnded = function(userFullJid) {

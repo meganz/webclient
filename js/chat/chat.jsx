@@ -13,13 +13,33 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
 (function() {
     chatui = function(id) {
-        var userHash = id.replace("chat/", "");
-        if (!M.u[userHash]) {
-            setTimeout(function() {
-                window.location = '#fm/chat';
-                M.openFolder('chat');
-            }, 100);
-            return;
+        var roomOrUserHash = id.replace("chat/", "");
+
+        var roomType = false;
+
+        if (roomOrUserHash.substr(0, 2) === "g/") {
+            roomType = "group";
+            roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
+            if (!megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain]) {
+                // chat not found
+                setTimeout(function () {
+                    window.location = '#fm/chat';
+                    M.openFolder('chat');
+                }, 100);
+                return;
+            }
+        }
+        else {
+            if (!M.u[roomOrUserHash]) {
+                setTimeout(function () {
+                    window.location = '#fm/chat';
+                    M.openFolder('chat');
+                }, 100);
+                return;
+            }
+            else {
+                roomType = "private";
+            }
         }
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
         hideEmptyGrids();
@@ -38,20 +58,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
         megaChat.refreshConversations();
 
-        var chatJids = id.split("chat/").pop();
-        if (chatJids) {
-            chatJids = chatJids.split(",");
-        }
-        else {
-            chatJids = [];
-        }
-
-        $.each(chatJids, function(k, v) {
-            chatJids[k] = megaChat.getJidFromNodeId(v);
-        });
-
-        var $promise;
-
 
         if (localStorage.megaChatPresence !== "unavailable") {
             if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
@@ -59,12 +65,37 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
         }
 
-        chatJids.push(megaChat.karere.getBareJid());
-        var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group", undefined, undefined, undefined, true);
+        if (roomType === "private") {
+            var chatJids = id.split("chat/").pop();
+            if (chatJids) {
+                chatJids = chatJids.split(",");
+            }
+            else {
+                chatJids = [];
+            }
 
-        $promise = resp[2];
+            $.each(chatJids, function (k, v) {
+                chatJids[k] = megaChat.getJidFromNodeId(v);
+            });
 
-        resp[1].show();
+            var $promise;
+
+            chatJids.push(megaChat.karere.getBareJid());
+            var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group", undefined, undefined, undefined, true);
+
+            $promise = resp[2];
+
+            resp[1].show();
+        }
+        else if(roomType === "group") {
+            megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain].show();
+        }
+        else {
+            console.error("Unknown room type.");
+            return;
+        }
+
+
 
 
         // since .fm-chat-block is out of the scope of the CovnersationsApp, this should be done manually :(
@@ -352,12 +383,7 @@ Chat.prototype.init = function() {
                     if (room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
                         self.logger.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
 
-                        self.karere.addUserToChat(roomJid, eventObject.getFromJid(), undefined, room.type, {
-                            'ctime': room.ctime,
-                            'invitationType': 'resume',
-                            'participants': room.users,
-                            'users': self.karere.getUsersInChat(roomJid)
-                        });
+                        //XXX: invite the user in case of mpenc mode
 
                         return false; // break;
                     }
@@ -404,96 +430,6 @@ Chat.prototype.init = function() {
             //room.refreshUI();
         }
 
-    });
-
-    // Invite messages
-    this.karere.bind("onInviteMessage", function(e, eventObject) {
-        if (eventObject.isMyOwn(self.karere) === true) {
-            e.stopPropagation();
-            return false;
-        }
-        self.logger.debug(self.karere.getNickname(), "Got invitation to join", eventObject.getRoomJid(), "with eventData:", eventObject);
-
-
-        var meta = eventObject.getMeta();
-
-        if (meta && meta.type === "private") {
-
-            var otherParticipants = meta.participants;
-            var myBareJid = megaChat.karere.getBareJid();
-
-            var otherParticipant;
-            if (Karere.getNormalizedBareJid(otherParticipants[0]) === megaChat.karere.getBareJid()) {
-                otherParticipant = Karere.getNormalizedBareJid(otherParticipants[0]);
-            }
-            else {
-                otherParticipant = Karere.getNormalizedBareJid(otherParticipants[1]);
-            }
-
-            if (otherParticipant && !self.getContactFromJid(otherParticipant)) {
-                self.logger.debug(
-                    self.karere.getNickname(),
-                    "Got invited to a private room with a non-existing contact. Ignoring: ",
-                    eventObject.getRoomJid(),
-                    roomJid,
-                    "with eventData:", eventObject, " and participants: ", otherParticipants
-                );
-            }
-            var bareFromJid = eventObject.getFromJid().split("/")[0];
-            self.chats.forEach(function(room, roomJid) {
-
-                if (roomJid === eventObject.getRoomJid()) {
-                    return; // continue
-                }
-
-                if (room.type === "private" && room.participantExistsInRoom(bareFromJid, false, true)) {
-                    self.logger.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventObject.getRoomJid(), roomJid, "with eventData:", eventObject);
-
-                    if (self.currentlyOpenedChat === room.roomJid) {
-                        room.ctime = meta.ctime;
-                        room.syncUsers(meta.participants);
-                    }
-
-                    // if not already in
-                    if (room.state < ChatRoom.STATE.JOINING) {
-                        room.setState(ChatRoom.STATE.JOINING);
-                        self.karere.joinChat(eventObject.getRoomJid(), eventObject.getPassword());
-                    }
-
-                    e.stopPropagation();
-                    return false;
-                }
-            });
-
-            if (e.isPropagationStopped()) {
-                return false;
-            }
-        }
-        if (self.chats[eventObject.getRoomJid()]) { //already joined
-            self.logger.warn("I'm already in", eventObject.getRoomJid(), "(ignoring invitation from: ", eventObject.getFromJid(), ")");
-
-            e.stopPropagation();
-            return false; // stop doing anything
-        }
-
-        // if we are here..then join the room
-        self.logger.debug("Initializing UI for new room: ", eventObject.getRoomJid(), "");
-
-        var roomJid = eventObject.getRoomJid();
-        var room = new ChatRoom(self, eventObject.getRoomJid(), meta.type, meta.participants, meta.ctime);
-        self.chats.set(
-            roomJid,
-            room
-        );
-        room.setState(ChatRoom.STATE.JOINING);
-        self.karere.joinChat(roomJid, eventObject.getPassword());
-
-        //room.refreshUI();
-
-
-        e.stopPropagation();
-
-        return false; // stop propagation, we are manually handling the join on invite case
     });
 
     var updateMyConnectionStatus = function() {
@@ -1108,6 +1044,27 @@ Chat.prototype.getContactFromJid = function(jid) {
 };
 
 /**
+ * Get Contact's hash from jid
+ *
+ * @param jid {String} full OR bare jid
+ * @returns {*}
+ */
+Chat.prototype.getContactHashFromJid = function(jid) {
+    var self = this;
+
+    assert(jid, "Missing jid");
+
+    if (jid === self.karere.getBareJid()) {
+        return u_handle;
+    }
+
+    jid = Karere.getNormalizedBareJid(jid); // always convert to bare jid
+    var h = megaJidToUserId(jid);
+
+    return typeof h !== 'string' || base64urldecode(h).length !== 8 ? false : h;
+};
+
+/**
  * Get formatted contact name from Jid
  *
  * @param jid {String} full/bare jid, does not matter
@@ -1369,7 +1326,28 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
         roomJid = self.generatePrivateRoomName(jids);
     }
     else {
-        roomJid = self.generateGroupRoomName(jids);
+        assert(chatId, 'Tried to create a group chat, without passing the chatId.');
+
+        roomJid = self.generateGroupRoomName(chatId);
+
+        jids.forEach(function(jid) {
+            var contactHash = megaChat.getContactHashFromJid(jid);
+
+            assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
+
+            if (!M.u[contactHash]) {
+                M.u.set(
+                    contactHash,
+                    new MegaDataObject(MEGA_USER_STRUCT, true, {
+                        'h': contactHash,
+                        'u': contactHash,
+                        'm': '',
+                        'c': 0
+                    })
+                );
+                M.syncUsersFullname(contactHash);
+            }
+        });
     }
 
     var roomFullJid = roomJid + "@" + self.karere.options.mucDomain;
@@ -1440,18 +1418,6 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
 
     $startChatPromise
         .done(function(roomJid) {
-            $.each(jidsWithoutMyself, function(k, userJid) {
-
-                if (self.chats[roomJid]) {
-                    self.karere.addUserToChat(roomJid, userJid, undefined, type, {
-                        'ctime': self.chats[roomJid].ctime,
-                        'invitationType': "created",
-                        'participants': jids,
-                        'users': self.karere.getUsersInChat(roomJid)
-                    });
-                }
-            });
-
             $promise.resolve(roomJid, self.chats[roomJid]);
         })
         .fail(function() {
@@ -1500,20 +1466,12 @@ Chat.prototype.generatePrivateRoomName = function(jids) {
 /**
  * Used to generate unique room JID for group chats.
  *
- * @param jids {Array} of BARE jids
+ * @param chatId {String} of BARE jids
  * @returns {string}
  */
-Chat.prototype.generateGroupRoomName = function(jids) {
+Chat.prototype.generateGroupRoomName = function(chatId) {
     var self = this;
-    var newJids = clone(jids);
-    newJids.sort();
-    var roomName = "grp";
-    $.each(newJids, function(k, jid) {
-        roomName = roomName + jid.split("@")[0];
-    });
-
-    roomName = base32.encode(asmCrypto.SHA256.bytes(roomName).subarray(0, 16));
-    return roomName;
+    return base32.encode(base64urldecode(chatId));
 };
 
 /**

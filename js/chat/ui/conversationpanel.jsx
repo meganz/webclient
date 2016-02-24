@@ -822,17 +822,30 @@ var ConversationRightArea = React.createClass({
             startAudioCallButton = startVideoCallButton = null;
         }
 
-        return <div className="chat-right-area">
-            <div className="chat-right-area conversation-details-scroll">
-                <div className="chat-right-pad">
+        var contactsList = [];
 
+
+        room.getContactParticipantsExceptMe().forEach(function(contactHash) {
+            var contact = M.u[contactHash];
+            if (contact) {
+                contactsList.push(
                     <ContactsUI.ContactCard
+                        key={contact.u}
                         contact={contact}
                         megaChat={room.megaChat}
                         className="right-chat-contact-card"
                         dropdownPositionMy="right top"
                         dropdownPositionAt="right bottom"
                     />
+                );
+            }
+        });
+
+        return <div className="chat-right-area">
+            <div className="chat-right-area conversation-details-scroll">
+                <div className="chat-right-pad">
+
+                    {contactsList}
 
                     <div className="buttons-block">
                         {startAudioCallButton}
@@ -881,7 +894,7 @@ var ConversationRightArea = React.createClass({
                         {
                             room.type === "group" ?
                                 <div className="link-button red" onClick={() => {
-                                   room.leaveChat(true);
+                                   room.leave(true);
                                 }}>
                                     <i className="small-icon rounded-stop"></i>
                                     {__("Leave Chat")}
@@ -1891,15 +1904,21 @@ var ConversationPanel = React.createClass({
                             self.setState({'attachCloudDialog': true});
                         }}
                         onAddParticipantSelected={function(contact, e) {
-                            var megaChat = self.props.chatRoom.megaChat;
-                            var newUserJid = megaChat.getJidFromNodeId(contact.u);
+                            if (self.props.chatRoom.type == "private") {
+                                var megaChat = self.props.chatRoom.megaChat;
 
-                            megaChat.openChat(
-                                self.props.chatRoom.getParticipants().concat(
-                                    [newUserJid]
-                                ),
-                                "group"
-                            );
+                                megaChat.trigger(
+                                    'onNewGroupChatRequest',
+                                    [
+                                        self.props.chatRoom.getContactParticipantsExceptMe().concat(
+                                            [contact.u]
+                                        )
+                                    ]
+                                );
+                            }
+                            else {
+                                self.props.chatRoom.trigger('onAddUserRequest', [contact.u]);
+                            }
                         }}
                     />
                     <ConversationAudioVideoPanel
@@ -2045,13 +2064,14 @@ var ConversationPanels = React.createClass({
 
             self.props.contacts.forEach(function(contact) {
                 if (contact.u === u_handle) { return; }
-                else if (contact.c === 0) { return; }
 
-                var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+                if(contact.c === 1) {
+                    var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
 
-                (pres === "offline" ? contactsListOffline : contactsList).push(
-                    <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u} />
-                );
+                    (pres === "offline" ? contactsListOffline : contactsList).push(
+                        <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u}/>
+                    );
+                }
             });
             var emptyMessage = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved' ?
                 l[8008] :

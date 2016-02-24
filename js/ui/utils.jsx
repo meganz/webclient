@@ -63,6 +63,10 @@ var JScrollPane = React.createClass({
         }
     },
     onResize: function() {
+        if (!this.isMounted()) {
+            return;
+        }
+
         var $elem = $(ReactDOM.findDOMNode(this));
 
         this.setWidthHeightIfEmpty();

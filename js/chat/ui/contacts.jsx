@@ -177,15 +177,24 @@ var ContactCard = React.createClass({
 
             var moreDropdowns = [];
 
-            if(window.location.hash != '#fm/chat/' + contact.u) {
+            if (contact.c === 1) {
                 moreDropdowns.push(
                     <DropdownsUI.DropdownItem
-                        key={"start_conv_" + contact.u}
-                        icon="conversations" label={__("Open/start Chat")} onClick={() => {
-                                    window.location = '#fm/chat/' + contact.u;
-                                }} />
+                            key="view" icon="human-profile" label={__("View Profile")} onClick={() => {
+                                window.location = '#fm/' + contact.u;
+                            }} />
                 );
+                if (window.location.hash != '#fm/chat/' + contact.u) {
+                    moreDropdowns.push(
+                        <DropdownsUI.DropdownItem
+                            key={"start_conv_" + contact.u}
+                            icon="conversations" label={__("Open/start Chat")} onClick={() => {
+                                        window.location = '#fm/chat/' + contact.u;
+                                    }}/>
+                    );
+                }
             }
+
             contextMenu = <ButtonsUI.Button
                 className="default-white-button tiny-button"
                 icon="tiny-icon grey-down-arrow">
@@ -195,9 +204,6 @@ var ContactCard = React.createClass({
                     vertOffset={4}
                     noArrow={true}
                 >
-                    <DropdownsUI.DropdownItem icon="human-profile" label={__("View Profile")} onClick={() => {
-                                    window.location = '#fm/' + contact.u;
-                                }} />
                     {moreDropdowns}
                 </DropdownsUI.Dropdown>
             </ButtonsUI.Button>;

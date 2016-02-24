@@ -31,28 +31,28 @@ var Chatd = function(userId, options) {
 
     self.options = $.extend({}, Chatd.DEFAULT_OPTIONS, options);
 
-//    // debug mode
-//    [
-//        'onMessageUpdated',
-//        'onMessageConfirm',
-//        'onMessageReject',
-//        'onMessageCheck',
-//        'onMessageModify',
-//        'onMessageStore',
-//        'onMessageSeen',
-//        'onMessageLastSeen',
-//        'onMessageReceived',
-//        'onMessageLastReceived',
-//        'onRetentionChanged',
-//        'onMessagesHistoryInfo',
-//        'onMembersUpdated',
-//        'onMessagesHistoryDone',
-//        'onMessagesHistoryRequest',
-//    ].forEach(function(evt) {
-//            self.rebind(evt + '.chatd', function(e) {
-//                console.error(evt, JSON.stringify(arguments[1]));
-//            });
-//    });
+    // debug mode
+    [
+        'onMessageUpdated',
+        'onMessageConfirm',
+        'onMessageReject',
+        'onMessageCheck',
+        'onMessageModify',
+        'onMessageStore',
+        'onMessageSeen',
+        'onMessageLastSeen',
+        'onMessageReceived',
+        'onMessageLastReceived',
+        'onRetentionChanged',
+        'onMessagesHistoryInfo',
+        'onMembersUpdated',
+        'onMessagesHistoryDone',
+        'onMessagesHistoryRequest',
+    ].forEach(function(evt) {
+            self.rebind(evt + '.chatd', function(e) {
+                console.error(evt, JSON.stringify(arguments[1]));
+            });
+    });
 };
 
 makeObservable(Chatd);
@@ -587,6 +587,8 @@ Chatd.prototype.modify = function(chatId, msgnum, message) {
 };
 
 Chatd.Shard.prototype.msg = function(chatId, msgxid, timestamp, message) {
+    //console.error("MSG", base64urlencode(chatId), msgxid, timestamp, message);
+
     this.cmd(Chatd.Opcode.NEWMSG, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack32le(message.length) + message);
 };
 

@@ -35,34 +35,53 @@ var ConversationsListItem = React.createClass({
 
         var megaChat = this.props.chatRoom.megaChat;
         var chatRoom = this.props.chatRoom;
-        var contactJid = chatRoom.getParticipantsExceptMe()[0];
-        var contact = chatRoom.megaChat.getContactFromJid(contactJid);
-
-
-        if (!contact) {
-            return null;
-        }
-        var id = 'conversation_' + htmlentities(contact.u);
         var roomShortJid = chatRoom.roomJid.split("@")[0];
-
-        var caps = megaChat.karere.getCapabilities(contactJid);
-        if (caps) {
-            Object.keys(caps).forEach(function (k) {
-                var v = caps[k];
-                if (v) {
-                    classString += " chat-capability-" + k;
-                }
-            });
-        }
 
         // selected
         if (chatRoom.isCurrentlyActive) {
             classString += " active";
         }
 
-        var presenceClass = chatRoom.megaChat.xmppPresenceToCssClass(
-            contact.presence
-        );
+
+        var contactJid;
+        var presenceClass;
+        var id;
+
+        if (chatRoom.type === "private") {
+            contactJid = chatRoom.getParticipantsExceptMe()[0];
+            var contact = chatRoom.megaChat.getContactFromJid(contactJid);
+
+
+            if (!contact) {
+                return null;
+            }
+            id = 'conversation_' + htmlentities(contact.u);
+
+
+            var caps = megaChat.karere.getCapabilities(contactJid);
+            if (caps) {
+                Object.keys(caps).forEach(function (k) {
+                    var v = caps[k];
+                    if (v) {
+                        classString += " chat-capability-" + k;
+                    }
+                });
+            }
+
+
+            presenceClass = chatRoom.megaChat.xmppPresenceToCssClass(
+                contact.presence
+            );
+        }
+        else if (chatRoom.type === "group") {
+            contactJid = roomShortJid;
+            id = 'conversation_' + contactJid;
+            presenceClass = 'group';
+            classString += ' groupchat';
+        }
+        else {
+            return "unknown room type: " + chatRoom.roomJid.split("@")[0];
+        }
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
         var unreadDiv = null;
@@ -139,12 +158,11 @@ var ConversationsListItem = React.createClass({
             classString += " call-active";
         }
 
-        var avatarMeta = generateAvatarMeta(contact.u);
 
         return (
             <li className={classString} id={id} data-room-jid={roomShortJid} data-jid={contactJid} onClick={this.props.onConversationClicked}>
                 <div className="user-card-name conversation-name">
-                    {avatarMeta.fullName}
+                    {chatRoom.getRoomTitle()}
                     <span className={"user-card-presence " + presenceClass}></span>
                 </div>
                 {unreadDiv}
@@ -159,11 +177,8 @@ var ConversationsListItem = React.createClass({
 var ConversationsList = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     conversationClicked: function(room, e) {
-        var contact = room.megaChat.getContactFromJid(
-            room.getParticipantsExceptMe()[0]
-        );
 
-        window.location = "#fm/chat/" + contact.u;
+        window.location = room.getRoomUrl();
         e.stopPropagation();
     },
     currentCallClicked: function(e) {
@@ -258,18 +273,20 @@ var ConversationsList = React.createClass({
                 return;
             }
 
-            var contact = chatRoom.getParticipantsExceptMe()[0];
-            if (!contact) {
-                return;
-            }
-            contact = chatRoom.megaChat.getContactFromJid(contact);
+            if (chatRoom.type === "private") {
+                var contact = chatRoom.getParticipantsExceptMe()[0];
+                if (!contact) {
+                    return;
+                }
+                contact = chatRoom.megaChat.getContactFromJid(contact);
 
-            if (contact && contact.c === 0) {
-                // skip & leave, a non-contact conversation, e.g. contact removed.
-                Soon(function() {
-                    chatRoom.destroy();
-                });
-                return;
+                if (contact && contact.c === 0) {
+                    // skip & leave, a non-contact conversation, e.g. contact removed.
+                    Soon(function () {
+                        chatRoom.destroy();
+                    });
+                    return;
+                }
             }
 
             currConvsList.push(

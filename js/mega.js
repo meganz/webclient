@@ -1045,27 +1045,33 @@ function MegaData()
                 s, ftype, c, cc, star;
 
             for (var i in M.v) {
-                if (!M.v[i].name) {
-                    DEBUG('Skipping M.v node with no name.', M.v[i]);
+
+                var nodeData = M.v[i];
+                var nodeHandle = nodeData.h;
+
+                if (!nodeData.name) {
+                    DEBUG('Skipping M.v node with no name.', nodeData);
                     continue;
                 }
+
                 s  = '';
                 c  = '';
                 cc = null;
-                if (M.v[i].t) {
+
+                if (nodeData.t) {
                     ftype = l[1049];
                     c = ' folder';
                 }
                 else {
-                    ftype = filetype(M.v[i].name);
-                    s = htmlentities(bytesToSize(M.v[i].s));
+                    ftype = filetype(nodeData.name);
+                    s = htmlentities(bytesToSize(nodeData.s));
                 }
-                star = M.v[i].fav ? ' star' : '';
+                star = nodeData.fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
-                    cs = M.contactstatus(M.v[i].h);
+                    cs = M.contactstatus(nodeHandle);
                     contains = fm_contains(cs.files, cs.folders);
-                    u_h = M.v[i].p;
+                    u_h = nodeData.p;
                     rights = l[55];
                     rightsclass = ' read-only';
                     onlinestatus = M.onlineStatusClass(
@@ -1076,11 +1082,11 @@ function MegaData()
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
                     }
-                    if (M.v[i].r === 1) {
+                    if (nodeData.r === 1) {
                         rights = l[56];
                         rightsclass = ' read-and-write';
                     }
-                    else if (M.v[i].r === 2) {
+                    else if (nodeData.r === 2) {
                         rights = l[57];
                         rightsclass = ' full-access';
                     }
@@ -1091,13 +1097,13 @@ function MegaData()
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder" id="'
-                            + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
+                            + htmlentities(nodeHandle) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
                             + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
                             + '<span class="block-view-file-type folder"></span></span>'
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
-                            + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
+                            + htmlentities(nodeData.name) + '</span><span class="shared-folder-info">by '
                             + contactName + '</span></span></a>';
                     }
                     else {
@@ -1105,9 +1111,9 @@ function MegaData()
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="50"><span class="grid-status-icon ' + htmlentities(star)
+                        html = '<tr id="' + htmlentities(nodeHandle) + '"><td width="50"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
-                            + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
+                            + htmlentities(nodeData.name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
                             + '</div></div> </td><td width="240">'
                                  + avatar
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
@@ -1120,17 +1126,17 @@ function MegaData()
 
                 // switching from contacts tab
                 else if (M.currentdirid.length === 11 && M.currentrootid === 'contacts') {
-                    cs = M.contactstatus(M.v[i].h);
+                    cs = M.contactstatus(nodeHandle);
                     contains = fm_contains(cs.files, cs.folders);
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
                     }
                     var rights = l[55], rightsclass = ' read-only';
-                    if (M.v[i].r === 1) {
+                    if (nodeData.r === 1) {
                         rights = l[56];
                         rightsclass = ' read-and-write';
                     }
-                    else if (M.v[i].r === 2) {
+                    else if (nodeData.r === 2) {
                         rights = l[57];
                         rightsclass = ' full-access';
                     }
@@ -1138,27 +1144,27 @@ function MegaData()
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.contact-details-view .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block folder">\n\
+                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block folder">\n\
                                     <span class="file-status-icon"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="shared-folder-access ' + rightsclass + '"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type folder-shared"><img alt=""></span>\n\
                                     </span>\n\
-                                    <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
+                                    <span class="file-block-title">' + htmlentities(nodeData.name) + '</span>\n\
                                 </a>';
                     }
                     else {
                         t = '.contacts-details-block .grid-table.shared-with-me';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
+                        html = '<tr id="' + htmlentities(nodeHandle) + '">\n\
                                     <td width="50">\n\
                                         <span class="grid-status-icon"></span>\n\
                                     </td>\n\
                                     <td>\n\
                                         <div class="shared-folder-icon"></div>\n\
                                         <div class="shared-folder-info-block">\n\
-                                            <div class="shared-folder-name">' + htmlentities(M.v[i].name) + '</div>\n\
+                                            <div class="shared-folder-name">' + htmlentities(nodeData.name) + '</div>\n\
                                             <div class="shared-folder-info">' + contains + '</div>\n\
                                         </div>\n\
                                     </td>\n\
@@ -1173,50 +1179,48 @@ function MegaData()
                 }
                 else {
 
-                    if (M.v[i].shares) {
-                        iShareNum = Object.keys(M.v[i].shares).length;
+                    if (nodeData.shares) {
+                        iShareNum = Object.keys(nodeData.shares).length;
                     }
                     else {
                         iShareNum = 0;
                     }
                     bShare = (
-                        (M.v[i].shares && M.v[i].shares.EXP && iShareNum > 1)
-                        || (M.v[i].shares && !M.v[i].shares.EXP && iShareNum)
-                        || M.ps[M.v[i].h])
+                        (nodeData.shares && nodeData.shares.EXP && iShareNum > 1)
+                        || (nodeData.shares && !nodeData.shares.EXP && iShareNum)
+                        || M.ps[nodeHandle])
                         ? true : false;
-                    sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
+                    sExportLink = (nodeData.shares && nodeData.shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                     additionClass = '';
                     titleTooltip = '';
-                    fName = htmlentities(M.v[i].name);
-                    fIcon = fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name});
+                    fName = htmlentities(nodeData.name);
+                    fIcon = fileIcon({t: nodeData.t, share: bShare, name: nodeData.name});
 
-                    if (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) {
+                    if (nodeData && nodeData.shares && nodeData.shares.EXP && nodeData.shares.EXP.down) {
                         additionClass = 'taken-down';
-                        titleTooltip = (M.v[i].t === 1) ? l[7705] : l[7704];
+                        titleTooltip = (nodeData.t === 1) ? l[7705] : l[7704];
                     }
 
-                    /*
                     // Undecryptable file indicators
-                    if (undecryptable) {
-                        additionClass = 'undecryptable';
-                        titleTooltip = 'We are waiting for the cryptographic key to this file';
-                        fName = 'undecrypted file';
-                        fIcon = 'generic';
-                        ftype = l[7381];
-                    }
-                    */
+//                    if (missingkeys[nodeHandle]) {
+//                        additionClass = 'undecryptable';
+//                        titleTooltip = 'We are waiting for the cryptographic key to this file';
+//                        fName = 'undecrypted file';
+//                        fIcon = 'generic';
+//                        ftype = l[7381];
+//                    }
 
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
+                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block' + c + ' ' + sExportLink + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileIcon({t: nodeData.t, share: bShare, name: nodeData.name}) + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + fName + '</span>\n\
                                 </a>';
@@ -1224,20 +1228,20 @@ function MegaData()
 
                     // List view
                     else {
-                        if (M.lastColumn && M.v[i].p !== "contacts") {
-                            time = time2date(M.v[i][M.lastColumn] || M.v[i].ts);
+                        if (M.lastColumn && nodeData.p !== "contacts") {
+                            time = time2date(nodeData[M.lastColumn] || nodeData.ts);
                         }
                         else {
-                            time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
+                            time = time2date(nodeData.ts || (nodeData.p === 'contacts' && M.contactstatus(nodeHandle).ts));
                         }
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
+                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + c + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
                                     <td width="50">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"> </span>\n\
+                                        <span class="transfer-filtype-icon ' + fileIcon({t: nodeData.t, share: bShare, name: nodeData.name}) + '"> </span>\n\
                                         <span class="tranfer-filetype-txt">' + fName + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
@@ -1250,11 +1254,11 @@ function MegaData()
                                 </tr>';
                     }
 
-                    if (!(M.v[i].seen = n_cache > files++)) {
-                        cc = [i, html, M.v[i].h, M.v[i].t];
+                    if (!(nodeData.seen = n_cache > files++)) {
+                        cc = [i, html, nodeHandle, nodeData.t];
                     }
                 }
-                mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u, cc);
+                mInsertNode(nodeData, M.v[i-1], M.v[i+1], t, el, html, u, cc);
             }
         }// renderLayout END
 

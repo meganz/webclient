@@ -108,6 +108,10 @@ def reduce_jshint(file_line_mapping, **extra):
     files_to_test = [os.path.join(*x)
                      for x in file_line_mapping.keys()
                      if x[-1].split('.')[-1] in ['js', 'jsx']]
+
+    if len(files_to_test) == 0:
+        return '', 0
+
     command = config.JSHINT_COMMAND.format(binary=config.JSHINT_BIN,
                                            rules=rules,
                                            files=' '.join(files_to_test))
@@ -148,7 +152,7 @@ def reduce_jshint(file_line_mapping, **extra):
 
 def reduce_jscs(file_line_mapping, **extra):
     """
-    Runs JSHCS on the project with the default configured rules. The output
+    Runs JSCS on the project with the default configured rules. The output
     is reduced to only contain entries from the Git change set.
 
     :param file_line_mapping: Mapping of files with changed lines (obtained
@@ -164,10 +168,16 @@ def reduce_jscs(file_line_mapping, **extra):
     logging.info('Obtaining JSCS output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
-    files_to_test = ' '.join([os.path.join(*x)
-                              for x in file_line_mapping.keys()])
+    files_to_test = [os.path.join(*x)
+                     for x in file_line_mapping.keys()
+                     if x[-1].split('.')[-1] in ['js', 'jsx']]
+
+    if len(files_to_test) == 0:
+        return '', 0
+
     command = config.JSCS_COMMAND.format(binary=config.JSCS_BIN,
-                                         rules=rules, files=files_to_test)
+                                         rules=rules,
+                                         files=' '.join(files_to_test))
     output = None
     try:
         output = subprocess.check_output(command.split())
@@ -227,7 +237,7 @@ def reduce_minifiedjs(file_line_mapping, **extra):
         filenameonly, file_extension = os.path.splitext(file_path)
 
         # Ignore known custom made files
-        if file_path in config.MINIFICATION_IGNORE_FILES:            
+        if file_path in config.MINIFICATION_IGNORE_FILES:
             continue
 
         # Ignore this entry e.g. html or json files
@@ -281,7 +291,7 @@ def reduce_cppcheck(file_line_mapping, **extra):
     if 'platform' in extra:
         # Override if given.
         platform = extra['platform']
-        
+
     # Get the CppCheck output.
     os.chdir(PROJECT_PATH)
     command = config.CPPCHECK_COMMAND.format(command=config.CPPCHECK_BIN,
@@ -295,7 +305,7 @@ def reduce_cppcheck(file_line_mapping, **extra):
         # But we still want the output in the same fashion.
         output = ex.output
     output = output.decode('utf8').split('\n')
-    
+
     # Go through output and collect only relevant lines to the result.
     logging.debug('Reducing CppCheck output ...')
     result = ['\nCppCheck output:\n================\n']
@@ -329,7 +339,7 @@ def reduce_nsiqcppstyle(file_line_mapping, **extra):
         an integer containing the number of failed rules.
     """
     logging.info("Obtaining N'SIQ CppStyle output ...")
-    
+
     # Get the output.
     outfile = tempfile.mktemp()
     os.chdir(PROJECT_PATH)
@@ -349,7 +359,7 @@ def reduce_nsiqcppstyle(file_line_mapping, **extra):
     # Get the output and delete the outfile.
     output = open(outfile, 'rt').read().split('\n')
     os.remove(outfile)
-    
+
     # Go through output and collect only relevant lines to the result.
     logging.debug("Reducing N'SIQ CppStyle output ...")
     result = ["\nN'SIQ CppStyle output:\n======================\n"]
@@ -439,7 +449,7 @@ def reduce_verapp(file_line_mapping, **extra):
     error_count = len(result) - 1
     result.append('\n{} errors'.format(error_count))
     return '\n'.join(result), error_count
-    
+
 
 def main(base, target, norules):
     """
@@ -451,7 +461,7 @@ def main(base, target, norules):
                        'cppcheck': reduce_cppcheck,
                        'nsiqcppstyle': reduce_nsiqcppstyle,
                        'vera++': reduce_verapp}
-    
+
     file_line_mapping = get_git_line_sets(base, target)
     results = []
     total_errors = 0
@@ -461,11 +471,11 @@ def main(base, target, norules):
         output, error_count = worker(file_line_mapping, **extra_options)
         results.append(output)
         total_errors += error_count
-        
+
         # If a minified file was found, quit the rest of the checks or they will hang
         if checker == 'minifiedjs' and error_count > 0:
             break
-    
+
     logging.info('Output of reduced results ...')
     print('\n\n'.join(results))
     if total_errors > 0:

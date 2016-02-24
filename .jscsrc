@@ -1,6 +1,3 @@
-
-
-
 {
     "requireCurlyBraces": [
         "if",
@@ -132,8 +129,6 @@
         "keygen.js",
         "karma.conf.js",
         "js/chat/mpenc.js",
-        "js/chat/bundle.js",
-        "mobile_privacy.html",
-        "mobile_terms.html"
+        "js/chat/bundle.js"
     ]
 }

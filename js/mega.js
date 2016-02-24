@@ -192,16 +192,14 @@ function MegaData()
 
     this.sortByName = function(d)
     {
-        // if (typeof Intl !== 'undefined' && Intl.Collator)
-        // {
-            // var intl = new Intl.Collator('co', { numeric: true });
+        if (typeof Intl !== 'undefined' && Intl.Collator) {
+            var intl = new Intl.Collator('co', { numeric: true });
 
-            // this.sortfn = function(a,b,d)
-            // {
-                // return intl.compare(a.name,b.name)*d;
-            // };
-        // }
-        // else
+            this.sortfn = function(a, b, d) {
+                return intl.compare(a.name, b.name) * d;
+            };
+        }
+        else
         {
             this.sortfn = function(a,b,d)
             {

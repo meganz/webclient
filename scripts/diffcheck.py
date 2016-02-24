@@ -224,8 +224,14 @@ def reduce_minifiedjs(file_line_mapping, **extra):
 
     for filename, line_set in file_line_mapping.items():
         file_path = '/'.join(filename)
-        if file_path in config.MINIFICATION_IGNORE_FILES:
-            # Ignore this entry.
+        filenameonly, file_extension = os.path.splitext(file_path)
+
+        # Ignore known custom made files
+        if file_path in config.MINIFICATION_IGNORE_FILES:            
+            continue
+
+        # Ignore this entry e.g. html or json files
+        if file_extension not in config.MINIFICATION_FILE_TYPES:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file

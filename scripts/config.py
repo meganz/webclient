@@ -36,7 +36,7 @@ VERAPP_BIN = 'vera++'
 NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 JSHINT_RULES = '--verbose'
 JSCS_RULES = '--verbose'
-MINIFICATION_FILE_TYPES = ['js', 'jsx']
+MINIFICATION_FILE_TYPES = ['.js', '.jsx']
 MINIFICATION_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js']
 MINIFICATION_THRESHOLD = 200 # Max chars per line to trigger.
 

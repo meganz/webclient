@@ -2668,7 +2668,7 @@
     "7588": "Vypl\u0148te jm\u00e9no, e-mailovou adresu a heslo MEGA.",
     "7589": "P\u0159esunout polo\u017eku do ko\u0161e?",
     "7590": "P\u0159esunout polo\u017eky do ko\u0161e?",
-    "7591": "M\u00e1te vybr\u00e1no v\u00edce ne\u017e {0} polo\u017eek ({0}) ke sta\u017een\u00ed. Chcete pokra\u010dovat?",
+    "7591": "M\u00e1te vybr\u00e1no v\u00edce ne\u017e {0} polo\u017eek ({1}) ke sta\u017een\u00ed. Chcete pokra\u010dovat?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Na\u010d\u00edt\u00e1n\u00ed soubor\u016f a slo\u017eek... [{0}]",
@@ -3154,10 +3154,13 @@
     "8577": "Vy\u017eadov\u00e1n\u00ed dat \u00fa\u010dtu",
     "8578": "Z\u00edsk\u00e1v\u00e1n\u00ed dat \u00fa\u010dtu",
     "8579": "De\u0161ifrov\u00e1n\u00ed",
-    "8580": "File import failed [{0}]",
-    "8584": "Requesting folder data",
-    "8585": "Receiving folder data",
-    "8586": "Decrypting folder data",
+    "8580": "Import souboru selhal [{0}]",
+    "8584": "Vy\u017eadov\u00e1n\u00ed dat slo\u017eky",
+    "8585": "Z\u00edsk\u00e1v\u00e1n\u00ed dat slo\u017eky",
+    "8586": "De\u0161ifrov\u00e1n\u00ed dat slo\u017eky",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3189,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

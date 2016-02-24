@@ -744,6 +744,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
     else {
         self.megaChat.refreshConversations();
     }
+
     setTimeout(function() {
         mc.chats.remove(roomJid);
     }, 1);

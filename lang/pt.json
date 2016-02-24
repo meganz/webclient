@@ -3154,6 +3154,10 @@
     "8577": "A pedir dados da conta",
     "8578": "A receber dados da conta",
     "8579": "A desencriptar",
+    "8580": "File import failed [{0}]",
+    "8584": "Requesting folder data",
+    "8585": "Receiving folder data",
+    "8586": "Decrypting folder data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

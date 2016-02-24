@@ -195,6 +195,7 @@ function init_page() {
             pfkey = ar[1].replace(/[^\w-]+/g, "");
         }
         // TODO: Rename pfid, pfkey, and pfhandle around our codebase
+        pfhandle = false;
         if (ar[2]) {
             pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
@@ -278,7 +279,7 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            if (u_type === 3 && !folderlink) {
+            if (u_type === 3 && !pfid && !folderlink) {
                 mega.config.fetch();
             }
 
@@ -1733,7 +1734,15 @@ function topmenuUI() {
 
 
     $('.top-head .logo').rebind('click', function () {
-        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
+        if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
+            if (folderlink) {
+                M.openFolder(M.RootID, true);
+            }
+            else {
+                document.location.hash =
+                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
+            }
+        }
     });
 
     var c = $('.fm-dialog.registration-page-success').attr('class');

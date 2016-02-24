@@ -55,8 +55,17 @@ if (typeof loadingInitDialog === 'undefined') {
     var loadingInitDialog = {};
     loadingInitDialog.progress = false;
     loadingInitDialog.active = false;
-
     loadingInitDialog.show = function() {
+        if (pfid) {
+            $('.loading-spinner .step1').text(l[8584]);
+            $('.loading-spinner .step2').text(l[8585]);
+            $('.loading-spinner .step3').text(l[8586]);
+        }
+        else {
+            $('.loading-spinner .step1').text(l[8577]);
+            $('.loading-spinner .step2').text(l[8578]);
+            $('.loading-spinner .step3').text(l[8579]);
+        }
         this.hide();
         $('.light-overlay').show();
         $('.loading-spinner').removeClass('hidden').addClass('init active');
@@ -275,11 +284,15 @@ function MegaData()
     {
         this.sortfn = function(a, b, d)
         {
-            var usera = M.d[a.p], userb = M.d[b.p];
-            if (typeof usera.name == 'string' && typeof userb.name == 'string')
+            var usera = Object(M.d[a.p]);
+            var userb = Object(M.d[b.p]);
+
+            if (typeof usera.name === 'string' && typeof userb.name === 'string') {
                 return usera.name.localeCompare(userb.name) * d;
-            else
+            }
+            else {
                 return -1;
+            }
         }
         this.sortd = d;
         this.sort();
@@ -4036,7 +4049,77 @@ function MegaData()
         }
     };
 
-    this.addDownload = function(n, z, preview, zipname)
+    this.addDownload = function(n, z, preview) {
+        var args = arguments;
+        var webdl = function() {
+            M.addWebDownload.apply(M, args);
+            args = undefined;
+        };
+
+        if (z || preview) {
+            return webdl();
+        }
+
+        dlmanager.isMEGAsyncRunning(0x02010100)
+            .done(function(sync) {
+                var cmd = {
+                    a: 'd',
+                    auth: folderlink ? M.RootID : u_sid
+                };
+                var files = [];
+
+                var addNode = function(node) {
+                    var item = {
+                        t: node.t,
+                        h: node.h,
+                        p: node.p,
+                        n: base64urlencode(node.name),
+                    };
+                    if (!node.t) {
+                        item.s = node.s;
+                        item.ts = node.mtime || node.ts;
+                        if (Object(node.key).length) {
+                            item.k = a32_to_base64(node.key);
+                        }
+                    }
+                    files.push(item);
+
+                    if (node.t) {
+                        foreach(fm_getnodes(node.h));
+                    }
+                };
+
+                var foreach = function(nodes) {
+                    for (var i in nodes) {
+                        if (nodes.hasOwnProperty(i)) {
+                            var node = M.d[nodes[i]];
+
+                            if (node) {
+                                addNode(node);
+                            }
+                        }
+                    }
+                };
+
+                foreach(n);
+
+                if (!files.length) {
+                    console.error('No files...');
+                    return webdl();
+                }
+
+                cmd.f = files;
+
+                sync.megaSyncRequest(cmd)
+                    .done(function() {
+                        showToast('megasync', 'Download added to MEGAsync', 'Open');
+                    })
+                    .fail(webdl);
+            })
+            .fail(webdl);
+    };
+
+    this.addWebDownload = function(n, z, preview, zipname)
     {
         delete $.dlhash;
         var path;
@@ -5814,18 +5897,16 @@ function loadfm(force)
         loadfm.loaded = false;
     }
     if (loadfm.loaded) {
-        Soon(loadfm_done.bind(this, pfkey));
+        Soon(loadfm_done.bind(this, -0x800e0fff));
     }
     else {
         if (is_fm()) {
             loadingDialog.show();
-
         }
         if (!loadfm.loading) {
             M.reset();
             fminitialized = false;
             loadfm.loading = true;
-            var sp = new Error('loadfm-stack-pointer');
             setTimeout(function __lazyLoadFM() {
 
                 loadingDialog.hide();
@@ -5836,8 +5917,7 @@ function loadfm(force)
                     callback: loadfm_callback,
                     progress: function(perc) {
                         loadingInitDialog.step2(parseInt(perc));
-                    },
-                    stackPointer: sp
+                    }
                 },n_h ? 1 : 0);
             }, 350);
         }
@@ -6817,6 +6897,7 @@ function init_chat() {
     function __init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
+
             try {
                 // Prevent known Strophe exceptions...
                 if (!Strophe.Websocket.prototype._unsafeOnIdle) {
@@ -6838,19 +6919,19 @@ function init_chat() {
                     console.error(ex);
                 }
             }
-            //try {
-                window.megaChat = new Chat();
-                window.megaChat.init();
+
+            var _chat = new Chat();
+
+            // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
+            if (!window.megaChatIsDisabled) {
+                window.megaChat = _chat;
+                megaChat.init();
 
                 if (fminitialized) {
                     //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }
-            //}
-            //catch (ex) {
-            //    console.error(ex);
-            //    megaChatIsDisabled = true;
-            //}
+            }
         }
     }
     if (folderlink) {
@@ -6858,7 +6939,7 @@ function init_chat() {
     }
     else if (!megaChatIsDisabled) {
         if (pubEd25519[u_handle]) {
-            __init_chat();
+            Soon(__init_chat);
         }
         else {
             mBroadcaster.once('pubEd25519', __init_chat);
@@ -6872,9 +6953,7 @@ function init_chat() {
 
 function loadfm_callback(res, ctx) {
 
-
     loadingInitDialog.step3();
-
 
     if (pfkey) {
         if (res.f && res.f[0]) {
@@ -6883,11 +6962,12 @@ function loadfm_callback(res, ctx) {
         }
         folderlink = pfid;
     }
+
     if (typeof res === 'number') {
-        loadfm_done(pfkey, ctx.stackPointer);
         msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
         return;
     }
+
     if (res.u) {
         process_u(res.u);
     }
@@ -6927,8 +7007,6 @@ function loadfm_callback(res, ctx) {
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
-        loadfm_done(pfkey, ctx.stackPointer);
-
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -6936,21 +7014,26 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        // We want to fetch initial notifications afterwards, if this is not a logged out user on the public folder page.
-        getsc(false, !pfkey);
+        // Retrieve initial batch of action-packets, if any
+        // we'll then complete the process using loadfm_done
+        getsc();
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);
         }
     });
-
 }
 
-function loadfm_done(pfkey, stackPointer) {
+/**
+ * Function to be invoked when the cloud has finished loaded,
+ * being the nodes loaded from either server or local cache.
+ * @param {Boolean} mDBload whether it came from local cache.
+ */
+function loadfm_done(mDBload) {
     loadfm.loaded = Date.now();
     loadfm.loading = false;
 
-    if (d > 1) console.error('loadfm_done', stackPointer, is_fm());
+    if (d > 1) console.error('loadfm_done', mDBload, is_fm());
 
     mega.config.ready(function() {
         init_chat();
@@ -6965,7 +7048,21 @@ function loadfm_done(pfkey, stackPointer) {
             loadingInitDialog.hide();
         }
 
-        watchdog.notify('loadfm_done');
+        // -0x800e0fff indicates a call to loadfm() when it was already loaded
+        if (mDBload !== -0x800e0fff) {
+            Soon(function _initialNotify() {
+                // After the first SC request all subsequent requests can generate notifications
+                notify.initialLoadComplete = true;
+
+                // If this was called from the initial fm load via gettree or db load, we should request the
+                // latest notifications. These must be done after the first getSC call.
+                if (!folderlink) {
+                    notify.getInitialNotifications();
+                }
+            });
+        }
+
+        watchdog.notify('loadfm_done', mDBload);
     });
 }
 

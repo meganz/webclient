@@ -657,6 +657,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
             .replace("ws:", "wss:")
             .replace("31.216.147.155", "chattest.userstorage.mega.co.nz")
     );
+
     self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
 };
 

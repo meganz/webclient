@@ -6697,6 +6697,7 @@ table {
 .fm-right-files-block, .fm-right-account-block {
     height: 100%;
     margin-left: 304px;
+    position: relative;
 }
 .fm-right-header, .fm-tranfers-header {
     padding-right: 8px;
@@ -24223,8 +24224,12 @@ a.ui-datepicker-next {
 }
 .empty-block {
     height: 100%;
-    position: relative;
+    position: absolute;
     min-height: 380px;
+        width: 100%;
+    width: -webkit-calc(100% -256px);
+    width: -moz-calc(100% - 256px);
+    width: calc(100% - 256px);
     overflow: hidden;
 }
 .empty-pad {
@@ -24250,7 +24255,7 @@ a.ui-datepicker-next {
     color: #777777;
 }
 .empty-pad.conversations {
-    margin-top: -168px;
+    margin-top: -125px;
 }
 .empty-icon.conversations {
     background-position: center 0px;

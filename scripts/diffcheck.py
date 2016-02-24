@@ -220,12 +220,20 @@ def reduce_minifiedjs(file_line_mapping, **extra):
     logging.info('Checking for minified JavaScript ...')
     result = ['\nMinification detection output:\n'
               '==============================']
+    warning = 'This is a security product. Do not add unverifiable code to the repository!'
+
     for filename, line_set in file_line_mapping.items():
         file_path = '/'.join(filename)
-        if (filename[0] not in config.MINIFICATION_CHECK_DIRS
-                or file_path in config.MINIFICATION_IGNORE_FILES):
+        if file_path in config.MINIFICATION_IGNORE_FILES:
             # Ignore this entry.
             continue
+
+        # If .min.js is in the filename (most basic detection), then log it and move onto the next file
+        if '.min.js' in file_path:
+            result.append('Minified/obfuscated code found in file {}. {}'
+                          .format(file_path, warning))
+            continue
+
         with open(file_path, 'r') as fd:
             # Check line lengths in file.
             line_number = 0
@@ -235,10 +243,12 @@ def reduce_minifiedjs(file_line_mapping, **extra):
                     # Not a changed line.
                     continue
                 line_length = len(line)
+
+                # If line length exceeded, log it and move onto the next file
                 if line_length > config.MINIFICATION_THRESHOLD:
-                    result.append('Minified code found in file {}, line {}'
-                                  ' (length {})'
-                                  .format(file_path, line_number, line_length))
+                    result.append('Minified/obfuscated found in file {}, line {} (length {}). {}'
+                                  .format(file_path, line_number, line_length, warning))
+                    break
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
@@ -445,6 +455,11 @@ def main(base, target, norules):
         output, error_count = worker(file_line_mapping, **extra_options)
         results.append(output)
         total_errors += error_count
+        
+        # If a minified file was found, quit the rest of the checks or they will hang
+        if checker == 'minifiedjs' and error_count > 0:
+            break
+    
     logging.info('Output of reduced results ...')
     print('\n\n'.join(results))
     if total_errors > 0:

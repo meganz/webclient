@@ -12618,5 +12618,21 @@
     "8579": {
         "text": "Decrypting",
         "context": "Stage 3 of 3 when a user is loading his account in the web app. This is the stage where the request has completed and the web app is decrypting the data."
+    },
+    "8580": {
+        "text": "File import failed [{0}]",
+        "context": "Message of the dialog displayed when it fails the process\/request to import an image.\r\n\r\nPreserve the [{0}] code because this is for including the error code or the error message at runtime."
+    },
+    "8584": {
+        "text": "Requesting folder data",
+        "context": "Stage 1\/3 of requesting the data of a folder link. At this stage the data is being prepared on the server side."
+    },
+    "8585": {
+        "text": "Receiving folder data",
+        "context": "Stage 2\/3: receiving the data of a folder link. At this stage the data is being transferred from the server to the client (with progress)."
+    },
+    "8586": {
+        "text": "Decrypting folder data",
+        "context": "Stage 3\/3: the folder data is being decrypted."
     }
 }

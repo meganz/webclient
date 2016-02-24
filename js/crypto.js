@@ -1647,12 +1647,6 @@ var from8 = firefox_boost ? mozFrom8 : function (utf8) {
     return decodeURIComponent(escape(utf8));
 };
 
-function getxhr() {
-    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined')
-        ? new XDomainRequest()
-        : new XMLHttpRequest();
-}
-
 // API command queueing
 // All commands are executed in sequence, with no overlap
 // @@@ user warning after backoff > 1000
@@ -1811,7 +1805,7 @@ function api_proc(q) {
                     }
                     catch (e) {}
                 }
-                if (!bytes) {
+                if (!bytes || bytes < 10) {
                     return false;
                 }
                 if (evt.loaded > 0) {
@@ -2034,32 +2028,26 @@ function stopsc() {
     }
 }
 
-// calls execsc() with server-client requests received
-function getsc(fm, initialNotify) {
+/**
+ * calls execsc() with server-client requests received
+ * @param {Boolean} mDBload whether invoked from indexedDB.
+ */
+function getsc(mDBload) {
     api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
-        fm: fm,
-        initialNotify: initialNotify,
+        mDBload: mDBload,
         callback: function __onGetSC(res, ctx) {
             if (typeof res === 'object') {
                 function getSCDone(sma) {
                     if (sma !== -0x7ff
-                            // && typeof mDBloaded !== 'undefined'
                             && !folderlink && !pfid
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
-                    if (ctx.fm) {
-                        // mDBloaded = true;
-                        loadfm_done();
-                    }
 
-                    // After the first SC request all subsequent requests can generate notifications
-                    notify.initialLoadComplete = true;
-
-                    // If this was called from the initial fm load via gettree or db load, we should request the
-                    // latest notifications. These must be done after the first getSC call.
-                    if (ctx.fm || ctx.initialNotify) {
-                        notify.getInitialNotifications();
+                    // If we're loading the cloud, notify completion only
+                    // once first action-packets have been processed.
+                    if (!fminitialized) {
+                        loadfm_done(ctx.mDBload);
                     }
                 }
                 if (res.w) {

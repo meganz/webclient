@@ -179,17 +179,60 @@ var megasync = (function() {
         }
     };
 
+    /**
+     * Perform an http request to the running MEGAsync instance.
+     *
+     * @param {Object}   args    parameters to send.
+     * @param {Function} resolve on promise's resolve (Optional)
+     * @param {Function} reject  on promise's reject (Optional)
+     * @return {MegaPromise}
+     */
+    function megaSyncRequest(args, resolve, reject) {
+
+        try {
+            args = JSON.stringify(args);
+        }
+        catch (ex) {
+            if (typeof reject === 'function') {
+                reject(ex);
+            }
+            return MegaPromise.reject(ex);
+        }
+
+        var promise = mega.utils.xhr({
+            url: megasyncUrl,
+            data: args,
+            type: 'json'
+        });
+
+        if (typeof resolve === 'function') {
+            promise.done(function() {
+                try {
+                    resolve.apply(null, arguments);
+                }
+                catch (ex) {
+                    if (typeof reject === 'function') {
+                        reject(ex);
+                    }
+                    else {
+                        throw ex;
+                    }
+                }
+            });
+        }
+
+        if (typeof reject === 'function') {
+            promise.fail(reject);
+        }
+
+        return promise;
+    }
 
     function SyncAPI(args, next) {
 
-        mega.utils.xhr({
-            url: megasyncUrl,
-            data: JSON.stringify(args),
-            type: 'json'
-        }).done(function(ev, response) {
-
+        megaSyncRequest(args, function(ev, response) {
             api_handle(next, response);
-        }).fail(function(ev) {
+        }, function(ev) {
             handler.error(next, ev);
         });
     }
@@ -284,6 +327,7 @@ var megasync = (function() {
         SyncAPI({a: "v"}, next);
     };
 
+    ns.megaSyncRequest = megaSyncRequest;
+
     return ns;
 })();
-

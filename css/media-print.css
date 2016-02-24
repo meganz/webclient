@@ -16,6 +16,10 @@
         padding-top: 0px !important;
     }
 
+    .main-pad-block {
+        padding-bottom: 0px !important;
+    }
+
     .nw-bottom-block {
         height: 48px;
         position: relative !important;
@@ -33,6 +37,11 @@
         width: 100% !important;
         position: absolute !important;
         overflow: visible !important;
+        min-height: auto !important;
+    }
+
+    .jspContainer {
+        height: auto !important;
     }
 
 }

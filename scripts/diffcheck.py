@@ -41,7 +41,6 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 PATH_SPLITTER = re.compile(r'\\|/')
 
-
 def get_git_line_sets(base, target):
     """
     Obtains the Git diff between the base and target to identify the lines that
@@ -56,7 +55,14 @@ def get_git_line_sets(base, target):
     # Get the Git output for the desired diff.
     logging.info('Extracting relevant lines from Git diff ...')
     command = 'git diff -U0 {} {}'.format(base, target)
-    output = subprocess.check_output(command.split())
+    try:
+        output = subprocess.check_output(command.split())
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('Git not installed. Install it first.')
+        else:
+            logging.error('Error calling Git: {}'.format(ex))
+        return {}
     diff = output.decode('latin1').split('\n')
 
     # Hunt down lines of changes for different files.
@@ -99,8 +105,12 @@ def reduce_jshint(file_line_mapping, **extra):
     logging.info('Obtaining JSHint output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
+    files_to_test = [os.path.join(*x)
+                     for x in file_line_mapping.keys()
+                     if x[-1].split('.')[-1] in ['js', 'jsx']]
     command = config.JSHINT_COMMAND.format(binary=config.JSHINT_BIN,
-                                           rules=rules)
+                                           rules=rules,
+                                           files=' '.join(files_to_test))
     output = None
     try:
         output = subprocess.check_output(command.split())
@@ -108,6 +118,13 @@ def reduce_jshint(file_line_mapping, **extra):
         # JSHint found something, so it has returned an error code.
         # But we still want the output in the same fashion.
         output = ex.output
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('JSHint not installed.'
+                          ' Try to do so with `npm install`.')
+        else:
+            logging.error('Error calling JSHint: {}'.format(ex))
+        return '*** JSHint: {} ***'.format(ex), 0
     output = output.decode('utf8').split('\n')
 
     # Go through output and collect only relevant lines to the result.
@@ -147,8 +164,10 @@ def reduce_jscs(file_line_mapping, **extra):
     logging.info('Obtaining JSCS output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
+    files_to_test = ' '.join([os.path.join(*x)
+                              for x in file_line_mapping.keys()])
     command = config.JSCS_COMMAND.format(binary=config.JSCS_BIN,
-                                         rules=rules)
+                                         rules=rules, files=files_to_test)
     output = None
     try:
         output = subprocess.check_output(command.split())
@@ -156,6 +175,13 @@ def reduce_jscs(file_line_mapping, **extra):
         # JSCS found something, so it has returned an error code.
         # But we still want the output in the same fashion.
         output = ex.output
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('JSCS not installed.'
+                          ' Try to do so with `npm install`.')
+        else:
+            logging.error('Error calling JSCS: {}'.format(ex))
+        return '*** JSCS: {} ***'.format(ex), 0
     output = output.decode('utf8').split('\n\n')
 
     # Go through output and collect only relevant lines to the result.
@@ -172,7 +198,7 @@ def reduce_jscs(file_line_mapping, **extra):
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list.
             if line_no in file_line_mapping[file_name]:
-                result.append(item)
+                result.append(item[:500])
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
@@ -194,12 +220,20 @@ def reduce_minifiedjs(file_line_mapping, **extra):
     logging.info('Checking for minified JavaScript ...')
     result = ['\nMinification detection output:\n'
               '==============================']
-    for filename, line_set in file_line_mapping.iteritems():
+    warning = 'This is a security product. Do not add unverifiable code to the repository!'
+
+    for filename, line_set in file_line_mapping.items():
         file_path = '/'.join(filename)
-        if (filename[0] not in config.MINIFICATION_CHECK_DIRS
-                or file_path in config.MINIFICATION_IGNORE_FILES):
+        if file_path in config.MINIFICATION_IGNORE_FILES:
             # Ignore this entry.
             continue
+
+        # If .min.js is in the filename (most basic detection), then log it and move onto the next file
+        if '.min.js' in file_path:
+            result.append('Minified/obfuscated code found in file {}. {}'
+                          .format(file_path, warning))
+            continue
+
         with open(file_path, 'r') as fd:
             # Check line lengths in file.
             line_number = 0
@@ -209,10 +243,12 @@ def reduce_minifiedjs(file_line_mapping, **extra):
                     # Not a changed line.
                     continue
                 line_length = len(line)
+
+                # If line length exceeded, log it and move onto the next file
                 if line_length > config.MINIFICATION_THRESHOLD:
-                    result.append('Minified code found in file {}, line {}'
-                                  ' (length {})'
-                                  .format(file_path, line_number, line_length))
+                    result.append('Minified/obfuscated found in file {}, line {} (length {}). {}'
+                                  .format(file_path, line_number, line_length, warning))
+                    break
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
@@ -419,6 +455,11 @@ def main(base, target, norules):
         output, error_count = worker(file_line_mapping, **extra_options)
         results.append(output)
         total_errors += error_count
+        
+        # If a minified file was found, quit the rest of the checks or they will hang
+        if checker == 'minifiedjs' and error_count > 0:
+            break
+    
     logging.info('Output of reduced results ...')
     print('\n\n'.join(results))
     if total_errors > 0:

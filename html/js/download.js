@@ -146,19 +146,21 @@ function dl_g(res) {
                 onDownloadError: dlerror,
                 onBeforeDownloadComplete: function() { }
             };
-            var n = fdl_file.n || 'unknown';
-            var n_l = n.length;
-            $('.file-info .download.info-txt.filename').text(n);
+            
+            var filename = htmlentities(fdl_file.n) || 'unknown';
+            var filenameLength = filename.length;
+            
+            $('.file-info .download.info-txt.filename').text(filename).attr('title', filename);
             $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
-            $('.info-block .block-view-file-type').addClass(fileIcon({name: n}));
+            $('.info-block .block-view-file-type').addClass(fileIcon({ name: filename }));
 
             // XXX: remove this once all browsers support `text-overflow: ellipsis;`
             Soon(function() {
-                while (n_l-- && $('.download.info-txt.filename').width() > 316) {
-                    $('.file-info .download.info-txt.filename').text(str_mtrunc(n, n_l));
+                while (filenameLength-- && $('.download.info-txt.filename').width() > 316) {
+                    $('.file-info .download.info-txt.filename').text(str_mtrunc(filename, filenameLength));
                 }
-                if (n_l < 1) {
-                    $('.file-info .download.info-txt.filename').text(str_mtrunc(n, 37));
+                if (filenameLength < 1) {
+                    $('.file-info .download.info-txt.filename').text(str_mtrunc(filename, 37));
                 }
             });
 

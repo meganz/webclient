@@ -114,9 +114,11 @@ function init_page() {
         $('body').attr('class', 'not-logged');
     }
     else {
-        // Todo: check if cleaning the whole class is ok..
         $('body').attr('class', '');
     }
+
+    // Initialise the Public Service Announcement system
+    psa.init();
 
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
@@ -193,6 +195,7 @@ function init_page() {
             pfkey = ar[1].replace(/[^\w-]+/g, "");
         }
         // TODO: Rename pfid, pfkey, and pfhandle around our codebase
+        pfhandle = false;
         if (ar[2]) {
             pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
@@ -276,7 +279,7 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            if (u_type === 3) {
+            if (u_type === 3 && !pfid && !folderlink) {
                 mega.config.fetch();
             }
 
@@ -1037,6 +1040,7 @@ function tooltiplogin() {
                     document.location.hash = login_next;
                 }
                 else if (page !== 'login') {
+                    page = document.location.hash.substr(1);
                     init_page();
                 }
                 else {
@@ -1667,11 +1671,19 @@ function topmenuUI() {
         $('.top-search-bl').removeClass('contains-value');
     });
 
-    $('.top-search-input').rebind('keyup', function (e) {
+    $('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
         if (e.keyCode == 13 || folderlink) {
 
-            // Add log to see how often they use the search
-            api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+            if (folderlink) {
+                // Flush cached nodes, if any
+                $(window).trigger('dynlist.flush');
+            }
+
+            if (!folderlink || !_topSearchHandler.logFired) {
+                // Add log to see how often they use the search
+                api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+                _topSearchHandler.logFired = true;
+            }
 
             var val = $.trim($('.top-search-input').val());
             if (folderlink || val.length > 2 || !asciionly(val)) {
@@ -1708,7 +1720,15 @@ function topmenuUI() {
 
 
     $('.top-head .logo').rebind('click', function () {
-        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
+        if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
+            if (folderlink) {
+                M.openFolder(M.RootID, true);
+            }
+            else {
+                document.location.hash =
+                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
+            }
+        }
     });
 
     var c = $('.fm-dialog.registration-page-success').attr('class');

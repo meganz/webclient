@@ -95,7 +95,10 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
-        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk', 'flags'];
+        var exclude = [
+            'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen'
+        ];
 
         for (var n in u_attr) {
             if (exclude.indexOf(n) == -1) {
@@ -121,11 +124,6 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
-        // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
-        if ((typeof u_attr.flags !== 'undefined') && (typeof u_attr.flags.mcs !== 'undefined')) {
-            localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
-        }
-
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
         }
@@ -137,6 +135,26 @@ function u_checklogin3a(res, ctx) {
         }
         catch (e) {
             console.error('Error decoding private RSA key', e);
+        }
+
+        // Flags is a generic object for various things
+        if (typeof u_attr.flags !== 'undefined') {
+
+            // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
+            if (typeof u_attr.flags.psa !== 'undefined') {
+
+                // Get the last seen announcement private attribute
+                var currentAnnounceNum = u_attr.flags.psa;
+                var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : null;
+
+                // Set the values we need to know if the PSA should be shown, then show the announcement
+                psa.setInitialValues(currentAnnounceNum, lastSeenAttr);
+            }
+
+            // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
+            if (typeof u_attr.flags.mcs !== 'undefined') {
+                localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
+            }
         }
 
         if (!u_attr.email) {
@@ -255,7 +273,7 @@ function u_setrsa(rsakey) {
                         var user = {
                             u: u_attr.u,
                             c: u_attr.c,
-                            m: u_attr.email,
+                            m: u_attr.email
                         };
                         process_u([user]);
 
@@ -856,6 +874,7 @@ function checkUserLogin() {
     var waiter;
     var ns = {};
     var logger = MegaLogger.getLogger('account.config');
+    var MMH_SEED = 0x7f01e0aa;
 
     /**
      * Move former/legacy settings stored in localStorage
@@ -911,6 +930,7 @@ function checkUserLogin() {
                 var modes = {};
                 for (var handle in value) {
                     if (value.hasOwnProperty(handle)
+                            && handle.substr(0, 7) !== 'search/'
                             && isValid(handle)) {
                         modes[handle] = value[handle];
                     }
@@ -945,12 +965,17 @@ function checkUserLogin() {
         if (!u_handle) {
             return MegaPromise.reject(EINCOMPLETE);
         }
+
         var config = getConfig();
+        if (!$.len(config)) {
+            return MegaPromise.reject(ENOENT);
+        }
+
         var hash = JSON.stringify(config);
         var len = hash.length;
 
         // generate checkum/hash for the config
-        hash = MurmurHash3(hash, 0x7f01e0aa);
+        hash = MurmurHash3(hash, MMH_SEED);
 
         // dont store it unless it has changed
         if (hash === parseInt(localStorage[u_handle + '_fmchash'])) {
@@ -1002,6 +1027,31 @@ function checkUserLogin() {
                     }
                 }
 
+                if (fminitialized) {
+                    var view = Object(fmconfig.viewmodes)[M.currentdirid];
+                    var sort = Object(fmconfig.sortmodes)[M.currentdirid];
+
+                    if ((view !== undefined && M.viewmode !== view)
+                            || (sort !== undefined
+                                && (sort.n !== M.sortmode.n
+                                    || sort.d !== M.sortmode.d))) {
+
+                        M.openFolder(M.currentdirid, true);
+                    }
+
+                    if (M.currentrootid === M.RootID) {
+                        var tree = Object(fmconfig.treenodes);
+
+                        if (JSON.stringify(tree) !== M.treenodes) {
+
+                            M.renderTree();
+                        }
+                    }
+
+                    localStorage[u_handle + '_fmchash'] =
+                        MurmurHash3(JSON.stringify(getConfig()), MMH_SEED);
+                }
+
                 if (fmconfig.ul_maxSlots) {
                     ulQueue.setSize(fmconfig.ul_maxSlots);
                 }
@@ -1013,9 +1063,11 @@ function checkUserLogin() {
                         .addClass('fontsize' + fmconfig.font_size);
                 }
                 waiter.resolve();
+                waiter = undefined;
             })
             .fail(function() {
                 waiter.reject.apply(waiter, arguments);
+                waiter = undefined;
             });
 
         return waiter;
@@ -1027,12 +1079,7 @@ function checkUserLogin() {
      */
     ns.ready = function _onConfigReady(callback) {
         if (waiter) {
-            logger.debug('Waiting to receive fmconfig...');
-
-            waiter.always(function() {
-                callback();
-                waiter = null;
-            });
+            waiter.always(callback);
         }
         else {
             Soon(callback);
@@ -1061,15 +1108,26 @@ function checkUserLogin() {
             logger.debug('Setting value for key "%s"', key, value);
         }
 
-        if (u_type === 3) {
-            if (timer) {
-                clearTimeout(timer);
+        var push = function() {
+            if (u_type === 3 && !pfid && !folderlink) {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                // through a timer to prevent floods
+                timer = setTimeout(store, 9701);
             }
-            // through a timer to prevent floods
-            timer = setTimeout(store, 9701);
+            else {
+                localStorage.fmconfig = JSON.stringify(fmconfig);
+                timer = null;
+            }
+        };
+
+        if (fminitialized) {
+            Soon(push);
         }
-        else {
-            localStorage.fmconfig = JSON.stringify(fmconfig);
+        else if (timer !== -MMH_SEED) {
+            timer = -MMH_SEED;
+            mBroadcaster.once('fm:initialized', push);
         }
 
         mBroadcaster.sendMessage('fmconfig:' + key, value);
@@ -1483,6 +1541,9 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
             }
             else if (attrName === '*!authCu255') {
                 authring.getContacts('Cu25519');
+            }
+            else if (attrName === '*!fmconfig') {
+                mega.config.fetch();
             }
             else if (attrName === '+puEd255') {
                 // pubEd25519 key was updated!

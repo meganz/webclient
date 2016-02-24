@@ -300,9 +300,9 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         var args = arguments;
 
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
-        if (!self.chatd.chatidshard[chatIdDecoded]) {
+        if (!self.chatd.chatIdShard[chatIdDecoded]) {
             createTimeoutPromise(function() {
-                return !!self.chatd.chatidshard[chatIdDecoded]
+                return !!self.chatd.chatIdShard[chatIdDecoded]
             }, 100, 10000)
                 .done(function() {
                     masterPromise.linkDoneAndFailToResult(fn, self, args);
@@ -537,6 +537,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
             .replace("ws:", "wss:")
             .replace("31.216.147.155", "chattest.userstorage.mega.co.nz")
     );
+
     self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
 };
 

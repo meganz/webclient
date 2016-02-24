@@ -310,21 +310,6 @@ Chat.prototype.init = function() {
         self.plugins[k] = new v(self);
     });
 
-    //if (!self.filePicker) {
-    //    self.filePicker = new mega.ui.FilePicker(self.options.filePickerOptions);
-    //    self.filePicker.bind('doneSelecting', function(e, selection) {
-    //        if (selection.length === 0) {
-    //            return;
-    //        }
-    //
-    //        var room = self.getCurrentRoom();
-    //        if (room) {
-    //            room.attachNodes(
-    //                selection
-    //            );
-    //        }
-    //    })
-    //}
 
     // Karere Events
     this.karere.bind("onPresence", function(e, eventObject) {
@@ -1026,15 +1011,12 @@ Chat.prototype.destroy = function(isLogout) {
     self.trigger('onDestroy', [isLogout]);
 
     // unmount the UI elements, to reduce any unneeded.
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
-
-    //
-    //localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
-    //localStorage.megaChatPresenceMtime = unixtime();
-
-    if (self.filePicker) {
-        self.filePicker.destroy();
-        self.filePicker = null;
+    if (
+        self.$conversationsAppInstance &&
+        ReactDOM.findDOMNode(self.$conversationsAppInstance) &&
+        ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode
+    ) {
+        ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
     }
 
 
@@ -1361,6 +1343,18 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
     var $promise = new MegaPromise();
 
     if (type === "private") {
+        // validate that ALL jids are contacts
+        var allValid = true;
+        jids.forEach(function(jid) {
+            var contact = self.getContactFromJid(jid);
+            if (!contact || (contact.c !== 1 && contact.c !== 2)) {
+                allValid = false;
+                return false;
+            }
+        });
+        if (allValid === false) {
+            return MegaPromise.reject();
+        }
         var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
         var roomJid = $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain;
         if (self.chats[roomJid]) {

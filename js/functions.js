@@ -4272,7 +4272,6 @@ if (typeof sjcl !== 'undefined') {
 
 
 
-var set = {};
 (function(scope) {
     /** Utilities for Set operations. */
     scope.setutils = {};
@@ -4339,14 +4338,16 @@ var set = {};
         var result = true;
 
         if (set1.size !== set2.size) {
-            result = false;
+            return false;
         }
 
-        set1.forEach(function _setEqualityIterator(item) {
-            if (!set2.has(item)) {
+        var set1array = Array.from(set1);
+        for (var i = 0; i < set1array.length; i++) {
+            if (!set2.has(set1array[i])) {
                 result = false;
+                break;
             }
-        });
+        }
 
         return result;
     };

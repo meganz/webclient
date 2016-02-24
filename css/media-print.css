@@ -18,6 +18,7 @@
 
     .nw-bottom-block {
         height: 48px;
+        position: relative !important;
     }
 
     .jspPane * {

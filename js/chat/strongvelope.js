@@ -957,6 +957,8 @@ var strongvelope = {};
 
         var clear = '';
 
+        assert(typeof(encryptedKeys) !== 'undefined', 'called _decryptKeysFor with empty `encryptedKeys`');
+
         // Check if sender key is encrypted using RSA.
         if (encryptedKeys.length < _RSA_ENCRYPTION_THRESHOLD) {
             // Using normal chat keys.
@@ -1122,9 +1124,14 @@ var strongvelope = {};
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
         var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
+
         var encryptedKeys = false;
         if (repeatKey || (this._sentKeyId !== this.keyId)) {
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
+        }
+
+        if(!encryptedKeys) {
+            debugger;
         }
 
         var messageType = encryptedKeys

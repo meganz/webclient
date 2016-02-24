@@ -361,5 +361,34 @@ describe("chat.strongvelope workflow test", function() {
 
             // jshint +W004
         });
+
+
+        it("normal operation - as in the UI", function() {
+            // Uncomment the following to see log messages produced in the process.
+            // sandbox.stub(ns._logger, '_log', console.log);
+
+            // jshint -W004
+            var participants = {};
+
+            var message = '';
+            var sent = '';
+            var sender = '';
+            var result;
+            var activeParticipants = new Set(['alice678900']);
+            participants['alice678900'] = _makeParticipant('alice678900');
+            participants['alice678900'].updateSenderKey();
+
+            // Alice starts a chat with Bob.
+            participants['bob45678900'] = _makeParticipant('bob45678900');
+            participants['bob45678900'].updateSenderKey();
+
+
+            sent = participants['alice678900'].alterParticipants(['bob45678900'], []);
+            activeParticipants.add('charlie8900');
+            _checkReceivers(sent, sender, null,
+                participants, activeParticipants);
+
+            // jshint +W004
+        });
     });
 });

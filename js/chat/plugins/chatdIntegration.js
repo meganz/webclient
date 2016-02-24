@@ -38,7 +38,7 @@ var ChatdIntegration = function(megaChat) {
 
                 if (r.c) {
                     r.c.forEach(function (actionPacket) {
-                        self.openChatFromApi(actionPacket);
+                        self.openChatFromApi(actionPacket, true);
                     });
 
                     self.mcfHasFinishedPromise.resolve();
@@ -53,8 +53,8 @@ var ChatdIntegration = function(megaChat) {
         self.chatd.destroyed = true;
     });
 
-    $(window).rebind('onChatUpdatedActionPacket.chatdInt', function(e, actionPacket) {
-        self.openChatFromApi(actionPacket);
+    $(window).rebind('onChatdChatUpdatedActionPacket.chatdInt', function(e, actionPacket) {
+        self.openChatFromApi(actionPacket, false);
     });
 
     return self;
@@ -120,7 +120,51 @@ ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
     return messageObject;
 };
 
-ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
+ChatdIntegration.prototype.alterParticipants = function(chatRoom, included, excluded) {
+    var self = this;
+
+    self.protocolHandlerRequiresKeysInit(chatRoom);
+
+    console.error('alterParticipants', chatRoom, included, excluded);
+
+    if (included || excluded) {
+        if (included.indexOf(u_handle) > -1) {
+            removeValue(included, u_handle);
+        }
+
+        var doSendMsg = function() {
+            var msg = chatRoom.protocolHandler.alterParticipants(included, excluded);
+            if (!msg)  {
+                self.logger.error("Failed to do altPart: " + msg);
+            }
+            else {
+                // send back to the protocolHandler
+                chatRoom.protocolHandler.decryptFrom(msg, u_handle);
+                self.chatd.submit(base64urldecode(chatRoom.chatId), msg);
+            }
+        };
+
+        if (chatRoom.protocolHandler) {
+            doSendMsg();
+        }
+        else {
+            if (chatRoom.strongvelopeSetupPromises) {
+                chatRoom.strongvelopeSetupPromises.done(function() {
+                    doSendMsg();
+                });
+            }
+            else {
+                createTimeoutPromise(function() {
+                    return !!chatRoom.protocolHandler;
+                }, 300, 5000).done(function() {
+                    doSendMsg();
+                });
+            }
+        }
+    }
+};
+
+ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var self = this;
 
     var chatParticipants = actionPacket.u;
@@ -153,7 +197,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     var finishProcess = function() {
 
         if (!chatRoom) {
-            self.megaChat.openChat(
+            var r = self.megaChat.openChat(
                 chatJids,
                 actionPacket.g === 1 ? "group" : "private",
                 actionPacket.id,
@@ -161,7 +205,19 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
                 actionPacket.url,
                 false
             );
+            chatRoom = r[1];
+            if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
+                // i'd JUST created this chat. I should send alter participants.
+                var members = [];
+                actionPacket.u.forEach(function(v) {
+                    members.push(
+                        v.u
+                    );
+                });
 
+                self.alterParticipants(chatRoom, members);
+                window.location = chatRoom.getRoomUrl();
+            }
         }
         else {
             if (!chatRoom.chatId) {
@@ -355,8 +411,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
 
         if (foundChatRoom.roomJid === chatRoom.roomJid) {
-            var included = undefined;
-            var excluded = undefined;
 
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
@@ -365,42 +419,10 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                 if (eventData.userId === u_handle) {
                     chatRoom.membersLoaded = true;
-                    included = chatRoom.members;
                 }
             }
             else if (eventData.priv === 255) {
                 removeValue(chatRoom.members, eventData.userId);
-                excluded = [eventData.userId];
-            }
-
-            if (included || excluded) {
-                var doSendMsg = function() {
-                    var msg = chatRoom.protocolHandler.alterParticipants(included, excluded);
-                    if (!msg)  {
-                        self.logger.error("Failed to do altPart: " + msg);
-                    }
-                    else {
-                        chatRoom.protocolHandler.send(msg);
-                    }
-                };
-
-                if (chatRoom.protocolHandler) {
-                    doSendMsg();
-                }
-                else {
-                    if (chatRoom.strongvelopeSetupPromises) {
-                        chatRoom.strongvelopeSetupPromises.done(function() {
-                            doSendMsg();
-                        });
-                    }
-                    else {
-                        createTimeoutPromise(function() {
-                            return !!chatRoom.protocolHandler;
-                        }, 300, 5000).done(function() {
-                            doSendMsg();
-                        });
-                    }
-                }
             }
         }
     });
@@ -501,6 +523,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             }
                         });
                     } catch (e) {
+                        debugger;
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }
 
@@ -682,6 +705,17 @@ ChatdIntegration.prototype.setRetention = function(chatRoom, time) {
 };
 
 
+ChatdIntegration.prototype.protocolHandlerRequiresKeysInit = function(chatRoom) {
+    if (
+        chatRoom.protocolHandler.previousKeyId === null &&
+        chatRoom.protocolHandler.keyId === null
+    ) {
+        debugger;
+        // new session, gen key!
+        chatRoom.protocolHandler.updateSenderKey();
+    }
+};
+
 ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     // allocate transactionid for the new message (it must be shown with status "delivering" in the UI;
     // edits and cancellations at that stage must be applied to the locally queued version that gets
@@ -710,13 +744,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
 
     var _runEncryption = function() {
         // is this a new (empty) chat?
-        if (
-            chatRoom.protocolHandler.previousKeyId === null &&
-            chatRoom.protocolHandler.keyId === null
-        ) {
-            // new session, gen key!
-            chatRoom.protocolHandler.updateSenderKey();
-        }
+        self.protocolHandlerRequiresKeysInit(chatRoom);
 
         try {
             var result;
@@ -724,8 +752,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
                 result = chatRoom.protocolHandler.encryptTo(message, participants[0]);
             }
             else {
-                result = chatRoom.protocolHandler.encryptTo(message, participants);
-                debugger;
+                result = chatRoom.protocolHandler.encryptTo(message);
             }
 
             if (result !== false) {
@@ -734,6 +761,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
                 );
             }
             else {
+                debugger;
                 tmpPromise.reject();
             }
         } catch(e) {

@@ -110,6 +110,7 @@ def reduce_jshint(file_line_mapping, **extra):
                      if x[-1].split('.')[-1] in ['js', 'jsx']]
 
     if len(files_to_test) == 0:
+        logging.info('JSHint: No modified JavaScript files found.')
         return '', 0
 
     command = config.JSHINT_COMMAND.format(binary=config.JSHINT_BIN,
@@ -167,12 +168,13 @@ def reduce_jscs(file_line_mapping, **extra):
     # Get the JSCS output.
     logging.info('Obtaining JSCS output ...')
     os.chdir(PROJECT_PATH)
-    rules = config.JSHINT_RULES if not norules else ''
+    rules = config.JSCS_RULES if not norules else ''
     files_to_test = [os.path.join(*x)
                      for x in file_line_mapping.keys()
                      if x[-1].split('.')[-1] in ['js', 'jsx']]
 
     if len(files_to_test) == 0:
+        logging.info('JSCS: No modified JavaScript files found.')
         return '', 0
 
     command = config.JSCS_COMMAND.format(binary=config.JSCS_BIN,
@@ -214,6 +216,68 @@ def reduce_jscs(file_line_mapping, **extra):
     error_count = len(result) - 1
     result.append('\n{} code style errors found.'.format(error_count))
     return '\n\n'.join(result), error_count
+
+def strip_ansi_codes(s):
+    return re.sub(r'\x1b\[([0-9,A-Z]{1,2}(;[0-9]{1,2})?(;[0-9]{3})?)?[m|K]?', '', s)
+
+def reduce_htmlhint(file_line_mapping, **extra):
+    """
+    Runs HTMLHINT on the project for changed files. The output
+    is reduced to only contain entries from the Git change set.
+
+    :param file_line_mapping: Mapping of files with changed lines (obtained
+        `get_git_line_sets()`).
+    :param extra: Optional keyword arguments:
+        `norules`: If true, omit verbose output of violated rule identifier
+                   (default: `False` to include rules).
+    :return: A tuple containing the formatted string suitable for output and
+        an integer containing the number of failed rules.
+    """
+    norules = extra['norules'] if 'norules' in extra else False
+    # Get the HTMLHINT output.
+    logging.info('Obtaining HTMLHINT output ...')
+    os.chdir(PROJECT_PATH)
+    rules = config.HTMLHINT_RULES if not norules else ''
+    files_to_test = [os.path.join(*x)
+                     for x in file_line_mapping.keys()
+                     if x[-1].split('.')[-1] in ['htm', 'html']]
+
+    if len(files_to_test) == 0:
+        logging.info('HTMLHINT: No modified HTML files found.')
+        return '', 0
+
+    command = config.HTMLHINT_COMMAND.format(binary=config.HTMLHINT_BIN,
+                                         rules=rules,
+                                         files=' '.join(files_to_test))
+    output = None
+    try:
+        output = subprocess.check_output(command.split())
+    except subprocess.CalledProcessError as ex:
+        # HTMLHINT found something, so it has returned an error code.
+        # But we still want the output in the same fashion.
+        output = ex.output
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('HTMLHINT not installed.'
+                          ' Try to do so with `npm install`.')
+        else:
+            logging.error('Error calling HTMLHINT: {}'.format(ex))
+        return '*** HTMLHINT: {} ***'.format(ex), 0
+    output = strip_ansi_codes(output.decode('utf8')).split('\n')
+
+    if re.search('Scan \d+ files, without errors', output[-1]):
+        return '', 0
+
+    # Go through output and collect only relevant lines to the result.
+    result = ['\nHTMLHINT output:\n================']
+
+    for line in output:
+        if line.find('Config loaded:') != -1:
+            continue;
+        result.append(line)
+
+    # Add the number of errors and return in a nicely formatted way.
+    return re.sub('\n+', '\n', '\n\n'.join(result).strip()), 1
 
 
 def reduce_minifiedjs(file_line_mapping, **extra):
@@ -457,6 +521,7 @@ def main(base, target, norules):
     """
     CHECKER_MAPPING = {'jshint': reduce_jshint,
                        'jscs': reduce_jscs,
+                       'htmlhint': reduce_htmlhint,
                        'minifiedjs': reduce_minifiedjs,
                        'cppcheck': reduce_cppcheck,
                        'nsiqcppstyle': reduce_nsiqcppstyle,

@@ -13,7 +13,7 @@ import os
 
 # Checkers to run. Available options for checkers are:
 # "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++"
-checkers = ['minifiedjs', 'jshint', 'jscs']
+checkers = ['minifiedjs', 'htmlhint', 'jshint', 'jscs']
 
 # Extra options for designated checkers.
 # This configuration needs an entry for every encountered checker if the
@@ -21,6 +21,7 @@ checkers = ['minifiedjs', 'jshint', 'jscs']
 extra_options = {
     'jshint': {'norules': False},
     'jscs': {'norules': False},
+    'htmlhint': {},
     'minifiedjs': {},
     'cppcheck': {},
     'nsiqcppstyle': {},
@@ -30,12 +31,14 @@ extra_options = {
 # Paths for the executables to use.
 JSHINT_BIN = 'node_modules/.bin/jshint'
 JSCS_BIN = 'node_modules/.bin/jscs'
+HTMLHINT_BIN = 'node_modules/.bin/htmlhint'
 CPPCHECK_BIN = 'cppcheck'
 VERAPP_BIN = 'vera++'
 
 NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 JSHINT_RULES = '--verbose'
 JSCS_RULES = '--verbose'
+HTMLHINT_RULES = '--config ./.htmlhintrc'
 MINIFICATION_FILE_TYPES = ['.js', '.jsx']
 MINIFICATION_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js']
 MINIFICATION_THRESHOLD = 200 # Max chars per line to trigger.
@@ -54,6 +57,7 @@ VERAPP_RULES = ['F001', 'F002',
 # Command line configuration.
 JSHINT_COMMAND = '{binary} {rules} {files}'
 JSCS_COMMAND = '{binary} {rules} {files}'
+HTMLHINT_COMMAND = '{binary} {rules} {files}'
 
 CPPCHECK_COMMAND = ("{command}"
                     " --template={{file}};{{line}};{{severity}};{{id}};{{message}}"
@@ -74,9 +78,11 @@ VERAPP_COMMAND = ('vera++ --show-rule --summary'
 if os.name == 'nt':
     JSHINT_BIN = '{}.cmd'.format(JSHINT_BIN).replace('/', '\\')
     JSCS_BIN = '{}.cmd'.format(JSCS_BIN).replace('/', '\\')
+    HTMLHINT_BIN = '{}.cmd'.format(HTMLHINT_BIN).replace('/', '\\')
     CPPCHECK_BIN += '.exe'
     VERAPP_BIN += '.exe'
     JSHINT_COMMAND = 'cmd /c {}'.format(JSHINT_COMMAND)
+    HTMLHINT_COMMAND = 'cmd /c {}'.format(HTMLHINT_COMMAND)
     JSCS_COMMAND = 'cmd /c {}'.format(JSCS_COMMAND)
 
 # Overlay project-config with a potentially available local configuration.

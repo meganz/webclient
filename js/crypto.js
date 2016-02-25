@@ -2046,7 +2046,8 @@ function getsc(mDBload) {
 
                     // If we're loading the cloud, notify completion only
                     // once first action-packets have been processed.
-                    if (!fminitialized) {
+                    if (!mega.fmLoaded) {
+                        mega.fmLoaded = true;
                         loadfm_done(ctx.mDBload);
                     }
                 }

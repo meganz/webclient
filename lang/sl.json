@@ -2668,7 +2668,7 @@
     "7588": "Prosim, vnesite svoje ime, e-po\u0161tni naslov in svoje MEGA geslo.",
     "7589": "Premaknem element v ko\u0161?",
     "7590": "Premaknem elemente v ko\u0161?",
-    "7591": "Izbrali ste ve\u010d kot {0} elementov ({0}) za prevzem. Ali \u017eelite nadaljevati?",
+    "7591": "Izbrali ste ve\u010d kot {0} elementov ({1}) za prevzem. Ali \u017eelite nadaljevati?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Prejemam datoteke in mape... [{0}]",
@@ -3154,10 +3154,13 @@
     "8577": "Zahtevam podatke o ra\u010dunu",
     "8578": "Prejemam podatke o ra\u010dunu",
     "8579": "Dekriptiram",
-    "8580": "File import failed [{0}]",
-    "8584": "Requesting folder data",
-    "8585": "Receiving folder data",
-    "8586": "Decrypting folder data",
+    "8580": "Uvoz datoteke neuspe\u0161en [{0}]",
+    "8584": "Zahtevam podatke mape",
+    "8585": "Prejemam podatke mape",
+    "8586": "Dekriptiram podatke mape",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3189,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

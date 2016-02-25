@@ -192,16 +192,14 @@ function MegaData()
 
     this.sortByName = function(d)
     {
-        // if (typeof Intl !== 'undefined' && Intl.Collator)
-        // {
-            // var intl = new Intl.Collator('co', { numeric: true });
+        if (typeof Intl !== 'undefined' && Intl.Collator) {
+            var intl = new Intl.Collator('co', { numeric: true });
 
-            // this.sortfn = function(a,b,d)
-            // {
-                // return intl.compare(a.name,b.name)*d;
-            // };
-        // }
-        // else
+            this.sortfn = function(a, b, d) {
+                return intl.compare(a.name, b.name) * d;
+            };
+        }
+        else
         {
             this.sortfn = function(a,b,d)
             {
@@ -1640,20 +1638,9 @@ function MegaData()
             this.chat = true;
             treeUI();
 
-            if (!megaChatIsDisabled) {
-                if (typeof megaChat === 'undefined') {
-                    // queue for opening the megachat UI WHEN the pubEd keys are loaded
-                    // happens, often when the APIs are returning -3
-
-                    mBroadcaster.once('pubEd25519', function() {
-                        chatui(id);
-                    });
-                }
-                else {
-                    // XX: using the old code...for now
-                    chatui(id);
-                }
-
+            if (megaChatIsReady) {
+                // XX: using the old code...for now
+                chatui(id);
             }
         }
         else if ((!id || !M.d[id]) && id !== 'transfers') {
@@ -6928,6 +6915,9 @@ function init_chat() {
                 megaChat.init();
 
                 if (fminitialized) {
+                    if (String(M.currentdirid).substr(0, 5) === 'chat/') {
+                        chatui(M.currentdirid);
+                    }
                     //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }

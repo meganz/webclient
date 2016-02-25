@@ -13,7 +13,7 @@ import os
 
 # Checkers to run. Available options for checkers are:
 # "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++"
-checkers = ['minifiedjs', 'htmlhint', 'jshint', 'jscs']
+checkers = ['validator', 'htmlhint', 'jshint', 'jscs']
 
 # Extra options for designated checkers.
 # This configuration needs an entry for every encountered checker if the
@@ -22,7 +22,7 @@ extra_options = {
     'jshint': {'norules': False},
     'jscs': {'norules': False},
     'htmlhint': {},
-    'minifiedjs': {},
+    'validator': {},
     'cppcheck': {},
     'nsiqcppstyle': {},
     'vera++': {}
@@ -39,9 +39,8 @@ NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 JSHINT_RULES = '--verbose'
 JSCS_RULES = '--verbose'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
-MINIFICATION_FILE_TYPES = ['.js', '.jsx']
-MINIFICATION_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js']
-MINIFICATION_THRESHOLD = 200 # Max chars per line to trigger.
+VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js']
+VALIDATOR_LINELEN_THRESHOLD = 120 # Max chars per line to trigger.
 
 # Vera++ rules like this should be superseded by a "profile", but it
 # doesn't work well, yet, on Vera++ v1.2 :-(
@@ -84,6 +83,7 @@ if os.name == 'nt':
     JSHINT_COMMAND = 'cmd /c {}'.format(JSHINT_COMMAND)
     HTMLHINT_COMMAND = 'cmd /c {}'.format(HTMLHINT_COMMAND)
     JSCS_COMMAND = 'cmd /c {}'.format(JSCS_COMMAND)
+    VALIDATOR_IGNORE_FILES = [x.replace('/', '\\') for x in VALIDATOR_IGNORE_FILES]
 
 # Overlay project-config with a potentially available local configuration.
 try:

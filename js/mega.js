@@ -1637,6 +1637,11 @@ function MegaData()
         else if (id && id.substr(0, 5) === 'chat/') {
             this.chat = true;
             treeUI();
+
+            if (megaChatIsReady) {
+                // XX: using the old code...for now
+                chatui(id);
+            }
         }
         else if ((!id || !M.d[id]) && id !== 'transfers') {
             id = this.RootID;

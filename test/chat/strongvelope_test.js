@@ -660,114 +660,6 @@ describe("chat.strongvelope unit test", function() {
             });
         });
 
-        describe('areMessagesDecryptable', function() {
-            it("all good", function() {
-                // This mock-history contains chatd as well as parsed data in one object.
-                // The attribute `keys` just needs to be there to avoid an exception.
-                var history = [
-                    { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI01'] },
-                    { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AI01'] },
-                    { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                    { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'] },
-                    { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                    { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                    { userId: 'you456789xw', ts: 1444255639, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['me3456789xw'], keyIds: ['AIf2', 'AIf1'] },
-                ];
-                var handler = new ns.ProtocolHandler('me3456789xw',
-                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
-                var participantKeys = {
-                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' },
-                    'you456789xw': { 'AIf1': 'your key 1', 'AIf2': 'your key 2' }
-                };
-                sandbox.stub(handler, '_batchParseAndExtractKeys', function() {
-                    handler.participantKeys = participantKeys;
-                    return history;
-                });
-
-                var result = handler.areMessagesDecryptable(history);
-                assert.deepEqual(result.messages,
-                    [true, true, true, true, true, true, true]);
-                assert.deepEqual(result.participants,
-                    { 'me3456789xw': 1444255633, 'you456789xw': 1444255635 });
-            });
-
-            it("missing keys other party", function() {
-                // This mock-history contains chatd as well as parsed data in one object.
-                // The attribute `keys` just needs to be there to avoid an exception.
-                var history = [
-                    { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI01'] },
-                    { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AI01'] },
-                    { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                    { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'] },
-                    { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                    { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                ];
-                var handler = new ns.ProtocolHandler('me3456789xw',
-                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
-                var participantKeys = {
-                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
-                };
-                sandbox.stub(handler, '_batchParseAndExtractKeys', function() {
-                    handler.participantKeys = participantKeys;
-                    return history;
-                });
-
-                var result = handler.areMessagesDecryptable(history);
-                assert.deepEqual(result.messages,
-                    [true, true, false, true, false, false]);
-                assert.deepEqual(result.participants,
-                    { 'me3456789xw': 1444255633, 'you456789xw': null });
-            });
-
-            it("some key missing", function() {
-                // This mock-history contains chatd as well as parsed data in one object.
-                // The attribute `keys` just needs to be there to avoid an exception.
-                var history = [
-                    { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AI01'] },
-                    { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                    { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI02'] },
-                    { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                    { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
-                    { userId: 'you456789xw', ts: 1444255639, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['me3456789xw'], keyIds: ['AIf2', 'AIf1'] },
-                ];
-                var handler = new ns.ProtocolHandler('me3456789xw',
-                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
-                var participantKeys = {
-                    'me3456789xw': { 'AI02': 'my key 2' },
-                    'you456789xw': { 'AIf1': 'your key 1', 'AIf2': 'your key 2' }
-                };
-                sandbox.stub(handler, '_batchParseAndExtractKeys', function() {
-                    handler.participantKeys = participantKeys;
-                    return history;
-                });
-
-                var result = handler.areMessagesDecryptable(history);
-                assert.deepEqual(result.messages,
-                    [false, true, true, true, true, true]);
-                assert.deepEqual(result.participants,
-                    { 'me3456789xw': 1444255636, 'you456789xw': 1444255635 });
-            });
-        });
-
         describe('updateSenderKey', function() {
             it("initial usage", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
@@ -1983,6 +1875,7 @@ describe("chat.strongvelope unit test", function() {
             });
 
             it("alter participants, me included, one excluded", function() {
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'u_handle', 'lino56789xw');
                 var handler = new ns.ProtocolHandler(u_handle,
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
@@ -2016,15 +1909,17 @@ describe("chat.strongvelope unit test", function() {
                     { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY });
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
                     { 'AI\u0000\u0001': ROTATED_KEY });
-                assert.ok(testutils.isSetEqual(handler.otherParticipants,
+                assert.ok(setutils.equal(handler.otherParticipants,
                     new Set(['me3456789xw'])),
                     'mismatching other participants on handler');
-                assert.ok(testutils.isSetEqual(handler.includeParticipants,
+                assert.ok(setutils.equal(handler.includeParticipants,
                     new Set(['lino56789xw'])),
                     'mismatching included participants');
-                assert.ok(testutils.isSetEqual(handler.excludeParticipants,
+                assert.ok(setutils.equal(handler.excludeParticipants,
                     new Set(['otto56789xw'])),
                     'mismatching excluded participants');
+                assert.strictEqual(ns._logger._log.args[0][0],
+                    'Particpant change received, updating sender key.');
             });
 
             it("alter participants, one included, me excluded", function() {
@@ -2048,7 +1943,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler.includeParticipants.size, 0);
                 assert.strictEqual(handler.excludeParticipants.size, 0);
                 assert.strictEqual(ns._logger._log.args[0][0],
-                                   'I have been excluded from this chat, cannot read message.');
+                    'I have been excluded from this chat, cannot read message.');
             });
 
             it("alter participants, one included, one excluded, not a member", function() {
@@ -2070,7 +1965,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler.includeParticipants.size, 0);
                 assert.strictEqual(handler.excludeParticipants.size, 0);
                 assert.strictEqual(ns._logger._log.args[0][0],
-                                   'I have been excluded from this chat, cannot read message.');
+                    'I am not participating in this chat, cannot read message.');
             });
 
             it("followup message", function() {

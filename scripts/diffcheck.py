@@ -147,6 +147,8 @@ def reduce_jshint(file_line_mapping, **extra):
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
+    if error_count == 0:
+        return '', 0
     result.append('\n{} errors'.format(error_count))
     return '\n'.join(result), error_count
 
@@ -214,6 +216,8 @@ def reduce_jscs(file_line_mapping, **extra):
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
+    if error_count == 0:
+        return '', 0
     result.append('\n{} code style errors found.'.format(error_count))
     return '\n\n'.join(result), error_count
 
@@ -571,7 +575,9 @@ def main(base, target, norules):
         error_count = result[1]
         if len(result) > 2:
             fatal = result[2]
-        results.append(result[0].rstrip())
+        result = result[0].rstrip();
+        if result:
+            results.append(result)
         total_errors += error_count
 
         # If a fatal issue is found, halt execution and quit
@@ -582,6 +588,8 @@ def main(base, target, norules):
         logging.info('Output of reduced results ...')
         print('\n\n'.join(results).rstrip())
         sys.exit(1)
+
+    print('\nEverything seems Ok.')
 
 
 if __name__ == '__main__':

@@ -33,21 +33,21 @@ var Chatd = function(userId, options) {
 
     // debug mode
     [
-        'onMessageUpdated',
+        //'onMessageUpdated',
         'onMessageConfirm',
-        'onMessageReject',
-        'onMessageCheck',
-        'onMessageModify',
+        //'onMessageReject',
+        //'onMessageCheck',
+        //'onMessageModify',
         'onMessageStore',
-        'onMessageSeen',
-        'onMessageLastSeen',
-        'onMessageReceived',
-        'onMessageLastReceived',
-        'onRetentionChanged',
-        'onMessagesHistoryInfo',
-        'onMembersUpdated',
-        'onMessagesHistoryDone',
-        'onMessagesHistoryRequest',
+        //'onMessageSeen',
+        //'onMessageLastSeen',
+        //'onMessageReceived',
+        //'onMessageLastReceived',
+        //'onRetentionChanged',
+        //'onMessagesHistoryInfo',
+        //'onMembersUpdated',
+        //'onMessagesHistoryDone',
+        //'onMessagesHistoryRequest',
     ].forEach(function(evt) {
             self.rebind(evt + '.chatd', function(e) {
                 console.error(evt, JSON.stringify(arguments[1]));

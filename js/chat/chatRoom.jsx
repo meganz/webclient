@@ -41,7 +41,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             chatId: undefined,
             chatdUrl: undefined,
             chatShard: undefined,
-            members: [],
+            members: {},
             membersLoaded: false
         },
         true
@@ -627,11 +627,13 @@ ChatRoom.prototype.getRoomTitle = function() {
         return self.megaChat.getContactNameFromJid(participants[0]);
     }
     else {
-        var participants = self.getParticipantsExceptMe();
-        var names = participants.map(function(jid) {
-            var contactHash = self.megaChat.getContactHashFromJid(jid);
-            if (contactHash && M.u[contactHash]) {
-                return M.u[contactHash].name ? M.u[contactHash].name : "non contact";
+        var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
+        var names = [];
+        participants.forEach(function(contactHash) {
+            if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
+                names.push(
+                    M.u[contactHash].name ? M.u[contactHash].name : "non contact"
+                );
             }
         });
         return names.join(", ");

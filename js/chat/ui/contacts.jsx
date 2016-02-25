@@ -175,7 +175,7 @@ var ContactCard = React.createClass({
             var ButtonsUI = require('./../../ui/buttons.jsx');
             var DropdownsUI = require('./../../ui/dropdowns.jsx');
 
-            var moreDropdowns = [];
+            var moreDropdowns = this.props.dropdowns ? this.props.dropdowns : [];
 
             if (contact.c === 1) {
                 moreDropdowns.push(

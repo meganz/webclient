@@ -1130,10 +1130,6 @@ var strongvelope = {};
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
 
-        if(!encryptedKeys) {
-            debugger;
-        }
-
         var messageType = encryptedKeys
                         ? MESSAGE_TYPES.GROUP_KEYED
                         : MESSAGE_TYPES.GROUP_FOLLOWUP;
@@ -1533,6 +1529,7 @@ var strongvelope = {};
 
         var errorOut = false;
 
+        debugger;
         includeParticipants = new Set(includeParticipants || []);
         excludeParticipants = new Set(excludeParticipants || []);
 

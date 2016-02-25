@@ -1696,7 +1696,7 @@
             counter1 = counter1 | 0;
             var iv0 = 0, iv1 = 0, iv2 = 0, iv3 = 0, iv4 = 0, iv5 = 0, iv6 = 0, iv7 = 0, iv8 = 0, iv9 = 0, ivA = 0, ivB = 0, ivC = 0, ivD = 0, ivE = 0, ivF = 0, s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0, s7 = 0, s8 = 0, s9 = 0, sA = 0, sB = 0, sC = 0, sD = 0, sE = 0, sF = 0, encrypted = 0;
             if (offset & 15) return -1;
-            iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+            iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7,
             iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
             while ((length | 0) >= 16) {
                 s0 = HEAP[offset] | 0;
@@ -1733,7 +1733,7 @@
                 HEAP[offset | 14] = sE ^ SE;
                 HEAP[offset | 15] = sF ^ SF;
                 _encrypt(s0 ^ iv0, s1 ^ iv1, s2 ^ iv2, s3 ^ iv3, s4 ^ iv4, s5 ^ iv5, s6 ^ iv6, s7 ^ iv7, s8 ^ iv8, s9 ^ iv9, sA ^ ivA, sB ^ ivB, sC ^ ivC, sD ^ ivD, sE ^ ivE, sF ^ ivF);
-                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7,
                 iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
                 encrypted = encrypted + 16 | 0;
                 offset = offset + 16 | 0;
@@ -1774,7 +1774,7 @@
                 if ((length | 0) > 13) HEAP[offset | 13] = sD ^ SD;
                 if ((length | 0) > 14) HEAP[offset | 14] = sE ^ SE;
                 _encrypt(s0 ^ iv0, s1 ^ iv1, s2 ^ iv2, s3 ^ iv3, s4 ^ iv4, s5 ^ iv5, s6 ^ iv6, s7 ^ iv7, s8 ^ iv8, s9 ^ iv9, sA ^ ivA, sB ^ ivB, sC ^ ivC, sD ^ ivD, sE ^ ivE, ivF);
-                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7,
                 iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
                 encrypted = encrypted + length | 0;
                 offset = offset + length | 0;
@@ -1805,7 +1805,7 @@
             counter1 = counter1 | 0;
             var iv0 = 0, iv1 = 0, iv2 = 0, iv3 = 0, iv4 = 0, iv5 = 0, iv6 = 0, iv7 = 0, iv8 = 0, iv9 = 0, ivA = 0, ivB = 0, ivC = 0, ivD = 0, ivE = 0, ivF = 0, s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0, s7 = 0, s8 = 0, s9 = 0, sA = 0, sB = 0, sC = 0, sD = 0, sE = 0, sF = 0, decrypted = 0;
             if (offset & 15) return -1;
-            iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+            iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7,
             iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
             while ((length | 0) >= 16) {
                 _encrypt(nonce0, nonce1, nonce2, nonce3, nonce4, nonce5, nonce6, nonce7, nonce8 ^ counter0 >>> 24, nonce9 ^ counter0 >>> 16 & 255, nonceA ^ counter0 >>> 8 & 255, nonceB ^ counter0 & 255, nonceC ^ counter1 >>> 24, nonceD ^ counter1 >>> 16 & 255, counter1 >>> 8 & 255, counter1 & 255);
@@ -1826,7 +1826,7 @@
                 HEAP[offset | 14] = sE = HEAP[offset | 14] ^ SE;
                 HEAP[offset | 15] = sF = HEAP[offset | 15] ^ SF;
                 _encrypt(s0 ^ iv0, s1 ^ iv1, s2 ^ iv2, s3 ^ iv3, s4 ^ iv4, s5 ^ iv5, s6 ^ iv6, s7 ^ iv7, s8 ^ iv8, s9 ^ iv9, sA ^ ivA, sB ^ ivB, sC ^ ivC, sD ^ ivD, sE ^ ivE, sF ^ ivF);
-                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7,
                 iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
                 decrypted = decrypted + 16 | 0;
                 offset = offset + 16 | 0;
@@ -1868,7 +1868,7 @@
                 if ((length | 0) > 13) HEAP[offset | 13] = sD;
                 if ((length | 0) > 14) HEAP[offset | 14] = sE;
                 _encrypt(s0 ^ iv0, s1 ^ iv1, s2 ^ iv2, s3 ^ iv3, s4 ^ iv4, s5 ^ iv5, s6 ^ iv6, s7 ^ iv7, s8 ^ iv8, s9 ^ iv9, sA ^ ivA, sB ^ ivB, sC ^ ivC, sD ^ ivD, sE ^ ivE, sF ^ ivF);
-                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7,
                 iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
                 decrypted = decrypted + length | 0;
                 offset = offset + length | 0;
@@ -2045,8 +2045,8 @@
             Z0 = z0, Z1 = z1, Z2 = z2, Z3 = z3;
         }
         function gcm_init() {
-            _encrypt(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), H0 = S0 << 24 | S1 << 16 | S2 << 8 | S3, 
-            H1 = S4 << 24 | S5 << 16 | S6 << 8 | S7, H2 = S8 << 24 | S9 << 16 | SA << 8 | SB, 
+            _encrypt(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), H0 = S0 << 24 | S1 << 16 | S2 << 8 | S3,
+            H1 = S4 << 24 | S5 << 16 | S6 << 8 | S7, H2 = S8 << 24 | S9 << 16 | SA << 8 | SB,
             H3 = SC << 24 | SD << 16 | SE << 8 | SF;
             Z0 = Z1 = Z2 = Z3 = 0;
         }
@@ -2055,15 +2055,15 @@
             length = length | 0;
             var processed = 0;
             if (offset & 15) return -1;
-            Z0 = S0 << 24 | S1 << 16 | S2 << 8 | S3, Z1 = S4 << 24 | S5 << 16 | S6 << 8 | S7, 
+            Z0 = S0 << 24 | S1 << 16 | S2 << 8 | S3, Z1 = S4 << 24 | S5 << 16 | S6 << 8 | S7,
             Z2 = S8 << 24 | S9 << 16 | SA << 8 | SB, Z3 = SC << 24 | SD << 16 | SE << 8 | SF;
             while ((length | 0) >= 16) {
                 _gcm_mult(Z0 ^ (HEAP[offset | 0] << 24 | HEAP[offset | 1] << 16 | HEAP[offset | 2] << 8 | HEAP[offset | 3]), Z1 ^ (HEAP[offset | 4] << 24 | HEAP[offset | 5] << 16 | HEAP[offset | 6] << 8 | HEAP[offset | 7]), Z2 ^ (HEAP[offset | 8] << 24 | HEAP[offset | 9] << 16 | HEAP[offset | 10] << 8 | HEAP[offset | 11]), Z3 ^ (HEAP[offset | 12] << 24 | HEAP[offset | 13] << 16 | HEAP[offset | 14] << 8 | HEAP[offset | 15]));
                 offset = offset + 16 | 0, length = length - 16 | 0, processed = processed + 16 | 0;
             }
-            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24, 
-            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255, 
-            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255, 
+            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24,
+            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255,
+            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255,
             SF = Z3 & 255;
             return processed | 0;
         }
@@ -2087,13 +2087,13 @@
             if (offset & 15) return -1;
             while ((length | 0) >= 16) {
                 _encrypt(g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF >>> 24, gCDEF >>> 16 & 255, gCDEF >>> 8 & 255, gCDEF & 255);
-                HEAP[offset | 0] = s0 = HEAP[offset | 0] ^ S0, HEAP[offset | 1] = s1 = HEAP[offset | 1] ^ S1, 
-                HEAP[offset | 2] = s2 = HEAP[offset | 2] ^ S2, HEAP[offset | 3] = s3 = HEAP[offset | 3] ^ S3, 
-                HEAP[offset | 4] = s4 = HEAP[offset | 4] ^ S4, HEAP[offset | 5] = s5 = HEAP[offset | 5] ^ S5, 
-                HEAP[offset | 6] = s6 = HEAP[offset | 6] ^ S6, HEAP[offset | 7] = s7 = HEAP[offset | 7] ^ S7, 
-                HEAP[offset | 8] = s8 = HEAP[offset | 8] ^ S8, HEAP[offset | 9] = s9 = HEAP[offset | 9] ^ S9, 
-                HEAP[offset | 10] = sA = HEAP[offset | 10] ^ SA, HEAP[offset | 11] = sB = HEAP[offset | 11] ^ SB, 
-                HEAP[offset | 12] = sC = HEAP[offset | 12] ^ SC, HEAP[offset | 13] = sD = HEAP[offset | 13] ^ SD, 
+                HEAP[offset | 0] = s0 = HEAP[offset | 0] ^ S0, HEAP[offset | 1] = s1 = HEAP[offset | 1] ^ S1,
+                HEAP[offset | 2] = s2 = HEAP[offset | 2] ^ S2, HEAP[offset | 3] = s3 = HEAP[offset | 3] ^ S3,
+                HEAP[offset | 4] = s4 = HEAP[offset | 4] ^ S4, HEAP[offset | 5] = s5 = HEAP[offset | 5] ^ S5,
+                HEAP[offset | 6] = s6 = HEAP[offset | 6] ^ S6, HEAP[offset | 7] = s7 = HEAP[offset | 7] ^ S7,
+                HEAP[offset | 8] = s8 = HEAP[offset | 8] ^ S8, HEAP[offset | 9] = s9 = HEAP[offset | 9] ^ S9,
+                HEAP[offset | 10] = sA = HEAP[offset | 10] ^ SA, HEAP[offset | 11] = sB = HEAP[offset | 11] ^ SB,
+                HEAP[offset | 12] = sC = HEAP[offset | 12] ^ SC, HEAP[offset | 13] = sD = HEAP[offset | 13] ^ SD,
                 HEAP[offset | 14] = sE = HEAP[offset | 14] ^ SE, HEAP[offset | 15] = sF = HEAP[offset | 15] ^ SF;
                 _gcm_mult(Z0 ^ (s0 << 24 | s1 << 16 | s2 << 8 | s3), Z1 ^ (s4 << 24 | s5 << 16 | s6 << 8 | s7), Z2 ^ (s8 << 24 | s9 << 16 | sA << 8 | sB), Z3 ^ (sC << 24 | sD << 16 | sE << 8 | sF));
                 gCDEF = gCDEF + 1 | 0;
@@ -2101,12 +2101,12 @@
             }
             if ((length | 0) > 0) {
                 _encrypt(g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF >>> 24, gCDEF >>> 16 & 255, gCDEF >>> 8 & 255, gCDEF & 255);
-                s0 = HEAP[offset | 0] ^ S0, s1 = (length | 0) > 1 ? HEAP[offset | 1] ^ S1 : 0, s2 = (length | 0) > 2 ? HEAP[offset | 2] ^ S2 : 0, 
-                s3 = (length | 0) > 3 ? HEAP[offset | 3] ^ S3 : 0, s4 = (length | 0) > 4 ? HEAP[offset | 4] ^ S4 : 0, 
-                s5 = (length | 0) > 5 ? HEAP[offset | 5] ^ S5 : 0, s6 = (length | 0) > 6 ? HEAP[offset | 6] ^ S6 : 0, 
-                s7 = (length | 0) > 7 ? HEAP[offset | 7] ^ S7 : 0, s8 = (length | 0) > 8 ? HEAP[offset | 8] ^ S8 : 0, 
-                s9 = (length | 0) > 9 ? HEAP[offset | 9] ^ S9 : 0, sA = (length | 0) > 10 ? HEAP[offset | 10] ^ SA : 0, 
-                sB = (length | 0) > 11 ? HEAP[offset | 11] ^ SB : 0, sC = (length | 0) > 12 ? HEAP[offset | 12] ^ SC : 0, 
+                s0 = HEAP[offset | 0] ^ S0, s1 = (length | 0) > 1 ? HEAP[offset | 1] ^ S1 : 0, s2 = (length | 0) > 2 ? HEAP[offset | 2] ^ S2 : 0,
+                s3 = (length | 0) > 3 ? HEAP[offset | 3] ^ S3 : 0, s4 = (length | 0) > 4 ? HEAP[offset | 4] ^ S4 : 0,
+                s5 = (length | 0) > 5 ? HEAP[offset | 5] ^ S5 : 0, s6 = (length | 0) > 6 ? HEAP[offset | 6] ^ S6 : 0,
+                s7 = (length | 0) > 7 ? HEAP[offset | 7] ^ S7 : 0, s8 = (length | 0) > 8 ? HEAP[offset | 8] ^ S8 : 0,
+                s9 = (length | 0) > 9 ? HEAP[offset | 9] ^ S9 : 0, sA = (length | 0) > 10 ? HEAP[offset | 10] ^ SA : 0,
+                sB = (length | 0) > 11 ? HEAP[offset | 11] ^ SB : 0, sC = (length | 0) > 12 ? HEAP[offset | 12] ^ SC : 0,
                 sD = (length | 0) > 13 ? HEAP[offset | 13] ^ SD : 0, sE = (length | 0) > 14 ? HEAP[offset | 14] ^ SE : 0;
                 sF = 0;
                 HEAP[offset] = s0;
@@ -2128,9 +2128,9 @@
                 gCDEF = gCDEF + 1 | 0;
                 processed = processed + length | 0;
             }
-            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24, 
-            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255, 
-            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255, 
+            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24,
+            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255,
+            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255,
             SF = Z3 & 255;
             return processed | 0;
         }
@@ -2153,30 +2153,30 @@
             var s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0, s7 = 0, s8 = 0, s9 = 0, sA = 0, sB = 0, sC = 0, sD = 0, sE = 0, sF = 0, processed = 0;
             if (offset & 15) return -1;
             while ((length | 0) >= 16) {
-                s0 = HEAP[offset | 0] | 0, s1 = HEAP[offset | 1] | 0, s2 = HEAP[offset | 2] | 0, 
-                s3 = HEAP[offset | 3] | 0, s4 = HEAP[offset | 4] | 0, s5 = HEAP[offset | 5] | 0, 
-                s6 = HEAP[offset | 6] | 0, s7 = HEAP[offset | 7] | 0, s8 = HEAP[offset | 8] | 0, 
-                s9 = HEAP[offset | 9] | 0, sA = HEAP[offset | 10] | 0, sB = HEAP[offset | 11] | 0, 
-                sC = HEAP[offset | 12] | 0, sD = HEAP[offset | 13] | 0, sE = HEAP[offset | 14] | 0, 
+                s0 = HEAP[offset | 0] | 0, s1 = HEAP[offset | 1] | 0, s2 = HEAP[offset | 2] | 0,
+                s3 = HEAP[offset | 3] | 0, s4 = HEAP[offset | 4] | 0, s5 = HEAP[offset | 5] | 0,
+                s6 = HEAP[offset | 6] | 0, s7 = HEAP[offset | 7] | 0, s8 = HEAP[offset | 8] | 0,
+                s9 = HEAP[offset | 9] | 0, sA = HEAP[offset | 10] | 0, sB = HEAP[offset | 11] | 0,
+                sC = HEAP[offset | 12] | 0, sD = HEAP[offset | 13] | 0, sE = HEAP[offset | 14] | 0,
                 sF = HEAP[offset | 15] | 0;
                 _gcm_mult(Z0 ^ (s0 << 24 | s1 << 16 | s2 << 8 | s3), Z1 ^ (s4 << 24 | s5 << 16 | s6 << 8 | s7), Z2 ^ (s8 << 24 | s9 << 16 | sA << 8 | sB), Z3 ^ (sC << 24 | sD << 16 | sE << 8 | sF));
                 _encrypt(g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF >>> 24, gCDEF >>> 16 & 255, gCDEF >>> 8 & 255, gCDEF & 255);
-                HEAP[offset | 0] = s0 ^ S0, HEAP[offset | 1] = s1 ^ S1, HEAP[offset | 2] = s2 ^ S2, 
-                HEAP[offset | 3] = s3 ^ S3, HEAP[offset | 4] = s4 ^ S4, HEAP[offset | 5] = s5 ^ S5, 
-                HEAP[offset | 6] = s6 ^ S6, HEAP[offset | 7] = s7 ^ S7, HEAP[offset | 8] = s8 ^ S8, 
-                HEAP[offset | 9] = s9 ^ S9, HEAP[offset | 10] = sA ^ SA, HEAP[offset | 11] = sB ^ SB, 
-                HEAP[offset | 12] = sC ^ SC, HEAP[offset | 13] = sD ^ SD, HEAP[offset | 14] = sE ^ SE, 
+                HEAP[offset | 0] = s0 ^ S0, HEAP[offset | 1] = s1 ^ S1, HEAP[offset | 2] = s2 ^ S2,
+                HEAP[offset | 3] = s3 ^ S3, HEAP[offset | 4] = s4 ^ S4, HEAP[offset | 5] = s5 ^ S5,
+                HEAP[offset | 6] = s6 ^ S6, HEAP[offset | 7] = s7 ^ S7, HEAP[offset | 8] = s8 ^ S8,
+                HEAP[offset | 9] = s9 ^ S9, HEAP[offset | 10] = sA ^ SA, HEAP[offset | 11] = sB ^ SB,
+                HEAP[offset | 12] = sC ^ SC, HEAP[offset | 13] = sD ^ SD, HEAP[offset | 14] = sE ^ SE,
                 HEAP[offset | 15] = sF ^ SF;
                 gCDEF = gCDEF + 1 | 0;
                 offset = offset + 16 | 0, length = length - 16 | 0, processed = processed + 16 | 0;
             }
             if ((length | 0) > 0) {
-                s0 = HEAP[offset | 0] | 0, s1 = (length | 0) > 1 ? HEAP[offset | 1] | 0 : 0, s2 = (length | 0) > 2 ? HEAP[offset | 2] | 0 : 0, 
-                s3 = (length | 0) > 3 ? HEAP[offset | 3] | 0 : 0, s4 = (length | 0) > 4 ? HEAP[offset | 4] | 0 : 0, 
-                s5 = (length | 0) > 5 ? HEAP[offset | 5] | 0 : 0, s6 = (length | 0) > 6 ? HEAP[offset | 6] | 0 : 0, 
-                s7 = (length | 0) > 7 ? HEAP[offset | 7] | 0 : 0, s8 = (length | 0) > 8 ? HEAP[offset | 8] | 0 : 0, 
-                s9 = (length | 0) > 9 ? HEAP[offset | 9] | 0 : 0, sA = (length | 0) > 10 ? HEAP[offset | 10] | 0 : 0, 
-                sB = (length | 0) > 11 ? HEAP[offset | 11] | 0 : 0, sC = (length | 0) > 12 ? HEAP[offset | 12] | 0 : 0, 
+                s0 = HEAP[offset | 0] | 0, s1 = (length | 0) > 1 ? HEAP[offset | 1] | 0 : 0, s2 = (length | 0) > 2 ? HEAP[offset | 2] | 0 : 0,
+                s3 = (length | 0) > 3 ? HEAP[offset | 3] | 0 : 0, s4 = (length | 0) > 4 ? HEAP[offset | 4] | 0 : 0,
+                s5 = (length | 0) > 5 ? HEAP[offset | 5] | 0 : 0, s6 = (length | 0) > 6 ? HEAP[offset | 6] | 0 : 0,
+                s7 = (length | 0) > 7 ? HEAP[offset | 7] | 0 : 0, s8 = (length | 0) > 8 ? HEAP[offset | 8] | 0 : 0,
+                s9 = (length | 0) > 9 ? HEAP[offset | 9] | 0 : 0, sA = (length | 0) > 10 ? HEAP[offset | 10] | 0 : 0,
+                sB = (length | 0) > 11 ? HEAP[offset | 11] | 0 : 0, sC = (length | 0) > 12 ? HEAP[offset | 12] | 0 : 0,
                 sD = (length | 0) > 13 ? HEAP[offset | 13] | 0 : 0, sE = (length | 0) > 14 ? HEAP[offset | 14] | 0 : 0;
                 sF = 0;
                 _gcm_mult(Z0 ^ (s0 << 24 | s1 << 16 | s2 << 8 | s3), Z1 ^ (s4 << 24 | s5 << 16 | s6 << 8 | s7), Z2 ^ (s8 << 24 | s9 << 16 | sA << 8 | sB), Z3 ^ (sC << 24 | sD << 16 | sE << 8 | sF));
@@ -2199,9 +2199,9 @@
                 gCDEF = gCDEF + 1 | 0;
                 processed = processed + length | 0;
             }
-            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24, 
-            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255, 
-            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255, 
+            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24,
+            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255,
+            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255,
             SF = Z3 & 255;
             return processed | 0;
         }
@@ -3380,7 +3380,7 @@
             HEAP[offset + length + 2 | 0] = block >>> 8 & 255;
             HEAP[offset + length + 3 | 0] = block & 255;
             hmac_finish(offset, length + 4 | 0, -1) | 0;
-            h0 = t0 = H0, h1 = t1 = H1, h2 = t2 = H2, h3 = t3 = H3, h4 = t4 = H4, h5 = t5 = H5, 
+            h0 = t0 = H0, h1 = t1 = H1, h2 = t2 = H2, h3 = t3 = H3, h4 = t4 = H4, h5 = t5 = H5,
             h6 = t6 = H6, h7 = t7 = H7;
             count = count - 1 | 0;
             while ((count | 0) > 0) {
@@ -4082,24 +4082,24 @@
             if ((lR | 0) < (lB | 0)) lB = lR;
             for (;(i | 0) < (lA | 0); i = i + 32 | 0) {
                 Ai = A + i | 0;
-                ah0 = HEAP32[(Ai | 0) >> 2] | 0, ah1 = HEAP32[(Ai | 4) >> 2] | 0, ah2 = HEAP32[(Ai | 8) >> 2] | 0, 
-                ah3 = HEAP32[(Ai | 12) >> 2] | 0, ah4 = HEAP32[(Ai | 16) >> 2] | 0, ah5 = HEAP32[(Ai | 20) >> 2] | 0, 
-                ah6 = HEAP32[(Ai | 24) >> 2] | 0, ah7 = HEAP32[(Ai | 28) >> 2] | 0, al0 = ah0 & 65535, 
-                al1 = ah1 & 65535, al2 = ah2 & 65535, al3 = ah3 & 65535, al4 = ah4 & 65535, al5 = ah5 & 65535, 
-                al6 = ah6 & 65535, al7 = ah7 & 65535, ah0 = ah0 >>> 16, ah1 = ah1 >>> 16, ah2 = ah2 >>> 16, 
+                ah0 = HEAP32[(Ai | 0) >> 2] | 0, ah1 = HEAP32[(Ai | 4) >> 2] | 0, ah2 = HEAP32[(Ai | 8) >> 2] | 0,
+                ah3 = HEAP32[(Ai | 12) >> 2] | 0, ah4 = HEAP32[(Ai | 16) >> 2] | 0, ah5 = HEAP32[(Ai | 20) >> 2] | 0,
+                ah6 = HEAP32[(Ai | 24) >> 2] | 0, ah7 = HEAP32[(Ai | 28) >> 2] | 0, al0 = ah0 & 65535,
+                al1 = ah1 & 65535, al2 = ah2 & 65535, al3 = ah3 & 65535, al4 = ah4 & 65535, al5 = ah5 & 65535,
+                al6 = ah6 & 65535, al7 = ah7 & 65535, ah0 = ah0 >>> 16, ah1 = ah1 >>> 16, ah2 = ah2 >>> 16,
                 ah3 = ah3 >>> 16, ah4 = ah4 >>> 16, ah5 = ah5 >>> 16, ah6 = ah6 >>> 16, ah7 = ah7 >>> 16;
                 r8 = r9 = r10 = r11 = r12 = r13 = r14 = r15 = 0;
                 for (j = 0; (j | 0) < (lB | 0); j = j + 32 | 0) {
                     Bj = B + j | 0;
                     Rk = R + (i + j | 0) | 0;
-                    bh0 = HEAP32[(Bj | 0) >> 2] | 0, bh1 = HEAP32[(Bj | 4) >> 2] | 0, bh2 = HEAP32[(Bj | 8) >> 2] | 0, 
-                    bh3 = HEAP32[(Bj | 12) >> 2] | 0, bh4 = HEAP32[(Bj | 16) >> 2] | 0, bh5 = HEAP32[(Bj | 20) >> 2] | 0, 
-                    bh6 = HEAP32[(Bj | 24) >> 2] | 0, bh7 = HEAP32[(Bj | 28) >> 2] | 0, bl0 = bh0 & 65535, 
-                    bl1 = bh1 & 65535, bl2 = bh2 & 65535, bl3 = bh3 & 65535, bl4 = bh4 & 65535, bl5 = bh5 & 65535, 
-                    bl6 = bh6 & 65535, bl7 = bh7 & 65535, bh0 = bh0 >>> 16, bh1 = bh1 >>> 16, bh2 = bh2 >>> 16, 
+                    bh0 = HEAP32[(Bj | 0) >> 2] | 0, bh1 = HEAP32[(Bj | 4) >> 2] | 0, bh2 = HEAP32[(Bj | 8) >> 2] | 0,
+                    bh3 = HEAP32[(Bj | 12) >> 2] | 0, bh4 = HEAP32[(Bj | 16) >> 2] | 0, bh5 = HEAP32[(Bj | 20) >> 2] | 0,
+                    bh6 = HEAP32[(Bj | 24) >> 2] | 0, bh7 = HEAP32[(Bj | 28) >> 2] | 0, bl0 = bh0 & 65535,
+                    bl1 = bh1 & 65535, bl2 = bh2 & 65535, bl3 = bh3 & 65535, bl4 = bh4 & 65535, bl5 = bh5 & 65535,
+                    bl6 = bh6 & 65535, bl7 = bh7 & 65535, bh0 = bh0 >>> 16, bh1 = bh1 >>> 16, bh2 = bh2 >>> 16,
                     bh3 = bh3 >>> 16, bh4 = bh4 >>> 16, bh5 = bh5 >>> 16, bh6 = bh6 >>> 16, bh7 = bh7 >>> 16;
-                    r0 = HEAP32[(Rk | 0) >> 2] | 0, r1 = HEAP32[(Rk | 4) >> 2] | 0, r2 = HEAP32[(Rk | 8) >> 2] | 0, 
-                    r3 = HEAP32[(Rk | 12) >> 2] | 0, r4 = HEAP32[(Rk | 16) >> 2] | 0, r5 = HEAP32[(Rk | 20) >> 2] | 0, 
+                    r0 = HEAP32[(Rk | 0) >> 2] | 0, r1 = HEAP32[(Rk | 4) >> 2] | 0, r2 = HEAP32[(Rk | 8) >> 2] | 0,
+                    r3 = HEAP32[(Rk | 12) >> 2] | 0, r4 = HEAP32[(Rk | 16) >> 2] | 0, r5 = HEAP32[(Rk | 20) >> 2] | 0,
                     r6 = HEAP32[(Rk | 24) >> 2] | 0, r7 = HEAP32[(Rk | 28) >> 2] | 0;
                     u = ((imul(al0, bl0) | 0) + (r8 & 65535) | 0) + (r0 & 65535) | 0;
                     v = ((imul(ah0, bl0) | 0) + (r8 >>> 16) | 0) + (r0 >>> 16) | 0;
@@ -4429,13 +4429,13 @@
                     m = ((imul(ah7, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
                     r14 = w << 16 | u & 65535;
                     r15 = m;
-                    HEAP32[(Rk | 0) >> 2] = r0, HEAP32[(Rk | 4) >> 2] = r1, HEAP32[(Rk | 8) >> 2] = r2, 
-                    HEAP32[(Rk | 12) >> 2] = r3, HEAP32[(Rk | 16) >> 2] = r4, HEAP32[(Rk | 20) >> 2] = r5, 
+                    HEAP32[(Rk | 0) >> 2] = r0, HEAP32[(Rk | 4) >> 2] = r1, HEAP32[(Rk | 8) >> 2] = r2,
+                    HEAP32[(Rk | 12) >> 2] = r3, HEAP32[(Rk | 16) >> 2] = r4, HEAP32[(Rk | 20) >> 2] = r5,
                     HEAP32[(Rk | 24) >> 2] = r6, HEAP32[(Rk | 28) >> 2] = r7;
                 }
                 Rk = R + (i + j | 0) | 0;
-                HEAP32[(Rk | 0) >> 2] = r8, HEAP32[(Rk | 4) >> 2] = r9, HEAP32[(Rk | 8) >> 2] = r10, 
-                HEAP32[(Rk | 12) >> 2] = r11, HEAP32[(Rk | 16) >> 2] = r12, HEAP32[(Rk | 20) >> 2] = r13, 
+                HEAP32[(Rk | 0) >> 2] = r8, HEAP32[(Rk | 4) >> 2] = r9, HEAP32[(Rk | 8) >> 2] = r10,
+                HEAP32[(Rk | 12) >> 2] = r11, HEAP32[(Rk | 16) >> 2] = r12, HEAP32[(Rk | 20) >> 2] = r13,
                 HEAP32[(Rk | 24) >> 2] = r14, HEAP32[(Rk | 28) >> 2] = r15;
             }
         }
@@ -4480,9 +4480,9 @@
             }
             for (p = 0; (p | 0) < (lA | 0); p = p + 16 | 0) {
                 Ai = A + p | 0, Rk = R + (p << 1) | 0;
-                ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0, 
+                ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0,
                 al1 = ah1 & 65535, ah1 = ah1 >>> 16;
-                bh0 = HEAP32[(Ai | 8) >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Ai | 12) >> 2] | 0, 
+                bh0 = HEAP32[(Ai | 8) >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Ai | 12) >> 2] | 0,
                 bl1 = bh1 & 65535, bh1 = bh1 >>> 16;
                 u = imul(al0, bl0) | 0;
                 v = imul(ah0, bl0) | 0;
@@ -4536,11 +4536,11 @@
             }
             for (p = 0; (p | 0) < (lA | 0); p = p + 32 | 0) {
                 Ai = A + p | 0, Rk = R + (p << 1) | 0;
-                ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0, 
-                al1 = ah1 & 65535, ah1 = ah1 >>> 16, ah2 = HEAP32[(Ai | 8) >> 2] | 0, al2 = ah2 & 65535, 
+                ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0,
+                al1 = ah1 & 65535, ah1 = ah1 >>> 16, ah2 = HEAP32[(Ai | 8) >> 2] | 0, al2 = ah2 & 65535,
                 ah2 = ah2 >>> 16, ah3 = HEAP32[(Ai | 12) >> 2] | 0, al3 = ah3 & 65535, ah3 = ah3 >>> 16;
-                bh0 = HEAP32[(Ai | 16) >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Ai | 20) >> 2] | 0, 
-                bl1 = bh1 & 65535, bh1 = bh1 >>> 16, bh2 = HEAP32[(Ai | 24) >> 2] | 0, bl2 = bh2 & 65535, 
+                bh0 = HEAP32[(Ai | 16) >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Ai | 20) >> 2] | 0,
+                bl1 = bh1 & 65535, bh1 = bh1 >>> 16, bh2 = HEAP32[(Ai | 24) >> 2] | 0, bl2 = bh2 & 65535,
                 bh2 = bh2 >>> 16, bh3 = HEAP32[(Ai | 28) >> 2] | 0, bl3 = bh3 & 65535, bh3 = bh3 >>> 16;
                 u = imul(al0, bl0) | 0;
                 v = imul(ah0, bl0) | 0;
@@ -4681,20 +4681,20 @@
                     h = 0;
                     for (i = 0; (i | 0) < (d | 0); i = i + 32 | 0) {
                         Ai = (A + p | 0) + i | 0;
-                        ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0, 
-                        al1 = ah1 & 65535, ah1 = ah1 >>> 16, ah2 = HEAP32[(Ai | 8) >> 2] | 0, al2 = ah2 & 65535, 
-                        ah2 = ah2 >>> 16, ah3 = HEAP32[(Ai | 12) >> 2] | 0, al3 = ah3 & 65535, ah3 = ah3 >>> 16, 
-                        ah4 = HEAP32[(Ai | 16) >> 2] | 0, al4 = ah4 & 65535, ah4 = ah4 >>> 16, ah5 = HEAP32[(Ai | 20) >> 2] | 0, 
-                        al5 = ah5 & 65535, ah5 = ah5 >>> 16, ah6 = HEAP32[(Ai | 24) >> 2] | 0, al6 = ah6 & 65535, 
+                        ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0,
+                        al1 = ah1 & 65535, ah1 = ah1 >>> 16, ah2 = HEAP32[(Ai | 8) >> 2] | 0, al2 = ah2 & 65535,
+                        ah2 = ah2 >>> 16, ah3 = HEAP32[(Ai | 12) >> 2] | 0, al3 = ah3 & 65535, ah3 = ah3 >>> 16,
+                        ah4 = HEAP32[(Ai | 16) >> 2] | 0, al4 = ah4 & 65535, ah4 = ah4 >>> 16, ah5 = HEAP32[(Ai | 20) >> 2] | 0,
+                        al5 = ah5 & 65535, ah5 = ah5 >>> 16, ah6 = HEAP32[(Ai | 24) >> 2] | 0, al6 = ah6 & 65535,
                         ah6 = ah6 >>> 16, ah7 = HEAP32[(Ai | 28) >> 2] | 0, al7 = ah7 & 65535, ah7 = ah7 >>> 16;
                         r8 = r9 = r10 = r11 = r12 = r13 = r14 = r15 = c = 0;
                         for (j = 0; (j | 0) < (d | 0); j = j + 32 | 0) {
                             Aj = ((A + p | 0) + d | 0) + j | 0;
-                            bh0 = HEAP32[Aj >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Aj | 4) >> 2] | 0, 
-                            bl1 = bh1 & 65535, bh1 = bh1 >>> 16, bh2 = HEAP32[(Aj | 8) >> 2] | 0, bl2 = bh2 & 65535, 
-                            bh2 = bh2 >>> 16, bh3 = HEAP32[(Aj | 12) >> 2] | 0, bl3 = bh3 & 65535, bh3 = bh3 >>> 16, 
-                            bh4 = HEAP32[(Aj | 16) >> 2] | 0, bl4 = bh4 & 65535, bh4 = bh4 >>> 16, bh5 = HEAP32[(Aj | 20) >> 2] | 0, 
-                            bl5 = bh5 & 65535, bh5 = bh5 >>> 16, bh6 = HEAP32[(Aj | 24) >> 2] | 0, bl6 = bh6 & 65535, 
+                            bh0 = HEAP32[Aj >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Aj | 4) >> 2] | 0,
+                            bl1 = bh1 & 65535, bh1 = bh1 >>> 16, bh2 = HEAP32[(Aj | 8) >> 2] | 0, bl2 = bh2 & 65535,
+                            bh2 = bh2 >>> 16, bh3 = HEAP32[(Aj | 12) >> 2] | 0, bl3 = bh3 & 65535, bh3 = bh3 >>> 16,
+                            bh4 = HEAP32[(Aj | 16) >> 2] | 0, bl4 = bh4 & 65535, bh4 = bh4 >>> 16, bh5 = HEAP32[(Aj | 20) >> 2] | 0,
+                            bl5 = bh5 & 65535, bh5 = bh5 >>> 16, bh6 = HEAP32[(Aj | 24) >> 2] | 0, bl6 = bh6 & 65535,
                             bh6 = bh6 >>> 16, bh7 = HEAP32[(Aj | 28) >> 2] | 0, bl7 = bh7 & 65535, bh7 = bh7 >>> 16;
                             r0 = r1 = r2 = r3 = r4 = r5 = r6 = r7 = 0;
                             u = ((imul(al0, bl0) | 0) + (r0 & 65535) | 0) + (r8 & 65535) | 0;
@@ -6213,82 +6213,92 @@ function crypto_process_sharekey(handle,key)
 // master_aes - my master password's AES cipher
 // file - ufs node containing .k and .a
 // Output: .key and .name set if successful
-function crypto_processkey(me,master_aes,file,OUT)
-{
+function crypto_processkey(me, master_aes, file, OUT) {
+
 	var id = me, key, k, n;
 
 	// do I own the file? (user key is guaranteed to be first in .k)
 	var p = file.k.indexOf(id + ':');
 
-	if (p)
-	{
+	if (p) {
 		// I don't - do I have a suitable sharekey?
-		for (id in u_sharekeys)
-		{
-			p = file.k.indexOf(id + ':');
+		for (id in u_sharekeys) {
 
-			if (p >= 0 && (!p || file.k.charAt(p-1) == '/'))
-			{
+			p = file.k.indexOf(id + ':');
+			if ((p >= 0) && (!p || (file.k.charAt(p-1) === '/'))) {
 				OUT.fk = 1;
 				break;
 			}
-
 			p = -1;
 		}
 	}
 
-	if (p >= 0)
-	{
+	if ( p >= 0 ) {
+
 		var pp = file.k.indexOf('/',p);
 
-		if (pp < 0) pp = file.k.length;
+		if (pp < 0) {
+            pp = file.k.length;
+        }
 
-		p += id.length+1;
+		p += id.length + 1;
 
 		key = file.k.substr(p,pp-p);
 
 		// we have found a suitable key: decrypt!
-		if (key.length < 46)
-		{
+		if (key.length < 46) {
+
 			// short keys: AES
 			k = base64_to_a32(key);
 
 			// check for permitted key lengths (4 == folder, 8 == file)
-			if (k.length == 4 || k.length == 8)
-			{
+			if ((k.length === 4) || (k.length === 8)) {
+
 				// TODO: cache sharekeys in aes
-				k = decrypt_key(id == me ? master_aes : new sjcl.cipher.aes(u_sharekeys[id]),k);
+				k = decrypt_key((id == me) ? master_aes : new sjcl.cipher.aes(u_sharekeys[id]), k);
+
+                // Update global variable which holds data about missing keys
+                // so DOM can be updated accordingly
+                if (missingkeys[file.h]) {
+                    delete missingkeys[file.h];
+                }
 			}
-			else
-			{
-				if (d) console.log("Received invalid key length (" + k.length + "): " + file.h);
+			else {
+				if (d) {
+                    console.log("Received invalid key length (" + k.length + "): " + file.h);
+                }
 				return;
 			}
 		}
-		else
-		{
+		else {
+
 			// long keys: RSA
-			if (u_privk)
-			{
+			if (u_privk) {
+
 				var t = base64urldecode(key);
-				try
-				{
-					if (t) k = str_to_a32(crypto_rsadecrypt(t,u_privk).substr(0,file.t ? 16 : 32));
-					else
-					{
-						if (d) console.log("Corrupt key for node " + file.h);
+
+				try {
+					if (t) {
+                        k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, file.t ? 16 : 32));
+                    }
+					else {
+						if (d) {
+                            console.log("Corrupt key for node " + file.h);
+                        }
 						return;
 					}
 				}
-				catch(e)
-				{
-					if (d) console.log('u_privk error: ' + e);
+				catch(e) {
+					if (d) {
+                        console.log('u_privk error: ' + e);
+                    }
 					return;
 				}
 			}
-			else
-			{
-				if (d) console.log("Received RSA key, but have no public key published: " + file.h);
+			else {
+				if (d) {
+                    console.log("Received RSA key, but have no public key published: " + file.h);
+                }
 				return;
 			}
 		}
@@ -6298,40 +6308,50 @@ function crypto_processkey(me,master_aes,file,OUT)
 
 		// if (d) console.log('dec_attr', file.h, key,ab,k, o && o.n, o);
 
-		if (typeof o == 'object')
-		{
-			if (typeof o.n == 'string')
-			{
-				if (file.h)
-				{
-					// u_nodekeys[file.h] = k;
-					if (key.length >= 46) rsa2aes[file.h] = a32_to_str(encrypt_key(u_k_aes,k));
-				}
-				if (typeof o.c == 'string') file.hash = o.c;
+		if (typeof o === 'object') {
+			if (typeof o.n === 'string') {
+				if (file.h) {
 
-				if (typeof o.t !== 'undefined') OUT.mtime = o.t;
-				else if (file.hash)
-				{
+					// u_nodekeys[file.h] = k;
+					if (key.length >= 46) {
+                        rsa2aes[file.h] = a32_to_str(encrypt_key(u_k_aes,k));
+                    }
+				}
+				if (typeof o.c === 'string') {
+                    file.hash = o.c;
+                }
+
+				if (typeof o.t !== 'undefined') {
+                    OUT.mtime = o.t;
+                }
+				else if (file.hash) {
 					var h = base64urldecode(file.hash);
 					var t = 0;
-					for (var i = h.charCodeAt(16); i--; ) t = t*256+h.charCodeAt(17+i);
+					for (var i = h.charCodeAt(16); i--; ) {
+                        t = t * 256 + h.charCodeAt(17 + i);
+                    }
 					OUT.mtime=t;
 				}
 
 				OUT.key = k;
 				OUT.ar = o;
 				OUT.name = o.n;
-				if (o.fav) OUT.fav=1;
-				if (file.hash) OUT.hash = file.hash;
+
+				if (o.fav) {
+                    OUT.fav = 1;
+                }
+				if (file.hash) {
+                    OUT.hash = file.hash;
+                }
 			}
 		}
 	}
-	else
-	{
-		if (d) console.log("Received no suitable key: " + file.h);
+	else {
+		if (d) {
+            console.log("Received no suitable key: " + file.h);
+        }
 
-		if (!missingkeys[file.h])
-		{
+		if (!missingkeys[file.h]) {
 			newmissingkeys = true;
 			missingkeys[file.h] = true;
 		}

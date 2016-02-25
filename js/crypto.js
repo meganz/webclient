@@ -1647,12 +1647,6 @@ var from8 = firefox_boost ? mozFrom8 : function (utf8) {
     return decodeURIComponent(escape(utf8));
 };
 
-function getxhr() {
-    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined')
-        ? new XDomainRequest()
-        : new XMLHttpRequest();
-}
-
 // API command queueing
 // All commands are executed in sequence, with no overlap
 // @@@ user warning after backoff > 1000
@@ -1781,6 +1775,55 @@ function api_proc(q) {
             api_reqerror(q, -3);
         }
     };
+
+    // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
+    if (loadingInitDialog.active) {
+        var needProgress = false;
+
+        // check whether this channel queue will need the progress
+        var ctxs = q.ctxs[q.i];
+        var idx = ctxs.length;
+        while (idx--) {
+            var ctx = ctxs[idx];
+
+            if (typeof ctx.progress === 'function') {
+                needProgress = true;
+                break;
+            }
+        }
+
+        if (needProgress) {
+            q.xhr.onprogress = function (evt) {
+                var progressPercent = 0;
+                var bytes = evt.total || this.totalBytes;
+
+                if (!bytes) {
+                    // This may throws an exception if the header doesn't exists
+                    try {
+                        bytes = this.getResponseHeader('Original-Content-Length');
+                        this.totalBytes = bytes;
+                    }
+                    catch (e) {}
+                }
+                if (!bytes || bytes < 10) {
+                    return false;
+                }
+                if (evt.loaded > 0) {
+                    progressPercent = evt.loaded / bytes * 100;
+                }
+
+                var ctxs = this.q.ctxs[this.q.i];
+                var idx = ctxs.length;
+                while (idx--) {
+                    var ctx = ctxs[idx];
+
+                    if (typeof ctx.progress === 'function') {
+                        ctx.progress(progressPercent);
+                    }
+                }
+            };
+        }
+    }
 
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {
@@ -1985,32 +2028,27 @@ function stopsc() {
     }
 }
 
-// calls execsc() with server-client requests received
-function getsc(fm, initialNotify) {
+/**
+ * calls execsc() with server-client requests received
+ * @param {Boolean} mDBload whether invoked from indexedDB.
+ */
+function getsc(mDBload) {
     api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
-        fm: fm,
-        initialNotify: initialNotify,
+        mDBload: mDBload,
         callback: function __onGetSC(res, ctx) {
             if (typeof res === 'object') {
                 function getSCDone(sma) {
                     if (sma !== -0x7ff
-                            // && typeof mDBloaded !== 'undefined'
                             && !folderlink && !pfid
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
-                    if (ctx.fm) {
-                        // mDBloaded = true;
-                        loadfm_done();
-                    }
 
-                    // After the first SC request all subsequent requests can generate notifications
-                    notify.initialLoadComplete = true;
-
-                    // If this was called from the initial fm load via gettree or db load, we should request the
-                    // latest notifications. These must be done after the first getSC call.
-                    if (ctx.fm || ctx.initialNotify) {
-                        notify.getInitialNotifications();
+                    // If we're loading the cloud, notify completion only
+                    // once first action-packets have been processed.
+                    if (!mega.fmLoaded) {
+                        mega.fmLoaded = true;
+                        loadfm_done(ctx.mDBload);
                     }
                 }
                 if (res.w) {

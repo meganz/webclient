@@ -124,26 +124,6 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
-        // Flags is a generic object for various things
-        if (typeof u_attr.flags !== 'undefined') {
-
-            // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
-            if (typeof u_attr.flags.psa !== 'undefined') {
-
-                // Get the last seen announcement private attribute
-                var currentAnnounceNum = u_attr.flags.psa;
-                var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : 0;
-
-                // Set the values we need to know if the PSA should be shown, then show the announcement
-                psa.setInitialValues(currentAnnounceNum, lastSeenAttr);
-            }
-
-            // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
-            if (typeof u_attr.flags.mcs !== 'undefined') {
-                localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
-            }
-        }
-
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
         }
@@ -155,6 +135,26 @@ function u_checklogin3a(res, ctx) {
         }
         catch (e) {
             console.error('Error decoding private RSA key', e);
+        }
+
+        // Flags is a generic object for various things
+        if (typeof u_attr.flags !== 'undefined') {
+
+            // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
+            if (typeof u_attr.flags.psa !== 'undefined') {
+
+                // Get the last seen announcement private attribute
+                var currentAnnounceNum = u_attr.flags.psa;
+                var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : null;
+
+                // Set the values we need to know if the PSA should be shown, then show the announcement
+                psa.setInitialValues(currentAnnounceNum, lastSeenAttr);
+            }
+
+            // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
+            if (typeof u_attr.flags.mcs !== 'undefined') {
+                localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
+            }
         }
 
         if (!u_attr.email) {
@@ -1108,15 +1108,26 @@ function checkUserLogin() {
             logger.debug('Setting value for key "%s"', key, value);
         }
 
-        if (u_type === 3 && !folderlink) {
-            if (timer) {
-                clearTimeout(timer);
+        var push = function() {
+            if (u_type === 3 && !pfid && !folderlink) {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                // through a timer to prevent floods
+                timer = setTimeout(store, 9701);
             }
-            // through a timer to prevent floods
-            timer = setTimeout(store, 9701);
+            else {
+                localStorage.fmconfig = JSON.stringify(fmconfig);
+                timer = null;
+            }
+        };
+
+        if (fminitialized) {
+            Soon(push);
         }
-        else {
-            localStorage.fmconfig = JSON.stringify(fmconfig);
+        else if (timer !== -MMH_SEED) {
+            timer = -MMH_SEED;
+            mBroadcaster.once('fm:initialized', push);
         }
 
         mBroadcaster.sendMessage('fmconfig:' + key, value);

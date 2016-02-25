@@ -2668,7 +2668,7 @@
     "7588": "Wpisz swoje imi\u0119, nazwisko, adres e-mail oraz has\u0142o do MEGA",
     "7589": "Czy przenie\u015b\u0107 do kosza?",
     "7590": "Czy przenie\u015b\u0107 elementy do kosza?",
-    "7591": "Zaznaczy\u0142e\u015b ponad {0} element\u00f3w ({0}) do pobrania. Czy chcesz kontynuowa\u0107?",
+    "7591": "Zaznaczy\u0142e\u015b ponad {0} element\u00f3w ({1}) do pobrania. Czy chcesz kontynuowa\u0107?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Pobieranie plik\u00f3w i katalog\u00f3w... [{0}]",
@@ -3154,10 +3154,13 @@
     "8577": "Pobieranie danych konta",
     "8578": "Otrzymywanie danych konta",
     "8579": "Odszyfrowywanie",
-    "8580": "File import failed [{0}]",
-    "8584": "Requesting folder data",
-    "8585": "Receiving folder data",
-    "8586": "Decrypting folder data",
+    "8580": "Import pliku nie powi\u00f3d\u0142 si\u0119 [{0}]",
+    "8584": "Ustalanie danych katalogu",
+    "8585": "Pobieranie danych katalogu",
+    "8586": "Deszyfrowanie danych katalogu",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3189,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

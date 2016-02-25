@@ -3158,9 +3158,9 @@
     "8584": "Vy\u017eadov\u00e1n\u00ed dat slo\u017eky",
     "8585": "Z\u00edsk\u00e1v\u00e1n\u00ed dat slo\u017eky",
     "8586": "De\u0161ifrov\u00e1n\u00ed dat slo\u017eky",
-    "8587": "We are waiting for the cryptographic key to this file.",
-    "8588": "undecrypted file",
-    "8589": "No notifications",
+    "8587": "\u010cek\u00e1me na \u0161ifrovac\u00ed kl\u00ed\u010d k tomuto souboru.",
+    "8588": "ne\u0161ifrovateln\u00fd soubor",
+    "8589": "\u017d\u00e1dn\u00e1 ozn\u00e1men\u00ed",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

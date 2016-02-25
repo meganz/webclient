@@ -3158,9 +3158,9 @@
     "8584": "Ustalanie danych katalogu",
     "8585": "Pobieranie danych katalogu",
     "8586": "Deszyfrowanie danych katalogu",
-    "8587": "We are waiting for the cryptographic key to this file.",
-    "8588": "undecrypted file",
-    "8589": "No notifications",
+    "8587": "Oczekujemy na klucz szyfruj\u0105cy do tego pliku.",
+    "8588": "plik nie odszyfrowany",
+    "8589": "Brak powiadomie\u0144",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

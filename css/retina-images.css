@@ -352,7 +352,7 @@ body.pro:after {
     background-image: url(../images/mega/top-login-sprite@2x_v4.png);
     background-size: 48px auto;
 }
-.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .toast-icon {
+.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked:not(.undecryptable) .tree-item-icon, .taken-down:not(.undecryptable) .tree-item-icon, .toast-icon {
     background-image: url(../images/mega/register-big-sprite-v8@2x.png);
     background-size: 200px auto;
 }

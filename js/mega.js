@@ -1038,7 +1038,7 @@ function MegaData()
         function renderLayout(u, n_cache) {
             var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
-                sExportLink, sLinkIcon, additionClass, titleTooltip, fName, fIcon,
+                sExportLink, additionClass, titleTooltip, fName, fIcon,
                 iShareNum = 0,
                 s, ftype, c, cc, star;
 
@@ -1183,7 +1183,6 @@ function MegaData()
                         || M.ps[M.v[i].h])
                         ? true : false;
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
-                    sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                     additionClass = '';
                     titleTooltip = '';
                     fName = htmlentities(M.v[i].name);
@@ -1211,7 +1210,7 @@ function MegaData()
                         el = 'a';
                         html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
-                                    <span class="' + sLinkIcon + '"></span>\n\
+                                    <span class="tree-item-icon"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
@@ -1243,7 +1242,7 @@ function MegaData()
                                     <td width="120">' + time + '</td>\n\
                                     <td width="62" class="grid-url-field own-data ' + sExportLink + '">\n\
                                         <a class="grid-url-arrow"></a>\n\
-                                        <span class="' + sLinkIcon + '"></span>\n\
+                                        <span class="tree-item-icon"></span>\n\
                                     </td>\n\
                                 </tr>';
                     }
@@ -2042,7 +2041,7 @@ function MegaData()
             _a = 'treea_',
             rebuild = false,
             sharedfolder, openedc, arrowIcon,
-            ulc, expandedc, buildnode, containsc, cns, html, sExportLink, sLinkIcon,
+            ulc, expandedc, buildnode, containsc, cns, html, sExportLink,
             prefix;
 
         var share = new mega.Share({});
@@ -2198,7 +2197,6 @@ function MegaData()
                     }
                     else {
                         sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
-                        sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                         arrowIcon = '';
 
                         if (containsc) {
@@ -2208,7 +2206,7 @@ function MegaData()
                                         <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
                                             <span ' + arrowIcon + '></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
-                                            <span class="' + sLinkIcon + '"></span>\n\
+                                            <span class="tree-item-icon"></span>\n\
                                         </span>\n\
                                         <ul id="' + _sub + folders[ii].h + '" ' + ulc + '></ul>\n\
                                     </li>';
@@ -7762,12 +7760,10 @@ function balance2pro(callback)
 
             // Add link-icon to list view
             $('.own-data', $nodeId).addClass('linked');
-            $('.own-data span', $nodeId).eq(0).addClass('link-icon');
 
             // Add link-icon to grid view
             if ($nodeId.hasClass('file-block')) {
                 $nodeId.addClass('linked');
-                $('span', $nodeId).eq(1).addClass('link-icon');
             }
         }
 
@@ -7775,9 +7771,6 @@ function balance2pro(callback)
 
             // Add link-icon to left panel
             $tree.addClass('linked');
-
-            // Add class to the third from the list
-            $(' span', $tree).eq(2).addClass('link-icon');
         }
     };
 
@@ -7791,14 +7784,12 @@ function balance2pro(callback)
 
         // Remove link icon from list view
         $('#' + nodeId + ' .own-data').removeClass('linked');
-        $('#' + nodeId + ' .own-data span').removeClass('link-icon');
 
         // Remove link icon from grid view
         $('#' + nodeId + '.file-block').removeClass('linked');
-        $('#' + nodeId + '.file-block span').removeClass('link-icon');
 
         // Remove link icon from left panel
-        $('#treeli_' + nodeId + ' span').removeClass('linked link-icon');
+        $('#treeli_' + nodeId + ' span').removeClass('linked');
     };
 
     /**

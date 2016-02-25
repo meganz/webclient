@@ -4044,8 +4044,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.linked {
     padding-right: 22px;
 }
-.nw-fm-tree-item.linked .link-icon {
-    top: 1px;
+.nw-fm-tree-item .tree-item-icon {
+    top: 2px;
     right: 7px;
 }
 .nw-fm-tree-item:hover {
@@ -5584,7 +5584,7 @@ th.grid-first-th {
 .file-status-icon {
     background-image: none;
 }
-.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
+.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .linked .tree-item-icon, .taken-down .tree-item-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
     background-image: url(../images/mega/register-big-sprite-v8.png);
     background-repeat: no-repeat;
     background-position: -69px -963px;
@@ -5592,7 +5592,7 @@ th.grid-first-th {
 .grid-status-icon.star {
     background-position: -64px -961px;
 }
-.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .link-icon {
+.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .tree-item-icon {
     position: absolute;
     left: 6px;
     top: 6px;
@@ -5600,14 +5600,16 @@ th.grid-first-th {
     z-index: 10;
     width: 20px;
 }
-.link-icon {
+.tree-item-icon {
     left: auto;
     right: 5px;
-    background-position: -106px -963px;
     display: none;
     cursor: pointer;
 }
-.taken-down .link-icon {
+.linked .tree-item-icon {
+    background-position: -106px -963px;
+}
+.taken-down .tree-item-icon {
     background-position: -146px -963px;
 }
 .taken-down .grid-status-icon, .taken-down .grid-status-icon.star {
@@ -5615,6 +5617,11 @@ th.grid-first-th {
 }
 .taken-down .file-status-icon {
     background-position: -181px -963px;
+}
+.undecryptable .tree-item-icon {
+    background-image: url(../images/mega/nw-fm-sprite_v15.svg);
+    background-repeat: no-repeat;
+    background-position: -15px -2639px;
 }
 .undecryptable .grid-status-icon, .undecryptable .grid-status-icon.star {
     background-position: -9px -2637px;
@@ -5628,14 +5635,14 @@ th.grid-first-th {
 .grid-table .undecryptable td {
     color: #999999;
 }
-.grid-table .undecryptable .tranfer-filetype-txt, .undecryptable .file-block-title {
+.grid-table .undecryptable .tranfer-filetype-txt, .undecryptable .file-block-title, .undecryptable .nw-fm-tree-folder {
     color: #FFA500;
 }
-.own-data .link-icon {
+.own-data .tree-item-icon {
     left: 3px;
     top: 2px;
 }
-.linked .link-icon {
+.linked .tree-item-icon, .taken-down .tree-item-icon, .undecryptable .tree-item-icon  {
     display: block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
@@ -9724,7 +9731,7 @@ span.orange {
     left: 13px;
     top: 13px;
 }
-.properties-dialog .link-icon {
+.properties-dialog .tree-item-icon {
     left: 225px;
     top: 13px;
 }

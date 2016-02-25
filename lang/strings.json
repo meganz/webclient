@@ -10676,8 +10676,8 @@
         "context": "Title of the dialog displayed when a user want to move multiple nodes to the rubbish bin, asking for confirmation to make the movement - (String as short as possible)."
     },
     "7591": {
-        "text": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
-        "context": "Message of the dialog displayed when a user would try to download at the same time more nodes than the reliable number of simultaneous downloads for a good app performance. This dialog ask confirmation to start the download process.\nPreserve the ({0}) codes because is for include the maximum reliable download number and the precise number of nodes to be downloaded in runtime."
+        "text": "You have selected over {0} items ({1}) to download. Do you want to proceed?",
+        "context": "Message of the dialog displayed when a user would try to download at the same time more nodes than the reliable number of simultaneous downloads for a good app performance. This dialog ask confirmation to start the download process.Preserve the ({0}) codes because is for include the maximum reliable download number and the precise number of nodes to be downloaded in runtime."
     },
     "7593": {
         "text": "https:\/\/mega.co.nz\/mobile_terms.html",
@@ -12618,5 +12618,33 @@
     "8579": {
         "text": "Decrypting",
         "context": "Stage 3 of 3 when a user is loading his account in the web app. This is the stage where the request has completed and the web app is decrypting the data."
+    },
+    "8580": {
+        "text": "File import failed [{0}]",
+        "context": "Message of the dialog displayed when it fails the process\/request to import an image.\r\n\r\nPreserve the [{0}] code because this is for including the error code or the error message at runtime."
+    },
+    "8584": {
+        "text": "Requesting folder data",
+        "context": "Stage 1\/3 of requesting the data of a folder link. At this stage the data is being prepared on the server side."
+    },
+    "8585": {
+        "text": "Receiving folder data",
+        "context": "Stage 2\/3: receiving the data of a folder link. At this stage the data is being transferred from the server to the client (with progress)."
+    },
+    "8586": {
+        "text": "Decrypting folder data",
+        "context": "Stage 3\/3: the folder data is being decrypted."
+    },
+    "8587": {
+        "text": "We are waiting for the cryptographic key to this file.",
+        "context": "A warning tooltip if a file can't be decrypted."
+    },
+    "8588": {
+        "text": "undecrypted file",
+        "context": "A message that this file can't be decrypted."
+    },
+    "8589": {
+        "text": "No notifications",
+        "context": "There are no notifications to display."
     }
 }

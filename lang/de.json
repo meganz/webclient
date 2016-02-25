@@ -2668,7 +2668,7 @@
     "7588": "Bitte tragen Sie Ihren Namen, E-Mail-Adresse und Ihr MEGA-Passwort ein.",
     "7589": "In den Papierkorb verschieben?",
     "7590": "In den Papierkorb verschieben?",
-    "7591": "Sie haben mehr als {0} Dateien ({0}) zum Download ausgew\u00e4hlt. Fortfahren?",
+    "7591": "Sie haben mehr als {0} Dateien ({1}) zum Download ausgew\u00e4hlt. Fortfahren?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Dateien und Ordner werden geladen... [{0}]",
@@ -3158,6 +3158,9 @@
     "8584": "Requesting folder data",
     "8585": "Receiving folder data",
     "8586": "Decrypting folder data",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3189,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

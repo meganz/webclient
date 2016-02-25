@@ -94,6 +94,7 @@ function registeraccount() {
         callback: function(res) {
             loadingDialog.hide();
             if (res === 0) {
+                passwordManager($('#register_form'));
                 if (m) {
                     done_text1 = l[216];
                     done_text2 = l[217];

@@ -4045,14 +4045,14 @@ function passwordManager(form) {
         return false;
     }
     $(form).rebind('submit', function() {
+        setTimeout(function() {
+            var path  = document.location.pathname;
+            var title = document.title;
+            history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
+            history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+        }, 1000);
         return false;
     }).submit();
-    setTimeout(function() {
-        var path  = document.location.pathname;
-        var title = document.title;
-        history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-        history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
-    }, 1000);
     return true;
 }
 

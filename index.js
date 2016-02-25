@@ -268,6 +268,7 @@ function init_page() {
                 folderlink = 0;
                 fminitialized = false;
                 loadfm.loaded = false;
+                mega.fmLoaded = false;
                 if (loadfm.loading) {
                     api_init(wasFolderlink ? 1 : 0, 'cs');
                     loadfm.loading = false;

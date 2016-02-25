@@ -128,7 +128,7 @@ var Secureboot = function() {
         var i = 0;
         while (groups.length > 0) {
             var id = groups.indexOf(null);
-            if (id !== 0) {
+            if (id > 1) {
                 files['css/mega-' + (++i) + '.css'] = groups.splice(0, id);
             }
             groups.splice(0, 1);
@@ -170,7 +170,7 @@ var Secureboot = function() {
         var i = 0;
         while (groups.length > 0) {
             var id = groups.indexOf(null);
-            if (id !== 0) {
+            if (id > 1) {
                 files['js/mega-' + (++i) + '.js'] = groups.splice(0, id);
             }
             groups.splice(0, 1);

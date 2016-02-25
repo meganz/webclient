@@ -6915,7 +6915,9 @@ function init_chat() {
                 megaChat.init();
 
                 if (fminitialized) {
-                    chatui(M.currentdirid);
+                    if (String(M.currentdirid).substr(0, 5) === 'chat/') {
+                        chatui(M.currentdirid);
+                    }
                     //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }

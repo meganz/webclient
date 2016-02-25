@@ -29,12 +29,16 @@ var Secureboot = function() {
                     if (line.trim().match(/^if/)) {
                         lines.push('jsl.push({f:"\0.js"})');
                     }
-                    line = line.replace(/else/, 'else if (false)');
-                    line = line.replace(/\(.+\)/, '(false)');
+                    line = line.replace(/else(\s*if)?/, 'if (true)');
+                    line = line.replace(/\(.+\)/, '(true)');
                 }
                 lines.push(line);
+                if (line.trim() == "}") {
+                    lines.push('jsl.push({f:"\0.js"})');
+                }
             }
         }
+        var is_chrome_firefox = 0;
         eval(lines.join("\n"));
         return jsl;
     };
@@ -42,21 +46,37 @@ var Secureboot = function() {
     ns.rewrite = function(name) {
         var addedHtml = false;
         var lines = [];
-        var groups = this.getJSGroups();
-        var keys   = Object.keys(groups);
-        var group  = []
+        var jsgroup = [];
+        var cssgroup = [];
+        var jsGroups = this.getJSGroups();
+        var jsKeys   = Object.keys(jsGroups);
+        var cssGroups = this.getCSSGroups();
+        var cssKeys   = Object.keys(cssGroups);
         for (var i in content) {
-            if (content[i].match(/jsl\.push.+js/)) {
-                var file = content[i].match(/'.+\.js'/);
+            if (content[i].match(/jsl\.push.+(js)/)) {
+                var file = content[i].match(/'.+\.(js)'/);
                 if (!file) {
                     lines.push(content[i]);
                     continue;
                 }
                 file = file[0].substr(1, file[0].length-2);
-                if (groups[keys[0]] && groups[keys[0]][0] == file) {
-                    lines.push("    jsl.push({f:'" + keys[0] + "', n: '" + keys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1, w: " + getWeight(keys[0]) + "});");
-                    group = groups[keys.shift()];
-                } else if (group.indexOf(file) == -1) {
+                if (jsGroups[jsKeys[0]] && jsGroups[jsKeys[0]][0] == file) {
+                    lines.push("    jsl.push({f:'" + jsKeys[0] + "', n: '" + jsKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1, w: " + getWeight(jsKeys[0]) + "});");
+                    jsgroup = jsGroups[jsKeys.shift()];
+                } else if (jsgroup.indexOf(file) == -1) {
+                    lines.push(content[i]);
+                }
+            } else if (content[i].match(/jsl\.push.+(css)/)) {
+                var file = content[i].match(/'.+\.(css)'/);
+                if (!file) {
+                    lines.push(content[i]);
+                    continue;
+                }
+                file = file[0].substr(1, file[0].length-2);
+                if (cssGroups[cssKeys[0]] && cssGroups[cssKeys[0]][0] == file) {
+                    lines.push("    jsl.push({f:'" + cssKeys[0] + "', n: '" + cssKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 2, w: " + getWeight(cssKeys[0]) + "});");
+                    cssgroup = cssGroups[cssKeys.shift()];
+                } else if (cssgroup.indexOf(file) == -1) {
                     lines.push(content[i]);
                 }
             } else if (content[i].match(/jsl\.push.+html/)) {
@@ -77,12 +97,55 @@ var Secureboot = function() {
         });
     };
 
+    ns.getCSS = function() {
+        return jsl.filter(function(f) {
+            return f.f.match(/css$/);
+        });
+    };
+
     ns.getHTML = function() {
         return jsl.filter(function(f) {
             return f.f.match(/html?$/);
         }).map(function(f) {
             return useHtmlMin ? 'build/' + f.f : f.f;
         });
+    };
+
+    ns.getCSSGroups = function() {
+        var groups = [];
+        var size = 0;
+        this.getCSS().forEach(function(f) {
+            if (size > fileLimit) {
+                size = 0;
+                groups.push(null);
+            }
+            groups.push(f.f);
+            size += fs.statSync(f.f)['size'];
+        });
+        groups.push(null);
+
+        var files = {};
+        var i = 0;
+        while (groups.length > 0) {
+            var id = groups.indexOf(null);
+            if (id > 1) {
+                files['css/mega-' + (++i) + '.css'] = groups.splice(0, id);
+            }
+            groups.splice(0, 1);
+        }
+
+        return files;
+    };
+
+    ns.getGroups = function() {
+        var groups = this.getJSGroups();
+        var css = this.getCSSGroups();
+        for (var i in css) {
+            if (css.hasOwnProperty(i)) {
+                groups[i] = css[i];
+            }
+        }
+        return groups;
     };
 
     ns.getJSGroups = function() {
@@ -101,12 +164,15 @@ var Secureboot = function() {
                 size += fs.statSync(f.f)['size'];
             }
         });
+        groups.push(null);
 
         var files = {};
         var i = 0;
         while (groups.length > 0) {
             var id = groups.indexOf(null);
-            files['js/mega-' + (++i) + '.js'] = groups.splice(0, id);
+            if (id > 1) {
+                files['js/mega-' + (++i) + '.js'] = groups.splice(0, id);
+            }
             groups.splice(0, 1);
         }
 
@@ -139,7 +205,7 @@ module.exports = function(grunt) {
                             + "\n";
                     }
                 },
-                files: Secureboot.getJSGroups(),
+                files: Secureboot.getGroups(),
             }
         },
         htmlmin: {

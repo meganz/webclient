@@ -1637,22 +1637,6 @@ function MegaData()
         else if (id && id.substr(0, 5) === 'chat/') {
             this.chat = true;
             treeUI();
-
-            if (!megaChatIsDisabled) {
-                if (typeof megaChat === 'undefined') {
-                    // queue for opening the megachat UI WHEN the pubEd keys are loaded
-                    // happens, often when the APIs are returning -3
-
-                    mBroadcaster.once('pubEd25519', function() {
-                        chatui(id);
-                    });
-                }
-                else {
-                    // XX: using the old code...for now
-                    chatui(id);
-                }
-
-            }
         }
         else if ((!id || !M.d[id]) && id !== 'transfers') {
             id = this.RootID;
@@ -6926,6 +6910,7 @@ function init_chat() {
                 megaChat.init();
 
                 if (fminitialized) {
+                    chatui(M.currentdirid);
                     //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }

@@ -29,12 +29,16 @@ var Secureboot = function() {
                     if (line.trim().match(/^if/)) {
                         lines.push('jsl.push({f:"\0.js"})');
                     }
-                    line = line.replace(/else/, 'else if (false)');
-                    line = line.replace(/\(.+\)/, '(false)');
+                    line = line.replace(/else(\s*if)?/, 'if (true)');
+                    line = line.replace(/\(.+\)/, '(true)');
                 }
                 lines.push(line);
+                if (line.trim() == "}") {
+                    lines.push('jsl.push({f:"\0.js"})');
+                }
             }
         }
+        var is_chrome_firefox = 0;
         eval(lines.join("\n"));
         return jsl;
     };
@@ -124,7 +128,9 @@ var Secureboot = function() {
         var i = 0;
         while (groups.length > 0) {
             var id = groups.indexOf(null);
-            files['css/mega-' + (++i) + '.css'] = groups.splice(0, id);
+            if (id !== 0) {
+                files['css/mega-' + (++i) + '.css'] = groups.splice(0, id);
+            }
             groups.splice(0, 1);
         }
 
@@ -139,7 +145,7 @@ var Secureboot = function() {
                 groups[i] = css[i];
             }
         }
-        return css;
+        return groups;
     };
 
     ns.getJSGroups = function() {
@@ -164,7 +170,9 @@ var Secureboot = function() {
         var i = 0;
         while (groups.length > 0) {
             var id = groups.indexOf(null);
-            files['js/mega-' + (++i) + '.js'] = groups.splice(0, id);
+            if (id !== 0) {
+                files['js/mega-' + (++i) + '.js'] = groups.splice(0, id);
+            }
             groups.splice(0, 1);
         }
 

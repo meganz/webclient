@@ -3161,6 +3161,9 @@
     "8587": "Oczekujemy na klucz szyfruj\u0105cy do tego pliku.",
     "8588": "plik nie odszyfrowany",
     "8589": "Brak powiadomie\u0144",
+    "8590": "nieodszyfrowany katalog",
+    "8591": "Przygotowanie plik\u00f3w nie powiod\u0142o si\u0119. Spr\u00f3buj ponownie.",
+    "8592": "B\u0142\u0105d przygotowywania plik(\u00f3w)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

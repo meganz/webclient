@@ -3161,6 +3161,9 @@
     "8587": "We are waiting for the cryptographic key to this file.",
     "8588": "undecrypted file",
     "8589": "No notifications",
+    "8590": "undecryptable folder",
+    "8591": "Failed to prepare file(s) for upload. Please try again.",
+    "8592": "Error preparing file(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

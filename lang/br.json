@@ -3161,6 +3161,9 @@
     "8587": "Estamos aguardando a chave codificada para este arquivo.",
     "8588": "arquivo n\u00e3o decodificado",
     "8589": "Sem notifica\u00e7\u00f5es",
+    "8590": "pasta n\u00e3o criptograf\u00e1vel",
+    "8591": "Falha ao preparar os arquivo para upload. Por favor, tente novamente.",
+    "8592": "Erro erro ao preparar o(s) arquivo(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

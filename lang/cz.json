@@ -3159,8 +3159,11 @@
     "8585": "Z\u00edsk\u00e1v\u00e1n\u00ed dat slo\u017eky",
     "8586": "De\u0161ifrov\u00e1n\u00ed dat slo\u017eky",
     "8587": "\u010cek\u00e1me na \u0161ifrovac\u00ed kl\u00ed\u010d k tomuto souboru.",
-    "8588": "ne\u0161ifrovateln\u00fd soubor",
+    "8588": "nede\u0161ifrovan\u00fd soubor",
     "8589": "\u017d\u00e1dn\u00e1 ozn\u00e1men\u00ed",
+    "8590": "nede\u0161ifrovateln\u00e1 slo\u017eka",
+    "8591": "Nepoda\u0159ilo se p\u0159ipravit soubory k nahr\u00e1n\u00ed. Zkuste to znovu.",
+    "8592": "Chyba p\u0159i p\u0159\u00edprav\u011b soubor\u016f",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

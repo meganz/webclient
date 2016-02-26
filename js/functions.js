@@ -4330,7 +4330,7 @@ if (typeof sjcl !== 'undefined') {
      * @param {Set} set2
      *     Second set to subtract.
      * @return {Set}
-     *     Joined result set.
+     *     Subtracted result set.
      */
     scope.setutils.subtract = function(set1, set2) {
 

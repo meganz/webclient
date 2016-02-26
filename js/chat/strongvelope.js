@@ -1378,7 +1378,7 @@ var strongvelope = {};
                                                          senderKeys);
 
         // Am I part of this chat?
-        // TODO: in future it should update participants based chatd server's requests rather than incoming messages.
+        // TODO: In future it should update participants based on chatd server's requests rather than incoming messages.
         if (parsedMessage.excludeParticipants.indexOf(this.ownHandle) >= 0) {
             logger.info('I have been excluded from this chat, cannot read message.');
             this.keyId = null;

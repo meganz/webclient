@@ -107,15 +107,19 @@
     margin: 2px 0 0 0;
 }
 .message.text-block {
-    margin: 2px 30px 0 0;
+    margin: 3px 30px 0 0;
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
 }
 .message.text-block em {
     font-family: 'Open Sans Italic';
-    color: #2BA6DE;
+    font-size: 12px;
     color: rgba(43,166,222,0.7);
+    display: inline-block;
+    position: relative;
+    font-style: normal;
+    cursor: default;
 }
 .message.text-block a {
     color: #2BA6DE;
@@ -249,4 +253,15 @@
     position: absolute;
     right: 24px;
     margin-top: -15px;
+}
+.message.warning-text {
+    font-size: 11px;
+    line-height: 20px;
+    color: #999999;
+    font-family: 'Open Sans Italic';
+    padding: 11px 0 0 7px;
+    margin: 0 0 -1px 0;
+}
+.message.warning-text i {
+    margin: 0 5px 0 0;
 }

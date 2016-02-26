@@ -1,7 +1,7 @@
 .tiny-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite-v1.svg);
+    background-image: url(../images/mega/new-chat-sprite-v2.svg);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v1.svg);
+    background-image: url(../images/mega/new-chat-sprite-v2.svg);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -136,6 +136,9 @@
 }
 .small-icon.circle-with-arrow {
     background-position: -4px -735px;
+}
+.small-icon.grey-triangle {
+    background-position: -3px -3846px;
 }
 .square-button .small-icon {
     width: 22px;
@@ -280,7 +283,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v1.svg);
+    background-image: url(../images/mega/new-chat-sprite-v2.svg);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;

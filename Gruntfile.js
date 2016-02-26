@@ -44,7 +44,7 @@ var Secureboot = function() {
     };
 
     ns.addHeader = function(lines, files) {
-        lines.push("    /* Includes:");
+        lines.push("    /* Bundle Includes:");
         files.forEach(function(file) {
             lines.push("     *   " + file);
         });
@@ -147,7 +147,7 @@ var Secureboot = function() {
         return files;
     };
 
-    ns.getGroups = function() {
+    ns.getGroups = function(header) {
         var groups = this.getJSGroups();
         var css = this.getCSSGroups();
         for (var i in css) {
@@ -155,6 +155,30 @@ var Secureboot = function() {
                 groups[i] = css[i];
             }
         }
+        if (header) {
+            var lines = [];
+            var tmp = [];
+            var file;
+            var i = 0;
+            for (var e in groups) {
+                if (groups.hasOwnProperty(e)) {
+                    lines = [];
+                    file = "node_modules/banner-" + (++i) + ".js";
+                    this.addHeader(lines, groups[e]);
+                    fs.writeFileSync(file, lines.join("\n").replace(/\n +/g, '\n '));
+                    groups[e].unshift(file);
+                }
+            }
+            setTimeout(function() {
+                console.error('delete');
+                tmp.forEach(function(file) {
+                    console.error(file);
+                    fs.unlink(file);
+                });
+            }, 100);
+        }
+
+
         return groups;
     };
 
@@ -208,14 +232,12 @@ module.exports = function(grunt) {
         concat: {
             prod: {
                 options: {
-                    sourceMap: true,
+                    sourceMap: false,
                     process: function(content, filename) {
-                        return "/*! Filename: " + filename + " */\n"
-                            + content.trim()
-                            + "\n";
+                        return content.trim() + "\n";
                     }
                 },
-                files: Secureboot.getGroups(),
+                files: Secureboot.getGroups(true),
             }
         },
         htmlmin: {

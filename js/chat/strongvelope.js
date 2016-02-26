@@ -1378,6 +1378,7 @@ var strongvelope = {};
                                                          senderKeys);
 
         // Am I part of this chat?
+        // TODO: in future it should update participants based chatd server's requests rather than incoming messages.
         if (parsedMessage.excludeParticipants.indexOf(this.ownHandle) >= 0) {
             logger.info('I have been excluded from this chat, cannot read message.');
             this.keyId = null;
@@ -1423,15 +1424,17 @@ var strongvelope = {};
 
             // Sanity checks.
             if ((parsedMessage.includeParticipants.length > 0)
-                    && (setutils.join(otherParticipants,
-                        new Set(parsedMessage.includeParticipants)).size === 0)) {
-                // Included participants must be in otherParticipants.
+                    && (setutils.subtract(new Set(parsedMessage.includeParticipants),
+                        otherParticipants).size > 0)) {
+                // Included participants are not allowed to be in otherParticipants.
+                // This is an invalid message.
                 return false;
             }
             if ((parsedMessage.excludeParticipants.length > 0)
                     && (setutils.intersection(otherParticipants,
                         new Set(parsedMessage.excludeParticipants)).size !== 0)) {
-                // Excluded participants must not be in otherParticipants.
+                // Exclude participants are not allowed to be in otherParticipants.
+                // This is an invalid message.
                 return false;
             }
 
@@ -1461,11 +1464,6 @@ var strongvelope = {};
                 parsedMessage.includeParticipants.forEach(function _excludeIterator(item) {
                     self.excludeParticipants.delete(item);
                 });
-                // Join own with new in/exclusion sets.
-                this.includeParticipants = setutils.join(
-                    this.includeParticipants, parsedMessage.includeParticipants);
-                this.excludeParticipants = setutils.join(
-                    this.excludeParticipants, parsedMessage.excludeParticipants);
             }
             else {
                 // Update other participants list.

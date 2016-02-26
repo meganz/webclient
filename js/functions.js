@@ -4321,6 +4321,26 @@ if (typeof sjcl !== 'undefined') {
         return result;
     };
 
+    /**
+     * Helper function that will return a Set from set1 subtracting set2.
+     *
+     * @private
+     * @param {Set} set1
+     *     First set to subtract from.
+     * @param {Set} set2
+     *     Second set to subtract.
+     * @return {Set}
+     *     Joined result set.
+     */
+    scope.setutils.subtract = function(set1, set2) {
+
+        var result = new Set(set1);
+        set2.forEach(function _setSubtractIterator(item) {
+            result.delete(item);
+        });
+
+        return result;
+    };
 
     /**
      * Helper function that will compare two Sets for equality.

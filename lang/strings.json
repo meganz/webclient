@@ -12175,54 +12175,6 @@
         "text": "Currently using %s",
         "context": "Size of offline files or cache folders"
     },
-    "8500": {
-        "text": "Calculating\u2026",
-        "context": "Calculating size of offline files or cache folders"
-    },
-    "8501": {
-        "text": "Turn on Camera Uploads",
-        "context": "Settings option to turn on Camera Uploads."
-    },
-    "8502": {
-        "text": "Reset PIN code",
-        "context": "Settings option of resetting the PIN code."
-    },
-    "8503": {
-        "text": "Your local files will be deleted and you will be logged out after 10 failed attempts.",
-        "context": "Error message for typing the wrong PIN code."
-    },
-    "8504": {
-        "text": "Wrong PIN code, please try again. You have %2d attemps left.",
-        "context": "Error message for typing the wrong pin code."
-    },
-    "8505": {
-        "text": "PIN Codes don't match",
-        "context": "Error message for typing the wrong PIN code (two times)"
-    },
-    "8506": {
-        "text": "Enter your PIN Code",
-        "context": "Title of the screen to unlock screen with pin code."
-    },
-    "8507": {
-        "text": "Re-Enter your PIN Code",
-        "context": "Title of the screen for re-entering PIN code to unlock screen."
-    },
-    "8508": {
-        "text": "Enter your new PIN Code",
-        "context": "Message to unlock screen with PIN code"
-    },
-    "8509": {
-        "text": "Re-Enter your new PIN Code",
-        "context": "Title of the screen asking to input PIN code to unlock the screen again."
-    },
-    "8510": {
-        "text": "All your local data will be deleted and you will be logged out in %d seconds.",
-        "context": "Message when the user  tries 10 failed attempts with wrong PIN codes."
-    },
-    "8511": {
-        "text": "Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account.",
-        "context": "Message displayed when the user wants to upgrade an account that cannot be upgraded and suggest the user to contact MEGA support."
-    },
     "8512": {
         "text": "Read more",
         "context": "Open the whole blog post"
@@ -12335,14 +12287,6 @@
         "text": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
         "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
     },
-    "8543": {
-        "text": "There are no contacts in the account. Please add them on the Contacts screen.",
-        "context": "When a user wants to share a folder but does not have any contact yet."
-    },
-    "8544": {
-        "text": "All the items in the rubbish bin will be deleted",
-        "context": "Confirmation message displayed when removing all the items in the rubbish bin."
-    },
     "8545": {
         "text": "Remember my decision and don't ask me again",
         "context": "Text next to a checkbox that allows remembering the decision of the user. The translation should be as short as possible."
@@ -12390,22 +12334,6 @@
     "8557": {
         "text": "Enable this option only if your transfers don't start. In normal circumstances HTTP is satisfactory as all transfers are already encrypted.",
         "context": "Information message next to a checkbox that allows for disabling the HTTP protocol for transfers."
-    },
-    "8558": {
-        "text": "MEGA v1 app is no longer supported",
-        "context": "A string that will appear on the app telling the user that the app is not gonna be updated again"
-    },
-    "8559": {
-        "text": "Please install our new app MEGA v3 with a new design and new features!",
-        "context": "Message to tell the users that they should install the new app"
-    },
-    "8560": {
-        "text": "You will have to enter your credentials (login and password) in the new app. If you don't remember your password, please Export your Master Key before uninstalling the v1 app.",
-        "context": "Message shown to tell the users that they should export the master key before uninstalling the old app"
-    },
-    "8561": {
-        "text": "If you have an active subscription on the v1 app, please cancel it on Google Play and subscribe again on the v3 app when the current subscription expires. Don't worry, you will keep your PRO status on the new app until it expires.",
-        "context": "Message shown to PRO users using v1 app telling them that they should cancel their subscriptions on v1 and subscribe again on v3"
     },
     "8562": {
         "text": "[Pricing may vary slightly depending on your country of residence and payment method.]",

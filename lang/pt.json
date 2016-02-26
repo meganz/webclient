@@ -2668,7 +2668,7 @@
     "7588": "Por favor introduza o seu nome, endere\u00e7o de e-mail e a sua palavra-passe MEGA.",
     "7589": "Mover item para o caixote do lixo?",
     "7590": "Mover itens para o caixote do lixo?",
-    "7591": "Voc\u00ea seleccionou mais do que {0} itens ({0}) para descarregar. Deseja prosseguir?",
+    "7591": "Voc\u00ea seleccionou mais do que {0} itens ({1}) para descarregar. Deseja prosseguir?",
     "7593": "https:\/\/mega.co.nz\/mobile_termos.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "A obter ficheiros e pastas... [{0}]",
@@ -3154,10 +3154,16 @@
     "8577": "A pedir dados da conta",
     "8578": "A receber dados da conta",
     "8579": "A desencriptar",
-    "8580": "File import failed [{0}]",
-    "8584": "Requesting folder data",
-    "8585": "Receiving folder data",
-    "8586": "Decrypting folder data",
+    "8580": "Falha ao importar ficheiro [{0}]",
+    "8584": "A pedir dados da pasta",
+    "8585": "A receber dados da pasta",
+    "8586": "A desencriptar dados da pasta",
+    "8587": "Estamos \u00e0 espera da chave criptogr\u00e1fica deste ficheiro.",
+    "8588": "ficheiro n\u00e3o desencriptado",
+    "8589": "Sem notifica\u00e7\u00f5es",
+    "8590": "pasta n\u00e3o-desencript\u00e1vel",
+    "8591": "Falha ao preparar ficheiro(s) para carregamento. Por favor tente novamente.",
+    "8592": "Erro ao preparar ficheiro(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3192,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

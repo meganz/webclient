@@ -2668,7 +2668,7 @@
     "7588": "K\u00e9rj\u00fck adja meg a nev\u00e9t, az e-mail c\u00edm\u00e9t \u00e9s MEGA jelszav\u00e1t.",
     "7589": "Elem \u00e1thelyez\u00e9se a szemetesl\u00e1d\u00e1ba?",
     "7590": "Elemek \u00e1thelyez\u00e9se a szemetesl\u00e1d\u00e1ba?",
-    "7591": "\u00d6n t\u00f6bb mint {0} elemet ({0}) jel\u00f6lt ki let\u00f6lt\u00e9sre. Szeretn\u00e9 folytatni?",
+    "7591": "\u00d6n t\u00f6bb mint {0} elemet ({1}) jel\u00f6lt ki let\u00f6lt\u00e9sre. Szeretn\u00e9 folytatni?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "F\u00e1jlok \u00e9s mapp\u00e1k lek\u00e9rdez\u00e9se... [{0}]",
@@ -3158,6 +3158,12 @@
     "8584": "Requesting folder data",
     "8585": "Receiving folder data",
     "8586": "Decrypting folder data",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
+    "8590": "undecryptable folder",
+    "8591": "Failed to prepare file(s) for upload. Please try again.",
+    "8592": "Error preparing file(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3192,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

@@ -10676,8 +10676,8 @@
         "context": "Title of the dialog displayed when a user want to move multiple nodes to the rubbish bin, asking for confirmation to make the movement - (String as short as possible)."
     },
     "7591": {
-        "text": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
-        "context": "Message of the dialog displayed when a user would try to download at the same time more nodes than the reliable number of simultaneous downloads for a good app performance. This dialog ask confirmation to start the download process.\nPreserve the ({0}) codes because is for include the maximum reliable download number and the precise number of nodes to be downloaded in runtime."
+        "text": "You have selected over {0} items ({1}) to download. Do you want to proceed?",
+        "context": "Message of the dialog displayed when a user would try to download at the same time more nodes than the reliable number of simultaneous downloads for a good app performance. This dialog ask confirmation to start the download process.Preserve the ({0}) codes because is for include the maximum reliable download number and the precise number of nodes to be downloaded in runtime."
     },
     "7593": {
         "text": "https:\/\/mega.co.nz\/mobile_terms.html",
@@ -12634,5 +12634,29 @@
     "8586": {
         "text": "Decrypting folder data",
         "context": "Stage 3\/3: the folder data is being decrypted."
+    },
+    "8587": {
+        "text": "We are waiting for the cryptographic key to this file.",
+        "context": "A warning tooltip if a file can't be decrypted."
+    },
+    "8588": {
+        "text": "undecrypted file",
+        "context": "A message that this file can't be decrypted."
+    },
+    "8589": {
+        "text": "No notifications",
+        "context": "There are no notifications to display."
+    },
+    "8590": {
+        "text": "undecryptable folder",
+        "context": "A message that this folder can't be decrypted."
+    },
+    "8591": {
+        "text": "Failed to prepare file(s) for upload. Please try again.",
+        "context": "A message of a dialog that is displayed when the process to prepare a file or files for upload failed."
+    },
+    "8592": {
+        "text": "Error preparing file(s)",
+        "context": "A title of a dialog that is displayed when the process to prepare a file or files for upload failed."
     }
 }

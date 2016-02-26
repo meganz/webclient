@@ -2668,7 +2668,7 @@
     "7588": "Var v\u00e4nlig och fyll i ditt namn, E-mail och ditt MEGA l\u00f6senord.",
     "7589": "Flytta till papperskorgen?",
     "7590": "Flytta f\u00f6rem\u00e5len till papperskorgen",
-    "7591": "Du har valt \u00f6ver {0} f\u00f6rem\u00e5l ({0}) att ladda ned. Vill du forts\u00e4tta? ",
+    "7591": "Du har valt \u00f6ver {0} f\u00f6rem\u00e5l ({1}) att ladda ned. Vill du forts\u00e4tta? ",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "H\u00e4mtar filer och mappar... [{0}]",
@@ -3155,9 +3155,15 @@
     "8578": "Mottager kontodetaljer",
     "8579": "Dekrypterar",
     "8580": "File import failed [{0}]",
-    "8584": "Requesting folder data",
-    "8585": "Receiving folder data",
-    "8586": "Decrypting folder data",
+    "8584": "Beg\u00e4r mappdata",
+    "8585": "Mottager mappdata",
+    "8586": "Dekrypterar mappdata",
+    "8587": "Vi v\u00e4ntar p\u00e5 den kryptografiska nyckeln till den h\u00e4r filen",
+    "8588": "okrypterad fil",
+    "8589": "Inga notiser",
+    "8590": "okrypterbar mapp",
+    "8591": "Misslyckades att f\u00f6rbereda fil(er) f\u00f6r uppladdning. F\u00f6rs\u00f6k igen. ",
+    "8592": "Error preparing file(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3192,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

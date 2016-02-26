@@ -2274,7 +2274,7 @@
     "7177": "Est\u00e1s a punto de cancelar tu subscripci\u00f3n a Mega. Por favor, indicanos en qu\u00e9 podemos mejorar.",
     "7178": "Escribe aqu\u00ed las posibles mejoras&#8230;",
     "7179": "Cancelar Subscripci\u00f3n",
-    "7180": "Gracias por tu mensaje! \u00bfEst\u00e1s seguro de que quieres cancelar la subscripci\u00f3n?",
+    "7180": "\u00a1Gracias por tu mensaje! \u00bfEst\u00e1s seguro de que quieres cancelar la subscripci\u00f3n?",
     "7181": "Tu subscripci\u00f3n no ha sido cancelada. Por favor, comparte con nosotros la raz\u00f3n de tu cancelaci\u00f3n.",
     "7182": "Otro fichero",
     "7183": "Podr\u00edas ser un usuario PRO. \u00bfQuieres mejorar tu cuenta?",
@@ -2668,7 +2668,7 @@
     "7588": "Por favor, introduce tu nombre, e-mail y tu contrase\u00f1a de MEGA.",
     "7589": "\u00bfMover a la papelera?",
     "7590": "\u00bfMover elementos a la papelera?",
-    "7591": "Has seleccionado m\u00e1s de {0} items ({0}) para descarga. \u00bfQuieres continuar?",
+    "7591": "Has seleccionado m\u00e1s de {0} items ({1}) para descarga. \u00bfQuieres continuar?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Cargando archivos y carpetas... [{0}]",
@@ -3154,10 +3154,16 @@
     "8577": "Solicitando datos de la cuenta",
     "8578": "Recibiendo datos de la cuenta",
     "8579": "Desencriptando",
-    "8580": "File import failed [{0}]",
-    "8584": "Requesting folder data",
-    "8585": "Receiving folder data",
-    "8586": "Decrypting folder data",
+    "8580": "Importaci\u00f3n de archivo fallida [{0}]",
+    "8584": "Solicitando datos de la carpeta",
+    "8585": "Recibiendo datos de la carpeta",
+    "8586": "Desencriptando datos de la carpeta",
+    "8587": "Estamos esperando a la clave de desencriptado de este archivo.",
+    "8588": "fichero no desencriptable",
+    "8589": "Sin notificaciones",
+    "8590": "carpeta no desencriptable",
+    "8591": "Fallo preparando archivo(s) para la subida. Por favor, int\u00e9ntelo de nuevo.",
+    "8592": "Error preparando archivo(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3192,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

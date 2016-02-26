@@ -2668,7 +2668,7 @@
     "7588": "Te rug\u0103m s\u0103 completezi numele, adresa de e-mail \u015fi parola MEGA.",
     "7589": "Mu\u0163i elementul \u00een co\u015ful de gunoi?",
     "7590": "Mu\u0163i elementele \u00een co\u015ful de gunoi?",
-    "7591": "Ai selectat peste {0} elemente ({0}) pentru desc\u0103rcare. Dore\u015fti s\u0103 continui?",
+    "7591": "Ai selectat peste {0} elemente ({1}) pentru desc\u0103rcare. Dore\u015fti s\u0103 continui?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Se preiau fi\u015fierele \u015fi folderele... [{0}]",
@@ -3158,6 +3158,12 @@
     "8584": "Requesting folder data",
     "8585": "Receiving folder data",
     "8586": "Decrypting folder data",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
+    "8590": "undecryptable folder",
+    "8591": "Failed to prepare file(s) for upload. Please try again.",
+    "8592": "Error preparing file(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3192,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

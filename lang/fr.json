@@ -2668,7 +2668,7 @@
     "7588": "Veuillez renseigner votre nom, adresse e-mail et votre mot de passe MEGA.",
     "7589": "D\u00e9placer l'\u00e9l\u00e9ment vers la corbeille?",
     "7590": "D\u00e9placer les \u00e9l\u00e9ments vers la corbeille?",
-    "7591": "Vous avez s\u00e9lectionn\u00e9 plus de {0} \u00e9l\u00e9ments ({0}) a t\u00e9l\u00e9charger. Voulez-vous poursuivre?",
+    "7591": "Vous avez s\u00e9lectionn\u00e9 plus de {0} \u00e9l\u00e9ments ({1}) a t\u00e9l\u00e9charger. Voulez-vous poursuivre?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "R\u00e9cup\u00e9ration des fichiers et dossiers en cours... [{0}]",
@@ -3158,6 +3158,12 @@
     "8584": "Requesting folder data",
     "8585": "Receiving folder data",
     "8586": "Decrypting folder data",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
+    "8590": "undecryptable folder",
+    "8591": "Failed to prepare file(s) for upload. Please try again.",
+    "8592": "Error preparing file(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3192,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

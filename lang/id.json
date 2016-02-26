@@ -2668,7 +2668,7 @@
     "7588": "Harap isi nama anda, alamat e-mail dan password MEGA anda.",
     "7589": "Pindahkan item ke sampah?",
     "7590": "Pindahkan item ke sampah?",
-    "7591": "Anda telah memilih lebih dari {0} item ({0}) untuk di download. Apakah anda ingin melanjutkan?",
+    "7591": "Anda telah memilih lebih dari {0} item ({1}) untuk di download. Apakah anda ingin melanjutkan?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Memuat file dan folder... [{0}]",
@@ -3158,6 +3158,12 @@
     "8584": "Requesting folder data",
     "8585": "Receiving folder data",
     "8586": "Decrypting folder data",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
+    "8590": "undecryptable folder",
+    "8591": "Failed to prepare file(s) for upload. Please try again.",
+    "8592": "Error preparing file(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3192,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

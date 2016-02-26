@@ -2668,7 +2668,7 @@
     "7588": "\uc774\ub984, \uc774\uba54\uc77c \uc8fc\uc18c, MEGA \ube44\ubc00\ubc88\ud638\ub97c \uc785\ub825\ud558\uc138\uc694.",
     "7589": "\ud56d\ubaa9\uc744 \ud734\uc9c0\ud1b5\uc73c\ub85c \uc774\ub3d9\ud560\uae4c\uc694?",
     "7590": "\ud56d\ubaa9\uc744 \ud734\uc9c0\ud1b5\uc73c\ub85c \uc774\ub3d9\ud560\uae4c\uc694?",
-    "7591": "{0} \ud56d\ubaa9 ({0})\uc744 \ucd08\uacfc\ud558\uc5ec \ub2e4\uc6b4\ub85c\ub4dc\ub97c \uc120\ud0dd\ud558\uc600\uc2b5\ub2c8\ub2e4. \uc9c4\ud589\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
+    "7591": "{0} \ud56d\ubaa9 ({1})\uc744 \ucd08\uacfc\ud558\uc5ec \ub2e4\uc6b4\ub85c\ub4dc\ub97c \uc120\ud0dd\ud558\uc600\uc2b5\ub2c8\ub2e4. \uc9c4\ud589\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "\ud30c\uc77c\uacfc \ud3f4\ub354 \ubc1b\uc544\uc624\ub294 \uc911... [{0}]",
@@ -3158,6 +3158,12 @@
     "8584": "Requesting folder data",
     "8585": "Receiving folder data",
     "8586": "Decrypting folder data",
+    "8587": "We are waiting for the cryptographic key to this file.",
+    "8588": "undecrypted file",
+    "8589": "No notifications",
+    "8590": "undecryptable folder",
+    "8591": "Failed to prepare file(s) for upload. Please try again.",
+    "8592": "Error preparing file(s)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3186,6 +3192,7 @@
         "thank-you-for-using-mega": 8536,
         "important-notice": 8537,
         "view-blog-post": 8538,
-        "v1_app_install_v3": 8559
+        "v1_app_install_v3": 8559,
+        "no-notifications": 8589
     }
 }

@@ -76,6 +76,9 @@ if (typeof loadingInitDialog === 'undefined') {
         $('.loading-info li.step1').addClass('loading');
     };
     loadingInitDialog.step2 = function(progress) {
+        if (!this.active) {
+            return;
+        }
         if (this.progress === false) {
             $('.loading-info li.loading').addClass('loaded').removeClass('loading');
             $('.loading-info li.step2').addClass('loading');
@@ -192,16 +195,14 @@ function MegaData()
 
     this.sortByName = function(d)
     {
-        // if (typeof Intl !== 'undefined' && Intl.Collator)
-        // {
-            // var intl = new Intl.Collator('co', { numeric: true });
+        if (typeof Intl !== 'undefined' && Intl.Collator) {
+            var intl = new Intl.Collator('co', { numeric: true });
 
-            // this.sortfn = function(a,b,d)
-            // {
-                // return intl.compare(a.name,b.name)*d;
-            // };
-        // }
-        // else
+            this.sortfn = function(a, b, d) {
+                return intl.compare(a.name, b.name) * d;
+            };
+        }
+        else
         {
             this.sortfn = function(a,b,d)
             {
@@ -1640,20 +1641,9 @@ function MegaData()
             this.chat = true;
             treeUI();
 
-            if (!megaChatIsDisabled) {
-                if (typeof megaChat === 'undefined') {
-                    // queue for opening the megachat UI WHEN the pubEd keys are loaded
-                    // happens, often when the APIs are returning -3
-
-                    mBroadcaster.once('pubEd25519', function() {
-                        chatui(id);
-                    });
-                }
-                else {
-                    // XX: using the old code...for now
-                    chatui(id);
-                }
-
+            if (megaChatIsReady) {
+                // XX: using the old code...for now
+                chatui(id);
             }
         }
         else if ((!id || !M.d[id]) && id !== 'transfers') {
@@ -5901,18 +5891,15 @@ function loadfm(force)
     }
     else {
         if (is_fm()) {
-            loadingDialog.show();
+            loadingDialog.hide();
+            loadingInitDialog.show();
+            loadingInitDialog.step1();
         }
         if (!loadfm.loading) {
             M.reset();
             fminitialized = false;
             loadfm.loading = true;
             setTimeout(function __lazyLoadFM() {
-
-                loadingDialog.hide();
-                loadingInitDialog.show();
-                loadingInitDialog.step1();
-
                 api_req({a:'f',c:1,r:1,ca:1},{
                     callback: loadfm_callback,
                     progress: function(perc) {
@@ -6928,6 +6915,9 @@ function init_chat() {
                 megaChat.init();
 
                 if (fminitialized) {
+                    if (String(M.currentdirid).substr(0, 5) === 'chat/') {
+                        chatui(M.currentdirid);
+                    }
                     //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }

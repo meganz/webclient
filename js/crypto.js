@@ -1777,7 +1777,7 @@ function api_proc(q) {
     };
 
     // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
-    if (loadingInitDialog.active) {
+    // if (loadingInitDialog.active) {
         var needProgress = false;
 
         // check whether this channel queue will need the progress
@@ -1823,7 +1823,7 @@ function api_proc(q) {
                 }
             };
         }
-    }
+    // }
 
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {

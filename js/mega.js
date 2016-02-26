@@ -76,6 +76,9 @@ if (typeof loadingInitDialog === 'undefined') {
         $('.loading-info li.step1').addClass('loading');
     };
     loadingInitDialog.step2 = function(progress) {
+        if (!this.active) {
+            return;
+        }
         if (this.progress === false) {
             $('.loading-info li.loading').addClass('loaded').removeClass('loading');
             $('.loading-info li.step2').addClass('loading');
@@ -5888,6 +5891,7 @@ function loadfm(force)
     }
     else {
         if (is_fm()) {
+            loadingDialog.hide();
             loadingInitDialog.show();
             loadingInitDialog.step1();
         }

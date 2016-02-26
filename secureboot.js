@@ -1490,7 +1490,7 @@ else if (!b_u)
     }
     if (typeof Number.isNaN !== 'function'
             || typeof Set === 'undefined'
-            || Array.from !== 'function') {
+            || typeof Array.from !== 'function') {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }

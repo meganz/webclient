@@ -76,6 +76,9 @@ if (typeof loadingInitDialog === 'undefined') {
         $('.loading-info li.step1').addClass('loading');
     };
     loadingInitDialog.step2 = function(progress) {
+        if (!this.active) {
+            return;
+        }
         if (this.progress === false) {
             $('.loading-info li.loading').addClass('loaded').removeClass('loading');
             $('.loading-info li.step2').addClass('loading');
@@ -5888,18 +5891,15 @@ function loadfm(force)
     }
     else {
         if (is_fm()) {
-            loadingDialog.show();
+            loadingDialog.hide();
+            loadingInitDialog.show();
+            loadingInitDialog.step1();
         }
         if (!loadfm.loading) {
             M.reset();
             fminitialized = false;
             loadfm.loading = true;
             setTimeout(function __lazyLoadFM() {
-
-                loadingDialog.hide();
-                loadingInitDialog.show();
-                loadingInitDialog.step1();
-
                 api_req({a:'f',c:1,r:1,ca:1},{
                     callback: loadfm_callback,
                     progress: function(perc) {

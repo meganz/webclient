@@ -43,6 +43,14 @@ var Secureboot = function() {
         return jsl;
     };
 
+    ns.addHeader = function(lines, files) {
+        lines.push("    /* Bundle Includes:");
+        files.forEach(function(file) {
+            lines.push("     *   " + file);
+        });
+        lines.push("     */");
+    }
+
     ns.rewrite = function(name) {
         var addedHtml = false;
         var lines = [];
@@ -61,6 +69,7 @@ var Secureboot = function() {
                 }
                 file = file[0].substr(1, file[0].length-2);
                 if (jsGroups[jsKeys[0]] && jsGroups[jsKeys[0]][0] == file) {
+                    ns.addHeader(lines, jsGroups[jsKeys[0]]);
                     lines.push("    jsl.push({f:'" + jsKeys[0] + "', n: '" + jsKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1, w: " + getWeight(jsKeys[0]) + "});");
                     jsgroup = jsGroups[jsKeys.shift()];
                 } else if (jsgroup.indexOf(file) == -1) {
@@ -74,6 +83,7 @@ var Secureboot = function() {
                 }
                 file = file[0].substr(1, file[0].length-2);
                 if (cssGroups[cssKeys[0]] && cssGroups[cssKeys[0]][0] == file) {
+                    ns.addHeader(lines, cssGroups[cssKeys[0]]);
                     lines.push("    jsl.push({f:'" + cssKeys[0] + "', n: '" + cssKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 2, w: " + getWeight(cssKeys[0]) + "});");
                     cssgroup = cssGroups[cssKeys.shift()];
                 } else if (cssgroup.indexOf(file) == -1) {
@@ -137,7 +147,7 @@ var Secureboot = function() {
         return files;
     };
 
-    ns.getGroups = function() {
+    ns.getGroups = function(header) {
         var groups = this.getJSGroups();
         var css = this.getCSSGroups();
         for (var i in css) {
@@ -145,6 +155,30 @@ var Secureboot = function() {
                 groups[i] = css[i];
             }
         }
+        if (header) {
+            var lines = [];
+            var tmp = [];
+            var file;
+            var i = 0;
+            for (var e in groups) {
+                if (groups.hasOwnProperty(e)) {
+                    lines = [];
+                    file = "node_modules/banner-" + (++i) + ".js";
+                    this.addHeader(lines, groups[e]);
+                    fs.writeFileSync(file, lines.join("\n").replace(/\n +/g, '\n '));
+                    groups[e].unshift(file);
+                }
+            }
+            setTimeout(function() {
+                console.error('delete');
+                tmp.forEach(function(file) {
+                    console.error(file);
+                    fs.unlink(file);
+                });
+            }, 100);
+        }
+
+
         return groups;
     };
 
@@ -198,14 +232,12 @@ module.exports = function(grunt) {
         concat: {
             prod: {
                 options: {
-                    sourceMap: true,
+                    sourceMap: false,
                     process: function(content, filename) {
-                        return "/*! Filename: " + filename + " */\n"
-                            + content.trim()
-                            + "\n";
+                        return content.trim() + "\n";
                     }
                 },
-                files: Secureboot.getGroups(),
+                files: Secureboot.getGroups(true),
             }
         },
         htmlmin: {

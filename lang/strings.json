@@ -12646,5 +12646,17 @@
     "8589": {
         "text": "No notifications",
         "context": "There are no notifications to display."
+    },
+    "8590": {
+        "text": "undecryptable folder",
+        "context": "A message that this folder can't be decrypted."
+    },
+    "8591": {
+        "text": "Failed to prepare file(s) for upload. Please try again.",
+        "context": "A message of a dialog that is displayed when the process to prepare a file or files for upload failed."
+    },
+    "8592": {
+        "text": "Error preparing file(s)",
+        "context": "A title of a dialog that is displayed when the process to prepare a file or files for upload failed."
     }
 }

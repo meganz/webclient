@@ -55,52 +55,6 @@ var strongvelope = {};
 
 
     /**
-     * Helper function that will return an intersect Set of two sets given.
-     *
-     * @private
-     * @param {Set} set1
-     *     First set to intersect with.
-     * @param {Set} set2
-     *     Second set to intersect with.
-     * @return {Set}
-     *     Intersected result set.
-     */
-    var _setIntersection = function(set1, set2) {
-
-        var result = new Set();
-        set1.forEach(function _setIntersectionIterator(item) {
-            if (set2.has(item)) {
-                result.add(item);
-            }
-        });
-
-        return result;
-    };
-
-
-    /**
-     * Helper function that will return a joined Set of two sets given.
-     *
-     * @private
-     * @param {Set} set1
-     *     First set to join with.
-     * @param {Set} set2
-     *     Second set to join with.
-     * @return {Set}
-     *     Joined result set.
-     */
-    var _setJoin = function(set1, set2) {
-
-        var result = new Set(set1);
-        set2.forEach(function _setJoinIterator(item) {
-            result.add(item);
-        });
-
-        return result;
-    };
-
-
-    /**
      * "Enumeration" of TLV types used for the chat message transport container.
      *
      * Note: The integer value of the TLV type also indicates the allowed order
@@ -610,9 +564,9 @@ var strongvelope = {};
      *     Our public signing key (Ed25519).
      * @property {Number} rotateKeyEvery
      *     The number of messages our sender key is used for before rotating.
-     * @property {Number} sendKeyEveryReceived
-     *     The number of messages to receive before a keyed message is to be
-     *     sent.
+     * @property {Number} totalMessagesBeforeSendKey
+     *     The number of total messages sent and received before a keyed
+     *     reminder message is to be sent.
      * @property {String} keyId
      *     ID of our current sender key.
      * @property {String} previousKeyId
@@ -650,6 +604,7 @@ var strongvelope = {};
         this.otherParticipants = new Set();
         this.includeParticipants = new Set();
         this.excludeParticipants = new Set();
+        this._inUse = false;
     };
 
 
@@ -1003,6 +958,35 @@ var strongvelope = {};
      */
 
 
+
+    /**
+     * Tracks the participant set from others, included and excluded participant
+     * sets.
+     *
+     * @private
+     * @param {Set} otherParticipants
+     *     Currently tracked other participants.
+     * @param {Set} includeParticipants
+     *     Currently tracked participants to include.
+     * @param {Set} excludeParticipants
+     *     Currently tracked participants to exclude.
+     * @returns {Set}
+     *     Expected set of other participants after altering participation.
+     */
+    strongvelope.ProtocolHandler.prototype._trackParticipants = function(
+        otherParticipants, includeParticipants, excludeParticipants) {
+
+        var trackedParticipants = new Set(otherParticipants);
+        excludeParticipants.forEach(function _excludeParticipantsIterator(item) {
+            trackedParticipants.delete(item);
+        });
+        trackedParticipants = setutils.join(
+            trackedParticipants, includeParticipants);
+        trackedParticipants.delete(this.ownHandle);
+
+        return trackedParticipants;
+    };
+
     /**
      * Encrypts the sender key to the recipients as needed.
      *
@@ -1023,12 +1007,9 @@ var strongvelope = {};
             return false;
         }
 
-        // Update participants list.
-        self.otherParticipants = _setJoin(self.otherParticipants, self.includeParticipants);
-        var index = -1;
-        self.excludeParticipants.forEach(function _excludeParticipantsIterator(item) {
-            self.otherParticipants.delete(item);
-        });
+        // Update participants set.
+        this.otherParticipants = this._trackParticipants(this.otherParticipants,
+            this.includeParticipants, this.excludeParticipants);
 
         var recipients = '';
         var keys = '';
@@ -1299,46 +1280,39 @@ var strongvelope = {};
 
 
     /**
-     * Update group participants on received message.
+     * Determines the other group participants from a parsed message.
      *
      * @method
      * @param {String} sender
      *     User handle of the message sender.
      * @param {Object} parsedMessage
      *     User handle of the message sender.
-     * @returns {Boolean}
-     *     `false` in case I am not a participant (any more),
-     *     `true` otherwise.
+     * @returns {Set|Boolean}
+     *     The set of group participants (without oneself). An empty set if one
+     *     is not a member of the group any more. If this cannot be determined
+     *     from the message `false` is returned.
      * @private
      */
-    strongvelope.ProtocolHandler.prototype._updateGroupParticipants = function(
+    strongvelope.ProtocolHandler.prototype._getOtherParticipantsFromMessage = function(
                 sender, parsedMessage) {
+
+        if (parsedMessage.recipients.length === 0) {
+            // No participants in message.
+            return false;
+        }
+
+        var otherParticipants = new Set(parsedMessage.recipients);
+        otherParticipants.add(sender);
+        otherParticipants.delete(this.ownHandle);
 
         var isOwnMessage = (sender === this.ownHandle);
         var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
-        if ((parsedMessage.recipients.length > 0) && !isOwnMessage) {
-            if (myIndex === -1) {
-                // I'm not in the list.
-                if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                    this.keyId = null;
-                    this.otherParticipants.clear();
-                    this.includeParticipants.clear();
-                    this.excludeParticipants.clear();
-                    logger.info('I have been excluded from this chat, cannot read message.');
-                }
-                else {
-                    logger.warn('Incoming chat message not intended for me (not part of chat).');
-                }
-
-                return false;
-            }
-
-            this.otherParticipants = new Set(parsedMessage.recipients);
-            this.otherParticipants.add(sender);
-            this.otherParticipants.delete(this.ownHandle);
+        if (!isOwnMessage && (myIndex === -1)) {
+            // I'm not in the list.
+            otherParticipants.clear();
         }
 
-        return true;
+        return otherParticipants;
     };
 
 
@@ -1395,17 +1369,28 @@ var strongvelope = {};
         }
 
         // TODO: Check legitimacy of operation (moderator set on alter participants).
-
-        // Now puzzle out the group composition.
-        if (this._updateGroupParticipants(sender, parsedMessage) === false) {
-            return false;
-        }
+        // Now puzzle out the group composition from a keyed message.
+        var otherParticipants = this._getOtherParticipantsFromMessage(
+            sender, parsedMessage);
 
         // Get sender key.
         var senderKey = this._getSenderKeyAndUpdateCache(sender, parsedMessage,
                                                          senderKeys);
 
-        if (senderKey === false) {
+        // Am I part of this chat?
+        if (parsedMessage.excludeParticipants.indexOf(this.ownHandle) >= 0) {
+            logger.info('I have been excluded from this chat, cannot read message.');
+            this.keyId = null;
+            this.otherParticipants.clear();
+            this.includeParticipants.clear();
+            this.excludeParticipants.clear();
+        }
+        else if ((parsedMessage.recipients.length > 0)
+                && (parsedMessage.recipients.indexOf(this.ownHandle) === -1)) {
+            logger.info('I am not participating in this chat, cannot read message.');
+        }
+
+        if (!senderKey) {
             return false;
         }
 
@@ -1427,11 +1412,6 @@ var strongvelope = {};
             excludeParticipants: []
         };
 
-        if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
-                && (result.sender !== this.ownHandle)) {
-            result.toSend = this.encryptTo(null, sender);
-        }
-
         // Update counter.
         if (!historicMessage && (result.sender !== this.ownHandle)) {
             this._totalMessagesWithoutSendKey++;
@@ -1440,25 +1420,92 @@ var strongvelope = {};
         // Take actions on participant changes.
         if ((sender !== this.ownHandle)
                 && (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS)) {
+
+            // Sanity checks.
+            if ((parsedMessage.includeParticipants.length > 0)
+                    && (setutils.join(otherParticipants,
+                        new Set(parsedMessage.includeParticipants)).size === 0)) {
+                // Included participants must be in otherParticipants.
+                return false;
+            }
+            if ((parsedMessage.excludeParticipants.length > 0)
+                    && (setutils.intersection(otherParticipants,
+                        new Set(parsedMessage.excludeParticipants)).size !== 0)) {
+                // Excluded participants must not be in otherParticipants.
+                return false;
+            }
+
+            if (this._inUse) {
+                // Sanity check whether everything matches up.
+                var myCheckParticipants = this._trackParticipants(
+                    this.otherParticipants, parsedMessage.includeParticipants,
+                    parsedMessage.excludeParticipants);
+                var messageCheckParticipants = new Set(parsedMessage.recipients);
+                messageCheckParticipants.add(sender);
+                messageCheckParticipants.delete(this.ownHandle);
+                if (!setutils.equal(myCheckParticipants, messageCheckParticipants)) {
+                    logger.critical('Participant group in chat does not match up with expectation!');
+                    logger.error('Expected group: '
+                        + JSON.stringify(Array.from(myCheckParticipants))
+                        + '; group from message: '
+                        + JSON.stringify(Array.from(messageCheckParticipants)));
+
+                    return false;
+                }
+
+                // Enact changes.
+                // Remove stuff from own tracking sets.
+                parsedMessage.excludeParticipants.forEach(function _excludeIterator(item) {
+                    self.includeParticipants.delete(item);
+                });
+                parsedMessage.includeParticipants.forEach(function _excludeIterator(item) {
+                    self.excludeParticipants.delete(item);
+                });
+                // Join own with new in/exclusion sets.
+                this.includeParticipants = setutils.join(
+                    this.includeParticipants, parsedMessage.includeParticipants);
+                this.excludeParticipants = setutils.join(
+                    this.excludeParticipants, parsedMessage.excludeParticipants);
+            }
+            else {
+                // Update other participants list.
+                this.otherParticipants = otherParticipants;
+                this._inUse = true;
+            }
             // Update my sender key.
             logger.info('Particpant change received, updating sender key.');
             this.updateSenderKey();
 
             // Track included/excluded members.
-            this.includeParticipants = _setJoin(this.includeParticipants,
+            this.includeParticipants = setutils.join(this.includeParticipants,
                 new Set(parsedMessage.includeParticipants));
             result.includeParticipants = parsedMessage.includeParticipants;
-            this.excludeParticipants = _setJoin(this.excludeParticipants,
+            this.excludeParticipants = setutils.join(this.excludeParticipants,
                 new Set(parsedMessage.excludeParticipants));
             result.excludeParticipants = parsedMessage.excludeParticipants;
+        }
+        else if (!historicMessage
+                    && (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED)) {
+            if (this._inUse === false) {
+                // We're in a new chat session: update group from received message.
+                this.otherParticipants = otherParticipants;
+                this._inUse = true;
+            }
+            else {
+                var trackedParticipants = this._trackParticipants(
+                    this.otherParticipants, this.includeParticipants, this.excludeParticipants);
+                if (!setutils.equal(trackedParticipants, otherParticipants)) {
+                    // There's a mismatch between what we're thinking the other
+                    // members are and what the message thinks they are.
+                    return false;
+                }
+            }
+        }
 
-            // Update other participants list.
-            this.otherParticipants = _setJoin(this.otherParticipants,
-                this.includeParticipants);
-            this.otherParticipants.delete(this.ownHandle);
-            this.excludeParticipants.forEach(function _removeEcludeIterator(item) {
-                self.otherParticipants.delete(item);
-            });
+        // Prepare a key reminder if required.
+        if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
+                && (result.sender !== this.ownHandle)) {
+            result.toSend = this.encryptTo(null, sender);
         }
 
         return result;
@@ -1503,7 +1550,7 @@ var strongvelope = {};
     /**
      * Alters the participant list of the chat room.
      *
-     * Note: There are no checks for overlaps in the include/eclude lists.
+     * Note: There are no checks for overlaps in the include/exclude lists.
      *
      * TODO: Employ the usage of sets (via object attributes) over arrays for
      *       uniqueness of entries (implement in _encryptSenderKey).
@@ -1529,9 +1576,9 @@ var strongvelope = {};
         includeParticipants = new Set(includeParticipants || []);
         excludeParticipants = new Set(excludeParticipants || []);
 
-        var alterIntersection = _setIntersection(includeParticipants,
-                                                 excludeParticipants);
-        var alterJoin = _setJoin(includeParticipants, excludeParticipants);
+        var alterIntersection = setutils.intersection(includeParticipants,
+                                                      excludeParticipants);
+        var alterJoin = setutils.join(includeParticipants, excludeParticipants);
 
         // General sanity check.
         if (alterJoin.size === 0) {

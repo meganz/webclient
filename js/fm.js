@@ -2943,10 +2943,10 @@ function notificationsUI(close)
     $.tresizer();
 }
 
-function accountUI()
-{
-    var sectionTitle,
-        sectionClass;
+function accountUI() {
+
+    var sectionTitle;
+    var sectionClass;
 
     $('.fm-account-overview').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
@@ -2957,6 +2957,7 @@ function accountUI()
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
     $('.fm-account-main').removeClass('white-bg');
+
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
@@ -2974,20 +2975,18 @@ function accountUI()
         return jsl_start();
     }
 
-    M.accountData(function(account)
-    {
+    M.accountData(function(account) {
+
         var perc, warning, perc_c;
         var id = document.location.hash;
-        if (id == '#fm/account/settings')
-        {
+
+        if (id == '#fm/account/settings') {
             $('.fm-account-settings').removeClass('hidden');
             sectionTitle = l[823];
             sectionClass = 'settings';
 
-            if (is_chrome_firefox)
-            {
-                if (!$('#acc_dls_folder').length)
-                {
+            if (is_chrome_firefox) {
+                if (!$('#acc_dls_folder').length) {
                     $('#acc_use_ssl').before(
                         $('<div id="acc_dls_folder" style="margin-top:25px">' +
                             '<div class="account-bandwidth-txt">Downloads folder:</div>' +
@@ -2996,8 +2995,7 @@ function accountUI()
                             '</div>'));
                     var fld = mozGetDownloadsFolder();
                     $('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
-                    $('#acc_dls_folder input').click(function()
-                    {
+                    $('#acc_dls_folder input').click(function() {
                         var fs = mozFilePicker(0,2);
                         if (fs) {
                             mozSetDownloadsFolder(fs);
@@ -3007,28 +3005,25 @@ function accountUI()
                 }
             }
         }
-        else if (id == '#fm/account/profile')
-        {
+        else if (id == '#fm/account/profile') {
             $('.fm-account-main').addClass('white-bg');
             $('.fm-account-profile').removeClass('hidden');
             sectionTitle = l[984];
             sectionClass = 'profile';
         }
-        else if (id == '#fm/account/history')
-        {
+        else if (id == '#fm/account/history') {
             $('.fm-account-main').addClass('white-bg');
             $('.fm-account-history').removeClass('hidden');
             sectionTitle = l[985];
             sectionClass = 'history';
         }
-        else if (id == '#fm/account/reseller' && M.account.reseller)
-        {
+        else if (id == '#fm/account/reseller' && M.account.reseller) {
             $('.fm-account-reseller').removeClass('hidden');
             sectionTitle = l[6873];
             sectionClass = 'reseller';
         }
-        else
-        {
+        else {
+
             // this is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
                 showNonActivatedAccountDialog(true);
@@ -3045,8 +3040,8 @@ function accountUI()
 
         $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
 
-        if (u_attr.p)
-        {
+        if (u_attr.p) {
+
             // LITE/PRO account
             var planNum = u_attr.p;
             var planText = getProPlan(planNum);
@@ -3055,8 +3050,7 @@ function accountUI()
             $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
 
             // Subscription
-            if (account.stype == 'S')
-            {
+            if (account.stype == 'S') {
                 $('.fm-account-header.typetitle').text(l[434]);
                 if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
@@ -3101,8 +3095,8 @@ function accountUI()
                     }
                 });
             }
-            else if (account.stype == 'O')
-            {
+            else if (account.stype == 'O') {
+
                 // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
@@ -3114,8 +3108,8 @@ function accountUI()
                 $('.subscription-bl').removeClass('active-subscription');
             }
         }
-        else
-        {
+        else {
+
             // free account:
             $('.fm-account-blocks .membership-icon.type').addClass('free');
             $('.membership-big-txt.type').text(l[435]);
@@ -3141,11 +3135,15 @@ function accountUI()
         var bandwidthDeg = 360 * perc_c / 100;
         if (bandwidthDeg <= 180) {
                 $('.bandwidth .nw-fm-chart0.right-c p').css('transform', 'rotate(' + bandwidthDeg + 'deg)');
-        } else {
+        }
+        else {
                 $('.bandwidth .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
                 $('.bandwidth .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (bandwidthDeg - 180) + 'deg)');
         }
-        if (bandwidthDeg > 0) $('.bandwidth .nw-fm-percentage').removeClass('empty');
+
+        if (bandwidthDeg > 0) {
+            $('.bandwidth .nw-fm-percentage').removeClass('empty');
+        }
         $('.bandwidth .nw-fm-bar0').css('width', perc_c + '%');
 
         // Maximum bandwidth
@@ -3155,10 +3153,13 @@ function accountUI()
 
         // Used bandwidth
         $('.bandwidth .fm-bar-size.used').html(b1);
+
         // Available bandwidth
         $('.bandwidth .fm-bar-size.available').html(b3);
 
-        if (perc > 99) $('.fm-account-blocks.storage').addClass('exceeded');
+        if (perc > 99) {
+            $('.fm-account-blocks.storage').addClass('exceeded');
+        }
 
         /* End of Used Bandwidth bar */
 
@@ -3254,12 +3255,13 @@ function accountUI()
 
         var $passwords = $('#account-password,#account-new-password,#account-confirm-password').unbind('click');
 
-        M.account.sessions.sort(function(a, b)
-        {
-            if (a[0] < b[0])
+        M.account.sessions.sort(function(a, b) {
+            if (a[0] < b[0]) {
                 return 1;
-            else
+            }
+            else {
                 return -1;
+            }
         });
 
         $('#sessions-table-container').empty();
@@ -3357,11 +3359,14 @@ function accountUI()
         });
 
         $('.settings-logout').rebind('click', function() {
+
             var $this = $(this).parents('tr');
             var sessionId = $this.attr('class');
+
             if (sessionId === 'current') {
                 mLogout();
-            } else {
+            }
+            else {
                 loadingDialog.show();
                 /* usr - user session remove
                  * remove a session Id from the current user,
@@ -3384,20 +3389,25 @@ function accountUI()
         $('.account-history-drop-items.purchase100-').text(l[469].replace('[X]', 100));
         $('.account-history-drop-items.purchase250-').text(l[469].replace('[X]', 250));
 
-        M.account.purchases.sort(function(a, b)
-        {
-            if (a[1] < b[1])
+        M.account.purchases.sort(function(a, b) {
+            if (a[1] < b[1]) {
                 return 1;
-            else
+            }
+            else {
                 return -1;
+            }
         });
 
         $('.grid-table.purchases tr').remove();
         var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
 
         // Render every purchase made into Purchase History on Account page
-        $(account.purchases).each(function(index, purchaseTransaction)
-        {
+        $(account.purchases).each(function(index, purchaseTransaction) {
+
+            if (index === $.purchaselimit) {
+                return false;// Break the loop
+            }
+
             // Set payment method
             //['Voucher', 'PayPal', 'Apple', 'Google', 'Bitcoin', 'Union Pay', 'Fortumo', 'Credit Card', 'Credit Card']
             var paymentMethodIndex = purchaseTransaction[4];
@@ -3465,81 +3475,96 @@ function accountUI()
         $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));
         $('.account-history-drop-items.transaction250-').text(l[471].replace('[X]', 250));
 
-        M.account.transactions.sort(function(a, b)
-        {
-            if (a[1] < b[1])
+        M.account.transactions.sort(function(a, b) {
+            if (a[1] < b[1]) {
                 return 1;
-            else
+            }
+            else {
                 return -1;
+            }
         });
+
         $('.grid-table.transactions tr').remove();
         var html = '<tr><th>' + l[475] + '</th><th>' + l[484] + '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
-        $(account.transactions).each(function(i, el)
-        {
+
+        $(account.transactions).each(function(i, el) {
+
+            if (i === $.transactionlimit) {
+                return false;
+            }
+
             var credit = '', debit = '';
-            if (el[2] > 0)
+
+            if (el[2] > 0) {
                 credit = '<span class="green">&euro;' + htmlentities(el[2]) + '</span>';
-            else
+            }
+            else {
                 debit = '<span class="red">&euro;' + htmlentities(el[2]) + '</span>';
+            }
             html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>' + credit + '</td><td>' + debit + '</td></tr>';
         });
+
         $('.grid-table.transactions').html(html);
         var i = new Date().getFullYear() - 10, html = '', sel = '';
         $('.default-select.year span').text('YYYY');
-        while (i >= 1900)
-        {
-            if (u_attr.birthyear && i == u_attr.birthyear)
-            {
+
+        while (i >= 1900) {
+            if (u_attr.birthyear && i == u_attr.birthyear) {
                 sel = 'active';
                 $('.default-select.year span').text(u_attr.birthyear);
             }
-            else
+            else {
                 sel = '';
+            }
+
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
             i--;
         }
+
         $('.default-select.year .default-select-scroll').html(html);
         var i = 1, html = '', sel = '';
         $('.default-select.day span').text('DD');
-        while (i < 32)
-        {
-            if (u_attr.birthday && i == u_attr.birthday)
-            {
+
+        while (i < 32) {
+            if (u_attr.birthday && i == u_attr.birthday) {
                 sel = 'active';
                 $('.default-select.day span').text(u_attr.birthday);
             }
-            else
+            else {
                 sel = '';
+            }
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
             i++;
         }
+
         $('.default-select.day .default-select-scroll').html(html);
         var i = 1, html = '', sel = '';
         $('.default-select.month span').text('MM');
-        while (i < 13)
-        {
-            if (u_attr.birthmonth && i == u_attr.birthmonth)
-            {
+
+        while (i < 13) {
+            if (u_attr.birthmonth && i == u_attr.birthmonth) {
                 sel = 'active';
                 $('.default-select.month span').text(u_attr.birthmonth);
             }
-            else
+            else {
                 sel = '';
+            }
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
             i++;
         }
+
         $('.default-select.month .default-select-scroll').html(html);
         var html = '', sel = '';
         $('.default-select.country span').text(l[996]);
-        for (var country in isocountries)
-        {
-            if (u_attr.country && country == u_attr.country)
-            {
+
+        for (var country in isocountries) {
+            if (u_attr.country && country == u_attr.country) {
                 sel = 'active';
                 $('.default-select.country span').text(isocountries[country]);
             }
-            else
+            else {
                 sel = '';
+            }
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
         }
         $('.default-select.country .default-select-scroll').html(html);
@@ -3563,7 +3588,8 @@ function accountUI()
             $newEmail.val('');
             if (texts.join("") === "") {
                 $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            } else {
+            }
+            else {
                 $newEmail.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
             }
         });
@@ -3794,54 +3820,73 @@ function accountUI()
         $('.current-email').html(htmlentities(u_attr.email));
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
-        $('.account-history-dropdown-button').unbind('click');
-        $('.account-history-dropdown-button').bind('click', function()
-        {
+
+        $('.account-history-dropdown-button').rebind('click', function() {
             $(this).addClass('active');
             $('.account-history-dropdown').addClass('hidden');
             $(this).next().removeClass('hidden');
-
         });
-        $('.account-history-drop-items').unbind('click');
-        $('.account-history-drop-items').bind('click', function()
-        {
+
+        $('.account-history-drop-items').rebind('click', function() {
+
             $(this).parent().prev().removeClass('active');
             $(this).parent().find('.account-history-drop-items').removeClass('active');
             $(this).parent().parent().find('.account-history-dropdown-button').text($(this).text());
+
             var c = $(this).attr('class');
-            if (!c)
+
+            if (!c) {
                 c = '';
-            if (c.indexOf('session10-') > -1)
+            }
+
+            if (c.indexOf('session10-') > -1) {
                 $.sessionlimit = 10;
-            else if (c.indexOf('session100-') > -1)
+            }
+            else if (c.indexOf('session100-') > -1) {
                 $.sessionlimit = 100;
-            else if (c.indexOf('session250-') > -1)
+            }
+            else if (c.indexOf('session250-') > -1) {
                 $.sessionlimit = 250;
-            if (c.indexOf('purchaselimit10-') > -1)
+            }
+
+            if (c.indexOf('purchase10-') > -1) {
                 $.purchaselimit = 10;
-            else if (c.indexOf('purchase100-') > -1)
+            }
+            else if (c.indexOf('purchase100-') > -1) {
                 $.purchaselimit = 100;
-            else if (c.indexOf('purchase250-') > -1)
+            }
+            else if (c.indexOf('purchase250-') > -1) {
                 $.purchaselimit = 250;
-            if (c.indexOf('transaction10-') > -1)
+            }
+
+            if (c.indexOf('transaction10-') > -1) {
                 $.transactionlimit = 10;
-            else if (c.indexOf('transaction100-') > -1)
+            }
+            else if (c.indexOf('transaction100-') > -1) {
                 $.transactionlimit = 100;
-            else if (c.indexOf('transaction250-') > -1)
+            }
+            else if (c.indexOf('transaction250-') > -1) {
                 $.transactionlimit = 250;
-            if (c.indexOf('voucher10-') > -1)
+            }
+
+            if (c.indexOf('voucher10-') > -1) {
                 $.voucherlimit = 10;
-            else if (c.indexOf('voucher100-') > -1)
+            }
+            else if (c.indexOf('voucher100-') > -1) {
                 $.voucherlimit = 100;
-            else if (c.indexOf('voucher250-') > -1)
+            }
+            else if (c.indexOf('voucher250-') > -1) {
                 $.voucherlimit = 250;
+            }
             else if (c.indexOf('voucherAll-') > -1) {
                 $.voucherlimit = 'all';
             }
+
             $(this).addClass('active');
             $(this).closest('.account-history-dropdown').addClass('hidden');
             accountUI();
         });
+
         $("#slider-range-max").slider({
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4, slide: function(e, ui)
             {

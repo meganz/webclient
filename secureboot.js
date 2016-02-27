@@ -1510,7 +1510,10 @@ else if (!b_u)
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
-    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined') {
+    if (typeof Number.isNaN !== 'function'
+            || typeof Set === 'undefined'
+            || typeof Array.from !== 'function') {
+
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
 

@@ -885,8 +885,6 @@ function MegaData()
          *
          */
         function mInsertNode(aNode, aPrevNode, aNextNode, aTag, aElement, aHTMLContent, aUpdate, aDynCache) {
-            console.error(aNode && aNode.toJS ? aNode.toJS() : null);
-
             if (!aUpdate || $(aTag + ' ' + aElement).length === 0) {
                 // 1. if the current view does not have any nodes, just append it
                 if (aDynCache) {
@@ -2660,7 +2658,6 @@ function MegaData()
         }
         if (n.p) {
             if (typeof this.c[n.p] === 'undefined') {
-                //this.c[n.p] = {};
                 this.c[n.p] = [];
             }
             this.c[n.p][n.h] = 1;
@@ -3167,8 +3164,6 @@ function MegaData()
             userId = u.u;
             if (this.u[userId]) {
                 for (var key in u) {
-                    if (key === 'name') { debugger; }
-
 					if (this.u[userId][key] && key != 'name')  {
 					  this.u[userId][key] = u[key];
 					}

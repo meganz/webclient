@@ -457,8 +457,16 @@ function MegaData()
 
     this.filterByParent = function(id) {
         this.filterBy(function(node) {
-            if ((node.name && node.p === id) || (node.name && node.p && node.p.length === 11 && id === 'shares'))
+            // if this is a contact, DONT check for .name
+            if (node.c) {
+                return (node.p === id) || (node.p && node.p.length === 11 && id === 'shares');
+            }
+            else if (
+                (node.name && node.p === id) ||
+                (node.name && node.p && node.p.length === 11 && id === 'shares')
+            ) {
                 return true;
+            }
         });
     };
 
@@ -877,6 +885,8 @@ function MegaData()
          *
          */
         function mInsertNode(aNode, aPrevNode, aNextNode, aTag, aElement, aHTMLContent, aUpdate, aDynCache) {
+            console.error(aNode && aNode.toJS ? aNode.toJS() : null);
+
             if (!aUpdate || $(aTag + ' ' + aElement).length === 0) {
                 // 1. if the current view does not have any nodes, just append it
                 if (aDynCache) {
@@ -1242,6 +1252,7 @@ function MegaData()
                         cc = [i, html, M.v[i].h, M.v[i].t];
                     }
                 }
+
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u, cc);
             }
         }// renderLayout END
@@ -1859,7 +1870,7 @@ function MegaData()
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                    + htmlentities(contacts[i].name)
+                    + htmlentities(contacts[i].name ? contacts[i].name : contacts[i].m)
                     + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
                 }
                 $('.fm-start-chat-dropdown').addClass('hidden');
@@ -2630,7 +2641,6 @@ function MegaData()
         if (n.p && n.p.length === 11 && !M.d[n.p]) {
             var u = this.u[n.p];
             if (u) {
-                u.name = u.name ? u.name : u.m;
                 u.h = u.u;
                 u.t = 1;
                 u.p = 'contacts';
@@ -2650,6 +2660,7 @@ function MegaData()
         }
         if (n.p) {
             if (typeof this.c[n.p] === 'undefined') {
+                //this.c[n.p] = {};
                 this.c[n.p] = [];
             }
             this.c[n.p][n.h] = 1;
@@ -3097,8 +3108,18 @@ function MegaData()
             lastName = lastName.value;
             firstName = firstName.value;
 
-            if (firstName.length > 0 && lastName.length > 0) {
-                self.u[userId].name = firstName + " " + lastName;
+
+            if (firstName.length > 0 || lastName.length > 0) {
+                self.u[userId].name = "";
+
+                if (firstName.length > 0) {
+                    self.u[userId].name = firstName
+                }
+                if (lastName.length > 0) {
+                    self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
+                }
+            } else {
+                delete self.u[userId].name;
             }
             self.u[userId].firstName = firstName;
             self.u[userId].lastName = lastName;
@@ -3146,24 +3167,26 @@ function MegaData()
             userId = u.u;
             if (this.u[userId]) {
                 for (var key in u) {
+                    if (key === 'name') { debugger; }
+
 					if (this.u[userId][key] && key != 'name')  {
 					  this.u[userId][key] = u[key];
 					}
                 }
-				
-				
+
+
                 u = this.u[userId];
             }
             else {
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
-
-                this.syncUsersFullname(userId);
             }
 
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
                 mDBadd('u', clone(u.toJS ? u.toJS() : u));
             }
+
+            this.syncUsersFullname(userId);
         }
     };
 
@@ -6838,8 +6861,6 @@ function process_u(u) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {
             if (u[i].c === 1) {
-                u[i].name = u[i].name ? u[i].name : u[i].m;
-
                 u[i].h = u[i].u;
                 u[i].t = 1;
                 u[i].p = 'contacts';

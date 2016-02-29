@@ -300,11 +300,6 @@ function dlerror(dl, error)
     var errorstr='';
     var tempe=false;
 
-    // If over quota show a special warning dialog
-    if (error === EOVERQUOTA) {
-        showOverQuotaDialog();
-    }
-
     else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
     else if (error == ESID) errorstr = l[19];
     else if (error == ETEMPUNAVAIL) tempe = l[233];

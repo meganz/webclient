@@ -382,6 +382,11 @@ function init_pro()
             document.location.hash = 'contact';
         });
     }
+
+    if (typeof window.selectedProPlan !== "undefined") {
+        $('.reg-st3-membership-bl.' + window.selectedProPlan).find('.membership-button').trigger('click');
+        delete window.selectedProPlan;
+    }
 }
 
 

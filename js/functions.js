@@ -3002,6 +3002,10 @@ function quotaDialog(time) {
         $('body').removeClass('overlayed');
     });
 
+    $dialog.find('.membership-button').rebind('click', function() {
+        window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').attr('class').replace(/.+? /, '');
+        document.location.hash = '#pro';
+    });
     var $txt = $('.countdown', $dialog);
     $txt.text(secondsToTimeShort(time));
 

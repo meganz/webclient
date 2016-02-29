@@ -354,6 +354,7 @@ var dlmanager = {
         if (code === 509) {
             var d   = new Date;
             args[2] = parseInt(args[2]);
+            args[2] = 600;
             d.setTime(d.getTime() + (args[2]-5)*1000);
             dlmanager.dlQuotaEnd = d;
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX

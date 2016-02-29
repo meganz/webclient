@@ -300,7 +300,7 @@ function dlerror(dl, error)
     var errorstr='';
     var tempe=false;
 
-    else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
+    if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
     else if (error == ESID) errorstr = l[19];
     else if (error == ETEMPUNAVAIL) tempe = l[233];
     else if (error == EBLOCKED) tempe = l[23];

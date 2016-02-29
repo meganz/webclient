@@ -3146,8 +3146,12 @@ function MegaData()
             userId = u.u;
             if (this.u[userId]) {
                 for (var key in u) {
-                    this.u[userId][key] = u[key];
+					if (this.u[userId][key] && key != 'name')  {
+					  this.u[userId][key] = u[key];
+					}
                 }
+				
+				
                 u = this.u[userId];
             }
             else {

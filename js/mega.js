@@ -1865,10 +1865,12 @@ function MegaData()
                         && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1
                         )
                     ) {
+                    var name = contacts[i].name && $.trim(contacts[i].name) ? $.trim(contacts[i].name) : contacts[i].m;
+
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                    + htmlentities(contacts[i].name ? contacts[i].name : contacts[i].m)
+                    + htmlentities(name)
                     + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
                 }
                 $('.fm-start-chat-dropdown').addClass('hidden');

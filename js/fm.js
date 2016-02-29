@@ -10446,6 +10446,11 @@ function fm_resize_handler() {
     }
 }
 
+/**
+ * sharedfolderUI()
+ *
+ * @returns {Boolean}
+ */
 function sharedfolderUI() {
 
     var c,
@@ -10491,7 +10496,7 @@ function sharedfolderUI() {
         if (M.viewmode === 1)
             e = '.fm-blocks-view.fm';
 
-        var nameStr = user && user.name ? htmlentities(user.name) : "N/a";
+        var nameStr = user && user.name ? htmlentities(user.name) : "N/A";
 
         $(e).wrap('<div class="shared-details-block"></div>');
         $('.shared-details-block').prepend(

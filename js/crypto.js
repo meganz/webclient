@@ -3941,6 +3941,12 @@ function crypto_processkey(me, master_aes, file) {
                         return;
                     }
                     k = decKey;
+                    
+                    // Update global variable which holds data about missing keys
+                    // so DOM can be updated accordingly
+                    if (missingkeys[file.h]) {
+                        delete missingkeys[file.h];
+                    }
                 }
             }
             else {

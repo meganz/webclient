@@ -1039,32 +1039,50 @@ function MegaData()
             var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
                 sExportLink, sLinkIcon, additionClass, titleTooltip, fName, fIcon,
+                undecryptableClass = '',
                 iShareNum = 0,
-                s, ftype, c, cc, star;
+                nodeType = '',
+                s, ftype, cc, star;
 
             for (var i in M.v) {
 
                 var nodeData = M.v[i];
                 var nodeHandle = nodeData.h;
 
-                if (!nodeData.name) {
+                if (typeof nodeData.name === 'undefined') {
                     DEBUG('Skipping M.v node with no name.', nodeData);
                     continue;
                 }
 
                 s  = '';
-                c  = '';
+                nodeType  = '';
                 cc = null;
+                undecryptableClass = '';
+                titleTooltip = '';
+                fName = '';
+                fIcon = '';
+                ftype = '';
 
                 if (nodeData.t) {
                     ftype = l[1049];
-                    c = ' folder';
+                    nodeType = ' folder';
+                    fIcon = 'folder';
                 }
                 else {
                     ftype = filetype(nodeData.name);
                     s = htmlentities(bytesToSize(nodeData.s));
+                    nodeType = ' file';
                 }
                 star = nodeData.fav ? ' star' : '';
+
+                // Undecryptable file indicators
+                if (missingkeys[nodeHandle]) {
+                    undecryptableClass = 'undecryptable';
+                    titleTooltip = 'Once cryptographic key becomes available, this' + nodeType + ' will be decrypted.';
+                    fName = 'undecrypted' + nodeType;
+                    fIcon = 'generic';
+                    ftype = l[7381];// i.e. 'unknown'
+                }
 
                 if (M.currentdirid === 'shares') {// render shares tab
                     cs = M.contactstatus(nodeHandle);
@@ -1089,19 +1107,20 @@ function MegaData()
                         rightsclass = ' full-access';
                     }
 
-                    var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
+                    var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/A";
+
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
-                        html = '<a class="file-block folder" id="'
+                        html = '<a class="file-block folder' + undecryptableClass + '" id="'
                             + htmlentities(nodeHandle) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
                             + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
-                            + '<span class="block-view-file-type folder"></span></span>'
+                            + '<span class="block-view-file-type ' + fIcon + '"></span></span>'
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
-                            + htmlentities(nodeData.name) + '</span><span class="shared-folder-info">by '
+                            + ftype + '</span><span class="shared-folder-info">by '
                             + contactName + '</span></span></a>';
                     }
                     else {
@@ -1109,7 +1128,7 @@ function MegaData()
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
-                        html = '<tr id="' + htmlentities(nodeHandle) + '"><td width="50"><span class="grid-status-icon ' + htmlentities(star)
+                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + undecryptableClass + '"><td width="50"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + htmlentities(nodeData.name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
                             + '</div></div> </td><td width="240">'
@@ -1200,20 +1219,11 @@ function MegaData()
                         titleTooltip = (nodeData.t === 1) ? l[7705] : l[7704];
                     }
 
-                    // Undecryptable file indicators
-//                    if (missingkeys[nodeHandle]) {
-//                        additionClass = 'undecryptable';
-//                        titleTooltip = 'We are waiting for the cryptographic key to this file';
-//                        fName = 'undecrypted file';
-//                        fIcon = 'generic';
-//                        ftype = l[7381];
-//                    }
-
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block' + c + ' ' + sExportLink + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
+                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block' + nodeType + ' ' + sExportLink + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
@@ -1234,7 +1244,7 @@ function MegaData()
                         }
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + c + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
+                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + nodeType + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
                                     <td width="50">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\

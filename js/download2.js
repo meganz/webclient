@@ -352,11 +352,11 @@ var dlmanager = {
         }
 
         if (code === 509) {
-            var t = NOW();
-            quotaDialog(args[2]);
-            dlmanager.dlLastQuotaWarning = t;
-            dl.dl_failed = true;
-            dlmanager.dlReportStatus(dl, code === 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
+            var d   = new Date;
+            args[2] = parseInt(args[2]);
+            d.setTime(d.getTime() + (args[2]-5)*1000);
+            dlmanager.dlQuotaEnd = d;
+            dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
             if (dl.quota_t) {
                 clearTimeout(dl.quota_t);
             }
@@ -364,8 +364,9 @@ var dlmanager = {
                 dlmanager.dlQueuePushBack(task);
                 $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
                 dlQueue.resume();
-            }, parseInt(args[2]) * 1000);
+            }, args[2] * 1000);
             dlQueue.pause();
+            quotaDialog(args[2]);
             return 1;
         } else {
             dlmanager.dlReportStatus(dl, EAGAIN);
@@ -1122,6 +1123,13 @@ var dlQueue = new TransferQueue(function _downloader(task, done) {
     }
     return task.run(done);
 }, 4, 'downloader');
+dlQueue.resume = function() {
+    if (dlmanager.dlQuotaEnd && dlmanager.dlQuotaEnd > new Date()) {
+        return false;
+    }
+
+    return MegaQueue.prototype.resume.apply(this, []);
+};
 
 // chunk scheduler
 dlQueue.validateTask = function(pzTask) {

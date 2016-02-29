@@ -1502,6 +1502,7 @@ function checkUserLogin() {
 })(this);
 
 var attribCache = new IndexedDBKVStorage('attrib');
+attribCache.syncNameTimer = {};
 
 /**
  * Process action-packet for attribute updates.
@@ -1523,7 +1524,15 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
             if (attrName === 'firstname'
                     || attrName === 'lastname') {
 
-                M.syncUsersFullname(userHandle);
+                // behind a timer, so that if we get action-packets for both
+                // first and last name we won't fire syncUsersFullname twice
+                if (attribCache.syncNameTimer[userHandle]) {
+                    clearTimeout(attribCache.syncNameTimer[userHandle]);
+                }
+                attribCache.syncNameTimer[userHandle] = setTimeout(function() {
+                    attribCache.syncNameTimer[userHandle] = null;
+                    M.syncUsersFullname(userHandle);
+                }, 350);
             }
             else if (ownActionPacket) {
                 // atm only first/last name is processed throguh own-action-packet

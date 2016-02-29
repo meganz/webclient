@@ -131,7 +131,6 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
             });
         }
         else {
-            debugger;
             createTimeoutPromise(function() {
                 return !!chatRoom.protocolHandler;
             }, 300, 5000).done(function() {
@@ -265,12 +264,15 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     );
                 });
 
-                self.alterParticipants(chatRoom, members, undefined, true);
+                self.setProtocolHandlerParticipants(chatRoom);
+
+                self.alterParticipants(chatRoom, members, [], true);
 
                 window.location = chatRoom.getRoomUrl();
             }
         }
         else {
+            self.setProtocolHandlerParticipants(chatRoom);
             if (!chatRoom.chatId) {
                 chatRoom.chatId = actionPacket.id;
                 chatRoom.chatShard = actionPacket.cs;
@@ -495,6 +497,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                 if (eventData.userId === u_handle) {
                     chatRoom.membersLoaded = true;
+                    //self.setProtocolHandlerParticipants(chatRoom);
                 }
             }
             else if (eventData.priv === 255) {
@@ -546,6 +549,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
+            self.protocolHandlerRequiresKeysInit(chatRoom);
+
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
                 if (v.userId) {
                     var msg = v.getContents ? v.getContents() : v.message;
@@ -678,7 +683,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 });
         });
         $(chatRoom.messagesBuff).rebind('onNewMessageReceived.chatdStrongvelope', function(e, msgObject) {
-            debugger;
             if (msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
                 var _runDecryption = function() {
                     try {
@@ -827,7 +831,10 @@ ChatdIntegration.prototype.setProtocolHandlerParticipants = function(chatRoom) {
     var self = this;
 
    if (chatRoom.type === "group" && chatRoom.protocolHandler.otherParticipants.size === 0) {
-       self.alterParticipants(chatRoom, Object.keys(chatRoom.members), undefined, true);
+       if (!chatRoom.protocolHandler._otherParticipantsFlag) {
+           self.alterParticipants(chatRoom, Object.keys(chatRoom.members), [], true);
+           chatRoom.protocolHandler._otherParticipantsFlag = true;
+       }
    }
 };
 

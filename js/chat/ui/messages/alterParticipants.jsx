@@ -29,10 +29,10 @@ var AlterParticipantsConversationMessage = React.createClass({
         var messages = [];
 
 
-        if (message.meta.excluded.length === 0) {
-            debugger;
-        }
-        console.error(message.meta);
+        //if (message.meta.excluded.length === 0) {
+        //    debugger;
+        //}
+        //console.error(message.meta);
 
         message.meta.included.forEach(function(h) {
             var otherContact = M.u[h] ? M.u[h] : {
@@ -42,7 +42,7 @@ var AlterParticipantsConversationMessage = React.createClass({
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
-            var otherDisplayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+            var otherDisplayName = otherContact.u === u_handle ? __("Me") : generateAvatarMeta(otherContact.u).fullName;
 
             messages.push(
                 <div className="message body" data-id={"id" + message.messageId} key={h}>

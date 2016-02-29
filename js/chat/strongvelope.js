@@ -1529,7 +1529,6 @@ var strongvelope = {};
 
         var errorOut = false;
 
-        debugger;
         includeParticipants = new Set(includeParticipants || []);
         excludeParticipants = new Set(excludeParticipants || []);
 

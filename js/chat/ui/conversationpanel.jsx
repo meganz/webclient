@@ -91,7 +91,7 @@ var ConversationRightArea = React.createClass({
 
         contacts.forEach(function(contactHash) {
             var contact = M.u[contactHash];
-            if (contact) {
+            if (contact && contactHash != u_handle) {
                 var dropdowns = [];
 
                 if (room.members && room.members[u_handle] === 3) {
@@ -117,6 +117,14 @@ var ConversationRightArea = React.createClass({
             }
         });
 
+        var excludedParticipants = room.type === "group" ?
+            (
+                room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
+                    room.getContactParticipants()
+            )   :
+            room.getContactParticipants();
+
+
         return <div className="chat-right-area">
             <div className="chat-right-area conversation-details-scroll">
                 <div className="chat-right-pad">
@@ -134,19 +142,15 @@ var ConversationRightArea = React.createClass({
                             contacts={this.props.contacts}
                             disabled={
                                 /* Disable in case I don't have any more contacts to add ... */
-                                (room.getContactParticipantsExceptMe().length + 1) === this.props.contacts.length
+                                excludedParticipants.length === this.props.contacts.length
                             }
                             >
                             <DropdownsUI.DropdownContactsSelector
                                 contacts={this.props.contacts}
                                 megaChat={this.props.megaChat}
+                                chatRoom={room}
                                 exclude={
-                                    room.type === "group" ?
-                                        (
-                                            room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
-                                            room.getContactParticipantsExceptMe()
-                                        )   :
-                                        room.getContactParticipantsExceptMe()
+                                    excludedParticipants
                                 }
                                 className="popup add-participant-selector"
                                 onClick={this.props.onAddParticipantSelected}

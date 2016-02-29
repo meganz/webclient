@@ -34,11 +34,11 @@ var Chatd = function(userId, options) {
     // debug mode
     [
         //'onMessageUpdated',
-        'onMessageConfirm',
+        //'onMessageConfirm',
         //'onMessageReject',
         //'onMessageCheck',
         //'onMessageModify',
-        'onMessageStore',
+        //'onMessageStore',
         //'onMessageSeen',
         //'onMessageLastSeen',
         //'onMessageReceived',
@@ -590,6 +590,15 @@ Chatd.Shard.prototype.msg = function(chatId, msgxid, timestamp, message) {
     //console.error("MSG", base64urlencode(chatId), msgxid, timestamp, message);
 
     this.cmd(Chatd.Opcode.NEWMSG, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack32le(message.length) + message);
+};
+
+Chatd.Shard.prototype.retention = function(chatId, seconds) {
+    this.cmd(
+        Chatd.Opcode.RETENTION,
+        chatId +
+        base64urldecode(u_handle) +
+        this.chatd.pack32le(seconds)
+    );
 };
 
 Chatd.Shard.prototype.msgupd = function(chatId, msgid, message) {

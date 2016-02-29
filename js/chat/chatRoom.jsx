@@ -616,6 +616,25 @@ ChatRoom.prototype.getContactParticipantsExceptMe = function(jids) {
 };
 
 /**
+ * Used to conver participants (from jids) -> contacts (as user hashes).
+ *
+ * @param [jids] {Array} optional list of jids to be used for converting -> contact list (if not passed, the current
+ * room jids would be used)
+ * @returns {Array} array of user hashes with the participants in the room
+ */
+ChatRoom.prototype.getContactParticipants = function(jids) {
+    var self = this;
+    var participantJids = self.getParticipants(jids);
+
+    return participantJids.map((jid) => {
+        var contactHash = megaJidToUserId(jid);
+        if (contactHash) {
+            return contactHash;
+        }
+    });
+};
+
+/**
  * Get room title
  *
  * @returns {string}
@@ -636,7 +655,7 @@ ChatRoom.prototype.getRoomTitle = function() {
                 );
             }
         });
-        return names.join(", ");
+        return names.length > 0 ? names.join(", ") : __("(empty)");
     }
 };
 
@@ -1474,6 +1493,12 @@ ChatRoom.prototype.startVideoCall = function() {
 
 ChatRoom.prototype.stateIsLeftOrLeaving = function() {
     return (this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING);
+};
+
+ChatRoom.prototype._clearChatMessagesFromChatd = function() {
+    megaChat.plugins.chatdIntegration.chatd.shards[0].retention(
+        base64urldecode(this.chatId), 1
+    );
 };
 
 window.ChatRoom = ChatRoom;

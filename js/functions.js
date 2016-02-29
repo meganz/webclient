@@ -2981,6 +2981,31 @@ function __(s) { //TODO: waiting for @crodas to commit the real __ code.
     return s;
 }
 
+function quotaDialog(time) {
+    var time = parseInt(time);
+    var tick;
+    if ($('.fm-dialog.bandwidth-dialog').is(':visible')) {
+        return;
+    }
+    var $dialog = $('.fm-dialog.bandwidth-dialog');
+    
+    $dialog.removeClass('hidden')
+        .find('.bandwidth-header')
+        .safeHTML(l[7100].replace('%1', '<span class="countdown"></span>'));
+
+    $dialog.find('.fm-dialog-close').rebind('click', function() {
+        clearInterval(tick);
+        $dialog.addClass('hidden');
+    });
+
+    var $txt = $('.countdown', $dialog);
+    $txt.text(secondsToTimeShort(time));
+
+    tick = setInterval(function() {
+        $txt.text(secondsToTimeShort(--time));
+    }, 1000);
+}
+
 function MegaEvents() {}
 MegaEvents.prototype.trigger = function(name, args) {
     if (!(this._events && this._events.hasOwnProperty(name))) {

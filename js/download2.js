@@ -353,18 +353,19 @@ var dlmanager = {
 
         if (code === 509) {
             var t = NOW();
-            if (t - dlmanager.dlLastQuotaWarning > 60000) {
-                dlmanager.dlLastQuotaWarning = t;
-                dlmanager.dlReportStatus(dl, code === 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
-                dl.quota_t = setTimeout(function() {
-                    dlmanager.dlQueuePushBack(task);
-                }, 60000);
-                return 1;
+            quotaDialog(args[2]);
+            dlmanager.dlLastQuotaWarning = t;
+            dlmanager.dlReportStatus(dl, code === 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
+            if (dl.quota_t) {
+                clearTimeout(dl.quoate_t);
             }
+            dl.quota_t = setTimeout(function() {
+                dlmanager.dlQueuePushBack(task);
+            }, parseInt(args[2]));
+            return 1;
+        } else {
+            dlmanager.dlReportStatus(dl, EAGAIN);
         }
-
-        /* update UI */
-        dlmanager.dlReportStatus(dl, EAGAIN);
 
         if (code === 403 || code === 404) {
             dlmanager.newUrl(dl, function(rg) {

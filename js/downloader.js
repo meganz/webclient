@@ -196,8 +196,9 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
 
     var chunk = this;
     var status = xhr.readyState > 1 && xhr.status;
+    var retryTime = xhr.getResponseHeader('x-mega-time-left');
     this.oet = setTimeout(function() {
-        chunk.finish_download(false, status);
+        chunk.finish_download(false, status, retryTime);
         chunk = undefined;
     }, 3950 + Math.floor(Math.random() * 2e3));
 };
@@ -227,7 +228,6 @@ ClassChunk.prototype.onXHRready = function(xhrEvent) {
             new Uint8Array(r)
         ]);
         this.dl.retries = 0;
-        dlmanager.reportQuota(this.size);
         this.finish_download();
         this.destroy();
     }

@@ -1075,6 +1075,8 @@ function MegaData()
                 }
                 star = nodeData.fav ? ' star' : '';
 
+                fName = htmlentities(nodeData.name);
+
                 // Undecryptable file indicators
                 if (missingkeys[nodeHandle]) {
                     undecryptableClass = 'undecryptable';
@@ -1113,14 +1115,14 @@ function MegaData()
                         t = '.shared-blocks-scrolling';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
-                        html = '<a class="file-block folder' + undecryptableClass + '" id="'
+                        html = '<a class="file-block folder ' + undecryptableClass + '" id="'
                             + htmlentities(nodeHandle) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
                             + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
                             + '<span class="block-view-file-type ' + fIcon + '"></span></span>'
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
-                            + ftype + '</span><span class="shared-folder-info">by '
+                            + fName + '</span><span class="shared-folder-info">by '
                             + contactName + '</span></span></a>';
                     }
                     else {
@@ -1130,7 +1132,7 @@ function MegaData()
 
                         html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + undecryptableClass + '"><td width="50"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
-                            + htmlentities(nodeData.name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
+                            + fName + '</div><div class="shared-folder-info">' + htmlentities(contains)
                             + '</div></div> </td><td width="240">'
                                  + avatar
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
@@ -1168,7 +1170,7 @@ function MegaData()
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type folder-shared"><img alt=""></span>\n\
                                     </span>\n\
-                                    <span class="file-block-title">' + htmlentities(nodeData.name) + '</span>\n\
+                                    <span class="file-block-title">' + fName + '</span>\n\
                                 </a>';
                     }
                     else {
@@ -1181,7 +1183,7 @@ function MegaData()
                                     <td>\n\
                                         <div class="shared-folder-icon"></div>\n\
                                         <div class="shared-folder-info-block">\n\
-                                            <div class="shared-folder-name">' + htmlentities(nodeData.name) + '</div>\n\
+                                            <div class="shared-folder-name">' + fName + '</div>\n\
                                             <div class="shared-folder-info">' + contains + '</div>\n\
                                         </div>\n\
                                     </td>\n\
@@ -1210,9 +1212,7 @@ function MegaData()
                     sExportLink = (nodeData.shares && nodeData.shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                     additionClass = '';
-                    titleTooltip = '';
-                    fName = htmlentities(nodeData.name);
-                    fIcon = fileIcon({t: nodeData.t, share: bShare, name: nodeData.name});
+                    fIcon = fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name });
 
                     if (nodeData && nodeData.shares && nodeData.shares.EXP && nodeData.shares.EXP.down) {
                         additionClass = 'taken-down';
@@ -1223,12 +1223,12 @@ function MegaData()
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block' + nodeType + ' ' + sExportLink + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
+                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block' + nodeType + ' ' + sExportLink + ' ' + additionClass + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileIcon({t: nodeData.t, share: bShare, name: nodeData.name}) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name }) + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + fName + '</span>\n\
                                 </a>';
@@ -1244,7 +1244,7 @@ function MegaData()
                         }
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + nodeType + ' ' + additionClass +  '" title="' + titleTooltip + '">\n\
+                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + nodeType + ' ' + additionClass + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                     <td width="50">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\

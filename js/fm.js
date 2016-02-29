@@ -1309,7 +1309,7 @@ function removeUInode(h) {
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
             if (!hasItems) {
-                if (sharedfolderUI()) {
+                if (sharedFolderUI()) {
                     M.emptySharefolderUI();
                 }
                 else {
@@ -6919,7 +6919,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }
             i++;
         }
-        if (ids[0] === 'contacts' && M.currentdirid && String(M.currentdirid).length === 11 && M.currentrootid == 'contacts') {
+        if ((ids[0] === 'contacts') && M.currentdirid && (String(M.currentdirid).length === 11) && (M.currentrootid == 'contacts')) {
             sectionUIopen('contacts');
         } else if (ids[0] === 'contacts') {
             // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the
@@ -10447,11 +10447,11 @@ function fm_resize_handler() {
 }
 
 /**
- * sharedfolderUI()
+ * sharedFolderUI()
  *
  * @returns {Boolean}
  */
-function sharedfolderUI() {
+function sharedFolderUI() {
 
     var c,
         n = M.d[M.currentdirid],
@@ -10464,7 +10464,7 @@ function sharedfolderUI() {
         r = true;
     }
 
-    if (!n || n.p.length !== 11) {
+    if (!n || (n.p.length !== 11)) {
         n = null;
 
         var p = M.getPath(M.currentdirid);
@@ -10472,7 +10472,7 @@ function sharedfolderUI() {
             c = M.d[p[0]];
             n = M.d[p[p.length - 3]];
 
-            if (!n || n.p.length !== 11) {
+            if (!n || (n.p.length !== 11)) {
                 n = 0;
             }
         }
@@ -10487,7 +10487,8 @@ function sharedfolderUI() {
         if (n.r === 1) {
             rights = l[56];
             rightsclass = ' read-and-write';
-        } else if (n.r === 2) {
+        }
+        else if (n.r === 2) {
             rights = l[57];
             rightsclass = ' full-access';
         }
@@ -10499,6 +10500,7 @@ function sharedfolderUI() {
         var nameStr = user && user.name ? htmlentities(user.name) : "N/A";
 
         $(e).wrap('<div class="shared-details-block"></div>');
+
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
                 +'<div class="shared-details-icon"></div>'

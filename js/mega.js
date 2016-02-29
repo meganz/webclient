@@ -454,7 +454,7 @@ function MegaData()
 
     this.filterByParent = function(id) {
         this.filterBy(function(node) {
-            if ((node.name && node.p === id) || (node.name && node.p && node.p.length === 11 && id === 'shares'))
+            if ((node.p === id) || (node.p && (node.p.length === 11) && (id === 'shares')))
                 return true;
         });
     };
@@ -1049,11 +1049,11 @@ function MegaData()
                 var nodeData = M.v[i];
                 var nodeHandle = nodeData.h;
 
-                if (typeof nodeData.name === 'undefined') {
-                    DEBUG('Skipping M.v node with no name.', nodeData);
-                    continue;
-                }
-
+//                if (typeof nodeData.name === 'undefined') {
+//                    DEBUG('Skipping M.v node with no name.', nodeData);
+//                    continue;
+//                }
+//
                 s  = '';
                 nodeType  = '';
                 cc = null;
@@ -1116,7 +1116,7 @@ function MegaData()
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder ' + undecryptableClass + '" id="'
-                            + htmlentities(nodeHandle) + '"><span class="file-status-icon '
+                            + htmlentities(nodeHandle) + '" title="' + titleTooltip + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
                             + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
                             + '<span class="block-view-file-type ' + fIcon + '"></span></span>'
@@ -1130,7 +1130,7 @@ function MegaData()
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
-                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + undecryptableClass + '"><td width="50"><span class="grid-status-icon ' + htmlentities(star)
+                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + undecryptableClass + '" title="' + titleTooltip + '"><td width="50"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + fName + '</div><div class="shared-folder-info">' + htmlentities(contains)
                             + '</div></div> </td><td width="240">'
@@ -1279,7 +1279,7 @@ function MegaData()
         lSel = this.fsViewSel;
         $(lSel).unbind('jsp-scroll-y.dynlist');
         $(window).unbind("resize.dynlist");
-        sharedfolderUI();// ToDo: Check do we really need this here
+        sharedFolderUI();// ToDo: Check do we really need this here
         $.tresizer();
 
         hideEmptyGrids();
@@ -1681,7 +1681,7 @@ function MegaData()
 
             }
         }
-        else if ((!id || !M.d[id]) && id !== 'transfers') {
+        else if ((!id || !M.d[id]) && (id !== 'transfers')) {
             id = this.RootID;
         }
 
@@ -1703,7 +1703,7 @@ function MegaData()
         $('.nw-fm-tree-item').removeClass('opened');
 
         if (this.chat) {
-            sharedfolderUI(); // remove shares-specific UI
+            sharedFolderUI(); // remove shares-specific UI
             //$.tresizer();
         }
         else if (id === undefined && folderlink) {
@@ -1711,7 +1711,7 @@ function MegaData()
             // Force cleaning the current cloud contents and showing an empty msg
             M.renderMain();
         }
-        else if (id && id.substr(0, 7) !== 'account' && id.substr(0, 13) !== 'notifications') {
+        else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 13) !== 'notifications')) {
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');
@@ -2057,6 +2057,11 @@ function MegaData()
             rebuild = false,
             sharedfolder, openedc, arrowIcon,
             ulc, expandedc, buildnode, containsc, cns, html, sExportLink, sLinkIcon,
+            fName = '',
+            curItemHandle = '',
+            undecryptableClass = '',
+            titleTooltip = '',
+            fIcon = '',
             prefix;
 
         var share = new mega.Share({});
@@ -2137,7 +2142,7 @@ function MegaData()
             folders = [];
 
             for (var i in this.c[n.h]) {
-                if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
+                if (this.d[i] && (this.d[i].t === 1)) {
                     folders.push(this.d[i]);
                 }
             }
@@ -2158,14 +2163,23 @@ function MegaData()
                  _sub = 'mctreesub_';
             }
 
+//            forEach() {};
+
             for (var ii in folders) {
+
                 if (folders.hasOwnProperty(ii)) {
 
                     ulc = '';
                     expandedc = '';
                     buildnode = false;
                     containsc = '';
-                    cns = M.c[folders[ii].h];
+                    curItemHandle = folders[ii].h;
+                    cns = M.c[curItemHandle];
+                    undecryptableClass = '';
+                    titleTooltip = '';
+                    fIcon = '';
+
+                    fName = htmlentities(folders[ii].name);
 
                     if (cns) {
                         for (var cn in cns) {
@@ -2174,57 +2188,67 @@ function MegaData()
                                 containsc = 'contains-folders';
                                 break;
                             }
+                            /* jshint +W073 */
                         }
                     }
-                    if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h]) {
+                    if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[curItemHandle]) {
                         buildnode = Boolean(containsc);
                     }
                     if (buildnode) {
                         ulc = 'class="opened"';
                         expandedc = 'expanded';
                     }
-                    else if (Object(fmconfig.treenodes).hasOwnProperty(folders[ii].h)) {
-                        fmtreenode(folders[ii].h, false);
+                    else if (Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
+                        fmtreenode(curItemHandle, false);
                     }
                     sharedfolder = '';
 
                     // Check is there a full and pending share available, exclude public link shares i.e. 'EXP'
-                    if (share.isShareExist([folders[ii].h], true, true, false)) {
+                    if (share.isShareExist([curItemHandle], true, true, false)) {
                         sharedfolder = ' shared-folder';
                     }
 
                     openedc = '';
-                    if (M.currentdirid === folders[ii].h) {
+                    if (M.currentdirid === curItemHandle) {
                         openedc = 'opened';
                     }
 
-                    var k = $('#' + _li + folders[ii].h).length;
+                    var k = $('#' + _li + curItemHandle).length;
 
                     if (k) {
                         if (containsc) {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc)
+                            $('#' + _li + curItemHandle + ' .nw-fm-tree-item').addClass(containsc)
                                 .find('span').eq(0).addClass('nw-fm-arrow-icon');
                         }
                         else {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders')
+                            $('#' + _li + curItemHandle + ' .nw-fm-tree-item').removeClass('contains-folders')
                                 .find('span').eq(0).removeClass('nw-fm-arrow-icon');
                         }
                     }
                     else {
-                        sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
+
+                        // Undecryptable file indicators
+                        if (missingkeys[curItemHandle]) {
+                            undecryptableClass = 'undecryptable';
+                            titleTooltip = 'Once cryptographic key becomes available, this folder will be decrypted.';
+                            fName = 'undecrypted folder';
+                            fIcon = 'generic';
+                        }
+
+                        sExportLink = (M.d[curItemHandle].shares && M.d[curItemHandle].shares.EXP) ? 'linked' : '';
                         sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                         arrowIcon = '';
 
                         if (containsc) {
                             arrowIcon = 'class="nw-fm-arrow-icon"';
                         }
-                        html = '<li id="' + _li + folders[ii].h + '">\n\
-                                        <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
+                        html = '<li id="' + _li + curItemHandle + '">\n\
+                                        <span  id="' + _a + htmlentities(curItemHandle) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                             <span ' + arrowIcon + '></span>\n\
-                                            <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
+                                            <span class="nw-fm-tree-folder' + sharedfolder + '">' + fName + '</span>\n\
                                             <span class="' + sLinkIcon + '"></span>\n\
                                         </span>\n\
-                                        <ul id="' + _sub + folders[ii].h + '" ' + ulc + '></ul>\n\
+                                        <ul id="' + _sub + curItemHandle + '" ' + ulc + '></ul>\n\
                                     </li>';
 
                         if (folders[ii - 1] && $('#' + _li + folders[ii - 1].h).length > 0) {
@@ -2238,12 +2262,12 @@ function MegaData()
                         }
                     }
 
-                    if (_ts_l && folders[ii].name) {
-                        if (folders[ii].name.toLowerCase().indexOf(_ts_l) === -1) {
-                            $('#' + _li + folders[ii].h).addClass('tree-item-on-search-hidden');
+                    if (_ts_l) {
+                        if (fName.toLowerCase().indexOf(_ts_l) === -1) {
+                            $('#' + _li + curItemHandle).addClass('tree-item-on-search-hidden');
                         }
                         else {
-                            $('#' + _li + folders[ii].h).parents('li').removeClass('tree-item-on-search-hidden');
+                            $('#' + _li + curItemHandle).parents('li').removeClass('tree-item-on-search-hidden');
                         }
                     }
                     if (buildnode) {
@@ -2251,7 +2275,7 @@ function MegaData()
                     }
 
                     if (fminitialized) {
-                        var nodeHandle = folders[ii].h;
+                        var nodeHandle = curItemHandle;
 
                         if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
                             sharedUInode(nodeHandle);

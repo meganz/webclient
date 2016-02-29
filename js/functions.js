@@ -2989,6 +2989,8 @@ function quotaDialog(time) {
     }
     var $dialog = $('.fm-dialog.bandwidth-dialog');
     
+    $('.fm-dialog-overlay').removeClass('hidden');
+    $('body').addClass('overlayed');
     $dialog.removeClass('hidden')
         .find('.bandwidth-header')
         .safeHTML(l[7100].replace('%1', '<span class="countdown"></span>'));
@@ -2996,6 +2998,8 @@ function quotaDialog(time) {
     $dialog.find('.fm-dialog-close').rebind('click', function() {
         clearInterval(tick);
         $dialog.addClass('hidden');
+        $('.fm-dialog-overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
     });
 
     var $txt = $('.countdown', $dialog);

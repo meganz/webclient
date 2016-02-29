@@ -200,7 +200,7 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
     this.oet = setTimeout(function() {
         chunk.finish_download(false, status, retryTime);
         chunk = undefined;
-    }, 3950 + Math.floor(Math.random() * 2e3));
+    }, 1);
 };
 
 ClassChunk.prototype.onXHRready = function(xhrEvent) {

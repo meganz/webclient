@@ -2984,9 +2984,6 @@ function __(s) { //TODO: waiting for @crodas to commit the real __ code.
 function quotaDialog(time) {
     var time = parseInt(time);
     var tick;
-    if ($('.fm-dialog.bandwidth-dialog').is(':visible')) {
-        return;
-    }
     var $dialog = $('.fm-dialog.bandwidth-dialog');
     
     $('.fm-dialog-overlay').removeClass('hidden');

@@ -355,13 +355,17 @@ var dlmanager = {
             var t = NOW();
             quotaDialog(args[2]);
             dlmanager.dlLastQuotaWarning = t;
+            dl.dl_failed = true;
             dlmanager.dlReportStatus(dl, code === 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
             if (dl.quota_t) {
-                clearTimeout(dl.quoate_t);
+                clearTimeout(dl.quota_t);
             }
             dl.quota_t = setTimeout(function() {
                 dlmanager.dlQueuePushBack(task);
-            }, parseInt(args[2]));
+                $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+                dlQueue.resume();
+            }, parseInt(args[2]) * 1000);
+            dlQueue.pause();
             return 1;
         } else {
             dlmanager.dlReportStatus(dl, EAGAIN);

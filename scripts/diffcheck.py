@@ -102,7 +102,6 @@ def reduce_jshint(file_line_mapping, **extra):
     """
     norules = extra['norules'] if 'norules' in extra else False
     # Get the JSHint output.
-    logging.info('Obtaining JSHint output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
     files_to_test = [os.path.join(*x)
@@ -113,6 +112,7 @@ def reduce_jshint(file_line_mapping, **extra):
         logging.info('JSHint: No modified JavaScript files found.')
         return '', 0
 
+    logging.info('Obtaining JSHint output ...')
     command = config.JSHINT_COMMAND.format(binary=config.JSHINT_BIN,
                                            rules=rules,
                                            files=' '.join(files_to_test))
@@ -147,6 +147,8 @@ def reduce_jshint(file_line_mapping, **extra):
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
+    if error_count == 0:
+        return '', 0
     result.append('\n{} errors'.format(error_count))
     return '\n'.join(result), error_count
 
@@ -166,7 +168,6 @@ def reduce_jscs(file_line_mapping, **extra):
     """
     norules = extra['norules'] if 'norules' in extra else False
     # Get the JSCS output.
-    logging.info('Obtaining JSCS output ...')
     os.chdir(PROJECT_PATH)
     rules = config.JSCS_RULES if not norules else ''
     files_to_test = [os.path.join(*x)
@@ -177,6 +178,7 @@ def reduce_jscs(file_line_mapping, **extra):
         logging.info('JSCS: No modified JavaScript files found.')
         return '', 0
 
+    logging.info('Obtaining JSCS output ...')
     command = config.JSCS_COMMAND.format(binary=config.JSCS_BIN,
                                          rules=rules,
                                          files=' '.join(files_to_test))
@@ -214,6 +216,8 @@ def reduce_jscs(file_line_mapping, **extra):
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
+    if error_count == 0:
+        return '', 0
     result.append('\n{} code style errors found.'.format(error_count))
     return '\n\n'.join(result), error_count
 
@@ -222,7 +226,7 @@ def strip_ansi_codes(s):
 
 def reduce_htmlhint(file_line_mapping, **extra):
     """
-    Runs HTMLHINT on the project for changed files. The output
+    Runs HTMLHint on the project for changed files. The output
     is reduced to only contain entries from the Git change set.
 
     :param file_line_mapping: Mapping of files with changed lines (obtained
@@ -234,8 +238,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
         an integer containing the number of failed rules.
     """
     norules = extra['norules'] if 'norules' in extra else False
-    # Get the HTMLHINT output.
-    logging.info('Obtaining HTMLHINT output ...')
+    # Get the HTMLHint output.
     os.chdir(PROJECT_PATH)
     rules = config.HTMLHINT_RULES if not norules else ''
     files_to_test = [os.path.join(*x)
@@ -243,9 +246,10 @@ def reduce_htmlhint(file_line_mapping, **extra):
                      if x[-1].split('.')[-1] in ['htm', 'html']]
 
     if len(files_to_test) == 0:
-        logging.info('HTMLHINT: No modified HTML files found.')
+        logging.info('HTMLHint: No modified HTML files found.')
         return '', 0
 
+    logging.info('Obtaining HTMLHint output ...')
     command = config.HTMLHINT_COMMAND.format(binary=config.HTMLHINT_BIN,
                                          rules=rules,
                                          files=' '.join(files_to_test))
@@ -253,23 +257,23 @@ def reduce_htmlhint(file_line_mapping, **extra):
     try:
         output = subprocess.check_output(command.split())
     except subprocess.CalledProcessError as ex:
-        # HTMLHINT found something, so it has returned an error code.
+        # HTMLHint found something, so it has returned an error code.
         # But we still want the output in the same fashion.
         output = ex.output
     except OSError as ex:
         if ex.errno == 2:
-            logging.error('HTMLHINT not installed.'
+            logging.error('HTMLHint not installed.'
                           ' Try to do so with `npm install`.')
         else:
-            logging.error('Error calling HTMLHINT: {}'.format(ex))
-        return '*** HTMLHINT: {} ***'.format(ex), 0
+            logging.error('Error calling HTMLHint: {}'.format(ex))
+        return '*** HTMLHint: {} ***'.format(ex), 0
     output = strip_ansi_codes(output.decode('utf8')).split('\n')
 
     if re.search('Scan \d+ files, without errors', output[-1]):
         return '', 0
 
     # Go through output and collect only relevant lines to the result.
-    result = ['\nHTMLHINT output:\n================']
+    result = ['\nHTMLHint output:\n================']
 
     for line in output:
         if line.find('Config loaded:') != -1:
@@ -280,9 +284,31 @@ def reduce_htmlhint(file_line_mapping, **extra):
     return re.sub('\n+', '\n', '\n\n'.join(result).strip()), 1
 
 
-def reduce_minifiedjs(file_line_mapping, **extra):
+def inspectjs(file, ln, line, result):
+    fatal = 0
+    line = line.strip()
+    indent = ' ' * (len(file)+len(str(ln))+3)
+
+    # check non-namespaced event handlers
+    match = re.search(r'\$\((.*?)\)\s*\.\s*(?:re|un)?bind\s*\(([^\),]+)', line)
+    if match:
+        target = match.group(1)
+        event = match.group(2)
+        if event.find('.') == -1:
+            if target in ['window', 'document']:
+                fatal += 1
+                result.append('{}:{}: {}\n{}^ Attaching event handlers '
+                    'to window or document requires a namespace.'
+                    .format(file, ln, line, indent))
+            elif event != 'click':
+                result.append('{}:{}: {}\n{}^ It is recommended to use'
+                    ' a namespace. '.format(file, ln, line, indent))
+
+    return fatal
+
+def reduce_validator(file_line_mapping, **extra):
     """
-    Checks changed files for contents of minified JavaScript.
+    Checks changed files for contents and alalyzes them.
 
     :param file_line_mapping: Mapping of files with changed lines (obtained
         `get_git_line_sets()`).
@@ -290,26 +316,27 @@ def reduce_minifiedjs(file_line_mapping, **extra):
     :return: A tuple containing the formatted string suitable for output and
         an integer containing the number of failed rules.
     """
-    # Get the JavaScript line lengths.
-    logging.info('Checking for minified JavaScript ...')
-    result = ['\nMinification detection output:\n'
-              '==============================']
+
+    logging.info('Analyzing modified files ...')
+    result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
+    fatal = 0
 
     for filename, line_set in file_line_mapping.items():
-        file_path = '/'.join(filename)
-        filenameonly, file_extension = os.path.splitext(file_path)
+        file_path = os.path.join(*filename)
+        file_extension = os.path.splitext(file_path)[-1]
 
         # Ignore known custom made files
-        if file_path in config.MINIFICATION_IGNORE_FILES:
+        if file_path in config.VALIDATOR_IGNORE_FILES:
             continue
 
-        # Ignore this entry e.g. html or json files
-        if file_extension not in config.MINIFICATION_FILE_TYPES:
+        # Ignore this specific file types
+        if file_extension in ['.json','.py','.sh']:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file
         if '.min.js' in file_path:
+            fatal += 1
             result.append('Minified/obfuscated code found in file {}. {}'
                           .format(file_path, warning))
             continue
@@ -325,16 +352,26 @@ def reduce_minifiedjs(file_line_mapping, **extra):
                 line_length = len(line)
 
                 # If line length exceeded, log it and move onto the next file
-                if line_length > config.MINIFICATION_THRESHOLD:
-                    result.append('Minified/obfuscated found in file {}, line {} (length {}). {}'
-                                  .format(file_path, line_number, line_length, warning))
+                if line_length > config.VALIDATOR_LINELEN_THRESHOLD:
+                    fatal += 1
+                    result.append('Found line too long in file {}, line {} (length {}). '
+                                  'Please keep your lines under 120 characters.'
+                                  .format(file_path, line_number, line_length))
                     break
+
+                # Analize JavaScript files...
+                if file_extension in ['.js', '.jsx']:
+                    fatal += inspectjs(file_path, line_number, line, result)
+                    continue
+
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
-    result.append('\n{} possible JavaScript minifications found.'
+    if error_count == 0:
+        return '', 0
+    result.append('\n{} issues found analizing modified files.'
                   .format(error_count))
-    return '\n\n'.join(result), error_count
+    return '\n\n'.join(result), error_count, fatal
 
 
 def reduce_cppcheck(file_line_mapping, **extra):
@@ -522,7 +559,7 @@ def main(base, target, norules):
     CHECKER_MAPPING = {'jshint': reduce_jshint,
                        'jscs': reduce_jscs,
                        'htmlhint': reduce_htmlhint,
-                       'minifiedjs': reduce_minifiedjs,
+                       'validator': reduce_validator,
                        'cppcheck': reduce_cppcheck,
                        'nsiqcppstyle': reduce_nsiqcppstyle,
                        'vera++': reduce_verapp}
@@ -533,18 +570,26 @@ def main(base, target, norules):
     for checker in config.checkers:
         worker = CHECKER_MAPPING[checker]
         extra_options = config.extra_options[checker]
-        output, error_count = worker(file_line_mapping, **extra_options)
-        results.append(output)
+        result = worker(file_line_mapping, **extra_options)
+        fatal = 0
+        error_count = result[1]
+        if len(result) > 2:
+            fatal = result[2]
+        result = result[0].rstrip();
+        if result:
+            results.append(result)
         total_errors += error_count
 
-        # If a minified file was found, quit the rest of the checks or they will hang
-        if checker == 'minifiedjs' and error_count > 0:
+        # If a fatal issue is found, halt execution and quit
+        if fatal > 0:
             break
 
-    logging.info('Output of reduced results ...')
-    print('\n\n'.join(results))
     if total_errors > 0:
+        logging.info('Output of reduced results ...')
+        print('\n\n'.join(results).rstrip())
         sys.exit(1)
+
+    print('\nEverything seems Ok.')
 
 
 if __name__ == '__main__':

@@ -365,10 +365,20 @@ var dlmanager = {
                 dlmanager.dlQueuePushBack(task);
                 $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
                 // resume downloads
-                $('.transfer-pause-icon.active').trigger('click');
+                $('.transfer-table tr.overquota').attrs('id')
+                    .forEach(function(id) {
+                        $('#' + id).removeClass('paused overquota')
+                            .find('.transfer-type').removeClass('paused');
+                        dlQueue.resume(id)
+                    });
             }, args[2] * 1000);
             // pause downloads
-            $('.transfer-pause-icon:not(.active)').trigger('click');
+            $('.transfer-table tr:not(.paused)').attrs('id')
+                .forEach(function(id) {
+                    $('#' + id).addClass('paused overquota')
+                        .find('.transfer-type').addClass('paused');
+                    dlQueue.pause(id)
+                });
             quotaDialog(args[2]);
             return 1;
         } else {

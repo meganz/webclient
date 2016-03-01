@@ -281,7 +281,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
         result.append(line)
 
     # Add the number of errors and return in a nicely formatted way.
-    return re.sub('\n+', '\n', '\n\n'.join(result).strip()), 1
+    return re.sub('\n+', '\n', '\n\n'.join(result).rstrip()), 1
 
 
 def inspectjs(file, ln, line, result):
@@ -290,7 +290,7 @@ def inspectjs(file, ln, line, result):
     indent = ' ' * (len(file)+len(str(ln))+3)
 
     # check non-namespaced event handlers
-    match = re.search(r'\$\((.*?)\)\s*\.\s*(?:re|un)?bind\s*\(([^\),]+)', line)
+    match = re.search(r'\$\((.*?)\)\s*\.\s*(?:re|un)?bind\s*\([\'"]([^\'"\),]+)', line)
     if match:
         target = match.group(1)
         event = match.group(2)

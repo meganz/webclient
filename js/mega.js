@@ -4102,7 +4102,7 @@ function MegaData()
             args = undefined;
         };
 
-        if (z || preview) {
+        if (z || preview || !fmconfig.dlThroughMEGAsync) {
             return webdl();
         }
 

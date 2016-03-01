@@ -18,6 +18,6 @@ UJS_PUREFUNCS=,pure_funcs=\'\$,String,getDeclarationErrorAddendum\'
 UJS_COMPRESS_OPTIONS=pure_getters,sequences=false,if_return=false,join_vars=false$UJS_PUREFUNCS
 UJS_BEAUTIFY_OPTIONS=indent-level=2,width=120,bracketize,quote_style=1
 
-uglifyjs -c $UJS_COMPRESS_OPTIONS -b $UJS_BEAUTIFY_OPTIONS --stats --screw-ie8 -o $temp_file2 $temp_file1
+./node_modules/.bin/uglifyjs -c $UJS_COMPRESS_OPTIONS -b $UJS_BEAUTIFY_OPTIONS --stats --screw-ie8 -o $temp_file2 $temp_file1
 
 cp -f $temp_file2 $build_file

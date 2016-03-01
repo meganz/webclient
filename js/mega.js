@@ -1865,7 +1865,7 @@ function MegaData()
                         && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1
                         )
                     ) {
-                    var name = contacts[i].name && $.trim(contacts[i].name) ? $.trim(contacts[i].name) : contacts[i].m;
+                    var name = contacts[i].name && $.trim(contacts[i].name) || contacts[i].m;
 
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)

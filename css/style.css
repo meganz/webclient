@@ -9293,15 +9293,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-image: url(../images/mega/dialogs-sprite_v6.svg);
     background-repeat: no-repeat;
 }
-.warning-dialog-ai .fm-notification-icon {
-    width: 106px !important;
-    min-height: 75px !important;
-    background-position: 9px -2553px !important;
-    background-image: url(../images/mega/dialogs-sprite_v6.svg) !important;
-    background-repeat: no-repeat !important;
-    background-size: auto !important;
-    margin: 0 !important;
-}
 .notification-dialog .fm-notification-icon {
     background-position: 10px -2333px;
 }
@@ -21570,7 +21561,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     min-height: 166px;
     width: 445px;
 }
-.loginrequired-dialog:not(.warning-dialog-ai) .fm-notification-body {
+.loginrequired-dialog .fm-notification-body {
     padding: 0 20px 10px 20px;
 }
 .fm-notification-info .top-login-button {
@@ -21601,10 +21592,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
 }
-.pro-login.fm-dialog-button, .pro-register.fm-dialog-button, .loginrequired-dialog .fm-dialog-button.notification-button {
+.pro-login.fm-dialog-button, .pro-register.fm-dialog-button, .loginrequired-dialog .fm-dialog-button.notification-button, .warning-dialog-a.login .fm-dialog-button.notification-button {
     display: none;
 }
-.loginrequired-dialog .pro-login.fm-dialog-button, .loginrequired-dialog .pro-register.fm-dialog-button {
+.loginrequired-dialog .pro-login.fm-dialog-button, .loginrequired-dialog .pro-register.fm-dialog-button, .warning-dialog-a.login .pro-login.fm-dialog-button, .warning-dialog-a.login .pro-register.fm-dialog-button {
     display: block;
 }
 /* login dialog */

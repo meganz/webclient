@@ -48,6 +48,7 @@
     "react-transform-hmr": "^1.0.1",
     "relaxed-json": "^0.2.9",
     "stripcomment-loader": "^0.1.0",
+    "uglify-js": "^2.6.2",
     "webpack": "^1.12.9"
   },
   "devDependencies": {

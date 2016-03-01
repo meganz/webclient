@@ -84,6 +84,7 @@
             .addClass('active');
 
         $('.fm-dialog-overlay').removeClass("hidden");
+        $('body').addClass("overlayed");
 
         $dialog.css({
             'margin-left': -1 * ($dialog.outerWidth() / 2),

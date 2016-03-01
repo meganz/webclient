@@ -354,7 +354,8 @@ var dlmanager = {
         if (code === 509) {
             var d   = new Date;
             args[2] = parseInt(args[2]);
-            args[2] = 600;
+            args[2] = 120;
+            var dlId = 'dl_' + dl.ph;
             d.setTime(d.getTime() + (args[2]-5)*1000);
             dlmanager.dlQuotaEnd = d;
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
@@ -365,20 +366,22 @@ var dlmanager = {
                 dlmanager.dlQueuePushBack(task);
                 $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
                 // resume downloads
-                $('.transfer-table tr.overquota').attrs('id')
-                    .forEach(function(id) {
-                        $('#' + id).removeClass('paused overquota')
-                            .find('.transfer-type').removeClass('paused');
-                        dlQueue.resume(id)
-                    });
+                var ids = $('.transfer-table tr.overquota').attrs('id');
+                ids.push(dlId);
+                ids.forEach(function(id) {
+                    $('#' + id).removeClass('paused overquota')
+                        .find('.transfer-type').removeClass('paused');
+                    dlQueue.resume(id)
+                });
             }, args[2] * 1000);
             // pause downloads
-            $('.transfer-table tr:not(.paused)').attrs('id')
-                .forEach(function(id) {
-                    $('#' + id).addClass('paused overquota')
-                        .find('.transfer-type').addClass('paused');
-                    dlQueue.pause(id)
-                });
+            var ids = $('.transfer-table tr:not(.paused)').attrs('id');
+            ids.push(dlId);
+            ids.forEach(function(id) {
+                $('#' + id).addClass('paused overquota')
+                    .find('.transfer-type').addClass('paused');
+                dlQueue.pause(id)
+            });
             quotaDialog(args[2]);
             return 1;
         } else {

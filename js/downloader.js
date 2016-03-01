@@ -196,7 +196,10 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
 
     var chunk = this;
     var status = xhr.readyState > 1 && xhr.status;
-    var retryTime = xhr.getResponseHeader('x-mega-time-left');
+    var retryTime = 600;
+    try {
+        retryTime = xhr.getResponseHeader('x-mega-time-left');
+    } catch (e) {}
     this.oet = setTimeout(function() {
         chunk.finish_download(false, status, retryTime);
         chunk = undefined;

@@ -364,9 +364,11 @@ var dlmanager = {
             dl.quota_t = setTimeout(function() {
                 dlmanager.dlQueuePushBack(task);
                 $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
-                dlQueue.resume();
+                // resume downloads
+                $('.transfer-pause-icon.active').trigger('click');
             }, args[2] * 1000);
-            dlQueue.pause();
+            // pause downloads
+            $('.transfer-pause-icon:not(.active)').trigger('click');
             quotaDialog(args[2]);
             return 1;
         } else {
@@ -1124,13 +1126,6 @@ var dlQueue = new TransferQueue(function _downloader(task, done) {
     }
     return task.run(done);
 }, 4, 'downloader');
-dlQueue.resume = function() {
-    if (dlmanager.dlQuotaEnd && dlmanager.dlQuotaEnd > new Date()) {
-        return false;
-    }
-
-    return MegaQueue.prototype.resume.apply(this, []);
-};
 
 // chunk scheduler
 dlQueue.validateTask = function(pzTask) {

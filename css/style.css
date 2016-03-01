@@ -9297,8 +9297,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 106px !important;
     min-height: 75px !important;
     background-position: 9px -2553px !important;
-    background-image: url(../images/mega/dialogs-sprite_v4.svg) !important;
+    background-image: url(../images/mega/dialogs-sprite_v6.svg) !important;
     background-repeat: no-repeat !important;
+    background-size: auto !important;
+    margin: 0 !important;
 }
 .notification-dialog .fm-notification-icon {
     background-position: 10px -2333px;
@@ -21568,7 +21570,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     min-height: 166px;
     width: 445px;
 }
-.loginrequired-dialog .fm-notification-body {
+.loginrequired-dialog:not(.warning-dialog-ai) .fm-notification-body {
     padding: 0 20px 10px 20px;
 }
 .fm-notification-info .top-login-button {

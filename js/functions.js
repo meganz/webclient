@@ -3000,7 +3000,7 @@ function quotaDialog(time) {
     });
 
     $dialog.find('.membership-button').rebind('click', function() {
-        window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').attr('class').replace(/.+? /, '');
+        window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
         document.location.hash = '#pro';
     });
     var $txt = $('.countdown', $dialog);

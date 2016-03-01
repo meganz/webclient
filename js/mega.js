@@ -1092,7 +1092,7 @@ function MegaData()
 
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
-                        avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
+                        avatar = useravatar.contact(ownersHandle, 'nw-contact-avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
@@ -1108,7 +1108,7 @@ function MegaData()
                     else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
-                        avatar = useravatar.contact(u_h, 'nw-contact-avatar');
+                        avatar = useravatar.contact(ownersHandle, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '">'
                             + '<td width="30"><span class="grid-status-icon ' + htmlentities(star)

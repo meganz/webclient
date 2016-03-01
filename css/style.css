@@ -6716,7 +6716,7 @@ table {
 }
 .fm-breadcrumbs-block, .fm-share-breadcrumbs-block, .fm-dialog-breadcrumbs-bl {
     float: left;
-    height: 30px;
+    height: 36px;
     padding: 12px 0 0 4px;
     overflow: hidden;
     -webkit-box-sizing: border-box;
@@ -6893,7 +6893,7 @@ table {
     background-position: 7px -6718px;
 }
 .fm-breadcrumbs.folder-link .right-arrow-bg {
-    background-position: -3px -9817px;
+    background-position: -3px -9815px;
 }
 .fm-dialog-breadcrumbs.shared-folder .right-arrow-bg {
     background-position: 2px -539px;

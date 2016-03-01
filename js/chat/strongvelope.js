@@ -976,6 +976,11 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype._trackParticipants = function(
         otherParticipants, includeParticipants, excludeParticipants) {
 
+        if (setutils.intersection(includeParticipants, excludeParticipants).size > 0) {
+            // There should be no intersection between these two sets
+            return false;
+        }
+
         var trackedParticipants = new Set(otherParticipants);
         excludeParticipants.forEach(function _excludeParticipantsIterator(item) {
             trackedParticipants.delete(item);
@@ -1008,8 +1013,15 @@ var strongvelope = {};
         }
 
         // Update participants set.
-        this.otherParticipants = this._trackParticipants(this.otherParticipants,
+        var trackedParticipants = this._trackParticipants(this.otherParticipants,
             this.includeParticipants, this.excludeParticipants);
+
+        if (trackedParticipants === false) {
+            // Sanity check, if the other participants had an inconsistency
+            return false;
+        }
+
+        this.otherParticipants = trackedParticipants;
 
         var recipients = '';
         var keys = '';
@@ -1370,7 +1382,7 @@ var strongvelope = {};
 
         // TODO: Check legitimacy of operation (moderator set on alter participants).
         // Now puzzle out the group composition from a keyed message.
-        var otherParticipants = this._getOtherParticipantsFromMessage(
+        var otherParticipantsFromMessage = this._getOtherParticipantsFromMessage(
             sender, parsedMessage);
 
         // Get sender key.
@@ -1425,16 +1437,17 @@ var strongvelope = {};
             // Sanity checks.
             if ((parsedMessage.includeParticipants.length > 0)
                     && (setutils.subtract(new Set(parsedMessage.includeParticipants),
-                        otherParticipants).size > 0)) {
-                // Included participants are not allowed to be in otherParticipants.
-                // This is an invalid message.
+                        otherParticipantsFromMessage).size > 0)) {
+                // Included participants must be in otherParticipantsFromMessage, so if the
+                // subtraction has anything left over, this is an invalid message.
                 return false;
             }
             if ((parsedMessage.excludeParticipants.length > 0)
-                    && (setutils.intersection(otherParticipants,
-                        new Set(parsedMessage.excludeParticipants)).size !== 0)) {
-                // Exclude participants are not allowed to be in otherParticipants.
-                // This is an invalid message.
+                    && (setutils.intersection(otherParticipantsFromMessage,
+                        new Set(parsedMessage.excludeParticipants)).size > 0)) {
+                // Exclude participants are not allowed to be in otherParticipantsFromMessage, so if
+                // there is anything left after an intersection between the two, then this is an
+                // invalid message.
                 return false;
             }
 
@@ -1443,6 +1456,12 @@ var strongvelope = {};
                 var myCheckParticipants = this._trackParticipants(
                     this.otherParticipants, parsedMessage.includeParticipants,
                     parsedMessage.excludeParticipants);
+
+                if (myCheckParticipants === false) {
+                    // Sanity check, if the checked participants had an inconsistency
+                    return false;
+                }
+
                 var messageCheckParticipants = new Set(parsedMessage.recipients);
                 messageCheckParticipants.add(sender);
                 messageCheckParticipants.delete(this.ownHandle);
@@ -1467,7 +1486,7 @@ var strongvelope = {};
             }
             else {
                 // Update other participants list.
-                this.otherParticipants = otherParticipants;
+                this.otherParticipants = otherParticipantsFromMessage;
                 this._inUse = true;
             }
             // Update my sender key.
@@ -1486,13 +1505,19 @@ var strongvelope = {};
                     && (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED)) {
             if (this._inUse === false) {
                 // We're in a new chat session: update group from received message.
-                this.otherParticipants = otherParticipants;
+                this.otherParticipants = otherParticipantsFromMessage;
                 this._inUse = true;
             }
             else {
                 var trackedParticipants = this._trackParticipants(
                     this.otherParticipants, this.includeParticipants, this.excludeParticipants);
-                if (!setutils.equal(trackedParticipants, otherParticipants)) {
+
+                if (trackedParticipants === false) {
+                    // Sanity check, if the tracked participants had an inconsistency
+                    return false;
+                }
+
+                if (!setutils.equal(trackedParticipants, otherParticipantsFromMessage)) {
                     // There's a mismatch between what we're thinking the other
                     // members are and what the message thinks they are.
                     return false;

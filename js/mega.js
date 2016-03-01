@@ -76,6 +76,9 @@ if (typeof loadingInitDialog === 'undefined') {
         $('.loading-info li.step1').addClass('loading');
     };
     loadingInitDialog.step2 = function(progress) {
+        if (!this.active) {
+            return;
+        }
         if (this.progress === false) {
             $('.loading-info li.loading').addClass('loaded').removeClass('loading');
             $('.loading-info li.step2').addClass('loading');
@@ -1577,15 +1580,7 @@ function MegaData()
         this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
         this.buildtree({h: M.InboxID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
-        this.renderInboxTree();
         treeUI();
-        if (megaChatIsReady) {
-            // megaChat.renderContactTree();
-        }
-    };
-
-    this.renderInboxTree = function() {
-
     };
 
     this.openFolder = function(id, force, chat) {
@@ -1595,13 +1590,21 @@ function MegaData()
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
-            console.log('openFolder()', M.currentdirid, id, force);
+            console.log('openFolder()', M.currentdirid, id, force, loadfm.loaded);
         }
+
+        if (!loadfm.loaded) {
+            console.error('Internal error, do not call openFolder before the cloud finished loading.');
+            return false;
+        }
+
         if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
             notificationsUI(1);
         }
+
         this.search = false;
         this.chat = false;
+
         if (!fminitialized) {
             fminitialized = true;
             $('.top-search-bl').show();
@@ -1610,6 +1613,7 @@ function MegaData()
         else if (id && id === this.currentdirid && !force) {// Do nothing if same path is choosen
             return false;
         }
+
         if (id === 'rubbish')
             id = this.RubbishID;
         else if (id === 'inbox')
@@ -3136,21 +3140,24 @@ function MegaData()
 
                 $('.user-name').text(u_attr.firstname);
             }
-            if (
-                typeof $.sortTreePanel !== 'undefined' &&
-                typeof $.sortTreePanel.contacts !== 'undefined' &&
-                $.sortTreePanel.contacts.by == 'status'
-            ) {
-                M.contacts(); // we need to resort
-            }
 
-            if (window.location.hash == "#fm/" + userId) {
-                // re-render the contact view page if the presence had changed
-                contactUI();
-            }
-            else if (window.location.hash == "#fm/contacts") {
-                // re-render the contact view page if the presence had changed
-                M.openFolder('contacts', true);
+            if (fminitialized) {
+                if (
+                    typeof $.sortTreePanel !== 'undefined' &&
+                    typeof $.sortTreePanel.contacts !== 'undefined' &&
+                    $.sortTreePanel.contacts.by === 'status'
+                ) {
+                    M.contacts(); // we need to resort
+                }
+
+                if (window.location.hash === "#fm/" + userId) {
+                    // re-render the contact view page if the presence had changed
+                    contactUI();
+                }
+                else if (window.location.hash === "#fm/contacts") {
+                    // re-render the contact view page if the presence had changed
+                    M.openFolder('contacts', true);
+                }
             }
         });
     },
@@ -3170,8 +3177,12 @@ function MegaData()
             userId = u.u;
             if (this.u[userId]) {
                 for (var key in u) {
-                    this.u[userId][key] = u[key];
+					if (this.u[userId][key] && key != 'name')  {
+					  this.u[userId][key] = u[key];
+					}
                 }
+				
+				
                 u = this.u[userId];
             }
             else {
@@ -5925,18 +5936,15 @@ function loadfm(force)
     }
     else {
         if (is_fm()) {
-            loadingDialog.show();
+            loadingDialog.hide();
+            loadingInitDialog.show();
+            loadingInitDialog.step1();
         }
         if (!loadfm.loading) {
             M.reset();
             fminitialized = false;
             loadfm.loading = true;
             setTimeout(function __lazyLoadFM() {
-
-                loadingDialog.hide();
-                loadingInitDialog.show();
-                loadingInitDialog.step1();
-
                 api_req({a:'f',c:1,r:1,ca:1},{
                     callback: loadfm_callback,
                     progress: function(perc) {

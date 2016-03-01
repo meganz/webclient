@@ -10791,32 +10791,12 @@ function contactUI() {
         });
 
         if (!megaChatIsDisabled) {
-            if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
-                // user is online, lets display the "Start chat" button
-
-                // Can use the line below again once text chat is ready
-                //var startConversationText = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : l[5885];
-
-                // Temporary for just video/audio only
-                var startConversationText = l[5885];
-
-                $('.fm-start-conversation').removeClass('hidden');
-                $('.fm-start-conversation span').text(startConversationText);
-
-                // Add this line back in when P2P file sharing is confirmed working
-                //$('.fm-send-files').removeClass('hidden');
-
-            } else {
-                // user is offline, hide the button
-                $('.fm-start-conversation').addClass('hidden');
-                $('.fm-send-files').addClass('hidden');
-            }
-
-            // bind the "start chat" button
-            $('.fm-start-conversation').unbind("click.megaChat");
-            $('.fm-start-conversation').bind("click.megaChat", function(e) {
-                window.location = "#fm/chat/" + u_h;
-
+            
+            // Bind the "Start conversation" button
+            $('.fm-start-conversation').unbind('click.megaChat');
+            $('.fm-start-conversation').bind('click.megaChat', function() {
+                
+                window.location = '#fm/chat/' + u_h;
                 return false;
             });
         }

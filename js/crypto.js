@@ -1777,7 +1777,7 @@ function api_proc(q) {
     };
 
     // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
-    if (loadingInitDialog.active) {
+    // if (loadingInitDialog.active) {
         var needProgress = false;
 
         // check whether this channel queue will need the progress
@@ -1823,7 +1823,7 @@ function api_proc(q) {
                 }
             };
         }
-    }
+    // }
 
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {
@@ -2046,8 +2046,7 @@ function getsc(mDBload) {
 
                     // If we're loading the cloud, notify completion only
                     // once first action-packets have been processed.
-                    if (!mega.fmLoaded) {
-                        mega.fmLoaded = true;
+                    if (!fminitialized) {
                         loadfm_done(ctx.mDBload);
                     }
                 }

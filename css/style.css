@@ -8932,8 +8932,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding: 0 12px;
 }
 .notification-popup .fm-notifications-bottom {
-     height: 32px;
- }
+    height: 32px;
+}
 .browsers-dialog .fm-notifications-bottom {
     padding: 0 20px 0 14px;
 }
@@ -12677,8 +12677,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: 0;
     font-size: 13px;
     color: #878787;
-    height: 24px;
-    line-height: 23px;
+    height: 25px;
+    line-height: 25px;
     font-family: 'source_sans_proregular', Arial;
 }
 .top-login-warning {
@@ -20730,7 +20730,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-image: url(../images/mega/dialogs-sprite_v6.svg);
     background-repeat: no-repeat;
     background-position: center -535px;
-        -webkit-box-shadow: none;
+    -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
     border-color: transparent;
@@ -24219,7 +24219,7 @@ a.ui-datepicker-next {
     height: 100%;
     position: absolute;
     min-height: 380px;
-        width: 100%;
+    width: 100%;
     width: -webkit-calc(100% -256px);
     width: -moz-calc(100% - 256px);
     width: calc(100% - 256px);
@@ -24287,7 +24287,7 @@ a.ui-datepicker-next {
     height: -webkit-calc(100% + 52px);
     height: -moz-calc(100% + 52px);
     height: calc(100% + 52px);
-} 
+}
 .notification .st-full-block {
     padding: 20px 0 50px 0;
 }
@@ -24567,8 +24567,6 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
     margin-top: -120px;
 }
 }
-
-
 /**
  * jQuery UI - Resizable - required classes.
  */
@@ -24655,7 +24653,6 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
-
 /**
  * Left Pane - Resize Handle styling
  */
@@ -24682,7 +24679,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     -khtml-opacity: 0.1;
     opacity: 0.1;
 }
-
 /**
  * Random CSS. TODO move css to correct place
  */

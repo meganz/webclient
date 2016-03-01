@@ -3845,9 +3845,7 @@ label.iPhoneCheckLabelOff span {
     background-color: white;
 }
 /* New FM */
-
-.fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
-    height: 100%;
+.fm-tree-panel {
     height: -webkit-calc(100% - 48px);
     height: -moz-calc(100% - 48px);
     height: calc(100% - 48px);
@@ -3855,14 +3853,15 @@ label.iPhoneCheckLabelOff span {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.nw-tree-panel-header + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
+    height: -webkit-calc(100% - 72px);
+    height: -moz-calc(100% - 72px);
+    height: calc(100% - 72px);
+}
 .contacts-panel .fm-tree-panel {
-    height: 100%;
-    height: -webkit-calc(100% - 144px);
-    height: -moz-calc(100% - 144px);
-    height: calc(100% - 144px);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+    height: -webkit-calc(100% - 170px);
+    height: -moz-calc(100% - 170px);
+    height: calc(100% - 170px);
 }
 .fm-contact-requests, .fm-received-requests {
     height: 48px;

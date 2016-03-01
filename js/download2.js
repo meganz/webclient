@@ -355,7 +355,7 @@ var dlmanager = {
             var d   = new Date;
             args[2] = parseInt(args[2]);
             args[2] = 120;
-            var dlId = 'dl_' + dl.ph;
+            var dlId = 'dl_' + (dl.ph || dl.id);
             d.setTime(d.getTime() + (args[2]-5)*1000);
             dlmanager.dlQuotaEnd = d;
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX

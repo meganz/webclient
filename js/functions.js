@@ -2999,6 +2999,10 @@ function quotaDialog(time) {
         $('body').removeClass('overlayed');
     });
 
+    $('.fm-dialog-overlay').rebind('click quota', function() {
+        $dialog.find('.fm-dialog-close').trigger('click');
+    });
+
     $dialog.find('.membership-button').rebind('click', function() {
         window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
         document.location.hash = '#pro';

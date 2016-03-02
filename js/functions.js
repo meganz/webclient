@@ -3007,6 +3007,7 @@ function quotaDialog(time) {
     $('.fm-dialog-overlay').rebind('click quota', closeModal);
 
     $dialog.find('.membership-button').rebind('click', function() {
+
         window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
         closeModal();
         document.location.hash = '#pro';
@@ -3015,6 +3016,7 @@ function quotaDialog(time) {
     $txt.text(secondsToTimeShort(time));
 
     tick = setInterval(function() {
+
         $txt.text(secondsToTimeShort(--time));
     }, 1000);
 }

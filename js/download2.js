@@ -352,35 +352,29 @@ var dlmanager = {
         }
 
         if (code === 509) {
-            var d   = new Date;
             args[2] = parseInt(args[2]);
             args[2] = 120;
-            var dlId = 'dl_' + (dl.ph || dl.id);
-            d.setTime(d.getTime() + (args[2]-5)*1000);
-            dlmanager.dlQuotaEnd = d;
+            var dlId = dlmanager.getGID(dl);
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
             if (dl.quota_t) {
                 clearTimeout(dl.quota_t);
             }
             dl.quota_t = setTimeout(function() {
+                // put current download back
                 dlmanager.dlQueuePushBack(task);
                 $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+
                 // resume downloads
                 var ids = $('.transfer-table tr.overquota').attrs('id');
                 ids.push(dlId);
-                ids.forEach(function(id) {
-                    $('#' + id).removeClass('paused overquota')
-                        .find('.transfer-type').removeClass('paused');
-                    dlQueue.resume(id)
-                });
+                ids.forEach(fm_tfsresume);
             }, args[2] * 1000);
+
             // pause downloads
             var ids = $('.transfer-table tr:not(.paused)').attrs('id');
             ids.push(dlId);
             ids.forEach(function(id) {
-                $('#' + id).addClass('paused overquota')
-                    .find('.transfer-type').addClass('paused');
-                dlQueue.pause(id)
+                fm_tfspause(id, true);
             });
             quotaDialog(args[2]);
             return 1;
@@ -902,7 +896,7 @@ function fm_tfsorderupd() {
     return M.t;
 }
 
-function fm_tfspause(gid) {
+function fm_tfspause(gid, overquota) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Ivalid GID to pause')) {
         if (gid[0] === 'u') {
             ulQueue.pause(gid);
@@ -913,7 +907,11 @@ function fm_tfspause(gid) {
         var $tr = $('.transfer-table tr#' + gid);
         $tr.addClass('paused');
         $tr.find('span.transfer-type').addClass('paused');
-        $tr.find('td:eq(5)').html('<span class="transfer-status queued">Queued</span>');
+        if (overquota) {
+            $tr.addClass('overquota');
+        } else  {
+            $tr.find('td:eq(5)').html('<span class="transfer-status queued">Queued</span>');
+        }
         return true;
     }
     return false;
@@ -929,7 +927,7 @@ function fm_tfsresume(gid) {
         }
         var $tr = $('.transfer-table tr#' + gid);
         $tr.removeClass('paused');
-        $tr.find('span.transfer-type').removeClass('paused');
+        $tr.find('span.transfer-type').removeClass('paused overquota');
 
         if (!$('.transfer-table .progress-block, .transfer-table .transfer-status.initiliazing').length) {
             $tr.find('td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');

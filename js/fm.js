@@ -5316,8 +5316,8 @@ function UIkeyevents() {
             addNewContact($('.add-user-popup-button.add'));
         }
 
-        else if (e.keyCode == 13 && $.dialog == 'rename') {
-            dorename();
+        else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
+            doRename();
         }
         else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
@@ -6846,16 +6846,16 @@ function sectionUIopen(id) {
     }
 
     if (!folderlink) {
-        $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header span').text(headertxt);
+        $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
     }
 
     {
         // required tricks to make the conversations work with the old UI HTML/css structure
         if (id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
-            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').addClass('hidden');
+            $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
             $('.fm-main.default > .fm-left-panel').addClass('hidden');
         } else {
-            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').removeClass('hidden');
+            $('.fm-left-panel .nw-tree-panel-header').removeClass('hidden');
             $('.fm-main.default > .fm-left-panel').removeClass('hidden');
         }
 
@@ -6988,9 +6988,9 @@ function renameDialog() {
         });
 
         $('.rename-dialog-button.rename').rebind('click', function() {
-            var c = $('.rename-dialog').attr('class');
-            if (c && c.indexOf('active') > -1)
-                dorename();
+            if ($('.rename-dialog').hasClass('active')) {
+                doRename();
+            }
         });
 
         var n = M.d[$.selected[0]];
@@ -7058,18 +7058,23 @@ function renameDialog() {
     }
 }
 
-function dorename()
-{
-    if ($('.rename-dialog input').val() !== '')
-    {
-        var h = $.selected[0];
-        var n = M.d[h];
-        if (n) {
-            var nn = $('.rename-dialog input').val();
-            if (nn !== n.name) {
-                M.rename(h, nn);
+/* @type {function} doRename
+ *
+ * On context menu rename
+ */
+function doRename() {
+
+    var itemName = $('.rename-dialog input').val();
+    var handle = $.selected[0];
+    var nodeData = M.d[handle];
+
+    if (itemName !== '') {
+        if (nodeData) {
+            if (nodeData && (itemName !== nodeData.name)) {
+                M.rename(handle, itemName);
             }
         }
+
         $.dialog = false;
         $('.rename-dialog').addClass('hidden');
         fm_hideoverlay();
@@ -7715,6 +7720,7 @@ function checkIfContactExists(email) {
             // Check if the users are already contacts by comparing email addresses of known contacts and the one entered
             if (email === userContacts[contact].m) {
                 userIsAlreadyContact = true;
+                break;
             }
         }
     }
@@ -9531,7 +9537,7 @@ function propertiesDialog(close)
         pd.addClass('shared shared-with-me ' + zclass)
     }
 
-    var p = {}, user = M.d[n.p] || {};
+    var p = {}, user = Object(M.d[n.su || n.p]);
     if (d) console.log('propertiesDialog', n, user);
     if ((filecnt + foldercnt) == 1)
     {
@@ -9620,7 +9626,7 @@ function propertiesDialog(close)
                 }
                 p.t4 = rights;
                 p.t6 = l[5905];
-                p.t7 = user.name;
+                p.t7 = mega.utils.fullUsername(user.h);
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -10446,85 +10452,109 @@ function fm_resize_handler() {
     }
 }
 
-/**
- * sharedFolderUI()
+/*
+ * fullUsername
  *
- * @returns {Boolean}
+ * @param {String} userHandle
+ * @returns {String} result An first and last user name or email
  */
+mega.utils.fullUsername = function username(userHandle) {
+
+    // User name
+    var result;
+
+    if (M.d[userHandle]) {
+        result = M.d[userHandle].name && $.trim(M.d[userHandle].name) || M.d[userHandle].m;
+    }
+
+    return String(result);
+};
+
 function sharedFolderUI() {
+    /* jshint -W074 */
+    var nodeData = M.d[M.currentdirid];
+    var browsingSharedContent = false;
+    var c;
 
-    var c,
-        n = M.d[M.currentdirid],
-        r = false;
-
+    // Browsing shared content
     if ($('.shared-details-block').length > 0) {
+
         $('.shared-details-block .shared-folder-content').unwrap();
         $('.shared-folder-content').removeClass('shared-folder-content');
         $('.shared-top-details').remove();
-        r = true;
+        browsingSharedContent = true;
     }
 
-    if (!n || (n.p.length !== 11)) {
-        n = null;
+    // Checks it's not a contact, contacts handles are 11 chars long
+    // file/folder handles are 8 chars long
+    if (!nodeData || (nodeData.p.length !== 11)) {
 
+        // [<current selection handle>, 'owners handle', 'tab name']
         var p = M.getPath(M.currentdirid);
+        nodeData = null;
+
         if (p[p.length - 1] === 'shares') {
             c = M.d[p[0]];
-            n = M.d[p[p.length - 3]];
+            nodeData = M.d[p[p.length - 3]];
 
-            if (!n || (n.p.length !== 11)) {
-                n = 0;
+            if (!nodeData || (nodeData.p.length !== 11)) {
+                nodeData = 0;
             }
         }
     }
 
-    if (n) {
-        var u_h = n.p;
-        var user = M.d[u_h];
-        avatar = useravatar.contact(user, 'nw-contact-avatar');
+    if (nodeData) {
 
-        var rights = l[55], rightsclass = ' read-only';
-        if (n.r === 1) {
+        var rights = l[55];
+        var rightsclass = ' read-only';
+        var rightPanelView = '.files-grid-view.fm';
+
+        // Handle of initial share owner
+        var ownersHandle = nodeData.su;
+        var fullOwnersName = mega.utils.fullUsername(ownersHandle);
+        var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
+
+        // Access rights
+        if (nodeData.r === 1) {
             rights = l[56];
             rightsclass = ' read-and-write';
         }
-        else if (n.r === 2) {
+        else if (nodeData.r === 2) {
             rights = l[57];
             rightsclass = ' full-access';
         }
 
-        var e = '.files-grid-view.fm';
-        if (M.viewmode === 1)
-            e = '.fm-blocks-view.fm';
+        if (M.viewmode === 1) {
+            rightPanelView = '.fm-blocks-view.fm';
+        }
 
-        var nameStr = user && user.name ? htmlentities(user.name) : "N/A";
-
-        $(e).wrap('<div class="shared-details-block"></div>');
+        $(rightPanelView).wrap('<div class="shared-details-block"></div>');
 
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
-                +'<div class="shared-details-icon"></div>'
-                +'<div class="shared-details-info-block">'
-                    +'<div class="shared-details-pad">'
-                        +'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
-                        +'<a href="javascript:;" class="grid-url-arrow"></a>'
-                        +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
-                        +'<div class="clear"></div>'
+                + '<div class="shared-details-icon"></div>'
+                + '<div class="shared-details-info-block">'
+                    + '<div class="shared-details-pad">'
+                        + '<div class="shared-details-folder-name">' + htmlentities((c || nodeData).name) + '</div>'
+                        + '<a href="javascript:;" class="grid-url-arrow"></a>'
+                        + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
+                        + '<div class="clear"></div>'
                         + avatar
-                        +'<div class="fm-chat-user-info">'
-                            +'<div class="fm-chat-user">' + nameStr + '</div>'
-                        +'</div>'
-                    +'</div>'
-                    +'<div class="shared-details-buttons">'
-                        +'<div class="fm-leave-share"><span>Leave share</span></div>'
-                        +'<div class="fm-share-copy"><span>Copy</span></div>'
-                        +'<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
-                        +'<div class="clear"></div>'
-                    +'</div>'
-                    +'<div class="clear"></div>'
-                +'</div>'
-            +'</div>');
-        $(e).addClass('shared-folder-content');
+                        + '<div class="fm-chat-user-info">'
+                            + '<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
+                        + '</div>'
+                    + '</div>'
+                    + '<div class="shared-details-buttons">'
+                        + '<div class="fm-leave-share"><span>' + l[5866] + '</span></div>'
+                        + '<div class="fm-share-copy"><span>' + l[63] + '</span></div>'
+                        + '<div class="fm-share-download"><span class="fm-chatbutton-arrow">' + l[58] + '</span></div>'
+                        + '<div class="clear"></div>'
+                    + '</div>'
+                    + '<div class="clear"></div>'
+                + '</div>'
+            + '</div>');
+
+        $(rightPanelView).addClass('shared-folder-content');
 
         Soon(function() {
             $(window).trigger('resize');
@@ -10532,7 +10562,8 @@ function sharedFolderUI() {
         });
     }
 
-    return r;
+    return browsingSharedContent;
+    /* jshint -W074 */
 }
 
 function userFingerprint(userid, callback) {
@@ -10761,32 +10792,12 @@ function contactUI() {
         });
 
         if (!megaChatIsDisabled) {
-            if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
-                // user is online, lets display the "Start chat" button
 
-                // Can use the line below again once text chat is ready
-                //var startConversationText = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : l[5885];
+            // Bind the "Start conversation" button
+            $('.fm-start-conversation').unbind('click.megaChat');
+            $('.fm-start-conversation').bind('click.megaChat', function() {
 
-                // Temporary for just video/audio only
-                var startConversationText = l[5885];
-
-                $('.fm-start-conversation').removeClass('hidden');
-                $('.fm-start-conversation span').text(startConversationText);
-
-                // Add this line back in when P2P file sharing is confirmed working
-                //$('.fm-send-files').removeClass('hidden');
-
-            } else {
-                // user is offline, hide the button
-                $('.fm-start-conversation').addClass('hidden');
-                $('.fm-send-files').addClass('hidden');
-            }
-
-            // bind the "start chat" button
-            $('.fm-start-conversation').unbind("click.megaChat");
-            $('.fm-start-conversation').bind("click.megaChat", function(e) {
-                window.location = "#fm/chat/" + u_h;
-
+                window.location = '#fm/chat/' + u_h;
                 return false;
             });
         }

@@ -4355,20 +4355,18 @@ if (typeof sjcl !== 'undefined') {
      */
     scope.setutils.equal = function(set1, set2) {
 
-        var result = true;
-
         if (set1.size !== set2.size) {
             return false;
         }
 
         var set1array = Array.from(set1);
-        for (var i = 0; i < set1array.length; i++) {
-            if (!set2.has(set1array[i])) {
-                result = false;
-                break;
+        var idx = set1array.length;
+        while (idx--) {
+            if (!set2.has(set1array[idx])) {
+                return false;
             }
         }
 
-        return result;
+        return true;
     };
 })(window);

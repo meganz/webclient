@@ -553,7 +553,7 @@
     "1086": " Sincronizzazione facile ed automatizzata tra i tuoi computers e il tuo Cloud Drive MEGA.",
     "1088": "Browser Apps",
     "1089": "Le nostre estensioni del browser installeranno MEGA  per caricamenti pi\u00f9 veloce ed una maggiore resilienza contro gli attacchi.",
-    "1093": "Non inserire mai la tua password su un dispositivo do cui non ti fidi ciecamente. Non accedere al tuo account da un computer condiviso o pubblico.",
+    "1093": "Non inserire mai la tua password su un dispositivo di cui non ti fidi ciecamente. Non accedere al tuo account da un computer condiviso o pubblico.",
     "1094": "Per una maggiore sicurezza, installa il nostro [A]plugin[\/A] e carica MEGA dal tuo computer piuttosto che dai nostri server.",
     "1095": "Crea il tuo [A]account gratuito[\/A]",
     "1096": "Nome",
@@ -569,7 +569,7 @@
     "1107": "Le passwords non corrispondono.",
     "1108": "Crea un Account",
     "1109": "La tua password \u00e8 \u00e8 la chiave di crittografia master.",
-    "1110": "La sicurezza del tuo account dipende dalla sicurezza della tua password. Le password che sono troppo brevi, troppo semplici o composti da parole del dizionario sono facilmente indovinabili.",
+    "1110": "La sicurezza del tuo account dipende dalla sicurezza della tua password. Le password che sono troppo brevi, troppo semplici o composte da parole del dizionario sono facilmente indovinabili.",
     "1111": "Non scordare la tua password.",
     "1112": "Non esiste una procedura di recupero per le password perse. Se non la ricordi, non sarai pi\u00f9 in grado di accedere ai dati memorizzati.",
     "1113": "Il tuo account \u00e8 solo sicuro come il tuo computer.",
@@ -2965,9 +2965,15 @@
     "8585": "Receiving folder data",
     "8586": "Decrypting folder data",
     "8587": "We are waiting for the cryptographic key to this file.",
-    "8588": "undecrypted file",
+    "8588": "undecryptable file",
     "8589": "No notifications",
     "8590": "undecryptable folder",
+    "8593": "Use the find duplicates feature to search for multiple copies of a file.",
+    "8594": "Find duplicates",
+    "8596": "Your PRO membership plan will expire in 1 day.",
+    "8597": "Your PRO membership plan will expire in %1 days.",
+    "8598": "PRO membership plan expiring soon",
+    "8599": "Delete duplicates",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3003,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

@@ -11864,7 +11864,7 @@
         "context": "A warning tooltip if a file can't be decrypted."
     },
     "8588": {
-        "text": "undecrypted file",
+        "text": "undecryptable file",
         "context": "A message that this file can't be decrypted."
     },
     "8589": {
@@ -11874,5 +11874,29 @@
     "8590": {
         "text": "undecryptable folder",
         "context": "A message that this folder can't be decrypted."
+    },
+    "8593": {
+        "text": "Use the find duplicates feature to search for multiple copies of a file.",
+        "context": "A description on the account settings page. It informs the user about the find duplicates feature (the button to trigger this feature is beside this text)."
+    },
+    "8594": {
+        "text": "Find duplicates",
+        "context": "A button title for the find duplicates feature. This allows the user to search for multiple copies of a file within their account."
+    },
+    "8596": {
+        "text": "Your PRO membership plan will expire in 1 day.",
+        "context": "The professional pricing plan which the user is currently on will expire in one day."
+    },
+    "8597": {
+        "text": "Your PRO membership plan will expire in %1 days.",
+        "context": "The professional pricing plan which the user is currently on will expire in 5 days. The %1 is a placeholder for the number of days and should not be removed."
+    },
+    "8598": {
+        "text": "PRO membership plan expiring soon",
+        "context": "A title for a notification saying the user's pricing plan will expire soon."
+    },
+    "8599": {
+        "text": "Delete duplicates",
+        "context": "A button title for a feature on the duplicate search page to delete all of the other copies of your file, leaving only 1 copy remaining."
     }
 }

@@ -2914,7 +2914,7 @@
     "8424": "Fout bij het openen van de standaardapplicatie.",
     "8425": "via uw browser",
     "8426": "[S]MEGAsync:[\/S] Gemakkelijke automatische synchronisatie tussen uw computers en uw MEGA Cloud Drive",
-    "8427": "S]Flexibel:[\/ S] Synchroniseer een map van uw pc naar een map in de cloud. Synchroniseer een aantal mappen tegelijkertijd.",
+    "8427": "S]Flexibel:[\/S] Synchroniseer een map van uw pc naar een map in de cloud. Synchroniseer een aantal mappen tegelijkertijd.",
     "8428": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
     "8429": "Snellere overdrachtsnelheden",
     "8430": "MEGAsync maakt volledig gebruik van MEGA's  krachtige infrastructuur en multi-connectietransfers.",
@@ -2968,6 +2968,12 @@
     "8588": "ontcijferd bestand",
     "8589": "Geen meldingen",
     "8590": "Map kan niet worden gedecodeerd",
+    "8593": "Use the find duplicates feature to search for multiple copies of a file.",
+    "8594": "Find duplicates",
+    "8596": "Your PRO membership plan will expire in 1 day.",
+    "8597": "Your PRO membership plan will expire in %1 days.",
+    "8598": "PRO membership plan expiring soon",
+    "8599": "Delete duplicates",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3003,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

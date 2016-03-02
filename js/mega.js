@@ -3628,6 +3628,8 @@ function MegaData()
     this.rubbishIco = function()
     {
         var i = 0;
+        var $icon = $('.nw-fm-left-icon.rubbish-bin');
+
         if (typeof M.c[M.RubbishID] !== 'undefined')
             for (var a in M.c[M.RubbishID])
                 i++;
@@ -3639,17 +3641,17 @@ function MegaData()
             $('.fm-tree-header.recycle-item').prev('.fm-connector-first').removeClass('active');
         }
         if (Object.keys(this.rubNodes).length == 0) {
-            $('.nw-fm-left-icon.rubbish-bin').removeClass('filled glow')
+            $icon.removeClass('filled glow')
         }
         else {
-            if (!$('.nw-fm-left-icon.rubbish-bin').hasClass('filled')) {
-                $('.nw-fm-left-icon.rubbish-bin').addClass('filled');
+            if (!$icon.hasClass('filled')) {
+                $icon.addClass('filled');
             } 
-            else if (!$('.nw-fm-left-icon.rubbish-bin').hasClass('glow')) {
-                $('.nw-fm-left-icon.rubbish-bin').addClass('glow');
+            else if (!$icon.hasClass('glow')) {
+                $icon.addClass('glow');
             } 
             else {
-                $('.nw-fm-left-icon.rubbish-bin').removeClass('glow');
+                $icon.removeClass('glow');
             }
         }
             

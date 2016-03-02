@@ -6846,16 +6846,16 @@ function sectionUIopen(id) {
     }
 
     if (!folderlink) {
-        $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header span').text(headertxt);
+        $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
     }
 
     {
         // required tricks to make the conversations work with the old UI HTML/css structure
         if (id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
-            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').addClass('hidden');
+            $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
             $('.fm-main.default > .fm-left-panel').addClass('hidden');
         } else {
-            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').removeClass('hidden');
+            $('.fm-left-panel .nw-tree-panel-header').removeClass('hidden');
             $('.fm-main.default > .fm-left-panel').removeClass('hidden');
         }
 

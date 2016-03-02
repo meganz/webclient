@@ -201,7 +201,8 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
     if (status === 509) {
         try {
             retryTime = parseInt(xhr.getResponseHeader('x-mega-time-left'));
-        } catch (e) {
+        } catch (e) { }
+        if (isNaN(retryTime) || typeof retryTime !== 'number' || retryTime <= 0) {
             // In case the server do not send 'Access-Control-Expose-Headers: x-mega-time-left'
             // fallback to a 10 minutes waiting
             retryTime = 600;
@@ -211,7 +212,7 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
     this.oet = setTimeout(function() {
         chunk.finish_download(false, {responseStatus: status, retry: retryTime});
         chunk = undefined;
-    }, 1);
+    }, status === 509 ? 1 : 3950 + Math.floor(Math.random() * 2e3));
 };
 
 ClassChunk.prototype.onXHRready = function(xhrEvent) {

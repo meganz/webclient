@@ -353,7 +353,6 @@ var dlmanager = {
 
         if (code === 509) {
             var retry = args[1].retry;            
-            retry = 120; //remove me after testing BEFORE merging
 
             if (dl.quota_t) {
                 // cleanup any previous quota retry timer

@@ -2986,9 +2986,9 @@ function quotaDialog(time) {
     var time = parseInt(time);
     var tick;
     var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+    var $button = $dialog.find('.fm-dialog-close');
+    var $overlay = $('.fm-dialog-overlay');
     
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
     fm_showoverlay();
     $dialog.removeClass('hidden')
         .find('.bandwidth-header')
@@ -2998,14 +2998,14 @@ function quotaDialog(time) {
 
         clearInterval(tick);
         $dialog.addClass('hidden');
+        $button.unbind('click.quota');
+        $overlay.unbind('click.quota');
         fm_hideoverlay();
         return false;
     }
 
-    $dialog.find('.fm-dialog-close').rebind('click', closeModal);
-
-    $('.fm-dialog-overlay').rebind('click quota', closeModal);
-
+    $button.rebind('click.quota', closeModal);
+    $overlay.rebind('click.quota', closeModal);
     $dialog.find('.membership-button').rebind('click', function() {
 
         window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');

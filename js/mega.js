@@ -1052,11 +1052,6 @@ function MegaData()
                 var nodeData = M.v[i];
                 var nodeHandle = nodeData.h;
 
-//                if (typeof nodeData.name === 'undefined') {
-//                    DEBUG('Skipping M.v node with no name.', nodeData);
-//                    continue;
-//                }
-//
                 s  = '';
                 nodeType  = '';
                 cc = null;
@@ -1068,13 +1063,13 @@ function MegaData()
 
                 if (nodeData.t) {
                     ftype = l[1049];
-                    nodeType = ' folder';
+                    nodeType = 'folder';
                     fIcon = 'folder';
                 }
                 else {
                     ftype = filetype(nodeData.name);
                     s = htmlentities(bytesToSize(nodeData.s));
-                    nodeType = ' file';
+                    nodeType = 'file';
                 }
                 star = nodeData.fav ? ' star' : '';
 
@@ -1083,7 +1078,7 @@ function MegaData()
                 // Undecryptable file indicators
                 if (missingkeys[nodeHandle]) {
                     undecryptableClass = 'undecryptable';
-                    titleTooltip = 'Once cryptographic key becomes available, this' + nodeType + ' will be decrypted.';
+                    titleTooltip = l[8595].replace('%1', nodeType);
                     fName = 'undecrypted' + nodeType;
                     fIcon = 'generic';
                     ftype = l[7381];// i.e. 'unknown'
@@ -1123,7 +1118,7 @@ function MegaData()
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
                             + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
                             + '<span class="block-view-file-type ' + fIcon + '"></span></span>'
-                                 + avatar
+                            + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + fName + '</span><span class="shared-folder-info">by '
                             + contactName + '</span></span></a>';
@@ -1137,7 +1132,7 @@ function MegaData()
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + fName + '</div><div class="shared-folder-info">' + htmlentities(contains)
                             + '</div></div> </td><td width="240">'
-                                 + avatar
+                            + avatar
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
                             + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
@@ -2156,8 +2151,6 @@ function MegaData()
                  _sub = 'mctreesub_';
             }
 
-//            forEach() {};
-
             for (var ii in folders) {
 
                 if (folders.hasOwnProperty(ii)) {
@@ -2223,7 +2216,7 @@ function MegaData()
                         // Undecryptable file indicators
                         if (missingkeys[curItemHandle]) {
                             undecryptableClass = 'undecryptable';
-                            titleTooltip = 'Once cryptographic key becomes available, this folder will be decrypted.';
+                            titleTooltip = l[8595].replace('%1', 'folder');
                             fName = 'undecrypted folder';
                             fIcon = 'generic';
                         }
@@ -3201,8 +3194,8 @@ function MegaData()
 					  this.u[userId][key] = u[key];
 					}
                 }
-				
-				
+
+
                 u = this.u[userId];
             }
             else {

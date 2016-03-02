@@ -1072,9 +1072,13 @@ function MegaData()
                 star = M.v[i].fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
+                    // Handle of initial share owner
+                    var ownersHandle = M.v[i].su;
+                    var fullContactName = mega.utils.fullUsername(ownersHandle);
+
                     cs = M.contactstatus(M.v[i].h);
                     contains = fm_contains(cs.files, cs.folders);
-                    u_h = M.v[i].p;
+                    u_h = ownersHandle || M.v[i].p;
                     rights = l[55];
                     rightsclass = ' read-only';
                     onlinestatus = M.onlineStatusClass(
@@ -1094,13 +1098,9 @@ function MegaData()
                         rightsclass = ' full-access';
                     }
 
-                    // Handle of initial share owner
-                    var ownersHandle = M.v[i].su;
-                    var fullContactName = mega.utils.fullUsername(ownersHandle);
-
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
-                        avatar = useravatar.contact(ownersHandle, 'nw-contact-avatar', 'span');
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
@@ -1116,7 +1116,7 @@ function MegaData()
                     else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
-                        avatar = useravatar.contact(ownersHandle, 'nw-contact-avatar');
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '">'
                             + '<td width="30"><span class="grid-status-icon ' + htmlentities(star)
@@ -1130,7 +1130,7 @@ function MegaData()
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div>'
                             + '<div class="fm-chat-user">'
                             + htmlentities(fullContactName) + '</div><div class="nw-contact-status"></div>'
-                            + '<div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h))
+                            + '<div class="fm-chat-user-status ' + htmlentities(u_h)
                             + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270">'
                             + '<div class="shared-folder-access'

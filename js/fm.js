@@ -9536,7 +9536,7 @@ function propertiesDialog(close)
         pd.addClass('shared shared-with-me ' + zclass)
     }
 
-    var p = {}, user = M.d[n.p] || {};
+    var p = {}, user = Object(M.d[n.su || n.p]);
     if (d) console.log('propertiesDialog', n, user);
     if ((filecnt + foldercnt) == 1)
     {

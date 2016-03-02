@@ -82,7 +82,12 @@ var useravatar = (function() {
 
         if (word && word !== u_handle) {
             letters = $.trim(word).toUpperCase()[0];
-            color   = letters.charCodeAt(0) % _colors.length;
+            // letters[0] can be undefined in case that word == ' '...
+            if (letters) {
+                color = letters.charCodeAt(0) % _colors.length;
+            } else {
+                color = 0;
+            }
         }
 
         return { letters: letters, color: _colors[color], colorIndex: color + 1 };

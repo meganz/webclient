@@ -7720,6 +7720,7 @@ function checkIfContactExists(email) {
             // Check if the users are already contacts by comparing email addresses of known contacts and the one entered
             if (email === userContacts[contact].m) {
                 userIsAlreadyContact = true;
+                break;
             }
         }
     }
@@ -9536,7 +9537,7 @@ function propertiesDialog(close)
         pd.addClass('shared shared-with-me ' + zclass)
     }
 
-    var p = {}, user = M.d[n.p] || {};
+    var p = {}, user = Object(M.d[n.su || n.p]);
     if (d) console.log('propertiesDialog', n, user);
     if ((filecnt + foldercnt) == 1)
     {
@@ -9625,7 +9626,7 @@ function propertiesDialog(close)
                 }
                 p.t4 = rights;
                 p.t6 = l[5905];
-                p.t7 = user.name;
+                p.t7 = mega.utils.fullUsername(user.h);
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -10460,13 +10461,13 @@ function fm_resize_handler() {
 mega.utils.fullUsername = function username(userHandle) {
 
     // User name
-    var result = '';
+    var result;
 
-    result = (M.d[userHandle].firstName && M.d[userHandle].lastName)
-        ? M.d[userHandle].firstName + " " + M.d[userHandle].lastName
-        : M.d[userHandle].m;
+    if (M.d[userHandle]) {
+        result = M.d[userHandle].name && $.trim(M.d[userHandle].name) || M.d[userHandle].m;
+    }
 
-    return result;
+    return String(result);
 };
 
 function sharedFolderUI() {
@@ -10791,11 +10792,11 @@ function contactUI() {
         });
 
         if (!megaChatIsDisabled) {
-            
+
             // Bind the "Start conversation" button
             $('.fm-start-conversation').unbind('click.megaChat');
             $('.fm-start-conversation').bind('click.megaChat', function() {
-                
+
                 window.location = '#fm/chat/' + u_h;
                 return false;
             });

@@ -966,6 +966,11 @@ function MegaData()
                 u_h = M.v[i].h;
                 contact = M.u[u_h];
 
+                // do not render oneself or invalid..
+                if (!contact || u_h === u_handle) {
+                    continue;
+                }
+
                 // chat is enabled?
                 if (chatIsReady) {
                     if (contact && contact.lastChatActivity > timems) {
@@ -3143,7 +3148,7 @@ function MegaData()
                 self.u[userId].name = "";
 
                 if (firstName.length > 0) {
-                    self.u[userId].name = firstName
+                    self.u[userId].name = firstName;
                 }
                 if (lastName.length > 0) {
                     self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
@@ -3197,9 +3202,10 @@ function MegaData()
             userId = u.u;
             if (this.u[userId]) {
                 for (var key in u) {
-					if (this.u[userId][key] && key != 'name')  {
-					  this.u[userId][key] = u[key];
-					}
+                    // XXX: 0e443ca6 Hackpatch for contact names bug -- still needed?
+                    if (this.u[userId][key] && key !== 'name')  {
+                        this.u[userId][key] = u[key];
+                    }
                 }
 
 

@@ -127,7 +127,7 @@ var authring = (function () {
 
             // Skip obviously faulty records.
             if ((record.fingerprint.length % 20 !== 0)
-                    || _ALLOWED_AUTHENTICATION_METHODS.indxOf(record.method) === -1
+                    || _ALLOWED_AUTHENTICATION_METHODS.indexOf(record.method) === -1
                     || _ALLOWED_KEY_CONFIDENCES.indexOf(record.confidence) === -1) {
                 continue;
             }

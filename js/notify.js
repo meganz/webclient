@@ -922,7 +922,7 @@ var notify = {
             // Populate other template information
             $notificationHtml.addClass('nt-payment-notification clickable');
             $notificationHtml.find('.notification-username').text(header);
-            $notificationHtml.find('.notification-info').text(title);
+            $notificationHtml.find('.notification-info').addClass('red').text(title);
             
             return $notificationHtml;
         }

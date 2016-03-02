@@ -2968,6 +2968,12 @@
     "8588": "\u041d\u0435\u0440\u0430\u0441\u0448\u0438\u0444\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u0444\u0430\u0439\u043b",
     "8589": "\u041d\u0435\u0442 \u043e\u043f\u043e\u0432\u0435\u0449\u0435\u043d\u0438\u0439",
     "8590": "\u041d\u0435\u0440\u0430\u0441\u0448\u0438\u0444\u0440\u043e\u0432\u0430\u043d\u043d\u0430\u044f \u043f\u0430\u043f\u043a\u0430",
+    "8593": "Use the find duplicates feature to search for multiple copies of a file.",
+    "8594": "Find duplicates",
+    "8596": "Your PRO membership plan will expire in 1 day.",
+    "8597": "Your PRO membership plan will expire in %1 days.",
+    "8598": "PRO membership plan expiring soon",
+    "8599": "Delete duplicates",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3003,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

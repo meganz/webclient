@@ -2957,7 +2957,7 @@
     "8554": "Sumulat",
     "8555": "Paganahin",
     "8556": "Huwag gumamit ng HTTP",
-    "8557": "Enable this option only if your transfers don't start. In normal circumstances HTTP is satisfactory as all transfers are already encrypted.",
+    "8557": "Paganahin ang option na ito kung hindi magsimula ang paglilipat. Kadalasan, sapat na ang HTTP sapagkat ang paglilipat dito ay encrypted na.",
     "8577": "Hinihiling ang account data",
     "8578": "Tinatanggap ang account data",
     "8579": "Idine-decrypt",
@@ -2968,6 +2968,12 @@
     "8588": "hindi pa decrypted na file",
     "8589": "Walang notification",
     "8590": "hindi pa decrypted na folder",
+    "8593": "Gamitin ang paghahanap sa kaparehas na feature upang humanap ng maramihang kaparehas ng file na ito.",
+    "8594": "Humanap ng kaparehas",
+    "8596": "Your PRO membership plan will expire in 1 day.",
+    "8597": "Your PRO membership plan will expire in %1 days.",
+    "8598": "PRO membership plan expiring soon",
+    "8599": "Delete duplicates",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3003,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

@@ -1309,7 +1309,7 @@ function removeUInode(h) {
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
             if (!hasItems) {
-                if (sharedfolderUI()) {
+                if (sharedFolderUI()) {
                     M.emptySharefolderUI();
                 }
                 else {
@@ -5316,8 +5316,8 @@ function UIkeyevents() {
             addNewContact($('.add-user-popup-button.add'));
         }
 
-        else if (e.keyCode == 13 && $.dialog == 'rename') {
-            dorename();
+        else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
+            doRename();
         }
         else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
@@ -6988,9 +6988,9 @@ function renameDialog() {
         });
 
         $('.rename-dialog-button.rename').rebind('click', function() {
-            var c = $('.rename-dialog').attr('class');
-            if (c && c.indexOf('active') > -1)
-                dorename();
+            if ($('.rename-dialog').hasClass('active')) {
+                doRename();
+            }
         });
 
         var n = M.d[$.selected[0]];
@@ -7058,18 +7058,23 @@ function renameDialog() {
     }
 }
 
-function dorename()
-{
-    if ($('.rename-dialog input').val() !== '')
-    {
-        var h = $.selected[0];
-        var n = M.d[h];
-        if (n) {
-            var nn = $('.rename-dialog input').val();
-            if (nn !== n.name) {
-                M.rename(h, nn);
+/* @type {function} doRename
+ *
+ * On context menu rename
+ */
+function doRename() {
+
+    var itemName = $('.rename-dialog input').val();
+    var handle = $.selected[0];
+    var nodeData = M.d[handle];
+
+    if (itemName !== '') {
+        if (nodeData) {
+            if (nodeData && (itemName !== nodeData.name)) {
+                M.rename(handle, itemName);
             }
         }
+
         $.dialog = false;
         $('.rename-dialog').addClass('hidden');
         fm_hideoverlay();
@@ -10446,78 +10451,109 @@ function fm_resize_handler() {
     }
 }
 
-function sharedfolderUI() {
+/*
+ * fullUsername
+ *
+ * @param {String} userHandle
+ * @returns {String} result An first and last user name or email
+ */
+mega.utils.fullUsername = function username(userHandle) {
 
-    var c,
-        n = M.d[M.currentdirid],
-        r = false;
+    // User name
+    var result = '';
 
+    result = (M.d[userHandle].firstName && M.d[userHandle].lastName)
+        ? M.d[userHandle].firstName + " " + M.d[userHandle].lastName
+        : M.d[userHandle].m;
+
+    return result;
+};
+
+function sharedFolderUI() {
+    /* jshint -W074 */
+    var nodeData = M.d[M.currentdirid];
+    var browsingSharedContent = false;
+    var c;
+
+    // Browsing shared content
     if ($('.shared-details-block').length > 0) {
+
         $('.shared-details-block .shared-folder-content').unwrap();
         $('.shared-folder-content').removeClass('shared-folder-content');
         $('.shared-top-details').remove();
-        r = true;
+        browsingSharedContent = true;
     }
 
-    if (!n || n.p.length !== 11) {
-        n = null;
+    // Checks it's not a contact, contacts handles are 11 chars long
+    // file/folder handles are 8 chars long
+    if (!nodeData || (nodeData.p.length !== 11)) {
 
+        // [<current selection handle>, 'owners handle', 'tab name']
         var p = M.getPath(M.currentdirid);
+        nodeData = null;
+
         if (p[p.length - 1] === 'shares') {
             c = M.d[p[0]];
-            n = M.d[p[p.length - 3]];
+            nodeData = M.d[p[p.length - 3]];
 
-            if (!n || n.p.length !== 11) {
-                n = 0;
+            if (!nodeData || (nodeData.p.length !== 11)) {
+                nodeData = 0;
             }
         }
     }
 
-    if (n) {
-        var u_h = n.p;
-        var user = M.d[u_h];
-        avatar = useravatar.contact(user, 'nw-contact-avatar');
+    if (nodeData) {
 
-        var rights = l[55], rightsclass = ' read-only';
-        if (n.r === 1) {
+        var rights = l[55];
+        var rightsclass = ' read-only';
+        var rightPanelView = '.files-grid-view.fm';
+
+        // Handle of initial share owner
+        var ownersHandle = nodeData.su;
+        var fullOwnersName = mega.utils.fullUsername(ownersHandle);
+        var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
+
+        // Access rights
+        if (nodeData.r === 1) {
             rights = l[56];
             rightsclass = ' read-and-write';
-        } else if (n.r === 2) {
+        }
+        else if (nodeData.r === 2) {
             rights = l[57];
             rightsclass = ' full-access';
         }
 
-        var e = '.files-grid-view.fm';
-        if (M.viewmode === 1)
-            e = '.fm-blocks-view.fm';
+        if (M.viewmode === 1) {
+            rightPanelView = '.fm-blocks-view.fm';
+        }
 
-        var nameStr = user && user.name ? htmlentities(user.name) : "N/a";
+        $(rightPanelView).wrap('<div class="shared-details-block"></div>');
 
-        $(e).wrap('<div class="shared-details-block"></div>');
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
-                +'<div class="shared-details-icon"></div>'
-                +'<div class="shared-details-info-block">'
-                    +'<div class="shared-details-pad">'
-                        +'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
-                        +'<a href="javascript:;" class="grid-url-arrow"></a>'
-                        +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
-                        +'<div class="clear"></div>'
+                + '<div class="shared-details-icon"></div>'
+                + '<div class="shared-details-info-block">'
+                    + '<div class="shared-details-pad">'
+                        + '<div class="shared-details-folder-name">' + htmlentities((c || nodeData).name) + '</div>'
+                        + '<a href="javascript:;" class="grid-url-arrow"></a>'
+                        + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
+                        + '<div class="clear"></div>'
                         + avatar
-                        +'<div class="fm-chat-user-info">'
-                            +'<div class="fm-chat-user">' + nameStr + '</div>'
-                        +'</div>'
-                    +'</div>'
-                    +'<div class="shared-details-buttons">'
-                        +'<div class="fm-leave-share"><span>Leave share</span></div>'
-                        +'<div class="fm-share-copy"><span>Copy</span></div>'
-                        +'<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
-                        +'<div class="clear"></div>'
-                    +'</div>'
-                    +'<div class="clear"></div>'
-                +'</div>'
-            +'</div>');
-        $(e).addClass('shared-folder-content');
+                        + '<div class="fm-chat-user-info">'
+                            + '<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
+                        + '</div>'
+                    + '</div>'
+                    + '<div class="shared-details-buttons">'
+                        + '<div class="fm-leave-share"><span>' + l[5866] + '</span></div>'
+                        + '<div class="fm-share-copy"><span>' + l[63] + '</span></div>'
+                        + '<div class="fm-share-download"><span class="fm-chatbutton-arrow">' + l[58] + '</span></div>'
+                        + '<div class="clear"></div>'
+                    + '</div>'
+                    + '<div class="clear"></div>'
+                + '</div>'
+            + '</div>');
+
+        $(rightPanelView).addClass('shared-folder-content');
 
         Soon(function() {
             $(window).trigger('resize');
@@ -10525,7 +10561,8 @@ function sharedfolderUI() {
         });
     }
 
-    return r;
+    return browsingSharedContent;
+    /* jshint -W074 */
 }
 
 function userFingerprint(userid, callback) {
@@ -10754,32 +10791,12 @@ function contactUI() {
         });
 
         if (!megaChatIsDisabled) {
-            if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
-                // user is online, lets display the "Start chat" button
-
-                // Can use the line below again once text chat is ready
-                //var startConversationText = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : l[5885];
-
-                // Temporary for just video/audio only
-                var startConversationText = l[5885];
-
-                $('.fm-start-conversation').removeClass('hidden');
-                $('.fm-start-conversation span').text(startConversationText);
-
-                // Add this line back in when P2P file sharing is confirmed working
-                //$('.fm-send-files').removeClass('hidden');
-
-            } else {
-                // user is offline, hide the button
-                $('.fm-start-conversation').addClass('hidden');
-                $('.fm-send-files').addClass('hidden');
-            }
-
-            // bind the "start chat" button
-            $('.fm-start-conversation').unbind("click.megaChat");
-            $('.fm-start-conversation').bind("click.megaChat", function(e) {
-                window.location = "#fm/chat/" + u_h;
-
+            
+            // Bind the "Start conversation" button
+            $('.fm-start-conversation').unbind('click.megaChat');
+            $('.fm-start-conversation').bind('click.megaChat', function() {
+                
+                window.location = '#fm/chat/' + u_h;
                 return false;
             });
         }

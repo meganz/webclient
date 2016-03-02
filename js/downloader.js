@@ -196,10 +196,18 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
 
     var chunk = this;
     var status = xhr.readyState > 1 && xhr.status;
-    var retryTime = 600;
-    try {
-        retryTime = xhr.getResponseHeader('x-mega-time-left');
-    } catch (e) {}
+    var retryTime = null;
+
+    if (status === 509) {
+        try {
+            retryTime = xhr.getResponseHeader('x-mega-time-left');
+        } catch (e) {
+            // In case the server do not send 'Access-Control-Expose-Headers: x-mega-time-left'
+            // fallback to a 10 minutes waiting
+            retryTime = 600;
+        }
+    }
+
     this.oet = setTimeout(function() {
         chunk.finish_download(false, status, retryTime);
         chunk = undefined;

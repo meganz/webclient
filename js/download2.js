@@ -384,9 +384,10 @@ var dlmanager = {
             });
             quotaDialog(args[2]);
             return 1;
-        } else {
-            dlmanager.dlReportStatus(dl, EAGAIN);
         }
+        
+        /* update UI */
+        dlmanager.dlReportStatus(dl, EAGAIN);
 
         if (code === 403 || code === 404) {
             dlmanager.newUrl(dl, function(rg) {

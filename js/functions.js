@@ -2982,29 +2982,33 @@ function __(s) { //TODO: waiting for @crodas to commit the real __ code.
 }
 
 function quotaDialog(time) {
+
     var time = parseInt(time);
     var tick;
     var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
     
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
+    fm_showoverlay();
     $dialog.removeClass('hidden')
         .find('.bandwidth-header')
         .safeHTML(l[7100].replace('%1', '<span class="countdown"></span>'));
+    
+    function closeModal() {
 
-    $dialog.find('.fm-dialog-close').rebind('click', function() {
         clearInterval(tick);
         $dialog.addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
-    });
+        fm_hideoverlay();
+        return false;
+    }
 
-    $('.fm-dialog-overlay').rebind('click quota', function() {
-        $dialog.find('.fm-dialog-close').trigger('click');
-    });
+    $dialog.find('.fm-dialog-close').rebind('click', closeModal);
+
+    $('.fm-dialog-overlay').rebind('click quota', closeModal);
 
     $dialog.find('.membership-button').rebind('click', function() {
         window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
+        closeModal();
         document.location.hash = '#pro';
     });
     var $txt = $('.countdown', $dialog);

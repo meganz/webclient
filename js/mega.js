@@ -3638,10 +3638,21 @@ function MegaData()
             $('.fm-tree-header.recycle-item').removeClass('recycle-notification expanded contains-subfolders');
             $('.fm-tree-header.recycle-item').prev('.fm-connector-first').removeClass('active');
         }
-        if (Object.keys(this.rubNodes).length == 0)
-            $('.nw-fm-left-icon.rubbish-bin').removeClass('filled')
-        else
-            $('.nw-fm-left-icon.rubbish-bin').addClass('filled')
+        if (Object.keys(this.rubNodes).length == 0) {
+            $('.nw-fm-left-icon.rubbish-bin').removeClass('filled glow')
+        }
+        else {
+            if (!$('.nw-fm-left-icon.rubbish-bin').hasClass('filled')) {
+                $('.nw-fm-left-icon.rubbish-bin').addClass('filled');
+            } 
+            else if (!$('.nw-fm-left-icon.rubbish-bin').hasClass('glow')) {
+                $('.nw-fm-left-icon.rubbish-bin').addClass('glow');
+            } 
+            else {
+                $('.nw-fm-left-icon.rubbish-bin').removeClass('glow');
+            }
+        }
+            
     };
 
     this.nodeAttr = function(attrs) {

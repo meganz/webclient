@@ -343,7 +343,7 @@ var dlmanager = {
     },
 
     failureFunction: function DM_failureFunction(task, args) {
-        var code = args[1] || 0;
+        var code = args[1].responseStatus || 0;
         var dl = task.task.download;
 
         if (d) {
@@ -352,13 +352,14 @@ var dlmanager = {
         }
 
         if (code === 509) {
-            args[2] = parseInt(args[2]);
-            args[2] = 120;
-            var dlId = dlmanager.getGID(dl);
-            dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
+            var retry = args[1].retry;            
+            retry = 120; //remove me after testing BEFORE merging
+
             if (dl.quota_t) {
+                // cleanup any previous quota retry timer
                 clearTimeout(dl.quota_t);
             }
+
             dl.quota_t = setTimeout(function() {
                 // put current download back
                 dlmanager.dlQueuePushBack(task);
@@ -366,17 +367,18 @@ var dlmanager = {
 
                 // resume downloads
                 var ids = $('.transfer-table tr.overquota').attrs('id');
-                ids.push(dlId);
+                ids.push(dlmanager.getGID(dl));
                 ids.forEach(fm_tfsresume);
-            }, args[2] * 1000);
+            }, retry * 1000);
 
             // pause downloads
             var ids = $('.transfer-table tr:not(.paused)').attrs('id');
-            ids.push(dlId);
+            ids.push(dlmanager.getGID(dl));
             ids.forEach(function(id) {
                 fm_tfspause(id, true);
             });
-            quotaDialog(args[2]);
+            quotaDialog(retry);
+            dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
             return 1;
         }
         

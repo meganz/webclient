@@ -352,7 +352,7 @@ var dlmanager = {
         }
 
         if (code === 509) {
-            var retry = args[1].retry;            
+            var retry = args[1].retry;
 
             if (dl.quota_t) {
                 // cleanup any previous quota retry timer
@@ -910,8 +910,8 @@ function fm_tfspause(gid, overquota) {
         $tr.find('span.transfer-type').addClass('paused');
         if (overquota) {
             $tr.addClass('overquota');
-        } else  {
-            $tr.find('td:eq(5)').html('<span class="transfer-status queued">Queued</span>');
+        } else {
+            $tr.find('td:eq(5)').safeHTML('<span class="transfer-status queued">' + l[7227] + '</span>');
         }
         return true;
     }

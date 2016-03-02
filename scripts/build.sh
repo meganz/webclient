@@ -8,7 +8,7 @@ temp_file2=/tmp/chat-bundle2.js
 # Replace `createElement` calls so that the AMO Validator doens't freaks out..
 cat $build_file \
     | sed 's/createElement:/makeElement:/' \
-    | sed -re 's/(React\w*)\.createElement/\1.makeElement/' > $temp_file1
+    | sed -E 's/(React\w*)\.createElement/\1.makeElement/' > $temp_file1
 
 # When removing unused code, it is ok to get rid of these function calls.
 # (I.e: for `Side effects in initialization of unused variable` reports)

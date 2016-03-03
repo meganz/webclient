@@ -1765,7 +1765,7 @@ a.blog-button:hover {
     padding: 2px 0 2px 28px;
     margin: 22px 14px 0 0;
     display: none;
-    background-image: url(../images/mega/notifications-sprite_v2.svg);
+    background-image: url(../images/mega/notifications-sprite-v3.svg);
     background-position: -10px -350px;
     background-repeat: no-repeat;
 }
@@ -1778,7 +1778,7 @@ a.blog-button:hover {
     height: 20px;
     right: -4px;
     top: -4px;
-    background-image: url(../images/mega/notifications-sprite_v2.svg);
+    background-image: url(../images/mega/notifications-sprite-v3.svg);
     background-position: -10px -27px;
     background-repeat: no-repeat;
 }
@@ -1807,6 +1807,17 @@ a.blog-button:hover {
 .nt-contact-request-denied .notification-avatar-icon, .nt-contact-request-blocked .notification-avatar-icon, .nt-contact-request-ignored .notification-avatar-icon {
     background-position: -10px -153px;
 }
+.nt-payment-reminder-notification .notification-avatar-icon {
+    background-position: -10px -415px;
+}
+
+.nt-payment-reminder-notification .notification-avatar {
+    background: url('../images/mega/bitcoin-v5.png') no-repeat scroll -152px -650px;
+    height: 48px;
+    left: 25px;
+    top: 0;
+    width: 48px;
+}
 .nt-payment-notification .notification-avatar-icon {
     background: url(../images/mega/bitcoin-v5.png) -152px -650px no-repeat;
     height: 48px;
@@ -1828,12 +1839,18 @@ a.blog-button:hover {
     left: 0;
     top: 0;
 }
+
+.nt-payment-reminder-notification .notification-avatar {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
 .nt-payment-notification .notification-avatar {
     background-color: transparent;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 }
 .nt-payment-notification .notification-avatar img {
     display: none;
 }
+ 
 .notification-popup .jspDrag {
     width: 4px;
 }

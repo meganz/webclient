@@ -920,7 +920,7 @@ var notify = {
             var title = (days === 1) ? l[8596] : l[8597].replace('%1', days);
                   
             // Populate other template information
-            $notificationHtml.addClass('nt-payment-notification clickable');
+            $notificationHtml.addClass('nt-payment-reminder-notification clickable');
             $notificationHtml.find('.notification-username').text(header);
             $notificationHtml.find('.notification-info').addClass('red').text(title);
             

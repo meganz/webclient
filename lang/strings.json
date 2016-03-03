@@ -11902,5 +11902,9 @@
     "8599": {
         "text": "Delete duplicates",
         "context": "A button title for a feature on the duplicate search page to delete all of the other copies of your file, leaving only 1 copy remaining."
+    },
+    "8601": {
+        "text": "Download with MEGAsync if it is running",
+        "context": "This option in the account settings allows users to download files with the external MEGAsync program if it is running in the background. Otherwise they will normally download through the browser.\r\n"
     }
 }

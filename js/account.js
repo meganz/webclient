@@ -1133,17 +1133,24 @@ function checkUserLogin() {
         mBroadcaster.sendMessage('fmconfig:' + key, value);
     };
 
-    Object.defineProperty(mega, 'config', {
-        value: Object.freeze(ns)
-    });
+    if (is_karma) {
+        mega.attr = ns;
+    }
+    else {
+        Object.defineProperty(mega, 'config', {
+            value: Object.freeze(ns)
+        });
+    }
+    ns = undefined;
 
 })(this);
 
-(function _userAttributeHandling() {
+var attributeHandling = (function _userAttributeHandling() {
     "use strict";
 
     var ns = {};
     var logger = MegaLogger.getLogger('account');
+    ns._logger = logger;
     var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
 
     /**
@@ -1232,7 +1239,6 @@ function checkUserLogin() {
          * @param {Number|Object} res The received result.
          */
         function settleFunction(res) {
-
             if (typeof res !== 'number') {
                 // Decrypt if it's a private attribute container.
                 if (attribute.charAt(0) === '*') {
@@ -1494,10 +1500,16 @@ function checkUserLogin() {
     };
 
 
-    Object.defineProperty(mega, 'attr', {
-        value: Object.freeze(ns)
-    });
-    ns = undefined;
+    if (is_karma) {
+        mega.attr = ns;
+    }
+    else {
+        Object.defineProperty(mega, 'attr', {
+            value: Object.freeze(ns)
+        });
+    }
+
+    return ns;
 
 })(this);
 

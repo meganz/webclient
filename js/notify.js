@@ -68,7 +68,6 @@ var notify = {
                 var lastTimeDelta = (result.ltd) ? result.ltd : 0;
                 var notifications = result.c;
                 var pendingContactUsers = result.u;
-                var shareNodes = {};
 
                 // Add pending contact users
                 notify.addUserEmails(pendingContactUsers);
@@ -84,24 +83,16 @@ var notify = {
                     var timestamp = currentTime - timeDelta;        // Timestamp of the notification
                     var userHandle = notification.u;                // User handle e.g. new share from this user
 
-                    // only add share notification once 
-                    // TODO: add notifications for permission changes?
-                    if ((type == 'share' && !shareNodes[notification.n]) || (type != 'share')) {
-                        // Add notifications to list
-                        notify.notifications.push({
-                            data: notification, // The full notification object
-                            id: id,
-                            seen: seen,
-                            timeDelta: timeDelta,
-                            timestamp: timestamp,
-                            type: type,
-                            userHandle: userHandle
-                        });
-                    }
-
-                    if (type == 'share') {
-                        shareNodes[notification.n] = 1;
-                    }
+                    // Add notifications to list
+                    notify.notifications.push({
+                        data: notification, // The full notification object
+                        id: id,
+                        seen: seen,
+                        timeDelta: timeDelta,
+                        timestamp: timestamp,
+                        type: type,
+                        userHandle: userHandle
+                    });
                 }
 
                 // Show the notifications

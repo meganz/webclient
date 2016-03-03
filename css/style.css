@@ -1838,7 +1838,7 @@ a.blog-button:hover {
 /* Custom icon instead of avatar for MEGA notifications */
 .nt-payment-reminder-notification .notification-avatar {
     background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
     height: 48px;
     left: 26px;
     top: 0;
@@ -1846,7 +1846,7 @@ a.blog-button:hover {
 }
 .nt-payment-notification .notification-avatar {
     background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
     height: 48px;
     left: 26px;
     top: 0;
@@ -1854,7 +1854,7 @@ a.blog-button:hover {
 }
 .nt-takedown-notification .notification-avatar {
     background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -151px -1451px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
     height: 48px;
     left: 25px;
     margin-top: -24px;
@@ -1863,7 +1863,7 @@ a.blog-button:hover {
 }
 .nt-takedown-reinstated-notification .notification-avatar {
     background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -1px -1451px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
     height: 48px;
     left: 25px;
     margin-top: -24px;
@@ -1873,6 +1873,9 @@ a.blog-button:hover {
  
 .notification-popup .jspDrag {
     width: 4px;
+}
+.notification-avatar .avatar-wrapper {
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
 }
 .notification-avatar img {
     -moz-border-radius: 100%;

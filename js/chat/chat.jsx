@@ -344,25 +344,6 @@ Chat.prototype.init = function() {
 
         if (eventObject.getShow() !== "unavailable") {
             if (eventObject.isMyOwn(self.karere) === false) {
-                self.chats.forEach(function(room, roomJid) {
-                    if (room._leaving === true || room._conv_ended === true) {
-                        return; // continue
-                    }
-
-                    if (room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
-                        self.logger.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
-
-                        self.karere.addUserToChat(roomJid, eventObject.getFromJid(), undefined, room.type, {
-                            'ctime': room.ctime,
-                            'invitationType': 'resume',
-                            'participants': room.users,
-                            'users': self.karere.getUsersInChat(roomJid)
-                        });
-
-                        return false; // break;
-                    }
-                });
-
                 // Sync presence across devices (will check the delayed val!)
                 if (bareJid === self.karere.getBareJid()) {
                     if (eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
@@ -1444,18 +1425,6 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
 
     $startChatPromise
         .done(function(roomJid) {
-            $.each(jidsWithoutMyself, function(k, userJid) {
-
-                if (self.chats[roomJid]) {
-                    self.karere.addUserToChat(roomJid, userJid, undefined, type, {
-                        'ctime': self.chats[roomJid].ctime,
-                        'invitationType': "created",
-                        'participants': jids,
-                        'users': self.karere.getUsersInChat(roomJid)
-                    });
-                }
-            });
-
             $promise.resolve(roomJid, self.chats[roomJid]);
         })
         .fail(function() {

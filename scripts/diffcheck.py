@@ -267,7 +267,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
         else:
             logging.error('Error calling HTMLHint: {}'.format(ex))
         return '*** HTMLHint: {} ***'.format(ex), 0
-    output = strip_ansi_codes(output.decode('utf8')).split('\n')
+    output = strip_ansi_codes(output.decode('utf8')).rstrip().split('\n')
 
     if re.search('Scan \d+ files, without errors', output[-1]):
         return '', 0

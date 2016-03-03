@@ -380,6 +380,7 @@ var notify = {
         notify.initShareClickHandler();
         notify.initTakedownClickHandler();
         notify.initPaymentClickHandler();
+        notify.initPaymentReminderClickHandler();
         notify.initAcceptContactClickHandler();
     },
 
@@ -451,6 +452,22 @@ var notify = {
 
             // Redirect to payment history
             document.location.hash = '#fm/account/history';
+        });
+    },
+    
+    /**
+     * If they click on a payment reminder notification, then redirect them to the Pro page
+     */
+    initPaymentReminderClickHandler: function() {
+
+        // On payment reminder notification click
+        this.$popup.find('.notification-item.nt-payment-reminder-notification').rebind('click', function() {
+
+            // Mark all notifications as seen (because they clicked on a notification within the popup)
+            notify.markAllNotificationsAsSeen();
+
+            // Redirect to pro page
+            document.location.hash = '#pro';
         });
     },
 

@@ -13,7 +13,8 @@ git pull
 cd $(dirname $BASH_SOURCE)/../lang
 
 # Remove all files in the language directory (in case we removed some languages in the code)
-rm *
+rm *.json
+rm lang.tar.gz
 
 # Fetch the latest translations from Babel
 wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz
@@ -25,7 +26,7 @@ tar xfvz lang.tar.gz
 rm lang.tar.gz
 
 # Add the .json files
-git add .
+git add *.json
 
 # Commit it
 git commit -m 'Updated strings from Babel'
@@ -35,3 +36,6 @@ git push
 
 # Check out the previous branch again
 git checkout $currentBranch
+
+# Merge translations branch into the current branch
+git merge translations -m "Merge branch 'translations' into $currentBranch"

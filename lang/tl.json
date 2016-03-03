@@ -2970,11 +2970,12 @@
     "8590": "hindi pa decrypted na folder",
     "8593": "Gamitin ang paghahanap sa kaparehas na feature upang humanap ng maramihang kaparehas ng file na ito.",
     "8594": "Humanap ng kaparehas",
-    "8595": "This folder will be decrypted as soon as the cryptographic key becomes available.",
+    "8595": "Ang folder na ito ay made-decrypt  kapag meron ng cryptographic key.",
     "8596": "Ang iyong PRO membership plan mo ay mawawala na sa loob ng isang araw.",
     "8597": "Mawawala na ang inyong PRO membership sa loob ng %1 na araw.",
     "8598": "Malapit ng mawala ang iyong PRO membership plan",
     "8599": "Burahin ang kaparehas",
+    "8601": "Idownload sa pamamagitan ng MEGAsync kung ito ay tumatakbo",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -2970,11 +2970,12 @@
     "8590": "nieodszyfrowany katalog",
     "8593": "Wykorzystaj funkcje znajdowania duplikat\u00f3w aby wyszuka\u0107 kopie plik\u00f3w.",
     "8594": "Znajd\u017a duplikaty",
-    "8595": "This folder will be decrypted as soon as the cryptographic key becomes available.",
+    "8595": "Ten folder zostanie odszyfrowany jak tylko b\u0119dzie dost\u0119pny klucz.",
     "8596": "Plan PRO wyga\u015bnie za 1 dzie\u0144.",
     "8597": "Plan PRO wyga\u015bnie za %1 dni.",
     "8598": "Plan PRO niebawem wyga\u015bnie",
     "8599": "Usu\u0144 duplikaty",
+    "8601": "Pobierz z MEGAsync je\u017celi nadal trwa pobieranie",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

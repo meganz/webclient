@@ -2975,6 +2975,7 @@
     "8597": "Your PRO membership plan will expire in %1 days.",
     "8598": "PRO membership plan expiring soon",
     "8599": "Delete duplicates",
+    "8601": "Download with MEGAsync if it is running",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -22,8 +22,7 @@ describe("time2lastSeparator Unit Test", function() {
         // This week
         expect(time2lastSeparator("2015-11-08T22:01:01.000Z", today)).to.eql(l[1303]);
         expect(time2lastSeparator("2015-11-09T22:01:01.000Z", today)).to.eql(l[1303]);
-        expect(time2lastSeparator("2015-11-10T21:59:01.000Z", today)).to.eql(l[1303]);
-
+        
         // Last week
         expect(time2lastSeparator("2015-11-07T22:01:01.000Z", today)).to.eql(l[1304]);
         expect(time2lastSeparator("2015-11-04T22:01:01.000Z", today)).to.eql(l[1304]);
@@ -31,8 +30,7 @@ describe("time2lastSeparator Unit Test", function() {
 
         // This month
         expect(time2lastSeparator("2015-11-01T02:01:01.000Z", today)).to.eql(l[1305]);
-        expect(time2lastSeparator("2015-11-01T21:59:59.000Z", today)).to.eql(l[1305]);
-
+        
         // This year
         expect(time2lastSeparator("2015-10-26T01:59:01.000Z", today)).to.eql(l[1306]);
         expect(time2lastSeparator("2015-09-30T22:00:00.000Z", today)).to.eql(l[1306]);

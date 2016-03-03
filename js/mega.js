@@ -1237,7 +1237,7 @@ function MegaData()
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block' + nodeType + ' ' + sExportLink + ' ' + additionClass + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
+                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block ' + nodeType + ' ' + sExportLink + ' ' + additionClass + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon"></span>\n\

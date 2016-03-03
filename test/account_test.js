@@ -16,7 +16,7 @@ describe("account unit test", function() {
 
     var stdoutHook;
     var _echo = function(x) { return x; };
-    var ns = attributeHandling;
+    var ns = mega.attr;
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();

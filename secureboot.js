@@ -1489,8 +1489,7 @@ else if (!b_u)
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
     if (typeof Number.isNaN !== 'function'
-            || typeof Set === 'undefined'
-            || typeof Array.from !== 'function') {
+            || typeof Set === 'undefined') {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }

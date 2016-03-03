@@ -376,7 +376,7 @@ var dlmanager = {
             ids.forEach(function(id) {
                 fm_tfspause(id, true);
             });
-            quotaDialog(retry);
+            this.showOverQuotaDialog(retry);
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
             return 1;
         }
@@ -600,6 +600,49 @@ var dlmanager = {
             window: 60000
         };
     },
+
+    showOverQuotaDialog: function DM_quotaDialog(time) {
+    
+        var tick;
+        var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+        var $button = $dialog.find('.fm-dialog-close');
+        var $overlay = $('.fm-dialog-overlay');
+    
+        // make sure time is indeed a number
+        time = parseInt(time);
+        
+        fm_showoverlay();
+        $dialog.removeClass('hidden')
+            .find('.bandwidth-header')
+            .safeHTML(l[7100].replace('%1', '<span class="countdown"></span>'));
+        
+        function closeModal() {
+    
+            clearInterval(tick);
+            $dialog.addClass('hidden');
+            $button.unbind('click.quota');
+            $overlay.unbind('click.quota');
+            fm_hideoverlay();
+            return false;
+        }
+    
+        $button.rebind('click.quota', closeModal);
+        $overlay.rebind('click.quota', closeModal);
+        $dialog.find('.membership-button').rebind('click', function() {
+    
+            window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
+            closeModal();
+            document.location.hash = '#pro';
+        });
+        var $txt = $('.countdown', $dialog);
+        $txt.text(secondsToTimeShort(time));
+    
+        tick = setInterval(function() {
+    
+            $txt.text(secondsToTimeShort(--time));
+        }, 1000);
+    },
+
 
     isMEGAsyncRunning: function(minVersion) {
         var timeout = 200;

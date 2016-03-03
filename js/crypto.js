@@ -211,9 +211,6 @@ var crypt = (function () {
 
     /**
      * Used for caching .getPubKey requests which are in progress (by reusing MegaPromises)
-     *
-     * @type {String, MegaPromise}
-     * @private
      */
     ns._pubKeyRetrievalPromises = {};
 

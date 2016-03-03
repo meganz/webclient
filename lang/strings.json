@@ -11883,6 +11883,10 @@
         "text": "Find duplicates",
         "context": "A button title for the find duplicates feature. This allows the user to search for multiple copies of a file within their account."
     },
+    "8595": {
+        "text": "This folder will be decrypted as soon as the cryptographic key becomes available.",
+        "context": "A tooltip message for undecryptable folders."
+    },
     "8596": {
         "text": "Your PRO membership plan will expire in 1 day.",
         "context": "The professional pricing plan which the user is currently on will expire in one day."

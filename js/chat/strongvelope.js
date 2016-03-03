@@ -33,14 +33,15 @@ var strongvelope = {};
     var _ONE_DAY = 1000 * 24 * 60 * 60;
 
     // Size in bytes of a key ID.
-    var _KEY_ID_SIZE = 4;
+    var _KEY_ID_SIZE_V0 = 4;
+    var _KEY_ID_SIZE_V1 = 8;
 
     // Size threshold for RSA encrypted sender keys (greater than ... bytes).
     // (1024 bit RSA key --> 128 byte + 2 byte cipher text).
     var _RSA_ENCRYPTION_THRESHOLD = 128;
 
     /** Version of the protocol implemented. */
-    strongvelope.PROTOCOL_VERSION = 0x00;
+    strongvelope.PROTOCOL_VERSION = 0x01;
     var PROTOCOL_VERSION = strongvelope.PROTOCOL_VERSION;
 
     /** After how many messages our symmetric sender key is rotated. */
@@ -161,37 +162,40 @@ var strongvelope = {};
      * Splits the keyId into the date stamp and counter portion.
      *
      * @ param {String} keyId
-     *     The key ID.
+     *     The full (64bit) key ID.
      * @return {Array.<Number>}
      *     Two elements in the array, the first being the date stamp, the
      *     second being the counter value.
      * @private
      */
-    strongvelope._splitKeyId = function(keyId) {
+    strongvelope._splitKeyId = function(fullKeyId) {
 
-        var keyIdNumber = str_to_a32(keyId)[0];
+        var prefix = str_to_a32(fullKeyId)[0];
+        var keyIdNumber = str_to_a32(fullKeyId)[1];
         var dateStamp = keyIdNumber >>> 16;
         var counter = keyIdNumber & 0xffff;
 
-        return [dateStamp, counter];
+        return [dateStamp, counter, prefix];
     };
 
 
     /**
      * Encodes a numeric date stamp and counter component into a key ID.
      *
-     * @return {Number}
+     * @param {Number}
      *     Date stamp value.
-     * @return {Number}
+     * @param {Number}
      *     Counter value.
+     * @param {Number}
+     *     Prefix value representing unique device id
      * @return {String}
      *     The key ID.
      * @private
      */
-    strongvelope._encodeKeyId = function(dateStamp, counter) {
+    strongvelope._encodeKeyId = function(dateStamp, counter, prefix) {
 
         var keyIdNumber = (dateStamp << 16) | counter;
-        return a32_to_str([keyIdNumber]);
+        return a32_to_str([prefix]) + a32_to_str([keyIdNumber]);
     };
 
 
@@ -398,6 +402,20 @@ var strongvelope = {};
 
 
     /**
+     * Get the key id length in bytes based on the protocol version
+     *
+     * @param {Number} protocolVersion
+     *     The number of the strongvelope protocol version to get the length for
+     * @returns {Number}
+     *     The length of a key id for the given protocol version, in bytes
+     */
+    strongvelope._getKeyIdLength = function(protocolVersion) {
+
+        return protocolVersion === 0 ? _KEY_ID_SIZE_V0 : _KEY_ID_SIZE_V1;
+    };
+
+
+    /**
      * Parses the binary content of a message into an object. Content will not
      * be decrypted or signatures verified.
      *
@@ -454,9 +472,13 @@ var strongvelope = {};
                     break;
                 case TLV_TYPES.KEY_IDS:
                     var keyIds = value;
+
+                    // The key length can change depending on the version
+                    var keyIdLength = strongvelope._getKeyIdLength(parsedContent.protocolVersion);
+
                     while (keyIds.length > 0) {
-                        parsedContent[tlvVariable].push(keyIds.substring(0, _KEY_ID_SIZE));
-                        keyIds = keyIds.substring(_KEY_ID_SIZE);
+                        parsedContent[tlvVariable].push(keyIds.substring(0, keyIdLength));
+                        keyIds = keyIds.substring(keyIdLength);
                     }
                     break;
                 default:
@@ -553,6 +575,8 @@ var strongvelope = {};
      * @param {String} [myPubEd25519]
      *     Our public signing key (Ed25519, optional, can be derived upon
      *     instantiation from private key).
+     * @param {String} [uniqueDeviceId]
+     *     A 32bit prefix that should be unique for this device, for this user
      *
      * @property {String} ownHandle
      *     Our own user handle (u_handle).
@@ -581,9 +605,11 @@ var strongvelope = {};
      *     An array of participants' user handles to include in the chat.
      * @property {Array.<String>} excludeParticipants
      *     An array of participants' user handles to exclude from the chat.
+     * @property {String} uniqueDeviceId
+     *     A 32bit prefix that should be unique for this device, for this user
      */
     strongvelope.ProtocolHandler = function(ownHandle, myPrivCu25519,
-            myPrivEd25519, myPubEd25519) {
+            myPrivEd25519, myPubEd25519, uniqueDeviceId) {
 
         this.ownHandle = ownHandle || u_handle;
         this.myPrivCu25519 = myPrivCu25519 || u_privCu25519;
@@ -604,6 +630,7 @@ var strongvelope = {};
         this.otherParticipants = new Set();
         this.includeParticipants = new Set();
         this.excludeParticipants = new Set();
+        this.uniqueDeviceId = uniqueDeviceId;
         this._inUse = false;
     };
 
@@ -726,25 +753,47 @@ var strongvelope = {};
 
         this._batchParseAndExtractKeys(messages);
 
+        var a32words = str_to_a32(this.uniqueDeviceId);
+        var myPrefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
+        if (myPrefix === -1) {
+            throw new Error('This should never happen, the unique device id was not set correctly');
+        }
+
         // Find our own most recent (highest) sender key ID.
-        var highestKeyId = '';
-        var secondHighestKeyId = '';
+        var highestDateCount = -1;
+        var secondHighestDateCount = -1;
         var ownKeys = this.participantKeys[this.ownHandle];
         for (var keyId in ownKeys) {
-            if (ownKeys.hasOwnProperty(keyId) && (keyId > highestKeyId)) {
-                secondHighestKeyId = highestKeyId;
-                highestKeyId = keyId;
+            if (ownKeys.hasOwnProperty(keyId)) {
+                var a32words = str_to_a32(keyId);
+                if (a32words.length <= 1) {
+                    // This key appears to be from an older protocol version as it only contains a single
+                    // 32bit part. We can not seed from an older key
+                    continue;
+                }
+
+                // We can only start re-using an existing key if it was from this device, so check
+                // the prefixes are the same
+                var prefix = a32words[0];
+                if (prefix === myPrefix) {
+                    var keyDateCounter = a32words[a32words.length-1];
+
+                    if ((keyDateCounter > highestDateCount)) {
+                        secondHighestDateCount = highestDateCount;
+                        highestDateCount = keyDateCounter;
+                    }
+                }
             }
         }
 
-        if (highestKeyId === '') {
+        if (highestDateCount === -1) {
             return false;
         }
 
-        this.keyId = highestKeyId;
+        this.keyId = a32_to_str([prefix]) + a32_to_str([highestDateCount]);
 
-        if (secondHighestKeyId) {
-            this.previousKeyId = secondHighestKeyId;
+        if (secondHighestDateCount) {
+            this.previousKeyId = a32_to_str([prefix]) + a32_to_str([secondHighestDateCount]);
         }
 
         return true;
@@ -762,6 +811,7 @@ var strongvelope = {};
 
         var dateStamp;
         var counter;
+        var prefix; // unique device id prefix, as a number
 
         if (this.keyId && (this.keyId !== this._sentKeyId)) {
             // We can return early, as our current sender key has not even been
@@ -775,6 +825,7 @@ var strongvelope = {};
             var keyIdComponents = ns._splitKeyId(this.keyId);
             dateStamp = keyIdComponents[0];
             counter = keyIdComponents[1];
+            prefix = keyIdComponents[2];
 
             var newDateStamp = ns._dateStampNow();
             if (newDateStamp !== dateStamp) {
@@ -792,8 +843,13 @@ var strongvelope = {};
         else {
             dateStamp  = ns._dateStampNow();
             counter = 0;
+            var a32words = str_to_a32(this.uniqueDeviceId);
+            prefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
+            if (prefix === -1) {
+                throw new Error('This should never happen, the unique device id was not set correctly');
+            }
         }
-        this.keyId = ns._encodeKeyId(dateStamp, counter);
+        this.keyId = ns._encodeKeyId(dateStamp, counter, prefix);
 
         // Now the new sender key.
         var secretKey = new Uint8Array(SECRET_KEY_SIZE);
@@ -976,7 +1032,7 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype._trackParticipants = function(
         otherParticipants, includeParticipants, excludeParticipants) {
 
-        if (setutils.intersection(includeParticipants, excludeParticipants).size > 0) {
+        if (setutils.intersection(new Set(includeParticipants), new Set(excludeParticipants)).size > 0) {
             // There should be no intersection between these two sets
             return false;
         }
@@ -1327,6 +1383,41 @@ var strongvelope = {};
         return otherParticipants;
     };
 
+    /**
+     * Determines the entire group of participants from a parsed message.
+     *
+     * @method
+     * @param {String} sender
+     *     User handle of the message sender.
+     * @param {Object} parsedMessage
+     *     User handle of the message sender.
+     * @returns {Set|Boolean}
+     *     The set of group participants (with oneself). An empty set if one
+     *     is not a member of the group any more. If this cannot be determined
+     *     from the message `false` is returned.
+     * @private
+     */
+    strongvelope.ProtocolHandler.prototype._getAllParticipantsFromMessage = function(
+                sender, parsedMessage) {
+
+        if (parsedMessage.recipients.length === 0) {
+            // No participants in message.
+            return false;
+        }
+
+        var otherParticipants = new Set(parsedMessage.recipients);
+        otherParticipants.add(sender);
+
+        var isOwnMessage = (sender === this.ownHandle);
+        var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
+        if (!isOwnMessage && (myIndex === -1)) {
+            // I'm not in the list.
+            otherParticipants.clear();
+        }
+
+        return otherParticipants;
+    };
+
 
     /**
      * Decrypts a message from a sender and (potentially) updates sender keys.
@@ -1374,15 +1465,16 @@ var strongvelope = {};
         }
 
         // Verify protocol version.
-        if (parsedMessage.protocolVersion !== PROTOCOL_VERSION) {
+        if (parsedMessage.protocolVersion > PROTOCOL_VERSION) {
             logger.critical('Message not compatible with current protocol version.');
 
             return false;
         }
-
         // TODO: Check legitimacy of operation (moderator set on alter participants).
         // Now puzzle out the group composition from a keyed message.
         var otherParticipantsFromMessage = this._getOtherParticipantsFromMessage(
+            sender, parsedMessage);
+        var allParticipantsFromMessage = this._getAllParticipantsFromMessage(
             sender, parsedMessage);
 
         // Get sender key.
@@ -1437,13 +1529,14 @@ var strongvelope = {};
             // Sanity checks.
             if ((parsedMessage.includeParticipants.length > 0)
                     && (setutils.subtract(new Set(parsedMessage.includeParticipants),
-                        otherParticipantsFromMessage).size > 0)) {
-                // Included participants must be in otherParticipantsFromMessage, so if the
+                        allParticipantsFromMessage).size > 0)) {
+                // Included participants must be in the receipients of the message, so if the
                 // subtraction has anything left over, this is an invalid message.
+
                 return false;
             }
             if ((parsedMessage.excludeParticipants.length > 0)
-                    && (setutils.intersection(otherParticipantsFromMessage,
+                    && (setutils.intersection(allParticipantsFromMessage,
                         new Set(parsedMessage.excludeParticipants)).size > 0)) {
                 // Exclude participants are not allowed to be in otherParticipantsFromMessage, so if
                 // there is anything left after an intersection between the two, then this is an

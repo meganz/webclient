@@ -2968,6 +2968,13 @@
     "8588": "plik nie odszyfrowany",
     "8589": "Brak powiadomie\u0144",
     "8590": "nieodszyfrowany katalog",
+    "8593": "Wykorzystaj funkcje znajdowania duplikat\u00f3w aby wyszuka\u0107 kopie plik\u00f3w.",
+    "8594": "Znajd\u017a duplikaty",
+    "8595": "This folder will be decrypted as soon as the cryptographic key becomes available.",
+    "8596": "Plan PRO wyga\u015bnie za 1 dzie\u0144.",
+    "8597": "Plan PRO wyga\u015bnie za %1 dni.",
+    "8598": "Plan PRO niebawem wyga\u015bnie",
+    "8599": "Usu\u0144 duplikaty",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3004,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

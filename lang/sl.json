@@ -2968,6 +2968,13 @@
     "8588": "nedekriptirana datoteka",
     "8589": "Ni obvestil",
     "8590": "nedekriptirana mapa",
+    "8593": "Use the find duplicates feature to search for multiple copies of a file.",
+    "8594": "Find duplicates",
+    "8595": "This folder will be decrypted as soon as the cryptographic key becomes available.",
+    "8596": "Your PRO membership plan will expire in 1 day.",
+    "8597": "Your PRO membership plan will expire in %1 days.",
+    "8598": "PRO membership plan expiring soon",
+    "8599": "Delete duplicates",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3004,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

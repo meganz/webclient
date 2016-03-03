@@ -356,10 +356,6 @@ ClassFile.prototype.abortTimers = function() {
             delete this.dl.retry_t;
         }
     }
-    if (this.hasQuotaTimer) {
-        clearTimeout(this.hasQuotaTimer);
-        delete this.hasQuotaTimer;
-    }
 };
 
 ClassFile.prototype.destroy = function() {
@@ -424,25 +420,6 @@ ClassFile.prototype.destroy = function() {
     oDestroy(this);
 }
 
-ClassFile.prototype.checkQuota = function(task_done) {
-    if (this.hasQuota) {
-        return true;
-    }
-
-    var that = this;
-
-    dlmanager.hasQuota(this.dl.size, function(hasQuota) {
-        that.hasQuota = hasQuota;
-        that.hasQuotaTimer = setTimeout(function() {
-            that.hasQuotaTimer = null;
-            that.run(task_done);
-            that = undefined;
-        }, 1000);
-    });
-
-    return false;
-};
-
 ClassFile.prototype.run = function(task_done) {
     var cancelled = oIsFrozen(this) || !this.dl || this.dl.cancelled;
 
@@ -458,10 +435,6 @@ ClassFile.prototype.run = function(task_done) {
 
     dlmanager.fetchingFile = 1; /* Block the fetchingFile state */
     this.dl.retries = 0; /* set the retries flag */
-
-    if (!this.checkQuota(task_done)) {
-        return;
-    }
 
     // dlmanager.logger.info("dl_key " + this.dl.key);
     if (!GlobalProgress[this.gid].started) {

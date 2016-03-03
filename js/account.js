@@ -1145,12 +1145,11 @@ function checkUserLogin() {
 
 })(this);
 
-var attributeHandling = (function _userAttributeHandling() {
+(function _userAttributeHandling(scope) {
     "use strict";
 
     var ns = {};
     var logger = MegaLogger.getLogger('account');
-    ns._logger = logger;
     var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
 
     /**
@@ -1501,6 +1500,7 @@ var attributeHandling = (function _userAttributeHandling() {
 
 
     if (is_karma) {
+        ns._logger = logger;
         mega.attr = ns;
     }
     else {
@@ -1508,8 +1508,7 @@ var attributeHandling = (function _userAttributeHandling() {
             value: Object.freeze(ns)
         });
     }
-
-    return ns;
+    ns = undefined;
 
 })(this);
 

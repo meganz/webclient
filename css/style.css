@@ -5661,6 +5661,7 @@ th.grid-first-th {
 .undecryptable.nw-fm-tree-item .data-item-icon {
     background-image: url(../images/mega/nw-fm-sprite_v15.svg);
     background-repeat: no-repeat;
+    background-size: auto;
     background-position: -15px -2639px;
 }
 .undecryptable .grid-status-icon, .undecryptable .grid-status-icon.star {

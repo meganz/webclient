@@ -4067,7 +4067,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.linked {
     padding-right: 22px;
 }
-.nw-fm-tree-item .tree-item-icon {
+.nw-fm-tree-item .data-item-icon {
     top: 2px;
     right: 7px;
 }
@@ -5624,7 +5624,7 @@ th.grid-first-th {
 .file-status-icon {
     background-image: none;
 }
-.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .linked .tree-item-icon, .taken-down.nw-fm-tree-item .tree-item-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
+.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down.nw-fm-tree-item .data-item-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
     background-image: url(../images/mega/register-big-sprite-v8.png);
     background-repeat: no-repeat;
     background-position: -69px -963px;
@@ -5632,7 +5632,7 @@ th.grid-first-th {
 .grid-status-icon.star {
     background-position: -64px -961px;
 }
-.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .tree-item-icon {
+.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .data-item-icon {
     position: absolute;
     left: 6px;
     top: 6px;
@@ -5640,16 +5640,16 @@ th.grid-first-th {
     z-index: 10;
     width: 20px;
 }
-.tree-item-icon {
+.data-item-icon {
     left: auto;
     right: 5px;
     display: none;
     cursor: pointer;
 }
-.linked .tree-item-icon {
+.linked .data-item-icon {
     background-position: -106px -963px;
 }
-.taken-down.nw-fm-tree-item .tree-item-icon {
+.taken-down .data-item-icon, .taken-down.nw-fm-tree-item .data-item-icon {
     background-position: -146px -963px;
 }
 .taken-down .grid-status-icon, .taken-down .grid-status-icon.star {
@@ -5658,7 +5658,7 @@ th.grid-first-th {
 .taken-down .file-status-icon {
     background-position: -181px -963px;
 }
-.undecryptable.nw-fm-tree-item .tree-item-icon {
+.undecryptable.nw-fm-tree-item .data-item-icon {
     background-image: url(../images/mega/nw-fm-sprite_v15.svg);
     background-repeat: no-repeat;
     background-position: -15px -2639px;
@@ -5678,11 +5678,11 @@ th.grid-first-th {
 .grid-table .undecryptable .tranfer-filetype-txt, .undecryptable .file-block-title, .undecryptable .nw-fm-tree-folder, .undecryptable .shared-folder-name, .undecryptable .shared-folder-info {
     color: #FFA500;
 }
-.own-data .tree-item-icon {
+.own-data .data-item-icon {
     left: 3px;
     top: 2px;
 }
-.linked .tree-item-icon, .taken-down.nw-fm-tree-item .tree-item-icon, .undecryptable.nw-fm-tree-item .tree-item-icon  {
+.linked .data-item-icon, .taken-down.linked .data-item-icon, .undecryptable.nw-fm-tree-item .data-item-icon  {
     display: block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
@@ -9764,7 +9764,7 @@ span.orange {
     left: 13px;
     top: 13px;
 }
-.properties-dialog .tree-item-icon {
+.properties-dialog .data-item-icon {
     left: 225px;
     top: 13px;
 }

@@ -1238,7 +1238,7 @@ function MegaData()
                         el = 'a';
                         html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block ' + nodeType + ' ' + sExportLink + ' ' + additionClass + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
-                                    <span class="tree-item-icon"></span>\n\
+                                    <span class="data-item-icon"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type ' + fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name }) + '"><img alt="" /></span>\n\
@@ -1270,7 +1270,7 @@ function MegaData()
                                     <td width="120">' + time + '</td>\n\
                                     <td width="62" class="grid-url-field own-data ' + sExportLink + '">\n\
                                         <a class="grid-url-arrow"></a>\n\
-                                        <span class="tree-item-icon"></span>\n\
+                                        <span class="data-item-icon"></span>\n\
                                     </td>\n\
                                 </tr>';
                     }
@@ -2247,7 +2247,7 @@ function MegaData()
                                         <span  id="' + _a + htmlentities(curItemHandle) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                             <span ' + arrowIcon + '></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + fName + '</span>\n\
-                                            <span class="tree-item-icon"></span>\n\
+                                            <span class="data-item-icon"></span>\n\
                                         </span>\n\
                                         <ul id="' + _sub + curItemHandle + '" ' + ulc + '></ul>\n\
                                     </li>';

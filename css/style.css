@@ -5624,7 +5624,7 @@ th.grid-first-th {
 .file-status-icon {
     background-image: none;
 }
-.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .linked .tree-item-icon, .taken-down .tree-item-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
+.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .linked .tree-item-icon, .taken-down.nw-fm-tree-item .tree-item-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
     background-image: url(../images/mega/register-big-sprite-v8.png);
     background-repeat: no-repeat;
     background-position: -69px -963px;
@@ -5649,7 +5649,7 @@ th.grid-first-th {
 .linked .tree-item-icon {
     background-position: -106px -963px;
 }
-.taken-down .tree-item-icon {
+.taken-down.nw-fm-tree-item .tree-item-icon {
     background-position: -146px -963px;
 }
 .taken-down .grid-status-icon, .taken-down .grid-status-icon.star {
@@ -5658,7 +5658,7 @@ th.grid-first-th {
 .taken-down .file-status-icon {
     background-position: -181px -963px;
 }
-.undecryptable .tree-item-icon {
+.undecryptable.nw-fm-tree-item .tree-item-icon {
     background-image: url(../images/mega/nw-fm-sprite_v15.svg);
     background-repeat: no-repeat;
     background-position: -15px -2639px;
@@ -5682,7 +5682,7 @@ th.grid-first-th {
     left: 3px;
     top: 2px;
 }
-.linked .tree-item-icon, .taken-down .tree-item-icon, .undecryptable .tree-item-icon  {
+.linked .tree-item-icon, .taken-down.nw-fm-tree-item .tree-item-icon, .undecryptable.nw-fm-tree-item .tree-item-icon  {
     display: block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {

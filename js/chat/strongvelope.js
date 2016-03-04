@@ -1032,7 +1032,7 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype._trackParticipants = function(
         otherParticipants, includeParticipants, excludeParticipants) {
 
-        if (setutils.intersection(new Set(includeParticipants), new Set(excludeParticipants)).size > 0) {
+        if (setutils.intersection(includeParticipants, excludeParticipants).size > 0) {
             // There should be no intersection between these two sets
             return false;
         }
@@ -1547,8 +1547,8 @@ var strongvelope = {};
             if (this._inUse) {
                 // Sanity check whether everything matches up.
                 var myCheckParticipants = this._trackParticipants(
-                    this.otherParticipants, parsedMessage.includeParticipants,
-                    parsedMessage.excludeParticipants);
+                    this.otherParticipants, new Set(parsedMessage.includeParticipants),
+                    new Set(parsedMessage.excludeParticipants));
 
                 if (myCheckParticipants === false) {
                     // Sanity check, if the checked participants had an inconsistency

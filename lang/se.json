@@ -2913,8 +2913,8 @@
     "8423": "Fel vid skapandet av streaming-l\u00e4nk",
     "8424": "Fel n\u00e4r f\u00f6rvalt program skulle \u00f6ppnas.",
     "8425": "genom din webbl\u00e4sare",
-    "8426": "[S] MEGAsync: [\/ S] Enkel automatisk synkronisering mellan dina datorer och din MEGA Cloud Drive",
-    "8427": "[S] Flexibel: [\/ S] Synkronisera en mapp fr\u00e5n din dator till n\u00e5gon mapp i molnet. Synkronisera valfritt antal mappar parallellt.",
+    "8426": "[S] MEGAsync: [\/S] Enkel automatisk synkronisering mellan dina datorer och din MEGA Cloud Drive",
+    "8427": "[S] Flexibel: [\/S] Synkronisera en mapp fr\u00e5n din dator till n\u00e5gon mapp i molnet. Synkronisera valfritt antal mappar parallellt.",
     "8428": "Utnyttja 50GB moln lagring med ett gratis konto, kryptera alla dina filer med v\u00e5r gener\u00f6sa [A] PRO planer [\/A].",
     "8429": "Snabbare \u00f6verf\u00f6ring",
     "8430": "MEGAsync drar full nytta av MEGA: s kraftfulla infrastruktur och multi-anslutnings \u00f6verf\u00f6ringar.",
@@ -2968,6 +2968,14 @@
     "8588": "okrypterad fil",
     "8589": "Inga notiser",
     "8590": "okrypterbar mapp",
+    "8593": "Anv\u00e4nd Hitta dubletter funktionen f\u00f6r att s\u00f6ka efter flera kopior av en fil.",
+    "8594": "Hitta dubletter",
+    "8595": "Denna katalog kommer att krypteras s\u00e5 snart krypteringsnyckeln blir tillg\u00e4nglig.",
+    "8596": "Ditt PRO medlemskap g\u00e5r ut om 1 dag.",
+    "8597": "PRO medlemsplan l\u00f6per ut om % 1 dagar.",
+    "8598": "PRO medlemskap g\u00e5r snart ut.",
+    "8599": "Ta bort dubletter",
+    "8601": "Ladda ner med MEGAsync om det k\u00f6rs",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3005,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

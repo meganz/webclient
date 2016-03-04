@@ -698,12 +698,19 @@ function browserdetails(useragent) {
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
+    details.version = (useragent.match(RegExp("\\s+" + browser + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 
     // Determine if using a browser extension
-    details.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    details.isExtension = (current && is_extension || useragent.indexOf('megext') > -1);
+
+    if (useragent.indexOf(' MEGAext/') !== -1) {
+        var ver = useragent.match(/ MEGAext\/([\d.]+)/);
+
+        details.isExtension = ver && ver[1] || true;
+    }
 
     // Determine core engine.
     if (useragent.indexOf('webkit') > 0) {

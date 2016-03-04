@@ -57,8 +57,40 @@ function geoStaticpath(eu)
     return 'https://eu.static.mega.co.nz/3/';
 }
 
-if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
-        && parseInt(navigator.appVersion.match(/Chrome\/(\d+)\./)[1]) < 22) {
+if (is_chrome_firefox) {
+    var Cu = Components.utils;
+    var Cc = Components.classes;
+    var Ci = Components.interfaces;
+
+    Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
+    Cu['import']("resource://gre/modules/Services.jsm");
+
+    ['userAgent', 'appName', 'appVersion', 'platform', 'oscpu']
+        .forEach(function(k) {
+            var pref = 'general.' + k.toLowerCase() + '.override';
+
+            if (Services.prefs.prefHasUserValue(pref)
+                    && Services.prefs.getPrefType(pref) === 32) {
+
+                try {
+                    var value = Services.prefs.getCharPref(pref);
+                    Services.prefs.clearUserPref(pref);
+
+                    Object.defineProperty(navigator, k, {
+                        enumerable: true,
+                        value: Cc["@mozilla.org/network/protocol;1?name=http"]
+                                    .getService(Ci.nsIHttpProtocolHandler)[k]
+                    });
+                    Services.prefs.setCharPref(pref, value);
+                }
+                catch (e) {}
+            }
+        });
+
+    ua = navigator.userAgent.toLowerCase();
+}
+else if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
+        && parseInt(String(navigator.appVersion).split('Chrome/').pop()) < 22) {
     b_u = 1;
 }
 else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
@@ -126,21 +158,20 @@ if (!b_u) try
 {
     if (is_chrome_firefox)
     {
-        var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
-
-        Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
-        Cu['import']("resource://gre/modules/Services.jsm");
         XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
         (function(global) {
             global.loadSubScript = function(file,scope) {
-                if (global.d) {
-                    Services.scriptloader.loadSubScriptWithOptions(file,{
-                        target : scope||global, charset: "UTF-8",
-                        ignoreCache : true
+                var loader = Services.scriptloader;
+
+                if (global.d && loader.loadSubScriptWithOptions) {
+                    loader.loadSubScriptWithOptions(file, {
+                        charset: "UTF-8",
+                        ignoreCache: true,
+                        target: scope || global
                     });
                 } else {
-                    Services.scriptloader.loadSubScript(file,scope||global);
+                    loader.loadSubScript(file, scope || global);
                 }
             };
         })(this);

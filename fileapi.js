@@ -958,18 +958,36 @@ function mozClearStartupCache() {
 
 	XMLHttpRequest.prototype.open = function(meth, url)
 	{
+		var success = false;
+
 		try
 		{
 			var uri = Services.io.newURI(url, null, null);
 
-			if (/\.mega(?:\.co)?\.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
+			if (/\.mega(?:\.co)?\.nz$/.test(uri.host)) {
+				__XHR_Open.apply(this, arguments);
+				success = true;
+			}
 		}
 		catch(e) {}
 
-		var err = new Error('Blocked XHR to ' + url);
-		setTimeout(function() { throw err }, 4);
+		if (success) {
+			try {
+				var userAgent = navigator.userAgent;
+
+				if (scope.mozMEGAExtensionVersion) {
+					userAgent += ' MEGAext/' + scope.mozMEGAExtensionVersion;
+				}
+				this.setRequestHeader('User-Agent', userAgent, false);
+			}
+			catch (e) {}
+		}
+		else {
+			var err = new Error('Blocked XHR to ' + url);
+			setTimeout(function() { throw err }, 4);
+		}
 	};
-	// XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
+	XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
 
 	if ("nsISiteSecurityService" in Ci) {
 		mozRunAsync(function() {

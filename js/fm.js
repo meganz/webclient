@@ -3289,10 +3289,9 @@ function accountUI() {
             var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
 
-            // Show if using an extension e.g. "Chrome Extension on Windows" or "Firefox Extension on Linux"
+            // Show if using an extension e.g. "Firefox on Linux (+Extension)"
             if (browser.isExtension) {
-                browserName = browserName.replace('Firefox', 'Firefox ' + l[7683]);
-                browserName = browserName.replace('Chrome', 'Chrome ' + l[7683]);
+                browserName += ' (+' + l[7683] + ')';
             }
 
             // If not the current session
@@ -3312,7 +3311,7 @@ function accountUI() {
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent)
+                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
                     + '" src="' + staticpath + 'images/browser/' + browser.icon
                     + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
                     + '</span></td>'

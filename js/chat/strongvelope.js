@@ -1560,10 +1560,13 @@ var strongvelope = {};
                 messageCheckParticipants.delete(this.ownHandle);
                 if (!setutils.equal(myCheckParticipants, messageCheckParticipants)) {
                     logger.critical('Participant group in chat does not match up with expectation!');
-                    logger.error('Expected group: '
-                        + JSON.stringify(Array.from(myCheckParticipants))
-                        + '; group from message: '
-                        + JSON.stringify(Array.from(messageCheckParticipants)));
+
+                    if (d) {
+                        logger.error('Expected group: '
+                            + JSON.stringify(Array.from(myCheckParticipants))
+                            + '; group from message: '
+                            + JSON.stringify(Array.from(messageCheckParticipants)));
+                    }
 
                     return false;
                 }

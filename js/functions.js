@@ -4359,14 +4359,13 @@ if (typeof sjcl !== 'undefined') {
             return false;
         }
 
-        var set1array = Array.from(set1);
-        var idx = set1array.length;
-        while (idx--) {
-            if (!set2.has(set1array[idx])) {
-                return false;
+        var result = true;
+        set1.forEach(function _setEqualityIterator(item) {
+            if (!set2.has(item)) {
+                result = false;
             }
-        }
+        });
 
-        return true;
+        return result;
     };
 })(window);

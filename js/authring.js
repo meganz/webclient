@@ -55,7 +55,7 @@ var authring = (function () {
         FINGERPRINT_COMPARISON: 0x01,
         SIGNATURE_VERIFIED: 0x02
     };
-    var _ALLOWED_AUTHENTICATION_METHODS = new Set([0x00, 0x01, 0x02]);
+    var _ALLOWED_AUTHENTICATION_METHODS = [0x00, 0x01, 0x02];
 
 
     /**
@@ -68,7 +68,7 @@ var authring = (function () {
     ns.KEY_CONFIDENCE = {
         UNSURE: 0x00
     };
-    var _ALLOWED_KEY_CONFIDENCES = new Set([0x00]);
+    var _ALLOWED_KEY_CONFIDENCES = [0x00];
 
     // User property names used for different key types.
     ns._PROPERTIES = { 'Ed25519': 'authring',
@@ -127,8 +127,8 @@ var authring = (function () {
 
             // Skip obviously faulty records.
             if ((record.fingerprint.length % 20 !== 0)
-                    || !_ALLOWED_AUTHENTICATION_METHODS.has(record.method)
-                    || !_ALLOWED_KEY_CONFIDENCES.has(record.confidence)) {
+                    || _ALLOWED_AUTHENTICATION_METHODS.indexOf(record.method) === -1
+                    || _ALLOWED_KEY_CONFIDENCES.indexOf(record.confidence) === -1) {
                 continue;
             }
 
@@ -190,8 +190,8 @@ var authring = (function () {
 
             // Skip obviously faulty records.
             if ((result.value.fingerprint.length % 20 !== 0)
-                    || !_ALLOWED_AUTHENTICATION_METHODS.has(result.value.method)
-                    || !_ALLOWED_KEY_CONFIDENCES.has(result.value.confidence)) {
+                    || _ALLOWED_AUTHENTICATION_METHODS.indexOf(result.value.method) === -1
+                    || _ALLOWED_KEY_CONFIDENCES.indexOf(result.value.confidence) === -1) {
                 continue;
             }
 

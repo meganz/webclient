@@ -462,8 +462,16 @@ function MegaData()
 
     this.filterByParent = function(id) {
         this.filterBy(function(node) {
-            if ((node.name && node.p === id) || (node.name && node.p && node.p.length === 11 && id === 'shares'))
+            // if this is a contact, DONT check for .name
+            if (node.c) {
+                return (node.p === id) || (node.p && node.p.length === 11 && id === 'shares');
+            }
+            else if (
+                (node.name && node.p === id) ||
+                (node.name && node.p && node.p.length === 11 && id === 'shares')
+            ) {
                 return true;
+            }
         });
     };
 
@@ -971,6 +979,11 @@ function MegaData()
                 u_h = M.v[i].h;
                 contact = M.u[u_h];
 
+                // do not render oneself or invalid..
+                if (!contact || u_h === u_handle) {
+                    continue;
+                }
+
                 // chat is enabled?
                 if (chatIsReady) {
                     if (contact && contact.lastChatActivity > timems) {
@@ -1077,9 +1090,13 @@ function MegaData()
                 star = M.v[i].fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
+                    // Handle of initial share owner
+                    var ownersHandle = M.v[i].su;
+                    var fullContactName = mega.utils.fullUsername(ownersHandle);
+
                     cs = M.contactstatus(M.v[i].h);
                     contains = fm_contains(cs.files, cs.folders);
-                    u_h = M.v[i].p;
+                    u_h = ownersHandle || M.v[i].p;
                     rights = l[55];
                     rightsclass = ' read-only';
                     onlinestatus = M.onlineStatusClass(
@@ -1099,13 +1116,9 @@ function MegaData()
                         rightsclass = ' full-access';
                     }
 
-                    // Handle of initial share owner
-                    var ownersHandle = M.v[i].su;
-                    var fullContactName = mega.utils.fullUsername(ownersHandle);
-
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
-                        avatar = useravatar.contact(ownersHandle, 'nw-contact-avatar', 'span');
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
@@ -1121,7 +1134,7 @@ function MegaData()
                     else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
-                        avatar = useravatar.contact(ownersHandle, 'nw-contact-avatar');
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '">'
                             + '<td width="30"><span class="grid-status-icon ' + htmlentities(star)
@@ -1135,7 +1148,7 @@ function MegaData()
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div>'
                             + '<div class="fm-chat-user">'
                             + htmlentities(fullContactName) + '</div><div class="nw-contact-status"></div>'
-                            + '<div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h))
+                            + '<div class="fm-chat-user-status ' + htmlentities(u_h)
                             + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270">'
                             + '<div class="shared-folder-access'
@@ -1267,6 +1280,7 @@ function MegaData()
                         cc = [i, html, M.v[i].h, M.v[i].t];
                     }
                 }
+
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u, cc);
             }
         }// renderLayout END
@@ -1881,10 +1895,12 @@ function MegaData()
                         && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1
                         )
                     ) {
+                    var name = contacts[i].name && $.trim(contacts[i].name) || contacts[i].m;
+
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                    + htmlentities(contacts[i].name)
+                    + htmlentities(name)
                     + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
                 }
                 $('.fm-start-chat-dropdown').addClass('hidden');
@@ -2674,7 +2690,6 @@ function MegaData()
         if (n.p && n.p.length === 11 && !M.d[n.p]) {
             var u = this.u[n.p];
             if (u) {
-                u.name = u.name ? u.name : u.m;
                 u.h = u.u;
                 u.t = 1;
                 u.p = 'contacts';
@@ -3134,8 +3149,18 @@ function MegaData()
             lastName = lastName.value;
             firstName = firstName.value;
 
-            if (firstName.length > 0 && lastName.length > 0) {
-                self.u[userId].name = firstName + " " + lastName;
+
+            if (firstName.length > 0 || lastName.length > 0) {
+                self.u[userId].name = "";
+
+                if (firstName.length > 0) {
+                    self.u[userId].name = firstName;
+                }
+                if (lastName.length > 0) {
+                    self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
+                }
+            } else {
+                delete self.u[userId].name;
             }
             self.u[userId].firstName = firstName;
             self.u[userId].lastName = lastName;
@@ -3194,18 +3219,17 @@ function MegaData()
             userId = u.u;
             if (this.u[userId]) {
                 for (var key in u) {
-					if (this.u[userId][key] && key != 'name')  {
-					  this.u[userId][key] = u[key];
-					}
+                    // XXX: 0e443ca6 Hackpatch for contact names bug -- still needed?
+                    if (this.u[userId][key] && key !== 'name')  {
+                        this.u[userId][key] = u[key];
+                    }
                 }
-				
-				
+
+
                 u = this.u[userId];
             }
             else {
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
-
-                this.syncUsersFullname(userId);
             }
 
             this.u[userId].addChangeListener(this.onContactChanged);
@@ -3214,6 +3238,8 @@ function MegaData()
                 // convert MegaDataObjects -> JS
                 mDBadd('u', clone(u.toJS ? u.toJS() : u));
             }
+
+            this.syncUsersFullname(userId);
         }
     };
 
@@ -3647,6 +3673,8 @@ function MegaData()
     this.rubbishIco = function()
     {
         var i = 0;
+        var $icon = $('.nw-fm-left-icon.rubbish-bin');
+
         if (typeof M.c[M.RubbishID] !== 'undefined')
             for (var a in M.c[M.RubbishID])
                 i++;
@@ -3657,10 +3685,21 @@ function MegaData()
             $('.fm-tree-header.recycle-item').removeClass('recycle-notification expanded contains-subfolders');
             $('.fm-tree-header.recycle-item').prev('.fm-connector-first').removeClass('active');
         }
-        if (Object.keys(this.rubNodes).length == 0)
-            $('.nw-fm-left-icon.rubbish-bin').removeClass('filled')
-        else
-            $('.nw-fm-left-icon.rubbish-bin').addClass('filled')
+        if (Object.keys(this.rubNodes).length == 0) {
+            $icon.removeClass('filled glow')
+        }
+        else {
+            if (!$icon.hasClass('filled')) {
+                $icon.addClass('filled');
+            } 
+            else if (!$icon.hasClass('glow')) {
+                $icon.addClass('glow');
+            } 
+            else {
+                $icon.removeClass('glow');
+            }
+        }
+            
     };
 
     this.nodeAttr = function(attrs) {
@@ -4121,7 +4160,7 @@ function MegaData()
             args = undefined;
         };
 
-        if (z || preview) {
+        if (z || preview || !fmconfig.dlThroughMEGAsync) {
             return webdl();
         }
 
@@ -6894,8 +6933,6 @@ function process_u(u) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {
             if (u[i].c === 1) {
-                u[i].name = u[i].name ? u[i].name : u[i].m;
-
                 u[i].h = u[i].u;
                 u[i].t = 1;
                 u[i].p = 'contacts';

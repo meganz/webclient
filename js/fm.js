@@ -3292,10 +3292,9 @@ function accountUI() {
             var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
 
-            // Show if using an extension e.g. "Chrome Extension on Windows" or "Firefox Extension on Linux"
+            // Show if using an extension e.g. "Firefox on Linux (+Extension)"
             if (browser.isExtension) {
-                browserName = browserName.replace('Firefox', 'Firefox ' + l[7683]);
-                browserName = browserName.replace('Chrome', 'Chrome ' + l[7683]);
+                browserName += ' (+' + l[7683] + ')';
             }
 
             // If not the current session
@@ -3315,7 +3314,7 @@ function accountUI() {
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent)
+                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
                     + '" src="' + staticpath + 'images/browser/' + browser.icon
                     + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
                     + '</span></td>'
@@ -3698,6 +3697,10 @@ function accountUI() {
                 mega.config.set('ul_skipIdentical', M.account.ul_skipIdentical);
                 delete M.account.ul_skipIdentical;
             }
+            if (typeof M.account.dlThroughMEGAsync !== 'undefined') {
+                mega.config.set('dlThroughMEGAsync', M.account.dlThroughMEGAsync);
+                delete M.account.dlThroughMEGAsync;
+            }
 
             if (typeof M.account.uisorting !== 'undefined') {
                 mega.config.set('uisorting', M.account.uisorting);
@@ -3984,6 +3987,29 @@ function accountUI() {
             else if (id == 'rad5')
                 M.account.ul_skipIdentical = 0;
             $('.ulskip').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+        });
+
+        $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
+        i = 19;
+        if (fmconfig.dlThroughMEGAsync) {
+            i = 18;
+        }
+        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        $('.dlThroughMEGAsync input').unbind('click');
+        $('.dlThroughMEGAsync input').bind('click', function(e)
+        {
+            var id = $(this).attr('id');
+            if (id === 'rad18') {
+                M.account.dlThroughMEGAsync = 1;
+            }
+            else if (id === 'rad19') {
+                M.account.dlThroughMEGAsync = 0;
+            }
+            $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
@@ -6849,16 +6875,16 @@ function sectionUIopen(id) {
     }
 
     if (!folderlink) {
-        $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header span').text(headertxt);
+        $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
     }
 
     {
         // required tricks to make the conversations work with the old UI HTML/css structure
         if (id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
-            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').addClass('hidden');
+            $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
             $('.fm-main.default > .fm-left-panel').addClass('hidden');
         } else {
-            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').removeClass('hidden');
+            $('.fm-left-panel .nw-tree-panel-header').removeClass('hidden');
             $('.fm-main.default > .fm-left-panel').removeClass('hidden');
         }
 
@@ -7723,6 +7749,7 @@ function checkIfContactExists(email) {
             // Check if the users are already contacts by comparing email addresses of known contacts and the one entered
             if (email === userContacts[contact].m) {
                 userIsAlreadyContact = true;
+                break;
             }
         }
     }
@@ -9539,7 +9566,7 @@ function propertiesDialog(close)
         pd.addClass('shared shared-with-me ' + zclass)
     }
 
-    var p = {}, user = M.d[n.p] || {};
+    var p = {}, user = Object(M.d[n.su || n.p]);
     if (d) console.log('propertiesDialog', n, user);
     if ((filecnt + foldercnt) == 1)
     {
@@ -9628,7 +9655,7 @@ function propertiesDialog(close)
                 }
                 p.t4 = rights;
                 p.t6 = l[5905];
-                p.t7 = user.name;
+                p.t7 = mega.utils.fullUsername(user.h);
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -10463,13 +10490,13 @@ function fm_resize_handler() {
 mega.utils.fullUsername = function username(userHandle) {
 
     // User name
-    var result = '';
+    var result;
 
-    result = (M.d[userHandle].firstName && M.d[userHandle].lastName)
-        ? M.d[userHandle].firstName + " " + M.d[userHandle].lastName
-        : M.d[userHandle].m;
+    if (M.d[userHandle]) {
+        result = M.d[userHandle].name && $.trim(M.d[userHandle].name) || M.d[userHandle].m;
+    }
 
-    return result;
+    return String(result);
 };
 
 function sharedFolderUI() {
@@ -10794,11 +10821,11 @@ function contactUI() {
         });
 
         if (!megaChatIsDisabled) {
-            
+
             // Bind the "Start conversation" button
             $('.fm-start-conversation').unbind('click.megaChat');
             $('.fm-start-conversation').bind('click.megaChat', function() {
-                
+
                 window.location = '#fm/chat/' + u_h;
                 return false;
             });

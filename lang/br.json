@@ -2752,7 +2752,7 @@
     "7706": "O seu MEGA voucher para % 1 \u20ac foi resgatado com sucesso",
     "7707": "Seu saldo agora \u00e9 1% \u20ac.",
     "7708": "Sugerimos o plano% 1 com base no saldo da sua conta.",
-    "7709": "Clique [S]UPGRADE COMPLETO[\/ S] e desfrute do seu novo plano de 1%.",
+    "7709": "Clique [S]UPGRADE COMPLETO[\/S] e desfrute do seu novo plano de 1%.",
     "7710": "UPGRADE COMPLETO",
     "7711": "Escolha outro plano",
     "7712": "Por favor fa\u00e7a o login ou registre-se para resgatar o seu voucher.",
@@ -2914,7 +2914,7 @@
     "8424": "Erro ao abrir o aplicativo padr\u00e3o.",
     "8425": "atrav\u00e9s do seu navegador",
     "8426": "[S]MEGAsync:[\/S] F\u00e1cil sincroniza\u00e7\u00e3o autom\u00e1tica entre seus computadores e sua unidade de nuvem MEGA",
-    "8427": "[S]Flex\u00edvel:[\/ S] sincronizar qualquer pasta do seu PC para qualquer pasta na nuvem. Sincronizar qualquer n\u00famero de pastas em paralelo.",
+    "8427": "[S]Flex\u00edvel:[\/S] sincronizar qualquer pasta do seu PC para qualquer pasta na nuvem. Sincronizar qualquer n\u00famero de pastas em paralelo.",
     "8428": "Tire vantagem de 50GB de armazenamento em nuvem com uma conta gratuita e ser capaz de criptografar todos os seus arquivos com os nossos generosos [A]planos PRO[\/A].",
     "8429": "Velocidades de transfer\u00eancia mais r\u00e1pidas",
     "8430": "MEGAsync tira o m\u00e1ximo partido das transfer\u00eancias de infra-estrutura e multi-liga\u00e7\u00e3o de alta pot\u00eancia da MEGA.",
@@ -2968,6 +2968,14 @@
     "8588": "arquivo n\u00e3o decodificado",
     "8589": "Sem notifica\u00e7\u00f5es",
     "8590": "pasta n\u00e3o criptograf\u00e1vel",
+    "8593": "Use a ferramenta de busca de arquivos duplicados para encontrar m\u00faltiplas c\u00f3pias de um arquivo.",
+    "8594": "Encontrar duplicados",
+    "8595": "Esta pasta ser\u00e1 decodificada assim que uma chave criptografica estar dispon\u00edvel.",
+    "8596": "Seu plano PRO vai expirar em 1 dia.",
+    "8597": "Seu plano PRO vai expirar em %1 dias.",
+    "8598": "Plano PRO encerrar\u00e1 em breve",
+    "8599": "Deletar duplicados",
+    "8601": "Download com MEGAsync se estiver em execu\u00e7\u00e3o",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3005,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

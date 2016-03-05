@@ -327,7 +327,7 @@ var useravatar = (function() {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        var letters = user.firstname || user.name || user.m;
+        var letters = mega.utils.fullUsername(user.u);
 
         return _letters(letters, user.u, className, element);
     };

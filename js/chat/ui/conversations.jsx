@@ -394,9 +394,15 @@ var ConversationsApp = React.createClass({
         var startChatIsDisabled = !presence || presence === "offline";
 
 
+        var leftPanelStyles = {};
+
+        if (fmconfig && fmconfig.leftPaneWidth) {
+            leftPanelStyles.width = fmconfig.leftPaneWidth;
+        }
+
         return (
             <div className="conversationsApp" key="conversationsApp">
-                <div className="fm-left-panel">
+                <div className="fm-left-panel" style={leftPanelStyles}>
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
@@ -419,8 +425,8 @@ var ConversationsApp = React.createClass({
                     </div>
 
 
-                    <div className="fm-tree-panel manual-tree-panel-scroll-management">
-                        <utils.JScrollPane>
+                    <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
+                        <utils.JScrollPane  style={leftPanelStyles}>
                             <div className="content-panel conversations">
                                 <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
                             </div>

@@ -1296,8 +1296,10 @@ function checkUserLogin() {
             }
             else {
                 // Got back an error (a number).
-                logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
-                            attribute, userhandle, res);
+                if (res !== -9) {
+                    logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
+                        attribute, userhandle, res);
+                }
                 thePromise.reject(res);
             }
 
@@ -1501,7 +1503,7 @@ function checkUserLogin() {
 
 })(this);
 
-var attribCache = new IndexedDBKVStorage('attrib');
+var attribCache = new IndexedDBKVStorage('attrib_v2');
 attribCache.syncNameTimer = {};
 
 /**
@@ -1523,16 +1525,7 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
         .always(function _uaPacketParser() {
             if (attrName === 'firstname'
                     || attrName === 'lastname') {
-
-                // behind a timer, so that if we get action-packets for both
-                // first and last name we won't fire syncUsersFullname twice
-                if (attribCache.syncNameTimer[userHandle]) {
-                    clearTimeout(attribCache.syncNameTimer[userHandle]);
-                }
-                attribCache.syncNameTimer[userHandle] = setTimeout(function() {
-                    attribCache.syncNameTimer[userHandle] = null;
-                    M.syncUsersFullname(userHandle);
-                }, 350);
+                M.syncUsersFullname(userHandle);
             }
             else if (ownActionPacket) {
                 // atm only first/last name is processed throguh own-action-packet

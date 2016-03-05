@@ -148,11 +148,14 @@ var useravatar = (function() {
         var found = false;
         // User is an email, we should look if the user
         // exists, if it does exists we use the user Object.
-        M.u.forEach(function(contact, u) {
+        M.u.every(function(contact, u) {
             if (M.u[u].m === email) {
                 // Found the user object
                 found = ns.contact(M.u[u], className, element);
-                throw StopIteration;
+                return false;
+            }
+            else {
+                return true;
             }
         });
 
@@ -184,7 +187,6 @@ var useravatar = (function() {
         }
 
         function isUserVerified_Callback() {
-
             var verifyState = u_authring.Ed25519[userHandle] || {};
             var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
 
@@ -288,7 +290,6 @@ var useravatar = (function() {
      * @returns {String}
      */
     ns.contact = function(user, className, element) {
-
         if (!className) {
             className = 'avatar';
         }

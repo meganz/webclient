@@ -419,10 +419,12 @@ var ConversationsApp = React.createClass({
                     </div>
 
 
-                    <div className="fm-tree-panel">
-                        <div className="content-panel conversations">
-                            <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
-                        </div>
+                    <div className="fm-tree-panel manual-tree-panel-scroll-management">
+                        <utils.JScrollPane>
+                            <div className="content-panel conversations">
+                                <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
+                            </div>
+                        </utils.JScrollPane>
                     </div>
                 </div>
                 <div className="fm-right-files-block">

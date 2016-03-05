@@ -123,10 +123,10 @@ var MEGA_USER_STRUCT = {
     "p": undefined,
     "presence": undefined,
     "presenceMtime": undefined,
-    "displayColor": undefined,
-    "shortName": undefined,
-    "firstName": undefined,
-    "lastName": undefined,
+    "displayColor": NaN,
+    "shortName": "",
+    "firstName": "",
+    "lastName": "",
     "ts": undefined
 };
 
@@ -142,7 +142,12 @@ function MegaData()
         this.d = {};
         this.v = [];
         this.c = {};
+
         this.u = new MegaDataMap();
+        var self = this;
+        this.u.addChangeListener(function() {
+            self.onContactsChanged();
+        });
 
         this.t = {};
         this.opc = {};
@@ -496,24 +501,28 @@ function MegaData()
             M.c.contacts[u_handle] = 1;
         }
 
+        if (d) {
+            console.time('M.avatars');
+        }
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
             if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
                 waitingPromises.push(
-                    mega.attr.get(u, 'a', true, false, function (res) {
-                        if (typeof res !== 'number' && res.length > 5) {
-                            var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
-                            avatars[u] = {
-                                data: blob,
-                                url: myURL.createObjectURL(blob)
-                            };
-                        }
-                        useravatar.loaded(u);
-                    })
-                    .fail(function() {
-                        delete avatars[u];
-                        useravatar.loaded(u);
-                    })
+                    mega.attr.get(u, 'a', true, false)
+                        .done(function (res) {
+                            if (typeof res !== 'number' && res.length > 5) {
+                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
+                                avatars[u] = {
+                                    data: blob,
+                                    url: myURL.createObjectURL(blob)
+                                };
+                            }
+                            useravatar.loaded(u);
+                        })
+                        .fail(function() {
+                            delete avatars[u];
+                            useravatar.loaded(u);
+                        })
                 );
             }
         });
@@ -524,6 +533,10 @@ function MegaData()
             ).always(function() {
                 // trigger UI refresh
                 M.renderAvatars();
+
+                if (d) {
+                    console.timeEnd('M.avatars');
+                }
             });
 
 
@@ -3114,13 +3127,6 @@ function MegaData()
                 }
 
                 if (typeof obj.value !== 'string' || !obj.value) {
-                    if (d) {
-                        // Inherit the logger for mega.attr.get
-                        var logger = MegaLogger.getLogger('account');
-
-                        logger.debug('Attribute "%s" for user "%s" cannot be decoded: "%s"',
-                                        obj.name, userId, obj.value);
-                    }
                     obj.value = '';
                 }
             });
@@ -3140,28 +3146,39 @@ function MegaData()
 
                 $('.user-name').text(u_attr.firstname);
             }
-
-            if (fminitialized) {
-                if (
-                    typeof $.sortTreePanel !== 'undefined' &&
-                    typeof $.sortTreePanel.contacts !== 'undefined' &&
-                    $.sortTreePanel.contacts.by === 'status'
-                ) {
-                    M.contacts(); // we need to resort
-                }
-
-                if (window.location.hash === "#fm/" + userId) {
-                    // re-render the contact view page if the presence had changed
-                    contactUI();
-                }
-                else if (window.location.hash === "#fm/contacts") {
-                    // re-render the contact view page if the presence had changed
-                    M.openFolder('contacts', true);
-                }
-            }
         });
     },
 
+    /**
+     * Callback, that would be called when a contact is changed.
+     */
+    this.onContactChanged = function(contact) {
+        if (fminitialized) {
+            if (window.location.hash === "#fm/" + contact.u) {
+                // re-render the contact view page if the presence had changed
+                contactUI();
+            }
+        }
+    };
+    /**
+     * Callback, that would be called when M.u had changed.
+     */
+    this.onContactsChanged = function() {
+        if (fminitialized) {
+            if (
+                typeof $.sortTreePanel !== 'undefined' &&
+                typeof $.sortTreePanel.contacts !== 'undefined' &&
+                $.sortTreePanel.contacts.by === 'status'
+            ) {
+                M.contacts(); // we need to resort
+            }
+
+            if (window.location.hash === "#fm/contacts") {
+                // re-render the contact view page if the presence had changed
+                M.openFolder('contacts', true);
+            }
+        }
+    };
     /**
      * addUser, updates global .u variable with new user data
      * adds/updates user indexedDB with newest user data
@@ -3190,6 +3207,8 @@ function MegaData()
 
                 this.syncUsersFullname(userId);
             }
+
+            this.u[userId].addChangeListener(this.onContactChanged);
 
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS

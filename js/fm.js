@@ -128,6 +128,7 @@ function initTransferScroll()
 
 function initTreeScroll()
 {
+    if (d) console.time('treeScroll');
     /**
      if (localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
      {
@@ -135,7 +136,8 @@ function initTreeScroll()
      }
      **/
 
-    $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
+    // .fm-tree-panel's with .manual-tree-panel-scroll-management would manage their jscroll pane by themself.
+    $('.fm-tree-panel:not(.manual-tree-panel-scroll-management)').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
     // $('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
     // $('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
     // {
@@ -146,7 +148,8 @@ function initTreeScroll()
     // if (t == $.scroller) treeDroppable();
     // },100);
     // });
-    jScrollFade('.fm-tree-panel');
+    jScrollFade('.fm-tree-panel:not(.manual-tree-panel-scroll-management)');
+    if (d) console.timeEnd('treeScroll');
 }
 
 var ddtreedisabled = {};
@@ -6553,7 +6556,7 @@ function treeUI()
     //console.error('treeUI');
     if (d)
         console.time('treeUI');
-    $('.fm-tree-panel .nw-fm-tree-item').draggable(
+    $('.fm-tree-panel .nw-fm-tree-item:visible').draggable(
         {
             revert: true,
             containment: 'document',
@@ -6607,7 +6610,7 @@ function treeUI()
         'ul.conversations-pane > li,' +
         '.messages-block,' +
         '.nw-contact-item'
-    ).droppable({
+    ).filter(":visible").droppable({
             tolerance: 'pointer',
             drop: function(e, ui)
             {
@@ -6634,8 +6637,8 @@ function treeUI()
         }
     });
 
-    $('.fm-tree-panel .nw-fm-tree-item').unbind('click contextmenu');
-    $('.fm-tree-panel .nw-fm-tree-item').bind('click contextmenu', function(e) {
+    $('.fm-tree-panel .nw-fm-tree-item:visible').unbind('click.treeUI contextmenu.treeUI');
+    $('.fm-tree-panel .nw-fm-tree-item:visible').bind('click.treeUI contextmenu.treeUI', function(e) {
         var id = $(this).attr('id').replace('treea_', '');
         if (e.type === 'contextmenu') {
             $('.nw-fm-tree-item').removeClass('dragover');

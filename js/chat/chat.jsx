@@ -716,6 +716,10 @@ Chat.prototype.init = function() {
     var appContainer = document.querySelector('.section.conversations');
 
     var initAppUI = function() {
+        if (d) {
+            console.time('chatReactUiInit');
+        }
+
         self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} contacts={M.u} />;
 
         self.$conversationsAppInstance = ReactDOM.render(
@@ -724,6 +728,9 @@ Chat.prototype.init = function() {
         );
 
         self.renderConversationsApp();
+        if (d) {
+            console.timeEnd('chatReactUiInit');
+        }
     };
 
     if (!appContainer) {

@@ -45,7 +45,12 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                 self.name,
                 u_handle,
                 {
-                    kv: { key: { keyPath: "k"   }}
+                    kv: {
+                        key: { keyPath: "k"   },
+                        indexes: {
+                            k: { unique: true }
+                        }
+                    }
                 },
                 {
                     plugins: MegaDB.DB_PLUGIN.ENCRYPTION
@@ -54,9 +59,12 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
             self.dbName = self.name + "_" + u_handle;
 
             self.db.one('onDbStateReady', function __onDbStateReady() {
-                promise.linkDoneAndFailTo(
-                    fn.apply(self, args)
-                );
+                self._prefillMemCache()
+                    .always(function() {
+                        promise.linkDoneAndFailTo(
+                            fn.apply(self, args)
+                        );
+                    });
             });
             self.db.one('onDbStateFailed', function __onDbStateFailed() {
                 self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
@@ -68,9 +76,12 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                 promise.reject(ENOENT);
             }
             else if (self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
-                promise.linkDoneAndFailTo(
-                    fn.apply(self, args)
-                );
+                self._prefillMemCache()
+                    .always(function() {
+                        promise.linkDoneAndFailTo(
+                            fn.apply(self, args)
+                        );
+                    });
             }
             else if (self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
                 // Most likely, Firefox in incognito mode.
@@ -79,9 +90,12 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
             else {
                 // If it's OPENING state, wait for either success or failure
                 self.db.one('onDbStateReady', function __onDbStateReady() {
-                    promise.linkDoneAndFailTo(
-                        fn.apply(self, args)
-                    );
+                    self._prefillMemCache()
+                        .always(function() {
+                            promise.linkDoneAndFailTo(
+                                fn.apply(self, args)
+                            );
+                        });
                 });
                 self.db.one('onDbStateFailed', function __onDbStateFailed() {
                     self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
@@ -94,6 +108,51 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
         return promise;
     };
 };
+
+/**
+ * This function would be called after the db is connected and would prefill the ._memCache with all values, to save
+ * some CPU cycles from indexedDB lookups later.
+ *
+ * @private
+ */
+IndexedDBKVStorage.prototype._prefillMemCache = function() {
+    var self = this;
+
+    // already filled.
+    if (Object.keys(self._memCache).length > 0) {
+        return MegaPromise.resolve();
+    }
+    if (self._cacheIsBeingPrefilled) {
+        return this._cacheIsBeingPrefilled;
+    }
+
+    var done = false;
+    var masterPromise = this._cacheIsBeingPrefilled = createTimeoutPromise(function() {
+        return done === true;
+    }, 100, 10000);
+
+    self.db
+        .query('kv')
+        .execute()
+        .done(function(r) {
+            if (r && Array.isArray(r)) {
+                r.forEach(function(obj) {
+                    self._memCache[obj.k] = obj.v;
+                });
+                done = true;
+                masterPromise.verify();
+            }
+        });
+
+    masterPromise.always(function() {
+        delete self._cacheIsBeingPrefilled;
+    });
+
+    return masterPromise;
+
+};
+
+/**
 
 /**
  * Set item
@@ -144,7 +203,7 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
         return MegaPromise.resolve(self._memCache[k]);
     }
 
-    self.db.get(
+    self.db.getByIndex(
         'kv',
         k
     )
@@ -157,7 +216,7 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
                 promise.resolve(r.v);
             }
         })
-        .fail(function __setItemFail() {
+        .fail(function __getItemFail() {
             promise.reject();
         });
 

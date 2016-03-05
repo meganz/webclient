@@ -657,6 +657,10 @@ var authring = (function () {
             }
         }
 
+        if (d) {
+            console.time('authring.initAuthenticationSystem');
+        }
+
         // The promise to return.
         var masterPromise = ns._initialisingPromise = new MegaPromise();
 
@@ -688,6 +692,11 @@ var authring = (function () {
             })
             .fail(function() {
                 ns._initialisingPromise = false;
+            })
+            .always(function() {
+                if (d) {
+                    console.timeEnd('authring.initAuthenticationSystem');
+                }
             });
 
         return masterPromise;

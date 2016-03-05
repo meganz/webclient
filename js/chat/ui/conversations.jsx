@@ -382,7 +382,12 @@ var ConversationsApp = React.createClass({
         this.handleWindowResize();
     },
     handleWindowResize: function() {
-        
+        // small piece of what is done in fm_resize_handler...
+        $('.fm-right-files-block, .fm-right-account-block')
+            .filter(':visible')
+            .css({
+                'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+            });
     },
     render: function() {
         var self = this;

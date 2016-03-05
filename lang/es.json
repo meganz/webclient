@@ -2968,6 +2968,13 @@
     "8588": "fichero no desencriptable",
     "8589": "Sin notificaciones",
     "8590": "carpeta no desencriptable",
+    "8593": "Usa la funcionalidad de localizar duplicados para buscar m\u00faltiples copias de un archivo.",
+    "8594": "Encontrar duplicados",
+    "8595": "Esta carpeta ser\u00e1 desencriptada tan pronto como se disponga de la clave de desencriptado.",
+    "8596": "Su plan de membres\u00eda PRO caducar\u00e1 en 1 d\u00eda.",
+    "8597": "Su plan de membres\u00eda PRO caducar\u00e1 en %1 d\u00edas.",
+    "8598": "Su plan de membres\u00eda PRO caducar\u00e1 en breve",
+    "8601": "Descargar con MEGAsync si est\u00e1 en funcionamiento",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3004,12 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599
     }
 }

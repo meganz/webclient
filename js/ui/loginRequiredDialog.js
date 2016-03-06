@@ -41,7 +41,7 @@
                     .safeHTML('<p>@@</p>', options.textContent || l[7679]);
 
                 icon = $(this.$dialog)
-                    .addClass('warning-dialog-ai');
+                    .addClass('warning-dialog-a login').removeClass('loginrequired-dialog');
 
                 $('.fm-dialog-button.pro-login', this.$dialog)
                     .rebind('click.loginrequired', function() {
@@ -64,7 +64,7 @@
                 loginRequiredDialog.hide();
                 loginRequiredDialog = undefined;
                 if (icon) {
-                    icon.removeClass('warning-dialog-ai');
+                    icon.removeClass('warning-dialog-a login').addClass('loginrequired-dialog');
                     icon = undefined;
                 }
                 closeDialog();
@@ -84,6 +84,7 @@
             .addClass('active');
 
         $('.fm-dialog-overlay').removeClass("hidden");
+        $('body').addClass("overlayed");
 
         $dialog.css({
             'margin-left': -1 * ($dialog.outerWidth() / 2),

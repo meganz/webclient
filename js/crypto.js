@@ -211,9 +211,6 @@ var crypt = (function () {
 
     /**
      * Used for caching .getPubKey requests which are in progress (by reusing MegaPromises)
-     *
-     * @type {String, MegaPromise}
-     * @private
      */
     ns._pubKeyRetrievalPromises = {};
 
@@ -662,8 +659,11 @@ var crypt = (function () {
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
 
-        // Show warning dialog
-        mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
+        if (localStorage.hideCryptoWarningDialogs !== '1') {
+            mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+        }
 
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
@@ -695,8 +695,11 @@ var crypt = (function () {
                + ' for user ' + userHandle
         });
 
-        // Show warning dialog.
-        mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
+        if (localStorage.hideCryptoWarningDialogs !== '1') {
+            mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+        }
 
         logger.error(keyType + ' signature does not verify for user '
                      + userHandle + '!');
@@ -1777,7 +1780,7 @@ function api_proc(q) {
     };
 
     // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
-    if (loadingInitDialog.active) {
+    // if (loadingInitDialog.active) {
         var needProgress = false;
 
         // check whether this channel queue will need the progress
@@ -1823,7 +1826,7 @@ function api_proc(q) {
                 }
             };
         }
-    }
+    // }
 
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {

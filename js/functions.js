@@ -698,12 +698,19 @@ function browserdetails(useragent) {
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
+    details.version = (useragent.match(RegExp("\\s+" + browser + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 
     // Determine if using a browser extension
-    details.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    details.isExtension = (current && is_extension || useragent.indexOf('megext') > -1);
+
+    if (useragent.indexOf(' MEGAext/') !== -1) {
+        var ver = useragent.match(/ MEGAext\/([\d.]+)/);
+
+        details.isExtension = ver && ver[1] || true;
+    }
 
     // Determine core engine.
     if (useragent.indexOf('webkit') > 0) {
@@ -4300,3 +4307,103 @@ if (typeof sjcl !== 'undefined') {
     // export
     scope.mega.Share = Share;
 })(jQuery, window);
+
+
+
+(function(scope) {
+    /** Utilities for Set operations. */
+    scope.setutils = {};
+
+    /**
+     * Helper function that will return an intersect Set of two sets given.
+     *
+     * @private
+     * @param {Set} set1
+     *     First set to intersect with.
+     * @param {Set} set2
+     *     Second set to intersect with.
+     * @return {Set}
+     *     Intersected result set.
+     */
+    scope.setutils.intersection = function(set1, set2) {
+
+        var result = new Set();
+        set1.forEach(function _setIntersectionIterator(item) {
+            if (set2.has(item)) {
+                result.add(item);
+            }
+        });
+
+        return result;
+    };
+
+
+    /**
+     * Helper function that will return a joined Set of two sets given.
+     *
+     * @private
+     * @param {Set} set1
+     *     First set to join with.
+     * @param {Set} set2
+     *     Second set to join with.
+     * @return {Set}
+     *     Joined result set.
+     */
+    scope.setutils.join = function(set1, set2) {
+
+        var result = new Set(set1);
+        set2.forEach(function _setJoinIterator(item) {
+            result.add(item);
+        });
+
+        return result;
+    };
+
+    /**
+     * Helper function that will return a Set from set1 subtracting set2.
+     *
+     * @private
+     * @param {Set} set1
+     *     First set to subtract from.
+     * @param {Set} set2
+     *     Second set to subtract.
+     * @return {Set}
+     *     Subtracted result set.
+     */
+    scope.setutils.subtract = function(set1, set2) {
+
+        var result = new Set(set1);
+        set2.forEach(function _setSubtractIterator(item) {
+            result.delete(item);
+        });
+
+        return result;
+    };
+
+    /**
+     * Helper function that will compare two Sets for equality.
+     *
+     * @private
+     * @param {Set} set1
+     *     First set to compare.
+     * @param {Set} set2
+     *     Second set to compare.
+     * @return {Boolean}
+     *     `true` if the sets are equal, `false` otherwise.
+     */
+    scope.setutils.equal = function(set1, set2) {
+
+        if (set1.size !== set2.size) {
+            return false;
+        }
+
+        var result = true;
+        set1.forEach(function _setEqualityIterator(item) {
+            if (!set2.has(item)) {
+                result = false;
+            }
+        });
+
+        return result;
+    };
+})(window);

@@ -607,6 +607,10 @@ var dlmanager = {
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
         var $button = $dialog.find('.fm-dialog-close');
         var $overlay = $('.fm-dialog-overlay');
+
+        if (!time && typeof this._lastQuotaTimeout == "number") {
+            time = this._lastQuotaTimeout - unixtime();
+        }
     
         // make sure time is indeed a number
         time = parseInt(time);
@@ -641,6 +645,8 @@ var dlmanager = {
     
             $txt.text(secondsToTimeShort(--time));
         }, 1000);
+
+        this._lastQuotaTimeout = unixtime() + time;
     },
 
 
@@ -756,13 +762,16 @@ function fm_tfspause(gid, overquota) {
 
 function fm_tfsresume(gid) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
+        var $tr = $('.transfer-table tr#' + gid);
         if (gid[0] === 'u') {
             ulQueue.resume(gid);
         }
         else {
+            if ($tr.is('.overquota')) {
+                return dlmanager.showOverQuotaDialog();
+            }
             dlQueue.resume(gid);
         }
-        var $tr = $('.transfer-table tr#' + gid);
         $tr.removeClass('paused');
         $tr.find('span.transfer-type').removeClass('paused overquota');
 

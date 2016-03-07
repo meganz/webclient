@@ -5,8 +5,6 @@
  * @constructor
  */
 function MegaDBEncryption(mdbInstance) {
-    assert(u_k, 'missing master key');
-
     var self = this;
 
     var logger = self.logger = MegaLogger.getLogger("mDBEncryptionPlugin", {
@@ -36,6 +34,10 @@ function MegaDBEncryption(mdbInstance) {
     // PlugIn Initialization
     this.setup = function MegaDBEncryptionSetup(mdbServerInstance) {
         var promise = new MegaPromise();
+
+        if (!u_k) {
+            return MegaPromise.reject(new Error('Missing MasterKey.'));
+        }
 
         mdbServerInstance.getUData('enckey')
             .then(function __enckey(data) {

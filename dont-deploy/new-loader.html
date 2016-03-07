@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../css/user-card.css" />
+<link rel="stylesheet" type="text/css" href="../css/avatars.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css" />
+<link rel="stylesheet" type="text/css" href="../css/buttons.css" />
+<link rel="stylesheet" type="text/css" href="../css/dropdowns.css" />
+<link rel="stylesheet" type="text/css" href="../css/popups.css" />
+<link rel="stylesheet" type="text/css" href="../css/spinners.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-messages.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-textarea.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-typing.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-left-pane.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-feedback.css" />
+<link rel="stylesheet" type="text/css" href="../css/chat-common.css" />
+<link rel="stylesheet" type="text/css" href="../css/retina-images.css" />
+<link rel="stylesheet" type="text/css" href="../css/rtl.css" />
+<link rel="stylesheet" type="text/css" href="../css/media-print.css" />
+<script type="text/javascript" src="../js/vendor/jquery-2.2.0.js"></script>
+<script type="text/javascript" src="../js/vendor/jquery-ui-1.11.4.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function ()
+{
+    $('.loading-info li').removeClass('loading loaded');
+    $('.loading-spinner').removeClass('active'); 
+    $('.loader-progressbar').removeClass('active'); 
+    $('.loader-percents').removeAttr('style');
+        
+    //All timeouts are just for demo
+    var count = 0;
+    setTimeout(function() { 
+        
+        $('.loading-spinner').addClass('active'); 
+    
+    }, 1000);
+    
+    setInterval(function() {
+        ++count;
+        $('.loading-info li').addClass('loaded').removeClass('loading');
+        $('.loading-info').prepend('<li>Updating file list ' + count + '</li>');
+        
+        // Important to add duration for nice animation
+        $('.loading-info li:not(.loaded)').addClass('loading', 10);
+        
+    }, 2000); 
+    
+});
+</script>
+</head>
+
+<body>
+
+<div class="loading-spinner">
+    <div class="main-loader"></div>
+    <ul class="loading-info">
+    </ul>
+    <div class="loader-progressbar">
+        <div class="loader-percents"></div>
+    </div>
+</div>
+  
+</div>
+</body>
+</html>

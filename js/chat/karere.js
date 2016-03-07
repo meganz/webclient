@@ -46,6 +46,8 @@ var Karere = function(user_options) {
     Strophe.fatal = function (msg) { self.error(msg); };
     Strophe.error = function (msg) { self.error(msg); };
 
+    self.destroying = false;
+
     // initialize the connection state
     self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
 
@@ -53,6 +55,8 @@ var Karere = function(user_options) {
     $(window).on("unload", function() {
 
         if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+            self.destroying = true;
+
             var msg = $pres({
                 type: 'unavailable'
             });
@@ -214,7 +218,7 @@ var Karere = function(user_options) {
             functions: {
                 reconnect: function(connectionRetryManager) {
                     //console.error("reconnect was called");
-                    self.forceReconnect();
+                    return self.forceReconnect();
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -222,7 +226,7 @@ var Karere = function(user_options) {
                  */
                 forceDisconnect: function(connectionRetryManager) {
                     //console.error("forceDisconnect was called");
-                    self.forceDisconnect();
+                    return self.forceDisconnect();
                 },
                 /**
                  * Should return true or false depending on the current state of this connection, e.g. (connected || connecting)
@@ -262,7 +266,7 @@ var Karere = function(user_options) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        localStorage.megaChatPresence === "unavailable"
+                        self.destroying === true || localStorage.megaChatPresence === "unavailable"
                     );
                 }
             }

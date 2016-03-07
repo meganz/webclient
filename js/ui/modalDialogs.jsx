@@ -399,6 +399,7 @@ var CloudBrowserDialog = React.createClass({
 
 var SelectContactDialog = React.createClass({
     mixins: [MegaRenderMixin],
+    clickTime: 0,
     getDefaultProps: function() {
         return {
             'selectLabel': __("Send"),
@@ -461,14 +462,25 @@ var SelectContactDialog = React.createClass({
                 onClick={(contact, e) => {
                     var contactHash = contact.h;
 
-                    if (self.state.selected.indexOf(contactHash) === -1) {
-                        self.state.selected.push(contact.h);
-                        self.onSelected(self.state.selected);
-                    }
-                    else {
-                        removeValue(self.state.selected, contactHash);
-                        self.onSelected(self.state.selected);
-                    }
+                        // differentiate between a click and a double click.
+                        if ((new Date() - self.clickTime) < 500) {
+                            // is a double click
+                            self.onSelected([contact.h]);
+                            self.props.onSelectClicked();
+                        }
+                        else {
+                            // is a single click
+                            if (self.state.selected.indexOf(contactHash) === -1) {
+                                self.state.selected.push(contact.h);
+                                self.onSelected(self.state.selected);
+                            }
+                            else {
+                                removeValue(self.state.selected, contactHash);
+                                self.onSelected(self.state.selected);
+                            }
+                        }
+                        self.clickTime = new Date();
+
                 }}
                 selected={self.state.selected}
                 headerClasses="left-aligned"

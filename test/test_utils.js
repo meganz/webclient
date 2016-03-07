@@ -56,34 +56,6 @@ var testutils = {};
     };
 
 
-    /**
-     * Determines equality of two sets.
-     *
-     * @param {Set} set1
-     *     First set for comparison.
-     * @param {Set} set2
-     *     Second set for comparison.
-     * @return {Boolean}
-     *     `true` if sets are equal, `false` otherwise.
-     */
-    ns.isSetEqual = function(set1, set2) {
-
-        var result = true;
-
-        if (set1.size !== set2.size) {
-            result = false;
-        }
-
-        set1.forEach(function _setEqualityIterator(item) {
-            if (!set2.has(item)) {
-                result = false;
-            }
-        });
-
-        return result;
-    };
-
-
     if (!Array.from) {
         /**
          * Iterates over an iterable and returns an Array object.

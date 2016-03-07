@@ -122,7 +122,7 @@ describe("MegaNotifications Unit Test", function() {
         expect(typeof(ion.sound.stop) !== "undefined").to.eql(true);
 
         // when loop is on, .stop will be called before .play()
-        expect(ion.sound.stop.callCount).to.eql(1);
+        expect(ion.sound.stop.callCount).to.eql(2);
         expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);
 
         // play was called
@@ -131,7 +131,7 @@ describe("MegaNotifications Unit Test", function() {
 
         n.setUnread(false);
 
-        expect(ion.sound.stop.callCount).to.eql(2);
+        expect(ion.sound.stop.callCount).to.eql(3);
         expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);
         expect(megaNotifications.favico.badge.callCount).to.eql(2);
         expect(megaNotifications.favico.badge.calledWith(0)).to.eql(true);

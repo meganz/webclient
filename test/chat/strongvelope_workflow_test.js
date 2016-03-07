@@ -359,38 +359,6 @@ describe("chat.strongvelope workflow test", function() {
             assert.strictEqual(result, false);
             participants['dave5678900'].updateSenderKey();
 
-            // Check some decryptability outcomes of the history.
-            var decryptabileMessages = [
-                false, false, false, false, false, false, false, false, false,
-                false, false, false, false, false, false, false, false,
-                true, true];
-            var decryptableParticipants = {
-                'alice678900': 0, 'bob45678900': 0, 'charlie8900': null };
-            result = participants['dave5678900'].areMessagesDecryptable(_messageBuffer, true);
-            assert.strictEqual(result.messages.length, decryptabileMessages.length);
-            for (var i = 0; i < decryptabileMessages.length; i++) {
-                assert.strictEqual(result.messages[i], decryptabileMessages[i],
-                    'mismatching decryptability of message ' + i);
-            }
-            for (var item in decryptableParticipants) {
-                if (!decryptableParticipants.hasOwnProperty(item)) {
-                    continue;
-                }
-                assert.strictEqual(typeof result.participants[item],
-                    typeof decryptableParticipants[item],
-                    'mismatching participant key time stamp of member ' + item);
-            }
-            result = participants['dave5678900'].batchDecrypt(_messageBuffer, true);
-            for (var i = 0; i < decryptabileMessages.length; i++) {
-                if (decryptabileMessages[i]) {
-                    assert.notStrictEqual(result[i], false,
-                        'mismatching decrypted message ' + i);
-                }
-                else {
-                    assert.strictEqual(result[i], decryptabileMessages[i],
-                        'mismatching decrypted message ' + i);
-                }
-            }
             // jshint +W004
         });
     });

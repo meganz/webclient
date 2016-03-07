@@ -300,6 +300,17 @@ function inputblur(id, defaultvalue, pw) {
     }
 }
 
+
+/**
+ * Check if something (val) is a string.
+ *
+ * @param val
+ * @returns {boolean}
+ */
+function isString(val) {
+    return (typeof val === 'string' || val instanceof String);
+};
+
 function easeOutCubic(t, b, c, d) {
     return c * ((t = t / d - 1) * t * t + 1) + b;
 }
@@ -522,18 +533,37 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
-
-    useragent = useragent || navigator.userAgent;
-    useragent = (' ' + useragent).toLowerCase();
-
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
     var nameTrans = '';
+    var current = false;
+    var brand = false;
+
+    if (useragent === undefined || useragent === ua) {
+        current = true;
+        useragent = ua;
+    }
+    if (Object(useragent).details !== undefined) {
+        return useragent.details;
+    }
+    useragent = (' ' + useragent).toLowerCase();
+
+    if (current) {
+        brand = mega.getBrowserBrandID();
+    }
+    else if (useragent.indexOf('~:') !== -1) {
+        brand = useragent.match(/~:(\d+)/);
+        brand = brand && brand.pop() | 0;
+    }
 
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
+    }
+    else if (useragent.indexOf('windows phone') > 0) {
+        icon = 'wp.png';
+        os = 'Windows Phone';
     }
     else if (useragent.indexOf('windows') > 0) {
         os = 'Windows';
@@ -547,20 +577,22 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('ipad') > 0) {
         os = 'iPad';
     }
-    else if (useragent.indexOf('mac') > 0) {
+    else if (useragent.indexOf('mac') > 0
+            || useragent.indexOf('darwin') > 0) {
         os = 'Apple';
     }
     else if (useragent.indexOf('linux') > 0) {
         os = 'Linux';
     }
-    else if (useragent.indexOf('linux') > 0) {
-        os = 'MEGAsync';
-    }
     else if (useragent.indexOf('blackberry') > 0) {
         os = 'Blackberry';
     }
-    if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
-        browser = 'Spartan';
+
+    if (mega.browserBrand[brand]) {
+        browser = mega.browserBrand[brand];
+    }
+    else if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
+        browser = 'Edge';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
@@ -575,26 +607,63 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('maxthon') > 0) {
         browser = 'Maxthon';
     }
+    else if (useragent.indexOf('electron') > 0) {
+        browser = 'Electron';
+    }
+    else if (useragent.indexOf('palemoon') > 0) {
+        browser = 'Palemoon';
+    }
+    else if (useragent.indexOf('cyberfox') > 0) {
+        browser = 'Cyberfox';
+    }
+    else if (useragent.indexOf('waterfox') > 0) {
+        browser = 'Waterfox';
+    }
+    else if (useragent.indexOf('iceweasel') > 0) {
+        browser = 'Iceweasel';
+    }
+    else if (useragent.indexOf('seamonkey') > 0) {
+        browser = 'SeaMonkey';
+    }
+    else if (useragent.indexOf('lunascape') > 0) {
+        browser = 'Lunascape';
+    }
+    else if (useragent.indexOf(' iron/') > 0) {
+        browser = 'Iron';
+    }
+    else if (useragent.indexOf('avant browser') > 0) {
+        browser = 'Avant';
+    }
+    else if (useragent.indexOf('polarity') > 0) {
+        browser = 'Polarity';
+    }
+    else if (useragent.indexOf('k-meleon') > 0) {
+        browser = 'K-Meleon';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
     }
-    else if (useragent.indexOf('palemoon') > 0) {
-        browser = 'Palemoon';
-    }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
     }
+    else if (useragent.indexOf(' otter/') > 0) {
+        browser = 'Otter';
+    }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
+    }
+    else if (useragent.indexOf('es plugin ') === 1) {
+        icon = 'esplugin.png';
+        browser = 'ES File Explorer';
     }
     else if (useragent.indexOf('megasync') > 0) {
         browser = 'MEGAsync';
     }
     else if (useragent.indexOf('msie') > 0
-            || "ActiveXObject" in window) {
+            || useragent.indexOf('trident') > 0) {
         browser = 'Internet Explorer';
     }
 
@@ -605,7 +674,7 @@ function browserdetails(useragent) {
     }
     else if (os) {
         name = os;
-        icon = os.toLowerCase() + '.png';
+        icon = icon || (os.toLowerCase() + '.png');
     }
     else if (browser) {
         name = browser;
@@ -615,7 +684,7 @@ function browserdetails(useragent) {
         icon = 'unknown.png';
     }
     if (!icon && browser) {
-        if (browser === 'Internet Explorer' || browser === 'Spartan') {
+        if (browser === 'Internet Explorer' || browser === 'Edge') {
             icon = 'ie.png';
         }
         else {
@@ -623,20 +692,34 @@ function browserdetails(useragent) {
         }
     }
 
-    var browserDetails = {};
-    browserDetails.name = name;
-    browserDetails.nameTrans = nameTrans || name;
-    browserDetails.icon = icon;
-    browserDetails.os = os || '';
-    browserDetails.browser = browser;
+    var details = {};
+    details.name = name;
+    details.nameTrans = nameTrans || name;
+    details.icon = icon;
+    details.os = os || '';
+    details.browser = browser;
 
     // Determine if the OS is 64bit
-    browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
+    details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 
     // Determine if using a browser extension
-    browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    details.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
 
-    return browserDetails;
+    // Determine core engine.
+    if (useragent.indexOf('webkit') > 0) {
+        details.engine = 'Webkit';
+    }
+    else if (useragent.indexOf('trident') > 0) {
+        details.engine = 'Trident';
+    }
+    else if (useragent.indexOf('gecko') > 0) {
+        details.engine = 'Gecko';
+    }
+    else {
+        details.engine = 'Unknown';
+    }
+
+    return details;
 }
 
 function countrydetails(isocode) {
@@ -1375,8 +1458,16 @@ function assert(test) {
  *     Throws an exception on something that does not seem to be a user handle.
  */
 var assertUserHandle = function(userHandle) {
-    assert(base64urldecode(userHandle).length === 8,
-       'This seems not to be a user handle: ' + userHandle);
+    try {
+        if (typeof userHandle !== 'string'
+                || base64urldecode(userHandle).length !== 8) {
+
+            throw 1;
+        }
+    }
+    catch (ex) {
+        assert(false, 'This seems not to be a user handle: ' + userHandle);
+    }
 };
 
 
@@ -1449,7 +1540,7 @@ function srvlog(msg, data, silent) {
     if (!silent && d) {
         console.error(msg, data);
     }
-    if (!d || onBetaW) {
+    if (typeof window.onerror === 'function') {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
     }
 }
@@ -1509,8 +1600,8 @@ function removeValue(array, value, can_fail) {
 function setTransferStatus(dl, status, ethrow, lock) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
-    if (text.length > 44) {
-        text = text.substr(0, 42) + '...';
+    if (text.length > 48) {
+        text = text.substr(0, 48) + "\u2026";
     }
     if (page === 'download') {
         $('.download.error-icon').text(text);
@@ -1533,7 +1624,10 @@ function setTransferStatus(dl, status, ethrow, lock) {
 
 function dlFatalError(dl, error, ethrow) {
     var m = 'This issue should be resolved ';
-    if (navigator.webkitGetUserMedia) {
+    if (ethrow === -0xDEADBEEF) {
+        ethrow = false;
+    }
+    else if (navigator.webkitGetUserMedia) {
         m += 'exiting from Incognito mode.';
         msgDialog('warninga', l[1676], m, error);
     }
@@ -1550,6 +1644,15 @@ function dlFatalError(dl, error, ethrow) {
     else {
         Later(firefoxDialog);
     }
+
+    // Log the fatal error
+    Soon(function() {
+        error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
+
+        srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+    });
+
+    // Set transfer status and abort it
     setTransferStatus(dl, error, ethrow, true);
     dlmanager.abort(dl);
 }
@@ -2177,6 +2280,25 @@ mSpawnWorker.prototype = {
                 console.timeEnd(reply.jid);
             }
 
+            // Don't report `newmissingkeys` unless there are *new* missing keys
+            if (job.newmissingkeys) {
+                try {
+                    var keys = Object.keys(missingkeys).sort();
+                    var hash = MurmurHash3(JSON.stringify(keys));
+                    var prop = u_handle + '_lastMissingKeysHash';
+
+                    if (localStorage[prop] !== hash) {
+                        localStorage[prop] = hash;
+                    }
+                    else {
+                        job.newmissingkeys = false;
+                    }
+                }
+                catch (ex) {
+                    console.error(ex);
+                }
+            }
+
             delete this.jobs[reply.jid];
             job.callback(job.result, job);
         }
@@ -2205,6 +2327,8 @@ function setupTransferAnalysis() {
     if ($.mTransferAnalysis) {
         return;
     }
+    var PROC_INTERVAL = 4.2 * 60 * 1000;
+    var logger = MegaLogger.getLogger('TransferAnalysis');
 
     var prev = {},
         tlen = {},
@@ -2218,98 +2342,46 @@ function setupTransferAnalysis() {
             var tp = $.transferprogress;
 
             for (var i in tp) {
-                var q = (i[0] === 'u' ? ulQueue : dlQueue);
-                if (!GlobalProgress[i] || GlobalProgress[i].paused
-                        || tp[i][0] === tp[i][1] || q.isPaused() || q._qpaused[i]) {
-                    delete prev[i];
-                }
-                else if (prev[i] && prev[i] === tp[i][0]) {
-                    var p = tp[i],
-                        t = i[0] === 'u' ? 'Upload' : 'Download',
-                        r = '',
-                        data = [];
-                    var s = GlobalProgress[i].speed,
-                        w = GlobalProgress[i].working || [];
-                    var c = p[0] + '/' + p[1] + '-' + Math.floor(p[0] / p[1] * 100) + '%';
-                    var u = w.map(function(c) {
-                        var x = c.xhr || {};
-                        return ['' + c, x.__failed, x.__timeout,
-                            !!x.listener, x.__id, x.readyState > 1 && x.status];
-                    });
+                if (tp.hasOwnProperty(i)) {
+                    var currentlyTransfered = tp[i][0];
+                    var totalToBeTransfered = tp[i][1];
+                    var currenTransferSpeed = tp[i][2];
 
-                    if (d) {
-                        console.warn(i + ' might be stuck, checking...', c, w.length, u);
+                    var finished = (currentlyTransfered === totalToBeTransfered);
+
+                    if (finished) {
+                        logger.info('Transfer "%s" has finished. \uD83D\uDC4D', i);
+                        continue;
                     }
 
-                    if (w.length) {
-                        var j = w.length;
-                        while (j--) {
-                            /**
-                             * if there's a timer, no need to call on_error ourselves
-                             * since the chunk will get restarted there by the xhr
-                             */
-                            var stuck = w[j].xhr && !w[j].xhr.__timeout;
-                            if (stuck) {
-                                var chunk_id = '' + w[j],
-                                    n = u[j];
+                    var transfer = Object(GlobalProgress[i]);
 
-                                if (w[j].dl && w[j].dl.lasterror) {
-                                    r = '[DLERR' + w[j].dl.lasterror + ']';
-                                }
-                                else if (w[j].srverr) {
-                                    r = '[SRVERR' + (w[j].srverr - 1) + ']';
-                                }
+                    if (transfer.paused || !transfer.started) {
+                        logger.info('Transfer "%s" is not active.', i, transfer);
+                        continue;
+                    }
 
-                                try {
-                                    w[j].on_error(0, {}, 'Stuck');
-                                }
-                                catch (e) {
-                                    n.push(e.message);
-                                }
+                    if (prev[i] && prev[i] === currentlyTransfered) {
+                        var type = (i[0] === 'u'
+                            ? 'Upload'
+                            : (i[0] === 'z' ? 'ZIP' : 'Download'));
 
-                                if (!chunks[chunk_id]) {
-                                    chunks[chunk_id] = 1;
-                                    data.push(n);
-                                }
-                            }
-                        }
+                        srvlog(type + ' transfer seems stuck.');
 
-                        if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1)) {
-                            r = s ? '[TIMEOUT]' : '[ETHERR]';
-                            data = ['Chunks are taking too long to complete... ', u];
-                        }
+                        logger.warn('Transfer "%s" had no progress for the last minutes...', i, transfer);
                     }
                     else {
-                        r = '[!]';
-                        data = 'GlobalProgress.' + i + ' exists with no working chunks.';
-                    }
+                        logger.info('Transfer "%s" is in progress... %d% completed', i,
+                            Math.floor(currentlyTransfered / totalToBeTransfered * 100));
 
-                    if (data.length) {
-                        var udata = {
-                            i: i,
-                            p: c,
-                            d: data,
-                            j: [prev, tlen],
-                            s: s
-                        };
-                        if (i[0] === 'z') {
-                            t = 'zip' + t;
-                        }
-                        console.error(t + ' stuck. ' + r, i, udata);
-                        if (!d) {
-                            srvlog(t + ' Stuck. ' + r, udata);
-                        }
+                        time[i] = Date.now();
+                        tlen[i] = Math.max(tlen[i] | 0, currentlyTransfered);
+                        prev[i] = currentlyTransfered;
                     }
-                    delete prev[i];
-                }
-                else {
-                    time[i] = Date.now();
-                    tlen[i] = Math.max(tlen[i] || 0, tp[i][0]);
-                    prev[i] = tp[i][0];
                 }
             }
         }
-    }, mXHRTimeoutMS * 1.2);
+    }, PROC_INTERVAL);
 }
 
 function percent_megatitle() {
@@ -2549,37 +2621,6 @@ function disableDescendantFolders(id, pref) {
     }
 
     return true;
-}
-
-function ucfirst(str) {
-    //  discuss at: http://phpjs.org/functions/ucfirst/
-    // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // bugfixed by: Onno Marsman
-    // improved by: Brett Zamir (http://brett-zamir.me)
-    //   example 1: ucfirst('kevin van zonneveld');
-    //   returns 1: 'Kevin van zonneveld'
-
-    str += '';
-    var f = str.charAt(0)
-        .toUpperCase();
-    return f + str.substr(1);
-}
-
-function readLocalStorage(name, type, val) {
-    var v;
-    if (localStorage[name]) {
-        var f = 'parse' + ucfirst(type);
-        v = localStorage[name];
-
-        if (typeof window[f] === "function") {
-            v = window[f](v);
-        }
-
-        if (val && ((val.min && val.min > v) || (val.max && val.max < v))) {
-            v = null;
-        }
-    }
-    return v || (val && val.def);
 }
 
 function obj_values(obj) {
@@ -3061,6 +3102,23 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+/**
+ * execCommandUsable
+ *
+ * Native browser 'copy' command using execCommand('copy').
+ * Supported by Chrome42+, FF41+, IE9+, Opera29+
+ * @returns {Boolean}
+ */
+mega.utils.execCommandUsable = function() {
+    var result;
+
+    try {
+        result = document.execCommand('copy');
+    }
+    catch (ex) {}
+
+    return result === false;
+};
 
 /**
  * Utility that will return a sorting function (can compare numbers OR strings, depending on the data stored in the
@@ -3288,7 +3346,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
-        clearXhr(); /* destroy all xhr */
+        clearTransferXHRs(); /* destroy all xhr */
 
         $('.transfer-pause-icon').addClass('disabled');
         $('.nw-fm-left-icon.transfers').removeClass('transfering');
@@ -3469,6 +3527,60 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
 };
 
 /**
+ * Resources loader through our secureboot mechanism
+ * @param {...*} var_args  Resources to load, either plain filenames or jsl2 members
+ * @return {MegaPromise}
+ */
+mega.utils.require = function megaUtilsRequire() {
+    var files = [];
+
+    toArray.apply(null, arguments).forEach(function(file) {
+
+        // If a plain filename, inject it into jsl2
+        // XXX: Likely this will have a conflict with our current build script
+        if (!jsl2[file]) {
+            var filename = file.replace(/^.*\//, '');
+            var extension = filename.split('.').pop().toLowerCase();
+            var name = filename.replace(/\./g, '_');
+            var type;
+            var result;
+
+            if (extension === 'html') {
+                type = 0;
+            }
+            else if (extension === 'js') {
+                type = 1;
+            }
+            else if (extension === 'css') {
+                type = 2;
+            }
+
+            jsl2[name] = { f: file, n: name, j: type };
+            file = name;
+        }
+
+        if (!jsl_loaded[jsl2[file].n]) {
+            files.push(jsl2[file]);
+        }
+    });
+
+    if (files.length === 0) {
+        // Everything is already loaded
+        return MegaPromise.resolve();
+    }
+
+    Array.prototype.push.apply(jsl, files);
+
+    var promise = new MegaPromise();
+    silent_loading = function() {
+        promise.resolve();
+    };
+    jsl_start();
+
+    return promise;
+};
+
+/**
  *  Kill session and Logout
  */
 mega.utils.logout = function megaUtilsLogout() {
@@ -3504,6 +3616,33 @@ mega.utils.logout = function megaUtilsLogout() {
 
     });
 }
+
+/**
+ * Convert a version string (eg, 2.1.1) to an integer, for easier comparison
+ * @param {String}  version The version string
+ * @param {Boolean} hex     Whether give an hex result
+ * @return {Number|String}
+ */
+mega.utils.vtol = function megaUtilsVTOL(version, hex) {
+    version = String(version).split('.');
+
+    while (version.length < 4) {
+        version.push(0);
+    }
+
+    version = ((version[0] | 0) & 0xff) << 24 |
+              ((version[1] | 0) & 0xff) << 16 |
+              ((version[2] | 0) & 0xff) <<  8 |
+              ((version[3] | 0) & 0xff);
+
+    version >>>= 0;
+
+    if (hex) {
+        return version.toString(16);
+    }
+
+    return version;
+};
 
 /**
  * Perform a normal logout
@@ -3558,7 +3697,7 @@ function mCleanestLogout(aUserHandle) {
 
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
-    var RUBSCHED_WAITPROC = 120 * 1000;
+    var RUBSCHED_WAITPROC =  20 * 1000;
     var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
@@ -3633,7 +3772,12 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
             console.time('rubsched');
         }
 
-        var nodes = Object.keys(M.c[M.RubbishID] || {}), rubnodes = [];
+        // Watch how long this is running
+        var startTime = Date.now();
+
+        // Get nodes in the Rubbish-bin
+        var nodes = Object.keys(M.c[M.RubbishID] || {});
+        var rubnodes = [];
 
         for (var i in nodes) {
             var node = M.d[nodes[i]];
@@ -3663,6 +3807,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                     if (handler.ready(node, xval)) {
                         break;
                     }
+
+                    // Abort if this has been running for too long..
+                    if ((Date.now() - startTime) > 7000) {
+                        break;
+                    }
                 }
             }
 
@@ -3670,6 +3819,11 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
             if (handles.length) {
                 var inRub = (M.RubbishID === M.currentrootid);
+
+                if (inRub) {
+                    // Flush cached nodes
+                    $(window).trigger('dynlist.flush');
+                }
 
                 handles.map(function(handle) {
                     M.delNode(handle);
@@ -4008,20 +4162,20 @@ if (typeof sjcl !== 'undefined') {
      */
     Share.prototype.hasExportLink = function(nodes) {
 
-        var result = false,
-            node;
+        if (typeof nodes === 'string') {
+            nodes = [nodes];
+        }
 
         // Loop through all selected items
-        $.each(nodes, function(index, value) {
-            node = M.d[value];
-            if (node.shares && node.shares.EXP) {
-                result = true;
-                return false;// Stop further $.each loop execution
+        for (var i in nodes) {
+            var node = M.d[nodes[i]];
 
+            if (node && Object(node.shares).EXP) {
+                return true;
             }
-        });
+        }
 
-        return result;
+        return false;
     };
 
     /**
@@ -4113,66 +4267,86 @@ if (typeof sjcl !== 'undefined') {
     };
 
     // export
-    scope.mega = scope.mega || {};
     scope.mega.Share = Share;
 })(jQuery, window);
 
-(function($, scope) {
-    /**
-     * Nodes related operations.
-     *
-     * @param opts {Object}
-     *
-     * @constructor
-     */
-    var Nodes = function(opts) {
 
-        var self = this;
-        var defaultOptions = {
-        };
 
-        self.options = $.extend(true, {}, defaultOptions, opts);    };
+(function(scope) {
+    /** Utilities for Set operations. */
+    scope.setutils = {};
 
     /**
-     * getChildNodes
+     * Helper function that will return an intersect Set of two sets given.
      *
-     * Loops through all subdirs of given node, as result gives array of subdir nodes.
-     * @param {String} id: node id.
-     * @param {Array} nodesId.
-     * @returns {Array} Child nodes id.
+     * @private
+     * @param {Set} set1
+     *     First set to intersect with.
+     * @param {Set} set2
+     *     Second set to intersect with.
+     * @return {Set}
+     *     Intersected result set.
      */
-    Nodes.prototype.getChildNodes = function(id, nodesId) {
+    scope.setutils.intersection = function(set1, set2) {
 
-        var self = this;
-
-        var subDirs = nodesId;
-
-        if (subDirs) {
-            if (subDirs.indexOf(id) === -1) {
-                subDirs.push(id);
+        var result = new Set();
+        set1.forEach(function _setIntersectionIterator(item) {
+            if (set2.has(item)) {
+                result.add(item);
             }
-        }
-        else {
-            // Make subDirs an array
-            subDirs = [id];
-        }
+        });
 
-        for (var item in M.c[id]) {
-            if (M.c[id].hasOwnProperty(item)) {
-
-                // Prevent duplication
-                if (subDirs && subDirs.indexOf(item) === -1) {
-                    subDirs.push(item);
-                }
-
-                self.getChildNodes(item, subDirs);
-            }
-        }
-
-        return subDirs;
+        return result;
     };
 
-    // export
-    scope.mega = scope.mega || {};
-    scope.mega.Nodes = Nodes;
-})(jQuery, window);
+
+    /**
+     * Helper function that will return a joined Set of two sets given.
+     *
+     * @private
+     * @param {Set} set1
+     *     First set to join with.
+     * @param {Set} set2
+     *     Second set to join with.
+     * @return {Set}
+     *     Joined result set.
+     */
+    scope.setutils.join = function(set1, set2) {
+
+        var result = new Set(set1);
+        set2.forEach(function _setJoinIterator(item) {
+            result.add(item);
+        });
+
+        return result;
+    };
+
+
+    /**
+     * Helper function that will compare two Sets for equality.
+     *
+     * @private
+     * @param {Set} set1
+     *     First set to compare.
+     * @param {Set} set2
+     *     Second set to compare.
+     * @return {Boolean}
+     *     `true` if the sets are equal, `false` otherwise.
+     */
+    scope.setutils.equal = function(set1, set2) {
+
+        if (set1.size !== set2.size) {
+            return false;
+        }
+
+        var set1array = Array.from(set1);
+        var idx = set1array.length;
+        while (idx--) {
+            if (!set2.has(set1array[idx])) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+})(window);

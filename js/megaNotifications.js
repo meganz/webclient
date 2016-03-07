@@ -340,6 +340,7 @@
                     self.trigger('onClick');
                 };
                 self._desktopNotification.onclose = function() {
+                    delete self._desktopNotification;
                     self.setUnread(false);
                     self.trigger('onClose');
                 };

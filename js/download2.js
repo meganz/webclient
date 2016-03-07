@@ -1,6 +1,4 @@
-
 var dlMethod;
-var dl_maxSlots = readLocalStorage('dl_maxSlots', 'int', { min: 1, max: 6, def: 5 });
 
 /* jshint -W003 */
 var dlmanager = {
@@ -13,7 +11,7 @@ var dlmanager = {
     dlDoneThreshold: 3,
     // How many queue IO we want before pausing the XHR fetching,
     // useful when we have internet faster than our IO
-    ioThrottleLimit: 15,
+    ioThrottleLimit: 6,
     ioThrottlePaused: false,
     fetchingFile: false,
     dlLastQuotaWarning: 0,
@@ -790,6 +788,74 @@ var dlmanager = {
         }
         quota[t] += chunksize;
         localStorage.q = JSON.stringify(quota);
+    },
+
+    isMEGAsyncRunning: function(minVersion) {
+        var timeout = 200;
+        var logger = this.logger;
+        var promise = new MegaPromise();
+
+        var resolve = function() {
+            if (promise) {
+                loadingDialog.hide();
+                logger.debug('isMEGAsyncRunning: YUP');
+
+                promise.resolve.apply(promise, arguments);
+                promise = undefined;
+            }
+        };
+        var reject = function(e) {
+            if (promise) {
+                loadingDialog.hide();
+                logger.debug('isMEGAsyncRunning: NOPE', e);
+
+                promise.reject.apply(promise, arguments);
+                promise = undefined;
+            }
+        };
+        var loader = function() {
+            if (typeof megasync === 'undefined') {
+                return reject(EACCESS);
+            }
+            megasync.isInstalled(function(err, is) {
+                if (err || !is) {
+                    reject(err || ENOENT);
+                }
+                else {
+                    // if a min version is required, check for it
+                    if (minVersion) {
+                        var runningVersion = mega.utils.vtol(is.v);
+
+                        if (typeof minVersion !== 'number'
+                                || parseInt(minVersion) !== minVersion) {
+
+                            minVersion = mega.utils.vtol(minVersion);
+                        }
+
+                        if (runningVersion < minVersion) {
+                            return reject(ERANGE);
+                        }
+                    }
+
+                    resolve(megasync);
+                }
+            });
+        };
+
+        loadingDialog.show();
+        logger.debug('isMEGAsyncRunning: checking...');
+
+        if (typeof megasync === 'undefined') {
+            timeout = 4000;
+            mega.utils.require('megasync_js').always(loader);
+        }
+        else {
+            loader();
+        }
+
+        setTimeout(reject, timeout);
+
+        return promise;
     }
 };
 
@@ -1050,7 +1116,7 @@ var dlQueue = new TransferQueue(function _downloader(task, done) {
         return done();
     }
     return task.run(done);
-}, dl_maxSlots, 'downloader');
+}, 4, 'downloader');
 
 // chunk scheduler
 dlQueue.validateTask = function(pzTask) {

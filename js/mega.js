@@ -3180,7 +3180,7 @@ function MegaData()
                     u_attr.name
                 );
 
-                avatars[userHandle] = undefined;
+                avatars[u_handle] = undefined;
                 M.avatars();
             }
         });

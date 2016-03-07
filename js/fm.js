@@ -10490,10 +10490,10 @@ function fm_resize_handler() {
 mega.utils.fullUsername = function username(userHandle) {
 
     // User name
-    var result;
+    var result = "";
 
-    if (M.d[userHandle]) {
-        result = M.d[userHandle].name && $.trim(M.d[userHandle].name) || M.d[userHandle].m;
+    if (M.u[userHandle]) {
+        result = M.u[userHandle].name && $.trim(M.u[userHandle].name) || M.u[userHandle].m;
     }
 
     return String(result);

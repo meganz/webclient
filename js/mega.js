@@ -3165,15 +3165,23 @@ function MegaData()
                     self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
                 }
             } else {
-                delete self.u[userId].name;
+                self.u[userId].name = "";
             }
 
 
             if (userId === u_handle) {
                 u_attr.firstname = firstName;
                 u_attr.lastname = lastName;
+                u_attr.name = self.u[userId].name;
 
                 $('.user-name').text(u_attr.firstname);
+
+                $('.membership-big-txt.name:visible').text(
+                    u_attr.name
+                );
+
+                avatars[userHandle] = undefined;
+                M.avatars();
             }
         });
     },

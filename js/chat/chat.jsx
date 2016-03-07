@@ -1103,11 +1103,8 @@ Chat.prototype.getContactNameFromJid = function(jid) {
     var name = jid.split("@")[0];
 
 
-    if (contact && contact.name) {
-        name = contact.name;
-    }
-    else if (contact && contact.m) {
-        name = contact.m;
+    if (contact) {
+        name = mega.utils.fullUsername(contact.u);
     }
 
     assert(name, "Name not found for jid: " + jid);

@@ -662,32 +662,99 @@ MegaDB.prototype.get = function(tableName, val) {
 
     assert(this.server[tableName], 'table not found:' + tableName);
 
-    var promise = new MegaPromise(function(resolve, reject) {
+    var promise = new MegaPromise();
 
-        self.query(tableName)
-            .filter(self._getTablePk(tableName), val)
-            .execute()
-            .then(
-            function(result) {
-                if ($.isArray(result) && result.length == 1) {
-                    resolve.apply(null, [result[0]]);
-                } else if ($.isArray(result) && result.length > 1) {
-                    resolve.apply(null, [result]);
-                }  else {
-                    resolve.apply(null, arguments);
-                }
+    self.query(tableName)
+        .filter(self._getTablePk(tableName), val)
+        .execute()
+        .then(
+        function(result) {
+            if ($.isArray(result) && result.length == 1) {
+                promise.resolve(result[0]);
+            } else if ($.isArray(result) && result.length > 1) {
+                promise.resolve([result]);
+            }  else {
+                promise.resolve.apply(promise, arguments);
+            }
 
-                // resolve with 1 OR multiple arguments please
-            },
-            function() {
-                reject.apply(null, arguments);
-            });
-    });
+            // resolve with 1 OR multiple arguments please
+        },
+        function() {
+            promise.reject.apply(promise, arguments);
+        });
+
     return promise;
 };
 MegaDB.prototype.get = _wrapFnWithBeforeAndAfterEvents(
     MegaDB._delayFnCallUntilDbReady(
         MegaDB.prototype.get
+    ),
+    'Get'
+);
+
+
+/**
+ * Get one object (by index) which pk equals to `val` from table `tableName`
+ * If the row/object is not found, then the promise will be resolved with 1 argument, which will be empty array
+ *
+ * @param tableName {String}
+ * @param val {Integer}
+ * @returns {MegaPromise}
+ */
+MegaDB.prototype.getByIndex = function(tableName, val) {
+    var self = this;
+
+    assert(this.server[tableName], 'table not found:' + tableName);
+
+    var tmpPromise = new MegaPromise(function(resolve, reject) {
+        attribCache.db.server[tableName].get(val)
+            .then(
+                function(result) {
+                    if ($.isArray(result) && result.length == 1) {
+                        resolve.apply(null, [result[0]]);
+                    }
+                    else if ($.isArray(result) && result.length > 1) {
+                        resolve.apply(null, [result]);
+                    }
+                    else if (arguments.length === 1 && typeof(arguments[0]) === 'undefined') {
+                        resolve.apply(null, arguments);
+                    }
+                    else {
+                        resolve.apply(null, arguments);
+                    }
+
+                    // resolve with 1 OR multiple arguments please
+                },
+                function() {
+                    reject.apply(null, arguments);
+                }
+            );
+    });
+
+    // forward the result fro tmpPromise/db.js -> onDbRead plugins
+    var masterPromise = new MegaPromise();
+    masterPromise.linkFailTo(tmpPromise);
+    tmpPromise.done(function(r) {
+        if (!r) {
+            masterPromise.resolve([]);
+            return;
+        }
+        var $event = new $.Event("onDbRead");
+        self.trigger($event, [tableName, r]);
+        if (!$event.isPropagationStopped()) {
+            masterPromise.resolve(r);
+        } else {
+            if ($event.data && $event.data.errors && $event.data.errors.length > 0) {
+                masterPromise.reject($event.data.errors);
+            }
+            return undefined;
+        }
+    });
+    return masterPromise;
+};
+MegaDB.prototype.getByIndex = _wrapFnWithBeforeAndAfterEvents(
+    MegaDB._delayFnCallUntilDbReady(
+        MegaDB.prototype.getByIndex
     ),
     'Get'
 );

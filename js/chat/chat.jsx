@@ -697,6 +697,10 @@ Chat.prototype.init = function() {
     var appContainer = document.querySelector('.section.conversations');
 
     var initAppUI = function() {
+        if (d) {
+            console.time('chatReactUiInit');
+        }
+
         self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} contacts={M.u} />;
 
         self.$conversationsAppInstance = ReactDOM.render(
@@ -705,6 +709,9 @@ Chat.prototype.init = function() {
         );
 
         self.renderConversationsApp();
+        if (d) {
+            console.timeEnd('chatReactUiInit');
+        }
     };
 
     if (!appContainer) {
@@ -1096,11 +1103,8 @@ Chat.prototype.getContactNameFromJid = function(jid) {
     var name = jid.split("@")[0];
 
 
-    if (contact && contact.name) {
-        name = contact.name;
-    }
-    else if (contact && contact.m) {
-        name = contact.m;
+    if (contact) {
+        name = mega.utils.fullUsername(contact.u);
     }
 
     assert(name, "Name not found for jid: " + jid);

@@ -112,13 +112,19 @@ var crypt = (function () {
         var masterPromise = new MegaPromise();
 
         if (keyType === 'RSA') {
+            var cacheKey = userhandle + "_@uk";
+
             var myCtx = {};
             /** Function to settle the promise for the RSA pub key attribute. */
-            var __settleFunction = function(res) {
+            var __settleFunction = function(res, ctx, xhr, fromCache) {
                 if (typeof res === 'object') {
                     var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
                     logger.debug('Got ' + keyType + ' pub key of user '
                                  + userhandle + ': ' + JSON.stringify(pubKey));
+
+                    if (!fromCache && attribCache) {
+                        attribCache.setItem(cacheKey, JSON.stringify(res));
+                    }
                     masterPromise.resolve(pubKey);
                 }
                 else {
@@ -132,8 +138,28 @@ var crypt = (function () {
             myCtx.u = userhandle;
             myCtx.callback = __settleFunction;
 
-            // Fire it off.
-            api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+            var __retrieveRsaKeyFunc = function() {
+                // Fire it off.
+                api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+            };
+
+            if (attribCache) {
+                attribCache.getItem(cacheKey)
+                    .done(function(r) {
+                        if (r && r.length !== 0) {
+                            __settleFunction(JSON.parse(r), undefined, undefined, true);
+                        } else {
+                            __retrieveRsaKeyFunc();
+                        }
+                    })
+                    .fail(function() {
+                        __retrieveRsaKeyFunc();
+                    });
+            }
+            else {
+                __retrieveRsaKeyFunc();
+            }
+
         }
         else {
             var pubKeyPromise = mega.attr.get(userhandle,

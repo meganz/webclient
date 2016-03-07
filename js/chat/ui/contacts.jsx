@@ -21,7 +21,7 @@ var ContactsListItem = React.createClass({
                     <div className="nw-contact-status"></div>
                     <div className="nw-conversations-unread">0</div>
                     <div className="nw-conversations-name">
-                        {generateContactName(contact.u)}
+                        {mega.utils.fullUsername(contact.u)}
                     </div>
                 </div>
             </div>
@@ -221,7 +221,7 @@ var ContactCard = React.createClass({
                 {contextMenu}
 
                 <div className="user-card-data">
-                    <div className="user-card-name small">{avatarMeta.fullName}</div>
+                    <div className="user-card-name small">{mega.utils.fullUsername(contact.u)}</div>
                     <div className="user-card-email small">{contact.m}</div>
                 </div>
             </div>;

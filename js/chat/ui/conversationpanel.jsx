@@ -490,7 +490,7 @@ var ConversationMessage = React.createClass({
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{contact.name}</div>
+                                    <div className="message data-title">{mega.utils.fullUsername(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :
@@ -2033,17 +2033,25 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-            self.props.contacts.forEach(function(contact) {
-                if (contact.u === u_handle) { return; }
-                else if (contact.c === 0) { return; }
+            var hadLoaded = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
 
-                var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+            if (hadLoaded) {
+                self.props.contacts.forEach(function (contact) {
+                    if (contact.u === u_handle) {
+                        return;
+                    }
+                    else if (contact.c === 0) {
+                        return;
+                    }
 
-                (pres === "offline" ? contactsListOffline : contactsList).push(
-                    <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u} />
-                );
-            });
-            var emptyMessage = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved' ?
+                    var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+
+                    (pres === "offline" ? contactsListOffline : contactsList).push(
+                        <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u}/>
+                    );
+                });
+            }
+            var emptyMessage = hadLoaded ?
                 l[8008] :
                 l[7006];
 

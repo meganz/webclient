@@ -1091,10 +1091,16 @@ function MegaData()
                 // Undecryptable file indicators
                 if (missingkeys[nodeHandle]) {
                     undecryptableClass = 'undecryptable';
-                    titleTooltip = l[8595].replace('%1', nodeType);
                     fName = 'undecrypted' + nodeType;
                     fIcon = 'generic';
                     ftype = l[7381];// i.e. 'unknown'
+
+                    if (nodeType === 'folder') {
+                        titleTooltip = l[8595];
+                    }
+                    else if (nodeType === 'file') {
+                        titleTooltip = l[8602];
+                    }
                 }
 
                 if (M.currentdirid === 'shares') {// render shares tab
@@ -2061,7 +2067,7 @@ function MegaData()
             _a = 'treea_',
             rebuild = false,
             sharedfolder, openedc, arrowIcon,
-            ulc, expandedc, buildnode, containsc, cns, html, sExportLink, 
+            ulc, expandedc, buildnode, containsc, cns, html, sExportLink,
             fName = '',
             curItemHandle = '',
             undecryptableClass = '',
@@ -2229,12 +2235,12 @@ function MegaData()
                     }
                     else {
 
-                        // Undecryptable file indicators
+                        // Undecryptable node indicators
                         if (missingkeys[curItemHandle]) {
                             undecryptableClass = 'undecryptable';
-                            titleTooltip = l[8595].replace('%1', 'folder');
                             fName = 'undecrypted folder';
                             fIcon = 'generic';
+                            titleTooltip = l[8595];
                         }
 
                         sExportLink = (M.d[curItemHandle].shares && M.d[curItemHandle].shares.EXP) ? 'linked' : '';
@@ -3702,15 +3708,15 @@ function MegaData()
         else {
             if (!$icon.hasClass('filled')) {
                 $icon.addClass('filled');
-            } 
+            }
             else if (!$icon.hasClass('glow')) {
                 $icon.addClass('glow');
-            } 
+            }
             else {
                 $icon.removeClass('glow');
             }
         }
-            
+
     };
 
     this.nodeAttr = function(attrs) {

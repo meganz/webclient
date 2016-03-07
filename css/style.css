@@ -1753,10 +1753,6 @@ a.blog-button:hover {
     text-transform: uppercase;
     font-family: 'source_sans_prolight';
 }
-.nt-takedown-notification .notification-avatar, .nt-takedown-reinstated-notification .notification-avatar {
-    margin-top: -24px;
-    top: 50%;
-}
 .notification-item .avatar-wrapper.avatar {
     width: 48px;
     height: 48px;
@@ -1789,7 +1785,7 @@ a.blog-button:hover {
     padding: 2px 0 2px 28px;
     margin: 22px 14px 0 0;
     display: none;
-    background-image: url(../images/mega/notifications-sprite_v2.svg);
+    background-image: url(../images/mega/notifications-sprite-v3.svg);
     background-position: -10px -350px;
     background-repeat: no-repeat;
 }
@@ -1802,14 +1798,15 @@ a.blog-button:hover {
     height: 20px;
     right: -4px;
     top: -4px;
-    background-image: url(../images/mega/notifications-sprite_v2.svg);
+    background-image: url(../images/mega/notifications-sprite-v3.svg);
     background-position: -10px -27px;
     background-repeat: no-repeat;
 }
 .black {
     color: black;
 }
-/* Notification icons */
+
+/* Small notification icons on top of the notification avatar */
 .nt-revocation-of-incoming .notification-avatar-icon {
     background-position: -10px -153px;
 }
@@ -1831,35 +1828,54 @@ a.blog-button:hover {
 .nt-contact-request-denied .notification-avatar-icon, .nt-contact-request-blocked .notification-avatar-icon, .nt-contact-request-ignored .notification-avatar-icon {
     background-position: -10px -153px;
 }
-.nt-payment-notification .notification-avatar-icon {
-    background: url(../images/mega/bitcoin-v5.png) -152px -650px no-repeat;
-    height: 48px;
-    width: 48px;
-    left: 0;
-    top: 0;
+.nt-payment-reminder-notification .notification-avatar-icon {
+    background-position: -10px -415px;
 }
-.nt-takedown-notification .notification-avatar-icon {
-    background: url("../images/mega/bitcoin-v5.png") no-repeat scroll -152px -1451px;
-    height: 48px;
-    width: 48px;
-    left: 0;
-    top: 0;
-}
-.nt-takedown-reinstated-notification .notification-avatar-icon {
-    background: url("../images/mega/bitcoin-v5.png") no-repeat scroll 0 -1452px;
-    height: 48px;
-    width: 48px;
-    left: 0;
-    top: 0;
-}
-.nt-payment-notification .notification-avatar {
-    background-color: transparent;
-}
-.nt-payment-notification .notification-avatar img {
+.nt-takedown-notification .notification-avatar-icon, .nt-takedown-reinstated-notification .notification-avatar-icon, .nt-payment-notification .notification-avatar-icon {
     display: none;
 }
+
+/* Custom icon instead of avatar for MEGA notifications */
+.nt-payment-reminder-notification .notification-avatar {
+    background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    height: 48px;
+    left: 26px;
+    top: 0;
+    width: 48px;
+}
+.nt-payment-notification .notification-avatar {
+    background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    height: 48px;
+    left: 26px;
+    top: 0;
+    width: 48px;
+}
+.nt-takedown-notification .notification-avatar {
+    background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -151px -1451px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    height: 48px;
+    left: 25px;
+    margin-top: -24px;
+    top: 50%;
+    width: 48px;
+}
+.nt-takedown-reinstated-notification .notification-avatar {
+    background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -1px -1451px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    height: 48px;
+    left: 25px;
+    margin-top: -24px;
+    top: 50%;
+    width: 48px;
+}
+ 
 .notification-popup .jspDrag {
     width: 4px;
+}
+.notification-avatar .avatar-wrapper {
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
 }
 .notification-avatar img {
     -moz-border-radius: 100%;
@@ -8365,7 +8381,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 256px;
 }
 .bitcoin-invoice-dialog .qr-code-mega-icon {
-    background: url(../images/mega/bitcoin-v5.png) 0 -650px no-repeat;
+    background: url(../images/mega/bitcoin-v7.png) 0 -650px no-repeat;
     display: none;
     height: 40.5px;
     left: 143.5px;
@@ -8510,7 +8526,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     padding-right: 5px;
     width: 15px;
     height: 15px;
-    background: url(../images/mega/bitcoin-v5.png) 0 -786px no-repeat;
+    background: url(../images/mega/bitcoin-v7.png) 0 -786px no-repeat;
 }
 .bitcoin-invoice-dialog .clock-icon::before {
     content: '\00a0';
@@ -8568,7 +8584,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
     margin: 0 auto;
     background-position: center -400px;
-    background-image: url("../images/mega/bitcoin-v5.png");
+    background-image: url("../images/mega/bitcoin-v7.png");
     background-repeat: no-repeat;
     height: 200px;
     width: 200px;
@@ -22821,7 +22837,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     width: 130px;
     height: 130px;
     margin: 0 auto;
-    background: url(../images/mega/bitcoin-v5.png) -33px -1048px no-repeat;
+    background: url(../images/mega/bitcoin-v7.png) -33px -1048px no-repeat;
     margin-bottom: 47px;
 }
 .failed .payment-result-icon {
@@ -22874,7 +22890,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     right: 0;
 }
 .payment-close-icon, .overlay-close-icon {
-    background: url(../images/mega/bitcoin-v5.png) -183px -791px no-repeat;
+    background: url(../images/mega/bitcoin-v7.png) -183px -791px no-repeat;
     width: 20px;
     height: 20px;
     margin: 0 auto;

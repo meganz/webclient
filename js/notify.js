@@ -68,7 +68,6 @@ var notify = {
                 var lastTimeDelta = (result.ltd) ? result.ltd : 0;
                 var notifications = result.c;
                 var pendingContactUsers = result.u;
-				var shareNodes = {};
 
                 // Add pending contact users
                 notify.addUserEmails(pendingContactUsers);
@@ -83,25 +82,17 @@ var notify = {
                     var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
                     var timestamp = currentTime - timeDelta;        // Timestamp of the notification
                     var userHandle = notification.u;                // User handle e.g. new share from this user
-					
-					// only add share notification once 
-					// TODO: add notifications for permission changes?
-					if ((type == 'share' && !shareNodes[notification.n]) || (type != 'share')) {
-						// Add notifications to list
-						notify.notifications.push({
-							data: notification,                         // The full notification object
-							id: id,
-							seen: seen,
-							timeDelta: timeDelta,
-							timestamp: timestamp,
-							type: type,
-							userHandle: userHandle
-						});					
-					}
-					
-					if (type == 'share') {
-						shareNodes[notification.n]=1;
-					}
+
+                    // Add notifications to list
+                    notify.notifications.push({
+                        data: notification, // The full notification object
+                        id: id,
+                        seen: seen,
+                        timeDelta: timeDelta,
+                        timestamp: timestamp,
+                        type: type,
+                        userHandle: userHandle
+                    });
                 }
 
                 // Show the notifications
@@ -380,6 +371,7 @@ var notify = {
         notify.initShareClickHandler();
         notify.initTakedownClickHandler();
         notify.initPaymentClickHandler();
+        notify.initPaymentReminderClickHandler();
         notify.initAcceptContactClickHandler();
     },
 
@@ -451,6 +443,22 @@ var notify = {
 
             // Redirect to payment history
             document.location.hash = '#fm/account/history';
+        });
+    },
+    
+    /**
+     * If they click on a payment reminder notification, then redirect them to the Pro page
+     */
+    initPaymentReminderClickHandler: function() {
+
+        // On payment reminder notification click
+        this.$popup.find('.notification-item.nt-payment-reminder-notification').rebind('click', function() {
+
+            // Mark all notifications as seen (because they clicked on a notification within the popup)
+            notify.markAllNotificationsAsSeen();
+
+            // Redirect to pro page
+            document.location.hash = '#pro';
         });
     },
 
@@ -535,7 +543,7 @@ var notify = {
         if (notification.seen) {
             $notificationHtml.addClass('read');
         }
-
+        
         // Populate other information based on each type of notification
         switch (notification.type) {
             case 'ipc':
@@ -554,6 +562,8 @@ var notify = {
                 return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
             case 'psts':
                 return notify.renderPayment($notificationHtml, notification);
+            case 'pses':
+                return notify.renderPaymentReminder($notificationHtml, notification);
             case 'ph':
                 return notify.renderTakedown($notificationHtml, notification);
             default:
@@ -862,9 +872,10 @@ var notify = {
     },
 
     /**
-     * Process payment notification sent from payment provider e.g. Bitcoin
+     * Process payment notification sent from payment provider e.g. Bitcoin.
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
+     * @param {Object} notification The notification object
+     * @returns {Object} The HTML to be rendered for the notification
      */
     renderPayment: function($notificationHtml, notification) {
 
@@ -890,11 +901,49 @@ var notify = {
 
         return $notificationHtml;
     },
+    
+    /**
+     * Process payment reminder notification to remind them their PRO plan is due for renewal.
+     * Example PSES (Pro Status Expiring Soon) packet: {"a":"pses", "ts":expirestimestamp}.
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification The notification object
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderPaymentReminder: function($notificationHtml, notification) {
+
+        // Find the time difference between the current time and the plan expiry time
+        var currentTimestamp = notify.getCurrentTimestamp();
+        var expiringTimestamp = notification.data.ts;
+        var secondsDifference = (expiringTimestamp - currentTimestamp);
+        
+        // If the notification is still in the future
+        if (secondsDifference > 0) {
+            
+            // Calculate day/days remaining
+            var days = Math.floor(secondsDifference / 86400);
+            
+            // PRO membership plan expiring soon
+            // Your PRO membership plan will expire in 1 day/x days.
+            var header = l[8598];
+            var title = (days === 1) ? l[8596] : l[8597].replace('%1', days);
+                  
+            // Populate other template information
+            $notificationHtml.addClass('nt-payment-reminder-notification clickable');
+            $notificationHtml.find('.notification-username').text(header);
+            $notificationHtml.find('.notification-info').addClass('red').text(title);
+            
+            return $notificationHtml;
+        }
+        
+        // Don't show any notification if the time has passed
+        return false;
+    },
 
     /**
-     * Processes a takedown notice or counter-notice to restore the file
+     * Processes a takedown notice or counter-notice to restore the file.
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
+     * @param {Object} notification The notification object
+     * @returns {Object|false} The HTML to be rendered for the notification
      */
     renderTakedown: function($notificationHtml, notification) {
 

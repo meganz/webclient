@@ -3642,7 +3642,7 @@ function accountUI() {
             $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
-            u_attr.lastname = $('#account-lastname').val().trim()||' ';
+            u_attr.lastname = $('#account-lastname').val().trim();
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
             u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
             u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
@@ -10674,7 +10674,7 @@ function fingerprintDialog(userid) {
     $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
     $this.find('.contact-details-user-name')
-        .text(user.name || user.m) // escape HTML things
+        .text(mega.utils.fullUsername(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
@@ -10763,7 +10763,9 @@ function contactUI() {
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
-        $('.contact-top-details .contact-details-user-name').text(user.name || user.m);
+        $('.contact-top-details .contact-details-user-name').text(
+            mega.utils.fullUsername(user.u)
+        );
         $('.contact-top-details .contact-details-email').text(user.m);
 
         $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {

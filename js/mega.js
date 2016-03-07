@@ -3149,21 +3149,25 @@ function MegaData()
             lastName = lastName.value;
             firstName = firstName.value;
 
+            self.u[userId].firstName = firstName;
+            self.u[userId].lastName = lastName;
 
-            if (firstName.length > 0 || lastName.length > 0) {
+            if (
+                (firstName && $.trim(firstName).length > 0) ||
+                (lastName && $.trim(lastName).length > 0)
+            ) {
                 self.u[userId].name = "";
 
-                if (firstName.length > 0) {
+                if (firstName && $.trim(firstName).length > 0) {
                     self.u[userId].name = firstName;
                 }
-                if (lastName.length > 0) {
+                if (lastName && $.trim(lastName).length > 0) {
                     self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
                 }
             } else {
                 delete self.u[userId].name;
             }
-            self.u[userId].firstName = firstName;
-            self.u[userId].lastName = lastName;
+
 
             if (userId === u_handle) {
                 u_attr.firstname = firstName;

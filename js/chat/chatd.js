@@ -261,11 +261,28 @@ Chatd.Shard.prototype.disconnect = function() {
     clearTimeout(self.keepAliveTimer);
 };
 
+Chatd.Shard.prototype.multicmd = function(cmds) {
+    //console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+    var self = this;
+    cmds.forEach( function _iterator(cmdObj)
+    {
+        var opCode = cmdObj[0];
+        var cmd = cmdObj[1];
+        self.cmdq += String.fromCharCode(opCode)+cmd;
+    });
+
+    this.triggerSendIfAble();
+};
+
 Chatd.Shard.prototype.cmd = function(opCode, cmd) {
     //console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
     this.cmdq += String.fromCharCode(opCode)+cmd;
 
+    this.triggerSendIfAble();
+};
+
+Chatd.Shard.prototype.triggerSendIfAble = function() {
     if (this.isOnline()) {
         var a = new Uint8Array(this.cmdq.length);
         for (var i = this.cmdq.length; i--; ) {
@@ -275,7 +292,7 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd) {
 
         this.cmdq = '';
     }
-};
+}
 
 // rejoin all open chats after reconnection (this is mandatory)
 Chatd.Shard.prototype.rejoinexisting = function() {
@@ -568,9 +585,9 @@ Chatd.prototype.join = function(chatId, shard, url) {
 };
 
 // submit a new message to the chatId
-Chatd.prototype.submit = function(chatId, message) {
+Chatd.prototype.submit = function(chatId, messages) {
     if (this.chatIdMessages[chatId]) {
-        return this.chatIdMessages[chatId].submit(message);
+        return this.chatIdMessages[chatId].submit(messages);
     }
     else {
         return false;
@@ -586,8 +603,19 @@ Chatd.prototype.modify = function(chatId, msgnum, message) {
     return this.chatIdMessages[chatId].modify(msgnum, message);
 };
 
-Chatd.Shard.prototype.msg = function(chatId, msgxid, timestamp, message) {
-    this.cmd(Chatd.Opcode.NEWMSG, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack32le(message.length) + message);
+Chatd.Shard.prototype.msg = function(chatId, messages) {
+    var cmds = [];
+    for (var i = 0; i<messages.length; i++) {
+        var messageObj = messages[i];
+
+        var msgxid = messageObj.msgxid;
+        var timestamp = messageObj.timestamp;
+        var message = messageObj.message;
+        var cmd = [Chatd.Opcode.NEWMSG, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack32le(message.length) + message];
+        cmds.push(cmd);
+    };
+
+    this.multicmd(cmds);
 };
 
 Chatd.Shard.prototype.msgupd = function(chatId, msgid, message) {
@@ -620,28 +648,36 @@ Chatd.Messages = function(chatd, chatId) {
     this.modified = {};
 };
 
-Chatd.Messages.prototype.submit = function(message) {
-    // allocate a transactionid for the new message
-    var msgxid = this.chatd.nexttransactionid();
-    var timestamp = Math.floor(new Date().getTime()/1000);
+Chatd.Messages.prototype.submit = function(messages) {
+    // messages is an array
+    var messageConstructs = [];
 
-    // write the new message to the message buffer and mark as in sending state
-    // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
-    this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message];
+    for (var i = 0; i<messages.length; i++) {
+        var message = messages[i];
 
-    this.chatd.trigger('onMessageUpdated', {
-        chatId: base64urlencode(this.chatId),
-        id: this.highnum,
-        state: 'PENDING',
-        message: message
-    });
+        // allocate a transactionid for the new message
+        var msgxid = this.chatd.nexttransactionid();
+        var timestamp = Math.floor(new Date().getTime()/1000);
 
+        // write the new message to the message buffer and mark as in sending state
+        // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
+        this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message];
 
-    this.sending[msgxid] = this.highnum;
+        this.chatd.trigger('onMessageUpdated', {
+            chatId: base64urlencode(this.chatId),
+            id: this.highnum,
+            state: 'PENDING',
+            message: message
+        });
+
+        this.sending[msgxid] = this.highnum;
+
+        messageConstructs.push({"msgxid":msgxid, "timestamp":timestamp,"message":message});
+    };
 
     // if we believe to be online, send immediately
     if (this.chatd.chatIdShard[this.chatId].isOnline()) {
-        this.chatd.chatIdShard[this.chatId].msg(this.chatId, msgxid, timestamp, message);
+        this.chatd.chatIdShard[this.chatId].msg(this.chatId, messageConstructs);
     }
     return this.highnum;
 };

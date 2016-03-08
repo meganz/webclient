@@ -452,6 +452,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             false
                         );
 
+                        // TODO: Delete this when fixing reminders to only occur lazily, with detection
+                        // inside the encryptTo function of strongvelope
                         if (decrypted && decrypted.toSend) {
                             self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
                         }
@@ -497,11 +499,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
 
+                var deviceid = a32_to_str([Math.random() * Math.pow(2,31)]);
+
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,
                     u_privCu25519,
                     u_privEd25519,
-                    u_pubEd25519
+                    u_pubEd25519,
+                    deviceid
                 );
 
                 self.join(chatRoom);
@@ -596,7 +601,10 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
         }
 
         try {
+            // encryptTo returns an array of at least the encrypted payload message
+            // but also potentially a keyed message.
             var result = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
+
             tmpPromise.resolve(
                 self.chatd.submit(base64urldecode(chatRoom.chatId), result)
             );

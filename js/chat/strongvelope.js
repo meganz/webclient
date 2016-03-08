@@ -224,6 +224,7 @@ var strongvelope = {};
         var result = { ciphertext: null, key: null, nonce: null };
         var keyBytes;
 
+
         if (key) {
             keyBytes = asmCrypto.string_to_bytes(key);
         }
@@ -777,7 +778,6 @@ var strongvelope = {};
                 var prefix = a32words[0];
                 if (prefix === myPrefix) {
                     var keyDateCounter = a32words[a32words.length-1];
-
                     if ((keyDateCounter > highestDateCount)) {
                         secondHighestDateCount = highestDateCount;
                         highestDateCount = keyDateCounter;
@@ -785,17 +785,15 @@ var strongvelope = {};
                 }
             }
         }
-
         if (highestDateCount === -1) {
             return false;
         }
 
-        this.keyId = a32_to_str([prefix]) + a32_to_str([highestDateCount]);
+        this.keyId = a32_to_str([myPrefix]) + a32_to_str([highestDateCount]);
 
         if (secondHighestDateCount) {
-            this.previousKeyId = a32_to_str([prefix]) + a32_to_str([secondHighestDateCount]);
+            this.previousKeyId = a32_to_str([myPrefix]) + a32_to_str([secondHighestDateCount]);
         }
-
         return true;
     };
 
@@ -1150,6 +1148,9 @@ var strongvelope = {};
     /**
      * Assembles the message body to the recipients of the (group) chat.
      * This function also rotates or re-sends the sender key if required.
+     * IMPORTANT: If a sender key rotation or reminder is required, then
+     * the body returned will NOT include the message payload, and this method
+     * should be called a second time.
      *
      * @method
      * @private
@@ -1168,6 +1169,7 @@ var strongvelope = {};
         }
 
         var senderKey = this.participantKeys[this.ownHandle][this.keyId];
+
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
         var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
@@ -1195,9 +1197,8 @@ var strongvelope = {};
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
                                             this.keyId);
         }
-
         // Only include ciphertext if it's not empty (non-blind message).
-        if (encryptedMessage.ciphertext !== null) {
+        if (!encryptedKeys && (encryptedMessage.ciphertext !== null)) {
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
                                             encryptedMessage.ciphertext);
             this._keyEncryptionCount++;
@@ -1209,7 +1210,9 @@ var strongvelope = {};
         }
 
         // Update message counters.
-        this._totalMessagesWithoutSendKey++;
+        if (!encryptedKeys) {
+            this._totalMessagesWithoutSendKey++;
+        }
 
         return { keyed: (encryptedKeys !== false), content: content };
     };
@@ -1245,11 +1248,12 @@ var strongvelope = {};
      *     will be encoded (i. e. it's a "blind" management message).
      * @param {String} [destination]
      *     User handle of the (new and only) recipient.
-     * @returns {String|Boolean}
-     *     Encrypted outgoing message or `false` if something fails.
+     * @returns {Array|Boolean}
+     *     Encrypted outgoing message array or `false` if something fails.
+     *     If we need to send out a keyed message, then two messages will be returned in the array.
      */
     strongvelope.ProtocolHandler.prototype.encryptTo = function(message, destination) {
-
+        var encryptedMessages = new Array();
         // Check we're in a chat with this destination, or a new chat.
         if (destination && !this.otherParticipants.has(destination)) {
             if (this.otherParticipants.size === 0) {
@@ -1268,22 +1272,30 @@ var strongvelope = {};
             return false;
         }
 
-        // Assemble main message body and rotate keys if required.
-        var assembledMessage = this._assembleBody(message);
-        var messageType = assembledMessage.keyed
-                        ? MESSAGE_TYPES.GROUP_KEYED
-                        : MESSAGE_TYPES.GROUP_FOLLOWUP;
+        var assembledMessage = null;
+        do {
+            // Assemble main message body and rotate keys if required.
+            assembledMessage = this._assembleBody(message);
+            var messageType = assembledMessage.keyed
+                            ? MESSAGE_TYPES.GROUP_KEYED
+                            : MESSAGE_TYPES.GROUP_FOLLOWUP;
+            // Assemble rest of message.
+            var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
+                                               String.fromCharCode(messageType))
+                        + assembledMessage.content;
 
-        // Assemble rest of message.
-        var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
-                                           String.fromCharCode(messageType))
-                    + assembledMessage.content;
+            // Sign message.
+            content = this._signContent(content);
 
-        // Sign message.
-        content = this._signContent(content);
+            // Return assembled total message.
+            content = String.fromCharCode(PROTOCOL_VERSION) + content;
 
-        // Return assembled total message.
-        return String.fromCharCode(PROTOCOL_VERSION) + content;
+            encryptedMessages.push(content);
+            // If it is a keyed message, then the payload is not included in the message,
+            // it needs to call it again to generate a second (payload) message.
+        } while(assembledMessage.keyed);
+
+        return encryptedMessages;
     };
 
 
@@ -1621,11 +1633,12 @@ var strongvelope = {};
             }
         }
 
+        // TODO: Move reminder detection logic into encryptTo method for lazy reminding.
         // Prepare a key reminder if required.
-        if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
+        /*if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
                 && (result.sender !== this.ownHandle)) {
             result.toSend = this.encryptTo(null, sender);
-        }
+        }*/
 
         return result;
     };

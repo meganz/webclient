@@ -433,80 +433,6 @@ return {
     return obj;
 }));
 
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define('strophe-utils', function () {
-            return factory();
-        });
-    } else {
-        // Browser globals
-        root.stropheUtils = factory();
-    }
-}(this, function () {
-
-    var utils = {
-
-        utf16to8: function (str) {
-            var i, c;
-            var out = "";
-            var len = str.length;
-            for (i = 0; i < len; i++) {
-                c = str.charCodeAt(i);
-                if ((c >= 0x0000) && (c <= 0x007F)) {
-                    out += str.charAt(i);
-                } else if (c > 0x07FF) {
-                    out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
-                    out += String.fromCharCode(0x80 | ((c >>  6) & 0x3F));
-                    out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));
-                } else {
-                    out += String.fromCharCode(0xC0 | ((c >>  6) & 0x1F));
-                    out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));
-                }
-            }
-            return out;
-        },
-
-        addCookies: function (cookies) {
-            /* Parameters:
-             *  (Object) cookies - either a map of cookie names
-             *    to string values or to maps of cookie values.
-             *
-             * For example:
-             * { "myCookie": "1234" }
-             *
-             * or:
-             * { "myCookie": {
-             *      "value": "1234",
-             *      "domain": ".example.org",
-             *      "path": "/",
-             *      "expires": expirationDate
-             *      }
-             *  }
-             *
-             *  These values get passed to Strophe.Connection via
-             *   options.cookies
-             */
-            var cookieName, cookieObj, isObj, cookieValue, expires, domain, path;
-            for (cookieName in (cookies || {})) {
-                expires = '';
-                domain = '';
-                path = '';
-                cookieObj = cookies[cookieName];
-                isObj = typeof cookieObj == "object";
-                cookieValue = escape(unescape(isObj ? cookieObj.value : cookieObj));
-                if (isObj) {
-                    expires = cookieObj.expires ? ";expires="+cookieObj.expires : '';
-                    domain = cookieObj.domain ? ";domain="+cookieObj.domain : '';
-                    path = cookieObj.path ? ";path="+cookieObj.path : '';
-                }
-                document.cookie =
-                    cookieName+'='+cookieValue + expires + domain + path;
-            }
-        }
-    };
-    return utils;
-}));
-
 /*
     This program is distributed under the terms of the MIT license.
     Please see the LICENSE file for details.
@@ -521,14 +447,13 @@ return {
     if (typeof define === 'function' && define.amd) {
         define('strophe-core', [
             'strophe-sha1',
-            'strophe-md5',
-            'strophe-utils'
+            'strophe-md5'
         ], function () {
             return factory.apply(this, arguments);
         });
     } else {
         // Browser globals
-        var o = factory(root.SHA1, root.MD5, root.stropheUtils);
+        var o = factory(root.SHA1, root.MD5);
         window.Strophe =        o.Strophe;
         window.$build =         o.$build;
         window.$iq =            o.$iq;
@@ -541,7 +466,7 @@ return {
         window.str_hmac_sha1 =  o.SHA1.str_hmac_sha1;
         window.str_sha1 =       o.SHA1.str_sha1;
     }
-}(this, function (SHA1, MD5, utils) {
+}(this, function (SHA1, MD5) {
 
 var Strophe;
 
@@ -603,7 +528,7 @@ Strophe = {
      *  The version of the Strophe library. Unreleased builds will have
      *  a version of head-HASH where HASH is a partial revision.
      */
-    VERSION: "1.2.5",
+    VERSION: "1.2.3",
 
     /** Constants: XMPP Namespace Constants
      *  Common namespace constants from the XMPP RFCs and XEPs.
@@ -1987,35 +1912,7 @@ Strophe.TimedHandler.prototype = {
  *
  *  > var conn = new Strophe.Connection("/http-bind/");
  *
- *  Options common to both Websocket and BOSH:
- *  ------------------------------------------
- *
- *  The "cookies" option allows you to pass in cookies to be added to the
- *  document. These cookies will then be included in the BOSH XMLHttpRequest
- *  or in the websocket connection.
- *
- *  The passed in value must be a map of cookie names and string values or
- *  cookie attributes.
- *
- * For example:
- * { "myCookie": "1234" }
- *
- * or:
- * { "myCookie": {
- *      "value": "1234",
- *      "domain": ".example.org",
- *      "path": "/",
- *      "expires": expirationDate
- *      }
- *  }
- *
- *  Note that cookies can't be set in this way for other domains (i.e. cross-domain).
- *  Those cookies need to be set under those domains, for example they can be
- *  set server-side by making a XHR call to that domain to ask it to set any
- *  necessary cookies.
- *
  *  WebSocket options:
- *  ------------------
  *
  *  If you want to connect to the current host with a WebSocket connection you
  *  can tell Strophe to use WebSockets through a "protocol" attribute in the
@@ -2033,7 +1930,6 @@ Strophe.TimedHandler.prototype = {
  *  variants if the current connection to the site is also secure (https).
  *
  *  BOSH options:
- *  -------------
  *
  *  By adding "sync" to the options, you can control if requests will
  *  be made synchronously or not. The default behaviour is asynchronous.
@@ -2053,19 +1949,6 @@ Strophe.TimedHandler.prototype = {
  *  "restore" is called it will check whether there are cached tokens with
  *  which it can resume an existing session.
  *
- *  The "withCredentials" option should receive a Boolean value and is used to
- *  indicate wether cookies should be included in ajax requests (by default
- *  they're not).
- *  Set this value to true if you are connecting to a BOSH service
- *  and for some reason need to send cookies to it.
- *  In order for this to work cross-domain, the server must also enable
- *  credentials by setting the Access-Control-Allow-Credentials response header
- *  to “true”. For most usecases however this setting should be false (which
- *  is the default).
- *  Additionally, when using Access-Control-Allow-Credentials, the
- *  Access-Control-Allow-Origin header can't be set to the wildcard "*", but
- *  instead must be restricted to actual domains.
- *
  *  Parameters:
  *    (String) service - The BOSH or WebSocket service URL.
  *    (Object) options - A hash of configuration options
@@ -2077,6 +1960,7 @@ Strophe.Connection = function (service, options)
 {
     // The service URL
     this.service = service;
+
     // Configuration options
     this.options = options || {};
     var proto = this.options.protocol || "";
@@ -2134,8 +2018,6 @@ Strophe.Connection = function (service, options)
     this._idleTimeout = setTimeout(function() {
         this._onIdle();
     }.bind(this), 100);
-    
-    utils.addCookies(this.options.cookies);
 
     // initialize plugins
     for (var k in Strophe._connectionPlugins) {
@@ -2592,7 +2474,7 @@ Strophe.Connection.prototype = {
             var acceptable = false;
             var from = stanza.getAttribute("from");
             if (from === expectedFrom ||
-               (!expectedFrom &&
+               (expectedFrom === null &&
                    (from === Strophe.getBareJidFromJid(fulljid) ||
                     from === Strophe.getDomainFromJid(fulljid) ||
                     from === fulljid))) {
@@ -3033,14 +2915,7 @@ Strophe.Connection.prototype = {
 
         this.connected = true;
 
-        var bodyWrap;
-        try {
-            bodyWrap = this._proto._reqToData(req);
-        } catch (e) {
-            if (e != "badformat") { throw e; }
-            this._changeConnectStatus(Strophe.Status.CONNFAIL, 'bad-format');
-            this._doDisconnect('bad-format');
-        }
+        var bodyWrap = this._proto._reqToData(req);
         if (!bodyWrap) { return; }
 
         if (this.xmlInput !== Strophe.Connection.prototype.xmlInput) {
@@ -3201,6 +3076,7 @@ Strophe.Connection.prototype = {
         stanza.t(btoa(response));
       }
       this.send(stanza.tree());
+
       return true;
     },
 
@@ -3775,7 +3651,7 @@ Strophe.SASLPlain.prototype.onChallenge = function(connection) {
   auth_str = auth_str + connection.authcid;
   auth_str = auth_str + "\u0000";
   auth_str = auth_str + connection.pass;
-  return utils.utf16to8(auth_str);
+  return auth_str;
 };
 
 Strophe.Connection.prototype.mechanisms[Strophe.SASLPlain.prototype.name] = Strophe.SASLPlain;
@@ -3785,15 +3661,30 @@ Strophe.Connection.prototype.mechanisms[Strophe.SASLPlain.prototype.name] = Stro
  */
 Strophe.SASLSHA1 = function() {};
 
+/* TEST:
+ * This is a simple example of a SCRAM-SHA-1 authentication exchange
+ * when the client doesn't support channel bindings (username 'user' and
+ * password 'pencil' are used):
+ *
+ * C: n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL
+ * S: r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,
+ * i=4096
+ * C: c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,
+ * p=v0X8v3Bz2T0CJGbJQyF0X+HI4Ts=
+ * S: v=rmF9pqV8S7suAoZWja4dJRkFsKQ=
+ *
+ */
+
 Strophe.SASLSHA1.prototype = new Strophe.SASLMechanism("SCRAM-SHA-1", true, 40);
 
 Strophe.SASLSHA1.test = function(connection) {
-    return connection.authcid !== null;
+  return connection.authcid !== null;
 };
 
 Strophe.SASLSHA1.prototype.onChallenge = function(connection, challenge, test_cnonce) {
   var cnonce = test_cnonce || MD5.hexdigest(Math.random() * 1234567890);
-  var auth_str = "n=" + utils.utf16to8(connection.authcid);
+
+  var auth_str = "n=" + connection.authcid;
   auth_str += ",r=";
   auth_str += cnonce;
 
@@ -3802,8 +3693,9 @@ Strophe.SASLSHA1.prototype.onChallenge = function(connection, challenge, test_cn
 
   auth_str = "n,," + auth_str;
 
-  this.onChallenge = function (connection, challenge) {
-    var nonce, salt, iter, Hi, U, U_old, i, k, pass;
+  this.onChallenge = function (connection, challenge)
+  {
+    var nonce, salt, iter, Hi, U, U_old, i, k;
     var clientKey, serverKey, clientSignature;
     var responseText = "c=biws,";
     var authMessage = connection._sasl_data["client-first-message-bare"] + "," +
@@ -3838,10 +3730,9 @@ Strophe.SASLSHA1.prototype.onChallenge = function(connection, challenge, test_cn
     salt = atob(salt);
     salt += "\x00\x00\x00\x01";
 
-    pass = utils.utf16to8(connection.pass);
-    Hi = U_old = SHA1.core_hmac_sha1(pass, salt);
+    Hi = U_old = SHA1.core_hmac_sha1(connection.pass, salt);
     for (i = 1; i < iter; i++) {
-      U = SHA1.core_hmac_sha1(pass, SHA1.binb2str(U_old));
+      U = SHA1.core_hmac_sha1(connection.pass, SHA1.binb2str(U_old));
       for (k = 0; k < 5; k++) {
         Hi[k] ^= U[k];
       }
@@ -3859,6 +3750,7 @@ Strophe.SASLSHA1.prototype.onChallenge = function(connection, challenge, test_cn
     }
 
     responseText += ",p=" + btoa(SHA1.binb2str(clientKey));
+
     return responseText;
   }.bind(this);
 
@@ -3928,13 +3820,15 @@ Strophe.SASLMD5.prototype.onChallenge = function(connection, challenge, test_cno
     digest_uri = digest_uri + "/" + host;
   }
 
-  var cred = utils.utf16to8(connection.authcid + ":" + realm + ":" + this._connection.pass);
-  var A1 = MD5.hash(cred) + ":" + nonce + ":" + cnonce;
+  var A1 = MD5.hash(connection.authcid +
+                    ":" + realm + ":" + this._connection.pass) +
+    ":" + nonce + ":" + cnonce;
   var A2 = 'AUTHENTICATE:' + digest_uri;
 
   var responseText = "";
   responseText += 'charset=utf-8,';
-  responseText += 'username=' + this._quote(utils.utf16to8(connection.authcid)) + ',';
+  responseText += 'username=' +
+    this._quote(connection.authcid) + ',';
   responseText += 'realm=' + this._quote(realm) + ',';
   responseText += 'nonce=' + this._quote(nonce) + ',';
   responseText += 'nc=00000001,';
@@ -3946,7 +3840,8 @@ Strophe.SASLMD5.prototype.onChallenge = function(connection, challenge, test_cno
                                               MD5.hexdigest(A2)) + ",";
   responseText += 'qop=auth';
 
-  this.onChallenge = function () {
+  this.onChallenge = function ()
+  {
       return "";
   }.bind(this);
 
@@ -4046,7 +3941,6 @@ Strophe.Request.prototype = {
      *
      *  Throws:
      *    "parsererror" - A parser error occured.
-     *    "badformat" - The entity has sent XML that cannot be processed.
      *
      *  Returns:
      *    The DOM element tree of the response.
@@ -4066,7 +3960,8 @@ Strophe.Request.prototype = {
         } else if (this.xhr.responseText) {
             Strophe.error("invalid response received");
             Strophe.error("responseText: " + this.xhr.responseText);
-            throw "badformat";
+            Strophe.error("responseXML: " +
+                          Strophe.serialize(this.xhr.responseXML));
         }
 
         return node;
@@ -4091,8 +3986,10 @@ Strophe.Request.prototype = {
         } else if (window.ActiveXObject) {
             xhr = new ActiveXObject("Microsoft.XMLHTTP");
         }
+
         // use Function.bind() to prepend ourselves as an argument
         xhr.onreadystatechange = this.func.bind(null, this);
+
         return xhr;
     }
 };
@@ -4297,7 +4194,7 @@ Strophe.Bosh.prototype = {
                    session.rid &&
                    session.sid &&
                    session.jid &&
-                   (typeof jid === "undefined" || jid === null || Strophe.getBareJidFromJid(session.jid) == Strophe.getBareJidFromJid(jid)))
+                   (typeof jid === "undefined" || jid === "null" || Strophe.getBareJidFromJid(session.jid) == Strophe.getBareJidFromJid(jid)))
         {
             this._conn.restored = true;
             this._attach(session.jid, session.sid, session.rid, callback, wait, hold, wind);
@@ -4701,9 +4598,6 @@ Strophe.Bosh.prototype = {
             try {
                 req.xhr.open("POST", this._conn.service, this._conn.options.sync ? false : true);
                 req.xhr.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
-                if (this._conn.options.withCredentials) {
-                    req.xhr.withCredentials = true;
-                }
             } catch (e2) {
                 Strophe.error("XHR open failed.");
                 if (!this._conn.connected) {
@@ -5303,7 +5197,7 @@ Strophe.Websocket.prototype = {
      */
     _onError: function(error) {
         Strophe.error("Websocket error " + error);
-        this._conn._changeConnectStatus(Strophe.Status.CONNFAIL, "The WebSocket connection could not be established or was disconnected.");
+        this._conn._changeConnectStatus(Strophe.Status.CONNFAIL, "The WebSocket connection could not be established was disconnected.");
         this._disconnect();
     },
 
@@ -5438,29 +5332,9 @@ Strophe.Websocket.prototype = {
 return Strophe;
 }));
 
-(function(root){
-    if(typeof define === 'function' && define.amd){
-        define("strophe", [
-            "strophe-core",
-            "strophe-bosh",
-            "strophe-websocket"
-        ], function (wrapper) {
-            return wrapper;
-        });
-    }
-})(this);
-
 /* jshint ignore:start */
 if (callback) {
-    if(typeof define === 'function' && define.amd){
-        //For backwards compatability
-        var n_callback = callback;
-        require(["strophe"],function(o){
-            n_callback(o.Strophe,o.$build,o.$msg,o.$iq,o.$pres);
-        });
-    }else{
-        return callback(Strophe, $build, $msg, $iq, $pres);
-    }
+    return callback(Strophe, $build, $msg, $iq, $pres);
 }
 
 

@@ -16,6 +16,7 @@ var ChatdIntegration = function(megaChat) {
     self.waitingChatIdPromises = {};
     self.chatIdToRoomJid = {};
     self.mcfHasFinishedPromise = new MegaPromise();
+    self.deviceId = null;
 
     megaChat.rebind("onInit.chatdInt", function(e) {
         megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
@@ -28,13 +29,14 @@ var ChatdIntegration = function(megaChat) {
             //self._detachFromChatRoom(chatRoom);
         });
 
-        asyncApiReq({a: "mcf"})
+        asyncApiReq({a: "mcf", d: 1})
             .done(function(r) {
                 // reopen chats from the MCF response.
                 if (r.c) {
                     r.c.forEach(function (actionPacket) {
                         self.openChatFromApi(actionPacket);
                     });
+                    self.deviceId = r.d;
 
                     self.mcfHasFinishedPromise.resolve();
                 }
@@ -496,12 +498,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
+                assert(self.deviceId !== null, 'deviceId not loaded.');
 
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,
                     u_privCu25519,
                     u_privEd25519,
-                    u_pubEd25519
+                    u_pubEd25519,
+                    a32_to_str(String(self.deviceId))
                 );
 
                 self.join(chatRoom);

@@ -790,10 +790,10 @@ var strongvelope = {};
             return false;
         }
 
-        this.keyId = a32_to_str([prefix]) + a32_to_str([highestDateCount]);
+        this.keyId = a32_to_str([myPrefix]) + a32_to_str([highestDateCount]);
 
         if (secondHighestDateCount) {
-            this.previousKeyId = a32_to_str([prefix]) + a32_to_str([secondHighestDateCount]);
+            this.previousKeyId = a32_to_str([myPrefix]) + a32_to_str([secondHighestDateCount]);
         }
 
         return true;

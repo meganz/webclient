@@ -3926,6 +3926,79 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/** prevent tabnabbing attacks */
+mBroadcaster.once('startMega', function() {
+
+    if (!(window.chrome || window.safari || window.opr)) {
+        return;
+    }
+
+    // Check whether is safe to open a link through the native window.open
+    var isSafeTarget = function(link) {
+        link = String(link);
+
+        var allowed = [
+            getBaseUrl(),
+            getAppBaseUrl(),
+            'https://accounts.google.com/o/oauth2/auth'
+        ];
+
+        var rv = allowed.some(function(v) {
+            return link.indexOf(v) === 0;
+        });
+
+        if (d) {
+            console.log('isSafeTarget', link, rv);
+        }
+
+        return rv;
+    };
+
+    var open = window.open;
+    delete window.open;
+
+    // Replace the native window.open which will open unsafe links through a hidden iframe
+    Object.defineProperty(window, 'open', {
+        writable: false,
+        enumerable: true,
+        value: function(url) {
+            var link = document.createElement('a');
+            link.href = url;
+
+            if (isSafeTarget(link.href)) {
+                return open.apply(window, arguments);
+            }
+
+            var iframe = mCreateElement('iframe', {type: 'content', style: 'display:none'}, 'body');
+            var data = 'var win=window.open("' + escapeHTML(link) + '");if(win)win.opener = null;';
+            var doc = iframe.contentDocument || iframe.contentWindow.document;
+            var script = doc.createElement('script');
+            script.type = 'text/javascript';
+            script.src = mObjectURL([data], script.type);
+            script.onload = SoonFc(function() {
+                myURL.revokeObjectURL(script.src);
+                document.body.removeChild(iframe);
+            });
+            doc.body.appendChild(script);
+        }
+    });
+
+    // Catch clicks on links and forward them to window.opemn
+    document.documentElement.addEventListener('click', function(ev) {
+        var node = Object(ev.target);
+
+        if (node.nodeName === 'A' && node.href
+                && String(node.getAttribute('target')).toLowerCase() === '_blank'
+                && !isSafeTarget(node.href)) {
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            window.open(node.href);
+        }
+    }, true);
+});
+
 /** document.hasFocus polyfill */
 mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {

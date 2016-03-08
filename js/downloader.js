@@ -467,7 +467,7 @@ ClassFile.prototype.run = function(task_done) {
         }
     }.bind(this);
 
-    this.dl.io.begin = function() {
+    this.dl.io.begin = function(newName) {
         /* jshint -W074 */
         var tasks = [];
 
@@ -479,6 +479,17 @@ ClassFile.prototype.run = function(task_done) {
         else {
             if (d) {
                 dlmanager.logger.info(this + ' Adding %d tasks...', (this.dl.urls || []).length);
+            }
+
+            if (newName) {
+                if (this.dl.zipid) {
+                    this.dl.zipname = newName;
+                }
+                else {
+                    this.dl.n = newName;
+                }
+
+                $('#' + dlmanager.getGID(this.dl) + ' .tranfer-filetype-txt').text(newName);
             }
 
             if (this.dl.urls) {

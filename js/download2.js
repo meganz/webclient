@@ -353,6 +353,7 @@ var dlmanager = {
 
         if (code === 509) {
             var retry = args[1].retry;
+            retry = 120; // remove me
 
             if (dl.quota_t) {
                 // cleanup any previous quota retry timer
@@ -365,7 +366,7 @@ var dlmanager = {
                 $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
 
                 // resume downloads
-                var ids = $('.transfer-table tr.overquota').attrs('id');
+                var ids = $('.transfer-table tr.overquota').removeClass('overquota').attrs('id');
                 ids.push(dlmanager.getGID(dl));
                 ids.forEach(fm_tfsresume);
             }, retry * 1000);
@@ -750,7 +751,7 @@ function fm_tfspause(gid, overquota) {
         var $tr = $('.transfer-table tr#' + gid);
         $tr.addClass('paused');
         $tr.find('span.transfer-type').addClass('paused');
-        if (overquota) {
+        if (overquota === true) {
             $tr.addClass('overquota');
         } else {
             $tr.find('td:eq(5)').safeHTML('<span class="transfer-status queued">' + l[7227] + '</span>');

@@ -352,7 +352,8 @@ var dlmanager = {
         }
 
         if (code === 509) {
-            var retry = args[1].retry;
+            // add extra 3 seconds before closing the dialog and retrying
+            var retry = args[1].retry + 3;
             retry = 60; // remove me
 
             this.showOverQuotaDialog(retry);
@@ -590,7 +591,7 @@ var dlmanager = {
             $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
             $('#' + ids.join(',#')).removeClass('overquota');
             ids.forEach(fm_tfsresume); 
-        }, (expires+3) * 1000);
+        }, expires * 1000);
     },
 
     showOverQuotaDialog: function DM_quotaDialog(time) {

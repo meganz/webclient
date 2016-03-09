@@ -1529,8 +1529,12 @@ var strongvelope = {};
             excludeParticipants: []
         };
 
-        // Update counter.
-        if (!historicMessage && (result.sender !== this.ownHandle)) {
+        // Update counter based on payload messages from other users or devices.
+        var keyIdFromMessage = parsedMessage.keyIds[0];
+        var prefixFromMessage = str_to_a32(keyIdFromMessage)[0];
+        var a32words = str_to_a32(this.uniqueDeviceId);
+        var myPrefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
+        if ((cleartext !== null) && !historicMessage && (result.sender !== this.ownHandle) && (myPrefix !== prefixFromMessage)) {
             this._totalMessagesWithoutSendKey++;
         }
 
@@ -1632,13 +1636,6 @@ var strongvelope = {};
                 }
             }
         }
-
-        // TODO: Move reminder detection logic into encryptTo method for lazy reminding.
-        // Prepare a key reminder if required.
-        /*if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
-                && (result.sender !== this.ownHandle)) {
-            result.toSend = this.encryptTo(null, sender);
-        }*/
 
         return result;
     };

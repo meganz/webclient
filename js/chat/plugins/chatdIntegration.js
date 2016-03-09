@@ -452,11 +452,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             false
                         );
 
-                        // TODO: Delete this when fixing reminders to only occur lazily, with detection
-                        // inside the encryptTo function of strongvelope
-                        if (decrypted && decrypted.toSend) {
-                            self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
-                        }
                         if (decrypted && decrypted.payload) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
                         } else if (decrypted && !decrypted.payload && decrypted.type === 0) {

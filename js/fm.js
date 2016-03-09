@@ -10496,7 +10496,11 @@ mega.utils.fullUsername = function username(userHandle) {
         result = M.u[userHandle].name && $.trim(M.u[userHandle].name) || M.u[userHandle].m;
     }
 
-    return String(result);
+    // Convert to string and escape for XSS
+    var stringNameEmail = String(result);
+    var escapedNameEmail = htmlentities(stringNameEmail);
+
+    return escapedNameEmail;
 };
 
 function sharedFolderUI() {
@@ -10570,7 +10574,7 @@ function sharedFolderUI() {
                         + '<div class="clear"></div>'
                         + avatar
                         + '<div class="fm-chat-user-info">'
-                            + '<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
+                            + '<div class="fm-chat-user">' + fullOwnersName + '</div>'
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'

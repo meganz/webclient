@@ -815,7 +815,7 @@ var ConversationRightArea = React.createClass({
             {__(l[5897])}
         </div>;
 
-        var endCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+        var endCallButton = <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
                         if (contact.presence && contact.presence !== "offline") {
                             if (room.callSession) {
                                 room.callSession.endCall();
@@ -848,7 +848,6 @@ var ConversationRightArea = React.createClass({
                     <div className="buttons-block">
                         {startAudioCallButton}
                         {startVideoCallButton}
-                        {endCallButton}
 
                         { null /*<ButtonsUI.Button
                             className="link-button dropdown-element"
@@ -884,7 +883,7 @@ var ConversationRightArea = React.createClass({
                             </DropdownsUI.Dropdown>
                         </ButtonsUI.Button>
 
-
+                        {endCallButton}
                         {
                             room.type !== "private" ?
                                 <div className="link-button red" onClick={() => {

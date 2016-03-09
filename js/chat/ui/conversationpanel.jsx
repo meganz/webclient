@@ -680,7 +680,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(generateContactName(contact.u)));
+                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -691,7 +691,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", htmlentities(generateContactName(contact.u)));
+                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
             }
 
             message.textContents = textMessage;
@@ -815,9 +815,20 @@ var ConversationRightArea = React.createClass({
             {__(l[5897])}
         </div>;
 
+        var endCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+                        if (contact.presence && contact.presence !== "offline") {
+                            room.endCall();
+                        }
+                    }}>
+            <i className="small-icon red-cross"></i>
+            {__(l[5884])}
+        </div>;
+
 
         if (room.callSession && room.callSession.isActive() === true) {
             startAudioCallButton = startVideoCallButton = null;
+        } else {
+            endCallButton = null;
         }
 
         return <div className="chat-right-area">
@@ -835,6 +846,7 @@ var ConversationRightArea = React.createClass({
                     <div className="buttons-block">
                         {startAudioCallButton}
                         {startVideoCallButton}
+                        {endCallButton}
 
                         { null /*<ButtonsUI.Button
                             className="link-button dropdown-element"

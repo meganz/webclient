@@ -455,3 +455,38 @@ MegaPromise.reject = function() {
 
     return p;
 };
+
+/**
+ * Development helper tool to delay .resolve/.reject of a promise.
+ *
+ * @param ms {Number} milliseconds to delay the .resolve/.reject
+ */
+MegaPromise.prototype.fakeDelay = function(ms) {
+    var self = this;
+    if (self._fakeDelayEnabled) {
+        return;
+    }
+
+    var origResolve = self.resolve;
+    var origReject = self.reject;
+    self.resolve = function() {
+        var args = arguments;
+        setTimeout(function() {
+            origResolve.apply(self, args);
+        }, ms);
+
+        return self;
+    };
+    self.reject = function() {
+        var args = arguments;
+        setTimeout(function() {
+            origReject.apply(self, args);
+        }, ms);
+
+        return self;
+    };
+
+    self._fakeDelayEnabled = true;
+
+    return self;
+};

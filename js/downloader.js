@@ -347,10 +347,6 @@ ClassFile.prototype.toString = function() {
 
 ClassFile.prototype.abortTimers = function() {
     if (this.dl) {
-        if (this.dl.quota_t) {
-            clearTimeout(this.dl.quota_t);
-            delete this.dl.quota_t;
-        }
         if (this.dl.retry_t) {
             clearTimeout(this.dl.retry_t);
             delete this.dl.retry_t;

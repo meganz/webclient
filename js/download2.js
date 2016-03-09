@@ -353,30 +353,8 @@ var dlmanager = {
 
         if (code === 509) {
             var retry = args[1].retry;
-            retry = 120; // remove me
+            retry = 60; // remove me
 
-            if (dl.quota_t) {
-                // cleanup any previous quota retry timer
-                clearTimeout(dl.quota_t);
-            }
-
-            dl.quota_t = setTimeout(function() {
-                // put current download back
-                dlmanager.dlQueuePushBack(task);
-                $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
-
-                // resume downloads
-                var ids = $('.transfer-table tr.overquota').removeClass('overquota').attrs('id');
-                ids.push(dlmanager.getGID(dl));
-                ids.forEach(fm_tfsresume);
-            }, retry * 1000);
-
-            // pause downloads
-            var ids = $('.transfer-table tr:not(.paused)').attrs('id');
-            ids.push(dlmanager.getGID(dl));
-            ids.forEach(function(id) {
-                fm_tfspause(id, true);
-            });
             this.showOverQuotaDialog(retry);
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
             return 1;
@@ -602,6 +580,19 @@ var dlmanager = {
         };
     },
 
+    _setQuotaRetryTimer: function setRetryTimer(expires) {
+        if (this._quotaRetry) {
+            clearTimeout(this._quotaRetry);
+        }
+        this._quotaRetry = setTimeout(function() {
+            
+            var ids = dlmanager.getCurrentDownloads();
+            $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+            $('#' + ids.join(',#')).removeClass('overquota');
+            ids.forEach(fm_tfsresume); 
+        }, expires * 1000);
+    },
+
     showOverQuotaDialog: function DM_quotaDialog(time) {
     
         var tick;
@@ -612,10 +603,15 @@ var dlmanager = {
         if (!time && typeof this._lastQuotaTimeout == "number") {
             time = this._lastQuotaTimeout - unixtime();
         }
-    
+
         // make sure time is indeed a number
         time = parseInt(time);
-        
+
+        dlmanager.getCurrentDownloads().forEach(function(id) {
+            fm_tfspause(id, true);
+        });
+
+
         fm_showoverlay();
         $dialog.removeClass('hidden')
             .find('.bandwidth-header')
@@ -647,9 +643,18 @@ var dlmanager = {
             $txt.text(secondsToTimeShort(--time));
         }, 1000);
 
+        this._setQuotaRetryTimer(time);
         this._lastQuotaTimeout = unixtime() + time;
     },
 
+    /**
+     *  Get the current downloads
+     *
+     *  TODO: Perhaps it's faster to iterate to the queue rather than bothering the DOM.
+     */
+    getCurrentDownloads: function() {
+        return $('.transfer-table tr .download').parents('tr').attrs('id');
+    },
 
     isMEGAsyncRunning: function(minVersion) {
         var timeout = 200;

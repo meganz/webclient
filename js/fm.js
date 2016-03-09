@@ -10490,17 +10490,17 @@ function fm_resize_handler() {
 mega.utils.fullUsername = function username(userHandle) {
 
     // User name
-    var result = "";
+    var result = '';
 
     if (M.u[userHandle]) {
         result = M.u[userHandle].name && $.trim(M.u[userHandle].name) || M.u[userHandle].m;
+
+        // Convert to string and escape for XSS
+        result = String(result);
+        result = htmlentities(result);
     }
 
-    // Convert to string and escape for XSS
-    var stringNameEmail = String(result);
-    var escapedNameEmail = htmlentities(stringNameEmail);
-
-    return escapedNameEmail;
+    return result;
 };
 
 function sharedFolderUI() {

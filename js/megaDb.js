@@ -673,7 +673,7 @@ MegaDB.prototype.get = function(tableName, val) {
             if ($.isArray(result) && result.length == 1) {
                 promise.resolve(result[0]);
             } else if ($.isArray(result) && result.length > 1) {
-                promise.resolve([result]);
+                promise.resolve(result);
             }  else {
                 promise.resolve.apply(promise, arguments);
             }

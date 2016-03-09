@@ -590,7 +590,7 @@ var dlmanager = {
             $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
             $('#' + ids.join(',#')).removeClass('overquota');
             ids.forEach(fm_tfsresume); 
-        }, expires * 1000);
+        }, (expires+3) * 1000);
     },
 
     showOverQuotaDialog: function DM_quotaDialog(time) {

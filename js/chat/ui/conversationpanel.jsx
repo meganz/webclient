@@ -817,7 +817,9 @@ var ConversationRightArea = React.createClass({
 
         var endCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                         if (contact.presence && contact.presence !== "offline") {
-                            room.endCall();
+                            if (room.callSession) {
+                                room.callSession.endCall();
+                            }
                         }
                     }}>
             <i className="small-icon horizontal-red-handset"></i>

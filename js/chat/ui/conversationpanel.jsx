@@ -820,7 +820,7 @@ var ConversationRightArea = React.createClass({
                             room.endCall();
                         }
                     }}>
-            <i className="small-icon red-cross"></i>
+            <i className="small-icon horizontal-red-handset"></i>
             {__(l[5884])}
         </div>;
 

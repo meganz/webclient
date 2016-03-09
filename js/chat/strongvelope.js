@@ -1689,16 +1689,12 @@ var strongvelope = {};
      *     Array of new participants' user handles to include to the chat room.
      * @param {Array.<String>} excludeParticipants
      *     Array of old participants' user handles to exclude from the chat room.
-     * @param {String} [message]
-     *     Data message to send directly with the member change. If `null`
-     *     or `undefined`, no message payload will be encoded (i. e. it's a
-     *     "blind" management message).
      * @returns {String|Boolean}
      *     Message to be sent to the room. `false` if no message is to be
      *     sent (e.g. on an error).
      */
     strongvelope.ProtocolHandler.prototype.alterParticipants = function(
-            includeParticipants, excludeParticipants, message) { // jshint maxcomplexity: 12
+            includeParticipants, excludeParticipants) { // jshint maxcomplexity: 12
 
         var errorOut = false;
 
@@ -1787,7 +1783,7 @@ var strongvelope = {};
         });
 
         // Assemble main message body and rotate keys if required.
-        var assembledMessage = this._assembleBody(message);
+        var assembledMessage = this._assembleBody(null);
 
         // Add correct message type to front and put together final content.
         var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),

@@ -629,7 +629,6 @@ var ConversationMessage = React.createClass({
                     name = <div className="message user-card-name">{displayName}</div>;
                 }
 
-
                 var messageDisplayBlock;
                 if (self.props.isBeingEdited === true) {
                     messageDisplayBlock = <TypingAreaUI.TypingArea
@@ -661,7 +660,6 @@ var ConversationMessage = React.createClass({
                             {datetime}
 
                             {messageActionButtons}
-
                             {messageDisplayBlock}
                             {buttonsBlock}
                             {spinnerElement}

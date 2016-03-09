@@ -29,7 +29,7 @@ function MegaDB(name, suffix, schema, options) {
     var self = this;
     var dbName = 'mdb_' + name + '_' + suffix;
     var murSeed = options.murSeed || 0x4d444201;
-    console.error(name, options.murSeed);
+
     var murData =
         JSON.stringify(this.schema) +
         JSON.stringify(clone(this.options));

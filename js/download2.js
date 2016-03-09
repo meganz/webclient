@@ -356,7 +356,7 @@ var dlmanager = {
             var retry = args[1].retry + 3;
             retry = 60; // remove me
 
-            this.showOverQuotaDialog(retry);
+            this.showOverQuotaDialog(retry, task);
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
             return 1;
         }
@@ -581,6 +581,8 @@ var dlmanager = {
         };
     },
 
+    _quotaPushBack: {},
+
     _setQuotaRetryTimer: function setRetryTimer(expires) {
         if (this._quotaRetry) {
             clearTimeout(this._quotaRetry);
@@ -590,11 +592,20 @@ var dlmanager = {
             var ids = dlmanager.getCurrentDownloads();
             $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
             $('#' + ids.join(',#')).removeClass('overquota');
+
+            for (var gid in this._quotaPushBack) {
+                if (this._quotaPushBack.hasOwnProperty(gid) && this._quotaPushBack[gid].onQueueDone) {
+                    this.dlQueuePushBack(this._quotaPushBack[gid]);
+                }
+            }
+
+            this._quotaPushBack = {};
+
             ids.forEach(fm_tfsresume); 
-        }, expires * 1000);
+        }.bind(this), expires * 1000);
     },
 
-    showOverQuotaDialog: function DM_quotaDialog(time) {
+    showOverQuotaDialog: function DM_quotaDialog(time, dlTask) {
     
         var tick;
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
@@ -603,6 +614,10 @@ var dlmanager = {
 
         if (!time && typeof this._lastQuotaTimeout == "number") {
             time = this._lastQuotaTimeout - unixtime();
+        }
+
+        if (dlTask) {
+            this._quotaPushBack[dlTask.gid] = dlTask;
         }
 
         // make sure time is indeed a number

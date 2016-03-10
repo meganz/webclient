@@ -633,6 +633,7 @@ var strongvelope = {};
         this.excludeParticipants = new Set();
         this.uniqueDeviceId = uniqueDeviceId;
         this._inUse = false;
+        this.participantChange = false;
     };
 
 
@@ -794,6 +795,7 @@ var strongvelope = {};
         if (secondHighestDateCount) {
             this.previousKeyId = a32_to_str([myPrefix]) + a32_to_str([secondHighestDateCount]);
         }
+        // TOGO: if detect user management message, flag participantChange to be ture and return true.
         return true;
     };
 
@@ -1174,7 +1176,7 @@ var strongvelope = {};
 
         var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
         var encryptedKeys = false;
-        if (repeatKey || (this._sentKeyId !== this.keyId)) {
+        if (repeatKey || (this._sentKeyId !== this.keyId) || this.participantChange) {
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
 
@@ -1192,6 +1194,7 @@ var strongvelope = {};
             content += encryptedKeys.keyIds;
             this._sentKeyId = this.keyId;
             this._totalMessagesWithoutSendKey = 0;
+            this.participantChange = false;
         }
         else {
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
@@ -1675,7 +1678,44 @@ var strongvelope = {};
         return decryptedMessages;
     };
 
+    /**
+     * Add a participant to current group participants.
+     *
+     * @method
+     * @param participant {String}
+     *     participant's user handle.
+     */
+    strongvelope.ProtocolHandler.prototype.addParticipant = function(participant, isNewUserJoin) {
+        if (typeof isNewUserJoin === 'undefined') {
+            isNewUserJoin = false;
+        }
+        if (participant !== this.ownHandle) {
+            if (!this.otherParticipants.has(participant)) {
+                this.otherParticipants.add(participant);
+            }
+            // Add participant into includeParticipants so it will not include the previous sender key for the new participant.
+            if (isNewUserJoin === true) {
+                if (!this.includeParticipants.has(participant)) {
+                    this.includeParticipants.add(participant);
+                    this.participantChange = true;
+                }
+            }
+        }
+    };
 
+    /**
+     * Remove a participant from current group participants.
+     *
+     * @method
+     * @param participant {String}
+     *     participant's user handle.
+     */
+    strongvelope.ProtocolHandler.prototype.removeParticipant = function(participant) {
+        if (this.otherParticipants.has(participant) && (participant !== this.ownHandle)) {
+            this.otherParticipants.delete(participant);
+            this.participantChange = true;
+        }
+    };
     /**
      * Alters the participant list of the chat room.
      *

@@ -230,7 +230,6 @@ describe("chat.strongvelope workflow test", function() {
                     }
                     else {
                         assert.strictEqual(received, false);
-                        assert.strictEqual(person.otherParticipants.size, 0);
                     }
                     if (received.toSend) {
                         toSend.push([received.toSend, person.ownHandle]);
@@ -261,6 +260,7 @@ describe("chat.strongvelope workflow test", function() {
             sender = 'alice678900';
             message = 'Tēnā koe';
             sent = participants[sender].encryptTo(message, 'bob45678900');
+
             activeParticipants.add('bob45678900');
             if (sent.length > 1)
             {
@@ -297,10 +297,17 @@ describe("chat.strongvelope workflow test", function() {
             participants['charlie8900'].updateSenderKey();
             sender = 'alice678900';
 
-            sent = participants[sender].alterParticipants(['charlie8900'], []);
+            for (var handle in participants) {
+                if (participants.hasOwnProperty(handle)) {
+                    var person = participants[handle];
+                    person.addParticipant('charlie8900', true);
+                }
+            }
+            // Charlie adds all participants of the current room.
+            for (var i = 0;i < activeParticipants.length; i++) {
+                participants['charlie8900'].addParticipant(activeParticipants[i]);
+            }
             activeParticipants.add('charlie8900');
-            _checkReceivers(sent, sender, null,
-                            participants, activeParticipants);
 
             // Bob sends to the group.
             sender = 'bob45678900';
@@ -318,12 +325,14 @@ describe("chat.strongvelope workflow test", function() {
                 _checkReceivers(sent[0], sender, message,
                             participants, activeParticipants);//payload message
             }
-            // Alice removes Bob from the chat.
-            sender = 'alice678900';
-            sent = participants[sender].alterParticipants([], ['bob45678900']);
+            // Removes Bob from the chat.
+            for (var handle in participants) {
+                if (participants.hasOwnProperty(handle)) {
+                    var person = participants[handle];
+                    person.removeParticipant('bob45678900');
+                }
+            }
             activeParticipants.delete('bob45678900');
-            _checkReceivers(sent, sender, null,
-                            participants, activeParticipants);
 
             // Charlie sends to the group.
             sender = 'charlie8900';
@@ -366,12 +375,21 @@ describe("chat.strongvelope workflow test", function() {
             result = participants['bob45678900'].seed(_messageBuffer);
             // Bob will fail to seed, because his device id has changed
             assert.strictEqual(result, false);
+            // Bob updates his sender key as he just failed to seed from history messages.
+            participants['bob45678900'].updateSenderKey();
             sender = 'alice678900';
             message = 'Welcome back, mate.';
-            sent = participants[sender].alterParticipants(['bob45678900'], []);
+            for (var handle in participants) {
+                if (participants.hasOwnProperty(handle)) {
+                    var person = participants[handle];
+                    person.addParticipant('bob45678900', true);
+                }
+            }
+            // Charlie add all participants of the current room.
+            for (var i = 0;i < activeParticipants.length; i++) {
+                participants['bob45678900'].addParticipant(activeParticipants[i]);
+            }
             activeParticipants.add('bob45678900');
-            _checkReceivers(sent, sender, null,
-                            participants, activeParticipants);
 
             // Chatty Charlie sends to the group.
             sender = 'charlie8900';
@@ -399,10 +417,18 @@ describe("chat.strongvelope workflow test", function() {
             sandbox.stub(window, 'u_privk', RSA_PRIV_KEY);
             sender = 'alice678900';
             message = 'Long time no see, Dave.';
-            sent = participants[sender].alterParticipants(['dave5678900'], []);
+            for (var handle in participants) {
+                if (participants.hasOwnProperty(handle)) {
+                    var person = participants[handle];
+                    person.addParticipant('dave5678900', true);
+                }
+            }
+            // Dave adds all participants of the current room.
+            for (var i = 0;i < activeParticipants.length; i++) {
+                participants['dave5678900'].addParticipant(activeParticipants[i]);
+            }
             activeParticipants.add('dave5678900');
-            _checkReceivers(sent, sender, null,
-                            participants, activeParticipants);
+
 
             // Bob sends to the group.
             sender = 'bob45678900';

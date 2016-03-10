@@ -680,7 +680,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+                var tmpMsg = textMessage[0].replace("[X]", mega.utils.fullUsername(contact.u));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -691,7 +691,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+                textMessage = textMessage.replace("[X]", mega.utils.fullUsername(contact.u));
             }
 
             message.textContents = textMessage;

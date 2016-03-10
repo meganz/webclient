@@ -629,7 +629,6 @@ var ConversationMessage = React.createClass({
                     name = <div className="message user-card-name">{displayName}</div>;
                 }
 
-
                 var messageDisplayBlock;
                 if (self.props.isBeingEdited === true) {
                     messageDisplayBlock = <TypingAreaUI.TypingArea
@@ -661,7 +660,6 @@ var ConversationMessage = React.createClass({
                             {datetime}
 
                             {messageActionButtons}
-
                             {messageDisplayBlock}
                             {buttonsBlock}
                             {spinnerElement}
@@ -682,7 +680,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(generateContactName(contact.u)));
+                var tmpMsg = textMessage[0].replace("[X]", mega.utils.fullUsername(contact.u));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -693,7 +691,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", htmlentities(generateContactName(contact.u)));
+                textMessage = textMessage.replace("[X]", mega.utils.fullUsername(contact.u));
             }
 
             message.textContents = textMessage;
@@ -817,9 +815,22 @@ var ConversationRightArea = React.createClass({
             {__(l[5897])}
         </div>;
 
+        var endCallButton = <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
+                        if (contact.presence && contact.presence !== "offline") {
+                            if (room.callSession) {
+                                room.callSession.endCall();
+                            }
+                        }
+                    }}>
+            <i className="small-icon horizontal-red-handset"></i>
+            {__(l[5884])}
+        </div>;
+
 
         if (room.callSession && room.callSession.isActive() === true) {
             startAudioCallButton = startVideoCallButton = null;
+        } else {
+            endCallButton = null;
         }
 
         return <div className="chat-right-area">
@@ -872,7 +883,7 @@ var ConversationRightArea = React.createClass({
                             </DropdownsUI.Dropdown>
                         </ButtonsUI.Button>
 
-
+                        {endCallButton}
                         {
                             room.type !== "private" ?
                                 <div className="link-button red" onClick={() => {

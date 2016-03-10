@@ -1989,23 +1989,23 @@ function api_reqfailed(c, e) {
         queue.ctxs = [[], []];
         queue.setimmediate = false;
         
-        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(code) {
+        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {
             u_logout(true);
 
             // On clicking OK, log the user out and redirect to contact page
             loadingDialog.hide();
                         
-            var reason = l[7660];   // You have been suspended due to repeated copyright infringement.
+            var reasonText = l[7660];   // You have been suspended due to repeated copyright infringement.
                         
-            if (code === 100) {
-                reason = l[7659];   // You have been suspended due to excess data usage.
+            if (reasonCode === 100) {
+                reasonText = l[7659];   // You have been suspended due to excess data usage.
             }
-            else if (code === 300) {
-                reason = l[8603];   // You have been suspended due to Terms of Service violations.
+            else if (reasonCode === 300) {
+                reasonText = l[8603];   // You have been suspended due to Terms of Service violations.
             }
             
             msgDialog('warninga', l[6789],
-                reason,
+                reasonText,
                 false,
                 function() {
                     var redirectUrl = getAppBaseUrl() + '#contact';

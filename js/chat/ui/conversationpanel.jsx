@@ -1148,46 +1148,53 @@ var ConversationAudioVideoPanel = React.createClass({
             </div>;
         }
         else {
-            var localPlayerSrc = callSession.localPlayer.src;
+            if (callSession.localPlayer) {
+                var localPlayerSrc = (
+                    callSession && callSession.localPlayer && callSession.localPlayer.src ?
+                        callSession.localPlayer.src :
+                        null
+                );
 
-            if (!localPlayerSrc) {
-                if (callSession.localPlayer.srcObject) {
-                    callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.srcObject);
-                    localPlayerSrc = callSession.localPlayer.src;
-                }
-                else if (callSession.localPlayer.mozSrcObject) {
-                    callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
-                    localPlayerSrc = callSession.localPlayer.src;
-                }
-                else if (
-                    callSession.getJingleSession() &&
-                    callSession.getJingleSession()._sess &&
-                    callSession.getJingleSession()._sess.localStream
-                ) {
-                    callSession.localPlayer.src = URL.createObjectURL(
+                if (!localPlayerSrc) {
+                    if (callSession.localPlayer.srcObject) {
+                        callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.srcObject);
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else if (callSession.localPlayer.mozSrcObject) {
+                        callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else if (
+                        callSession.getJingleSession() &&
+                        callSession.getJingleSession()._sess &&
                         callSession.getJingleSession()._sess.localStream
-                    );
-                    localPlayerSrc = callSession.localPlayer.src;
+                    ) {
+                        callSession.localPlayer.src = URL.createObjectURL(
+                            callSession.getJingleSession()._sess.localStream
+                        );
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else {
+                        console.error("Could not retrieve src object.");
+                    }
                 }
-                else {
-                    console.error("Could not retrieve src object.");
-                }
-            }
-            localPlayerElement = <div className={"call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
-                <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
-                    <i className="tiny-icon grey-minus-icon" />
-                </div>
-                <video
-                    className="localViewport"
-                    defaultMuted={true}
-                    muted={true}
-                    volume={0}
-                    id={"localvideo_" + callSession.sid}
-                    src={localPlayerSrc}
-                    style={{display: !this.state.localMediaDisplay ? "none" : ""}}
+                localPlayerElement = <div
+                    className={"call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
+                    <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
+                        <i className="tiny-icon grey-minus-icon"/>
+                    </div>
+                    <video
+                        className="localViewport"
+                        defaultMuted={true}
+                        muted={true}
+                        volume={0}
+                        id={"localvideo_" + callSession.sid}
+                        src={localPlayerSrc}
+                        style={{display: !this.state.localMediaDisplay ? "none" : ""}}
 
-                />
-            </div>;
+                    />
+                </div>;
+            }
         }
 
         if (callSession.getRemoteMediaOptions().video === false || !callSession.remotePlayer) {

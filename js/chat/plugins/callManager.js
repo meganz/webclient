@@ -959,7 +959,7 @@ CallManager.prototype._rtcEventProxyToRoom = function(e, eventData) {
 
         self.logger.warn("Routing RTC event to current room: ", room, e, eventData);
 
-        // local-stream-obtained = most likely this is the currently active window/room
+        // local-stream-connect = most likely this is the currently active window/room
         if (room) {
             room.trigger(e, eventData);
         }

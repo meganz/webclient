@@ -10490,13 +10490,17 @@ function fm_resize_handler() {
 mega.utils.fullUsername = function username(userHandle) {
 
     // User name
-    var result = "";
+    var result = '';
 
     if (M.u[userHandle]) {
         result = M.u[userHandle].name && $.trim(M.u[userHandle].name) || M.u[userHandle].m;
+
+        // Convert to string and escape for XSS
+        result = String(result);
+        result = htmlentities(result);
     }
 
-    return String(result);
+    return result;
 };
 
 function sharedFolderUI() {
@@ -10570,7 +10574,7 @@ function sharedFolderUI() {
                         + '<div class="clear"></div>'
                         + avatar
                         + '<div class="fm-chat-user-info">'
-                            + '<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
+                            + '<div class="fm-chat-user">' + fullOwnersName + '</div>'
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'

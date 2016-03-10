@@ -797,6 +797,10 @@ var ConversationRightArea = React.createClass({
         var contact = room.megaChat.getContactFromJid(contactJid);
 
 
+        if (!contact) {
+            // something is really bad.
+            return null;
+        }
         var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                             if (contact.presence && contact.presence !== "offline") {
                                 room.startAudioCall();

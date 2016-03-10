@@ -2975,6 +2975,8 @@
     "8597": "O seu Plano de Filia\u00e7\u00e3o PRO ir\u00e1 expirar em %1 dias.",
     "8598": "O Plano de Filia\u00e7\u00e3o PRO expirar\u00e1 brevemente",
     "8601": "Descarregar com MEGAsync se este estiver a correr",
+    "8602": "This file will be decrypted as soon as the cryptographic key becomes available.",
+    "8603": "You have been suspended due to Terms of Service violations.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3010,6 +3012,7 @@
         "pro-plan-expires-1-day": 8596,
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
-        "delete-duplicates": 8599
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

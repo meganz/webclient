@@ -2975,6 +2975,8 @@
     "8597": "\u60a8\u7684\u5c08\u696d\u7248\u6703\u54e1\u5c08\u6848\u5c07\u5728%1\u5929\u5167\u5230\u671f",
     "8598": "\u5c08\u696d\u7248\u6703\u54e1\u5c08\u6848\u5373\u5c07\u5230\u671f",
     "8601": "\u82e5\u53ef\u904b\u4f5c\uff0c\u5247\u4f7f\u7528MEGAsync\u4e0b\u8f09",
+    "8602": "This file will be decrypted as soon as the cryptographic key becomes available.",
+    "8603": "You have been suspended due to Terms of Service violations.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3010,6 +3012,7 @@
         "pro-plan-expires-1-day": 8596,
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
-        "delete-duplicates": 8599
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

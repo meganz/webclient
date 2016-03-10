@@ -2975,6 +2975,8 @@
     "8597": "Membership PRO anda akan habis dalam %1 hari.",
     "8598": "Membership PRO akan habis dalam waktu dekat",
     "8601": "Download dengan MEGAsync jika program sedang berjalan",
+    "8602": "This file will be decrypted as soon as the cryptographic key becomes available.",
+    "8603": "You have been suspended due to Terms of Service violations.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3010,6 +3012,7 @@
         "pro-plan-expires-1-day": 8596,
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
-        "delete-duplicates": 8599
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

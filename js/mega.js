@@ -1028,7 +1028,7 @@ function MegaData()
                                 <td>\n\
                                     ' + avatar + ' \
                                     <div class="fm-chat-user-info todo-star">\n\
-                                        <div class="fm-chat-user">' + htmlentities(mega.utils.fullUsername(node.u)) + '</div>\n\
+                                        <div class="fm-chat-user">' + mega.utils.fullUsername(node.u) + '</div>\n\
                                         <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
                                     </div>\n\
                                 </td>\n\
@@ -1129,7 +1129,7 @@ function MegaData()
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + htmlentities(fullContactName) + '</span></span></a>';
+                            + fullContactName + '</span></span></a>';
                     }
                     else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
@@ -1147,7 +1147,7 @@ function MegaData()
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div>'
                             + '<div class="fm-chat-user">'
-                            + htmlentities(fullContactName) + '</div><div class="nw-contact-status"></div>'
+                            + fullContactName + '</div><div class="nw-contact-status"></div>'
                             + '<div class="fm-chat-user-status ' + htmlentities(u_h)
                             + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270">'
@@ -3703,15 +3703,15 @@ function MegaData()
         else {
             if (!$icon.hasClass('filled')) {
                 $icon.addClass('filled');
-            } 
+            }
             else if (!$icon.hasClass('glow')) {
                 $icon.addClass('glow');
-            } 
+            }
             else {
                 $icon.removeClass('glow');
             }
         }
-            
+
     };
 
     this.nodeAttr = function(attrs) {

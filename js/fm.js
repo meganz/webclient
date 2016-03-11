@@ -2183,7 +2183,7 @@ function fmremove() {
             contact = 'contacts';
         }
         else {
-            replaceString = '<strong>' + decodeURIComponent(M.d[$.selected[0]].name) + '</strong>';
+            replaceString = '<strong>' + htmlentities(M.d[$.selected[0]].name) + '</strong>';
             contact = 'contact';
         }
 
@@ -7540,7 +7540,7 @@ function addShareDialogContactToContent(type, id, av, name, permClass, permText,
     }
     else {
         item = av +   '<div class="fm-chat-user-info">'
-               +       '<div class="fm-chat-user">' + name + '</div>'
+               +       '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
                +   '</div>';
     }
 

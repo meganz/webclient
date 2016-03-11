@@ -167,7 +167,8 @@ var ContactCard = React.createClass({
         var self = this;
 
         var contact = this.props.contact;
-        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
+        var megaChat = (this.props.megaChat ? this.props.megaChat : window.megaChat);
+        var pres = megaChat.xmppPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
 
         var contextMenu;

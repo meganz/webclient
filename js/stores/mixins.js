@@ -246,11 +246,10 @@ var MegaRenderMixin = {
 
         var foundChanges = false;
         mapKeys.forEach(function(k) {
-            foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
-
             if (foundChanges === true) {
                 return false; // break
             }
+            foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
         });
         return foundChanges;
     },
@@ -273,6 +272,7 @@ var MegaRenderMixin = {
             "rendered: ", this.getElementName(),
             "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
             "props:", this.props,
+            "nextProps:", this.props,
             "state:", this.state
         );
 

@@ -1624,8 +1624,9 @@ var strongvelope = {};
         }
 
         // Prepare a key reminder if required.
+        // If keyId is null, there is no need to send out a key reminder.
         if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
-                && (result.sender !== this.ownHandle)) {
+                && (result.sender !== this.ownHandle) && this.keyId) {
             result.toSend = this.encryptTo(null, sender);
         }
 

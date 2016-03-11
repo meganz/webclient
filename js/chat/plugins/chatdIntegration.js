@@ -505,7 +505,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     u_privCu25519,
                     u_privEd25519,
                     u_pubEd25519,
-                    a32_to_str(String(self.deviceId))
+                    a32_to_str([self.deviceId])
                 );
 
                 self.join(chatRoom);

@@ -955,28 +955,6 @@ function loginDialog(close) {
     $('.top-dialog-login-button').rebind('click', function (e) {
         tooltiplogin();
     });
-    $('#login-name').rebind('focus', function (e) {
-        if ($(this).val() == l[195]) {
-            $(this).val('');
-        }
-    });
-    $('#login-name').rebind('blur', function (e) {
-        if ($(this).val() == '') {
-            $(this).val(l[195]);
-        }
-    });
-    $('#login-password').rebind('focus', function (e) {
-        if ($(this).val() == l[909]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
-    });
-    $('#login-password').rebind('blur', function (e) {
-        if ($(this).val() == '') {
-            $(this).val(l[909]);
-            $(this)[0].type = 'text';
-        }
-    });
     $('.top-login-full').rebind('click', function (e) {
         loginDialog(1);
         document.location.hash = 'login';
@@ -1007,6 +985,13 @@ function loginDialog(close) {
     $('.top-login-input-block').rebind('click', function (e) {
         $(this).find('input').focus();
     });
+
+    $('.top-login-input-block.password input,.top-login-input-block.e-mail input').rebind('blur', function() {
+        $(this).parents('.top-login-input-block').removeClass('focused');
+    }).rebind('focus', function() {
+        $(this).parents('.top-login-input-block').addClass('focused');
+    });
+
 
     $('.loginwarning-checkbox,.top-login-warning .radio-txt').rebind('click', function (e) {
         var c = '.loginwarning-checkbox',
@@ -1049,6 +1034,7 @@ function tooltiplogin() {
                 alert(l[730]);
             }
             else if (r) {
+                passwordManager('#form_login_header');
                 u_type = r;
                 if (login_next) {
                     document.location.hash = login_next;

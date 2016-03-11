@@ -4032,6 +4032,37 @@ function rand_range(a, b) {
     return Math.random() * (b - a) + a;
 };
 
+/**
+ * Invoke the password manager in Chrome.
+ *
+ * There are some requirements for this function work propertly:
+ *
+ *  1. The username/password needs to be in a <form/>
+ *  2. The form needs to be filled and visible when this function is called
+ *  3. After this function is called, within the next second the form needs to be gone
+ *
+ * As an example take a look at the `tooltiplogin()` function in `index.js`.
+ *
+ * @param {String|Object} form jQuery selector of the form
+ * @return {Bool}   True if the password manager can be called.
+ *
+ */
+function passwordManager(form) {
+    if (typeof history !== "object") {
+        return false;
+    }
+    $(form).rebind('submit', function() {
+        setTimeout(function() {
+            var path  = document.location.pathname;
+            var title = document.title;
+            history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
+            history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+        }, 1000);
+        return false;
+    }).submit();
+    return true;
+}
+
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2Lightweight(el) {
     var top = el.offsetTop;

@@ -2183,7 +2183,7 @@ function fmremove() {
             contact = 'contacts';
         }
         else {
-            replaceString = '<strong>' + decodeURIComponent(M.d[$.selected[0]].name) + '</strong>';
+            replaceString = '<strong>' + htmlentities(M.d[$.selected[0]].name) + '</strong>';
             contact = 'contact';
         }
 
@@ -7540,7 +7540,7 @@ function addShareDialogContactToContent(type, id, av, name, permClass, permText,
     }
     else {
         item = av +   '<div class="fm-chat-user-info">'
-               +       '<div class="fm-chat-user">' + name + '</div>'
+               +       '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
                +   '</div>';
     }
 
@@ -7640,7 +7640,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     rowId = (userHandle) ? userHandle : email;
     html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
-    $('.share-dialog .share-dialog-contacts').append(html);
+    $('.share-dialog .share-dialog-contacts').safeAppend(html);
 }
 
 function handleDialogScroll(num, dc)

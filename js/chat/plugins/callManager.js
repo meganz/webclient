@@ -957,7 +957,7 @@ CallManager.prototype._rtcEventProxyToRoom = function(e, eventData) {
     } else {
         var room = megaChat.getCurrentRoom();
 
-        self.logger.warn("Routing RTC event to current room: ", room, e, eventData);
+        self.logger.log("Routing RTC event to current room: ", room, e, eventData);
 
         // local-stream-obtained = most likely this is the currently active window/room
         if (room) {

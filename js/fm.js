@@ -7640,7 +7640,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     rowId = (userHandle) ? userHandle : email;
     html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
-    $('.share-dialog .share-dialog-contacts').append(html);
+    $('.share-dialog .share-dialog-contacts').safeAppend(html);
 }
 
 function handleDialogScroll(num, dc)

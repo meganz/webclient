@@ -792,7 +792,7 @@ var strongvelope = {};
 
         this.keyId = a32_to_str([myPrefix]) + a32_to_str([highestDateCount]);
 
-        if (secondHighestDateCount) {
+        if (secondHighestDateCount !== -1) {
             this.previousKeyId = a32_to_str([myPrefix]) + a32_to_str([secondHighestDateCount]);
         }
 

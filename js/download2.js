@@ -615,7 +615,7 @@ var dlmanager = {
                         size += res.tah[i];
                     }
                     this._dlQuotaLimit = bytesToSize(size); 
-                    this._dlQuotaHours = res.tah.length+2;
+                    this._dlQuotaHours = res.tah.length;
                     this.showOverQuotaDialog(time, dlTask);
                 }.bind(this)
             });
@@ -650,9 +650,10 @@ var dlmanager = {
             .end()
             .find('.bandwidth-text-bl.second')
             .safeHTML(
-                l[7099].replace('%1', this._dlQuotaLimit)
-                    .replace("[A]", '<a href="#pro">').replace('[/A]', '</a>')
+                l[7099]
                     .replace("6", this._dlQuotaHours)
+                    .replace('%1', this._dlQuotaLimit)
+                    .replace("[A]", '<a href="#pro">').replace('[/A]', '</a>')
             );
 
         

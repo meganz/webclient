@@ -2975,6 +2975,8 @@
     "8597": "V\u00e1\u0161 pl\u00e1n \u010dlenstv\u00ed PRO vypr\u0161\u00ed za %1 dn\u00ed.",
     "8598": "Pl\u00e1n \u010dlenstv\u00ed PRO brzy vypr\u0161\u00ed",
     "8601": "St\u00e1hnout pomoc\u00ed MEGAsync, pokud je spu\u0161t\u011bn\u00fd",
+    "8602": "Tento soubor bude de\u0161ifrov\u00e1n, jakmile se \u0161ifrovac\u00ed kl\u00ed\u010d stane dostupn\u00fdm.",
+    "8603": "V\u00e1\u0161 \u00fa\u010det byl pozastaven kv\u016fli poru\u0161ov\u00e1n\u00ed podm\u00ednek slu\u017eby.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3010,6 +3012,7 @@
         "pro-plan-expires-1-day": 8596,
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
-        "delete-duplicates": 8599
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

@@ -2183,7 +2183,7 @@ function fmremove() {
             contact = 'contacts';
         }
         else {
-            replaceString = '<strong>' + decodeURIComponent(M.d[$.selected[0]].name) + '</strong>';
+            replaceString = '<strong>' + htmlentities(M.d[$.selected[0]].name) + '</strong>';
             contact = 'contact';
         }
 
@@ -7540,7 +7540,7 @@ function addShareDialogContactToContent(type, id, av, name, permClass, permText,
     }
     else {
         item = av +   '<div class="fm-chat-user-info">'
-               +       '<div class="fm-chat-user">' + name + '</div>'
+               +       '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
                +   '</div>';
     }
 
@@ -7640,7 +7640,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     rowId = (userHandle) ? userHandle : email;
     html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
-    $('.share-dialog .share-dialog-contacts').append(html);
+    $('.share-dialog .share-dialog-contacts').safeAppend(html);
 }
 
 function handleDialogScroll(num, dc)
@@ -10490,13 +10490,17 @@ function fm_resize_handler() {
 mega.utils.fullUsername = function username(userHandle) {
 
     // User name
-    var result = "";
+    var result = '';
 
     if (M.u[userHandle]) {
         result = M.u[userHandle].name && $.trim(M.u[userHandle].name) || M.u[userHandle].m;
+
+        // Convert to string and escape for XSS
+        result = String(result);
+        result = htmlentities(result);
     }
 
-    return String(result);
+    return result;
 };
 
 function sharedFolderUI() {
@@ -10570,7 +10574,7 @@ function sharedFolderUI() {
                         + '<div class="clear"></div>'
                         + avatar
                         + '<div class="fm-chat-user-info">'
-                            + '<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
+                            + '<div class="fm-chat-user">' + fullOwnersName + '</div>'
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'

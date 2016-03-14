@@ -2975,6 +2975,8 @@
     "8597": "\u05de\u05e0\u05d5\u05d9 \u05d4-PRO \u05e9\u05dc\u05da \u05d9\u05e4\u05d5\u05d2 \u05ea\u05d5\u05e7\u05e3 \u05d1\u05e2\u05d5\u05d3 %1 \u05d9\u05de\u05d9\u05dd.",
     "8598": "\u05de\u05e0\u05d5\u05d9 \u05d4-PRO \u05d9\u05e4\u05d5\u05d2 \u05ea\u05d5\u05e7\u05e3 \u05d1\u05e7\u05e8\u05d5\u05d1",
     "8601": "\u05d4\u05d5\u05e8\u05d3 \u05e2\u05dd MEGASync \u05d0\u05dd \u05d4\u05d5\u05d0 \u05e4\u05d5\u05e2\u05dc",
+    "8602": "This file will be decrypted as soon as the cryptographic key becomes available.",
+    "8603": "You have been suspended due to Terms of Service violations.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3010,6 +3012,7 @@
         "pro-plan-expires-1-day": 8596,
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
-        "delete-duplicates": 8599
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

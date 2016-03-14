@@ -1485,7 +1485,10 @@ function checkUserLogin() {
 
 })(this);
 
-var attribCache = new IndexedDBKVStorage('attrib_v2');
+var attribCache = new IndexedDBKVStorage('attrib', {
+    murSeed: 0x800F0002
+});
+
 attribCache.syncNameTimer = {};
 
 /**

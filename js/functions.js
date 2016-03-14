@@ -989,46 +989,6 @@ function showNonActivatedAccountDialog(log) {
         .append(l[5847]); //TODO: l[]
 }
 
-/**
- * Shows a dialog with a message that the user is over quota
- */
-function showOverQuotaDialog() {
-
-    // Show the dialog
-    var $dialog = $('.top-warning-popup');
-    $dialog.addClass('active');
-
-    // Unhide the warning icon and show the button
-    $('.warning-popup-icon').removeClass('hidden');
-    $('.fm-notifications-bottom', $dialog).show();
-
-    // Add a click event on the warning icon to hide and show the dialog
-    $('.warning-icon-area').unbind('click');
-    $('.warning-icon-area').click(function() {
-        if ($dialog.hasClass('active')) {
-            $dialog.removeClass('active');
-        }
-        else {
-            $dialog.addClass('active');
-        }
-    });
-
-    // Change contents of dialog text
-    $('.warning-green-icon', $dialog).remove();
-    $('.warning-popup-body', $dialog).unbind('click').html(
-        '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
-        + "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
-    );
-
-    // Set button text to 'Upgrade Account'
-    $('.warning-button span').text(l[5549]);
-
-    // Redirect to Pro signup page on button click
-    $('.warning-button').click(function() {
-        document.location.hash = 'pro';
-    });
-}
-
 function logincheckboxCheck(ch_id) {
     var ch_div = ch_id + "_div";
     if (document.getElementById(ch_id).checked) {
@@ -3426,23 +3386,28 @@ mega.utils.reload = function megaUtilsReload() {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
-                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
-                    msgDialog('warningb', l[882], l[7157]);
-                }
-                if (mBroadcaster.crossTab.master) {
-                    mega.utils.abortTransfers().then(function() {
-                        loadingDialog.show();
-                        stopsc();
-                        stopapi();
+                var reload = function() {
+                    if (mBroadcaster.crossTab.master) {
+                        mega.utils.abortTransfers().then(function() {
+                            loadingDialog.show();
+                            stopsc();
+                            stopapi();
 
-                        MegaPromise.allDone([
-                            MegaDB.dropAllDatabases(/*u_handle*/),
-                            mega.utils.clearFileSystemStorage()
-                        ]).then(function(r) {
-                                console.debug('megaUtilsReload', r);
-                                _reload();
-                            });
-                    });
+                            MegaPromise.allDone([
+                                MegaDB.dropAllDatabases(/*u_handle*/),
+                                mega.utils.clearFileSystemStorage()
+                            ]).then(function(r) {
+                                    console.debug('megaUtilsReload', r);
+                                    _reload();
+                                });
+                        });
+                    }
+                };
+                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+                    msgDialog('warningb', l[882], l[7157], 0, reload);
+                }
+                else {
+                    reload();
                 }
             }
         });
@@ -4031,6 +3996,37 @@ watchdog.setup();
 function rand_range(a, b) {
     return Math.random() * (b - a) + a;
 };
+
+/**
+ * Invoke the password manager in Chrome.
+ *
+ * There are some requirements for this function work propertly:
+ *
+ *  1. The username/password needs to be in a <form/>
+ *  2. The form needs to be filled and visible when this function is called
+ *  3. After this function is called, within the next second the form needs to be gone
+ *
+ * As an example take a look at the `tooltiplogin()` function in `index.js`.
+ *
+ * @param {String|Object} form jQuery selector of the form
+ * @return {Bool}   True if the password manager can be called.
+ *
+ */
+function passwordManager(form) {
+    if (typeof history !== "object") {
+        return false;
+    }
+    $(form).rebind('submit', function() {
+        setTimeout(function() {
+            var path  = document.location.pathname;
+            var title = document.title;
+            history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
+            history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+        }, 1000);
+        return false;
+    }).submit();
+    return true;
+}
 
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2Lightweight(el) {

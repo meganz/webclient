@@ -399,20 +399,21 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         var seedResult = chatRoom.protocolHandler.seed(hist);
                         //console.error(chatRoom.roomJid, seedResult);
 
-
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
                         decryptedMsgs.forEach(function (v, k) {
-                            if (typeof v === undefined) {
+                            if (typeof v === 'undefined') {
                                 return; // skip already decrypted messages
                             }
 
-                            if (v && v.payload) {
+
+                            if (v && typeof(v.payload) !== 'undefined' && v.payload !== null) {
                                 chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
-                                delete chatRoom.notDecryptedBuffer[k];
+                                delete chatRoom.notDecryptedBuffer[hist[k]['k']];
                             }
                             else if (v && v.type === 0) {
                                 // this is a system message
                                 chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
+                                delete chatRoom.notDecryptedBuffer[hist[k]['k']];
                             }
                             else if (v && !v.payload) {
                                 self.logger.error("Could not decrypt: ", v)
@@ -432,9 +433,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         chatRoom.strongvelopeSetupPromises.done(function() {
                             decryptMessages();
                         })
-                    }
-                    else {
-                        debugger;
                     }
                 }
                 else {
@@ -457,9 +455,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         if (decrypted && decrypted.toSend) {
                             self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
                         }
-                        if (decrypted && decrypted.payload) {
+
+                        if (decrypted && typeof(decrypted.payload) !== 'undefined' && decrypted.payload !== null) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
-                        } else if (decrypted && !decrypted.payload && decrypted.type === 0) {
+                        } else if (
+                            decrypted &&
+                            (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) &&
+                            decrypted.type === 0
+                        ) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                         }
                     } catch(e) {

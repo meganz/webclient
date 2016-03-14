@@ -94,6 +94,7 @@ function registeraccount() {
         callback: function(res) {
             loadingDialog.hide();
             if (res === 0) {
+                passwordManager($('#register_form'));
                 if (m) {
                     done_text1 = l[216];
                     done_text2 = l[217];
@@ -275,75 +276,41 @@ function init_register() {
     $('#register-firstname').rebind('focus', function(e) {
         $('.login-register-input.name').removeClass('incorrect');
         $('.login-register-input.name').addClass('focused');
-        if ($(this).val() === l[1096]) {
-            $(this).val('');
-        }
     });
     $('#register-firstname').rebind('blur', function(e) {
         $('.login-register-input.name').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[1096]);
-        }
     });
     $('#register-lastname').rebind('focus', function(e) {
         $('.login-register-input.name').removeClass('incorrect');
         $('.login-register-input.name').addClass('focused');
-        if ($(this).val() === l[1097]) {
-            $(this).val('');
-        }
     });
     $('#register-lastname').rebind('blur', function(e) {
         $('.login-register-input.name').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[1097]);
-        }
     });
     $('#register-email').rebind('focus', function(e) {
         $('.login-register-input.email .top-loginp-tooltip-txt')
             .safeHTML('@@<div class="white-txt">@@</div>', l[1100], l[1101]);
         $('.login-register-input.email').removeClass('incorrect');
         $('.login-register-input.email').addClass('focused');
-        if ($(this).val() === l[95]) {
-            $(this).val('');
-        }
     });
     $('#register-email').rebind('blur', function(e) {
         $('.login-register-input.email').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[95]);
-        }
     });
     $('#register-password').rebind('focus', function(e) {
         $('.login-register-input.password.first').removeClass('incorrect');
         $('.login-register-input.password.confirm').removeClass('incorrect');
-        $('.login-register-input.password').addClass('focused');
-        if ($(this).val() === l[909]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
+        $(this).parents('.password').addClass('focused');
     });
     $('#register-password').rebind('blur', function(e) {
         $('.login-register-input.password').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[909]);
-            $(this)[0].type = 'text';
-        }
         registerpwcheck();
     });
     $('#register-password2').rebind('focus', function(e) {
         $('.login-register-input.password.confirm').removeClass('incorrect');
-        $('.login-register-input.password2').addClass('focused');
-        if ($(this).val() === l[1114]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
+        $(this).parents('.password').addClass('focused');
     });
     $('#register-password2').rebind('blur', function(e) {
-        $('.login-register-input.password2').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[1114]);
-            $(this)[0].type = 'text';
-        }
+        $(this).parents('.password').removeClass('focused');
     });
     $('.new-registration-checkbox .radio-txt,.register-check').rebind('click.uiCheckboxes', function(e) {
         if ($('.register-check').attr('class').indexOf('checkboxOn') > -1) {

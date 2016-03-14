@@ -6,13 +6,14 @@
  *
  * @constructor
  */
-var IndexedDBKVStorage = function(name) {
+var IndexedDBKVStorage = function(name, dbOpts) {
     var self = this;
     self.name = name;
     self.db = null;
     self.dbName = null;
     self.logger = new MegaLogger("IDBKVStorage[" + name + "]");
     self._memCache = {};
+    self.dbOpts = dbOpts;
 };
 
 
@@ -52,9 +53,13 @@ IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
                         }
                     }
                 },
-                {
-                    plugins: MegaDB.DB_PLUGIN.ENCRYPTION
-                }
+                $.extend(
+                    {},
+                    {
+                        plugins: MegaDB.DB_PLUGIN.ENCRYPTION
+                    },
+                    self.dbOpts
+                )
             );
             self.dbName = self.name + "_" + u_handle;
 

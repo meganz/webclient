@@ -1028,7 +1028,7 @@ function MegaData()
                                 <td>\n\
                                     ' + avatar + ' \
                                     <div class="fm-chat-user-info todo-star">\n\
-                                        <div class="fm-chat-user">' + htmlentities(mega.utils.fullUsername(node.u)) + '</div>\n\
+                                        <div class="fm-chat-user">' + mega.utils.fullUsername(node.u) + '</div>\n\
                                         <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
                                     </div>\n\
                                 </td>\n\
@@ -1129,7 +1129,7 @@ function MegaData()
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + htmlentities(fullContactName) + '</span></span></a>';
+                            + fullContactName + '</span></span></a>';
                     }
                     else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
@@ -1147,7 +1147,7 @@ function MegaData()
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div>'
                             + '<div class="fm-chat-user">'
-                            + htmlentities(fullContactName) + '</div><div class="nw-contact-status"></div>'
+                            + fullContactName + '</div><div class="nw-contact-status"></div>'
                             + '<div class="fm-chat-user-status ' + htmlentities(u_h)
                             + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270">'
@@ -3703,15 +3703,15 @@ function MegaData()
         else {
             if (!$icon.hasClass('filled')) {
                 $icon.addClass('filled');
-            } 
+            }
             else if (!$icon.hasClass('glow')) {
                 $icon.addClass('glow');
-            } 
+            }
             else {
                 $icon.removeClass('glow');
             }
         }
-            
+
     };
 
     this.nodeAttr = function(attrs) {
@@ -3730,9 +3730,40 @@ function MegaData()
         }
     };
 
-    this.rename = function(itemHandle, newItemName) {
+    /**
+     * Fire DOM updating when a node gets a new name
+     * @param {String} itemHandle  node's handle
+     * @param {String} newItemName the new name
+     */
+    this.onRenameUIUpdate = function(itemHandle, newItemName) {
+        if (fminitialized) {
 
-        var newValue = htmlentities(newItemName);
+            // DOM update, left and right panel in 'Cloud Drive' tab
+            $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newItemName);
+            $('#' + itemHandle + '.file-block .file-block-title').text(newItemName);
+
+            // DOM update, left and right panel in "Shared with me' tab
+            $('#treea_' + itemHandle + ' span:nth-child(2)').text(newItemName);
+            $('#' + itemHandle + ' .shared-folder-info-block .shared-folder-name').text(newItemName);
+
+            // DOM update, right panel view during browsing shared content
+            $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newItemName);
+
+            // DOM update, breadcrumbs in 'Shared with me' tab
+            if ($('#path_' + itemHandle).length > 0) {
+                if (this.onRenameUIUpdate.tick) {
+                    clearTimeout(this.onRenameUIUpdate.tick);
+                }
+                this.onRenameUIUpdate.tick = setTimeout(function() {
+                    M.renderPath();
+                }, 90);
+            }
+
+            $(document).trigger('MegaNodeRename', [itemHandle, newItemName]);
+        }
+    };
+
+    this.rename = function(itemHandle, newItemName) {
 
         if (M.d[itemHandle]) {
             var nodeData = M.d[itemHandle];
@@ -3740,32 +3771,16 @@ function MegaData()
             if (nodeData && nodeData.ar) {
 
                 // Update global var with newest data
-                nodeData.ar.n = newValue;
+                nodeData.ar.n = newItemName;
 
                 var mkat = enc_attr(nodeData.ar, nodeData.key);
                 var attr = ab_to_base64(mkat[0]);
                 var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
 
-                M.nodeAttr({ h: itemHandle, name: newValue, a: attr });
+                M.nodeAttr({ h: itemHandle, name: newItemName, a: attr });
                 api_req({ a: 'a', n: itemHandle, attr: attr, key: key, i: requesti });
 
-                // DOM update, left and right panel in 'Cloud Drive' tab
-                $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newValue);
-                $('#' + itemHandle + '.file-block .file-block-title').text(newValue);
-
-                // DOM update, left and right panel in "Shared with me' tab
-                $('#treea_' + itemHandle + ' span:nth-child(2)').text(newValue);
-                $('#' + itemHandle + ' .shared-folder-info-block .shared-folder-name').text(newValue);
-
-                // DOM update, right panel view during browsing shared content
-                $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newValue);
-
-                // DOM update, breadcrumbs in 'Shared with me' tab
-                if ($('#path_' + itemHandle).length > 0) {
-                    M.renderPath();
-                }
-
-                $(document).trigger('MegaNodeRename', [itemHandle, newValue]);
+                this.onRenameUIUpdate(itemHandle, newItemName);
             }
         }
     };
@@ -5919,7 +5934,7 @@ function execsc(actionPackets, callback) {
         if (async_treestate.length) {
             async_treestate.forEach(function(actionPacket) {
                 var n = M.d[actionPacket.n];
-                if (d) console.log('updateTreeState', n, actionPacket);
+                // if (d) console.log('updateTreeState', n, actionPacket);
                 if (n) {
                     var f = {
                         h : actionPacket.n,
@@ -5929,9 +5944,9 @@ function execsc(actionPackets, callback) {
                     crypto_processkey(u_handle, u_k_aes, f);
                     if (f.key) {
                         if (f.name !== n.name) {
-                            M.rename(n.h, f.name);
+                            M.onRenameUIUpdate(n.h, f.name);
                         }
-                        if (f.fav !== n.fav) {
+                        if (fminitialized && f.fav !== n.fav) {
                             if (f.fav) {
                                 $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
                                 $('#' + n.h + '.file-block .file-status-icon').addClass('star');
@@ -5954,9 +5969,6 @@ function execsc(actionPackets, callback) {
                     }
                 }
             });
-
-            // Remove processed item from the queue
-            async_treestate = [];
         }
         if (newnodes.length > 0 && fminitialized) {
             renderNew();

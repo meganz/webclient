@@ -5801,7 +5801,13 @@ th.grid-first-th {
     margin: 0;
 }
 .file-block .block-view-file-type.thumb {
-    background-image: none;
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-image: linear-gradient(45deg, rgba(222,222,222,0.6) 25%, transparent 25%),
+                      linear-gradient(-45deg, rgba(222,222,222,0.6) 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.6) 75%),
+                      linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.6) 75%);
 }
 .contact-block-view-avatar {
     margin: 17px 0 5px 18px;

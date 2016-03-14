@@ -29,6 +29,7 @@ function MegaDB(name, suffix, schema, options) {
     var self = this;
     var dbName = 'mdb_' + name + '_' + suffix;
     var murSeed = options.murSeed || 0x4d444201;
+
     var murData =
         JSON.stringify(this.schema) +
         JSON.stringify(clone(this.options));
@@ -672,7 +673,7 @@ MegaDB.prototype.get = function(tableName, val) {
             if ($.isArray(result) && result.length == 1) {
                 promise.resolve(result[0]);
             } else if ($.isArray(result) && result.length > 1) {
-                promise.resolve([result]);
+                promise.resolve(result);
             }  else {
                 promise.resolve.apply(promise, arguments);
             }

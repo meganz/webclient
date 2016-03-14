@@ -632,7 +632,7 @@ var dlmanager = {
                 l[7099]
                     .replace("6", this._dlQuotaHours)
                     .replace('%1', this._dlQuotaLimit)
-                    .replace("[A]", '<a href="#pro">').replace('[/A]', '</a>')
+                    .replace("[A]", '<a href="#pro" class="red">').replace('[/A]', '</a>')
             );
 
     },

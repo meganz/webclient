@@ -620,6 +620,12 @@ var dlmanager = {
                 this._dlQuotaHours = res.tah.length;
                 this._overquotaShowVariables();
                 this._setQuotaRetryTimer(this._dlQuotaRetry);
+                var $txt = $('.fm-dialog.bandwidth-dialog.overquota .countdown').removeClass('hidden')
+                $txt.text(secondsToTimeShort(this._dlQuotaRetry));
+    
+                this._dlTick = setInterval(function() {
+                    $txt.text(secondsToTimeShort(this._dlQuotaRetry--));
+                }.bind(this), 1000);
             }.bind(this)
         });
     },
@@ -633,16 +639,18 @@ var dlmanager = {
                     .replace('%1', this._dlQuotaLimit)
                     .replace("[A]", '<a href="#pro" class="red">').replace('[/A]', '</a>')
             );
-        $('.fm-dialog.bandwidth-dialog.overquota .countdown').removeClass('hidden')
 
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask) {
 
-        var tick;
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
         var $button = $dialog.find('.fm-dialog-close');
         var $overlay = $('.fm-dialog-overlay');
+
+        if ($dialog.is(':visible')) {
+            return;
+        }
 
         if (dlTask) {
             this._quotaPushBack[dlTask.gid] = dlTask;
@@ -663,31 +671,24 @@ var dlmanager = {
         $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
         this._overquotaInfo();
     
-        function closeModal() {
+        var doCloseModal = function closeModal() {
     
-            clearInterval(tick);
+            clearInterval(this._dlTick);
             $dialog.addClass('hidden');
             $button.unbind('click.quota');
             $overlay.unbind('click.quota');
             fm_hideoverlay();
             return false;
-        }
+        }.bind(this);
     
-        $button.rebind('click.quota', closeModal);
-        $overlay.rebind('click.quota', closeModal);
+        $button.rebind('click.quota', doCloseModal);
+        $overlay.rebind('click.quota', doCloseModal);
         $dialog.find('.membership-button').rebind('click', function() {
     
             window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
-            closeModal();
+            doCloseModal();
             document.location.hash = '#pro';
         });
-        var $txt = $('.countdown', $dialog);
-        $txt.text(secondsToTimeShort(0));
-    
-        tick = setInterval(function() {
-    
-            $txt.text(secondsToTimeShort(--this._dlQuotaRetry));
-        }.bind(this), 1000);
     },
 
     /**

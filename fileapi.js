@@ -267,11 +267,14 @@ function mozFrom8(utf8) {
 }
 
 function mozNotifyDL(fn,f) {
-	if (!mozPrefs.getBoolPref('notifydl')) return false;
-	if (!f) return mozAlert('Download ' + fn + ' finished.');
+	if (!mozPrefs.getBoolPref('notifydl')) {
+		return false;
+	}
+	if (!f) {
+		return mozAlert(l[239] + ' (' + fn + ')');
+	}
 
-	mozAlert(fn,'Download Finished.',function(s,t)
-	{
+	mozAlert(fn, l[239], function(s,t) {
 		if(t == 'alertclickcallback') try {
 			if(parseInt(Services.appinfo.version) > 23) throw 2;
 			Components.classesByID["{7dfdf0d1-aff6-4a34-bad1-d0fe74601642}"]

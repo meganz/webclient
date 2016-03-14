@@ -50,7 +50,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         // XXX: In Firefox loading a ~100MB image might throw `Image corrupt or truncated.`
         // and this .onload called back with a white image. Bug #941823 / #1045926
         // This is the MurmurHash3 for such image's dataURI.
-        var MURMURHASH3RR = 0x59d73a69;
+        var MURMURHASH3RR = 0xE6BC61E0;
 
         // thumbnail:
         if (fa.indexOf(':0*') < 0) {
@@ -59,21 +59,29 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 height: 120
             };
 
-            if (d) {
-                console.time('smartcrop');
-            }
-            var crop = SmartCrop.crop(this, options).topCrop;
             canvas = document.createElement('canvas');
             ctx = canvas.getContext("2d");
             canvas.width = options.width;
             canvas.height = options.height;
-            if (img.src === noThumbURI) {
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-            ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
 
-            dataURI = canvas.toDataURL('image/jpeg', 0.90);
+            if (this.naturalWidth > options.width || this.naturalHeight > options.height) {
+                if (d) {
+                    console.time('smartcrop');
+                }
+                var crop = SmartCrop.crop(this, options).topCrop;
+                ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
+
+                if (d) {
+                    console.timeEnd('smartcrop');
+                }
+            }
+            else {
+                ctx.drawImage(this,
+                    (options.width / 2) - (this.naturalWidth / 2),
+                    (options.height / 2) - (this.naturalHeight / 2));
+            }
+
+            dataURI = canvas.toDataURL();
             // if (d) console.log('THUMBNAIL', dataURI);
             if (MurmurHash3(dataURI, 0x7fee00aa) === MURMURHASH3RR) {
                 console.error('Error generating thumbnail, aborting...');
@@ -82,10 +90,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             ab = dataURLToAB(dataURI);
             // FIXME hack into cipher and extract key
             api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer);
-
-            if (d) {
-                console.timeEnd('smartcrop');
-            }
         }
 
         // preview image:
@@ -339,6 +343,7 @@ function __render_thumb(img, u8, orientation, blob) {
             maxWidth: 1000,
             maxHeight: 1000,
             quality: 0.96,
+            imageType: 'image/png',
             orientation: orientation
         });
     }

@@ -490,7 +490,7 @@ var ConversationMessage = React.createClass({
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{contact.name}</div>
+                                    <div className="message data-title">{mega.utils.fullUsername(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :
@@ -629,7 +629,6 @@ var ConversationMessage = React.createClass({
                     name = <div className="message user-card-name">{displayName}</div>;
                 }
 
-
                 var messageDisplayBlock;
                 if (self.props.isBeingEdited === true) {
                     messageDisplayBlock = <TypingAreaUI.TypingArea
@@ -661,7 +660,6 @@ var ConversationMessage = React.createClass({
                             {datetime}
 
                             {messageActionButtons}
-
                             {messageDisplayBlock}
                             {buttonsBlock}
                             {spinnerElement}
@@ -682,7 +680,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(generateContactName(contact.u)));
+                var tmpMsg = textMessage[0].replace("[X]", mega.utils.fullUsername(contact.u));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -693,7 +691,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", htmlentities(generateContactName(contact.u)));
+                textMessage = textMessage.replace("[X]", mega.utils.fullUsername(contact.u));
             }
 
             message.textContents = textMessage;
@@ -799,6 +797,10 @@ var ConversationRightArea = React.createClass({
         var contact = room.megaChat.getContactFromJid(contactJid);
 
 
+        if (!contact) {
+            // something is really bad.
+            return null;
+        }
         var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                             if (contact.presence && contact.presence !== "offline") {
                                 room.startAudioCall();
@@ -817,9 +819,22 @@ var ConversationRightArea = React.createClass({
             {__(l[5897])}
         </div>;
 
+        var endCallButton = <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
+                        if (contact.presence && contact.presence !== "offline") {
+                            if (room.callSession) {
+                                room.callSession.endCall();
+                            }
+                        }
+                    }}>
+            <i className="small-icon horizontal-red-handset"></i>
+            {__(l[5884])}
+        </div>;
+
 
         if (room.callSession && room.callSession.isActive() === true) {
             startAudioCallButton = startVideoCallButton = null;
+        } else {
+            endCallButton = null;
         }
 
         return <div className="chat-right-area">
@@ -872,7 +887,7 @@ var ConversationRightArea = React.createClass({
                             </DropdownsUI.Dropdown>
                         </ButtonsUI.Button>
 
-
+                        {endCallButton}
                         {
                             room.type !== "private" ?
                                 <div className="link-button red" onClick={() => {
@@ -1137,46 +1152,53 @@ var ConversationAudioVideoPanel = React.createClass({
             </div>;
         }
         else {
-            var localPlayerSrc = callSession.localPlayer.src;
+            if (callSession.localPlayer) {
+                var localPlayerSrc = (
+                    callSession && callSession.localPlayer && callSession.localPlayer.src ?
+                        callSession.localPlayer.src :
+                        null
+                );
 
-            if (!localPlayerSrc) {
-                if (callSession.localPlayer.srcObject) {
-                    callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.srcObject);
-                    localPlayerSrc = callSession.localPlayer.src;
-                }
-                else if (callSession.localPlayer.mozSrcObject) {
-                    callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
-                    localPlayerSrc = callSession.localPlayer.src;
-                }
-                else if (
-                    callSession.getJingleSession() &&
-                    callSession.getJingleSession()._sess &&
-                    callSession.getJingleSession()._sess.localStream
-                ) {
-                    callSession.localPlayer.src = URL.createObjectURL(
+                if (!localPlayerSrc) {
+                    if (callSession.localPlayer.srcObject) {
+                        callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.srcObject);
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else if (callSession.localPlayer.mozSrcObject) {
+                        callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else if (
+                        callSession.getJingleSession() &&
+                        callSession.getJingleSession()._sess &&
                         callSession.getJingleSession()._sess.localStream
-                    );
-                    localPlayerSrc = callSession.localPlayer.src;
+                    ) {
+                        callSession.localPlayer.src = URL.createObjectURL(
+                            callSession.getJingleSession()._sess.localStream
+                        );
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else {
+                        console.error("Could not retrieve src object.");
+                    }
                 }
-                else {
-                    console.error("Could not retrieve src object.");
-                }
-            }
-            localPlayerElement = <div className={"call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
-                <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
-                    <i className="tiny-icon grey-minus-icon" />
-                </div>
-                <video
-                    className="localViewport"
-                    defaultMuted={true}
-                    muted={true}
-                    volume={0}
-                    id={"localvideo_" + callSession.sid}
-                    src={localPlayerSrc}
-                    style={{display: !this.state.localMediaDisplay ? "none" : ""}}
+                localPlayerElement = <div
+                    className={"call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
+                    <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
+                        <i className="tiny-icon grey-minus-icon"/>
+                    </div>
+                    <video
+                        className="localViewport"
+                        defaultMuted={true}
+                        muted={true}
+                        volume={0}
+                        id={"localvideo_" + callSession.sid}
+                        src={localPlayerSrc}
+                        style={{display: !this.state.localMediaDisplay ? "none" : ""}}
 
-                />
-            </div>;
+                    />
+                </div>;
+            }
         }
 
         if (callSession.getRemoteMediaOptions().video === false || !callSession.remotePlayer) {
@@ -2033,17 +2055,25 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-            self.props.contacts.forEach(function(contact) {
-                if (contact.u === u_handle) { return; }
-                else if (contact.c === 0) { return; }
+            var hadLoaded = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
 
-                var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+            if (hadLoaded) {
+                self.props.contacts.forEach(function (contact) {
+                    if (contact.u === u_handle) {
+                        return;
+                    }
+                    else if (contact.c === 0) {
+                        return;
+                    }
 
-                (pres === "offline" ? contactsListOffline : contactsList).push(
-                    <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u} />
-                );
-            });
-            var emptyMessage = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved' ?
+                    var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+
+                    (pres === "offline" ? contactsListOffline : contactsList).push(
+                        <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u}/>
+                    );
+                });
+            }
+            var emptyMessage = hadLoaded ?
                 l[8008] :
                 l[7006];
 

@@ -343,7 +343,7 @@ var dlmanager = {
     },
 
     failureFunction: function DM_failureFunction(task, args) {
-        var code = args[1] || 0;
+        var code = args[1].responseStatus || 0;
         var dl = task.task.download;
 
         if (d) {
@@ -352,17 +352,11 @@ var dlmanager = {
         }
 
         if (code === 509) {
-            var t = NOW();
-            if (t - dlmanager.dlLastQuotaWarning > 60000) {
-                dlmanager.dlLastQuotaWarning = t;
-                dlmanager.dlReportStatus(dl, code === 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
-                dl.quota_t = setTimeout(function() {
-                    dlmanager.dlQueuePushBack(task);
-                }, 60000);
-                return 1;
-            }
+            this.showOverQuotaDialog(task);
+            dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
+            return 1;
         }
-
+        
         /* update UI */
         dlmanager.dlReportStatus(dl, EAGAIN);
 
@@ -583,211 +577,127 @@ var dlmanager = {
         };
     },
 
-    apiQuota: function DM_apiQuota(callback2) {
-        // cache 'bq' for up to 60 seconds for each limitation
-        if (typeof $.bq !== 'undefined' && $.lastlimit > new Date().getTime() - 60000) {
-            callback2($.bq);
+    _quotaPushBack: {},
+
+    _setQuotaRetryTimer: function setRetryTimer(expires) {
+        if (this._quotaRetry) {
+            clearTimeout(this._quotaRetry);
         }
-        else {
-            api_req({
-                a: 'bq'
-            }, {
-                callback: function(res) {
-                    $.bq = res;
-                    callback2(res);
+
+        this._quotaRetry = setTimeout(function() {
+            
+            var ids = dlmanager.getCurrentDownloads();
+            $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+            $('#' + ids.join(',#')).removeClass('overquota');
+
+            for (var gid in this._quotaPushBack) {
+                if (this._quotaPushBack.hasOwnProperty(gid) && this._quotaPushBack[gid].onQueueDone) {
+                    this.dlQueuePushBack(this._quotaPushBack[gid]);
                 }
-            });
-        }
+            }
+
+            this._quotaPushBack = {};
+
+            ids.forEach(fm_tfsresume); 
+        }.bind(this), expires * 1000);
     },
+
+    _overquotaInfo: function() {
+
+        api_req({a: 'uq', xfer: 1}, {
+            callback: function(res) {
+                var size = 0;
+                if (typeof res === "number") {
+                    // Error, just keep retrying
+                    return this._overquotaInfo();
+                }
+                res.tah = res.tah || [];
+                for (var i = 0 ; i < res.tah.length; i++) {
+                    size += res.tah[i];
+                }
+                this._dlQuotaRetry = 3600 - (res.bt % 3600);
+                this._dlQuotaLimit = bytesToSize(size); 
+                this._dlQuotaHours = res.tah.length;
+                this._overquotaShowVariables();
+                this._setQuotaRetryTimer(this._dlQuotaRetry);
+                var $txt = $('.fm-dialog.bandwidth-dialog.overquota .countdown').removeClass('hidden')
+                $txt.text(secondsToTimeShort(this._dlQuotaRetry));
+    
+                this._dlTick = setInterval(function() {
+                    $txt.text(secondsToTimeShort(this._dlQuotaRetry--));
+                }.bind(this), 1000);
+            }.bind(this)
+        });
+    },
+
+    _overquotaShowVariables: function() {
+
+        $('.fm-dialog.bandwidth-dialog.overquota .bandwidth-text-bl.second').removeClass('hidden')
+            .safeHTML(
+                l[7099]
+                    .replace("6", this._dlQuotaHours)
+                    .replace('%1', this._dlQuotaLimit)
+                    .replace("[A]", '<a href="#pro" class="red">').replace('[/A]', '</a>')
+            );
+
+    },
+
+    showOverQuotaDialog: function DM_quotaDialog(dlTask) {
+
+        var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+        var $button = $dialog.find('.fm-dialog-close');
+        var $overlay = $('.fm-dialog-overlay');
+
+        if ($dialog.is(':visible')) {
+            return;
+        }
+
+        if (dlTask) {
+            this._quotaPushBack[dlTask.gid] = dlTask;
+        }
+
+        dlmanager.getCurrentDownloads().forEach(function(id) {
+            fm_tfspause(id, true);
+        });
+
+
+        fm_showoverlay();
+        $dialog.removeClass('hidden')
+            .find('.bandwidth-header')
+            .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
+            .end();
+
+        
+        $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
+        this._overquotaInfo();
+    
+        var doCloseModal = function closeModal() {
+    
+            clearInterval(this._dlTick);
+            $dialog.addClass('hidden');
+            $button.unbind('click.quota');
+            $overlay.unbind('click.quota');
+            fm_hideoverlay();
+            return false;
+        }.bind(this);
+    
+        $button.rebind('click.quota', doCloseModal);
+        $overlay.rebind('click.quota', doCloseModal);
+        $dialog.find('.membership-button').rebind('click', function() {
+    
+            window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
+            doCloseModal();
+            document.location.hash = '#pro';
+        });
+    },
+
     /**
-     * Shows the bandwidth dialog
-     * @param {Boolean} close If true, closes the dialog, otherwise opens it
+     *  Get the current downloads
+     *
+     *  TODO: Perhaps it's faster to iterate to the queue rather than bothering the DOM.
      */
-    bandwidthDialog: function DM_bandwidthDialog(close) {
-
-        var $bandwidthDialog = $('.fm-dialog.bandwidth-dialog');
-        var $backgroundOverlay = $('.fm-dialog-overlay');
-
-        // Close dialog
-        if (close) {
-            $backgroundOverlay.addClass('hidden');
-            $bandwidthDialog.addClass('hidden');
-        }
-        else {
-            // Don't show if not in filemanager or download page
-            if (!is_fm() && page !== 'download') {
-                return false;
-            }
-
-            // Send a log to the API the first time the over bandwidth quota dialog is triggered
-            if (!localStorage.seenBandwidthDialog) {
-                api_req({
-                    a: 'log',
-                    e: 99333,
-                    m: 'bandwidthdialog'
-                });
-                localStorage.setItem('seenBandwidthDialog', true);
-            }
-
-            // On close button click, close the dialog
-            $bandwidthDialog.find('.fm-dialog-close').rebind('click', function() {
-                $backgroundOverlay.addClass('hidden');
-                $bandwidthDialog.addClass('hidden');
-            });
-
-            // On Select button click
-            $bandwidthDialog.find('.membership-button').rebind('click', function() {
-
-                // Get the plan number and redirect to pro step 2
-                var planId = $(this).closest('.reg-st3-membership-bl').attr('data-payment');
-                document.location.hash = 'pro&planNum=' + planId;
-            });
-
-            // Show the dialog
-            $backgroundOverlay.removeClass('hidden');
-            $bandwidthDialog.removeClass('hidden');
-        }
-    },
-
-    checkQuota: function DM_checkQuota(filesize, callback) {
-        /* jshint -W074 */
-        if (u_attr && u_attr.p) {
-            if (callback) {
-                callback({
-                    sec: -1
-                });
-            }
-            return false;
-        }
-        dlmanager.apiQuota(function(quotabytes) {
-            if (localStorage.bq) {
-                quotabytes = localStorage.bq;
-            }
-            var consumed = 0;
-            var quota = {};
-            if (localStorage.q) {
-                quota = JSON.parse(localStorage.q);
-            }
-            var t = Math.floor(new Date().getTime() / 60000);
-            var t2 = t - 360;
-            var sec = 0;
-            var available = 0;
-            var newbw = 0;
-            while (t2 <= t) {
-                if (quota[t2]) {
-                    consumed += quota[t2];
-                }
-                t2++;
-            }
-            if (quotabytes === 0) {
-                sec = 0;
-            }
-            else if (quotabytes - filesize < 0) {
-                sec = -1;
-            }
-            else if (quotabytes - consumed - filesize < 0) {
-                var shortage = quotabytes - consumed - filesize;
-                t2 = t - 360;
-                while (t2 <= t) {
-                    if (quota[t2]) {
-                        shortage += quota[t2];
-                    }
-                    if (shortage > 0) {
-                        newbw = shortage - quotabytes - consumed - filesize;
-                        sec = (t2 + 360 - t) * 60;
-                        break;
-                    }
-                    t2++;
-                }
-                if (sec === 0 || sec > 21600) {
-                    sec = 21600;
-                    newbw = quotabytes;
-                }
-            }
-            else {
-                sec = 0;
-            }
-            if (callback) {
-                callback({
-                    used: consumed,
-                    sec: sec,
-                    filesize: filesize,
-                    newbw: newbw
-                });
-            }
-
-        });
-    },
-
-    hasQuota: function DM_hasQuota(filesize, next) {
-        dlmanager.checkQuota(filesize, function(r) {
-            if (r.sec === 0 || r.sec === -1) {
-                dlmanager.bandwidthDialog(1);
-                next(true);
-            }
-            else {
-                sessionStorage.proref = 'bwlimit';
-
-                if (!$.lastlimit) {
-                    $.lastlimit = 0;
-                }
-
-                // Translate bottom right text block of bandwidth dialog
-                var $bottomRightText = $('.bandwidth-dialog .bandwidth-text-bl.second');
-                var text = $bottomRightText.html().replace('[A]',
-                    '<span class="red">').replace('[/A]', '</span>');
-                text = text.replace('%1',
-                    '<strong class="bandwidth-used">' + bytesToSize(r.used) + '</strong>');
-                $bottomRightText.html(text);
-
-                var minutes = Math.ceil(r.sec / 60);
-                var minutesText = l[5838];
-                if (minutes !== 1) {
-                    minutesText = l[5837].replace('[X]', minutes);
-                }
-
-                // Translate header text of bandwidth dialog
-                var $header = $('.bandwidth-dialog .bandwidth-header');
-                var headerText = $header.html().replace('%1',
-                    '<span class="bandwidth-minutes">' + minutesText + '</span>');
-                $header.html(headerText);
-
-                dlmanager.bandwidthDialog();
-
-                if ($.lastlimit < new Date().getTime() - 60000) {
-                    megaAnalytics.log("dl",
-                        "limit", {
-                            used: r.used,
-                            filesize: r.filesize,
-                            seconds: r.sec
-                        });
-                }
-
-                $.lastlimit = new Date().getTime();
-                next(false);
-            }
-        });
-    },
-
-    reportQuota: function DM_reportQuota(chunksize) {
-        if (u_attr && u_attr.p) {
-            return false;
-        }
-        var quota = {};
-        var t = Math.floor(new Date().getTime() / 60000);
-        if (localStorage.q) {
-            quota = JSON.parse(localStorage.q);
-        }
-        for (var i in quota) {
-            if (i < t - 360) {
-                delete quota[i];
-            }
-        }
-        if (!quota[t]) {
-            quota[t] = 0;
-        }
-        quota[t] += chunksize;
-        localStorage.q = JSON.stringify(quota);
+    getCurrentDownloads: function() {
+        return $('.transfer-table tr .download').parents('tr').attrs('id');
     },
 
     isMEGAsyncRunning: function(minVersion) {
@@ -879,7 +789,7 @@ function fm_tfsorderupd() {
     return M.t;
 }
 
-function fm_tfspause(gid) {
+function fm_tfspause(gid, overquota) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Ivalid GID to pause')) {
         if (gid[0] === 'u') {
             ulQueue.pause(gid);
@@ -890,7 +800,11 @@ function fm_tfspause(gid) {
         var $tr = $('.transfer-table tr#' + gid);
         $tr.addClass('paused');
         $tr.find('span.transfer-type').addClass('paused');
-        $tr.find('td:eq(5)').html('<span class="transfer-status queued">Queued</span>');
+        if (overquota === true) {
+            $tr.addClass('overquota');
+        } else {
+            $tr.find('td:eq(5)').safeHTML('<span class="transfer-status queued">' + l[7227] + '</span>');
+        }
         return true;
     }
     return false;
@@ -898,15 +812,18 @@ function fm_tfspause(gid) {
 
 function fm_tfsresume(gid) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
+        var $tr = $('.transfer-table tr#' + gid);
         if (gid[0] === 'u') {
             ulQueue.resume(gid);
         }
         else {
+            if ($tr.is('.overquota')) {
+                return dlmanager.showOverQuotaDialog();
+            }
             dlQueue.resume(gid);
         }
-        var $tr = $('.transfer-table tr#' + gid);
         $tr.removeClass('paused');
-        $tr.find('span.transfer-type').removeClass('paused');
+        $tr.find('span.transfer-type').removeClass('paused overquota');
 
         if (!$('.transfer-table .progress-block, .transfer-table .transfer-status.initiliazing').length) {
             $tr.find('td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');

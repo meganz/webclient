@@ -2975,6 +2975,8 @@
     "8597": "Mawawala na ang inyong PRO membership sa loob ng %1 na araw.",
     "8598": "Malapit ng mawala ang iyong PRO membership plan",
     "8601": "Idownload sa pamamagitan ng MEGAsync kung ito ay tumatakbo",
+    "8602": "Ang file ay madedecrypt kapag mayroon ng cryptographic key.",
+    "8603": "Sinuspinde ka dahil sa paglabag sa Terms of Service.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3010,6 +3012,7 @@
         "pro-plan-expires-1-day": 8596,
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
-        "delete-duplicates": 8599
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

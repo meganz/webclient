@@ -1471,6 +1471,7 @@ else if (!b_u)
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
+    jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
     jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
@@ -1596,7 +1597,7 @@ else if (!b_u)
         'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-        'register': ['register','register_js'],
+        'register': ['register','register_js', 'zxcvbn_js'],
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],

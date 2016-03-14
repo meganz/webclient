@@ -2975,6 +2975,8 @@
     "8597": "Plan PRO wyga\u015bnie za %1 dni.",
     "8598": "Plan PRO niebawem wyga\u015bnie",
     "8601": "Pobierz z MEGAsync je\u017celi nadal trwa pobieranie",
+    "8602": "Ten plik zostanie odszyfrowany jak tylko klucz deszyfruj\u0105cy b\u0119dzie dost\u0119pny.",
+    "8603": "Twoje konto zosta\u0142o zablokowane z powodu naruszenia regulaminu serwisu.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3010,6 +3012,7 @@
         "pro-plan-expires-1-day": 8596,
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
-        "delete-duplicates": 8599
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

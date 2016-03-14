@@ -128,6 +128,7 @@ function initTransferScroll()
 
 function initTreeScroll()
 {
+    if (d) console.time('treeScroll');
     /**
      if (localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
      {
@@ -135,7 +136,8 @@ function initTreeScroll()
      }
      **/
 
-    $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
+    // .fm-tree-panel's with .manual-tree-panel-scroll-management would manage their jscroll pane by themself.
+    $('.fm-tree-panel:not(.manual-tree-panel-scroll-management)').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
     // $('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
     // $('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
     // {
@@ -146,7 +148,8 @@ function initTreeScroll()
     // if (t == $.scroller) treeDroppable();
     // },100);
     // });
-    jScrollFade('.fm-tree-panel');
+    jScrollFade('.fm-tree-panel:not(.manual-tree-panel-scroll-management)');
+    if (d) console.timeEnd('treeScroll');
 }
 
 var ddtreedisabled = {};
@@ -2180,7 +2183,7 @@ function fmremove() {
             contact = 'contacts';
         }
         else {
-            replaceString = '<strong>' + decodeURIComponent(M.d[$.selected[0]].name) + '</strong>';
+            replaceString = '<strong>' + htmlentities(M.d[$.selected[0]].name) + '</strong>';
             contact = 'contact';
         }
 
@@ -3639,7 +3642,7 @@ function accountUI() {
             $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
-            u_attr.lastname = $('#account-lastname').val().trim()||' ';
+            u_attr.lastname = $('#account-lastname').val().trim();
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
             u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
             u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
@@ -6579,7 +6582,7 @@ function treeUI()
     //console.error('treeUI');
     if (d)
         console.time('treeUI');
-    $('.fm-tree-panel .nw-fm-tree-item').draggable(
+    $('.fm-tree-panel .nw-fm-tree-item:visible').draggable(
         {
             revert: true,
             containment: 'document',
@@ -6633,7 +6636,7 @@ function treeUI()
         'ul.conversations-pane > li,' +
         '.messages-block,' +
         '.nw-contact-item'
-    ).droppable({
+    ).filter(":visible").droppable({
             tolerance: 'pointer',
             drop: function(e, ui)
             {
@@ -6660,8 +6663,8 @@ function treeUI()
         }
     });
 
-    $('.fm-tree-panel .nw-fm-tree-item').unbind('click contextmenu');
-    $('.fm-tree-panel .nw-fm-tree-item').bind('click contextmenu', function(e) {
+    $('.fm-tree-panel .nw-fm-tree-item:visible').unbind('click.treeUI contextmenu.treeUI');
+    $('.fm-tree-panel .nw-fm-tree-item:visible').bind('click.treeUI contextmenu.treeUI', function(e) {
         var id = $(this).attr('id').replace('treea_', '');
         if (e.type === 'contextmenu') {
             $('.nw-fm-tree-item').removeClass('dragover');
@@ -7537,7 +7540,7 @@ function addShareDialogContactToContent(type, id, av, name, permClass, permText,
     }
     else {
         item = av +   '<div class="fm-chat-user-info">'
-               +       '<div class="fm-chat-user">' + name + '</div>'
+               +       '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
                +   '</div>';
     }
 
@@ -7637,7 +7640,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     rowId = (userHandle) ? userHandle : email;
     html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
-    $('.share-dialog .share-dialog-contacts').append(html);
+    $('.share-dialog .share-dialog-contacts').safeAppend(html);
 }
 
 function handleDialogScroll(num, dc)
@@ -10487,13 +10490,17 @@ function fm_resize_handler() {
 mega.utils.fullUsername = function username(userHandle) {
 
     // User name
-    var result;
+    var result = '';
 
-    if (M.d[userHandle]) {
-        result = M.d[userHandle].name && $.trim(M.d[userHandle].name) || M.d[userHandle].m;
+    if (M.u[userHandle]) {
+        result = M.u[userHandle].name && $.trim(M.u[userHandle].name) || M.u[userHandle].m;
+
+        // Convert to string and escape for XSS
+        result = String(result);
+        result = htmlentities(result);
     }
 
-    return String(result);
+    return result;
 };
 
 function sharedFolderUI() {
@@ -10567,7 +10574,7 @@ function sharedFolderUI() {
                         + '<div class="clear"></div>'
                         + avatar
                         + '<div class="fm-chat-user-info">'
-                            + '<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
+                            + '<div class="fm-chat-user">' + fullOwnersName + '</div>'
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'
@@ -10671,7 +10678,7 @@ function fingerprintDialog(userid) {
     $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
     $this.find('.contact-details-user-name')
-        .text(user.name || user.m) // escape HTML things
+        .text(mega.utils.fullUsername(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
@@ -10760,7 +10767,9 @@ function contactUI() {
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
-        $('.contact-top-details .contact-details-user-name').text(user.name || user.m);
+        $('.contact-top-details .contact-details-user-name').text(
+            mega.utils.fullUsername(user.u)
+        );
         $('.contact-top-details .contact-details-email').text(user.m);
 
         $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {

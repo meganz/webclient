@@ -11902,5 +11902,13 @@
     "8601": {
         "text": "Download with MEGAsync if it is running",
         "context": "This option in the account settings allows users to download files with the external MEGAsync program if it is running in the background. Otherwise they will normally download through the browser.\r\n"
+    },
+    "8602": {
+        "text": "This file will be decrypted as soon as the cryptographic key becomes available.",
+        "context": "A tooltip message for undecryptable file."
+    },
+    "8603": {
+        "text": "You have been suspended due to Terms of Service violations.",
+        "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
     }
 }

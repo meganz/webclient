@@ -1434,11 +1434,13 @@ var strongvelope = {};
         if ((sender !== this.ownHandle)
                 && (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS)) {
 
+            var allParticipants = setutils.join(otherParticipantsFromMessage, new Set([this.ownHandle]));
+
             // Sanity checks.
             if ((parsedMessage.includeParticipants.length > 0)
                     && (setutils.subtract(new Set(parsedMessage.includeParticipants),
-                        otherParticipantsFromMessage).size > 0)) {
-                // Included participants must be in otherParticipantsFromMessage, so if the
+                        allParticipants).size > 0)) {
+                // Included participants must be in allParticipants, so if the
                 // subtraction has anything left over, this is an invalid message.
                 return false;
             }
@@ -1454,8 +1456,8 @@ var strongvelope = {};
             if (this._inUse) {
                 // Sanity check whether everything matches up.
                 var myCheckParticipants = this._trackParticipants(
-                    this.otherParticipants, parsedMessage.includeParticipants,
-                    parsedMessage.excludeParticipants);
+                    this.otherParticipants, new Set(parsedMessage.includeParticipants),
+                    new Set(parsedMessage.excludeParticipants));
 
                 if (myCheckParticipants === false) {
                     // Sanity check, if the checked participants had an inconsistency

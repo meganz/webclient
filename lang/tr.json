@@ -2975,6 +2975,8 @@
     "8597": "PRO \u00fcyeli\u011finizin s\u00fcresi %1 g\u00fcn i\u00e7erisinde dolacak",
     "8598": "PRO \u00fcyeli\u011finizin s\u00fcresi yak\u0131nda dolacak",
     "8601": "\u00c7al\u0131\u015f\u0131yorsa MEGASync ile indirin",
+    "8602": "Bu dosyan\u0131n kriptografik anahtar kullan\u0131labilir oldu\u011funda \u015fifresi \u00e7\u00f6z\u00fclecek.",
+    "8603": "Kullan\u0131m Ko\u015fullar\u0131n\u0131 ihlal etti\u011finizden dolay\u0131 hesab\u0131n\u0131z ask\u0131ya al\u0131nd\u0131.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3010,6 +3012,7 @@
         "pro-plan-expires-1-day": 8596,
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
-        "delete-duplicates": 8599
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

@@ -989,46 +989,6 @@ function showNonActivatedAccountDialog(log) {
         .append(l[5847]); //TODO: l[]
 }
 
-/**
- * Shows a dialog with a message that the user is over quota
- */
-function showOverQuotaDialog() {
-
-    // Show the dialog
-    var $dialog = $('.top-warning-popup');
-    $dialog.addClass('active');
-
-    // Unhide the warning icon and show the button
-    $('.warning-popup-icon').removeClass('hidden');
-    $('.fm-notifications-bottom', $dialog).show();
-
-    // Add a click event on the warning icon to hide and show the dialog
-    $('.warning-icon-area').unbind('click');
-    $('.warning-icon-area').click(function() {
-        if ($dialog.hasClass('active')) {
-            $dialog.removeClass('active');
-        }
-        else {
-            $dialog.addClass('active');
-        }
-    });
-
-    // Change contents of dialog text
-    $('.warning-green-icon', $dialog).remove();
-    $('.warning-popup-body', $dialog).unbind('click').html(
-        '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
-        + "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
-    );
-
-    // Set button text to 'Upgrade Account'
-    $('.warning-button span').text(l[5549]);
-
-    // Redirect to Pro signup page on button click
-    $('.warning-button').click(function() {
-        document.location.hash = 'pro';
-    });
-}
-
 function logincheckboxCheck(ch_id) {
     var ch_div = ch_id + "_div";
     if (document.getElementById(ch_id).checked) {
@@ -3426,23 +3386,28 @@ mega.utils.reload = function megaUtilsReload() {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
-                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
-                    msgDialog('warningb', l[882], l[7157]);
-                }
-                if (mBroadcaster.crossTab.master) {
-                    mega.utils.abortTransfers().then(function() {
-                        loadingDialog.show();
-                        stopsc();
-                        stopapi();
+                var reload = function() {
+                    if (mBroadcaster.crossTab.master) {
+                        mega.utils.abortTransfers().then(function() {
+                            loadingDialog.show();
+                            stopsc();
+                            stopapi();
 
-                        MegaPromise.allDone([
-                            MegaDB.dropAllDatabases(/*u_handle*/),
-                            mega.utils.clearFileSystemStorage()
-                        ]).then(function(r) {
-                                console.debug('megaUtilsReload', r);
-                                _reload();
-                            });
-                    });
+                            MegaPromise.allDone([
+                                MegaDB.dropAllDatabases(/*u_handle*/),
+                                mega.utils.clearFileSystemStorage()
+                            ]).then(function(r) {
+                                    console.debug('megaUtilsReload', r);
+                                    _reload();
+                                });
+                        });
+                    }
+                };
+                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+                    msgDialog('warningb', l[882], l[7157], 0, reload);
+                }
+                else {
+                    reload();
                 }
             }
         });

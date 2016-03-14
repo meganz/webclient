@@ -1230,9 +1230,11 @@ function topmenuUI() {
             else {
                 var c = $('.top-login-popup').attr('class');
                 if (c && c.indexOf('active') > -1) {
+                    $('.top-login-popup form').empty();
                     loginDialog(1);
                 }
                 else {
+                    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
                     loginDialog();
                 }
             }
@@ -1782,6 +1784,18 @@ function is_fm() {
     if (d > 1) console.error('is_fm', r, page, hash);
 
     return r;
+}
+
+/**
+ *  Process a given template (which has been loaded already in `pages[]`) 
+ *  and return the translated HTML code.
+ *
+ *  @param {String} name    Template name
+ *  @returns {String}       The HTML ready to be used
+ */
+function getTemplate(name) {
+
+    return translate(''+pages[name]).replace(/{staticpath}/g, staticpath);
 }
 
 function parsepage(pagehtml, pp) {

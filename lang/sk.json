@@ -2975,8 +2975,8 @@
     "8597": "Va\u0161e PRO \u010dlenstvo expiruje o %1 dn\u00ed.",
     "8598": "Va\u0161e PRO \u010dlenstvo \u010doskoro expiruje",
     "8601": "Stiahnu\u0165 cez MEGAsync pokia\u013e je spusten\u00fd",
-    "8602": "This file will be decrypted as soon as the cryptographic key becomes available.",
-    "8603": "You have been suspended due to Terms of Service violations.",
+    "8602": "S\u00fabok bude od\u0161ifrovan\u00fd hne\u010f, ako bude dostupn\u00fd kryptografick\u00fd k\u013e\u00fa\u010d.",
+    "8603": "Boli ste suspendovan\u00fd pre poru\u0161ovanie Podmienok pou\u017e\u00edvania slu\u017eby.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

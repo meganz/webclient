@@ -107,7 +107,7 @@ var Chat = function() {
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
-        'loadbalancerService': 'gelb530n001.karere.mega.nz',
+        'loadbalancerService': 'gelb.karere.mega.nz',
         'fallbackXmppServers': [
              "https://xmpp270n001.karere.mega.nz/ws",
              "https://xmpp270n002.karere.mega.nz/ws"

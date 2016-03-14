@@ -605,23 +605,40 @@ var dlmanager = {
         }.bind(this), expires * 1000);
     },
 
+    _overquotaInfo: function() {
+
+        api_req({a: 'uq', xfer: 1}, {
+            callback: function(res) {
+                var size = 0;
+                if (typeof res === "number") {
+                    // Error, just keep retrying
+                    return this._overquotaInfo();
+                }
+                res.tah = res.tah || [];
+                for (var i = 0 ; i < res.tah.length; i++) {
+                    size += res.tah[i];
+                }
+                this._dlQuotaLimit = bytesToSize(size); 
+                this._dlQuotaHours = res.tah.length;
+                this._overquotaShowVariables();
+            }.bind(this)
+        });
+    },
+
+    _overquotaShowVariables: function() {
+
+        $('.fm-dialog.bandwidth-dialog.overquota .bandwidth-text-bl.second').removeClass('hidden')
+            .safeHTML(
+                l[7099]
+                    .replace("6", this._dlQuotaHours)
+                    .replace('%1', this._dlQuotaLimit)
+                    .replace("[A]", '<a href="#pro">').replace('[/A]', '</a>')
+            );
+
+    },
+
     showOverQuotaDialog: function DM_quotaDialog(time, dlTask) {
 
-        if (!this._dlQuotaLimit) {
-            api_req({a: 'uq', xfer: 1}, {
-                callback: function(res) {
-                    var size = 0;
-                    for (var i = 0 ; i < res.tah.length; i++) {
-                        size += res.tah[i];
-                    }
-                    this._dlQuotaLimit = bytesToSize(size); 
-                    this._dlQuotaHours = res.tah.length;
-                    this.showOverQuotaDialog(time, dlTask);
-                }.bind(this)
-            });
-            return;
-        }
-    
         var tick;
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
         var $button = $dialog.find('.fm-dialog-close');
@@ -647,14 +664,15 @@ var dlmanager = {
         $dialog.removeClass('hidden')
             .find('.bandwidth-header')
             .safeHTML(l[7100].replace('%1', '<span class="countdown"></span>'))
-            .end()
-            .find('.bandwidth-text-bl.second')
-            .safeHTML(
-                l[7099]
-                    .replace("6", this._dlQuotaHours)
-                    .replace('%1', this._dlQuotaLimit)
-                    .replace("[A]", '<a href="#pro">').replace('[/A]', '</a>')
-            );
+            .end();
+
+        if (!this._dlQuotaLimit) {
+            $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
+            this._overquotaInfo();
+        } else {
+            this._overquotaShowVariables();
+        }
+    
 
         
         function closeModal() {

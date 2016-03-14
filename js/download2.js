@@ -606,6 +606,21 @@ var dlmanager = {
     },
 
     showOverQuotaDialog: function DM_quotaDialog(time, dlTask) {
+
+        if (!this._dlQuotaLimit) {
+            api_req({a: 'uq', xfer: 1}, {
+                callback: function(res) {
+                    var size = 0;
+                    for (var i = 0 ; i < res.tah.length; i++) {
+                        size += res.tah[i];
+                    }
+                    this._dlQuotaLimit = bytesToSize(size); 
+                    this._dlQuotaHours = res.tah.length+2;
+                    this.showOverQuotaDialog(time, dlTask);
+                }.bind(this)
+            });
+            return;
+        }
     
         var tick;
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
@@ -631,7 +646,15 @@ var dlmanager = {
         fm_showoverlay();
         $dialog.removeClass('hidden')
             .find('.bandwidth-header')
-            .safeHTML(l[7100].replace('%1', '<span class="countdown"></span>'));
+            .safeHTML(l[7100].replace('%1', '<span class="countdown"></span>'))
+            .end()
+            .find('.bandwidth-text-bl.second')
+            .safeHTML(
+                l[7099].replace('%1', this._dlQuotaLimit)
+                    .replace("[A]", '<a href="#pro">').replace('[/A]', '</a>')
+                    .replace("6", this._dlQuotaHours)
+            );
+
         
         function closeModal() {
     

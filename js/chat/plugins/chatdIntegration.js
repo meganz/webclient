@@ -421,10 +421,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }
-
-                    if (seedResult === false && chatRoom.messagesBuff.haveMoreHistory() === true) {
-                        chatRoom.messagesBuff.retrieveChatHistory();
-                    }
                 };
 
                 if (!chatRoom.protocolHandler) {

@@ -1,10 +1,6 @@
 *.xpi
 *.crx
 
-#################
-## Webclient build artifacts
-#################
-js/chat/bundle.js
 
 #################
 ## Eclipse
@@ -227,7 +223,6 @@ test-results.xml
 .tox
 js/tests/coverage
 test/phantomjs-storage
-js/chat/bundle.js
 
 
 #############

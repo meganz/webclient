@@ -1234,7 +1234,7 @@ function topmenuUI() {
                     loginDialog(1);
                 }
                 else {
-                    $('.top-login-popup form').replaceWith(getTemplate('top_login'));
+                    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
                     loginDialog();
                 }
             }

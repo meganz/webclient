@@ -989,46 +989,6 @@ function showNonActivatedAccountDialog(log) {
         .append(l[5847]); //TODO: l[]
 }
 
-/**
- * Shows a dialog with a message that the user is over quota
- */
-function showOverQuotaDialog() {
-
-    // Show the dialog
-    var $dialog = $('.top-warning-popup');
-    $dialog.addClass('active');
-
-    // Unhide the warning icon and show the button
-    $('.warning-popup-icon').removeClass('hidden');
-    $('.fm-notifications-bottom', $dialog).show();
-
-    // Add a click event on the warning icon to hide and show the dialog
-    $('.warning-icon-area').unbind('click');
-    $('.warning-icon-area').click(function() {
-        if ($dialog.hasClass('active')) {
-            $dialog.removeClass('active');
-        }
-        else {
-            $dialog.addClass('active');
-        }
-    });
-
-    // Change contents of dialog text
-    $('.warning-green-icon', $dialog).remove();
-    $('.warning-popup-body', $dialog).unbind('click').html(
-        '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
-        + "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
-    );
-
-    // Set button text to 'Upgrade Account'
-    $('.warning-button span').text(l[5549]);
-
-    // Redirect to Pro signup page on button click
-    $('.warning-button').click(function() {
-        document.location.hash = 'pro';
-    });
-}
-
 function logincheckboxCheck(ch_id) {
     var ch_div = ch_id + "_div";
     if (document.getElementById(ch_id).checked) {

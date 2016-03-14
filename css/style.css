@@ -24797,7 +24797,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     padding-top: 6px
 }
 .support .fm-accout-inputs-blocks {
-    padding-top: 12px
+    padding-top: 15px
 }
 .support .fm-account-labels {
     width: 30px;
@@ -24810,10 +24810,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     height: 80%;
     float: left;
     border: 1px solid #e8e8e8;
-    border-radius: 5px;
+    font-size: 14px;
+    color: #666666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 8px 35px 8px 10px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
 }
 .help2 img[alt="smallx"] {
     max-width: 50px;
+}
+.support .fm-account-input::before {
+    display: none;
 }
 .help2 img[alt="small"] {
     max-width: 50%;

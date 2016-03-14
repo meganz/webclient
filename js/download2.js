@@ -352,11 +352,7 @@ var dlmanager = {
         }
 
         if (code === 509) {
-            // add extra 3 seconds before closing the dialog and retrying
-            var retry = args[1].retry + 3;
-            retry = 60; // remove me
-
-            this.showOverQuotaDialog(retry, task);
+            this.showOverQuotaDialog(task);
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
             return 1;
         }
@@ -587,6 +583,7 @@ var dlmanager = {
         if (this._quotaRetry) {
             clearTimeout(this._quotaRetry);
         }
+
         this._quotaRetry = setTimeout(function() {
             
             var ids = dlmanager.getCurrentDownloads();
@@ -618,9 +615,11 @@ var dlmanager = {
                 for (var i = 0 ; i < res.tah.length; i++) {
                     size += res.tah[i];
                 }
+                this._dlQuotaRetry = 3600 - (res.bt % 3600);
                 this._dlQuotaLimit = bytesToSize(size); 
                 this._dlQuotaHours = res.tah.length;
                 this._overquotaShowVariables();
+                this._setQuotaRetryTimer(this._dlQuotaRetry);
             }.bind(this)
         });
     },
@@ -634,26 +633,20 @@ var dlmanager = {
                     .replace('%1', this._dlQuotaLimit)
                     .replace("[A]", '<a href="#pro" class="red">').replace('[/A]', '</a>')
             );
+        $('.fm-dialog.bandwidth-dialog.overquota .countdown').removeClass('hidden')
 
     },
 
-    showOverQuotaDialog: function DM_quotaDialog(time, dlTask) {
+    showOverQuotaDialog: function DM_quotaDialog(dlTask) {
 
         var tick;
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
         var $button = $dialog.find('.fm-dialog-close');
         var $overlay = $('.fm-dialog-overlay');
 
-        if (!time && typeof this._lastQuotaTimeout == "number") {
-            time = this._lastQuotaTimeout - unixtime();
-        }
-
         if (dlTask) {
             this._quotaPushBack[dlTask.gid] = dlTask;
         }
-
-        // make sure time is indeed a number
-        time = parseInt(time);
 
         dlmanager.getCurrentDownloads().forEach(function(id) {
             fm_tfspause(id, true);
@@ -663,18 +656,13 @@ var dlmanager = {
         fm_showoverlay();
         $dialog.removeClass('hidden')
             .find('.bandwidth-header')
-            .safeHTML(l[7100].replace('%1', '<span class="countdown"></span>'))
+            .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
             .end();
 
-        if (!this._dlQuotaLimit) {
-            $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
-            this._overquotaInfo();
-        } else {
-            this._overquotaShowVariables();
-        }
-    
-
         
+        $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
+        this._overquotaInfo();
+    
         function closeModal() {
     
             clearInterval(tick);
@@ -694,15 +682,12 @@ var dlmanager = {
             document.location.hash = '#pro';
         });
         var $txt = $('.countdown', $dialog);
-        $txt.text(secondsToTimeShort(time));
+        $txt.text(secondsToTimeShort(0));
     
         tick = setInterval(function() {
     
-            $txt.text(secondsToTimeShort(--time));
-        }, 1000);
-
-        this._setQuotaRetryTimer(time);
-        this._lastQuotaTimeout = unixtime() + time;
+            $txt.text(secondsToTimeShort(--this._dlQuotaRetry));
+        }.bind(this), 1000);
     },
 
     /**

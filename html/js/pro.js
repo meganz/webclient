@@ -416,15 +416,6 @@ function pro_next_step(proPlanName) {
 
     megaAnalytics.log('pro', 'proc');
 
-    proPlanName = String(proPlanName).replace(/pro/i, '').trim().toLowerCase();
-    if (proPlanName !== 'lite') {
-        proPlanName = proPlanName.length;
-    }
-    if (location.hash.split('_').pop() != proPlanName) {
-        window.skipHashChange = true;
-        location.hash = 'pro_' + proPlanName;
-    }
-
     var currentDate = new Date(),
         monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         mon = monthName[currentDate.getMonth()],

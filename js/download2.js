@@ -629,10 +629,13 @@ var dlmanager = {
                     size += res.tah[i];
                 }
                 this._dlQuotaRetry = 3600 - ((res.bt||0) % 3600);
-                this._dlQuotaRetry = 60;
-                this._dlQuotaLimit = bytesToSize(size); 
-                this._dlQuotaHours = res.tah.length;
-                this._overquotaShowVariables();
+                if (res.tah.length) {
+                    this._dlQuotaLimit = bytesToSize(size); 
+                    this._dlQuotaHours = res.tah.length;
+                    this._overquotaShowVariables();
+                } else {
+                    this._dlQuotaRetry = 3600;
+                }
                 this._setQuotaRetryTimer(this._dlQuotaRetry);
                 var $txt = $('.fm-dialog.bandwidth-dialog.overquota .countdown').removeClass('hidden')
                 $txt.text(secondsToTimeShort(this._dlQuotaRetry));
@@ -645,7 +648,6 @@ var dlmanager = {
     },
 
     _overquotaShowVariables: function() {
-
         $('.fm-dialog.bandwidth-dialog.overquota .bandwidth-text-bl.second').removeClass('hidden')
             .safeHTML(
                 l[7099]

@@ -2968,6 +2968,15 @@
     "8588": "nedekriptirana datoteka",
     "8589": "Ni obvestil",
     "8590": "nedekriptirana mapa",
+    "8593": "Uporabite mo\u017enost iskanja duplikatov, da poi\u0161\u010dete ve\u010d kopij iste datoteke.",
+    "8594": "Poi\u0161\u010di duplikate",
+    "8595": "Ta mapa bo dekriptirana takoj, ko bo na voljo kriptografski klju\u010d zanjo.",
+    "8596": "Va\u0161a PRO naro\u010dnina bo potekla \u010dez 1 dan.",
+    "8597": "Va\u0161a PRO naro\u010dnina bo potekla v %1 dneh.",
+    "8598": "PRO naro\u010dnina se kmalu izteka",
+    "8601": "Prevzemi z MEGAsync, \u010de je zagnan",
+    "8602": "Ta datoteka bo dekriptirana takoj, ko bo na voljo kriptografski klju\u010d zanjo.",
+    "8603": "Bili ste suspendirani zaradi kr\u0161itev Pravil uporabe storitev.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -2997,6 +3006,13 @@
         "important-notice": 8537,
         "view-blog-post": 8538,
         "v1_app_install_v3": 8559,
-        "no-notifications": 8589
+        "no-notifications": 8589,
+        "duplicate-search-description": 8593,
+        "duplicate-search-button-title": 8594,
+        "pro-plan-expires-1-day": 8596,
+        "pro-plan-expires-x-days": 8597,
+        "pro-plan-expiring-soon": 8598,
+        "delete-duplicates": 8599,
+        "suspended-for-tos-violations": 8603
     }
 }

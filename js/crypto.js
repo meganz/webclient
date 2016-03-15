@@ -211,9 +211,6 @@ var crypt = (function () {
 
     /**
      * Used for caching .getPubKey requests which are in progress (by reusing MegaPromises)
-     *
-     * @type {String, MegaPromise}
-     * @private
      */
     ns._pubKeyRetrievalPromises = {};
 
@@ -2046,8 +2043,7 @@ function getsc(mDBload) {
 
                     // If we're loading the cloud, notify completion only
                     // once first action-packets have been processed.
-                    if (!mega.fmLoaded) {
-                        mega.fmLoaded = true;
+                    if (!fminitialized) {
                         loadfm_done(ctx.mDBload);
                     }
                 }

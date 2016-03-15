@@ -112,13 +112,19 @@ var crypt = (function () {
         var masterPromise = new MegaPromise();
 
         if (keyType === 'RSA') {
+            var cacheKey = userhandle + "_@uk";
+
             var myCtx = {};
             /** Function to settle the promise for the RSA pub key attribute. */
-            var __settleFunction = function(res) {
+            var __settleFunction = function(res, ctx, xhr, fromCache) {
                 if (typeof res === 'object') {
                     var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
                     logger.debug('Got ' + keyType + ' pub key of user '
                                  + userhandle + ': ' + JSON.stringify(pubKey));
+
+                    if (!fromCache && attribCache) {
+                        attribCache.setItem(cacheKey, JSON.stringify(res));
+                    }
                     masterPromise.resolve(pubKey);
                 }
                 else {
@@ -132,8 +138,28 @@ var crypt = (function () {
             myCtx.u = userhandle;
             myCtx.callback = __settleFunction;
 
-            // Fire it off.
-            api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+            var __retrieveRsaKeyFunc = function() {
+                // Fire it off.
+                api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+            };
+
+            if (attribCache) {
+                attribCache.getItem(cacheKey)
+                    .done(function(r) {
+                        if (r && r.length !== 0) {
+                            __settleFunction(JSON.parse(r), undefined, undefined, true);
+                        } else {
+                            __retrieveRsaKeyFunc();
+                        }
+                    })
+                    .fail(function() {
+                        __retrieveRsaKeyFunc();
+                    });
+            }
+            else {
+                __retrieveRsaKeyFunc();
+            }
+
         }
         else {
             var pubKeyPromise = mega.attr.get(userhandle,
@@ -659,8 +685,11 @@ var crypt = (function () {
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
 
-        // Show warning dialog
-        mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
+        if (localStorage.hideCryptoWarningDialogs !== '1') {
+            mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+        }
 
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
@@ -692,8 +721,11 @@ var crypt = (function () {
                + ' for user ' + userHandle
         });
 
-        // Show warning dialog.
-        mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
+        if (localStorage.hideCryptoWarningDialogs !== '1') {
+            mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+        }
 
         logger.error(keyType + ' signature does not verify for user '
                      + userHandle + '!');
@@ -1956,13 +1988,24 @@ function api_reqfailed(c, e) {
         queue.cmds = [[], []];
         queue.ctxs = [[], []];
         queue.setimmediate = false;
-        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reason) {
+        
+        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {
             u_logout(true);
 
             // On clicking OK, log the user out and redirect to contact page
             loadingDialog.hide();
+                        
+            var reasonText = l[7660];   // You have been suspended due to repeated copyright infringement.
+                        
+            if (reasonCode === 100) {
+                reasonText = l[7659];   // You have been suspended due to excess data usage.
+            }
+            else if (reasonCode === 300) {
+                reasonText = l[8603];   // You have been suspended due to Terms of Service violations.
+            }
+            
             msgDialog('warninga', l[6789],
-                (reason === 100) ? l[7659] : l[7660],
+                reasonText,
                 false,
                 function() {
                     var redirectUrl = getAppBaseUrl() + '#contact';

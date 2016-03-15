@@ -107,7 +107,7 @@ var Chat = function() {
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
-        'loadbalancerService': 'gelb530n001.karere.mega.nz',
+        'loadbalancerService': 'gelb.karere.mega.nz',
         'fallbackXmppServers': [
              "https://xmpp270n001.karere.mega.nz/ws",
              "https://xmpp270n002.karere.mega.nz/ws"
@@ -393,84 +393,6 @@ Chat.prototype.init = function() {
             e.stopPropagation();
             return false;
         }
-        self.logger.debug(self.karere.getNickname(), "Got invitation to join", eventObject.getRoomJid(), "with eventData:", eventObject);
-
-
-        var meta = eventObject.getMeta();
-
-        if (meta && meta.type === "private") {
-
-            var otherParticipants = meta.participants;
-            var myBareJid = megaChat.karere.getBareJid();
-
-            var otherParticipant;
-            if (Karere.getNormalizedBareJid(otherParticipants[0]) === megaChat.karere.getBareJid()) {
-                otherParticipant = Karere.getNormalizedBareJid(otherParticipants[0]);
-            }
-            else {
-                otherParticipant = Karere.getNormalizedBareJid(otherParticipants[1]);
-            }
-
-            if (otherParticipant && !self.getContactFromJid(otherParticipant)) {
-                self.logger.debug(
-                    self.karere.getNickname(),
-                    "Got invited to a private room with a non-existing contact. Ignoring: ",
-                    eventObject.getRoomJid(),
-                    roomJid,
-                    "with eventData:", eventObject, " and participants: ", otherParticipants
-                );
-            }
-            var bareFromJid = eventObject.getFromJid().split("/")[0];
-            self.chats.forEach(function(room, roomJid) {
-
-                if (roomJid === eventObject.getRoomJid()) {
-                    return; // continue
-                }
-
-                if (room.type === "private" && room.participantExistsInRoom(bareFromJid, false, true)) {
-                    self.logger.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventObject.getRoomJid(), roomJid, "with eventData:", eventObject);
-
-                    if (self.currentlyOpenedChat === room.roomJid) {
-                        room.ctime = meta.ctime;
-                        room.syncUsers(meta.participants);
-                    }
-
-                    // if not already in
-                    if (room.state < ChatRoom.STATE.JOINING) {
-                        room.setState(ChatRoom.STATE.JOINING);
-                        self.karere.joinChat(eventObject.getRoomJid(), eventObject.getPassword());
-                    }
-
-                    e.stopPropagation();
-                    return false;
-                }
-            });
-
-            if (e.isPropagationStopped()) {
-                return false;
-            }
-        }
-        if (self.chats[eventObject.getRoomJid()]) { //already joined
-            self.logger.warn("I'm already in", eventObject.getRoomJid(), "(ignoring invitation from: ", eventObject.getFromJid(), ")");
-
-            e.stopPropagation();
-            return false; // stop doing anything
-        }
-
-        // if we are here..then join the room
-        self.logger.debug("Initializing UI for new room: ", eventObject.getRoomJid(), "");
-
-        var roomJid = eventObject.getRoomJid();
-        var room = new ChatRoom(self, eventObject.getRoomJid(), meta.type, meta.participants, meta.ctime);
-        self.chats.set(
-            roomJid,
-            room
-        );
-        room.setState(ChatRoom.STATE.JOINING);
-        self.karere.joinChat(roomJid, eventObject.getPassword());
-
-        //room.refreshUI();
-
 
         e.stopPropagation();
 
@@ -697,6 +619,10 @@ Chat.prototype.init = function() {
     var appContainer = document.querySelector('.section.conversations');
 
     var initAppUI = function() {
+        if (d) {
+            console.time('chatReactUiInit');
+        }
+
         self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} contacts={M.u} />;
 
         self.$conversationsAppInstance = ReactDOM.render(
@@ -705,6 +631,9 @@ Chat.prototype.init = function() {
         );
 
         self.renderConversationsApp();
+        if (d) {
+            console.timeEnd('chatReactUiInit');
+        }
     };
 
     if (!appContainer) {
@@ -1096,11 +1025,8 @@ Chat.prototype.getContactNameFromJid = function(jid) {
     var name = jid.split("@")[0];
 
 
-    if (contact && contact.name) {
-        name = contact.name;
-    }
-    else if (contact && contact.m) {
-        name = contact.m;
+    if (contact) {
+        name = mega.utils.fullUsername(contact.u);
     }
 
     assert(name, "Name not found for jid: " + jid);

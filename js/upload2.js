@@ -175,7 +175,9 @@ var ulmanager = {
                 if (d) {
                     ulmanager.logger.error('Too many retries for ' + cid);
                 }
+                var fileName = htmlentities(file.name);
                 var errorstr = reason.match(/"([^"]+)"/);
+                
                 if (errorstr) {
                     errorstr = errorstr.pop();
                 }
@@ -184,7 +186,7 @@ var ulmanager = {
                 }
                 $('.transfer-table #ul_' + file.id + ' td:eq(5)')
                     .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
-                msgDialog('warninga', l[1309], l[1498] + ': ' + file.name, reason);
+                msgDialog('warninga', l[1309], l[1498] + ': ' + fileName, reason);
                 ulmanager.abort(file);
             }
             if (!$.len(q)) {
@@ -630,7 +632,7 @@ var ulmanager = {
             ulmanager.ulCompletePending(ctx.target);
         }
         else {
-            var fileName = ctx.file.name;
+            var fileName = htmlentities(ctx.file.name);
             Later(mega.utils.resetUploadDownload);
             Soon(function() {
 

@@ -281,7 +281,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
         result.append(line)
 
     # Add the number of errors and return in a nicely formatted way.
-    return re.sub('\n+', '\n', '\n\n'.join(result).strip()), 1
+    return re.sub('\n+', '\n', '\n\n'.join(result).rstrip()), 1
 
 
 def inspectjs(file, ln, line, result):
@@ -290,7 +290,7 @@ def inspectjs(file, ln, line, result):
     indent = ' ' * (len(file)+len(str(ln))+3)
 
     # check non-namespaced event handlers
-    match = re.search(r'\$\((.*?)\)\s*\.\s*(?:re|un)?bind\s*\(([^\),]+)', line)
+    match = re.search(r'\$\((.*?)\)\s*\.\s*(?:re|un)?bind\s*\([\'"]([^\'"\),]+)', line)
     if match:
         target = match.group(1)
         event = match.group(2)
@@ -331,7 +331,7 @@ def reduce_validator(file_line_mapping, **extra):
             continue
 
         # Ignore this specific file types
-        if file_extension in ['.json','.py','.sh']:
+        if file_extension in ['.json','.py','.sh', '.svg', '.css']:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file

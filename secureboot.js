@@ -57,8 +57,40 @@ function geoStaticpath(eu)
     return 'https://eu.static.mega.co.nz/3/';
 }
 
-if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
-        && parseInt(navigator.appVersion.match(/Chrome\/(\d+)\./)[1]) < 22) {
+if (is_chrome_firefox) {
+    var Cu = Components.utils;
+    var Cc = Components.classes;
+    var Ci = Components.interfaces;
+
+    Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
+    Cu['import']("resource://gre/modules/Services.jsm");
+
+    ['userAgent', 'appName', 'appVersion', 'platform', 'oscpu']
+        .forEach(function(k) {
+            var pref = 'general.' + k.toLowerCase() + '.override';
+
+            if (Services.prefs.prefHasUserValue(pref)
+                    && Services.prefs.getPrefType(pref) === 32) {
+
+                try {
+                    var value = Services.prefs.getCharPref(pref);
+                    Services.prefs.clearUserPref(pref);
+
+                    Object.defineProperty(navigator, k, {
+                        enumerable: true,
+                        value: Cc["@mozilla.org/network/protocol;1?name=http"]
+                                    .getService(Ci.nsIHttpProtocolHandler)[k]
+                    });
+                    Services.prefs.setCharPref(pref, value);
+                }
+                catch (e) {}
+            }
+        });
+
+    ua = navigator.userAgent.toLowerCase();
+}
+else if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
+        && parseInt(String(navigator.appVersion).split('Chrome/').pop()) < 22) {
     b_u = 1;
 }
 else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
@@ -126,21 +158,20 @@ if (!b_u) try
 {
     if (is_chrome_firefox)
     {
-        var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
-
-        Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
-        Cu['import']("resource://gre/modules/Services.jsm");
         XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
         (function(global) {
             global.loadSubScript = function(file,scope) {
-                if (global.d) {
-                    Services.scriptloader.loadSubScriptWithOptions(file,{
-                        target : scope||global, charset: "UTF-8",
-                        ignoreCache : true
+                var loader = Services.scriptloader;
+
+                if (global.d && loader.loadSubScriptWithOptions) {
+                    loader.loadSubScriptWithOptions(file, {
+                        charset: "UTF-8",
+                        ignoreCache: true,
+                        target: scope || global
                     });
                 } else {
-                    Services.scriptloader.loadSubScript(file,scope||global);
+                    loader.loadSubScript(file, scope || global);
                 }
             };
         })(this);
@@ -1440,6 +1471,7 @@ else if (!b_u)
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
+    jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
     jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
@@ -1462,7 +1494,6 @@ else if (!b_u)
     jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/rtl.css', n: 'rtl_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
@@ -1489,8 +1520,7 @@ else if (!b_u)
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
     if (typeof Number.isNaN !== 'function'
-            || typeof Set === 'undefined'
-            || typeof Array.from !== 'function') {
+            || typeof Set === 'undefined') {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
@@ -1566,7 +1596,7 @@ else if (!b_u)
         'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-        'register': ['register','register_js'],
+        'register': ['register','register_js', 'zxcvbn_js'],
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],

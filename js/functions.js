@@ -698,12 +698,19 @@ function browserdetails(useragent) {
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
+    details.version = (useragent.match(RegExp("\\s+" + browser + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 
     // Determine if using a browser extension
-    details.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    details.isExtension = (current && is_extension || useragent.indexOf('megext') > -1);
+
+    if (useragent.indexOf(' MEGAext/') !== -1) {
+        var ver = useragent.match(/ MEGAext\/([\d.]+)/);
+
+        details.isExtension = ver && ver[1] || true;
+    }
 
     // Determine core engine.
     if (useragent.indexOf('webkit') > 0) {
@@ -3379,23 +3386,28 @@ mega.utils.reload = function megaUtilsReload() {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
-                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
-                    msgDialog('warningb', l[882], l[7157]);
-                }
-                if (mBroadcaster.crossTab.master) {
-                    mega.utils.abortTransfers().then(function() {
-                        loadingDialog.show();
-                        stopsc();
-                        stopapi();
+                var reload = function() {
+                    if (mBroadcaster.crossTab.master) {
+                        mega.utils.abortTransfers().then(function() {
+                            loadingDialog.show();
+                            stopsc();
+                            stopapi();
 
-                        MegaPromise.allDone([
-                            MegaDB.dropAllDatabases(/*u_handle*/),
-                            mega.utils.clearFileSystemStorage()
-                        ]).then(function(r) {
-                                console.debug('megaUtilsReload', r);
-                                _reload();
-                            });
-                    });
+                            MegaPromise.allDone([
+                                MegaDB.dropAllDatabases(/*u_handle*/),
+                                mega.utils.clearFileSystemStorage()
+                            ]).then(function(r) {
+                                    console.debug('megaUtilsReload', r);
+                                    _reload();
+                                });
+                        });
+                    }
+                };
+                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+                    msgDialog('warningb', l[882], l[7157], 0, reload);
+                }
+                else {
+                    reload();
                 }
             }
         });
@@ -3879,6 +3891,78 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/** prevent tabnabbing attacks */
+mBroadcaster.once('startMega', function() {
+
+    if (!(window.chrome || window.safari || window.opr)) {
+        return;
+    }
+
+    // Check whether is safe to open a link through the native window.open
+    var isSafeTarget = function(link) {
+        link = String(link);
+
+        var allowed = [
+            getBaseUrl(),
+            getAppBaseUrl()
+        ];
+
+        var rv = allowed.some(function(v) {
+            return link.indexOf(v) === 0;
+        });
+
+        if (d) {
+            console.log('isSafeTarget', link, rv);
+        }
+
+        return rv || (location.hash.indexOf('fm/chat') === -1);
+    };
+
+    var open = window.open;
+    delete window.open;
+
+    // Replace the native window.open which will open unsafe links through a hidden iframe
+    Object.defineProperty(window, 'open', {
+        writable: false,
+        enumerable: true,
+        value: function(url) {
+            var link = document.createElement('a');
+            link.href = url;
+
+            if (isSafeTarget(link.href)) {
+                return open.apply(window, arguments);
+            }
+
+            var iframe = mCreateElement('iframe', {type: 'content', style: 'display:none'}, 'body');
+            var data = 'var win=window.open("' + escapeHTML(link) + '");if(win)win.opener = null;';
+            var doc = iframe.contentDocument || iframe.contentWindow.document;
+            var script = doc.createElement('script');
+            script.type = 'text/javascript';
+            script.src = mObjectURL([data], script.type);
+            script.onload = SoonFc(function() {
+                myURL.revokeObjectURL(script.src);
+                document.body.removeChild(iframe);
+            });
+            doc.body.appendChild(script);
+        }
+    });
+
+    // Catch clicks on links and forward them to window.opemn
+    document.documentElement.addEventListener('click', function(ev) {
+        var node = Object(ev.target);
+
+        if (node.nodeName === 'A' && node.href
+                && String(node.getAttribute('target')).toLowerCase() === '_blank'
+                && !isSafeTarget(node.href)) {
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            window.open(node.href);
+        }
+    }, true);
+});
+
 /** document.hasFocus polyfill */
 mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {
@@ -3984,6 +4068,37 @@ watchdog.setup();
 function rand_range(a, b) {
     return Math.random() * (b - a) + a;
 };
+
+/**
+ * Invoke the password manager in Chrome.
+ *
+ * There are some requirements for this function work propertly:
+ *
+ *  1. The username/password needs to be in a <form/>
+ *  2. The form needs to be filled and visible when this function is called
+ *  3. After this function is called, within the next second the form needs to be gone
+ *
+ * As an example take a look at the `tooltiplogin()` function in `index.js`.
+ *
+ * @param {String|Object} form jQuery selector of the form
+ * @return {Bool}   True if the password manager can be called.
+ *
+ */
+function passwordManager(form) {
+    if (typeof history !== "object") {
+        return false;
+    }
+    $(form).rebind('submit', function() {
+        setTimeout(function() {
+            var path  = document.location.pathname;
+            var title = document.title;
+            history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
+            history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+        }, 1000);
+        return false;
+    }).submit();
+    return true;
+}
 
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2Lightweight(el) {
@@ -4281,6 +4396,26 @@ if (typeof sjcl !== 'undefined') {
         return result;
     };
 
+    /**
+     * Helper function that will return a Set from set1 subtracting set2.
+     *
+     * @private
+     * @param {Set} set1
+     *     First set to subtract from.
+     * @param {Set} set2
+     *     Second set to subtract.
+     * @return {Set}
+     *     Subtracted result set.
+     */
+    scope.setutils.subtract = function(set1, set2) {
+
+        var result = new Set(set1);
+        set2.forEach(function _setSubtractIterator(item) {
+            result.delete(item);
+        });
+
+        return result;
+    };
 
     /**
      * Helper function that will compare two Sets for equality.
@@ -4299,14 +4434,13 @@ if (typeof sjcl !== 'undefined') {
             return false;
         }
 
-        var set1array = Array.from(set1);
-        var idx = set1array.length;
-        while (idx--) {
-            if (!set2.has(set1array[idx])) {
-                return false;
+        var result = true;
+        set1.forEach(function _setEqualityIterator(item) {
+            if (!set2.has(item)) {
+                result = false;
             }
-        }
+        });
 
-        return true;
+        return result;
     };
 })(window);

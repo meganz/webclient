@@ -3904,8 +3904,7 @@ mBroadcaster.once('startMega', function() {
 
         var allowed = [
             getBaseUrl(),
-            getAppBaseUrl(),
-            'https://accounts.google.com/o/oauth2/auth'
+            getAppBaseUrl()
         ];
 
         var rv = allowed.some(function(v) {
@@ -3916,7 +3915,7 @@ mBroadcaster.once('startMega', function() {
             console.log('isSafeTarget', link, rv);
         }
 
-        return rv;
+        return rv || (location.hash.indexOf('fm/chat') === -1);
     };
 
     var open = window.open;

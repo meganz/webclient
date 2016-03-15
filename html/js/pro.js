@@ -384,7 +384,8 @@ function init_pro()
     }
 
     if (page.substr(0, 4) === 'pro_') {
-        window.selectedProPlan = page.substr(4);
+        var plan = page.substr(4);
+        window.selectedProPlan = plan === 'lite' ? 4 : plan;
     }
 
     if (typeof window.selectedProPlan !== "undefined") {

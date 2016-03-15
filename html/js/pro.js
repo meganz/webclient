@@ -384,10 +384,8 @@ function init_pro()
     }
 
     if (page.substr(0, 4) === 'pro_') {
-        if (page.substr(4) === 'lite') {
-            page = "pro_4";
-        }
-        window.selectedProPlan = page.substr(4);
+        var plan = page.substr(4);
+        window.selectedProPlan = plan === 'lite' ? 4 : plan;
     }
 
     if (typeof window.selectedProPlan !== "undefined") {
@@ -415,6 +413,15 @@ function pro_next_step(proPlanName) {
     }
 
     megaAnalytics.log('pro', 'proc');
+
+    proPlanName = String(proPlanName).replace(/pro/i, '').trim().toLowerCase();
+    if (proPlanName !== 'lite') {
+        proPlanName = proPlanName.length;
+    }
+    if (location.hash.split('_').pop() != proPlanName) {
+        window.skipHashChange = true;
+        location.hash = 'pro_' + proPlanName;
+    }
 
     var currentDate = new Date(),
         monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],

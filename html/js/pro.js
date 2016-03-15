@@ -384,6 +384,9 @@ function init_pro()
     }
 
     if (page.substr(0, 4) === 'pro_') {
+        if (page.substr(4) === 'lite') {
+            page = "pro_4";
+        }
         window.selectedProPlan = page.substr(4);
     }
 

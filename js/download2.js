@@ -703,9 +703,8 @@ var dlmanager = {
         $overlay.rebind('click.quota', doCloseModal);
         $dialog.find('.membership-button').rebind('click', function() {
     
-            window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
             doCloseModal();
-            document.location.hash = '#pro';
+            document.location.hash = '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment');
         });
     },
 

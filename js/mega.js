@@ -1162,7 +1162,7 @@ function MegaData()
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
-                        html = ''<tr id="' + htmlentities(nodeHandle) + '" class="' + undecryptableClass + '" title="' + titleTooltip + '">'
+                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + undecryptableClass + '" title="' + titleTooltip + '">'
                             + '<td width="30"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div>'
                             + '<div class="shared-folder-info-block"><div class="shared-folder-name">'
@@ -2173,7 +2173,7 @@ function MegaData()
             folders = [];
 
             for (var i in this.c[n.h]) {
-                if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
+                if (this.d[i] && (this.d[i].t === 1)) {
                     folders.push(this.d[i]);
                 }
             }
@@ -2182,8 +2182,9 @@ function MegaData()
             // sort by name is default in the tree
             treePanelSortElements(prefix, folders, {
                 name: function(a, b) {
-                    if (a.name)
+                    if (a.name) {
                         return a.name.localeCompare(b.name);
+                    }
                 }
             });
 
@@ -2356,7 +2357,7 @@ function MegaData()
             sub, cs, sm, fid, sharedFolder, html;
 
         for (var i in this.c[id]) {
-            if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
+            if (this.d[i] && this.d[i].t === 1) {
                 folders.push(this.d[i]);
             }
         }
@@ -2366,8 +2367,9 @@ function MegaData()
             // localeCompare is not supported in IE10, >=IE11 only
             // sort by name is default in the tree
             folders.sort(function(a, b) {
-                if (a.name)
+                if (a.name) {
                     return a.name.localeCompare(b.name);
+                }
             });
 
             for (var i in folders) {

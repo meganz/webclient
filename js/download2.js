@@ -235,6 +235,7 @@ var dlmanager = {
             ssl: use_ssl
         };
 
+
         if (object.ph) {
             req.p = object.ph;
         }
@@ -258,8 +259,12 @@ var dlmanager = {
         else if (typeof res === 'object') {
             if (res.d) {
                 dlmanager.dlReportStatus(ctx.object, res.d ? 2 : 1);
-            }
-            else if (res.g) {
+            } else if (res.e == EOVERQUOTA) {
+                return this.showOverQuotaDialog(function() {
+                    dlmanager.dlRetryInterval *= 1.2;
+                    ctx.next(new Error("failed"));
+                });
+            } else if (res.g) {
                 var ab = base64_to_ab(res.at);
                 var attr = dec_attr(ab, [ctx.dl_key[0] ^ ctx.dl_key[4], ctx.dl_key[1] ^ ctx.dl_key[5], ctx.dl_key[2]
                             ^ ctx.dl_key[6], ctx.dl_key[3] ^ ctx.dl_key[7]]);
@@ -578,6 +583,7 @@ var dlmanager = {
     },
 
     _quotaPushBack: {},
+    _dlQuotaListener: [],
 
     _setQuotaRetryTimer: function setRetryTimer(expires) {
         if (this._quotaRetry) {
@@ -589,6 +595,13 @@ var dlmanager = {
             var ids = dlmanager.getCurrentDownloads();
             $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
             $('#' + ids.join(',#')).removeClass('overquota');
+
+            for (var i = 0; i < this._dlQuotaListener.length; ++i) {
+                if (typeof this._dlQuotaListener[i] === "function") {
+                    this._dlQuotaListener[i]();
+                }
+            }
+            this._dlQuotaListener = [];
 
             for (var gid in this._quotaPushBack) {
                 if (this._quotaPushBack.hasOwnProperty(gid) && this._quotaPushBack[gid].onQueueDone) {
@@ -615,10 +628,14 @@ var dlmanager = {
                 for (var i = 0 ; i < res.tah.length; i++) {
                     size += res.tah[i];
                 }
-                this._dlQuotaRetry = 3600 - (res.bt % 3600);
-                this._dlQuotaLimit = bytesToSize(size); 
-                this._dlQuotaHours = res.tah.length;
-                this._overquotaShowVariables();
+                this._dlQuotaRetry = 3600 - ((res.bt||0) % 3600);
+                if (res.tah.length) {
+                    this._dlQuotaLimit = bytesToSize(size); 
+                    this._dlQuotaHours = res.tah.length;
+                    this._overquotaShowVariables();
+                } else {
+                    this._dlQuotaRetry = 3600;
+                }
                 this._setQuotaRetryTimer(this._dlQuotaRetry);
                 var $txt = $('.fm-dialog.bandwidth-dialog.overquota .countdown').removeClass('hidden')
                 $txt.text(secondsToTimeShort(this._dlQuotaRetry));
@@ -631,7 +648,6 @@ var dlmanager = {
     },
 
     _overquotaShowVariables: function() {
-
         $('.fm-dialog.bandwidth-dialog.overquota .bandwidth-text-bl.second').removeClass('hidden')
             .safeHTML(
                 l[7099]
@@ -652,7 +668,9 @@ var dlmanager = {
             return;
         }
 
-        if (dlTask) {
+        if (typeof dlTask === "function") {
+            this._dlQuotaListener.push(dlTask);
+        } else if (dlTask) {
             this._quotaPushBack[dlTask.gid] = dlTask;
         }
 
@@ -685,9 +703,8 @@ var dlmanager = {
         $overlay.rebind('click.quota', doCloseModal);
         $dialog.find('.membership-button').rebind('click', function() {
     
-            window.selectedProPlan = $(this).parents('.reg-st3-membership-bl').data('payment');
             doCloseModal();
-            document.location.hash = '#pro';
+            document.location.hash = '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment');
         });
     },
 
@@ -801,7 +818,7 @@ function fm_tfspause(gid, overquota) {
         $tr.addClass('paused');
         $tr.find('span.transfer-type').addClass('paused');
         if (overquota === true) {
-            $tr.addClass('overquota');
+            $tr.find('td:eq(5)').safeHTML('<span class="transfer-status error overquota">' + l[1673] + '</span>');
         } else {
             $tr.find('td:eq(5)').safeHTML('<span class="transfer-status queued">' + l[7227] + '</span>');
         }

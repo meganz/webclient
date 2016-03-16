@@ -1787,7 +1787,7 @@ function is_fm() {
 }
 
 /**
- *  Process a given template (which has been loaded already in `pages[]`) 
+ *  Process a given template (which has been loaded already in `pages[]`)
  *  and return the translated HTML code.
  *
  *  @param {String} name    Template name
@@ -1851,6 +1851,11 @@ window.onhashchange = function() {
 
     if (typeof gifSlider !== 'undefined') {
         gifSlider.clear();
+    }
+
+    if (window.skipHashChange) {
+        delete window.skipHashChange;
+        return false;
     }
 
     if (silent_loading) {

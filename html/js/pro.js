@@ -403,7 +403,7 @@ function pro_next_step(proPlanName) {
     proPage.preloadAnimation();
 
     if (proPlanName === undefined) {
-        // this came from skipConfirmationSkep
+        // this came from skipConfirmationStep
         var plan = $('.reg-st3-membership-bl.selected').data('payment');
         proPlanName = (plan === 4 ? 'lite' : Array(plan).join("i"));
     }
@@ -2982,9 +2982,9 @@ var doProRegister = function($dialog) {
                     $('.pro-register-dialog').addClass('hidden');
                     $('.fm-dialog.registration-page-success').unbind('click');
 
-                    var skipConfirmationSkep = true;
+                    var skipConfirmationStep = true;
 
-                    if (skipConfirmationSkep) {
+                    if (skipConfirmationStep) {
                         closeDialog();
                         pro_next_step();
                     }

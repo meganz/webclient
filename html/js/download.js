@@ -80,12 +80,10 @@ function dl_g(res) {
         $('.download.pause-button').rebind('click', function(e) {
             if (!$(this).hasClass('active')) {
                 fm_tfspause('dl_' + fdl_queue_var.ph);
-                $('.download.status-txt, .download-info .text').safeHTML(l[1651]).addClass('blue');
                 $(this).addClass('active');
             }
             else {
                 fm_tfsresume('dl_' + fdl_queue_var.ph);
-                $('.download.status-txt, .download-info .text').text('').removeClass('blue');
                 $(this).removeClass('active');
             }
         });

@@ -4041,14 +4041,33 @@ var watchdog = Object.freeze({
                 }
                 break;
 
+            case 'setsid':
+                if (dlmanager.isOverQuota) {
+                    // another tab fired a login/register while this one has an overquota state
+                    var sid = strg.data;
+                    if (dlmanager.isOverQuotaTick) {
+                        clearTimeout(dlmanager.isOverQuotaTick);
+                    }
+                    dlmanager.isOverQuotaTick = setTimeout(function() {
+                        // the other tab must have sent the new sid
+                        assert(sid, 'sid not set');
+                        api_setsid(sid);
+                        dlmanager.uqFastTrack = 1;
+                        dlmanager._onQuotaRetry();
+                    }, 2000);
+                }
+                break;
+
             case 'login':
             case 'createuser':
-                loadingDialog.show();
-                this.Strg.login = strg.origin;
+                if (!dlmanager.isOverQuota) {
+                    loadingDialog.show();
+                    this.Strg.login = strg.origin;
+                }
                 break;
 
             case 'logout':
-                if (!dlmanager._quotaRetry) {
+                if (!dlmanager.isOverQuota) {
                     u_logout(-0xDEADF);
                     location.reload();
                 }

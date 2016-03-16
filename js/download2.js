@@ -290,6 +290,7 @@ var dlmanager = {
             dlmanager.dlReportStatus(ctx.object, EAGAIN);
         }
 
+        dlmanager.isOverQuota = false;
         dlmanager.dlRetryInterval *= 1.2;
         ctx.next(new Error("failed"));
     },
@@ -585,35 +586,41 @@ var dlmanager = {
     _quotaPushBack: {},
     _dlQuotaListener: [],
 
+    _onQuotaRetry: function DM_onQuotaRetry() {
+        if (this._quotaRetry) {
+            clearTimeout(this._quotaRetry);
+        }
+
+        this._quotaRetry = null;
+
+        var ids = dlmanager.getCurrentDownloads();
+        $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+        $('#' + ids.join(',#')).removeClass('overquota');
+
+        for (var i = 0; i < this._dlQuotaListener.length; ++i) {
+            if (typeof this._dlQuotaListener[i] === "function") {
+                this._dlQuotaListener[i]();
+            }
+        }
+        this._dlQuotaListener = [];
+
+        for (var gid in this._quotaPushBack) {
+            if (this._quotaPushBack.hasOwnProperty(gid) && this._quotaPushBack[gid].onQueueDone) {
+                this.dlQueuePushBack(this._quotaPushBack[gid]);
+            }
+        }
+
+        this._quotaPushBack = {};
+
+        ids.forEach(fm_tfsresume);
+    },
+
     _setQuotaRetryTimer: function setRetryTimer(expires) {
         if (this._quotaRetry) {
             clearTimeout(this._quotaRetry);
         }
 
-        this._quotaRetry = setTimeout(function() {
-            this._quotaRetry = null;
-
-            var ids = dlmanager.getCurrentDownloads();
-            $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
-            $('#' + ids.join(',#')).removeClass('overquota');
-
-            for (var i = 0; i < this._dlQuotaListener.length; ++i) {
-                if (typeof this._dlQuotaListener[i] === "function") {
-                    this._dlQuotaListener[i]();
-                }
-            }
-            this._dlQuotaListener = [];
-
-            for (var gid in this._quotaPushBack) {
-                if (this._quotaPushBack.hasOwnProperty(gid) && this._quotaPushBack[gid].onQueueDone) {
-                    this.dlQueuePushBack(this._quotaPushBack[gid]);
-                }
-            }
-
-            this._quotaPushBack = {};
-
-            ids.forEach(fm_tfsresume);
-        }.bind(this), expires * 1000);
+        this._quotaRetry = setTimeout(this._onQuotaRetry.bind(this), expires * 1000);
     },
 
     _overquotaInfo: function() {
@@ -624,6 +631,24 @@ var dlmanager = {
                 if (typeof res === "number") {
                     // Error, just keep retrying
                     return this._overquotaInfo();
+                }
+                if (this.uqFastTrack) {
+                    // The user loged/registered in another tab, poll the uq command every
+                    // 30 seconds until we find a pro status and then retry with fresh download
+
+                    var proStatus = res.mxfer;
+                    if (d) console.log('proStatus', proStatus);
+
+                    if (proStatus) {
+                        // Got PRO, resume dl inmediately.
+                        this._onQuotaRetry();
+                    }
+                    else {
+                        if (this.uqFastTrackTimer) {
+                            clearTimeout(this.uqFastTrackTimer);
+                        }
+                        this.uqFastTrackTimer = setTimeout(this._overquotaInfo.bind(this), 30000);
+                    }
                 }
                 res.tah = res.tah || [];
                 for (var i = 0 ; i < res.tah.length; i++) {
@@ -664,6 +689,7 @@ var dlmanager = {
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
         var $button = $dialog.find('.fm-dialog-close');
         var $overlay = $('.fm-dialog-overlay');
+        this.isOverQuota = true;
 
         if ($dialog.is(':visible')) {
             return;

@@ -90,6 +90,9 @@ var ConversationMessage = React.createClass({
                 msg.internalId = internalId;
             });
     },
+    _preloadThumbnail: function(node) {
+
+    },
     render: function () {
         var self = this;
         var cssClasses = "message body";
@@ -282,6 +285,8 @@ var ConversationMessage = React.createClass({
                         };
 
                         var dropdown = null;
+
+
                         if (!message.revoked) {
                             if (contact.u === u_handle) {
                                 dropdown = <ButtonsUI.Button
@@ -329,24 +334,50 @@ var ConversationMessage = React.createClass({
                                 icon="tiny-icon grey-down-arrow" />;
                         }
 
+                        // generate preview/icon
+                        var icon = fileIcon(v);
+                        var preview = <div className="data-block-view medium">
+                            {dropdown}
+
+                            <div className="data-block-bg">
+                                <div className={"block-view-file-type " + icon}></div>
+                            </div>
+                        </div>;
+
+                        if (!message.revoked) {
+                            if (icon === "graphic" || icon === "image") {
+                                preview = <div className="data-block-view medium">
+
+                                    <div className="shared-link img-block">
+                                        <div className="img-overlay"></div>
+                                        <div className="button overlay-button">
+                                            <i className="huge-white-icon loupe"></i>
+                                        </div>
+
+                                        {dropdown}
+
+                                        <img alt="" className={"thumbnail-placeholder " + v.h}/>
+                                    </div>
+                                </div>;
+
+                                self._preloadThumbnail(
+                                    v
+                                );
+                            }
+                        }
+
                         files.push(
                             <div className="message shared-data" key={v.h}>
                                 <div className="message shared-info">
                                     <div className="message data-title">
                                         {v.name}
-                                    </div>
+                                    </div>}
                                     <div className="message file-size">
                                         {bytesToSize(v.s)}
                                     </div>
                                 </div>
 
-                                <div className="data-block-view medium">
-                                    {dropdown}
-
-                                    <div className="data-block-bg">
-                                        <div className={"block-view-file-type " + fileIcon(v)}></div>
-                                    </div>
-                                </div>
+                                {preview}
                                 <div className="clear"></div>
 
                             </div>

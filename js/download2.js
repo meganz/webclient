@@ -361,7 +361,7 @@ var dlmanager = {
             dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
             return 1;
         }
-        
+
         /* update UI */
         dlmanager.dlReportStatus(dl, EAGAIN);
 
@@ -591,7 +591,8 @@ var dlmanager = {
         }
 
         this._quotaRetry = setTimeout(function() {
-            
+            this._quotaRetry = null;
+
             var ids = dlmanager.getCurrentDownloads();
             $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
             $('#' + ids.join(',#')).removeClass('overquota');
@@ -611,7 +612,7 @@ var dlmanager = {
 
             this._quotaPushBack = {};
 
-            ids.forEach(fm_tfsresume); 
+            ids.forEach(fm_tfsresume);
         }.bind(this), expires * 1000);
     },
 
@@ -630,7 +631,7 @@ var dlmanager = {
                 }
                 this._dlQuotaRetry = 3600 - ((res.bt||0) % 3600);
                 if (res.tah.length) {
-                    this._dlQuotaLimit = bytesToSize(size); 
+                    this._dlQuotaLimit = bytesToSize(size);
                     this._dlQuotaHours = res.tah.length;
                     this._overquotaShowVariables();
                 } else {
@@ -639,7 +640,7 @@ var dlmanager = {
                 this._setQuotaRetryTimer(this._dlQuotaRetry);
                 var $txt = $('.fm-dialog.bandwidth-dialog.overquota .countdown').removeClass('hidden')
                 $txt.text(secondsToTimeShort(this._dlQuotaRetry));
-    
+
                 this._dlTick = setInterval(function() {
                     $txt.text(secondsToTimeShort(this._dlQuotaRetry--));
                 }.bind(this), 1000);
@@ -685,12 +686,12 @@ var dlmanager = {
             .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
             .end();
 
-        
+
         $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
         this._overquotaInfo();
-    
+
         var doCloseModal = function closeModal() {
-    
+
             clearInterval(this._dlTick);
             $dialog.addClass('hidden');
             $button.unbind('click.quota');
@@ -698,13 +699,13 @@ var dlmanager = {
             fm_hideoverlay();
             return false;
         }.bind(this);
-    
+
         $button.rebind('click.quota', doCloseModal);
         $overlay.rebind('click.quota', doCloseModal);
         $dialog.find('.membership-button').rebind('click', function() {
-    
+
             doCloseModal();
-            document.location.hash = '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment');
+            open(getAppBaseUrl() + '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment'));
         });
     },
 

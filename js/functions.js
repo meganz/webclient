@@ -2302,7 +2302,7 @@ function setupTransferAnalysis() {
         time = {},
         chunks = {};
     $.mTransferAnalysis = setInterval(function() {
-        if (uldl_hold) {
+        if (uldl_hold || dlmanager._quotaRetry) {
             prev = {};
         }
         else if ($.transferprogress) {
@@ -4048,8 +4048,10 @@ var watchdog = Object.freeze({
                 break;
 
             case 'logout':
-                u_logout(-0xDEADF);
-                location.reload();
+                if (!dlmanager._quotaRetry) {
+                    u_logout(-0xDEADF);
+                    location.reload();
+                }
                 break;
         }
 

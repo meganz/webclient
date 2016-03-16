@@ -402,7 +402,12 @@ function pro_next_step(proPlanName) {
     // Preload loading/transferring/processing animation
     proPage.preloadAnimation();
 
-    if (!u_handle) {
+    if (proPlanName === undefined) {
+        // this came from skipConfirmationSkep
+        var plan = $('.reg-st3-membership-bl.selected').data('payment');
+        proPlanName = (plan === 4 ? 'lite' : Array(plan).join("i"));
+    }
+    else if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
         showSignupPromptDialog();
         return;
@@ -2974,12 +2979,20 @@ var doProRegister = function($dialog) {
                     u_attr.terms=1;
 
                     api_req(ops);
-                    //proceedToPaypal();
                     $('.pro-register-dialog').addClass('hidden');
-                    $('.fm-dialog.registration-page-success').removeClass('hidden');
-                    $('.fm-dialog-overlay').removeClass('hidden');
-                    $('body').addClass('overlayed');
                     $('.fm-dialog.registration-page-success').unbind('click');
+
+                    var skipConfirmationSkep = true;
+
+                    if (skipConfirmationSkep) {
+                        closeDialog();
+                        pro_next_step();
+                    }
+                    else {
+                        $('.fm-dialog.registration-page-success').removeClass('hidden');
+                        $('.fm-dialog-overlay').removeClass('hidden');
+                        $('body').addClass('overlayed');
+                    }
                 }
                 else
                 {

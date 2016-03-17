@@ -10483,21 +10483,13 @@
         "text": "%.2f %@ per month",
         "context": "Price asociated with the MEGA PRO account level you can subscribe"
     },
-    "7575": {
-        "text": "Fetching nodes",
-        "context": "DO NOT TRANSLATE, it will change"
-    },
-    "7576": {
-        "text": "Preparing nodes",
-        "context": "DO NOT TRANSLATE, it will change"
-    },
     "7577": {
         "text": "The file you want to download already exists Offline",
-        "context": "DO NOT TRANSLATE, it will change (Process)"
+        "context": "Message displayed when the file the user wants to download already exists Offline."
     },
     "7578": {
         "text": "MEGA Folder Link",
-        "context": "DO NOT TRANSLATE, it will change (Design)"
+        "context": "Folder Link"
     },
     "7579": {
         "text": "No Transfers",
@@ -10515,13 +10507,9 @@
         "text": "You don't have any pending transfers.",
         "context": "Text shown under the upper title when there's no transfers"
     },
-    "7583": {
-        "text": "Updating nodes...",
-        "context": "DO NOT TRANSLATE, it will change"
-    },
     "7584": {
-        "text": "Purchases history",
-        "context": "DO NOT TRANSLATE, it will change"
+        "text": "Purchase history",
+        "context": "Title message of user's purchase history."
     },
     "7585": {
         "text": "The signature of the %1 key from user %2 is incorrect.",
@@ -11910,5 +11898,9 @@
     "8603": {
         "text": "You have been suspended due to Terms of Service violations.",
         "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
+    },
+    "8623": {
+        "text": "popular!",
+        "context": "Label above the most popular PRO plan"
     }
 }

@@ -80,12 +80,10 @@ function dl_g(res) {
         $('.download.pause-button').rebind('click', function(e) {
             if (!$(this).hasClass('active')) {
                 fm_tfspause('dl_' + fdl_queue_var.ph);
-                $('.download.status-txt, .download-info .text').safeHTML(l[1651]).addClass('blue');
                 $(this).addClass('active');
             }
             else {
                 fm_tfsresume('dl_' + fdl_queue_var.ph);
-                $('.download.status-txt, .download-info .text').text('').removeClass('blue');
                 $(this).removeClass('active');
             }
         });
@@ -287,7 +285,7 @@ function importFile() {
         // Check response and if over quota show a special warning dialog
         callback: function (result) {
             if (result === EOVERQUOTA) {
-                showOverQuotaDialog();
+                ulmanager.showOverQuotaDialog();
             }
         }
     });
@@ -300,20 +298,27 @@ function dlerror(dl, error)
     var errorstr='';
     var tempe=false;
 
-    // If over quota show a special warning dialog
     if (error === EOVERQUOTA) {
-        showOverQuotaDialog();
+        tempe = l[1673];
+    } else if (error === ETOOMANYCONNECTIONS) {
+        errorstr = l[18];
+    } else if (error === ESID) {
+        errorstr = l[19];
+    } else if (error === ETEMPUNAVAIL) {
+        tempe = l[233];
+    } else if (error === EBLOCKED) {
+        tempe = l[23];
+    } else if (error === ENOENT) {
+        tempe = l[22];
+    } else if (error === EACCESS) {
+        tempe = l[23];
+    } else if (error === EKEY) {
+        tempe = l[24];
+    } else if (error === EAGAIN) {
+        tempe = l[233];
+    } else {
+        tempe = l[233];
     }
-
-    else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
-    else if (error == ESID) errorstr = l[19];
-    else if (error == ETEMPUNAVAIL) tempe = l[233];
-    else if (error == EBLOCKED) tempe = l[23];
-    else if (error == ENOENT) tempe=l[22];
-    else if (error == EACCESS) tempe = l[23];
-    else if (error == EKEY) tempe = l[24];
-    else if (error == EAGAIN) tempe = l[233];
-    else tempe = l[233];
 
     if (tempe)
     {

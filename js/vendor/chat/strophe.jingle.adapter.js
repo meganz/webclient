@@ -36,7 +36,11 @@ function WebrtcApi() {
         this.browser =  window.opr?'opera':'chrome';
         this.getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
         this.attachMediaStream = function (element, stream) {
-            element.attr('src', webkitURL.createObjectURL(stream));
+            if (!stream) {
+                element.removeAttr('src');
+            } else {
+                element.attr('src', URL.createObjectURL(stream));
+            }
         };
         this.pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': 'true'}]}; // enable dtls support for compat with Firefox            
 		this.cloneMediaStream = function(src, what) {

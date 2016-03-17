@@ -7,8 +7,8 @@
 body.pro:after {
     content: url(../images/mega/payment-animation@2x.gif);
 }
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar-icon, .nt-takedown-reinstated-notification .notification-avatar-icon {
-    background-image: url(../images/mega/bitcoin-v5@2x.png);
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar, .nt-takedown-reinstated-notification .notification-avatar, .nt-payment-notification .notification-avatar, .nt-payment-reminder-notification .notification-avatar {
+    background-image: url(../images/mega/bitcoin-v7@2x.png);
     background-size: 200px auto;
 }
 .top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
@@ -20,7 +20,7 @@ body.pro:after {
     background-size: 20px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
-    background-image: url(../images/mega/bitcoin-v5@2x.png);
+    background-image: url(../images/mega/bitcoin-v7@2x.png);
     background-size: 200px auto;
 }
 .icoming-call-button {

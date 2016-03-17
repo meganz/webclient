@@ -28,7 +28,13 @@
     -khtml-opacity: 0.6;
     opacity: 0.6;
 }
-.link-button:not(.disabled):hover > .small-icon, .link-button.active > .small-icon, .red > .small-icon {
+.link-button.red > .small-icon {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+}
+.link-button:not(.disabled):hover > .small-icon, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
@@ -137,8 +143,11 @@
 .small-icon.circle-with-arrow {
     background-position: -4px -735px;
 }
+.small-icon.horizontal-red-handset {
+    background-position: -54px -38px;
+}
 .small-icon.grey-triangle {
-    background-position: -3px -3846px;
+    background-position: -52px -146px;
 }
 .square-button .small-icon {
     width: 22px;

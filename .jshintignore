@@ -24,5 +24,6 @@ karma.conf.js
 js/chat/mpenc.js
 js/cmsSnapshot.js
 js/chat/bundle.js
+js/downloadFirefox.js
 *.sh
 *.xml

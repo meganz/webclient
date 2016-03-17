@@ -82,7 +82,12 @@ var useravatar = (function() {
 
         if (word && word !== u_handle) {
             letters = $.trim(word).toUpperCase()[0];
-            color   = letters.charCodeAt(0) % _colors.length;
+            // letters[0] can be undefined in case that word == ' '...
+            if (letters) {
+                color = letters.charCodeAt(0) % _colors.length;
+            } else {
+                color = 0;
+            }
         }
 
         return { letters: letters, color: _colors[color], colorIndex: color + 1 };
@@ -148,11 +153,14 @@ var useravatar = (function() {
         var found = false;
         // User is an email, we should look if the user
         // exists, if it does exists we use the user Object.
-        M.u.forEach(function(contact, u) {
+        M.u.every(function(contact, u) {
             if (M.u[u].m === email) {
                 // Found the user object
                 found = ns.contact(M.u[u], className, element);
-                throw StopIteration;
+                return false;
+            }
+            else {
+                return true;
             }
         });
 
@@ -184,7 +192,6 @@ var useravatar = (function() {
         }
 
         function isUserVerified_Callback() {
-
             var verifyState = u_authring.Ed25519[userHandle] || {};
             var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
 
@@ -288,7 +295,6 @@ var useravatar = (function() {
      * @returns {String}
      */
     ns.contact = function(user, className, element) {
-
         if (!className) {
             className = 'avatar';
         }
@@ -321,7 +327,7 @@ var useravatar = (function() {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        var letters = user.firstname || user.name || user.m;
+        var letters = mega.utils.fullUsername(user.u);
 
         return _letters(letters, user.u, className, element);
     };

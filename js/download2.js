@@ -644,7 +644,7 @@ var dlmanager = {
                     return;
                 }
 
-                if (this.uqFastTrack) {
+                if (this.uqFastTrack || u_type) {
                     // The user loged/registered in another tab, poll the uq command every
                     // 30 seconds until we find a pro status and then retry with fresh download
 
@@ -756,9 +756,12 @@ var dlmanager = {
 
         $button.rebind('click.quota', doCloseModal);
         $overlay.rebind('click.quota', doCloseModal);
+
+        var self = this;
         $dialog.find('.membership-button').rebind('click', function() {
 
             // doCloseModal();
+            delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
             open(getAppBaseUrl() + '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment'));
         });
     },

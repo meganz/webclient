@@ -4097,7 +4097,7 @@ var watchdog = Object.freeze({
                         assert(sid, 'sid not set');
                         api_setsid(sid);
                         dlmanager.uqFastTrack = 1;
-                        dlmanager._onQuotaRetry();
+                        dlmanager._overquotaInfo();
                     }, 2000);
                 }
                 break;

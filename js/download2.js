@@ -23,19 +23,21 @@ var dlmanager = {
     logger: MegaLogger.getLogger('dlmanager'),
 
     newUrl: function DM_newUrl(dl, callback) {
+        var gid = dl.dl_id || dl.ph;
+
         if (callback) {
-            if (!this.nup) {
-                this.nup = {};
+            if (!this._newUrlQueue) {
+                this._newUrlQueue = {};
             }
 
-            if (this.nup[dl.dl_id]) {
-                this.nup[dl.dl_id].push(callback);
+            if (this._newUrlQueue.hasOwnProperty(gid)) {
+                this._newUrlQueue[gid].push(callback);
                 return;
             }
-            this.nup[dl.dl_id] = [callback];
+            this._newUrlQueue[gid] = [callback];
         }
         if (d) {
-            dlmanager.logger.info("Retrieving New URLs for", dl.dl_id);
+            dlmanager.logger.info("Retrieving New URLs for", gid);
         }
 
         dlQueue.pause();
@@ -43,6 +45,7 @@ var dlmanager = {
             if (error) {
                 return Later(this.newUrl.bind(this, dl));
             }
+            dl.url = res.g;
 
             var changed = 0;
             for (var i = 0; i < dlQueue._queue.length; i++) {
@@ -52,13 +55,14 @@ var dlmanager = {
                     changed++;
                 }
             }
-            if (this.nup && this.nup[dl.dl_id]) {
-                this.nup[dl.dl_id].forEach(function(callback) {
-                    callback(res.g, res);
-                });
-                delete this.nup[dl.dl_id];
+            if (Object(this._newUrlQueue).hasOwnProperty(gid)) {
+                this._newUrlQueue[gid]
+                    .forEach(function(callback) {
+                        callback(res.g, res);
+                    });
+                delete this._newUrlQueue[gid];
             }
-            dlmanager.logger.info("got", changed, "new URL for", dl.dl_id, "resume everything");
+            dlmanager.logger.info("Resuming, got new URL for %s:%s", gid, res.g, changed, res);
             dlQueue.resume();
         }.bind(this));
     },
@@ -259,12 +263,14 @@ var dlmanager = {
         else if (typeof res === 'object') {
             if (res.d) {
                 dlmanager.dlReportStatus(ctx.object, res.d ? 2 : 1);
-            } else if (res.e == EOVERQUOTA) {
+            }
+            else if (res.e == EOVERQUOTA) {
                 return this.showOverQuotaDialog(function() {
                     dlmanager.dlRetryInterval *= 1.2;
                     ctx.next(new Error("failed"));
                 });
-            } else if (res.g) {
+            }
+            else if (res.g) {
                 var ab = base64_to_ab(res.at);
                 var attr = dec_attr(ab, [ctx.dl_key[0] ^ ctx.dl_key[4], ctx.dl_key[1] ^ ctx.dl_key[5], ctx.dl_key[2]
                             ^ ctx.dl_key[6], ctx.dl_key[3] ^ ctx.dl_key[7]]);
@@ -278,6 +284,7 @@ var dlmanager = {
                                 || res.fa.indexOf(':1*') < 0 || ctx.object.preview === -1)) {
                         ctx.object.data = new ArrayBuffer(res.s);
                     }
+                    dlmanager.isOverQuota = false;
                     return ctx.next(false, res, attr, ctx.object);
                 }
                 dlmanager.dlReportStatus(ctx.object, EAGAIN);
@@ -290,7 +297,6 @@ var dlmanager = {
             dlmanager.dlReportStatus(ctx.object, EAGAIN);
         }
 
-        dlmanager.isOverQuota = false;
         dlmanager.dlRetryInterval *= 1.2;
         ctx.next(new Error("failed"));
     },
@@ -359,7 +365,7 @@ var dlmanager = {
 
         if (code === 509) {
             this.showOverQuotaDialog(task);
-            dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
+            dlmanager.dlReportStatus(dl, EOVERQUOTA);
             return 1;
         }
 
@@ -586,7 +592,7 @@ var dlmanager = {
     _quotaPushBack: {},
     _dlQuotaListener: [],
 
-    _onQuotaRetry: function DM_onQuotaRetry() {
+    _onQuotaRetry: function DM_onQuotaRetry(getNewUrl) {
         delay.cancel('overquota:retry');
 
         var ids = dlmanager.getCurrentDownloads();
@@ -600,15 +606,32 @@ var dlmanager = {
         }
         this._dlQuotaListener = [];
 
+        var tasks = [];
+
         for (var gid in this._quotaPushBack) {
             if (this._quotaPushBack.hasOwnProperty(gid) && this._quotaPushBack[gid].onQueueDone) {
-                this.dlQueuePushBack(this._quotaPushBack[gid]);
+                tasks.push(this._quotaPushBack[gid]);
             }
         }
-
         this._quotaPushBack = {};
 
-        ids.forEach(fm_tfsresume);
+        if (getNewUrl) {
+            tasks.forEach(function(task) {
+                var dl = task.task.download;
+
+                dlmanager.newUrl(dl, function(rg) {
+                    if (task.url) {
+                        task.url = rg + "/" + task.url.replace(/.+\//, '');
+                        dlmanager.dlQueuePushBack(task);
+                        fm_tfsresume(dlmanager.getGID(dl));
+                    }
+                });
+            });
+        }
+        else {
+            tasks.forEach(this.dlQueuePushBack);
+            ids.forEach(fm_tfsresume);
+        }
     },
 
     _overquotaInfo: function() {
@@ -626,13 +649,11 @@ var dlmanager = {
                     // 30 seconds until we find a pro status and then retry with fresh download
 
                     var proStatus = res.mxfer;
-                    if (d) {
-                        console.debug('overquota:proStatus', proStatus);
-                    }
+                    this.logger.debug('overquota:proStatus', proStatus);
 
                     if (proStatus) {
                         // Got PRO, resume dl inmediately.
-                        return this._onQuotaRetry();
+                        return this._onQuotaRetry(true);
                     }
 
                     delay('overquota:uqft', this._overquotaInfo.bind(this), 30000);
@@ -641,11 +662,20 @@ var dlmanager = {
                 var timeLeft = 3600;
 
                 if (Object(res.tah).length) {
+                    var add = 1;
+                    var size = 0;
+
                     timeLeft = 3600 - ((res.bt | 0) % 3600);
 
-                    var size = 0;
                     for (var i = 0 ; i < res.tah.length; i++) {
                         size += res.tah[i];
+
+                        if (res.tah[i]) {
+                            add = 0;
+                        }
+                        else if (add) {
+                            timeLeft += 3600;
+                        }
                     }
                     var limit = bytesToSize(size);
                     var hours = res.tah.length;

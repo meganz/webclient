@@ -1507,6 +1507,9 @@ else if (!b_u)
 
 
 
+    if (localStorage.enableDevtools) {
+        jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
+    }
 
     // We need to keep a consistent order in loaded resources, so that if users
     // send us logs we won't get different line numbers on stack-traces from

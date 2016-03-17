@@ -196,23 +196,11 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
 
     var chunk = this;
     var status = xhr.readyState > 1 && xhr.status;
-    var retryTime = null;
-
-    if (status === 509) {
-        try {
-            retryTime = parseInt(xhr.getResponseHeader('x-mega-time-left'));
-        } catch (e) { }
-        if (isNaN(retryTime) || typeof retryTime !== 'number' || retryTime <= 0) {
-            // In case the server do not send 'Access-Control-Expose-Headers: x-mega-time-left'
-            // fallback to a 10 minutes waiting
-            retryTime = 600;
-        }
-    }
 
     this.oet = setTimeout(function() {
-        chunk.finish_download(false, {responseStatus: status, retry: retryTime});
+        chunk.finish_download(false, {responseStatus: status});
         chunk = undefined;
-    }, status === 509 ? 1 : 3950 + Math.floor(Math.random() * 2e3));
+    }, status === 509 || (3950 + Math.floor(Math.random() * 2e3)));
 };
 
 ClassChunk.prototype.onXHRready = function(xhrEvent) {
@@ -282,6 +270,9 @@ ClassChunk.prototype.run = function(task_done) {
     }
 
     this.Progress.working.push(this);
+
+    // HACK: In case of 509s, construct the url from the dl object which must be up-to-date
+    this.url = this.dl.url +  "/" + this.url.replace(/.+\//, '');
 
     /* let the fun begin! */
     this.url = dlmanager.uChangePort(this.url, this.altport ? 8080 : 0);

@@ -23,19 +23,21 @@ var dlmanager = {
     logger: MegaLogger.getLogger('dlmanager'),
 
     newUrl: function DM_newUrl(dl, callback) {
+        var gid = dl.dl_id || dl.ph;
+
         if (callback) {
-            if (!this.nup) {
-                this.nup = {};
+            if (!this._newUrlQueue) {
+                this._newUrlQueue = {};
             }
 
-            if (this.nup[dl.dl_id]) {
-                this.nup[dl.dl_id].push(callback);
+            if (this._newUrlQueue.hasOwnProperty(gid)) {
+                this._newUrlQueue[gid].push(callback);
                 return;
             }
-            this.nup[dl.dl_id] = [callback];
+            this._newUrlQueue[gid] = [callback];
         }
         if (d) {
-            dlmanager.logger.info("Retrieving New URLs for", dl.dl_id);
+            dlmanager.logger.info("Retrieving New URLs for", gid);
         }
 
         dlQueue.pause();
@@ -43,6 +45,7 @@ var dlmanager = {
             if (error) {
                 return Later(this.newUrl.bind(this, dl));
             }
+            dl.url = res.g;
 
             var changed = 0;
             for (var i = 0; i < dlQueue._queue.length; i++) {
@@ -52,13 +55,14 @@ var dlmanager = {
                     changed++;
                 }
             }
-            if (this.nup && this.nup[dl.dl_id]) {
-                this.nup[dl.dl_id].forEach(function(callback) {
-                    callback(res.g, res);
-                });
-                delete this.nup[dl.dl_id];
+            if (Object(this._newUrlQueue).hasOwnProperty(gid)) {
+                this._newUrlQueue[gid]
+                    .forEach(function(callback) {
+                        callback(res.g, res);
+                    });
+                delete this._newUrlQueue[gid];
             }
-            dlmanager.logger.info("got", changed, "new URL for", dl.dl_id, "resume everything");
+            dlmanager.logger.info("Resuming, got new URL for %s:%s", gid, res.g, changed, res);
             dlQueue.resume();
         }.bind(this));
     },
@@ -259,12 +263,14 @@ var dlmanager = {
         else if (typeof res === 'object') {
             if (res.d) {
                 dlmanager.dlReportStatus(ctx.object, res.d ? 2 : 1);
-            } else if (res.e == EOVERQUOTA) {
+            }
+            else if (res.e == EOVERQUOTA) {
                 return this.showOverQuotaDialog(function() {
                     dlmanager.dlRetryInterval *= 1.2;
                     ctx.next(new Error("failed"));
                 });
-            } else if (res.g) {
+            }
+            else if (res.g) {
                 var ab = base64_to_ab(res.at);
                 var attr = dec_attr(ab, [ctx.dl_key[0] ^ ctx.dl_key[4], ctx.dl_key[1] ^ ctx.dl_key[5], ctx.dl_key[2]
                             ^ ctx.dl_key[6], ctx.dl_key[3] ^ ctx.dl_key[7]]);
@@ -278,6 +284,7 @@ var dlmanager = {
                                 || res.fa.indexOf(':1*') < 0 || ctx.object.preview === -1)) {
                         ctx.object.data = new ArrayBuffer(res.s);
                     }
+                    dlmanager.isOverQuota = false;
                     return ctx.next(false, res, attr, ctx.object);
                 }
                 dlmanager.dlReportStatus(ctx.object, EAGAIN);
@@ -358,10 +365,10 @@ var dlmanager = {
 
         if (code === 509) {
             this.showOverQuotaDialog(task);
-            dlmanager.dlReportStatus(dl, EOVERQUOTA); // XXX
+            dlmanager.dlReportStatus(dl, EOVERQUOTA);
             return 1;
         }
-        
+
         /* update UI */
         dlmanager.dlReportStatus(dl, EAGAIN);
 
@@ -585,74 +592,120 @@ var dlmanager = {
     _quotaPushBack: {},
     _dlQuotaListener: [],
 
-    _setQuotaRetryTimer: function setRetryTimer(expires) {
-        if (this._quotaRetry) {
-            clearTimeout(this._quotaRetry);
+    _onQuotaRetry: function DM_onQuotaRetry(getNewUrl) {
+        delay.cancel('overquota:retry');
+
+        var ids = dlmanager.getCurrentDownloads();
+        $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+        $('.download.info-block, #' + ids.join(',#')).removeClass('overquota');
+
+        for (var i = 0; i < this._dlQuotaListener.length; ++i) {
+            if (typeof this._dlQuotaListener[i] === "function") {
+                this._dlQuotaListener[i]();
+            }
         }
+        this._dlQuotaListener = [];
 
-        this._quotaRetry = setTimeout(function() {
-            
-            var ids = dlmanager.getCurrentDownloads();
-            $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
-            $('#' + ids.join(',#')).removeClass('overquota');
+        var tasks = [];
 
-            for (var i = 0; i < this._dlQuotaListener.length; ++i) {
-                if (typeof this._dlQuotaListener[i] === "function") {
-                    this._dlQuotaListener[i]();
-                }
+        for (var gid in this._quotaPushBack) {
+            if (this._quotaPushBack.hasOwnProperty(gid) && this._quotaPushBack[gid].onQueueDone) {
+                tasks.push(this._quotaPushBack[gid]);
             }
-            this._dlQuotaListener = [];
+        }
+        this._quotaPushBack = {};
 
-            for (var gid in this._quotaPushBack) {
-                if (this._quotaPushBack.hasOwnProperty(gid) && this._quotaPushBack[gid].onQueueDone) {
-                    this.dlQueuePushBack(this._quotaPushBack[gid]);
-                }
-            }
+        if (getNewUrl) {
+            tasks.forEach(function(task) {
+                var dl = task.task.download;
 
-            this._quotaPushBack = {};
-
-            ids.forEach(fm_tfsresume); 
-        }.bind(this), expires * 1000);
+                dlmanager.newUrl(dl, function(rg) {
+                    if (task.url) {
+                        task.url = rg + "/" + task.url.replace(/.+\//, '');
+                        dlmanager.dlQueuePushBack(task);
+                        fm_tfsresume(dlmanager.getGID(dl));
+                    }
+                });
+            });
+        }
+        else {
+            tasks.forEach(this.dlQueuePushBack);
+            ids.forEach(fm_tfsresume);
+        }
     },
 
     _overquotaInfo: function() {
 
         api_req({a: 'uq', xfer: 1}, {
             callback: function(res) {
-                var size = 0;
                 if (typeof res === "number") {
                     // Error, just keep retrying
-                    return this._overquotaInfo();
+                    Soon(this._overquotaInfo.bind(this));
+                    return;
                 }
-                res.tah = res.tah || [];
-                for (var i = 0 ; i < res.tah.length; i++) {
-                    size += res.tah[i];
+
+                if (this.uqFastTrack || u_type) {
+                    // The user loged/registered in another tab, poll the uq command every
+                    // 30 seconds until we find a pro status and then retry with fresh download
+
+                    var proStatus = res.mxfer;
+                    this.logger.debug('overquota:proStatus', proStatus);
+
+                    if (proStatus) {
+                        // Got PRO, resume dl inmediately.
+                        return this._onQuotaRetry(true);
+                    }
+
+                    delay('overquota:uqft', this._overquotaInfo.bind(this), 30000);
                 }
-                this._dlQuotaRetry = 3600 - ((res.bt||0) % 3600);
-                if (res.tah.length) {
-                    this._dlQuotaLimit = bytesToSize(size); 
-                    this._dlQuotaHours = res.tah.length;
-                    this._overquotaShowVariables();
-                } else {
-                    this._dlQuotaRetry = 3600;
+
+                var timeLeft = 3600;
+
+                if (Object(res.tah).length) {
+                    var add = 1;
+                    var size = 0;
+
+                    timeLeft = 3600 - ((res.bt | 0) % 3600);
+
+                    for (var i = 0 ; i < res.tah.length; i++) {
+                        size += res.tah[i];
+
+                        if (res.tah[i]) {
+                            add = 0;
+                        }
+                        else if (add) {
+                            timeLeft += 3600;
+                        }
+                    }
+                    var limit = bytesToSize(size);
+                    var hours = res.tah.length;
+                    this._overquotaShowVariables(limit, hours);
                 }
-                this._setQuotaRetryTimer(this._dlQuotaRetry);
-                var $txt = $('.fm-dialog.bandwidth-dialog.overquota .countdown').removeClass('hidden')
-                $txt.text(secondsToTimeShort(this._dlQuotaRetry));
-    
-                this._dlTick = setInterval(function() {
-                    $txt.text(secondsToTimeShort(this._dlQuotaRetry--));
-                }.bind(this), 1000);
+
+                clearInterval(this._overQuotaTimeLeftTick);
+                delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
+
+                var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+
+                if ($dialog.is(':visible')) {
+                    var $countdown = $dialog.find('.countdown').removeClass('hidden');
+                    $countdown.text(secondsToTimeShort(timeLeft));
+
+                    this._overQuotaTimeLeftTick =
+                        setInterval(function() {
+                            $countdown.text(secondsToTimeShort(timeLeft--));
+                        }, 1000);
+                }
             }.bind(this)
         });
     },
 
-    _overquotaShowVariables: function() {
+    _overquotaShowVariables: function(dlQuotaLimit, dlQuotaHours) {
         $('.fm-dialog.bandwidth-dialog.overquota .bandwidth-text-bl.second').removeClass('hidden')
             .safeHTML(
                 l[7099]
-                    .replace("6", this._dlQuotaHours)
-                    .replace('%1', this._dlQuotaLimit)
+                    .replace("6", dlQuotaHours)
+                    .replace('%1', dlQuotaLimit)
                     .replace("[A]", '<a href="#pro" class="red">').replace('[/A]', '</a>')
             );
 
@@ -663,6 +716,7 @@ var dlmanager = {
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
         var $button = $dialog.find('.fm-dialog-close');
         var $overlay = $('.fm-dialog-overlay');
+        this.isOverQuota = true;
 
         if ($dialog.is(':visible')) {
             return;
@@ -670,14 +724,15 @@ var dlmanager = {
 
         if (typeof dlTask === "function") {
             this._dlQuotaListener.push(dlTask);
-        } else if (dlTask) {
+        }
+        else if (dlTask) {
             this._quotaPushBack[dlTask.gid] = dlTask;
         }
 
-        dlmanager.getCurrentDownloads().forEach(function(id) {
-            fm_tfspause(id, true);
-        });
-
+        dlmanager.getCurrentDownloads()
+            .forEach(function(gid) {
+                fm_tfspause(gid, true);
+            });
 
         fm_showoverlay();
         $dialog.removeClass('hidden')
@@ -685,36 +740,34 @@ var dlmanager = {
             .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
             .end();
 
-        
+
         $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
         this._overquotaInfo();
-    
+
         var doCloseModal = function closeModal() {
-    
-            clearInterval(this._dlTick);
+
+            clearInterval(this._overQuotaTimeLeftTick);
             $dialog.addClass('hidden');
             $button.unbind('click.quota');
             $overlay.unbind('click.quota');
             fm_hideoverlay();
             return false;
         }.bind(this);
-    
+
         $button.rebind('click.quota', doCloseModal);
         $overlay.rebind('click.quota', doCloseModal);
+
+        var self = this;
         $dialog.find('.membership-button').rebind('click', function() {
-    
-            doCloseModal();
-            document.location.hash = '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment');
+
+            // doCloseModal();
+            delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
+            open(getAppBaseUrl() + '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment'));
         });
     },
 
-    /**
-     *  Get the current downloads
-     *
-     *  TODO: Perhaps it's faster to iterate to the queue rather than bothering the DOM.
-     */
     getCurrentDownloads: function() {
-        return $('.transfer-table tr .download').parents('tr').attrs('id');
+        return array_unique(dl_queue.map(dlmanager.getGID));
     },
 
     isMEGAsyncRunning: function(minVersion) {
@@ -814,13 +867,27 @@ function fm_tfspause(gid, overquota) {
         else {
             dlQueue.pause(gid);
         }
-        var $tr = $('.transfer-table tr#' + gid);
-        $tr.addClass('paused');
-        $tr.find('span.transfer-type').addClass('paused');
-        if (overquota === true) {
-            $tr.find('td:eq(5)').safeHTML('<span class="transfer-status error overquota">' + l[1673] + '</span>');
-        } else {
-            $tr.find('td:eq(5)').safeHTML('<span class="transfer-status queued">' + l[7227] + '</span>');
+
+        if (page === 'download') {
+            if (overquota === true) {
+                $('.download.info-block').addClass('overquota');
+                $('.download.status-txt, .download-info .text').safeHTML(l[1673]).removeClass('blue');
+            }
+            else {
+                $('.download.status-txt, .download-info .text').safeHTML(l[1651]).addClass('blue');
+            }
+        }
+        else {
+            var $tr = $('.transfer-table tr#' + gid);
+            $tr.addClass('paused');
+            $tr.find('span.transfer-type').addClass('paused');
+
+            if (overquota === true) {
+                $tr.find('td:eq(5)').safeHTML('<span class="transfer-status error overquota">@@</span>', l[1673]);
+            }
+            else {
+                $tr.find('td:eq(5)').safeHTML('<span class="transfer-status queued">@@</span>', l[7227]);
+            }
         }
         return true;
     }
@@ -830,20 +897,30 @@ function fm_tfspause(gid, overquota) {
 function fm_tfsresume(gid) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
         var $tr = $('.transfer-table tr#' + gid);
+
         if (gid[0] === 'u') {
             ulQueue.resume(gid);
         }
         else {
-            if ($tr.is('.overquota')) {
+            if (page === 'download'
+                    && $('.download.info-block').hasClass('overquota')
+                    || $tr.is('.overquota')) {
+
                 return dlmanager.showOverQuotaDialog();
             }
             dlQueue.resume(gid);
         }
-        $tr.removeClass('paused');
-        $tr.find('span.transfer-type').removeClass('paused overquota');
 
-        if (!$('.transfer-table .progress-block, .transfer-table .transfer-status.initiliazing').length) {
-            $tr.find('td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');
+        if (page === 'download') {
+            $('.download.status-txt, .download-info .text').text('').removeClass('blue');
+        }
+        else {
+            $tr.removeClass('paused');
+            $tr.find('span.transfer-type').removeClass('paused overquota');
+
+            if (!$('.transfer-table .progress-block, .transfer-table .transfer-status.initiliazing').length) {
+                $tr.find('td:eq(5)').safeHTML('<span class="transfer-status initiliazing">@@</span>', l[1042]);
+            }
         }
         return true;
     }

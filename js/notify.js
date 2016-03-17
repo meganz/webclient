@@ -368,6 +368,7 @@ var notify = {
         notify.initPopupScrolling();
 
         // Add click handlers for various notifications
+        notify.initFullContactClickHandler();
         notify.initShareClickHandler();
         notify.initTakedownClickHandler();
         notify.initPaymentClickHandler();
@@ -387,6 +388,21 @@ var notify = {
         });
 
         jScrollFade('.notification-scroll');
+    },
+
+    /**
+     * When the other user has accepted the contact request and the 'Contact relationship established' notification 
+     * appears, make this is clickable so they can go to the contact's page to verify fingerprints or start chatting.
+     */
+    initFullContactClickHandler: function() {
+        
+        // Add click handler for the 'Contact relationship established' notification
+        this.$popup.find('.nt-contact-accepted').rebind('click', function() {
+        
+            // Redirect to the contact's page
+            document.location.hash = '#fm/' + $(this).attr('data-contact-handle');
+            notify.closePopup();
+        });
     },
 
     /**
@@ -652,7 +668,11 @@ var notify = {
         }
         else if (action === 1) {
             className = 'nt-contact-accepted';
-            title = l[7145];        // You are now both contacts
+            title = l[7145];        // Contact relationship established
+            
+            // Add a data attribute for the click handler
+            $notificationHtml.attr('data-contact-handle', notification.userHandle);
+            $notificationHtml.addClass('clickable');
         }
         else if (action === 2) {
             className = 'nt-contact-deleted';

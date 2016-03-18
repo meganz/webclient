@@ -1897,7 +1897,6 @@
     "6227": "Saya mengalami terlalu banyak masalah",
     "6229": "Menurut saya interface MEGA terlalu susah digunakan",
     "6234": "LITE",
-    "6240": "Windows Phone App",
     "6508": "Settings",
     "6690": "Pergi ke Akun Saya",
     "6771": "Folder terbuang",
@@ -2972,8 +2971,8 @@
     "8597": "Membership PRO anda akan habis dalam %1 hari.",
     "8598": "Membership PRO akan habis dalam waktu dekat",
     "8601": "Download dengan MEGAsync jika program sedang berjalan",
-    "8602": "This file will be decrypted as soon as the cryptographic key becomes available.",
-    "8603": "You have been suspended due to Terms of Service violations.",
+    "8602": "File ini akan di dekripsi saat cryptographic key tersedia.",
+    "8603": "Anda sedang di skors karena pelanggaran Kebijakan Pelayanan.",
     "8623": "popular!",
     "alias": {
         "shared-with-me": 5589,

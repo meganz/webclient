@@ -112,7 +112,14 @@ function parseHTMLfmt(markup) {
                         if (is_chrome_firefox) {
                             $('a[data-fxhref]').rebind('click', function() {
                                 if (!$(this).attr('href')) {
-                                    location.hash = $(this).data('fxhref');
+                                    var target = String($(this).attr('target')).toLowerCase();
+
+                                    if (target === '_blank') {
+                                        open(getAppBaseUrl() + $(this).data('fxhref'));
+                                    }
+                                    else {
+                                        location.hash = $(this).data('fxhref');
+                                    }
                                 }
                             });
                         }

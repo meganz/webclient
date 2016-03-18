@@ -2349,7 +2349,7 @@ function setupTransferAnalysis() {
         time = {},
         chunks = {};
     $.mTransferAnalysis = setInterval(function() {
-        if (uldl_hold || dlmanager._quotaRetry) {
+        if (uldl_hold || dlmanager.isOverQuota) {
             prev = {};
         }
         else if ($.transferprogress) {
@@ -3048,10 +3048,6 @@ MegaEvents.prototype.on = function(name, callback) {
             data
         );
 
-        if (c === 'pro' && sessionStorage.proref) {
-            data['ref'] = sessionStorage.proref;
-        }
-
         var msg = JSON.stringify({
             'c': c,
             'e': e,
@@ -3357,6 +3353,12 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
+
+        delay.cancel('overquota:retry');
+        delay.cancel('overquota:uqft');
+
+        dlmanager._quotaPushBack = {};
+        dlmanager._dlQuotaListener = [];
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
@@ -4150,7 +4152,7 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
-    if (typeof history !== "object") {
+    if (is_chrome_firefox || typeof history !== "object") {
         return false;
     }
     $(form).rebind('submit', function() {

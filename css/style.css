@@ -11834,7 +11834,10 @@ table {
 .download.buttons-block {
     margin: 23px 0 0 0;
 }
-.downloading .download.buttons-block {
+.download.icons-block {
+    min-height: 25px;
+}
+.downloading .download.buttons-block, .download-complete .download.buttons-block, .download-complete .download.pause-button {
     display: none;
 }
 .download.percents-block {
@@ -12086,7 +12089,7 @@ table {
 .download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block, .megasync-content.features {
     display: none;
 }
-.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
+.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.download.in-progress, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
     display: block;
 }
 .megasync-content.slider, .megasync-close, .megasync-close-txt {

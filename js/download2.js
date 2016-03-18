@@ -705,6 +705,7 @@ var dlmanager = {
                 delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
 
                 var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+                this._overquotaClickListeners($dialog);
 
                 if ($dialog.is(':visible')) {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
@@ -719,15 +720,32 @@ var dlmanager = {
         });
     },
 
+    _overquotaClickListeners: function($dialog) {
+        var self = this;
+        var onclick = function onProClicked() {
+            self.onOverQuotaProClicked = true;
+            delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
+
+            if ($(this).hasClass('membership-button')) {
+                open(getAppBaseUrl() + '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment'));
+            }
+            else {
+                open(getAppBaseUrl() + '#pro');
+            }
+        };
+        $dialog.find('.membership-button').rebind('click', onclick);
+        $('#bwd-utp-xz1').rebind('click', onclick);
+    },
+
     _overquotaShowVariables: function(dlQuotaLimit, dlQuotaHours) {
         $('.fm-dialog.bandwidth-dialog.overquota .bandwidth-text-bl.second').removeClass('hidden')
             .safeHTML(
                 l[7099]
                     .replace("6", dlQuotaHours)
                     .replace('%1', dlQuotaLimit)
-                    .replace("[A]", '<a href="#pro" class="red">').replace('[/A]', '</a>')
+                    .replace("[A]", '<a class="red" id="bwd-utp-xz1" style="cursor:pointer">')
+                    .replace('[/A]', '</a>')
             );
-
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask) {
@@ -778,14 +796,7 @@ var dlmanager = {
         $button.rebind('click.quota', doCloseModal);
         $overlay.rebind('click.quota', doCloseModal);
 
-        var self = this;
-        $dialog.find('.membership-button').rebind('click', function() {
-
-            // doCloseModal();
-            self.onOverQuotaProClicked = true;
-            delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
-            open(getAppBaseUrl() + '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment'));
-        });
+        this._overquotaClickListeners($dialog);
     },
 
     getCurrentDownloads: function() {

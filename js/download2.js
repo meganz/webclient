@@ -303,7 +303,7 @@ var dlmanager = {
     dlQueuePushBack: function DM_dlQueuePushBack(aTask) {
         var isValidTask = aTask && (aTask.onQueueDone || aTask instanceof ClassFile);
 
-        this.logger.debug('dlQueuePushBack', isValidTask, aTask);
+        dlmanager.logger.debug('dlQueuePushBack', isValidTask, aTask);
 
         if (ASSERT(isValidTask, 'dlQueuePushBack: Invalid aTask...')) {
             dlQueue.pushFirst(aTask);

@@ -131,8 +131,10 @@
         });
     }
 
-    function doLogin($dialog, aPromise) {
 
+    
+
+    function doLogin($dialog, aPromise) {
         loadingDialog.show();
 
         var ctx = {
@@ -143,8 +145,7 @@
                     aPromise.reject(l[730]);
                 }
                 else if (r) {
-                    $('#login-password', $dialog).val('');
-                    $('#login-email', $dialog).val('');
+                    passwordManager('#form_login_header');
 
                     u_type = r;
                     u_checked = true;
@@ -155,6 +156,9 @@
                         boot_auth(ctx, r);
                         aPromise.reject();
                     }
+                    $('#login-password', $dialog).val('');
+                    $('#login-email', $dialog).val('');
+
                 }
                 else {
                     $('#login-password', $dialog).val('');

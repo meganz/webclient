@@ -196,10 +196,11 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
 
     var chunk = this;
     var status = xhr.readyState > 1 && xhr.status;
+
     this.oet = setTimeout(function() {
-        chunk.finish_download(false, status);
+        chunk.finish_download(false, {responseStatus: status});
         chunk = undefined;
-    }, 3950 + Math.floor(Math.random() * 2e3));
+    }, status === 509 || (3950 + Math.floor(Math.random() * 2e3)));
 };
 
 ClassChunk.prototype.onXHRready = function(xhrEvent) {
@@ -227,7 +228,6 @@ ClassChunk.prototype.onXHRready = function(xhrEvent) {
             new Uint8Array(r)
         ]);
         this.dl.retries = 0;
-        dlmanager.reportQuota(this.size);
         this.finish_download();
         this.destroy();
     }
@@ -270,6 +270,9 @@ ClassChunk.prototype.run = function(task_done) {
     }
 
     this.Progress.working.push(this);
+
+    // HACK: In case of 509s, construct the url from the dl object which must be up-to-date
+    this.url = this.dl.url +  "/" + this.url.replace(/.+\//, '');
 
     /* let the fun begin! */
     this.url = dlmanager.uChangePort(this.url, this.altport ? 8080 : 0);
@@ -335,18 +338,10 @@ ClassFile.prototype.toString = function() {
 
 ClassFile.prototype.abortTimers = function() {
     if (this.dl) {
-        if (this.dl.quota_t) {
-            clearTimeout(this.dl.quota_t);
-            delete this.dl.quota_t;
-        }
         if (this.dl.retry_t) {
             clearTimeout(this.dl.retry_t);
             delete this.dl.retry_t;
         }
-    }
-    if (this.hasQuotaTimer) {
-        clearTimeout(this.hasQuotaTimer);
-        delete this.hasQuotaTimer;
     }
 };
 
@@ -412,25 +407,6 @@ ClassFile.prototype.destroy = function() {
     oDestroy(this);
 }
 
-ClassFile.prototype.checkQuota = function(task_done) {
-    if (this.hasQuota) {
-        return true;
-    }
-
-    var that = this;
-
-    dlmanager.hasQuota(this.dl.size, function(hasQuota) {
-        that.hasQuota = hasQuota;
-        that.hasQuotaTimer = setTimeout(function() {
-            that.hasQuotaTimer = null;
-            that.run(task_done);
-            that = undefined;
-        }, 1000);
-    });
-
-    return false;
-};
-
 ClassFile.prototype.run = function(task_done) {
     var cancelled = oIsFrozen(this) || !this.dl || this.dl.cancelled;
 
@@ -446,10 +422,6 @@ ClassFile.prototype.run = function(task_done) {
 
     dlmanager.fetchingFile = 1; /* Block the fetchingFile state */
     this.dl.retries = 0; /* set the retries flag */
-
-    if (!this.checkQuota(task_done)) {
-        return;
-    }
 
     // dlmanager.logger.info("dl_key " + this.dl.key);
     if (!GlobalProgress[this.gid].started) {
@@ -555,12 +527,14 @@ ClassFile.prototype.run = function(task_done) {
             }
             return false;
         }.bind(this);
+
         if (cancelOnInit()) {
             error = true;
         }
         else if (error) {
             /* failed */
             this.dlGetUrlErrors = (this.dlGetUrlErrors | 0) + 1;
+
             if (this.dl.zipid && this.dlGetUrlErrors > 20) {
                 // Prevent stuck ZIP downloads if there are repetitive errors for some of the files
                 // TODO: show notification to the user about empty files in the zip?
@@ -574,16 +548,22 @@ ClassFile.prototype.run = function(task_done) {
                 }
             }
             else {
-                this.dl.retry_t = setTimeout(function onGetUrlError() { /* retry !*/
+                var onGetUrlError = function onGetUrlError() {
                     if (!cancelOnInit()) {
-                        dlmanager.logger.error('retrying ', this.dl.n);
-                        dlQueue.pushFirst(this);
-                        if (dlmanager.ioThrottlePaused) {
-                            dlQueue.resume();
-                        }
+                        dlmanager.logger.info(this + ' Retrying dlGetUrl for ' + this.dl.n);
+                        dlmanager.dlQueuePushBack(this);
                     }
-                }.bind(this), dlmanager.dlRetryInterval);
-                dlmanager.logger.info('retry to fetch url in ', dlmanager.dlRetryInterval, ' ms');
+                }.bind(this);
+
+                if (error === EOVERQUOTA) {
+                    dlmanager.logger.warn(this + ' Got EOVERQUOTA, holding...');
+                    dlmanager.showOverQuotaDialog(onGetUrlError);
+                }
+                else {
+                    this.dl.retry_t = setTimeout(onGetUrlError, dlmanager.dlRetryInterval);
+                    dlmanager.logger.warn(this + ' Retry to fetch url in %dms, error:%s',
+                                            dlmanager.dlRetryInterval, error);
+                }
             }
         }
         else {

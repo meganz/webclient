@@ -135,6 +135,8 @@ module.exports = function(config) {
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
 
+        {pattern: 'test/chat/transcripts/*.json', included: false},
+
         // == Tests ==
         // Dependency-based load order of library modules.
         // modules that already follow AMD need included: false

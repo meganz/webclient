@@ -1060,7 +1060,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 24, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 25, writable : false });
 
     // Do not report exceptions if this build is older than 20 days
     var exTimeLeft = ((buildVersion.timestamp + (20 * 86400)) * 1000) > Date.now();
@@ -1471,6 +1471,7 @@ else if (!b_u)
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
+    jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
     jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
@@ -1493,7 +1494,6 @@ else if (!b_u)
     jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/rtl.css', n: 'rtl_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
@@ -1507,6 +1507,9 @@ else if (!b_u)
 
 
 
+    if (localStorage.enableDevtools) {
+        jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
+    }
 
     // We need to keep a consistent order in loaded resources, so that if users
     // send us logs we won't get different line numbers on stack-traces from
@@ -1596,7 +1599,7 @@ else if (!b_u)
         'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-        'register': ['register','register_js'],
+        'register': ['register','register_js', 'zxcvbn_js'],
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],

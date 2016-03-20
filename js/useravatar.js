@@ -286,7 +286,7 @@ var useravatar = (function() {
             $this.removeClass($this.data('color'))
                 .addClass($avatar.data('color'))
                 .data('color', $avatar.data('color'))
-                .empty().html($avatar.html());
+                .safeHTML($avatar.html());
         }
 
         var $avatar = $(ns.contact(user));

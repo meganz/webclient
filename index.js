@@ -930,6 +930,7 @@ var avatars = {};
 
 function loginDialog(close) {
     if (close) {
+        $('.top-login-popup form').empty();
         $('.top-login-popup').removeClass('active');
         return false;
     }
@@ -1231,7 +1232,6 @@ function topmenuUI() {
             else {
                 var c = $('.top-login-popup').attr('class');
                 if (c && c.indexOf('active') > -1) {
-                    $('.top-login-popup form').empty();
                     loginDialog(1);
                 }
                 else {

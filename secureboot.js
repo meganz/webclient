@@ -911,7 +911,7 @@ if (m)
     }
     else if (ua.indexOf('android') > -1)
     {
-        app='https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzsb';
+        app='https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
         android=1;
 
@@ -921,7 +921,7 @@ if (m)
             ver = ver.pop();
             // Check for Android 2.3+
             if (ver > 2 || (ver === 2 && rev > 3)) {
-                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
+                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             }
         }
         if (intent) {
@@ -1038,7 +1038,7 @@ if (m)
 }
 else if (page == '#android')
 {
-    document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzmobileapps';
+    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps';
 }
 else if (!b_u)
 {
@@ -2058,7 +2058,7 @@ else if (!b_u)
     {
         if (document.location.hash == '#android')
         {
-            document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzindexandroid';
+            document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
         }
         else
         {
@@ -2066,7 +2066,7 @@ else if (!b_u)
             document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
             document.getElementById('android_yes').addEventListener("click", function ()
             {
-                document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzandroid';
+                document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzandroid';
             }, false);
             document.getElementById('android_no').addEventListener("click", function ()
             {

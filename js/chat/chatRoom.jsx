@@ -29,6 +29,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         {
             state: null,
             users: [],
+            attachments: null,
             roomJid: null,
             type: null,
             messages: [],
@@ -58,6 +59,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.callRequest = null;
     this.callIsActive = false;
     this.shownMessages = {};
+    this.attachments = new MegaDataSortedMap('h', 'sts', this);
 
     this.options = {
 
@@ -714,6 +716,9 @@ ChatRoom.prototype.show = function() {
 
     self.isCurrentlyActive = true;
 
+    // clear M.v
+    M.v = [];
+
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
     $('.contacts-grid-view').addClass('hidden');
@@ -1079,6 +1084,7 @@ ChatRoom.prototype.attachNodes = function(ids) {
                     't': node.t,
                     'name': node.name,
                     's': node.s,
+                    'fa': node.fa,
                     'ar': {
                         'n': node.ar.n,
                         't': node.ar.t,

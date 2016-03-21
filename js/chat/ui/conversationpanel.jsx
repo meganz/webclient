@@ -91,7 +91,42 @@ var ConversationMessage = React.createClass({
             });
     },
     _preloadThumbnail: function(node) {
+        var self = this;
+        var found = false;
 
+        M.v.forEach(function(n) {
+            if (found === true) {
+                return;
+            }
+
+            if (n.h === node.h) {
+                found = true;
+            }
+        });
+
+        if (!found) {
+            var listenerId;
+            listenerId = mBroadcaster.addListener("thumbnailloaded_" + node.h, function() {
+                // because in the case of the thumbnail got just loaded, the event would trigger tooo fast, e.g. while
+                // the .render() is getting called.
+                $.tresizer();
+                mBroadcaster.removeListener(listenerId);
+            });
+
+            node.seen = node.seen || 1;
+            M.v.push(node);
+
+            // XXX: Next 5-10 lines can/should be optimised. fm_thumbnails's logic for rendering stuff in the FM is not
+            // valid here so it should not skip loading of thumbnails.
+            fm_thumbnails();
+
+            createTimeoutPromise(function() {
+                return !!thumbnails[node.h];
+            }, 1000, 3500)
+                .always(function() {
+                    fm_thumbnails();
+                });
+        }
     },
     render: function () {
         var self = this;
@@ -262,16 +297,25 @@ var ConversationMessage = React.createClass({
                             M.addDownload([v]);
                         };
 
+                        var attachmentInstance;
                         // cache ALL current attachments, so that we can revoke them later on in an ordered way.
                         if (message.messageId) {
-                            if (!chatRoom._attachmentsMap) {
-                                chatRoom._attachmentsMap = {};
+                            if (!chatRoom.attachments.exists(v.h)) {
+                                v.sts = message.delay;
+                                v.revoked = false;
+
+                                attachmentInstance = MegaDataObject.fromJS(
+                                    v
+                                );
+                                attachmentInstance.sts = message.delay;
+
+                                chatRoom.attachments.push(attachmentInstance);
                             }
-                            if (!chatRoom._attachmentsMap[v.h]) {
-                                chatRoom._attachmentsMap[v.h] = {};
+                            else {
+                                attachmentInstance = chatRoom.attachments[v.h];
                             }
-                            chatRoom._attachmentsMap[v.h][message.messageId] = false;
                         }
+
                         var addToCloudDrive = function() {
                             M.injectNodes(v, M.RootID, false, function(res) {
                                 if (res === 0) {
@@ -284,10 +328,30 @@ var ConversationMessage = React.createClass({
                             });
                         };
 
+                        var startPreview = function(e) {
+                            slideshow(v.h);
+                            if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        };
+
+                        // generate preview/icon
+                        var icon = fileIcon(v);
+
                         var dropdown = null;
+                        var previewButtons = null;
 
 
-                        if (!message.revoked) {
+
+                        if (!attachmentInstance.revoked) {
+                            if (v.fa && (icon === "graphic" || icon === "image")) {
+                                previewButtons = <span>
+                                    <DropdownsUI.DropdownItem icon="search-icon" label={__(l[1899])}
+                                          onClick={startPreview}/>
+                                    <hr/>
+                                </span>
+                            }
                             if (contact.u === u_handle) {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
@@ -299,6 +363,7 @@ var ConversationMessage = React.createClass({
                                         positionAt="right bottom"
                                         horizOffset={4}
                                         >
+                                        {previewButtons}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
@@ -320,6 +385,7 @@ var ConversationMessage = React.createClass({
                                         <DropdownsUI.Dropdown
                                             className="attachments-dropdown"
                                         >
+                                        {previewButtons}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
@@ -334,8 +400,7 @@ var ConversationMessage = React.createClass({
                                 icon="tiny-icon grey-down-arrow" />;
                         }
 
-                        // generate preview/icon
-                        var icon = fileIcon(v);
+                        var attachmentClasses = "message shared-data";
                         var preview = <div className="data-block-view medium">
                             {dropdown}
 
@@ -344,34 +409,47 @@ var ConversationMessage = React.createClass({
                             </div>
                         </div>;
 
-                        if (!message.revoked) {
-                            if (icon === "graphic" || icon === "image") {
-                                preview = <div className="data-block-view medium">
+                        if (!attachmentInstance.revoked) {
+                            if (v.fa && (icon === "graphic" || icon === "image")) {
+                                var src = thumbnails[v.h];
+                                if (!src) {
+                                    src = "";
+                                    self._preloadThumbnail(
+                                        v
+                                    );
+                                }
+                                else {
+                                    // trigger preload
+                                    (new Image()).src = src;
+                                }
 
-                                    <div className="shared-link img-block">
-                                        <div className="img-overlay"></div>
-                                        <div className="button overlay-button">
+                                preview =  (src ? (<div id={v.h} className="shared-link img-block">
+                                        <div className="img-overlay" onClick={startPreview}></div>
+                                        <div className="button overlay-button" onClick={startPreview}>
                                             <i className="huge-white-icon loupe"></i>
                                         </div>
 
                                         {dropdown}
 
-                                        <img alt="" className={"thumbnail-placeholder " + v.h}/>
-                                    </div>
-                                </div>;
-
-                                self._preloadThumbnail(
-                                    v
-                                );
+                                        <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
+                                             width="120"
+                                             height="126"
+                                             onLoad={() => {
+                                                // because of dynamic image sizes, we need to re-calc layout
+                                                $.tresizer();
+                                             }}
+                                             onClick={startPreview}
+                                        />
+                                    </div>) :  preview);
                             }
                         }
 
                         files.push(
-                            <div className="message shared-data" key={v.h}>
+                            <div className={attachmentClasses} key={v.h}>
                                 <div className="message shared-info">
                                     <div className="message data-title">
                                         {v.name}
-                                    </div>}
+                                    </div>
                                     <div className="message file-size">
                                         {bytesToSize(v.s)}
                                     </div>
@@ -577,15 +655,12 @@ var ConversationMessage = React.createClass({
                     </div>;
                 }
                 else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-                    if (!chatRoom._attachmentsMap) {
-                        chatRoom._attachmentsMap = {};
-                    }
                     var foundRevokedNode = null;
 
                     var revokedNode = textContents.substr(2, textContents.length);
 
-                    if (chatRoom._attachmentsMap[revokedNode]) {
-                        Object.keys(chatRoom._attachmentsMap[revokedNode]).forEach(function(messageId) {
+                    if (chatRoom.attachments.exists(revokedNode)) {
+                        Object.keys(chatRoom.attachments[revokedNode]).forEach(function(messageId) {
                             var attachedMsg = chatRoom.messagesBuff.messages[messageId];
 
                             if (!attachedMsg) {
@@ -602,8 +677,9 @@ var ConversationMessage = React.createClass({
                                     })
                                 } catch(e) {
                                 }
-                                attachedMsg.revoked = true;
                                 attachedMsg.seen = true;
+                                attachedMsg.revoked = true;
+                                revokedNode.revoked = true;
                             }
                         });
                     }
@@ -1599,7 +1675,6 @@ var ConversationPanel = React.createClass({
         room.megaChat.updateSectionUnreadCount();
 
         self.handleWindowResize();
-
     },
     handleWindowResize: function(e, scrollToBottom) {
         var $container = $(ReactDOM.findDOMNode(this));

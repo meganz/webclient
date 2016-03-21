@@ -112,6 +112,12 @@
     min-height: 20px;
     position: relative;
 }
+.not-sent.retrying .message.text-block {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
 .message.text-block em {
     font-family: 'Open Sans Italic';
     font-size: 12px;
@@ -204,18 +210,24 @@
 .message.shared-data {
     margin: 0 0 4px 0;
 }
-.not-sent.message.body {
+.not-sent.message.body:not(.retrying) {
     background-color: rgba(255, 51, 58, 0.7);
     padding: 9px 24px 12px 24px;
 }
-.not-sent .message.user-card-name, .not-sent .message.text-block {
+.not-sent:not(.retrying) .message.user-card-name, .not-sent:not(.retrying) .message.text-block {
     color: white;
 }
-.not-sent .message.date-time {
+.not-sent:not(.retrying) .message.date-time {
     color: rgba(255,255,255,0.84);
 }
-.not-sent .red {
+.not-sent:not(.retrying) .red {
     color: #E54C51;
+}
+.not-sent-indicator {
+    position:absolute;
+    z-index: 10;
+    right: 20px;
+    margin: 5px 0 0 0;
 }
 .message.circuit-label {
     display: block;

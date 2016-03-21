@@ -149,6 +149,9 @@
 .small-icon.grey-triangle {
     background-position: -52px -146px;
 }
+.small-icon.yellow-triangle {
+    background-position: -52px -111px;
+}
 .square-button .small-icon {
     width: 22px;
     height: 22px;

@@ -139,3 +139,14 @@
 .message.text-block em:hover .dropdown.body.notification {
     display: block;
 }
+.dropdown.notification-txt {
+    height: 32px;
+    font-size: 14px;
+    line-height: 32px;
+    color: #666666; white-space:nowrap;
+    padding:0 15px 0 12px;
+}
+.dropdown.notification-txt i {
+    margin: 0 5px 0 0;
+    vertical-align: middle;
+}

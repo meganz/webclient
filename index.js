@@ -930,9 +930,11 @@ var avatars = {};
 
 function loginDialog(close) {
     if (close) {
+        $('.top-login-popup form').empty();
         $('.top-login-popup').removeClass('active');
         return false;
     }
+    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
     if (localStorage.hideloginwarning || is_extension) {
         $('.top-login-warning').hide();
         $('.login-notification-icon').removeClass('hidden');
@@ -1230,11 +1232,9 @@ function topmenuUI() {
             else {
                 var c = $('.top-login-popup').attr('class');
                 if (c && c.indexOf('active') > -1) {
-                    $('.top-login-popup form').empty();
                     loginDialog(1);
                 }
                 else {
-                    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
                     loginDialog();
                 }
             }

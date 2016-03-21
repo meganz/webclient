@@ -484,7 +484,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
                     // add group participant in strongvelope
-                    console.log('ANDRE SAYS Add:' + eventData.userId);
                     chatRoom.protocolHandler.addParticipant(eventData.userId);
                     // also add to our list
                     chatRoom.members[eventData.userId] = eventData.priv;

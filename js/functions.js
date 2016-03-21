@@ -112,7 +112,14 @@ function parseHTMLfmt(markup) {
                         if (is_chrome_firefox) {
                             $('a[data-fxhref]').rebind('click', function() {
                                 if (!$(this).attr('href')) {
-                                    location.hash = $(this).data('fxhref');
+                                    var target = String($(this).attr('target')).toLowerCase();
+
+                                    if (target === '_blank') {
+                                        open(getAppBaseUrl() + $(this).data('fxhref'));
+                                    }
+                                    else {
+                                        location.hash = $(this).data('fxhref');
+                                    }
                                 }
                             });
                         }
@@ -244,6 +251,53 @@ function SoonFc(func, ms) {
         }, ms || 122);
     };
 }
+
+/**
+ * Delay a function execution, like Soon() does except it accept a parameter to
+ * identify the delayed function so that consecutive calls to delay the same
+ * function will make it just fire once. Actually, this is the same than
+ * SoonFc() does, but it'll work with function expressions as well.
+ *
+ * @param {String}   aProcID   ID to identify the delayed function
+ * @param {Function} aFunction The function/callback to invoke
+ * @param {Number}   aTimeout  The timeout, in ms, to wait.
+ */
+function delay(aProcID, aFunction, aTimeout) {
+
+    // Let aProcID be optional...
+    if (typeof aProcID === 'function') {
+        aTimeout = aFunction;
+        aFunction = aProcID;
+        aProcID = mRandomToken();
+    }
+
+    if (d) {
+        console.debug("delay'ing", aProcID, delay.queue[aProcID]);
+    }
+    delay.cancel(aProcID);
+
+    delay.queue[aProcID] =
+        setTimeout(function() {
+            if (d) {
+                console.debug('dispatching delayed function...', aProcID);
+            }
+            delete delay.queue[aProcID];
+            aFunction();
+        }, (aTimeout | 0) || 350);
+
+    return aProcID;
+}
+delay.queue = {};
+delay.has = function(aProcID) {
+    return delay.queue.hasOwnProperty(aProcID);
+};
+delay.cancel = function(aProcID) {
+    if (delay.has(aProcID)) {
+        clearTimeout(delay.queue[aProcID]);
+        return true;
+    }
+    return false;
+};
 
 function jScrollFade(id) {
 
@@ -2302,7 +2356,7 @@ function setupTransferAnalysis() {
         time = {},
         chunks = {};
     $.mTransferAnalysis = setInterval(function() {
-        if (uldl_hold) {
+        if (uldl_hold || dlmanager.isOverQuota) {
             prev = {};
         }
         else if ($.transferprogress) {
@@ -3001,10 +3055,6 @@ MegaEvents.prototype.on = function(name, callback) {
             data
         );
 
-        if (c === 'pro' && sessionStorage.proref) {
-            data['ref'] = sessionStorage.proref;
-        }
-
         var msg = JSON.stringify({
             'c': c,
             'e': e,
@@ -3250,7 +3300,7 @@ mega.utils.getStack = function megaUtilsGetStack() {
  *  @return {Boolean}
  */
 mega.utils.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
-    return ((fminitialized && dlmanager.isDownloading) || ulmanager.isUploading);
+    return ((fminitialized && ulmanager.isUploading) || dlmanager.isDownloading);
 };
 
 /**
@@ -3310,6 +3360,12 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
+
+        delay.cancel('overquota:retry');
+        delay.cancel('overquota:uqft');
+
+        dlmanager._quotaPushBack = {};
+        dlmanager._dlQuotaListener = [];
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
@@ -3891,6 +3947,78 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/** prevent tabnabbing attacks */
+mBroadcaster.once('startMega', function() {
+
+    if (!(window.chrome || window.safari || window.opr)) {
+        return;
+    }
+
+    // Check whether is safe to open a link through the native window.open
+    var isSafeTarget = function(link) {
+        link = String(link);
+
+        var allowed = [
+            getBaseUrl(),
+            getAppBaseUrl()
+        ];
+
+        var rv = allowed.some(function(v) {
+            return link.indexOf(v) === 0;
+        });
+
+        if (d) {
+            console.log('isSafeTarget', link, rv);
+        }
+
+        return rv || (location.hash.indexOf('fm/chat') === -1);
+    };
+
+    var open = window.open;
+    delete window.open;
+
+    // Replace the native window.open which will open unsafe links through a hidden iframe
+    Object.defineProperty(window, 'open', {
+        writable: false,
+        enumerable: true,
+        value: function(url) {
+            var link = document.createElement('a');
+            link.href = url;
+
+            if (isSafeTarget(link.href)) {
+                return open.apply(window, arguments);
+            }
+
+            var iframe = mCreateElement('iframe', {type: 'content', style: 'display:none'}, 'body');
+            var data = 'var win=window.open("' + escapeHTML(link) + '");if(win)win.opener = null;';
+            var doc = iframe.contentDocument || iframe.contentWindow.document;
+            var script = doc.createElement('script');
+            script.type = 'text/javascript';
+            script.src = mObjectURL([data], script.type);
+            script.onload = SoonFc(function() {
+                myURL.revokeObjectURL(script.src);
+                document.body.removeChild(iframe);
+            });
+            doc.body.appendChild(script);
+        }
+    });
+
+    // Catch clicks on links and forward them to window.opemn
+    document.documentElement.addEventListener('click', function(ev) {
+        var node = Object(ev.target);
+
+        if (node.nodeName === 'A' && node.href
+                && String(node.getAttribute('target')).toLowerCase() === '_blank'
+                && !isSafeTarget(node.href)) {
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            window.open(node.href);
+        }
+    }, true);
+});
+
 /** document.hasFocus polyfill */
 mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {
@@ -3969,15 +4097,33 @@ var watchdog = Object.freeze({
                 }
                 break;
 
+            case 'setsid':
+                if (dlmanager.isOverQuota) {
+                    // another tab fired a login/register while this one has an overquota state
+                    var sid = strg.data;
+                    delay('watchdog:setsid', function() {
+                        // the other tab must have sent the new sid
+                        assert(sid, 'sid not set');
+                        api_setsid(sid);
+                        dlmanager.uqFastTrack = 1;
+                        dlmanager._overquotaInfo();
+                    }, 2000);
+                }
+                break;
+
             case 'login':
             case 'createuser':
-                loadingDialog.show();
-                this.Strg.login = strg.origin;
+                if (!mega.utils.hasPendingTransfers()) {
+                    loadingDialog.show();
+                    this.Strg.login = strg.origin;
+                }
                 break;
 
             case 'logout':
-                u_logout(-0xDEADF);
-                location.reload();
+                if (!mega.utils.hasPendingTransfers()) {
+                    u_logout(-0xDEADF);
+                    location.reload();
+                }
                 break;
         }
 
@@ -4013,7 +4159,7 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
-    if (typeof history !== "object") {
+    if (is_chrome_firefox || typeof history !== "object") {
         return false;
     }
     $(form).rebind('submit', function() {

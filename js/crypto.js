@@ -1694,6 +1694,7 @@ function api_reset() {
 
 function api_setsid(sid) {
     if (sid !== false) {
+        watchdog.notify('setsid', sid);
         sid = 'sid=' + sid;
     }
     else {
@@ -1988,22 +1989,22 @@ function api_reqfailed(c, e) {
         queue.cmds = [[], []];
         queue.ctxs = [[], []];
         queue.setimmediate = false;
-        
+
         api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {
             u_logout(true);
 
             // On clicking OK, log the user out and redirect to contact page
             loadingDialog.hide();
-                        
+
             var reasonText = l[7660];   // You have been suspended due to repeated copyright infringement.
-                        
+
             if (reasonCode === 100) {
                 reasonText = l[7659];   // You have been suspended due to excess data usage.
             }
             else if (reasonCode === 300) {
                 reasonText = l[8603];   // You have been suspended due to Terms of Service violations.
             }
-            
+
             msgDialog('warninga', l[6789],
                 reasonText,
                 false,

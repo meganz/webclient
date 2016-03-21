@@ -1283,22 +1283,54 @@ else if (!b_u)
         };
     }
 
-    function detectlang()
-    {
-        if (!navigator.language) return 'en';
-        var bl = navigator.language.toLowerCase();
-        var l2 = languages, b;
-        for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
-        for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
+    /**
+     * Detects which language the user currently has set in their browser
+     * @returns {String} Returns the two letter language code e.g. 'en', 'es' etc
+     */
+    var detectLang = function() {
+        
+        // Get the preferred language in their browser
+        var userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        var langCode = null;
+        var langCodeVariant = null;
+        
+        if (!userLang) {
+            return 'en';
+        }
+        
+        // Lowercase it
+        userLang = userLang.toLowerCase();
+        
+        // Match on language code variants e.g. 'pt-br' returns 'br'
+        /* jshint -W089 */
+        for (langCode in languages) {
+            for (langCodeVariant in languages[langCode]) {
+                if (languages[langCode][langCodeVariant] === userLang) {                    
+                    return langCode;
+                }
+            }
+        }
+        
+        // If no exact match supported, normalise to base language code e.g. en-gb, en-us, en-ca returns 'en'
+        /* jshint -W089 */
+        for (langCode in languages) {
+            for (langCodeVariant in languages[langCode]) {
+                if (languages[langCode][langCodeVariant].substring(0, 3) === userLang.substring(0, 3)) {
+                    return langCode;
+                }
+            }
+        }
+        
+        // Default to English
         return 'en';
-    }
+    };
 
     /**
      * Gets the file path for a language file
      * @param {String} language
      * @returns {String}
      */
-    function getLanguageFilePath(language) {
+    var getLanguageFilePath = function(language) {
 
         // If the sh1 (filename with hashes) array has been created from deploy script
         if (typeof sh1 !== 'undefined') {
@@ -1319,9 +1351,9 @@ else if (!b_u)
             // Otherwise return the filename.json when in Development
             return 'lang/' + language + '.json';
         }
-    }
+    };
 
-    var lang = detectlang();
+    var lang = detectLang();    
     var jsl = [];
 
     // If they've already selected a language, use that
@@ -1334,7 +1366,7 @@ else if (!b_u)
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
     var langFilepath = getLanguageFilePath(lang);
 
-    jsl.push({f: langFilepath, n: 'lang', j:3});
+    jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});

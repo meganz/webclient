@@ -392,6 +392,15 @@ var MegaDataMap = function(parent) {
     });
 };
 
+MegaDataMap.prototype.exists = function(keyValue) {
+    var self = this;
+    if (typeof(self._data[keyValue]) !== 'undefined') {
+        return true;
+    }
+    else {
+        return false;
+    }
+};
 
 MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 

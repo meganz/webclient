@@ -59,7 +59,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.callRequest = null;
     this.callIsActive = false;
     this.shownMessages = {};
-    this.attachments = new MegaDataSortedMap('h', 'sts', this);
+    this.attachments = new MegaDataMap(this);
 
     this.options = {
 

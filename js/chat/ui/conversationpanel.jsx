@@ -297,22 +297,25 @@ var ConversationMessage = React.createClass({
                             M.addDownload([v]);
                         };
 
-                        var attachmentInstance;
+                        var attachmentMetaInfo;
                         // cache ALL current attachments, so that we can revoke them later on in an ordered way.
                         if (message.messageId) {
                             if (!chatRoom.attachments.exists(v.h)) {
-                                v.sts = message.delay;
-                                v.revoked = false;
+                                chatRoom.attachments.set(v.h, new MegaDataMap(chatRoom.attachments));
+                            }
 
-                                attachmentInstance = MegaDataObject.fromJS(
-                                    v
+                            if (!chatRoom.attachments[v.h].exists(message.messageId)) {
+                                chatRoom.attachments[v.h].set(
+                                    message.messageId,
+                                    attachmentMetaInfo = new MegaDataObject({
+                                        messageId: message.messageId,
+                                        revoked: false
+                                    })
                                 );
-                                attachmentInstance.sts = message.delay;
-
-                                chatRoom.attachments.push(attachmentInstance);
+                                attachmentMetaInfo._parent = chatRoom.attachments;
                             }
                             else {
-                                attachmentInstance = chatRoom.attachments[v.h];
+                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
                             }
                         }
 
@@ -344,7 +347,7 @@ var ConversationMessage = React.createClass({
 
 
 
-                        if (!attachmentInstance.revoked) {
+                        if (!attachmentMetaInfo.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 previewButtons = <span>
                                     <DropdownsUI.DropdownItem icon="search-icon" label={__(l[1899])}
@@ -409,7 +412,7 @@ var ConversationMessage = React.createClass({
                             </div>
                         </div>;
 
-                        if (!attachmentInstance.revoked) {
+                        if (!message.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 var src = thumbnails[v.h];
                                 if (!src) {
@@ -660,7 +663,8 @@ var ConversationMessage = React.createClass({
                     var revokedNode = textContents.substr(2, textContents.length);
 
                     if (chatRoom.attachments.exists(revokedNode)) {
-                        Object.keys(chatRoom.attachments[revokedNode]).forEach(function(messageId) {
+                        chatRoom.attachments[revokedNode].forEach(function(obj) {
+                            var messageId = obj.messageId;
                             var attachedMsg = chatRoom.messagesBuff.messages[messageId];
 
                             if (!attachedMsg) {
@@ -679,7 +683,7 @@ var ConversationMessage = React.createClass({
                                 }
                                 attachedMsg.seen = true;
                                 attachedMsg.revoked = true;
-                                revokedNode.revoked = true;
+                                obj.revoked = true;
                             }
                         });
                     }

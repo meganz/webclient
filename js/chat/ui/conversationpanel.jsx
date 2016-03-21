@@ -993,9 +993,7 @@ var ConversationPanel = React.createClass({
                 self.props.messagesBuff.messages.length === 0 ?
                     __(l[8002]) :
                     __(l[8002])
-            ),
-            firstParagraph = '<strong>' + l[8081].replace(/ -| -/g, '.</strong>'),
-            secondParagraph = '<strong>' + l[8082].replace(/ -| -/g, '.</strong>');
+            );
 
             headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 
@@ -1007,11 +1005,19 @@ var ConversationPanel = React.createClass({
                         {__(l[8080])}
                         <p>
                             <i className="semi-big-icon grey-lock"></i>
-                            <span dangerouslySetInnerHTML={{__html: firstParagraph}}></span>
+                            <span dangerouslySetInnerHTML={{
+                                __html: __(l[8540])
+                                    .replace("[S]", "<strong>")
+                                    .replace("[/S]", "</strong>")
+                            }}></span>
                         </p>
                         <p>
                             <i className="semi-big-icon grey-tick"></i>
-                            <span dangerouslySetInnerHTML={{__html: secondParagraph}}></span>
+                            <span dangerouslySetInnerHTML={{
+                                __html: __(l[8539])
+                                    .replace("[S]", "<strong>")
+                                    .replace("[/S]", "</strong>")
+                            }}></span>
                         </p>
                     </div>
                 </div>

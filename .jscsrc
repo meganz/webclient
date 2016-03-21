@@ -103,6 +103,8 @@
         "checkTypes": "capitalizedNativeCase"
     },
 
+    "maxErrors": -1,
+
     "fileExtensions": [".js", ".jsx"],
 
     "excludeFiles": [

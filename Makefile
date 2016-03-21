@@ -58,7 +58,7 @@ test-ci: $(KARMA)
 	KARMA_FLAGS="--singleRun=true --no-colors" $(MAKE) test
 
 test-debug: $(KARMA)
-	KARMA_FLAGS=" --debug " $(MAKE) test
+	KARMA_FLAGS="--preprocessors= --debug" $(MAKE) test
 
 test-all:
 	OPTIONS="--singleRun=true" BROWSER=$(TESTALL_BROWSERS) $(MAKE) $(SILENT_MAKE) test

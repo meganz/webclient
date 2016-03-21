@@ -16,7 +16,7 @@ var ChatdIntegration = function(megaChat) {
     self.waitingChatIdPromises = {};
     self.chatIdToRoomJid = {};
     self.mcfHasFinishedPromise = new MegaPromise();
-
+    self.deviceId = null;
 
 
     // chat events
@@ -31,7 +31,7 @@ var ChatdIntegration = function(megaChat) {
             //self._detachFromChatRoom(chatRoom);
         });
 
-        asyncApiReq({a: "mcf"})
+        asyncApiReq({a: "mcf", d: 1})
             .done(function(r) {
                 // reopen chats from the MCF response.
                 self.logger.debug("MCF returned: ", r);
@@ -40,7 +40,7 @@ var ChatdIntegration = function(megaChat) {
                     r.c.forEach(function (actionPacket) {
                         self.openChatFromApi(actionPacket, true);
                     });
-
+                    self.deviceId = r.d;
                     self.mcfHasFinishedPromise.resolve();
                 }
                 else {
@@ -155,7 +155,7 @@ ChatdIntegration.prototype.alterParticipants = function(chatRoom, included, excl
         }
 
         var doSendMsg = function() {
-            if (!forced) {
+            /*if (!forced) {
                 var msg = chatRoom.protocolHandler.alterParticipants(clone(included), clone(excluded));
                 if (!msg) {
                     self.logger.error("Failed to do altPart: " + msg);
@@ -206,7 +206,7 @@ ChatdIntegration.prototype.alterParticipants = function(chatRoom, included, excl
                     });
                 }
 
-            }
+            }*/
         };
 
 
@@ -254,19 +254,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             );
             chatRoom = r[1];
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
-                // i'd JUST created this chat. I should send alter participants.
-                var members = [];
 
+                //self.setProtocolHandlerParticipants(chatRoom);
 
-                actionPacket.u.forEach(function(v) {
-                    members.push(
-                        v.u
-                    );
-                });
-
-                self.setProtocolHandlerParticipants(chatRoom);
-
-                self.alterParticipants(chatRoom, members, [], true);
+                //self.alterParticipants(chatRoom, members, [], true);
 
                 window.location = chatRoom.getRoomUrl();
             }
@@ -492,6 +483,10 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
+                    // add group participant in strongvelope
+                    console.log('ANDRE SAYS Add:' + eventData.userId);
+                    chatRoom.protocolHandler.addParticipant(eventData.userId);
+                    // also add to our list
                     chatRoom.members[eventData.userId] = eventData.priv;
                 }
 
@@ -501,6 +496,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 }
             }
             else if (eventData.priv === 255) {
+                // remove group participant in strongvelope
+                chatRoom.protocolHandler.removeParticipant(eventData.userId);
+                // also remove from our list
                 delete chatRoom.members[eventData.userId];
             }
         }
@@ -692,9 +690,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             false
                         );
 
-                        if (decrypted && decrypted.toSend) {
-                            self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
-                        }
                         if (decrypted && decrypted.payload) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
                         } else if (decrypted && !decrypted.payload && typeof(decrypted.type) !== 'undefined') {
@@ -746,12 +741,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
+                assert(self.deviceId !== null, 'deviceId not loaded.');
 
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,
                     u_privCu25519,
                     u_privEd25519,
-                    u_pubEd25519
+                    u_pubEd25519,
+                    a32_to_str([self.deviceId])
                 );
 
                 self.join(chatRoom);
@@ -828,14 +825,14 @@ ChatdIntegration.prototype.protocolHandlerRequiresKeysInit = function(chatRoom) 
  * @param chatRoom
  */
 ChatdIntegration.prototype.setProtocolHandlerParticipants = function(chatRoom) {
-    var self = this;
+   /* var self = this;
 
    if (chatRoom.type === "group" && chatRoom.protocolHandler.otherParticipants.size === 0) {
        if (!chatRoom.protocolHandler._otherParticipantsFlag) {
            self.alterParticipants(chatRoom, Object.keys(chatRoom.members), [], true);
            chatRoom.protocolHandler._otherParticipantsFlag = true;
        }
-   }
+   }*/
 };
 
 ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {

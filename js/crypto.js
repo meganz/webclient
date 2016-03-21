@@ -211,9 +211,6 @@ var crypt = (function () {
 
     /**
      * Used for caching .getPubKey requests which are in progress (by reusing MegaPromises)
-     *
-     * @type {String, MegaPromise}
-     * @private
      */
     ns._pubKeyRetrievalPromises = {};
 
@@ -1777,7 +1774,7 @@ function api_proc(q) {
     };
 
     // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
-    if (loadingInitDialog.active) {
+    // if (loadingInitDialog.active) {
         var needProgress = false;
 
         // check whether this channel queue will need the progress
@@ -1823,7 +1820,7 @@ function api_proc(q) {
                 }
             };
         }
-    }
+    // }
 
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {

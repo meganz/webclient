@@ -375,20 +375,6 @@ Chat.prototype.init = function() {
 
         if (eventObject.getShow() !== "unavailable") {
             if (eventObject.isMyOwn(self.karere) === false) {
-                self.chats.forEach(function(room, roomJid) {
-                    if (room._leaving === true || room._conv_ended === true) {
-                        return; // continue
-                    }
-
-                    if (room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
-                        self.logger.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
-
-                        //XXX: invite the user in case of mpenc mode
-
-                        return false; // break;
-                    }
-                });
-
                 // Sync presence across devices (will check the delayed val!)
                 if (bareJid === self.karere.getBareJid()) {
                     if (eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {

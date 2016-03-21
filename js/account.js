@@ -1133,13 +1133,19 @@ function checkUserLogin() {
         mBroadcaster.sendMessage('fmconfig:' + key, value);
     };
 
-    Object.defineProperty(mega, 'config', {
-        value: Object.freeze(ns)
-    });
+    if (is_karma) {
+        mega.attr = ns;
+    }
+    else {
+        Object.defineProperty(mega, 'config', {
+            value: Object.freeze(ns)
+        });
+    }
+    ns = undefined;
 
 })(this);
 
-(function _userAttributeHandling() {
+(function _userAttributeHandling(scope) {
     "use strict";
 
     var ns = {};
@@ -1232,7 +1238,6 @@ function checkUserLogin() {
          * @param {Number|Object} res The received result.
          */
         function settleFunction(res) {
-
             if (typeof res !== 'number') {
                 // Decrypt if it's a private attribute container.
                 if (attribute.charAt(0) === '*') {
@@ -1494,14 +1499,21 @@ function checkUserLogin() {
     };
 
 
-    Object.defineProperty(mega, 'attr', {
-        value: Object.freeze(ns)
-    });
+    if (is_karma) {
+        ns._logger = logger;
+        mega.attr = ns;
+    }
+    else {
+        Object.defineProperty(mega, 'attr', {
+            value: Object.freeze(ns)
+        });
+    }
     ns = undefined;
 
 })(this);
 
 var attribCache = new IndexedDBKVStorage('attrib');
+attribCache.syncNameTimer = {};
 
 /**
  * Process action-packet for attribute updates.
@@ -1523,7 +1535,15 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
             if (attrName === 'firstname'
                     || attrName === 'lastname') {
 
-                M.syncUsersFullname(userHandle);
+                // behind a timer, so that if we get action-packets for both
+                // first and last name we won't fire syncUsersFullname twice
+                if (attribCache.syncNameTimer[userHandle]) {
+                    clearTimeout(attribCache.syncNameTimer[userHandle]);
+                }
+                attribCache.syncNameTimer[userHandle] = setTimeout(function() {
+                    attribCache.syncNameTimer[userHandle] = null;
+                    M.syncUsersFullname(userHandle);
+                }, 350);
             }
             else if (ownActionPacket) {
                 // atm only first/last name is processed throguh own-action-packet

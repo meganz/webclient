@@ -149,7 +149,13 @@ var GenericConversationMessage = React.createClass({
                 }
             }
 
-            var displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+            var displayName;
+            if (contact) {
+                displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+            }
+            else {
+                displayName = contact;
+            }
 
             var textContents = message.getContents ? message.getContents() : message.textContents;
 

@@ -115,7 +115,7 @@ var useravatar = (function() {
         }
 
         _watching[id][className] = true;
-        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
+        return '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
                     + '<div class="verified_icon"></div>'
                     + s.letters
                 + '</span></' + element + '>';
@@ -132,7 +132,7 @@ var useravatar = (function() {
      */
     function _image(url, id, className, type) {
 
-        return '<' + type + ' class="avatar-wrapper ' + id + ' ' + className + '">'
+        return '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">'
                 + '<div class="verified_icon"></div>'
                 + '<img src="' + url + '">'
          + '</' + type + '>';
@@ -279,11 +279,21 @@ var useravatar = (function() {
             // .trackDataChange() will trigger some parts in the Chat UI to re-render.
             M.u[user].trackDataChange();
         }
-        var avatar = $(ns.contact(user)).html();
-        $('.avatar-wrapper.' + user).empty().html(avatar);
+
+        function updateAvatar() {
+
+            var $this = $(this);
+            $this.removeClass($this.data('color'))
+                .addClass($avatar.data('color'))
+                .data('color', $avatar.data('color'))
+                .safeHTML($avatar.html());
+        }
+
+        var $avatar = $(ns.contact(user));
+        $('.avatar-wrapper.' + user).each(updateAvatar);
 
         if ((M.u[user] || {}).m) {
-            $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
+            $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).each(updateAvatar);
         }
     };
 

@@ -4809,6 +4809,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #bf1f02;
     color: rgba(255,255,255,0.9);
 }
+.top-head .user-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .user-name, a.user-name {
     float: right;
     margin: 11px 22px 0 0;
@@ -11849,7 +11855,10 @@ table {
 .download.buttons-block {
     margin: 23px 0 0 0;
 }
-.downloading .download.buttons-block {
+.download.icons-block {
+    min-height: 25px;
+}
+.downloading .download.buttons-block, .download-complete .download.buttons-block, .download-complete .download.pause-button {
     display: none;
 }
 .download.percents-block {
@@ -12101,7 +12110,7 @@ table {
 .download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block, .megasync-content.features {
     display: none;
 }
-.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
+.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.download.in-progress, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
     display: block;
 }
 .megasync-content.slider, .megasync-close, .megasync-close-txt {
@@ -22387,6 +22396,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .voucher-dialog a.voucher-reseller-link {
     font-family: 'source_sans_probold';
+    color: #d90007;
 }
 .voucher-dialog .voucher-dialog-buttons {
     display: table;
@@ -24818,7 +24828,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     padding-top: 6px
 }
 .support .fm-accout-inputs-blocks {
-    padding-top: 12px
+    padding-top: 15px
 }
 .support .fm-account-labels {
     width: 30px;
@@ -24831,10 +24841,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     height: 80%;
     float: left;
     border: 1px solid #e8e8e8;
-    border-radius: 5px;
+    font-size: 14px;
+    color: #666666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 8px 35px 8px 10px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
 }
 .help2 img[alt="smallx"] {
     max-width: 50px;
+}
+.support .fm-account-input::before {
+    display: none;
 }
 .help2 img[alt="small"] {
     max-width: 50%;

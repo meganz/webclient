@@ -60,6 +60,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.callIsActive = false;
     this.shownMessages = {};
     this.attachments = new MegaDataMap(this);
+    this.images = new MegaDataSortedMap("h", "delay", this);
 
     this.options = {
 

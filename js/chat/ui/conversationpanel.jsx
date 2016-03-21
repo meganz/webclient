@@ -104,6 +104,7 @@ var ConversationMessage = React.createClass({
             }
         });
 
+
         if (!found) {
             var listenerId;
             listenerId = mBroadcaster.addListener("thumbnailloaded_" + node.h, function() {
@@ -332,6 +333,7 @@ var ConversationMessage = React.createClass({
                         };
 
                         var startPreview = function(e) {
+                            M.v = chatRoom.images;
                             slideshow(v.h);
                             if (e) {
                                 e.preventDefault();
@@ -349,6 +351,11 @@ var ConversationMessage = React.createClass({
 
                         if (!attachmentMetaInfo.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
+                                var imagesListKey = message.messageId + "_" + v.h;
+                                if (!chatRoom.images.exists(imagesListKey)) {
+                                    v.delay = message.delay;
+                                    chatRoom.images.push(v);
+                                }
                                 previewButtons = <span>
                                     <DropdownsUI.DropdownItem icon="search-icon" label={__(l[1899])}
                                           onClick={startPreview}/>

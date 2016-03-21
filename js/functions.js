@@ -4168,6 +4168,7 @@ function passwordManager(form) {
             var title = document.title;
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
             history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+            $(form).find('input').val('');
         }, 1000);
         return false;
     }).submit();

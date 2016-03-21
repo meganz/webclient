@@ -519,7 +519,7 @@ function MegaData()
                     mega.attr.get(u, 'a', true, false)
                         .done(function (res) {
                             if (typeof res !== 'number' && res.length > 5) {
-                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
+                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/png'});
                                 avatars[u] = {
                                     data: blob,
                                     url: myURL.createObjectURL(blob)

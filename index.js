@@ -933,6 +933,7 @@ function loginDialog(close) {
         $('.top-login-popup').removeClass('active');
         return false;
     }
+    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
     if (localStorage.hideloginwarning || is_extension) {
         $('.top-login-warning').hide();
         $('.login-notification-icon').removeClass('hidden');
@@ -1234,7 +1235,6 @@ function topmenuUI() {
                     loginDialog(1);
                 }
                 else {
-                    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
                     loginDialog();
                 }
             }

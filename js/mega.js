@@ -5869,7 +5869,6 @@ function execsc(actionPackets, callback) {
         }
         // Action packet for the mcc
         else if (actionPacket.a === 'mcc') {
-            console.error(actionPacket);
             $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
         }
         else {

@@ -233,7 +233,6 @@ function init_pro()
 
     if (localStorage.keycomplete) {
         $('body').addClass('key');
-        sessionStorage.proref = 'accountcompletion';
         localStorage.removeItem('keycomplete');
     }
     else {
@@ -262,8 +261,6 @@ function init_pro()
         localStorage.affid = document.location.hash.replace('#pro/','');
         localStorage.affts = new Date().getTime();
     }
-
-    if (document.location.hash.indexOf('#pro#') > -1) sessionStorage.proref = document.location.hash.replace('#pro#','');
 
     if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
     if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
@@ -405,7 +402,7 @@ function pro_next_step(proPlanName) {
     if (proPlanName === undefined) {
         // this came from skipConfirmationStep
         var plan = $('.reg-st3-membership-bl.selected').data('payment');
-        proPlanName = (plan === 4 ? 'lite' : Array(plan).join("i"));
+        proPlanName = (plan === 4 ? 'lite' : Array(++plan).join("i"));
     }
     else if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -571,7 +568,7 @@ function pro_pay() {
     var currency = selectedProPackage[6];
 
     // Convert from boolean to integer for API
-    var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
+    var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 36e5) ? 1 : 0;
 
     // uts = User Transaction Sale
     api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m, bq: fromBandwidthDialog }, {
@@ -631,16 +628,11 @@ function pro_pay() {
                 // needs a redirect after confirmation action packet it will redirect to the account page.
                 proPage.lastPaymentProviderId = pro_m;
 
-                var proref = '';
-                if (sessionStorage.proref) {
-                    proref = sessionStorage.proref;
-                }
-
                 // utc = User Transaction Complete
                 // s = sale ID
                 // m = pro number
                 // bq = bandwidth quota triggered
-                api_req({ a : 'utc', s: [saleId], m: pro_m, r: proref, bq: fromBandwidthDialog, extra: extra },
+                api_req({ a : 'utc', s: [saleId], m: pro_m, bq: fromBandwidthDialog, extra: extra },
                 {
                     callback : function (utcResult)
                     {

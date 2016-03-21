@@ -132,6 +132,7 @@ function dl_g(res) {
                 return false;
             }
             fdl_queue_var = {
+                id:     dlpage_ph,
                 ph:     dlpage_ph,
                 key:    key,
                 s:      res.s,

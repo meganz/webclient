@@ -527,12 +527,14 @@ ClassFile.prototype.run = function(task_done) {
             }
             return false;
         }.bind(this);
+
         if (cancelOnInit()) {
             error = true;
         }
         else if (error) {
             /* failed */
             this.dlGetUrlErrors = (this.dlGetUrlErrors | 0) + 1;
+
             if (this.dl.zipid && this.dlGetUrlErrors > 20) {
                 // Prevent stuck ZIP downloads if there are repetitive errors for some of the files
                 // TODO: show notification to the user about empty files in the zip?
@@ -546,16 +548,22 @@ ClassFile.prototype.run = function(task_done) {
                 }
             }
             else {
-                this.dl.retry_t = setTimeout(function onGetUrlError() { /* retry !*/
+                var onGetUrlError = function onGetUrlError() {
                     if (!cancelOnInit()) {
-                        dlmanager.logger.error('retrying ', this.dl.n);
-                        dlQueue.pushFirst(this);
-                        if (dlmanager.ioThrottlePaused) {
-                            dlQueue.resume();
-                        }
+                        dlmanager.logger.info(this + ' Retrying dlGetUrl for ' + this.dl.n);
+                        dlmanager.dlQueuePushBack(this);
                     }
-                }.bind(this), dlmanager.dlRetryInterval);
-                dlmanager.logger.info('retry to fetch url in ', dlmanager.dlRetryInterval, ' ms');
+                }.bind(this);
+
+                if (error === EOVERQUOTA) {
+                    dlmanager.logger.warn(this + ' Got EOVERQUOTA, holding...');
+                    dlmanager.showOverQuotaDialog(onGetUrlError);
+                }
+                else {
+                    this.dl.retry_t = setTimeout(onGetUrlError, dlmanager.dlRetryInterval);
+                    dlmanager.logger.warn(this + ' Retry to fetch url in %dms, error:%s',
+                                            dlmanager.dlRetryInterval, error);
+                }
             }
         }
         else {

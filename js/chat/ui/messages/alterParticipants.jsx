@@ -24,7 +24,13 @@ var AlterParticipantsConversationMessage = React.createClass({
         var datetime = <div className="message date-time"
                                        title={time2date(timestampInt)}>{timestamp}</div>;
 
-        var displayName = contact.u === u_handle ? __("you") : generateAvatarMeta(contact.u).fullName;
+        var displayName;
+        if (contact) {
+            displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+        }
+        else {
+            displayName = contact;
+        }
 
         var messages = [];
 

@@ -11,6 +11,10 @@ var ContactsListItem = React.createClass({
 
         var contact = this.props.contact;
 
+        if (!contact) {
+            return null;
+        }
+
         classString += " " + this.props.megaChat.xmppPresenceToCssClass(
             contact.presence
         );
@@ -36,6 +40,10 @@ var ContactVerified = React.createClass({
         var self = this;
 
         var contact = this.props.contact;
+
+        if (!contact) {
+            return null;
+        }
 
         var verifiedElement = null;
 
@@ -66,6 +74,10 @@ var ContactPresence = React.createClass({
     render: function() {
         var self = this;
         var contact = this.props.contact;
+        if (!contact) {
+            return null;
+        }
+
         var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
 
         return <div className={"user-card-presence " + pres + " " + this.props.className}></div>;
@@ -79,6 +91,10 @@ var Avatar = React.createClass({
     render: function() {
         var self = this;
         var contact = this.props.contact;
+
+        if (!contact) {
+            return null;
+        }
 
         var $avatar = $(useravatar.contact(contact));
 
@@ -167,6 +183,10 @@ var ContactCard = React.createClass({
         var self = this;
 
         var contact = this.props.contact;
+        if (!contact) {
+            return null;
+        }
+
         var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
 

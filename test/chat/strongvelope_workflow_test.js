@@ -105,10 +105,13 @@ describe("chat.strongvelope workflow test", function() {
             dhPublicKey = asmCrypto.bytes_to_string(dhKeyPair.publicKey);
         }
 
+        var randomPrefix = a32_to_str([Math.floor((Math.random() * (Math.pow(2,31))))]);
+
         var participant = new strongvelope.ProtocolHandler(handle,
                                                            dhSecretKey,
                                                            signSecretKey,
-                                                           signPublicKey);
+                                                           signPublicKey,
+                                                           randomPrefix);
         pubEd25519[handle] = signPublicKey;
         pubCu25519[handle] = dhPublicKey;
         if (rsaKey) {
@@ -274,6 +277,7 @@ describe("chat.strongvelope workflow test", function() {
             participants['charlie8900'] = _makeParticipant('charlie8900');
             participants['charlie8900'].updateSenderKey();
             sender = 'alice678900';
+
             sent = participants[sender].alterParticipants(['charlie8900'], []);
             activeParticipants.add('charlie8900');
             _checkReceivers(sent, sender, null,
@@ -313,7 +317,8 @@ describe("chat.strongvelope workflow test", function() {
             participants['bob45678900'].rotateKeyEvery = 3;
             participants['bob45678900'].totalMessagesBeforeSendKey = 5;
             result = participants['bob45678900'].seed(_messageBuffer);
-            assert.strictEqual(result, true);
+            // Bob will fail to seed, because his device id has changed
+            assert.strictEqual(result, false);
             sender = 'alice678900';
             message = 'Welcome back, mate.';
             sent = participants[sender].alterParticipants(['bob45678900'], [], message);

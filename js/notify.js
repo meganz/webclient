@@ -24,6 +24,7 @@ var notify = {
     $popupIcon: null,
     $popupNum: null,
 
+    // A flag for if the initial loading of notifications is complete
     initialLoadComplete: false,
 
     // A list of already rendered pending contact request IDs (multiple can exist with reminders)
@@ -365,6 +366,7 @@ var notify = {
         notify.$popup.removeClass('empty');
 
         // Add scrolling for the notifications
+        notify.setHeightForNotifications();
         notify.initPopupScrolling();
 
         // Add click handlers for various notifications
@@ -374,6 +376,32 @@ var notify = {
         notify.initPaymentClickHandler();
         notify.initPaymentReminderClickHandler();
         notify.initAcceptContactClickHandler();
+    },
+
+    /**
+     * Sets the height of the notification dialog so it shows all the notifications
+     * that it can. If there are only a few notifications the height will only be 
+     * as high as those few notifications.
+     */
+    setHeightForNotifications: function () {
+
+        var $jspContainer = notify.$popup.find('.jspContainer');
+        var $notificationScrollList = notify.$popup.find('.notification-scr-list');
+
+        // Get the heights
+        var heightOfAllNotifications = $notificationScrollList.height();
+        var maxNotificationsHeight = $jspContainer.css('max-height');
+
+        // Set the initial height
+        var newHeight = heightOfAllNotifications;
+
+        // If the limit is exceeded, set it to the maximum
+        if (newHeight > maxNotificationsHeight) {
+            newHeight = maxNotificationsHeight;
+        }
+
+        // Set the height
+        $jspContainer.css('height', newHeight);
     },
 
     /**

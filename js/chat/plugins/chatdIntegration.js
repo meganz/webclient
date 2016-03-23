@@ -635,19 +635,18 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
                                 delete chatRoom.notDecryptedBuffer[k];
                             }
-                            else if (v && (v.type === 0 || v.type === 2)) {
-                                // this is a system message
-                                chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
-                            }
-                            /*else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                                console.error(v);
+                            else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
                                 chatRoom.messagesBuff.messages[hist[k]['k']].meta = {
                                     userId: v.sender,
                                     included: v.includeParticipants,
                                     excluded: v.excludeParticipants
                                 };
                                 chatRoom.messagesBuff.messages[hist[k]['k']].dialogType = "alterParticipants";
-                            }*/
+                            }
+                            else if (v && (v.type === 0 || v.type === 2)) {
+                                // this is a system message
+                                chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
+                            }
                             else if (v && !v.payload) {
                                 self.logger.error("Could not decrypt: ", v)
                             }
@@ -752,15 +751,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 };
 
                 var promises = [];
-                if (!pubCu25519[msgObject.userId]) {
-                    promises.push(
-                        crypt.getPubCu25519(msgObject.userId)
-                    );
-                } if (!u_pubkeys[msgObject.userId]) {
-                    promises.push(
-                        crypt.getPubRSA(msgObject.userId)
-                    );
-                }
+                promises.push(
+                    ChatdIntegration._ensureKeysAreLoaded([msgObject])
+                );
 
                 MegaPromise.allDone(promises).always(function() {
                     _runDecryption();
@@ -872,7 +865,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     removeValue(participants, u_handle);
 
     promises.push(
-        ChatdIntegration._ensureKeysAreLoaded(participants)
+        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
     );
 
 

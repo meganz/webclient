@@ -1481,7 +1481,7 @@ var strongvelope = {};
                 sender: message.userId,
                 type: parsedMessage.type,
                 includeParticipants: parsedMessage.includeParticipants,
-                excludeParticipants: parsedMessage.includeParticipants
+                excludeParticipants: parsedMessage.excludeParticipants
             };
             if (historicMessage === true) {
                 return result;

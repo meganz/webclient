@@ -17,6 +17,7 @@ var ChatdIntegration = function(megaChat) {
     self.chatIdToRoomJid = {};
     self.mcfHasFinishedPromise = new MegaPromise();
     self.deviceId = null;
+    self._processedMessages = {};
 
     megaChat.rebind("onInit.chatdInt", function(e) {
         megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
@@ -320,6 +321,61 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
     };
 };
 
+
+ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
+    var textContents = message.getContents ? message.getContents() : message.textContents;
+
+    if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+        if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+            try {
+                var attachmentMeta = JSON.parse(textContents.substr(2));
+            } catch(e) {
+                debugger;
+                return null;
+            }
+
+
+            attachmentMeta.forEach(function(v) {
+                var attachmentMetaInfo;
+                // cache ALL current attachments, so that we can revoke them later on in an ordered way.
+                if (message.messageId) {
+                    if (!chatRoom.attachments.exists(v.h)) {
+                        chatRoom.attachments.set(v.h, new MegaDataMap(chatRoom.attachments));
+                    }
+
+                    if (!chatRoom.attachments[v.h].exists(message.messageId)) {
+                        chatRoom.attachments[v.h].set(
+                            message.messageId,
+                            attachmentMetaInfo = new MegaDataObject({
+                                messageId: message.messageId,
+                                revoked: false
+                            })
+                        );
+                        attachmentMetaInfo._parent = chatRoom.attachments;
+                    }
+                    else {
+                        attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
+                    }
+                }
+
+                // generate preview/icon
+                var icon = fileIcon(v);
+
+                if (!attachmentMetaInfo.revoked && !message.revoked) {
+                    if (v.fa && (icon === "graphic" || icon === "image")) {
+                        var imagesListKey = message.messageId + "_" + v.h;
+                        if (!chatRoom.images.exists(imagesListKey)) {
+                            v.k = imagesListKey;
+                            v.delay = message.delay;
+                            chatRoom.images.push(v);
+                        }
+                    }
+                }
+            });
+        }
+    }
+};
+
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
@@ -367,11 +423,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
+                var cacheKey = chatRoom.chatId + " _" + v.messageId;
+                if (v.messageId && self._processedMessages[cacheKey]) {
+                    return;
+                }
+
                 if (v.userId) {
                     var msg = v.getContents ? v.getContents() : v.message;
-                    //if (msg && msg.length && msg.length > 0) {
-                    //    msg = base64urldecode(msg);
-                    //}
 
                     chatRoom.notDecryptedBuffer[k] = {
                         'message': msg,
@@ -405,19 +463,25 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 return; // skip already decrypted messages
                             }
 
+                            var messageId = hist[k]['k'];
+                            var cacheKey = chatRoom.chatId + " _" + messageId;
+                            if (messageId) {
+                                self._processedMessages[cacheKey] = true;
+                            }
 
                             if (v && typeof(v.payload) !== 'undefined' && v.payload !== null) {
-                                chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
-                                delete chatRoom.notDecryptedBuffer[hist[k]['k']];
+                                chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
+                                delete chatRoom.notDecryptedBuffer[messageId];
                             }
                             else if (v && v.type === 0) {
                                 // this is a system message
-                                chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
-                                delete chatRoom.notDecryptedBuffer[hist[k]['k']];
+                                chatRoom.messagesBuff.messages[messageId].protocol = true;
+                                delete chatRoom.notDecryptedBuffer[messageId];
                             }
                             else if (v && !v.payload) {
                                 self.logger.error("Could not decrypt: ", v)
                             }
+                            self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
                         });
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
@@ -461,6 +525,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         ) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                         }
+                        self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                     } catch(e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }
@@ -600,6 +665,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
 
         try {
             var result = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
+            
             tmpPromise.resolve(
                 self.chatd.submit(base64urldecode(chatRoom.chatId), result)
             );

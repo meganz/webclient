@@ -574,6 +574,16 @@ MegaDataSortedMap.prototype.keys = function() {
     return self._sortedVals;
 };
 
+MegaDataSortedMap.prototype.values = function() {
+    var self = this;
+    var res = [];
+    self.forEach(function(v) {
+        res.push(v);
+    });
+
+    return res;
+};
+
 MegaDataSortedMap.prototype.getItem = function(num) {
     var self = this;
 

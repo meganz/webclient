@@ -21035,6 +21035,9 @@
 	        return true;
 	    },
 	    eventuallyUpdate: function() {
+	        if (!this._wasRendered) {
+	            return;
+	        }
 	        if (!this.isComponentVisible()) {
 	            return;
 	        }
@@ -23230,6 +23233,40 @@
 	            msg.internalId = internalId;
 	        });
 	    },
+	    _preloadThumbnail: function _preloadThumbnail(node) {
+	        var self = this;
+	        var found = false;
+
+	        M.v.forEach(function (n) {
+	            if (found === true) {
+	                return;
+	            }
+
+	            if (n.h === node.h) {
+	                found = true;
+	            }
+	        });
+
+	        if (!found) {
+	            var listenerId;
+	            listenerId = mBroadcaster.addListener("thumbnailloaded_" + node.h, function () {
+
+	                $.tresizer();
+	                mBroadcaster.removeListener(listenerId);
+	            });
+
+	            node.seen = node.seen || 1;
+	            M.v.push(node);
+
+	            fm_thumbnails();
+
+	            createTimeoutPromise(function () {
+	                return !!thumbnails[node.h];
+	            }, 1000, 3500).always(function () {
+	                fm_thumbnails();
+	            });
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -23380,15 +23417,12 @@
 	                            M.addDownload([v]);
 	                        };
 
+	                        var attachmentMetaInfo;
+
 	                        if (message.messageId) {
-	                            if (!chatRoom._attachmentsMap) {
-	                                chatRoom._attachmentsMap = {};
-	                            }
-	                            if (!chatRoom._attachmentsMap[v.h]) {
-	                                chatRoom._attachmentsMap[v.h] = {};
-	                            }
-	                            chatRoom._attachmentsMap[v.h][message.messageId] = false;
+	                            attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
 	                        }
+
 	                        var addToCloudDrive = function addToCloudDrive() {
 	                            M.injectNodes(v, M.RootID, false, function (res) {
 	                                if (res === 0) {
@@ -23397,8 +23431,36 @@
 	                            });
 	                        };
 
+	                        var startPreview = function startPreview(e) {
+	                            M.v = chatRoom.images.values();
+	                            slideshow(v.h);
+	                            if (e) {
+	                                e.preventDefault();
+	                                e.stopPropagation();
+	                            }
+	                        };
+
+	                        var icon = fileIcon(v);
+
 	                        var dropdown = null;
-	                        if (!message.revoked) {
+	                        var previewButtons = null;
+
+	                        if (!attachmentMetaInfo.revoked) {
+	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                                var imagesListKey = message.messageId + "_" + v.h;
+	                                if (!chatRoom.images.exists(imagesListKey)) {
+	                                    v.k = imagesListKey;
+	                                    v.delay = message.delay;
+	                                    chatRoom.images.push(v);
+	                                }
+	                                previewButtons = React.makeElement(
+	                                    "span",
+	                                    null,
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: "search-icon", label: __(l[1899]),
+	                                        onClick: startPreview }),
+	                                    React.makeElement("hr", null)
+	                                );
+	                            }
 	                            if (contact.u === u_handle) {
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
@@ -23414,6 +23476,7 @@
 	                                            positionAt: "right bottom",
 	                                            horizOffset: 4
 	                                        },
+	                                        previewButtons,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "rounded-grey-down-arrow", label: __(l[1187]),
 	                                            onClick: startDownload }),
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8005]),
@@ -23436,6 +23499,7 @@
 	                                        {
 	                                            className: "attachments-dropdown"
 	                                        },
+	                                        previewButtons,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "rounded-grey-down-arrow", label: __(l[1187]),
 	                                            onClick: startDownload }),
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8005]),
@@ -23449,9 +23513,52 @@
 	                                icon: "tiny-icon grey-down-arrow" });
 	                        }
 
+	                        var attachmentClasses = "message shared-data";
+	                        var preview = React.makeElement(
+	                            "div",
+	                            { className: "data-block-view medium" },
+	                            dropdown,
+	                            React.makeElement(
+	                                "div",
+	                                { className: "data-block-bg" },
+	                                React.makeElement("div", { className: "block-view-file-type " + icon })
+	                            )
+	                        );
+
+	                        if (!message.revoked) {
+	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                                var src = thumbnails[v.h];
+	                                if (!src) {
+	                                    src = "";
+	                                    self._preloadThumbnail(v);
+	                                }
+
+	                                preview = src ? React.makeElement(
+	                                    "div",
+	                                    { id: v.h, className: "shared-link img-block" },
+	                                    React.makeElement("div", { className: "img-overlay", onClick: startPreview }),
+	                                    React.makeElement(
+	                                        "div",
+	                                        { className: "button overlay-button", onClick: startPreview },
+	                                        React.makeElement("i", { className: "huge-white-icon loupe" })
+	                                    ),
+	                                    dropdown,
+	                                    React.makeElement("img", { alt: "", className: "thumbnail-placeholder " + v.h, src: src,
+	                                        width: "120",
+	                                        height: "126",
+	                                        onLoad: function onLoad() {
+
+	                                            $.tresizer();
+	                                        },
+	                                        onClick: startPreview
+	                                    })
+	                                ) : preview;
+	                            }
+	                        }
+
 	                        files.push(React.makeElement(
 	                            "div",
-	                            { className: "message shared-data", key: v.h },
+	                            { className: attachmentClasses, key: v.h },
 	                            React.makeElement(
 	                                "div",
 	                                { className: "message shared-info" },
@@ -23466,16 +23573,7 @@
 	                                    bytesToSize(v.s)
 	                                )
 	                            ),
-	                            React.makeElement(
-	                                "div",
-	                                { className: "data-block-view medium" },
-	                                dropdown,
-	                                React.makeElement(
-	                                    "div",
-	                                    { className: "data-block-bg" },
-	                                    React.makeElement("div", { className: "block-view-file-type " + fileIcon(v) })
-	                                )
-	                            ),
+	                            preview,
 	                            React.makeElement("div", { className: "clear" })
 	                        ));
 	                    });
@@ -23695,15 +23793,13 @@
 	                        )
 	                    );
 	                } else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-	                    if (!chatRoom._attachmentsMap) {
-	                        chatRoom._attachmentsMap = {};
-	                    }
 	                    var foundRevokedNode = null;
 
 	                    var revokedNode = textContents.substr(2, textContents.length);
 
-	                    if (chatRoom._attachmentsMap[revokedNode]) {
-	                        Object.keys(chatRoom._attachmentsMap[revokedNode]).forEach(function (messageId) {
+	                    if (chatRoom.attachments.exists(revokedNode)) {
+	                        chatRoom.attachments[revokedNode].forEach(function (obj) {
+	                            var messageId = obj.messageId;
 	                            var attachedMsg = chatRoom.messagesBuff.messages[messageId];
 
 	                            if (!attachedMsg) {
@@ -23719,8 +23815,9 @@
 	                                        }
 	                                    });
 	                                } catch (e) {}
-	                                attachedMsg.revoked = true;
 	                                attachedMsg.seen = true;
+	                                attachedMsg.revoked = true;
+	                                obj.revoked = true;
 	                            }
 	                        });
 	                    }
@@ -25961,6 +26058,7 @@
 	    MegaDataObject.attachToExistingJSObject(this, {
 	        state: null,
 	        users: [],
+	        attachments: null,
 	        roomJid: null,
 	        type: null,
 	        messages: [],
@@ -25988,6 +26086,8 @@
 	    this.callRequest = null;
 	    this.callIsActive = false;
 	    this.shownMessages = {};
+	    this.attachments = new MegaDataMap(this);
+	    this.images = new MegaDataSortedMap("k", "delay", this);
 
 	    this.options = {
 
@@ -26453,6 +26553,8 @@
 
 	    self.isCurrentlyActive = true;
 
+	    M.v = [];
+
 	    $('.files-grid-view').addClass('hidden');
 	    $('.fm-blocks-view').addClass('hidden');
 	    $('.contacts-grid-view').addClass('hidden');
@@ -26684,6 +26786,7 @@
 	                't': node.t,
 	                'name': node.name,
 	                's': node.s,
+	                'fa': node.fa,
 	                'ar': {
 	                    'n': node.ar.n,
 	                    't': node.ar.t,

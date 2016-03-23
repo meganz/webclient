@@ -301,23 +301,7 @@ var ConversationMessage = React.createClass({
                         var attachmentMetaInfo;
                         // cache ALL current attachments, so that we can revoke them later on in an ordered way.
                         if (message.messageId) {
-                            if (!chatRoom.attachments.exists(v.h)) {
-                                chatRoom.attachments.set(v.h, new MegaDataMap(chatRoom.attachments));
-                            }
-
-                            if (!chatRoom.attachments[v.h].exists(message.messageId)) {
-                                chatRoom.attachments[v.h].set(
-                                    message.messageId,
-                                    attachmentMetaInfo = new MegaDataObject({
-                                        messageId: message.messageId,
-                                        revoked: false
-                                    })
-                                );
-                                attachmentMetaInfo._parent = chatRoom.attachments;
-                            }
-                            else {
-                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
-                            }
+                            attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
                         }
 
                         var addToCloudDrive = function() {
@@ -333,7 +317,7 @@ var ConversationMessage = React.createClass({
                         };
 
                         var startPreview = function(e) {
-                            M.v = chatRoom.images;
+                            M.v = chatRoom.images.values();
                             slideshow(v.h);
                             if (e) {
                                 e.preventDefault();
@@ -353,6 +337,7 @@ var ConversationMessage = React.createClass({
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
+                                    v.k = imagesListKey;
                                     v.delay = message.delay;
                                     chatRoom.images.push(v);
                                 }
@@ -427,10 +412,6 @@ var ConversationMessage = React.createClass({
                                     self._preloadThumbnail(
                                         v
                                     );
-                                }
-                                else {
-                                    // trigger preload
-                                    (new Image()).src = src;
                                 }
 
                                 preview =  (src ? (<div id={v.h} className="shared-link img-block">

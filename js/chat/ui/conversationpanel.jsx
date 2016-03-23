@@ -90,45 +90,6 @@ var ConversationMessage = React.createClass({
                 msg.internalId = internalId;
             });
     },
-    _preloadThumbnail: function(node) {
-        var self = this;
-        var found = false;
-
-        M.v.forEach(function(n) {
-            if (found === true) {
-                return;
-            }
-
-            if (n.h === node.h) {
-                found = true;
-            }
-        });
-
-
-        if (!found) {
-            var listenerId;
-            listenerId = mBroadcaster.addListener("thumbnailloaded_" + node.h, function() {
-                // because in the case of the thumbnail got just loaded, the event would trigger tooo fast, e.g. while
-                // the .render() is getting called.
-                $.tresizer();
-                mBroadcaster.removeListener(listenerId);
-            });
-
-            node.seen = node.seen || 1;
-            M.v.push(node);
-
-            // XXX: Next 5-10 lines can/should be optimised. fm_thumbnails's logic for rendering stuff in the FM is not
-            // valid here so it should not skip loading of thumbnails.
-            fm_thumbnails();
-
-            createTimeoutPromise(function() {
-                return !!thumbnails[node.h];
-            }, 1000, 3500)
-                .always(function() {
-                    fm_thumbnails();
-                });
-        }
-    },
     render: function () {
         var self = this;
         var cssClasses = "message body";
@@ -333,6 +294,7 @@ var ConversationMessage = React.createClass({
                         };
 
                         var startPreview = function(e) {
+                            assert(M.chat, 'Not in chat.');
                             M.v = chatRoom.images;
                             slideshow(v.h);
                             if (e) {
@@ -419,19 +381,22 @@ var ConversationMessage = React.createClass({
                             </div>
                         </div>;
 
-                        if (!message.revoked) {
+                        if (M.chat && !message.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 var src = thumbnails[v.h];
                                 if (!src) {
-                                    src = "";
-                                    self._preloadThumbnail(
-                                        v
-                                    );
+                                    src = M.getNodeByHandle(v.h);
+                                    if (!src || src !== v) {
+                                        M.v.push(v);
+                                        if (!v.seen) {
+                                            v.seen = 1; // HACK
+                                        }
+                                        delay('chat:thumbnail', fm_thumbnails, 90);
+                                    }
+                                    src = noThumbURI;
                                 }
-                                else {
-                                    // trigger preload
-                                    (new Image()).src = src;
-                                }
+                                // console.debug('M.v-CHAT', M.v);
+
 
                                 preview =  (src ? (<div id={v.h} className="shared-link img-block">
                                         <div className="img-overlay" onClick={startPreview}></div>

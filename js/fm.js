@@ -10299,9 +10299,8 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
-        mBroadcaster.sendMessage("thumbnailloaded_" + n.h, [n]);
 
-        var e = $('#' + n.h + '.file-block, #' + n.h + '.img-block');
+        var e = M.chat ? $('#' + n.h + '.img-block') : $('#' + n.h + '.file-block');
 
         if (e.length > 0) {
             e = e.find('img:first');

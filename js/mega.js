@@ -1708,6 +1708,7 @@ function MegaData()
         $('.nw-fm-tree-item').removeClass('opened');
 
         if (this.chat) {
+            M.v = [];
             sharedFolderUI(); // remove shares-specific UI
             //$.tresizer();
         }

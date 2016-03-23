@@ -1708,6 +1708,7 @@ function MegaData()
         $('.nw-fm-tree-item').removeClass('opened');
 
         if (this.chat) {
+            M.v = [];
             sharedFolderUI(); // remove shares-specific UI
             //$.tresizer();
         }
@@ -4119,6 +4120,22 @@ function MegaData()
                 console.log('0 path', path);
             }
         }
+    };
+
+    this.getNodeByHandle = function(handle) {
+        if (Object(M.d).hasOwnProperty(handle)) {
+            return M.d[handle];
+        }
+
+        for (var i in M.v) {
+            if (M.v.hasOwnProperty(i)) {
+                if (M.v[i].h === handle) {
+                    return M.v[i];
+                }
+            }
+        }
+
+        return false;
     };
 
     this.isNodeObject = function(n) {

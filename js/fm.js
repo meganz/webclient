@@ -9977,18 +9977,7 @@ function slideshow(id, close)
         return false;
     }
 
-    var n = M.d[id];
-    if (!n) {
-        M.v.forEach(function(v) {
-            if (n) {
-                return;
-            }
-
-            if (v.h === id) {
-                n = v;
-            }
-        });
-    }
+    var n = M.getNodeByHandle(id);
     if (n && RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
@@ -10113,17 +10102,10 @@ function fetchsrc(id)
         delete pfails[id];
     }
 
-    var n = M.d[id];
+    var n = M.getNodeByHandle(id);
     if (!n) {
-        M.v.forEach(function(v) {
-            if (n) {
-                return;
-            }
-
-            if (v.h === id) {
-                n = v;
-            }
-        });
+        console.error('handle "%s" not found...', id);
+        return false;
     }
 
     preqs[id] = 1;
@@ -10288,28 +10270,18 @@ function fm_thumbnails()
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
 
-                var targetNode = M.d[node];
-                if (!targetNode) {
-                    M.v.forEach(function(v) {
-                        if (targetNode) {
-                            return;
-                        }
+                var targetNode = M.getNodeByHandle(node);
 
-                        if (v.h === node) {
-                            targetNode = v;
-                        }
-                    });
-                }
-
-                if (targetNode && targetNode.seen && M.currentdirid === cdid)
+                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
                     fm_thumbnail_render(targetNode);
+                }
 
                 // deduplicate in view when there is a duplicate fa:
                 if (targetNode && fa_duplicates[targetNode.fa] > 0)
                 {
                     for (var i in M.v)
                     {
-                        if (M.v[i].h !== node && M.v[i].fa == targetNode.fa && !thumbnails[M.v[i].h])
+                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
                         {
                             thumbnails[M.v[i].h] = thumbnails[node];
                             if (M.v[i].seen && M.currentdirid === cdid)
@@ -10327,9 +10299,8 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
-        mBroadcaster.sendMessage("thumbnailloaded_" + n.h, [n]);
 
-        var e = $('#' + n.h + '.file-block, #' + n.h + '.img-block');
+        var e = M.chat ? $('#' + n.h + '.img-block') : $('#' + n.h + '.file-block');
 
         if (e.length > 0) {
             e = e.find('img:first');

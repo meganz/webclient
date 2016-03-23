@@ -717,9 +717,6 @@ ChatRoom.prototype.show = function() {
 
     self.isCurrentlyActive = true;
 
-    // clear M.v
-    M.v = [];
-
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
     $('.contacts-grid-view').addClass('hidden');

@@ -199,7 +199,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
                 contactHash = msg.authorContact.h;
             }
             else if (msg.userId) {
-                contactHash = M.u[msg.userId];
+                contactHash = msg.userId;
             }
             else if (msg.getFromJid) {
                 contactHash = megaChat.getContactHashFromJid(msg.getFromJid());

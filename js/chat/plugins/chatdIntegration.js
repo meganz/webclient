@@ -144,7 +144,7 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
 ChatdIntegration.prototype.alterParticipants = function(chatRoom, included, excluded, forced) {
     var self = this;
 
-    self.protocolHandlerRequiresKeysInit(chatRoom);
+    //self.protocolHandlerRequiresKeysInit(chatRoom);
 
 
     console.error('alterParticipants', chatRoom, included, excluded);
@@ -288,7 +288,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     if (included.length > 0 || excluded.length > 0) {
                         self.setProtocolHandlerParticipants(chatRoom);
                         if (actionPacket.ou === u_handle) {
-                            self.alterParticipants(chatRoom, included, excluded);
+                            //self.alterParticipants(chatRoom, included, excluded);
                         }
                         chatRoom.trackDataChange();
                     }
@@ -546,7 +546,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
-            self.protocolHandlerRequiresKeysInit(chatRoom);
+            //self.protocolHandlerRequiresKeysInit(chatRoom);
 
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
                 if (v.userId) {
@@ -592,11 +592,11 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
                                 delete chatRoom.notDecryptedBuffer[k];
                             }
-                            else if (v && v.type === 0) {
+                            else if (v && (v.type === 0 || v.type === 2)) {
                                 // this is a system message
                                 chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
                             }
-                            else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+                            /*else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
                                 console.error(v);
                                 chatRoom.messagesBuff.messages[hist[k]['k']].meta = {
                                     userId: v.sender,
@@ -604,7 +604,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     excluded: v.excludeParticipants
                                 };
                                 chatRoom.messagesBuff.messages[hist[k]['k']].dialogType = "alterParticipants";
-                            }
+                            }*/
                             else if (v && !v.payload) {
                                 self.logger.error("Could not decrypt: ", v)
                             }
@@ -612,17 +612,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }
-
-                    if (seedResult === false && chatRoom.messagesBuff.haveMoreHistory() === true) {
-                        chatRoom.messagesBuff.retrieveChatHistory();
-                    }
                 };
 
                 if (!chatRoom.protocolHandler) {
                     if (chatRoom.strongvelopeSetupPromises) {
                         chatRoom.strongvelopeSetupPromises.done(function() {
                             decryptMessages();
-                        })
+                        });
                     }
                     else {
                         debugger;

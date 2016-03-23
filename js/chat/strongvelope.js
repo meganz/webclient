@@ -719,12 +719,12 @@ var strongvelope = {};
 
         // Iterate over all messages to extract keys (if present).
         // TOGO: make sure the messages are ordered from latest to oldest.
-        for (var i = 0; i < messages.length; i++) {
+        for (var i = messages.length -1;i>=0; i--) {
             // if the message is from chat API.
-            if ((iamSeeding === true) && (messages[i].userId === COMMANDER)) {
+            if (messages[i].userId === COMMANDER) {
                 // not keyed yet, update group participant
-                if (keyed === false) {
-                    this.handleManagementMessage(messages[i], messages[i].userId);
+                if ((iamSeeding === true) && (keyed === false)) {
+                    this.handleManagementMessage(messages[i]);
                 }
             }
             // the message is from other participants.
@@ -1186,7 +1186,8 @@ var strongvelope = {};
 
         // Check and rotate key if due.
         if ((this._keyEncryptionCount >= this.rotateKeyEvery) ||
-            (this.previousKeyId === null && this.keyId === null)) {
+            (this.previousKeyId === null && this.keyId === null) || 
+            (this.participantChange === true)) {
             this.updateSenderKey();
         }
 
@@ -1196,7 +1197,7 @@ var strongvelope = {};
 
         var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
         var encryptedKeys = false;
-        if (repeatKey || (this._sentKeyId !== this.keyId) || this.participantChange) {
+        if (repeatKey || (this._sentKeyId !== this.keyId) || (this.participantChange === true)) {
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
 
@@ -1457,19 +1458,13 @@ var strongvelope = {};
      * handle the management message from chat API.
      *
      * @method
-     * @param {String} message
-     *     Data message to encrypt.
-     * @param {String} sender
-     *     User handle of the message sender.
-     * @param {Boolean} [historicMessage=false]
-     *     Whether the message passed in for decryption is from the history.
+     * message {ChatdMessage}
+     *     A management message from chat API.
      * @returns {(StrongvelopeMessage|Boolean)}
      *     The message content on success, `false` in case of errors.
      */
-    strongvelope.ProtocolHandler.prototype.handleManagementMessage = function(message,
-                sender) {
-          
-        var parsedMessage = ns._parseMessageContent(message);
+    strongvelope.ProtocolHandler.prototype.handleManagementMessage = function(message) {
+        var parsedMessage = ns._parseMessageContent(message.message);
 
         var self = this;
         if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS) {
@@ -1482,7 +1477,7 @@ var strongvelope = {};
             }
             var result = {
                 version: parsedMessage.protocolVersion,
-                sender: sender,
+                sender: message.userId,
                 type: parsedMessage.type,
                 includeParticipants: [],
                 excludeParticipants: []
@@ -1529,10 +1524,8 @@ var strongvelope = {};
 
         // if the message is from chat API
         if (sender === COMMANDER) {
-            return this.handleManagementMessage(message, sender);
+            return this.handleManagementMessage({ userId: sender, message: message});
         }
-        var self = this;
-
 
         // Check we're in a chat with this sender, or on a new chat.
         if (!this.otherParticipants.has(sender)

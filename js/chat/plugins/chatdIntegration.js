@@ -6,6 +6,7 @@
  * @returns {ChatdIntegration}
  * @constructor
  */
+
 var ChatdIntegration = function(megaChat) {
     //return false;
     var self = this;
@@ -263,7 +264,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             }
         }
         else {
-            self.setProtocolHandlerParticipants(chatRoom);
             if (!chatRoom.chatId) {
                 chatRoom.chatId = actionPacket.id;
                 chatRoom.chatShard = actionPacket.cs;
@@ -286,7 +286,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     });
 
                     if (included.length > 0 || excluded.length > 0) {
-                        self.setProtocolHandlerParticipants(chatRoom);
                         if (actionPacket.ou === u_handle) {
                             //self.alterParticipants(chatRoom, included, excluded);
                         }
@@ -464,6 +463,50 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         return masterPromise;
     };
 };
+ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
+    var promises = [];
+    if (Array.isArray(messages)) {
+        messages.forEach(function (msgObject) {
+            if (msgObject.userId === strongvelope.COMMANDER) {
+                return;
+            }
+
+            if (!pubCu25519[msgObject.userId]) {
+                promises.push(
+                    crypt.getPubCu25519(msgObject.userId)
+                );
+            }
+
+            if (!u_pubkeys[msgObject.userId]) {
+                promises.push(
+                    crypt.getPubRSA(msgObject.userId)
+                );
+            }
+            console.error(msgObject.userId);
+        });
+    }
+    if (Array.isArray(users)) {
+        users.forEach(function (userId) {
+            if (userId === strongvelope.COMMANDER) {
+                return;
+            }
+
+            if (!pubCu25519[userId]) {
+                promises.push(
+                    crypt.getPubCu25519(userId)
+                );
+            }
+
+            if (!u_pubkeys[userId]) {
+                promises.push(
+                    crypt.getPubRSA(userId)
+                );
+            }
+            console.error(userId);
+        });
+    }
+    return MegaPromise.allDone(promises);
+};
 
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
@@ -572,7 +615,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     hist.push(v);
                 }
             });
-
+            
             if (hist.length > 0) {
                 var decryptMessages = function() {
                     try {
@@ -614,10 +657,12 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     }
                 };
 
+
                 if (!chatRoom.protocolHandler) {
                     if (chatRoom.strongvelopeSetupPromises) {
                         chatRoom.strongvelopeSetupPromises.done(function() {
-                            decryptMessages();
+                            ChatdIntegration._ensureKeysAreLoaded(hist)
+                                .always(decryptMessages);
                         });
                     }
                     else {
@@ -625,7 +670,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     }
                 }
                 else {
-                    decryptMessages();
+                    ChatdIntegration._ensureKeysAreLoaded(hist)
+                        .always(decryptMessages);
                 }
 
             }
@@ -743,8 +789,12 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     u_privCu25519,
                     u_privEd25519,
                     u_pubEd25519,
-                    a32_to_str([self.deviceId])
+                    a32_to_str([self.deviceId]),
+                    function(user_id) {
+                        return ChatdIntegration._ensureKeysAreLoaded(undefined, [user_id]);
+                    }
                 );
+                chatRoom.protocolHandler.chatRoom = chatRoom;
 
                 self.join(chatRoom);
             })
@@ -814,22 +864,6 @@ ChatdIntegration.prototype.protocolHandlerRequiresKeysInit = function(chatRoom) 
     }
 };
 
-/**
- * Will initialsie .otherParticipants if needed.
- *
- * @param chatRoom
- */
-ChatdIntegration.prototype.setProtocolHandlerParticipants = function(chatRoom) {
-   /* var self = this;
-
-   if (chatRoom.type === "group" && chatRoom.protocolHandler.otherParticipants.size === 0) {
-       if (!chatRoom.protocolHandler._otherParticipantsFlag) {
-           self.alterParticipants(chatRoom, Object.keys(chatRoom.members), [], true);
-           chatRoom.protocolHandler._otherParticipantsFlag = true;
-       }
-   }*/
-};
-
 ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     // allocate transactionid for the new message (it must be shown with status "delivering" in the UI;
     // edits and cancellations at that stage must be applied to the locally queued version that gets
@@ -840,21 +874,10 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     var participants = Object.keys(chatRoom.members);
     removeValue(participants, u_handle);
 
-    participants.forEach(function(participant) {
-        if (!pubCu25519[participant]) {
-            promises.push(
-                crypt.getPubCu25519(participant)
-            );
-        }
-        if (!u_pubkeys[participant]) {
-            promises.push(
-                crypt.getPubRSA(participant)
-            );
-        }
-    });
+    promises.push(
+        ChatdIntegration._ensureKeysAreLoaded(participants)
+    );
 
-
-    self.setProtocolHandlerParticipants(chatRoom);
 
     var tmpPromise = new MegaPromise();
 
@@ -864,7 +887,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
 
         try {
             var result;
-            if (participants.length === 1) {
+            if (chatRoom.type === "private") {
                 result = chatRoom.protocolHandler.encryptTo(message, participants[0]);
             }
             else {

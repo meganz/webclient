@@ -459,7 +459,8 @@
         };
 
         this.abort = function(err) {
-            logger.debug('abort', err, wTimer, dl_id, dl_fw, zfileEntry);
+            var _logger = logger || dlmanager.logger;
+            _logger.debug('abort', err, wTimer, dl_id, dl_fw, zfileEntry);
 
             if (wTimer) {
                 clearTimeout(wTimer);
@@ -475,12 +476,12 @@
                         var onWriteEnd = (function(writer, entry) {
                             return function() {
                                 if (arguments.length) {
-                                    logger.debug('onWriteEnd', arguments);
+                                    _logger.debug('onWriteEnd', arguments);
                                 }
                                 if (entry) {
                                     entry.remove(
-                                        logger.debug.bind(logger),
-                                        logger.error.bind(logger)
+                                        _logger.debug.bind(_logger),
+                                        _logger.error.bind(_logger)
                                     );
                                 }
                                 else if (writer) {
@@ -501,7 +502,7 @@
                     }
                     catch (e) {
                         if (d) {
-                            logger.error(e);
+                            _logger.error(e);
                         }
                     }
                 }

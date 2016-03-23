@@ -1463,7 +1463,8 @@ var strongvelope = {};
      * @returns {(StrongvelopeMessage|Boolean)}
      *     The message content on success, `false` in case of errors.
      */
-    strongvelope.ProtocolHandler.prototype.handleManagementMessage = function(message) {
+    strongvelope.ProtocolHandler.prototype.handleManagementMessage = function(message, historicMessage) {
+        historicMessage = (typeof historicMessage === 'undefined') ? false : historicMessage;
         var parsedMessage = ns._parseMessageContent(message.message);
 
         var self = this;
@@ -1479,9 +1480,12 @@ var strongvelope = {};
                 version: parsedMessage.protocolVersion,
                 sender: message.userId,
                 type: parsedMessage.type,
-                includeParticipants: [],
-                excludeParticipants: []
+                includeParticipants: parsedMessage.includeParticipants,
+                excludeParticipants: parsedMessage.includeParticipants
             };
+            if (historicMessage === true) {
+                return result;
+            }
             // Do group participant update.
             var actulIncludeParticipants = [];
             var actulExcludeParticipants = [];
@@ -1524,7 +1528,7 @@ var strongvelope = {};
 
         // if the message is from chat API
         if (sender === COMMANDER) {
-            return this.handleManagementMessage({ userId: sender, message: message});
+            return this.handleManagementMessage({ userId: sender, message: message}, historicMessage);
         }
 
         // Check we're in a chat with this sender, or on a new chat.
@@ -1735,7 +1739,6 @@ var strongvelope = {};
             historicMessages) {
 
         historicMessages = (historicMessages === false) ? false : true;
-
         // First extract all keys.
         this._batchParseAndExtractKeys(messages);
 
@@ -1743,14 +1746,12 @@ var strongvelope = {};
         var decryptedMessages = [];
 
         var message;
-        for (var i = 0; i < messages.length; i++) {
+        for (var i = 0; i < messages.length ;i++) {
             message = messages[i];
-            // only decrypt messages if it is not from chat API.
-            if (message.userId !== COMMANDER) {
-                decryptedMessages.push(this.decryptFrom(message.message,
-                                                        message.userId,
-                                                        historicMessages));
-            }
+
+            decryptedMessages.push(this.decryptFrom(message.message,
+                                                    message.userId,
+                                                    historicMessages));
         }
 
         return decryptedMessages;

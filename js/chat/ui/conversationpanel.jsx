@@ -378,10 +378,8 @@ var ConversationMessage = React.createClass({
                                         }
                                         delay('chat:thumbnail', fm_thumbnails, 90);
                                     }
-                                    src = noThumbURI;
+                                    src = window.noThumbURI || '';
                                 }
-                                // console.debug('M.v-CHAT', M.v);
-
 
                                 preview =  (src ? (<div id={v.h} className="shared-link img-block">
                                         <div className="img-overlay" onClick={startPreview}></div>

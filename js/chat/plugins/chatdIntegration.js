@@ -789,10 +789,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     u_privCu25519,
                     u_privEd25519,
                     u_pubEd25519,
-                    a32_to_str([self.deviceId]),
-                    function(user_id) {
-                        return ChatdIntegration._ensureKeysAreLoaded(undefined, [user_id]);
-                    }
+                    a32_to_str([self.deviceId])
                 );
                 chatRoom.protocolHandler.chatRoom = chatRoom;
 

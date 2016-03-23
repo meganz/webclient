@@ -611,12 +611,9 @@ var strongvelope = {};
      *     An array of participants' user handles to exclude from the chat.
      * @property {String} uniqueDeviceId
      *     A 32bit prefix that should be unique for this device, for this user
-     * @property {Function} keyLoaderCallback
-     *     A function(userId) that returns a promise that would be resolved when all keys are available for this specific
-     *     user
      */
     strongvelope.ProtocolHandler = function(ownHandle, myPrivCu25519,
-            myPrivEd25519, myPubEd25519, uniqueDeviceId, keyLoaderCallback) {
+            myPrivEd25519, myPubEd25519, uniqueDeviceId) {
 
         this.ownHandle = ownHandle || u_handle;
         this.myPrivCu25519 = myPrivCu25519 || u_privCu25519;
@@ -640,7 +637,6 @@ var strongvelope = {};
         this.uniqueDeviceId = uniqueDeviceId;
         this._inUse = false;
         this.participantChange = false;
-        this.keyLoaderCallback = keyLoaderCallback;
     };
 
 

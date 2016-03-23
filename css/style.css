@@ -5666,7 +5666,6 @@ th.grid-first-th {
     left: auto;
     right: 5px;
     display: none;
-    cursor: pointer;
 }
 .linked .data-item-icon {
     background-position: -106px -963px;

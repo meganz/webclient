@@ -9655,7 +9655,7 @@ function propertiesDialog(close)
                 }
                 p.t4 = rights;
                 p.t6 = l[5905];
-                p.t7 = mega.utils.fullUsername(user.h);
+                p.t7 = htmlentities(mega.utils.fullUsername(user.h));
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -10497,7 +10497,6 @@ mega.utils.fullUsername = function username(userHandle) {
 
         // Convert to string and escape for XSS
         result = String(result);
-        result = htmlentities(result);
     }
 
     return result;
@@ -10544,7 +10543,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var fullOwnersName = mega.utils.fullUsername(ownersHandle);
+        var fullOwnersName = htmlentities(mega.utils.fullUsername(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
         // Access rights

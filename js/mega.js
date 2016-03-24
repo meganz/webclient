@@ -1028,7 +1028,7 @@ function MegaData()
                                 <td>\n\
                                     ' + avatar + ' \
                                     <div class="fm-chat-user-info todo-star">\n\
-                                        <div class="fm-chat-user">' + mega.utils.fullUsername(node.u) + '</div>\n\
+                                        <div class="fm-chat-user">' + htmlentities(mega.utils.fullUsername(node.u)) + '</div>\n\
                                         <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
                                     </div>\n\
                                 </td>\n\
@@ -1092,7 +1092,7 @@ function MegaData()
                 if (M.currentdirid === 'shares') {// render shares tab
                     // Handle of initial share owner
                     var ownersHandle = M.v[i].su;
-                    var fullContactName = mega.utils.fullUsername(ownersHandle);
+                    var fullContactName = htmlentities(mega.utils.fullUsername(ownersHandle));
 
                     cs = M.contactstatus(M.v[i].h);
                     contains = fm_contains(cs.files, cs.folders);

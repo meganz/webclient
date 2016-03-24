@@ -3026,10 +3026,9 @@ function accountUI() {
             sectionClass = 'reseller';
         }
         else {
-
-            // this is the main entry point for users who just had upgraded their accounts
+            // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
-                showNonActivatedAccountDialog(true);
+                warnPopup.showNonActivatedAccount(true);
             }
 
             $('.fm-account-overview').removeClass('hidden');

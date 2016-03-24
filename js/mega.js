@@ -462,16 +462,7 @@ function MegaData()
 
     this.filterByParent = function(id) {
         this.filterBy(function(node) {
-            // if this is a contact, DONT check for .name
-            if (node.c) {
-                return (node.p === id) || (node.p && node.p.length === 11 && id === 'shares');
-            }
-            else if (
-                (node.name && node.p === id) ||
-                (node.name && node.p && node.p.length === 11 && id === 'shares')
-            ) {
-                return true;
-            }
+            return (node.p === id) || (node.p && (node.p.length === 11) && (id === 'shares'));
         });
     };
 

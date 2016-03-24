@@ -262,7 +262,18 @@ var ConversationMessage = React.createClass({
                         var attachmentMetaInfo;
                         // cache ALL current attachments, so that we can revoke them later on in an ordered way.
                         if (message.messageId) {
-                            attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
+                            if (
+                                chatRoom.attachments &&
+                                chatRoom.attachments[v.h] &&
+                                chatRoom.attachments[v.h][message.messageId]
+                            ) {
+                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
+                            }
+                            else {
+                                // if the chatRoom.attachments is not filled in yet, just skip the rendering
+                                // and this attachment would be re-rendered on the next loop.
+                                return;
+                            }
                         }
 
                         var addToCloudDrive = function() {
@@ -371,10 +382,16 @@ var ConversationMessage = React.createClass({
                                 var src = thumbnails[v.h];
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
-                                    if (!src || src !== v) {
+
+                                    if (!src || !src.seen) {
                                         M.v.push(v);
-                                        if (!v.seen) {
-                                            v.seen = 1; // HACK
+
+                                        if (!src.seen) {
+                                            if (src !== false) {
+                                                src.seen = 1; // HACK
+                                            }
+
+                                            v.seen = 1;
                                         }
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }

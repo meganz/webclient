@@ -9509,6 +9509,18 @@ function propertiesDialog(close)
         showToast('clipboard', l[7703]);
     }
 
+    // Undecryptable file indicators
+    var isUndecrypted = missingkeys[$.selected];
+    if (isUndecrypted) {
+        pd.addClass('undecryptable');
+        if (M.d[$.selected].t) {// folder
+            showToast('clipboard', l[8595]);
+        }
+        else {// file
+            showToast('clipboard', l[8602]);
+        }
+    }
+
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
     {

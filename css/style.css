@@ -5697,7 +5697,7 @@ th.grid-first-th {
 .grid-table .undecryptable td {
     color: #999999;
 }
-.grid-table .undecryptable .tranfer-filetype-txt, .undecryptable .file-block-title, .undecryptable .nw-fm-tree-folder, .undecryptable .shared-folder-name, .undecryptable .shared-folder-info {
+.grid-table .undecryptable .tranfer-filetype-txt, .undecryptable .file-block-title, .undecryptable .nw-fm-tree-folder, .undecryptable .shared-folder-name, .undecryptable .shared-folder-info, .undecryptable .propreties-dark-txt {
     color: #FFA500;
 }
 .own-data .data-item-icon {

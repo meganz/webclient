@@ -5994,8 +5994,12 @@ function transferPanelUI()
         }
     });
 
-    $('.transfer-pause-icon').rebind('click', function()
-    {
+    $('.transfer-pause-icon').rebind('click', function() {
+
+        if (dlmanager.isOverQuota) {
+            return dlmanager.showOverQuotaDialog();
+        }
+
         if (!$(this).hasClass('disabled')) {
             if ($(this).hasClass('active')) {
                 // terms of service

@@ -4613,9 +4613,15 @@ function MegaData()
 
     this.dlerror = function(dl, error)
     {
-        var errorstr, fileid = dl.dl_id, x;
+        var x;
+        var errorstr;
+        var gid = dlmanager.getGID(dl);
+
         if (d) {
-            dlmanager.logger.error('dlerror', fileid, error);
+            dlmanager.logger.error('dlerror', gid, error);
+        }
+        else if (error === EOVERQUOTA) {
+            srvlog('onDownloadError :: ' + error + ' [EOVERQUOTA]');
         }
         else {
             srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
@@ -4659,19 +4665,33 @@ function MegaData()
         }
 
         if (errorstr) {
+            var prog = Object(GlobalProgress[gid]);
+
             dl.failed = new Date;
-            var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + fileid);
-            var prog = GlobalProgress[id] || {};
             if (x != 233 || !prog.speed || !(prog.working || []).length) {
                 /**
                  * a chunk may fail at any time, don't report a temporary error while
                  * there is network activity associated with the download, though.
                  */
-                $('.transfer-table #' + id + ' td:eq(5)')
-                    .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>')
-                // .parents('tr').data({'failed' : NOW()});
-                //$('.transfer-table #' + id + ' td:eq(4)').text('');
-                $('.transfer-table #' + id + ' td:eq(2)').text('--:--:--');
+                if (page === 'download') {
+                    $('.download.error-icon').text(errorstr);
+                    $('.download.error-icon').removeClass('hidden');
+                    $('.download.icons-block').addClass('hidden');
+
+                    if (error === EOVERQUOTA) {
+                        $('.download.info-block').addClass('overquota');
+                    }
+                }
+                else {
+                    var $tr = $('.transfer-table tr#' + gid);
+
+                    $tr.find('td:eq(2)').text('--:--:--');
+                    $tr.find('td:eq(5)').safeHTML('<span class="transfer-status error">@@</span>', errorstr);
+
+                    if (error === EOVERQUOTA) {
+                        $tr.find('.transfer-status').addClass('overquota');
+                    }
+                }
             }
         }
     }
@@ -5260,7 +5280,7 @@ function onUploadError(ul, errorstr, reason, xhr)
 {
     var hn = hostname(ul.posturl);
 
-    if (!d && (!xhr || xhr.readyState < 2 || xhr.status)) {
+    /*if (!d && (!xhr || xhr.readyState < 2 || xhr.status)) {
         var details = [
             browserdetails(ua).name,
             String(reason)
@@ -5274,14 +5294,14 @@ function onUploadError(ul, errorstr, reason, xhr)
         if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]')) {
             srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
         }
-    }
+    }*/
 
     if (d) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
     }
 
     $('.transfer-table #ul_' + ul.id + ' td:eq(5)')
-        .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
+        .safeHTML('<span class="transfer-status error">@@</span>', errorstr);
 }
 
 function addupload(u)

@@ -10,9 +10,7 @@
      * Get a new reusable XMLHttpRequest
      */
     var getXMLHttpRequest = function _xhr2() {
-        return new XMLHttpRequest();
-
-        /*var idx = xhrStack.length;
+        var idx = xhrStack.length;
         while (idx--) {
             var state = xhrStack[idx].readyState;
             if (state === 4 || state === 0) {
@@ -23,7 +21,7 @@
         if (idx < 0) {
             idx = xhrStack.push(new XMLHttpRequest) - 1;
         }
-        return xhrStack[idx];*/
+        return xhrStack[idx];
     };
 
     /**
@@ -230,7 +228,7 @@
                 xhrStack[idx].abort();
             }
         }
-        // xhrStack = [];
+        xhrStack = [];
     };
 
     // Export globals

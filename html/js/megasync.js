@@ -31,7 +31,9 @@ var megasync = (function() {
         $('.megasync-overlay').addClass('linux');
         linuxClients.forEach(function(client) {
 
-            var icon = client.name.toLowerCase().replace(/[^a-z]/g, '');
+            var icon = client.name.toLowerCase().match(/([a-z]+)/i)[1];
+            icon = (icon === 'red') ? 'redhat' : icon;
+
             $('<div/>').addClass('megasync-dropdown-link ' + icon)
                 .text(client.name)
                 .attr('link', ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32")))

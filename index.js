@@ -137,13 +137,9 @@ function init_page() {
         delete $.infoscroll;
     }
 
+    // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
-        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-            page = 'firefox';
-        }
-        else {
-            page = 'chrome';
-        }
+        page = (window.chrome) ? 'chrome' : 'firefox';
     }
 
     if (localStorage.signupcode && u_type !== false) {

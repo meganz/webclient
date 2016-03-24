@@ -376,7 +376,7 @@ var ConversationMessage = React.createClass({
                                         if (!v.seen) {
                                             v.seen = 1; // HACK
                                         }
-                                        delay('chat:thumbnail', fm_thumbnails, 90);
+                                        delay('thumbnails', fm_thumbnails, 90);
                                     }
                                     src = window.noThumbURI || '';
                                 }

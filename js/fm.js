@@ -10114,12 +10114,16 @@ function fetchsrc(id)
     api_getfileattr(treq, 1, function(ctx, id, uint8arr)
     {
         previewimg(id, uint8arr);
-        if (!n.fa || n.fa.indexOf(':0*') < 0)
-        {
-            if (d)
+        if (!n.fa || n.fa.indexOf(':0*') < 0) {
+            if (d) {
                 console.log('Thumbnail found missing on preview, creating...', id, n);
-            var aes = new sjcl.cipher.aes([n.key[0], n.key[1], n.key[2], n.key[3]]);
-            createthumbnail(false, aes, id, uint8arr);
+            }
+            var aes = new sjcl.cipher.aes([
+                n.key[0] ^ n.key[4],
+                n.key[1] ^ n.key[5],
+                n.key[2] ^ n.key[6],
+                n.key[3] ^ n.key[7]]);
+            createnodethumbnail(n.h, aes, id, uint8arr);
         }
         if (id == slideshowid)
             fetchnext();

@@ -23502,7 +23502,7 @@
 	                                        if (!v.seen) {
 	                                            v.seen = 1;
 	                                        }
-	                                        delay('chat:thumbnail', fm_thumbnails, 90);
+	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }
 	                                    src = window.noThumbURI || '';
 	                                }

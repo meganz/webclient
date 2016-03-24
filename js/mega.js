@@ -1094,7 +1094,7 @@ function MegaData()
                 // Undecryptable file indicators
                 if (missingkeys[nodeHandle]) {
                     undecryptableClass = 'undecryptable';
-                    fName = 'undecrypted' + nodeType;
+                    fName = 'undecrypted ' + nodeType;
                     fIcon = 'generic';
                     ftype = l[7381];// i.e. 'unknown'
 

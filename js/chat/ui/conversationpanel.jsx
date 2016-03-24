@@ -391,11 +391,7 @@ var ConversationMessage = React.createClass({
 
                                         <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
                                              width="120"
-                                             height="126"
-                                             onLoad={() => {
-                                                // because of dynamic image sizes, we need to re-calc layout
-                                                $.tresizer();
-                                             }}
+                                             height="120"
                                              onClick={startPreview}
                                         />
                                     </div>) :  preview);

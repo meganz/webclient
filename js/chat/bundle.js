@@ -23519,11 +23519,7 @@
 	                                    dropdown,
 	                                    React.makeElement("img", { alt: "", className: "thumbnail-placeholder " + v.h, src: src,
 	                                        width: "120",
-	                                        height: "126",
-	                                        onLoad: function onLoad() {
-
-	                                            $.tresizer();
-	                                        },
+	                                        height: "120",
 	                                        onClick: startPreview
 	                                    })
 	                                ) : preview;

@@ -23386,7 +23386,12 @@
 	                        var attachmentMetaInfo;
 
 	                        if (message.messageId) {
-	                            attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
+	                            if (chatRoom.attachments && chatRoom.attachments[v.h] && chatRoom.attachments[v.h][message.messageId]) {
+	                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
+	                            } else {
+
+	                                return;
+	                            }
 	                        }
 
 	                        var addToCloudDrive = function addToCloudDrive() {
@@ -23497,10 +23502,14 @@
 	                                var src = thumbnails[v.h];
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
-	                                    if (!src || src !== v) {
+
+	                                    if (!src || !src.seen) {
 	                                        M.v.push(v);
 	                                        if (!v.seen) {
 	                                            v.seen = 1;
+	                                        }
+	                                        if (src) {
+	                                            src.seen = 1;
 	                                        }
 	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }

@@ -385,13 +385,11 @@ var ConversationMessage = React.createClass({
 
                                     if (!src || !src.seen) {
                                         M.v.push(v);
-
-                                        if (!src.seen) {
-                                            if (src !== false) {
-                                                src.seen = 1; // HACK
-                                            }
-
-                                            v.seen = 1;
+                                        if (!v.seen) {
+                                            v.seen = 1; // HACK
+                                        }
+                                        if (src) {
+                                            src.seen = 1; // HACK
                                         }
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }

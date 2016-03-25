@@ -247,7 +247,7 @@ var ContactCard = React.createClass({
                 {contextMenu}
 
                 <div className="user-card-data">
-                    <div className="user-card-name small">{avatarMeta.fullName}</div>
+                    <div className="user-card-name small">{this.props.namePrefix ? this.props.namePrefix : null}{avatarMeta.fullName}</div>
                     <div className="user-card-email small">{contact.m}</div>
                 </div>
             </div>;

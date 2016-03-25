@@ -1501,5 +1501,12 @@ ChatRoom.prototype._clearChatMessagesFromChatd = function() {
     );
 };
 
+ChatRoom.prototype.isReadOnly = function() {
+    return this.members && this.members[u_handle] === 0;
+};
+ChatRoom.prototype.iAmOperator = function() {
+    return this.type === "private" || this.members && this.members[u_handle] === 3;
+};
+
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

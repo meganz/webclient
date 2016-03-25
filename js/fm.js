@@ -9981,7 +9981,7 @@ function slideshow(id, close)
         return false;
     }
 
-    var n = M.d[id];
+    var n = M.getNodeByHandle(id);
     if (n && RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
@@ -10037,18 +10037,36 @@ function slideshow(id, close)
                 return;
             }
         }
-        M.addDownload([slideshowid]);
-    });
 
-    $('.slideshow-getlink').rebind('click', function() {
-
-        if (u_type === 0) {
-            ephemeralDialog(l[1005]);
+        if (M.d[slideshowid]) {
+            M.addDownload([slideshowid]);
         }
         else {
-            initCopyrightsDialog([slideshowid]);
+            M.addDownload([n]);
         }
     });
+
+
+    if (M.d[slideshowid]) {
+        $('.slideshow-getlink')
+            .show()
+            .rebind('click', function() {
+                if (u_type === 0) {
+                    ephemeralDialog(l[1005]);
+                }
+                else {
+                    initCopyrightsDialog([slideshowid]);
+                }
+            })
+            .next('.slideshow-line')
+                .show();
+    }
+    else {
+        $('.slideshow-getlink')
+            .hide()
+                .next('.slideshow-line')
+                    .hide();
+    }
 
     if (previews[id]) {
         previewsrc(previews[id].src);
@@ -10088,19 +10106,28 @@ function fetchsrc(id)
         delete pfails[id];
     }
 
-    var n = M.d[id];
+    var n = M.getNodeByHandle(id);
+    if (!n) {
+        console.error('handle "%s" not found...', id);
+        return false;
+    }
+
     preqs[id] = 1;
     var treq = {};
     treq[id] = {fa: n.fa, k: n.key};
     api_getfileattr(treq, 1, function(ctx, id, uint8arr)
     {
         previewimg(id, uint8arr);
-        if (!n.fa || n.fa.indexOf(':0*') < 0)
-        {
-            if (d)
+        if (!n.fa || n.fa.indexOf(':0*') < 0) {
+            if (d) {
                 console.log('Thumbnail found missing on preview, creating...', id, n);
-            var aes = new sjcl.cipher.aes([n.key[0], n.key[1], n.key[2], n.key[3]]);
-            createthumbnail(false, aes, id, uint8arr);
+            }
+            var aes = new sjcl.cipher.aes([
+                n.key[0] ^ n.key[4],
+                n.key[1] ^ n.key[5],
+                n.key[2] ^ n.key[6],
+                n.key[3] ^ n.key[7]]);
+            createnodethumbnail(n.h, aes, id, uint8arr);
         }
         if (id == slideshowid)
             fetchnext();
@@ -10220,7 +10247,6 @@ function fm_thumbnails()
         }
         if (y)
             fa_tnwait = y;
-
         if (a > 0)
         {
             fa_reqcnt += a;
@@ -10251,15 +10277,19 @@ function fm_thumbnails()
                     blob = new Blob([uint8arr.buffer]);
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
-                if (M.d[node] && M.d[node].seen && M.currentdirid === cdid)
-                    fm_thumbnail_render(M.d[node]);
+
+                var targetNode = M.getNodeByHandle(node);
+
+                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
+                    fm_thumbnail_render(targetNode);
+                }
 
                 // deduplicate in view when there is a duplicate fa:
-                if (M.d[node] && fa_duplicates[M.d[node].fa] > 0)
+                if (targetNode && fa_duplicates[targetNode.fa] > 0)
                 {
                     for (var i in M.v)
                     {
-                        if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
+                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
                         {
                             thumbnails[M.v[i].h] = thumbnails[node];
                             if (M.v[i].seen && M.currentdirid === cdid)
@@ -10274,10 +10304,11 @@ function fm_thumbnails()
         console.timeEnd('fm_thumbnails');
 }
 
-function fm_thumbnail_render(n) {
 
+function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
-        var e = $('#' + n.h + '.file-block');
+
+        var e = M.chat ? $('#' + n.h + '.img-block') : $('#' + n.h + '.file-block');
 
         if (e.length > 0) {
             e = e.find('img:first');

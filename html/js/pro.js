@@ -571,7 +571,20 @@ function pro_pay() {
     var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 36e5) ? 1 : 0;
 
     // uts = User Transaction Sale
-    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m, bq: fromBandwidthDialog }, {
+    var uts = {
+        a:  'uts',
+        it:  0,
+        si:  apiId,
+        p:   price,
+        c:   currency,
+        aff: aff,
+        m:   m,
+        bq:  fromBandwidthDialog
+    };
+    if (mega.uaoref) {
+        uts.uao = escapeHTML(mega.uaoref);
+    }
+    api_req(uts, {
         callback: function (utsResult) {
 
             // Store the sale ID to check with API later

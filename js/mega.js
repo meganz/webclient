@@ -979,8 +979,8 @@ function MegaData()
                 u_h = M.v[i].h;
                 contact = M.u[u_h];
 
-                // do not render oneself or invalid..
-                if (!contact || u_h === u_handle) {
+                // do not render invalid..
+                if (!contact) {
                     continue;
                 }
 
@@ -5879,8 +5879,6 @@ function execsc(actionPackets, callback) {
                     }
                 });
 
-
-
                 M.handleEmptyContactGrid();
             }
 
@@ -6990,6 +6988,16 @@ function processUPCO(ap) {
     }
 }
 
+/*
+ * process_u
+ *
+ * Updates contact/s data in global variable M.u, local dB and
+ * taking care of items in share and add contacts dialogs dropdown
+ *
+ * .c param is contact level i.e. [0-(inactive/deleted), 1-(active), 2-(owner)]
+ *
+ * @param {Object} u Users informations
+ */
 function process_u(u) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {

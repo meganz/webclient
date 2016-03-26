@@ -15,6 +15,12 @@ var megasync = (function() {
     var listeners = [];
     var pending;
 
+    ns.UILinuxDropdown = function() {
+
+        linuxDropdown(function() {
+        });
+    };
+
     // Linux stuff {{{
     /**
      * Prepare Linux Dropdown with the list of distro.
@@ -23,7 +29,7 @@ var megasync = (function() {
      * creates an HTML dropdown with the list of distros we support.
      *
      */
-    function linuxDropdown() {
+    function linuxDropdown(selected) {
 
         var is64    = browserdetails().is64bit;
         var $select = $('.megasync-scr-pad').empty();
@@ -68,13 +74,18 @@ var megasync = (function() {
      */
     function linuxDropdownResizeHandler() {
 
+        var $main = $('.megasync-dropdown:visible');
         var $pane = $('.megasync-dropdown-scroll');
-        var jsp = $pane.data('jsp');
+        var jsp   = $pane.data('jsp');
         var $list = $('.megasync-dropdown-list');
         var overlayHeight = $('.megasync-overlay').outerHeight();
         var listHeight = $('.megasync-scr-pad').outerHeight() + 72;
-        var listPosition = $list.offset().top;
 
+        if ($main.parent('.sync-button-block').length) {
+            $list.css({'top': $main.position().top-10, 'left': $main.offset().left + $main.width()/2});
+        }
+
+        var listPosition = $list.offset().top;
         if (overlayHeight < (listHeight + listPosition)) {
             $('.megasync-list-arrow').removeClass('hidden inactive');
             $pane.height(overlayHeight - listPosition - 72);

@@ -23175,6 +23175,11 @@ body.pro:after {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
 }
+
+.sync-bottom-block .megasync-dropdown {
+    margin: 0px;
+}
+
 .linux .megasync-dropdown {
     display: block;
 }
@@ -23284,6 +23289,7 @@ body.pro:after {
     z-index: 10;
     top: 122px;
 }
+
 .megasync-dropdown-pad {
     background-color: white;
     -moz-border-radius: 4px;
@@ -23297,6 +23303,7 @@ body.pro:after {
     box-sizing: border-box;
     padding: 36px 0 4px 0;
 }
+
 .megasync-dropdown-scroll .jspVerticalBar {
     width: 10px;
 }

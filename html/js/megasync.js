@@ -15,10 +15,9 @@ var megasync = (function() {
     var listeners = [];
     var pending;
 
-    ns.UILinuxDropdown = function() {
+    ns.UILinuxDropdown = function(selected) {
 
-        linuxDropdown(function() {
-        });
+        linuxDropdown(selected);
     };
 
     // Linux stuff {{{
@@ -35,13 +34,26 @@ var megasync = (function() {
         var $select = $('.megasync-scr-pad').empty();
         var $list   = $('.megasync-dropdown-list');
         $('.megasync-overlay').addClass('linux');
-        linuxClients.forEach(function(client) {
+
+        if (typeof selected !== "function") {
+            /**
+             * Default click handler 
+             * @param {jquery} $element     Element that has been clicked.
+             */
+            selected = function followLink($element) {
+                window.location = $element.attr('link');
+            }
+        }
+
+        linuxClients.forEach(function(client, id) {
 
             var icon = client.name.toLowerCase().match(/([a-z]+)/i)[1];
             icon = (icon === 'red') ? 'redhat' : icon;
 
             $('<div/>').addClass('megasync-dropdown-link ' + icon)
                 .text(client.name)
+                .data('client', client.name)
+                .data('client-id', id)
                 .attr('link', ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32")))
                 .appendTo($select);
         });
@@ -49,7 +61,7 @@ var megasync = (function() {
 
             $('.megasync-dropdown span').removeClass('active').text($(this).text());
             $list.addClass('hidden');
-            window.location = $(this).attr('link');
+            selected($(this));
         });
         $('.megasync-dropdown span').rebind('click', function() {
 

@@ -35,8 +35,8 @@ function renderLinuxOptions(linuxsync) {
     }
     loadingDialog.hide();
 
-    megasync.UILinuxDropdown(function(value) {
-        changeLinux(linuxsync, $(this).val());
+    megasync.UILinuxDropdown(function($element) {
+        changeLinux(linuxsync, $element.data('client-id'));
     });
 
     $('.sync-bottom-txt.linux-txt a').rebind('click', function(e) {

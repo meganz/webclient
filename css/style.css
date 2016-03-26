@@ -23290,6 +23290,11 @@ body.pro:after {
     top: 122px;
 }
 
+.megasync-dropdown-list .jspPane {
+    min-width: 280px;
+    max-width: 280px;
+}
+
 .megasync-dropdown-pad {
     background-color: white;
     -moz-border-radius: 4px;

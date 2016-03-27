@@ -16,6 +16,7 @@ var ChatdIntegration = function(megaChat) {
     self.waitingChatIdPromises = {};
     self.chatIdToRoomJid = {};
     self.mcfHasFinishedPromise = new MegaPromise();
+    self.deviceId = null;
 
     megaChat.rebind("onInit.chatdInt", function(e) {
         megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
@@ -28,13 +29,14 @@ var ChatdIntegration = function(megaChat) {
             //self._detachFromChatRoom(chatRoom);
         });
 
-        asyncApiReq({a: "mcf"})
+        asyncApiReq({a: "mcf", d: 1})
             .done(function(r) {
                 // reopen chats from the MCF response.
                 if (r.c) {
                     r.c.forEach(function (actionPacket) {
                         self.openChatFromApi(actionPacket);
                     });
+                    self.deviceId = r.d;
 
                     self.mcfHasFinishedPromise.resolve();
                 }
@@ -397,20 +399,21 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         var seedResult = chatRoom.protocolHandler.seed(hist);
                         //console.error(chatRoom.roomJid, seedResult);
 
-
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
                         decryptedMsgs.forEach(function (v, k) {
-                            if (typeof v === undefined) {
+                            if (typeof v === 'undefined') {
                                 return; // skip already decrypted messages
                             }
 
-                            if (v && v.payload) {
+
+                            if (v && typeof(v.payload) !== 'undefined' && v.payload !== null) {
                                 chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
-                                delete chatRoom.notDecryptedBuffer[k];
+                                delete chatRoom.notDecryptedBuffer[hist[k]['k']];
                             }
                             else if (v && v.type === 0) {
                                 // this is a system message
                                 chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
+                                delete chatRoom.notDecryptedBuffer[hist[k]['k']];
                             }
                             else if (v && !v.payload) {
                                 self.logger.error("Could not decrypt: ", v)
@@ -419,10 +422,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }
-
-                    if (seedResult === false && chatRoom.messagesBuff.haveMoreHistory() === true) {
-                        chatRoom.messagesBuff.retrieveChatHistory();
-                    }
                 };
 
                 if (!chatRoom.protocolHandler) {
@@ -430,9 +429,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         chatRoom.strongvelopeSetupPromises.done(function() {
                             decryptMessages();
                         })
-                    }
-                    else {
-                        debugger;
                     }
                 }
                 else {
@@ -455,9 +451,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         if (decrypted && decrypted.toSend) {
                             self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
                         }
-                        if (decrypted && decrypted.payload) {
+
+                        if (decrypted && typeof(decrypted.payload) !== 'undefined' && decrypted.payload !== null) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
-                        } else if (decrypted && !decrypted.payload && decrypted.type === 0) {
+                        } else if (
+                            decrypted &&
+                            (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) &&
+                            decrypted.type === 0
+                        ) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                         }
                     } catch(e) {
@@ -496,12 +497,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
+                assert(self.deviceId !== null, 'deviceId not loaded.');
 
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,
                     u_privCu25519,
                     u_privEd25519,
-                    u_pubEd25519
+                    u_pubEd25519,
+                    a32_to_str([self.deviceId])
                 );
 
                 self.join(chatRoom);

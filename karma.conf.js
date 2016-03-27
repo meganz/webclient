@@ -26,7 +26,7 @@ module.exports = function(config) {
         'node_modules/indexeddbshim/dist/indexeddbshim.js',
 
         // == Basics ==
-        'js/vendor/jquery-2.2.0.js',
+        'js/vendor/jquery-2.2.1.js',
         'js/vendor/jquery-ui-1.11.4.js',
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
@@ -134,6 +134,8 @@ module.exports = function(config) {
         'js/chat/karere.js',
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
+
+        {pattern: 'test/chat/transcripts/*.json', included: false},
 
         // == Tests ==
         // Dependency-based load order of library modules.

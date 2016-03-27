@@ -707,6 +707,9 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 ChatRoom.prototype.show = function() {
     var self = this;
 
+    if (self.isCurrentlyActive) {
+        return false;
+    }
     self.megaChat.hideAllChats();
 
     self.isCurrentlyActive = true;

@@ -18,5 +18,5 @@
                    NS1:minVersion="4.0"
                    NS1:maxVersion="30.*"
                    NS1:updateLink="http://eu.static.mega.co.nz/3/meganz.xpi"
-                   NS1:updateHash="sha256:71eaa92682323abc74daa4f8cd15f82852a5033415c1a32fd5a7cdf2b3c35d62" />
+                   NS1:updateHash="sha256:{hash}" />
 </RDF:RDF>

@@ -31,7 +31,7 @@ function FirefoxIO(dl_id, dl) {
                 trunc: true
             }).then(fd => {
                 FD = fd;
-                Soon(() => this.begin());
+                Soon(() => this.begin(OS.Path.basename(p)));
             }, error);
         });
     };
@@ -111,8 +111,11 @@ function mozIOCleanup(name, path, size, dl) {
 
 function mozIOSetup(name, path, size, error, success) {
     function setup() {
+        var root;
+        var rename;
+        var dirname;
+
         try {
-            var root; /* jshint -W117 */
             if (path && mozIOSetup.lastPath[path]) {
                 root = mozIOSetup.lastPath[path];
             }
@@ -134,14 +137,52 @@ function mozIOSetup(name, path, size, error, success) {
 
         path = OS.Path.join(root, ...mozSanePathTree(path, name));
 
-        if (d) {
-            console.log('mozIOSetup', name, path);
-        }
+        dirname = OS.Path.dirname(path);
 
-        OS.File.makeDir(OS.Path.dirname(path), {
+        rename = function() {
+            OS.File.exists(path)
+                .then(yes => {
+                    if (yes) {
+                        var newName;
+                        var oldName = OS.Path.basename(path);
+                        var idx = oldName.match(/\((\d+)\)(?:\..*?)?$/);
+
+                        if (d) {
+                            console.log('File "%s" exists...', path, idx);
+                        }
+
+                        if (idx) {
+                            idx = idx[1] | 0;
+
+                            newName = oldName.replace('(' + (idx++) + ')', '(' + idx + ')');
+                        }
+                        else {
+                            newName = oldName.split('.');
+                            if (newName.length > 1) {
+                                var ext = newName.pop();
+                                newName = newName.join('.') + ' (1).' + ext;
+                            }
+                            else {
+                                newName += ' (1)';
+                            }
+                        }
+
+                        path = OS.Path.join(dirname, newName);
+                        rename();
+                    }
+                    else {
+                        if (d) {
+                            console.log('mozIOSetup', name, path);
+                        }
+                        success(path);
+                    }
+                }, error);
+        };
+
+        OS.File.makeDir(dirname, {
             ignoreExisting: true,
             from: root
-        }).then(() => success(path), error);
+        }).then(rename, error);
     }
 
     webkitStorageInfo.queryUsageAndQuota((u, r) => {

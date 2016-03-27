@@ -145,7 +145,7 @@ function init_help() {
 }
 
 
-var aapp = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzhelp';
+var aapp = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzhelp';
 l[1212] = escapeHTML(l[1212])
     .replace('[A]', '<a href="#sdk" class="red">').replace('[/A]', '</a>');
 l[1863] = escapeHTML(l[1863])

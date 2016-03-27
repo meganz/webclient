@@ -482,35 +482,6 @@ function _generateReadableContactNameFromStr(s, shortFormat) {
 }
 
 /**
- * Use this when rendering contact's name. Will try to find the contact and render his name (or email, if name is not
- * available) and as a last fallback option, if the contact is not found will render the user_hash (which is not
- * really helpful, but a way to debug)
- *
- * @param user_hash
- * @returns {String}
- */
-function generateContactName(user_hash) {
-    var contact = M.u[user_hash];
-    if (!contact) {
-        console.error('contact not found');
-    }
-
-    var name;
-
-    if (contact && contact.name) {
-        name = contact.name;
-    }
-    else if (contact && contact.m) {
-        name = contact.m;
-    }
-    else {
-        name = user_hash;
-    }
-
-    return name;
-}
-
-/**
  * Generates meta data required for rendering avatars
  *
  * @param user_hash
@@ -525,7 +496,7 @@ function generateAvatarMeta(user_hash) {
         contact = {}; // dummy obj.
     }
 
-    var fullName = generateContactName(user_hash);
+    var fullName = mega.utils.fullUsername(user_hash);
 
     var shortName = fullName.substr(0, 1).toUpperCase();
     var avatar = avatars[contact.u];
@@ -539,7 +510,7 @@ function generateAvatarMeta(user_hash) {
     else {
         M.u.forEach(function(k, v) {
             var c = M.u[v];
-            var n = generateContactName(v);
+            var n = mega.utils.fullUsername(v);
 
             if (!n || !c) {
                 return; // skip, contact not found
@@ -1133,13 +1104,19 @@ function checkUserLogin() {
         mBroadcaster.sendMessage('fmconfig:' + key, value);
     };
 
-    Object.defineProperty(mega, 'config', {
-        value: Object.freeze(ns)
-    });
+    if (is_karma) {
+        mega.attr = ns;
+    }
+    else {
+        Object.defineProperty(mega, 'config', {
+            value: Object.freeze(ns)
+        });
+    }
+    ns = undefined;
 
 })(this);
 
-(function _userAttributeHandling() {
+(function _userAttributeHandling(scope) {
     "use strict";
 
     var ns = {};
@@ -1232,7 +1209,6 @@ function checkUserLogin() {
          * @param {Number|Object} res The received result.
          */
         function settleFunction(res) {
-
             if (typeof res !== 'number') {
                 // Decrypt if it's a private attribute container.
                 if (attribute.charAt(0) === '*') {
@@ -1296,8 +1272,10 @@ function checkUserLogin() {
             }
             else {
                 // Got back an error (a number).
-                logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
-                            attribute, userhandle, res);
+                if (res !== -9) {
+                    logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
+                        attribute, userhandle, res);
+                }
                 thePromise.reject(res);
             }
 
@@ -1494,14 +1472,24 @@ function checkUserLogin() {
     };
 
 
-    Object.defineProperty(mega, 'attr', {
-        value: Object.freeze(ns)
-    });
+    if (is_karma) {
+        ns._logger = logger;
+        mega.attr = ns;
+    }
+    else {
+        Object.defineProperty(mega, 'attr', {
+            value: Object.freeze(ns)
+        });
+    }
     ns = undefined;
 
 })(this);
 
-var attribCache = new IndexedDBKVStorage('attrib');
+var attribCache = new IndexedDBKVStorage('attrib', {
+    murSeed: 0x800F0002
+});
+
+attribCache.syncNameTimer = {};
 
 /**
  * Process action-packet for attribute updates.
@@ -1522,7 +1510,6 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
         .always(function _uaPacketParser() {
             if (attrName === 'firstname'
                     || attrName === 'lastname') {
-
                 M.syncUsersFullname(userHandle);
             }
             else if (ownActionPacket) {

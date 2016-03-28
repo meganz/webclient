@@ -128,6 +128,9 @@ var MegaRenderMixin = {
         return true;
     },
     eventuallyUpdate: function() {
+        if (!this._wasRendered) {
+            return;
+        }
         if (!this.isComponentVisible()) {
             return;
         }

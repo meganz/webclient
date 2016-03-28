@@ -392,6 +392,15 @@ var MegaDataMap = function(parent) {
     });
 };
 
+MegaDataMap.prototype.exists = function(keyValue) {
+    var self = this;
+    if (typeof(self._data[keyValue]) !== 'undefined') {
+        return true;
+    }
+    else {
+        return false;
+    }
+};
 
 MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 
@@ -563,6 +572,16 @@ MegaDataSortedMap.prototype.exists = function(keyValue) {
 MegaDataSortedMap.prototype.keys = function() {
     var self = this;
     return self._sortedVals;
+};
+
+MegaDataSortedMap.prototype.values = function() {
+    var self = this;
+    var res = [];
+    self.forEach(function(v) {
+        res.push(v);
+    });
+
+    return res;
 };
 
 MegaDataSortedMap.prototype.getItem = function(num) {

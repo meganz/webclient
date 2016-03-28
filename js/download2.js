@@ -296,7 +296,6 @@ var dlmanager = {
 
         dlmanager.dlReportStatus(dl, error);
 
-        dlmanager.dlRetryInterval *= 1.2;
         ctx.next(error || new Error("failed"));
     },
 
@@ -604,8 +603,17 @@ var dlmanager = {
 
         var ids = dlmanager.getCurrentDownloads();
         $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
-        $('.download.info-block').removeClass('overquota');
-        $('#' + ids.join(',#')).find('span.transfer-status').removeClass('overquota');
+
+        if (page === 'download') {
+            $('.download.info-block').removeClass('overquota');
+        }
+        else {
+            $('#' + ids.join(',#'))
+                .find('span.transfer-status')
+                .removeClass('overquota')
+                .parents('td')
+                .safeHTML('<span class="transfer-status queued">@@</span>', l[7227]);
+        }
 
         this.logger.debug('_onQuotaRetry', ids, this._dlQuotaListener.length, this._dlQuotaListener);
 

@@ -6032,7 +6032,7 @@
 	  return element;
 	};
 
-	ReactElement.createElement = function (type, config, children) {
+	ReactElement.makeElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -6083,7 +6083,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.createElement.bind(null, type);
+	  var factory = ReactElement.makeElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -9130,7 +9130,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.createElement(component);
+	    placeholderElement = ReactElement.makeElement(component);
 	  }
 	};
 
@@ -19618,12 +19618,12 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.createElement;
+	var createElement = ReactElement.makeElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
 	if (false) {
-	  createElement = ReactElementValidator.createElement;
+	  createElement = ReactElementValidator.makeElement;
 	  createFactory = ReactElementValidator.createFactory;
 	  cloneElement = ReactElementValidator.cloneElement;
 	}
@@ -20076,7 +20076,7 @@
 	    // succeed and there will likely be errors in render.
 	     false ? warning(validType, 'React.makeElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : undefined;
 
-	    var element = ReactElement.createElement.apply(this, arguments);
+	    var element = ReactElement.makeElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -20101,7 +20101,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -21035,6 +21035,9 @@
 	        return true;
 	    },
 	    eventuallyUpdate: function() {
+	        if (!this._wasRendered) {
+	            return;
+	        }
 	        if (!this.isComponentVisible()) {
 	            return;
 	        }
@@ -23380,15 +23383,17 @@
 	                            M.addDownload([v]);
 	                        };
 
+	                        var attachmentMetaInfo;
+
 	                        if (message.messageId) {
-	                            if (!chatRoom._attachmentsMap) {
-	                                chatRoom._attachmentsMap = {};
+	                            if (chatRoom.attachments && chatRoom.attachments[v.h] && chatRoom.attachments[v.h][message.messageId]) {
+	                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
+	                            } else {
+
+	                                return;
 	                            }
-	                            if (!chatRoom._attachmentsMap[v.h]) {
-	                                chatRoom._attachmentsMap[v.h] = {};
-	                            }
-	                            chatRoom._attachmentsMap[v.h][message.messageId] = false;
 	                        }
+
 	                        var addToCloudDrive = function addToCloudDrive() {
 	                            M.injectNodes(v, M.RootID, false, function (res) {
 	                                if (res === 0) {
@@ -23397,8 +23402,37 @@
 	                            });
 	                        };
 
+	                        var startPreview = function startPreview(e) {
+	                            assert(M.chat, 'Not in chat.');
+	                            M.v = chatRoom.images.values();
+	                            slideshow(v.h);
+	                            if (e) {
+	                                e.preventDefault();
+	                                e.stopPropagation();
+	                            }
+	                        };
+
+	                        var icon = fileIcon(v);
+
 	                        var dropdown = null;
-	                        if (!message.revoked) {
+	                        var previewButtons = null;
+
+	                        if (!attachmentMetaInfo.revoked) {
+	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                                var imagesListKey = message.messageId + "_" + v.h;
+	                                if (!chatRoom.images.exists(imagesListKey)) {
+	                                    v.k = imagesListKey;
+	                                    v.delay = message.delay;
+	                                    chatRoom.images.push(v);
+	                                }
+	                                previewButtons = React.makeElement(
+	                                    "span",
+	                                    null,
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: "search-icon", label: __(l[1899]),
+	                                        onClick: startPreview }),
+	                                    React.makeElement("hr", null)
+	                                );
+	                            }
 	                            if (contact.u === u_handle) {
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
@@ -23414,6 +23448,7 @@
 	                                            positionAt: "right bottom",
 	                                            horizOffset: 4
 	                                        },
+	                                        previewButtons,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "rounded-grey-down-arrow", label: __(l[1187]),
 	                                            onClick: startDownload }),
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8005]),
@@ -23436,6 +23471,7 @@
 	                                        {
 	                                            className: "attachments-dropdown"
 	                                        },
+	                                        previewButtons,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "rounded-grey-down-arrow", label: __(l[1187]),
 	                                            onClick: startDownload }),
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8005]),
@@ -23449,9 +23485,59 @@
 	                                icon: "tiny-icon grey-down-arrow" });
 	                        }
 
+	                        var attachmentClasses = "message shared-data";
+	                        var preview = React.makeElement(
+	                            "div",
+	                            { className: "data-block-view medium" },
+	                            dropdown,
+	                            React.makeElement(
+	                                "div",
+	                                { className: "data-block-bg" },
+	                                React.makeElement("div", { className: "block-view-file-type " + icon })
+	                            )
+	                        );
+
+	                        if (M.chat && !message.revoked) {
+	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                                var src = thumbnails[v.h];
+	                                if (!src) {
+	                                    src = M.getNodeByHandle(v.h);
+
+	                                    if (!src || !src.seen) {
+	                                        M.v.push(v);
+	                                        if (!v.seen) {
+	                                            v.seen = 1;
+	                                        }
+	                                        if (src) {
+	                                            src.seen = 1;
+	                                        }
+	                                        delay('thumbnails', fm_thumbnails, 90);
+	                                    }
+	                                    src = window.noThumbURI || '';
+	                                }
+
+	                                preview = src ? React.makeElement(
+	                                    "div",
+	                                    { id: v.h, className: "shared-link img-block" },
+	                                    React.makeElement("div", { className: "img-overlay", onClick: startPreview }),
+	                                    React.makeElement(
+	                                        "div",
+	                                        { className: "button overlay-button", onClick: startPreview },
+	                                        React.makeElement("i", { className: "huge-white-icon loupe" })
+	                                    ),
+	                                    dropdown,
+	                                    React.makeElement("img", { alt: "", className: "thumbnail-placeholder " + v.h, src: src,
+	                                        width: "120",
+	                                        height: "120",
+	                                        onClick: startPreview
+	                                    })
+	                                ) : preview;
+	                            }
+	                        }
+
 	                        files.push(React.makeElement(
 	                            "div",
-	                            { className: "message shared-data", key: v.h },
+	                            { className: attachmentClasses, key: v.h },
 	                            React.makeElement(
 	                                "div",
 	                                { className: "message shared-info" },
@@ -23466,16 +23552,7 @@
 	                                    bytesToSize(v.s)
 	                                )
 	                            ),
-	                            React.makeElement(
-	                                "div",
-	                                { className: "data-block-view medium" },
-	                                dropdown,
-	                                React.makeElement(
-	                                    "div",
-	                                    { className: "data-block-bg" },
-	                                    React.makeElement("div", { className: "block-view-file-type " + fileIcon(v) })
-	                                )
-	                            ),
+	                            preview,
 	                            React.makeElement("div", { className: "clear" })
 	                        ));
 	                    });
@@ -23695,15 +23772,13 @@
 	                        )
 	                    );
 	                } else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-	                    if (!chatRoom._attachmentsMap) {
-	                        chatRoom._attachmentsMap = {};
-	                    }
 	                    var foundRevokedNode = null;
 
 	                    var revokedNode = textContents.substr(2, textContents.length);
 
-	                    if (chatRoom._attachmentsMap[revokedNode]) {
-	                        Object.keys(chatRoom._attachmentsMap[revokedNode]).forEach(function (messageId) {
+	                    if (chatRoom.attachments.exists(revokedNode)) {
+	                        chatRoom.attachments[revokedNode].forEach(function (obj) {
+	                            var messageId = obj.messageId;
 	                            var attachedMsg = chatRoom.messagesBuff.messages[messageId];
 
 	                            if (!attachedMsg) {
@@ -23719,8 +23794,9 @@
 	                                        }
 	                                    });
 	                                } catch (e) {}
-	                                attachedMsg.revoked = true;
 	                                attachedMsg.seen = true;
+	                                attachedMsg.revoked = true;
+	                                obj.revoked = true;
 	                            }
 	                        });
 	                    }
@@ -25961,6 +26037,7 @@
 	    MegaDataObject.attachToExistingJSObject(this, {
 	        state: null,
 	        users: [],
+	        attachments: null,
 	        roomJid: null,
 	        type: null,
 	        messages: [],
@@ -25988,6 +26065,8 @@
 	    this.callRequest = null;
 	    this.callIsActive = false;
 	    this.shownMessages = {};
+	    this.attachments = new MegaDataMap(this);
+	    this.images = new MegaDataSortedMap("k", "delay", this);
 
 	    this.options = {
 
@@ -26684,6 +26763,7 @@
 	                't': node.t,
 	                'name': node.name,
 	                's': node.s,
+	                'fa': node.fa,
 	                'ar': {
 	                    'n': node.ar.n,
 	                    't': node.ar.t,

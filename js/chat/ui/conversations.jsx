@@ -444,9 +444,11 @@ var ConversationsApp = React.createClass({
                         <div className="fm-empty-messages-bg"></div>
                         <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
                         <div className="fm-not-logged-text">
-                            <div className="fm-not-logged-description">
-                                Login or create an account to <span className="red">get 50GB FREE</span> and get messages from your friends and coworkers.
-                            </div>
+                            <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
+                                __html: __(l[8634])
+                                    .replace("[S]", "<span className='red'>")
+                                    .replace("[/S]", "</span>")
+                            }}></div>
                             <div className="fm-not-logged-button login">
                                 {__(l[193])}
                             </div>

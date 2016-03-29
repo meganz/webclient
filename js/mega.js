@@ -4260,7 +4260,7 @@ function MegaData()
 
                 sync.megaSyncRequest(cmd)
                     .done(function() {
-                        showToast('megasync', 'Download added to MEGAsync', 'Open');
+                        showToast('megasync', l[8635], 'Open');
                     })
                     .fail(webdl);
             })

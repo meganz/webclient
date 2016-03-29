@@ -504,7 +504,7 @@ var ConversationMessage = React.createClass({
                                     >
                                         <DropdownsUI.DropdownItem
                                             icon="human-profile"
-                                            label={__("View profile")}
+                                            label={__(l[5868])}
                                             onClick={() => {
                                                 window.location = "#fm/" + contact.u;
                                             }}
@@ -512,14 +512,14 @@ var ConversationMessage = React.createClass({
                                         <hr/>
                                         { null /*<DropdownsUI.DropdownItem
                                          icon="rounded-grey-plus"
-                                         label={__("Add to chat")}
+                                         label={__(l[8631])}
                                          onClick={() => {
                                          window.location = "#fm/" + contact.u;
                                          }}
                                          />*/}
                                         <DropdownsUI.DropdownItem
                                             icon="conversations"
-                                            label={__("Start new chat")}
+                                            label={__(l[8632])}
                                             onClick={() => {
                                                 window.location = "#fm/chat/" + contact.u;
                                             }}
@@ -971,7 +971,7 @@ var ConversationRightArea = React.createClass({
                                    room.leaveChat(true);
                                 }}>
                                     <i className="small-icon rounded-stop"></i>
-                                    {__("Leave Chat")}
+                                    {__(l[8633])}
                                 </div>
                                 : null
                         }
@@ -1906,7 +1906,7 @@ var ConversationPanel = React.createClass({
                     .replace("%s", namesDisplay[1]);
             }
             else {
-                msg = __("%s is typing").replace("%s", namesDisplay[0]);
+                msg = __(l[8629]).replace("%1", namesDisplay[0]);
             }
 
             typingElement = <div className="typing-block">
@@ -2061,7 +2061,7 @@ var ConversationPanel = React.createClass({
                                             }} />
                                             <DropdownsUI.DropdownItem
                                                 icon="square-profile"
-                                                label={__("Send Contact")}
+                                                label={__(l[8628])}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
                                             }} />

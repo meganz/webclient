@@ -490,7 +490,7 @@ var ConversationMessage = React.createClass({
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{mega.utils.fullUsername(contact.u)}</div>
+                                    <div className="message data-title">{htmlentities(mega.utils.fullUsername(contact.u))}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :
@@ -680,7 +680,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", mega.utils.fullUsername(contact.u));
+                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -691,7 +691,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", mega.utils.fullUsername(contact.u));
+                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
             }
 
             message.textContents = textMessage;
@@ -1117,7 +1117,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
         participants.forEach(function(v) {
             displayNames.push(
-                chatRoom.megaChat.getContactNameFromJid(v)
+                htmlentities(chatRoom.megaChat.getContactNameFromJid(v))
             );
         });
 

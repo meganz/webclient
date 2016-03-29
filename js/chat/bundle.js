@@ -23628,7 +23628,7 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
-	                                    mega.utils.fullUsername(contact.u)
+	                                    htmlentities(mega.utils.fullUsername(contact.u))
 	                                ),
 	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
 	                                React.makeElement(
@@ -23803,7 +23803,7 @@
 	            }
 
 	            if (textMessage.splice) {
-	                var tmpMsg = textMessage[0].replace("[X]", mega.utils.fullUsername(contact.u));
+	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
 
 	                if (message.currentCallCounter) {
 	                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
@@ -23811,7 +23811,7 @@
 	                textMessage = tmpMsg;
 	                textMessage = textMessage.replace("[[ ", "<span className=\"grey-color\">").replace("]]", "</span>");
 	            } else {
-	                textMessage = textMessage.replace("[X]", mega.utils.fullUsername(contact.u));
+	                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
 	            }
 
 	            message.textContents = textMessage;
@@ -24207,7 +24207,7 @@
 	        var displayNames = [];
 
 	        participants.forEach(function (v) {
-	            displayNames.push(chatRoom.megaChat.getContactNameFromJid(v));
+	            displayNames.push(htmlentities(chatRoom.megaChat.getContactNameFromJid(v)));
 	        });
 
 	        var callSession = chatRoom.callSession;
@@ -26359,7 +26359,7 @@
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
-	        return self.megaChat.getContactNameFromJid(participants[0]);
+	        return htmlentities(self.megaChat.getContactNameFromJid(participants[0]));
 	    } else {
 	        assert(false, "invalid room type");
 	        return "[invalid room type]";

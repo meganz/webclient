@@ -696,6 +696,12 @@ function init_page() {
         }
     }
     else if (page.substr(0, 3) == 'pro') {
+        var tmp = page.split('/uao=');
+        if (tmp.length > 1) {
+            mega.uaoref = decodeURIComponent(tmp[1]);
+            location.hash = tmp[0];
+            return;
+        }
         parsepage(pages['pro']);
         init_pro();
     }

@@ -19,6 +19,12 @@ var TypingArea = React.createClass({
         };
     },
     onEmojiClicked: function (e, slug, meta) {
+        if (this.props.disabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
         var self = this;
 
         var txt = ":" + slug + ":";
@@ -37,6 +43,10 @@ var TypingArea = React.createClass({
     },
 
     typing: function () {
+        if (this.props.disabled) {
+            return;
+        }
+
         var self = this;
         var room = this.props.chatRoom;
 
@@ -55,6 +65,10 @@ var TypingArea = React.createClass({
         }, 2000);
     },
     stoppedTyping: function () {
+        if (this.props.disabled) {
+            return;
+        }
+
         var self = this;
         var room = this.props.chatRoom;
 
@@ -69,6 +83,12 @@ var TypingArea = React.createClass({
         }
     },
     onTypeAreaKeyDown: function (e) {
+        if (this.props.disabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
         var self = this;
         var key = e.keyCode || e.which;
         var element = e.target;
@@ -98,11 +118,23 @@ var TypingArea = React.createClass({
         this.setState({typedMessage: e.target.value});
     },
     onTypeAreaBlur: function (e) {
+        if (this.props.disabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
         var self = this;
 
         self.stoppedTyping();
     },
     onTypeAreaChange: function (e) {
+        if (this.props.disabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
         var self = this;
 
         self.setState({typedMessage: e.target.value});
@@ -116,6 +148,10 @@ var TypingArea = React.createClass({
         }
     },
     focusTypeArea: function () {
+        if (this.props.disabled) {
+            return;
+        }
+
         var $container = $(ReactDOM.findDOMNode(this));
         if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
             if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
@@ -209,6 +245,7 @@ var TypingArea = React.createClass({
                     <ButtonsUI.Button
                         className="popup-button"
                         icon="smiling-face"
+                        disabled={this.props.disabled}
                     >
                         <DropdownsUI.DropdownEmojiSelector
                             className="popup emoji-one"
@@ -229,8 +266,8 @@ var TypingArea = React.createClass({
                             onChange={self.onTypeAreaChange}
                             value={self.state.typedMessage}
                             ref="typearea"
-                            disabled={room.pubCu25519KeyIsMissing === true ? true : false}
-                            readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
+                            disabled={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
+                            readOnly={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
                         ></textarea>
                         <div className="message-preview" dangerouslySetInnerHTML={{
                                                 __html: typedMessage.replace(/\s/g, "&nbsp;")

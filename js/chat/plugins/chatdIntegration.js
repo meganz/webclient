@@ -482,7 +482,6 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
                     crypt.getPubRSA(msgObject.userId)
                 );
             }
-            console.error(msgObject.userId);
         });
     }
     if (Array.isArray(users)) {
@@ -697,6 +696,17 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "a":"mcr",
                 "id": chatRoom.chatId,
                 "u": contactHash
+            });
+        });
+        $(chatRoom).rebind('alterUserPrivilege.chatdInt', function(e, contactHash, newPriv) {
+            console.error("Not implemented on API yet.");
+
+            return;
+            asyncApiReq({
+                "a":"mcup",
+                "id": chatRoom.chatId,
+                "u": contactHash,
+                "p": newPriv
             });
         });
         chatRoom.megaChat.rebind('onNewGroupChatRequest.chatdInt', function(e, contactHashes) {

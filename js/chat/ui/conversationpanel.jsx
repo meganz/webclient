@@ -74,6 +74,9 @@ var ConversationRightArea = React.createClass({
             {__(l[5897])}
         </div>;
 
+        if (room.isReadOnly()) {
+           startAudioCallButton = startVideoCallButton = null;
+        }
 
         if (room.callSession && room.callSession.isActive() === true) {
             startAudioCallButton = startVideoCallButton = null;
@@ -93,14 +96,79 @@ var ConversationRightArea = React.createClass({
             var contact = M.u[contactHash];
             if (contact && contactHash != u_handle) {
                 var dropdowns = [];
+                var privilege = null;
 
-                if (room.members && room.members[u_handle] === 3) {
-                    dropdowns.push(
-                        <DropdownsUI.DropdownItem
-                            key="remove" icon="human-profile" label={__("Remove participant")} onClick={() => {
-                                $(room).trigger('onRemoveUserRequest', [contact.u]);
-                            }} />
-                    )
+                if (room.type === "group" && room.members) {
+                    var removeParticipantButton = <DropdownsUI.DropdownItem
+                        key="remove" icon="human-profile" label={__("Remove participant")} onClick={() => {
+                                    $(room).trigger('onRemoveUserRequest', [contactHash]);
+                                }}/>;
+
+
+                    if (room.iAmOperator()) {
+                        // operator
+                        dropdowns.push(
+                            removeParticipantButton
+                        );
+
+
+                        if (room.members[contactHash] !== 3) {
+                            dropdowns.push(
+                                <DropdownsUI.DropdownItem
+                                    key="privOperator" icon="human-profile"
+                                    label={__("Change privilege to Operator")}
+                                    onClick={() => {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 3]);
+                                    }}/>
+                            );
+                        }
+
+                        if (room.members[contactHash] !== 2) {
+                            dropdowns.push(
+                                <DropdownsUI.DropdownItem
+                                    key="privFullAcc" icon="human-profile"
+                                    label={__("Change privilage to Full access")} onClick={() => {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 2]);
+                                    }}/>
+                            );
+                        }
+
+                        if (room.members[contactHash] !== 1) {
+                            dropdowns.push(
+                                <DropdownsUI.DropdownItem
+                                    key="privReadWrite" icon="human-profile"
+                                    label={__("Change privilage to Read & Write")} onClick={() => {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 1]);
+                                    }}/>
+                            );
+                        }
+                    }
+                    else if (room.members[u_handle] === 2) {
+                        // full access
+
+                    }
+                    else if (room.members[u_handle] === 1) {
+                        // read write
+
+                    }
+                    else if (room.isReadOnly()) {
+                        // read only
+                    }
+
+
+                    // other user privilege
+                    if (room.members[contactHash] === 3) {
+                        privilege = <abbr title="Operator">@</abbr>;
+                    }
+                    else if (room.members[contactHash] === 2) {
+                        privilege = <abbr title="Full access">$</abbr>;
+                    } 
+                    else if (room.members[contactHash] === 1) {
+                        privilege = <abbr title="Read & Write"></abbr>;
+                    }
+                    else if (room.members[contactHash] === 0) {
+                        privilege = <abbr title="Removed">-</abbr>;
+                    }
                 }
 
                 contactsList.push(
@@ -112,11 +180,17 @@ var ConversationRightArea = React.createClass({
                         dropdownPositionMy="right top"
                         dropdownPositionAt="right bottom"
                         dropdowns={dropdowns}
+                        namePrefix={privilege}
                     />
                 );
             }
         });
 
+        var isReadOnlyElement = null;
+
+        if (room.isReadOnly()) {
+            isReadOnlyElement = <span className="center">(read only chat)</span>;
+        }
         var excludedParticipants = room.type === "group" ?
             (
                 room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
@@ -129,6 +203,7 @@ var ConversationRightArea = React.createClass({
             <div className="chat-right-area conversation-details-scroll">
                 <div className="chat-right-pad">
 
+                    {isReadOnlyElement}
                     {contactsList}
 
                     <div className="buttons-block">
@@ -142,7 +217,11 @@ var ConversationRightArea = React.createClass({
                             contacts={this.props.contacts}
                             disabled={
                                 /* Disable in case I don't have any more contacts to add ... */
-                                excludedParticipants.length === this.props.contacts.length
+                                !(
+                                    excludedParticipants.length !== this.props.contacts.length &&
+                                    !room.isReadOnly() &&
+                                    room.iAmOperator()
+                                )
                             }
                             >
                             <DropdownsUI.DropdownContactsSelector
@@ -161,6 +240,7 @@ var ConversationRightArea = React.createClass({
                             className="link-button dropdown-element"
                             icon="rounded-grey-up-arrow"
                             label={__(l[6834] + "...")}
+                            disabled={room.isReadOnly()}
                             >
                             <DropdownsUI.Dropdown
                                 contacts={this.props.contacts}
@@ -1305,6 +1385,7 @@ var ConversationPanel = React.createClass({
                             <TypingAreaUI.TypingArea
                                 chatRoom={self.props.chatRoom}
                                 className="main-typing-area"
+                                disabled={room.isReadOnly()}
                                 onUpdate={() => {
                                     self.handleWindowResize();
                                 }}
@@ -1314,7 +1395,9 @@ var ConversationPanel = React.createClass({
                             >
                                     <ButtonsUI.Button
                                         className="popup-button"
-                                        icon="small-icon grey-medium-plus">
+                                        icon="small-icon grey-medium-plus"
+                                        disabled={room.isReadOnly()}
+                                        >
                                         <DropdownsUI.Dropdown
                                             className="wide-dropdown attach-to-chat-popup"
                                             vertOffset={10}

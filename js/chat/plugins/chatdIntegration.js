@@ -145,9 +145,6 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
 ChatdIntegration.prototype.alterParticipants = function(chatRoom, included, excluded, forced) {
     var self = this;
 
-    //self.protocolHandlerRequiresKeysInit(chatRoom);
-
-
     console.error('alterParticipants', chatRoom, included, excluded);
 
     if (included || excluded) {
@@ -588,7 +585,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
-            //self.protocolHandlerRequiresKeysInit(chatRoom);
 
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
                 if (v.userId) {
@@ -853,17 +849,6 @@ ChatdIntegration.prototype.setRetention = function(chatRoom, time) {
     self.chatd.cmd(Chatd.Opcode.RETENTION, base64urldecode(chatRoom.chatId), Chatd.Const.UNDEFINED + pack32le(time));
 };
 
-
-ChatdIntegration.prototype.protocolHandlerRequiresKeysInit = function(chatRoom) {
-    if (
-        chatRoom.protocolHandler.previousKeyId === null &&
-        chatRoom.protocolHandler.keyId === null
-    ) {
-        // new session, gen key!
-        chatRoom.protocolHandler.updateSenderKey();
-    }
-};
-
 ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     // allocate transactionid for the new message (it must be shown with status "delivering" in the UI;
     // edits and cancellations at that stage must be applied to the locally queued version that gets
@@ -882,8 +867,6 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     var tmpPromise = new MegaPromise();
 
     var _runEncryption = function() {
-        // is this a new (empty) chat?
-        self.protocolHandlerRequiresKeysInit(chatRoom);
 
         try {
             var result;

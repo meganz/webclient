@@ -1288,29 +1288,29 @@ else if (!b_u)
      * @returns {String} Returns the two letter language code e.g. 'en', 'es' etc
      */
     var detectLang = function() {
-        
+
         // Get the preferred language in their browser
         var userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
         var langCode = null;
         var langCodeVariant = null;
-        
+
         if (!userLang) {
             return 'en';
         }
-        
+
         // Lowercase it
         userLang = userLang.toLowerCase();
-        
+
         // Match on language code variants e.g. 'pt-br' returns 'br'
         /* jshint -W089 */
         for (langCode in languages) {
             for (langCodeVariant in languages[langCode]) {
-                if (languages[langCode][langCodeVariant] === userLang) {                    
+                if (languages[langCode][langCodeVariant] === userLang) {
                     return langCode;
                 }
             }
         }
-        
+
         // If no exact match supported, normalise to base language code e.g. en-gb, en-us, en-ca returns 'en'
         /* jshint -W089 */
         for (langCode in languages) {
@@ -1320,7 +1320,7 @@ else if (!b_u)
                 }
             }
         }
-        
+
         // Default to English
         return 'en';
     };
@@ -1353,7 +1353,7 @@ else if (!b_u)
         }
     };
 
-    var lang = detectLang();    
+    var lang = detectLang();
     var jsl = [];
 
     // If they've already selected a language, use that
@@ -1615,8 +1615,7 @@ else if (!b_u)
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
         'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
         'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1},
-        'version_compare_js': {f:'js/vendor/version-compare.js', n: 'version_compare_js', j:1}
+        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1}
     };
 
     var subpages =
@@ -1647,10 +1646,10 @@ else if (!b_u)
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': ['help_js'],
-        'plugin': ['chrome', 'firefox'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
-        'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
+        'plugin': ['chrome', 'chrome_js', 'firefox', 'firefox_js'],
+        'chrome': ['chrome', 'chrome_js'],
         'firefox': ['firefox', 'firefox_js']
     };
 

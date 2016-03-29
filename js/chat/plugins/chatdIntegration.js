@@ -252,11 +252,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             );
             chatRoom = r[1];
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
-
-                //self.setProtocolHandlerParticipants(chatRoom);
-
-                //self.alterParticipants(chatRoom, members, [], true);
-
                 window.location = chatRoom.getRoomUrl();
             }
         }

@@ -12,6 +12,8 @@ describe("chat.strongvelope unit test", function() {
 
     // Some test data.
     var PROTOCOL_VERSION_STRING = "\u0001";
+    var PROTOCOL_VERSION_V0 = 0;
+    var PROTOCOL_VERSION_V1 = 1;
     var ED25519_PRIV_KEY = atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A=');
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
     var CU25519_PRIV_KEY = atob('ZMB9oRI87iFj5cwKBvgzwnxxToRAO3L5P1gILfJyEik=');
@@ -597,6 +599,25 @@ describe("chat.strongvelope unit test", function() {
                       recipients: ['me3456789xw'],
                       keyIds: ['AIf2', 'AIf1'], keys: ['bar2', 'bar1'], message: 'payload 6' },
                 ];
+                var history_result = [
+                    { userId: 'you456789xw', ts: 1444255639, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      recipients: ['me3456789xw'],
+                      keyIds: ['AIf2', 'AIf1'], keys: ['bar2', 'bar1'], message: 'payload 6' },
+                    { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      keyIds: ['AIf1'], message: 'payload 5' },
+                    { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      keyIds: ['AIf1'], message: 'payload 4' },
+                    { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      recipients: ['you456789xw'],
+                      keyIds: ['AI02', 'AI01'], keys: ['foo2', 'foo1'], message: 'payload 3' },
+                    { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      keyIds: ['AIf1'], message: 'payload 2' },
+                    { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      keyIds: ['AI01'], message: 'payload 1' },
+                    { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      recipients: ['you456789xw'],
+                      keyIds: ['AI01'], keys: ['foo1'], message: 'payload 0' },
+                ];
                 sandbox.stub(ns, '_verifyMessage').returns(true);
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY, UNIQUE_DEVICE_ID);
@@ -615,7 +636,8 @@ describe("chat.strongvelope unit test", function() {
                              senderKeys: senderKeys };
                 });
                 var result = handler._batchParseAndExtractKeys(history);
-                assert.deepEqual(result, history);
+
+                assert.deepEqual(result, history_result);
                 assert.ok(handler.participantKeys['me3456789xw'].hasOwnProperty('AI01'));
                 assert.ok(handler.participantKeys['me3456789xw'].hasOwnProperty('AI02'));
                 assert.ok(handler.participantKeys['you456789xw'].hasOwnProperty('AIf1'));
@@ -1806,6 +1828,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: PROTOCOL_VERSION_V1,
                     sender: 'me3456789xw',
                     type: 0,
                     payload: 'Hello!',
@@ -1832,6 +1855,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: PROTOCOL_VERSION_V1,
                     sender: 'me3456789xw',
                     type: 0,
                     payload: 'Hello!',
@@ -1857,6 +1881,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: PROTOCOL_VERSION_V1,
                     sender: 'me3456789xw',
                     type: 0,
                     payload: 'Hello!',
@@ -1893,6 +1918,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: PROTOCOL_VERSION_V1,
                     sender: 'me3456789xw',
                     type: 0,
                     payload: 'Hello!',
@@ -2059,6 +2085,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: PROTOCOL_VERSION_V1,
                     sender: 'me3456789xw',
                     type: 1,
                     payload: 'Hello!',
@@ -2082,6 +2109,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: PROTOCOL_VERSION_V1,
                     sender: 'me3456789xw',
                     type: 1,
                     payload: 'Hello!',
@@ -2141,8 +2169,9 @@ describe("chat.strongvelope unit test", function() {
                 });
                 sandbox.stub(ns, '_symmetricDecryptMessage').returns('Hello!');
 
-                var result = handler.decryptFrom(ROTATION_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(ROTATION_MESSAGE_BIN_PROTOCOL_1, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: 0,
                     sender: 'me3456789xw',
                     type: 0,
                     payload: 'Hello!',
@@ -2169,9 +2198,9 @@ describe("chat.strongvelope unit test", function() {
                 });
                 sandbox.stub(ns, '_symmetricDecryptMessage').returns('Hello!');
 
-                var result = handler.decryptFrom(ROTATION_MESSAGE_BIN, 'me3456789xw');
-
+                var result = handler.decryptFrom(ROTATION_MESSAGE_BIN_PROTOCOL_1, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: PROTOCOL_VERSION_V0,
                     sender: 'me3456789xw',
                     type: 0,
                     payload: 'Hello!',
@@ -2198,6 +2227,7 @@ describe("chat.strongvelope unit test", function() {
 
                 var result = handler.decryptFrom(REMINDER_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
+                    version: PROTOCOL_VERSION_V1,
                     sender: 'me3456789xw',
                     type: 0,
                     payload: null,
@@ -2317,7 +2347,7 @@ describe("chat.strongvelope unit test", function() {
         });
 
         // Alter participants is going to be phased out, and is not currently in use live
-        /*describe('alterParticipants', function() {
+        describe('alterParticipants', function() {
             it("nothing to do", function() {
                 sandbox.stub(ns._logger, '_log');
                 var handler = new ns.ProtocolHandler('me3456789xw',
@@ -2381,120 +2411,43 @@ describe("chat.strongvelope unit test", function() {
             it("include lino", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY, UNIQUE_DEVICE_ID);
-                handler.keyId = KEY_ID;
-                handler.participantKeys['me3456789xw'][KEY_ID] = KEY;
-                handler._sentKeyId = KEY_ID;
-                sandbox.stub(handler, 'updateSenderKey', function() {
-                    handler.keyId = ROTATED_KEY_ID;
-                    handler.participantKeys['me3456789xw'][ROTATED_KEY_ID] = ROTATED_KEY;
-                });
-                sandbox.stub(handler, '_assembleBody', function(message) {
-                    return { content: '|' + message + '|new keys and stuff',
-                             keyed: true };
-                });
+
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(tlvstore, 'toTlvRecord', _toTlvRecordWType);
-                sandbox.stub(handler, '_signContent', function(content) {
-                    return '|squiggle' + content;
-                });
 
-                var result = handler.alterParticipants(['lino56789xw'], [], 'Hello!');
+                var result = handler.alterParticipants(['lino56789xw'], []);
                 assert.strictEqual(result,
-                    '\u0000|squiggle|\u0002:\u0002|Hello!|new keys and stuff|\u0008:lino56789xw');
-                assert.strictEqual(handler.updateSenderKey.callCount, 1);
-                assert.strictEqual(handler.keyId, ROTATED_KEY_ID);
+                    '\u0001|\u0002:\u0002|\u0008:lino56789xw');
             });
 
             it("exclude otto", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY, UNIQUE_DEVICE_ID);
                 handler.otherParticipants = new Set(['otto56789xw']);
-                handler.keyId = KEY_ID;
-                handler.participantKeys['me3456789xw'][KEY_ID] = KEY;
-                handler._sentKeyId = KEY_ID;
-                sandbox.stub(handler, 'updateSenderKey', function() {
-                    handler.keyId = ROTATED_KEY_ID;
-                    handler.participantKeys['me3456789xw'][ROTATED_KEY_ID] = ROTATED_KEY;
-                });
-                sandbox.stub(handler, '_assembleBody', function(message) {
-                    return { content: '|' + message + '|new keys and stuff',
-                             keyed: true };
-                });
+
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(tlvstore, 'toTlvRecord', _toTlvRecordWType);
                 sandbox.stub(handler, '_signContent', function(content) {
                     return '|squiggle' + content;
                 });
 
-                var result = handler.alterParticipants([], ['otto56789xw'], 'Hello!');
+                var result = handler.alterParticipants([], ['otto56789xw']);
                 assert.strictEqual(result,
-                    '\u0000|squiggle|\u0002:\u0002|Hello!|new keys and stuff|\u0009:otto56789xw');
-                assert.strictEqual(handler.updateSenderKey.callCount, 1);
-                assert.strictEqual(handler.keyId, ROTATED_KEY_ID);
+                    '\u0001|\u0002:\u0002|\u0009:otto56789xw');
             });
 
             it("include lino, exclude otto", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY, UNIQUE_DEVICE_ID);
                 handler.otherParticipants = new Set(['otto56789xw']);
-                handler.keyId = KEY_ID;
-                handler.participantKeys['me3456789xw'][KEY_ID] = KEY;
-                handler._sentKeyId = KEY_ID;
-                sandbox.stub(handler, 'updateSenderKey', function() {
-                    handler.keyId = ROTATED_KEY_ID;
-                    handler.participantKeys['me3456789xw'][ROTATED_KEY_ID] = ROTATED_KEY;
-                });
-                sandbox.stub(handler, '_assembleBody', function(message) {
-                    return { content: '|' + message + '|new keys and stuff',
-                             keyed: true };
-                });
+
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(tlvstore, 'toTlvRecord', _toTlvRecordWType);
-                sandbox.stub(handler, '_signContent', function(content) {
-                    return '|squiggle' + content;
-                });
 
                 var result = handler.alterParticipants(['lino56789xw'], ['otto56789xw'], 'Hello!');
                 assert.strictEqual(result,
-                    '\u0000|squiggle|\u0002:\u0002|Hello!|new keys and stuff|\u0008:lino56789xw|\u0009:otto56789xw');
-                assert.strictEqual(handler.updateSenderKey.callCount, 1);
-                assert.strictEqual(handler.keyId, ROTATED_KEY_ID);
+                    '\u0001|\u0002:\u0002|\u0008:lino56789xw|\u0009:otto56789xw');
             });
-
-            it("include lino, exclude otto, binary", function() {
-                var handler = new ns.ProtocolHandler('me3456789xw',
-                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY, UNIQUE_DEVICE_ID);
-                handler.keyId = KEY_ID;
-                handler.participantKeys['me3456789xw'][KEY_ID] = KEY;
-                handler._sentKeyId = KEY_ID;
-                handler.otherParticipants = new Set(['otto56789xw']);
-                sandbox.stub(window, 'u_handle', 'me3456789xw');
-                sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
-                sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
-                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
-                sandbox.stub(window, 'pubCu25519', {
-                    'otto56789xw': CU25519_PUB_KEY, 'lino56789xw': CU25519_PUB_KEY });
-                sandbox.stub(handler, 'updateSenderKey', function() {
-                    handler.keyId = ROTATED_KEY_ID;
-                    handler.participantKeys['me3456789xw'][ROTATED_KEY_ID] = ROTATED_KEY;
-                    handler.previousKeyId = KEY_ID;
-                    handler._keyEncryptionCount = 0;
-                });
-                sandbox.stub(ns, '_symmetricEncryptMessage').returns(
-                    { key: ROTATED_KEY, nonce: atob('71BrlkBJXmR5xRtM'),
-                      ciphertext: atob('H78adfMY') });
-                sandbox.stub(ns, '_signMessage').returns(PARTICIPANT_CHANGE_MESSAGE.signature);
-
-                var result = handler.alterParticipants(['lino56789xw'], ['otto56789xw'], 'Hello!');
-                assert.strictEqual(btoa(result), btoa(PARTICIPANT_CHANGE_MESSAGE_BIN));
-                assert.strictEqual(result.length, 168);
-                assert.strictEqual(handler.keyId, ROTATED_KEY_ID);
-                assert.strictEqual(handler._sentKeyId, ROTATED_KEY_ID);
-                assert.deepEqual(handler.participantKeys,
-                    { 'me3456789xw': { 'AI\u0000\u0000': KEY,
-                                       'AI\u0000\u0001': ROTATED_KEY } });
-                assert.strictEqual(handler._keyEncryptionCount, 1);
-            });
-        });*/
+        });
     });
 });

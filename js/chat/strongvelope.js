@@ -1817,7 +1817,8 @@ var strongvelope = {};
     /**
      * Alters the participant list of the chat room.
      *
-     * Note: There are no checks for overlaps in the include/exclude lists.
+     * Note: This function is not supposed to use by any client, it only exists for unit testing of the format of AlterParticipant message.
+     *       AlterParticipant message is now sent by chat API.
      *
      * TODO: Employ the usage of sets (via object attributes) over arrays for
      *       uniqueness of entries (implement in _encryptSenderKey).
@@ -1906,9 +1907,6 @@ var strongvelope = {};
         this.includeParticipants = tempIncludes;
         this.excludeParticipants = tempExcludes;
 
-        // Update our sender key.
-        this.updateSenderKey();
-
         // Collect participants to be in- or excluded.
         var participantsInExcluded = '';
         this.includeParticipants.forEach(function _addIncludedParticipants(item) {
@@ -1920,16 +1918,13 @@ var strongvelope = {};
                                                            base64urldecode(item));
         });
 
-        // Assemble main message body and rotate keys if required.
-        var assembledMessage = this._assembleBody(null);
-
         // Add correct message type to front and put together final content.
         var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
                                            String.fromCharCode(MESSAGE_TYPES.ALTER_PARTICIPANTS))
-                    + assembledMessage.content + participantsInExcluded;
+                    + participantsInExcluded;
 
         // Sign message.
-        content = this._signContent(content);
+        //content = this._signContent(content);
 
         // Return assembled total message.
         return String.fromCharCode(PROTOCOL_VERSION) + content;

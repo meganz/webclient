@@ -267,9 +267,11 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
-            self.joined = true;
-            if (chatRoom.state === ChatRoom.STATE.JOINING) {
-                chatRoom.setState(ChatRoom.STATE.READY);
+            if (eventData.userId === u_handle) {
+                self.joined = true;
+                if (chatRoom.state === ChatRoom.STATE.JOINING) {
+                    chatRoom.setState(ChatRoom.STATE.READY);
+                }
             }
         }
     });
@@ -331,6 +333,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.lastMessageId = eventData.newest;
             self.haveMessages = true;
             self.trackDataChange();
+
+            if (!self.messages[eventData.newest]) {
+                self.retrieveChatHistory(true);
+            }
         }
     });
 
@@ -399,20 +405,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
-    self.chatd.rebind('onMessageCheck.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (!chatRoom) {
-            self.logger.warn("Message not found for: ", e, eventData);
-            return;
-        }
-
-        self.haveMessages = true;
-
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
-            self.retrieveChatHistory(true);
-        }
-    });
 
     self.chatd.rebind('onMessageUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);

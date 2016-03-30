@@ -943,7 +943,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
     if (
         megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
         self.arePluginsForcingMessageQueue(message) ||
-        (self.state != ChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0)
+        self.state !== ChatRoom.STATE.READY
     ) {
 
         var event = new $.Event("onQueueMessage");
@@ -957,12 +957,11 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
             return false;
         }
 
-        self.logger.debug("Queueing: ", eventObject);
-
-
-        self._messagesQueue.push(eventObject);
-
-        self.appendMessage(eventObject);
+        if (self._messagesQueue.indexOf(eventObject) === -1) {
+            self.logger.debug("Queueing: ", eventObject);
+            self._messagesQueue.push(eventObject);
+            self.appendMessage(eventObject);
+        }
     }
     else {
         self._sendMessageToTransport(eventObject)
@@ -985,7 +984,7 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var megaChat = this.megaChat;
 
     var messageContents = messageObject.getContents() ? messageObject.getContents() : "";
-
+    
     var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
         return MegaPromise.reject();
@@ -1265,7 +1264,10 @@ ChatRoom.prototype.recover = function() {
 ChatRoom.prototype._flushMessagesQueue = function() {
     var self = this;
 
+    self.trigger('onMessageQueuePreFlush');
+
     self.logger.debug("Chat room state set to ready, will flush queue: ", self._messagesQueue);
+
 
     if (self._messagesQueue.length > 0) {
         $.each(self._messagesQueue, function(k, v) {
@@ -1278,10 +1280,11 @@ ChatRoom.prototype._flushMessagesQueue = function() {
                     v.internalId = internalId;
                 });
         });
-        self._messagesQueue = [];
-
-        self.megaChat.trigger('onMessageQueueFlushed', self);
     }
+
+    self._messagesQueue = [];
+
+    self.megaChat.trigger('onMessageQueueFlushed', self);
 };
 
 ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {

@@ -132,6 +132,7 @@ var ConversationMessage = React.createClass({
         var additionalClasses = "";
         var buttonsBlock = null;
         var spinnerElement = null;
+        var messageNotSendIndicator = null;
 
         timestamp = unixtimeToTimeString(timestampInt);
         var messageIsNowBeingSent = false;
@@ -185,18 +186,19 @@ var ConversationMessage = React.createClass({
 
                     if (!messageIsNowBeingSent) {
                         message.sending = false;
-                        additionalClasses += " not-sent";
 
-                        buttonsBlock = <div className="buttons-block">
-                            <div className="message circuit-label left">{__(l[8003])}</div>
-                            <div className="default-white-button right" onClick={(e) => {
-                                self.doRetry(e, message);
-                            }}>{__(l[1364])}</div>
-                            <div className="default-white-button right red" onClick={(e) => {
-                                self.doDelete(e, message);
-                            }}>{__(l[8004])}</div>
-                            <div className="clear"></div>
-                        </div>;
+                        $(message).trigger(
+                            'onChange',
+                            [
+                                message,
+                                "sending",
+                                true,
+                                false
+                            ]
+                        );
+                        additionalClasses += " not-sent retrying";
+
+                        buttonsBlock = null;
                     }
                     else {
                         additionalClasses += " sending";
@@ -665,32 +667,14 @@ var ConversationMessage = React.createClass({
             else {
                 var messageActionButtons = null;
 
-                if (message.getState() !== Message.STATE.NOT_SENT) {
+                if (message.getState() === Message.STATE.NOT_SENT) {
                     messageActionButtons = null;
-                    /*<ButtonsUI.Button
-                        className="default-white-button tiny-button"
-                        icon="tiny-icon grey-down-arrow">
-                        <DropdownsUI.Dropdown
-                            className="white-context-menu message-dropdown"
-                            positionMy="right top"
-                            positionAt="right bottom"
-                            vertOffset={4}
-                            noArrow={true}
-                        >
-                            <DropdownsUI.DropdownItem icon="writing-pen" label={__(l[1342])} onClick={() => {
-                                        console.error("TBD!");
-                                    }}/>
-                            <DropdownsUI.DropdownItem icon="quotes" label={__(l[8012])} onClick={() => {
-                                        console.error("TBD!");
-                                    }}/>
 
-                            <hr />
-
-                            <DropdownsUI.DropdownItem icon="red-cross" label={__(l[1730])} className="red" onClick={(e) => {
-                                        self.doDelete(e, message);
-                                    }}/>
-                        </DropdownsUI.Dropdown>
-                    </ButtonsUI.Button> */
+                    if (!spinnerElement) {
+                        messageNotSendIndicator = <div className="not-sent-indicator">
+                            <i className="small-icon yellow-triangle"></i>
+                        </div>;
+                    }
                 }
 
                 var avatar = null;
@@ -737,6 +721,7 @@ var ConversationMessage = React.createClass({
                             {datetime}
 
                             {messageActionButtons}
+                            {messageNotSendIndicator}
                             {messageDisplayBlock}
                             {buttonsBlock}
                             {spinnerElement}
@@ -2004,6 +1989,14 @@ var ConversationPanel = React.createClass({
                     {attachCloudDialog}
                     {sendContactDialog}
 
+
+                    <div className="dropdown body dropdown-arrow down-arrow not-sent-notification hidden">
+                        <i className="dropdown-white-arrow"></i>
+                        <div className="dropdown notification-text">
+                            <i className="small-icon conversations"></i>
+                            {__("Message not sent. Will retry later.")}
+                        </div>
+                    </div>
 
                     <div className={"messages-block " + additionalClass}>
                         <div className="messages scroll-area">

@@ -748,6 +748,27 @@ Chat.prototype.init = function() {
         }
     });
 
+    $(document.body).delegate('.not-sent-indicator', 'mouseover.notsentindicator', function() {
+        var $this = $(this),
+            $notification = $('.not-sent-notification'),
+            iconTopPos,
+            iconLeftPos,
+            notificatonWidth,
+            notificatonHeight;
+
+        $notification.removeClass('hidden');
+        iconTopPos = $this.offset().top,
+            iconLeftPos = $this.offset().left,
+            notificatonWidth = $notification.outerWidth()/2 - 10,
+            notificatonHeight = $notification.outerHeight() + 10;
+        $notification.offset({ top: iconTopPos - notificatonHeight, left: iconLeftPos - notificatonWidth});
+    });
+
+    $(document.body).delegate('.not-sent-indicator', 'mouseout.notsentindicator', function() {
+        var $notification = $('.not-sent-notification');
+        $notification.addClass('hidden').removeAttr('style');
+    });
+
     self.trigger("onInit");
 };
 

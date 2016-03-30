@@ -30,9 +30,12 @@ var Chatd = function(userId, options) {
     self.logger = new MegaLogger("chatd");
 
     self.options = $.extend({}, Chatd.DEFAULT_OPTIONS, options);
-
+//
 //    // debug mode
 //    [
+//        'onError',
+//        'onOpen',
+//        'onClose',
 //        'onMessageUpdated',
 //        'onMessageConfirm',
 //        'onMessageReject',
@@ -50,7 +53,17 @@ var Chatd = function(userId, options) {
 //        'onMessagesHistoryRequest',
 //    ].forEach(function(evt) {
 //            self.rebind(evt + '.chatd', function(e) {
-//                console.error(evt, JSON.stringify(arguments[1]));
+//                if (arguments[1].shard) {
+//                    var tmp = $.extend({}, arguments[1]);
+//                    delete tmp.shard;
+//                    tmp.shard = "shard#" + arguments[1].shard.shard;
+//                    console.error(evt, JSON.stringify(
+//                        tmp
+//                    ));
+//                }
+//                else {
+//                    console.error(evt, JSON.stringify(arguments[1]));
+//                }
 //            });
 //    });
 };
@@ -218,6 +231,22 @@ Chatd.Shard.prototype.isOnline = function() {
     return this.s && this.s.readyState == this.s.OPEN;
 };
 
+/**
+ * Helper function that return the chat Ids (base64urlencode'd) related to this shard
+ * as an Array
+ * @returns {Array}
+ */
+Chatd.Shard.prototype.getRelatedChatIds = function() {
+    var chatIds = [];
+    Object.keys(this.chatIds).forEach(function(v) {
+        chatIds.push(
+            base64urlencode(v)
+        );
+    });
+    return chatIds;
+};
+
+
 Chatd.Shard.prototype.reconnect = function() {
     var self = this;
 
@@ -228,13 +257,22 @@ Chatd.Shard.prototype.reconnect = function() {
         self.keepAliveTimerRestart();
         self.logger.log('chatd connection established');
         self.rejoinexisting();
-        self.resendpending();
+        self.clearpending();
+
+        self.chatd.trigger('onOpen', {
+            shard: self
+        });
+
     };
 
     self.s.onerror = function(e) {
         self.logger.error("WebSocket error:", e);
         clearTimeout(self.keepAliveTimer);
         self.connectionRetryManager.doConnectionRetry();
+
+        self.chatd.trigger('onError', {
+            shard: self
+        });
     };
 
     self.s.onmessage = function(e) {
@@ -247,6 +285,10 @@ Chatd.Shard.prototype.reconnect = function() {
         clearTimeout(self.keepAliveTimer);
         self.joinedChatIds = {};
         self.connectionRetryManager.gotDisconnected();
+
+        self.chatd.trigger('onClose', {
+            shard: self
+        });
     };
 };
 
@@ -262,7 +304,7 @@ Chatd.Shard.prototype.disconnect = function() {
 };
 
 Chatd.Shard.prototype.cmd = function(opCode, cmd) {
-    //console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+    // console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
     this.cmdq += String.fromCharCode(opCode)+cmd;
 
@@ -287,7 +329,15 @@ Chatd.Shard.prototype.rejoinexisting = function() {
     }
 };
 
+Chatd.Shard.prototype.clearpending = function() {
+    var self = this;
+    for (var chatId in this.chatIds) {
+        self.chatd.chatIdMessages[chatId].clearpending();
+    }
+};
+
 // resend all unconfirmed messages (this is mandatory)
+// @deprecated
 Chatd.Shard.prototype.resendpending = function() {
     var self = this;
     for (var chatId in this.chatIds) {
@@ -297,6 +347,7 @@ Chatd.Shard.prototype.resendpending = function() {
 
 // send JOIN
 Chatd.Shard.prototype.join = function(chatId) {
+    // console.error("JOIN: ", chatId);
     this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
     this.chatd.range(chatId);
 };
@@ -682,6 +733,15 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     // FIXME: overwrite failed modifications with the original message
 };
 
+Chatd.Messages.prototype.clearpending = function() {
+    // mapping of transactionids of messages being sent to the numeric index of this.buf
+    this.sending = {};
+    this.sendingList = [];
+
+    // msgnums of modified messages
+    this.modified = {};
+};
+
 Chatd.Messages.prototype.resend = function() {
     var self = this;
 
@@ -710,6 +770,7 @@ Chatd.Messages.prototype.resend = function() {
 // after a reconnect, we tell the chatd the oldest and newest buffered message
 Chatd.Messages.prototype.range = function(chatId) {
     var low, high;
+    // console.error("RANGE: ", chatId);
 
     for (low = this.lownum; low <= this.highnum; low++) {
         if (this.buf[low] && !this.sending[this.buf[low][Chatd.MsgField.MSGID]]) {
@@ -847,12 +908,8 @@ Chatd.Messages.prototype.check = function(chatId, msgid) {
         messageId: base64urlencode(msgid)
     });
 
-    if (this.buf[this.highnum]) {
-        // if the newest held message is not current, initiate a fetch of newer messages just in case
-        if (this.buf[this.highnum][Chatd.MsgField.MSGID] !== msgid) {
-            this.chatd.cmd(Chatd.Opcode.HIST, chatId, this.chatd.pack32le(32));
-        }
-    }
+    // refetching of history message in case of the user's history is "out of date" would be done in the
+    // integration side after the onMessagesHistoryInfo event is triggered
 };
 
 // utility functions

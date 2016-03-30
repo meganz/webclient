@@ -222,17 +222,21 @@ describe("chat.strongvelope workflow test", function() {
                 if (participants.hasOwnProperty(handle)) {
                     var person = participants[handle];
                     received = person.decryptFrom(sent, sender);
-                    if (activeParticipants.has(person.ownHandle)) {
-                        assert.strictEqual(received.payload, message);
-                        if (sender !== person.ownHandle) {
-                            assert.ok(person.otherParticipants.has(sender));
+                    if (sender !== ns.COMMANDER) {
+                        if (activeParticipants.has(person.ownHandle)) {
+                            if (message) {
+                                assert.strictEqual(received.payload, message);
+                            }
+                            if (sender !== person.ownHandle) {
+                                assert.ok(person.otherParticipants.has(sender));
+                            }
                         }
-                    }
-                    else {
-                        assert.strictEqual(received, false);
-                    }
-                    if (received.toSend) {
-                        toSend.push([received.toSend, person.ownHandle]);
+                        else {
+                            assert.strictEqual(received, false);
+                        }
+                        if (received.toSend) {
+                            toSend.push([received.toSend, person.ownHandle]);
+                        }
                     }
                 }
             }
@@ -250,13 +254,16 @@ describe("chat.strongvelope workflow test", function() {
             var sent = '';
             var sender = '';
             var result;
+            var alterMessage = '';
             var activeParticipants = new Set(['alice678900']);
             participants['alice678900'] = _makeParticipant('alice678900');
             participants['alice678900'].updateSenderKey();
 
+
             // Alice starts a chat with Bob.
             participants['bob45678900'] = _makeParticipant('bob45678900');
             participants['bob45678900'].updateSenderKey();
+            participants['bob45678900'].addParticipant('alice678900');
             sender = 'alice678900';
             message = 'Tēnā koe';
             sent = participants[sender].encryptTo(message, 'bob45678900');
@@ -295,20 +302,16 @@ describe("chat.strongvelope workflow test", function() {
             // Alice adds Charlie to the chat.
             participants['charlie8900'] = _makeParticipant('charlie8900');
             participants['charlie8900'].updateSenderKey();
+            alterMessage = participants['alice678900'].alterParticipants(['charlie8900'], []);
             sender = 'alice678900';
 
-            for (var handle in participants) {
-                if (participants.hasOwnProperty(handle)) {
-                    var person = participants[handle];
-                    person.addParticipant('charlie8900', true);
-                }
-            }
-            // Charlie adds all participants of the current room.
-            for (var i = 0;i < activeParticipants.length; i++) {
-                participants['charlie8900'].addParticipant(activeParticipants[i]);
-            }
-            activeParticipants.add('charlie8900');
+            _checkReceivers(alterMessage, ns.COMMANDER, null,
+                            participants, activeParticipants);//API message
 
+            activeParticipants.forEach(function(item) {
+                participants['charlie8900'].addParticipant(item);
+            });
+            activeParticipants.add('charlie8900');
             // Bob sends to the group.
             sender = 'bob45678900';
             message = 'Good to see you, bro.';
@@ -325,13 +328,11 @@ describe("chat.strongvelope workflow test", function() {
                 _checkReceivers(sent[0], sender, message,
                             participants, activeParticipants);//payload message
             }
+
+            alterMessage = participants['alice678900'].alterParticipants([], ['bob45678900']);
             // Removes Bob from the chat.
-            for (var handle in participants) {
-                if (participants.hasOwnProperty(handle)) {
-                    var person = participants[handle];
-                    person.removeParticipant('bob45678900');
-                }
-            }
+            _checkReceivers(alterMessage, ns.COMMANDER, null,
+                            participants, activeParticipants);//API message
             activeParticipants.delete('bob45678900');
 
             // Charlie sends to the group.
@@ -350,6 +351,7 @@ describe("chat.strongvelope workflow test", function() {
                 _checkReceivers(sent[0], sender, message,
                             participants, activeParticipants);//payload message
             }
+
             // Let's remove Bob's handler, and send another message.
             delete participants['bob45678900'];
             sender = 'alice678900';
@@ -379,18 +381,16 @@ describe("chat.strongvelope workflow test", function() {
             participants['bob45678900'].updateSenderKey();
             sender = 'alice678900';
             message = 'Welcome back, mate.';
-            for (var handle in participants) {
-                if (participants.hasOwnProperty(handle)) {
-                    var person = participants[handle];
-                    person.addParticipant('bob45678900', true);
-                }
-            }
-            // Charlie add all participants of the current room.
-            for (var i = 0;i < activeParticipants.length; i++) {
-                participants['bob45678900'].addParticipant(activeParticipants[i]);
-            }
-            activeParticipants.add('bob45678900');
+            alterMessage = participants['alice678900'].alterParticipants(['bob45678900'], []);
+            // Adds Bob into the chat.
+            _checkReceivers(alterMessage, ns.COMMANDER, null,
+                            participants, activeParticipants);//API message
 
+            // Bob adds all participants of the current room.
+            activeParticipants.forEach(function(item) {
+               participants['bob45678900'].addParticipant(item);
+            });
+            activeParticipants.add('bob45678900');
             // Chatty Charlie sends to the group.
             sender = 'charlie8900';
             for (var mi = 0; mi < TEST_MESSAGES.length; mi++) {
@@ -417,16 +417,14 @@ describe("chat.strongvelope workflow test", function() {
             sandbox.stub(window, 'u_privk', RSA_PRIV_KEY);
             sender = 'alice678900';
             message = 'Long time no see, Dave.';
-            for (var handle in participants) {
-                if (participants.hasOwnProperty(handle)) {
-                    var person = participants[handle];
-                    person.addParticipant('dave5678900', true);
-                }
-            }
+            alterMessage = participants['alice678900'].alterParticipants(['dave5678900'], []);
+            // Removes Bob from the chat.
+            _checkReceivers(alterMessage, ns.COMMANDER, null,
+                            participants, activeParticipants);//API message
             // Dave adds all participants of the current room.
-            for (var i = 0;i < activeParticipants.length; i++) {
-                participants['dave5678900'].addParticipant(activeParticipants[i]);
-            }
+            activeParticipants.forEach(function(item) {
+                participants['dave5678900'].addParticipant(item);
+            });
             activeParticipants.add('dave5678900');
 
 

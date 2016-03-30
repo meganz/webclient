@@ -104,7 +104,7 @@ body.dndc-to-rubbish * {
 body.dndc-sort * {
     cursor: url(../images/mega/cursor9.png), auto !important
 }
-body *:not(input):not(textarea) {
+body *:not(input):not(textarea):not(.fm-dialog p) {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -17184,9 +17184,6 @@ a.contact-new-button:hover {
 }
 .dev-nw-gray-bg {
     height: 100%;
-    height: -webkit-calc(100% - 306px);
-    height: -moz-calc(100% - 306px);
-    height: calc(100% - 306px);
     width: 100%;
     position: absolute;
     overflow: hidden;

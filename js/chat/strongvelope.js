@@ -109,6 +109,7 @@ var strongvelope = {};
         INC_PARTICIPANT:    0x08,
         EXC_PARTICIPANT:    0x09,
         OWN_KEY:            0x0a,
+        INVITOR:            0x0b,
     };
     var TLV_TYPES = strongvelope.TLV_TYPES;
 
@@ -126,6 +127,7 @@ var strongvelope = {};
         0x08: 'includeParticipants',
         0x09: 'excludeParticipants',
         0x0a: 'ownKey',
+        0x0b: 'invitor',
     };
 
 
@@ -484,6 +486,9 @@ var strongvelope = {};
                         parsedContent[tlvVariable].push(keyIds.substring(0, keyIdLength));
                         keyIds = keyIds.substring(keyIdLength);
                     }
+                    break;
+                case TLV_TYPES.INVITOR:
+                    parsedContent[tlvVariable] = base64urlencode(value);
                     break;
                 default:
                     // For all non-special cases, this will be used.
@@ -1478,7 +1483,7 @@ var strongvelope = {};
             }
             var result = {
                 version: parsedMessage.protocolVersion,
-                sender: message.userId,
+                sender: parsedMessage.invitor,
                 type: parsedMessage.type,
                 includeParticipants: parsedMessage.includeParticipants,
                 excludeParticipants: parsedMessage.excludeParticipants

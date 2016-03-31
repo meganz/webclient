@@ -90,6 +90,14 @@ var ConversationMessage = React.createClass({
                 msg.internalId = internalId;
             });
     },
+    doCancelRetry: function(e, msg) {
+        e.preventDefault(e);
+        e.stopPropagation(e);
+        var chatRoom = this.props.chatRoom;
+
+        chatRoom._dequeueMessage(msg);
+        chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
+    },
     render: function () {
         var self = this;
         var cssClasses = "message body";
@@ -671,9 +679,32 @@ var ConversationMessage = React.createClass({
                     messageActionButtons = null;
 
                     if (!spinnerElement) {
-                        messageNotSendIndicator = <div className="not-sent-indicator">
-                            <i className="small-icon yellow-triangle"></i>
-                        </div>;
+                        if (!message.requiresManualRetry) {
+                            messageNotSendIndicator = <div className="not-sent-indicator tooltip-trigger"
+                                                           data-tooltip="not-sent-notification">
+                                <i className="small-icon yellow-triangle"></i>
+                            </div>;
+                        }
+                        else {
+                            messageNotSendIndicator = <div className="not-sent-indicator">
+                                    <span className="tooltip-trigger"
+                                     key="retry"
+                                     data-tooltip="not-sent-notification-manual"
+                                     onClick={(e) => {
+                                            self.doRetry(e, message);
+                                        }}>
+                                      <i className="small-icon refresh-circle"></i>
+                                </span>
+                                <span className="tooltip-trigger"
+                                       key="cancel"
+                                       data-tooltip="not-sent-notification-cancel"
+                                       onClick={(e) => {
+                                                self.doCancelRetry(e, message);
+                                            }}>
+                                        <i className="small-icon red-cross"></i>
+                                </span>
+                            </div>;
+                        }
                     }
                 }
 
@@ -1990,11 +2021,27 @@ var ConversationPanel = React.createClass({
                     {sendContactDialog}
 
 
-                    <div className="dropdown body dropdown-arrow down-arrow not-sent-notification hidden">
+                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
                             {__("Message not sent. Will retry later.")}
+                        </div>
+                    </div>
+
+                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden">
+                        <i className="dropdown-white-arrow"></i>
+                        <div className="dropdown notification-text">
+                            <i className="small-icon conversations"></i>
+                            {__("Message not sent. Click here if you want to re-send it.")}
+                        </div>
+                    </div>
+
+                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden">
+                        <i className="dropdown-white-arrow"></i>
+                        <div className="dropdown notification-text">
+                            <i className="small-icon conversations"></i>
+                            {__("Message not sent. Click here if you want to cancel it.")}
                         </div>
                     </div>
 

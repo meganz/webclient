@@ -600,9 +600,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             chatRoom.messagesBuff.messages.forEach(function(msg) {
                 if (msg.getState() === Message.STATE.NOT_SENT) {
                     if (msg.sending === false) {
-                        chatRoom._messagesQueue.push(
-                            msg
-                        );
+                        chatRoom._queueMessage(msg);
                     }
                     else {
                         // the message is being sent at the moment.

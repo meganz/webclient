@@ -7546,20 +7546,23 @@ function addShareDialogContactToContent(type, id, av, name, permClass, permText,
         exportClass = 'share-item-bl';
     }
     else {
-        item = av +   '<div class="fm-chat-user-info">'
-               +       '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
-               +   '</div>';
+        item = av 
+            + '<div class="fm-share-user-info">'
+            + '<div class="fm-share-centered">'
+            + '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
+            + '</div>'
+            + '</div>';
     }
 
     html = '<div class="share-dialog-contact-bl ' + exportClass + ' ' + type + '" id="sdcbl_' + id + '">'
-           +   item
-           +   '<div class="share-dialog-remove-button"></div>'
-           +   '<div class="share-dialog-permissions ' + permClass + '">'
-           +       '<span></span>' + permText
-           +   '</div>';
+           + item
+           + '<div class="share-dialog-remove-button"></div>'
+           + '<div class="share-dialog-permissions ' + permClass + '">'
+           + '<span></span>' + permText
+           +  '</div>';
 
 
-    htmlEnd = '   <div class="clear"></div>'
+    htmlEnd = '<div class="clear"></div>'
               + '</div>';
 
     return html + htmlEnd;

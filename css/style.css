@@ -3870,14 +3870,14 @@ label.iPhoneCheckLabelOff span {
     box-sizing: border-box;
 }
 .nw-tree-panel-header + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 72px);
-    height: -moz-calc(100% - 72px);
-    height: calc(100% - 72px);
+    height: -webkit-calc(100% - 70px);
+    height: -moz-calc(100% - 70px);
+    height: calc(100% - 70px);
 }
 .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 170px);
-    height: -moz-calc(100% - 170px);
-    height: calc(100% - 170px);
+    height: -webkit-calc(100% - 168px);
+    height: -moz-calc(100% - 168px);
+    height: calc(100% - 168px);
 }
 .fm-contact-requests, .fm-received-requests {
     height: 48px;
@@ -20020,7 +20020,7 @@ span.incoming-call-name {
     overflow: hidden;
 }
 .sent-requests-grid td .email .fm-chat-user-info {
-    margin: 6px 0 8px 44px;
+    margin: 8px 0 8px 44px;
 }
 .shared-folder-icon {
     background-image: url(../images/mega/shared-sprite_v3.svg);
@@ -20837,7 +20837,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     border-radius: 100%;
 }
 .email .nw-contact-avatar {
-    background-position: center -571px;
+    background-position: center -572px;
 }
 .gmail .nw-contact-avatar {
     background-position: center -674px;
@@ -20853,6 +20853,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .email .fm-chat-user-email {
     display: none;
+}
+.ipc .left.email, .opc .left.email {
+    min-height: 34px;
 }
 .share-search-result {
     cursor: pointer;

@@ -3169,6 +3169,11 @@
     "8635": "\u05d4\u05d4\u05d5\u05e8\u05d3\u05d4 \u05d4\u05ea\u05d5\u05d5\u05e1\u05e4\u05d4 \u05d0\u05dc MEGAsync",
     "8636": "\u05d4\u05d4\u05d5\u05d3\u05e2\u05d4 \u05dc\u05d0 \u05e0\u05e9\u05dc\u05d7\u05d4. \u05de\u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1...",
     "8637": "I&#039;ll wait",
+    "8638": "Forgotten Password",
+    "8639": "Transfer Speed Issue",
+    "8640": "Contact\/Sharing Issue",
+    "8641": " MEGAsync Issue",
+    "8642": "Missing \/ Invisible Data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3206,6 +3211,9 @@
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
         "suspended-for-tos-violations": 8603,
-        "i-will-wait": 8637
+        "i-will-wait": 8637,
+        "forgotten-password": 8638,
+        "transfer-speed-issue": 8639,
+        " MEGAsync-Issue": 8641
     }
 }

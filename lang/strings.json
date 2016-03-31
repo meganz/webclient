@@ -12678,5 +12678,25 @@
     "8637": {
         "text": "I'll wait",
         "context": "Some button text on the over quota dialog which lets the user wait a few more minutes or hours until their quota is reset and they can download again."
+    },
+    "8638": {
+        "text": "Forgotten Password",
+        "context": "A subject in our help system about how to recover their account if they forget their password."
+    },
+    "8639": {
+        "text": "Transfer Speed Issue",
+        "context": "Message subject in our help system"
+    },
+    "8640": {
+        "text": "Contact\/Sharing Issue",
+        "context": "Message subject in our help system"
+    },
+    "8641": {
+        "text": " MEGAsync Issue",
+        "context": "Message subject in our help system"
+    },
+    "8642": {
+        "text": "Missing \/ Invisible Data",
+        "context": "Message subject in our help system"
     }
 }

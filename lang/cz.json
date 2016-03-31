@@ -3169,6 +3169,11 @@
     "8635": "Stahov\u00e1n\u00ed p\u0159id\u00e1no do MEGAsync",
     "8636": "Zpr\u00e1va nebyla odesl\u00e1na. Opakov\u00e1n\u00ed pokusu...",
     "8637": "I&#039;ll wait",
+    "8638": "Forgotten Password",
+    "8639": "Transfer Speed Issue",
+    "8640": "Contact\/Sharing Issue",
+    "8641": " MEGAsync Issue",
+    "8642": "Missing \/ Invisible Data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3206,6 +3211,9 @@
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
         "suspended-for-tos-violations": 8603,
-        "i-will-wait": 8637
+        "i-will-wait": 8637,
+        "forgotten-password": 8638,
+        "transfer-speed-issue": 8639,
+        " MEGAsync-Issue": 8641
     }
 }

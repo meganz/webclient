@@ -3168,6 +3168,7 @@
     "8634": "Inicie sess\u00e3o ou crie uma conta para [S]obter 50GB GR\u00c1TIS[\/S] de armazenamento na nuvem e para receber mensagens dos seus amigos e colegas de trabalho.",
     "8635": "Descarga adicionada ao MEGAsync",
     "8636": "Mensagem n\u00e3o enviada. A tentar novamente...",
+    "8637": "I&#039;ll wait",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3205,7 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637
     }
 }

@@ -3168,6 +3168,7 @@
     "8634": "\u015eimdi \u00fcye olun veya giri\u015f yap\u0131n [S]\u00dcCRETS\u0130Z 50GB[\/S] depolama alan\u0131na sahip olun, arkada\u015flar\u0131n\u0131z ve \u00e7al\u0131\u015fanlar\u0131n\u0131zla mesajla\u015f\u0131n.",
     "8635": "\u0130ndirme MEGAsync&#039;e eklendi",
     "8636": "\u0130leti g\u00f6nderilemedi. Yeniden deneniyor...",
+    "8637": "I&#039;ll wait",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3205,7 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637
     }
 }

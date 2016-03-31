@@ -3168,6 +3168,7 @@
     "8634": "Prihl\u00e1ste sa alebo si vytvorte \u00fa\u010det, aby ste [S]zdarma z\u00edskali 50GB[\/S] cloudov\u00e9ho \u00falo\u017eiska a mohli prij\u00edma\u0165 spr\u00e1vy od svojich priate\u013eov a kolegov.",
     "8635": "S\u0165ahovanie pridan\u00e9 do MEGAsync",
     "8636": "Spr\u00e1va nebola odoslan\u00e1. Sk\u00fa\u0161am to znovu...",
+    "8637": "I&#039;ll wait",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3205,7 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637
     }
 }

@@ -3168,6 +3168,7 @@
     "8634": "Masuk atau buat akun untuk [S]mendapatkan 50GB GRATIS[\/S] cloud storage dan menerima pesan dari teman dan teman kantor anda.",
     "8635": "Download ditambahkan ke MEGAsync",
     "8636": "Pesan belum terkirim. Mencoba kembali...",
+    "8637": "I&#039;ll wait",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3205,7 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637
     }
 }

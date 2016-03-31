@@ -3168,6 +3168,7 @@
     "8634": "Accede o crea una cuenta para [S]obtener 50GB GRATIS[\/S] de almacenamiento en la nube y para recibir mensajes de tus amigos y compa\u00f1eros de trabajo.",
     "8635": "Descarga a\u00f1adida a MEGAsync",
     "8636": "Mensaje no enviado. Reintentando...",
+    "8637": "I&#039;ll wait",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3205,7 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637
     }
 }

@@ -12674,5 +12674,9 @@
     "8636": {
         "text": "Message not sent. Retrying...",
         "context": "A notification if the message could not be sent."
+    },
+    "8637": {
+        "text": "I'll wait",
+        "context": "Some button text on the over quota dialog which lets the user wait a few more minutes or hours until their quota is reset and they can download again."
     }
 }

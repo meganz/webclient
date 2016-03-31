@@ -3168,6 +3168,7 @@
     "8634": "Vpi\u0161ite se ali se prijavite za ra\u010dun, da [S]dobite 50GB BREZPLA\u010cNEGA[\/S] prostora za shranjevanje v oblaku in da lahko prejemate sporo\u010dila od prijateljev in sodelavcev. ",
     "8635": "Prevzemanje dodano v MEGAsync",
     "8636": "Sporo\u010dilo ni bilo poslano. Posku\u0161am ponovno...",
+    "8637": "I&#039;ll wait",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3205,7 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637
     }
 }

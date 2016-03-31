@@ -3169,6 +3169,11 @@
     "8635": "S\u0165ahovanie pridan\u00e9 do MEGAsync",
     "8636": "Spr\u00e1va nebola odoslan\u00e1. Sk\u00fa\u0161am to znovu...",
     "8637": "I&#039;ll wait",
+    "8638": "Forgotten Password",
+    "8639": "Transfer Speed Issue",
+    "8640": "Contact\/Sharing Issue",
+    "8641": " MEGAsync Issue",
+    "8642": "Missing \/ Invisible Data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3206,6 +3211,9 @@
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
         "suspended-for-tos-violations": 8603,
-        "i-will-wait": 8637
+        "i-will-wait": 8637,
+        "forgotten-password": 8638,
+        "transfer-speed-issue": 8639,
+        " MEGAsync-Issue": 8641
     }
 }

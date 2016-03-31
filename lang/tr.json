@@ -3168,12 +3168,12 @@
     "8634": "\u015eimdi \u00fcye olun veya giri\u015f yap\u0131n [S]\u00dcCRETS\u0130Z 50GB[\/S] depolama alan\u0131na sahip olun, arkada\u015flar\u0131n\u0131z ve \u00e7al\u0131\u015fanlar\u0131n\u0131zla mesajla\u015f\u0131n.",
     "8635": "\u0130ndirme MEGAsync&#039;e eklendi",
     "8636": "\u0130leti g\u00f6nderilemedi. Yeniden deneniyor...",
-    "8637": "I&#039;ll wait",
-    "8638": "Forgotten Password",
-    "8639": "Transfer Speed Issue",
-    "8640": "Contact\/Sharing Issue",
-    "8641": " MEGAsync Issue",
-    "8642": "Missing \/ Invisible Data",
+    "8637": "Bekleyece\u011fim",
+    "8638": "Unutulan \u015eifre",
+    "8639": "Transfer H\u0131z\u0131 Sorunu",
+    "8640": "\u0130leti\u015fim\/Payla\u015f\u0131m Sorunu",
+    "8641": "MEGAsync Sorunu",
+    "8642": "Eksik\/G\u00f6r\u00fcnmez Veri",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3214,6 +3214,6 @@
         "i-will-wait": 8637,
         "forgotten-password": 8638,
         "transfer-speed-issue": 8639,
-        " MEGAsync-Issue": 8641
+        "megasync-issue": 8641
     }
 }

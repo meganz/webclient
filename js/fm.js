@@ -4474,7 +4474,6 @@ function avatarDialog(close)
                     data: blob,
                     url: myURL.createObjectURL(blob)
                 };
-                console.error(avatars[u_handle]);
                 $('.fm-account-avatar').html(useravatar.contact(u_handle));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);

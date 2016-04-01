@@ -3168,12 +3168,14 @@
     "8634": "Entre ou crie uma nova conta para ganhar [S]50 GB GR\u00c1TIS[\/B] de armazenamento na nuvem, e para receber mensagens de seus amigos e colegas de trabalho.",
     "8635": "Download adicionado ao MEGAsync",
     "8636": "Mensagem n\u00e3o enviada. Tentando novamente...",
-    "8637": "I&#039;ll wait",
-    "8638": "Forgotten Password",
-    "8639": "Transfer Speed Issue",
-    "8640": "Contact\/Sharing Issue",
-    "8641": " MEGAsync Issue",
-    "8642": "Missing \/ Invisible Data",
+    "8637": "Vou esperar",
+    "8638": "Esqueci minha senha",
+    "8639": "Problemas com velocidade de transfer\u00eancias",
+    "8640": "Problemas com Contato\/Compartilhamento",
+    "8641": "Problemas com o MEGAsync",
+    "8642": "Dados perdidos ou n\u00e3o acess\u00edveis",
+    "8643": "Voc\u00ea est\u00e1 utilizando uma sess\u00e3o tempor\u00e1ria.",
+    "8644": "Voc\u00ea est\u00e1 utilizando uma sess\u00e3o tempor\u00e1ria. Os dados que est\u00e1 armazenando ser\u00e3o perdidos quando a sess\u00e3o expirar. Para manter seus arquivos ativos, por favor, crie uma conta o quanto antes e receba [S]50 GB de armazenamento seguro na nuvem![\/S]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3214,6 +3216,8 @@
         "i-will-wait": 8637,
         "forgotten-password": 8638,
         "transfer-speed-issue": 8639,
-        "megasync-issue": 8641
+        "megasync-issue": 8641,
+        "using-ephemeral-session": 8643,
+        "ephemeral-session-message": 8644
     }
 }

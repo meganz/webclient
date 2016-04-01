@@ -3168,12 +3168,14 @@
     "8634": "Prihl\u00e1ste sa alebo si vytvorte \u00fa\u010det, aby ste [S]zdarma z\u00edskali 50GB[\/S] cloudov\u00e9ho \u00falo\u017eiska a mohli prij\u00edma\u0165 spr\u00e1vy od svojich priate\u013eov a kolegov.",
     "8635": "S\u0165ahovanie pridan\u00e9 do MEGAsync",
     "8636": "Spr\u00e1va nebola odoslan\u00e1. Sk\u00fa\u0161am to znovu...",
-    "8637": "I&#039;ll wait",
-    "8638": "Forgotten Password",
-    "8639": "Transfer Speed Issue",
-    "8640": "Contact\/Sharing Issue",
-    "8641": " MEGAsync Issue",
-    "8642": "Missing \/ Invisible Data",
+    "8637": "Po\u010dk\u00e1m",
+    "8638": "Zabudnut\u00e9 heslo",
+    "8639": "Probl\u00e9m s prenosovou r\u00fdchlos\u0165ou",
+    "8640": "Probl\u00e9m s Kontaktmi\/Zdie\u013ean\u00edm",
+    "8641": "MEGAsync probl\u00e9m",
+    "8642": "Ch\u00fdbaj\u00face \/ Nevidite\u013en\u00e9 d\u00e1ta",
+    "8643": "You are using an ephemeral session.",
+    "8644": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3214,6 +3216,8 @@
         "i-will-wait": 8637,
         "forgotten-password": 8638,
         "transfer-speed-issue": 8639,
-        "megasync-issue": 8641
+        "megasync-issue": 8641,
+        "using-ephemeral-session": 8643,
+        "ephemeral-session-message": 8644
     }
 }

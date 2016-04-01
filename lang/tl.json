@@ -2981,7 +2981,7 @@
     "8438": "Source Code Transparency",
     "8439": "Ang aming mga client side apps ay lisensyado sa ilalim ng isang custom na lisensya at ang aming core libraries (gaya ng Software Development Kit) ay nasa ilalim ng mas malayang lisensya. Makikita sa kanya-kanyang code repositories ang lisensya para sa bawat proyekto.",
     "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
-    "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
+    "8441": "Kung makakita ka ng bug o security flaw sa aming code, magpadala ng email sa [A]bugs@mega.nz[\/A] na nagpapaliwanag sa problema. Kami ay may magandang bayad para sa aming vulnerability rewards program at ang submission criteria pinapaliwanag [A2]dito[\/A2].",
     "8442": "Pumili ng files",
     "8443": "Pumili ng folder",
     "8444": "Mag-subscribe",
@@ -3096,7 +3096,7 @@
     "8557": "Paganahin ang option na ito kung hindi magsimula ang paglilipat. Kadalasan, sapat na ang HTTP sapagkat ang paglilipat dito ay encrypted na.",
     "8558": "Hindi na suportado ang MEGA v1 app",
     "8559": "Iinstall ang aming bagong MEGA v3 app may mga bagong design at features!",
-    "8560": "You will have to enter your credentials (login and password) in the new app. If you don't remember your password, please Export your Master Key before uninstalling the v1 app.",
+    "8560": "Kailangan mong ilagay ang iyong credentials (login at password) sa bagong app. Kung hindi mo maalala ang iyong password, i-Export ang iyong Master Key bago i-auninstall ang v1 app.",
     "8561": "Kung mayroon kang aktibong subscription sa v1 app, itigil ito sa Google Play at magsubscribe muli sa v3 app kapag ang kasalakuyang subscription ay nahinto na. 'Wag mag-alala dahil ang iyong PRO status sa bagong app ay nasa iyo pa rin hangga't di na nahihinto ang bagong app.",
     "8562": "[Maaaring maiba ang presyo depende sa bansang tinitirhan at ng uri ng pagbabayad.]",
     "8563": "Ititigil mo na ang iyong subscription sa MEGA. Ipaalam kaagad sa amin kung mayroon kaming magagawa upang mabawi ang iyong desisyon.",
@@ -3168,12 +3168,14 @@
     "8634": "Mag log in o gumawa ng account para makakuha ng [S]libreng 50GB[\/S] cloud storage at makatanggap ng mga mensahe sa iyong mga kaibigan o katrabaho.",
     "8635": "Naidagdag ang download sa MEGAsync",
     "8636": "Hindi naipadala ang mensahe. Sinusubukang muli...",
-    "8637": "I&#039;ll wait",
-    "8638": "Forgotten Password",
-    "8639": "Transfer Speed Issue",
-    "8640": "Contact\/Sharing Issue",
-    "8641": " MEGAsync Issue",
-    "8642": "Missing \/ Invisible Data",
+    "8637": "Maghihintay ako",
+    "8638": "Nalimutan ang Password",
+    "8639": "Issue sa Bilis ng Paglilipat",
+    "8640": "Issue sa Contact\/Pamamahagi",
+    "8641": "MEGAsync Issue",
+    "8642": "Nawawala \/ Di-makitang Data",
+    "8643": "You are using an ephemeral session.",
+    "8644": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3214,6 +3216,8 @@
         "i-will-wait": 8637,
         "forgotten-password": 8638,
         "transfer-speed-issue": 8639,
-        "megasync-issue": 8641
+        "megasync-issue": 8641,
+        "using-ephemeral-session": 8643,
+        "ephemeral-session-message": 8644
     }
 }

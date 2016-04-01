@@ -911,7 +911,7 @@ if (m)
     }
     else if (ua.indexOf('android') > -1)
     {
-        app='https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzsb';
+        app='https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
         android=1;
 
@@ -921,7 +921,7 @@ if (m)
             ver = ver.pop();
             // Check for Android 2.3+
             if (ver > 2 || (ver === 2 && rev > 3)) {
-                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
+                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             }
         }
         if (intent) {
@@ -1038,14 +1038,14 @@ if (m)
 }
 else if (page == '#android')
 {
-    document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzmobileapps';
+    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps';
 }
 else if (!b_u)
 {
     d = localStorage.d || 0;
     var jj = localStorage.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'bg':['bg'],'tl':['en-ph'],'vi':['vn', 'vi']};
+    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cs','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'bg':['bg'],'tl':['en-ph'],'vi':['vn', 'vi']};
 
     if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
     if (d && !console.time) (function(c)
@@ -1283,22 +1283,54 @@ else if (!b_u)
         };
     }
 
-    function detectlang()
-    {
-        if (!navigator.language) return 'en';
-        var bl = navigator.language.toLowerCase();
-        var l2 = languages, b;
-        for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
-        for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
+    /**
+     * Detects which language the user currently has set in their browser
+     * @returns {String} Returns the two letter language code e.g. 'en', 'es' etc
+     */
+    var detectLang = function() {
+
+        // Get the preferred language in their browser
+        var userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        var langCode = null;
+        var langCodeVariant = null;
+
+        if (!userLang) {
+            return 'en';
+        }
+
+        // Lowercase it
+        userLang = userLang.toLowerCase();
+
+        // Match on language code variants e.g. 'pt-br' returns 'br'
+        /* jshint -W089 */
+        for (langCode in languages) {
+            for (langCodeVariant in languages[langCode]) {
+                if (languages[langCode][langCodeVariant] === userLang) {
+                    return langCode;
+                }
+            }
+        }
+
+        // If no exact match supported, normalise to base language code e.g. en-gb, en-us, en-ca returns 'en'
+        /* jshint -W089 */
+        for (langCode in languages) {
+            for (langCodeVariant in languages[langCode]) {
+                if (languages[langCode][langCodeVariant].substring(0, 3) === userLang.substring(0, 3)) {
+                    return langCode;
+                }
+            }
+        }
+
+        // Default to English
         return 'en';
-    }
+    };
 
     /**
      * Gets the file path for a language file
      * @param {String} language
      * @returns {String}
      */
-    function getLanguageFilePath(language) {
+    var getLanguageFilePath = function(language) {
 
         // If the sh1 (filename with hashes) array has been created from deploy script
         if (typeof sh1 !== 'undefined') {
@@ -1319,9 +1351,9 @@ else if (!b_u)
             // Otherwise return the filename.json when in Development
             return 'lang/' + language + '.json';
         }
-    }
+    };
 
-    var lang = detectlang();
+    var lang = detectLang();
     var jsl = [];
 
     // If they've already selected a language, use that
@@ -1334,7 +1366,7 @@ else if (!b_u)
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
     var langFilepath = getLanguageFilePath(lang);
 
-    jsl.push({f: langFilepath, n: 'lang', j:3});
+    jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -1583,8 +1615,7 @@ else if (!b_u)
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
         'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
         'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1},
-        'version_compare_js': {f:'js/vendor/version-compare.js', n: 'version_compare_js', j:1}
+        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1}
     };
 
     var subpages =
@@ -1615,10 +1646,10 @@ else if (!b_u)
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': ['help_js'],
-        'plugin': ['chrome', 'firefox'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
-        'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
+        'plugin': ['chrome', 'chrome_js', 'firefox', 'firefox_js'],
+        'chrome': ['chrome', 'chrome_js'],
         'firefox': ['firefox', 'firefox_js']
     };
 
@@ -2058,7 +2089,7 @@ else if (!b_u)
     {
         if (document.location.hash == '#android')
         {
-            document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzindexandroid';
+            document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
         }
         else
         {
@@ -2066,7 +2097,7 @@ else if (!b_u)
             document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
             document.getElementById('android_yes').addEventListener("click", function ()
             {
-                document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzandroid';
+                document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzandroid';
             }, false);
             document.getElementById('android_no').addEventListener("click", function ()
             {

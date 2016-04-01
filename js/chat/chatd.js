@@ -615,6 +615,7 @@ Chatd.Messages = function(chatd, chatId) {
 
     // mapping of transactionids of messages being sent to the numeric index of this.buf
     this.sending = {};
+    this.sendingList = [];
 
     // msgnums of modified messages
     this.modified = {};
@@ -638,6 +639,7 @@ Chatd.Messages.prototype.submit = function(message) {
 
 
     this.sending[msgxid] = this.highnum;
+    this.sendingList.push(msgxid);
 
     // if we believe to be online, send immediately
     if (this.chatd.chatIdShard[this.chatId].isOnline()) {
@@ -684,14 +686,14 @@ Chatd.Messages.prototype.resend = function() {
     var self = this;
 
     // resend all pending new messages and modifications
-    for (var msgxid in this.sending) {
+    this.sendingList.forEach(function(msgxid) {
         self.chatd.chatIdShard[this.chatId].msg(
             this.chatId,
             msgxid,
             this.buf[this.sending[msgxid]][Chatd.MsgField.TIMESTAMP],
             this.buf[this.sending[msgxid]][Chatd.MsgField.MESSAGE]
         );
-    }
+    });
 
     // resend all pending modifications of completed messages
     for (var msgnum in this.modified) {
@@ -737,6 +739,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     var self = this;
     var num = this.sending[msgxid];
 
+    removeValue(this.sendingList, msgxid);
     delete this.sending[msgxid];
 
     this.buf[num][Chatd.MsgField.MSGID] = msgid;

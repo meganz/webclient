@@ -5666,7 +5666,6 @@ th.grid-first-th {
     right: 6px;
     background-position: -106px -963px;
     display: none;
-    cursor: pointer;
 }
 .taken-down .link-icon {
     background-position: -146px -963px;
@@ -5806,7 +5805,7 @@ th.grid-first-th {
     display: block;
     margin: 0;
 }
-.file-block .block-view-file-type.thumb {
+.file-block .block-view-file-type.thumb, .img-block.thumb {
     background-repeat: repeat;
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;

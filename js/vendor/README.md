@@ -127,11 +127,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/jwagner/smartcrop.js/compare/master...meganz:master)
 
 ---
-[version-compare.js]: Compares two software version numbers (e.g. "1.7.1" or "1.2b"). This is used to show whether there is a site or extension update available.
-
-> This is released into the [public domain](https://en.wikipedia.org/wiki/Public_domain_software).
-
----
 [zxcvbn.js]: A realistic password strength estimator.
 
 > NB: We are using a custom, unobfuscated build which was created using:
@@ -180,5 +175,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
-[version-compare.js]: <https://gist.github.com/TheDistantSea/8021359>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>

@@ -259,16 +259,23 @@ var ConversationMessage = React.createClass({
                             M.addDownload([v]);
                         };
 
+                        var attachmentMetaInfo;
                         // cache ALL current attachments, so that we can revoke them later on in an ordered way.
                         if (message.messageId) {
-                            if (!chatRoom._attachmentsMap) {
-                                chatRoom._attachmentsMap = {};
+                            if (
+                                chatRoom.attachments &&
+                                chatRoom.attachments[v.h] &&
+                                chatRoom.attachments[v.h][message.messageId]
+                            ) {
+                                attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
                             }
-                            if (!chatRoom._attachmentsMap[v.h]) {
-                                chatRoom._attachmentsMap[v.h] = {};
+                            else {
+                                // if the chatRoom.attachments is not filled in yet, just skip the rendering
+                                // and this attachment would be re-rendered on the next loop.
+                                return;
                             }
-                            chatRoom._attachmentsMap[v.h][message.messageId] = false;
                         }
+
                         var addToCloudDrive = function() {
                             M.injectNodes(v, M.RootID, false, function(res) {
                                 if (res === 0) {
@@ -281,8 +288,38 @@ var ConversationMessage = React.createClass({
                             });
                         };
 
+                        var startPreview = function(e) {
+                            assert(M.chat, 'Not in chat.');
+                            M.v = chatRoom.images.values();
+                            slideshow(v.h);
+                            if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        };
+
+                        // generate preview/icon
+                        var icon = fileIcon(v);
+
                         var dropdown = null;
-                        if (!message.revoked) {
+                        var previewButtons = null;
+
+
+
+                        if (!attachmentMetaInfo.revoked) {
+                            if (v.fa && (icon === "graphic" || icon === "image")) {
+                                var imagesListKey = message.messageId + "_" + v.h;
+                                if (!chatRoom.images.exists(imagesListKey)) {
+                                    v.k = imagesListKey;
+                                    v.delay = message.delay;
+                                    chatRoom.images.push(v);
+                                }
+                                previewButtons = <span>
+                                    <DropdownsUI.DropdownItem icon="search-icon" label={__(l[1899])}
+                                          onClick={startPreview}/>
+                                    <hr/>
+                                </span>
+                            }
                             if (contact.u === u_handle) {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
@@ -294,6 +331,7 @@ var ConversationMessage = React.createClass({
                                         positionAt="right bottom"
                                         horizOffset={4}
                                         >
+                                        {previewButtons}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
@@ -315,6 +353,7 @@ var ConversationMessage = React.createClass({
                                         <DropdownsUI.Dropdown
                                             className="attachments-dropdown"
                                         >
+                                        {previewButtons}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
@@ -329,8 +368,53 @@ var ConversationMessage = React.createClass({
                                 icon="tiny-icon grey-down-arrow" />;
                         }
 
+                        var attachmentClasses = "message shared-data";
+                        var preview = <div className="data-block-view medium">
+                            {dropdown}
+
+                            <div className="data-block-bg">
+                                <div className={"block-view-file-type " + icon}></div>
+                            </div>
+                        </div>;
+
+                        if (M.chat && !message.revoked) {
+                            if (v.fa && (icon === "graphic" || icon === "image")) {
+                                var src = thumbnails[v.h];
+                                if (!src) {
+                                    src = M.getNodeByHandle(v.h);
+
+                                    if (!src || !src.seen) {
+                                        M.v.push(v);
+                                        if (!v.seen) {
+                                            v.seen = 1; // HACK
+                                        }
+                                        if (src) {
+                                            src.seen = 1; // HACK
+                                        }
+                                        delay('thumbnails', fm_thumbnails, 90);
+                                    }
+                                    src = window.noThumbURI || '';
+                                }
+
+                                preview =  (src ? (<div id={v.h} className="shared-link img-block">
+                                        <div className="img-overlay" onClick={startPreview}></div>
+                                        <div className="button overlay-button" onClick={startPreview}>
+                                            <i className="huge-white-icon loupe"></i>
+                                        </div>
+
+                                        {dropdown}
+
+                                        <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
+                                             width="120"
+                                             height="120"
+                                             onClick={startPreview}
+                                        />
+                                    </div>) :  preview);
+                            }
+                        }
+
                         files.push(
-                            <div className="message shared-data" key={v.h}>
+                            <div className={attachmentClasses} key={v.h}>
                                 <div className="message shared-info">
                                     <div className="message data-title">
                                         {v.name}
@@ -340,13 +424,7 @@ var ConversationMessage = React.createClass({
                                     </div>
                                 </div>
 
-                                <div className="data-block-view medium">
-                                    {dropdown}
-
-                                    <div className="data-block-bg">
-                                        <div className={"block-view-file-type " + fileIcon(v)}></div>
-                                    </div>
-                                </div>
+                                {preview}
                                 <div className="clear"></div>
 
                             </div>
@@ -426,7 +504,7 @@ var ConversationMessage = React.createClass({
                                     >
                                         <DropdownsUI.DropdownItem
                                             icon="human-profile"
-                                            label={__("View profile")}
+                                            label={__(l[5868])}
                                             onClick={() => {
                                                 window.location = "#fm/" + contact.u;
                                             }}
@@ -434,14 +512,14 @@ var ConversationMessage = React.createClass({
                                         <hr/>
                                         { null /*<DropdownsUI.DropdownItem
                                          icon="rounded-grey-plus"
-                                         label={__("Add to chat")}
+                                         label={__(l[8631])}
                                          onClick={() => {
                                          window.location = "#fm/" + contact.u;
                                          }}
                                          />*/}
                                         <DropdownsUI.DropdownItem
                                             icon="conversations"
-                                            label={__("Start new chat")}
+                                            label={__(l[8632])}
                                             onClick={() => {
                                                 window.location = "#fm/chat/" + contact.u;
                                             }}
@@ -490,7 +568,7 @@ var ConversationMessage = React.createClass({
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{mega.utils.fullUsername(contact.u)}</div>
+                                    <div className="message data-title">{htmlentities(mega.utils.fullUsername(contact.u))}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :
@@ -546,15 +624,13 @@ var ConversationMessage = React.createClass({
                     </div>;
                 }
                 else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-                    if (!chatRoom._attachmentsMap) {
-                        chatRoom._attachmentsMap = {};
-                    }
                     var foundRevokedNode = null;
 
                     var revokedNode = textContents.substr(2, textContents.length);
 
-                    if (chatRoom._attachmentsMap[revokedNode]) {
-                        Object.keys(chatRoom._attachmentsMap[revokedNode]).forEach(function(messageId) {
+                    if (chatRoom.attachments.exists(revokedNode)) {
+                        chatRoom.attachments[revokedNode].forEach(function(obj) {
+                            var messageId = obj.messageId;
                             var attachedMsg = chatRoom.messagesBuff.messages[messageId];
 
                             if (!attachedMsg) {
@@ -571,8 +647,9 @@ var ConversationMessage = React.createClass({
                                     })
                                 } catch(e) {
                                 }
-                                attachedMsg.revoked = true;
                                 attachedMsg.seen = true;
+                                attachedMsg.revoked = true;
+                                obj.revoked = true;
                             }
                         });
                     }
@@ -680,7 +757,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", mega.utils.fullUsername(contact.u));
+                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -691,7 +768,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", mega.utils.fullUsername(contact.u));
+                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
             }
 
             message.textContents = textMessage;
@@ -894,7 +971,7 @@ var ConversationRightArea = React.createClass({
                                    room.leaveChat(true);
                                 }}>
                                     <i className="small-icon rounded-stop"></i>
-                                    {__("Leave Chat")}
+                                    {__(l[8633])}
                                 </div>
                                 : null
                         }
@@ -1117,7 +1194,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
         participants.forEach(function(v) {
             displayNames.push(
-                chatRoom.megaChat.getContactNameFromJid(v)
+                htmlentities(chatRoom.megaChat.getContactNameFromJid(v))
             );
         });
 
@@ -1568,7 +1645,6 @@ var ConversationPanel = React.createClass({
         room.megaChat.updateSectionUnreadCount();
 
         self.handleWindowResize();
-
     },
     handleWindowResize: function(e, scrollToBottom) {
         var $container = $(ReactDOM.findDOMNode(this));
@@ -1830,7 +1906,7 @@ var ConversationPanel = React.createClass({
                     .replace("%s", namesDisplay[1]);
             }
             else {
-                msg = __("%s is typing").replace("%s", namesDisplay[0]);
+                msg = __(l[8629]).replace("%1", namesDisplay[0]);
             }
 
             typingElement = <div className="typing-block">
@@ -1985,7 +2061,7 @@ var ConversationPanel = React.createClass({
                                             }} />
                                             <DropdownsUI.DropdownItem
                                                 icon="square-profile"
-                                                label={__("Send Contact")}
+                                                label={__(l[8628])}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
                                             }} />

@@ -211,6 +211,7 @@ if (!b_u) try
         // We could either show the user a message about the issue and let him
         // enable cookies, or rather setup a tiny polyfill so that they can use
         // the site even in such case, even though this solution has side effects.
+        delete window.localStorage;
         Object.defineProperty(window, 'localStorage', {
             value: Object.create({}, {
                 length:     { get: function() { return Object.keys(this).length; }},

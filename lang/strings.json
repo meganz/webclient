@@ -12674,5 +12674,37 @@
     "8636": {
         "text": "Message not sent. Retrying...",
         "context": "A notification if the message could not be sent."
+    },
+    "8637": {
+        "text": "I'll wait",
+        "context": "Some button text on the over quota dialog which lets the user wait a few more minutes or hours until their quota is reset and they can download again."
+    },
+    "8638": {
+        "text": "Forgotten Password",
+        "context": "A subject in our help system about how to recover their account if they forget their password."
+    },
+    "8639": {
+        "text": "Transfer Speed Issue",
+        "context": "Message subject in our help system"
+    },
+    "8640": {
+        "text": "Contact\/Sharing Issue",
+        "context": "Message subject in our help system"
+    },
+    "8641": {
+        "text": " MEGAsync Issue",
+        "context": "Message subject in our help system"
+    },
+    "8642": {
+        "text": "Missing \/ Invisible Data",
+        "context": "Message subject in our help system"
+    },
+    "8643": {
+        "text": "You are using an ephemeral session.",
+        "context": "A warning dialog title which is shown when a user adds a file to the cloud drive but they are not logged into an account, so the file is stored in an ephemeral (temporary) session."
+    },
+    "8644": {
+        "text": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
+        "context": "A message in the ephemeral warning dialog. Please keep the [S] and [\/S] placeholder tags in the translation which will be used to stylise the content at runtime."
     }
 }

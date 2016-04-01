@@ -3156,7 +3156,7 @@
     "8621": "Det gick inte att ladda inkommande delade objekt fr\u00e5n MEGA. F\u00f6rs\u00f6k igen eller klicka p\u00e5 uppdatera.",
     "8622": "Det gick inte att ladda utg\u00e5ende delade objekt fr\u00e5n MEGA. F\u00f6rs\u00f6k igen eller klicka p\u00e5 uppdatera.",
     "8623": "popul\u00e4r!",
-    "8624": "Failed to delete settings. Please try again. [{0}]",
+    "8624": "Misslyckades att ta bort inst\u00e4llningar. F\u00f6rs\u00f6k igen [{0}]",
     "8625": "Fel vid borttagning av inst\u00e4llningar",
     "8626": "Misslyckades att ladda inst\u00e4llningar, f\u00f6rs\u00f6k igen [{0}]",
     "8627": "Fel vid inl\u00e4sning av inst\u00e4llningar",
@@ -3165,9 +3165,17 @@
     "8631": "L\u00e4gg till i chatt",
     "8632": "Starta ny chatt",
     "8633": "L\u00e4mna chatt",
-    "8634": "Log in or create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+    "8634": "Logga in eller skapa ett konto f\u00f6r att [S] f\u00e5 50GB gratis [\/S] molnlagring och ta emot meddelanden fr\u00e5n dina v\u00e4nner och arbetskamrater .",
     "8635": "Nedladdning tillagd till MEGAsync",
     "8636": "Meddelande ej skickat. F\u00f6rs\u00f6ker igen....",
+    "8637": "Jag v\u00e4ntar",
+    "8638": "Gl\u00f6mt l\u00f6senord",
+    "8639": "\u00f6verf\u00f6ringshastighetsproblem",
+    "8640": "Kontakt\/delnings problem",
+    "8641": " MEGAsync problem",
+    "8642": "Saknar \/ Osynlig data",
+    "8643": "You are using an ephemeral session.",
+    "8644": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3212,12 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637,
+        "forgotten-password": 8638,
+        "transfer-speed-issue": 8639,
+        "megasync-issue": 8641,
+        "using-ephemeral-session": 8643,
+        "ephemeral-session-message": 8644
     }
 }

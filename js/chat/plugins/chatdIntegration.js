@@ -494,7 +494,6 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
                     crypt.getPubRSA(userId)
                 );
             }
-            console.error(userId);
         });
     }
     return MegaPromise.allDone(promises);

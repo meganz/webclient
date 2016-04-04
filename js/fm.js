@@ -2895,7 +2895,7 @@ function fmtopUI() {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc' || String(M.currentdirid).length === 11 ) {
             $('.fm-add-user').removeClass('hidden');
             $('.fm-left-panel').addClass('contacts-panel');
             if (M.currentdirid === 'ipc') {
@@ -6813,7 +6813,7 @@ function sectionUIopen(id) {
         $('.fm-blocks-view.fm').addClass('hidden');
     }
 
-    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc' && String(M.currentdirid).length !== 11) {
         $('.fm-left-panel').removeClass('contacts-panel');
         $('.fm-right-header').removeClass('requests-panel');
         $('.fm-received-requests').removeClass('active');

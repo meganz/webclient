@@ -7,6 +7,10 @@
 describe("chat.strongvelope transcripts unit test", function() {
     "use strict";
 
+    if (window.__SKIP_WORKFLOWS) {
+        return;
+    }
+
     var assert = chai.assert;
     var AssertionError = chai.AssertionError;
 

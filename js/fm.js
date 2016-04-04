@@ -4464,17 +4464,17 @@ function avatarDialog(close)
         {
             cropButton: $('#fm-change-avatar'),
             dragDropUploadPrompt:l[1390],
+            outputFormat: 'image/png',
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);
                 mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
-                var blob = new Blob([data], {type: 'image/jpeg'});
-                avatars[u_handle] =
-                    {
-                        data: blob,
-                        url: myURL.createObjectURL(blob)
-                    }
-                    $('.fm-account-avatar').html(useravatar.contact(u_handle));
+                var blob = new Blob([data], {type: 'image/png'});
+                avatars[u_handle] = {
+                    data: blob,
+                    url: myURL.createObjectURL(blob)
+                };
+                $('.fm-account-avatar').html(useravatar.contact(u_handle));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },
@@ -4937,6 +4937,9 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
+        if (!is_fm()) {
+            return; 
+        }
         if (self.is_active()) {
             self.deactivate();
             return false;
@@ -6659,7 +6662,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if ($(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if (!is_fm() || $(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -9659,7 +9662,7 @@ function propertiesDialog(close)
                 }
                 p.t4 = rights;
                 p.t6 = l[5905];
-                p.t7 = mega.utils.fullUsername(user.h);
+                p.t7 = htmlentities(mega.utils.fullUsername(user.h));
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -10532,7 +10535,6 @@ mega.utils.fullUsername = function username(userHandle) {
 
         // Convert to string and escape for XSS
         result = String(result);
-        result = htmlentities(result);
     }
 
     return result;
@@ -10579,7 +10581,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var fullOwnersName = mega.utils.fullUsername(ownersHandle);
+        var fullOwnersName = htmlentities(mega.utils.fullUsername(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
         // Access rights

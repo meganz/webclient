@@ -519,7 +519,7 @@ function MegaData()
                     mega.attr.get(u, 'a', true, false)
                         .done(function (res) {
                             if (typeof res !== 'number' && res.length > 5) {
-                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
+                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/png'});
                                 avatars[u] = {
                                     data: blob,
                                     url: myURL.createObjectURL(blob)
@@ -979,8 +979,8 @@ function MegaData()
                 u_h = M.v[i].h;
                 contact = M.u[u_h];
 
-                // do not render oneself or invalid..
-                if (!contact || u_h === u_handle) {
+                // do not render invalid..
+                if (!contact) {
                     continue;
                 }
 
@@ -1028,7 +1028,7 @@ function MegaData()
                                 <td>\n\
                                     ' + avatar + ' \
                                     <div class="fm-chat-user-info todo-star">\n\
-                                        <div class="fm-chat-user">' + mega.utils.fullUsername(node.u) + '</div>\n\
+                                        <div class="fm-chat-user">' + htmlentities(mega.utils.fullUsername(node.u)) + '</div>\n\
                                         <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
                                     </div>\n\
                                 </td>\n\
@@ -1092,7 +1092,7 @@ function MegaData()
                 if (M.currentdirid === 'shares') {// render shares tab
                     // Handle of initial share owner
                     var ownersHandle = M.v[i].su;
-                    var fullContactName = mega.utils.fullUsername(ownersHandle);
+                    var fullContactName = htmlentities(mega.utils.fullUsername(ownersHandle));
 
                     cs = M.contactstatus(M.v[i].h);
                     contains = fm_contains(cs.files, cs.folders);
@@ -4260,7 +4260,7 @@ function MegaData()
 
                 sync.megaSyncRequest(cmd)
                     .done(function() {
-                        showToast('megasync', 'Download added to MEGAsync', 'Open');
+                        showToast('megasync', l[8635], 'Open');
                     })
                     .fail(webdl);
             })
@@ -5879,8 +5879,6 @@ function execsc(actionPackets, callback) {
                     }
                 });
 
-
-
                 M.handleEmptyContactGrid();
             }
 
@@ -6990,6 +6988,16 @@ function processUPCO(ap) {
     }
 }
 
+/*
+ * process_u
+ *
+ * Updates contact/s data in global variable M.u, local dB and
+ * taking care of items in share and add contacts dialogs dropdown
+ *
+ * .c param is contact level i.e. [0-(inactive/deleted), 1-(active), 2-(owner)]
+ *
+ * @param {Object} u Users informations
+ */
 function process_u(u) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {

@@ -514,7 +514,7 @@ var ConversationMessage = React.createClass({
                                     >
                                         <DropdownsUI.DropdownItem
                                             icon="human-profile"
-                                            label={__("View profile")}
+                                            label={__(l[5868])}
                                             onClick={() => {
                                                 window.location = "#fm/" + contact.u;
                                             }}
@@ -522,14 +522,14 @@ var ConversationMessage = React.createClass({
                                         <hr/>
                                         { null /*<DropdownsUI.DropdownItem
                                          icon="rounded-grey-plus"
-                                         label={__("Add to chat")}
+                                         label={__(l[8631])}
                                          onClick={() => {
                                          window.location = "#fm/" + contact.u;
                                          }}
                                          />*/}
                                         <DropdownsUI.DropdownItem
                                             icon="conversations"
-                                            label={__("Start new chat")}
+                                            label={__(l[8632])}
                                             onClick={() => {
                                                 window.location = "#fm/chat/" + contact.u;
                                             }}
@@ -578,7 +578,7 @@ var ConversationMessage = React.createClass({
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{mega.utils.fullUsername(contact.u)}</div>
+                                    <div className="message data-title">{htmlentities(mega.utils.fullUsername(contact.u))}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :
@@ -773,7 +773,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", mega.utils.fullUsername(contact.u));
+                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -784,7 +784,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", mega.utils.fullUsername(contact.u));
+                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
             }
 
             message.textContents = textMessage;
@@ -987,7 +987,7 @@ var ConversationRightArea = React.createClass({
                                    room.leaveChat(true);
                                 }}>
                                     <i className="small-icon rounded-stop"></i>
-                                    {__("Leave Chat")}
+                                    {__(l[8633])}
                                 </div>
                                 : null
                         }
@@ -1210,7 +1210,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
         participants.forEach(function(v) {
             displayNames.push(
-                chatRoom.megaChat.getContactNameFromJid(v)
+                htmlentities(chatRoom.megaChat.getContactNameFromJid(v))
             );
         });
 
@@ -1922,7 +1922,7 @@ var ConversationPanel = React.createClass({
                     .replace("%s", namesDisplay[1]);
             }
             else {
-                msg = __("%s is typing").replace("%s", namesDisplay[0]);
+                msg = __(l[8629]).replace("%1", namesDisplay[0]);
             }
 
             typingElement = <div className="typing-block">
@@ -2101,7 +2101,7 @@ var ConversationPanel = React.createClass({
                                             }} />
                                             <DropdownsUI.DropdownItem
                                                 icon="square-profile"
-                                                label={__("Send Contact")}
+                                                label={__(l[8628])}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
                                             }} />

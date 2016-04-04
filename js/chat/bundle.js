@@ -6032,7 +6032,7 @@
 	  return element;
 	};
 
-	ReactElement.makeElement = function (type, config, children) {
+	ReactElement.createElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -6083,7 +6083,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.makeElement.bind(null, type);
+	  var factory = ReactElement.createElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -9130,7 +9130,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.makeElement(component);
+	    placeholderElement = ReactElement.createElement(component);
 	  }
 	};
 
@@ -19618,12 +19618,12 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.makeElement;
+	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
 	if (false) {
-	  createElement = ReactElementValidator.makeElement;
+	  createElement = ReactElementValidator.createElement;
 	  createFactory = ReactElementValidator.createFactory;
 	  cloneElement = ReactElementValidator.cloneElement;
 	}
@@ -20076,7 +20076,7 @@
 	    // succeed and there will likely be errors in render.
 	     false ? warning(validType, 'React.makeElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : undefined;
 
-	    var element = ReactElement.makeElement.apply(this, arguments);
+	    var element = ReactElement.createElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -20101,7 +20101,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -20735,17 +20735,9 @@
 	                        React.makeElement(
 	                            "div",
 	                            { className: "fm-not-logged-text" },
-	                            React.makeElement(
-	                                "div",
-	                                { className: "fm-not-logged-description" },
-	                                "Login or create an account to ",
-	                                React.makeElement(
-	                                    "span",
-	                                    { className: "red" },
-	                                    "get 50GB FREE"
-	                                ),
-	                                " and get messages from your friends and coworkers."
-	                            ),
+	                            React.makeElement("div", { className: "fm-not-logged-description", dangerouslySetInnerHTML: {
+	                                    __html: __(l[8634]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
+	                                } }),
 	                            React.makeElement(
 	                                "div",
 	                                { className: "fm-not-logged-button login" },
@@ -23642,7 +23634,7 @@
 	                                        },
 	                                        React.makeElement(DropdownsUI.DropdownItem, {
 	                                            icon: "human-profile",
-	                                            label: __("View profile"),
+	                                            label: __(l[5868]),
 	                                            onClick: function onClick() {
 	                                                window.location = "#fm/" + contact.u;
 	                                            }
@@ -23651,7 +23643,7 @@
 	                                        null,
 	                                        React.makeElement(DropdownsUI.DropdownItem, {
 	                                            icon: "conversations",
-	                                            label: __("Start new chat"),
+	                                            label: __(l[8632]),
 	                                            onClick: function onClick() {
 	                                                window.location = "#fm/chat/" + contact.u;
 	                                            }
@@ -23705,7 +23697,7 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
-	                                    mega.utils.fullUsername(contact.u)
+	                                    htmlentities(mega.utils.fullUsername(contact.u))
 	                                ),
 	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
 	                                React.makeElement(
@@ -23879,7 +23871,7 @@
 	            }
 
 	            if (textMessage.splice) {
-	                var tmpMsg = textMessage[0].replace("[X]", mega.utils.fullUsername(contact.u));
+	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
 
 	                if (message.currentCallCounter) {
 	                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
@@ -23887,7 +23879,7 @@
 	                textMessage = tmpMsg;
 	                textMessage = textMessage.replace("[[ ", "<span className=\"grey-color\">").replace("]]", "</span>");
 	            } else {
-	                textMessage = textMessage.replace("[X]", mega.utils.fullUsername(contact.u));
+	                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
 	            }
 
 	            message.textContents = textMessage;
@@ -24085,7 +24077,7 @@
 	                                    room.leaveChat(true);
 	                                } },
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
-	                            __("Leave Chat")
+	                            __(l[8633])
 	                        ) : null
 	                    )
 	                )
@@ -24283,7 +24275,7 @@
 	        var displayNames = [];
 
 	        participants.forEach(function (v) {
-	            displayNames.push(chatRoom.megaChat.getContactNameFromJid(v));
+	            displayNames.push(htmlentities(chatRoom.megaChat.getContactNameFromJid(v)));
 	        });
 
 	        var callSession = chatRoom.callSession;
@@ -24934,7 +24926,7 @@
 	            if (areMultipleUsersTyping === true) {
 	                msg = __("%s and %s are typing").replace("%s", namesDisplay[0]).replace("%s", namesDisplay[1]);
 	            } else {
-	                msg = __("%s is typing").replace("%s", namesDisplay[0]);
+	                msg = __(l[8629]).replace("%1", namesDisplay[0]);
 	            }
 
 	            typingElement = React.makeElement(
@@ -25102,7 +25094,7 @@
 	                                        } }),
 	                                    React.makeElement(DropdownsUI.DropdownItem, {
 	                                        icon: "square-profile",
-	                                        label: __("Send Contact"),
+	                                        label: __(l[8628]),
 	                                        onClick: function onClick(e) {
 	                                            self.setState({ 'sendContactDialog': true });
 	                                        } })
@@ -26438,7 +26430,7 @@
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
-	        return self.megaChat.getContactNameFromJid(participants[0]);
+	        return htmlentities(self.megaChat.getContactNameFromJid(participants[0]));
 	    } else {
 	        assert(false, "invalid room type");
 	        return "[invalid room type]";

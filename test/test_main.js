@@ -38,9 +38,21 @@ describe("Initialization Unit Tests", function() {
         expect(console.log.callCount).to.be.at.least(1);
         expect(console.error.callCount).to.eql(0);
 
-        // Check mDB.js's startMega was called
-        expect(window.mDB).to.eql(0x7f);
-        expect(indexedDB.getDatabaseNames).to.be.a('function');
+        var iDBState = 'OK';
+        try {
+            var tmp = !!window.indexedDB;
+        }
+        catch (ex) {
+            iDBState = ex.name;
+        }
 
+        if (iDBState === 'SecurityError') {
+            assert.strictEqual(window.mDB, undefined);
+        }
+        else {
+            // Check mDB.js's startMega was called
+            expect(window.mDB).to.eql(0x7f);
+            expect(indexedDB.getDatabaseNames).to.be.a('function');
+        }
     });
 });

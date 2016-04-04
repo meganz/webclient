@@ -104,7 +104,7 @@ body.dndc-to-rubbish * {
 body.dndc-sort * {
     cursor: url(../images/mega/cursor9.png), auto !important
 }
-body *:not(input):not(textarea) {
+body *:not(input):not(textarea):not(.fm-dialog p) {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -10327,6 +10327,31 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     min-height: 20px;
     color: #333333;
 }
+.green-bg, .membershtip-medium-txt.red-bg, .membershtip-medium-txt.gray-bg, .membershtip-medium-txt.blue-bg {
+	-moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #9a1c06;
+    line-height: 16px;
+    padding: 0 6px;
+    color: rgba(255,255,255,1);
+    font-size: 13px;
+    line-height: 19px;
+    background-color: #71AD32;
+    cursor: pointer;
+}
+.membershtip-medium-txt.red-bg {
+	background-color: #D32200;
+}
+.membershtip-medium-txt.blue-bg {
+	background-color: #1FA4E5;
+}
+.membershtip-medium-txt.gray-bg {
+	background-color: #4c4c4c;
+}
 .membership-small-txt {
     font-size: 13px;
 }
@@ -10352,6 +10377,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-usage-bl:first-child {
     border-left: 0;
     width: 235px;
+}
+.free .membership-usage-bl.storage, .free .fm-account-blocks.storage {
+    width: 100%; 
+}
+.free .membership-usage-bl.bandwidth, .free .fm-account-blocks.bandwidth {
+    display: none;
 }
 .membership-circle {
     width: 76px;
@@ -15287,7 +15318,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .new-bottom-pages p.sub-list span.number, .new-bottom-pages h2.sub-list span.number {
     margin: 2px 0 0 70px;
 }
-.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-page li a, .new-bottom-pages li a {
+.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a {
     color: #D22400;
 }
 .new-bottom-pages h2 span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
@@ -17218,9 +17249,6 @@ a.contact-new-button:hover {
 }
 .dev-nw-gray-bg {
     height: 100%;
-    height: -webkit-calc(100% - 306px);
-    height: -moz-calc(100% - 306px);
-    height: calc(100% - 306px);
     width: 100%;
     position: absolute;
     overflow: hidden;
@@ -23219,6 +23247,11 @@ body.pro:after {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
 }
+
+.sync-bottom-block .megasync-dropdown {
+    margin: 0px;
+}
+
 .linux .megasync-dropdown {
     display: block;
 }
@@ -23328,6 +23361,12 @@ body.pro:after {
     z-index: 10;
     top: 122px;
 }
+
+.megasync-dropdown-list .jspPane {
+    min-width: 280px;
+    max-width: 280px;
+}
+
 .megasync-dropdown-pad {
     background-color: white;
     -moz-border-radius: 4px;
@@ -23341,6 +23380,7 @@ body.pro:after {
     box-sizing: border-box;
     padding: 36px 0 4px 0;
 }
+
 .megasync-dropdown-scroll .jspVerticalBar {
     width: 10px;
 }

@@ -3176,6 +3176,7 @@
     "8642": "Ontbrekende \/ onzichtbare gegevens",
     "8643": "U gebruikt een kortstondige sessie.",
     "8644": "U gebruikt een tijdelijke sessie. De gegevens die u opslaat zullen verloren gaan wanneer de sessie verloopt. Om uw bestanden te bewaren, kunt u wanneer het u schikt upgraden naar een echt account en claimt u uw [S]gratis 50 GB beveiligde opslagruimte in de cloud![\/S]",
+    "8645": "Image size exceeded",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3218,6 +3219,8 @@
         "transfer-speed-issue": 8639,
         "megasync-issue": 8641,
         "using-ephemeral-session": 8643,
-        "ephemeral-session-message": 8644
+        "ephemeral-session-message": 8644,
+        "image-size-exceeded": 8645,
+        "image-size-exceeded-body": 8646
     }
 }

@@ -3451,10 +3451,6 @@
         "text": "Not found",
         "context": ""
     },
-    "1602": {
-        "text": "MEGAsync is up to date",
-        "context": "Message that is displayed when the sync client is up to date. Please note that \"MEGAsync\" is a name and should be probably kept the same in most languages."
-    },
     "1603": {
         "text": "RECENTLY UPDATED",
         "context": "Label to indicate the files recently updated. Keep capital letters."
@@ -3490,10 +3486,6 @@
     "1611": {
         "text": "File transfers paused",
         "context": "Label to indicate that the state of transfers is actually paused."
-    },
-    "1612": {
-        "text": "MEGAsync is scanning",
-        "context": "Label to indicate that MEGAsync is at state of scanning inside synced folders (String as short as possible)"
     },
     "1613": {
         "text": "All transfers have been completed",
@@ -3555,10 +3547,6 @@
         "text": "Logging in",
         "context": "Status text when the app is logging in"
     },
-    "1628": {
-        "text": "MEGAsync is now running.",
-        "context": ""
-    },
     "1629": {
         "text": "Click here to open the status window.",
         "context": ""
@@ -3594,14 +3582,6 @@
     "1639": {
         "text": "Exit anyway?",
         "context": ""
-    },
-    "1640": {
-        "text": "About MEGAsync",
-        "context": "Title of the dialog that displays the version code of MEGAsync."
-    },
-    "1641": {
-        "text": "MEGAsync version code %1",
-        "context": "Label to indicate the version code of MEGAsync installed. Preserve \"%1\" code because is used to indicate the version code at runtime."
     },
     "1642": {
         "text": "The link has been copied to the clipboard",
@@ -4255,14 +4235,6 @@
         "text": "More",
         "context": "Top menu option which opens more menu options in a context menu."
     },
-    "1818": {
-        "text": "MEGAsync is waiting",
-        "context": "Label to indicate that MEGAsync is at a wait state (String as short as possible)"
-    },
-    "1819": {
-        "text": "MEGAsync has been updated",
-        "context": "Notification message launched when an update has been succesfully applied."
-    },
     "1820": {
         "text": "Coming soon for Mac and Linux",
         "context": "Text on the sync client download page that indicates that the sync client will soon be available for Mac and Linux"
@@ -4306,14 +4278,6 @@
     "1864": {
         "text": "Error report",
         "context": ""
-    },
-    "1865": {
-        "text": "MEGAsync has detected a problem. These are the details:",
-        "context": "Label to indicate that a crash has occured and the detailed stacktrace of the problem."
-    },
-    "1866": {
-        "text": "You can help us to improve MEGAsync by sending this error report. It doesn't contain any personal information. If you want to give us more details, please write them below:",
-        "context": "Label to indicate if the user wants to add some more details to attach to the crash report."
     },
     "1867": {
         "text": "Thank you for your collaboration!",
@@ -4419,10 +4383,6 @@
         "text": "Install update",
         "context": "Label to indicate the user that there is an available update downloaded to be installed."
     },
-    "1905": {
-        "text": "A new version of MEGAsync is available! Click on this message to install it",
-        "context": "Notification message launched to inform the user that there is an available update ."
-    },
     "1908": {
         "text": "Check for updates",
         "context": "Button label to let the user check for new application updates."
@@ -4490,10 +4450,6 @@
     "1930": {
         "text": "The cloud in your pocket. Access and stream your files from your smartphone or tablet.",
         "context": "Advertising text for mobile apps"
-    },
-    "1931": {
-        "text": "MEGAsync is starting",
-        "context": "Label to indicate that MEGAsync is at start state (String as short as possible)"
     },
     "1932": {
         "text": "To download files larger than 1 GB, please install MEGAsync or our browser extension.",
@@ -4775,25 +4731,9 @@
         "text": "Full scan",
         "context": "Title of the message dialog of Full scan operation."
     },
-    "2011": {
-        "text": "MEGAsync will perform a full scan of your synced folders\nwhen it starts.",
-        "context": ""
-    },
-    "2012": {
-        "text": "Do you want to restart MEGAsync now?",
-        "context": ""
-    },
     "2013": {
         "text": "Upload files\/folders",
         "context": ""
-    },
-    "2014": {
-        "text": "A new version of MEGAsync is available!",
-        "context": "Notification message launched when an update is available."
-    },
-    "2015": {
-        "text": "MEGAsync is now running. Click the system tray icon to open the status window.",
-        "context": "Notification message launched when an user logged in succesfully. String as short as possible."
     },
     "2016": {
         "text": "Show status",
@@ -4890,10 +4830,6 @@
     "2042": {
         "text": "You don't have write permissions in this folder.",
         "context": ""
-    },
-    "2043": {
-        "text": "MEGAsync won't be able to download anything here.",
-        "context": "Message displayed when a user is trying to synchronized a local folder in wich the user has no write permissions."
     },
     "2044": {
         "text": "Do you want to continue?",
@@ -6350,6 +6286,10 @@
     "5866": {
         "text": "Leave share",
         "context": "User can leave share in \"Shared with me\" section"
+    },
+    "5868": {
+        "text": "View profile",
+        "context": "Context menu item"
     },
     "5871": {
         "text": "Favourite",
@@ -8379,14 +8319,6 @@
         "text": "&Yes",
         "context": "Label for confirm button. Keep capital letter."
     },
-    "6980": {
-        "text": "Settings - MEGAsync",
-        "context": "Title of the MEGAsync Settings dialog. Keep capital letters."
-    },
-    "6981": {
-        "text": "Setup Wizard - MEGAsync",
-        "context": "Title of the dialog Setup Wizar of MEGAsync. Keep capital letters."
-    },
     "6982": {
         "text": "Exclude by size",
         "context": "Title of the dialog to set exclusion based on file size."
@@ -8397,10 +8329,6 @@
     },
     "6989": {
         "text": "Free bandwidth quota exceeded",
-        "context": ""
-    },
-    "6990": {
-        "text": "MEGAsync is currently disabled",
         "context": ""
     },
     "6991": {
@@ -8463,21 +8391,9 @@
         "text": "Local folder too large (this version is limited to %1 folders or %2 files.\nPlease, select another folder.",
         "context": ""
     },
-    "7008": {
-        "text": "You are trying to sync an extremely large folder.\nTo prevent the syncing of entire boot volumes, which is inefficient and dangerous,\nwe ask you to start with a smaller folder and add more data while MEGAsync is running.",
-        "context": ""
-    },
     "7009": {
         "text": "You can not sync a shared folder without Full Access permissions",
         "context": ""
-    },
-    "7010": {
-        "text": "\/MEGAsync Downloads",
-        "context": ""
-    },
-    "7011": {
-        "text": "\/MEGAsync Imports",
-        "context": "Default created folder for imported links at the user Cloud Drive."
     },
     "7012": {
         "text": "You are about to import this file to a synced folder.\nIf you enable downloading, the file will be duplicated on your computer.\nAre you sure?",
@@ -8499,14 +8415,6 @@
         "text": "Select whether you want to install $(^NameDA) for yourself only or for all users of this computer. $(^ClickNext)",
         "context": "Label to indicate the type of installation. Preserve $(^NameDA)  and $(^ClickNext) codes."
     },
-    "7017": {
-        "text": "Thank you for testing MEGAsync.<br>This beta version is no longer current and has expired.<br>Please follow <a href=\"https:\/\/twitter.com\/MEGAprivacy\">@MEGAprivacy<\/a> on Twitter for updates.",
-        "context": ""
-    },
-    "7018": {
-        "text": "MEGAsync is now running. Click here to open the status window.",
-        "context": "Notification message that MEGAsync is actually running."
-    },
     "7019": {
         "text": "There was a problem installing the update. Please try again later or download the last version from:\r\nhttps:\/\/mega.nz\/#sync",
         "context": "Notification message launched when a problem occurs during the installation of an update. Keep \"\n\" codes."
@@ -8527,10 +8435,6 @@
         "text": "Unable to get the filesystem.\r\nPlease, try again. If the problem persists please contact bug@mega.nz",
         "context": "Message displayed when an error occurs while fetching nodes from the server."
     },
-    "7024": {
-        "text": "MEGAsync is now running. Click the menu bar icon to open the status window.",
-        "context": "Notification message launched when an user logged in succesfully. String as short as possible."
-    },
     "7025": {
         "text": "Quit",
         "context": "Label displayed to let the user quit the application. Max 20 characters. Keep capital letter."
@@ -8538,10 +8442,6 @@
     "7026": {
         "text": "Preferences",
         "context": "Label and title of the preferences dialog. MAX 20 characters. Keep capital letter."
-    },
-    "7027": {
-        "text": "MEGAsync is unable to connect. Please check your Internet connectivity and local firewall configuration. Note that most antivirus software includes a firewall.",
-        "context": "Notification message launched when a connectivity problem occurs."
     },
     "7028": {
         "text": "Your sync \"%1\" has been disabled because the local folder doesn't exist",
@@ -8639,10 +8539,6 @@
         "text": ":",
         "context": "Label to indicate colon to separate IP and Port to be used."
     },
-    "7052": {
-        "text": "\/MEGAsync Uploads",
-        "context": "Label to indicate the default path for MEGAsync uploads."
-    },
     "7053": {
         "text": "You are already syncing your entire Cloud Drive.",
         "context": ""
@@ -8663,14 +8559,6 @@
         "text": "Force a full scan",
         "context": "Button label to let the user force a full scan of his synced folders."
     },
-    "7058": {
-        "text": "MEGAsync will perform a full scan of your synced folders\nwhen it starts.\n\nDo you want to restart MEGAsync now?",
-        "context": ""
-    },
-    "7059": {
-        "text": "Preferences - MEGAsync",
-        "context": "Title label of the settings dialog."
-    },
     "7060": {
         "text": "Open at login",
         "context": "Label to let the user start MEGAsync on login with a checkbox."
@@ -8678,10 +8566,6 @@
     "7061": {
         "text": "Show Mac OS notifications",
         "context": "Label to let the user enable Mac OS desktop notifications with a checkbox."
-    },
-    "7062": {
-        "text": "MEGAsync will perform a full scan of your synced folders when it starts.\n\nDo you want to restart MEGAsync now?",
-        "context": "Message displayed asking for confirmation to the user for a Full scan operation."
     },
     "7063": {
         "text": "This sync can't be enabled because the remote folder doesn't exist",
@@ -8735,10 +8619,6 @@
         "text": "You have %1 in your Cloud Drive.\nAre you sure you want to sync your entire Cloud Drive?",
         "context": ""
     },
-    "7076": {
-        "text": "Setup Assistant - MEGAsync",
-        "context": "Title of the setup assistant dialog. Keep capital letters."
-    },
     "7077": {
         "text": "Are you sure you want to cancel this wizard and undo all changes?",
         "context": ""
@@ -8762,10 +8642,6 @@
     "7082": {
         "text": "Size limits cannot be zero",
         "context": "Message displayed when a user is trying to set zero limits."
-    },
-    "7083": {
-        "text": "MEGAsync Uploads",
-        "context": "Label to indicate the default MEGA folder for file uploaded."
     },
     "7084": {
         "text": "with MEGAsync",
@@ -8804,7 +8680,7 @@
         "context": "Information on the over bandwidth quota dialog."
     },
     "7099": {
-        "text": "You have utilized %1 of data transfer in the last 6 hours which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
+        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the amount of bandwidth they have used e.g. 532 MB."
     },
     "7100": {
@@ -9538,10 +9414,6 @@
     "7295": {
         "text": "Menu Item",
         "context": ""
-    },
-    "7296": {
-        "text": "\/Pages\/",
-        "context": "DO NOT NEED TO TRANSLATE"
     },
     "7297": {
         "text": "https:\/\/mega.nz\/mobile_terms.html",
@@ -10611,21 +10483,13 @@
         "text": "%.2f %@ per month",
         "context": "Price asociated with the MEGA PRO account level you can subscribe"
     },
-    "7575": {
-        "text": "Fetching nodes",
-        "context": "DO NOT TRANSLATE, it will change"
-    },
-    "7576": {
-        "text": "Preparing nodes",
-        "context": "DO NOT TRANSLATE, it will change"
-    },
     "7577": {
         "text": "The file you want to download already exists Offline",
-        "context": "DO NOT TRANSLATE, it will change (Process)"
+        "context": "Message displayed when the file the user wants to download already exists Offline."
     },
     "7578": {
         "text": "MEGA Folder Link",
-        "context": "DO NOT TRANSLATE, it will change (Design)"
+        "context": "Folder Link"
     },
     "7579": {
         "text": "No Transfers",
@@ -10643,13 +10507,9 @@
         "text": "You don't have any pending transfers.",
         "context": "Text shown under the upper title when there's no transfers"
     },
-    "7583": {
-        "text": "Updating nodes...",
-        "context": "DO NOT TRANSLATE, it will change"
-    },
     "7584": {
-        "text": "Purchases history",
-        "context": "DO NOT TRANSLATE, it will change"
+        "text": "Purchase history",
+        "context": "Title message of user's purchase history."
     },
     "7585": {
         "text": "The signature of the %1 key from user %2 is incorrect.",
@@ -10676,8 +10536,8 @@
         "context": "Title of the dialog displayed when a user want to move multiple nodes to the rubbish bin, asking for confirmation to make the movement - (String as short as possible)."
     },
     "7591": {
-        "text": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
-        "context": "Message of the dialog displayed when a user would try to download at the same time more nodes than the reliable number of simultaneous downloads for a good app performance. This dialog ask confirmation to start the download process.\nPreserve the ({0}) codes because is for include the maximum reliable download number and the precise number of nodes to be downloaded in runtime."
+        "text": "You have selected over {0} items ({1}) to download. Do you want to proceed?",
+        "context": "Message of the dialog displayed when a user would try to download at the same time more nodes than the reliable number of simultaneous downloads for a good app performance. This dialog ask confirmation to start the download process.Preserve the ({0}) codes because is for include the maximum reliable download number and the precise number of nodes to be downloaded in runtime."
     },
     "7593": {
         "text": "https:\/\/mega.co.nz\/mobile_terms.html",
@@ -11191,10 +11051,6 @@
         "text": "New in this version:",
         "context": "Label to indicate new features or fixes for the current MEGAsync version. Please keep the colon."
     },
-    "7722": {
-        "text": "MEGAsync is in guest mode",
-        "context": "A label to inform the user that MEGAsync is running in guest user mode."
-    },
     "7723": {
         "text": "Your download has started",
         "context": "A notification shown when a web download has commenced."
@@ -11202,10 +11058,6 @@
     "7724": {
         "text": "DEBUG mode disabled",
         "context": "Notification message shown when the DEBUG mode is disabled."
-    },
-    "7725": {
-        "text": "DEBUG mode enabled. A log is being created in your desktop (MEGAsync.log).",
-        "context": "A notification message which is shown when the DEBUG mode is enabled."
     },
     "7726": {
         "text": "Error: Invalid destination folder. The download has been cancelled.",
@@ -12364,7 +12216,7 @@
         "context": "Open the whole blog post"
     },
     "8513": {
-        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\n\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\n\nInside the app you can upgrade your storage space & bandwidth quota with a monthly or yearly subscription.\n\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\n\nFor more info, please check our website:\nMobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\nDesktop - https:\/\/mega.nz\/\n\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\r\n\r\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\n\r\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\r\n\r\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\r\n\r\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\r\n\r\nFor more info, please check our website:\r\nMobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/\r\n\r\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
         "context": "General description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\n\" AND \"\t\"."
     },
     "8514": {
@@ -12430,5 +12282,397 @@
     "8529": {
         "text": "Payment Issue",
         "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a payment problem they are having e.g. missing payment."
+    },
+    "8531": {
+        "text": "Invalid link",
+        "context": "This message is displayed when the user clicks on an invalid hyperlink."
+    },
+    "8532": {
+        "text": "To access this folder\/file, you will need its Decryption key. If you do not have the key, contact the creator of the link.",
+        "context": "Alert message shown when you tap on a encrypted file\/folder link that can't be opened because it doesn't include the key to see its contents."
+    },
+    "8533": {
+        "text": "Invalid decryption key",
+        "context": "An alert message displayed when the user inputs an invalid decryption key."
+    },
+    "8534": {
+        "text": "Unavailable link",
+        "context": "This error title is shown when you open a file or folder link and it is no longer available."
+    },
+    "8535": {
+        "text": "MEGA will be changing its Terms of Service on the [B]20th February 2016[\/B]. Please read our anniversary blog post for more information.",
+        "context": "This string is a notification letting users know that our terms of service are changing. Please leave the [B] and [\/B] placeholder tags in place."
+    },
+    "8536": {
+        "text": "Thank you for using MEGA.",
+        "context": "A message within a public service announcement notification to thank users for using MEGA."
+    },
+    "8537": {
+        "text": "Important notice:",
+        "context": "A title for an important notification to all users."
+    },
+    "8538": {
+        "text": "View blog post",
+        "context": "Label on a button taking the user to a blog post."
+    },
+    "8539": {
+        "text": "[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.",
+        "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
+    },
+    "8540": {
+        "text": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
+        "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
+    },
+    "8543": {
+        "text": "There are no contacts in the account. Please add them on the Contacts screen.",
+        "context": "When a user wants to share a folder but does not have any contact yet."
+    },
+    "8544": {
+        "text": "All the items in the rubbish bin will be deleted",
+        "context": "Confirmation message displayed when removing all the items in the rubbish bin."
+    },
+    "8545": {
+        "text": "Remember my decision and don't ask me again",
+        "context": "Text next to a checkbox that allows remembering the decision of the user. The translation should be as short as possible."
+    },
+    "8546": {
+        "text": "You are about to enable an option that could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
+        "context": "Information for the user about the consequences of disabling a security check of MEGAsync."
+    },
+    "8547": {
+        "text": "I don't care",
+        "context": "Text for a button that, when clicked, will disable an important security check of MEGAsync. The text should be as short as possible. If it's not possible to provide a short translation, it can be translated as: Ignore."
+    },
+    "8548": {
+        "text": "Permissions for new folders and files",
+        "context": "Title of the dialog that allows to change the default permissions for new files and folders created by MEGAsync."
+    },
+    "8549": {
+        "text": "Numeric value:",
+        "context": "A numeric value that represents the permissions that will be applied to new files and folders."
+    },
+    "8550": {
+        "text": "Group permissions:",
+        "context": "Label just before the new group permissions that will be applied to new files and folders."
+    },
+    "8551": {
+        "text": "Public permissions:",
+        "context": "A label just before the new public permissions that will be applied to new files and folders."
+    },
+    "8553": {
+        "text": "Read",
+        "context": "Text next to a checkbox that allows granting read permissions for new files and folder."
+    },
+    "8554": {
+        "text": "Write",
+        "context": "Text next to a checkbox that allows granting write permissions for new files and folders."
+    },
+    "8555": {
+        "text": "Execution",
+        "context": "Text next to a checkbox that allows granting execution permissions for new files and folder. The execute permission grants the ability to execute a file."
+    },
+    "8556": {
+        "text": "Don't use HTTP",
+        "context": "Text next to a checkbox that allows disabling the HTTP protocol for transfers."
+    },
+    "8557": {
+        "text": "Enable this option only if your transfers don't start. In normal circumstances HTTP is satisfactory as all transfers are already encrypted.",
+        "context": "Information message next to a checkbox that allows for disabling the HTTP protocol for transfers."
+    },
+    "8558": {
+        "text": "MEGA v1 app is no longer supported",
+        "context": "A string that will appear on the app telling the user that the app is not gonna be updated again"
+    },
+    "8559": {
+        "text": "Please install our new app MEGA v3 with a new design and new features!",
+        "context": "Message to tell the users that they should install the new app"
+    },
+    "8560": {
+        "text": "You will have to enter your credentials (login and password) in the new app. If you don't remember your password, please Export your Master Key before uninstalling the v1 app.",
+        "context": "Message shown to tell the users that they should export the master key before uninstalling the old app"
+    },
+    "8561": {
+        "text": "If you have an active subscription on the v1 app, please cancel it on Google Play and subscribe again on the v3 app when the current subscription expires. Don't worry, you will keep your PRO status on the new app until it expires.",
+        "context": "Message shown to PRO users using v1 app telling them that they should cancel their subscriptions on v1 and subscribe again on v3"
+    },
+    "8562": {
+        "text": "[Pricing may vary slightly depending on your country of residence and payment method.]",
+        "context": "A line to include on the Windows Phone app description in the store to indicate that the prices may vary depending on several factors. Please keep the characters \"[\" and \"]\" at the beginning and the end of the string."
+    },
+    "8563": {
+        "text": "You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help change your mind.",
+        "context": "A dialog message displayed when a user is trying to cancel a subscription and it asks them to send a feedback message."
+    },
+    "8564": {
+        "text": "You don't have access to the path '{0}'. Please select another one and try again.",
+        "context": "A dialog message which is displayed in cases that the app or the user doesn't have access to a folder path in the device memory. For example to download a file\/folder, create a new folder, etc.\r\nPlease preserve the '{0}' code because is for including the file\/folder path at runtime."
+    },
+    "8565": {
+        "text": "The name of the file '{0}' is not valid or has illegal characters. Please change it and try again.",
+        "context": "A dialog message displayed in cases that a file name is not valid or has illegal characters.\r\nPlease preserve the '{0}' code because is for including the filename at runtime."
+    },
+    "8566": {
+        "text": "Invalid file name",
+        "context": "Title of the dialog displayed in cases that the file name is not valid or has illegal characters - (String as short as possible)."
+    },
+    "8567": {
+        "text": "The path of the file\/folder '{0}' is too long. Please change it and try again.",
+        "context": "A message on a dialog which is displayed in cases that the file\/folder path is too long.\r\nPreserve the '{0}' code because it is for including the file\/folder name at runtime."
+    },
+    "8568": {
+        "text": "Path too long",
+        "context": "The title of a dialog which displayed in cases that the file\/folder path is too long."
+    },
+    "8569": {
+        "text": "The name or path of the folder '{0}' is not valid or has illegal characters. Please change it and try again.",
+        "context": "A dialog message displayed in cases that a folder name or path is not valid or has illegal characters.\r\nPreserve the '{0}' code because it is for including the file name at runtime."
+    },
+    "8570": {
+        "text": "Invalid name or path",
+        "context": "Title of the dialog displayed in cases that the file name or path is not valid or has illegal characters - (String as short as possible)."
+    },
+    "8571": {
+        "text": "Failed to select the folder. Please try again or select another folder.",
+        "context": "A message on a dialog which is displayed when the process to select a folder failed."
+    },
+    "8572": {
+        "text": "Canceling subscription...",
+        "context": "A progress indicator message when canceling a subscription."
+    },
+    "8573": {
+        "text": "Changing password...",
+        "context": "A progress indicator message when changing the MEGA account password."
+    },
+    "8574": {
+        "text": "Confirm account",
+        "context": "Label for any 'Confirm account' button, link, text, title, etc. - (String as short as possible)."
+    },
+    "8575": {
+        "text": "Folder name:",
+        "context": "Text to show when a user wants to create a new folder to type the name for the new folder."
+    },
+    "8576": {
+        "text": "Close session",
+        "context": "Label for any 'Close session' button, link, etc. - (String as short as possible)."
+    },
+    "8577": {
+        "text": "Requesting account data",
+        "context": "Stage 1 of 3 when a user is loading his account in the web app. This is the stage where the request has been made but no response has been made by the server yet."
+    },
+    "8578": {
+        "text": "Receiving account data",
+        "context": "Stage 2 of 3 when a user is loading his account in the web app. This is the stage where the server response is being transferred to the web app."
+    },
+    "8579": {
+        "text": "Decrypting",
+        "context": "Stage 3 of 3 when a user is loading his account in the web app. This is the stage where the request has completed and the web app is decrypting the data."
+    },
+    "8580": {
+        "text": "File import failed [{0}]",
+        "context": "Message of the dialog displayed when it fails the process\/request to import an image.\r\n\r\nPreserve the [{0}] code because this is for including the error code or the error message at runtime."
+    },
+    "8584": {
+        "text": "Requesting folder data",
+        "context": "Stage 1\/3 of requesting the data of a folder link. At this stage the data is being prepared on the server side."
+    },
+    "8585": {
+        "text": "Receiving folder data",
+        "context": "Stage 2\/3: receiving the data of a folder link. At this stage the data is being transferred from the server to the client (with progress)."
+    },
+    "8586": {
+        "text": "Decrypting folder data",
+        "context": "Stage 3\/3: the folder data is being decrypted."
+    },
+    "8587": {
+        "text": "We are waiting for the cryptographic key to this file.",
+        "context": "A warning tooltip if a file can't be decrypted."
+    },
+    "8588": {
+        "text": "undecryptable file",
+        "context": "A message that this file can't be decrypted."
+    },
+    "8589": {
+        "text": "No notifications",
+        "context": "There are no notifications to display."
+    },
+    "8590": {
+        "text": "undecryptable folder",
+        "context": "A message that this folder can't be decrypted."
+    },
+    "8591": {
+        "text": "Failed to prepare file(s) for upload. Please try again.",
+        "context": "A message of a dialog that is displayed when the process to prepare a file or files for upload failed."
+    },
+    "8592": {
+        "text": "Error preparing file(s)",
+        "context": "A title of a dialog that is displayed when the process to prepare a file or files for upload failed."
+    },
+    "8593": {
+        "text": "Use the find duplicates feature to search for multiple copies of a file.",
+        "context": "A description on the account settings page. It informs the user about the find duplicates feature (the button to trigger this feature is beside this text)."
+    },
+    "8594": {
+        "text": "Find duplicates",
+        "context": "A button title for the find duplicates feature. This allows the user to search for multiple copies of a file within their account."
+    },
+    "8595": {
+        "text": "This folder will be decrypted as soon as the cryptographic key becomes available.",
+        "context": "A tooltip message for undecryptable folders."
+    },
+    "8596": {
+        "text": "Your PRO membership plan will expire in 1 day.",
+        "context": "The professional pricing plan which the user is currently on will expire in one day."
+    },
+    "8597": {
+        "text": "Your PRO membership plan will expire in %1 days.",
+        "context": "The professional pricing plan which the user is currently on will expire in 5 days. The %1 is a placeholder for the number of days and should not be removed."
+    },
+    "8598": {
+        "text": "PRO membership plan expiring soon",
+        "context": "A title for a notification saying the user's pricing plan will expire soon."
+    },
+    "8600": {
+        "text": "MEGA can periodically start camera uploads when your location changes.",
+        "context": "An alert message which explains why the app uses location permissions."
+    },
+    "8601": {
+        "text": "Download with MEGAsync if it is running",
+        "context": "This option in the account settings allows users to download files with the external MEGAsync program if it is running in the background. Otherwise they will normally download through the browser.\r\n"
+    },
+    "8602": {
+        "text": "This file will be decrypted as soon as the cryptographic key becomes available.",
+        "context": "A tooltip message for undecryptable file."
+    },
+    "8603": {
+        "text": "You have been suspended due to Terms of Service violations.",
+        "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
+    },
+    "8604": {
+        "text": "This gives you 500 GB of storage space and 2 TB of bandwidth per month for one year.",
+        "context": "A description of the in-app purchase for the PRO I annual plan (only one year and no recurring subscription) in the Windows Phone store."
+    },
+    "8605": {
+        "text": "PRO I annual plan",
+        "context": "Title of the in-app purchase for the PRO I annual plan in the Windows Phone store. This gives them only one year and no subscription."
+    },
+    "8606": {
+        "text": "This gives you 500 GB of storage space and 2 TB of bandwidth for one month.",
+        "context": "A description of the in-app purchase for the PRO I monthly plan (only one month and no subscription) in the Windows Phone store."
+    },
+    "8607": {
+        "text": "PRO I monthly plan",
+        "context": "Title of the in-app purchase for the PRO 1 monthly plan in the Windows Phone store. This gives them only one month and no subscription."
+    },
+    "8608": {
+        "text": "This gives you 2 TB of storage space and 4 TB of bandwidth per month for one year.",
+        "context": "A description of the in-app purchase for the PRO II annual plan (only one year and no recurring subscription) in the Windows Phone store."
+    },
+    "8609": {
+        "text": "PRO II annual plan",
+        "context": "Title of the in-app purchase for the PRO II annual plan in the Windows Phone store. This gives them only one year and no subscription."
+    },
+    "8610": {
+        "text": "This gives you 2 TB of storage space and 4 TB of bandwidth for one month.",
+        "context": "A description of the in-app purchase for the PRO II monthly plan (only one month and no subscription) in the Windows Phone store."
+    },
+    "8611": {
+        "text": "PRO II monthly plan",
+        "context": "Title of the in-app purchase for the PRO II monthly plan in the Windows Phone store. This gives them only one month and no subscription."
+    },
+    "8612": {
+        "text": "This gives you 4 TB of storage space and 8 TB of bandwidth per month for one year.",
+        "context": "A description of the in-app purchase for the PRO III annual plan (only one year and no recurring subscription) in the Windows Phone store."
+    },
+    "8613": {
+        "text": "PRO III annual plan",
+        "context": "Title of the in-app purchase for the PRO III annual plan in the Windows Phone store. This gives them only one year and no subscription."
+    },
+    "8614": {
+        "text": "This gives you 4 TB of storage space and 8 TB of bandwidth for one month.",
+        "context": "A description of the in-app purchase for the PRO III monthly plan (only one month and no subscription) in the Windows Phone store."
+    },
+    "8615": {
+        "text": "PRO III monthly plan",
+        "context": "Title of the in-app purchase for the PRO III monthly plan in the Windows Phone store. This gives them only one month and no subscription."
+    },
+    "8616": {
+        "text": "This gives you 200 GB of storage space and 1 TB of bandwidth per month for one year.",
+        "context": "A description of the in-app purchase for the PRO LITE annual plan (only one year and no recurring subscription) in the Windows Phone store."
+    },
+    "8617": {
+        "text": "LITE annual plan",
+        "context": "Title of the in-app purchase for the LITE annual plan in the Windows Phone store. This gives them only one year and no subscription."
+    },
+    "8618": {
+        "text": "This gives you 200 GB of storage space and 1 TB of bandwidth for one month.",
+        "context": "A description of the in-app purchase for the PRO LITE monthly plan (only one month and no subscription) in the Windows Phone store."
+    },
+    "8619": {
+        "text": "LITE monthly plan",
+        "context": "Title of the in-app purchase for the LITE monthly plan in the Windows Phone store. This gives them only one month and no subscription."
+    },
+    "8620": {
+        "text": "Failed to download the file. Please try again.",
+        "context": "Message displayed when it failed to download the file."
+    },
+    "8621": {
+        "text": "Failed to load incoming shared items from MEGA. Please try again or click on refresh.",
+        "context": "A dialog message which is displayed when the program failed to load the incoming shared items."
+    },
+    "8622": {
+        "text": "Failed to load outgoing shared items from MEGA. Please try again or click on refresh.",
+        "context": "A dialog message which is displayed when the program failed to load the outgoing shared items."
+    },
+    "8623": {
+        "text": "popular!",
+        "context": "Label above the most popular PRO plan"
+    },
+    "8624": {
+        "text": "Failed to delete settings. Please try again. [{0}]",
+        "context": "A dialog message which is displayed when the process to delete settings failed.\r\nPlease keep the [{0}] placeholder because is for including the error code or the error message at runtime."
+    },
+    "8625": {
+        "text": "Error deleting settings",
+        "context": "A dialog title which is displayed when the process to delete settings failed."
+    },
+    "8626": {
+        "text": "Failed to load settings. Please try again. [{0}]",
+        "context": "A dialog message which is displayed when the process to load settings failed.\r\nPlease keep the [{0}] code because it is for including the error code or the error message at runtime."
+    },
+    "8627": {
+        "text": "Error loading settings",
+        "context": "A dialog title which is displayed when the process to load settings failed."
+    },
+    "8628": {
+        "text": "Send contact",
+        "context": "A button label. The button sends contact information to a user in the conversation."
+    },
+    "8629": {
+        "text": "%1 is typing",
+        "context": "A typing indicator in the chat. Please leave the %1 which will be automatically replaced with the user's name at runtime."
+    },
+    "8631": {
+        "text": "Add to chat",
+        "context": "A button label. The button allows adding a new user to the conversation."
+    },
+    "8632": {
+        "text": "Start new chat",
+        "context": "A button label. The button starts a new conversation."
+    },
+    "8633": {
+        "text": "Leave chat",
+        "context": "A button label. The button allows the user to leave the conversation."
+    },
+    "8634": {
+        "text": "Log in or create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+        "context": "Some information for users that are not logged in. Please leave the [S] and [\/S] placeholder tags as they will be replaced at runtime."
+    },
+    "8635": {
+        "text": "Download added to MEGAsync",
+        "context": "A notification when a file is downloading through the MEGAsync application. Please leave the brand \"MEGAsync\" as it is."
+    },
+    "8636": {
+        "text": "Message not sent. Retrying...",
+        "context": "A notification if the message could not be sent."
     }
 }

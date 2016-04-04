@@ -112,13 +112,19 @@ var crypt = (function () {
         var masterPromise = new MegaPromise();
 
         if (keyType === 'RSA') {
+            var cacheKey = userhandle + "_@uk";
+
             var myCtx = {};
             /** Function to settle the promise for the RSA pub key attribute. */
-            var __settleFunction = function(res) {
+            var __settleFunction = function(res, ctx, xhr, fromCache) {
                 if (typeof res === 'object') {
                     var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
                     logger.debug('Got ' + keyType + ' pub key of user '
                                  + userhandle + ': ' + JSON.stringify(pubKey));
+
+                    if (!fromCache && attribCache) {
+                        attribCache.setItem(cacheKey, JSON.stringify(res));
+                    }
                     masterPromise.resolve(pubKey);
                 }
                 else {
@@ -132,8 +138,28 @@ var crypt = (function () {
             myCtx.u = userhandle;
             myCtx.callback = __settleFunction;
 
-            // Fire it off.
-            api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+            var __retrieveRsaKeyFunc = function() {
+                // Fire it off.
+                api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+            };
+
+            if (attribCache) {
+                attribCache.getItem(cacheKey)
+                    .done(function(r) {
+                        if (r && r.length !== 0) {
+                            __settleFunction(JSON.parse(r), undefined, undefined, true);
+                        } else {
+                            __retrieveRsaKeyFunc();
+                        }
+                    })
+                    .fail(function() {
+                        __retrieveRsaKeyFunc();
+                    });
+            }
+            else {
+                __retrieveRsaKeyFunc();
+            }
+
         }
         else {
             var pubKeyPromise = mega.attr.get(userhandle,
@@ -211,9 +237,6 @@ var crypt = (function () {
 
     /**
      * Used for caching .getPubKey requests which are in progress (by reusing MegaPromises)
-     *
-     * @type {String, MegaPromise}
-     * @private
      */
     ns._pubKeyRetrievalPromises = {};
 
@@ -662,8 +685,11 @@ var crypt = (function () {
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
 
-        // Show warning dialog
-        mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
+        if (localStorage.hideCryptoWarningDialogs !== '1') {
+            mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+        }
 
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
@@ -695,8 +721,11 @@ var crypt = (function () {
                + ' for user ' + userHandle
         });
 
-        // Show warning dialog.
-        mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
+        if (localStorage.hideCryptoWarningDialogs !== '1') {
+            mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+        }
 
         logger.error(keyType + ' signature does not verify for user '
                      + userHandle + '!');
@@ -1647,12 +1676,6 @@ var from8 = firefox_boost ? mozFrom8 : function (utf8) {
     return decodeURIComponent(escape(utf8));
 };
 
-function getxhr() {
-    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined')
-        ? new XDomainRequest()
-        : new XMLHttpRequest();
-}
-
 // API command queueing
 // All commands are executed in sequence, with no overlap
 // @@@ user warning after backoff > 1000
@@ -1671,6 +1694,7 @@ function api_reset() {
 
 function api_setsid(sid) {
     if (sid !== false) {
+        watchdog.notify('setsid', sid);
         sid = 'sid=' + sid;
     }
     else {
@@ -1782,6 +1806,55 @@ function api_proc(q) {
         }
     };
 
+    // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
+    // if (loadingInitDialog.active) {
+        var needProgress = false;
+
+        // check whether this channel queue will need the progress
+        var ctxs = q.ctxs[q.i];
+        var idx = ctxs.length;
+        while (idx--) {
+            var ctx = ctxs[idx];
+
+            if (typeof ctx.progress === 'function') {
+                needProgress = true;
+                break;
+            }
+        }
+
+        if (needProgress) {
+            q.xhr.onprogress = function (evt) {
+                var progressPercent = 0;
+                var bytes = evt.total || this.totalBytes;
+
+                if (!bytes) {
+                    // This may throws an exception if the header doesn't exists
+                    try {
+                        bytes = this.getResponseHeader('Original-Content-Length');
+                        this.totalBytes = bytes;
+                    }
+                    catch (e) {}
+                }
+                if (!bytes || bytes < 10) {
+                    return false;
+                }
+                if (evt.loaded > 0) {
+                    progressPercent = evt.loaded / bytes * 100;
+                }
+
+                var ctxs = this.q.ctxs[this.q.i];
+                var idx = ctxs.length;
+                while (idx--) {
+                    var ctx = ctxs[idx];
+
+                    if (typeof ctx.progress === 'function') {
+                        ctx.progress(progressPercent);
+                    }
+                }
+            };
+        }
+    // }
+
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {
             var t;
@@ -1835,9 +1908,8 @@ function api_proc(q) {
         q.url = apipath + q.service
               + '?id=' + (q.seqno++)
               + '&' + q.sid
-              + '&domain=meganz'                    // Coming from mega.nz
-              + '&lang=' + lang                     // Their selected language
-              + (is_extension ? '&ext=1' : '');     // Using browser extension
+              + '&lang=' + lang      // Their selected language
+              + mega.urlParams();    // Additional parameters
 
         if (typeof q.cmds[q.i][0] === 'string') {
             q.url += '&' + q.cmds[q.i][0];
@@ -1917,13 +1989,24 @@ function api_reqfailed(c, e) {
         queue.cmds = [[], []];
         queue.ctxs = [[], []];
         queue.setimmediate = false;
-        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reason) {
+
+        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {
             u_logout(true);
 
             // On clicking OK, log the user out and redirect to contact page
             loadingDialog.hide();
+
+            var reasonText = l[7660];   // You have been suspended due to repeated copyright infringement.
+
+            if (reasonCode === 100) {
+                reasonText = l[7659];   // You have been suspended due to excess data usage.
+            }
+            else if (reasonCode === 300) {
+                reasonText = l[8603];   // You have been suspended due to Terms of Service violations.
+            }
+
             msgDialog('warninga', l[6789],
-                (reason === 100) ? l[7659] : l[7660],
+                reasonText,
                 false,
                 function() {
                     var redirectUrl = getAppBaseUrl() + '#contact';
@@ -1986,32 +2069,26 @@ function stopsc() {
     }
 }
 
-// calls execsc() with server-client requests received
-function getsc(fm, initialNotify) {
+/**
+ * calls execsc() with server-client requests received
+ * @param {Boolean} mDBload whether invoked from indexedDB.
+ */
+function getsc(mDBload) {
     api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
-        fm: fm,
-        initialNotify: initialNotify,
+        mDBload: mDBload,
         callback: function __onGetSC(res, ctx) {
             if (typeof res === 'object') {
                 function getSCDone(sma) {
                     if (sma !== -0x7ff
-                            // && typeof mDBloaded !== 'undefined'
                             && !folderlink && !pfid
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
-                    if (ctx.fm) {
-                        // mDBloaded = true;
-                        loadfm_done();
-                    }
 
-                    // After the first SC request all subsequent requests can generate notifications
-                    notify.initialLoadComplete = true;
-
-                    // If this was called from the initial fm load via gettree or db load, we should request the
-                    // latest notifications. These must be done after the first getSC call.
-                    if (ctx.fm || ctx.initialNotify) {
-                        notify.getInitialNotifications();
+                    // If we're loading the cloud, notify completion only
+                    // once first action-packets have been processed.
+                    if (!fminitialized) {
+                        loadfm_done(ctx.mDBload);
                     }
                 }
                 if (res.w) {
@@ -2535,6 +2612,9 @@ function api_setshare1(ctx, params) {
     for (i = req.s.length; i--;) {
         if (u_pubkeys[req.s[i].u]) {
             req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey, u_pubkeys[req.s[i].u]));
+        }
+        if (typeof req.s[i].m !== 'undefined') {
+            req.s[i].u = req.s[i].m;
         }
     }
 
@@ -3607,8 +3687,8 @@ function api_fareq(res, ctx, xhr) {
                             clearTimeout(this.fart);
                         }
 
-                        if (this.fah.done(ev)) {
-                            Soon(fm_thumbnails);
+                        if (this.fah.done(ev) || M.chat) {
+                            delay('thumbnails', fm_thumbnails, 200);
                         }
                     }
                 };

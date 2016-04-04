@@ -16,6 +16,8 @@ var ChatdIntegration = function(megaChat) {
     self.waitingChatIdPromises = {};
     self.chatIdToRoomJid = {};
     self.mcfHasFinishedPromise = new MegaPromise();
+    self.deviceId = null;
+    self._processedMessages = {};
 
     megaChat.rebind("onInit.chatdInt", function(e) {
         megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
@@ -28,13 +30,14 @@ var ChatdIntegration = function(megaChat) {
             //self._detachFromChatRoom(chatRoom);
         });
 
-        asyncApiReq({a: "mcf"})
+        asyncApiReq({a: "mcf", d: 1})
             .done(function(r) {
                 // reopen chats from the MCF response.
                 if (r.c) {
                     r.c.forEach(function (actionPacket) {
                         self.openChatFromApi(actionPacket);
                     });
+                    self.deviceId = r.d;
 
                     self.mcfHasFinishedPromise.resolve();
                 }
@@ -44,6 +47,9 @@ var ChatdIntegration = function(megaChat) {
             })
     });
 
+    megaChat.rebind("onDestroy.chatdInt", function(e) {
+        self.chatd.destroyed = true;
+    });
 
     $(window).rebind('onChatCreatedActionPacket.chatdInt', function(e, actionPacket) {
         self.openChatFromApi(actionPacket);
@@ -297,9 +303,9 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         var args = arguments;
 
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
-        if (!self.chatd.chatidshard[chatIdDecoded]) {
+        if (!self.chatd.chatIdShard[chatIdDecoded]) {
             createTimeoutPromise(function() {
-                return !!self.chatd.chatidshard[chatIdDecoded]
+                return !!self.chatd.chatIdShard[chatIdDecoded]
             }, 100, 10000)
                 .done(function() {
                     masterPromise.linkDoneAndFailToResult(fn, self, args);
@@ -313,6 +319,61 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         }
         return masterPromise;
     };
+};
+
+
+ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
+    var textContents = message.getContents ? message.getContents() : message.textContents;
+
+    if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+        if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+            try {
+                var attachmentMeta = JSON.parse(textContents.substr(2));
+            } catch(e) {
+                debugger;
+                return null;
+            }
+
+
+            attachmentMeta.forEach(function(v) {
+                var attachmentMetaInfo;
+                // cache ALL current attachments, so that we can revoke them later on in an ordered way.
+                if (message.messageId) {
+                    if (!chatRoom.attachments.exists(v.h)) {
+                        chatRoom.attachments.set(v.h, new MegaDataMap(chatRoom.attachments));
+                    }
+
+                    if (!chatRoom.attachments[v.h].exists(message.messageId)) {
+                        chatRoom.attachments[v.h].set(
+                            message.messageId,
+                            attachmentMetaInfo = new MegaDataObject({
+                                messageId: message.messageId,
+                                revoked: false
+                            })
+                        );
+                        attachmentMetaInfo._parent = chatRoom.attachments;
+                    }
+                    else {
+                        attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
+                    }
+                }
+
+                // generate preview/icon
+                var icon = fileIcon(v);
+
+                if (!attachmentMetaInfo.revoked && !message.revoked) {
+                    if (v.fa && (icon === "graphic" || icon === "image")) {
+                        var imagesListKey = message.messageId + "_" + v.h;
+                        if (!chatRoom.images.exists(imagesListKey)) {
+                            v.k = imagesListKey;
+                            v.delay = message.delay;
+                            chatRoom.images.push(v);
+                        }
+                    }
+                }
+            });
+        }
+    }
 };
 
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
@@ -362,11 +423,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
+                var cacheKey = chatRoom.chatId + " _" + v.messageId;
+                if (v.messageId && self._processedMessages[cacheKey]) {
+                    return;
+                }
+
                 if (v.userId) {
                     var msg = v.getContents ? v.getContents() : v.message;
-                    //if (msg && msg.length && msg.length > 0) {
-                    //    msg = base64urldecode(msg);
-                    //}
 
                     chatRoom.notDecryptedBuffer[k] = {
                         'message': msg,
@@ -394,31 +457,34 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         var seedResult = chatRoom.protocolHandler.seed(hist);
                         //console.error(chatRoom.roomJid, seedResult);
 
-
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
                         decryptedMsgs.forEach(function (v, k) {
-                            if (typeof v === undefined) {
+                            if (typeof v === 'undefined') {
                                 return; // skip already decrypted messages
                             }
 
-                            if (v && v.payload) {
-                                chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
-                                delete chatRoom.notDecryptedBuffer[k];
+                            var messageId = hist[k]['k'];
+                            var cacheKey = chatRoom.chatId + " _" + messageId;
+                            if (messageId) {
+                                self._processedMessages[cacheKey] = true;
+                            }
+
+                            if (v && typeof(v.payload) !== 'undefined' && v.payload !== null) {
+                                chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
+                                delete chatRoom.notDecryptedBuffer[messageId];
                             }
                             else if (v && v.type === 0) {
                                 // this is a system message
-                                chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
+                                chatRoom.messagesBuff.messages[messageId].protocol = true;
+                                delete chatRoom.notDecryptedBuffer[messageId];
                             }
                             else if (v && !v.payload) {
                                 self.logger.error("Could not decrypt: ", v)
                             }
+                            self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
                         });
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
-                    }
-
-                    if (seedResult === false && chatRoom.messagesBuff.haveMoreHistory() === true) {
-                        chatRoom.messagesBuff.retrieveChatHistory();
                     }
                 };
 
@@ -427,9 +493,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         chatRoom.strongvelopeSetupPromises.done(function() {
                             decryptMessages();
                         })
-                    }
-                    else {
-                        debugger;
                     }
                 }
                 else {
@@ -452,11 +515,17 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         if (decrypted && decrypted.toSend) {
                             self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
                         }
-                        if (decrypted && decrypted.payload) {
+
+                        if (decrypted && typeof(decrypted.payload) !== 'undefined' && decrypted.payload !== null) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
-                        } else if (decrypted && !decrypted.payload && decrypted.type === 0) {
+                        } else if (
+                            decrypted &&
+                            (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) &&
+                            decrypted.type === 0
+                        ) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                         }
+                        self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                     } catch(e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }
@@ -493,12 +562,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
+                assert(self.deviceId !== null, 'deviceId not loaded.');
 
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,
                     u_privCu25519,
                     u_privEd25519,
-                    u_pubEd25519
+                    u_pubEd25519,
+                    a32_to_str([self.deviceId])
                 );
 
                 self.join(chatRoom);
@@ -534,6 +605,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
             .replace("ws:", "wss:")
             .replace("31.216.147.155", "chattest.userstorage.mega.co.nz")
     );
+
     self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
 };
 
@@ -593,6 +665,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
 
         try {
             var result = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
+            
             tmpPromise.resolve(
                 self.chatd.submit(base64urldecode(chatRoom.chatId), result)
             );

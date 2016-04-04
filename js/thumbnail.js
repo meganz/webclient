@@ -47,10 +47,38 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var canvas;
         var ctx;
         var ab;
+        var imageType = 'image/jpeg';
         // XXX: In Firefox loading a ~100MB image might throw `Image corrupt or truncated.`
         // and this .onload called back with a white image. Bug #941823 / #1045926
         // This is the MurmurHash3 for such image's dataURI.
         var MURMURHASH3RR = 0x59d73a69;
+
+        if (img.isPNG) {
+            var transparent;
+
+            canvas = document.createElement('canvas');
+            ctx = canvas.getContext("2d");
+            canvas.width = this.naturalWidth;
+            canvas.height = this.naturalHeight;
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            ab = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+            for (var i = 0 ; i < ab.length ; i += 4) {
+                if (ab[i + 3] < 0xff) {
+                    transparent = true;
+                    break;
+                }
+            }
+
+            if (transparent) {
+                imageType = 'image/png';
+                MURMURHASH3RR = 0xE6BC61E0;
+            }
+        }
+
+        if (d) {
+            console.debug('createthumbnail', imageType);
+        }
 
         // thumbnail:
         if (fa.indexOf(':0*') < 0) {
@@ -59,21 +87,29 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 height: 120
             };
 
-            if (d) {
-                console.time('smartcrop');
-            }
-            var crop = SmartCrop.crop(this, options).topCrop;
             canvas = document.createElement('canvas');
             ctx = canvas.getContext("2d");
             canvas.width = options.width;
             canvas.height = options.height;
-            if (img.src === noThumbURI) {
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-            ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
 
-            dataURI = canvas.toDataURL('image/jpeg', 0.90);
+            if (this.naturalWidth > options.width || this.naturalHeight > options.height) {
+                if (d) {
+                    console.time('smartcrop');
+                }
+                var crop = SmartCrop.crop(this, options).topCrop;
+                ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
+
+                if (d) {
+                    console.timeEnd('smartcrop');
+                }
+            }
+            else {
+                ctx.drawImage(this,
+                    (options.width / 2) - (this.naturalWidth / 2),
+                    (options.height / 2) - (this.naturalHeight / 2));
+            }
+
+            dataURI = canvas.toDataURL(imageType, 0.70);
             // if (d) console.log('THUMBNAIL', dataURI);
             if (MurmurHash3(dataURI, 0x7fee00aa) === MURMURHASH3RR) {
                 console.error('Error generating thumbnail, aborting...');
@@ -83,8 +119,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             // FIXME hack into cipher and extract key
             api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer);
 
-            if (d) {
-                console.timeEnd('smartcrop');
+            if (node) {
+                delete th_requested[node];
             }
         }
 
@@ -144,8 +180,18 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         setTimeout(function() {
             var ThumbFR = new FileReader();
             ThumbFR.onload = function(e) {
-                var u8 = new Uint8Array(ThumbFR.result),
-                    orientation;
+                var orientation;
+                var u8 = new Uint8Array(ThumbFR.result);
+                var dv = new DataView(u8.buffer);
+
+                if (dv.getUint32(0) === 0x89504e47) {
+                    img.isPNG = true;
+                }
+                dv = undefined;
+
+                img.dataSize = u8.byteLength;
+                img.is64bit = browserdetails(ua).is64bit;
+
                 if (thumbHandler) {
                     return thumbHandler(u8.buffer, function(ab) {
                         if (ab) {
@@ -153,9 +199,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                         }
                     });
                 }
-
-                img.dataSize = u8.byteLength;
-                img.is64bit = browserdetails(ua).is64bit;
 
                 // Deal with huge images...
                 if (!img.is64bit && img.dataSize > (36 * 1024 * 1024)) {
@@ -339,6 +382,7 @@ function __render_thumb(img, u8, orientation, blob) {
             maxWidth: 1000,
             maxHeight: 1000,
             quality: 0.96,
+            imageType: 'image/png',
             orientation: orientation
         });
     }

@@ -37,6 +37,8 @@ a.shared-link.show-more {
 	position: relative;
 	display: inline-block;
 	margin: 0 0 4px 0;
+	width: 120px;
+	height: 120px;
 }
 .shared-link.img-block img {
 	max-width: 360px;

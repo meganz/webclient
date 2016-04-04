@@ -64,8 +64,20 @@ var _createObjectDataMethods = function(kls) {
 
     obj.forEach = function(cb) {
         var self = this;
+        self.keys().forEach(function(k) {
+            cb(self._data[k], k);
+        });
+    };
+    obj.breakableForEach = function(cb) {
+        var self = this;
         breakableForEach(self.keys(), function(k) {
             cb(self._data[k], k);
+        });
+    };
+    obj.every = function(cb) {
+        var self = this;
+        return self.keys().every(function(k) {
+            return cb(self._data[k], k);
         });
     };
 
@@ -126,6 +138,9 @@ var _trackedId = 0;
 var _properJSCmp = function(a, b) {
     if (Number.isNaN(a) && Number.isNaN(b)) {
         return true;
+    }
+    else if(typeof(a) == 'boolean' || typeof(b) == 'boolean') {
+        return a === b;
     }
     else {
         return a == b;
@@ -240,20 +255,31 @@ var trackPropertyChanges = function(obj, properties, implementChangeListener) {
 
         Object.defineProperty(obj, k, {
             get: function () {
-                return this.get(k, v);
+                return obj.get(k, v);
             },
             set: function (value) {
-                this.set(k, value);
+                obj.set(k, value, false, v);
             },
             enumerable: true
         });
     });
 
-    obj.set = function(k, v) {
-        if (!_properJSCmp(this._data[k], v)) {
-            this.trackDataChange();
+    obj.set = function(k, v, ignoreDataChange, defaultVal) {
+        if(typeof(this._data[k]) === 'undefined' || _properJSCmp(this._data[k], v) !== true) {
+            if (
+                typeof(this._data[k]) === 'undefined' &&
+                typeof(defaultVal) !== 'undefined' &&
+                _properJSCmp(defaultVal, v) === true
+            ) {
+                // this._data[...] is empty and defaultVal == newVal, DON'T track updates.
+                return false;
+            }
+
+            if (!ignoreDataChange) {
+                this.trackDataChange();
+            }
+            this._data[k] = v;
         }
-        this._data[k] = v;
     };
 
     obj.get = function(k, defaultVal) {
@@ -294,7 +320,7 @@ _arrayAliases.forEach(function(methodName) {
                     arguments[0]._parent = this;
                 }
             }
-            if (methodName == "forEach") {
+            if (methodName == "breakableForEach") {
                 return breakableForEach(this._data, arguments[0]);
             }
             else {
@@ -366,6 +392,15 @@ var MegaDataMap = function(parent) {
     });
 };
 
+MegaDataMap.prototype.exists = function(keyValue) {
+    var self = this;
+    if (typeof(self._data[keyValue]) !== 'undefined') {
+        return true;
+    }
+    else {
+        return false;
+    }
+};
 
 MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 
@@ -537,6 +572,16 @@ MegaDataSortedMap.prototype.exists = function(keyValue) {
 MegaDataSortedMap.prototype.keys = function() {
     var self = this;
     return self._sortedVals;
+};
+
+MegaDataSortedMap.prototype.values = function() {
+    var self = this;
+    var res = [];
+    self.forEach(function(v) {
+        res.push(v);
+    });
+
+    return res;
 };
 
 MegaDataSortedMap.prototype.getItem = function(num) {

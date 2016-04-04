@@ -57,8 +57,40 @@ function geoStaticpath(eu)
     return 'https://eu.static.mega.co.nz/3/';
 }
 
-if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
-        && parseInt(navigator.appVersion.match(/Chrome\/(\d+)\./)[1]) < 22) {
+if (is_chrome_firefox) {
+    var Cu = Components.utils;
+    var Cc = Components.classes;
+    var Ci = Components.interfaces;
+
+    Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
+    Cu['import']("resource://gre/modules/Services.jsm");
+
+    ['userAgent', 'appName', 'appVersion', 'platform', 'oscpu']
+        .forEach(function(k) {
+            var pref = 'general.' + k.toLowerCase() + '.override';
+
+            if (Services.prefs.prefHasUserValue(pref)
+                    && Services.prefs.getPrefType(pref) === 32) {
+
+                try {
+                    var value = Services.prefs.getCharPref(pref);
+                    Services.prefs.clearUserPref(pref);
+
+                    Object.defineProperty(navigator, k, {
+                        enumerable: true,
+                        value: Cc["@mozilla.org/network/protocol;1?name=http"]
+                                    .getService(Ci.nsIHttpProtocolHandler)[k]
+                    });
+                    Services.prefs.setCharPref(pref, value);
+                }
+                catch (e) {}
+            }
+        });
+
+    ua = navigator.userAgent.toLowerCase();
+}
+else if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
+        && parseInt(String(navigator.appVersion).split('Chrome/').pop()) < 22) {
     b_u = 1;
 }
 else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
@@ -126,21 +158,20 @@ if (!b_u) try
 {
     if (is_chrome_firefox)
     {
-        var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
-
-        Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
-        Cu['import']("resource://gre/modules/Services.jsm");
         XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
         (function(global) {
             global.loadSubScript = function(file,scope) {
-                if (global.d) {
-                    Services.scriptloader.loadSubScriptWithOptions(file,{
-                        target : scope||global, charset: "UTF-8",
-                        ignoreCache : true
+                var loader = Services.scriptloader;
+
+                if (global.d && loader.loadSubScriptWithOptions) {
+                    loader.loadSubScriptWithOptions(file, {
+                        charset: "UTF-8",
+                        ignoreCache: true,
+                        target: scope || global
                     });
                 } else {
-                    Services.scriptloader.loadSubScript(file,scope||global);
+                    loader.loadSubScript(file, scope || global);
                 }
             };
         })(this);
@@ -257,7 +288,61 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}, utils: {}, flags: 0, updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt'};
+var mega = {
+    ui: {},
+    flags: 0,
+    utils: {},
+    updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
+    browserBrand: [
+        0, 'Torch', 'Epic'
+    ],
+
+    /** Get browser brancd internal ID */
+    getBrowserBrandID: function() {
+        if (Object(window.chrome).torch) {
+            return 1;
+        }
+        else {
+            var plugins = Object(navigator.plugins);
+            var len = plugins.length | 0;
+
+            while (len--) {
+                var plugin = Object(plugins[len]);
+
+                // XXX: This plugin might be shown in other browsers than Epic,
+                //      hence we check for chrome.webstore since it won't appear
+                //      in Google Chrome, although it might does in other forks?
+                if (plugin.name === 'Epic Privacy Browser Installer') {
+                    return Object(window.chrome).webstore ? 2 : 0;
+                }
+            }
+        }
+
+        return 0;
+    },
+
+    /** Parameters to append to API requests */
+    urlParams: function() {
+        if (!this._urlParams) {
+            var params = '&domain=meganz'; // domain origin
+
+            // If using extension this is passed through to the API for the helpdesk tool
+            if (is_extension) {
+                params += '&ext=1';
+            }
+
+            // Append browser brand for easier troubleshoting
+            var brand = this.getBrowserBrandID();
+            if (brand) {
+                params += '&bb=' + parseInt(brand);
+            }
+
+            this._urlParams = params;
+        }
+
+        return this._urlParams;
+    }
+};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -734,8 +819,15 @@ function init_storage ( storage ) {
     return storage;
 }
 
-function getxhr() {
-    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
+if (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') {
+    window.getxhr = function _getxhr() {
+        return new XDomainRequest();
+    };
+}
+else {
+    window.getxhr = function _getxhr() {
+        return new XMLHttpRequest();
+    };
 }
 
 function siteLoadError(error, filename) {
@@ -819,7 +911,7 @@ if (m)
     }
     else if (ua.indexOf('android') > -1)
     {
-        app='https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzsb';
+        app='https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
         android=1;
 
@@ -829,7 +921,7 @@ if (m)
             ver = ver.pop();
             // Check for Android 2.3+
             if (ver > 2 || (ver === 2 && rev > 3)) {
-                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
+                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             }
         }
         if (intent) {
@@ -843,6 +935,12 @@ if (m)
     }
     else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
     {
+        app = document.querySelector('meta[name="apple-itunes-app"]');
+        if (app) {
+            app.setAttribute('content',
+                'app-id=706857885, app-argument=mega://' + window.location.hash);
+        }
+
         // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
         // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
         app='https://itunes.apple.com/app/mega/id706857885';
@@ -905,7 +1003,9 @@ if (m)
             document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
         }
     }
-    else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
+    else if (window.location.hash.substr(1, 7) == 'confirm'
+            || window.location.hash.substr(1, 9) == 'newsignup'
+            || window.location.hash.substr(1, 7) == 'account')
     {
         var i = 0;
         if (ua.indexOf('windows phone') > -1) {
@@ -938,14 +1038,14 @@ if (m)
 }
 else if (page == '#android')
 {
-    document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzmobileapps';
+    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps';
 }
 else if (!b_u)
 {
     d = localStorage.d || 0;
     var jj = localStorage.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'bg':['bg'],'tl':['en-ph'],'vi':['vn', 'vi']};
+    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cs','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'bg':['bg'],'tl':['en-ph'],'vi':['vn', 'vi']};
 
     if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
     if (d && !console.time) (function(c)
@@ -960,8 +1060,12 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 23, writable : false });
-    if (!d || onBetaW)
+    Object.defineProperty(window, "__cd_v", { value : 25, writable : false });
+
+    // Do not report exceptions if this build is older than 20 days
+    var exTimeLeft = ((buildVersion.timestamp + (20 * 86400)) * 1000) > Date.now();
+
+    if (!d && exTimeLeft && (location.host === 'mega.nz' || is_extension || onBetaW))
     {
         var __cdumps = [], __cd_t;
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -1001,6 +1105,7 @@ else if (!b_u)
             if (~dump.m.indexOf('[[:i]]')) {
                 return false;
             }
+
             if ((mega.flags & window.MEGAFLAG_MDBOPEN)
                     && (dump.m === 'InvalidStateError'
                         || (dump.m === 'UnknownError'))) {
@@ -1026,6 +1131,14 @@ else if (!b_u)
                 }
             }
             dump.m = dump.m.replace(/\s+/g, ' ');
+
+            if (!window.jsl_done) {
+                // Alert the user if there was an uncaught exception while
+                // loading the site, this should only happen on some fancy
+                // browsers other than what we use during development, and
+                // hopefully they'll report it back to us for troubleshoot
+                return siteLoadError(dump.m, url);
+            }
 
             if (~dump.m.indexOf('took +10s'))
             {
@@ -1072,6 +1185,11 @@ else if (!b_u)
                 }
             }
             if (cn) dump.c = cn;
+
+            if (/Access to '.*' from script denied/.test(dump.m)) {
+                console.error(dump.m, dump);
+                return false;
+            }
 
             if (ln == 0 && !dump.s)
             {
@@ -1165,22 +1283,54 @@ else if (!b_u)
         };
     }
 
-    function detectlang()
-    {
-        if (!navigator.language) return 'en';
-        var bl = navigator.language.toLowerCase();
-        var l2 = languages, b;
-        for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
-        for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
+    /**
+     * Detects which language the user currently has set in their browser
+     * @returns {String} Returns the two letter language code e.g. 'en', 'es' etc
+     */
+    var detectLang = function() {
+
+        // Get the preferred language in their browser
+        var userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        var langCode = null;
+        var langCodeVariant = null;
+
+        if (!userLang) {
+            return 'en';
+        }
+
+        // Lowercase it
+        userLang = userLang.toLowerCase();
+
+        // Match on language code variants e.g. 'pt-br' returns 'br'
+        /* jshint -W089 */
+        for (langCode in languages) {
+            for (langCodeVariant in languages[langCode]) {
+                if (languages[langCode][langCodeVariant] === userLang) {
+                    return langCode;
+                }
+            }
+        }
+
+        // If no exact match supported, normalise to base language code e.g. en-gb, en-us, en-ca returns 'en'
+        /* jshint -W089 */
+        for (langCode in languages) {
+            for (langCodeVariant in languages[langCode]) {
+                if (languages[langCode][langCodeVariant].substring(0, 3) === userLang.substring(0, 3)) {
+                    return langCode;
+                }
+            }
+        }
+
+        // Default to English
         return 'en';
-    }
+    };
 
     /**
      * Gets the file path for a language file
      * @param {String} language
      * @returns {String}
      */
-    function getLanguageFilePath(language) {
+    var getLanguageFilePath = function(language) {
 
         // If the sh1 (filename with hashes) array has been created from deploy script
         if (typeof sh1 !== 'undefined') {
@@ -1201,9 +1351,9 @@ else if (!b_u)
             // Otherwise return the filename.json when in Development
             return 'lang/' + language + '.json';
         }
-    }
+    };
 
-    var lang = detectlang();
+    var lang = detectLang();
     var jsl = [];
 
     // If they've already selected a language, use that
@@ -1216,20 +1366,15 @@ else if (!b_u)
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
     var langFilepath = getLanguageFilePath(lang);
 
-    jsl.push({f: langFilepath, n: 'lang', j:3});
+    jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-
-    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined') {
-        jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
-    }
-
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-    jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:1});
-    jsl.push({f:'js/vendor/jquery-2.2.0.js', n: 'jquery', j:1, w:10});
+    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+    jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
-    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
@@ -1243,7 +1388,6 @@ else if (!b_u)
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
-    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/vendor/jquery-ui-1.11.4.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
@@ -1284,13 +1428,13 @@ else if (!b_u)
     jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
 
     // MEGA CHAT
     if (location.host === 'mega.nz' || !megaChatIsDisabled) {
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
-        jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1, w:7});
 
         jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'stropheligh_js', j:1, w:4});
         jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1, w:1});
@@ -1326,12 +1470,9 @@ else if (!b_u)
     jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
-    if (is_extension)
-    {
-        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1});
-    }
-    /* better download */
-    jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
+
+    // Transfers
+    jsl.push({f:'js/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
     jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
@@ -1347,8 +1488,8 @@ else if (!b_u)
     jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
     jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
-    /* end better download */
 
+    // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
@@ -1362,6 +1503,7 @@ else if (!b_u)
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
+    jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
     jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
@@ -1383,6 +1525,8 @@ else if (!b_u)
     jsl.push({f:'css/chat-calls.css', n: 'chat_calls_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
@@ -1393,7 +1537,28 @@ else if (!b_u)
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
+
+
+    if (localStorage.enableDevtools) {
+        jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
+    }
+
+    // We need to keep a consistent order in loaded resources, so that if users
+    // send us logs we won't get different line numbers on stack-traces from
+    // different browsers. Hence, do NOT add more jsl entries after this block,
+    // unless they're optional (such as polyfills) or third-party resources.
+
     jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+    jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
+
+    if (is_extension) {
+        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
+    }
+    if (typeof Number.isNaN !== 'function'
+            || typeof Set === 'undefined') {
+
+        jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
+    }
 
     // only used on beta
     if (onBetaW) {
@@ -1450,8 +1615,7 @@ else if (!b_u)
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
         'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
         'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1},
-        'version_compare_js': {f:'js/vendor/version-compare.js', n: 'version_compare_js', j:1}
+        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1}
     };
 
     var subpages =
@@ -1466,7 +1630,7 @@ else if (!b_u)
         'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-        'register': ['register','register_js'],
+        'register': ['register','register_js', 'zxcvbn_js'],
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],
@@ -1482,10 +1646,10 @@ else if (!b_u)
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': ['help_js'],
-        'plugin': ['chrome', 'firefox'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
-        'chrome': ['chrome', 'chrome_js', 'version_compare_js'],
+        'plugin': ['chrome', 'chrome_js', 'firefox', 'firefox_js'],
+        'chrome': ['chrome', 'chrome_js'],
         'firefox': ['firefox', 'firefox_js']
     };
 
@@ -1570,7 +1734,9 @@ else if (!b_u)
             }
             i++;
         }
+        hashdata = null;
     }
+    asmCryptoSha256Js = null;
 
     if (jj)
     {
@@ -1637,7 +1803,11 @@ else if (!b_u)
         jsl_total = 0;
         jsl_perc = 0;
         jsli=0;
-        for (var i = jsl.length; i--;) if (!jsl[i].text) jsl_total += jsl[i].w || 1;
+        for (var i = jsl.length; i--;) {
+            if (jsl[i] && !jsl[i].text) {
+                jsl_total += jsl[i].w || 1;
+            }
+        }
         if (fx_startup_cache)
         {
             var step = function(jsi)
@@ -1919,7 +2089,7 @@ else if (!b_u)
     {
         if (document.location.hash == '#android')
         {
-            document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzindexandroid';
+            document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
         }
         else
         {
@@ -1927,7 +2097,7 @@ else if (!b_u)
             document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
             document.getElementById('android_yes').addEventListener("click", function ()
             {
-                document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzandroid';
+                document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzandroid';
             }, false);
             document.getElementById('android_no').addEventListener("click", function ()
             {
@@ -1943,7 +2113,7 @@ else if (!b_u)
         if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
         else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-sprite-v2.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-sprite-v2@2x.png);background-size: 356px auto;}}';
+        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-sprite-v4.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-sprite-v4@2x.png);background-size: 356px auto;}}';
 
         mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
             .innerHTML =
@@ -1993,10 +2163,7 @@ else if (!b_u)
             boot_done();
         };
 
-        // If using extension this is passed through to the API for the helpdesk tool
-        var usingExtension = (is_extension) ? '&ext=1' : '';
-
-        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + usingExtension, true);
+        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
     function boot_auth(u_ctx,r)
@@ -2012,6 +2179,13 @@ else if (!b_u)
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
         if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
+
+        // turn the `ua` (userAgent) string into an object which holds the browser details
+        try {
+            ua = Object(ua);
+            ua.details = Object.create(browserdetails(ua));
+        }
+        catch (e) {}
 
         if (u_checked) startMega();
         else if (loginresponse === -15) {
@@ -2051,10 +2225,7 @@ else if (!b_u)
             boot_done();
         };
 
-        // If using extension this is passed through to the API for the helpdesk tool
-        var usingExtension = (is_extension) ? '&ext=1' : '';
-
-        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz' + usingExtension, true);
+        dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
 }

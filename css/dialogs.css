@@ -33,7 +33,7 @@
 .fm-dialog .contacts-info.body.contacts-search:nth-child(odd) {
    background-color: white;
 }
-.fm-dialog .contacts-info.body.selected {
+.fm-dialog .contacts-info.body.contacts-search.selected {
     background-color: rgba(240,240,240,1);
 }
 .fm-dialog .contacts-search-header {

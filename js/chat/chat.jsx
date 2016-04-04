@@ -107,7 +107,7 @@ var Chat = function() {
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
-        'loadbalancerService': 'gelb530n001.karere.mega.nz',
+        'loadbalancerService': 'gelb.karere.mega.nz',
         'fallbackXmppServers': [
              "https://xmpp270n001.karere.mega.nz/ws",
              "https://xmpp270n002.karere.mega.nz/ws"
@@ -263,7 +263,7 @@ var Chat = function() {
 
     this.plugins = {};
 
-    if (!megaChatIsDisabled) {
+    if (!window.megaChatIsDisabled) {
         try {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
@@ -273,7 +273,7 @@ var Chat = function() {
         }
         catch (e) {
             console.error(e);
-            megaChatIsDisabled = true;
+            window.megaChatIsDisabled = true;
         }
     }
 
@@ -310,21 +310,6 @@ Chat.prototype.init = function() {
         self.plugins[k] = new v(self);
     });
 
-    //if (!self.filePicker) {
-    //    self.filePicker = new mega.ui.FilePicker(self.options.filePickerOptions);
-    //    self.filePicker.bind('doneSelecting', function(e, selection) {
-    //        if (selection.length === 0) {
-    //            return;
-    //        }
-    //
-    //        var room = self.getCurrentRoom();
-    //        if (room) {
-    //            room.attachNodes(
-    //                selection
-    //            );
-    //        }
-    //    })
-    //}
 
     // Karere Events
     this.karere.bind("onPresence", function(e, eventObject) {
@@ -359,25 +344,6 @@ Chat.prototype.init = function() {
 
         if (eventObject.getShow() !== "unavailable") {
             if (eventObject.isMyOwn(self.karere) === false) {
-                self.chats.forEach(function(room, roomJid) {
-                    if (room._leaving === true || room._conv_ended === true) {
-                        return; // continue
-                    }
-
-                    if (room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
-                        self.logger.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
-
-                        self.karere.addUserToChat(roomJid, eventObject.getFromJid(), undefined, room.type, {
-                            'ctime': room.ctime,
-                            'invitationType': 'resume',
-                            'participants': room.users,
-                            'users': self.karere.getUsersInChat(roomJid)
-                        });
-
-                        return false; // break;
-                    }
-                });
-
                 // Sync presence across devices (will check the delayed val!)
                 if (bareJid === self.karere.getBareJid()) {
                     if (eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
@@ -427,84 +393,6 @@ Chat.prototype.init = function() {
             e.stopPropagation();
             return false;
         }
-        self.logger.debug(self.karere.getNickname(), "Got invitation to join", eventObject.getRoomJid(), "with eventData:", eventObject);
-
-
-        var meta = eventObject.getMeta();
-
-        if (meta && meta.type === "private") {
-
-            var otherParticipants = meta.participants;
-            var myBareJid = megaChat.karere.getBareJid();
-
-            var otherParticipant;
-            if (Karere.getNormalizedBareJid(otherParticipants[0]) === megaChat.karere.getBareJid()) {
-                otherParticipant = Karere.getNormalizedBareJid(otherParticipants[0]);
-            }
-            else {
-                otherParticipant = Karere.getNormalizedBareJid(otherParticipants[1]);
-            }
-
-            if (otherParticipant && !self.getContactFromJid(otherParticipant)) {
-                self.logger.debug(
-                    self.karere.getNickname(),
-                    "Got invited to a private room with a non-existing contact. Ignoring: ",
-                    eventObject.getRoomJid(),
-                    roomJid,
-                    "with eventData:", eventObject, " and participants: ", otherParticipants
-                );
-            }
-            var bareFromJid = eventObject.getFromJid().split("/")[0];
-            self.chats.forEach(function(room, roomJid) {
-
-                if (roomJid === eventObject.getRoomJid()) {
-                    return; // continue
-                }
-
-                if (room.type === "private" && room.participantExistsInRoom(bareFromJid, false, true)) {
-                    self.logger.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventObject.getRoomJid(), roomJid, "with eventData:", eventObject);
-
-                    if (self.currentlyOpenedChat === room.roomJid) {
-                        room.ctime = meta.ctime;
-                        room.syncUsers(meta.participants);
-                    }
-
-                    // if not already in
-                    if (room.state < ChatRoom.STATE.JOINING) {
-                        room.setState(ChatRoom.STATE.JOINING);
-                        self.karere.joinChat(eventObject.getRoomJid(), eventObject.getPassword());
-                    }
-
-                    e.stopPropagation();
-                    return false;
-                }
-            });
-
-            if (e.isPropagationStopped()) {
-                return false;
-            }
-        }
-        if (self.chats[eventObject.getRoomJid()]) { //already joined
-            self.logger.warn("I'm already in", eventObject.getRoomJid(), "(ignoring invitation from: ", eventObject.getFromJid(), ")");
-
-            e.stopPropagation();
-            return false; // stop doing anything
-        }
-
-        // if we are here..then join the room
-        self.logger.debug("Initializing UI for new room: ", eventObject.getRoomJid(), "");
-
-        var roomJid = eventObject.getRoomJid();
-        var room = new ChatRoom(self, eventObject.getRoomJid(), meta.type, meta.participants, meta.ctime);
-        self.chats.set(
-            roomJid,
-            room
-        );
-        room.setState(ChatRoom.STATE.JOINING);
-        self.karere.joinChat(roomJid, eventObject.getPassword());
-
-        //room.refreshUI();
-
 
         e.stopPropagation();
 
@@ -731,6 +619,10 @@ Chat.prototype.init = function() {
     var appContainer = document.querySelector('.section.conversations');
 
     var initAppUI = function() {
+        if (d) {
+            console.time('chatReactUiInit');
+        }
+
         self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} contacts={M.u} />;
 
         self.$conversationsAppInstance = ReactDOM.render(
@@ -739,6 +631,9 @@ Chat.prototype.init = function() {
         );
 
         self.renderConversationsApp();
+        if (d) {
+            console.timeEnd('chatReactUiInit');
+        }
     };
 
     if (!appContainer) {
@@ -834,6 +729,24 @@ Chat.prototype.init = function() {
         M.onlineStatusEvent(contact, presenceEventData.getShow());
     });
 
+
+
+    $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
+        if (ul_target.indexOf("chat/") > -1) {
+            var contactHash = ul_target.replace("chat/", "");
+            if (!contactHash) {
+                return;
+            }
+
+            var chatRoom = megaChat.getPrivateRoom(contactHash);
+
+            if (!chatRoom) {
+                return;
+            }
+
+            chatRoom.attachNodes(uploads);
+        }
+    });
 
     self.trigger("onInit");
 };
@@ -1003,13 +916,17 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
  */
 Chat.prototype.destroy = function(isLogout) {
     var self = this;
-    //
-    //localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
-    //localStorage.megaChatPresenceMtime = unixtime();
 
-    if (self.filePicker) {
-        self.filePicker.destroy();
-        self.filePicker = null;
+    self.karere.destroying = true;
+    self.trigger('onDestroy', [isLogout]);
+
+    // unmount the UI elements, to reduce any unneeded.
+    if (
+        self.$conversationsAppInstance &&
+        ReactDOM.findDOMNode(self.$conversationsAppInstance) &&
+        ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode
+    ) {
+        ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
     }
 
 
@@ -1024,15 +941,23 @@ Chat.prototype.destroy = function(isLogout) {
 
     self.karere.connectionRetryManager.resetConnectionRetries();
 
-    return self.karere.disconnect()
-        .done(function() {
-            self.karere = new Karere({
-                'clientName': 'mc',
-                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
-            });
 
-            self.is_initialized = false;
+    self.karere.connectionRetryManager.options.functions.forceDisconnect();
+
+    if (
+        self.plugins.chatdIntegration &&
+        self.plugins.chatdIntegration.chatd &&
+        self.plugins.chatdIntegration.chatd.shards
+    ) {
+        var shards = self.plugins.chatdIntegration.chatd.shards;
+        Object.keys(shards).forEach(function(k) {
+            shards[k].connectionRetryManager.options.functions.forceDisconnect();
         });
+    }
+
+    self.is_initialized = false;
+
+    return MegaPromise.resolve();
 };
 
 /**
@@ -1100,11 +1025,8 @@ Chat.prototype.getContactNameFromJid = function(jid) {
     var name = jid.split("@")[0];
 
 
-    if (contact && contact.name) {
-        name = contact.name;
-    }
-    else if (contact && contact.m) {
-        name = contact.m;
+    if (contact) {
+        name = mega.utils.fullUsername(contact.u);
     }
 
     assert(name, "Name not found for jid: " + jid);
@@ -1328,6 +1250,18 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
     var $promise = new MegaPromise();
 
     if (type === "private") {
+        // validate that ALL jids are contacts
+        var allValid = true;
+        jids.forEach(function(jid) {
+            var contact = self.getContactFromJid(jid);
+            if (!contact || (contact.c !== 1 && contact.c !== 2)) {
+                allValid = false;
+                return false;
+            }
+        });
+        if (allValid === false) {
+            return MegaPromise.reject();
+        }
         var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
         var roomJid = $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain;
         if (self.chats[roomJid]) {
@@ -1417,18 +1351,6 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
 
     $startChatPromise
         .done(function(roomJid) {
-            $.each(jidsWithoutMyself, function(k, userJid) {
-
-                if (self.chats[roomJid]) {
-                    self.karere.addUserToChat(roomJid, userJid, undefined, type, {
-                        'ctime': self.chats[roomJid].ctime,
-                        'invitationType': "created",
-                        'participants': jids,
-                        'users': self.karere.getUsersInChat(roomJid)
-                    });
-                }
-            });
-
             $promise.resolve(roomJid, self.chats[roomJid]);
         })
         .fail(function() {
@@ -1732,7 +1654,7 @@ Chat.prototype.renderListing = function() {
             // have last opened chat, which is active
             self.chats[self.lastOpenedChat].setActive();
             self.chats[self.lastOpenedChat].show();
-            return true;
+            return self.chats[self.lastOpenedChat];
         }
         else {
             // show first chat from the conv. list
@@ -1745,7 +1667,7 @@ Chat.prototype.renderListing = function() {
                 var room = sortedConversations[0];
                 room.setActive();
                 room.show();
-                return true;
+                return room;
             }
             else {
                 $('.fm-empty-conversations').removeClass('hidden');

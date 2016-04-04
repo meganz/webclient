@@ -95,7 +95,10 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
-        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk', 'flags'];
+        var exclude = [
+            'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen'
+        ];
 
         for (var n in u_attr) {
             if (exclude.indexOf(n) == -1) {
@@ -121,11 +124,6 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
-        // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
-        if ((typeof u_attr.flags !== 'undefined') && (typeof u_attr.flags.mcs !== 'undefined')) {
-            localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
-        }
-
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
         }
@@ -137,6 +135,26 @@ function u_checklogin3a(res, ctx) {
         }
         catch (e) {
             console.error('Error decoding private RSA key', e);
+        }
+
+        // Flags is a generic object for various things
+        if (typeof u_attr.flags !== 'undefined') {
+
+            // If the 'psa' Public Service Announcement flag is set, this is the current announcement being sent out
+            if (typeof u_attr.flags.psa !== 'undefined') {
+
+                // Get the last seen announcement private attribute
+                var currentAnnounceNum = u_attr.flags.psa;
+                var lastSeenAttr = (typeof u_attr['*!lastPsaSeen'] !== 'undefined') ? u_attr['*!lastPsaSeen'] : null;
+
+                // Set the values we need to know if the PSA should be shown, then show the announcement
+                psa.setInitialValues(currentAnnounceNum, lastSeenAttr);
+            }
+
+            // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
+            if (typeof u_attr.flags.mcs !== 'undefined') {
+                localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
+            }
         }
 
         if (!u_attr.email) {
@@ -185,11 +203,7 @@ function u_logout(logout) {
             localStorage.removeItem("audioVideoScreenSize");
 
             if (megaChatIsReady) {
-                megaChat.destroy( /* isLogout: */ true).always(function () {
-                    window.megaChat = new Chat();
-                    localStorage.removeItem("megaChatPresence");
-                    localStorage.removeItem("megaChatPresenceMtime");
-                });
+                megaChat.destroy( /* isLogout: */ true);
 
                 localStorage.removeItem("megaChatPresence");
                 localStorage.removeItem("megaChatPresenceMtime");
@@ -258,8 +272,12 @@ function u_setrsa(rsakey) {
                     if (ASSERT(u_type === 3, 'Invalid activation procedure.')) {
                         var user = {
                             u: u_attr.u,
-                            c: u_attr.c,
-                            m: u_attr.email,
+
+                            // u_attr.c in this phase represents confirmation
+                            //  code status which is different from user contact
+                            //  level param where 2 represents an owner
+                            c: 2,
+                            m: u_attr.email
                         };
                         process_u([user]);
 
@@ -468,35 +486,6 @@ function _generateReadableContactNameFromStr(s, shortFormat) {
 }
 
 /**
- * Use this when rendering contact's name. Will try to find the contact and render his name (or email, if name is not
- * available) and as a last fallback option, if the contact is not found will render the user_hash (which is not
- * really helpful, but a way to debug)
- *
- * @param user_hash
- * @returns {String}
- */
-function generateContactName(user_hash) {
-    var contact = M.u[user_hash];
-    if (!contact) {
-        console.error('contact not found');
-    }
-
-    var name;
-
-    if (contact && contact.name) {
-        name = contact.name;
-    }
-    else if (contact && contact.m) {
-        name = contact.m;
-    }
-    else {
-        name = user_hash;
-    }
-
-    return name;
-}
-
-/**
  * Generates meta data required for rendering avatars
  *
  * @param user_hash
@@ -511,7 +500,7 @@ function generateAvatarMeta(user_hash) {
         contact = {}; // dummy obj.
     }
 
-    var fullName = generateContactName(user_hash);
+    var fullName = mega.utils.fullUsername(user_hash);
 
     var shortName = fullName.substr(0, 1).toUpperCase();
     var avatar = avatars[contact.u];
@@ -525,7 +514,7 @@ function generateAvatarMeta(user_hash) {
     else {
         M.u.forEach(function(k, v) {
             var c = M.u[v];
-            var n = generateContactName(v);
+            var n = mega.utils.fullUsername(v);
 
             if (!n || !c) {
                 return; // skip, contact not found
@@ -853,7 +842,285 @@ function checkUserLogin() {
 
 
 
-(function _userAttributeHandling() {
+(function _userConfig() {
+    "use strict";
+
+    var timer;
+    var waiter;
+    var ns = {};
+    var logger = MegaLogger.getLogger('account.config');
+    var MMH_SEED = 0x7f01e0aa;
+
+    /**
+     * Move former/legacy settings stored in localStorage
+     * @private
+     */
+    var moveLegacySettings = function() {
+        var prefs = [
+            'dl_maxSlots', 'ul_maxSlots', 'ul_maxSpeed', 'use_ssl',
+            'ul_skipIdentical', 'font_size', 'leftPaneWidth'
+        ];
+
+        prefs.forEach(function(pref) {
+            if (localStorage[pref] !== undefined) {
+                if (fmconfig[pref] === undefined) {
+                    mega.config.set(pref, parseInt(localStorage[pref]) | 0);
+                }
+            }
+        });
+    };
+
+    /**
+     * Pick the global `fmconfig` and sanitize it before
+     * sending it to the server, as per TLV requirements.
+     * @private
+     */
+    var getConfig = function() {
+        var result = {};
+        var config = Object(fmconfig);
+        var nodes = { viewmodes: 1, sortmodes: 1, treenodes: 1 };
+
+        var isValid = function(handle) {
+            return handle.length !== 8 || M.d[handle] || handle === 'contacts';
+        };
+
+        for (var key in config) {
+            if (!config.hasOwnProperty(key)) {
+                continue;
+            }
+            var value = config[key];
+
+            if (!value && value !== 0) {
+                logger.info('Skipping empty value for "%s"', key);
+                continue;
+            }
+
+            // Dont save no longer existing nodes
+            if (nodes[key]) {
+                if (typeof value !== 'object') {
+                    logger.warn('Unexpected type for ' + key);
+                    continue;
+                }
+
+                var modes = {};
+                for (var handle in value) {
+                    if (value.hasOwnProperty(handle)
+                            && handle.substr(0, 7) !== 'search/'
+                            && isValid(handle)) {
+                        modes[handle] = value[handle];
+                    }
+                    else {
+                        logger.info('Skipping non-existant node "%s"', handle);
+                    }
+                }
+                value = modes;
+            }
+
+            if (typeof value === 'object' && !$.len(value)) {
+                logger.info('Skipping empty object "%s"', key);
+                continue;
+            }
+
+            try {
+                result[key] = JSON.stringify(value);
+            }
+            catch (ex) {
+                logger.error(ex);
+            }
+        }
+
+        return result;
+    };
+
+    /**
+     * Wrapper around mega.attr.set to store fmconfig on the server, encrypted.
+     * @private
+     */
+    var store = function() {
+        if (!u_handle) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        var config = getConfig();
+        if (!$.len(config)) {
+            return MegaPromise.reject(ENOENT);
+        }
+
+        var hash = JSON.stringify(config);
+        var len = hash.length;
+
+        // generate checkum/hash for the config
+        hash = MurmurHash3(hash, MMH_SEED);
+
+        // dont store it unless it has changed
+        if (hash === parseInt(localStorage[u_handle + '_fmchash'])) {
+            return MegaPromise.resolve(EEXIST);
+        }
+        localStorage[u_handle + '_fmchash'] = hash;
+
+        var promise;
+        if (len < 8) {
+            srvlog('config.set: invalid data');
+            promise = MegaPromise.reject(EARGS);
+        }
+        else if (len > 12000) {
+            srvlog('config.set: over quota');
+            promise = MegaPromise.reject(EOVERQUOTA);
+        }
+        else {
+            promise = mega.attr.set('fmconfig', config, false, true);
+        }
+
+        return promise;
+    };
+
+    /**
+     * Fetch server-side config.
+     * @return {MegaPromise}
+     */
+    ns.fetch = function _fetchConfig() {
+        if (!u_handle) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        // if already running/pending
+        if (waiter) {
+            return waiter;
+        }
+        waiter = new MegaPromise();
+
+        mega.attr.get(u_handle, 'fmconfig', false, true)
+            .always(moveLegacySettings)
+            .done(function(result) {
+                result = Object(result);
+                for (var key in result) {
+                    if (result.hasOwnProperty(key)) {
+                        try {
+                            mega.config.set(key, JSON.parse(result[key]));
+                        }
+                        catch (ex) {}
+                    }
+                }
+
+                if (fminitialized) {
+                    var view = Object(fmconfig.viewmodes)[M.currentdirid];
+                    var sort = Object(fmconfig.sortmodes)[M.currentdirid];
+
+                    if ((view !== undefined && M.viewmode !== view)
+                            || (sort !== undefined
+                                && (sort.n !== M.sortmode.n
+                                    || sort.d !== M.sortmode.d))) {
+
+                        M.openFolder(M.currentdirid, true);
+                    }
+
+                    if (M.currentrootid === M.RootID) {
+                        var tree = Object(fmconfig.treenodes);
+
+                        if (JSON.stringify(tree) !== M.treenodes) {
+
+                            M.renderTree();
+                        }
+                    }
+
+                    localStorage[u_handle + '_fmchash'] =
+                        MurmurHash3(JSON.stringify(getConfig()), MMH_SEED);
+                }
+
+                if (fmconfig.ul_maxSlots) {
+                    ulQueue.setSize(fmconfig.ul_maxSlots);
+                }
+                if (fmconfig.dl_maxSlots) {
+                    dlQueue.setSize(fmconfig.dl_maxSlots);
+                }
+                if (fmconfig.font_size) {
+                    $('body').removeClass('fontsize1 fontsize2')
+                        .addClass('fontsize' + fmconfig.font_size);
+                }
+                waiter.resolve();
+                waiter = undefined;
+            })
+            .fail(function() {
+                waiter.reject.apply(waiter, arguments);
+                waiter = undefined;
+            });
+
+        return waiter;
+    };
+
+    /**
+     * Wrap a callback to be executed when the fetch's wait promise is resolved.
+     * @param {Function} callback function
+     */
+    ns.ready = function _onConfigReady(callback) {
+        if (waiter) {
+            waiter.always(callback);
+        }
+        else {
+            Soon(callback);
+        }
+    };
+
+    /**
+     * Retrieve configuration value.
+     * (We'll keep using the global `fmconfig` for now)
+     *
+     * @param {String} key Configuration key
+     */
+    ns.get = function _getConfigValue(key) {
+        return fmconfig[key];
+    };
+
+    /**
+     * Store configuration value
+     * @param {String} key   Configuration key
+     * @param {String} value Configuration value
+     */
+    ns.set = function _setConfigValue(key, value) {
+        fmconfig[key] = value;
+
+        if (d) {
+            logger.debug('Setting value for key "%s"', key, value);
+        }
+
+        var push = function() {
+            if (u_type === 3 && !pfid && !folderlink) {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                // through a timer to prevent floods
+                timer = setTimeout(store, 9701);
+            }
+            else {
+                localStorage.fmconfig = JSON.stringify(fmconfig);
+                timer = null;
+            }
+        };
+
+        if (fminitialized) {
+            Soon(push);
+        }
+        else if (timer !== -MMH_SEED) {
+            timer = -MMH_SEED;
+            mBroadcaster.once('fm:initialized', push);
+        }
+
+        mBroadcaster.sendMessage('fmconfig:' + key, value);
+    };
+
+    if (is_karma) {
+        mega.attr = ns;
+    }
+    else {
+        Object.defineProperty(mega, 'config', {
+            value: Object.freeze(ns)
+        });
+    }
+    ns = undefined;
+
+})(this);
+
+(function _userAttributeHandling(scope) {
     "use strict";
 
     var ns = {};
@@ -878,12 +1145,14 @@ function checkUserLogin() {
         if (nonHistoric === true || nonHistoric === 1) {
             attribute = '!' + attribute;
         }
+
         if (pub === true || pub === undefined) {
             attribute = '+' + attribute;
         }
-        else {
+        else if (pub !== -1) {
             attribute = '*' + attribute;
         }
+
         return attribute;
     };
 
@@ -944,7 +1213,6 @@ function checkUserLogin() {
          * @param {Number|Object} res The received result.
          */
         function settleFunction(res) {
-
             if (typeof res !== 'number') {
                 // Decrypt if it's a private attribute container.
                 if (attribute.charAt(0) === '*') {
@@ -1008,8 +1276,10 @@ function checkUserLogin() {
             }
             else {
                 // Got back an error (a number).
-                logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
-                            attribute, userhandle, res);
+                if (res !== -9) {
+                    logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
+                        attribute, userhandle, res);
+                }
                 thePromise.reject(res);
             }
 
@@ -1206,14 +1476,24 @@ function checkUserLogin() {
     };
 
 
-    Object.defineProperty(mega, 'attr', {
-        value: Object.freeze(ns)
-    });
+    if (is_karma) {
+        ns._logger = logger;
+        mega.attr = ns;
+    }
+    else {
+        Object.defineProperty(mega, 'attr', {
+            value: Object.freeze(ns)
+        });
+    }
     ns = undefined;
 
 })(this);
 
-var attribCache = new IndexedDBKVStorage('attrib');
+var attribCache = new IndexedDBKVStorage('attrib', {
+    murSeed: 0x800F0002
+});
+
+attribCache.syncNameTimer = {};
 
 /**
  * Process action-packet for attribute updates.
@@ -1232,15 +1512,13 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
 
     removeItemPromise
         .always(function _uaPacketParser() {
-            if (ownActionPacket) {
-                if (attrName === 'firstname'
-                        || attrName === 'lastname') {
-
-                    M.syncUsersFullname(userHandle);
-                }
-                else {
-                    logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
-                }
+            if (attrName === 'firstname'
+                    || attrName === 'lastname') {
+                M.syncUsersFullname(userHandle);
+            }
+            else if (ownActionPacket) {
+                // atm only first/last name is processed throguh own-action-packet
+                logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
             }
             else if (attrName === '+a') {
                 avatars[userHandle] = undefined;
@@ -1254,6 +1532,9 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
             }
             else if (attrName === '*!authCu255') {
                 authring.getContacts('Cu25519');
+            }
+            else if (attrName === '*!fmconfig') {
+                mega.config.fetch();
             }
             else if (attrName === '+puEd255') {
                 // pubEd25519 key was updated!

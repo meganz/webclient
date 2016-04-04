@@ -1,16 +1,4 @@
-
-var ul_maxSpeed = 0;
 var uldl_hold = false;
-var ul_skipIdentical = 1;
-var ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 });
-
-if (localStorage.ul_maxSpeed) {
-    ul_maxSpeed = parseInt(localStorage.ul_maxSpeed);
-}
-
-if (localStorage.ul_skipIdentical) {
-    ul_skipIdentical = parseInt(localStorage.ul_skipIdentical);
-}
 
 /* jshint -W003 */
 var ulmanager = {
@@ -23,6 +11,46 @@ var ulmanager = {
     ulBlockSize: 131072,
     ulBlockExtraSize: 1048576,
     logger: MegaLogger.getLogger('ulmanager'),
+
+    /**
+     * Shows a dialog with a message that the user is over quota
+     */
+    showOverQuotaDialog: function UL_showOverQuotaDialog() {
+        // Show the dialog
+        var $dialog = $('.top-warning-popup');
+        $dialog.addClass('active');
+    
+        // Unhide the warning icon and show the button
+        $('.warning-popup-icon').removeClass('hidden');
+        $('.fm-notifications-bottom', $dialog).show();
+    
+        // Add a click event on the warning icon to hide and show the dialog
+        $('.warning-icon-area').unbind('click');
+        $('.warning-icon-area').click(function() {
+            if ($dialog.hasClass('active')) {
+                $dialog.removeClass('active');
+            }
+            else {
+                $dialog.addClass('active');
+            }
+        });
+    
+        // Change contents of dialog text
+        $('.warning-green-icon', $dialog).remove();
+        $('.warning-popup-body', $dialog).unbind('click').html(
+            '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
+            + "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
+        );
+    
+        // Set button text to 'Upgrade Account'
+        $('.warning-button span').text(l[5549]);
+    
+        // Redirect to Pro signup page on button click
+        $('.warning-button').click(function() {
+            document.location.hash = 'pro';
+        });
+    },
+
 
     // Errors megad might return while uploading
     ulErrorMap: Object.freeze({
@@ -147,7 +175,9 @@ var ulmanager = {
                 if (d) {
                     ulmanager.logger.error('Too many retries for ' + cid);
                 }
+                var fileName = htmlentities(file.name);
                 var errorstr = reason.match(/"([^"]+)"/);
+                
                 if (errorstr) {
                     errorstr = errorstr.pop();
                 }
@@ -156,7 +186,7 @@ var ulmanager = {
                 }
                 $('.transfer-table #ul_' + file.id + ' td:eq(5)')
                     .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
-                msgDialog('warninga', l[1309], l[1498] + ': ' + file.name, reason);
+                msgDialog('warninga', l[1309], l[1498] + ': ' + fileName, reason);
                 ulmanager.abort(file);
             }
             if (!$.len(q)) {
@@ -416,7 +446,7 @@ var ulmanager = {
             if (res === EOVERQUOTA) {
 
                 // Show a warning dialog
-                showOverQuotaDialog();
+                ulmanager.showOverQuotaDialog();
 
                 // Return early so it does not retry automatically and spam the API server with requests
                 return false;
@@ -464,7 +494,7 @@ var ulmanager = {
             api_req({
                 a: 'u',
                 ssl: use_ssl,
-                ms: ul_maxSpeed,
+                ms: fmconfig.ul_maxSpeed | 0,
                 s: cfile.size,
                 r: cfile.retries,
                 e: cfile.ul_lastreason
@@ -602,13 +632,13 @@ var ulmanager = {
             ulmanager.ulCompletePending(ctx.target);
         }
         else {
-            var fileName = ctx.file.name;
+            var fileName = htmlentities(ctx.file.name);
             Later(mega.utils.resetUploadDownload);
             Soon(function() {
 
                 // If over quota show a special warning dialog
                 if (res === EOVERQUOTA) {
-                    showOverQuotaDialog();
+                    ulmanager.showOverQuotaDialog();
                 }
                 else {
                     // Otherwise show 'Upload failed - Error uploading asset [filename]'
@@ -631,7 +661,7 @@ var ulmanager = {
     ulDeDuplicate: function UM_ul_deduplicate(File, identical) {
         var n;
         var uq = File.ul;
-        if (identical && ul_skipIdentical) {
+        if (identical && fmconfig.ul_skipIdentical) {
             n = identical;
         }
         else if (!M.h[uq.hash] && !identical) {
@@ -655,7 +685,7 @@ var ulmanager = {
         }, {
             uq: uq,
             n: n,
-            skipfile: (ul_skipIdentical && identical),
+            skipfile: (fmconfig.ul_skipIdentical && identical),
             callback: function(res, ctx) {
                 if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
                     ctx.uq.repair = ctx.n.key;
@@ -786,7 +816,7 @@ ChunkUpload.prototype.abort = function() {
         clearTimeout(this.oet);
     }
     if (this.xhr) {
-        this.xhr.xhr_cleanup(0x9ffe);
+        this.xhr.abort(this.xhr.ABORT_CLEANUP);
     }
     if (GlobalProgress[this.gid]) {
         removeValue(GlobalProgress[this.gid].working, this, 1);
@@ -797,15 +827,15 @@ ChunkUpload.prototype.abort = function() {
     delete this.xhr;
 };
 
-ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
+ChunkUpload.prototype.onXHRprogress = function(xhrEvent) {
     if (!this.file || !this.file.progress || this.file.abort) {
         return this.done && this.done();
     }
-    this.file.progress[this.start] = args[0].loaded;
+    this.file.progress[this.start] = xhrEvent.loaded;
     this.updateprogress();
 };
 
-ChunkUpload.prototype.on_error = function(args, xhr, reason) {
+ChunkUpload.prototype.onXHRerror = function(args, xhr, reason) {
     if (this.file && !this.file.abort && this.file.progress) {
         this.file.progress[this.start] = 0;
         this.updateprogress();
@@ -823,13 +853,16 @@ ChunkUpload.prototype.on_error = function(args, xhr, reason) {
     this.done();
 }
 
-ChunkUpload.prototype.on_ready = function(args, xhr) {
+ChunkUpload.prototype.onXHRready = function(xhrEvent) {
     if (!this.file || !this.file.progress) {
         if (d) {
             this.logger.error('Upload aborted...', this);
         }
         return Soon(this.done.bind(this));
     }
+    var xhr = xhrEvent.target;
+    xhrEvent = undefined;
+
     if (xhr.status === 200 && typeof xhr.response === 'string' && xhr.statusText === 'OK') {
         var response = xhr.response;
         if (response.length > 27) {
@@ -886,7 +919,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
             var estr = ulmanager.ulStrError(response);
             this.logger.error("Invalid upload response: ", response, estr);
             if (estr !== "EKEY") {
-                return this.on_error("$FATAL", null,
+                return this.onXHRerror("$FATAL", null,
                     (estr ? (estr + " error")
                     : "IUR[" + String(response).trim().substr(0, 5) + "]"));
             }
@@ -911,7 +944,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
     var self = this;
     this.oet = setTimeout(function() {
         if (!oIsFrozen(self)) {
-            self.on_error(null, xhr, errstr);
+            self.onXHRerror(null, xhr, errstr);
         }
         self = undefined;
     }, 1950 + Math.floor(Math.random() * 2e3));
@@ -953,7 +986,7 @@ ChunkUpload.prototype.upload = function() {
         return;
     }
 
-    xhr = getXhr(this);
+    xhr = getTransferXHR(this);
     url = dlmanager.uChangePort(this.file.posturl + this.suffix, this.altport ? 8080 : 0);
     xhr._murl = url;
 
@@ -962,6 +995,7 @@ ChunkUpload.prototype.upload = function() {
     }
 
     xhr.open('POST', url);
+    xhr.responseType = 'text';
     xhr.send(this.bytes.buffer);
 
     this.xhr = xhr;
@@ -1204,7 +1238,7 @@ var ulQueue = new TransferQueue(function _workerUploader(task, done) {
         ulQueue.logger.info('worker_uploader', task, done);
     }
     task.run(done);
-}, ul_maxSlots, 'uploader');
+}, 4, 'uploader');
 
 ulQueue.poke = function(file, meth) {
     if (file.owner) {
@@ -1248,23 +1282,6 @@ ulQueue.poke = function(file, meth) {
         file.completion = [];
         file.owner = new FileUpload(file);
         ulQueue[meth || 'push'](file.owner);
-    }
-};
-
-ulQueue.stuck = function() {
-    // Check certain conditions to make sure the workaround isn't worse than the problem...
-    if (ulQueue._running === 1
-            && ulQueue._limit > 1 && ulQueue._queue.length && ulQueue._queue[0][0] instanceof FileUpload) {
-        if (ASSERT(ulQueue._pending.length === 1, 'Invalid ulQueue pending state')) {
-            var chunk = ulQueue._pending[0];
-            if (ASSERT(chunk instanceof ChunkUpload, 'Invalid pending chunk')) {
-                var id = ulmanager.getGID(chunk.ul);
-                $('.transfer-table #' + id + ' td:eq(0)').text('Internal Error (0x7f023)');
-                $('.transfer-table #' + id).attr('id', 'STUCKed_' + id);
-                srvlog('Upload automatically aborted on stuck detection');
-                ulmanager.abort(id);
-            }
-        }
     }
 };
 

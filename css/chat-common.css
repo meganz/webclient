@@ -4,8 +4,9 @@
     -khtml-opacity: 0.5;
     opacity: 0.5;
 }
-.section {
+.section, .conversationsApp {
     width: 100%;
+    height: 100% !important;
 }
 .nw-fm-tree-header.conversations .button {
     position: absolute;
@@ -15,7 +16,7 @@
 }
 .conversation-panels, .conversation-panel {
     box-sizing: border-box;
-    height: 100% !important;
+    height: 100%;
     position: relative;
 }
 .chat-content-block {
@@ -136,7 +137,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     left: auto;
     right: 34px;
     background-position: -11px -420px;
-    background-image: url(../images/mega/top-sprite_v2.svg);
+    background-image: url(../images/mega/top-sprite_v3.svg);
 }
 .fm-chat-popup-button {
     height: 32px;

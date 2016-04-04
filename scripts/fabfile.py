@@ -5,11 +5,17 @@ Fabfile for deploying the Mega Web Client.
 * To deploy/update the current branch on beta.developers.mega.co.nz:
   fab dev
 
-* To deploy/update a branch on beta.developers.mega.co.nz:
-  fab dev:branch-name
+* To deploy/update a specific branch on beta.developers.mega.co.nz:
+  fab dev:branch_name=1657-simple-translations
+
+* To build bundle.js as well for React changes:
+  fab dev:build_bundle=True  OR  fab dev:1
+
+* To build bundle.js and deploy to a specific branch:
+  fab dev:build_bundle=True,branch_name=1657-simple-translations
 
 * To deploy/update a branch on sandbox3.developers.mega.co.nz:
-  fab sandbox dev:branch-name
+  fab sandbox dev:branch_name=1657-simple-translations
 
 * To deploy/update a branch on the root of beta.mega.nz:
   fab beta deploy
@@ -79,7 +85,7 @@ def _build_chat_bundle(target_dir):
 
 
 @task
-def dev(branch_name=''):
+def dev(build_bundle=False, branch_name=''):
     """
     Clones a branch and deploys it to beta.developers.mega.co.nz.
     It will then output a test link which can be pasted into a Redmine
@@ -136,14 +142,15 @@ def dev(branch_name=''):
             version = run("cat current_ver.txt")
 
         # Installs dependencies and builds bundles.
-        _build_chat_bundle(remote_branch_path)
+        if build_bundle:
+            _build_chat_bundle(remote_branch_path)
 
         # Provide test link and version info.
         host_name = env.host_string.split('@')[-1]
         boot_html = ('sandbox3' if env.host_string == SANDBOX3_HOST
                      else 'devboot-beta')
         print('Test link:\n    https://{host}/{branch_name}'
-                '/dont-deploy/{boot_html}.html?apipath=prod'
+                '/dont-deploy/sandbox3.html?apipath=prod'
                 .format(host=host_name,
                         branch_name=branch_name,
                         boot_html=boot_html))

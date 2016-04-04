@@ -1,6 +1,9 @@
 (function(window) {
     "use strict";
 
+    // https://dev.w3.org/2009/dap/file-system/file-writer.html#idl-def-FileWriter
+    // https://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-entry-interface
+
     var TEMPORARY = window.TEMPORARY || 0,
         PERSISTENT = window.PERSISTENT || 1;
 
@@ -340,10 +343,16 @@
                         }
                         dl_fw = fileWriter;
 
-                        dl_fw.onerror = function(e) {
+                        dl_fw.onerror = function(ev) {
                             /* onwriteend() will take care of it */
                             if (d) {
-                                logger.error(e);
+                                var error = Object(ev.target).error;
+                                if (error) {
+                                    logger.error(error.name, error.message);
+                                }
+                                else {
+                                    logger.error(ev);
+                                }
                             }
                         };
 
@@ -369,18 +378,28 @@
                                 dl_ack_write();
                             }
                             else {
-                                logger.error('Short write (' + dl_fw.position + ' / ' +
-                                    targetpos + ')');
+                                logger.error('Short write (%d/%d)', dl_fw.position, targetpos, dl_fw.readyState);
 
                                 /* try to release disk space and retry */
                                 free_space(function() {
+                                    if (!dl_fw) {
+                                        logger.debug('Transfer %s cancelled while freeing space', dl_id);
+                                        return;
+                                    }
                                     if (++chrome_write_error_msg % 21 == 0
                                             && !$.msgDialog) {
                                         chrome_write_error_msg = 0;
-                                        msgDialog('warningb',
+                                        msgDialog('warningb:' + l[103],
                                             WRITERR_DIAGTITLE,
                                             'Your browser storage for MEGA is full. ' +
-                                            'Your download will continue automatically after you free up some space.');
+                                            'Your download will continue automatically after you free up some space.',
+                                            str_mtrunc(dl_filename), function(cancel) {
+                                                if (cancel) {
+                                                    dlFatalError(dl, WRITERR_DIAGTITLE, -0xDEADBEEF);
+                                                }
+                                            });
+
+                                        srvlog('Out of HTML5 Offline Storage space (write)');
                                     }
                                     failed = true;
                                     dl_ack_write();
@@ -407,9 +426,16 @@
 
                 if (aFail === -1) {
                     if (!$.msgDialog) {
-                        msgDialog('warningb', WRITERR_DIAGTITLE,
+                        srvlog('Out of HTML5 Offline Storage space (open)');
+
+                        msgDialog('warningb:' + l[103], WRITERR_DIAGTITLE,
                             'Your available browser storage for MEGA cannot ' +
-                            'handle this download size, please free up some disk space.');
+                            'handle this download size, please free up some disk space.',
+                            str_mtrunc(dl_filename), function(cancel) {
+                                if (cancel) {
+                                    dlFatalError(dl, WRITERR_DIAGTITLE, -0xDEADBEEF);
+                                }
+                            });
                     }
                     wTimer = setTimeout(function() {
                         this.fsInitOp();
@@ -433,6 +459,9 @@
         };
 
         this.abort = function(err) {
+            var _logger = logger || dlmanager.logger;
+            _logger.debug('abort', err, wTimer, dl_id, dl_fw, zfileEntry);
+
             if (wTimer) {
                 clearTimeout(wTimer);
             }
@@ -444,16 +473,42 @@
                 }
                 else if (err) {
                     try {
-                        dl_fw.onerror = dl_fw.onwriteend = function() {};
-                        dl_fw.truncate(0);
+                        var onWriteEnd = (function(writer, entry) {
+                            return function() {
+                                if (arguments.length) {
+                                    _logger.debug('onWriteEnd', arguments);
+                                }
+                                if (entry) {
+                                    entry.remove(
+                                        _logger.debug.bind(_logger),
+                                        _logger.error.bind(_logger)
+                                    );
+                                }
+                                else if (writer) {
+                                    writer.truncate(0);
+                                }
+
+                                writer = entry = undefined;
+                            };
+                        })(dl_fw, zfileEntry);
+
+                        if (dl_fw.readyState === dl_fw.WRITING) {
+                            dl_fw.onerror = dl_fw.onwriteend = onWriteEnd;
+                        }
+                        else {
+                            dl_fw.onerror = dl_fw.onwriteend = function() {};
+                            onWriteEnd();
+                        }
                     }
                     catch (e) {
                         if (d) {
-                            logger.error(e);
+                            _logger.error(e);
                         }
                     }
                 }
             }
+
+            dl_fw = zfileEntry = null;
         };
 
         function dl_ack_write() {
@@ -461,13 +516,16 @@
                 /* reset error flag */
                 failed = false;
                 /* retry */
-                dl_fw.seek(dl_position);
-                if (d) {
-                    logger.info('IO: error, retrying');
+                try {
+                    dl_fw.seek(dl_position);
                 }
+                catch (e) {
+                    return dlFatalError(dl, e);
+                }
+                logger.warn('write error, retrying...', dl_fw.readyState);
                 return wTimer = setTimeout(function() {
                     dl_fw.write(new Blob([dl_buffer]))
-                }, 2600);
+                }, 4480);
             }
 
             if ($.msgDialog
@@ -506,6 +564,8 @@
         };
 
         this.download = function(name, path) {
+            logger.debug('download', name, path, dl_fw, zfileEntry);
+
             document.getElementById('dllink').download = name;
             document.getElementById('dllink').href = zfileEntry.toURL();
             if (!is_chrome_firefox) {
@@ -520,9 +580,15 @@
             dl_filename = filename;
             dl_chunks = chunks;
             dl_chunksizes = sizes;
-            this.fsInitOp();
+
+            // Try to free space before starting the download.
+            free_space(this.fsInitOp.bind(this), 50);
         };
     };
+
+    if (window.d) {
+        window.free_space = free_space;
+    }
 
     if (navigator.webkitGetUserMedia) {
         mBroadcaster.once('startMega', function __setup_fs() {

@@ -64,7 +64,7 @@
   function renderImageToDataURL(img, options, doSquash) {
     var canvas = document.createElement('canvas');
     renderImageToCanvas(img, canvas, options, doSquash);
-    return canvas.toDataURL("image/jpeg", options.quality || 0.8);
+    return canvas.toDataURL(options.imageType || "image/jpeg", options.quality || 0.8);
   }
 
   /**
@@ -76,10 +76,12 @@
     var width = options.width, height = options.height;
     var ctx = canvas.getContext('2d');
     transformCoordinate(canvas, ctx, width, height, options.orientation);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (options.fillStyle) {
+        ctx.fillStyle = options.fillStyle;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     ctx.save();
-    var subsampled = detectSubsampling(img);
+    var subsampled = doSquash && detectSubsampling(img);
     if (subsampled) {
       iw /= 2;
       ih /= 2;

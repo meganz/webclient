@@ -386,7 +386,7 @@ ZipEntryIO.prototype.push = function(obj) {
     obj.zfile = this;
     this.zipWriter.zwriter.push(obj, function() {
         this.queued--
-        if (this.file.ready) {
+        if (Object(this.file).ready) {
             this.file.ready();
         }
     }.bind(this));

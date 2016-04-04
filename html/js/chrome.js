@@ -110,10 +110,12 @@ var chromepage = {
         var message = l[7873].replace('%1', serverBuildVersion.chrome);
 
         // If current build information is available (not in development) and currently using the Chrome extension
-        if ((buildVersion.chrome !== '') && (is_extension) && (ua.indexOf('chrome') > -1)) {
+        if (buildVersion.chrome && is_extension && window.chrome) {
+            var local = mega.utils.vtol(buildVersion.chrome);
+            var remote = mega.utils.vtol(serverBuildVersion.chrome);
 
             // If the currently loaded version is older than the server build
-            if (versionCompare(buildVersion.chrome, serverBuildVersion.chrome) === -1) {
+            if (local < remote) {
                 message = l[7874].replace('%1', buildVersion.chrome).replace('%2', serverBuildVersion.chrome);
             }
             else {

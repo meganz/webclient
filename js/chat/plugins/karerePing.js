@@ -16,13 +16,13 @@ var KarerePing = function(megaChat) {
     self._intervalId = false;
     self._currentPingRequest = false;
 
-    // auto disable if the current connection is not to a websocket.
-    if (megaChat.karere.connection.service.indexOf("wss://") !== 0) {
-        return self;
-    }
-
     megaChat.unbind("onInit.karerePing");
     megaChat.bind("onInit.karerePing", function(e) {
+        // auto disable if the current connection is not to a websocket.
+        if (megaChat.karere.connection.service.indexOf("wss://") !== 0) {
+            return self;
+        }
+
         megaChat.karere.rebind("onConnected.karerePing", function() {
             self.startTimer();
         });

@@ -24,6 +24,7 @@ var notify = {
     $popupIcon: null,
     $popupNum: null,
 
+    // A flag for if the initial loading of notifications is complete
     initialLoadComplete: false,
 
     // A list of already rendered pending contact request IDs (multiple can exist with reminders)
@@ -85,7 +86,7 @@ var notify = {
 
                     // Add notifications to list
                     notify.notifications.push({
-                        data: notification,                         // The full notification object
+                        data: notification, // The full notification object
                         id: id,
                         seen: seen,
                         timeDelta: timeDelta,
@@ -157,6 +158,7 @@ var notify = {
     countAndShowNewNotifications: function() {
 
         var newNotifications = 0;
+        var $popup = $(notify.$popupNum);
 
         // Loop through the notifications
         for (var i = 0; i < notify.notifications.length; i++) {
@@ -169,13 +171,11 @@ var notify = {
 
         // If there is a new notification, show the red circle with the number of notifications in it
         if (newNotifications >= 1) {
-            notify.$popupNum.removeClass('hidden');
-            notify.$popupNum.html(newNotifications);
+            $popup.removeClass('hidden').text(newNotifications);
         }
         else {
             // Otherwise hide it
-            notify.$popupNum.addClass('hidden');
-            notify.$popupNum.html(newNotifications);
+            $popup.addClass('hidden').text(newNotifications);
         }
 
         // Update page title
@@ -307,9 +307,10 @@ var notify = {
 
         // Add the emails from the user's list of known contacts
         if (M && M.u) {
-            M.u.forEach(function(c, userHandle) {
+            M.u.forEach(function(contact, userHandle) {
+
                 // Add the email
-                notify.userEmails[userHandle] = c.m;
+                notify.userEmails[userHandle] = contact.m;
             });
         }
     },
@@ -350,12 +351,12 @@ var notify = {
 
             // Update template
             $notificationHtml = notify.updateTemplate($notificationHtml, notification);
-            
+
             // Skip this notification if it's not one that is recognised
             if ($notificationHtml === false) {
                 continue;
             }
-            
+
             // Build the html
             allNotificationsHtml += $notificationHtml.prop('outerHTML');
         }
@@ -365,13 +366,42 @@ var notify = {
         notify.$popup.removeClass('empty');
 
         // Add scrolling for the notifications
+        notify.setHeightForNotifications();
         notify.initPopupScrolling();
 
         // Add click handlers for various notifications
+        notify.initFullContactClickHandler();
         notify.initShareClickHandler();
         notify.initTakedownClickHandler();
         notify.initPaymentClickHandler();
+        notify.initPaymentReminderClickHandler();
         notify.initAcceptContactClickHandler();
+    },
+
+    /**
+     * Sets the height of the notification dialog so it shows all the notifications
+     * that it can. If there are only a few notifications the height will only be 
+     * as high as those few notifications.
+     */
+    setHeightForNotifications: function () {
+
+        var $jspContainer = notify.$popup.find('.jspContainer');
+        var $notificationScrollList = notify.$popup.find('.notification-scr-list');
+
+        // Get the heights
+        var heightOfAllNotifications = $notificationScrollList.height();
+        var maxNotificationsHeight = $jspContainer.css('max-height');
+
+        // Set the initial height
+        var newHeight = heightOfAllNotifications;
+
+        // If the limit is exceeded, set it to the maximum
+        if (newHeight > maxNotificationsHeight) {
+            newHeight = maxNotificationsHeight;
+        }
+
+        // Set the height
+        $jspContainer.css('height', newHeight);
     },
 
     /**
@@ -386,6 +416,21 @@ var notify = {
         });
 
         jScrollFade('.notification-scroll');
+    },
+
+    /**
+     * When the other user has accepted the contact request and the 'Contact relationship established' notification
+     * appears, make this is clickable so they can go to the contact's page to verify fingerprints or start chatting.
+     */
+    initFullContactClickHandler: function() {
+
+        // Add click handler for the 'Contact relationship established' notification
+        this.$popup.find('.nt-contact-accepted').rebind('click', function() {
+
+            // Redirect to the contact's page
+            document.location.hash = '#fm/' + $(this).attr('data-contact-handle');
+            notify.closePopup();
+        });
     },
 
     /**
@@ -412,23 +457,23 @@ var notify = {
      * On click of a takedown or restore notice, go to the parent folder
      */
     initTakedownClickHandler: function() {
-        
+
         // Select the notifications with shares or new files/folders
         this.$popup.find('.nt-takedown-notification, .nt-takedown-reinstated-notification').rebind('click', function() {
-                        
+
             // Get the folder ID from the HTML5 data attribute
             var folderOrFileId = $(this).attr('data-folder-or-file-id');
             var parentFolderId = M.d[folderOrFileId].p;
-            
+
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
-            
+
             // Open the folder
             M.openFolder(parentFolderId);
             reselect(true);
         });
     },
-    
+
     /**
      * If they click on a payment notification, then redirect them to the Account History page
      */
@@ -442,6 +487,22 @@ var notify = {
 
             // Redirect to payment history
             document.location.hash = '#fm/account/history';
+        });
+    },
+
+    /**
+     * If they click on a payment reminder notification, then redirect them to the Pro page
+     */
+    initPaymentReminderClickHandler: function() {
+
+        // On payment reminder notification click
+        this.$popup.find('.notification-item.nt-payment-reminder-notification').rebind('click', function() {
+
+            // Mark all notifications as seen (because they clicked on a notification within the popup)
+            notify.markAllNotificationsAsSeen();
+
+            // Redirect to pro page
+            document.location.hash = '#pro';
         });
     },
 
@@ -510,13 +571,16 @@ var notify = {
             avatar = useravatar.contact(userEmail);
         }
 
+        // Get the user's name if we have it, otherwise user their email
+        var displayNameOrEmail = notify.getDisplayName(userEmail);
+
         // Escape email address
         userEmail = htmlentities(userEmail);
 
         // Update common template variables
         $notificationHtml.attr('id', notification.id);
         $notificationHtml.find('.notification-date').text(date);
-        $notificationHtml.find('.notification-username').text(userEmail);
+        $notificationHtml.find('.notification-username').text(displayNameOrEmail);
         $notificationHtml.find('.notification-avatar').prepend(avatar);
 
         // Add read status
@@ -542,12 +606,13 @@ var notify = {
                 return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
             case 'psts':
                 return notify.renderPayment($notificationHtml, notification);
+            case 'pses':
+                return notify.renderPaymentReminder($notificationHtml, notification);
             case 'ph':
                 return notify.renderTakedown($notificationHtml, notification);
             default:
                 return false;   // If it's a notification type we do not recognise yet
         }
-
     },
 
     /**
@@ -631,7 +696,11 @@ var notify = {
         }
         else if (action === 1) {
             className = 'nt-contact-accepted';
-            title = l[7145];        // You are now both contacts
+            title = l[7145];        // Contact relationship established
+
+            // Add a data attribute for the click handler
+            $notificationHtml.attr('data-contact-handle', notification.userHandle);
+            $notificationHtml.addClass('clickable');
         }
         else if (action === 2) {
             className = 'nt-contact-deleted';
@@ -851,9 +920,10 @@ var notify = {
     },
 
     /**
-     * Process payment notification sent from payment provider e.g. Bitcoin
+     * Process payment notification sent from payment provider e.g. Bitcoin.
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
+     * @param {Object} notification The notification object
+     * @returns {Object} The HTML to be rendered for the notification
      */
     renderPayment: function($notificationHtml, notification) {
 
@@ -879,51 +949,132 @@ var notify = {
 
         return $notificationHtml;
     },
-    
+
     /**
-     * Processes a takedown notice or counter-notice to restore the file
+     * Process payment reminder notification to remind them their PRO plan is due for renewal.
+     * Example PSES (Pro Status Expiring Soon) packet: {"a":"pses", "ts":expirestimestamp}.
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
+     * @param {Object} notification The notification object
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderPaymentReminder: function($notificationHtml, notification) {
+
+        // Find the time difference between the current time and the plan expiry time
+        var currentTimestamp = notify.getCurrentTimestamp();
+        var expiringTimestamp = notification.data.ts;
+        var secondsDifference = (expiringTimestamp - currentTimestamp);
+
+        // If the notification is still in the future
+        if (secondsDifference > 0) {
+
+            // Calculate day/days remaining
+            var days = Math.floor(secondsDifference / 86400);
+
+            // PRO membership plan expiring soon
+            // Your PRO membership plan will expire in 1 day/x days.
+            var header = l[8598];
+            var title = (days === 1) ? l[8596] : l[8597].replace('%1', days);
+
+            // Populate other template information
+            $notificationHtml.addClass('nt-payment-reminder-notification clickable');
+            $notificationHtml.find('.notification-username').text(header);
+            $notificationHtml.find('.notification-info').addClass('red').text(title);
+
+            return $notificationHtml;
+        }
+
+        // Don't show any notification if the time has passed
+        return false;
+    },
+
+    /**
+     * Processes a takedown notice or counter-notice to restore the file.
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification The notification object
+     * @returns {Object|false} The HTML to be rendered for the notification
      */
     renderTakedown: function($notificationHtml, notification) {
-        
+
         var header = '';
         var title = '';
         var cssClass = '';
-        var folderOrFileHandle = notification.data.h;
-        var folderOrFileName = (M.d[folderOrFileHandle].name) ? htmlentities(M.d[folderOrFileHandle].name) : '';
-        var folderOrFile = (M.d[folderOrFileHandle].t === 0) ? l[5557] : l[5561];
-        
+        var handle = notification.data.h;
+        var node = M.d[handle] || {};
+        var name = (node.name) ? '(' + notify.shortenNodeName(node.name) + ')' : '';
+        var type = (node.t === 0) ? l[5557] : l[5561];
+
         // Takedown notice
         // Your publicly shared %1 (%2) has been taken down.
         if (typeof notification.data.down !== 'undefined') {
             header = l[8521];
-            title = l[8522].replace('%1', folderOrFile).replace('%2', folderOrFileName);
+            title = l[8522].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-notification';
         }
-        
+
         // Takedown reinstated
         // Your taken down %1 (%2) has been reinstated.
         else if (typeof notification.data.up !== 'undefined') {
             header = l[8524];
-            title = l[8523].replace('%1', folderOrFile).replace('%2', folderOrFileName);
+            title = l[8523].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-reinstated-notification';
         }
-        
+        else {
+            // Not applicable so don't return anything or it will show a blank notification
+            return false;
+        }
+
         // Populate other template information
         $notificationHtml.addClass(cssClass);
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notification-username').text(header);
-        $notificationHtml.attr('data-folder-or-file-id', folderOrFileHandle);
-        
+        $notificationHtml.attr('data-folder-or-file-id', handle);
+
         return $notificationHtml;
+    },
+
+    /**
+     * Truncates long file or folder names to 30 characters
+     * @param {String} name The file or folder name
+     * @returns {String} Returns a string similar to 'reallylongfilename...'
+     */
+    shortenNodeName: function(name) {
+
+        if (name.length > 30) {
+            name = name.substr(0, 30) + '...';
+        }
+
+        return htmlentities(name);
+    },
+
+    /**
+     * Gets a display name for the notification. If available it will use the user or contact's name.
+     * If the name is unavailable (e.g. a new contact request) then it will use the email address.
+     * @param {String} email The email address e.g. ed@fredom.press
+     * @returns {String} Returns the name and email as a string e.g. "Ed Snowden (ed@fredom.press)" or just the email
+     */
+    getDisplayName: function(email) {
+
+        // Use the email by default
+        var displayName = email;
+
+        // Search through contacts for the email address
+        if (M && M.u) {
+            M.u.forEach(function(contact) {
+
+                // If the email is found
+                if ((contact.m === email) && contact.firstName && contact.lastName) {
+
+                    // Set the name and email
+                    displayName = contact.firstName + ' ' + contact.lastName + ' (' + email + ')';
+
+                    // Exit foreach loop
+                    return true;
+                }
+            });
+        }
+
+        // Escape and return
+        return displayName;
     }
 };
-
-/**
- * Tests
- *
- * IPC action packet:
- * notify.notifyFromActionPacket({ a: "ipc", p: "mkwfd6Fpwsk", m: "test+401@mega.co.nz", msg: "Hello, join me on MEGA and get acce...", ps: 0, ts: 1439427955, uts: 1439427955, i: "6ZWnwU8ujK" });
- */

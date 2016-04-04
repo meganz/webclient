@@ -59,7 +59,7 @@ ClassChunk.prototype.abort = function() {
         clearTimeout(this.oet);
     }
     if (this.xhr) {
-        this.xhr.xhr_cleanup(0x9ffe);
+        this.xhr.abort(this.xhr.ABORT_CLEANUP);
     }
     if (this.Progress) {
         removeValue(this.Progress.working, this, 1);
@@ -172,21 +172,19 @@ ClassChunk.prototype.finish_download = function() {
     }
 };
 
-// XHR::on_progress
-ClassChunk.prototype.on_progress = function(args) {
+ClassChunk.prototype.onXHRprogress = function(xhrEvent) {
     if (!this.Progress.data[this.xid] || this.isCancelled()) {
         return;
     }
     // if (args[0].loaded) this.Progress.data[this.xid][0] = args[0].loaded;
     // this.updateProgress(!!args[0].zSaaDc ? 0x9a : 0);
-    this.Progress.data[this.xid][0] = args[0].loaded;
+    this.Progress.data[this.xid][0] = xhrEvent.loaded;
     this.updateProgress();
 };
 
-// XHR::on_error
-ClassChunk.prototype.on_error = function(args, xhr) {
+ClassChunk.prototype.onXHRerror = function(args, xhr) {
     if (d) {
-        dlmanager.logger.error('ClassChunk.on_error', this.task && this.task.chunk_id, args, xhr, this);
+        dlmanager.logger.error('ClassChunk.onXHRerror', this.task && this.task.chunk_id, args, xhr, this);
     }
     if (this.isCancelled()) {
         ASSERT(0, 'This chunk should have been destroyed before reaching XHR.onerror..');
@@ -198,18 +196,19 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 
     var chunk = this;
     var status = xhr.readyState > 1 && xhr.status;
+
     this.oet = setTimeout(function() {
-        chunk.finish_download(false, status);
+        chunk.finish_download(false, {responseStatus: status});
         chunk = undefined;
-    }, 3950 + Math.floor(Math.random() * 2e3));
+    }, status === 509 || (3950 + Math.floor(Math.random() * 2e3)));
 };
 
-// XHR::on_ready
-ClassChunk.prototype.on_ready = function(args, xhr) {
+ClassChunk.prototype.onXHRready = function(xhrEvent) {
     var r;
     if (this.isCancelled()) {
         return;
     }
+    var xhr = xhrEvent.target;
     try {
         r = xhr.response || {};
     }
@@ -229,7 +228,6 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
             new Uint8Array(r)
         ]);
         this.dl.retries = 0;
-        dlmanager.reportQuota(this.size);
         this.finish_download();
         this.destroy();
     }
@@ -248,7 +246,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
                 dlFatalError(this.dl, e);
             }
         }
-        return 0xDEAD;
+        return Object(this.xhr).ABORT_EINTERNAL;
     }
 };
 
@@ -273,12 +271,15 @@ ClassChunk.prototype.run = function(task_done) {
 
     this.Progress.working.push(this);
 
+    // HACK: In case of 509s, construct the url from the dl object which must be up-to-date
+    this.url = this.dl.url +  "/" + this.url.replace(/.+\//, '');
+
     /* let the fun begin! */
     this.url = dlmanager.uChangePort(this.url, this.altport ? 8080 : 0);
     if (d) {
         dlmanager.logger.info(this + " Fetching ", this.url);
     }
-    this.xhr = getXhr(this);
+    this.xhr = getTransferXHR(this);
     this.xhr._murl = this.url;
 
     this.xhr.open('POST', this.url, true);
@@ -337,18 +338,10 @@ ClassFile.prototype.toString = function() {
 
 ClassFile.prototype.abortTimers = function() {
     if (this.dl) {
-        if (this.dl.quota_t) {
-            clearTimeout(this.dl.quota_t);
-            delete this.dl.quota_t;
-        }
         if (this.dl.retry_t) {
             clearTimeout(this.dl.retry_t);
             delete this.dl.retry_t;
         }
-    }
-    if (this.hasQuotaTimer) {
-        clearTimeout(this.hasQuotaTimer);
-        delete this.hasQuotaTimer;
     }
 };
 
@@ -414,25 +407,6 @@ ClassFile.prototype.destroy = function() {
     oDestroy(this);
 }
 
-ClassFile.prototype.checkQuota = function(task_done) {
-    if (this.hasQuota) {
-        return true;
-    }
-
-    var that = this;
-
-    dlmanager.hasQuota(this.dl.size, function(hasQuota) {
-        that.hasQuota = hasQuota;
-        that.hasQuotaTimer = setTimeout(function() {
-            that.hasQuotaTimer = null;
-            that.run(task_done);
-            that = undefined;
-        }, 1000);
-    });
-
-    return false;
-};
-
 ClassFile.prototype.run = function(task_done) {
     var cancelled = oIsFrozen(this) || !this.dl || this.dl.cancelled;
 
@@ -448,10 +422,6 @@ ClassFile.prototype.run = function(task_done) {
 
     dlmanager.fetchingFile = 1; /* Block the fetchingFile state */
     this.dl.retries = 0; /* set the retries flag */
-
-    if (!this.checkQuota(task_done)) {
-        return;
-    }
 
     // dlmanager.logger.info("dl_key " + this.dl.key);
     if (!GlobalProgress[this.gid].started) {
@@ -469,7 +439,7 @@ ClassFile.prototype.run = function(task_done) {
         }
     }.bind(this);
 
-    this.dl.io.begin = function() {
+    this.dl.io.begin = function(newName) {
         /* jshint -W074 */
         var tasks = [];
 
@@ -481,6 +451,17 @@ ClassFile.prototype.run = function(task_done) {
         else {
             if (d) {
                 dlmanager.logger.info(this + ' Adding %d tasks...', (this.dl.urls || []).length);
+            }
+
+            if (newName) {
+                if (this.dl.zipid) {
+                    this.dl.zipname = newName;
+                }
+                else {
+                    this.dl.n = newName;
+                }
+
+                $('#' + dlmanager.getGID(this.dl) + ' .tranfer-filetype-txt').text(newName);
             }
 
             if (this.dl.urls) {
@@ -546,12 +527,14 @@ ClassFile.prototype.run = function(task_done) {
             }
             return false;
         }.bind(this);
+
         if (cancelOnInit()) {
             error = true;
         }
         else if (error) {
             /* failed */
             this.dlGetUrlErrors = (this.dlGetUrlErrors | 0) + 1;
+
             if (this.dl.zipid && this.dlGetUrlErrors > 20) {
                 // Prevent stuck ZIP downloads if there are repetitive errors for some of the files
                 // TODO: show notification to the user about empty files in the zip?
@@ -565,16 +548,24 @@ ClassFile.prototype.run = function(task_done) {
                 }
             }
             else {
-                this.dl.retry_t = setTimeout(function onGetUrlError() { /* retry !*/
+                var onGetUrlError = function onGetUrlError() {
                     if (!cancelOnInit()) {
-                        dlmanager.logger.error('retrying ', this.dl.n);
-                        dlQueue.pushFirst(this);
-                        if (dlmanager.ioThrottlePaused) {
-                            dlQueue.resume();
-                        }
+                        dlmanager.logger.info(this + ' Retrying dlGetUrl for ' + this.dl.n);
+                        dlmanager.dlQueuePushBack(this);
                     }
-                }.bind(this), dlmanager.dlRetryInterval);
-                dlmanager.logger.info('retry to fetch url in ', dlmanager.dlRetryInterval, ' ms');
+                }.bind(this);
+
+                if (error === EOVERQUOTA) {
+                    dlmanager.logger.warn(this + ' Got EOVERQUOTA, holding...');
+                    dlmanager.showOverQuotaDialog(onGetUrlError);
+                    this.dlGetUrlErrors = 0;
+                }
+                else {
+                    dlmanager.dlRetryInterval *= 1.2;
+                    this.dl.retry_t = setTimeout(onGetUrlError, dlmanager.dlRetryInterval);
+                    dlmanager.logger.warn(this + ' Retry to fetch url in %dms, error:%s',
+                                            dlmanager.dlRetryInterval, error);
+                }
             }
         }
         else {

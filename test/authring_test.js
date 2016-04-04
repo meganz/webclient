@@ -104,13 +104,13 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail:  sinon.stub()};
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
 
                 var aPromise = ns.getContacts('Ed25519');
                 assert.strictEqual(aPromise, masterPromise);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.lengthOf(getUserAttribute.args[0], 4);
-                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.lengthOf(mega.attr.get.args[0], 4);
+                assert.strictEqual(mega.attr.get.args[0][1], 'authring');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
@@ -118,7 +118,7 @@ describe("authring unit test", function() {
                 callback(EFAILED);
                 assert.strictEqual(masterPromise.reject.callCount, 1);
                 assert.strictEqual(u_authring.Ed25519, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Error retrieving authentication ring for key type Ed25519: -5');
             });
 
@@ -129,14 +129,14 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail:  sinon.stub()};
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(ns, 'setContacts');
 
                 var aPromise = ns.getContacts('Ed25519');
                 assert.strictEqual(aPromise, masterPromise);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.lengthOf(getUserAttribute.args[0], 4);
-                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.lengthOf(mega.attr.get.args[0], 4);
+                assert.strictEqual(mega.attr.get.args[0][1], 'authring');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
@@ -146,7 +146,7 @@ describe("authring unit test", function() {
                 assert.deepEqual(u_authring.Ed25519, {});
                 assert.strictEqual(ns.setContacts.callCount, 1);
                 assert.strictEqual(ns.setContacts.args[0][0], 'Ed25519');
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'No authentication ring for key type Ed25519, making one.');
             });
 
@@ -157,14 +157,14 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail:  sinon.stub()};
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(ns, 'deserialise').returns('the authring');
 
                 var aPromise = ns.getContacts('Ed25519');
                 assert.strictEqual(aPromise, masterPromise);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.lengthOf(getUserAttribute.args[0], 4);
-                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.lengthOf(mega.attr.get.args[0], 4);
+                assert.strictEqual(mega.attr.get.args[0][1], 'authring');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
@@ -174,7 +174,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns.deserialise.args[0][0], 'some content');
                 assert.deepEqual(u_authring.Ed25519, 'the authring');
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Got authentication ring for key type Ed25519.');
             });
 
@@ -185,13 +185,13 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail:  sinon.stub()};
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
 
                 var aPromise = ns.getContacts('Ed25519');
                 assert.strictEqual(aPromise, masterPromise);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.lengthOf(getUserAttribute.args[0], 4);
-                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.lengthOf(mega.attr.get.args[0], 4);
+                assert.strictEqual(mega.attr.get.args[0][1], 'authring');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
@@ -199,7 +199,7 @@ describe("authring unit test", function() {
                 callback(EFAILED);
                 assert.strictEqual(masterPromise.reject.callCount, 1);
                 assert.strictEqual(u_authring.Ed25519, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Error retrieving authentication ring for key type Ed25519: -5');
             });
 
@@ -210,14 +210,14 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail:  sinon.stub()};
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(ns, 'setContacts');
 
                 var aPromise = ns.getContacts('Ed25519');
                 assert.strictEqual(aPromise, masterPromise);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.lengthOf(getUserAttribute.args[0], 4);
-                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.lengthOf(mega.attr.get.args[0], 4);
+                assert.strictEqual(mega.attr.get.args[0][1], 'authring');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
@@ -227,7 +227,7 @@ describe("authring unit test", function() {
                 assert.deepEqual(u_authring.Ed25519, {});
                 assert.strictEqual(ns.setContacts.callCount, 1);
                 assert.strictEqual(ns.setContacts.args[0][0], 'Ed25519');
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'No authentication ring for key type Ed25519, making one.');
             });
 
@@ -235,7 +235,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.getContacts('DSA');
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported authentication key type: DSA');
             });
 
@@ -246,14 +246,14 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail:  sinon.stub()};
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(ns, 'deserialise').returns('the authring');
 
                 var aPromise = ns.getContacts('RSA');
                 assert.strictEqual(aPromise, masterPromise);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.lengthOf(getUserAttribute.args[0], 4);
-                assert.strictEqual(getUserAttribute.args[0][1], 'authRSA');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.lengthOf(mega.attr.get.args[0], 4);
+                assert.strictEqual(mega.attr.get.args[0][1], 'authRSA');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
@@ -263,7 +263,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns.deserialise.args[0][0], 'some content');
                 assert.deepEqual(u_authring.RSA, 'the authring');
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Got authentication ring for key type RSA.');
             });
         });
@@ -273,28 +273,32 @@ describe("authring unit test", function() {
 
             it("authring for Ed25519", function() {
                 sandbox.stub(u_authring, 'Ed25519', RING_ED25519);
-                sandbox.stub(window, 'setUserAttribute').returns('foo');
+                sandbox.stub(mega.attr, 'set').returns('foo');
+                sandbox.stub(window, 'u_handle', 'Nxmg3MOw0CI');
+                sandbox.stub(ns, 'hadInitialised').returns(true);
                 assert.strictEqual(ns.setContacts('Ed25519'), 'foo');
-                assert.strictEqual(setUserAttribute.callCount, 1);
-                assert.lengthOf(setUserAttribute.args[0], 4);
-                assert.strictEqual(setUserAttribute.args[0][0], 'authring');
+                assert.strictEqual(mega.attr.set.callCount, 1);
+                assert.lengthOf(mega.attr.set.args[0], 4);
+                assert.strictEqual(mega.attr.set.args[0][0], 'authring');
             });
 
             it("authring for RSA", function() {
                 sandbox.stub(u_authring, 'RSA', RING_RSA);
-                sandbox.stub(window, 'setUserAttribute').returns('foo');
+                sandbox.stub(mega.attr, 'set').returns('foo');
+                sandbox.stub(window, 'u_handle', 'Nxmg3MOw0CI');
+                sandbox.stub(ns, 'hadInitialised').returns(true);
                 assert.strictEqual(ns.setContacts('RSA'), 'foo');
-                assert.strictEqual(setUserAttribute.callCount, 1);
-                assert.lengthOf(setUserAttribute.args[0], 4);
-                assert.strictEqual(setUserAttribute.args[0][0], 'authRSA');
-                assert.strictEqual(setUserAttribute.args[0][1][''], SERIALISED_RING_RSA);
+                assert.strictEqual(mega.attr.set.callCount, 1);
+                assert.lengthOf(mega.attr.set.args[0], 4);
+                assert.strictEqual(mega.attr.set.args[0][0], 'authRSA');
+                assert.strictEqual(mega.attr.set.args[0][1][''], SERIALISED_RING_RSA);
             });
 
             it("unsupported key type", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.setContacts('DSA');
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported authentication key type: DSA');
             });
         });
@@ -336,7 +340,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.computeFingerprint(RSA_PUB_KEY, 'DSA');
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type: DSA');
             });
         });
@@ -354,7 +358,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.signKey(RSA_PUB_KEY, 'DSA');
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type: DSA');
             });
 
@@ -362,7 +366,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.signKey(undefined, 'RSA');
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'No key to sign.');
             });
         });
@@ -381,7 +385,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.verifyKey('', RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY);
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Cannot verify an empty signature.');
             });
 
@@ -390,7 +394,7 @@ describe("authring unit test", function() {
                 sandbox.stub(Date, 'now', function() { return 1407891027650; });
                 var result = ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY);
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Bad timestamp: In the future!');
             });
 
@@ -403,7 +407,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'DSA', ED25519_PUB_KEY);
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type: DSA');
             });
         });
@@ -474,7 +478,7 @@ describe("authring unit test", function() {
                                                     ns.AUTHENTICATION_METHOD.SEEN,
                                                     ns.KEY_CONFIDENCE.UNSURE);
             assert.strictEqual(result, undefined);
-            assert.strictEqual(ns._logger._log.args[0][1][0],
+            assert.strictEqual(ns._logger._log.args[0][0],
                                'First initialise u_authring by calling authring.getContacts()');
         });
 
@@ -486,7 +490,7 @@ describe("authring unit test", function() {
                                                     ns.AUTHENTICATION_METHOD.SEEN,
                                                     ns.KEY_CONFIDENCE.UNSURE);
             assert.strictEqual(result, undefined);
-            assert.strictEqual(ns._logger._log.args[0][1][0],
+            assert.strictEqual(ns._logger._log.args[0][0],
                                'Unsupported key type: DSA');
         });
 
@@ -542,7 +546,7 @@ describe("authring unit test", function() {
             sandbox.stub(u_authring, 'Ed25519', undefined);
             var result = ns.getContactAuthenticated('you456789xw', 'Ed25519');
             assert.strictEqual(result, undefined);
-            assert.strictEqual(ns._logger._log.args[0][1][0],
+            assert.strictEqual(ns._logger._log.args[0][0],
                           'First initialise u_authring by calling authring.getContacts()');
         });
 
@@ -550,7 +554,7 @@ describe("authring unit test", function() {
             sandbox.stub(ns._logger, '_log');
             var result = ns.getContactAuthenticated('you456789xw', 'DSA');
             assert.strictEqual(result, undefined);
-            assert.strictEqual(ns._logger._log.args[0][1][0],
+            assert.strictEqual(ns._logger._log.args[0][0],
                                'Unsupported key type: DSA');
         });
 
@@ -596,7 +600,7 @@ describe("authring unit test", function() {
                 for (var i = 0; i < tests.length; i++) {
                     result = ns._longToByteString(tests[i]);
                     assert.strictEqual(result, undefined);
-                    assert.strictEqual(ns._logger._log.args[0][1][0],
+                    assert.strictEqual(ns._logger._log.args[0][0],
                         'Integer not suitable for lossless conversion in JavaScript.');
                 }
             });
@@ -624,7 +628,7 @@ describe("authring unit test", function() {
                     var testString = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(tests[i]));
                     result = ns._byteStringToLong(testString);
                     assert.strictEqual(result, undefined);
-                    assert.strictEqual(ns._logger._log.args[0][1][0],
+                    assert.strictEqual(ns._logger._log.args[0][0],
                         'Integer not suitable for lossless conversion in JavaScript.');
                 }
             });
@@ -666,13 +670,13 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(window, 'base64urldecode', _echo);
 
                 var result = ns._checkPubKey('the key', 'Ed25519');
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
@@ -689,23 +693,23 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(window, 'setUserAttribute');
+                sandbox.stub(mega.attr, 'set');
 
                 var result = ns._checkPubKey('the old key', 'Ed25519');
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
                 var callback = attributePromise.done.args[0][0];
                 result = callback('the key');
                 assert.strictEqual(base64urldecode.callCount, 1);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Need to update Ed25519 pub key.');
-                assert.strictEqual(setUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.set.callCount, 1);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
             });
 
@@ -715,21 +719,21 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
-                sandbox.stub(window, 'setUserAttribute');
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
+                sandbox.stub(mega.attr, 'set');
 
                 var result = ns._checkPubKey('the key', 'Ed25519');
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
                 var callback = attributePromise.fail.args[0][0];
                 result = callback(ENOENT);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Could not get my Ed25519 pub key, setting it now.');
-                assert.strictEqual(setUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.set.callCount, 1);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
             });
 
@@ -737,7 +741,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns._checkPubKey('the key', 'RSA');
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type for pub key check: RSA');
             });
         });
@@ -775,8 +779,6 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns._initKeyPair.callCount, 2);
                 assert.strictEqual(MegaPromise.all.callCount, 1);
                 assert.strictEqual(MegaPromise.all.callCount, 1);
-                assert.deepEqual(MegaPromise.all.args[0][0],
-                        [rsaPromise, 'Cu25519', prefilledRsaKeysPromise]);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'combo');
                 assert.strictEqual(masterPromise.done.callCount, 1);
@@ -795,6 +797,7 @@ describe("authring unit test", function() {
                 masterPromise.linkDoneAndFailTo = sinon.stub();
                 masterPromise.done = sinon.stub().returns(masterPromise);
                 masterPromise.fail = sinon.stub().returns(masterPromise);
+                masterPromise.reject = sinon.stub().returns(masterPromise);
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 sandbox.stub(MegaPromise, 'all').returns('combo');
                 var keyringPromise = { done: sinon.stub(),
@@ -812,7 +815,8 @@ describe("authring unit test", function() {
 
                 var callback = keyringPromise.fail.args[0][0];
                 callback();
-                assert.strictEqual(masterPromise.fail.callCount, 2);
+                assert.strictEqual(masterPromise.fail.callCount, 1);
+                assert.strictEqual(masterPromise.reject.callCount, 1);
             });
         });
 
@@ -822,7 +826,7 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(window, 'u_keyring', undefined);
                 sandbox.stub(window, 'u_attr', {});
                 sandbox.stub(window, 'u_privEd25519', undefined);
@@ -834,7 +838,7 @@ describe("authring unit test", function() {
                     return { secretKey: privKey, publicKey: 'public key' };
                 });
                 sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
-                sandbox.stub(window, 'setUserAttribute');
+                sandbox.stub(mega.attr, 'set');
                 sandbox.stub(ns, 'getContacts').returns('authring');
                 sandbox.stub(ns, '_checkPubKey');
                 sandbox.stub(crypt, 'setPubKey');
@@ -842,8 +846,8 @@ describe("authring unit test", function() {
                 var result = ns._initKeyringAndEd25519();
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.strictEqual(getUserAttribute.args[0][1], 'keyring');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.strictEqual(mega.attr.get.args[0][1], 'keyring');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
@@ -870,7 +874,7 @@ describe("authring unit test", function() {
                 MegaPromise.all = sinon.stub;
                 var attributePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(window, 'u_keyring', undefined);
                 sandbox.stub(window, 'u_attr', {});
                 sandbox.stub(window, 'u_privEd25519', undefined);
@@ -878,7 +882,7 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
-                sandbox.stub(window, 'setUserAttribute').returns('attribute');
+                sandbox.stub(mega.attr, 'set').returns('attribute');
                 sandbox.stub(ns, 'getContacts').returns('authring');
                 sandbox.stub(nacl.sign, 'keyPair').returns({
                     secretKey: { subarray: sinon.stub().returns('private key') },
@@ -888,15 +892,15 @@ describe("authring unit test", function() {
                 var result = ns._initKeyringAndEd25519();
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.strictEqual(getUserAttribute.args[0][1], 'keyring');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.strictEqual(mega.attr.get.args[0][1], 'keyring');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
                 var keyRing = { prEd255: 'private key' };
                 var resolveCallback = attributePromise.fail.args[0][0];
                 resolveCallback(ENOENT);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Authentication system seems non-existent. Setting up ...');
                 assert.strictEqual(nacl.sign.keyPair.callCount, 1);
                 assert.strictEqual(asmCrypto.bytes_to_string.callCount, 2);
@@ -917,19 +921,19 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var attributePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(mega.attr, 'get').returns(attributePromise);
 
                 var result = ns._initKeyringAndEd25519();
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.strictEqual(getUserAttribute.args[0][1], 'keyring');
+                assert.strictEqual(mega.attr.get.callCount, 1);
+                assert.strictEqual(mega.attr.get.args[0][1], 'keyring');
                 assert.strictEqual(attributePromise.done.callCount, 1);
                 assert.strictEqual(attributePromise.fail.callCount, 1);
 
                 var resolveCallback = attributePromise.fail.args[0][0];
                 resolveCallback(EFAILED);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Error retrieving key ring: -5');
                 assert.strictEqual(masterPromise.reject.callCount, 1);
             });
@@ -949,7 +953,7 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'pubCu25519', {});
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(ns, 'signKey').returns('squiggle');
-                sandbox.stub(window, 'setUserAttribute').returns('attribute');
+                sandbox.stub(mega.attr, 'set').returns('attribute');
                 sandbox.stub(window, 'base64urlencode');
                 sandbox.stub(ns, 'getContacts').returns('contacts');
 
@@ -964,7 +968,7 @@ describe("authring unit test", function() {
                 assert.deepEqual(u_attr, { keyring: keyRing, puCu255: 'public key', prCu255: 'private key' });
                 assert.deepEqual(pubCu25519, { 'me3456789xw': 'public key' });
                 assert.strictEqual(ns.signKey.callCount, 1);
-                assert.strictEqual(setUserAttribute.callCount, 3);
+                assert.strictEqual(mega.attr.set.callCount, 3);
                 assert.strictEqual(ns.getContacts.callCount, 1);
                 assert.strictEqual(MegaPromise.all.callCount, 1);
                 assert.deepEqual(MegaPromise.all.args[0][0],
@@ -975,7 +979,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns._setupKeyPair('Ed25519');
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type for key generation: Ed25519');
             });
         });
@@ -985,7 +989,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns._initKeyPair('Ed25519');
                 assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type for initialisation: Ed25519');
             });
 
@@ -1007,7 +1011,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns, 'getContacts').returns('contacts');
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
+                sandbox.stub(mega.attr, 'get').returns(signaturePromise);
                 sandbox.stub(window, 'u_keyring', { prCu255: 'private key' });
                 sandbox.stub(window, 'u_attr', { keyring: {}});
                 sandbox.stub(window, 'u_privCu25519', undefined);
@@ -1025,7 +1029,7 @@ describe("authring unit test", function() {
                 var result = ns._initKeyPair('Cu25519');
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(ns.getContacts.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyFromPrivKey.callCount, 1);
                 assert.strictEqual(MegaPromise.callCount, 3);
                 assert.strictEqual(pubkeyPromise.resolve.callCount, 1);
@@ -1076,7 +1080,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns, 'getContacts').returns('contacts');
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
+                sandbox.stub(mega.attr, 'get').returns(signaturePromise);
                 sandbox.stub(window, 'u_privk', 'private key');
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'my private Eddie');
@@ -1091,7 +1095,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 2);
                 assert.strictEqual(ns.getContacts.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubkeyPromise.done.callCount, 1);
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
@@ -1132,7 +1136,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns, 'getContacts').returns('contacts');
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
+                sandbox.stub(mega.attr, 'get').returns(signaturePromise);
                 sandbox.stub(window, 'u_privk', 'private key');
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'my private Eddie');
@@ -1140,7 +1144,7 @@ describe("authring unit test", function() {
                 var pubkeyPromise = { done: sinon.stub(),
                                       resolve: sinon.stub() };
                 sandbox.stub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
-                sandbox.stub(window, 'setUserAttribute');
+                sandbox.stub(mega.attr, 'set');
                 sandbox.stub(ns, 'signKey').returns('squiggle');
                 sandbox.stub(window, 'base64urlencode', _echo);
 
@@ -1148,7 +1152,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 2);
                 assert.strictEqual(ns.getContacts.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubkeyPromise.done.callCount, 1);
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
@@ -1171,8 +1175,8 @@ describe("authring unit test", function() {
                 callback([null, 'RSA pubkey']);
                 assert.strictEqual(ns.signKey.callCount, 1);
                 assert.strictEqual(base64urlencode.callCount, 1);
-                assert.strictEqual(setUserAttribute.callCount, 1);
-                assert.strictEqual(setUserAttribute.args[0][1], 'squiggle');
+                assert.strictEqual(mega.attr.set.callCount, 1);
+                assert.strictEqual(mega.attr.set.args[0][1], 'squiggle');
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
             });
 
@@ -1191,7 +1195,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns, 'getContacts').returns('contacts');
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
+                sandbox.stub(mega.attr, 'get').returns(signaturePromise);
                 sandbox.stub(window, 'u_privk', 'private key');
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'my private Eddie');
@@ -1204,7 +1208,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 2);
                 assert.strictEqual(ns.getContacts.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubkeyPromise.done.callCount, 1);
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
@@ -1239,7 +1243,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns, 'getContacts').returns('contacts');
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
+                sandbox.stub(mega.attr, 'get').returns(signaturePromise);
                 sandbox.stub(window, 'u_privk', 'private key');
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'my private Eddie');
@@ -1249,7 +1253,7 @@ describe("authring unit test", function() {
                                       resolve: sinon.stub() };
                 sandbox.stub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
                 sandbox.stub(ns, 'verifyKey').returns(false);
-                sandbox.stub(window, 'setUserAttribute');
+                sandbox.stub(mega.attr, 'set');
                 sandbox.stub(ns, 'signKey').returns('squiggle');
                 sandbox.stub(window, 'base64urlencode', _echo);
 
@@ -1257,7 +1261,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(MegaPromise.callCount, 2);
                 assert.strictEqual(ns.getContacts.callCount, 1);
-                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubkeyPromise.done.callCount, 1);
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
@@ -1282,8 +1286,8 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns.verifyKey.callCount, 1);
                 assert.strictEqual(ns.signKey.callCount, 1);
                 assert.strictEqual(base64urlencode.callCount, 1);
-                assert.strictEqual(setUserAttribute.callCount, 1);
-                assert.strictEqual(setUserAttribute.args[0][1], 'squiggle');
+                assert.strictEqual(mega.attr.set.callCount, 1);
+                assert.strictEqual(mega.attr.set.args[0][1], 'squiggle');
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
             });
 

@@ -2,9 +2,9 @@
  * Handle all logic for rendering for users' avatar
  */
 var useravatar = (function() {
-    
+
     'use strict';
-    
+
     var _colors = [
         '#FF6A19',
         '#5856d6',
@@ -33,20 +33,20 @@ var useravatar = (function() {
      * Take the class colors and create a inject as a CSS.
      */
     function registerCssColors() {
-        
+
         var css = '';
         var color = '';
-        
+
         for (var i in _colors) {
             if (!_colors.hasOwnProperty(i)) {
                 continue;
             }
             color = '.color' + (parseInt(i) + 1);
-            css += color + ', .nw-contact-avatar' + color + ', .contacts-avatar' + color 
+            css += color + ', .nw-contact-avatar' + color + ', .contacts-avatar' + color
                 + ', .avatar' + color + ' { background-color: '
                 + _colors[i] + '; }';
         }
-        
+
         css = mObjectURL([css], 'text/css');
         mCreateElement('link', { type: 'text/css', rel: 'stylesheet' }, 'head').href = css;
     };
@@ -58,14 +58,14 @@ var useravatar = (function() {
      * @returns {String}
      */
     function _lettersImg(letters) {
-        
+
         var s = _lettersSettings(letters);
         var $template = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
 
         $template = window.btoa(to8($template.html()));
-        
+
         return 'data:image/svg+xml;base64,' + $template;
     };
 
@@ -76,15 +76,20 @@ var useravatar = (function() {
      * @returns {String}
      */
     function _lettersSettings(word) {
-        
+
         var letters = '';
         var color   = 1;
-        
+
         if (word && word !== u_handle) {
             letters = $.trim(word).toUpperCase()[0];
-            color   = letters.charCodeAt(0) % _colors.length;
+            // letters[0] can be undefined in case that word == ' '...
+            if (letters) {
+                color = letters.charCodeAt(0) % _colors.length;
+            } else {
+                color = 0;
+            }
         }
-        
+
         return { letters: letters, color: _colors[color], colorIndex: color + 1 };
     };
 
@@ -98,19 +103,19 @@ var useravatar = (function() {
      * @return {String} Returns the HTML
      */
     function _letters(letters, id, className, element) {
-        
+
         if (element === 'ximg') {
             return _lettersImg(letters);
         }
-        
+
         var s = _lettersSettings(letters);
-        
+
         if (!_watching[id]) {
             _watching[id] = {};
         }
-        
+
         _watching[id][className] = true;
-        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
+        return '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
                     + '<div class="verified_icon"></div>'
                     + s.letters
                 + '</span></' + element + '>';
@@ -126,8 +131,8 @@ var useravatar = (function() {
      * @returns {String} The image HTML
      */
     function _image(url, id, className, type) {
-        
-        return '<' + type + ' class="avatar-wrapper ' + id + ' ' + className + '">'
+
+        return '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">'
                 + '<div class="verified_icon"></div>'
                 + '<img src="' + url + '">'
          + '</' + type + '>';
@@ -148,11 +153,14 @@ var useravatar = (function() {
         var found = false;
         // User is an email, we should look if the user
         // exists, if it does exists we use the user Object.
-        M.u.forEach(function(contact, u) {
+        M.u.every(function(contact, u) {
             if (M.u[u].m === email) {
                 // Found the user object
                 found = ns.contact(M.u[u], className, element);
-                throw StopIteration;
+                return false;
+            }
+            else {
+                return true;
             }
         });
 
@@ -167,9 +175,10 @@ var useravatar = (function() {
     /**
      * Check if the current user is verified by the current user. It
      * is asynchronous and waits for `u_authring.Ed25519` is ready.
-     * @param {Object} user The user object
+     * @param {String} userHandle The user handle
+     * @private
      */
-    function isUserVerified(user) {
+    function isUserVerified(userHandle) {
         if (u_type !== 3) {
             return;
         }
@@ -179,16 +188,15 @@ var useravatar = (function() {
             authSystemPromise.always(isUserVerified_Callback);
         }
         else {
-            isUserVerified_Callback();
+            Soon(isUserVerified_Callback);
         }
 
         function isUserVerified_Callback() {
-            
-            var verifyState = u_authring.Ed25519[user.h] || {};
+            var verifyState = u_authring.Ed25519[userHandle] || {};
             var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             if (isVerified) {
-                $('.avatar-wrapper.' + user.h).addClass('verified');
+                $('.avatar-wrapper.' + userHandle).addClass('verified');
             }
         }
     }
@@ -199,7 +207,7 @@ var useravatar = (function() {
      * @returns {Boolean}
      */
     function isEmail(email) {
-        
+
         return ((typeof email === 'string') && email.match(/.+@.+/));
     }
 
@@ -210,11 +218,11 @@ var useravatar = (function() {
      * @returns {String} The HTML to be rendered
      */
     ns.imgUrl = function(contact) {
-        
+
         if (avatars[contact]) {
             return avatars[contact].url;
         }
-        
+
         return ns.contact(contact, '', 'ximg');
     };
 
@@ -222,12 +230,19 @@ var useravatar = (function() {
      * Return the current user's avatar in image URL.
      */
     ns.top = function() {
-        
+
         if (!u_handle) {
             /* No user */
             return staticpath + 'images/mega/default-top-avatar.png';
         }
-        return ns.imgUrl(u_handle);
+
+        try {
+            return ns.imgUrl(u_handle);
+        }
+        catch (ex) {
+            console.error(ex);
+            return '';
+        }
     };
 
 
@@ -235,12 +250,12 @@ var useravatar = (function() {
      * Return the current user's avatar in image URL.
      */
     ns.mine = function() {
-        
+
         // If no user, return default avatar
         if (!u_handle) {
             return staticpath + 'images/mega/default-avatar.png';
         }
-        
+
         return ns.imgUrl(u_handle);
     };
 
@@ -250,7 +265,7 @@ var useravatar = (function() {
      * @param {String} user The user handle
      */
     ns.loaded = function(user) {
-        
+
         if (typeof user !== "string") {
             return false;
         }
@@ -261,14 +276,24 @@ var useravatar = (function() {
         }
 
         if (M.u[user]) {
-            // by updating the M.u[contact] this will trigger some parts in the Chat UI to re-render.
-            M.u[user].avatar = true;
+            // .trackDataChange() will trigger some parts in the Chat UI to re-render.
+            M.u[user].trackDataChange();
         }
-        var avatar = $(ns.contact(user)).html();
-        $('.avatar-wrapper.' + user).empty().html(avatar);
-        
+
+        function updateAvatar() {
+
+            var $this = $(this);
+            $this.removeClass($this.data('color'))
+                .addClass($avatar.data('color'))
+                .data('color', $avatar.data('color'))
+                .safeHTML($avatar.html());
+        }
+
+        var $avatar = $(ns.contact(user));
+        $('.avatar-wrapper.' + user).each(updateAvatar);
+
         if ((M.u[user] || {}).m) {
-            $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
+            $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).each(updateAvatar);
         }
     };
 
@@ -280,14 +305,13 @@ var useravatar = (function() {
      * @returns {String}
      */
     ns.contact = function(user, className, element) {
-        
         if (!className) {
             className = 'avatar';
         }
-        
+
         element = element || 'div';
-        
-        if (typeof user === 'string' && user.length > 0) {            
+
+        if (typeof user === 'string' && user.length > 0) {
             if (isEmail(user)) {
                 return emailAvatar(user, className, element);
             }
@@ -303,22 +327,22 @@ var useravatar = (function() {
             }
         }
 
-        if (typeof user !== 'object' || !(user || {}).u) {
+        if (!user || typeof user !== 'object' || !user.u) {
             return '';
         }
 
-        isUserVerified(user);
+        isUserVerified(user.u);
 
         if (avatars[user.u]) {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        var letters = user.firstname || user.name || user.m;
+        var letters = mega.utils.fullUsername(user.u);
 
         return _letters(letters, user.u, className, element);
     };
 
-    registerCssColors();
+    Soon(registerCssColors);
 
     return ns;
 })();

@@ -114,13 +114,11 @@ function init_page() {
         $('body').attr('class', 'not-logged');
     }
     else {
-        // Todo: check if cleaning the whole class is ok..
         $('body').attr('class', '');
     }
 
-    if (localStorage.font_size) {
-        $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + localStorage.font_size);
-    }
+    // Initialise the Public Service Announcement system
+    psa.init();
 
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
@@ -139,13 +137,9 @@ function init_page() {
         delete $.infoscroll;
     }
 
+    // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
-        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-            page = 'firefox';
-        }
-        else {
-            page = 'chrome';
-        }
+        page = (window.chrome) ? 'chrome' : 'firefox';
     }
 
     if (localStorage.signupcode && u_type !== false) {
@@ -197,6 +191,7 @@ function init_page() {
             pfkey = ar[1].replace(/[^\w-]+/g, "");
         }
         // TODO: Rename pfid, pfkey, and pfhandle around our codebase
+        pfhandle = false;
         if (ar[2]) {
             pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
@@ -280,6 +275,10 @@ function init_page() {
         }
 
         if (!fminitialized) {
+            if (u_type === 3 && !pfid && !folderlink) {
+                mega.config.fetch();
+            }
+
             if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
                 mDBstart();
             }
@@ -693,6 +692,12 @@ function init_page() {
         }
     }
     else if (page.substr(0, 3) == 'pro') {
+        var tmp = page.split('/uao=');
+        if (tmp.length > 1) {
+            mega.uaoref = decodeURIComponent(tmp[1]);
+            location.hash = tmp[0];
+            return;
+        }
         parsepage(pages['pro']);
         init_pro();
     }
@@ -927,9 +932,11 @@ var avatars = {};
 
 function loginDialog(close) {
     if (close) {
+        $('.top-login-popup form').empty();
         $('.top-login-popup').removeClass('active');
         return false;
     }
+    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
     if (localStorage.hideloginwarning || is_extension) {
         $('.top-login-warning').hide();
         $('.login-notification-icon').removeClass('hidden');
@@ -951,28 +958,6 @@ function loginDialog(close) {
 
     $('.top-dialog-login-button').rebind('click', function (e) {
         tooltiplogin();
-    });
-    $('#login-name').rebind('focus', function (e) {
-        if ($(this).val() == l[195]) {
-            $(this).val('');
-        }
-    });
-    $('#login-name').rebind('blur', function (e) {
-        if ($(this).val() == '') {
-            $(this).val(l[195]);
-        }
-    });
-    $('#login-password').rebind('focus', function (e) {
-        if ($(this).val() == l[909]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
-    });
-    $('#login-password').rebind('blur', function (e) {
-        if ($(this).val() == '') {
-            $(this).val(l[909]);
-            $(this)[0].type = 'text';
-        }
     });
     $('.top-login-full').rebind('click', function (e) {
         loginDialog(1);
@@ -1004,6 +989,13 @@ function loginDialog(close) {
     $('.top-login-input-block').rebind('click', function (e) {
         $(this).find('input').focus();
     });
+
+    $('.top-login-input-block.password input,.top-login-input-block.e-mail input').rebind('blur', function() {
+        $(this).parents('.top-login-input-block').removeClass('focused');
+    }).rebind('focus', function() {
+        $(this).parents('.top-login-input-block').addClass('focused');
+    });
+
 
     $('.loginwarning-checkbox,.top-login-warning .radio-txt').rebind('click', function (e) {
         var c = '.loginwarning-checkbox',
@@ -1046,11 +1038,13 @@ function tooltiplogin() {
                 alert(l[730]);
             }
             else if (r) {
+                passwordManager('#form_login_header');
                 u_type = r;
                 if (login_next) {
                     document.location.hash = login_next;
                 }
                 else if (page !== 'login') {
+                    page = document.location.hash.substr(1);
                     init_page();
                 }
                 else {
@@ -1681,11 +1675,19 @@ function topmenuUI() {
         $('.top-search-bl').removeClass('contains-value');
     });
 
-    $('.top-search-input').rebind('keyup', function (e) {
+    $('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
         if (e.keyCode == 13 || folderlink) {
 
-            // Add log to see how often they use the search
-            api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+            if (folderlink) {
+                // Flush cached nodes, if any
+                $(window).trigger('dynlist.flush');
+            }
+
+            if (!folderlink || !_topSearchHandler.logFired) {
+                // Add log to see how often they use the search
+                api_req({ a: 'log', e: 99603, m: 'Webclient top search used' });
+                _topSearchHandler.logFired = true;
+            }
 
             var val = $.trim($('.top-search-input').val());
             if (folderlink || val.length > 2 || !asciionly(val)) {
@@ -1722,7 +1724,15 @@ function topmenuUI() {
 
 
     $('.top-head .logo').rebind('click', function () {
-        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
+        if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
+            if (folderlink) {
+                M.openFolder(M.RootID, true);
+            }
+            else {
+                document.location.hash =
+                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
+            }
+        }
     });
 
     var c = $('.fm-dialog.registration-page-success').attr('class');
@@ -1778,6 +1788,18 @@ function is_fm() {
     return r;
 }
 
+/**
+ *  Process a given template (which has been loaded already in `pages[]`)
+ *  and return the translated HTML code.
+ *
+ *  @param {String} name    Template name
+ *  @returns {String}       The HTML ready to be used
+ */
+function getTemplate(name) {
+
+    return translate(''+pages[name]).replace(/{staticpath}/g, staticpath);
+}
+
 function parsepage(pagehtml, pp) {
     $('body').removeClass('ads');
     $('#fmholder').hide();
@@ -1831,6 +1853,11 @@ window.onhashchange = function() {
 
     if (typeof gifSlider !== 'undefined') {
         gifSlider.clear();
+    }
+
+    if (window.skipHashChange) {
+        delete window.skipHashChange;
+        return false;
     }
 
     if (silent_loading) {

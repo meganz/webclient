@@ -29,6 +29,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         {
             state: null,
             users: [],
+            attachments: null,
             roomJid: null,
             type: null,
             messages: [],
@@ -58,6 +59,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.callRequest = null;
     this.callIsActive = false;
     this.shownMessages = {};
+    this.attachments = new MegaDataMap(this);
+    this.images = new MegaDataSortedMap("k", "delay", this);
 
     this.options = {
 
@@ -586,7 +589,7 @@ ChatRoom.prototype.getRoomTitle = function() {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
-        return self.megaChat.getContactNameFromJid(participants[0]);
+        return htmlentities(self.megaChat.getContactNameFromJid(participants[0]));
     }
     else {
         assert(false, "invalid room type");
@@ -694,6 +697,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
     else {
         self.megaChat.refreshConversations();
     }
+
     setTimeout(function() {
         mc.chats.remove(roomJid);
     }, 1);
@@ -706,6 +710,9 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 ChatRoom.prototype.show = function() {
     var self = this;
 
+    if (self.isCurrentlyActive) {
+        return false;
+    }
     self.megaChat.hideAllChats();
 
     self.isCurrentlyActive = true;
@@ -1046,8 +1053,6 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
 ChatRoom.prototype.attachNodes = function(ids) {
     var self = this;
 
-    loadingDialog.show();
-
     var users = [];
 
     $.each(self.getParticipantsExceptMe(), function(k, v) {
@@ -1077,6 +1082,7 @@ ChatRoom.prototype.attachNodes = function(ids) {
                     't': node.t,
                     'name': node.name,
                     's': node.s,
+                    'fa': node.fa,
                     'ar': {
                         'n': node.ar.n,
                         't': node.ar.t,
@@ -1099,9 +1105,6 @@ ChatRoom.prototype.attachNodes = function(ids) {
         })
         .fail(function(r) {
             $masterPromise.reject(r);
-        })
-        .always(function() {
-            loadingDialog.hide();
         });
 
     return $masterPromise;

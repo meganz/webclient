@@ -21,7 +21,7 @@ var ContactsListItem = React.createClass({
                     <div className="nw-contact-status"></div>
                     <div className="nw-conversations-unread">0</div>
                     <div className="nw-conversations-name">
-                        {generateContactName(contact.u)}
+                        {mega.utils.fullUsername(contact.u)}
                     </div>
                 </div>
             </div>
@@ -137,11 +137,14 @@ var AvatarImage = React.createClass({
 
             loadAvatarPromise
                 .done(function(r) {
-                    var blob = new Blob([base64urldecode(r)], {type: 'image/jpeg'});
-                    avatars[contact.u] = {
-                        data: blob,
-                        url: myURL.createObjectURL(blob)
-                    };
+                    if (typeof r !== 'number' && r.length > 5) {
+                        var blob = new Blob([str_to_ab(base64urldecode(r))], {type: 'image/jpeg'});
+                        avatars[contact.u] = {
+                            data: blob,
+                            url: myURL.createObjectURL(blob)
+                        };
+                    }
+
                     useravatar.loaded(contact);
 
                     delete _noAvatars[contact.u];
@@ -164,7 +167,8 @@ var ContactCard = React.createClass({
         var self = this;
 
         var contact = this.props.contact;
-        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
+        var megaChat = (this.props.megaChat ? this.props.megaChat : window.megaChat);
+        var pres = megaChat.xmppPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
 
         var contextMenu;
@@ -218,7 +222,7 @@ var ContactCard = React.createClass({
                 {contextMenu}
 
                 <div className="user-card-data">
-                    <div className="user-card-name small">{avatarMeta.fullName}</div>
+                    <div className="user-card-name small">{mega.utils.fullUsername(contact.u)}</div>
                     <div className="user-card-email small">{contact.m}</div>
                 </div>
             </div>;
@@ -274,8 +278,11 @@ var ContactPickerWidget = React.createClass({
             contacts.push(
                 <ContactCard
                     contact={v}
-                    className={"contacts-search " + selectedClass} onClick={(contact, e) => {
-                        self.props.onClick(contact, e);
+                    className={"contacts-search " + selectedClass}
+                    onClick={(contact, e) => {
+                        if (self.props.onClick) {
+                            self.props.onClick(contact, e);
+                        }
                     }}
                     noContextMenu={true}
                     key={v.u + "_" + selectedClass}

@@ -265,9 +265,6 @@ MegaQueue.prototype.process = function(sp) {
                     if (d) {
                         this.logger.error('*** CHECK THIS ***', this);
                     }
-                    if (this.stuck) {
-                        this.stuck();
-                    }
                     // srvlog('MegaQueue.getNextTask gave no tasks for too long... (' + this.qname + ')', sp);
                 }
             }

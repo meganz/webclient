@@ -74,7 +74,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/IonDen/ion.sound/compare/master...meganz:master)
 
 ---
-[jquery-2.2.0.js]: jQuery JavaScript Library.
+[jquery-2.2.1.js]: jQuery JavaScript Library.
 
 ---
 [jquery-ui-1.11.4.js]: jQuery-UI - jQuery User Interface library.
@@ -127,11 +127,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/jwagner/smartcrop.js/compare/master...meganz:master)
 
 ---
-[version-compare.js]: Compares two software version numbers (e.g. "1.7.1" or "1.2b"). This is used to show whether there is a site or extension update available.
-
-> This is released into the [public domain](https://en.wikipedia.org/wiki/Public_domain_software).
-
----
 [zxcvbn.js]: A realistic password strength estimator.
 
 > NB: We are using a custom, unobfuscated build which was created using:
@@ -165,7 +160,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
 [int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
-[jquery-2.2.0.js]: <https://github.com/jquery/jquery/blob/2.2.0/dist/jquery.js>
+[jquery-2.2.1.js]: <https://github.com/jquery/jquery/blob/2.2.1/dist/jquery.js>
 [jquery-ui-1.11.4.js]: <https://code.jquery.com/ui/1.11.4/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/kayahr/jquery-fullscreen-plugin/tree/5c95707f9ebf3d4962e9057b09cc43c10f11c3f4>
 [jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>
@@ -180,5 +175,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
-[version-compare.js]: <https://gist.github.com/TheDistantSea/8021359>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>

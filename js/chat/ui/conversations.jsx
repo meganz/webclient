@@ -184,12 +184,18 @@ var ConversationsList = React.createClass({
         }
     },
     handleWindowResize: function() {
-        var $container = $(document.querySelector('.content-panel.conversations').parentNode.parentNode.parentNode);
+        var contentPanelConversations = document.querySelector('.content-panel.conversations');
+        if (
+            !contentPanelConversations ||
+            !contentPanelConversations.parentNode ||
+            !contentPanelConversations.parentNode.parentNode ||
+            !contentPanelConversations.parentNode.parentNode.parentNode
+        ) {
+            // UI element is being destroyed, e.g. on log out.
+            return;
+        }
+        var $container = $(contentPanelConversations.parentNode.parentNode.parentNode);
         var $jsp = $container.data('jsp');
-
-        $container.height(
-            $(window).outerHeight() -  $('#topmenu').outerHeight() - $('.fm-left-menu.conversations').outerHeight()
-        );
 
 
         if ($jsp) {
@@ -376,11 +382,12 @@ var ConversationsApp = React.createClass({
         this.handleWindowResize();
     },
     handleWindowResize: function() {
-        var $container = $(ReactDOM.findDOMNode(this));
-
-        $container.height(
-            $(window).outerHeight() -  $('#topmenu').outerHeight()
-        );
+        // small piece of what is done in fm_resize_handler...
+        $('.fm-right-files-block, .fm-right-account-block')
+            .filter(':visible')
+            .css({
+                'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+            });
     },
     render: function() {
         var self = this;
@@ -392,9 +399,15 @@ var ConversationsApp = React.createClass({
         var startChatIsDisabled = !presence || presence === "offline";
 
 
+        var leftPanelStyles = {};
+
+        if (fmconfig && fmconfig.leftPaneWidth) {
+            leftPanelStyles.width = fmconfig.leftPaneWidth;
+        }
+
         return (
             <div className="conversationsApp" key="conversationsApp">
-                <div className="fm-left-panel">
+                <div className="fm-left-panel" style={leftPanelStyles}>
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
@@ -417,10 +430,12 @@ var ConversationsApp = React.createClass({
                     </div>
 
 
-                    <div className="fm-tree-panel">
-                        <div className="content-panel conversations">
-                            <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
-                        </div>
+                    <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
+                        <utils.JScrollPane  style={leftPanelStyles}>
+                            <div className="content-panel conversations">
+                                <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
+                            </div>
+                        </utils.JScrollPane>
                     </div>
                 </div>
                 <div className="fm-right-files-block">
@@ -429,9 +444,11 @@ var ConversationsApp = React.createClass({
                         <div className="fm-empty-messages-bg"></div>
                         <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
                         <div className="fm-not-logged-text">
-                            <div className="fm-not-logged-description">
-                                Login or create an account to <span className="red">get 50GB FREE</span> and get messages from your friends and coworkers.
-                            </div>
+                            <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
+                                __html: __(l[8634])
+                                    .replace("[S]", "<span className='red'>")
+                                    .replace("[/S]", "</span>")
+                            }}></div>
                             <div className="fm-not-logged-button login">
                                 {__(l[193])}
                             </div>

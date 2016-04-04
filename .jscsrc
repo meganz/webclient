@@ -103,22 +103,34 @@
         "checkTypes": "capitalizedNativeCase"
     },
 
+    "maxErrors": -1,
+
+    "fileExtensions": [".js", ".jsx"],
+
     "excludeFiles": [
         "node_modules/**",
-        "test/node_modules/**",
-        "test/lang_dummy.js",
+        "js/tests/**",
         "js/vendor/**",
         "coverage/**",
         "dont-deploy/**",
         "doc/**",
+        "css/**",
+        "lang/**",
+        "test/**",
+        "fonts/**",
+        "audio/**",
+        "images/**",
+        "sounds/**",
         "contrib/**",
         "scripts/**",
         "rsaasm.js",
         "sjcl.js",
         "fileapi.js",
         "aesasm.js",
+        "keydec.js",
         "keygen.js",
         "karma.conf.js",
-        "js/chat/mpenc.js"
+        "js/chat/mpenc.js",
+        "js/chat/bundle.js"
     ]
 }

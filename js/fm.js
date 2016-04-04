@@ -4467,7 +4467,7 @@ function avatarDialog(close)
             outputFormat: 'image/jpeg',
             onCrop: function(croppedDataURI)
             {
-                if (croppedDataURI.length < 64 * 1024) {
+                if (croppedDataURI.length > 64 * 1024) {
                     return msgDialog('warninga', l[8645], l[8646]);
                 }
                 var data = dataURLToAB(croppedDataURI);

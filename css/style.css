@@ -1734,8 +1734,12 @@ a.blog-button:hover {
     position: relative;
 }
 .notification-type {
-    display: block;
+    display: table;
+    width: 100%;
     padding-left: 62px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .notification-avatar {
     position: absolute;
@@ -1764,33 +1768,29 @@ a.blog-button:hover {
     width: 44px;
     height: 44px;
 }
-.notification-request-buttons {
-    float: right;
-    padding: 4px 20px 0 8px;
+.notification-request-buttons, .notification-accepted-bl {
+    padding: 0 20px 0 8px;
+    width: 10px;
+    vertical-align: middle;
 }
-.nt-contact-request .notification-request-buttons.hidden {
-    display: none;
+.fm-dialog-button.notifications-button {
+    margin-top: 0;
 }
-.nt-contact-request .notification-request-buttons {
-    display: block;
+.nt-contact-request .notification-request-buttons, .nt-contact-request.accepted .notification-accepted-bl {
+    display: table-cell;
 }
-.nt-contact-request.accepted .notification-request-buttons, .nt-contact-request.not-now .notification-request-buttons {
+.nt-contact-request.accepted .notification-request-buttons, .nt-contact-request.not-now .notification-request-buttons, .nt-contact-request .notification-request-buttons.hidden, .notification-accepted-bl {
     display: none;
 }
 .notification-accepted {
-    float: right;
     color: #666666;
     font-size: 13px;
     line-height: 18px;
     padding: 2px 0 2px 28px;
-    margin: 22px 14px 0 0;
-    display: none;
+    margin: 0 14px 0 0;
     background-image: url(../images/mega/notifications-sprite-v3.svg);
     background-position: -10px -350px;
     background-repeat: no-repeat;
-}
-.nt-contact-request.accepted .notification-accepted {
-    display: block;
 }
 .notification-avatar-icon {
     position: absolute;
@@ -1893,7 +1893,6 @@ a.blog-button:hover {
     padding: 0;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 280px;
 }
 .notification-content {
     -webkit-box-sizing: border-box;
@@ -7560,11 +7559,11 @@ table {
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    margin: 0 4px;
 }
 .fm-empty-button:hover, .fm-not-logged-button:hover {
     background-color: rgba(49,181,0,0.7);
     color: white;
-    margin: 0 4px;
 }
 .fm-empty-cloud-txt {
     color: #CCCCCC;

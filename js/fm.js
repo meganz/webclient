@@ -4464,7 +4464,7 @@ function avatarDialog(close)
         {
             cropButton: $('#fm-change-avatar'),
             dragDropUploadPrompt:l[1390],
-            outputFormat: 'image/png',
+            outputFormat: 'image/jpeg',
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);

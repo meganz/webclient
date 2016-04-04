@@ -3168,12 +3168,14 @@
     "8634": "Prihl\u00e1ste sa alebo si vytvorte \u00fa\u010det, aby ste [S]zdarma z\u00edskali 50GB[\/S] cloudov\u00e9ho \u00falo\u017eiska a mohli prij\u00edma\u0165 spr\u00e1vy od svojich priate\u013eov a kolegov.",
     "8635": "S\u0165ahovanie pridan\u00e9 do MEGAsync",
     "8636": "Spr\u00e1va nebola odoslan\u00e1. Sk\u00fa\u0161am to znovu...",
-    "8637": "I&#039;ll wait",
-    "8638": "Forgotten Password",
-    "8639": "Transfer Speed Issue",
-    "8640": "Contact\/Sharing Issue",
-    "8641": " MEGAsync Issue",
-    "8642": "Missing \/ Invisible Data",
+    "8637": "Po\u010dk\u00e1m",
+    "8638": "Zabudnut\u00e9 heslo",
+    "8639": "Probl\u00e9m s prenosovou r\u00fdchlos\u0165ou",
+    "8640": "Probl\u00e9m s Kontaktmi\/Zdie\u013ean\u00edm",
+    "8641": "MEGAsync probl\u00e9m",
+    "8642": "Ch\u00fdbaj\u00face \/ Nevidite\u013en\u00e9 d\u00e1ta",
+    "8643": "Pou\u017e\u00edvate do\u010dasn\u00fd session.",
+    "8644": "Pou\u017e\u00edvate do\u010dasn\u00fa rel\u00e1ciu. Inform\u00e1cie ktor\u00e9 uklad\u00e1te bud\u00fa straten\u00e9 ke\u010f rel\u00e1cia vypr\u0161\u00ed. Pre zachovanie svojich d\u00e1t si \u010do najsk\u00f4r pros\u00edm zaregistrujte naozajstn\u00fd \u00fa\u010det a uplatnite si potom n\u00e1rok na [S]50 GB bezpe\u010dn\u00e9ho \u00falo\u017en\u00e9ho priestoru v coude zdarma![\/S]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3214,6 +3216,8 @@
         "i-will-wait": 8637,
         "forgotten-password": 8638,
         "transfer-speed-issue": 8639,
-        "megasync-issue": 8641
+        "megasync-issue": 8641,
+        "using-ephemeral-session": 8643,
+        "ephemeral-session-message": 8644
     }
 }

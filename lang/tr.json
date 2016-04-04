@@ -3174,6 +3174,8 @@
     "8640": "\u0130leti\u015fim\/Payla\u015f\u0131m Sorunu",
     "8641": "MEGAsync Sorunu",
     "8642": "Eksik\/G\u00f6r\u00fcnmez Veri",
+    "8643": "Ge\u00e7ici oturum kullanmaktas\u0131n\u0131z.",
+    "8644": "Ge\u00e7ici oturum kullanmaktas\u0131n\u0131z. Depolad\u0131\u011f\u0131n\u0131z veri zaman a\u015f\u0131m\u0131na u\u011frad\u0131\u011f\u0131nda yok olacakt\u0131r. Dosyalar\u0131n\u0131z\u0131 saklamak i\u00e7in l\u00fctfen en k\u0131sa zamanda normal oturuma ge\u00e7in ve [S]bulutunuzdaki \u00fccretsiz 50GB g\u00fcvenli saklama alan\u0131na sahip olun![\/S]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3214,6 +3216,8 @@
         "i-will-wait": 8637,
         "forgotten-password": 8638,
         "transfer-speed-issue": 8639,
-        "megasync-issue": 8641
+        "megasync-issue": 8641,
+        "using-ephemeral-session": 8643,
+        "ephemeral-session-message": 8644
     }
 }

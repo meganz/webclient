@@ -3168,12 +3168,14 @@
     "8634": "Zaloguj si\u0119 lub utw\u00f3rz konto aby [S]dosta\u0107 za darmo 50GB[\/S] miejsca na dane w chmurze oraz otrzymywa\u0107 wiadomo\u015bci od znajomych i wsp\u00f3\u0142pracownik\u00f3w.",
     "8635": "Dodano do MEGAsync",
     "8636": "Wiadomo\u015b\u0107 nie zosta\u0142a wys\u0142ana. Ponawiam pr\u00f3b\u0119...",
-    "8637": "I&#039;ll wait",
-    "8638": "Forgotten Password",
-    "8639": "Transfer Speed Issue",
-    "8640": "Contact\/Sharing Issue",
-    "8641": " MEGAsync Issue",
-    "8642": "Missing \/ Invisible Data",
+    "8637": "Poczekam",
+    "8638": "Zapomnia\u0142em has\u0142a",
+    "8639": "B\u0142\u0105d przesy\u0142ania",
+    "8640": "B\u0142\u0105d udost\u0119pniania",
+    "8641": "B\u0142\u0105d w MEGAsync",
+    "8642": "Brakuj\u0105ce dane",
+    "8643": "You are using an ephemeral session.",
+    "8644": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3214,6 +3216,8 @@
         "i-will-wait": 8637,
         "forgotten-password": 8638,
         "transfer-speed-issue": 8639,
-        "megasync-issue": 8641
+        "megasync-issue": 8641,
+        "using-ephemeral-session": 8643,
+        "ephemeral-session-message": 8644
     }
 }

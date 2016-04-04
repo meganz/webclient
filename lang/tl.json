@@ -3177,6 +3177,7 @@
     "8643": "Ikaw ay gumagamit ng ephemeral session.",
     "8644": "Ikaw ay kasalukuyang gumagamit ng panandaliang sesyon. Mawawala ang data na nakalagay kapag nag-expire ito. Para mapanatili ang files, gumamit na ng totoong account sa lalong madaling panahon at kunin ang [S]libreng 50 GB ng secure storage space sa cloud![\/S]",
     "8645": "Image size exceeded",
+    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -12710,5 +12710,9 @@
     "8645": {
         "text": "Image size exceeded",
         "context": "An error dialog title for when a user tried to upload an avatar image which was too large."
+    },
+    "8646": {
+        "text": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+        "context": "An error dialog message when a user tried to upload an avatar image which was too large."
     }
 }

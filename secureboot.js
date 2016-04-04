@@ -1632,6 +1632,7 @@ else if (!b_u)
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js', 'zxcvbn_js'],
+        'newsignup': ['register','register_js', 'zxcvbn_js'],
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],

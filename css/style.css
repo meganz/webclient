@@ -104,7 +104,7 @@ body.dndc-to-rubbish * {
 body.dndc-sort * {
     cursor: url(../images/mega/cursor9.png), auto !important
 }
-body *:not(input):not(textarea) {
+body *:not(input):not(textarea):not(.fm-dialog p) {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -17184,9 +17184,6 @@ a.contact-new-button:hover {
 }
 .dev-nw-gray-bg {
     height: 100%;
-    height: -webkit-calc(100% - 306px);
-    height: -moz-calc(100% - 306px);
-    height: calc(100% - 306px);
     width: 100%;
     position: absolute;
     overflow: hidden;
@@ -23175,6 +23172,11 @@ body.pro:after {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
 }
+
+.sync-bottom-block .megasync-dropdown {
+    margin: 0px;
+}
+
 .linux .megasync-dropdown {
     display: block;
 }
@@ -23284,6 +23286,12 @@ body.pro:after {
     z-index: 10;
     top: 122px;
 }
+
+.megasync-dropdown-list .jspPane {
+    min-width: 280px;
+    max-width: 280px;
+}
+
 .megasync-dropdown-pad {
     background-color: white;
     -moz-border-radius: 4px;
@@ -23297,6 +23305,7 @@ body.pro:after {
     box-sizing: border-box;
     padding: 36px 0 4px 0;
 }
+
 .megasync-dropdown-scroll .jspVerticalBar {
     width: 10px;
 }

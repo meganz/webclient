@@ -182,8 +182,16 @@ mStorageDB.prototype = {
 };
 
 mBroadcaster.once('startMega', function __idb_setup() {
-    if (!window.indexedDB) {
-        window.indexedDB = window.webkitIndexedDB || window.msIndexedDB || window.mozIndexedDB;
+    try {
+        if (!window.indexedDB) {
+            window.indexedDB = window.webkitIndexedDB || window.msIndexedDB || window.mozIndexedDB;
+            if (!window.indexedDB) {
+                throw 1;
+            }
+        }
+    }
+    catch (ex) {
+        return;
     }
     if (!window.IDBKeyRange) {
         window.IDBKeyRange = window.webkitIDBKeyRange || window.msIDBKeyRange;

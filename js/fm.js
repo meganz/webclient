@@ -4937,6 +4937,9 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
+        if (!is_fm()) {
+            return; 
+        }
         if (self.is_active()) {
             self.deactivate();
             return false;
@@ -6659,7 +6662,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if ($(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if (!is_fm() || $(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();

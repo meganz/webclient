@@ -6,6 +6,16 @@
 describe("MegaDB unit test", function() {
     "use strict";
 
+    try {
+        if (typeof indexedDB === 'undefined') {
+            throw 'No indexedDB support.';
+        }
+    }
+    catch (ex) {
+        console.warn('Unable to run MegaDB tests.', ex.message || ex);
+        return;
+    }
+
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
 
@@ -90,9 +100,6 @@ describe("MegaDB unit test", function() {
             }
         };
         try {
-            if (typeof indexedDB === 'undefined') {
-                throw 'No indexedDB support.';
-            }
             mdb = new MegaDB("test" + (++testCount), "unit", schema);
             mdb.logger.options.isEnabled = false;
         }
@@ -112,7 +119,7 @@ describe("MegaDB unit test", function() {
 
         mdb.drop()
             .fail(function() {
-                fail("db not dropped: ", toArray(arguments));
+                fail("db not dropped: ", toArray.apply(this, arguments));
             })
             .then(function() {
                 if (msdb && msdb.dbState === MegaDB.DB_STATE.INITIALIZED) {
@@ -121,7 +128,7 @@ describe("MegaDB unit test", function() {
                             done();
                         })
                         .fail(function() {
-                            fail("Failed to drop msdb", toArray(arguments));
+                            fail("Failed to drop msdb", toArray.apply(this, arguments));
                         });
                     msdb = null;
                 }

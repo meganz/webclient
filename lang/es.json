@@ -3168,6 +3168,14 @@
     "8634": "Accede o crea una cuenta para [S]obtener 50GB GRATIS[\/S] de almacenamiento en la nube y para recibir mensajes de tus amigos y compa\u00f1eros de trabajo.",
     "8635": "Descarga a\u00f1adida a MEGAsync",
     "8636": "Mensaje no enviado. Reintentando...",
+    "8637": "Esperar\u00e9",
+    "8638": "Contrase\u00f1a Olvidada",
+    "8639": "Problema de Velocidad de Transferencia",
+    "8640": "Problema con Contacto\/Compartir",
+    "8641": "Problema con MEGASync",
+    "8642": "Datos Desaparecidos \/ No visibles",
+    "8643": "You are using an ephemeral session.",
+    "8644": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3212,12 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637,
+        "forgotten-password": 8638,
+        "transfer-speed-issue": 8639,
+        "megasync-issue": 8641,
+        "using-ephemeral-session": 8643,
+        "ephemeral-session-message": 8644
     }
 }

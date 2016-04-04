@@ -749,10 +749,7 @@ describe("authring unit test", function() {
         describe('initAuthenticationSystem()', function() {
             it('works normally', function() {
                 sandbox.stub(ns, '_initialisingPromise', false);
-                var masterPromise = {};
-                masterPromise.linkDoneAndFailTo = sinon.stub();
-                masterPromise.done = sinon.stub().returns(masterPromise);
-                masterPromise.fail = sinon.stub().returns(masterPromise);
+                var masterPromise = _stubMegaPromise(sinon);
                 var prefilledRsaKeysPromise = { linkDoneAndFailTo: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise');
                 MegaPromise.onCall(0).returns(masterPromise);
@@ -793,15 +790,9 @@ describe("authring unit test", function() {
 
             it('Ed25519 fails', function() {
                 sandbox.stub(ns, '_initialisingPromise', false);
-                var masterPromise = {};
-                masterPromise.linkDoneAndFailTo = sinon.stub();
-                masterPromise.done = sinon.stub().returns(masterPromise);
-                masterPromise.fail = sinon.stub().returns(masterPromise);
-                masterPromise.reject = sinon.stub().returns(masterPromise);
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var masterPromise = _stubMegaPromise(sinon, sandbox);
                 sandbox.stub(MegaPromise, 'all').returns('combo');
-                var keyringPromise = { done: sinon.stub(),
-                                       fail: sinon.stub() };
+                var keyringPromise = _stubMegaPromise(sinon);
                 sandbox.stub(ns, '_initKeyringAndEd25519').returns(keyringPromise);
 
                 var result = ns.initAuthenticationSystem();
@@ -822,10 +813,8 @@ describe("authring unit test", function() {
 
         describe('_initKeyringAndEd25519()', function() {
             it('existing keyring', function() {
-                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
-                var attributePromise = { done: sinon.stub(),
-                                         fail: sinon.stub() };
+                var masterPromise = _stubMegaPromise(sinon, sandbox);
+                var attributePromise = _stubMegaPromise(sinon);
                 sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(window, 'u_keyring', undefined);
                 sandbox.stub(window, 'u_attr', {});
@@ -869,11 +858,9 @@ describe("authring unit test", function() {
 
             it('no keyring', function() {
                 sandbox.stub(ns._logger, '_log');
-                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var masterPromise = _stubMegaPromise(sinon, sandbox);
                 MegaPromise.all = sinon.stub;
-                var attributePromise = { done: sinon.stub(),
-                                         fail: sinon.stub() };
+                var attributePromise = _stubMegaPromise(sinon);
                 sandbox.stub(mega.attr, 'get').returns(attributePromise);
                 sandbox.stub(window, 'u_keyring', undefined);
                 sandbox.stub(window, 'u_attr', {});
@@ -917,10 +904,8 @@ describe("authring unit test", function() {
 
             it('failed fetching keyring', function() {
                 sandbox.stub(ns._logger, '_log');
-                var masterPromise = { reject: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
-                var attributePromise = { done: sinon.stub(),
-                                         fail: sinon.stub() };
+                var masterPromise = _stubMegaPromise(sinon, sandbox);
+                var attributePromise = _stubMegaPromise(sinon);
                 sandbox.stub(mega.attr, 'get').returns(attributePromise);
 
                 var result = ns._initKeyringAndEd25519();

@@ -3687,8 +3687,8 @@ function api_fareq(res, ctx, xhr) {
                             clearTimeout(this.fart);
                         }
 
-                        if (this.fah.done(ev)) {
-                            Soon(fm_thumbnails);
+                        if (this.fah.done(ev) || M.chat) {
+                            delay('thumbnails', fm_thumbnails, 200);
                         }
                     }
                 };

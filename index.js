@@ -137,13 +137,9 @@ function init_page() {
         delete $.infoscroll;
     }
 
+    // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
-        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-            page = 'firefox';
-        }
-        else {
-            page = 'chrome';
-        }
+        page = (window.chrome) ? 'chrome' : 'firefox';
     }
 
     if (localStorage.signupcode && u_type !== false) {
@@ -696,6 +692,12 @@ function init_page() {
         }
     }
     else if (page.substr(0, 3) == 'pro') {
+        var tmp = page.split('/uao=');
+        if (tmp.length > 1) {
+            mega.uaoref = decodeURIComponent(tmp[1]);
+            location.hash = tmp[0];
+            return;
+        }
         parsepage(pages['pro']);
         init_pro();
     }
@@ -1124,6 +1126,7 @@ function topmenuUI() {
                 .safeHTML('<div class="membership-status @@">@@</div>', cssClass, purchasedPlan);
             $('.context-menu-divider.upgrade-your-account').addClass('pro');
             $('.membership-popup.pro-popup');
+            $('body').removeClass('free');
         }
         else {
             // Show the free badge
@@ -1131,6 +1134,7 @@ function topmenuUI() {
             $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
             $('.membership-status').addClass('free');
             $('.membership-status').text(l[435]);
+            $('body').addClass('free');
         }
 
         $('.membership-status').show();

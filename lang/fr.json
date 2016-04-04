@@ -3177,6 +3177,7 @@
     "8643": "Vous \u00eates en train d&#039;utiliser une session \u00e9ph\u00e9m\u00e8re",
     "8644": "Vous \u00eates en train d&#039;utiliser une session temporaire. La donn\u00e9e que vous \u00eates en train d&#039;enregistrer sera perdue lorsque la session expirera. Pour pr\u00e9server vos fichiers, veuillez cr\u00e9er un compte d\u00e8s que possible et r\u00e9clamez vos [S]50 Go d&#039;espace de stockage s\u00e9curis\u00e9 et gratuit dans le cloud[\/S]",
     "8645": "Image size exceeded",
+    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

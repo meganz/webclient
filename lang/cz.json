@@ -3177,6 +3177,7 @@
     "8643": "Pou\u017e\u00edv\u00e1te do\u010dasnou relaci.",
     "8644": "Pou\u017e\u00edv\u00e1te do\u010dasnou relaci. Data, kter\u00e1 ukl\u00e1d\u00e1te, budou ztracena, kdy\u017e vypr\u0161\u00ed. Abyste zachovali sv\u00e9 soubory, upgradujte na skute\u010dn\u00fd \u00fa\u010det, jakmile se v\u00e1m to bude hodit, a z\u00edskejte [S]bezplatn\u00fdch 50 GB bezpe\u010dn\u00e9ho \u00falo\u017ei\u0161t\u011b v cloudu![\/S]",
     "8645": "Image size exceeded",
+    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

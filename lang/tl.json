@@ -2980,7 +2980,7 @@
     "8437": "Web Client",
     "8438": "Source Code Transparency",
     "8439": "Ang aming mga client side apps ay lisensyado sa ilalim ng isang custom na lisensya at ang aming core libraries (gaya ng Software Development Kit) ay nasa ilalim ng mas malayang lisensya. Makikita sa kanya-kanyang code repositories ang lisensya para sa bawat proyekto.",
-    "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
+    "8440": "Makikita mo ang links sa aming mga pinakasikat na source code sa repositories sa ibaba. Para sa aming mga maliliit na libraries, maaari mong makita ito dito [A]lahatang pahina ng GitHub[\/A]. Kung gusto mong gamitin itong mga code na ito na pangkomersyo, na labas sa lisensya, [A]tawagan kami[\/A] para mapag-usapan ito.",
     "8441": "Kung makakita ka ng bug o security flaw sa aming code, magpadala ng email sa [A]bugs@mega.nz[\/A] na nagpapaliwanag sa problema. Kami ay may magandang bayad para sa aming vulnerability rewards program at ang submission criteria pinapaliwanag [A2]dito[\/A2].",
     "8442": "Pumili ng files",
     "8443": "Pumili ng folder",
@@ -3083,7 +3083,7 @@
     "8543": "Walang contacts sa account na ito. Ilagay sila sa Contacts screen.",
     "8544": "Lahat ng items sa basurahan ay papahiin",
     "8545": "Tandaan ang aking desisyon at huwag na akong tanungin muli pa",
-    "8546": "You are about to enable an option that could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
+    "8546": "Papaganahin mo ang option na maaaring ma-intercept ng iba ang communication. Dahil naman sa end-to-end encryption, hindi pa rin ma-aaccess ng attackers ang inyong data pero, maaari pa rin nilang magalaw ang files at folders sa MEGA, burahin ito o tanggalan ka ng access sa account mo.",
     "8547": "Wala akong pakialam",
     "8548": "Pahintulot para sa mga bagong folders at files",
     "8549": "Idine-decrypt",
@@ -3175,7 +3175,8 @@
     "8641": "MEGAsync Issue",
     "8642": "Nawawala \/ Di-makitang Data",
     "8643": "Ikaw ay gumagamit ng ephemeral session.",
-    "8644": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
+    "8644": "Ikaw ay kasalukuyang gumagamit ng panandaliang sesyon. Mawawala ang data na nakalagay kapag nag-expire ito. Para mapanatili ang files, gumamit na ng totoong account sa lalong madaling panahon at kunin ang [S]libreng 50 GB ng secure storage space sa cloud![\/S]",
+    "8645": "Image size exceeded",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3218,6 +3219,8 @@
         "transfer-speed-issue": 8639,
         "megasync-issue": 8641,
         "using-ephemeral-session": 8643,
-        "ephemeral-session-message": 8644
+        "ephemeral-session-message": 8644,
+        "image-size-exceeded": 8645,
+        "image-size-exceeded-body": 8646
     }
 }

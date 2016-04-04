@@ -3176,6 +3176,7 @@
     "8642": "Ch\u00fdbaj\u00face \/ Nevidite\u013en\u00e9 d\u00e1ta",
     "8643": "Pou\u017e\u00edvate do\u010dasn\u00fd session.",
     "8644": "Pou\u017e\u00edvate do\u010dasn\u00fa rel\u00e1ciu. Inform\u00e1cie ktor\u00e9 uklad\u00e1te bud\u00fa straten\u00e9 ke\u010f rel\u00e1cia vypr\u0161\u00ed. Pre zachovanie svojich d\u00e1t si \u010do najsk\u00f4r pros\u00edm zaregistrujte naozajstn\u00fd \u00fa\u010det a uplatnite si potom n\u00e1rok na [S]50 GB bezpe\u010dn\u00e9ho \u00falo\u017en\u00e9ho priestoru v coude zdarma![\/S]",
+    "8645": "Image size exceeded",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3218,6 +3219,8 @@
         "transfer-speed-issue": 8639,
         "megasync-issue": 8641,
         "using-ephemeral-session": 8643,
-        "ephemeral-session-message": 8644
+        "ephemeral-session-message": 8644,
+        "image-size-exceeded": 8645,
+        "image-size-exceeded-body": 8646
     }
 }

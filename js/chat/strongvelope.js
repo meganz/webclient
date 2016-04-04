@@ -1629,6 +1629,8 @@ var strongvelope = {};
         if ((sender !== this.ownHandle)
                 && (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS)) {
 
+            var allParticipants = setutils.join(otherParticipantsFromMessage, new Set([this.ownHandle]));
+
             // Sanity checks.
             if ((parsedMessage.includeParticipants.length > 0)
                     && (setutils.subtract(new Set(parsedMessage.includeParticipants),

@@ -1,4 +1,3 @@
-
 var Message = function(chatRoom, messagesBuff, vals) {
     var self = this;
 
@@ -430,7 +429,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             var found = false;
 
-            self.messages.forEach(function(v, k) {
+            self.messages.every(function(v, k) {
                 if (v.internalId === eventData.id) {
                     var confirmedMessage = new Message(
                         chatRoom,
@@ -452,9 +451,16 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
                     self.lastMessageId = self.messages.getItem(self.messages.length - 1).messageId;
 
+                    if (v.textContents) {
+                        self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, confirmedMessage);
+                    }
+
                     found = true;
 
-                    throw StopIteration; // break
+                    return false; // break
+                }
+                else {
+                    return true;
                 }
             });
             if (!found) {

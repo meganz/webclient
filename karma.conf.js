@@ -2,28 +2,21 @@
 
 module.exports = function(config) {
 
-  var specific_tests = process.env.SPECIFIC_TEST ? process.env.SPECIFIC_TEST : {pattern: 'test/**/*_test.js', included: true};
+  var specific_tests = process.env.SPECIFIC_TEST || 'test/**/*_test.js';
+
   config.set({
     // Base path, that will be used to resolve files and exclude.
     basePath: '',
 
     // Frameworks to use.
-    frameworks: ['mocha', 'chai', 'sinon'],
+    frameworks: ['mocha', 'chai', 'sinon-chai'],
 
     // List of files/patterns to load in the browser.
     // {included: false} files are loaded by requirejs
     files: [
-        // Shim for ES6 features some browsers may not have (PhantomJS).
-        {pattern: 'node_modules/es6-shim/es6-shim.js', included: true},
         // == Basic test setup ==
         'test/test_main.js',
         'test/test_utils.js',
-        // == Test utilities ==
-        'node_modules/mocha/mocha.js',
-        'node_modules/chai/chai.js',
-        'node_modules/karma-chai-plugins/node_modules/sinon-chai/lib/sinon-chai.js',
-        'node_modules/sinon/pkg/sinon.js',
-        'node_modules/indexeddbshim/dist/indexeddbshim.js',
 
         // == Basics ==
         'js/vendor/jquery-2.2.1.js',
@@ -67,6 +60,9 @@ module.exports = function(config) {
         // == Test helpers and test configuration ==
         'test/lang_dummy.js',
         'test/config.js',
+
+        // Shim for ES6 features some browsers may not have (PhantomJS, MSIE).
+        'node_modules/es6-shim/es6-shim.js',
 
         // == Our code ==
         'secureboot.js',
@@ -135,6 +131,8 @@ module.exports = function(config) {
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
 
+        {pattern: 'test/chat/transcripts/*.json', included: false},
+
         // == Tests ==
         // Dependency-based load order of library modules.
         // modules that already follow AMD need included: false
@@ -162,13 +160,20 @@ module.exports = function(config) {
     // (Do not include tests or libraries.
     // These files will be instrumented by Istanbul.)
     preprocessors: {
-        'js/**/*.js': ['coverage']
+        '*.js': ['coverage'],
+        'js/*.js': ['coverage'],
+        'js/ui/*.js': ['coverage'],
+        'html/js/*.js': ['coverage'],
+        'js/chat/**/!(bundle)*.js': ['coverage']
     },
 
     // Coverage configuration
     coverageReporter: {
         type: 'html',
-        dir: 'coverage/'
+        dir: 'coverage/',
+        subdir: function(browser) {
+            return String(browser).replace(/[^\w.()]+/g, '_');
+        }
     },
 
     // JUnit reporter configuration.
@@ -198,8 +203,8 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
     browsers: [
-        'PhantomJS2',
-        'PhantomJS2_custom',
+        'PhantomJS',
+        'PhantomJS_custom',
         'Firefox',
         'Firefox_Extension',
         'Firefox_NoCookies',
@@ -211,9 +216,14 @@ module.exports = function(config) {
     ],
 
     customLaunchers: {
-        'PhantomJS2_custom': {
-            base: 'PhantomJS2',
-            flags: ['--local-storage-path=./test/phantomjs-storage']
+        'PhantomJS_custom': {
+            base: 'PhantomJS',
+            // debug: true,
+            flags: [
+                // '--debug=true',
+                '--local-storage-path=./test/phantomjs-storage',
+                '--offline-storage-path=./test/phantomjs-storage'
+            ]
         },
         'Firefox_NoCookies': {
             base: 'Firefox',

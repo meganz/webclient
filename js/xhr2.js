@@ -228,7 +228,7 @@
                 xhrStack[idx].abort();
             }
         }
-        // xhrStack = [];
+        xhrStack = [];
     };
 
     // Export globals

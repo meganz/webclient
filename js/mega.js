@@ -123,10 +123,10 @@ var MEGA_USER_STRUCT = {
     "p": undefined,
     "presence": undefined,
     "presenceMtime": undefined,
-    "displayColor": undefined,
-    "shortName": undefined,
-    "firstName": undefined,
-    "lastName": undefined,
+    "displayColor": NaN,
+    "shortName": "",
+    "firstName": "",
+    "lastName": "",
     "ts": undefined
 };
 
@@ -142,7 +142,12 @@ function MegaData()
         this.d = {};
         this.v = [];
         this.c = {};
+
         this.u = new MegaDataMap();
+        var self = this;
+        this.u.addChangeListener(function() {
+            self.onContactsChanged();
+        });
 
         this.t = {};
         this.opc = {};
@@ -504,24 +509,28 @@ function MegaData()
             M.c.contacts[u_handle] = 1;
         }
 
+        if (d) {
+            console.time('M.avatars');
+        }
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
             if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
                 waitingPromises.push(
-                    mega.attr.get(u, 'a', true, false, function (res) {
-                        if (typeof res !== 'number' && res.length > 5) {
-                            var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
-                            avatars[u] = {
-                                data: blob,
-                                url: myURL.createObjectURL(blob)
-                            };
-                        }
-                        useravatar.loaded(u);
-                    })
-                    .fail(function() {
-                        delete avatars[u];
-                        useravatar.loaded(u);
-                    })
+                    mega.attr.get(u, 'a', true, false)
+                        .done(function (res) {
+                            if (typeof res !== 'number' && res.length > 5) {
+                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/png'});
+                                avatars[u] = {
+                                    data: blob,
+                                    url: myURL.createObjectURL(blob)
+                                };
+                            }
+                            useravatar.loaded(u);
+                        })
+                        .fail(function() {
+                            delete avatars[u];
+                            useravatar.loaded(u);
+                        })
                 );
             }
         });
@@ -532,6 +541,10 @@ function MegaData()
             ).always(function() {
                 // trigger UI refresh
                 M.renderAvatars();
+
+                if (d) {
+                    console.timeEnd('M.avatars');
+                }
             });
 
 
@@ -966,8 +979,8 @@ function MegaData()
                 u_h = M.v[i].h;
                 contact = M.u[u_h];
 
-                // do not render oneself or invalid..
-                if (!contact || u_h === u_handle) {
+                // do not render invalid..
+                if (!contact) {
                     continue;
                 }
 
@@ -1015,7 +1028,7 @@ function MegaData()
                                 <td>\n\
                                     ' + avatar + ' \
                                     <div class="fm-chat-user-info todo-star">\n\
-                                        <div class="fm-chat-user">' + htmlentities(node.name) + '</div>\n\
+                                        <div class="fm-chat-user">' + htmlentities(mega.utils.fullUsername(node.u)) + '</div>\n\
                                         <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
                                     </div>\n\
                                 </td>\n\
@@ -1079,7 +1092,7 @@ function MegaData()
                 if (M.currentdirid === 'shares') {// render shares tab
                     // Handle of initial share owner
                     var ownersHandle = M.v[i].su;
-                    var fullContactName = mega.utils.fullUsername(ownersHandle);
+                    var fullContactName = htmlentities(mega.utils.fullUsername(ownersHandle));
 
                     cs = M.contactstatus(M.v[i].h);
                     contains = fm_contains(cs.files, cs.folders);
@@ -1116,7 +1129,7 @@ function MegaData()
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + htmlentities(fullContactName) + '</span></span></a>';
+                            + fullContactName + '</span></span></a>';
                     }
                     else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
@@ -1134,7 +1147,7 @@ function MegaData()
                             + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div>'
                             + '<div class="fm-chat-user">'
-                            + htmlentities(fullContactName) + '</div><div class="nw-contact-status"></div>'
+                            + fullContactName + '</div><div class="nw-contact-status"></div>'
                             + '<div class="fm-chat-user-status ' + htmlentities(u_h)
                             + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270">'
@@ -1695,6 +1708,7 @@ function MegaData()
         $('.nw-fm-tree-item').removeClass('opened');
 
         if (this.chat) {
+            M.v = [];
             sharedFolderUI(); // remove shares-specific UI
             //$.tresizer();
         }
@@ -3129,13 +3143,6 @@ function MegaData()
                 }
 
                 if (typeof obj.value !== 'string' || !obj.value) {
-                    if (d) {
-                        // Inherit the logger for mega.attr.get
-                        var logger = MegaLogger.getLogger('account');
-
-                        logger.debug('Attribute "%s" for user "%s" cannot be decoded: "%s"',
-                                        obj.name, userId, obj.value);
-                    }
                     obj.value = '';
                 }
             });
@@ -3143,50 +3150,73 @@ function MegaData()
             lastName = lastName.value;
             firstName = firstName.value;
 
+            self.u[userId].firstName = firstName;
+            self.u[userId].lastName = lastName;
 
-            if (firstName.length > 0 || lastName.length > 0) {
+            if (
+                (firstName && $.trim(firstName).length > 0) ||
+                (lastName && $.trim(lastName).length > 0)
+            ) {
                 self.u[userId].name = "";
 
-                if (firstName.length > 0) {
+                if (firstName && $.trim(firstName).length > 0) {
                     self.u[userId].name = firstName;
                 }
-                if (lastName.length > 0) {
+                if (lastName && $.trim(lastName).length > 0) {
                     self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
                 }
             } else {
-                delete self.u[userId].name;
+                self.u[userId].name = "";
             }
-            self.u[userId].firstName = firstName;
-            self.u[userId].lastName = lastName;
+
 
             if (userId === u_handle) {
                 u_attr.firstname = firstName;
                 u_attr.lastname = lastName;
+                u_attr.name = self.u[userId].name;
 
                 $('.user-name').text(u_attr.firstname);
-            }
 
-            if (fminitialized) {
-                if (
-                    typeof $.sortTreePanel !== 'undefined' &&
-                    typeof $.sortTreePanel.contacts !== 'undefined' &&
-                    $.sortTreePanel.contacts.by === 'status'
-                ) {
-                    M.contacts(); // we need to resort
-                }
+                $('.membership-big-txt.name:visible').text(
+                    u_attr.name
+                );
 
-                if (window.location.hash === "#fm/" + userId) {
-                    // re-render the contact view page if the presence had changed
-                    contactUI();
-                }
-                else if (window.location.hash === "#fm/contacts") {
-                    // re-render the contact view page if the presence had changed
-                    M.openFolder('contacts', true);
-                }
+                avatars[u_handle] = undefined;
+                M.avatars();
             }
         });
     },
 
+    /**
+     * Callback, that would be called when a contact is changed.
+     */
+    this.onContactChanged = function(contact) {
+        if (fminitialized) {
+            if (window.location.hash === "#fm/" + contact.u) {
+                // re-render the contact view page if the presence had changed
+                contactUI();
+            }
+        }
+    };
+    /**
+     * Callback, that would be called when M.u had changed.
+     */
+    this.onContactsChanged = function() {
+        if (fminitialized) {
+            if (
+                typeof $.sortTreePanel !== 'undefined' &&
+                typeof $.sortTreePanel.contacts !== 'undefined' &&
+                $.sortTreePanel.contacts.by === 'status'
+            ) {
+                M.contacts(); // we need to resort
+            }
+
+            if (window.location.hash === "#fm/contacts") {
+                // re-render the contact view page if the presence had changed
+                M.openFolder('contacts', true);
+            }
+        }
+    };
     /**
      * addUser, updates global .u variable with new user data
      * adds/updates user indexedDB with newest user data
@@ -3214,6 +3244,8 @@ function MegaData()
             else {
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
             }
+
+            this.u[userId].addChangeListener(this.onContactChanged);
 
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
@@ -3672,15 +3704,15 @@ function MegaData()
         else {
             if (!$icon.hasClass('filled')) {
                 $icon.addClass('filled');
-            } 
+            }
             else if (!$icon.hasClass('glow')) {
                 $icon.addClass('glow');
-            } 
+            }
             else {
                 $icon.removeClass('glow');
             }
         }
-            
+
     };
 
     this.nodeAttr = function(attrs) {
@@ -3699,9 +3731,40 @@ function MegaData()
         }
     };
 
-    this.rename = function(itemHandle, newItemName) {
+    /**
+     * Fire DOM updating when a node gets a new name
+     * @param {String} itemHandle  node's handle
+     * @param {String} newItemName the new name
+     */
+    this.onRenameUIUpdate = function(itemHandle, newItemName) {
+        if (fminitialized) {
 
-        var newValue = htmlentities(newItemName);
+            // DOM update, left and right panel in 'Cloud Drive' tab
+            $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newItemName);
+            $('#' + itemHandle + '.file-block .file-block-title').text(newItemName);
+
+            // DOM update, left and right panel in "Shared with me' tab
+            $('#treea_' + itemHandle + ' span:nth-child(2)').text(newItemName);
+            $('#' + itemHandle + ' .shared-folder-info-block .shared-folder-name').text(newItemName);
+
+            // DOM update, right panel view during browsing shared content
+            $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newItemName);
+
+            // DOM update, breadcrumbs in 'Shared with me' tab
+            if ($('#path_' + itemHandle).length > 0) {
+                if (this.onRenameUIUpdate.tick) {
+                    clearTimeout(this.onRenameUIUpdate.tick);
+                }
+                this.onRenameUIUpdate.tick = setTimeout(function() {
+                    M.renderPath();
+                }, 90);
+            }
+
+            $(document).trigger('MegaNodeRename', [itemHandle, newItemName]);
+        }
+    };
+
+    this.rename = function(itemHandle, newItemName) {
 
         if (M.d[itemHandle]) {
             var nodeData = M.d[itemHandle];
@@ -3709,32 +3772,16 @@ function MegaData()
             if (nodeData && nodeData.ar) {
 
                 // Update global var with newest data
-                nodeData.ar.n = newValue;
+                nodeData.ar.n = newItemName;
 
                 var mkat = enc_attr(nodeData.ar, nodeData.key);
                 var attr = ab_to_base64(mkat[0]);
                 var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
 
-                M.nodeAttr({ h: itemHandle, name: newValue, a: attr });
+                M.nodeAttr({ h: itemHandle, name: newItemName, a: attr });
                 api_req({ a: 'a', n: itemHandle, attr: attr, key: key, i: requesti });
 
-                // DOM update, left and right panel in 'Cloud Drive' tab
-                $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newValue);
-                $('#' + itemHandle + '.file-block .file-block-title').text(newValue);
-
-                // DOM update, left and right panel in "Shared with me' tab
-                $('#treea_' + itemHandle + ' span:nth-child(2)').text(newValue);
-                $('#' + itemHandle + ' .shared-folder-info-block .shared-folder-name').text(newValue);
-
-                // DOM update, right panel view during browsing shared content
-                $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newValue);
-
-                // DOM update, breadcrumbs in 'Shared with me' tab
-                if ($('#path_' + itemHandle).length > 0) {
-                    M.renderPath();
-                }
-
-                $(document).trigger('MegaNodeRename', [itemHandle, newValue]);
+                this.onRenameUIUpdate(itemHandle, newItemName);
             }
         }
     };
@@ -4075,6 +4122,22 @@ function MegaData()
         }
     };
 
+    this.getNodeByHandle = function(handle) {
+        if (Object(M.d).hasOwnProperty(handle)) {
+            return M.d[handle];
+        }
+
+        for (var i in M.v) {
+            if (M.v.hasOwnProperty(i)) {
+                if (M.v[i].h === handle) {
+                    return M.v[i];
+                }
+            }
+        }
+
+        return false;
+    };
+
     this.isNodeObject = function(n) {
         return typeof n === 'object' && Array.isArray(n.key) && n.key.length === 8;
     };
@@ -4141,7 +4204,7 @@ function MegaData()
             args = undefined;
         };
 
-        if (z || preview) {
+        if (z || preview || !fmconfig.dlThroughMEGAsync) {
             return webdl();
         }
 
@@ -4197,7 +4260,7 @@ function MegaData()
 
                 sync.megaSyncRequest(cmd)
                     .done(function() {
-                        showToast('megasync', 'Download added to MEGAsync', 'Open');
+                        showToast('megasync', l[8635], 'Open');
                     })
                     .fail(webdl);
             })
@@ -4550,9 +4613,15 @@ function MegaData()
 
     this.dlerror = function(dl, error)
     {
-        var errorstr, fileid = dl.dl_id, x;
+        var x;
+        var errorstr;
+        var gid = dlmanager.getGID(dl);
+
         if (d) {
-            dlmanager.logger.error('dlerror', fileid, error);
+            dlmanager.logger.error('dlerror', gid, error);
+        }
+        else if (error === EOVERQUOTA) {
+            srvlog('onDownloadError :: ' + error + ' [EOVERQUOTA]');
         }
         else {
             srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
@@ -4596,19 +4665,33 @@ function MegaData()
         }
 
         if (errorstr) {
+            var prog = Object(GlobalProgress[gid]);
+
             dl.failed = new Date;
-            var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + fileid);
-            var prog = GlobalProgress[id] || {};
             if (x != 233 || !prog.speed || !(prog.working || []).length) {
                 /**
                  * a chunk may fail at any time, don't report a temporary error while
                  * there is network activity associated with the download, though.
                  */
-                $('.transfer-table #' + id + ' td:eq(5)')
-                    .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>')
-                // .parents('tr').data({'failed' : NOW()});
-                //$('.transfer-table #' + id + ' td:eq(4)').text('');
-                $('.transfer-table #' + id + ' td:eq(2)').text('--:--:--');
+                if (page === 'download') {
+                    $('.download.error-icon').text(errorstr);
+                    $('.download.error-icon').removeClass('hidden');
+                    $('.download.icons-block').addClass('hidden');
+
+                    if (error === EOVERQUOTA) {
+                        $('.download.info-block').addClass('overquota');
+                    }
+                }
+                else {
+                    var $tr = $('.transfer-table tr#' + gid);
+
+                    $tr.find('td:eq(2)').text('--:--:--');
+                    $tr.find('td:eq(5)').safeHTML('<span class="transfer-status error">@@</span>', errorstr);
+
+                    if (error === EOVERQUOTA) {
+                        $tr.find('.transfer-status').addClass('overquota');
+                    }
+                }
             }
         }
     }
@@ -5197,7 +5280,7 @@ function onUploadError(ul, errorstr, reason, xhr)
 {
     var hn = hostname(ul.posturl);
 
-    if (!d && (!xhr || xhr.readyState < 2 || xhr.status)) {
+    /*if (!d && (!xhr || xhr.readyState < 2 || xhr.status)) {
         var details = [
             browserdetails(ua).name,
             String(reason)
@@ -5211,14 +5294,14 @@ function onUploadError(ul, errorstr, reason, xhr)
         if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]')) {
             srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
         }
-    }
+    }*/
 
     if (d) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
     }
 
     $('.transfer-table #ul_' + ul.id + ' td:eq(5)')
-        .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
+        .safeHTML('<span class="transfer-status error">@@</span>', errorstr);
 }
 
 function addupload(u)
@@ -5796,8 +5879,6 @@ function execsc(actionPackets, callback) {
                     }
                 });
 
-
-
                 M.handleEmptyContactGrid();
             }
 
@@ -5888,7 +5969,7 @@ function execsc(actionPackets, callback) {
         if (async_treestate.length) {
             async_treestate.forEach(function(actionPacket) {
                 var n = M.d[actionPacket.n];
-                if (d) console.log('updateTreeState', n, actionPacket);
+                // if (d) console.log('updateTreeState', n, actionPacket);
                 if (n) {
                     var f = {
                         h : actionPacket.n,
@@ -5898,9 +5979,9 @@ function execsc(actionPackets, callback) {
                     crypto_processkey(u_handle, u_k_aes, f);
                     if (f.key) {
                         if (f.name !== n.name) {
-                            M.rename(n.h, f.name);
+                            M.onRenameUIUpdate(n.h, f.name);
                         }
-                        if (f.fav !== n.fav) {
+                        if (fminitialized && f.fav !== n.fav) {
                             if (f.fav) {
                                 $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
                                 $('#' + n.h + '.file-block .file-status-icon').addClass('star');
@@ -5923,9 +6004,6 @@ function execsc(actionPackets, callback) {
                     }
                 }
             });
-
-            // Remove processed item from the queue
-            async_treestate = [];
         }
         if (newnodes.length > 0 && fminitialized) {
             renderNew();
@@ -6910,6 +6988,16 @@ function processUPCO(ap) {
     }
 }
 
+/*
+ * process_u
+ *
+ * Updates contact/s data in global variable M.u, local dB and
+ * taking care of items in share and add contacts dialogs dropdown
+ *
+ * .c param is contact level i.e. [0-(inactive/deleted), 1-(active), 2-(owner)]
+ *
+ * @param {Object} u Users informations
+ */
 function process_u(u) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {

@@ -267,11 +267,14 @@ function mozFrom8(utf8) {
 }
 
 function mozNotifyDL(fn,f) {
-	if (!mozPrefs.getBoolPref('notifydl')) return false;
-	if (!f) return mozAlert('Download ' + fn + ' finished.');
+	if (!mozPrefs.getBoolPref('notifydl')) {
+		return false;
+	}
+	if (!f) {
+		return mozAlert(l[239] + ' (' + fn + ')');
+	}
 
-	mozAlert(fn,'Download Finished.',function(s,t)
-	{
+	mozAlert(fn, l[239], function(s,t) {
 		if(t == 'alertclickcallback') try {
 			if(parseInt(Services.appinfo.version) > 23) throw 2;
 			Components.classesByID["{7dfdf0d1-aff6-4a34-bad1-d0fe74601642}"]
@@ -958,18 +961,36 @@ function mozClearStartupCache() {
 
 	XMLHttpRequest.prototype.open = function(meth, url)
 	{
+		var success = false;
+
 		try
 		{
 			var uri = Services.io.newURI(url, null, null);
 
-			if (/\.mega(?:\.co)?\.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
+			if (/\.mega(?:\.co)?\.nz$/.test(uri.host)) {
+				__XHR_Open.apply(this, arguments);
+				success = true;
+			}
 		}
 		catch(e) {}
 
-		var err = new Error('Blocked XHR to ' + url);
-		setTimeout(function() { throw err }, 4);
+		if (success) {
+			try {
+				var userAgent = navigator.userAgent;
+
+				if (scope.mozMEGAExtensionVersion) {
+					userAgent += ' MEGAext/' + scope.mozMEGAExtensionVersion;
+				}
+				this.setRequestHeader('User-Agent', userAgent, false);
+			}
+			catch (e) {}
+		}
+		else {
+			var err = new Error('Blocked XHR to ' + url);
+			setTimeout(function() { throw err }, 4);
+		}
 	};
-	// XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
+	XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
 
 	if ("nsISiteSecurityService" in Ci) {
 		mozRunAsync(function() {

@@ -401,7 +401,6 @@ Chatd.Shard.prototype.exec = function(a) {
                         // ^^ explicit and easy to read...despite that i could have done >= 1 <= 3 or something like
                         // that..
                         if (!self.joinedChatIds[chatId]) {
-                            
                             self.joinedChatIds[chatId] = true;
                         }
                     }
@@ -642,6 +641,7 @@ Chatd.Messages = function(chatd, chatId) {
 
     // mapping of transactionids of messages being sent to the numeric index of this.buf
     this.sending = {};
+    this.sendingList = [];
 
     // msgnums of modified messages
     this.modified = {};
@@ -668,8 +668,9 @@ Chatd.Messages.prototype.submit = function(messages) {
             state: 'PENDING',
             message: message
         });
-
+        
         this.sending[msgxid] = this.highnum;
+        this.sendingList.push(msgxid);
 
         messageConstructs.push({"msgxid":msgxid, "timestamp":timestamp,"message":message});
     };
@@ -719,14 +720,14 @@ Chatd.Messages.prototype.resend = function() {
     var self = this;
 
     // resend all pending new messages and modifications
-    for (var msgxid in this.sending) {
+    this.sendingList.forEach(function(msgxid) {
         self.chatd.chatIdShard[this.chatId].msg(
             this.chatId,
             msgxid,
             this.buf[this.sending[msgxid]][Chatd.MsgField.TIMESTAMP],
             this.buf[this.sending[msgxid]][Chatd.MsgField.MESSAGE]
         );
-    }
+    });
 
     // resend all pending modifications of completed messages
     for (var msgnum in this.modified) {
@@ -772,6 +773,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     var self = this;
     var num = this.sending[msgxid];
 
+    removeValue(this.sendingList, msgxid);
     delete this.sending[msgxid];
 
     this.buf[num][Chatd.MsgField.MSGID] = msgid;

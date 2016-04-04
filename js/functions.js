@@ -112,7 +112,14 @@ function parseHTMLfmt(markup) {
                         if (is_chrome_firefox) {
                             $('a[data-fxhref]').rebind('click', function() {
                                 if (!$(this).attr('href')) {
-                                    location.hash = $(this).data('fxhref');
+                                    var target = String($(this).attr('target')).toLowerCase();
+
+                                    if (target === '_blank') {
+                                        open(getAppBaseUrl() + $(this).data('fxhref'));
+                                    }
+                                    else {
+                                        location.hash = $(this).data('fxhref');
+                                    }
                                 }
                             });
                         }
@@ -244,6 +251,53 @@ function SoonFc(func, ms) {
         }, ms || 122);
     };
 }
+
+/**
+ * Delay a function execution, like Soon() does except it accept a parameter to
+ * identify the delayed function so that consecutive calls to delay the same
+ * function will make it just fire once. Actually, this is the same than
+ * SoonFc() does, but it'll work with function expressions as well.
+ *
+ * @param {String}   aProcID   ID to identify the delayed function
+ * @param {Function} aFunction The function/callback to invoke
+ * @param {Number}   aTimeout  The timeout, in ms, to wait.
+ */
+function delay(aProcID, aFunction, aTimeout) {
+
+    // Let aProcID be optional...
+    if (typeof aProcID === 'function') {
+        aTimeout = aFunction;
+        aFunction = aProcID;
+        aProcID = mRandomToken();
+    }
+
+    if (d) {
+        console.debug("delay'ing", aProcID, delay.queue[aProcID]);
+    }
+    delay.cancel(aProcID);
+
+    delay.queue[aProcID] =
+        setTimeout(function() {
+            if (d) {
+                console.debug('dispatching delayed function...', aProcID);
+            }
+            delete delay.queue[aProcID];
+            aFunction();
+        }, (aTimeout | 0) || 350);
+
+    return aProcID;
+}
+delay.queue = {};
+delay.has = function(aProcID) {
+    return delay.queue.hasOwnProperty(aProcID);
+};
+delay.cancel = function(aProcID) {
+    if (delay.has(aProcID)) {
+        clearTimeout(delay.queue[aProcID]);
+        return true;
+    }
+    return false;
+};
 
 function jScrollFade(id) {
 
@@ -698,12 +752,19 @@ function browserdetails(useragent) {
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
+    details.version = (useragent.match(RegExp("\\s+" + browser + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 
     // Determine if using a browser extension
-    details.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    details.isExtension = (current && is_extension || useragent.indexOf('megext') > -1);
+
+    if (useragent.indexOf(' MEGAext/') !== -1) {
+        var ver = useragent.match(/ MEGAext\/([\d.]+)/);
+
+        details.isExtension = ver && ver[1] || true;
+    }
 
     // Determine core engine.
     if (useragent.indexOf('webkit') > 0) {
@@ -980,46 +1041,6 @@ function showNonActivatedAccountDialog(log) {
         .empty()
         .append($("<div class='warning-gray-icon mailbox-icon'></div>"))
         .append(l[5847]); //TODO: l[]
-}
-
-/**
- * Shows a dialog with a message that the user is over quota
- */
-function showOverQuotaDialog() {
-
-    // Show the dialog
-    var $dialog = $('.top-warning-popup');
-    $dialog.addClass('active');
-
-    // Unhide the warning icon and show the button
-    $('.warning-popup-icon').removeClass('hidden');
-    $('.fm-notifications-bottom', $dialog).show();
-
-    // Add a click event on the warning icon to hide and show the dialog
-    $('.warning-icon-area').unbind('click');
-    $('.warning-icon-area').click(function() {
-        if ($dialog.hasClass('active')) {
-            $dialog.removeClass('active');
-        }
-        else {
-            $dialog.addClass('active');
-        }
-    });
-
-    // Change contents of dialog text
-    $('.warning-green-icon', $dialog).remove();
-    $('.warning-popup-body', $dialog).unbind('click').html(
-        '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
-        + "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
-    );
-
-    // Set button text to 'Upgrade Account'
-    $('.warning-button span').text(l[5549]);
-
-    // Redirect to Pro signup page on button click
-    $('.warning-button').click(function() {
-        document.location.hash = 'pro';
-    });
 }
 
 function logincheckboxCheck(ch_id) {
@@ -2335,7 +2356,7 @@ function setupTransferAnalysis() {
         time = {},
         chunks = {};
     $.mTransferAnalysis = setInterval(function() {
-        if (uldl_hold) {
+        if (uldl_hold || dlmanager.isOverQuota) {
             prev = {};
         }
         else if ($.transferprogress) {
@@ -3034,10 +3055,6 @@ MegaEvents.prototype.on = function(name, callback) {
             data
         );
 
-        if (c === 'pro' && sessionStorage.proref) {
-            data['ref'] = sessionStorage.proref;
-        }
-
         var msg = JSON.stringify({
             'c': c,
             'e': e,
@@ -3283,7 +3300,7 @@ mega.utils.getStack = function megaUtilsGetStack() {
  *  @return {Boolean}
  */
 mega.utils.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
-    return ((fminitialized && dlmanager.isDownloading) || ulmanager.isUploading);
+    return ((fminitialized && ulmanager.isUploading) || dlmanager.isDownloading);
 };
 
 /**
@@ -3343,6 +3360,12 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
+
+        delay.cancel('overquota:retry');
+        delay.cancel('overquota:uqft');
+
+        dlmanager._quotaPushBack = {};
+        dlmanager._dlQuotaListener = [];
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
@@ -3419,23 +3442,28 @@ mega.utils.reload = function megaUtilsReload() {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
-                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
-                    msgDialog('warningb', l[882], l[7157]);
-                }
-                if (mBroadcaster.crossTab.master) {
-                    mega.utils.abortTransfers().then(function() {
-                        loadingDialog.show();
-                        stopsc();
-                        stopapi();
+                var reload = function() {
+                    if (mBroadcaster.crossTab.master) {
+                        mega.utils.abortTransfers().then(function() {
+                            loadingDialog.show();
+                            stopsc();
+                            stopapi();
 
-                        MegaPromise.allDone([
-                            MegaDB.dropAllDatabases(/*u_handle*/),
-                            mega.utils.clearFileSystemStorage()
-                        ]).then(function(r) {
-                                console.debug('megaUtilsReload', r);
-                                _reload();
-                            });
-                    });
+                            MegaPromise.allDone([
+                                MegaDB.dropAllDatabases(/*u_handle*/),
+                                mega.utils.clearFileSystemStorage()
+                            ]).then(function(r) {
+                                    console.debug('megaUtilsReload', r);
+                                    _reload();
+                                });
+                        });
+                    }
+                };
+                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+                    msgDialog('warningb', l[882], l[7157], 0, reload);
+                }
+                else {
+                    reload();
                 }
             }
         });
@@ -3919,6 +3947,78 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/** prevent tabnabbing attacks */
+mBroadcaster.once('startMega', function() {
+
+    if (!(window.chrome || window.safari || window.opr)) {
+        return;
+    }
+
+    // Check whether is safe to open a link through the native window.open
+    var isSafeTarget = function(link) {
+        link = String(link);
+
+        var allowed = [
+            getBaseUrl(),
+            getAppBaseUrl()
+        ];
+
+        var rv = allowed.some(function(v) {
+            return link.indexOf(v) === 0;
+        });
+
+        if (d) {
+            console.log('isSafeTarget', link, rv);
+        }
+
+        return rv || (location.hash.indexOf('fm/chat') === -1);
+    };
+
+    var open = window.open;
+    delete window.open;
+
+    // Replace the native window.open which will open unsafe links through a hidden iframe
+    Object.defineProperty(window, 'open', {
+        writable: false,
+        enumerable: true,
+        value: function(url) {
+            var link = document.createElement('a');
+            link.href = url;
+
+            if (isSafeTarget(link.href)) {
+                return open.apply(window, arguments);
+            }
+
+            var iframe = mCreateElement('iframe', {type: 'content', style: 'display:none'}, 'body');
+            var data = 'var win=window.open("' + escapeHTML(link) + '");if(win)win.opener = null;';
+            var doc = iframe.contentDocument || iframe.contentWindow.document;
+            var script = doc.createElement('script');
+            script.type = 'text/javascript';
+            script.src = mObjectURL([data], script.type);
+            script.onload = SoonFc(function() {
+                myURL.revokeObjectURL(script.src);
+                document.body.removeChild(iframe);
+            });
+            doc.body.appendChild(script);
+        }
+    });
+
+    // Catch clicks on links and forward them to window.opemn
+    document.documentElement.addEventListener('click', function(ev) {
+        var node = Object(ev.target);
+
+        if (node.nodeName === 'A' && node.href
+                && String(node.getAttribute('target')).toLowerCase() === '_blank'
+                && !isSafeTarget(node.href)) {
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            window.open(node.href);
+        }
+    }, true);
+});
+
 /** document.hasFocus polyfill */
 mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {
@@ -3997,15 +4097,33 @@ var watchdog = Object.freeze({
                 }
                 break;
 
+            case 'setsid':
+                if (dlmanager.isOverQuota) {
+                    // another tab fired a login/register while this one has an overquota state
+                    var sid = strg.data;
+                    delay('watchdog:setsid', function() {
+                        // the other tab must have sent the new sid
+                        assert(sid, 'sid not set');
+                        api_setsid(sid);
+                        dlmanager.uqFastTrack = 1;
+                        dlmanager._overquotaInfo();
+                    }, 2000);
+                }
+                break;
+
             case 'login':
             case 'createuser':
-                loadingDialog.show();
-                this.Strg.login = strg.origin;
+                if (!mega.utils.hasPendingTransfers()) {
+                    loadingDialog.show();
+                    this.Strg.login = strg.origin;
+                }
                 break;
 
             case 'logout':
-                u_logout(-0xDEADF);
-                location.reload();
+                if (!mega.utils.hasPendingTransfers()) {
+                    u_logout(-0xDEADF);
+                    location.reload();
+                }
                 break;
         }
 
@@ -4024,6 +4142,38 @@ watchdog.setup();
 function rand_range(a, b) {
     return Math.random() * (b - a) + a;
 };
+
+/**
+ * Invoke the password manager in Chrome.
+ *
+ * There are some requirements for this function work propertly:
+ *
+ *  1. The username/password needs to be in a <form/>
+ *  2. The form needs to be filled and visible when this function is called
+ *  3. After this function is called, within the next second the form needs to be gone
+ *
+ * As an example take a look at the `tooltiplogin()` function in `index.js`.
+ *
+ * @param {String|Object} form jQuery selector of the form
+ * @return {Bool}   True if the password manager can be called.
+ *
+ */
+function passwordManager(form) {
+    if (is_chrome_firefox || typeof history !== "object") {
+        return false;
+    }
+    $(form).rebind('submit', function() {
+        setTimeout(function() {
+            var path  = document.location.pathname;
+            var title = document.title;
+            history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
+            history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+            $(form).find('input').val('');
+        }, 1000);
+        return false;
+    }).submit();
+    return true;
+}
 
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2Lightweight(el) {

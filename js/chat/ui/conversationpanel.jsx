@@ -56,6 +56,10 @@ var ConversationRightArea = React.createClass({
         var contact = room.megaChat.getContactFromJid(contactJid);
 
 
+        if (!contact) {
+            // something is really bad.
+            return null;
+        }
         var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                             if (contact.presence && contact.presence !== "offline") {
                                 room.startAudioCall();
@@ -77,9 +81,22 @@ var ConversationRightArea = React.createClass({
         if (room.isReadOnly()) {
            startAudioCallButton = startVideoCallButton = null;
         }
+        var endCallButton = <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
+                        if (contact.presence && contact.presence !== "offline") {
+                            if (room.callSession) {
+                                room.callSession.endCall();
+                            }
+                        }
+                    }}>
+            <i className="small-icon horizontal-red-handset"></i>
+            {__(l[5884])}
+        </div>;
+
 
         if (room.callSession && room.callSession.isActive() === true) {
             startAudioCallButton = startVideoCallButton = null;
+        } else {
+            endCallButton = null;
         }
 
         var contactsList = [];
@@ -257,14 +274,14 @@ var ConversationRightArea = React.createClass({
                             </DropdownsUI.Dropdown>
                         </ButtonsUI.Button>
 
-
+                        {endCallButton}
                         {
                             room.type === "group" ?
                                 <div className="link-button red" onClick={() => {
                                    room.leave(true);
                                 }}>
                                     <i className="small-icon rounded-stop"></i>
-                                    {__("Leave Chat")}
+                                    {__(l[8633])}
                                 </div>
                                 : null
                         }
@@ -512,7 +529,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
         participants.forEach(function(v) {
             displayNames.push(
-                chatRoom.megaChat.getContactNameFromJid(v)
+                htmlentities(chatRoom.megaChat.getContactNameFromJid(v))
             );
         });
 
@@ -547,46 +564,53 @@ var ConversationAudioVideoPanel = React.createClass({
             </div>;
         }
         else {
-            var localPlayerSrc = callSession.localPlayer.src;
+            if (callSession.localPlayer) {
+                var localPlayerSrc = (
+                    callSession && callSession.localPlayer && callSession.localPlayer.src ?
+                        callSession.localPlayer.src :
+                        null
+                );
 
-            if (!localPlayerSrc) {
-                if (callSession.localPlayer.srcObject) {
-                    callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.srcObject);
-                    localPlayerSrc = callSession.localPlayer.src;
-                }
-                else if (callSession.localPlayer.mozSrcObject) {
-                    callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
-                    localPlayerSrc = callSession.localPlayer.src;
-                }
-                else if (
-                    callSession.getJingleSession() &&
-                    callSession.getJingleSession()._sess &&
-                    callSession.getJingleSession()._sess.localStream
-                ) {
-                    callSession.localPlayer.src = URL.createObjectURL(
+                if (!localPlayerSrc) {
+                    if (callSession.localPlayer.srcObject) {
+                        callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.srcObject);
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else if (callSession.localPlayer.mozSrcObject) {
+                        callSession.localPlayer.src = URL.createObjectURL(callSession.localPlayer.mozSrcObject);
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else if (
+                        callSession.getJingleSession() &&
+                        callSession.getJingleSession()._sess &&
                         callSession.getJingleSession()._sess.localStream
-                    );
-                    localPlayerSrc = callSession.localPlayer.src;
+                    ) {
+                        callSession.localPlayer.src = URL.createObjectURL(
+                            callSession.getJingleSession()._sess.localStream
+                        );
+                        localPlayerSrc = callSession.localPlayer.src;
+                    }
+                    else {
+                        console.error("Could not retrieve src object.");
+                    }
                 }
-                else {
-                    console.error("Could not retrieve src object.");
-                }
-            }
-            localPlayerElement = <div className={"call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
-                <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
-                    <i className="tiny-icon grey-minus-icon" />
-                </div>
-                <video
-                    className="localViewport"
-                    defaultMuted={true}
-                    muted={true}
-                    volume={0}
-                    id={"localvideo_" + callSession.sid}
-                    src={localPlayerSrc}
-                    style={{display: !this.state.localMediaDisplay ? "none" : ""}}
+                localPlayerElement = <div
+                    className={"call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass}>
+                    <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
+                        <i className="tiny-icon grey-minus-icon"/>
+                    </div>
+                    <video
+                        className="localViewport"
+                        defaultMuted={true}
+                        muted={true}
+                        volume={0}
+                        id={"localvideo_" + callSession.sid}
+                        src={localPlayerSrc}
+                        style={{display: !this.state.localMediaDisplay ? "none" : ""}}
 
-                />
-            </div>;
+                    />
+                </div>;
+            }
         }
 
         if (callSession.getRemoteMediaOptions().video === false || !callSession.remotePlayer) {
@@ -956,7 +980,6 @@ var ConversationPanel = React.createClass({
         room.megaChat.updateSectionUnreadCount();
 
         self.handleWindowResize();
-
     },
     handleWindowResize: function(e, scrollToBottom) {
         var $container = $(ReactDOM.findDOMNode(this));
@@ -1239,7 +1262,7 @@ var ConversationPanel = React.createClass({
                     .replace("%s", namesDisplay[1]);
             }
             else {
-                msg = __("%s is typing").replace("%s", namesDisplay[0]);
+                msg = __(l[8629]).replace("%1", namesDisplay[0]);
             }
 
             typingElement = <div className="typing-block">
@@ -1416,7 +1439,7 @@ var ConversationPanel = React.createClass({
                                             }} />
                                             <DropdownsUI.DropdownItem
                                                 icon="square-profile"
-                                                label={__("Send Contact")}
+                                                label={__(l[8628])}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
                                             }} />
@@ -1486,18 +1509,24 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-            self.props.contacts.forEach(function(contact) {
-                if (contact.u === u_handle) { return; }
+            var hadLoaded = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
 
-                if(contact.c === 1) {
-                    var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+            if (hadLoaded) {
+                self.props.contacts.forEach(function (contact) {
+                    if (contact.u === u_handle) {
+                        return;
+                    }
+                    
+                    if(contact.c === 1) {
+                        var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
 
-                    (pres === "offline" ? contactsListOffline : contactsList).push(
-                        <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u}/>
-                    );
-                }
-            });
-            var emptyMessage = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved' ?
+                        (pres === "offline" ? contactsListOffline : contactsList).push(
+                            <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u}/>
+                        );
+                    }
+                });
+            }
+            var emptyMessage = hadLoaded ?
                 l[8008] :
                 l[7006];
 

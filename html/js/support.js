@@ -76,7 +76,12 @@ var support = (function() {
         var supportSubjects = {
             0: l[8527],     // General Inquiry
             1: l[8528],     // Technical Issue
-            2: l[8529]      // Payment Issue
+            2: l[8529],     // Payment Issue
+            3: l[8638],     // Forgotten password
+            4: l[8639],     // Transfer Speed Issue
+            5: l[8640],     // Contact/Sharing Issue
+            6: l[8641],     // MEGAsync Issue
+            7: l[8642],     // Missing / Invisible Data
         };
         
         for (var i in supportSubjects) {

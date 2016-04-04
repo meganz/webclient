@@ -1,7 +1,7 @@
 .tiny-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite-v1.svg);
+    background-image: url(../images/mega/new-chat-sprite-v2.svg);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v1.svg);
+    background-image: url(../images/mega/new-chat-sprite-v2.svg);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -28,7 +28,13 @@
     -khtml-opacity: 0.6;
     opacity: 0.6;
 }
-.link-button:not(.disabled):hover > .small-icon, .link-button.active > .small-icon, .red > .small-icon {
+.link-button.red > .small-icon {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+}
+.link-button:not(.disabled):hover > .small-icon, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
@@ -136,6 +142,9 @@
 }
 .small-icon.circle-with-arrow {
     background-position: -4px -735px;
+}
+.small-icon.horizontal-red-handset {
+    background-position: -54px -38px;
 }
 .square-button .small-icon {
     width: 22px;
@@ -280,7 +289,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v1.svg);
+    background-image: url(../images/mega/new-chat-sprite-v2.svg);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;

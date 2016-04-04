@@ -1,9 +1,11 @@
+((TOP))    
+
 <div class="main-scroll-block">
 <div class="main-pad-block">
-  ((TOP))    
    <div class="main-top-info-block hidden">
          <div class="main-top-info-text"></div>
       </div>  
+<form id="register_form" autocomplete="off">
   <div class="main-mid-pad register1">
 		<div class="main-left-block">
 		   <h3 class="main-italic-header">[$1095]</h3>
@@ -17,10 +19,10 @@
 				 </div>
 			   </div>
 			   <div class="register-name-input-block">
-				  <input type="text" name="login-name" id="register-firstname" value="[$1096]" />
+				  <input type="text" name="login-name" id="register-firstname" placeholder="[$1096]" maxlength="40" />
 			   </div>
 			   <div class="register-family-input-block ">
-				  <input type="text" name="login-familyname" id="register-lastname" value="[$1097]" />
+				  <input type="text" name="login-familyname" id="register-lastname" placeholder="[$1097]" maxlength="40" />
 			   </div>
 		   </div>
 		   <div class="login-register-input email">
@@ -32,7 +34,7 @@
 					</div>
 				 </div>
 			   </div>
-			   <input type="text" name="login-email" id="register-email" value="[$95]" />
+			   <input autocomplete="off" type="text" name="login-email" id="register-email" placeholder="[$95]" />
 		   </div>
 		   <div class="login-register-input password first">
 			   <div class="top-login-input-tooltip">
@@ -48,7 +50,7 @@
 					</div>
 			   </div>
 			   <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif" /></div>
-			   <input type="text" name="login-password" id="register-password" value="[$909]"  />
+			   <input autocomplete="off" type="password" name="login-password" id="register-password" placeholder="[$909]"  />
 		   </div>
 		   <div class="new-registration"> 
 			 <div class="register-pass-status-line1"></div> 
@@ -75,7 +77,7 @@
 					</div>
 				 </div>
 			   </div>
-			   <input type="text" name="login-password2" id="register-password2" value="[$1114]"  />
+			   <input autocomplete="off" type="password" name="login-password2" id="register-password2" placeholder="[$1114]"  />
 		   </div>		   
 		   <div class="new-registration-checkbox">
 			  <div class="register-check checkboxOff"></div>
@@ -113,6 +115,7 @@
 		</div>
 		<div class="clear"></div>	   
   </div>
+</form>
   ((BOTTOM))
 </div>
 </div>

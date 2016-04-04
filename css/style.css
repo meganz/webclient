@@ -104,7 +104,7 @@ body.dndc-to-rubbish * {
 body.dndc-sort * {
     cursor: url(../images/mega/cursor9.png), auto !important
 }
-body *:not(input):not(textarea) {
+body *:not(input):not(textarea):not(.fm-dialog p) {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -1753,10 +1753,6 @@ a.blog-button:hover {
     text-transform: uppercase;
     font-family: 'source_sans_prolight';
 }
-.nt-takedown-notification .notification-avatar, .nt-takedown-reinstated-notification .notification-avatar {
-    margin-top: -24px;
-    top: 50%;
-}
 .notification-item .avatar-wrapper.avatar {
     width: 48px;
     height: 48px;
@@ -1789,7 +1785,7 @@ a.blog-button:hover {
     padding: 2px 0 2px 28px;
     margin: 22px 14px 0 0;
     display: none;
-    background-image: url(../images/mega/notifications-sprite_v2.svg);
+    background-image: url(../images/mega/notifications-sprite-v3.svg);
     background-position: -10px -350px;
     background-repeat: no-repeat;
 }
@@ -1802,14 +1798,15 @@ a.blog-button:hover {
     height: 20px;
     right: -4px;
     top: -4px;
-    background-image: url(../images/mega/notifications-sprite_v2.svg);
+    background-image: url(../images/mega/notifications-sprite-v3.svg);
     background-position: -10px -27px;
     background-repeat: no-repeat;
 }
 .black {
     color: black;
 }
-/* Notification icons */
+
+/* Small notification icons on top of the notification avatar */
 .nt-revocation-of-incoming .notification-avatar-icon {
     background-position: -10px -153px;
 }
@@ -1831,35 +1828,54 @@ a.blog-button:hover {
 .nt-contact-request-denied .notification-avatar-icon, .nt-contact-request-blocked .notification-avatar-icon, .nt-contact-request-ignored .notification-avatar-icon {
     background-position: -10px -153px;
 }
-.nt-payment-notification .notification-avatar-icon {
-    background: url(../images/mega/bitcoin-v5.png) -152px -650px no-repeat;
-    height: 48px;
-    width: 48px;
-    left: 0;
-    top: 0;
+.nt-payment-reminder-notification .notification-avatar-icon {
+    background-position: -10px -415px;
 }
-.nt-takedown-notification .notification-avatar-icon {
-    background: url("../images/mega/bitcoin-v5.png") no-repeat scroll -152px -1451px;
-    height: 48px;
-    width: 48px;
-    left: 0;
-    top: 0;
-}
-.nt-takedown-reinstated-notification .notification-avatar-icon {
-    background: url("../images/mega/bitcoin-v5.png") no-repeat scroll 0 -1452px;
-    height: 48px;
-    width: 48px;
-    left: 0;
-    top: 0;
-}
-.nt-payment-notification .notification-avatar {
-    background-color: transparent;
-}
-.nt-payment-notification .notification-avatar img {
+.nt-takedown-notification .notification-avatar-icon, .nt-takedown-reinstated-notification .notification-avatar-icon, .nt-payment-notification .notification-avatar-icon {
     display: none;
 }
+
+/* Custom icon instead of avatar for MEGA notifications */
+.nt-payment-reminder-notification .notification-avatar {
+    background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    height: 48px;
+    left: 26px;
+    top: 0;
+    width: 48px;
+}
+.nt-payment-notification .notification-avatar {
+    background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    height: 48px;
+    left: 26px;
+    top: 0;
+    width: 48px;
+}
+.nt-takedown-notification .notification-avatar {
+    background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -151px -1451px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    height: 48px;
+    left: 25px;
+    margin-top: -24px;
+    top: 50%;
+    width: 48px;
+}
+.nt-takedown-reinstated-notification .notification-avatar {
+    background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -1px -1451px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    height: 48px;
+    left: 25px;
+    margin-top: -24px;
+    top: 50%;
+    width: 48px;
+}
+ 
 .notification-popup .jspDrag {
     width: 4px;
+}
+.notification-avatar .avatar-wrapper {
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
 }
 .notification-avatar img {
     -moz-border-radius: 100%;
@@ -4793,6 +4809,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #bf1f02;
     color: rgba(255,255,255,0.9);
 }
+.top-head .user-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .user-name, a.user-name {
     float: right;
     margin: 11px 22px 0 0;
@@ -5644,7 +5666,6 @@ th.grid-first-th {
     right: 6px;
     background-position: -106px -963px;
     display: none;
-    cursor: pointer;
 }
 .taken-down .link-icon {
     background-position: -146px -963px;
@@ -5784,8 +5805,14 @@ th.grid-first-th {
     display: block;
     margin: 0;
 }
-.file-block .block-view-file-type.thumb {
-    background-image: none;
+.file-block .block-view-file-type.thumb, .img-block.thumb {
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-image: linear-gradient(45deg, rgba(222,222,222,0.6) 25%, transparent 25%),
+                      linear-gradient(-45deg, rgba(222,222,222,0.6) 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.6) 75%),
+                      linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.6) 75%);
 }
 .contact-block-view-avatar {
     margin: 17px 0 5px 18px;
@@ -8344,7 +8371,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 256px;
 }
 .bitcoin-invoice-dialog .qr-code-mega-icon {
-    background: url(../images/mega/bitcoin-v5.png) 0 -650px no-repeat;
+    background: url(../images/mega/bitcoin-v7.png) 0 -650px no-repeat;
     display: none;
     height: 40.5px;
     left: 143.5px;
@@ -8489,7 +8516,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     padding-right: 5px;
     width: 15px;
     height: 15px;
-    background: url(../images/mega/bitcoin-v5.png) 0 -786px no-repeat;
+    background: url(../images/mega/bitcoin-v7.png) 0 -786px no-repeat;
 }
 .bitcoin-invoice-dialog .clock-icon::before {
     content: '\00a0';
@@ -8547,7 +8574,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
     margin: 0 auto;
     background-position: center -400px;
-    background-image: url("../images/mega/bitcoin-v5.png");
+    background-image: url("../images/mega/bitcoin-v7.png");
     background-repeat: no-repeat;
     height: 200px;
     width: 200px;
@@ -10275,6 +10302,31 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     min-height: 20px;
     color: #333333;
 }
+.green-bg, .membershtip-medium-txt.red-bg, .membershtip-medium-txt.gray-bg, .membershtip-medium-txt.blue-bg {
+	-moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #9a1c06;
+    line-height: 16px;
+    padding: 0 6px;
+    color: rgba(255,255,255,1);
+    font-size: 13px;
+    line-height: 19px;
+    background-color: #71AD32;
+    cursor: pointer;
+}
+.membershtip-medium-txt.red-bg {
+	background-color: #D32200;
+}
+.membershtip-medium-txt.blue-bg {
+	background-color: #1FA4E5;
+}
+.membershtip-medium-txt.gray-bg {
+	background-color: #4c4c4c;
+}
 .membership-small-txt {
     font-size: 13px;
 }
@@ -10300,6 +10352,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-usage-bl:first-child {
     border-left: 0;
     width: 235px;
+}
+.free .membership-usage-bl.storage, .free .fm-account-blocks.storage {
+    width: 100%; 
+}
+.free .membership-usage-bl.bandwidth, .free .fm-account-blocks.bandwidth {
+    display: none;
 }
 .membership-circle {
     width: 76px;
@@ -11806,7 +11864,10 @@ table {
 .download.buttons-block {
     margin: 23px 0 0 0;
 }
-.downloading .download.buttons-block {
+.download.icons-block {
+    min-height: 25px;
+}
+.downloading .download.buttons-block, .download-complete .download.buttons-block, .download-complete .download.pause-button {
     display: none;
 }
 .download.percents-block {
@@ -12058,7 +12119,7 @@ table {
 .download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block, .megasync-content.features {
     display: none;
 }
-.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
+.downloading .download.in-progress, .downloading .download.percents-block, .download-complete .download.download.in-progress, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
     display: block;
 }
 .megasync-content.slider, .megasync-close, .megasync-close-txt {
@@ -15223,7 +15284,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .new-bottom-pages p.sub-list span.number, .new-bottom-pages h2.sub-list span.number {
     margin: 2px 0 0 70px;
 }
-.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-page li a, .new-bottom-pages li a {
+.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a {
     color: #D22400;
 }
 .new-bottom-pages h2 span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
@@ -17154,9 +17215,6 @@ a.contact-new-button:hover {
 }
 .dev-nw-gray-bg {
     height: 100%;
-    height: -webkit-calc(100% - 306px);
-    height: -moz-calc(100% - 306px);
-    height: calc(100% - 306px);
     width: 100%;
     position: absolute;
     overflow: hidden;
@@ -22344,6 +22402,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .voucher-dialog a.voucher-reseller-link {
     font-family: 'source_sans_probold';
+    color: #d90007;
 }
 .voucher-dialog .voucher-dialog-buttons {
     display: table;
@@ -22800,7 +22859,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     width: 130px;
     height: 130px;
     margin: 0 auto;
-    background: url(../images/mega/bitcoin-v5.png) -33px -1048px no-repeat;
+    background: url(../images/mega/bitcoin-v7.png) -33px -1048px no-repeat;
     margin-bottom: 47px;
 }
 .failed .payment-result-icon {
@@ -22853,7 +22912,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     right: 0;
 }
 .payment-close-icon, .overlay-close-icon {
-    background: url(../images/mega/bitcoin-v5.png) -183px -791px no-repeat;
+    background: url(../images/mega/bitcoin-v7.png) -183px -791px no-repeat;
     width: 20px;
     height: 20px;
     margin: 0 auto;
@@ -23144,6 +23203,11 @@ body.pro:after {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
 }
+
+.sync-bottom-block .megasync-dropdown {
+    margin: 0px;
+}
+
 .linux .megasync-dropdown {
     display: block;
 }
@@ -23253,6 +23317,12 @@ body.pro:after {
     z-index: 10;
     top: 122px;
 }
+
+.megasync-dropdown-list .jspPane {
+    min-width: 280px;
+    max-width: 280px;
+}
+
 .megasync-dropdown-pad {
     background-color: white;
     -moz-border-radius: 4px;
@@ -23266,6 +23336,7 @@ body.pro:after {
     box-sizing: border-box;
     padding: 36px 0 4px 0;
 }
+
 .megasync-dropdown-scroll .jspVerticalBar {
     width: 10px;
 }
@@ -24775,7 +24846,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     padding-top: 6px
 }
 .support .fm-accout-inputs-blocks {
-    padding-top: 12px
+    padding-top: 15px
 }
 .support .fm-account-labels {
     width: 30px;
@@ -24788,10 +24859,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     height: 80%;
     float: left;
     border: 1px solid #e8e8e8;
-    border-radius: 5px;
+    font-size: 14px;
+    color: #666666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 8px 35px 8px 10px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
 }
 .help2 img[alt="smallx"] {
     max-width: 50px;
+}
+.support .fm-account-input::before {
+    display: none;
 }
 .help2 img[alt="small"] {
     max-width: 50%;

@@ -4467,6 +4467,9 @@ function avatarDialog(close)
             outputFormat: 'image/jpeg',
             onCrop: function(croppedDataURI)
             {
+                if (croppedDataURI.length < 64 * 1024) {
+                    return msgDialog('warninga', l[8645], l[8646]);
+                }
                 var data = dataURLToAB(croppedDataURI);
                 mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
                 var blob = new Blob([data], {type: 'image/png'});

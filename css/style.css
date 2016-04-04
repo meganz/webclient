@@ -1772,7 +1772,7 @@ a.blog-button:hover {
 }
 .notification-request-buttons, .notification-accepted-bl {
     padding: 0 20px 0 8px;
-    width: 110px;
+    width: 105px;
     vertical-align: middle;
     text-align: right;
 }
@@ -1901,7 +1901,7 @@ a.blog-button:hover {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    display: block;
+    display: table-cell;
     min-height: 64px;
     padding: 8px 8px 6px 0;
     vertical-align: middle;

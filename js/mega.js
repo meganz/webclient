@@ -6228,10 +6228,7 @@ function fm_getnodes(nodeId, ignore)
                         }
                         continue;
                     }
-                    // ToDo: check this condition
-                    if (M.d[n].name || ignore) {
-                        nodes.push(n);
-                    }
+                    nodes.push(n);
                     if (M.d[n].t === 1) {
                         procnode(n);
                     }

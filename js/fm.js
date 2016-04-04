@@ -7533,13 +7533,20 @@ function shareDialogContentCheck() {
     }
 }
 
-function addShareDialogContactToContent(type, id, av, name, permClass, permText, exportLink) {
+function addShareDialogContactToContent(userEmail, type, id, av, userName, permClass, permText, exportLink) {
 
     var html = '',
         htmlEnd = '',
         item = '',
         exportClass = '';
 
+    var contactEmailHtml = '';
+
+    if (userEmail !== userName) {
+        contactEmailHtml = '<div class="contact-email">'
+            + htmlentities(userEmail)
+            + '</div>';
+    }
 
     if (exportLink) {
         item = itemExportLinkHtml(M.d[exportLink]);
@@ -7549,7 +7556,8 @@ function addShareDialogContactToContent(type, id, av, name, permClass, permText,
         item = av 
             + '<div class="fm-share-user-info">'
             + '<div class="fm-share-centered">'
-            + '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
+            + '<div class="fm-chat-user">' + htmlentities(userName) + '</div>'
+            + contactEmailHtml
             + '</div>'
             + '</div>';
     }
@@ -7588,7 +7596,7 @@ function fillShareDialogWithContent() {
             if (M.u[userHandle] && M.u[userHandle].c && (M.u[userHandle].c === 1)) {
                 user = M.u[userHandle];
                 email = user.m;
-                name = (user.name && user.name.length > 1) ? user.name : user.m;
+                name = mega.utils.fullUsername(userHandle);
                 shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
 
                 generateShareDialogRow(name, email, shareRights, userHandle);
@@ -7648,7 +7656,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     removeFromMultiInputDDL('.share-multiple-input', {id: email, name: email});
 
     rowId = (userHandle) ? userHandle : email;
-    html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
+    html = addShareDialogContactToContent(email, '', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
     $('.share-dialog .share-dialog-contacts').safeAppend(html);
 }

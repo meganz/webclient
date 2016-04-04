@@ -10302,6 +10302,31 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     min-height: 20px;
     color: #333333;
 }
+.green-bg, .membershtip-medium-txt.red-bg, .membershtip-medium-txt.gray-bg, .membershtip-medium-txt.blue-bg {
+	-moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #9a1c06;
+    line-height: 16px;
+    padding: 0 6px;
+    color: rgba(255,255,255,1);
+    font-size: 13px;
+    line-height: 19px;
+    background-color: #71AD32;
+    cursor: pointer;
+}
+.membershtip-medium-txt.red-bg {
+	background-color: #D32200;
+}
+.membershtip-medium-txt.blue-bg {
+	background-color: #1FA4E5;
+}
+.membershtip-medium-txt.gray-bg {
+	background-color: #4c4c4c;
+}
 .membership-small-txt {
     font-size: 13px;
 }
@@ -10327,6 +10352,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-usage-bl:first-child {
     border-left: 0;
     width: 235px;
+}
+.free .membership-usage-bl.storage, .free .fm-account-blocks.storage {
+    width: 100%; 
+}
+.free .membership-usage-bl.bandwidth, .free .fm-account-blocks.bandwidth {
+    display: none;
 }
 .membership-circle {
     width: 76px;

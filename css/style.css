@@ -1752,8 +1752,9 @@ a.blog-button:hover {
     font-size: 23px;
     text-align: center;
     line-height: 46px;
-    margin: 8px 0;
+    margin: -24px 0 0 0;
     display: block;
+    top: 50%;
     text-transform: uppercase;
     font-family: 'source_sans_prolight';
 }

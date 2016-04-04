@@ -1735,6 +1735,7 @@ a.blog-button:hover {
 }
 .notification-type {
     display: table;
+    table-layout: fixed;
     width: 100%;
     padding-left: 62px;
     -webkit-box-sizing: border-box;
@@ -1771,8 +1772,9 @@ a.blog-button:hover {
 }
 .notification-request-buttons, .notification-accepted-bl {
     padding: 0 20px 0 8px;
-    width: 10px;
+    width: 110px;
     vertical-align: middle;
+    text-align: right;
 }
 .fm-dialog-button.notifications-button {
     margin-top: 0;

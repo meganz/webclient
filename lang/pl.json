@@ -3168,6 +3168,12 @@
     "8634": "Zaloguj si\u0119 lub utw\u00f3rz konto aby [S]dosta\u0107 za darmo 50GB[\/S] miejsca na dane w chmurze oraz otrzymywa\u0107 wiadomo\u015bci od znajomych i wsp\u00f3\u0142pracownik\u00f3w.",
     "8635": "Dodano do MEGAsync",
     "8636": "Wiadomo\u015b\u0107 nie zosta\u0142a wys\u0142ana. Ponawiam pr\u00f3b\u0119...",
+    "8637": "I&#039;ll wait",
+    "8638": "Forgotten Password",
+    "8639": "Transfer Speed Issue",
+    "8640": "Contact\/Sharing Issue",
+    "8641": " MEGAsync Issue",
+    "8642": "Missing \/ Invisible Data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3210,10 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637,
+        "forgotten-password": 8638,
+        "transfer-speed-issue": 8639,
+        "megasync-issue": 8641
     }
 }

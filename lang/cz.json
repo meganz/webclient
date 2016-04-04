@@ -3168,6 +3168,12 @@
     "8634": "P\u0159ihlaste se nobo si vytvo\u0159te \u00fa\u010det, abyste [S]z\u00edskali 50 GB BEZPLATN\u00c9HO[\/S] cloudov\u00e9ho \u00falo\u017eist\u011b a dost\u00e1vali zpr\u00e1vy od va\u0161ich p\u0159\u00e1tel a spolupracovn\u00edk\u016f.",
     "8635": "Stahov\u00e1n\u00ed p\u0159id\u00e1no do MEGAsync",
     "8636": "Zpr\u00e1va nebyla odesl\u00e1na. Opakov\u00e1n\u00ed pokusu...",
+    "8637": "Po\u010dk\u00e1m",
+    "8638": "Zapomenut\u00e9 heslo",
+    "8639": "Probl\u00e9m s rychlost\u00ed p\u0159enosu",
+    "8640": "Probl\u00e9m s kontaktem nebo sd\u00edlen\u00edm",
+    "8641": "Probl\u00e9m s MEGAsyncem",
+    "8642": "Chyb\u011bj\u00edc\u00ed nebo nevidizeln\u00e1 data",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3204,6 +3210,10 @@
         "pro-plan-expires-x-days": 8597,
         "pro-plan-expiring-soon": 8598,
         "delete-duplicates": 8599,
-        "suspended-for-tos-violations": 8603
+        "suspended-for-tos-violations": 8603,
+        "i-will-wait": 8637,
+        "forgotten-password": 8638,
+        "transfer-speed-issue": 8639,
+        "megasync-issue": 8641
     }
 }

@@ -172,8 +172,6 @@ window.CanvasCropper = (function(){
             cropHeight = newCropHeight;
         }
 
-        context.canvas.width = 250;
-        context.canvas.height = 250;
         context.drawImage(
             image,
             sourceX,
@@ -182,8 +180,8 @@ window.CanvasCropper = (function(){
             cropHeight,
             targetX,
             targetY,
-            250,
-            250
+            targetWidth,
+            targetHeight
         );
 
         return this;
@@ -191,7 +189,7 @@ window.CanvasCropper = (function(){
 
     CanvasCropper.prototype.getDataURI = function(outputFormat) {
         if (outputFormat) { //TODO: Check if in array of valid mime types
-            return this.canvas.toDataURL("image/jpeg", 0.85);
+            return this.canvas.toDataURL(outputFormat, 0.85);
         } else {
             return null;
         }
@@ -857,8 +855,10 @@ window.ImageUploadAndCrop = (function(){
         var mask = this.imageExplorer.get$Mask();
 
         this.canvasCroppper = new CanvasCropper(
-            mask.width() * this.options.HiDPIMultiplier,
-            mask.height() * this.options.HiDPIMultiplier,
+            250,
+            250,
+            //mask.width() * this.options.HiDPIMultiplier,
+            //mask.height() * this.options.HiDPIMultiplier,
             {
                 outputFormat: this.options.outputFormat
             }

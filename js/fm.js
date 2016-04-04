@@ -4464,17 +4464,17 @@ function avatarDialog(close)
         {
             cropButton: $('#fm-change-avatar'),
             dragDropUploadPrompt:l[1390],
+            outputFormat: 'image/png',
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);
                 mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
-                var blob = new Blob([data], {type: 'image/jpeg'});
-                avatars[u_handle] =
-                    {
-                        data: blob,
-                        url: myURL.createObjectURL(blob)
-                    }
-                    $('.fm-account-avatar').html(useravatar.contact(u_handle));
+                var blob = new Blob([data], {type: 'image/png'});
+                avatars[u_handle] = {
+                    data: blob,
+                    url: myURL.createObjectURL(blob)
+                };
+                $('.fm-account-avatar').html(useravatar.contact(u_handle));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },

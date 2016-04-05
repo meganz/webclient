@@ -383,13 +383,10 @@ var ConversationMessage = React.createClass({
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
 
-                                    if (!src || !src.seen) {
+                                    if (!src || src !== v) {
                                         M.v.push(v);
                                         if (!v.seen) {
                                             v.seen = 1; // HACK
-                                        }
-                                        if (src) {
-                                            src.seen = 1; // HACK
                                         }
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }

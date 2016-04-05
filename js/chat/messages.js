@@ -464,7 +464,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
-    self.chatd.rebind('onMessagesHistoryRequest' + chatRoomId, function(e, eventData) {
+    self.chatd.rebind('onMessagesHistoryRequest.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
@@ -473,7 +473,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
-    self.chatd.rebind('onMessagesKeyDone' + chatRoomId, function(e, eventData) {
+    self.chatd.rebind('onMessagesKeyDone.messagesBuff' + chatRoomId, function(e, eventData) {
         console.log('VG: key done');
         console.log('VG: keyxid: ' + eventData.keyxid);
         console.log('VG: keyid: ' + eventData.keyid);

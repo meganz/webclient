@@ -1245,16 +1245,26 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
         chunksize = 1048576 * Math.floor(chunksize / 1048576);
     }
 
+    /**
     var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1));
-    // var reserved = dl_filesize - chunksize;
-    // var eofcs = Math.max(Math.floor(chunksize/3),1048576);
     while (p < dl_filesize) {
         dl_chunksizes[p] = p > reserved ? 1048576 : chunksize;
-        // dl_chunksizes[p] = p > reserved ? eofcs : chunksize;
         dl_chunks.push(p);
         pp = p;
         p += dl_chunksizes[p];
     }
+    /**/
+    while (p < dl_filesize) {
+        var length = Math.floor((dl_filesize - p) / 1048576 + 1) * 1048576;
+        if (length > chunksize) {
+            length = chunksize;
+        }
+        dl_chunksizes[p] = length;
+        dl_chunks.push(p);
+        pp = p;
+        p += length;
+    }
+    /**/
 
     if (!(dl_chunksizes[pp] = dl_filesize - pp)) {
         delete dl_chunksizes[pp];

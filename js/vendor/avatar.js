@@ -189,7 +189,7 @@ window.CanvasCropper = (function(){
 
     CanvasCropper.prototype.getDataURI = function(outputFormat) {
         if (outputFormat) { //TODO: Check if in array of valid mime types
-            return this.canvas.toDataURL(outputFormat, 0.85);
+            return this.canvas.toDataURL(outputFormat, 0.75);
         } else {
             return null;
         }

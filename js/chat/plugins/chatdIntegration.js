@@ -906,6 +906,14 @@ ChatdIntegration.prototype.setRetention = function(chatRoom, time) {
     self.chatd.cmd(Chatd.Opcode.RETENTION, base64urldecode(chatRoom.chatId), Chatd.Const.UNDEFINED + pack32le(time));
 };
 
+ChatdIntegration.prototype.sendNewKey = function(chatRoom, keyxid, keyBlob) {
+    var self = this;
+    keyxid |= 0xffff0000;//mark it as a tempory id.
+    var keylen = keyBlob.length;
+    var keybody = self.chatd.pack32le(keyxid) + self.chatd.pack32le(keylen) + keyBlob;
+    self.chatd.cmd(Chatd.Opcode.NEWKEY, base64urldecode(chatRoom.chatId), keybody);
+};
+
 ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     // allocate transactionid for the new message (it must be shown with status "delivering" in the UI;
     // edits and cancellations at that stage must be applied to the locally queued version that gets
@@ -935,9 +943,28 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
             }
 
             if (result !== false) {
-                tmpPromise.resolve(
-                    self.chatd.submit(base64urldecode(chatRoom.chatId), result)
-                );
+                if (result.length > 1)//if it is a key message,send out the new key first.
+                {
+                    tmpPromise.resolve(
+                        //var ids = strongvelope._splitKeyId(chatRoom.protocolHandler.keyId);]  
+                        self.sendNewKey(chatRoom, chatRoom.protocolHandler.keyId, chatRoom.protocolHandler.getKeyBlob())
+                    );
+                    var newreuslt = [result[1]];
+                    var keyxid = chatRoom.protocolHandler.keyId|0xffff0000;
+                    
+                    tmpPromise.resolve(
+                        //var ids = strongvelope._splitKeyId(chatRoom.protocolHandler.keyId);]  
+ 
+                        self.chatd.submit(base64urldecode(chatRoom.chatId), newreuslt, keyxid)
+                    );
+                }
+                else
+                {
+                    var keyxid = chatRoom.protocolHandler.keyId|0xffff0000;
+                    tmpPromise.resolve(
+                        self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyxid)
+                    );
+                }
             }
             else {
                 tmpPromise.reject();

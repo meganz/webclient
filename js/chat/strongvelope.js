@@ -41,7 +41,7 @@ var strongvelope = {};
     var _RSA_ENCRYPTION_THRESHOLD = 128;
 
     /** Version of the protocol implemented. */
-    strongvelope.PROTOCOL_VERSION = 0x01;
+    strongvelope.PROTOCOL_VERSION = 0x02;
     var PROTOCOL_VERSION = strongvelope.PROTOCOL_VERSION;
 
     /** After how many messages our symmetric sender key is rotated. */
@@ -58,6 +58,9 @@ var strongvelope = {};
     strongvelope.COMMANDER = 'gTxFhlOd_LQ';
     var COMMANDER = strongvelope.COMMANDER;
 
+    /** Flag of temporary key ID. */
+    strongvelope.TEMPKEYIDFLAG = 0xffff0000;
+    var TEMPKEYIDFLAG = strongvelope.TEMPKEYIDFLAG;
     /**
      * "Enumeration" of TLV types used for the chat message transport container.
      *
@@ -197,10 +200,10 @@ var strongvelope = {};
      *     The key ID.
      * @private
      */
-    strongvelope._encodeKeyId = function(dateStamp, counter, prefix) {
+    strongvelope._encodeKeyId = function(counter) {
 
-        var keyIdNumber = (dateStamp << 16) | counter;
-        return a32_to_str([prefix]) + a32_to_str([keyIdNumber]);
+        var keyIdNumber =  TEMPKEYIDFLAG | counter;
+        return a32_to_str([keyIdNumber]);
     };
 
 
@@ -636,6 +639,7 @@ var strongvelope = {};
         this._sentKeyId = null;
         this.participantKeys = {};
         this.participantKeys[this.ownHandle] = {};
+        this.participantSenderKeys = [];
         this.otherParticipants = new Set();
         this.includeParticipants = new Set();
         this.excludeParticipants = new Set();
@@ -670,9 +674,10 @@ var strongvelope = {};
                 // If we sent the message, pick first recipient for getting the
                 // sender key (e. g. for history loading).
                 var keyIndex = isOwnMessage ? 0 : myIndex;
-                var otherHandle = isOwnMessage
-                                ? parsedMessage.recipients[0]
-                                : message.userId;
+                var otherHandle = message.userId;
+                if (parsedMessage.protocolVersion < PROTOCOL_VERSION) {
+                    otherHandle = isOwnMessage ? parsedMessage.recipients[0] : message.userId;
+                }
                 if (keyIndex >= 0) {
                     // Decrypt message key(s).
                     var decryptedKeys = this._decryptKeysFor(parsedMessage.keys[keyIndex],
@@ -873,7 +878,7 @@ var strongvelope = {};
                 throw new Error('This should never happen, the unique device id was not set correctly');
             }
         }
-        this.keyId = ns._encodeKeyId(dateStamp, counter, prefix);
+        this.keyId = ns._encodeKeyId(counter);
 
         // Now the new sender key.
         var secretKey = new Uint8Array(SECRET_KEY_SIZE);
@@ -964,7 +969,9 @@ var strongvelope = {};
         var cipherBytes = asmCrypto.AES_CBC.encrypt(clearBytes, keyBytes,
                                                     false, ivBytes);
 
-        return asmCrypto.bytes_to_string(cipherBytes);
+        var result = asmCrypto.bytes_to_string(cipherBytes);
+        this.participantSenderKeys[destination] = nonce+result;
+        return result;
     };
 
 
@@ -1067,7 +1074,7 @@ var strongvelope = {};
         });
         trackedParticipants = setutils.join(
             trackedParticipants, includeParticipants);
-        trackedParticipants.delete(this.ownHandle);
+        trackedParticipants.add(this.ownHandle);
 
         return trackedParticipants;
     };
@@ -1111,10 +1118,11 @@ var strongvelope = {};
 
         // Assemble the key ID(s) to be sent.
         var keyIdContent = self.keyId;
+        /* ToGO
         if (self.previousKeyId && (self._sentKeyId !== self.keyId)) {
             // Also add previous key ID on key rotation.
             keyIdContent += self.previousKeyId;
-        }
+        }*/
         keyIds = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
                                       keyIdContent);
 
@@ -1129,12 +1137,15 @@ var strongvelope = {};
             recipients += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
                                                base64urldecode(destination));
             keysIncluded = [senderKey];
-            if (self.previousKeyId
+            /**
+             * TOGO
+             */
+            /*if (self.previousKeyId
                     && (self._sentKeyId !== self.keyId)
                     && !isNewMember) {
                 // Also add previous key on key rotation for existing members.
                 keysIncluded.push(self.participantKeys[self.ownHandle][self.previousKeyId]);
-            }
+            }*/
             encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, destination);
             if (encryptedKeys === false) {
                 // Something went wrong, and we can't encrypt to that destination.
@@ -1515,7 +1526,7 @@ var strongvelope = {};
 
         return false;
     };
-    /**
+        /**
      * Decrypts a message from a sender and (potentially) updates sender keys.
      *
      * @method
@@ -1528,7 +1539,7 @@ var strongvelope = {};
      * @returns {(StrongvelopeMessage|Boolean)}
      *     The message content on success, `false` in case of errors.
      */
-    strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
+    strongvelope.ProtocolHandler.prototype.legacyDecryptFrom = function(message,
             sender, historicMessage) { // jshint maxcomplexity: 11
 
         // if the message is from chat API
@@ -1619,110 +1630,115 @@ var strongvelope = {};
             this._totalMessagesWithoutSendKey++;
         }
 
-        // TODO: Check legitimacy of operation (moderator set on alter participants).
-        // Now puzzle out the group composition from a keyed message.
-        /*var otherParticipantsFromMessage = this._getOtherParticipantsFromMessage(
-            sender, parsedMessage);
-        var allParticipantsFromMessage = this._getAllParticipantsFromMessage(
-            sender, parsedMessage);
-        // Take actions on participant changes.
-        if ((sender !== this.ownHandle)
-                && (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS)) {
+        return result;
+    };
+    /**
+     * Decrypts a message from a sender and (potentially) updates sender keys.
+     *
+     * @method
+     * @param {String} message
+     *     Data message to encrypt.
+     * @param {String} sender
+     *     User handle of the message sender.
+     * @param {Boolean} [historicMessage=false]
+     *     Whether the message passed in for decryption is from the history.
+     * @returns {(StrongvelopeMessage|Boolean)}
+     *     The message content on success, `false` in case of errors.
+     */
+    strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
+            sender, historicMessage) { // jshint maxcomplexity: 11
 
-            // Sanity checks.
-            if ((parsedMessage.includeParticipants.length > 0)
-                    && (setutils.subtract(new Set(parsedMessage.includeParticipants),
-                        allParticipantsFromMessage).size > 0)) {
-                // Included participants must be in the receipients of the message, so if the
-                // subtraction has anything left over, this is an invalid message.
-
-                return false;
-            }
-            if ((parsedMessage.excludeParticipants.length > 0)
-                    && (setutils.intersection(allParticipantsFromMessage,
-                        new Set(parsedMessage.excludeParticipants)).size > 0)) {
-                // Exclude participants are not allowed to be in otherParticipantsFromMessage, so if
-                // there is anything left after an intersection between the two, then this is an
-                // invalid message.
-                return false;
-            }
-
-            if (this._inUse) {
-                // Sanity check whether everything matches up.
-                var myCheckParticipants = this._trackParticipants(
-                    this.otherParticipants, new Set(parsedMessage.includeParticipants),
-                    new Set(parsedMessage.excludeParticipants));
-
-                if (myCheckParticipants === false) {
-                    // Sanity check, if the checked participants had an inconsistency
-                    return false;
-                }
-
-                var messageCheckParticipants = new Set(parsedMessage.recipients);
-                messageCheckParticipants.add(sender);
-                messageCheckParticipants.delete(this.ownHandle);
-                if (!setutils.equal(myCheckParticipants, messageCheckParticipants)) {
-                    logger.critical('Participant group in chat does not match up with expectation!');
-
-                    if (d) {
-                        logger.error('Expected group: '
-                            + JSON.stringify(Array.from(myCheckParticipants))
-                            + '; group from message: '
-                            + JSON.stringify(Array.from(messageCheckParticipants)));
-                    }
-
-                    return false;
-                }
-
-                // Enact changes.
-                // Remove stuff from own tracking sets.
-                parsedMessage.excludeParticipants.forEach(function _excludeIterator(item) {
-                    self.includeParticipants.delete(item);
-                });
-                parsedMessage.includeParticipants.forEach(function _excludeIterator(item) {
-                    self.excludeParticipants.delete(item);
-                });
-            }
-            else {
-                // Update other participants list.
-                this.otherParticipants = otherParticipantsFromMessage;
-                this._inUse = true;
-            }
-            // Update my sender key.
-            logger.info('Particpant change received, updating sender key.');
-            this.updateSenderKey();
-
-            // Track included/excluded members.
-            this.includeParticipants = setutils.join(this.includeParticipants,
-                new Set(parsedMessage.includeParticipants));
-            result.includeParticipants = parsedMessage.includeParticipants;
-            this.excludeParticipants = setutils.join(this.excludeParticipants,
-                new Set(parsedMessage.excludeParticipants));
-            result.excludeParticipants = parsedMessage.excludeParticipants;
+        var protocolVersion = message.charCodeAt(0);
+        if (protocolVersion < PROTOCOL_VERSION) {
+            return this.legacyDecryptFrom(message, sender, historicMessage);
         }
-        else if (!historicMessage
-                    && (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED)) {
-            if (this._inUse === false) {
-                // We're in a new chat session: update group from received message.
-                this.otherParticipants = otherParticipantsFromMessage;
-                this._inUse = true;
-            }
-            else {
-                var trackedParticipants = this._trackParticipants(
-                    this.otherParticipants, this.includeParticipants, this.excludeParticipants);
+        // if the message is from chat API
+        if (sender === COMMANDER) {
+            return this.handleManagementMessage({ userId: sender, message: message}, historicMessage);
+        }
 
-                if (trackedParticipants === false) {
-                    // Sanity check, if the tracked participants had an inconsistency
-                    return false;
-                }
+        // Check we're in a chat with this sender, or on a new chat.
+        if (!this.otherParticipants.has(sender)
+                && (sender !== this.ownHandle)
+                && (this.otherParticipants.size > 0)) {
+            logger.warn('Sender not in current participants: ' + sender);
 
-                if (!setutils.equal(trackedParticipants, otherParticipantsFromMessage)) {
-                    // There's a mismatch between what we're thinking the other
-                    // members are and what the message thinks they are.
-                    return false;
-                }
-            }
-        }*/
+            return false;
+        }
+
+        // Extract keys, and parse message in the same go.
+        var extractedContent = this._parseAndExtractKeys({ userId: sender, message: message});
+        if (extractedContent === false) {
+            logger.critical('Message signature invalid.');
+
+            return false;
+        }
+
+        var parsedMessage = extractedContent.parsedMessage;
+        var senderKeys = extractedContent.senderKeys;
+
+        // Bail out on parse error.
+        if (parsedMessage === false) {
+            logger.critical('Incoming message not usable.');
+
+            return false;
+        }
+
+        // Verify protocol version.
+        if (parsedMessage.protocolVersion > PROTOCOL_VERSION) {
+            logger.critical('Message not compatible with current protocol version.');
+
+            return false;
+        }
+
+        // Get sender key.
+        var senderKey = this._getSenderKeyAndUpdateCache(sender, parsedMessage,
+                                                         senderKeys);
+
+        // Am I part of this chat?
+        // TODO: In future it should update participants based on chatd server's requests rather than incoming messages.
+        if (parsedMessage.excludeParticipants.indexOf(this.ownHandle) >= 0) {
+            logger.info('I have been excluded from this chat, cannot read message.');
+            this.keyId = null;
+            this.otherParticipants.clear();
+            this.includeParticipants.clear();
+            this.excludeParticipants.clear();
+        }
+        else if ((parsedMessage.recipients.length > 0)
+                && (parsedMessage.recipients.indexOf(this.ownHandle) === -1)) {
+            logger.info('I am not participating in this chat, cannot read message.');
+        }
+
+        if (!senderKey) {
+            return false;
+        }
+
+        // Decrypt message payload.
+        var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+                                                    senderKey,
+                                                    parsedMessage.nonce);
+        // Bail out if decryption failed.
+        if (cleartext === false) {
+            return false;
+        }
+
+        var result = {
+            version: parsedMessage.protocolVersion,
+            sender: sender,
+            type: parsedMessage.type,
+            payload: cleartext,
+            includeParticipants: [],
+            excludeParticipants: []
+        };
+
+        // Update counter based on payload messages from other users or devices.
+        var keyIdFromMessage = parsedMessage.keyIds[0];
+        var prefixFromMessage = str_to_a32(keyIdFromMessage)[0];
+        var a32words = str_to_a32(this.uniqueDeviceId);
+        var myPrefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
+        if ((cleartext !== null) && !historicMessage && (result.sender !== this.ownHandle) && (myPrefix !== prefixFromMessage)) {
+            this._totalMessagesWithoutSendKey++;
+        }
 
         return result;
     };
@@ -1934,5 +1950,60 @@ var strongvelope = {};
         // Return assembled total message.
         return String.fromCharCode(PROTOCOL_VERSION) + content;
     };
+    // utility functions
+    strongvelope.ProtocolHandler.prototype.pack16le = function(x) {
+        var r = '';
 
+        for (var i = 2; i--; ) {
+            r += String.fromCharCode(x & 255);
+            x >>= 8;
+        }
+
+        return r;
+    };
+
+    strongvelope.ProtocolHandler.prototype.getKeyBlob = function() { 
+        var result = '';
+        var self = this;
+        for (var item in this.participantSenderKeys) {
+            var key = self.participantSenderKeys[item];
+            var len = self.pack16le(key.length);
+
+            result += (base64urldecode(item) + len + key);
+        }
+        console.log('key result');
+        var codestr = '';
+        for (var i=0;i<result.length;i++)
+        {
+            codestr += ("000000000" + result[i].charCodeAt(0).toString(2)).substr(-8) + " ";
+        }
+        return result;
+    };
+
+    strongvelope.ProtocolHandler.prototype.setKeyID = function(keyxId, keyId) {
+        if (keyxId < TEMPKEYIDFLAG) {
+            logger.critical('Temporary key ID is not correct');
+        }
+        var tempkeyid = a32_to_str([keyxId]);
+        var newkeyid = a32_to_str([keyId]);
+
+        if (!this.participantKeys[this.ownHandle][tempkeyid]) {
+            logger.critical('Temporary key does not exist with ID ' + tempkeyid);
+        }  
+        this.participantKeys[this.ownHandle][newkeyid] = this.participantKeys[this.ownHandle][tempkeyid];
+    };
+
+    strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) { 
+        for (var i=0; i<keys.length;i++) {
+            if (this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
+                logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + base64urldecode(keys[i].userid));
+            }
+            var isOwnMessage = (keys[i].userid === this.ownHandle);
+            var decryptedKeys = this._decryptKeysFor(keys[i].key,
+                                         keys[i].nonce,
+                                         keys[i].userid,
+                                         isOwnMessage);
+            this.participantKeys[keys[i].userid][keys[i].keyid] = decryptedKeys[0];
+        }
+    };
 }());

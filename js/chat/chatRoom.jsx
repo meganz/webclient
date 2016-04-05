@@ -589,7 +589,7 @@ ChatRoom.prototype.getRoomTitle = function() {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
-        return htmlentities(self.megaChat.getContactNameFromJid(participants[0]));
+        return self.megaChat.getContactNameFromJid(participants[0]);
     }
     else {
         assert(false, "invalid room type");

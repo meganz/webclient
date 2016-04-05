@@ -646,7 +646,7 @@ ChatRoom.prototype.getRoomTitle = function() {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
-        return htmlentities(self.megaChat.getContactNameFromJid(participants[0]));
+        return self.megaChat.getContactNameFromJid(participants[0]);
     }
     else {
         var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
@@ -654,7 +654,7 @@ ChatRoom.prototype.getRoomTitle = function() {
         participants.forEach(function(contactHash) {
             if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
                 names.push(
-                    M.u[contactHash].name ? M.u[contactHash].name : "non contact"
+                    M.u[contactHash] ? mega.utils.fullUsername(contactHash) : "non contact"
                 );
             }
         });

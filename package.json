@@ -54,7 +54,6 @@
     "webpack": "^1.12.9"
   },
   "devDependencies": {
-    "es6-shim": "^0.35.0",
     "eslint": "^1.10.3",
     "eslint-loader": "^1.1.1",
     "htmlhint": "^0.9.12",

@@ -1844,7 +1844,7 @@ a.blog-button:hover {
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
     height: 48px;
     left: 26px;
-    top: 0;
+    top: 50%;
     width: 48px;
 }
 .nt-payment-notification .notification-avatar {
@@ -1852,7 +1852,7 @@ a.blog-button:hover {
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
     height: 48px;
     left: 26px;
-    top: 0;
+    top: 50%;
     width: 48px;
 }
 .nt-takedown-notification .notification-avatar {

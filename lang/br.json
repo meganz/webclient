@@ -3176,8 +3176,8 @@
     "8642": "Dados perdidos ou n\u00e3o acess\u00edveis",
     "8643": "Voc\u00ea est\u00e1 utilizando uma sess\u00e3o tempor\u00e1ria.",
     "8644": "Voc\u00ea est\u00e1 utilizando uma sess\u00e3o tempor\u00e1ria. Os dados que est\u00e1 armazenando ser\u00e3o perdidos quando a sess\u00e3o expirar. Para manter seus arquivos ativos, por favor, crie uma conta o quanto antes e receba [S]50 GB de armazenamento seguro na nuvem![\/S]",
-    "8645": "Image size exceeded",
-    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8645": "Limite de tamanho de arquivo excedido.",
+    "8646": "Sua imagem excedeu o limite m\u00e1ximo de 64 KB. Por favor tente enviar um arquivo menor.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -1086,6 +1086,7 @@ function MegaData()
                 else {
                     ftype = filetype(M.v[i].name);
                     s = htmlentities(bytesToSize(M.v[i].s));
+                    nodeType = 'file';
                 }
                 star = nodeData.fav ? ' star' : '';
 

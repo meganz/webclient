@@ -9621,6 +9621,10 @@ function propertiesDialog(close)
         else if (n.h === M.RubbishID) {
             p.t2 = htmlentities(l[167]);
         }
+        // 'Shared with me' tab, info dialog, undecrypted nodes
+        else if (missingkeys[n.h]) {
+            p.t2 = htmlentities(l[8649]);
+        }
         p.t4 = bytesToSize(size);
         p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
         p.t8 = p.t9 ? (l[896] + ':') : '';

@@ -1146,6 +1146,9 @@ function topmenuUI() {
                 megaChat.renderMyStatus();
             }
         }
+        
+        // Show PRO plan expired warning popup (if applicable)
+        warnPopup.showProPlanRenewal();
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {

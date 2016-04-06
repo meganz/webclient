@@ -3176,8 +3176,8 @@
     "8642": "Chyb\u011bj\u00edc\u00ed nebo nevidizeln\u00e1 data",
     "8643": "Pou\u017e\u00edv\u00e1te do\u010dasnou relaci.",
     "8644": "Pou\u017e\u00edv\u00e1te do\u010dasnou relaci. Data, kter\u00e1 ukl\u00e1d\u00e1te, budou ztracena, kdy\u017e vypr\u0161\u00ed. Abyste zachovali sv\u00e9 soubory, upgradujte na skute\u010dn\u00fd \u00fa\u010det, jakmile se v\u00e1m to bude hodit, a z\u00edskejte [S]bezplatn\u00fdch 50 GB bezpe\u010dn\u00e9ho \u00falo\u017ei\u0161t\u011b v cloudu![\/S]",
-    "8645": "Image size exceeded",
-    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8645": "P\u0159ekro\u010dena velikost obr\u00e1zku",
+    "8646": "V\u00e1\u0161 obr\u00e1zek p\u0159ekro\u010dil maxim\u00e1ln\u00ed velikost souboru 64 KB. Zkuste to znovu s men\u0161\u00edm souborem.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3222,6 +3222,7 @@
         "using-ephemeral-session": 8643,
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
-        "image-size-exceeded-body": 8646
+        "image-size-exceeded-body": 8646,
+        "support-too-short": 8650
     }
 }

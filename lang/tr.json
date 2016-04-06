@@ -3178,6 +3178,7 @@
     "8644": "Ge\u00e7ici oturum kullanmaktas\u0131n\u0131z. Depolad\u0131\u011f\u0131n\u0131z veri zaman a\u015f\u0131m\u0131na u\u011frad\u0131\u011f\u0131nda yok olacakt\u0131r. Dosyalar\u0131n\u0131z\u0131 saklamak i\u00e7in l\u00fctfen en k\u0131sa zamanda normal oturuma ge\u00e7in ve [S]bulutunuzdaki \u00fccretsiz 50GB g\u00fcvenli saklama alan\u0131na sahip olun![\/S]",
     "8645": "Image size exceeded",
     "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

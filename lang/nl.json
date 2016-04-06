@@ -3178,6 +3178,7 @@
     "8644": "U gebruikt een tijdelijke sessie. De gegevens die u opslaat zullen verloren gaan wanneer de sessie verloopt. Om uw bestanden te bewaren, kunt u wanneer het u schikt upgraden naar een echt account en claimt u uw [S]gratis 50 GB beveiligde opslagruimte in de cloud![\/S]",
     "8645": "Image size exceeded",
     "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

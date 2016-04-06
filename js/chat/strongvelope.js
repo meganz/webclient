@@ -1213,7 +1213,7 @@ var strongvelope = {};
 
         var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
         var encryptedKeys = false;
-        if (repeatKey || (this._sentKeyId !== this.keyId) || (this.participantChange === true)) {
+        if ((this._sentKeyId !== this.keyId) || (this.participantChange === true)) {
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
 
@@ -1965,7 +1965,7 @@ console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
             var key = self.participantSenderKeys[item];
             var len = self.pack16le(key.length);
 
-            result += (base64urldecode(this.ownHandle) + len + key);
+            result += (base64urldecode(item) + len + key);
         }
         console.log('key result');
         var codestr = '';

@@ -533,6 +533,7 @@ MessagesBuff.prototype.getUnreadCount = function() {
 };
 
 MessagesBuff.prototype.setLastSeen = function(msgId) {
+    console.log('last seen msgid:' + msgId);
     var self = this;
     var targetMsg = Message._mockupNonLoadedMessage(msgId, self.messages[msgId], 999999999);
     var lastMsg = Message._mockupNonLoadedMessage(self.lastSeen, self.messages[self.lastSeen], 0);
@@ -673,6 +674,7 @@ MessagesBuff.prototype.markAllAsSeen = function() {
     }
 };
 MessagesBuff.prototype.markAllAsReceived = function() {
+    console.log('markAllAsReceived');
     var self = this;
 
     var lastToBeMarkedAsReceived = null;

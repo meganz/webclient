@@ -271,6 +271,15 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
         self.cmdq += String.fromCharCode(opCode)+cmd;
+        console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+
+        var cmdstr = String.fromCharCode(opCode)+cmd;
+        var codestr = '';
+        for (var i=0;i<cmdstr.length;i++)
+        {
+            codestr += (cmdstr[i].charCodeAt(0).toString(16)) + " ";
+        }
+        console.log(codestr);
     });
 
     this.triggerSendIfAble();
@@ -283,7 +292,7 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd) {
     var codestr = '';
     for (var i=0;i<cmdstr.length;i++)
     {
-        codestr += ("000000000" + cmdstr[i].charCodeAt(0).toString(2)).substr(-8) + " ";
+        codestr += cmdstr[i].charCodeAt(0).toString(16) + " ";
     }
     console.log(codestr);
     this.cmdq += String.fromCharCode(opCode)+cmd;
@@ -441,11 +450,11 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.NEWMSG:
                 self.keepAliveTimerRestart();
                 newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
-                len = self.chatd.unpack32le(cmd.substr(33,4));
-                self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(33,len));
-                len += 37;
+                len = self.chatd.unpack32le(cmd.substr(35,4));
+                self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(35,len));
+                len += 39;
 
-                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), cmd.substr(37,len));
+                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), self.chatd.unpack32le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
                 break;
 
             case Chatd.Opcode.MSGUPD:
@@ -547,13 +556,32 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
             case Chatd.Opcode.NEWKEY:
                 //self.keepAliveTimerRestart();
-                self.logger.log("Set new key: " + base64urlencode(cmd.substr(1,8)));
+                self.logger.log("Set keys: " + base64urlencode(cmd.substr(1,8)) + "length: " + self.chatd.unpack32le(cmd.substr(13,4)));
                 len = self.chatd.unpack32le(cmd.substr(13,4));
-                self.chatd.trigger('onMessagesKeyDone',
+                var index = 17;
+                var keys = [];
+                while (index < len+17) {
+                    var keylen = self.chatd.unpack16le(cmd.substr(index + 12,2));
+                    if (keylen < 28) {
+                        index += (keylen + 14);   
+                        continue;
+                    }
+                    keys.push(
+                        {
+                            userid : base64urlencode(cmd.substr(index,8)),
+                            keyid  : self.chatd.unpack32le(cmd.substr(index + 8,4)),
+                            keylen : keylen,
+                            nonce  : cmd.substr(index + 14,12),
+                            key    : cmd.substr(index + 26,16)
+                        });
+                    index += (keylen + 14);
+                }
+                    
+                self.chatd.trigger('onMessageKeysDone',
                     {
                         chatId: base64urlencode(cmd.substr(1,8)),
-                        keyId : cmd.substr(9,4),
-                        keys  : cmd.substr(17)
+                        keyid : cmd.substr(9,4),
+                        keys  : keys
                     }
                 );
 
@@ -563,11 +591,11 @@ Chatd.Shard.prototype.exec = function(a) {
                 //self.keepAliveTimerRestart();
                 self.logger.log("GET new key: " + base64urlencode(cmd.substr(1,8)));
 
-                self.chatd.trigger('onMessagesKeyDone',
+                self.chatd.trigger('onMessagesKeyIdDone',
                     {
                         chatId: base64urlencode(cmd.substr(1,8)),
-                        keyxid: cmd.substr(9,4),
-                        keyid:  cmd.substr(13,4)
+                        keyxid: self.chatd.unpack32le(cmd.substr(9,4)),
+                        keyid:  self.chatd.unpack32le(cmd.substr(13,4))
                     }
                 );
 
@@ -654,7 +682,13 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
         var keyid = messageObj.keyid;
         var timestamp = messageObj.timestamp;
         var message = messageObj.message;
-        var cmd = [Chatd.Opcode.NEWMSG, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];
+        var type = messageObj.type;
+        var cmd = '';
+        if (type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {// this is key message;
+            cmd = [Chatd.Opcode.NEWKEY, chatId + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];   
+        } else {
+            cmd = [Chatd.Opcode.NEWMSG, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack16le(0) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];
+        }
         cmds.push(cmd);
     };
 
@@ -697,7 +731,11 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
 
     for (var i = 0; i<messages.length; i++) {
         var message = messages[i];
-
+        if (message.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
+            console.log('key message');
+            messageConstructs.push({"msgxid":0, "timestamp":0,"keyid":keyId, "message":message.message, "type":message.type});
+            continue;
+        }
         // allocate a transactionid for the new message
         var msgxid = this.chatd.nexttransactionid();
         var timestamp = Math.floor(new Date().getTime()/1000);
@@ -715,7 +753,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
 
         this.sending[msgxid] = this.highnum;
 
-        messageConstructs.push({"msgxid":msgxid, "timestamp":timestamp,"keyid":keyId, "message":message});
+        messageConstructs.push({"msgxid":msgxid, "timestamp":timestamp,"keyid":keyId, "message":message.message, "type":message.type});
     };
 
     // if we believe to be online, send immediately
@@ -797,7 +835,7 @@ Chatd.Messages.prototype.range = function(chatId) {
             console.log(chatId);
             console.log(this.buf[low][Chatd.MsgField.MSGID]);
             console.log(this.buf[high][Chatd.MsgField.MSGID]);
-            this.chatd.cmd(Chatd.Opcode.RANGE, chatId, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
+            //this.chatd.cmd(Chatd.Opcode.RANGE, chatId, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
             break;
         }
     }
@@ -854,13 +892,13 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     }
 };
 
-Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, msg) {
+Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, updated, keyid, msg) {
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, msg);
+        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg);
     }
 };
 
-Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, msg) {
+Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg) {
     var id;
 
     if (newmsg) {
@@ -869,9 +907,9 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, msg)
     else {
         id = this.lownum--;
     }
-
+console.log('key id:'+ keyid);
     // store message
-    this.buf[id] = [msgid, userId, timestamp, msg];
+    this.buf[id] = [msgid, userId, timestamp, updated, keyid, msg];
 
     this.chatd.trigger('onMessageStore', {
         chatId: base64urlencode(this.chatId),
@@ -879,6 +917,8 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, msg)
         messageId: base64urlencode(msgid),
         userId: base64urlencode(userId),
         ts: timestamp,
+        updated: updated,
+        keyid : keyid,
         message: msg,
         isNew: newmsg
     });
@@ -951,6 +991,27 @@ Chatd.prototype.unpack32le = function(x) {
     var r = 0;
 
     for (var i = 4; i--; ) {
+        r = (r << 8)+x.charCodeAt(i);
+    }
+
+    return r;
+};
+
+Chatd.prototype.pack16le = function(x) {
+    var r = '';
+
+    for (var i = 2; i--; ) {
+        r += String.fromCharCode(x & 255);
+        x >>= 8;
+    }
+
+    return r;
+};
+
+Chatd.prototype.unpack16le = function(x) {
+    var r = 0;
+
+    for (var i = 2; i--; ) {
         r = (r << 8)+x.charCodeAt(i);
     }
 

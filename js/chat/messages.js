@@ -12,6 +12,8 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'userId': true,
             'messageId': true,
 
+            'keyid': true,
+
             'message': true,
             'textContents': false,
 
@@ -294,7 +296,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.chatd.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
+console.log('onMessagesHistoryDone.messagesBuff');
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
@@ -349,12 +351,13 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.haveMessages = true;
-
+            console.log('store key id:' + eventData.keyid);
             var msgObject = new Message(chatRoom,
                 self,
                 {
                     'messageId': eventData.messageId,
                     'userId': eventData.userId,
+                    'keyid': eventData.keyid,
                     'message': eventData.message,
                     'delay': eventData.ts,
                     'orderValue': eventData.id
@@ -473,12 +476,31 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
-    self.chatd.rebind('onMessagesKeyDone.messagesBuff' + chatRoomId, function(e, eventData) {
+    self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
         console.log('VG: key done');
         console.log('VG: keyxid: ' + eventData.keyxid);
         console.log('VG: keyid: ' + eventData.keyid);
+        for (var i=0;i<eventData.keyxid.length;i++) {
+            console.log(eventData.keyid[i].charCodeAt(0).toString(16) + " ");
+        }
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        console.log(chatRoom);
+        chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
+        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+            self.trackDataChange();
+        }
+    });
 
+    self.chatd.rebind('onMessageKeysDone.messagesBuff' + chatRoomId, function(e, eventData) {
+        console.log('VG: keys done');
+        console.log('VG: keyid: ' + eventData.keyid);
+        console.log('VG: keys: ' + eventData.keys);
+        for (var i=0;i<eventData.keys.length;i++) {
+            console.log(eventData.keys[i].userid + " ");
+        }
+        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        console.log(chatRoom);
+        chatRoom.protocolHandler.seedKeys(eventData.keys);
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();
         }

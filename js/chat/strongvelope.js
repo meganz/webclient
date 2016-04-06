@@ -1329,8 +1329,11 @@ var strongvelope = {};
 
             // Return assembled total message.
             content = String.fromCharCode(PROTOCOL_VERSION) + content;
-
-            encryptedMessages.push(content);
+            if (assembledMessage.keyed) {
+                encryptedMessages.push({"type": messageType, "message": this.getKeyBlob()});
+            } else {
+                encryptedMessages.push({"type": messageType, "message": content});
+            }
             // If it is a keyed message, then the payload is not included in the message,
             // it needs to call it again to generate a second (payload) message.
         } while(assembledMessage.keyed);
@@ -1355,7 +1358,7 @@ var strongvelope = {};
      * @private
      */
     strongvelope.ProtocolHandler.prototype._getSenderKeyAndUpdateCache = function(
-                sender, parsedMessage, senderKeys) {
+            sender, parsedMessage, senderKeys) {
 
         var storedKey;
         for (var id in senderKeys) {
@@ -1646,8 +1649,8 @@ var strongvelope = {};
      *     The message content on success, `false` in case of errors.
      */
     strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
-            sender, historicMessage) { // jshint maxcomplexity: 11
-
+            sender, keyid, historicMessage) { // jshint maxcomplexity: 11
+console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
         var protocolVersion = message.charCodeAt(0);
         if (protocolVersion < PROTOCOL_VERSION) {
             return this.legacyDecryptFrom(message, sender, historicMessage);
@@ -1666,50 +1669,42 @@ var strongvelope = {};
             return false;
         }
 
-        // Extract keys, and parse message in the same go.
-        var extractedContent = this._parseAndExtractKeys({ userId: sender, message: message});
-        if (extractedContent === false) {
-            logger.critical('Message signature invalid.');
-
-            return false;
-        }
-
-        var parsedMessage = extractedContent.parsedMessage;
-        var senderKeys = extractedContent.senderKeys;
-
+        var parsedMessage = ns._parseMessageContent(message);
         // Bail out on parse error.
         if (parsedMessage === false) {
             logger.critical('Incoming message not usable.');
 
             return false;
         }
-
         // Verify protocol version.
         if (parsedMessage.protocolVersion > PROTOCOL_VERSION) {
             logger.critical('Message not compatible with current protocol version.');
 
             return false;
         }
+        var senderKey = null;
+        logger.critical(parsedMessage);
+        //var keyidStr = a32_to_str([keyid]);
+        if (parsedMessage) {
+            if (ns._verifyMessage(parsedMessage.signedContent,
+                                  parsedMessage.signature,
+                                  pubEd25519[sender])) {
+                                    // Get sender key.
+                                    logger.critical('Signature valid');
+                                    senderKey = this.participantKeys[sender][keyid];
+                                    
+                }
+                else {
+                logger.critical('Signature invalid for message from *** on ***');
+                logger.error('Signature invalid for message from '
+                             + sender);
 
-        // Get sender key.
-        var senderKey = this._getSenderKeyAndUpdateCache(sender, parsedMessage,
-                                                         senderKeys);
-
-        // Am I part of this chat?
-        // TODO: In future it should update participants based on chatd server's requests rather than incoming messages.
-        if (parsedMessage.excludeParticipants.indexOf(this.ownHandle) >= 0) {
-            logger.info('I have been excluded from this chat, cannot read message.');
-            this.keyId = null;
-            this.otherParticipants.clear();
-            this.includeParticipants.clear();
-            this.excludeParticipants.clear();
-        }
-        else if ((parsedMessage.recipients.length > 0)
-                && (parsedMessage.recipients.indexOf(this.ownHandle) === -1)) {
-            logger.info('I am not participating in this chat, cannot read message.');
+                return false;
+            }
         }
 
         if (!senderKey) {
+            logger.critical('Message does not have a sender key for :' + sender);
             return false;
         }
 
@@ -1761,7 +1756,7 @@ var strongvelope = {};
 
         historicMessages = (historicMessages === false) ? false : true;
         // First extract all keys.
-        this._batchParseAndExtractKeys(messages);
+        //this._batchParseAndExtractKeys(messages);
 
         // Now attempt to decrypt all messages.
         var decryptedMessages = [];
@@ -1772,6 +1767,7 @@ var strongvelope = {};
 
             decryptedMessages.push(this.decryptFrom(message.message,
                                                     message.userId,
+                                                    message.keyid,
                                                     historicMessages));
         }
 
@@ -1969,7 +1965,7 @@ var strongvelope = {};
             var key = self.participantSenderKeys[item];
             var len = self.pack16le(key.length);
 
-            result += (base64urldecode(item) + len + key);
+            result += (base64urldecode(this.ownHandle) + len + key);
         }
         console.log('key result');
         var codestr = '';
@@ -1981,7 +1977,8 @@ var strongvelope = {};
     };
 
     strongvelope.ProtocolHandler.prototype.setKeyID = function(keyxId, keyId) {
-        if (keyxId < TEMPKEYIDFLAG) {
+        console.log('update key id');
+        if (keyxId & TEMPKEYIDFLAG !== TEMPKEYIDFLAG) {
             logger.critical('Temporary key ID is not correct');
         }
         var tempkeyid = a32_to_str([keyxId]);
@@ -1991,18 +1988,25 @@ var strongvelope = {};
             logger.critical('Temporary key does not exist with ID ' + tempkeyid);
         }  
         this.participantKeys[this.ownHandle][newkeyid] = this.participantKeys[this.ownHandle][tempkeyid];
+        this.keyId = newkeyid;
     };
 
     strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) { 
         for (var i=0; i<keys.length;i++) {
-            if (this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
-                logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + base64urldecode(keys[i].userid));
-            }
+            console.log('seed key id:' + keys[i].keyid);
+            //var keyidStr = a32_to_str([keys[i].keyid]);
+            /*if (this.participantKeys[keys[i].userid] && this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
+                logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + keys[i].userid);
+            }*/
             var isOwnMessage = (keys[i].userid === this.ownHandle);
+            console.log('from:' + keys[i].userid);
             var decryptedKeys = this._decryptKeysFor(keys[i].key,
                                          keys[i].nonce,
                                          keys[i].userid,
                                          isOwnMessage);
+            if (!this.participantKeys[keys[i].userid]) {
+                this.participantKeys[keys[i].userid] = {};
+            }        
             this.participantKeys[keys[i].userid][keys[i].keyid] = decryptedKeys[0];
         }
     };

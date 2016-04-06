@@ -480,4 +480,8 @@ body.pro:after {
     background-image: url(../images/mega/encr-sprite@2x_v1.png);
     background-size: 216px;
 }
+.dropdown-white-arrow, .huge-white-icon, .shared-link.small-icon {
+    background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
+    background-size: 68px auto;
+}
 }

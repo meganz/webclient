@@ -18,6 +18,7 @@
 <link rel="stylesheet" type="text/css" href="../../css/chat-left-pane.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-feedback.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
 </head>
 
 <body class="overlayed">
@@ -27,7 +28,12 @@
 <div class="fm-dialog add-from-cloud">
     <div class="fm-dialog-close"></div>
     <div class="fm-dialog-title">Add from your Cloud Drive</div>
-    
+    <div class="dropdown body dropdown-arrow img-preview down-arrow">
+        <i class="dropdown-white-arrow"></i>
+        <div class="dropdown img-wrapper">
+            <img alt="" src="../../images/temp/avatar-img.jpg" />
+        </div>
+     </div>
     <div class="fm-dialog-content">
         <!-- Please add "long-path" if theres not enough space for breadcrumbs path !-->
         <div class="fm-breadcrumbs-block">
@@ -50,26 +56,42 @@
             <div class="fm-dialog-grid-scroll">
                 <table class="grid-table fm-dialog-table">
                     <!-- Please add "folder" class for folders !-->
-                    <tr class="folder">
+                    <tr>
                         <td>
-                            <span class="grid-status-icon"></span>
+                            <span class="grid-status-icon star"></span>
                         </td>
                         <td>
-                            <span class="transfer-filtype-icon folder"> </span>
-                            <span class="tranfer-filetype-txt">Folder</span>
+                            <span class="transfer-filtype-icon image"> </span>
+                            <span class="tranfer-filetype-txt">File</span>
                         </td>
-                        <td></td>
-                    </tr>
-                    <!-- Please add "ui-selected" class for folders !-->
-                    <tr class="folder">
+                        <td>2MB</td>
+                    </tr><tr>
                         <td>
-                            <span class="grid-status-icon"></span>
+                            <span class="grid-status-icon star"></span>
                         </td>
                         <td>
-                            <span class="transfer-filtype-icon folder"> </span>
-                            <span class="tranfer-filetype-txt">Folder</span>
+                            <span class="transfer-filtype-icon image"> </span>
+                            <span class="tranfer-filetype-txt">File</span>
                         </td>
-                        <td></td>
+                        <td>2MB</td>
+                    </tr><tr>
+                        <td>
+                            <span class="grid-status-icon star"></span>
+                        </td>
+                        <td>
+                            <span class="transfer-filtype-icon image"> </span>
+                            <span class="tranfer-filetype-txt">File</span>
+                        </td>
+                        <td>2MB</td>
+                    </tr><tr>
+                        <td>
+                            <span class="grid-status-icon star"></span>
+                        </td>
+                        <td>
+                            <span class="transfer-filtype-icon image"> </span>
+                            <span class="tranfer-filetype-txt">File</span>
+                        </td>
+                        <td>2MB</td>
                     </tr>
                     <tr>
                         <td>

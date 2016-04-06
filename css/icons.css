@@ -326,9 +326,8 @@
     width: 70px;
     height: 70px;
     display: block;
-    background-image: url(../images/mega/chat-static-sprite@2x.png);
+    background-image: url(../images/mega/chat-static-sprite-v1.png);
     background-repeat: no-repeat;
-    background-size: 68px auto;
     background-position: 0 0;
 }
 .huge-white-icon.loupe {
@@ -341,9 +340,8 @@
     width: 16px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/chat-static-sprite@2x.png);
+    background-image: url(../images/mega/chat-static-sprite-v1.png);
     background-repeat: no-repeat;
-    background-size: 68px auto;
     background-position: 0 0;
     vertical-align: top;
     margin: 2px 6px 0 0;

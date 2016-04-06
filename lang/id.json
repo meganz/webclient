@@ -3222,6 +3222,7 @@
         "using-ephemeral-session": 8643,
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
-        "image-size-exceeded-body": 8646
+        "image-size-exceeded-body": 8646,
+        "support-too-short": 8650
     }
 }

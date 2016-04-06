@@ -1,6 +1,6 @@
 var support = (function() {
 
-    var minLetters = 10;
+    var minLetters = 30;
     var ns = {};
     var $textarea;
     var $button;    
@@ -25,10 +25,10 @@ var support = (function() {
             m: $.trim($textarea.val()), // message
             t: $subject.find('.active').data('value') // type
         };
-        if (opts.m.length <= minLetters) {
+        if (opts.m.replace(/\s+/g, '').length <= minLetters) {
             msgDialog('warninga',
                 l[7884], // Message too short
-                l[7885].replace('%d', minLetters), // Your message needs to be at least %d letters long.
+                l[8650], // Your message needs to be at least %d letters long.
                 false, function() {
                     $textarea.focus();
                 });

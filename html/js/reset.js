@@ -127,6 +127,10 @@ function delete_reset_pw() {
         msgDialog('warninga', l[135], l[715]);
         return;
     }
+    else if ($('.login-register-input.password').hasClass('weak-password')) {
+        msgDialog('warninga', l[135], l[1129]);
+        return;
+    }
     else if ($(this).hasClass('checkboxOff')) {
         msgDialog('warninga', l[135], l[1974]);
         return;
@@ -166,6 +170,10 @@ function recovery_reset_pw() {
     }
     else if ($('#withkey-password').val() !== $('#withkey-password2').val()) {
         msgDialog('warninga', l[135], l[715]);
+        return;
+    }
+    else if ($('.login-register-input.password').hasClass('weak-password')) {
+        msgDialog('warninga', l[135], l[1129]);
         return;
     }
     loadingDialog.show();

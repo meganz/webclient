@@ -9499,14 +9499,13 @@ browserDialog.isWeak = function() {
     return result.weak && result;
 }
 
-function propertiesDialog(close)
-{
-    var pd = $('.fm-dialog.properties-dialog'),
-        c = $('.properties-elements-counter span');
+function propertiesDialog(close) {
+    var pd = $('.fm-dialog.properties-dialog');
+    var c = $('.properties-elements-counter span');
+
     $(document).unbind('MegaNodeRename.Properties');
     $(document).unbind('MegaCloseDialog.Properties');
-    if (close)
-    {
+    if (close) {
         $.dialog = false;
         delete $.propertiesDialog;
         fm_hideoverlay();
@@ -9514,6 +9513,7 @@ function propertiesDialog(close)
         $('.contact-list-icon').removeClass('active');
         $('.properties-context-menu').fadeOut(200);
         $.hideContextMenu();
+
         return true;
     }
     $.propertiesDialog = $.dialog = 'properties';
@@ -9524,38 +9524,42 @@ function propertiesDialog(close)
 
     var exportLink = new mega.Share.ExportLink({});
     var isTakenDown = exportLink.isTakenDown($.selected);
-    if (isTakenDown) {
-        pd.addClass('taken-down');
-        showToast('clipboard', l[7703]);
-    }
-
-    // Undecryptable file indicators
     var isUndecrypted = missingkeys[$.selected];
-    if (isUndecrypted) {
-        pd.addClass('undecryptable');
-        if (M.d[$.selected].t) {// folder
-            showToast('clipboard', l[8595]);
+    var notificationText = '';
+
+    if (isTakenDown || isUndecrypted) {
+        if (isTakenDown) {
+            pd.addClass('taken-down');
+            notificationText  = l[7703] + '\n';
         }
-        else {// file
-            showToast('clipboard', l[8602]);
+        if (isUndecrypted) {
+            pd.addClass('undecryptable');
+
+            if (M.d[$.selected].t) {// folder
+                notificationText  += l[8595];
+            }
+            else {// file
+                notificationText  += l[8602];
+            }
         }
+        showToast('clipboard', notificationText);
     }
 
     $('.properties-elements-counter span').text('');
-    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
-    {
+    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
             e.click();
     });
-    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function()
-    {
+
+    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function() {
         propertiesDialog(1);
     });
+
     var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
-    for (var i in $.selected)
-    {
+
+    for (var i in $.selected) {
         n = M.d[$.selected[i]];
         if (!n) {
             console.error('propertiesDialog: invalid node', $.selected[i]);

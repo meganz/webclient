@@ -1092,18 +1092,23 @@ function MegaData()
 
                 fName = htmlentities(nodeData.name);
 
-                // Undecryptable file indicators
+                // Undecryptable node indicators
                 if (missingkeys[nodeHandle]) {
                     undecryptableClass = 'undecryptable';
                     fName = 'undecrypted ' + nodeType;
                     fIcon = 'generic';
                     ftype = l[7381];// i.e. 'unknown'
 
+                    // Taken down item
+                    if (nodeData && nodeData.shares && nodeData.shares.EXP && nodeData.shares.EXP.down) {
+                        titleTooltip = (nodeData.t === 1) ? (l[7705] + '\n') : (l[7704] + '\n');
+                    }
+
                     if (nodeType === 'folder') {
-                        titleTooltip = l[8595];
+                        titleTooltip += l[8595];
                     }
                     else if (nodeType === 'file') {
-                        titleTooltip = l[8602];
+                        titleTooltip += l[8602];
                     }
                 }
 
@@ -1256,7 +1261,24 @@ function MegaData()
 
                     if (nodeData && nodeData.shares && nodeData.shares.EXP && nodeData.shares.EXP.down) {
                         additionClass = 'taken-down';
-                        titleTooltip = (nodeData.t === 1) ? l[7705] : l[7704];
+
+                        if (nodeData.t === 1) {// folder
+                            titleTooltip = l[7705];
+
+                            // Undecryptable node indicators
+                            if (missingkeys[nodeHandle]) {
+                                titleTooltip += '\n' + l[8595];
+                            }
+                        }
+                        else {// file
+                            titleTooltip = l[7704];
+
+                            // Undecryptable node indicators
+                            if (missingkeys[nodeHandle]) {
+                                titleTooltip += '\n' + l[8602];
+                            }
+                        }
+
                     }
 
                     // Block view
@@ -2275,7 +2297,13 @@ function MegaData()
                             undecryptableClass = 'undecryptable';
                             fName = 'undecrypted folder';
                             fIcon = 'generic';
-                            titleTooltip = l[8595];
+
+                            var exportLink = new mega.Share.ExportLink({});
+                            if (exportLink.isTakenDown(curItemHandle)) {
+                                titleTooltip = l[7705] + '\n';
+                            }
+                            
+                            titleTooltip += l[8595];
                         }
 
                         sExportLink = (M.d[curItemHandle].shares && M.d[curItemHandle].shares.EXP) ? 'linked' : '';
@@ -8038,6 +8066,8 @@ function balance2pro(callback)
      */
     UiExportLink.prototype.addTakenDownIcon = function(nodeId) {
 
+        var titleTooltip = '';
+
         // Add taken-down to list view
         $('.grid-table.fm #' + nodeId).addClass('taken-down');
 
@@ -8049,12 +8079,28 @@ function balance2pro(callback)
 
         // Add title, mouse popup
         if (M.d[nodeId].t === 1) {// Item is folder
-            $('.grid-table.fm #' + nodeId).attr('title', l[7705]);
-            $('#' + nodeId + '.file-block').attr('title', l[7705]);
+
+            titleTooltip = l[7705];
+
+            // Undecryptable node indicators
+            if (missingkeys[nodeId]) {
+                titleTooltip += '\n' + l[8595];
+            }
+
+            $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
+            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
         }
         else {// Item is file
-            $('.grid-table.fm #' + nodeId).attr('title', l[7704]);
-            $('#' + nodeId + '.file-block').attr('title', l[7704]);
+
+            titleTooltip = l[7704];
+
+            // Undecryptable node indicators
+            if (missingkeys[nodeId]) {
+                titleTooltip += '\n' + l[8602];
+            }
+
+            $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
+            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
         }
     };
 

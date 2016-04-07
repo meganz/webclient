@@ -83,7 +83,7 @@ pkg-upgrade:
 checks: jshint jscs
 
 clean:
-	rm -rf doc/api/ coverage/ build/ test-results.xml test/phantomjs-storage dont-deploy/ui/out/
+	rm -rf doc/api/ coverage/ build/ test-results.xml jscpd-report.xml test/phantomjs-storage dont-deploy/ui/out/
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)

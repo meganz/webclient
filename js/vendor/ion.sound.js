@@ -1,7 +1,7 @@
 /**
  * Ion.Sound
- * version 3.0.6 Build 88
- * (c) Denis Ineshin, 2015
+ * version 3.0.7 Build 89
+ * (c) Denis Ineshin, 2017
  *
  * Project page:    http://ionden.com/a/plugins/ion.sound/en.html
  * GitHub page:     https://github.com/IonDen/ion.sound
@@ -85,6 +85,7 @@
         i;
 
 
+
     if (!settings.supported && is_iOS) {
         settings.supported = ["mp3", "mp4", "aac"];
     } else if (!settings.supported) {
@@ -112,6 +113,7 @@
         settings.scope = settings.scope || null;
         settings.ready_callback = settings.ready_callback || null;
         settings.ended_callback = settings.ended_callback || null;
+        settings.allow_cache = typeof settings.allow_cache === 'undefined' ? true : settings.allow_cache;
 
         sounds_num = settings.sounds.length;
 
@@ -125,7 +127,7 @@
         }
     };
 
-    ion.sound.VERSION = "3.0.6";
+    ion.sound.VERSION = "3.0.7";
 
     ion.sound._method = function (method, name, options) {
         if (name) {
@@ -253,13 +255,22 @@
         },
 
         createUrl: function () {
-            var no_cache = new Date().valueOf();
-            this.url = this.options.path + encodeURIComponent(this.options.name) + "." + this.options.supported[this.ext] + "?" + no_cache;
+            var url = this.options.path + encodeURIComponent(this.options.name) + "." +
+                        this.options.supported[this.ext];
+
+            if (this.options.allow_cache === true) {
+                url =  url + "?" + new Date().valueOf();
+            }
+            this.url = url;
         },
 
         load: function () {
             if (this.no_file) {
                 warn("No sources for \"" + this.options.name + "\" sound :(");
+                return;
+            }
+
+            if (this.request) {
                 return;
             }
 
@@ -764,7 +775,10 @@
                 if (!this.options.preload) {
                     this.autoplay = true;
                     this.load();
+                } else {
+                    this.autoplay = true;
                 }
+
                 return;
             }
 

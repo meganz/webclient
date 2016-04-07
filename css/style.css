@@ -5686,6 +5686,9 @@ th.grid-first-th {
     background-position: -15px -2639px;
 }
 .undecryptable .grid-status-icon, .undecryptable .grid-status-icon.star {
+    background-image: url(../images/mega/nw-fm-sprite_v15.svg);
+    background-repeat: no-repeat;
+    background-size: auto;
     background-position: -9px -2637px;
 }
 .undecryptable .file-status-icon, .undecryptable .file-status-icon.star {

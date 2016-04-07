@@ -6184,7 +6184,7 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && M.currentrootid !== M.RubbishID) {
+        if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.context-menu-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
@@ -6286,6 +6286,15 @@ function contextMenuUI(e, ll) {
             items = menuItems();
             for (var item in items) {
                 $(menuCMI).filter(item).show();
+            }
+
+            // Hide context menu items not needed for undecrypted nodes
+            if (missingkeys[id]) {
+                $(menuCMI).filter('.add-star-item').hide();
+                $(menuCMI).filter('.download-item').hide();
+                $(menuCMI).filter('.rename-item').hide();
+                $(menuCMI).filter('.copy-item').hide();
+                $(menuCMI).filter('.getlink-item').hide();
             }
         }
         else {

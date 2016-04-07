@@ -1204,6 +1204,7 @@ var strongvelope = {};
         if ((this._keyEncryptionCount >= this.rotateKeyEvery) ||
             (this.previousKeyId === null && this.keyId === null) || 
             (this.participantChange === true)) {
+        console.log('update updateSenderKey');
             this.updateSenderKey();
         }
 
@@ -1214,6 +1215,7 @@ var strongvelope = {};
         var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
         var encryptedKeys = false;
         if ((this._sentKeyId !== this.keyId) || (this.participantChange === true)) {
+            console.log(' _encryptSenderKey')
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
 
@@ -1649,8 +1651,10 @@ var strongvelope = {};
      *     The message content on success, `false` in case of errors.
      */
     strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
-            sender, keyid, historicMessage) { // jshint maxcomplexity: 11
-console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
+            sender, keyid, historicMessage, isNew, key) { // jshint maxcomplexity: 11
+        isNew = (typeof isNew === 'undefine') ? false : isNew;
+
+        console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
         var protocolVersion = message.charCodeAt(0);
         if (protocolVersion < PROTOCOL_VERSION) {
             return this.legacyDecryptFrom(message, sender, historicMessage);
@@ -1668,7 +1672,19 @@ console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
 
             return false;
         }
-
+        var keyidStr = a32_to_str([keyid]);
+        if (isNew === true) {
+            var isOwnMessage = (sender === this.ownHandle);
+            console.log('cache key from:' + sender + 'with key id ' + keyid);
+            var decryptedKeys = this._decryptKeysFor(key.key,
+                                        key.nonce,
+                                        sender,
+                                        isOwnMessage);
+            if (!this.participantKeys[sender]) {
+                this.participantKeys[sender] = {};
+            }
+            this.participantKeys[sender][keyidStr] = decryptedKeys[0];
+        }
         var parsedMessage = ns._parseMessageContent(message);
         // Bail out on parse error.
         if (parsedMessage === false) {
@@ -1684,14 +1700,14 @@ console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
         }
         var senderKey = null;
         logger.critical(parsedMessage);
-        //var keyidStr = a32_to_str([keyid]);
+
         if (parsedMessage) {
             if (ns._verifyMessage(parsedMessage.signedContent,
                                   parsedMessage.signature,
                                   pubEd25519[sender])) {
                                     // Get sender key.
                                     logger.critical('Signature valid');
-                                    senderKey = this.participantKeys[sender][keyid];
+                                    senderKey = this.participantKeys[sender][keyidStr];
                                     
                 }
                 else {
@@ -1989,12 +2005,13 @@ console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
         }  
         this.participantKeys[this.ownHandle][newkeyid] = this.participantKeys[this.ownHandle][tempkeyid];
         this.keyId = newkeyid;
+        this._sentKeyId = newkeyid;
     };
 
     strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) { 
         for (var i=0; i<keys.length;i++) {
             console.log('seed key id:' + keys[i].keyid);
-            //var keyidStr = a32_to_str([keys[i].keyid]);
+            var keyidStr = a32_to_str([keys[i].keyid]);
             /*if (this.participantKeys[keys[i].userid] && this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
                 logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + keys[i].userid);
             }*/
@@ -2006,8 +2023,8 @@ console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
                                          isOwnMessage);
             if (!this.participantKeys[keys[i].userid]) {
                 this.participantKeys[keys[i].userid] = {};
-            }        
-            this.participantKeys[keys[i].userid][keys[i].keyid] = decryptedKeys[0];
+            }
+            this.participantKeys[keys[i].userid][keyidStr] = decryptedKeys[0];
         }
     };
 }());

@@ -447,6 +447,14 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.OLDMSG:
+                self.keepAliveTimerRestart();
+                newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
+                len = self.chatd.unpack32le(cmd.substr(35,4));
+                self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(35,len));
+                len += 39;
+
+                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
+                break;
             case Chatd.Opcode.NEWMSG:
                 self.keepAliveTimerRestart();
                 newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
@@ -454,9 +462,8 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(35,len));
                 len += 39;
 
-                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), self.chatd.unpack32le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
+                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack16le(cmd.substr(29,2)), cmd.substr(39,len));
                 break;
-
             case Chatd.Opcode.MSGUPD:
                 self.keepAliveTimerRestart();
                 len = self.chatd.unpack32le(cmd.substr(29,4));
@@ -576,7 +583,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         });
                     index += (keylen + 14);
                 }
-                    
+                self.chatd.keystore(base64urlencode(cmd.substr(1,8)), keys);
                 self.chatd.trigger('onMessageKeysDone',
                     {
                         chatId: base64urlencode(cmd.substr(1,8)),
@@ -723,6 +730,9 @@ Chatd.Messages = function(chatd, chatId) {
 
     // msgnums of modified messages
     this.modified = {};
+
+    // msgnums of modified messages
+    this.storedkey = null;
 };
 
 Chatd.Messages.prototype.submit = function(messages, keyId) {
@@ -894,11 +904,15 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
 
 Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, updated, keyid, msg) {
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg);
+        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg, this.storedkey);
     }
 };
 
-Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg) {
+Chatd.prototype.keystore = function(chatId, keys) {
+    this.storedkey = keys[keys.length - 1];
+};
+
+Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg, key) {
     var id;
 
     if (newmsg) {
@@ -919,6 +933,7 @@ console.log('key id:'+ keyid);
         ts: timestamp,
         updated: updated,
         keyid : keyid,
+        key : key,
         message: msg,
         isNew: newmsg
     });

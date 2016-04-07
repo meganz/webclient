@@ -730,7 +730,9 @@ console.log('batchDecrypt');
                             msgObject.message,
                             msgObject.userId,
                             msgObject.keyid,
-                            false
+                            false,
+                            true,
+                            msgObject.key
                         );
 
                         if (decrypted && decrypted.payload) {

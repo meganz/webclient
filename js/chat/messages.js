@@ -13,6 +13,8 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'messageId': true,
 
             'keyid': true,
+            'key': true,
+            'isNew': true,
 
             'message': true,
             'textContents': false,
@@ -358,6 +360,7 @@ console.log('onMessagesHistoryDone.messagesBuff');
                     'messageId': eventData.messageId,
                     'userId': eventData.userId,
                     'keyid': eventData.keyid,
+                    'key': eventData.key,
                     'message': eventData.message,
                     'delay': eventData.ts,
                     'orderValue': eventData.id
@@ -499,7 +502,7 @@ console.log('onMessagesHistoryDone.messagesBuff');
             console.log(eventData.keys[i].userid + " ");
         }
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        console.log(chatRoom);
+        
         chatRoom.protocolHandler.seedKeys(eventData.keys);
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();

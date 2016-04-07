@@ -3176,8 +3176,9 @@
     "8642": "Manjkajo\u010di\/nevidni podatki",
     "8643": "Uporabljate za\u010dasno sejo",
     "8644": "Uporabljate za\u010dasno sejo. Podatki, ki jih shranjujete, bodo izgubljeni, ko se seja zaklju\u010di. Za za\u0161\u010dito svojih podatkov, si prosim priskrbite pravi ra\u010dun v najkraj\u0161em mo\u017enem \u010dasu in pridobite svojih [S]brezpla\u010dnih 50 GB varnega shranjevalnega prostora v oblaku![\/S]",
-    "8645": "Image size exceeded",
-    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8645": "Prevelika velikost slike",
+    "8646": "Va\u0161a slika je presegla najvi\u0161jo dovoljeno velikost 64 KB. Prosim, poskusite ponovno z manj\u0161o datoteko.",
+    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3222,6 +3223,7 @@
         "using-ephemeral-session": 8643,
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
-        "image-size-exceeded-body": 8646
+        "image-size-exceeded-body": 8646,
+        "support-too-short": 8650
     }
 }

@@ -3176,8 +3176,9 @@
     "8642": "Nawawala \/ Di-makitang Data",
     "8643": "Ikaw ay gumagamit ng ephemeral session.",
     "8644": "Ikaw ay kasalukuyang gumagamit ng panandaliang sesyon. Mawawala ang data na nakalagay kapag nag-expire ito. Para mapanatili ang files, gumamit na ng totoong account sa lalong madaling panahon at kunin ang [S]libreng 50 GB ng secure storage space sa cloud![\/S]",
-    "8645": "Image size exceeded",
-    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8645": "Masyadong malaki ang imahe",
+    "8646": "Lumagpas sa pinakamataas na file na 64 KB ang imahe mo. Subukang mag-upload na may mas maliit na file size.",
+    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3222,6 +3223,7 @@
         "using-ephemeral-session": 8643,
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
-        "image-size-exceeded-body": 8646
+        "image-size-exceeded-body": 8646,
+        "support-too-short": 8650
     }
 }

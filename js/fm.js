@@ -10525,7 +10525,7 @@ function fm_resize_handler() {
 /*
  * fullUsername
  *
- * @param {String} userHandle
+ * @param {String|Object} userHandle
  * @returns {String} result An first and last user name or email
  */
 mega.utils.fullUsername = function username(userHandle) {
@@ -10538,6 +10538,9 @@ mega.utils.fullUsername = function username(userHandle) {
 
         // Convert to string and escape for XSS
         result = String(result);
+    }
+    else if (typeof userHandle === 'object' && (userHandle.u || userHandle.h) && userHandle.m) {
+        result = userHandle.name && $.trim(userHandle.name) || userHandle.m;
     }
 
     return result;

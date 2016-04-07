@@ -80,6 +80,10 @@ var Avatar = React.createClass({
         var self = this;
         var contact = this.props.contact;
 
+        if (!contact.m && contact.email) {
+            contact.m = contact.email;
+        }
+
         var $avatar = $(useravatar.contact(contact));
 
         var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;

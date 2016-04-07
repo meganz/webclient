@@ -2895,7 +2895,7 @@ function fmtopUI() {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc' || String(M.currentdirid).length === 11 ) {
             $('.fm-add-user').removeClass('hidden');
             $('.fm-left-panel').addClass('contacts-panel');
             if (M.currentdirid === 'ipc') {
@@ -4464,9 +4464,12 @@ function avatarDialog(close)
         {
             cropButton: $('#fm-change-avatar'),
             dragDropUploadPrompt:l[1390],
-            outputFormat: 'image/png',
+            outputFormat: 'image/jpeg',
             onCrop: function(croppedDataURI)
             {
+                if (croppedDataURI.length > 64 * 1024) {
+                    return msgDialog('warninga', l[8645], l[8646]);
+                }
                 var data = dataURLToAB(croppedDataURI);
                 mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
                 var blob = new Blob([data], {type: 'image/png'});
@@ -6822,7 +6825,7 @@ function sectionUIopen(id) {
         $('.fm-blocks-view.fm').addClass('hidden');
     }
 
-    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc' && String(M.currentdirid).length !== 11) {
         $('.fm-left-panel').removeClass('contacts-panel');
         $('.fm-right-header').removeClass('requests-panel');
         $('.fm-received-requests').removeClass('active');

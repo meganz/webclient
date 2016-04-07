@@ -10,6 +10,8 @@
   },
   "scripts": {
     "test": "make test",
+    "jscpd": "jscpd --verbose -g javascript,jsx -e **/vendor/** -p ./js --skip-comments -o jscpd-report.xml",
+    "plato": "plato -n -d coverage/plato-report -l .jshintrc -x \"(vendor|bundle|downloadFirefox|fileapi|e10s|strg)\" -r js html \"*.js\"",
     "api-doc": "make api-doc"
   },
   "homepage": "https://mega.nz/",
@@ -57,6 +59,7 @@
     "eslint-loader": "^1.1.1",
     "htmlhint": "^0.9.12",
     "istanbul": "^0.4.2",
+    "jscpd": "^0.6.1",
     "jscs": "^2.10.1",
     "jscs-jsdoc": "^1.2.0",
     "jsdoc": "~3.3.0",
@@ -77,6 +80,7 @@
     "karma-sinon": "~1.0.4",
     "mocha": "~1.17.1",
     "phantomjs-prebuilt": "^2.1.7",
+    "plato": "^1.5.0",
     "sinon": "~1.13.0",
     "webpack-dev-server": "^1.14.0"
   }

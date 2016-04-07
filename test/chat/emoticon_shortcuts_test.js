@@ -24,12 +24,6 @@ describe("chat.emoticon_shortcuts unit test", function() {
             var errorMsg = "Expected: " + expected + "\nGot: " + got + "\nError message: " + msg;
             assert.fail(expected, got, errorMsg);
         }
-        // else {
-        //     console.log(
-        //         "Success: ",
-        //         expected
-        //     );
-        // }
     };
 
     it("testing util funcs of shortcuts to emoticons", function() {
@@ -98,10 +92,6 @@ describe("chat.emoticon_shortcuts unit test", function() {
             };
 
             fakeChat.trigger('onBeforeRenderMessage', msgObj);
-
-            // console.error(
-            //     entry[0] + " => " + msgObj.message.messageHtml
-            // );
 
             expected(
                 entry[1],

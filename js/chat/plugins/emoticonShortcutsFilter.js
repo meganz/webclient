@@ -42,19 +42,19 @@ var EmoticonShortcutsFilter = function(megaChat) {
     return this;
 };
 
-EmoticonShortcutsFilter._strStartsWithNSpaces = function(s) {
-    for (var i = 0; i < s.length; i++) {
-        if (s[i] !== " " && s[i] !== "\t" && s[i] !== "\n" && s[i] !== "\r") {
+EmoticonShortcutsFilter._strStartsWithNSpaces = function(string) {
+    for (var i = 0; i < string.length; i++) {
+        if (string[i] !== " " && string[i] !== "\t" && string[i] !== "\n" && string[i] !== "\r") {
             return i;
         }
     }
-    return s.length;
+    return string.length;
 };
 
-EmoticonShortcutsFilter._strEndsWithNSpaces = function(s) {
-    for (var i = s.length - 1; i >= 0; i--) {
-        if (s[i] !== " " && s[i] !== "\t" && s[i] !== "\n" && s[i] !== "\r") {
-            return s.length - i - 1;
+EmoticonShortcutsFilter._strEndsWithNSpaces = function(string) {
+    for (var i = string.length - 1; i >= 0; i--) {
+        if (string[i] !== " " && string[i] !== "\t" && string[i] !== "\n" && string[i] !== "\r") {
+            return string.length - i - 1;
         }
     }
     return 0;
@@ -85,7 +85,6 @@ EmoticonShortcutsFilter.prototype.processMessage = function(e, eventData) {
     }
 
     messageContents = messageContents.replace(self.emoticonsRegExp, function(match) {
-        // console.error("Found match: ", match, "for str: ", messageContents);
         var foundSlug = $.trim(match.toLowerCase());
         var startingSpaces = EmoticonShortcutsFilter._strStartsWithNSpaces(match);
         var prefix = "";
@@ -104,7 +103,7 @@ EmoticonShortcutsFilter.prototype.processMessage = function(e, eventData) {
 
         return self.shortcuts[foundSlug] ?
             prefix + self.shortcuts[foundSlug] + suffix :
-            "not found: "  + match;
+            match;
     });
 
     eventData.message.messageHtml = messageContents;

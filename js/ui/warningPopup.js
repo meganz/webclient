@@ -120,18 +120,22 @@ var warnPopup = {
         var planMonthsPluralisation = (planMonths > 1) ? l[6788] : l[913];
         
         var gatewayId = warnPopup.userLastPaymentInfo.gw;
-        var gatewayName = 'gateway';
+        var gatewayData = warnPopup.userLastPaymentInfo.gwd;
+        var gatewayName = warnPopup.userLastPaymentInfo.gwname;
+            gatewayName = warnPopup.normaliseGatewayName(gatewayName, gatewayData);
+        
         
         // Complete the first dialog message
         var firstMessage = $dialog.find('.first-message').html();
-            firstMessage = firstMessage.replace('[S]', '<span>').replace('[/S]', '</span>');
+            firstMessage = firstMessage.replace('[S1]', '<span class="renew-text">').replace('[/S1]', '</span>');
+            firstMessage = firstMessage.replace('[S2]', '<span class="gateway-icon">').replace('[/S2]', '</span>');
+            firstMessage = firstMessage.replace('[S3]', '<span class="gateway-name">' + gatewayName).replace('[/S3]', '</span>');
             firstMessage = firstMessage.replace('%1', proPlanName);
             firstMessage = firstMessage.replace('%2', planMonths + ' ' + planMonthsPluralisation);
-            firstMessage = firstMessage.replace('%3', '<span class="icon"></span>' + gatewayName);
             
         // Add some styling for the second message
         var secondMessage = $dialog.find('.second-message').html();
-            secondMessage = secondMessage.replace('[S]', '<span>').replace('[/S]', '</span>');
+            secondMessage = secondMessage.replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
         
         $dialog.find('.warning-header').text(headerText);
         $dialog.find('.purchased-date').text(purchasedDate);
@@ -141,6 +145,34 @@ var warnPopup = {
         
         
         console.log('zzzz', warnPopup.userLastPaymentInfo);
+    },
+    
+    /**
+     * Return a translated string for the Gateway Name / Payment Provider Name. If an AstroPay 
+     * gateway it will return the relevant sub gateway e.g. Visa, MasterCard, Bradesco etc.
+     * @param {String} gatewayName The name on the API
+     * @param {Object} gatewayData Any additional data from the API about the gateway
+     * @returns {String} Returns the name of the gateway for display
+     */
+    normaliseGatewayName: function(gatewayName, gatewayData) {
+        
+        // If AstroPay then the API has an exact name for that gatway
+        if (gatewayName === 'Astropay') {
+            return gatewayData.gwname;
+        }
+        else if (gatewayName === 'voucher') {
+            return l[487] + ' / ' + l[7108];    // Voucher code / Balance
+        }
+        else if (gatewayName === 'wiretransfer') {
+            return l[6198];                     // Wire transfer
+        }
+        else if (gatewayName === 'wiretransfer') {
+            return l[6198];                     // Wire transfer
+        }
+        else {
+            // As a default, return name of the gateway from the API
+            return gatewayName;
+        }
     },
     
     /**

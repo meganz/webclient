@@ -4943,6 +4943,56 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-position: center 1px;
     background-repeat: no-repeat;
 }
+
+/* PRO plan expired dialog */
+.astropay-payment-reminder .warning-popup-body {
+    display: table;
+}
+.astropay-payment-reminder .left-block {
+    display: table-cell;
+    width: 48px;
+}
+.astropay-payment-reminder .mega-payment-icon {
+    background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll -151px -650px;
+    height: 48px;
+    left: 26px;
+    top: 0;
+    width: 48px;
+}
+.astropay-payment-reminder .right-block {
+    display: table-cell;
+    padding-left: 20px;
+    vertical-align: top;
+    width: 100%;
+}
+.astropay-payment-reminder .warning-header {
+    font-family: "source_sans_prolight";
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.astropay-payment-reminder .right-block .last-payment-info {
+    font-family: 'source_sans_prosemibold', Arial;
+    font-size: 13px;
+}
+.astropay-payment-reminder .purchased-label, .astropay-payment-reminder .expired-label {
+    color: #ff3333;
+}
+.astropay-payment-reminder .expired-label {
+    padding-left: 20px;
+}
+.astropay-payment-reminder .renew-text, .astropay-payment-reminder .choose-text {
+    font-family: 'source_sans_probold', Arial;
+}
+.astropay-payment-reminder .purchased-date, .astropay-payment-reminder .expired-date {
+    padding-left: 5px;
+}
+.astropay-payment-reminder .gateway-name {
+    font-family: 'source_sans_probold', Arial;
+}
+.astropay-payment-reminder .first-message, .astropay-payment-reminder .second-message {
+    margin-top: 20px;
+}
+
 .top-search-bl {
     float: right;
     height: 24px;

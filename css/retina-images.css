@@ -6,7 +6,7 @@
 body.pro:after {
     content: url(../images/mega/payment-animation@2x.gif);
 }
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar, .nt-takedown-reinstated-notification .notification-avatar, .nt-payment-notification .notification-avatar, .nt-payment-reminder-notification .notification-avatar {
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar, .nt-takedown-reinstated-notification .notification-avatar, .nt-payment-notification .notification-avatar, .nt-payment-reminder-notification .notification-avatar, .astropay-payment-reminder .left-block .mega-payment-icon {
     background-image: url(../images/mega/bitcoin-v7@2x.png);
     background-size: 200px auto;
 }

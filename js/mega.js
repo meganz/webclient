@@ -2299,10 +2299,7 @@ function MegaData()
                             fIcon = 'generic';
 
                             var exportLink = new mega.Share.ExportLink({});
-                            if (exportLink.isTakenDown(curItemHandle)) {
-                                titleTooltip = l[7705] + '\n';
-                            }
-                            
+                            titleTooltip = exportLink.isTakenDown(curItemHandle) ? (l[7705] + '\n') : '';
                             titleTooltip += l[8595];
                         }
 

@@ -9484,6 +9484,7 @@ function browserDialog(close) {
     $('.browsers-info-header').text(bh);
     $('.browsers-info-header p').text(bt);
 }
+
 browserDialog.isWeak = function() {
     var result = {};
     var ua = String(navigator.userAgent);
@@ -9497,14 +9498,17 @@ browserDialog.isWeak = function() {
     result.weak = result.edge || result.ie11 || result.ie10 || result.safari;
 
     return result.weak && result;
-}
+};
 
+/* jshint -W074 */
 function propertiesDialog(close) {
+
     var pd = $('.fm-dialog.properties-dialog');
     var c = $('.properties-elements-counter span');
 
     $(document).unbind('MegaNodeRename.Properties');
     $(document).unbind('MegaCloseDialog.Properties');
+
     if (close) {
         $.dialog = false;
         delete $.propertiesDialog;
@@ -9516,6 +9520,7 @@ function propertiesDialog(close) {
 
         return true;
     }
+
     $.propertiesDialog = $.dialog = 'properties';
     fm_showoverlay();
 
@@ -9560,26 +9565,28 @@ function propertiesDialog(close) {
     var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
 
     for (var i in $.selected) {
-        n = M.d[$.selected[i]];
-        if (!n) {
-            console.error('propertiesDialog: invalid node', $.selected[i]);
-        }
-        else if (n.t) {
-            var nodes = fm_getnodes(n.h);
-            for (var i in nodes) {
-                if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
-                    size += M.d[nodes[i]].s;
-                    sfilecnt++;
-                }
-                else {
-                    sfoldercnt++;
-                }
+        if ($.selected.hasOwnProperty(i)) {
+            n = M.d[$.selected[i]];
+            if (!n) {
+                console.error('propertiesDialog: invalid node', $.selected[i]);
             }
-            foldercnt++;
-        }
-        else {
-            filecnt++
-            size += n.s;
+            else if (n.t) {
+                var nodes = fm_getnodes(n.h);
+                for (i in nodes) {
+                    if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
+                        size += M.d[nodes[i]].s;
+                        sfilecnt++;
+                    }
+                    else {
+                        sfoldercnt++;
+                    }
+                }
+                foldercnt++;
+            }
+            else {
+                filecnt++;
+                size += n.s;
+            }
         }
     }
     if (!n) {
@@ -9587,45 +9594,48 @@ function propertiesDialog(close) {
         return propertiesDialog(1);
     }
 
-    var star = ''
+    var star = '';
     if (n.fav)
         star = ' star';
     pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star)
 
-    if (fileIcon(n).indexOf('shared') > -1)
+    if (fileIcon(n).indexOf('shared') > -1) {
         pd.addClass('shared');
-    if (typeof n.r == "number")
-    {
-        var cs = M.contactstatus(n.h)
+    }
+
+    if (typeof n.r === "number") {
+        var cs = M.contactstatus(n.h);
         var zclass = "read-only";
-        if (n.r == 1) {
-            zclass = "read-and-write"
-        } else if (n.r == 2) {
-            zclass = "full-access"
+
+        if (n.r === 1) {
+            zclass = "read-and-write";
         }
-        pd.addClass('shared shared-with-me ' + zclass)
+        else if (n.r === 2) {
+            zclass = "full-access";
+        }
+        pd.addClass('shared shared-with-me ' + zclass);
     }
 
     var p = {}, user = Object(M.d[n.su || n.p]);
-    if (d) console.log('propertiesDialog', n, user);
-    if ((filecnt + foldercnt) == 1)
-    {
+
+    if (d) {
+        console.log('propertiesDialog', n, user);
+    }
+
+    if ((filecnt + foldercnt) === 1) {
         p.t6 = '';
         p.t7 = '';
 
-        if (filecnt)
-        {
+        if (filecnt) {
             p.t3 = l[87] + ':';
             p.t5 = ' second';
 
-            if (n.mtime)
-            {
+            if (n.mtime) {
                 p.t6 = l[94] + ':';
                 p.t7 = htmlentities(time2date(n.mtime));
             }
         }
-        else
-        {
+        else {
             p.t3 = l[894] + ':';
             p.t5 = '';
         }
@@ -9646,13 +9656,14 @@ function propertiesDialog(close) {
         else if (missingkeys[n.h]) {
             p.t2 = htmlentities(l[8649]);
         }
+
         p.t4 = bytesToSize(size);
         p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
         p.t8 = p.t9 ? (l[896] + ':') : '';
         p.t10 = '';
         p.t11 = '';
-        if (foldercnt)
-        {
+
+        if (foldercnt) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
@@ -9816,6 +9827,7 @@ function propertiesDialog(close) {
         }
     }
 }
+/* jshint +W074 */
 
 function paypalDialog(url, close)
 {

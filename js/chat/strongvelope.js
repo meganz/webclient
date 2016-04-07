@@ -1215,7 +1215,7 @@ var strongvelope = {};
         var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
         var encryptedKeys = false;
         if ((this._sentKeyId !== this.keyId) || (this.participantChange === true)) {
-            console.log(' _encryptSenderKey')
+            console.log(' _encryptSenderKey');
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
 
@@ -1683,7 +1683,9 @@ var strongvelope = {};
             if (!this.participantKeys[sender]) {
                 this.participantKeys[sender] = {};
             }
-            this.participantKeys[sender][keyidStr] = decryptedKeys[0];
+            if (!this.participantKeys[sender][keyidStr]) {
+                this.participantKeys[sender][keyidStr] = decryptedKeys[0];
+            }
         }
         var parsedMessage = ns._parseMessageContent(message);
         // Bail out on parse error.
@@ -1978,6 +1980,7 @@ var strongvelope = {};
         var result = '';
         var self = this;
         for (var item in this.participantSenderKeys) {
+            console.log('key blob for :' + item);
             var key = self.participantSenderKeys[item];
             var len = self.pack16le(key.length);
 
@@ -1989,6 +1992,83 @@ var strongvelope = {};
         {
             codestr += ("000000000" + result[i].charCodeAt(0).toString(2)).substr(-8) + " ";
         }
+        return result;
+        var self = this;
+        var needOwnKeyEncryption = false;
+
+        if (self.otherParticipants.size === 0) {
+            return false;
+        }
+
+        // Update participants set.
+        var trackedParticipants = this._trackParticipants(this.otherParticipants,
+            this.includeParticipants, this.excludeParticipants);
+
+        if (trackedParticipants === false) {
+            // Sanity check, if the other participants had an inconsistency
+            return false;
+        }
+
+        var recipients = '';
+        var keys = '';
+        var keyIds = '';
+
+        var senderKey = self.participantKeys[self.ownHandle][self.keyId];
+
+
+        // Assemble the output for all recipients.
+        var keysIncluded = [];
+        var encryptedKeys = '';
+        var isNewMember = false;
+        var keyEncryptionError = false;
+        trackedParticipants.forEach(function _memberIterator(destination) {
+            isNewMember = self.includeParticipants.has(destination);
+
+            recipients += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
+                                               base64urldecode(destination));
+            keysIncluded = [senderKey];
+            /**
+             * TOGO
+             */
+            /*if (self.previousKeyId
+                    && (self._sentKeyId !== self.keyId)
+                    && !isNewMember) {
+                // Also add previous key on key rotation for existing members.
+                keysIncluded.push(self.participantKeys[self.ownHandle][self.previousKeyId]);
+            }*/
+            encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, destination);
+            if (encryptedKeys === false) {
+                // Something went wrong, and we can't encrypt to that destination.
+                keyEncryptionError = true;
+            }
+            if (encryptedKeys.length > _RSA_ENCRYPTION_THRESHOLD) {
+                needOwnKeyEncryption = true;
+            }
+            keys += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
+                                         encryptedKeys);
+        });
+        if (keyEncryptionError === true) {
+            return false;
+        }
+
+        var result = { recipients: recipients, keys: keys, keyIds: keyIds };
+
+        // Add sender key encrypted to self if required.
+        if (needOwnKeyEncryption) {
+            keysIncluded = [senderKey];
+            if (self.previousKeyId) {
+                keysIncluded.push(self.participantKeys[self.ownHandle][self.previousKeyId]);
+            }
+            encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, this.ownHandle);
+            result.ownKey = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.OWN_KEY),
+                                                 encryptedKeys);
+        }
+
+        // Reset include/exclude lists before leaving.
+        self.includeParticipants.clear();
+        self.excludeParticipants.clear();
+
+        return result;
         return result;
     };
 

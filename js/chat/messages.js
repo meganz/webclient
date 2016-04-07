@@ -502,7 +502,7 @@ console.log('onMessagesHistoryDone.messagesBuff');
             console.log(eventData.keys[i].userid + " ");
         }
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        
+
         chatRoom.protocolHandler.seedKeys(eventData.keys);
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();

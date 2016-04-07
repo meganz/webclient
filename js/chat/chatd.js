@@ -76,7 +76,9 @@ Chatd.Opcode = {
     'REJECT' : 11,
     'HISTDONE' : 13,
     'NEWKEY' : 17,
-    'KEYID' : 18
+    'KEYID' : 18,
+    'JOINRANGEHIST' : 19,
+    'MSGUPDX' : 20
 };
 
 // privilege levels
@@ -447,14 +449,6 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.OLDMSG:
-                self.keepAliveTimerRestart();
-                newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
-                len = self.chatd.unpack32le(cmd.substr(35,4));
-                self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(35,len));
-                len += 39;
-
-                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
-                break;
             case Chatd.Opcode.NEWMSG:
                 self.keepAliveTimerRestart();
                 newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
@@ -462,7 +456,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(35,len));
                 len += 39;
 
-                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack16le(cmd.substr(29,2)), cmd.substr(39,len));
+                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
                 break;
             case Chatd.Opcode.MSGUPD:
                 self.keepAliveTimerRestart();
@@ -845,7 +839,7 @@ Chatd.Messages.prototype.range = function(chatId) {
             console.log(chatId);
             console.log(this.buf[low][Chatd.MsgField.MSGID]);
             console.log(this.buf[high][Chatd.MsgField.MSGID]);
-            //this.chatd.cmd(Chatd.Opcode.RANGE, chatId, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
+            this.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
             break;
         }
     }

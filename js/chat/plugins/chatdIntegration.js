@@ -840,6 +840,7 @@ ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
 
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
     var self = this;
+    console.log('received : ' + chatRoom.chatId + ' ' + msgid);
     self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
 };
 

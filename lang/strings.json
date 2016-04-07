@@ -12715,6 +12715,18 @@
         "text": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
         "context": "An error dialog message when a user tried to upload an avatar image which was too large."
     },
+    "8647": {
+        "text": "Failed to copy the MEGA link to your clipboard.",
+        "context": "Message of the dialog displayed when fails the process\/request to copy a MEGA link to the clipboard."
+    },
+    "8648": {
+        "text": "Error copying link",
+        "context": "Title of the dialog displayed when fails the process\/request to copy a MEGA link to the clipboard - (String as short as possible)."
+    },
+    "8649": {
+        "text": "Unknown until decryption",
+        "context": "This means that the name of the file or folder is unknown until it has been decrypted. This is shown instead of the file\/folder name in the Info dialog."
+    },
     "8650": {
         "text": "Your enquiry is too short. Please give us more details about your issue \/ query.",
         "context": "Error message when a given query is too short when emailing mega support via the \"Get Support\" option on the website. They are not allowed to send questions of only a few words."

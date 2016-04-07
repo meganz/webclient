@@ -3178,6 +3178,9 @@
     "8644": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
     "8645": "Image size exceeded",
     "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8647": "Failed to copy the MEGA link to your clipboard.",
+    "8648": "Error copying link",
+    "8649": "Unknown until decryption",
     "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
     "alias": {
         "shared-with-me": 5589,

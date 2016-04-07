@@ -3178,6 +3178,9 @@
     "8644": "Uporabljate za\u010dasno sejo. Podatki, ki jih shranjujete, bodo izgubljeni, ko se seja zaklju\u010di. Za za\u0161\u010dito svojih podatkov, si prosim priskrbite pravi ra\u010dun v najkraj\u0161em mo\u017enem \u010dasu in pridobite svojih [S]brezpla\u010dnih 50 GB varnega shranjevalnega prostora v oblaku![\/S]",
     "8645": "Prevelika velikost slike",
     "8646": "Va\u0161a slika je presegla najvi\u0161jo dovoljeno velikost 64 KB. Prosim, poskusite ponovno z manj\u0161o datoteko.",
+    "8647": "Failed to copy the MEGA link to your clipboard.",
+    "8648": "Error copying link",
+    "8649": "Unknown until decryption",
     "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
     "alias": {
         "shared-with-me": 5589,

@@ -12714,5 +12714,9 @@
     "8646": {
         "text": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
         "context": "An error dialog message when a user tried to upload an avatar image which was too large."
+    },
+    "8650": {
+        "text": "Your enquiry is too short. Please give us more details about your issue \/ query.",
+        "context": "Error message when a given query is too short when emailing mega support via the \"Get Support\" option on the website. They are not allowed to send questions of only a few words."
     }
 }

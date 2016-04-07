@@ -37,7 +37,8 @@
             sounds: sounds,
             volume: self.options.soundsVolume,
             path: self.options.soundsPath,
-            preload: self.options.soundsPreload
+            preload: self.options.soundsPreload,
+            allow_cache: false
         });
 
         if (self.options.showFaviconCounter) {

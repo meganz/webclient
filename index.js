@@ -753,7 +753,7 @@ function init_page() {
                 if (dl) {
                     dl.onDownloadProgress = dlprogress;
                     dl.onDownloadComplete = dlcomplete;
-                    dl.onDownloadError = dlerror;
+                    dl.onDownloadError = M.dlerror;
                     $tr.remove();
                 }
             }

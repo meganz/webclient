@@ -577,7 +577,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         });
                     index += (keylen + 14);
                 }
-                self.chatd.keystore(base64urlencode(cmd.substr(1,8)), keys);
+
                 self.chatd.trigger('onMessageKeysDone',
                     {
                         chatId: base64urlencode(cmd.substr(1,8)),
@@ -724,9 +724,6 @@ Chatd.Messages = function(chatd, chatId) {
 
     // msgnums of modified messages
     this.modified = {};
-
-    // msgnums of modified messages
-    this.storedkey = null;
 };
 
 Chatd.Messages.prototype.submit = function(messages, keyId) {
@@ -900,10 +897,6 @@ Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, up
     if (this.chatIdMessages[chatId]) {
         this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg, this.storedkey);
     }
-};
-
-Chatd.prototype.keystore = function(chatId, keys) {
-    this.storedkey = keys[keys.length - 1];
 };
 
 Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg, key) {

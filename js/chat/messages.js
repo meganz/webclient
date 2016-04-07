@@ -13,8 +13,6 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'messageId': true,
 
             'keyid': true,
-            'key': true,
-            'isNew': true,
 
             'message': true,
             'textContents': false,
@@ -353,14 +351,13 @@ console.log('onMessagesHistoryDone.messagesBuff');
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.haveMessages = true;
-            console.log('store key id:' + eventData.keyid);
+
             var msgObject = new Message(chatRoom,
                 self,
                 {
                     'messageId': eventData.messageId,
                     'userId': eventData.userId,
                     'keyid': eventData.keyid,
-                    'key': eventData.key,
                     'message': eventData.message,
                     'delay': eventData.ts,
                     'orderValue': eventData.id

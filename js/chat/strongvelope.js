@@ -41,6 +41,10 @@ var strongvelope = {};
     var _RSA_ENCRYPTION_THRESHOLD = 128;
 
     /** Version of the protocol implemented. */
+    strongvelope.PROTOCOL_VERSION_V1 = 0x01;
+    var PROTOCOL_VERSION_V1 = strongvelope.PROTOCOL_VERSION_V1;
+
+    /** Version of the protocol implemented. */
     strongvelope.PROTOCOL_VERSION = 0x02;
     var PROTOCOL_VERSION = strongvelope.PROTOCOL_VERSION;
 
@@ -889,7 +893,84 @@ var strongvelope = {};
         this._totalMessagesWithoutSendKey = 0;
     };
 
+    /**
+     * Derives a symmetric key for encrypting a message to a contact.  It is
+     * derived using a Curve25519 key agreement.
+     *
+     * Note: The Curve25519 key cache must already contain the public key of
+     *       the recipient.
+     *
+     * @method
+     * @param userhandle {String}
+     *     Mega user handle for user to send to or receive from.
+     * @return {String}
+     *     Binary string containing a 256 bit symmetric encryption key.
+     * @private
+     */
+    strongvelope.ProtocolHandler.prototype._computeSymmetricKey = function(userhandle) {
 
+        var pubKey = pubCu25519[userhandle];
+        if (!pubKey) {
+            logger.critical('No cached chat key for user!');
+            logger.error('No cached chat key for user: ' + userhandle);
+            throw new Error('No cached chat key for user!');
+        }
+        var sharedSecret = nacl.scalarMult(
+            asmCrypto.string_to_bytes(this.myPrivCu25519),
+            asmCrypto.string_to_bytes(pubKey));
+
+        return strongvelope.deriveSharedKey(sharedSecret);
+    };
+
+
+    /**
+     * Encrypts symmetric encryption keys for a particular recipient.
+     *
+     * Note: This function requires the Cu25519 public key for the destination
+     *       to be loaded already.
+     *
+     * @method
+     * @param {Array.<String>} keys
+     *     Keys to encrypt.
+     * @param {String} destination
+     *     User handle of the recipient.
+     * @returns {String}
+     *     Encrypted sender keys.
+     */
+    strongvelope.ProtocolHandler.prototype._encryptKeysTo = function(keys, destination) {
+
+        assert(keys.length > 0, 'No keys to encrypt.');
+
+        var clearText = '';
+        for (var i = 0; i < keys.length; i++) {
+            clearText += keys[i];
+        }
+
+        // Use RSA encryption if no chat key is available.
+        if (!pubCu25519[destination]) {
+            var pubKey = u_pubkeys[destination];
+            if (!pubKey) {
+                logger.warn('No public encryption key (RSA or x25519) available for '
+                            + destination);
+
+                return false;
+            }
+            logger.info('Encrypting sender keys for ' + destination + ' using RSA.');
+
+            return crypt.rsaEncryptString(clearText, pubKey);
+        }
+
+        // Encrypt chat keys.
+        var clearBytes = asmCrypto.string_to_bytes(clearText);
+        var keyBytes = asmCrypto.string_to_bytes(
+            this._computeSymmetricKey(destination).substring(0, KEY_SIZE));
+        var cipherBytes = asmCrypto.AES_ECB.encrypt(clearBytes, keyBytes,
+                                                    false);
+
+        var result = asmCrypto.bytes_to_string(cipherBytes);
+        this.participantSenderKeys[destination] = nonce+result;
+        return result;
+    };
     /**
      * Derives a symmetric key for encrypting a message to a contact.  It is
      * derived using a Curve25519 key agreement.
@@ -1030,6 +1111,55 @@ var strongvelope = {};
         return result;
     };
 
+    /**
+     * Decrypts symmetric encryption keys for a particular sender.
+     *
+     * Note: This function requires the Cu25519 public key for the destination
+     *       to be loaded already.
+     *
+     * @method
+     * @param {String} encryptedKeys
+     *     Encrypted Key(s).
+     * @param {String} otherParty
+     *     User handle of the other party.
+     * @param {Boolean} [iAmSender]
+     *     If true, the message was sent by us (default: false).
+     * @returns {Array.<String>}
+     *     All symmetric keys in an array.
+     */
+    strongvelope.ProtocolHandler.prototype._decryptKeysFrom = function(
+            encryptedKeys, otherParty, iAmSender) {
+
+        var clear = '';
+
+        // Check if sender key is encrypted using RSA.
+        if (encryptedKeys.length < _RSA_ENCRYPTION_THRESHOLD) {
+            // Using normal chat keys.
+            var receiver = iAmSender ? otherParty : this.ownHandle;
+            var cipherBytes = asmCrypto.string_to_bytes(encryptedKeys);
+            var keyBytes = asmCrypto.string_to_bytes(
+                this._computeSymmetricKey(otherParty).substring(0, KEY_SIZE));
+            var clearBytes = asmCrypto.AES_ECB.decrypt(cipherBytes, keyBytes,
+                                                       false);
+            clear = asmCrypto.bytes_to_string(clearBytes);
+        }
+        else {
+            logger.info('Got RSA encrypted sender keys.');
+
+            clear = crypt.rsaDecryptString(encryptedKeys, u_privk);
+        }
+
+        assert(clear.length % KEY_SIZE === 0,
+               'Length mismatch for decoding sender keys.');
+
+        var result = [];
+        while (clear.length > 0) {
+            result.push(clear.substring(0, KEY_SIZE));
+            clear = clear.substring(KEY_SIZE);
+        }
+
+        return result;
+    };
 
     /**
      * An object containing the encrypted and TLV encoded recipient key IDs and
@@ -1651,12 +1781,11 @@ var strongvelope = {};
      *     The message content on success, `false` in case of errors.
      */
     strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
-            sender, keyid, historicMessage, isNew, key) { // jshint maxcomplexity: 11
-        isNew = (typeof isNew === 'undefine') ? false : isNew;
+            sender, keyid, historicMessage) { // jshint maxcomplexity: 11
 
         console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
         var protocolVersion = message.charCodeAt(0);
-        if (protocolVersion < PROTOCOL_VERSION) {
+        if (protocolVersion <= PROTOCOL_VERSION_V1) {
             return this.legacyDecryptFrom(message, sender, historicMessage);
         }
         // if the message is from chat API
@@ -1672,21 +1801,7 @@ var strongvelope = {};
 
             return false;
         }
-        var keyidStr = a32_to_str([keyid]);
-        if (isNew === true) {
-            var isOwnMessage = (sender === this.ownHandle);
-            console.log('cache key from:' + sender + 'with key id ' + keyid);
-            var decryptedKeys = this._decryptKeysFor(key.key,
-                                        key.nonce,
-                                        sender,
-                                        isOwnMessage);
-            if (!this.participantKeys[sender]) {
-                this.participantKeys[sender] = {};
-            }
-            if (!this.participantKeys[sender][keyidStr]) {
-                this.participantKeys[sender][keyidStr] = decryptedKeys[0];
-            }
-        }
+
         var parsedMessage = ns._parseMessageContent(message);
         // Bail out on parse error.
         if (parsedMessage === false) {
@@ -1701,23 +1816,20 @@ var strongvelope = {};
             return false;
         }
         var senderKey = null;
-        logger.critical(parsedMessage);
+        var keyidStr = a32_to_str([keyid]);
 
         if (parsedMessage) {
             if (ns._verifyMessage(parsedMessage.signedContent,
                                   parsedMessage.signature,
                                   pubEd25519[sender])) {
-                                    // Get sender key.
-                                    logger.critical('Signature valid');
-                                    senderKey = this.participantKeys[sender][keyidStr];
-                                    
+                    senderKey = this.participantKeys[sender][keyidStr];
                 }
                 else {
-                logger.critical('Signature invalid for message from *** on ***');
-                logger.error('Signature invalid for message from '
-                             + sender);
+                    logger.critical('Signature invalid for message from *** on ***');
+                    logger.error('Signature invalid for message from '
+                                 + sender);
 
-                return false;
+                    return false;
             }
         }
 
@@ -1743,15 +1855,6 @@ var strongvelope = {};
             includeParticipants: [],
             excludeParticipants: []
         };
-
-        // Update counter based on payload messages from other users or devices.
-        var keyIdFromMessage = parsedMessage.keyIds[0];
-        var prefixFromMessage = str_to_a32(keyIdFromMessage)[0];
-        var a32words = str_to_a32(this.uniqueDeviceId);
-        var myPrefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
-        if ((cleartext !== null) && !historicMessage && (result.sender !== this.ownHandle) && (myPrefix !== prefixFromMessage)) {
-            this._totalMessagesWithoutSendKey++;
-        }
 
         return result;
     };

@@ -3176,6 +3176,12 @@
     "8642": "Dados desaparecidos\/invis\u00edveis",
     "8643": "You are using an ephemeral session.",
     "8644": "You are using a temporary session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB of secure storage space in the cloud![\/S]",
+    "8645": "Image size exceeded",
+    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8647": "Failed to copy the MEGA link to your clipboard.",
+    "8648": "Error copying link",
+    "8649": "Unknown until decryption",
+    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3218,6 +3224,9 @@
         "transfer-speed-issue": 8639,
         "megasync-issue": 8641,
         "using-ephemeral-session": 8643,
-        "ephemeral-session-message": 8644
+        "ephemeral-session-message": 8644,
+        "image-size-exceeded": 8645,
+        "image-size-exceeded-body": 8646,
+        "support-too-short": 8650
     }
 }

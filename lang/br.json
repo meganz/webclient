@@ -3176,6 +3176,12 @@
     "8642": "Dados perdidos ou n\u00e3o acess\u00edveis",
     "8643": "Voc\u00ea est\u00e1 utilizando uma sess\u00e3o tempor\u00e1ria.",
     "8644": "Voc\u00ea est\u00e1 utilizando uma sess\u00e3o tempor\u00e1ria. Os dados que est\u00e1 armazenando ser\u00e3o perdidos quando a sess\u00e3o expirar. Para manter seus arquivos ativos, por favor, crie uma conta o quanto antes e receba [S]50 GB de armazenamento seguro na nuvem![\/S]",
+    "8645": "Limite de tamanho de arquivo excedido.",
+    "8646": "Sua imagem excedeu o limite m\u00e1ximo de 64 KB. Por favor tente enviar um arquivo menor.",
+    "8647": "Falha na c\u00f3pia do link MEGA para a sua \u00e1rea de transfer\u00eancia.",
+    "8648": "Erro ao copiar o link",
+    "8649": "Unknown until decryption",
+    "8650": "Sua solicita\u00e7\u00e3o \u00e9 muito curta. Por favor, nos d\u00ea mais detalhes sobre sua d\u00favida.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3218,6 +3224,9 @@
         "transfer-speed-issue": 8639,
         "megasync-issue": 8641,
         "using-ephemeral-session": 8643,
-        "ephemeral-session-message": 8644
+        "ephemeral-session-message": 8644,
+        "image-size-exceeded": 8645,
+        "image-size-exceeded-body": 8646,
+        "support-too-short": 8650
     }
 }

@@ -122,6 +122,7 @@ module.exports = function(config) {
         'js/chat/rtcStats.js',
         'js/chat/rtcSession.js',
         'js/chat/plugins/urlFilter.js',
+        'js/chat/plugins/emoticonShortcutsFilter.js',
         'js/chat/plugins/emoticonsFilter.js',
         'js/chat/plugins/chatNotifications.js',
         'js/chat/plugins/callFeedback.js',

@@ -6967,7 +6967,12 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }
             i++;
         }
-        if ((ids[0] === 'contacts') && M.currentdirid && (String(M.currentdirid).length === 11) && (M.currentrootid == 'contacts')) {
+        if (
+            (ids[0] === 'contacts')
+            && M.currentdirid
+            && (String(M.currentdirid).length === 11)
+            && (M.currentrootid === 'contacts')
+            ) {
             sectionUIopen('contacts');
         } else if (ids[0] === 'contacts') {
             // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the

@@ -1140,9 +1140,12 @@ function MegaData()
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder ' + undecryptableClass + '" id="'
-                            + htmlentities(nodeHandle) + '" title="' + titleTooltip + '"><span class="file-status-icon '
+                            + htmlentities(nodeHandle) + '" title="'
+                            + titleTooltip + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
+                            + htmlentities(rightsclass)
+                            + '"></span><span class="file-settings-icon">' +
+                            '</span><span class="file-icon-area">'
                             + '<span class="block-view-file-type ' + fIcon + '"></span></span>'
                             + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
@@ -1154,7 +1157,9 @@ function MegaData()
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
-                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + undecryptableClass + '" title="' + titleTooltip + '">'
+                        html = '<tr id="' + htmlentities(nodeHandle)
+                            + '" class="' + undecryptableClass + '" title="'
+                            + titleTooltip + '">'
                             + '<td width="30"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div>'
                             + '<div class="shared-folder-info-block"><div class="shared-folder-name">'
@@ -1195,6 +1200,7 @@ function MegaData()
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.contact-details-view .file-block-scrolling';
                         el = 'a';
+                        /* jshint -W043 */
                         html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block folder">\n\
                                     <span class="file-status-icon"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
@@ -1204,10 +1210,12 @@ function MegaData()
                                     </span>\n\
                                     <span class="file-block-title">' + fName + '</span>\n\
                                 </a>';
+                        /* jshint +W043 */
                     }
                     else {
                         t = '.contacts-details-block .grid-table.shared-with-me';
                         el = 'tr';
+                        /* jshint -W043 */
                         html = '<tr id="' + htmlentities(nodeHandle) + '">\n\
                                     <td width="30">\n\
                                         <span class="grid-status-icon"></span>\n\
@@ -1226,6 +1234,7 @@ function MegaData()
                                         <a class="grid-url-arrow"></a>\n\
                                     </td>\n\
                                 </tr>';
+                        /* jshint +W043 */
                     }
                 }
                 else {
@@ -1254,15 +1263,21 @@ function MegaData()
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block ' + nodeType + ' ' + sExportLink + ' ' + additionClass + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
+                        /* jshint -W043 */
+                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block '
+                            + nodeType + ' ' + sExportLink + ' ' + additionClass + ' '
+                            + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="data-item-icon"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name }) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type '
+                            + fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name })
+                            + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + fName + '</span>\n\
                                 </a>';
+                        /* jshint +W043 */
                     }
 
                     // List view
@@ -1271,16 +1286,21 @@ function MegaData()
                             time = time2date(nodeData[M.lastColumn] || nodeData.ts);
                         }
                         else {
-                            time = time2date(nodeData.ts || (nodeData.p === 'contacts' && M.contactstatus(nodeHandle).ts));
+                            time = time2date(nodeData.ts
+                                || (nodeData.p === 'contacts' && M.contactstatus(nodeHandle).ts));
                         }
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="' + nodeType + ' ' + additionClass + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
+                        /* jshint -W043 */
+                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="'
+                            + nodeType + ' ' + additionClass + ' '
+                            + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                     <td width="50">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileIcon({t: nodeData.t, share: bShare, name: nodeData.name}) + '"> </span>\n\
+                                        <span class="transfer-filtype-icon '
+                            + fileIcon({t: nodeData.t, share: bShare, name: nodeData.name}) + '"> </span>\n\
                                         <span class="tranfer-filetype-txt">' + fName + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
@@ -1291,6 +1311,7 @@ function MegaData()
                                         <span class="data-item-icon"></span>\n\
                                     </td>\n\
                                 </tr>';
+                        /* jshint +W043 */
                     }
 
                     if (!(nodeData.seen = n_cache > files++)) {
@@ -2263,14 +2284,19 @@ function MegaData()
                         if (containsc) {
                             arrowIcon = 'class="nw-fm-arrow-icon"';
                         }
+                        /* jshint -W043 */
                         html = '<li id="' + _li + curItemHandle + '">\n\
-                                        <span  id="' + _a + htmlentities(curItemHandle) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + ' ' + undecryptableClass + '" title="' + titleTooltip + '">\n\
+                                        <span  id="' + _a + htmlentities(curItemHandle)
+                            + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' '
+                            + openedc + ' ' + sExportLink + ' ' + undecryptableClass
+                            + '" title="' + titleTooltip + '">\n\
                                             <span ' + arrowIcon + '></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + fName + '</span>\n\
                                             <span class="data-item-icon"></span>\n\
                                         </span>\n\
                                         <ul id="' + _sub + curItemHandle + '" ' + ulc + '></ul>\n\
                                     </li>';
+                        /* jshint +W043 */
 
                         if (folders[ii - 1] && $('#' + _li + folders[ii - 1].h).length > 0) {
                             $('#' + _li + folders[ii - 1].h).after(html);

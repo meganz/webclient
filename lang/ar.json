@@ -3176,6 +3176,18 @@
     "8642": "\u0645\u0641\u0642\u0648\u062f \/ \u0628\u064a\u0627\u0646\u0627\u062a \u0645\u062e\u0641\u064a\u0629",
     "8643": "\u0623\u0646\u062a \u062a\u0633\u062a\u062e\u062f\u0645 \u062c\u0644\u0633\u0629 \u0645\u0624\u0642\u062a\u0629 ",
     "8644": "\u0623\u0646\u062a \u062a\u0633\u062a\u062e\u062f\u0645 \u062c\u0644\u0633\u0629 \u0645\u0624\u0642\u062a\u0629 \u060c \u0627\u0644\u0645\u0644\u0641\u0627\u062a \u0627\u0644\u062a\u064a \u062a\u062e\u0632\u0646\u0647\u0627 \u0633\u062a\u062e\u0633\u0631\u0647\u0627 \u062d\u0627\u0644\u0645\u0627 \u0627\u0646\u062a\u0647\u062a \u0627\u0644\u0645\u0647\u0644\u0629. \u0644\u062d\u0641\u0638 \u0645\u0644\u0641\u0627\u062a\u0643\u060c \u0627\u0644\u0631\u062c\u0627\u0621 \u0627\u0644\u062a\u0631\u0642\u064a\u0629 \u0644\u062d\u0633\u0627\u0628 \u062d\u0642\u064a\u0642\u064a \u0641\u064a \u0623\u0642\u0631\u0628 \u0648\u0642\u062a \u0645\u0645\u0643\u0646 \u0648\u0633\u062a\u062d\u0635\u0644 \u0639\u0644\u0649 [S]\u0665\u0660 \u062c\u064a\u062c\u0627 \u0645\u0646 \u0627\u0644\u062a\u062e\u0632\u064a\u0646 \u0627\u0644\u0622\u0645\u0646 \u0641\u064a \u0627\u0644\u0633\u062d\u0627\u0628\u0629![\/S]",
+    "8645": "Image size exceeded",
+    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8647": "Failed to copy the MEGA link to your clipboard.",
+    "8648": "Error copying link",
+    "8649": "Unknown until decryption",
+    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
+    "8651": "Your %1 plan has expired.",
+    "8652": "PURCHASED",
+    "8653": "Click [S]Renew[\/S] to purchase your %1 plan (%2) using %3 %4.",
+    "8654": "Otherwise click [S]Choose[\/S] to select a different plan or payment option.",
+    "8655": "Renew",
+    "8656": "Choose...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3218,6 +3230,16 @@
         "transfer-speed-issue": 8639,
         "megasync-issue": 8641,
         "using-ephemeral-session": 8643,
-        "ephemeral-session-message": 8644
+        "ephemeral-session-message": 8644,
+        "image-size-exceeded": 8645,
+        "image-size-exceeded-body": 8646,
+        "support-too-short": 8650,
+        "your-plan-has-expired": 8651,
+        "purchased": 8652,
+        "expired": 1664,
+        "renew-plan-instruction": 8653,
+        "choose-different-plan-instruction": 8654,
+        "renew": 8655,
+        "choose": 8656
     }
 }

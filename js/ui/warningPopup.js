@@ -53,7 +53,7 @@ var warnPopup = {
             
             // Hide the dialog and go to register page
             $dialog.removeClass('active');
-            document.location.hash = 'register';            
+            document.location.hash = 'register';      
         });
     },
     
@@ -87,8 +87,9 @@ var warnPopup = {
      */
     showProPlanRenewal: function() {
         
-        // If their last payment info is not set by the API, then their plan is not currently expired
-        if (this.userLastPaymentInfo === null) {
+        // If their last payment info is not set by the API, then their plan is not currently expired.
+        // Also if they've already seen the popup, then don't keep showing it again or it's annoying.
+        if ((this.userLastPaymentInfo === null) || (localStorage.getItem('hideProPlanExpiredPopup') !== null)) {
             return false;
         }
         
@@ -130,6 +131,16 @@ var warnPopup = {
         $dialog.find('.provider-icon').addClass(iconClass);
         $dialog.find('.gateway-name').text(gatewayName);
         
+        // On the Choose... button click
+        $dialog.find('.warning-button.choose').rebind('click', function() {
+            
+            // Hide the dialog and go to pro page
+            $dialog.removeClass('active');
+            document.location.hash = 'pro';
+            
+            // Set localStorage so it doesn't show each time
+            localStorage.setItem('hideProPlanExpiredPopup', '1');
+        });
         
         console.log('zzzz', warnPopup.userLastPaymentInfo);
     },

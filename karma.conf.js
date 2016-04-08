@@ -62,7 +62,7 @@ module.exports = function(config) {
         'test/config.js',
 
         // Shim for ES6 features some browsers may not have (PhantomJS, MSIE).
-        'node_modules/es6-shim/es6-shim.js',
+        'js/vendor/es6-shim.js',
 
         // == Our code ==
         'secureboot.js',

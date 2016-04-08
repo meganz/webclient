@@ -3188,6 +3188,7 @@
     "8654": "Otherwise click [S]Choose[\/S] to select a different plan or payment option.",
     "8655": "Renew",
     "8656": "Choose...",
+    "8657": "EXPIRED",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3236,7 +3237,7 @@
         "support-too-short": 8650,
         "your-plan-has-expired": 8651,
         "purchased": 8652,
-        "expired": 1664,
+        "expired": 8657,
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,

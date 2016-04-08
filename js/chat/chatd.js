@@ -563,17 +563,13 @@ Chatd.Shard.prototype.exec = function(a) {
                 var keys = [];
                 while (index < len+17) {
                     var keylen = self.chatd.unpack16le(cmd.substr(index + 12,2));
-                    if (keylen < 28) {
-                        index += (keylen + 14);   
-                        continue;
-                    }
+
                     keys.push(
                         {
                             userid : base64urlencode(cmd.substr(index,8)),
                             keyid  : self.chatd.unpack32le(cmd.substr(index + 8,4)),
                             keylen : keylen,
-                            nonce  : cmd.substr(index + 14,12),
-                            key    : cmd.substr(index + 26,16)
+                            key  : cmd.substr(index + 14,keylen)
                         });
                     index += (keylen + 14);
                 }

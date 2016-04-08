@@ -637,7 +637,6 @@ var strongvelope = {};
         this.rotateKeyEvery = strongvelope.ROTATE_KEY_EVERY;
         this.totalMessagesBeforeSendKey = strongvelope.TOTAL_MESSAGES_BEFORE_SEND_KEY;
         this._keyEncryptionCount = 0;
-        this._totalMessagesWithoutSendKey = 0;
         this.keyId = null;
         this.previousKeyId = null;
         this._sentKeyId = null;
@@ -890,7 +889,6 @@ var strongvelope = {};
         this.participantKeys[this.ownHandle][this.keyId] = asmCrypto.bytes_to_string(secretKey);
 
         this._keyEncryptionCount = 0;
-        this._totalMessagesWithoutSendKey = 0;
     };
 
     /**
@@ -968,7 +966,7 @@ var strongvelope = {};
                                                     false);
 
         var result = asmCrypto.bytes_to_string(cipherBytes);
-        this.participantSenderKeys[destination] = nonce+result;
+        this.participantSenderKeys[destination] = result;
         return result;
     };
     /**
@@ -1332,9 +1330,9 @@ var strongvelope = {};
 
         // Check and rotate key if due.
         if ((this._keyEncryptionCount >= this.rotateKeyEvery) ||
-            (this.previousKeyId === null && this.keyId === null) || 
+            (this.previousKeyId === null && this.keyId === null) ||
             (this.participantChange === true)) {
-        console.log('update updateSenderKey');
+
             this.updateSenderKey();
         }
 
@@ -1342,10 +1340,8 @@ var strongvelope = {};
 
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
-        var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
         var encryptedKeys = false;
         if ((this._sentKeyId !== this.keyId) || (this.participantChange === true)) {
-            console.log(' _encryptSenderKey');
             encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
         }
 
@@ -1362,7 +1358,6 @@ var strongvelope = {};
             content += encryptedKeys.keys;
             content += encryptedKeys.keyIds;
             this._sentKeyId = this.keyId;
-            this._totalMessagesWithoutSendKey = 0;
             this.participantChange = false;
         }
         else {
@@ -1379,11 +1374,6 @@ var strongvelope = {};
         // Add sender key encrypted to self if required (on RSA use).
         if (encryptedKeys && encryptedKeys.ownKey) {
             content += encryptedKeys.ownKey;
-        }
-
-        // Update message counters.
-        if (!encryptedKeys) {
-            this._totalMessagesWithoutSendKey++;
         }
 
         return { keyed: (encryptedKeys !== false), content: content };
@@ -1444,6 +1434,14 @@ var strongvelope = {};
             return false;
         }
 
+        if ((this.previousKeyId === null && this.keyId === null) || 
+            (this.participantChange === true)) {
+
+            this.updateSenderKey();
+            encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_KEYED, "message": this.getKeyBlob()});
+            this._sentKeyId = this.keyId;
+            this.participantChange = false;
+        }
         var assembledMessage = null;
         do {
             // Assemble main message body and rotate keys if required.
@@ -1461,11 +1459,9 @@ var strongvelope = {};
 
             // Return assembled total message.
             content = String.fromCharCode(PROTOCOL_VERSION) + content;
-            if (assembledMessage.keyed) {
-                encryptedMessages.push({"type": messageType, "message": this.getKeyBlob()});
-            } else {
-                encryptedMessages.push({"type": messageType, "message": content});
-            }
+
+            encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_FOLLOWUP, "message": content});
+
             // If it is a keyed message, then the payload is not included in the message,
             // it needs to call it again to generate a second (payload) message.
         } while(assembledMessage.keyed);
@@ -1755,15 +1751,6 @@ var strongvelope = {};
             includeParticipants: [],
             excludeParticipants: []
         };
-
-        // Update counter based on payload messages from other users or devices.
-        var keyIdFromMessage = parsedMessage.keyIds[0];
-        var prefixFromMessage = str_to_a32(keyIdFromMessage)[0];
-        var a32words = str_to_a32(this.uniqueDeviceId);
-        var myPrefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
-        if ((cleartext !== null) && !historicMessage && (result.sender !== this.ownHandle) && (myPrefix !== prefixFromMessage)) {
-            this._totalMessagesWithoutSendKey++;
-        }
 
         return result;
     };
@@ -2080,24 +2067,7 @@ var strongvelope = {};
     };
 
     strongvelope.ProtocolHandler.prototype.getKeyBlob = function() { 
-        var result = '';
         var self = this;
-        for (var item in this.participantSenderKeys) {
-            console.log('key blob for :' + item);
-            var key = self.participantSenderKeys[item];
-            var len = self.pack16le(key.length);
-
-            result += (base64urldecode(item) + len + key);
-        }
-        console.log('key result');
-        var codestr = '';
-        for (var i=0;i<result.length;i++)
-        {
-            codestr += ("000000000" + result[i].charCodeAt(0).toString(2)).substr(-8) + " ";
-        }
-        return result;
-        var self = this;
-        var needOwnKeyEncryption = false;
 
         if (self.otherParticipants.size === 0) {
             return false;
@@ -2112,67 +2082,28 @@ var strongvelope = {};
             return false;
         }
 
-        var recipients = '';
         var keys = '';
-        var keyIds = '';
-
         var senderKey = self.participantKeys[self.ownHandle][self.keyId];
-
 
         // Assemble the output for all recipients.
         var keysIncluded = [];
         var encryptedKeys = '';
-        var isNewMember = false;
         var keyEncryptionError = false;
         trackedParticipants.forEach(function _memberIterator(destination) {
-            isNewMember = self.includeParticipants.has(destination);
 
-            recipients += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
-                                               base64urldecode(destination));
             keysIncluded = [senderKey];
-            /**
-             * TOGO
-             */
-            /*if (self.previousKeyId
-                    && (self._sentKeyId !== self.keyId)
-                    && !isNewMember) {
-                // Also add previous key on key rotation for existing members.
-                keysIncluded.push(self.participantKeys[self.ownHandle][self.previousKeyId]);
-            }*/
-            encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, destination);
+
+            encryptedKeys = self._encryptKeysTo(keysIncluded, destination);
             if (encryptedKeys === false) {
                 // Something went wrong, and we can't encrypt to that destination.
                 keyEncryptionError = true;
             }
-            if (encryptedKeys.length > _RSA_ENCRYPTION_THRESHOLD) {
-                needOwnKeyEncryption = true;
-            }
-            keys += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
-                                         encryptedKeys);
+            keys += (base64urldecode(destination) + self.pack16le(encryptedKeys.length) + encryptedKeys);
         });
         if (keyEncryptionError === true) {
             return false;
         }
-
-        var result = { recipients: recipients, keys: keys, keyIds: keyIds };
-
-        // Add sender key encrypted to self if required.
-        if (needOwnKeyEncryption) {
-            keysIncluded = [senderKey];
-            if (self.previousKeyId) {
-                keysIncluded.push(self.participantKeys[self.ownHandle][self.previousKeyId]);
-            }
-            encryptedKeys = self._encryptKeysFor(keysIncluded, nonce, this.ownHandle);
-            result.ownKey = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.OWN_KEY),
-                                                 encryptedKeys);
-        }
-
-        // Reset include/exclude lists before leaving.
-        self.includeParticipants.clear();
-        self.excludeParticipants.clear();
-
-        return result;
-        return result;
+        return keys;
     };
 
     strongvelope.ProtocolHandler.prototype.setKeyID = function(keyxId, keyId) {
@@ -2200,8 +2131,7 @@ var strongvelope = {};
             }*/
             var isOwnMessage = (keys[i].userid === this.ownHandle);
             console.log('from:' + keys[i].userid);
-            var decryptedKeys = this._decryptKeysFor(keys[i].key,
-                                         keys[i].nonce,
+            var decryptedKeys = this._decryptKeysFrom(keys[i].key,
                                          keys[i].userid,
                                          isOwnMessage);
             if (!this.participantKeys[keys[i].userid]) {

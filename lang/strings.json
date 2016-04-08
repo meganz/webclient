@@ -12754,5 +12754,9 @@
     "8656": {
         "text": "Choose...",
         "context": "This is a button on the PRO plan expired dialog. It will let the user choose a different PRO plan."
+    },
+    "8657": {
+        "text": "EXPIRED",
+        "context": "A label on the PRO plan expired dialog for showing the date when their last PRO plan purchase expired."
     }
 }

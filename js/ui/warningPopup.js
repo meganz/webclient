@@ -110,38 +110,25 @@ var warnPopup = {
         // Convert the timestamps to yyyy-mm-dd format
         var purchasedDate = warnPopup.formatTimestampToDate(warnPopup.userLastPaymentInfo.ts);
         var expiryDate = warnPopup.formatTimestampToDate(warnPopup.userLastPaymentInfo.exts);
-        
-        // Replace placeholder in header with the last PRO plan they purchased
-        var headerText = $dialog.find('.warning-header').html();
-            headerText = headerText.replace('%1', proPlanName);
-        
+                
         // Work out the number of months their previous plan was for e.g. 1 month or 3 months
         var planMonths = warnPopup.userLastPaymentInfo.m;
         var planMonthsPluralisation = (planMonths > 1) ? l[6788] : l[913];
         
-        var gatewayId = warnPopup.userLastPaymentInfo.gw;
+        // Set the payment provider name and icon
         var gatewayData = warnPopup.userLastPaymentInfo.gwd;
         var gatewayName = warnPopup.userLastPaymentInfo.gwname;
             gatewayName = warnPopup.normaliseGatewayName(gatewayName, gatewayData);
+        var iconClass = (gatewayName === 'Astropay') ? gatewayData.gwname : gatewayName;
         
-        
-        // Complete the first dialog message
-        var firstMessage = $dialog.find('.first-message').html();
-            firstMessage = firstMessage.replace('[S1]', '<span class="renew-text">').replace('[/S1]', '</span>');
-            firstMessage = firstMessage.replace('[S2]', '<span class="gateway-icon">').replace('[/S2]', '</span>');
-            firstMessage = firstMessage.replace('[S3]', '<span class="gateway-name">' + gatewayName).replace('[/S3]', '</span>');
-            firstMessage = firstMessage.replace('%1', proPlanName);
-            firstMessage = firstMessage.replace('%2', planMonths + ' ' + planMonthsPluralisation);
-            
-        // Add some styling for the second message
-        var secondMessage = $dialog.find('.second-message').html();
-            secondMessage = secondMessage.replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
-        
-        $dialog.find('.warning-header').text(headerText);
+        // Display
+        $dialog.find('.header-pro-plan').text(proPlanName);
         $dialog.find('.purchased-date').text(purchasedDate);
         $dialog.find('.expired-date').text(expiryDate);
-        $dialog.find('.first-message').safeHTML(firstMessage);
-        $dialog.find('.second-message').safeHTML(secondMessage);
+        $dialog.find('.pro-plan').text(proPlanName);
+        $dialog.find('.plan-duration').text(planMonths + ' ' + planMonthsPluralisation);
+        $dialog.find('.gateway-icon').addClass(iconClass);
+        $dialog.find('.gateway-name').text(gatewayName);
         
         
         console.log('zzzz', warnPopup.userLastPaymentInfo);
@@ -158,13 +145,19 @@ var warnPopup = {
         
         // If AstroPay then the API has an exact name for that gatway
         if (gatewayName === 'Astropay') {
-            return gatewayData.gwname;
+            return gatewayData.gwname;          // Visa, Mastercard etc
+        }
+        else if (gatewayName === 'Infobip') {
+            return l[7219] + ' (Centilli)';     // Mobile (Centilli)
+        }
+        else if (gatewayName === 'T-Pay') {
+            return l[7219] + ' (T-Pay)';        // Mobile (T-Pay)
+        }
+        else if (gatewayName === 'Fortumo') {
+            return l[7219] + ' (Fortumo)';      // Mobile (Fortumo)
         }
         else if (gatewayName === 'voucher') {
             return l[487] + ' / ' + l[7108];    // Voucher code / Balance
-        }
-        else if (gatewayName === 'wiretransfer') {
-            return l[6198];                     // Wire transfer
         }
         else if (gatewayName === 'wiretransfer') {
             return l[6198];                     // Wire transfer

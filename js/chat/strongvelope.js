@@ -48,12 +48,6 @@ var strongvelope = {};
     strongvelope.PROTOCOL_VERSION = 0x02;
     var PROTOCOL_VERSION = strongvelope.PROTOCOL_VERSION;
 
-    /** After how many messages our symmetric sender key is rotated. */
-    strongvelope.ROTATE_KEY_EVERY = 16;
-
-    /** How many messages our handler should "see" before re-sending our sender key. */
-    strongvelope.TOTAL_MESSAGES_BEFORE_SEND_KEY = 30;
-
     /** Size (in bytes) of the secret/symmetric encryption key. */
     strongvelope.SECRET_KEY_SIZE = 16;
     var SECRET_KEY_SIZE = strongvelope.SECRET_KEY_SIZE;
@@ -595,11 +589,6 @@ var strongvelope = {};
      *     Our private signing key (Ed25519).
      * @property {String} myPubEd25519
      *     Our public signing key (Ed25519).
-     * @property {Number} rotateKeyEvery
-     *     The number of messages our sender key is used for before rotating.
-     * @property {Number} totalMessagesBeforeSendKey
-     *     The number of total messages sent and received before a keyed
-     *     reminder message is to be sent.
      * @property {String} keyId
      *     ID of our current sender key.
      * @property {String} previousKeyId
@@ -627,8 +616,7 @@ var strongvelope = {};
         if (!this.myPubEd25519) {
             this.myPubEd25519 = crypt.getPubKeyFromPrivKey(this.myPrivEd25519, 'Ed25519');
         }
-        this.rotateKeyEvery = strongvelope.ROTATE_KEY_EVERY;
-        this.totalMessagesBeforeSendKey = strongvelope.TOTAL_MESSAGES_BEFORE_SEND_KEY;
+
         this._keyEncryptionCount = 0;
         this.keyId = null;
         this.previousKeyId = null;
@@ -1321,55 +1309,25 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype._assembleBody = function(message) {
 
-        // Check and rotate key if due.
-        if ((this._keyEncryptionCount >= this.rotateKeyEvery) ||
-            (this.previousKeyId === null && this.keyId === null) ||
-            (this.participantChange === true)) {
-
-            this.updateSenderKey();
-        }
-
         var senderKey = this.participantKeys[this.ownHandle][this.keyId];
 
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
-        var encryptedKeys = false;
-        if ((this._sentKeyId !== this.keyId) || (this.participantChange === true)) {
-            encryptedKeys = this._encryptSenderKey(encryptedMessage.nonce);
-        }
-
-        var messageType = encryptedKeys
-                        ? MESSAGE_TYPES.GROUP_KEYED
-                        : MESSAGE_TYPES.GROUP_FOLLOWUP;
-
         // Assemble message content.
         var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.NONCE),
                                            encryptedMessage.nonce);
-        if (encryptedKeys) {
-            // Include recipient(s) and sender key(s).
-            content += encryptedKeys.recipients;
-            content += encryptedKeys.keys;
-            content += encryptedKeys.keyIds;
-            this._sentKeyId = this.keyId;
-            this.participantChange = false;
-        }
-        else {
-            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
+
+        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
                                             this.keyId);
-        }
+
         // Only include ciphertext if it's not empty (non-blind message).
-        if (!encryptedKeys && (encryptedMessage.ciphertext !== null)) {
+        if (encryptedMessage.ciphertext !== null) {
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
                                             encryptedMessage.ciphertext);
             this._keyEncryptionCount++;
         }
 
-        // Add sender key encrypted to self if required (on RSA use).
-        if (encryptedKeys && encryptedKeys.ownKey) {
-            content += encryptedKeys.ownKey;
-        }
-
-        return { keyed: (encryptedKeys !== false), content: content };
+        return content;
     };
 
 
@@ -1427,6 +1385,7 @@ var strongvelope = {};
             return false;
         }
 
+        // if the key is rotated , generate a new key and send it out.
         if ((this.previousKeyId === null && this.keyId === null) || 
             (this.participantChange === true)) {
 
@@ -1435,29 +1394,23 @@ var strongvelope = {};
             this._sentKeyId = this.keyId;
             this.participantChange = false;
         }
+
         var assembledMessage = null;
-        do {
-            // Assemble main message body and rotate keys if required.
-            assembledMessage = this._assembleBody(message);
-            var messageType = assembledMessage.keyed
-                            ? MESSAGE_TYPES.GROUP_KEYED
-                            : MESSAGE_TYPES.GROUP_FOLLOWUP;
-            // Assemble rest of message.
-            var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
-                                               String.fromCharCode(messageType))
-                        + assembledMessage.content;
+        // Assemble main message body.
+        assembledMessage = this._assembleBody(message);
+        var messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
+        // Assemble rest of message.
+        var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
+                                           String.fromCharCode(messageType))
+                    + assembledMessage;
 
-            // Sign message.
-            content = this._signContent(content);
+        // Sign message.
+        content = this._signContent(content);
 
-            // Return assembled total message.
-            content = String.fromCharCode(PROTOCOL_VERSION) + content;
+        // Return assembled total message.
+        content = String.fromCharCode(PROTOCOL_VERSION) + content;
 
-            encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_FOLLOWUP, "message": content});
-
-            // If it is a keyed message, then the payload is not included in the message,
-            // it needs to call it again to generate a second (payload) message.
-        } while(assembledMessage.keyed);
+        encryptedMessages.push({"type": messageType, "message": content});
 
         return encryptedMessages;
     };

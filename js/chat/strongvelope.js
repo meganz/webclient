@@ -506,13 +506,6 @@ var strongvelope = {};
             lastTlvType = tlvType;
         }
 
-        if ((parsedContent.recipients.length > 0)
-                && (parsedContent.recipients.length !== parsedContent.keys.length)) {
-            logger.critical('Number of keys does not match number of recipients.');
-
-            return false;
-        }
-
         return parsedContent;
     };
 
@@ -2098,7 +2091,9 @@ var strongvelope = {};
                 // Something went wrong, and we can't encrypt to that destination.
                 keyEncryptionError = true;
             }
-            keys += (base64urldecode(destination) + self.pack16le(encryptedKeys.length) + encryptedKeys);
+            var signedKey = self._signContent(tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS), encryptedKeys));
+            signedKey = String.fromCharCode(PROTOCOL_VERSION) + signedKey;
+            keys += (base64urldecode(destination) + self.pack16le(signedKey.length) + signedKey);
         });
         if (keyEncryptionError === true) {
             return false;
@@ -2129,15 +2124,30 @@ var strongvelope = {};
             /*if (this.participantKeys[keys[i].userid] && this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
                 logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + keys[i].userid);
             }*/
-            var isOwnMessage = (keys[i].userid === this.ownHandle);
-            console.log('from:' + keys[i].userid);
-            var decryptedKeys = this._decryptKeysFrom(keys[i].key,
-                                         keys[i].userid,
-                                         isOwnMessage);
-            if (!this.participantKeys[keys[i].userid]) {
-                this.participantKeys[keys[i].userid] = {};
+            var parsedKey = ns._parseMessageContent(keys[i].key);
+            console.log('parsedkey:' + parsedKey);
+            if (ns._verifyMessage(parsedKey.signedContent,
+                    parsedKey.signature,
+                    pubEd25519[keys[i].userid])) {
+                var key = parsedKey.keys[0];
+                var isOwnMessage = (keys[i].userid === this.ownHandle);
+                console.log('from:' + keys[i].userid);
+
+                var decryptedKeys = this._decryptKeysFrom(key,
+                                             keys[i].userid,
+                                             isOwnMessage);
+                if (!this.participantKeys[keys[i].userid]) {
+                    this.participantKeys[keys[i].userid] = {};
+                }
+                this.participantKeys[keys[i].userid][keyidStr] = decryptedKeys[0];
             }
-            this.participantKeys[keys[i].userid][keyidStr] = decryptedKeys[0];
+            else {
+                logger.critical('Signature invalid for key from *** on ***');
+                logger.error('Signature invalid for message from '
+                             + keys[i].userid + ' with keyid ' + keys[i].keyid);
+
+                return false;
+            }
         }
     };
 }());

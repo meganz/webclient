@@ -296,7 +296,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.chatd.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-console.log('onMessagesHistoryDone.messagesBuff');
+
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
@@ -477,14 +477,7 @@ console.log('onMessagesHistoryDone.messagesBuff');
     });
 
     self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
-        console.log('VG: key done');
-        console.log('VG: keyxid: ' + eventData.keyxid);
-        console.log('VG: keyid: ' + eventData.keyid);
-        for (var i=0;i<eventData.keyxid.length;i++) {
-            console.log(eventData.keyid[i].charCodeAt(0).toString(16) + " ");
-        }
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        console.log(chatRoom);
         chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();
@@ -492,12 +485,6 @@ console.log('onMessagesHistoryDone.messagesBuff');
     });
 
     self.chatd.rebind('onMessageKeysDone.messagesBuff' + chatRoomId, function(e, eventData) {
-        console.log('VG: keys done');
-        console.log('VG: keyid: ' + eventData.keyid);
-        console.log('VG: keys: ' + eventData.keys);
-        for (var i=0;i<eventData.keys.length;i++) {
-            console.log(eventData.keys[i].userid + " ");
-        }
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
         chatRoom.protocolHandler.seedKeys(eventData.keys);
@@ -533,7 +520,6 @@ MessagesBuff.prototype.getUnreadCount = function() {
 };
 
 MessagesBuff.prototype.setLastSeen = function(msgId) {
-    console.log('last seen msgid:' + msgId);
     var self = this;
     var targetMsg = Message._mockupNonLoadedMessage(msgId, self.messages[msgId], 999999999);
     var lastMsg = Message._mockupNonLoadedMessage(self.lastSeen, self.messages[self.lastSeen], 0);
@@ -674,7 +660,6 @@ MessagesBuff.prototype.markAllAsSeen = function() {
     }
 };
 MessagesBuff.prototype.markAllAsReceived = function() {
-    console.log('markAllAsReceived');
     var self = this;
 
     var lastToBeMarkedAsReceived = null;

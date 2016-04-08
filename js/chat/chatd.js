@@ -273,30 +273,13 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
         self.cmdq += String.fromCharCode(opCode)+cmd;
-        console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
-
-        var cmdstr = String.fromCharCode(opCode)+cmd;
-        var codestr = '';
-        for (var i=0;i<cmdstr.length;i++)
-        {
-            codestr += (cmdstr[i].charCodeAt(0).toString(16)) + " ";
-        }
-        console.log(codestr);
     });
 
     this.triggerSendIfAble();
 };
 
 Chatd.Shard.prototype.cmd = function(opCode, cmd) {
-    console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
-    var cmdstr = String.fromCharCode(opCode)+cmd;
-    var codestr = '';
-    for (var i=0;i<cmdstr.length;i++)
-    {
-        codestr += cmdstr[i].charCodeAt(0).toString(16) + " ";
-    }
-    console.log(codestr);
     this.cmdq += String.fromCharCode(opCode)+cmd;
 
     this.triggerSendIfAble();
@@ -729,7 +712,6 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
     for (var i = 0; i<messages.length; i++) {
         var message = messages[i];
         if (message.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
-            console.log('key message');
             messageConstructs.push({"msgxid":0, "timestamp":0,"keyid":keyId, "message":message.message, "type":message.type});
             continue;
         }
@@ -828,10 +810,6 @@ Chatd.Messages.prototype.range = function(chatId) {
             for (high = this.highnum; high > low; high--) {
                 if (!this.sending[this.buf[high][Chatd.MsgField.MSGID]]) break;
             }
-            console.log('VG:');
-            console.log(chatId);
-            console.log(this.buf[low][Chatd.MsgField.MSGID]);
-            console.log(this.buf[high][Chatd.MsgField.MSGID]);
             this.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
             break;
         }
@@ -904,7 +882,7 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
     else {
         id = this.lownum--;
     }
-console.log('key id:'+ keyid);
+
     // store message
     this.buf[id] = [msgid, userId, timestamp, updated, keyid, msg];
 

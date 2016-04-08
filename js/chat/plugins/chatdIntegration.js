@@ -580,7 +580,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
-console.log('onHistoryFinished.chatd');
+
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
                 if (v.userId) {
                     var msg = v.getContents ? v.getContents() : v.message;
@@ -612,10 +612,9 @@ console.log('onHistoryFinished.chatd');
                     try {
                         // .seed result is not used in here, since it returns false, even when some messages can be decrypted
                         // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
-                        //var seedResult = chatRoom.protocolHandler.seed(hist);
+                        var seedResult = chatRoom.protocolHandler.seed(hist);
                         //console.error(chatRoom.roomJid, seedResult);
 
-console.log('batchDecrypt');
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
                         decryptedMsgs.forEach(function (v, k) {
                             if (typeof v === undefined) {
@@ -838,7 +837,6 @@ ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
 
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
     var self = this;
-    console.log('received : ' + chatRoom.chatId + ' ' + msgid);
     self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
 };
 
@@ -884,10 +882,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
 
             if (result !== false) {
                 var keyid = str_to_a32(chatRoom.protocolHandler.keyId)[0];
-                /*tmpPromise.resolve(
-                    self.sendNewKey(chatRoom, keyid, chatRoom.protocolHandler.getKeyBlob())
-                );*/
-                console.log(keyid);
+
                 tmpPromise.resolve(
                     self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)
                 );

@@ -127,7 +127,7 @@ var warnPopup = {
         $dialog.find('.expired-date').text(expiryDate);
         $dialog.find('.pro-plan').text(proPlanName);
         $dialog.find('.plan-duration').text(planMonths + ' ' + planMonthsPluralisation);
-        $dialog.find('.gateway-icon').addClass(iconClass);
+        $dialog.find('.provider-icon').addClass(iconClass);
         $dialog.find('.gateway-name').text(gatewayName);
         
         

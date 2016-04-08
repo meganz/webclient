@@ -4979,7 +4979,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .astropay-payment-reminder .expired-label {
     padding-left: 20px;
-    text-transform: uppercase;
 }
 .astropay-payment-reminder .renew-text, .astropay-payment-reminder .choose-text {
     font-family: 'source_sans_probold', Arial;

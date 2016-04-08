@@ -535,7 +535,7 @@ function populate_l() {
     l[8653] = l[8653].replace('[S]', '<span class="renew-text">').replace('[/S]', '</span>');
     l[8653] = l[8653].replace('%1', '<span class="pro-plan"></span>');
     l[8653] = l[8653].replace('%2', '<span class="plan-duration"></span>');
-    l[8653] = l[8653].replace('%3', '<span class="gateway-icon"></span>');
+    l[8653] = l[8653].replace('%3', '<span class="provider-icon"></span>');
     l[8653] = l[8653].replace('%4', '<span class="gateway-name"></span>');
     l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
     

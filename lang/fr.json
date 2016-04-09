@@ -3178,6 +3178,7 @@
     "8644": "Vous \u00eates en train d&#039;utiliser une session temporaire. La donn\u00e9e que vous \u00eates en train d&#039;enregistrer sera perdue lorsque la session expirera. Pour pr\u00e9server vos fichiers, veuillez cr\u00e9er un compte d\u00e8s que possible et r\u00e9clamez vos [S]50 Go d&#039;espace de stockage s\u00e9curis\u00e9 et gratuit dans le cloud[\/S]",
     "8645": "Image size exceeded",
     "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
+    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3222,6 +3223,7 @@
         "using-ephemeral-session": 8643,
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
-        "image-size-exceeded-body": 8646
+        "image-size-exceeded-body": 8646,
+        "support-too-short": 8650
     }
 }

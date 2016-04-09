@@ -2,8 +2,8 @@
   * https://github.com/paulmillr/es6-shim
   * @license es6-shim Copyright 2013-2016 by Paul Miller (http://paulmillr.com)
   *   and contributors,  MIT License
-  * es6-shim: v0.34.1
-  * see https://github.com/paulmillr/es6-shim/blob/0.34.1/LICENSE
+  * es6-shim: v0.35.0
+  * see https://github.com/paulmillr/es6-shim/blob/0.35.0/LICENSE
   * Details and documentation:
   * https://github.com/paulmillr/es6-shim/
   */
@@ -33,7 +33,9 @@
   var keys = Object.keys;
 
   var not = function notThunker(func) {
-    return function notThunk() { return !_apply(func, this, arguments); };
+    return function notThunk() {
+      return !_apply(func, this, arguments);
+    };
   };
   var throwsError = function (func) {
     try {
@@ -54,7 +56,9 @@
   var isCallableWithoutNew = not(throwsError);
   var arePropertyDescriptorsSupported = function () {
     // if Object.defineProperty exists but throws, it's IE 8
-    return !throwsError(function () { Object.defineProperty({}, 'x', { get: function () {} }); });
+    return !throwsError(function () {
+      Object.defineProperty({}, 'x', { get: function () {} });
+    });
   };
   var supportsDescriptors = !!Object.defineProperty && arePropertyDescriptorsSupported();
   var functionsHaveNames = (function foo() {}).name === 'foo';
@@ -183,6 +187,7 @@
   var globals = getGlobal();
   var globalIsFinite = globals.isFinite;
   var _indexOf = Function.call.bind(String.prototype.indexOf);
+  var _arrayIndexOfApply = Function.apply.bind(Array.prototype.indexOf);
   var _concat = Function.call.bind(Array.prototype.concat);
   var _sort = Function.call.bind(Array.prototype.sort);
   var _strSlice = Function.call.bind(String.prototype.slice);
@@ -193,6 +198,7 @@
   var _min = Math.min;
   var _floor = Math.floor;
   var _abs = Math.abs;
+  var _exp = Math.exp;
   var _log = Math.log;
   var _sqrt = Math.sqrt;
   var _hasOwnProperty = Function.call.bind(Object.prototype.hasOwnProperty);
@@ -212,6 +218,12 @@
   };
   var numberIsFinite = Number.isFinite || function isFinite(value) {
     return typeof value === 'number' && globalIsFinite(value);
+  };
+  var _sign = isCallable(Math.sign) ? Math.sign : function sign(value) {
+    var number = Number(value);
+    if (number === 0) { return number; }
+    if (numberIsNaN(number)) { return number; }
+    return number < 0 ? -1 : 1;
   };
 
   // taken directly from https://github.com/ljharb/is-arguments/blob/master/index.js
@@ -262,7 +274,7 @@
 
   // Reflect
   if (!globals.Reflect) {
-    defineProperty(globals, 'Reflect', {});
+    defineProperty(globals, 'Reflect', {}, true);
   }
   var Reflect = globals.Reflect;
 
@@ -684,7 +696,9 @@
   // https://bugzilla.mozilla.org/show_bug.cgi?id=1062484
   if (String.fromCodePoint && String.fromCodePoint.length !== 1) {
     var originalFromCodePoint = String.fromCodePoint;
-    overrideNative(String, 'fromCodePoint', function fromCodePoint(codePoints) { return ES.Call(originalFromCodePoint, this, arguments); });
+    overrideNative(String, 'fromCodePoint', function fromCodePoint(codePoints) {
+      return ES.Call(originalFromCodePoint, this, arguments);
+    });
   }
 
   var StringShims = {
@@ -827,7 +841,9 @@
       /* throws if spec-compliant */
       '/a/'.startsWith(/a/);
     });
-    var startsWithHandlesInfinity = 'abc'.startsWith('a', Infinity) === false;
+    var startsWithHandlesInfinity = valueOrFalseIfThrows(function () {
+      return 'abc'.startsWith('a', Infinity) === false;
+    });
     if (!startsWithRejectsRegex || !startsWithHandlesInfinity) {
       // Firefox (< 37?) and IE 11 TP have a noncompliant startsWith implementation
       overrideNative(String.prototype, 'startsWith', StringPrototypeShims.startsWith);
@@ -887,12 +903,14 @@
     this._i = 0;
   };
   StringIterator.prototype.next = function () {
-    var s = this._s, i = this._i;
+    var s = this._s;
+    var i = this._i;
     if (typeof s === 'undefined' || i >= s.length) {
       this._s = void 0;
       return { value: void 0, done: true };
     }
-    var first = s.charCodeAt(i), second, len;
+    var first = s.charCodeAt(i);
+    var second, len;
     if (first < 0xD800 || first > 0xDBFF || (i + 1) === s.length) {
       len = 1;
     } else {
@@ -966,7 +984,7 @@
           if (mapping) {
             value = typeof T === 'undefined' ? mapFn(value, i) : _call(mapFn, T, value, i);
           }
-          result[i] = value;
+          createDataPropertyOrThrow(result, i, value);
         }
       }
 
@@ -1005,7 +1023,8 @@
 
   defineProperties(ArrayIterator.prototype, {
     next: function () {
-      var i = this.i, array = this.array;
+      var i = this.i;
+      var array = this.array;
       if (!(this instanceof ArrayIterator)) {
         throw new TypeError('Not an ArrayIterator');
       }
@@ -1056,48 +1075,6 @@
 
     return _concat(ownKeys, keys);
   };
-
-  var ObjectIterator = function (object, kind) {
-    defineProperties(this, {
-      object: object,
-      array: getAllKeys(object),
-      kind: kind
-    });
-  };
-
-  defineProperties(ObjectIterator.prototype, {
-    next: function next() {
-      var key;
-      var array = this.array;
-
-      if (!(this instanceof ObjectIterator)) {
-        throw new TypeError('Not an ObjectIterator');
-      }
-
-      // Find next key in the object
-      while (array.length > 0) {
-        key = _shift(array);
-
-        // The candidate key isn't defined on object.
-        // Must have been deleted, or object[[Prototype]]
-        // has been modified.
-        if (!(key in this.object)) {
-          continue;
-        }
-
-        if (this.kind === 'key') {
-          return iteratorResult(key);
-        } else if (this.kind === 'value') {
-          return iteratorResult(this.object[key]);
-        } else {
-          return iteratorResult([key, this.object[key]]);
-        }
-      }
-
-      return iteratorResult();
-    }
-  });
-  addIterator(ObjectIterator.prototype);
 
   // note: this is positioned here because it depends on ArrayIterator
   var arrayOfSupportsSubclassing = Array.of === ArrayShims.of || (function () {
@@ -1178,7 +1155,9 @@
       for (var i = 0, value; i < length; i++) {
         value = list[i];
         if (thisArg) {
-          if (_call(predicate, thisArg, value, i, list)) { return value; }
+          if (_call(predicate, thisArg, value, i, list)) {
+            return value;
+          }
         } else if (predicate(value, i, list)) {
           return value;
         }
@@ -1194,7 +1173,9 @@
       var thisArg = arguments.length > 1 ? arguments[1] : null;
       for (var i = 0; i < length; i++) {
         if (thisArg) {
-          if (_call(predicate, thisArg, list[i], i, list)) { return i; }
+          if (_call(predicate, thisArg, list[i], i, list)) {
+            return i;
+          }
         } else if (predicate(list[i], i, list)) {
           return i;
         }
@@ -1240,6 +1221,18 @@
   }
   defineProperties(Array.prototype, ArrayPrototypeShims);
 
+  if (1 / [true].indexOf(true, -0) < 0) {
+    // indexOf when given a position arg of -0 should return +0.
+    // https://github.com/tc39/ecma262/pull/316
+    defineProperty(Array.prototype, 'indexOf', function indexOf(searchElement) {
+      var value = _arrayIndexOfApply(this, arguments);
+      if (value === 0 && (1 / value) < 0) {
+        return 0;
+      }
+      return value;
+    }, true);
+  }
+
   addIterator(Array.prototype, function () { return this.values(); });
   // Chrome defines keys/values/entries on Array, but doesn't give us
   // any way to identify its iterator.  So add our own shimmed field.
@@ -1251,7 +1244,9 @@
   var arrayFromSwallowsNegativeLengths = (function () {
     // Detects a Firefox bug in v32
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1063993
-    return valueOrFalseIfThrows(function () { return Array.from({ length: -1 }).length === 0; });
+    return valueOrFalseIfThrows(function () {
+      return Array.from({ length: -1 }).length === 0;
+    });
   }());
   var arrayFromHandlesIterables = (function () {
     // Detects a bug in Webkit nightly r181886
@@ -1264,7 +1259,9 @@
   var arrayFromHandlesUndefinedMapFunction = (function () {
     // Microsoft Edge v0.11 throws if the mapFn argument is *provided* but undefined,
     // but the spec doesn't care if it's provided or not - undefined doesn't throw.
-    return valueOrFalseIfThrows(function () { return Array.from([0], void 0); });
+    return valueOrFalseIfThrows(function () {
+      return Array.from([0], void 0);
+    });
   }());
   if (!arrayFromHandlesUndefinedMapFunction) {
     var origArrayFrom = Array.from;
@@ -1397,6 +1394,14 @@
       return NumberShim;
     }());
     wrapConstructor(OrigNumber, NumberShim, {});
+    // this is necessary for ES3 browsers, where these properties are non-enumerable.
+    defineProperties(NumberShim, {
+      NaN: OrigNumber.NaN,
+      MAX_VALUE: OrigNumber.MAX_VALUE,
+      MIN_VALUE: OrigNumber.MIN_VALUE,
+      NEGATIVE_INFINITY: OrigNumber.NEGATIVE_INFINITY,
+      POSITIVE_INFINITY: OrigNumber.POSITIVE_INFINITY
+    });
     /* globals Number: true */
     /* eslint-disable no-undef */
     /* jshint -W020 */
@@ -1572,7 +1577,8 @@
       Object.getPrototypeOf(Object.create(null)) === null) {
     (function () {
       var FAKENULL = Object.create(null);
-      var gpo = Object.getPrototypeOf, spo = Object.setPrototypeOf;
+      var gpo = Object.getPrototypeOf;
+      var spo = Object.setPrototypeOf;
       Object.getPrototypeOf = function (o) {
         var result = gpo(o);
         return result === FAKENULL ? null : result;
@@ -1590,6 +1596,23 @@
     var originalObjectKeys = Object.keys;
     overrideNative(Object, 'keys', function keys(value) {
       return originalObjectKeys(ES.ToObject(value));
+    });
+    keys = Object.keys;
+  }
+  var objectKeysRejectsRegex = throwsError(function () { Object.keys(/a/g); });
+  if (objectKeysRejectsRegex) {
+    var regexRejectingObjectKeys = Object.keys;
+    overrideNative(Object, 'keys', function keys(value) {
+      if (Type.regex(value)) {
+        var regexKeys = [];
+        for (var k in value) {
+          if (_hasOwnProperty(value, k)) {
+            _push(regexKeys, k);
+          }
+        }
+       return regexKeys;
+      }
+      return regexRejectingObjectKeys(value);
     });
     keys = Object.keys;
   }
@@ -1733,6 +1756,26 @@
     return RegExp(regex) === regex;
   }());
 
+  var regexToStringIsGeneric = valueOrFalseIfThrows(function () {
+    return RegExp.prototype.toString.call({ source: 'abc' }) === '/abc/';
+  });
+  var regexToStringSupportsGenericFlags = regexToStringIsGeneric && valueOrFalseIfThrows(function () {
+    return RegExp.prototype.toString.call({ source: 'a', flags: 'b' }) === '/a/b';
+  });
+  if (!regexToStringIsGeneric || !regexToStringSupportsGenericFlags) {
+    var origRegExpToString = RegExp.prototype.toString;
+    defineProperty(RegExp.prototype, 'toString', function toString() {
+      var R = ES.RequireObjectCoercible(this);
+      if (Type.regex(R)) {
+        return _call(origRegExpToString, R);
+      }
+      var pattern = $String(R.source);
+      var flags = $String(R.flags);
+      return '/' + pattern + '/' + flags;
+    }, true);
+    Value.preserveToString(RegExp.prototype.toString, origRegExpToString);
+  }
+
   if (supportsDescriptors && (!regExpSupportsFlagsWithRegex || regExpNeedsToSupportSymbolMatch)) {
     var flagsGetter = Object.getOwnPropertyDescriptor(RegExp.prototype, 'flags').get;
     var sourceDesc = Object.getOwnPropertyDescriptor(RegExp.prototype, 'source') || {};
@@ -1800,16 +1843,19 @@
   var BINARY_32_EPSILON = Math.pow(2, -23);
   var BINARY_32_MAX_VALUE = Math.pow(2, 127) * (2 - BINARY_32_EPSILON);
   var BINARY_32_MIN_VALUE = Math.pow(2, -126);
+  var E = Math.E;
+  var LOG2E = Math.LOG2E;
+  var LOG10E = Math.LOG10E;
   var numberCLZ = Number.prototype.clz;
   delete Number.prototype.clz; // Safari 8 has Number#clz
 
   var MathShims = {
     acosh: function acosh(value) {
       var x = Number(value);
-      if (Number.isNaN(x) || value < 1) { return NaN; }
+      if (numberIsNaN(x) || value < 1) { return NaN; }
       if (x === 1) { return 0; }
       if (x === Infinity) { return x; }
-      return _log(x / Math.E + _sqrt(x + 1) * _sqrt(x - 1) / Math.E) + 1;
+      return _log(x / E + _sqrt(x + 1) * _sqrt(x - 1) / E) + 1;
     },
 
     asinh: function asinh(value) {
@@ -1817,12 +1863,12 @@
       if (x === 0 || !globalIsFinite(x)) {
         return x;
       }
-      return x < 0 ? -Math.asinh(-x) : _log(x + _sqrt(x * x + 1));
+      return x < 0 ? -asinh(-x) : _log(x + _sqrt(x * x + 1));
     },
 
     atanh: function atanh(value) {
       var x = Number(value);
-      if (Number.isNaN(x) || x < -1 || x > 1) {
+      if (numberIsNaN(x) || x < -1 || x > 1) {
         return NaN;
       }
       if (x === -1) { return -Infinity; }
@@ -1834,12 +1880,13 @@
     cbrt: function cbrt(value) {
       var x = Number(value);
       if (x === 0) { return x; }
-      var negate = x < 0, result;
+      var negate = x < 0;
+      var result;
       if (negate) { x = -x; }
       if (x === Infinity) {
         result = Infinity;
       } else {
-        result = Math.exp(_log(x) / 3);
+        result = _exp(_log(x) / 3);
         // from http://en.wikipedia.org/wiki/Cube_root#Numerical_methods
         result = (x / (result * result) + (2 * result)) / 3;
       }
@@ -1853,17 +1900,17 @@
       if (number === 0) {
         return 32;
       }
-      return numberCLZ ? ES.Call(numberCLZ, number) : 31 - _floor(_log(number + 0.5) * Math.LOG2E);
+      return numberCLZ ? ES.Call(numberCLZ, number) : 31 - _floor(_log(number + 0.5) * LOG2E);
     },
 
     cosh: function cosh(value) {
       var x = Number(value);
       if (x === 0) { return 1; } // +0 or -0
-      if (Number.isNaN(x)) { return NaN; }
+      if (numberIsNaN(x)) { return NaN; }
       if (!globalIsFinite(x)) { return Infinity; }
       if (x < 0) { x = -x; }
-      if (x > 21) { return Math.exp(x) / 2; }
-      return (Math.exp(x) + Math.exp(-x)) / 2;
+      if (x > 21) { return _exp(x) / 2; }
+      return (_exp(x) + _exp(-x)) / 2;
     },
 
     expm1: function expm1(value) {
@@ -1871,7 +1918,7 @@
       if (x === -Infinity) { return -1; }
       if (!globalIsFinite(x) || x === 0) { return x; }
       if (_abs(x) > 0.5) {
-        return Math.exp(x) - 1;
+        return _exp(x) - 1;
       }
       // A more precise approximation using Taylor series expansion
       // from https://github.com/paulmillr/es6-shim/issues/314#issuecomment-70293986
@@ -1903,28 +1950,23 @@
     },
 
     log2: function log2(value) {
-      return _log(value) * Math.LOG2E;
+      return _log(value) * LOG2E;
     },
 
     log10: function log10(value) {
-      return _log(value) * Math.LOG10E;
+      return _log(value) * LOG10E;
     },
 
     log1p: function log1p(value) {
       var x = Number(value);
-      if (x < -1 || Number.isNaN(x)) { return NaN; }
+      if (x < -1 || numberIsNaN(x)) { return NaN; }
       if (x === 0 || x === Infinity) { return x; }
       if (x === -1) { return -Infinity; }
 
       return (1 + x) - 1 === 0 ? x : x * (_log(1 + x) / ((1 + x) - 1));
     },
 
-    sign: function sign(value) {
-      var number = Number(value);
-      if (number === 0) { return number; }
-      if (Number.isNaN(number)) { return number; }
-      return number < 0 ? -1 : 1;
-    },
+    sign: _sign,
 
     sinh: function sinh(value) {
       var x = Number(value);
@@ -1933,19 +1975,17 @@
       if (_abs(x) < 1) {
         return (Math.expm1(x) - Math.expm1(-x)) / 2;
       }
-      return (Math.exp(x - 1) - Math.exp(-x - 1)) * Math.E / 2;
+      return (_exp(x - 1) - _exp(-x - 1)) * E / 2;
     },
 
     tanh: function tanh(value) {
       var x = Number(value);
-      if (Number.isNaN(x) || x === 0) { return x; }
-      if (x === Infinity) { return 1; }
-      if (x === -Infinity) { return -1; }
-      var a = Math.expm1(x);
-      var b = Math.expm1(-x);
-      if (a === Infinity) { return 1; }
-      if (b === Infinity) { return -1; }
-      return (a - b) / (Math.exp(x) + Math.exp(-x));
+      if (numberIsNaN(x) || x === 0) { return x; }
+      // can exit early at +-20 as JS loses precision for true value at this integer
+      if (x >= 20) { return 1; }
+      if (x <= -20) { return -1; }
+
+      return (Math.expm1(x) - Math.expm1(-x)) / (_exp(x) + _exp(-x));
     },
 
     trunc: function trunc(value) {
@@ -1971,7 +2011,7 @@
       if (v === 0 || v === Infinity || v === -Infinity || numberIsNaN(v)) {
         return v;
       }
-      var sign = Math.sign(v);
+      var sign = _sign(v);
       var abs = _abs(v);
       if (abs < BINARY_32_MIN_VALUE) {
         return sign * roundTiesToEven(abs / BINARY_32_MIN_VALUE / BINARY_32_EPSILON) * BINARY_32_MIN_VALUE * BINARY_32_EPSILON;
@@ -2328,7 +2368,9 @@
 
     var performPromiseAll = function (iteratorRecord, C, resultCapability) {
       var it = iteratorRecord.iterator;
-      var values = [], remaining = { count: 1 }, next, nextValue;
+      var values = [];
+      var remaining = { count: 1 };
+      var next, nextValue;
       var index = 0;
       while (true) {
         try {
@@ -2359,7 +2401,8 @@
     };
 
     var performPromiseRace = function (iteratorRecord, C, resultCapability) {
-      var it = iteratorRecord.iterator, next, nextValue, nextPromise;
+      var it = iteratorRecord.iterator;
+      var next, nextValue, nextPromise;
       while (true) {
         try {
           next = ES.IteratorStep(it);
@@ -2454,7 +2497,9 @@
         }
         if (ES.IsPromise(v)) {
           var constructor = v.constructor;
-          if (constructor === C) { return v; }
+          if (constructor === C) {
+            return v;
+          }
         }
         var capability = new PromiseCapability(C);
         var resolveFunc = capability.resolve;
@@ -2550,7 +2595,12 @@
       var p = Promise.resolve(5);
       p.constructor = {};
       var p2 = Promise.resolve(p);
-      return (p === p2); // This *should* be false!
+      try {
+        p2.then(null, noop).then(null, noop); // avoid "uncaught rejection" warnings in console
+      } catch (e) {
+        return true; // v8 native Promises break here https://code.google.com/p/chromium/issues/detail?id=575314
+      }
+      return p === p2; // This *should* be false!
     }(globals.Promise));
 
     // Chrome 46 (probably older too) does not retrieve a thenable's .then synchronously
@@ -2762,7 +2812,9 @@
 
         MapIterator.prototype = {
           next: function next() {
-            var i = this.i, kind = this.kind, head = this.head, result;
+            var i = this.i;
+            var kind = this.kind;
+            var head = this.head;
             if (typeof this.i === 'undefined') {
               return { value: void 0, done: true };
             }
@@ -2771,6 +2823,7 @@
               i = i.prev;
             }
             // advance to next unreturned element.
+            var result;
             while (i.next !== head) {
               i = i.next;
               if (!i.isRemoved()) {
@@ -2840,7 +2893,8 @@
                 return;
               }
             }
-            var head = this._head, i = head;
+            var head = this._head;
+            var i = head;
             while ((i = i.next) !== head) {
               if (ES.SameValueZero(i.key, key)) {
                 return i.value;
@@ -2855,7 +2909,8 @@
               // fast O(1) path
               return typeof this._storage[fkey] !== 'undefined';
             }
-            var head = this._head, i = head;
+            var head = this._head;
+            var i = head;
             while ((i = i.next) !== head) {
               if (ES.SameValueZero(i.key, key)) {
                 return true;
@@ -2866,7 +2921,9 @@
 
           set: function set(key, value) {
             requireMapSlot(this, 'set');
-            var head = this._head, i = head, entry;
+            var head = this._head;
+            var i = head;
+            var entry;
             var fkey = fastkey(key);
             if (fkey !== null) {
               // fast O(1) path
@@ -2899,7 +2956,8 @@
 
           'delete': function (key) {
             requireMapSlot(this, 'delete');
-            var head = this._head, i = head;
+            var head = this._head;
+            var i = head;
             var fkey = fastkey(key);
             if (fkey !== null) {
               // fast O(1) path
@@ -2926,7 +2984,9 @@
             requireMapSlot(this, 'clear');
             this._size = 0;
             this._storage = emptyObject();
-            var head = this._head, i = head, p = i.next;
+            var head = this._head;
+            var i = head;
+            var p = i.next;
             while ((i = p) !== head) {
               i.key = i.value = empty;
               p = i.next;
@@ -3364,11 +3424,6 @@
       return delete target[key];
     },
 
-    enumerate: function enumerate(target) {
-      throwUnlessTargetIsObject(target);
-      return new ObjectIterator(target, 'key');
-    },
-
     has: function has(target, key) {
       throwUnlessTargetIsObject(target);
       return key in target;
@@ -3588,8 +3643,8 @@
   Object.keys(ReflectShims).forEach(function (key) {
     defineOrOverrideReflectProperty(key, ReflectShims[key]);
   });
-  if (functionsHaveNames && globals.Reflect.getPrototypeOf.name !== 'getPrototypeOf') {
-    var originalReflectGetProto = globals.Reflect.getPrototypeOf;
+  var originalReflectGetProto = globals.Reflect.getPrototypeOf;
+  if (functionsHaveNames && originalReflectGetProto && originalReflectGetProto.name !== 'getPrototypeOf') {
     overrideNative(globals.Reflect, 'getPrototypeOf', function getPrototypeOf(target) {
       return _call(originalReflectGetProto, globals.Reflect, target);
     });
@@ -3694,7 +3749,7 @@
       if (!isArray(replacer)) {
         var replaceFn = ES.IsCallable(replacer) ? replacer : null;
         var wrappedReplacer = function (key, val) {
-          var parsedValue = replacer ? _call(replacer, this, key, val) : val;
+          var parsedValue = replaceFn ? _call(replaceFn, this, key, val) : val;
           if (typeof parsedValue !== 'symbol') {
             if (Type.symbol(parsedValue)) {
               return assignTo({})(parsedValue);

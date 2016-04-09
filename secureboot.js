@@ -1456,6 +1456,7 @@ else if (!b_u)
         jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1, w:7});
@@ -1555,8 +1556,10 @@ else if (!b_u)
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
-    if (typeof Number.isNaN !== 'function'
-            || typeof Set === 'undefined') {
+    if (
+        typeof Number.isNaN !== 'function' ||
+        typeof Set === 'undefined'
+    ) {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }

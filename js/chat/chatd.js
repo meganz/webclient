@@ -302,7 +302,7 @@ Chatd.Shard.prototype.rejoinexisting = function() {
     for (var c in this.chatIds) {
         // rejoin chat and immediately set the locally buffered message range
         if (!this.joinedChatIds[c]) {
-            this.join(c);
+            this.chatd.range(c);
         }
     }
 };
@@ -318,7 +318,6 @@ Chatd.Shard.prototype.resendpending = function() {
 // send JOIN
 Chatd.Shard.prototype.join = function(chatId) {
     this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
-    this.chatd.range(chatId);
 };
 
 Chatd.prototype.cmd = function(opCode, chatId, cmd) {

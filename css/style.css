@@ -4950,14 +4950,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .astropay-payment-reminder .left-block {
     display: table-cell;
+    padding-top: 3px;
     width: 48px;
 }
 .astropay-payment-reminder .mega-payment-icon {
-    background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll -151px -650px;
-    height: 48px;
+    background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll -113px -487px;
+    height: 36px;
     left: 26px;
     top: 0;
-    width: 48px;
+    width: 36px;
 }
 .astropay-payment-reminder .right-block {
     display: table-cell;
@@ -4970,7 +4971,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding-bottom: 10px;
     padding-top: 10px;
 }
-.astropay-payment-reminder .right-block .last-payment-info {
+.astropay-payment-reminder .last-payment-info {
     font-family: 'source_sans_prosemibold', Arial;
     font-size: 13px;
 }
@@ -4981,13 +4982,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding-left: 20px;
 }
 .astropay-payment-reminder .renew-text, .astropay-payment-reminder .choose-text {
-    font-family: 'source_sans_probold', Arial;
+    font-family: 'source_sans_prosemibold', Arial;
 }
 .astropay-payment-reminder .purchased-date, .astropay-payment-reminder .expired-date {
     padding-left: 5px;
 }
+.astropay-payment-reminder .provider-icon {
+    padding-bottom: 2px;
+}
 .astropay-payment-reminder .gateway-name {
-    font-family: 'source_sans_probold', Arial;
+    font-family: 'source_sans_prosemibold', Arial;
 }
 .astropay-payment-reminder .first-message, .astropay-payment-reminder .second-message {
     margin-top: 20px;

@@ -159,7 +159,7 @@ function u_checklogin3a(res, ctx) {
         
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if (typeof u_attr.lup !== 'undefined') {
-            warnPopup.userLastPaymentInfo = u_attr.lup;
+            warnPopup.lastPaymentInfo = u_attr.lup;
         }
 
         if (!u_attr.email) {

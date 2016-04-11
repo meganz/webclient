@@ -402,7 +402,7 @@ function pro_next_step(proPlanName) {
     if (proPlanName === undefined) {
         // this came from skipConfirmationStep
         var plan = $('.reg-st3-membership-bl.selected').data('payment');
-        proPlanName = (plan === 4 ? 'lite' : Array(++plan).join("i"));
+        proPlanName = (plan === 4 ? 'lite' : Array(++plan).join('i'));
     }
     else if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -643,7 +643,7 @@ function pro_pay() {
                             loadingDialog.hide();
 
                             // If an error code
-                            if (typeof utcResult == 'number' && utcResult < 0) {
+                            if (typeof utcResult === 'number' && utcResult < 0) {
                                 if (utcResult == EOVERQUOTA) {
                                     alert(l[514]);
                                 }

@@ -79,17 +79,23 @@ var warnPopup = {
         $dialog.addClass('active');        
     },
     
-    // The user's last payment information
-    userLastPaymentInfo: null,
+    /** The user's last payment information */
+    lastPaymentInfo: null,
         
     /**
      * A helpful PRO plan renewal popup which is shown when their PRO plan has expired
      */
-    showProPlanRenewal: function() {
+    showProPlanExpired: function() {
         
         // If their last payment info is not set by the API, then their plan is not currently expired.
         // Also if they've already seen the popup, then don't keep showing it again or it's annoying.
-        if ((this.userLastPaymentInfo === null) || (localStorage.getItem('hideProPlanExpiredPopup') !== null)) {
+        if ((warnPopup.lastPaymentInfo === null) || (localStorage.getItem('hideProPlanExpiredPopup') !== null)) {
+            return false;
+        }
+        
+        // Don't display the popup for Apple or Google as they are recurring subscriptions. If the lastPaymentInfo is 
+        // set then it means they have purposefully cancelled their account and would not want to see any warnings.
+        if ((warnPopup.lastPaymentInfo.gwname === 'iTunes') || (warnPopup.lastPaymentInfo.gwname === 'Google')) {
             return false;
         }
         
@@ -105,33 +111,33 @@ var warnPopup = {
         $dialog.addClass('active');
         
         // Get PRO plan name e.g. PRO III
-        var proNum = warnPopup.userLastPaymentInfo.p;
+        var proNum = warnPopup.lastPaymentInfo.p;
         var proPlanName = getProPlan(proNum);
         
         // Convert the timestamps to yyyy-mm-dd format
-        var purchasedDate = warnPopup.formatTimestampToDate(warnPopup.userLastPaymentInfo.ts);
-        var expiryDate = warnPopup.formatTimestampToDate(warnPopup.userLastPaymentInfo.exts);
-                
+        var purchasedDate = warnPopup.formatTimestampToDate(warnPopup.lastPaymentInfo.ts);
+        var expiryDate = warnPopup.formatTimestampToDate(warnPopup.lastPaymentInfo.exts);
+        
         // Work out the number of months their previous plan was for e.g. 1 month or 3 months
-        var planMonths = warnPopup.userLastPaymentInfo.m;
+        var planMonths = warnPopup.lastPaymentInfo.m;
         var planMonthsPluralisation = (planMonths > 1) ? l[6788] : l[913];
         
         // Set the payment provider name and icon
-        var gatewayData = warnPopup.userLastPaymentInfo.gwd;
-        var gatewayName = warnPopup.userLastPaymentInfo.gwname;
-            gatewayName = warnPopup.normaliseGatewayName(gatewayName, gatewayData);
-        var iconClass = (gatewayName === 'Astropay') ? gatewayData.gwname : gatewayName;
-        
+        var gatewayName = warnPopup.lastPaymentInfo.gwname;
+        var gatewayData = (typeof warnPopup.lastPaymentInfo.gwd !== 'undefined') ? warnPopup.lastPaymentInfo.gwd : null;
+            gatewayName = (gatewayData) ? gatewayData.gwname : gatewayName;
+        var gatewayDisplayName = warnPopup.normaliseGatewayName(gatewayName, gatewayData);
+                
         // Display
         $dialog.find('.header-pro-plan').text(proPlanName);
         $dialog.find('.purchased-date').text(purchasedDate);
         $dialog.find('.expired-date').text(expiryDate);
         $dialog.find('.pro-plan').text(proPlanName);
         $dialog.find('.plan-duration').text(planMonths + ' ' + planMonthsPluralisation);
-        $dialog.find('.provider-icon').addClass(iconClass);
-        $dialog.find('.gateway-name').text(gatewayName);
+        $dialog.find('.provider-icon').addClass(gatewayName);
+        $dialog.find('.gateway-name').text(gatewayDisplayName);
         
-        // On the Choose... button click
+        // On the Choose button click
         $dialog.find('.warning-button.choose').rebind('click', function() {
             
             // Hide the dialog and go to pro page
@@ -142,7 +148,31 @@ var warnPopup = {
             localStorage.setItem('hideProPlanExpiredPopup', '1');
         });
         
-        console.log('zzzz', warnPopup.userLastPaymentInfo);
+        // On the Renew button click
+        $dialog.find('.warning-button.renew').rebind('click', function() {
+            
+            // Hide the dialog
+            $dialog.removeClass('active');
+            
+            // Set localStorage so it doesn't show each time, also set details for pre-population on the Pro page
+            localStorage.setItem('hideProPlanExpiredPopup', '1');
+            localStorage.setItem('lastPaymentProvider', gatewayName);
+            localStorage.setItem('lastPaymentDuration', planMonths);
+            
+            // If Astropay, then set the payer's name and tax number to prefill the form
+            if (gatewayData) {
+                localStorage.setItem('lastPaymentName', gatewayData.name);
+                localStorage.setItem('lastPaymentTaxNum', gatewayData.cpf);
+            }
+            
+            // Get the link for the Pro page second step e.g. #pro_lite, #pro_1 etc
+            var proLink = (proNum === 4) ? 'lite' : proNum;
+            
+            // Go to the second step of the Pro page which will pre-populate the details
+            document.location.hash = 'pro_' + proLink;
+        });
+        
+        console.log('zzzz', warnPopup.lastPaymentInfo);
     },
     
     /**
@@ -155,8 +185,8 @@ var warnPopup = {
     normaliseGatewayName: function(gatewayName, gatewayData) {
         
         // If AstroPay then the API has an exact name for that gatway
-        if (gatewayName === 'Astropay') {
-            return gatewayData.gwname;          // Visa, Mastercard etc
+        if (gatewayData) {
+            return gatewayData.label;           // Visa, Mastercard etc
         }
         else if (gatewayName === 'Infobip') {
             return l[7219] + ' (Centilli)';     // Mobile (Centilli)

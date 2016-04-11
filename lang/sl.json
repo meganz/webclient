@@ -3178,7 +3178,17 @@
     "8644": "Uporabljate za\u010dasno sejo. Podatki, ki jih shranjujete, bodo izgubljeni, ko se seja zaklju\u010di. Za za\u0161\u010dito svojih podatkov, si prosim priskrbite pravi ra\u010dun v najkraj\u0161em mo\u017enem \u010dasu in pridobite svojih [S]brezpla\u010dnih 50 GB varnega shranjevalnega prostora v oblaku![\/S]",
     "8645": "Prevelika velikost slike",
     "8646": "Va\u0161a slika je presegla najvi\u0161jo dovoljeno velikost 64 KB. Prosim, poskusite ponovno z manj\u0161o datoteko.",
-    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
+    "8647": "Neuspe\u0161no kopiranje MEGA povezave na odlagali\u0161\u010de.",
+    "8648": "Napaka pri kopiranju povezave",
+    "8649": "Neznano do dekripcije",
+    "8650": "Va\u0161e povpra\u0161evanje je prekratko. Prosim, podajte nam ve\u010d podrobnosti o va\u0161i te\u017eavi \/ vpra\u0161anju.",
+    "8651": "Va\u0161 %1 plan je potekel.",
+    "8652": "KUPLJEN",
+    "8653": "Kliknite na [S]Obnovi[\/S] za nakup va\u0161ega %1 plana (%2) z uporabo %3 %4.",
+    "8654": "Sicer kliknite [S]Izberi[\/S] za izbiro drugega plana ali pla\u010dilne mo\u017enosti.",
+    "8655": "Obnovi",
+    "8656": "Izberite...",
+    "8657": "POTEKEL",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3224,6 +3234,13 @@
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
         "image-size-exceeded-body": 8646,
-        "support-too-short": 8650
+        "support-too-short": 8650,
+        "your-plan-has-expired": 8651,
+        "purchased": 8652,
+        "expired": 8657,
+        "renew-plan-instruction": 8653,
+        "choose-different-plan-instruction": 8654,
+        "renew": 8655,
+        "choose": 8656
     }
 }

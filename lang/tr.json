@@ -3176,9 +3176,19 @@
     "8642": "Eksik\/G\u00f6r\u00fcnmez Veri",
     "8643": "Ge\u00e7ici oturum kullanmaktas\u0131n\u0131z.",
     "8644": "Ge\u00e7ici oturum kullanmaktas\u0131n\u0131z. Depolad\u0131\u011f\u0131n\u0131z veri zaman a\u015f\u0131m\u0131na u\u011frad\u0131\u011f\u0131nda yok olacakt\u0131r. Dosyalar\u0131n\u0131z\u0131 saklamak i\u00e7in l\u00fctfen en k\u0131sa zamanda normal oturuma ge\u00e7in ve [S]bulutunuzdaki \u00fccretsiz 50GB g\u00fcvenli saklama alan\u0131na sahip olun![\/S]",
-    "8645": "Image size exceeded",
-    "8646": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
-    "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
+    "8645": "G\u00f6r\u00fcnt\u00fc boyutu a\u015f\u0131ld\u0131",
+    "8646": "Resminiz 64 KB maksimum dosya boyutunu a\u015ft\u0131. Daha k\u00fc\u00e7\u00fck bir dosya ile tekrar deneyin.",
+    "8647": "Panoya MEGA ba\u011flant\u0131s\u0131n\u0131 kopyalama ba\u015far\u0131s\u0131z oldu.",
+    "8648": "Ba\u011flant\u0131 kopyalan\u0131rken hata olu\u015ftu",
+    "8649": "\u015eifreleme \u00e7\u00f6z\u00fclene kadar bilinmiyor",
+    "8650": "Talebiniz \u00e7ok k\u0131sa. L\u00fctfen talebinizle ilgili bize daha fazla bilgi verin.",
+    "8651": "%1 plan\u0131n\u0131n s\u00fcresi doldu.",
+    "8652": "SATIN ALINDI",
+    "8653": "%1 plan\u0131n\u0131 (%2) sat\u0131n almak i\u00e7in %3 %4 kullanarak [S]Yenile[\/S]ye t\u0131klay\u0131n",
+    "8654": "Aksi takdirde, farkl\u0131 bir plan veya \u00f6deme se\u00e7ene\u011fini se\u00e7mek i\u00e7in [S]Se\u00e7in[\/S]e t\u0131klay\u0131n.",
+    "8655": "Yenile",
+    "8656": "Se\u00e7in...",
+    "8657": "S\u00dcRES\u0130 DOLDU",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3224,6 +3234,13 @@
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
         "image-size-exceeded-body": 8646,
-        "support-too-short": 8650
+        "support-too-short": 8650,
+        "your-plan-has-expired": 8651,
+        "purchased": 8652,
+        "expired": 8657,
+        "renew-plan-instruction": 8653,
+        "choose-different-plan-instruction": 8654,
+        "renew": 8655,
+        "choose": 8656
     }
 }

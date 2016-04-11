@@ -1144,7 +1144,7 @@ function fm_tfsupdate() {
     var $tpt = $('.transfer-panel-title');
     var l = $.trim($tpt.text()).split(sep)[0];
     if (i && u) {
-        t = '\u2191 ' + i + ' \u2193 ' + u;
+        t = '\u2191 ' + u + ' \u2193 ' + i;
     }
     else if (i) {
         t = i;

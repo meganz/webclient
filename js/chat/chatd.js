@@ -231,6 +231,7 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.onopen = function(e) {
         self.keepAliveTimerRestart();
         self.logger.log('chatd connection established');
+        self.triggerSendIfAble();
         self.rejoinexisting();
         self.resendpending();
     };
@@ -266,12 +267,12 @@ Chatd.Shard.prototype.disconnect = function() {
 };
 
 Chatd.Shard.prototype.multicmd = function(cmds) {
-    //console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
     var self = this;
     cmds.forEach( function _iterator(cmdObj)
     {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
+        console.error("MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
         self.cmdq += String.fromCharCode(opCode)+cmd;
     });
 
@@ -279,6 +280,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
 };
 
 Chatd.Shard.prototype.cmd = function(opCode, cmd) {
+    console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
     this.cmdq += String.fromCharCode(opCode)+cmd;
 
@@ -287,21 +289,27 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd) {
 
 Chatd.Shard.prototype.triggerSendIfAble = function() {
     if (this.isOnline()) {
-        var a = new Uint8Array(this.cmdq.length);
-        for (var i = this.cmdq.length; i--; ) {
-            a[i] = this.cmdq.charCodeAt(i);
-        }
-        this.s.send(a);
+        if (this.cmdq.length > 0) {
+            var a = new Uint8Array(this.cmdq.length);
+            for (var i = this.cmdq.length; i--;) {
+                a[i] = this.cmdq.charCodeAt(i);
+            }
+            this.s.send(a);
 
-        this.cmdq = '';
+            console.error("sending", this.cmdq);
+            this.cmdq = '';
+        }
+    } else {
+        console.error("delaying");
     }
-}
+};
 
 // rejoin all open chats after reconnection (this is mandatory)
 Chatd.Shard.prototype.rejoinexisting = function() {
     for (var c in this.chatIds) {
         // rejoin chat and immediately set the locally buffered message range
         if (!this.joinedChatIds[c]) {
+            this.join(c);
             this.chatd.range(c);
         }
     }
@@ -781,11 +789,11 @@ Chatd.Messages.prototype.resend = function() {
 
     // resend all pending new messages and modifications
     this.sendingList.forEach(function(msgxid) {
-        self.chatd.chatIdShard[this.chatId].msg(
-            this.chatId,
+        self.chatd.chatIdShard[self.chatId].msg(
+            self.chatId,
             msgxid,
-            this.buf[this.sending[msgxid]][Chatd.MsgField.TIMESTAMP],
-            this.buf[this.sending[msgxid]][Chatd.MsgField.MESSAGE]
+            self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],
+            self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE]
         );
     });
 

@@ -296,11 +296,8 @@ Chatd.Shard.prototype.triggerSendIfAble = function() {
             }
             this.s.send(a);
 
-            console.error("sending", this.cmdq);
             this.cmdq = '';
         }
-    } else {
-        console.error("delaying");
     }
 };
 

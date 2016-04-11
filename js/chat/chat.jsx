@@ -232,6 +232,7 @@ var Chat = function() {
             'chatdIntegration': ChatdIntegration,
             'callManager': CallManager,
             'urlFilter': UrlFilter,
+            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'karerePing': KarerePing

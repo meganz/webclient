@@ -62,7 +62,7 @@ module.exports = function(config) {
         'test/config.js',
 
         // Shim for ES6 features some browsers may not have (PhantomJS, MSIE).
-        'node_modules/es6-shim/es6-shim.js',
+        'js/vendor/es6-shim.js',
 
         // == Our code ==
         'secureboot.js',
@@ -122,6 +122,7 @@ module.exports = function(config) {
         'js/chat/rtcStats.js',
         'js/chat/rtcSession.js',
         'js/chat/plugins/urlFilter.js',
+        'js/chat/plugins/emoticonShortcutsFilter.js',
         'js/chat/plugins/emoticonsFilter.js',
         'js/chat/plugins/chatNotifications.js',
         'js/chat/plugins/callFeedback.js',

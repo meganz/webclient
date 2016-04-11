@@ -142,10 +142,20 @@ Unless otherwise noted, they were released under a [MIT License].
 > Use output in compiled.js
 > ```
 
+---
+[chat/strophe.light.js]: Strophe.js is an XMPP library for JavaScript.
+
+> NB: We are using a custom build which was created using:
+> 
+> ```bash
+> git clone https://github.com/strophe/strophejs.git
+> cd strophejs
+> git checkout 30033f05eded0bb079e8c06a75045f195068d896
+> npm install
+> make strophe.light.js
+> ```
 
 ---
----
-
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>
@@ -177,3 +187,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
+[chat/strophe.light.js]: <https://github.com/strophe/strophejs/tree/30033f05eded0bb079e8c06a75045f195068d896>

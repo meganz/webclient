@@ -95,7 +95,7 @@ function init_sync() {
     }, 1000);
     var pf = navigator.platform.toUpperCase();
 
-    if (true || page.substr(-5) === 'linux') {
+    if (page.substr(-5) === 'linux') {
         sync_switchOS('linux');
     }
     else if (pf.indexOf('MAC') >= 0) {

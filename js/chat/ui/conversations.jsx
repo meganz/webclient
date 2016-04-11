@@ -234,7 +234,6 @@ var ConversationsList = React.createClass({
             'className': "nw-conversations-item current-calling",
             'data-jid': ''
         };
-        var callName;
 
         var megaChat = this.props.megaChat;
 
@@ -247,7 +246,6 @@ var ConversationsList = React.createClass({
             if (user) {
                 currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
                 currentCallingContactStatusProps['data-jid'] = room.roomJid;
-                callName = room.getRoomTitle();
 
                 if (room.roomJid == megaChat.currentlyOpenedChat) {
                     currentCallingContactStatusProps.className += " selected";

@@ -11,6 +11,8 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'userId': true,
             'messageId': true,
 
+            'keyid': true,
+
             'message': true,
             'textContents': false,
 
@@ -354,6 +356,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 {
                     'messageId': eventData.messageId,
                     'userId': eventData.userId,
+                    'keyid': eventData.keyid,
                     'message': eventData.message,
                     'delay': eventData.ts,
                     'orderValue': eventData.id
@@ -479,12 +482,18 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
-    self.chatd.rebind('onMessagesKeyDone.messagesBuff' + chatRoomId, function(e, eventData) {
-        console.log('VG: key done');
-        console.log('VG: keyxid: ' + eventData.keyxid);
-        console.log('VG: keyid: ' + eventData.keyid);
+    self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
+        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+            self.trackDataChange();
+        }
+    });
+
+    self.chatd.rebind('onMessageKeysDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
+        chatRoom.protocolHandler.seedKeys(eventData.keys);
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();
         }

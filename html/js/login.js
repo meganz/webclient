@@ -3,8 +3,7 @@ var login_email = false;
 
 function dologin() {
     /* jshint -W074 */
-    if ((document.getElementById('login_email').value === '')
-            || (document.getElementById('login_email').value === l[195])) {
+    if ((document.getElementById('login_email').value === '')) {
         alert(l[197]);
     }
     else if (checkMail(document.getElementById('login_email').value)) {
@@ -156,7 +155,7 @@ function pagelogin() {
         $('.login-register-input.email').addClass('incorrect');
         $('#login-name2').focus();
     }
-    else if ($('#login-password2').val() === '' || $('#login-password2').val() === l[909]) {
+    else if ($('#login-password2').val() === '') {
         $('.login-register-input.password').addClass('incorrect');
         $('#login-password2').focus();
     }
@@ -194,6 +193,7 @@ function pagelogin() {
                 }
                 else if (r) {
                     u_type = r;
+                    passwordManager('#login_form');
                     if (login_next) {
                         document.location.hash = login_next;
                     }
@@ -241,38 +241,17 @@ function init_login() {
         }
     }
 
-    $('#login-name2').rebind('focus', function(e) {
-        $('.login-register-input.email').addClass('focused');
-        if ($(this).val() === l[195]) {
-            $(this).val('');
-        }
+    $('#login-name2,#login-password2').rebind('focus', function(e) {
+        $(this).parents('.login-register-input').addClass('focused');
     });
-    $('#login-name2').rebind('blur', function(e) {
-        $('.login-register-input.email').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[195]);
-        }
-    });
-    $('#login-password2').rebind('focus', function(e) {
-        $('.login-register-input.password').addClass('focused');
-        if ($(this).val() === l[909]) {
-            $(this).val('');
-            $(this)[0].type = 'password';
-        }
-    });
-    $('#login-password2').rebind('blur', function(e) {
-        $('.login-register-input.password').removeClass('focused');
-        if ($(this).val() === '') {
-            $(this).val(l[909]);
-            $(this)[0].type = 'text';
-        }
+    $('#login-name2,#login-password2').rebind('blur', function(e) {
+        $(this).parents('.login-register-input').removeClass('focused');
     });
 
     $('#login-password2, #login-name2').rebind('keydown', function(e) {
         if ($('#login-name2').val() !== ''
                 && $('#login-name2').val() !== l[195]
-                && $('#login-password2').val() !== ''
-                && $('#login-password2').val() !== l[909]) {
+                && $('#login-password2').val() !== '') {
             $('.register-st2-button').addClass('active');
         }
         $('.login-register-input.password').removeClass('incorrect');

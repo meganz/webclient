@@ -23,11 +23,7 @@ var EmoticonsFilter = function(megaChat) {
     });
 
     var regExpStr = "(" + escapedRegExps.join("|") + ")";
-
-    window.regExpStr = regExpStr;
-
     self.emoticonsRegExp = new RegExp(regExpStr, "gi");
-    window.emoticonsRegExp = self.emoticonsRegExp;
 
     megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);

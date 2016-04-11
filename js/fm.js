@@ -128,6 +128,7 @@ function initTransferScroll()
 
 function initTreeScroll()
 {
+    if (d) console.time('treeScroll');
     /**
      if (localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth)
      {
@@ -135,7 +136,8 @@ function initTreeScroll()
      }
      **/
 
-    $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
+    // .fm-tree-panel's with .manual-tree-panel-scroll-management would manage their jscroll pane by themself.
+    $('.fm-tree-panel:not(.manual-tree-panel-scroll-management)').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
     // $('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
     // $('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
     // {
@@ -146,7 +148,8 @@ function initTreeScroll()
     // if (t == $.scroller) treeDroppable();
     // },100);
     // });
-    jScrollFade('.fm-tree-panel');
+    jScrollFade('.fm-tree-panel:not(.manual-tree-panel-scroll-management)');
+    if (d) console.timeEnd('treeScroll');
 }
 
 var ddtreedisabled = {};
@@ -2180,7 +2183,7 @@ function fmremove() {
             contact = 'contacts';
         }
         else {
-            replaceString = '<strong>' + decodeURIComponent(M.d[$.selected[0]].name) + '</strong>';
+            replaceString = '<strong>' + htmlentities(M.d[$.selected[0]].name) + '</strong>';
             contact = 'contact';
         }
 
@@ -2886,13 +2889,20 @@ function fmtopUI() {
     if (M.currentrootid === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
         $('.fm-right-files-block').addClass('rubbish-bin');
-    } else {
+    }
+    else {
         $('.fm-right-files-block').removeClass('rubbish-bin');
         if (M.currentrootid === M.InboxID) {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+        }
+        else if (M.currentdirid === 'contacts'
+                || M.currentdirid === 'ipc'
+                || M.currentdirid === 'opc'
+                || (String(M.currentdirid).length === 11
+                    && M.currentdirid.substr(0, 6) !== 'search')) {
+
             $('.fm-add-user').removeClass('hidden');
             $('.fm-left-panel').addClass('contacts-panel');
             if (M.currentdirid === 'ipc') {
@@ -2902,7 +2912,8 @@ function fmtopUI() {
                 $('.fm-contact-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
             }
-        } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
+        }
+        else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
@@ -3289,10 +3300,9 @@ function accountUI() {
             var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
 
-            // Show if using an extension e.g. "Chrome Extension on Windows" or "Firefox Extension on Linux"
+            // Show if using an extension e.g. "Firefox on Linux (+Extension)"
             if (browser.isExtension) {
-                browserName = browserName.replace('Firefox', 'Firefox ' + l[7683]);
-                browserName = browserName.replace('Chrome', 'Chrome ' + l[7683]);
+                browserName += ' (+' + l[7683] + ')';
             }
 
             // If not the current session
@@ -3312,7 +3322,7 @@ function accountUI() {
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent)
+                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
                     + '" src="' + staticpath + 'images/browser/' + browser.icon
                     + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
                     + '</span></td>'
@@ -3640,7 +3650,7 @@ function accountUI() {
             $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
-            u_attr.lastname = $('#account-lastname').val().trim()||' ';
+            u_attr.lastname = $('#account-lastname').val().trim();
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
             u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
             u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
@@ -3694,6 +3704,10 @@ function accountUI() {
             {
                 mega.config.set('ul_skipIdentical', M.account.ul_skipIdentical);
                 delete M.account.ul_skipIdentical;
+            }
+            if (typeof M.account.dlThroughMEGAsync !== 'undefined') {
+                mega.config.set('dlThroughMEGAsync', M.account.dlThroughMEGAsync);
+                delete M.account.dlThroughMEGAsync;
             }
 
             if (typeof M.account.uisorting !== 'undefined') {
@@ -3981,6 +3995,29 @@ function accountUI() {
             else if (id == 'rad5')
                 M.account.ul_skipIdentical = 0;
             $('.ulskip').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+        });
+
+        $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
+        i = 19;
+        if (fmconfig.dlThroughMEGAsync) {
+            i = 18;
+        }
+        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        $('.dlThroughMEGAsync input').unbind('click');
+        $('.dlThroughMEGAsync input').bind('click', function(e)
+        {
+            var id = $(this).attr('id');
+            if (id === 'rad18') {
+                M.account.dlThroughMEGAsync = 1;
+            }
+            else if (id === 'rad19') {
+                M.account.dlThroughMEGAsync = 0;
+            }
+            $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
@@ -4435,17 +4472,20 @@ function avatarDialog(close)
         {
             cropButton: $('#fm-change-avatar'),
             dragDropUploadPrompt:l[1390],
+            outputFormat: 'image/jpeg',
             onCrop: function(croppedDataURI)
             {
+                if (croppedDataURI.length > 64 * 1024) {
+                    return msgDialog('warninga', l[8645], l[8646]);
+                }
                 var data = dataURLToAB(croppedDataURI);
                 mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
-                var blob = new Blob([data], {type: 'image/jpeg'});
-                avatars[u_handle] =
-                    {
-                        data: blob,
-                        url: myURL.createObjectURL(blob)
-                    }
-                    $('.fm-account-avatar').html(useravatar.contact(u_handle));
+                var blob = new Blob([data], {type: 'image/png'});
+                avatars[u_handle] = {
+                    data: blob,
+                    url: myURL.createObjectURL(blob)
+                };
+                $('.fm-account-avatar').html(useravatar.contact(u_handle));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },
@@ -4908,6 +4948,9 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
+        if (!is_fm()) {
+            return;
+        }
         if (self.is_active()) {
             self.deactivate();
             return false;
@@ -5965,8 +6008,12 @@ function transferPanelUI()
         }
     });
 
-    $('.transfer-pause-icon').rebind('click', function()
-    {
+    $('.transfer-pause-icon').rebind('click', function() {
+
+        if (dlmanager.isOverQuota) {
+            return dlmanager.showOverQuotaDialog();
+        }
+
         if (!$(this).hasClass('disabled')) {
             if ($(this).hasClass('active')) {
                 // terms of service
@@ -6553,7 +6600,7 @@ function treeUI()
     //console.error('treeUI');
     if (d)
         console.time('treeUI');
-    $('.fm-tree-panel .nw-fm-tree-item').draggable(
+    $('.fm-tree-panel .nw-fm-tree-item:visible').draggable(
         {
             revert: true,
             containment: 'document',
@@ -6607,7 +6654,7 @@ function treeUI()
         'ul.conversations-pane > li,' +
         '.messages-block,' +
         '.nw-contact-item'
-    ).droppable({
+    ).filter(":visible").droppable({
             tolerance: 'pointer',
             drop: function(e, ui)
             {
@@ -6626,7 +6673,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if ($(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length > 0 || $(e.target).parents('.messages.content-area').length > 0 || $(e.target).parents('.chat-right-pad .user-card-data').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if (!is_fm() || $(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6634,8 +6681,8 @@ function treeUI()
         }
     });
 
-    $('.fm-tree-panel .nw-fm-tree-item').unbind('click contextmenu');
-    $('.fm-tree-panel .nw-fm-tree-item').bind('click contextmenu', function(e) {
+    $('.fm-tree-panel .nw-fm-tree-item:visible').unbind('click.treeUI contextmenu.treeUI');
+    $('.fm-tree-panel .nw-fm-tree-item:visible').bind('click.treeUI contextmenu.treeUI', function(e) {
         var id = $(this).attr('id').replace('treea_', '');
         if (e.type === 'contextmenu') {
             $('.nw-fm-tree-item').removeClass('dragover');
@@ -6777,7 +6824,7 @@ function sectionUIopen(id) {
         $('.fm-blocks-view.fm').addClass('hidden');
     }
 
-    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc' && String(M.currentdirid).length !== 11) {
         $('.fm-left-panel').removeClass('contacts-panel');
         $('.fm-right-header').removeClass('requests-panel');
         $('.fm-received-requests').removeClass('active');
@@ -7511,7 +7558,7 @@ function addShareDialogContactToContent(type, id, av, name, permClass, permText,
     }
     else {
         item = av +   '<div class="fm-chat-user-info">'
-               +       '<div class="fm-chat-user">' + name + '</div>'
+               +       '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
                +   '</div>';
     }
 
@@ -7611,7 +7658,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     rowId = (userHandle) ? userHandle : email;
     html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
-    $('.share-dialog .share-dialog-contacts').append(html);
+    $('.share-dialog .share-dialog-contacts').safeAppend(html);
 }
 
 function handleDialogScroll(num, dc)
@@ -9626,7 +9673,7 @@ function propertiesDialog(close)
                 }
                 p.t4 = rights;
                 p.t6 = l[5905];
-                p.t7 = mega.utils.fullUsername(user.h);
+                p.t7 = htmlentities(mega.utils.fullUsername(user.h));
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -9948,7 +9995,7 @@ function slideshow(id, close)
         return false;
     }
 
-    var n = M.d[id];
+    var n = M.getNodeByHandle(id);
     if (n && RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
@@ -10004,18 +10051,36 @@ function slideshow(id, close)
                 return;
             }
         }
-        M.addDownload([slideshowid]);
-    });
 
-    $('.slideshow-getlink').rebind('click', function() {
-
-        if (u_type === 0) {
-            ephemeralDialog(l[1005]);
+        if (M.d[slideshowid]) {
+            M.addDownload([slideshowid]);
         }
         else {
-            initCopyrightsDialog([slideshowid]);
+            M.addDownload([n]);
         }
     });
+
+
+    if (M.d[slideshowid]) {
+        $('.slideshow-getlink')
+            .show()
+            .rebind('click', function() {
+                if (u_type === 0) {
+                    ephemeralDialog(l[1005]);
+                }
+                else {
+                    initCopyrightsDialog([slideshowid]);
+                }
+            })
+            .next('.slideshow-line')
+                .show();
+    }
+    else {
+        $('.slideshow-getlink')
+            .hide()
+                .next('.slideshow-line')
+                    .hide();
+    }
 
     if (previews[id]) {
         previewsrc(previews[id].src);
@@ -10055,19 +10120,28 @@ function fetchsrc(id)
         delete pfails[id];
     }
 
-    var n = M.d[id];
+    var n = M.getNodeByHandle(id);
+    if (!n) {
+        console.error('handle "%s" not found...', id);
+        return false;
+    }
+
     preqs[id] = 1;
     var treq = {};
     treq[id] = {fa: n.fa, k: n.key};
     api_getfileattr(treq, 1, function(ctx, id, uint8arr)
     {
         previewimg(id, uint8arr);
-        if (!n.fa || n.fa.indexOf(':0*') < 0)
-        {
-            if (d)
+        if (!n.fa || n.fa.indexOf(':0*') < 0) {
+            if (d) {
                 console.log('Thumbnail found missing on preview, creating...', id, n);
-            var aes = new sjcl.cipher.aes([n.key[0], n.key[1], n.key[2], n.key[3]]);
-            createthumbnail(false, aes, id, uint8arr);
+            }
+            var aes = new sjcl.cipher.aes([
+                n.key[0] ^ n.key[4],
+                n.key[1] ^ n.key[5],
+                n.key[2] ^ n.key[6],
+                n.key[3] ^ n.key[7]]);
+            createnodethumbnail(n.h, aes, id, uint8arr);
         }
         if (id == slideshowid)
             fetchnext();
@@ -10187,7 +10261,6 @@ function fm_thumbnails()
         }
         if (y)
             fa_tnwait = y;
-
         if (a > 0)
         {
             fa_reqcnt += a;
@@ -10218,15 +10291,19 @@ function fm_thumbnails()
                     blob = new Blob([uint8arr.buffer]);
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
-                if (M.d[node] && M.d[node].seen && M.currentdirid === cdid)
-                    fm_thumbnail_render(M.d[node]);
+
+                var targetNode = M.getNodeByHandle(node);
+
+                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
+                    fm_thumbnail_render(targetNode);
+                }
 
                 // deduplicate in view when there is a duplicate fa:
-                if (M.d[node] && fa_duplicates[M.d[node].fa] > 0)
+                if (targetNode && fa_duplicates[targetNode.fa] > 0)
                 {
                     for (var i in M.v)
                     {
-                        if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
+                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
                         {
                             thumbnails[M.v[i].h] = thumbnails[node];
                             if (M.v[i].seen && M.currentdirid === cdid)
@@ -10241,10 +10318,11 @@ function fm_thumbnails()
         console.timeEnd('fm_thumbnails');
 }
 
-function fm_thumbnail_render(n) {
 
+function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
-        var e = $('#' + n.h + '.file-block');
+
+        var e = M.chat ? $('#' + n.h + '.img-block') : $('#' + n.h + '.file-block');
 
         if (e.length > 0) {
             e = e.find('img:first');
@@ -10461,13 +10539,16 @@ function fm_resize_handler() {
 mega.utils.fullUsername = function username(userHandle) {
 
     // User name
-    var result;
+    var result = '';
 
-    if (M.d[userHandle]) {
-        result = M.d[userHandle].name && $.trim(M.d[userHandle].name) || M.d[userHandle].m;
+    if (M.u[userHandle]) {
+        result = M.u[userHandle].name && $.trim(M.u[userHandle].name) || M.u[userHandle].m;
+
+        // Convert to string and escape for XSS
+        result = String(result);
     }
 
-    return String(result);
+    return result;
 };
 
 function sharedFolderUI() {
@@ -10511,7 +10592,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var fullOwnersName = mega.utils.fullUsername(ownersHandle);
+        var fullOwnersName = htmlentities(mega.utils.fullUsername(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
         // Access rights
@@ -10541,7 +10622,7 @@ function sharedFolderUI() {
                         + '<div class="clear"></div>'
                         + avatar
                         + '<div class="fm-chat-user-info">'
-                            + '<div class="fm-chat-user">' + htmlentities(fullOwnersName) + '</div>'
+                            + '<div class="fm-chat-user">' + fullOwnersName + '</div>'
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'
@@ -10645,7 +10726,7 @@ function fingerprintDialog(userid) {
     $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
     $this.find('.contact-details-user-name')
-        .text(user.name || user.m) // escape HTML things
+        .text(mega.utils.fullUsername(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
@@ -10734,7 +10815,9 @@ function contactUI() {
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
-        $('.contact-top-details .contact-details-user-name').text(user.name || user.m);
+        $('.contact-top-details .contact-details-user-name').text(
+            mega.utils.fullUsername(user.u)
+        );
         $('.contact-top-details .contact-details-email').text(user.m);
 
         $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {

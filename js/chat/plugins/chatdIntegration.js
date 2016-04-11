@@ -6,7 +6,6 @@
  * @returns {ChatdIntegration}
  * @constructor
  */
-
 var ChatdIntegration = function(megaChat) {
     //return false;
     var self = this;
@@ -18,6 +17,7 @@ var ChatdIntegration = function(megaChat) {
     self.chatIdToRoomJid = {};
     self.mcfHasFinishedPromise = new MegaPromise();
     self.deviceId = null;
+    self._processedMessages = {};
 
 
     // chat events
@@ -42,6 +42,7 @@ var ChatdIntegration = function(megaChat) {
                         self.openChatFromApi(actionPacket, true);
                     });
                     self.deviceId = r.d;
+
                     self.mcfHasFinishedPromise.resolve();
                 }
                 else {
@@ -377,7 +378,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
                 userHashes.push(
                     {
                         'u': contact.u,
-                        'p': 3
+                        'p': 1
                     }
                 );
             });
@@ -493,10 +494,64 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
                     crypt.getPubRSA(userId)
                 );
             }
-            console.error(userId);
         });
     }
     return MegaPromise.allDone(promises);
+};
+
+
+ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
+    var textContents = message.getContents ? message.getContents() : message.textContents;
+
+    if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+        if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+            try {
+                var attachmentMeta = JSON.parse(textContents.substr(2));
+            } catch(e) {
+                debugger;
+                return null;
+            }
+
+
+            attachmentMeta.forEach(function(v) {
+                var attachmentMetaInfo;
+                // cache ALL current attachments, so that we can revoke them later on in an ordered way.
+                if (message.messageId) {
+                    if (!chatRoom.attachments.exists(v.h)) {
+                        chatRoom.attachments.set(v.h, new MegaDataMap(chatRoom.attachments));
+                    }
+
+                    if (!chatRoom.attachments[v.h].exists(message.messageId)) {
+                        chatRoom.attachments[v.h].set(
+                            message.messageId,
+                            attachmentMetaInfo = new MegaDataObject({
+                                messageId: message.messageId,
+                                revoked: false
+                            })
+                        );
+                        attachmentMetaInfo._parent = chatRoom.attachments;
+                    }
+                    else {
+                        attachmentMetaInfo = chatRoom.attachments[v.h][message.messageId];
+                    }
+                }
+
+                // generate preview/icon
+                var icon = fileIcon(v);
+
+                if (!attachmentMetaInfo.revoked && !message.revoked) {
+                    if (v.fa && (icon === "graphic" || icon === "image")) {
+                        var imagesListKey = message.messageId + "_" + v.h;
+                        if (!chatRoom.images.exists(imagesListKey)) {
+                            v.k = imagesListKey;
+                            v.delay = message.delay;
+                            chatRoom.images.push(v);
+                        }
+                    }
+                }
+            });
+        }
+    }
 };
 
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
@@ -582,11 +637,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
 
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
+                var cacheKey = chatRoom.chatId + "_" + v.messageId;
+                if (v.messageId && self._processedMessages[cacheKey]) {
+                    return;
+                }
+
                 if (v.userId) {
                     var msg = v.getContents ? v.getContents() : v.message;
-                    //if (msg && msg.length && msg.length > 0) {
-                    //    msg = base64urldecode(msg);
-                    //}
 
                     chatRoom.notDecryptedBuffer[k] = {
                         'message': msg,
@@ -621,25 +678,33 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 return; // skip already decrypted messages
                             }
 
-                            if (v && v.payload) {
-                                chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
-                                delete chatRoom.notDecryptedBuffer[k];
+                            var messageId = hist[k]['k'];
+                            var cacheKey = chatRoom.chatId + "_" + messageId;
+                            if (messageId) {
+                                self._processedMessages[cacheKey] = true;
+                            }
+
+                            if (v && typeof(v.payload) !== 'undefined' && v.payload !== null) {
+                                chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
+                                delete chatRoom.notDecryptedBuffer[messageId];
                             }
                             else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                                chatRoom.messagesBuff.messages[hist[k]['k']].meta = {
+                                chatRoom.messagesBuff.messages[messageId].meta = {
                                     userId: v.sender,
                                     included: v.includeParticipants,
                                     excluded: v.excludeParticipants
                                 };
-                                chatRoom.messagesBuff.messages[hist[k]['k']].dialogType = "alterParticipants";
+                                chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
                             }
                             else if (v && (v.type === 0 || v.type === 2)) {
                                 // this is a system message
-                                chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
+                                chatRoom.messagesBuff.messages[messageId].protocol = true;
+                                delete chatRoom.notDecryptedBuffer[messageId];
                             }
                             else if (v && !v.payload) {
                                 self.logger.error("Could not decrypt: ", v)
                             }
+                            self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
                         });
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
@@ -653,9 +718,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             ChatdIntegration._ensureKeysAreLoaded(hist)
                                 .always(decryptMessages);
                         });
-                    }
-                    else {
-                        debugger;
                     }
                 }
                 else {
@@ -678,7 +740,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "a":"mci",
                 "id": chatRoom.chatId,
                 "u": contactHash,
-                "p": 3
+                "p": 1
             });
         });
 
@@ -747,6 +809,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                             }
                         }
+                        self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                     } catch(e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }

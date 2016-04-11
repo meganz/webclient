@@ -138,7 +138,7 @@ var Chat = function() {
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
-        'loadbalancerService': 'gelb530n001.karere.mega.nz',
+        'loadbalancerService': 'gelb.karere.mega.nz',
         'fallbackXmppServers': [
              "https://xmpp270n001.karere.mega.nz/ws",
              "https://xmpp270n002.karere.mega.nz/ws"
@@ -232,6 +232,7 @@ var Chat = function() {
             'chatdIntegration': ChatdIntegration,
             'callManager': CallManager,
             'urlFilter': UrlFilter,
+            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'karerePing': KarerePing
@@ -638,6 +639,10 @@ Chat.prototype.init = function() {
     var appContainer = document.querySelector('.section.conversations');
 
     var initAppUI = function() {
+        if (d) {
+            console.time('chatReactUiInit');
+        }
+
         self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} contacts={M.u} />;
 
         self.$conversationsAppInstance = ReactDOM.render(
@@ -646,6 +651,9 @@ Chat.prototype.init = function() {
         );
 
         self.renderConversationsApp();
+        if (d) {
+            console.timeEnd('chatReactUiInit');
+        }
     };
 
     if (!appContainer) {
@@ -1066,11 +1074,8 @@ Chat.prototype.getContactNameFromJid = function(jid) {
     var name = jid.split("@")[0];
 
 
-    if (contact && contact.name) {
-        name = contact.name;
-    }
-    else if (contact && contact.m) {
-        name = contact.m;
+    if (contact) {
+        name = mega.utils.fullUsername(contact.u);
     }
 
     assert(name, "Name not found for jid: " + jid);

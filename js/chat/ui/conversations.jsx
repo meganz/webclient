@@ -234,7 +234,6 @@ var ConversationsList = React.createClass({
             'className': "nw-conversations-item current-calling",
             'data-jid': ''
         };
-        var callName;
 
         var megaChat = this.props.megaChat;
 
@@ -247,7 +246,6 @@ var ConversationsList = React.createClass({
             if (user) {
                 currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
                 currentCallingContactStatusProps['data-jid'] = room.roomJid;
-                callName = room.getRoomTitle();
 
                 if (room.roomJid == megaChat.currentlyOpenedChat) {
                     currentCallingContactStatusProps.className += " selected";
@@ -399,7 +397,12 @@ var ConversationsApp = React.createClass({
         this.handleWindowResize();
     },
     handleWindowResize: function() {
-        
+        // small piece of what is done in fm_resize_handler...
+        $('.fm-right-files-block, .fm-right-account-block')
+            .filter(':visible')
+            .css({
+                'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+            });
     },
     render: function() {
         var self = this;
@@ -411,9 +414,15 @@ var ConversationsApp = React.createClass({
         var startChatIsDisabled = !presence || presence === "offline";
 
 
+        var leftPanelStyles = {};
+
+        if (fmconfig && fmconfig.leftPaneWidth) {
+            leftPanelStyles.width = fmconfig.leftPaneWidth;
+        }
+
         return (
             <div className="conversationsApp" key="conversationsApp">
-                <div className="fm-left-panel">
+                <div className="fm-left-panel" style={leftPanelStyles}>
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
@@ -436,10 +445,12 @@ var ConversationsApp = React.createClass({
                     </div>
 
 
-                    <div className="fm-tree-panel">
-                        <div className="content-panel conversations">
-                            <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
-                        </div>
+                    <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
+                        <utils.JScrollPane  style={leftPanelStyles}>
+                            <div className="content-panel conversations">
+                                <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
+                            </div>
+                        </utils.JScrollPane>
                     </div>
                 </div>
                 <div className="fm-right-files-block">
@@ -448,9 +459,11 @@ var ConversationsApp = React.createClass({
                         <div className="fm-empty-messages-bg"></div>
                         <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
                         <div className="fm-not-logged-text">
-                            <div className="fm-not-logged-description">
-                                Login or create an account to <span className="red">get 50GB FREE</span> and get messages from your friends and coworkers.
-                            </div>
+                            <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
+                                __html: __(l[8634])
+                                    .replace("[S]", "<span className='red'>")
+                                    .replace("[/S]", "</span>")
+                            }}></div>
                             <div className="fm-not-logged-button login">
                                 {__(l[193])}
                             </div>

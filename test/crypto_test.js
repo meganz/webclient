@@ -53,6 +53,7 @@ describe("crypto unit test", function() {
     });
 
     afterEach(function() {
+        _hideDebug();
         sandbox.restore();
     });
 
@@ -60,16 +61,19 @@ describe("crypto unit test", function() {
         describe('getPubKeyAattribute()', function() {
             it("RSA key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { resolve: sinon.stub(), reject: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 var pubKey = 'the key';
+                var rootPromise = _stubMegaPromise(sinon, sandbox);
+                var attribCachePromise = _stubMegaPromise(sinon);
+                attribCachePromise.fail = function(callback) {
+                    callback();
+                };
                 sandbox.stub(window, 'crypto_decodepubkey').returns(pubKey);
-                sandbox.stub(window, 'base64urldecode');
-                sandbox.stub(window, 'api_req');
-                sandbox.stub(window, 'assertUserHandle');
+                sandbox.stub(attribCache, 'getItem').returns(attribCachePromise);
+                _showDebug(sandbox, ['api_req', 'assertUserHandle', 'base64urldecode']);
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'RSA');
                 assert.strictEqual(result, rootPromise);
+                assert.strictEqual(attribCache.getItem.callCount, 1);
                 assert.strictEqual(api_req.callCount, 1);
                 assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw' });
                 assert.strictEqual(api_req.args[0][1].u, 'you456789xw');
@@ -84,13 +88,17 @@ describe("crypto unit test", function() {
 
             it("API error on RSA key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { then: sinon.stub(),
-                                    reject: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
-                sandbox.stub(window, 'api_req');
+                var rootPromise = _stubMegaPromise(sinon, sandbox);
+                var attribCachePromise = _stubMegaPromise(sinon);
+                attribCachePromise.fail = function(callback) {
+                    callback();
+                };
+                sandbox.stub(attribCache, 'getItem').returns(attribCachePromise);
+                _showDebug(sandbox, ['api_req']);
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'RSA');
                 assert.strictEqual(result, rootPromise);
+                assert.strictEqual(attribCache.getItem.callCount, 1);
                 assert.strictEqual(api_req.callCount, 1);
                 assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw' });
                 assert.strictEqual(api_req.args[0][1].u, 'you456789xw');
@@ -404,7 +412,7 @@ describe("crypto unit test", function() {
             });
 
             it("uncached Cu25519 key", function(done) {
-dump('*** begin');
+// dump('*** begin');
                 sandbox.stub(window, 'u_authring', { Cu25519: {} });
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
                 sandbox.stub(window, 'pubCu25519', {});
@@ -450,7 +458,7 @@ dump('*** begin');
                     .fail(function() {
                         assert.fail('failed to retrv. uncached Cu key');
                     });
-dump('*** end');
+// dump('*** end');
             });
 
             it("uncached Cu25519 key, unseen", function(done) {
@@ -854,8 +862,7 @@ dump('*** end');
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
                 sandbox.stub(authring, 'computeFingerprint').returns('the fingerprint');
-                var masterPromise = { resolve: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var masterPromise = _stubMegaPromise(sinon, sandbox);
 
                 var result = ns.getFingerprintEd25519('you456789xw');
                 assert.strictEqual(result, masterPromise);
@@ -870,8 +877,7 @@ dump('*** end');
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
                 sandbox.stub(authring, 'computeFingerprint').returns('the hexprint');
-                var masterPromise = { resolve: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var masterPromise = _stubMegaPromise(sinon, sandbox);
 
                 var result = ns.getFingerprintEd25519('you456789xw', 'hex');
                 assert.strictEqual(result, masterPromise);
@@ -886,8 +892,7 @@ dump('*** end');
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
                 sandbox.stub(authring, 'computeFingerprint').returns('\u0000\u0001\u0002\u0003');
-                var masterPromise = { resolve: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var masterPromise = _stubMegaPromise(sinon, sandbox);
 
                 var result = ns.getFingerprintEd25519('you456789xw', 'string');
                 assert.strictEqual(result, masterPromise);
@@ -902,9 +907,8 @@ dump('*** end');
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(authring, 'computeFingerprint').returns('the fingerprint');
-                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
-                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
-                var keyPromise = { done: sinon.stub() };
+                var masterPromise = _stubMegaPromise(sinon, sandbox);
+                var keyPromise = _stubMegaPromise(sinon);
                 sandbox.stub(crypt, 'getPubEd25519').returns(keyPromise);
 
                 var result = ns.getFingerprintEd25519('you456789xw');

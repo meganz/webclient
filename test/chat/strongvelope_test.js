@@ -4,10 +4,7 @@
  */
 
 describe("chat.strongvelope unit test", function() {
-    "use strict";
-
     var assert = chai.assert;
-
     var ns = strongvelope;
 
     // Some test data.
@@ -720,7 +717,7 @@ describe("chat.strongvelope unit test", function() {
                 handler.updateSenderKey();
                 var obj = {};
                 obj[KEY_ID_0] = KEY;
-
+                // console.log(btoa(handler.keyId));
                 assert.strictEqual(handler.keyId, KEY_ID_0);
                 assert.strictEqual(handler.previousKeyId, null);
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
@@ -1977,13 +1974,14 @@ describe("chat.strongvelope unit test", function() {
 
             // Alter participants is going to be phased out, and is not currently in use live
             /*it("alter participants, me included, one excluded", function() {
+            /*it("alter participants, me included, one excluded", function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'u_handle', 'lino56789xw');
                 var handler = new ns.ProtocolHandler(u_handle,
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY, UNIQUE_DEVICE_ID);
                 sandbox.stub(window, 'pubEd25519', { 'lino56789xw': ED25519_PUB_KEY });
                 handler.keyId = KEY_ID;
-                handler.participantKeys[u_handle][KEY_ID] = KEY;
+                handler.participantKeys['lino56789xw'][KEY_ID] = KEY;
                 var senderKeys = {};
                 senderKeys[ROTATED_KEY_ID] = ROTATED_KEY;
                 sandbox.stub(handler, '_parseAndExtractKeys').returns({
@@ -1999,12 +1997,14 @@ describe("chat.strongvelope unit test", function() {
                 });
 
                 var result = handler.decryptFrom('binary stuff', 'me3456789xw');
+
                 assert.deepEqual(result, {
                     sender: 'me3456789xw',
                     type: 0x02,
                     payload: 'Hello!',
                     includeParticipants: ['lino56789xw'], excludeParticipants: ['otto56789xw']
                 });
+                 console.log("ANDRE SAYS 2");
                 assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);
                 assert.strictEqual(handler.updateSenderKey.callCount, 1);
                 assert.deepEqual(handler.participantKeys['lino56789xw'],
@@ -2022,7 +2022,7 @@ describe("chat.strongvelope unit test", function() {
                     'mismatching excluded participants');
                 assert.strictEqual(ns._logger._log.args[0][0],
                     'Particpant change received, updating sender key.');
-            });
+            });*/
 
             it("alter participants, one included, me excluded", function() {
                 sandbox.stub(ns._logger, '_log');
@@ -2068,7 +2068,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler.excludeParticipants.size, 0);
                 assert.strictEqual(ns._logger._log.args[0][0],
                     'I am not participating in this chat, cannot read message.');
-            });*/
+            });
 
             it("followup message", function() {
                 var handler = new ns.ProtocolHandler('you456789xw',
@@ -2204,6 +2204,7 @@ describe("chat.strongvelope unit test", function() {
                     sender: 'me3456789xw',
                     type: 0,
                     payload: 'Hello!',
+                    // toSend: 'key reminder message',
                     includeParticipants: [], excludeParticipants: []
                 });
                 assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);

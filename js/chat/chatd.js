@@ -231,6 +231,7 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.onopen = function(e) {
         self.keepAliveTimerRestart();
         self.logger.log('chatd connection established');
+        self.triggerSendIfAble();
         self.rejoinexisting();
         self.resendpending();
     };
@@ -266,12 +267,12 @@ Chatd.Shard.prototype.disconnect = function() {
 };
 
 Chatd.Shard.prototype.multicmd = function(cmds) {
-    //console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
     var self = this;
     cmds.forEach( function _iterator(cmdObj)
     {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
+        console.error("MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
         self.cmdq += String.fromCharCode(opCode)+cmd;
     });
 
@@ -279,6 +280,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
 };
 
 Chatd.Shard.prototype.cmd = function(opCode, cmd) {
+    console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
     this.cmdq += String.fromCharCode(opCode)+cmd;
 
@@ -287,21 +289,24 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd) {
 
 Chatd.Shard.prototype.triggerSendIfAble = function() {
     if (this.isOnline()) {
-        var a = new Uint8Array(this.cmdq.length);
-        for (var i = this.cmdq.length; i--; ) {
-            a[i] = this.cmdq.charCodeAt(i);
-        }
-        this.s.send(a);
+        if (this.cmdq.length > 0) {
+            var a = new Uint8Array(this.cmdq.length);
+            for (var i = this.cmdq.length; i--;) {
+                a[i] = this.cmdq.charCodeAt(i);
+            }
+            this.s.send(a);
 
-        this.cmdq = '';
+            this.cmdq = '';
+        }
     }
-}
+};
 
 // rejoin all open chats after reconnection (this is mandatory)
 Chatd.Shard.prototype.rejoinexisting = function() {
     for (var c in this.chatIds) {
         // rejoin chat and immediately set the locally buffered message range
         if (!this.joinedChatIds[c]) {
+            this.join(c);
             this.chatd.range(c);
         }
     }
@@ -410,7 +415,6 @@ Chatd.Shard.prototype.exec = function(a) {
                         // ^^ explicit and easy to read...despite that i could have done >= 1 <= 3 or something like
                         // that..
                         if (!self.joinedChatIds[chatId]) {
-                            
                             self.joinedChatIds[chatId] = true;
                         }
                     }
@@ -699,6 +703,7 @@ Chatd.Messages = function(chatd, chatId) {
 
     // mapping of transactionids of messages being sent to the numeric index of this.buf
     this.sending = {};
+    this.sendingList = [];
 
     // msgnums of modified messages
     this.modified = {};
@@ -728,8 +733,9 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
             state: 'PENDING',
             message: message
         });
-
+        
         this.sending[msgxid] = this.highnum;
+        this.sendingList.push(msgxid);
 
         messageConstructs.push({"msgxid":msgxid, "timestamp":timestamp,"keyid":keyId, "message":message.message, "type":message.type});
     };
@@ -779,14 +785,14 @@ Chatd.Messages.prototype.resend = function() {
     var self = this;
 
     // resend all pending new messages and modifications
-    for (var msgxid in this.sending) {
-        self.chatd.chatIdShard[this.chatId].msg(
-            this.chatId,
+    this.sendingList.forEach(function(msgxid) {
+        self.chatd.chatIdShard[self.chatId].msg(
+            self.chatId,
             msgxid,
-            this.buf[this.sending[msgxid]][Chatd.MsgField.TIMESTAMP],
-            this.buf[this.sending[msgxid]][Chatd.MsgField.MESSAGE]
+            self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],
+            self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE]
         );
-    }
+    });
 
     // resend all pending modifications of completed messages
     for (var msgnum in this.modified) {
@@ -832,6 +838,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     var self = this;
     var num = this.sending[msgxid];
 
+    removeValue(this.sendingList, msgxid);
     delete this.sending[msgxid];
 
     this.buf[num][Chatd.MsgField.MSGID] = msgid;

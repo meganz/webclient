@@ -617,7 +617,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
                         decryptedMsgs.forEach(function (v, k) {
-                            if (typeof v === undefined) {
+                            if (typeof v === 'undefined') {
                                 return; // skip already decrypted messages
                             }
 

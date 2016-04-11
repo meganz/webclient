@@ -701,33 +701,23 @@ var strongvelope = {};
      *     An array of all the parsed messages' content.
      * @private
      */
-    strongvelope.ProtocolHandler.prototype._batchParseAndExtractKeys = function(messages, isSeeding) {
+    strongvelope.ProtocolHandler.prototype._batchParseAndExtractKeys = function(messages) {
 
         var extracted;
         var parsedMessages = [];
         var parsedMessage;
         var senderKeys;
         var storedKey;
-        var keyed = false;
-        var iamSeeding = (typeof isSeeding === 'undefined') ? false : isSeeding;
 
         // Iterate over all messages to extract keys (if present).
         // TOGO: make sure the messages are ordered from latest to oldest.
         for (var i = messages.length -1;i>=0; i--) {
             // if the message is from chat API.
-            if (messages[i].userId === COMMANDER) {
-                // not keyed yet, update group participant
-                if ((iamSeeding === true) && (keyed === false)) {
-                    this.handleManagementMessage(messages[i]);
-                }
-            }
-            // the message is from other participants.
-            else {
+            if (messages[i].userId !== COMMANDER) {
+
                 extracted = this._parseAndExtractKeys(messages[i]);
                 parsedMessage = extracted.parsedMessage;
-                if (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED) {
-                    keyed = true;
-                }
+
                 parsedMessages.push(parsedMessage);
                 senderKeys = extracted.senderKeys;
                 for (var keyId in senderKeys) {
@@ -766,7 +756,7 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.seed = function(messages) {
 
-        this._batchParseAndExtractKeys(messages, true);
+        this._batchParseAndExtractKeys(messages);
 
         var a32words = str_to_a32(this.uniqueDeviceId);
         var myPrefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
@@ -1624,15 +1614,6 @@ var strongvelope = {};
             return this.handleManagementMessage({ userId: sender, message: message}, historicMessage);
         }
 
-        // Check we're in a chat with this sender, or on a new chat.
-        if (!this.otherParticipants.has(sender)
-                && (sender !== this.ownHandle)
-                && (this.otherParticipants.size > 0)) {
-            logger.warn('Sender not in current participants: ' + sender);
-
-            return false;
-        }
-
         // Extract keys, and parse message in the same go.
         var extractedContent = this._parseAndExtractKeys({ userId: sender, message: message});
         if (extractedContent === false) {
@@ -1716,7 +1697,6 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
             sender, keyid, historicMessage) { // jshint maxcomplexity: 11
 
-        console.log('decrypt message with keyid:' + keyid + 'from ' + sender);
         var protocolVersion = message.charCodeAt(0);
         if (protocolVersion <= PROTOCOL_VERSION_V1) {
             return this.legacyDecryptFrom(message, sender, historicMessage);
@@ -1724,15 +1704,6 @@ var strongvelope = {};
         // if the message is from chat API
         if (sender === COMMANDER) {
             return this.handleManagementMessage({ userId: sender, message: message}, historicMessage);
-        }
-
-        // Check we're in a chat with this sender, or on a new chat.
-        if (!this.otherParticipants.has(sender)
-                && (sender !== this.ownHandle)
-                && (this.otherParticipants.size > 0)) {
-            logger.warn('Sender not in current participants: ' + sender);
-
-            return false;
         }
 
         var parsedMessage = ns._parseMessageContent(message);
@@ -1809,8 +1780,6 @@ var strongvelope = {};
             historicMessages) {
 
         historicMessages = (historicMessages === false) ? false : true;
-        // First extract all keys.
-        //this._batchParseAndExtractKeys(messages);
 
         // Now attempt to decrypt all messages.
         var decryptedMessages = [];
@@ -2074,11 +2043,11 @@ var strongvelope = {};
         for (var i=0; i<keys.length;i++) {
             console.log('seed key id:' + keys[i].keyid);
             var keyidStr = a32_to_str([keys[i].keyid]);
-            /*if (this.participantKeys[keys[i].userid] && this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
+            if (this.participantKeys[keys[i].userid] && this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
                 logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + keys[i].userid);
-            }*/
+            }
             var parsedKey = ns._parseMessageContent(keys[i].key);
-            console.log('parsedkey:' + parsedKey);
+
             if (ns._verifyMessage(parsedKey.signedContent,
                     parsedKey.signature,
                     pubEd25519[keys[i].userid])) {

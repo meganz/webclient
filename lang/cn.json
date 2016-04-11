@@ -863,11 +863,11 @@
     "1600": "\u89e3\u5bc6\u9519\u8bef",
     "1601": "\u6ca1\u6709\u53d1\u73b0",
     "1603": "\u6700\u8fd1\u66f4\u65b0",
-    "1604": "\u7528\u6cd5\uff1a\u6570\u636e\u6682\u65f6\u4e0d\u53ef\u7528",
+    "1604": "\u7528\u91cf\uff1a\u6570\u636e\u6682\u65f6\u4e0d\u53ef\u7528",
     "1605": "\u540c\u6b65",
     "1606": "MEGA\u7f51\u7ad9",
     "1607": "%1 \u5230%2",
-    "1608": "\u7528\u6cd5\uff1a\uff051",
+    "1608": "\u7528\u91cf\uff1a\uff051",
     "1609": "\uff051-\uff052\uff08\uff053\/\u79d2\uff09",
     "1610": "\uff051-\uff052\uff08\u6682\u505c\uff09",
     "1611": "\u6682\u505c\u6587\u4ef6\u4f20\u8f93",
@@ -3182,6 +3182,13 @@
     "8648": "Error copying link",
     "8649": "Unknown until decryption",
     "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
+    "8651": "Your %1 plan has expired.",
+    "8652": "PURCHASED",
+    "8653": "Click [S]Renew[\/S] to purchase your %1 plan (%2) using %3 %4.",
+    "8654": "Otherwise click [S]Choose[\/S] to select a different plan or payment option.",
+    "8655": "Renew",
+    "8656": "Choose...",
+    "8657": "EXPIRED",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3227,6 +3234,13 @@
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
         "image-size-exceeded-body": 8646,
-        "support-too-short": 8650
+        "support-too-short": 8650,
+        "your-plan-has-expired": 8651,
+        "purchased": 8652,
+        "expired": 8657,
+        "renew-plan-instruction": 8653,
+        "choose-different-plan-instruction": 8654,
+        "renew": 8655,
+        "choose": 8656
     }
 }

@@ -12730,5 +12730,33 @@
     "8650": {
         "text": "Your enquiry is too short. Please give us more details about your issue \/ query.",
         "context": "Error message when a given query is too short when emailing mega support via the \"Get Support\" option on the website. They are not allowed to send questions of only a few words."
+    },
+    "8651": {
+        "text": "Your %1 plan has expired.",
+        "context": "A title for the PRO plan expired dialog. Please leave the %1 placeholder which will be replaced with the PRO plan name e.g. PRO III."
+    },
+    "8652": {
+        "text": "PURCHASED",
+        "context": "A label on the PRO plan expired dialog for showing the date when they last purchased a PRO plan."
+    },
+    "8653": {
+        "text": "Click [S]Renew[\/S] to purchase your %1 plan (%2) using %3 %4.",
+        "context": "This is an instruction on the PRO plan expired dialog. Please leave the [S][\/S] tags which will be replaced with bold text at runtime, but do translate the word Renew inside. The %1 placeholder will be replaced with the PRO plan name e.g. PRO III. The %2 placeholder will be replaced with the plan duration e.g. 1 month. The %3 placeholder will be an icon. The %4 placeholder will be the name of payment provider."
+    },
+    "8654": {
+        "text": "Otherwise click [S]Choose[\/S] to select a different plan or payment option.",
+        "context": "This is a second instruction on the PRO plan expired dialog. Please leave the [S][\/S] tags which will be replaced with bold text at runtime, but do translate the word Choose inside."
+    },
+    "8655": {
+        "text": "Renew",
+        "context": "This is a button on the PRO plan expired dialog. It will renew their most recent PRO plan (it will take them back to the pro page and pre-select as many things as it can so that the user can repurchase)"
+    },
+    "8656": {
+        "text": "Choose...",
+        "context": "This is a button on the PRO plan expired dialog. It will let the user choose a different PRO plan."
+    },
+    "8657": {
+        "text": "EXPIRED",
+        "context": "A label on the PRO plan expired dialog for showing the date when their last PRO plan purchase expired."
     }
 }

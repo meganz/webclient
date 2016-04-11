@@ -1835,16 +1835,23 @@ function MegaData()
 
             M.renderMain();
 
-            if (fminitialized && (id.substr(0, 6) !== 'search')) {
-                if ($('#treea_' + M.currentdirid).length === 0) {
-                    var n = M.d[M.currentdirid];
-                    if (n && n.p) {
-                        treeUIopen(n.p, false, true);
+            if (fminitialized) {
+                if (id.substr(0, 6) === 'search') {
+                    if ($.transferClose) {
+                        $.transferClose();
                     }
                 }
-                treeUIopen(M.currentdirid, M.currentdirid === 'contacts');
+                else {
+                    if ($('#treea_' + M.currentdirid).length === 0) {
+                        var n = M.d[M.currentdirid];
+                        if (n && n.p) {
+                            treeUIopen(n.p, false, true);
+                        }
+                    }
+                    treeUIopen(M.currentdirid, M.currentdirid === 'contacts');
 
-                $('#treea_' + M.currentdirid).addClass('opened');
+                    $('#treea_' + M.currentdirid).addClass('opened');
+                }
             }
             if (d) {
                 console.timeEnd('time for rendering');

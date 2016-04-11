@@ -3182,6 +3182,13 @@
     "8648": "Error copying link",
     "8649": "Unknown until decryption",
     "8650": "Your enquiry is too short. Please give us more details about your issue \/ query.",
+    "8651": "Your %1 plan has expired.",
+    "8652": "PURCHASED",
+    "8653": "Click [S]Renew[\/S] to purchase your %1 plan (%2) using %3 %4.",
+    "8654": "Otherwise click [S]Choose[\/S] to select a different plan or payment option.",
+    "8655": "Renew",
+    "8656": "Choose...",
+    "8657": "EXPIRED",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3227,6 +3234,13 @@
         "ephemeral-session-message": 8644,
         "image-size-exceeded": 8645,
         "image-size-exceeded-body": 8646,
-        "support-too-short": 8650
+        "support-too-short": 8650,
+        "your-plan-has-expired": 8651,
+        "purchased": 8652,
+        "expired": 8657,
+        "renew-plan-instruction": 8653,
+        "choose-different-plan-instruction": 8654,
+        "renew": 8655,
+        "choose": 8656
     }
 }

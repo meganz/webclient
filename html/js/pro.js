@@ -1016,6 +1016,7 @@ var proPage = {
         $('.payment-options-list.' + primaryOrSecondary + ' .payment-method:not(.template)').remove();
         $('.loading-placeholder-text').hide();
 
+
         // Loop through gateway providers (change to use list from API soon)
         for (var i = 0, length = gatewayOptions.length; i < length; i++) {
 
@@ -1077,12 +1078,41 @@ var proPage = {
      */
     initPaymentMethodRadioOptions: function() {
 
-        // Pre-select the first option in the list
-        var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
-        $paymentOption.find('input').attr('checked', 'checked');
-        $paymentOption.find('input').addClass('checked');
-        $paymentOption.find('.membership-radio').addClass('checked');
-        $paymentOption.find('.provider-details').addClass('checked');
+        var lastGatewayName = null;
+        
+        // If they have paid before and their plan has expired, then re-select their last payment method
+        if (warnPopup.lastPaymentInfo) {
+
+            // Get the last gateway they paid with
+            var lastPaymentInfo = warnPopup.lastPaymentInfo;
+            var gatewayData = (typeof lastPaymentInfo.gwd !== 'undefined') ? lastPaymentInfo.gwd : null;
+                lastGatewayName = (gatewayData) ? gatewayData.gwname : lastPaymentInfo.gwname;
+            
+            // Get the elements which need to be set
+            var $gatewayInput = $('#' + lastGatewayName);
+            var $membershipRadio = $gatewayInput.parent();
+            var $providerDetails = $membershipRadio.next();
+            var $secondaryPaymentOptions = $('.payment-options-list.secondary');
+            var $showMoreButton = $('.membership-step2 .provider-show-more');
+            
+            // Set to checked
+            $gatewayInput.prop('checked', true);
+            $membershipRadio.addClass('checked');
+            $providerDetails.addClass('checked');
+            
+            // If the gateway is in the secondary list, then show the secondary list and hide the button
+            if ($secondaryPaymentOptions.find('#' + lastGatewayName).prop('checked')) {
+                $secondaryPaymentOptions.removeClass('hidden');
+                $showMoreButton.hide();
+            }
+        }
+        else {
+            // Pre-select the first option in the primary list of providers
+            var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
+            $paymentOption.find('input').attr('checked', 'checked');
+            $paymentOption.find('.membership-radio').addClass('checked');
+            $paymentOption.find('.provider-details').addClass('checked');
+        }
 
         // Add click handler to all payment methods
         var paymentOptionsList = $('.payment-options-list');

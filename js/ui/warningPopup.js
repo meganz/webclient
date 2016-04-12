@@ -79,7 +79,7 @@ var warnPopup = {
         $dialog.addClass('active');        
     },
     
-    /** The user's last payment information */
+    /** All the user's last payment information from the API */
     lastPaymentInfo: null,
         
     /**
@@ -154,16 +154,8 @@ var warnPopup = {
             // Hide the dialog
             $dialog.removeClass('active');
             
-            // Set localStorage so it doesn't show each time, also set details for pre-population on the Pro page
+            // Set localStorage so it doesn't show each time
             localStorage.setItem('hideProPlanExpiredPopup', '1');
-            localStorage.setItem('lastPaymentProvider', gatewayName);
-            localStorage.setItem('lastPaymentDuration', planMonths);
-            
-            // If Astropay, then set the payer's name and tax number to prefill the form
-            if (gatewayData) {
-                localStorage.setItem('lastPaymentName', gatewayData.name);
-                localStorage.setItem('lastPaymentTaxNum', gatewayData.cpf);
-            }
             
             // Get the link for the Pro page second step e.g. #pro_lite, #pro_1 etc
             var proLink = (proNum === 4) ? 'lite' : proNum;

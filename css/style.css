@@ -4955,6 +4955,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .astropay-payment-reminder .mega-payment-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll -113px -487px;
+    background-size: 150px auto;
     height: 36px;
     left: 26px;
     top: 0;

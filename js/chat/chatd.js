@@ -307,7 +307,6 @@ Chatd.Shard.prototype.rejoinexisting = function() {
         // rejoin chat and immediately set the locally buffered message range
         if (!this.joinedChatIds[c]) {
             this.join(c);
-            this.chatd.range(c);
         }
     }
 };
@@ -322,7 +321,12 @@ Chatd.Shard.prototype.resendpending = function() {
 
 // send JOIN
 Chatd.Shard.prototype.join = function(chatId) {
-    this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
+    // send a `JOIN` (if no local messages are buffered) or a `JOINRANGEHIST` (if local messages are buffered)
+    if (Object.keys(this.chatd.chatIdMessages[chatId].buf).length === 0) {
+        this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
+    } else {
+        this.chatd.joinrangehist(chatId);
+    }
 };
 
 Chatd.prototype.cmd = function(opCode, chatId, cmd) {
@@ -334,8 +338,8 @@ Chatd.prototype.hist = function(chatId, count) {
 };
 
 // send RANGE
-Chatd.prototype.range = function(chatId) {
-    this.chatIdMessages[chatId].range(chatId);
+Chatd.prototype.joinrangehist = function(chatId) {
+    this.chatIdMessages[chatId].joinrangehist(chatId);
 };
 
 // send HIST
@@ -807,7 +811,7 @@ Chatd.Messages.prototype.resend = function() {
 };
 
 // after a reconnect, we tell the chatd the oldest and newest buffered message
-Chatd.Messages.prototype.range = function(chatId) {
+Chatd.Messages.prototype.joinrangehist = function(chatId) {
     var low, high;
 
     for (low = this.lownum; low <= this.highnum; low++) {

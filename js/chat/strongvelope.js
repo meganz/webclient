@@ -711,7 +711,7 @@ var strongvelope = {};
 
         // Iterate over all messages to extract keys (if present).
         // TOGO: make sure the messages are ordered from latest to oldest.
-        for (var i = messages.length -1;i>=0; i--) {
+        for (var i = 0;i < messages.length; i++) {
             // if the message is from chat API.
             if (messages[i].userId !== COMMANDER) {
 

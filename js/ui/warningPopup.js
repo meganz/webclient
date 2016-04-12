@@ -4,27 +4,31 @@
  * after purchase and PRO plan expired warnings.
  */
 var warnPopup = {
+        
+    /** Whether the popup has been seen or not so it won't keep auto showing on new pages */
+    seen: false,
+    
+    /** All the user's last payment information from the API */
+    lastPaymentInfo: null,
     
     /**
      * Shows a dialog with a message that the user is over quota
      */
     showOverQuota: function() {
         
+        // Cache lookups
         var $container = $('.warning-popup-icon.over-quota');
         var $dialog = $container.find('.top-warning-popup');
-        
-        // Hide other dialogs that may be open and make the icon clickable
-        warnPopup.hideOtherWarningDialogs();
-        warnPopup.addWarningIconClickHandler($container, $dialog);
-        
-        // Show the dialog
-        $container.removeClass('hidden');
-        $dialog.addClass('active');
-            
+                    
         // Redirect to Pro signup page on button click
         $container.find('.warning-button').click(function() {
             document.location.hash = 'pro';
         });
+        
+        // Hide other dialogs that may be open and make the icon clickable
+        warnPopup.hideOtherWarningDialogs();
+        warnPopup.addWarningIconClickHandler($container, $dialog);
+        warnPopup.showWarningPopup($container, $dialog);  
     },
     
     /**
@@ -32,17 +36,10 @@ var warnPopup = {
      */
     showEphemeral: function() {
         
+        // Cache lookups
         var $container = $('.warning-popup-icon.ephemeral-session');
         var $dialog = $container.find('.top-warning-popup');
-        
-        // Hide other dialogs that may be open and make the icon clickable
-        warnPopup.hideOtherWarningDialogs();
-        warnPopup.addWarningIconClickHandler($container, $dialog);
-        
-        // Show the dialog
-        $container.removeClass('hidden');
-        $dialog.addClass('active');
-        
+                
         // Redirect to register signup page on button click
         $container.find('.warning-button').click(function() {
             
@@ -55,6 +52,11 @@ var warnPopup = {
             $dialog.removeClass('active');
             document.location.hash = 'register';      
         });
+        
+        // Hide other dialogs that may be open and make the icon clickable
+        warnPopup.hideOtherWarningDialogs();
+        warnPopup.addWarningIconClickHandler($container, $dialog);
+        warnPopup.showWarningPopup($container, $dialog);  
     },
     
     /**
@@ -63,6 +65,7 @@ var warnPopup = {
      */
     showNonActivatedAccount: function(log) {
         
+        // Cache lookups
         var $container = $('.warning-popup-icon.non-activated-account');
         var $dialog = $container.find('.top-warning-popup');
                 
@@ -73,15 +76,9 @@ var warnPopup = {
         
         // Hide other dialogs that may be open
         warnPopup.hideOtherWarningDialogs();
-        
-        // Show the dialog
-        $container.removeClass('hidden');
-        $dialog.addClass('active');        
+        warnPopup.showWarningPopup($container, $dialog);     
     },
-    
-    /** All the user's last payment information from the API */
-    lastPaymentInfo: null,
-        
+       
     /**
      * A helpful PRO plan renewal popup which is shown when their PRO plan has expired
      */
@@ -89,7 +86,7 @@ var warnPopup = {
         
         // If their last payment info is not set by the API, then their plan is not currently expired.
         // Also if they've already seen the popup, then don't keep showing it again or it's annoying.
-        if ((warnPopup.lastPaymentInfo === null) || (localStorage.getItem('hideProPlanExpiredPopup') !== null)) {
+        if (warnPopup.lastPaymentInfo === null) {
             return false;
         }
         
@@ -99,17 +96,10 @@ var warnPopup = {
             return false;
         }
         
+        // Cache lookups
         var $container = $('.warning-popup-icon.astropay-payment-reminder');
         var $dialog = $container.find('.top-warning-popup');
-        
-        // Hide other dialogs that may be open and make the icon clickable
-        warnPopup.hideOtherWarningDialogs();
-        warnPopup.addWarningIconClickHandler($container, $dialog);
-        
-        // Show the dialog
-        $container.removeClass('hidden');
-        $dialog.addClass('active');
-        
+                        
         // Get PRO plan name e.g. PRO III
         var proNum = warnPopup.lastPaymentInfo.p;
         var proPlanName = getProPlan(proNum);
@@ -142,10 +132,12 @@ var warnPopup = {
             
             // Hide the dialog and go to pro page
             $dialog.removeClass('active');
-            document.location.hash = 'pro';
+                        
+            // Set a flag so it doesn't show each time
+            warnPopup.seen = true;
             
-            // Set localStorage so it doesn't show each time
-            localStorage.setItem('hideProPlanExpiredPopup', '1');
+            // Go to the first step of the Pro page so they can choose a new plan
+            document.location.hash = 'pro';
         });
         
         // On the Renew button click
@@ -154,8 +146,8 @@ var warnPopup = {
             // Hide the dialog
             $dialog.removeClass('active');
             
-            // Set localStorage so it doesn't show each time
-            localStorage.setItem('hideProPlanExpiredPopup', '1');
+            // Set a flag so it doesn't show each time
+            warnPopup.seen = true;
             
             // Get the link for the Pro page second step e.g. #pro_lite, #pro_1 etc
             var proLink = (proNum === 4) ? 'lite' : proNum;
@@ -163,8 +155,11 @@ var warnPopup = {
             // Go to the second step of the Pro page which will pre-populate the details
             document.location.hash = 'pro_' + proLink;
         });
-        
-        console.log('zzzz', warnPopup.lastPaymentInfo);
+                        
+        // Hide other dialogs that may be open and make the icon clickable
+        warnPopup.hideOtherWarningDialogs();
+        warnPopup.addWarningIconClickHandler($container, $dialog);
+        warnPopup.showWarningPopup($container, $dialog);        
     },
     
     /**
@@ -204,7 +199,7 @@ var warnPopup = {
     /**
      * Converts a timestamp to a localised yyyy-mm-dd format e.g. 2016-04-17
      * @param {Number} timestamp The UNIX timestamp
-     * @returns {String} Returns the date
+     * @returns {String} Returns the date in yyyy-mm-dd format
      */
     formatTimestampToDate: function(timestamp) {
         
@@ -216,23 +211,52 @@ var warnPopup = {
         
         return year + '-' + month + '-' + day;
     },
-    
+        
     /**
      * Adds a click event on the warning icon to hide and show the dialog
      * @param {Object} $container The dialog's container
      * @param {Object} $dialog The dialog
      */
     addWarningIconClickHandler: function($container, $dialog) {
-                
+        
+        // On warning icon click
         $container.find('.warning-icon-area').rebind('click', function() {
             
+            // If the popup is currently visible
             if ($dialog.hasClass('active')) {
+                
+                // Hide the popup
                 $dialog.removeClass('active');
+                
+                // Set flag so it doesn't auto show each time
+                warnPopup.seen = true;
             }
             else {
+                // Otherwise show the popup
                 $dialog.addClass('active');
             }
         });        
+    },
+    
+    /**
+     * Shows the warning popup
+     * @param {Object} $container The dialog's container
+     * @param {Object} $dialog The dialog
+     */
+    showWarningPopup: function($container, $dialog) {
+        
+        // If they have seen it already
+        if (warnPopup.seen) {
+            
+            // Just show the warning icon and they can click to re-show it if they want
+            $container.removeClass('hidden');
+            $dialog.removeClass('active');
+        }
+        else {
+            // Otherwise auto show the dialog and warning icon
+            $container.removeClass('hidden');
+            $dialog.addClass('active');
+        }
     },
     
     /**

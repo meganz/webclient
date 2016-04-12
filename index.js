@@ -1165,7 +1165,7 @@ function topmenuUI() {
             }
 
             if (page !== 'register') {
-                $('.top-warning-popup').addClass('active');
+                warnPopup.showEphemeral();
             }
         }
 

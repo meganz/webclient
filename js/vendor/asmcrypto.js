@@ -1,5 +1,5 @@
-/*! asmCrypto v0.0.10, (c) 2013 Artem S Vybornov, opensource.org/licenses/MIT */
-!function ( exports, global ) {
+/*! asmCrypto v0.0.11, (c) 2013 Artem S Vybornov, opensource.org/licenses/MIT */
+(function ( exports, global ) {
 
 function IllegalStateError () { var err = Error.apply( this, arguments ); this.message = err.message, this.stack = err.stack; }
 IllegalStateError.prototype = Object.create( Error.prototype, { name: { value: 'IllegalStateError' } } );
@@ -1795,7 +1795,7 @@ function AES_CCM_Encrypt_process ( data ) {
         wlen = asm.mac( AES_asm.MAC.CBC, AES_asm.HEAP_DATA + pos, len );
         wlen = asm.cipher( AES_asm.ENC.CTR, AES_asm.HEAP_DATA + pos, wlen );
 
-        result.set( heap.subarray( pos, pos + wlen ), rpos );
+        if ( wlen ) result.set( heap.subarray( pos, pos + wlen ), rpos );
         counter += (wlen>>>4);
         rpos += wlen;
 
@@ -1897,7 +1897,7 @@ function AES_CCM_Decrypt_process ( data ) {
         wlen = asm.cipher( AES_asm.DEC.CTR, AES_asm.HEAP_DATA + pos, wlen );
         wlen = asm.mac( AES_asm.MAC.CBC, AES_asm.HEAP_DATA + pos, wlen );
 
-        result.set( heap.subarray( pos, pos+wlen ), rpos );
+        if ( wlen ) result.set( heap.subarray( pos, pos+wlen ), rpos );
         counter += (wlen>>>4);
         rpos += wlen;
 
@@ -9440,12 +9440,11 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
      * @param Q offser where to place the quotient to, 32-byte aligned
      */
 
-    function div ( N, lN, D, lD, R, Q ) {
+    function div ( N, lN, D, lD, Q ) {
         N  =  N|0;
         lN = lN|0
         D  =  D|0;
         lD = lD|0
-        R  =  R|0;
         Q  =  Q|0;
 
         var n = 0, d = 0, e = 0,
@@ -9454,9 +9453,6 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
             qh = 0, ql = 0, rh = 0, rl = 0,
             t1 = 0, t2 = 0, m = 0, c = 0,
             i = 0, j = 0, k = 0;
-
-        // copy `N` to `R`
-        cp( lN, N, R );
 
         // number of significant limbs in `N` (multiplied by 4)
         for ( i = (lN-1) & -4; (i|0) >= 0; i = (i-4)|0 ) {
@@ -9478,21 +9474,23 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
 
         // `D` is zero? WTF?!
 
-        // calculate `e` - the power of 2 of the normalization factor
+        // calculate `e` — the power of 2 of the normalization factor
         while ( (d & 0x80000000) == 0 ) {
             d = d << 1;
             e = e + 1|0;
         }
 
-        // shift `R` for `e` bits left
+        // normalize `N` in place
         u0 = HEAP32[(N+lN)>>2]|0;
-        if ( e ) u1 = u0>>>(32-e|0);
-        for ( i = (lN-4)|0; (i|0) >= 0; i = (i-4)|0 ) {
-            n = HEAP32[(N+i)>>2]|0;
-            HEAP32[(R+i+4)>>2] = (u0 << e) | ( e ? n >>> (32-e|0) : 0 );
-            u0 = n;
+        if ( e ) {
+            u1 = u0>>>(32-e|0);
+            for ( i = (lN-4)|0; (i|0) >= 0; i = (i-4)|0 ) {
+                n = HEAP32[(N+i)>>2]|0;
+                HEAP32[(N+i+4)>>2] = (u0 << e) | ( e ? n >>> (32-e|0) : 0 );
+                u0 = n;
+            }
+            HEAP32[N>>2] = u0 << e;
         }
-        HEAP32[R>>2] = u0 << e;
 
         // normalize `D` in place
         if ( e ) {
@@ -9514,7 +9512,7 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
             j = (i-lD)|0;
 
             // estimate high part of the quotient
-            u0 = HEAP32[(R+i)>>2]|0;
+            u0 = HEAP32[(N+i)>>2]|0;
             qh = ( (u1>>>0) / (vh>>>0) )|0, rh = ( (u1>>>0) % (vh>>>0) )|0, t1 = imul(qh, vl)|0;
             while ( ( (qh|0) == 0x10000 ) | ( (t1>>>0) > (((rh << 16)|(u0 >>> 16))>>>0) ) ) {
                 qh = (qh-1)|0, rh = (rh+vh)|0, t1 = (t1-vl)|0;
@@ -9530,34 +9528,34 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
                 t2 = (imul(qh, d >>> 16)|0) + (t1 >>> 16)|0;
                 d = (m & 0xffff) | (t1 << 16);
                 m = t2;
-                n = HEAP32[(R+j+k)>>2]|0;
+                n = HEAP32[(N+j+k)>>2]|0;
                 t1 = ((n & 0xffff) - (d & 0xffff)|0) + c|0;
                 t2 = ((n >>> 16) - (d >>> 16)|0) + (t1 >> 16)|0;
-                HEAP32[(R+j+k)>>2] = (t2 << 16) | (t1 & 0xffff);
+                HEAP32[(N+j+k)>>2] = (t2 << 16) | (t1 & 0xffff);
                 c = t2 >> 16;
             }
             t1 = ((u1 & 0xffff) - (m & 0xffff)|0) + c|0;
             t2 = ((u1 >>> 16) - (m >>> 16)|0) + (t1 >> 16)|0;
-            HEAP32[(R+j+k)>>2] = u1 = (t2 << 16) | (t1 & 0xffff);
+            u1 = (t2 << 16) | (t1 & 0xffff);
             c = t2 >> 16;
 
             // add `D` back if got carry-out
             if ( c ) {
-                qh = (qh-1)|0, rh = (rh-vh)|0;
+                qh = (qh-1)|0;
                 c = 0;
                 for ( k = 0; (k|0) <= (lD|0); k = (k+4)|0 ) {
                     d = HEAP32[(D+k)>>2]|0;
-                    n = HEAP32[(R+j+k)>>2]|0;
-                    t1 = ((n & 0xffff) + (d & 0xffff)|0) + c|0;
-                    t2 = ((n >>> 16) + (d >>> 16)|0) + (t1 >>> 16)|0;
-                    HEAP32[(R+j+k)>>2] = (t2 << 16) | (t1 & 0xffff);
+                    n = HEAP32[(N+j+k)>>2]|0;
+                    t1 = (n & 0xffff) + c|0;
+                    t2 = (n >>> 16) + d + (t1 >>> 16)|0;
+                    HEAP32[(N+j+k)>>2] = (t2 << 16) | (t1 & 0xffff);
                     c = t2 >>> 16;
                 }
-                HEAP32[(R+j+k)>>2] = u1 = (u1+c)|0;
+                u1 = (u1+c)|0;
             }
 
             // estimate low part of the quotient
-            u0 = HEAP32[(R+i)>>2]|0;
+            u0 = HEAP32[(N+i)>>2]|0;
             n = (u1 << 16) | (u0 >>> 16);
             ql = ( (n>>>0) / (vh>>>0) )|0, rl = ( (n>>>0) % (vh>>>0) )|0, t1 = imul(ql, vl)|0;
             while ( ( (ql|0) == 0x10000 ) | ( (t1>>>0) > (((rl << 16)|(u0 & 0xffff))>>>0) ) ) {
@@ -9574,49 +9572,47 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
                 t2 = ((imul(ql, d >>> 16)|0) + (t1 >>> 16)|0) + (m >>> 16)|0;
                 d = (t1 & 0xffff) | (t2 << 16);
                 m = t2 >>> 16;
-                n = HEAP32[(R+j+k)>>2]|0;
+                n = HEAP32[(N+j+k)>>2]|0;
                 t1 = ((n & 0xffff) - (d & 0xffff)|0) + c|0;
                 t2 = ((n >>> 16) - (d >>> 16)|0) + (t1 >> 16)|0;
                 c = t2 >> 16;
-                HEAP32[(R+j+k)>>2] = (t2 << 16) | (t1 & 0xffff);
+                HEAP32[(N+j+k)>>2] = (t2 << 16) | (t1 & 0xffff);
             }
             t1 = ((u1 & 0xffff) - (m & 0xffff)|0) + c|0;
             t2 = ((u1 >>> 16) - (m >>> 16)|0) + (t1 >> 16)|0;
-            HEAP32[(R+j+k)>>2] = u1 = (t2 << 16) | (t1 & 0xffff);
             c = t2 >> 16;
 
             // add `D` back if got carry-out
             if ( c ) {
-                ql = (ql-1)|0, rl = (rl+vh)|0;
+                ql = (ql-1)|0;
                 c = 0;
                 for ( k = 0; (k|0) <= (lD|0); k = (k+4)|0 ) {
                     d = HEAP32[(D+k)>>2]|0;
-                    n = HEAP32[(R+j+k)>>2]|0;
+                    n = HEAP32[(N+j+k)>>2]|0;
                     t1 = ((n & 0xffff) + (d & 0xffff)|0) + c|0;
                     t2 = ((n >>> 16) + (d >>> 16)|0) + (t1 >>> 16)|0;
                     c = t2 >>> 16;
-                    HEAP32[(R+j+k)>>2] = (t1 & 0xffff) | (t2 << 16);
+                    HEAP32[(N+j+k)>>2] = (t1 & 0xffff) | (t2 << 16);
                 }
-                HEAP32[(R+j+k)>>2] = (u1+c)|0;
             }
 
             // got quotient limb
             HEAP32[(Q+j)>>2] = (qh << 16) | ql;
 
-            u1 = HEAP32[(R+i)>>2]|0;
+            u1 = HEAP32[(N+i)>>2]|0;
         }
 
         if ( e ) {
             // TODO denormalize `D` in place
 
-            // denormalize `R` in place
-            u0 = HEAP32[R>>2]|0;
+            // denormalize `N` in place
+            u0 = HEAP32[N>>2]|0;
             for ( i = 4; (i|0) <= (lD|0); i = (i+4)|0 ) {
-                n = HEAP32[(R+i)>>2]|0;
-                HEAP32[(R+i-4)>>2] = ( n << (32-e|0) ) | (u0 >>> e);
+                n = HEAP32[(N+i)>>2]|0;
+                HEAP32[(N+i-4)>>2] = ( n << (32-e|0) ) | (u0 >>> e);
                 u0 = n;
             }
-            HEAP32[(R+lD)>>2] = u0 >>> e;
+            HEAP32[(N+lD)>>2] = u0 >>> e;
         }
     }
 
@@ -10095,7 +10091,6 @@ function BigNumber_divide ( that ) {
 
     var pA = _bigint_asm.salloc( alimbcnt<<2 ),
         pB = _bigint_asm.salloc( blimbcnt<<2 ),
-        pR = _bigint_asm.salloc( blimbcnt<<2 ),
         pQ = _bigint_asm.salloc( alimbcnt<<2 );
 
     _bigint_asm.z( pQ-pA+(alimbcnt<<2), 0, pA );
@@ -10103,7 +10098,7 @@ function BigNumber_divide ( that ) {
     _bigint_heap.set( alimbs, pA>>2 );
     _bigint_heap.set( blimbs, pB>>2 );
 
-    _bigint_asm.div( pA, alimbcnt<<2, pB, blimbcnt<<2, pR, pQ );
+    _bigint_asm.div( pA, alimbcnt<<2, pB, blimbcnt<<2, pQ );
 
     qlimbcnt = _bigint_asm.tst( pQ, alimbcnt<<2 )>>2;
     if ( qlimbcnt ) {
@@ -10113,10 +10108,10 @@ function BigNumber_divide ( that ) {
         quotient.sign = this.sign * that.sign;
     }
 
-    rlimbcnt = _bigint_asm.tst( pR, blimbcnt<<2 )>>2;
+    rlimbcnt = _bigint_asm.tst( pA, blimbcnt<<2 )>>2;
     if ( rlimbcnt ) {
         remainder = new BigNumber;
-        remainder.limbs = new Uint32Array( _bigint_heap.subarray( pR>>2, (pR>>2)+rlimbcnt ) );;
+        remainder.limbs = new Uint32Array( _bigint_heap.subarray( pA>>2, (pA>>2)+rlimbcnt ) );;
         remainder.bitLength = bbitlen < (rlimbcnt<<5) ? bbitlen : (rlimbcnt<<5);
         remainder.sign = this.sign;
     }
@@ -10849,6 +10844,9 @@ RSA_RAW.verify = rsa_raw_encrypt_bytes;
 
 exports.RSA_RAW = RSA_RAW;
 
-global.asmCrypto=exports;
-}( {}, function(){return this}() );
+
+'function'==typeof define&&define.amd?define([],function(){return exports}):'object'==typeof module&&module.exports?module.exports=exports:global.asmCrypto=exports;
+
+return exports;
+})( {}, function(){return this}() );
 //# sourceMappingURL=asmcrypto.js.map

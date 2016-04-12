@@ -50,10 +50,7 @@ var astroPayDialog = {
      */
     updateDialogDetails: function() {
 
-        // Add the provider icon and name into the translated string
-        var displayName = htmlentities(this.selectedProvider.displayName);
-        var iconAndName = '<span class="provider-icon"></span><span class="provider-name">' + displayName + '</span>';
-        var information = l[7991].replace('%1', iconAndName);
+        // Get the gateway name
         var gatewayName = this.selectedProvider.gatewayName;
 
         // Change icon and payment provider name
@@ -77,8 +74,7 @@ var astroPayDialog = {
         }
 
         // Change the tax labels
-        this.$dialog.find('.astropay-information').safeHTML(information);
-        this.$dialog.find('.astropay-label.tax').safeHTML(taxLabel);
+        this.$dialog.find('.astropay-label.tax').text(taxLabel);
         this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);
     },
 

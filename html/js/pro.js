@@ -1016,7 +1016,6 @@ var proPage = {
         $('.payment-options-list.' + primaryOrSecondary + ' .payment-method:not(.template)').remove();
         $('.loading-placeholder-text').hide();
 
-
         // Loop through gateway providers (change to use list from API soon)
         for (var i = 0, length = gatewayOptions.length; i < length; i++) {
 
@@ -1229,6 +1228,7 @@ var proPage = {
                 // Update months and price
                 $durationOption.removeClass('template');
                 $durationOption.attr('data-plan-index', i);
+                $durationOption.attr('data-plan-months', numOfMonths);
                 $durationOption.find('.duration').text(monthsWording);
                 $durationOption.find('.price').text(price);
 
@@ -1250,11 +1250,30 @@ var proPage = {
             }
         }
 
-        // Pre-select the first option
+        // If there is data about any previous plan they purchased
+        if (warnPopup.lastPaymentInfo) {
+
+            // Get the number of months for the plan they last paid for
+            var lastPaymentMonths = warnPopup.lastPaymentInfo.m;
+            
+            // Find the radio option with the same number of months 
+            var $monthOption = $(".payment-duration[data-plan-months='" + lastPaymentMonths + "']");
+
+            // If it can find it then select the radio option. Note: In some 
+            // cases this may not be available (e.g. with upcoming A/B testing
+            if ($monthOption.length) {
+                $monthOption.find('input').prop('checked', true);
+                $monthOption.find('.membership-radio').addClass('checked');
+                $monthOption.find('.membership-radio-label').addClass('checked');
+                return true;
+            }
+        }
+        
+        // Otherwise pre-select the first option available
         var $firstOption = $('.duration-options-list .payment-duration:not(.template').first();
+        $firstOption.find('input').prop('checked', true);
         $firstOption.find('.membership-radio').addClass('checked');
         $firstOption.find('.membership-radio-label').addClass('checked');
-        $firstOption.find('input').attr('checked', 'checked');
     },
 
     /**

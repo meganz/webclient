@@ -21235,6 +21235,16 @@
 	        } else {
 	            return null;
 	        }
+	    },
+	    safeForceUpdate: function() {
+	        var self = this;
+	        try {
+	            setTimeout(function() {
+	                self.forceUpdate();
+	            }, 75);
+	        } catch(e) {
+	            console.warn(e);
+	        }
 	    }
 	};
 
@@ -21978,7 +21988,7 @@
 
 	            crypt.getPubEd25519(contact.u).done(function () {
 	                if (self.isMounted()) {
-	                    self.forceUpdate();
+	                    self.safeForceUpdate();
 	                }
 	            });
 	        }
@@ -22008,6 +22018,10 @@
 	    render: function render() {
 	        var self = this;
 	        var contact = this.props.contact;
+
+	        if (!contact.m && contact.email) {
+	            contact.m = contact.email;
+	        }
 
 	        var $avatar = $(useravatar.contact(contact));
 
@@ -22083,7 +22097,7 @@
 
 	                delete _noAvatars[contact.u];
 
-	                self.forceUpdate();
+	                self.safeForceUpdate();
 	            }).fail(function (e) {
 	                _noAvatars[contact.u] = true;
 	            });
@@ -23614,9 +23628,17 @@
 	                            });
 	                        }
 	                        var dropdown = null;
+	                        if (!M.u[contact.u]) {
+	                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+	                                'u': contact.u,
+	                                'name': contact.name,
+	                                'm': contact.email,
+	                                'c': 0
+	                            }));
+	                        }
 	                        if (M.u[contact.u]) {
 
-	                            if (contact.c === 1) {
+	                            if (M.u[contact.u].c === 1) {
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
@@ -23651,40 +23673,40 @@
 	                                        deleteButtonOptional
 	                                    )
 	                                );
-	                            }
-	                        } else {
-	                            dropdown = React.makeElement(
-	                                ButtonsUI.Button,
-	                                {
-	                                    className: "default-white-button tiny-button",
-	                                    icon: "tiny-icon grey-down-arrow" },
-	                                React.makeElement(
-	                                    DropdownsUI.Dropdown,
+	                            } else if (M.u[contact.u].c === 0) {
+	                                dropdown = React.makeElement(
+	                                    ButtonsUI.Button,
 	                                    {
-	                                        className: "white-context-menu shared-contact-dropdown",
-	                                        noArrow: true,
-	                                        positionMy: "left bottom",
-	                                        positionAt: "right bottom",
-	                                        horizOffset: 4
-	                                    },
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
-	                                        icon: "rounded-grey-plus",
-	                                        label: __("Add contact"),
-	                                        onClick: function onClick() {
-	                                            M.inviteContact(M.u[u_handle].m, contactEmail);
+	                                        className: "default-white-button tiny-button",
+	                                        icon: "tiny-icon grey-down-arrow" },
+	                                    React.makeElement(
+	                                        DropdownsUI.Dropdown,
+	                                        {
+	                                            className: "white-context-menu shared-contact-dropdown",
+	                                            noArrow: true,
+	                                            positionMy: "left bottom",
+	                                            positionAt: "right bottom",
+	                                            horizOffset: 4
+	                                        },
+	                                        React.makeElement(DropdownsUI.DropdownItem, {
+	                                            icon: "rounded-grey-plus",
+	                                            label: __("Add contact"),
+	                                            onClick: function onClick() {
+	                                                M.inviteContact(M.u[u_handle].m, contactEmail);
 
-	                                            var title = l[150];
+	                                                var title = l[150];
 
-	                                            var msg = l[5898].replace('[X]', contactEmail);
+	                                                var msg = l[5898].replace('[X]', contactEmail);
 
-	                                            closeDialog();
-	                                            msgDialog('info', title, msg);
-	                                        }
-	                                    }),
-	                                    deleteButtonOptional ? React.makeElement("hr", null) : null,
-	                                    deleteButtonOptional
-	                                )
-	                            );
+	                                                closeDialog();
+	                                                msgDialog('info', title, msg);
+	                                            }
+	                                        }),
+	                                        deleteButtonOptional ? React.makeElement("hr", null) : null,
+	                                        deleteButtonOptional
+	                                    )
+	                                );
+	                            }
 	                        }
 
 	                        contacts.push(React.makeElement(
@@ -23696,7 +23718,7 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
-	                                    htmlentities(mega.utils.fullUsername(contact.u))
+	                                    mega.utils.fullUsername(contact.u)
 	                                ),
 	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
 	                                React.makeElement(
@@ -23716,7 +23738,7 @@
 	                                    React.makeElement(
 	                                        "div",
 	                                        { className: "data-block-bg" },
-	                                        React.makeElement(ContactsUI.Avatar, { className: "medium-avatar share", contact: contact })
+	                                        React.makeElement(ContactsUI.AvatarImage, { className: "medium-avatar share", contact: contact })
 	                                    )
 	                                ),
 	                                React.makeElement("div", { className: "clear" })

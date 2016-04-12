@@ -25,10 +25,6 @@ function renderLinuxOptions(linuxsync) {
         $(this).parent().removeClass('radioOff').addClass('radioOn');
         $(this).attr('checked', true);
     });
-    $('.fm-version-select select').bind('change', function() {
-        $('.version-select-txt').text($('.fm-version-select select option:selected').text());
-        $('.sync-button').attr('href', $(this).val());
-    });
     $('.sync-button.linux').addClass('disabled');
     $('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
     $('.version-select-txt').text(l[2029]);
@@ -37,27 +33,11 @@ function renderLinuxOptions(linuxsync) {
             || ua.indexOf('i386') > -1 || ua.indexOf('i586') > -1) {
         $('.sync-radio-buttons #rad1').click();
     }
-    var options = '<option id="-1">' + escapeHTML(l[2029]) + '</option>';
-    for (var i in linuxsync) {
-        if (linuxsync.hasOwnProperty(i)) {
-            var selected = '';
-            var version = linuxsync[i].name.split(' ');
-            version = version[version.length - 1];
-            var name = linuxsync[i].name.replace(' ' + version, '');
-            if (ua.indexOf(name.toLowerCase()) > -1 && ua.indexOf(version) > -1) {
-                selected = 'selected';
-                changeLinux(linuxsync, i);
-            }
-            options += '<option value="' + escapeHTML(i) + '" ' +
-                escapeHTML(selected) + '>' + escapeHTML(linuxsync[i].name) + '</option>';
-        }
-    }
     loadingDialog.hide();
-    $('.fm-version-select.sync select').safeHTML(options);
 
-    $('.fm-version-select.sync select').rebind('change', function(e) {
-            changeLinux(linuxsync, $(this).val());
-        });
+    megasync.UILinuxDropdown(function($element) {
+        changeLinux(linuxsync, $element.data('client-id'));
+    });
 
     $('.sync-bottom-txt.linux-txt a').rebind('click', function(e) {
             if (!nautilusurl) {

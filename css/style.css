@@ -1734,8 +1734,13 @@ a.blog-button:hover {
     position: relative;
 }
 .notification-type {
-    display: block;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
     padding-left: 62px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .notification-avatar {
     position: absolute;
@@ -1748,8 +1753,9 @@ a.blog-button:hover {
     font-size: 23px;
     text-align: center;
     line-height: 46px;
-    margin: 8px 0;
+    margin: -24px 0 0 0;
     display: block;
+    top: 50%;
     text-transform: uppercase;
     font-family: 'source_sans_prolight';
 }
@@ -1764,33 +1770,30 @@ a.blog-button:hover {
     width: 44px;
     height: 44px;
 }
-.notification-request-buttons {
-    float: right;
-    padding: 4px 20px 0 8px;
+.notification-request-buttons, .notification-accepted-bl {
+    padding: 0 20px 0 8px;
+    width: 105px;
+    vertical-align: middle;
+    text-align: right;
 }
-.nt-contact-request .notification-request-buttons.hidden {
-    display: none;
+.fm-dialog-button.notifications-button {
+    margin-top: 0;
 }
-.nt-contact-request .notification-request-buttons {
-    display: block;
+.nt-contact-request .notification-request-buttons, .nt-contact-request.accepted .notification-accepted-bl {
+    display: table-cell;
 }
-.nt-contact-request.accepted .notification-request-buttons, .nt-contact-request.not-now .notification-request-buttons {
+.nt-contact-request.accepted .notification-request-buttons, .nt-contact-request.not-now .notification-request-buttons, .nt-contact-request .notification-request-buttons.hidden, .notification-accepted-bl {
     display: none;
 }
 .notification-accepted {
-    float: right;
     color: #666666;
     font-size: 13px;
     line-height: 18px;
     padding: 2px 0 2px 28px;
-    margin: 22px 14px 0 0;
-    display: none;
+    margin: 0 14px 0 0;
     background-image: url(../images/mega/notifications-sprite-v3.svg);
     background-position: -10px -350px;
     background-repeat: no-repeat;
-}
-.nt-contact-request.accepted .notification-accepted {
-    display: block;
 }
 .notification-avatar-icon {
     position: absolute;
@@ -1834,43 +1837,19 @@ a.blog-button:hover {
 .nt-takedown-notification .notification-avatar-icon, .nt-takedown-reinstated-notification .notification-avatar-icon, .nt-payment-notification .notification-avatar-icon {
     display: none;
 }
-
 /* Custom icon instead of avatar for MEGA notifications */
-.nt-payment-reminder-notification .notification-avatar {
+.nt-payment-reminder-notification .notification-avatar, .nt-payment-notification .notification-avatar {
     background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
-    height: 48px;
-    left: 26px;
-    top: 0;
-    width: 48px;
-}
-.nt-payment-notification .notification-avatar {
-    background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
-    height: 48px;
-    left: 26px;
-    top: 0;
-    width: 48px;
 }
 .nt-takedown-notification .notification-avatar {
     background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -151px -1451px;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
-    height: 48px;
-    left: 25px;
-    margin-top: -24px;
-    top: 50%;
-    width: 48px;
 }
 .nt-takedown-reinstated-notification .notification-avatar {
     background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -1px -1451px;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
-    height: 48px;
-    left: 25px;
-    margin-top: -24px;
-    top: 50%;
-    width: 48px;
 }
- 
 .notification-popup .jspDrag {
     width: 4px;
 }
@@ -1893,13 +1872,12 @@ a.blog-button:hover {
     padding: 0;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 280px;
 }
 .notification-content {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    display: block;
+    display: table-cell;
     min-height: 64px;
     padding: 8px 8px 6px 0;
     vertical-align: middle;
@@ -7560,11 +7538,11 @@ table {
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    margin: 0 4px;
 }
 .fm-empty-button:hover, .fm-not-logged-button:hover {
     background-color: rgba(49,181,0,0.7);
     color: white;
-    margin: 0 4px;
 }
 .fm-empty-cloud-txt {
     color: #CCCCCC;
@@ -10302,6 +10280,31 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     min-height: 20px;
     color: #333333;
 }
+.green-bg, .membershtip-medium-txt.red-bg, .membershtip-medium-txt.gray-bg, .membershtip-medium-txt.blue-bg {
+	-moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #9a1c06;
+    line-height: 16px;
+    padding: 0 6px;
+    color: rgba(255,255,255,1);
+    font-size: 13px;
+    line-height: 19px;
+    background-color: #71AD32;
+    cursor: pointer;
+}
+.membershtip-medium-txt.red-bg {
+	background-color: #D32200;
+}
+.membershtip-medium-txt.blue-bg {
+	background-color: #1FA4E5;
+}
+.membershtip-medium-txt.gray-bg {
+	background-color: #4c4c4c;
+}
 .membership-small-txt {
     font-size: 13px;
 }
@@ -10327,6 +10330,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-usage-bl:first-child {
     border-left: 0;
     width: 235px;
+}
+.free .membership-usage-bl.storage, .free .fm-account-blocks.storage {
+    width: 100%; 
+}
+.free .membership-usage-bl.bandwidth, .free .fm-account-blocks.bandwidth {
+    display: none;
 }
 .membership-circle {
     width: 76px;
@@ -15253,7 +15262,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .new-bottom-pages p.sub-list span.number, .new-bottom-pages h2.sub-list span.number {
     margin: 2px 0 0 70px;
 }
-.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-page li a, .new-bottom-pages li a {
+.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a {
     color: #D22400;
 }
 .new-bottom-pages h2 span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
@@ -23187,6 +23196,11 @@ body.pro:after {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
 }
+
+.sync-bottom-block .megasync-dropdown {
+    margin: 0px;
+}
+
 .linux .megasync-dropdown {
     display: block;
 }
@@ -23296,6 +23310,12 @@ body.pro:after {
     z-index: 10;
     top: 122px;
 }
+
+.megasync-dropdown-list .jspPane {
+    min-width: 280px;
+    max-width: 280px;
+}
+
 .megasync-dropdown-pad {
     background-color: white;
     -moz-border-radius: 4px;
@@ -23309,6 +23329,7 @@ body.pro:after {
     box-sizing: border-box;
     padding: 36px 0 4px 0;
 }
+
 .megasync-dropdown-scroll .jspVerticalBar {
     width: 10px;
 }

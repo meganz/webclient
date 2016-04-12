@@ -30,17 +30,17 @@ endif
 
 # If no browser set, run on our custom PhantomJS2.
 ifeq ($(BROWSER),)
-    BROWSER = PhantomJS2_custom
+    BROWSER = PhantomJS_custom
 endif
 
 # If no Karma flags set, set a default.
 ifeq ($(KARMA_FLAGS),)
     # Set to --preprocessors= to show line numbers, otherwise coverage clobbers them.
-    KARMA_FLAGS = "--preprocessors="
+    KARMA_FLAGS = --preprocessors=
 endif
 
 # All browsers to test with on the test-all target.
-TESTALL_BROWSERS = PhantomJS2_custom,Chrome_Unlimited,Firefox
+TESTALL_BROWSERS = PhantomJS_custom,Chrome_Unlimited,Firefox
 ifeq ($(OS), Windows_NT)
     TESTALL_BROWSERS := $(TESTALL_BROWSERS),IE,FirefoxNightly,FirefoxDeveloper,Firefox_NoCookies,Chrome_NoCookies,Chrome_Incognito
 endif
@@ -55,13 +55,13 @@ test: $(KARMA)
 	$(HEADLESS_RUN) $(NODE) $(KARMA) start $(KARMA_FLAGS) karma.conf.js --browsers $(BROWSER) $(OPTIONS)
 
 test-ci: $(KARMA)
-	KARMA_FLAGS="--singleRun=true --no-colors" $(MAKE) test
+	KARMA_FLAGS="--singleRun=true --no-colors" $(MAKE) $(SILENT_MAKE) test
 
 test-debug: $(KARMA)
-	KARMA_FLAGS="--preprocessors= --debug" $(MAKE) test
+	KARMA_FLAGS="--preprocessors= --debug" $(MAKE) $(SILENT_MAKE) test
 
 test-all:
-	OPTIONS="--singleRun=true" BROWSER=$(TESTALL_BROWSERS) $(MAKE) $(SILENT_MAKE) test
+	KARMA_FLAGS="--singleRun=true" BROWSER=$(TESTALL_BROWSERS) $(MAKE) $(SILENT_MAKE) test
 
 api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \
@@ -83,7 +83,7 @@ pkg-upgrade:
 checks: jshint jscs
 
 clean:
-	rm -rf doc/api/ coverage/ build/ test-results.xml test/phantomjs-storage dont-deploy/ui/out/
+	rm -rf doc/api/ coverage/ build/ test-results.xml jscpd-report.xml test/phantomjs-storage dont-deploy/ui/out/
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)

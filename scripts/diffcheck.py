@@ -317,6 +317,7 @@ def reduce_validator(file_line_mapping, **extra):
         an integer containing the number of failed rules.
     """
 
+    exclude = ['vendor', 'asm', 'sjcl']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -328,6 +329,8 @@ def reduce_validator(file_line_mapping, **extra):
 
         # Ignore known custom made files
         if file_path in config.VALIDATOR_IGNORE_FILES:
+            continue
+        if any([n in file_path for n in exclude]):
             continue
 
         # Ignore this specific file types

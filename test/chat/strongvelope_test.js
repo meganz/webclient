@@ -4,10 +4,7 @@
  */
 
 describe("chat.strongvelope unit test", function() {
-    "use strict";
-
     var assert = chai.assert;
-
     var ns = strongvelope;
 
     // Some test data.
@@ -692,7 +689,7 @@ describe("chat.strongvelope unit test", function() {
                 handler.updateSenderKey();
                 var obj = {};
                 obj[KEY_ID_0] = KEY;
-                console.log(btoa(handler.keyId));
+                // console.log(btoa(handler.keyId));
                 assert.strictEqual(handler.keyId, KEY_ID_0);
                 assert.strictEqual(handler.previousKeyId, null);
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
@@ -2021,7 +2018,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler.excludeParticipants.size, 0);
                 assert.strictEqual(ns._logger._log.args[0][0],
                     'I am not participating in this chat, cannot read message.');
-            });*/
+            });
 
             it("followup message", function() {
                 var handler = new ns.ProtocolHandler('you456789xw',
@@ -2153,7 +2150,7 @@ describe("chat.strongvelope unit test", function() {
                     sender: 'me3456789xw',
                     type: 0,
                     payload: 'Hello!',
-                    toSend: 'key reminder message',
+                    // toSend: 'key reminder message',
                     includeParticipants: [], excludeParticipants: []
                 });
                 assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);

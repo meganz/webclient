@@ -64,6 +64,18 @@ var astroPayDialog = {
         var taxLabel = l[7989].replace('%1', this.selectedProvider.extra.taxIdLabel);
         var taxPlaceholder = l[7990].replace('%1', this.selectedProvider.extra.taxIdLabel);
 
+        // If they have previously paid before with Astropay
+        if ((warnPopup.lastPaymentInfo) && (warnPopup.lastPaymentInfo.gwd)) {
+
+            // Get the extra data from the gateway details
+            var firstLastName = warnPopup.lastPaymentInfo.gwd.name;
+            var taxNum = warnPopup.lastPaymentInfo.gwd.cpf;
+            
+            // Prefill the user's name and tax details
+            this.$dialog.find('.astropay-name-field').val(firstLastName);
+            this.$dialog.find('.astropay-tax-field').val(taxNum);
+        }
+
         // Change the tax labels
         this.$dialog.find('.astropay-information').safeHTML(information);
         this.$dialog.find('.astropay-label.tax').safeHTML(taxLabel);

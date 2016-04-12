@@ -112,7 +112,7 @@ function dl_g(res) {
                         loadingDialog.hide();
                         if (res.msd !== 0 && (!err || is)) {
                             $('.megasync-overlay').removeClass('downloading');
-                            megasync.download(dlpage_ph, dlpage_key);
+                            megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
                         } else {
                             megasyncOverlay();
                         }

@@ -2889,13 +2889,20 @@ function fmtopUI() {
     if (M.currentrootid === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
         $('.fm-right-files-block').addClass('rubbish-bin');
-    } else {
+    }
+    else {
         $('.fm-right-files-block').removeClass('rubbish-bin');
         if (M.currentrootid === M.InboxID) {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc' || String(M.currentdirid).length === 11 ) {
+        }
+        else if (M.currentdirid === 'contacts'
+                || M.currentdirid === 'ipc'
+                || M.currentdirid === 'opc'
+                || (String(M.currentdirid).length === 11
+                    && M.currentdirid.substr(0, 6) !== 'search')) {
+
             $('.fm-add-user').removeClass('hidden');
             $('.fm-left-panel').addClass('contacts-panel');
             if (M.currentdirid === 'ipc') {
@@ -2905,7 +2912,8 @@ function fmtopUI() {
                 $('.fm-contact-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
             }
-        } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
+        }
+        else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
@@ -4941,7 +4949,7 @@ var QuickFinder = function(searchable_elements, containers) {
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
         if (!is_fm()) {
-            return; 
+            return;
         }
         if (self.is_active()) {
             self.deactivate();

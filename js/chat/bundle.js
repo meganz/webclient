@@ -216,6 +216,7 @@
 	            'chatdIntegration': ChatdIntegration,
 	            'callManager': CallManager,
 	            'urlFilter': UrlFilter,
+	            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
 	            'karerePing': KarerePing
@@ -20511,7 +20512,6 @@
 	            'className': "nw-conversations-item current-calling",
 	            'data-jid': ''
 	        };
-	        var callName;
 
 	        var megaChat = this.props.megaChat;
 
@@ -20524,7 +20524,6 @@
 	            if (user) {
 	                currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
 	                currentCallingContactStatusProps['data-jid'] = room.roomJid;
-	                callName = room.getRoomTitle();
 
 	                if (room.roomJid == megaChat.currentlyOpenedChat) {
 	                    currentCallingContactStatusProps.className += " selected";
@@ -26430,7 +26429,7 @@
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
-	        return htmlentities(self.megaChat.getContactNameFromJid(participants[0]));
+	        return self.megaChat.getContactNameFromJid(participants[0]);
 	    } else {
 	        assert(false, "invalid room type");
 	        return "[invalid room type]";

@@ -2889,13 +2889,20 @@ function fmtopUI() {
     if (M.currentrootid === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
         $('.fm-right-files-block').addClass('rubbish-bin');
-    } else {
+    }
+    else {
         $('.fm-right-files-block').removeClass('rubbish-bin');
         if (M.currentrootid === M.InboxID) {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+        }
+        else if (M.currentdirid === 'contacts'
+                || M.currentdirid === 'ipc'
+                || M.currentdirid === 'opc'
+                || (String(M.currentdirid).length === 11
+                    && M.currentdirid.substr(0, 6) !== 'search')) {
+
             $('.fm-add-user').removeClass('hidden');
             $('.fm-left-panel').addClass('contacts-panel');
             if (M.currentdirid === 'ipc') {
@@ -2905,7 +2912,8 @@ function fmtopUI() {
                 $('.fm-contact-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
             }
-        } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
+        }
+        else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
@@ -4464,17 +4472,20 @@ function avatarDialog(close)
         {
             cropButton: $('#fm-change-avatar'),
             dragDropUploadPrompt:l[1390],
+            outputFormat: 'image/jpeg',
             onCrop: function(croppedDataURI)
             {
+                if (croppedDataURI.length > 64 * 1024) {
+                    return msgDialog('warninga', l[8645], l[8646]);
+                }
                 var data = dataURLToAB(croppedDataURI);
                 mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
-                var blob = new Blob([data], {type: 'image/jpeg'});
-                avatars[u_handle] =
-                    {
-                        data: blob,
-                        url: myURL.createObjectURL(blob)
-                    }
-                    $('.fm-account-avatar').html(useravatar.contact(u_handle));
+                var blob = new Blob([data], {type: 'image/png'});
+                avatars[u_handle] = {
+                    data: blob,
+                    url: myURL.createObjectURL(blob)
+                };
+                $('.fm-account-avatar').html(useravatar.contact(u_handle));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },
@@ -4938,7 +4949,7 @@ var QuickFinder = function(searchable_elements, containers) {
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
         if (!is_fm()) {
-            return; 
+            return;
         }
         if (self.is_active()) {
             self.deactivate();
@@ -6813,7 +6824,7 @@ function sectionUIopen(id) {
         $('.fm-blocks-view.fm').addClass('hidden');
     }
 
-    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc' && String(M.currentdirid).length !== 11) {
         $('.fm-left-panel').removeClass('contacts-panel');
         $('.fm-right-header').removeClass('requests-panel');
         $('.fm-received-requests').removeClass('active');
@@ -8746,7 +8757,7 @@ function moveDialog() {
     // Clears already selected sub-folders, and set selection to root
     function selectMoveDialogTabRoot(section) {
 
-        var $btn = $('.dialog-move-button');
+        var $btn = $('.dialog-move-button'), timer;
 
         $('.move-dialog .nw-fm-tree-item').removeClass('selected');
 
@@ -8770,7 +8781,6 @@ function moveDialog() {
     };
 
     $('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').rebind('click', function() {
-
         closeDialog();
     });
 
@@ -8964,6 +8974,40 @@ function moveDialog() {
         if (typeof $.mcselected == 'undefined') {
             $btn.addClass('disabled');
         }
+    });
+    
+    $('.move-dialog .shared-with-me').off('mouseover', '.nw-fm-tree-item');
+    $('.move-dialog .shared-with-me').on('mouseover', '.nw-fm-tree-item', function(e) {
+        var $item = $(this).find('.nw-fm-tree-folder');
+        var itemLeftPos = $item.offset().left;
+        var itemTopPos = $item.offset().top;
+        var $tooltip = $('.contact-preview');
+        var tooltipWidth = 0;
+        var html = '<div class="small-rounded-avatar color6">\n\
+                <div class="avatar-letter">A</div>\n\
+            </div>\n\
+            <div class="user-card-data no-status">\n\
+                <div class="user-card-name small">Andrei Dymovich <span class="grey">(owner)</span></div>\n\
+                <div class="user-card-email small">ad@mega.nz</div>\n\
+            </div>';
+
+        $tooltip.find('.contacts-info.body').safeHTML(html);
+        
+        tooltipWidth = $tooltip.outerWidth();
+        timer = setTimeout(function () {
+            $tooltip.css({
+                'left': itemLeftPos + ($item.outerWidth()/2 - $tooltip.outerWidth()/2)  + 'px',
+                'top': itemTopPos - 63 + 'px'
+            });
+            $tooltip.fadeIn(200);
+        }, 1000);
+    });
+
+    $('.move-dialog .shared-with-me').off('mouseout', '.nw-fm-tree-item');
+    $('.move-dialog .shared-with-me').on('mouseout', '.nw-fm-tree-item', function(e) {
+        var $tooltip = $('.contact-preview');
+        clearTimeout(timer);
+        $tooltip.fadeOut(200);
     });
 
     $('.move-dialog .dialog-move-button').rebind('click', function() {

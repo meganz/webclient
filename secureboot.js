@@ -211,6 +211,7 @@ if (!b_u) try
         // We could either show the user a message about the issue and let him
         // enable cookies, or rather setup a tiny polyfill so that they can use
         // the site even in such case, even though this solution has side effects.
+        delete window.localStorage;
         Object.defineProperty(window, 'localStorage', {
             value: Object.create({}, {
                 length:     { get: function() { return Object.keys(this).length; }},
@@ -1455,6 +1456,7 @@ else if (!b_u)
         jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1, w:7});
@@ -1554,8 +1556,10 @@ else if (!b_u)
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
-    if (typeof Number.isNaN !== 'function'
-            || typeof Set === 'undefined') {
+    if (
+        typeof Number.isNaN !== 'function' ||
+        typeof Set === 'undefined'
+    ) {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
@@ -1631,6 +1635,7 @@ else if (!b_u)
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js', 'zxcvbn_js'],
+        'newsignup': ['register','register_js', 'zxcvbn_js'],
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],

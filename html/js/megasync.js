@@ -15,6 +15,11 @@ var megasync = (function() {
     var listeners = [];
     var pending;
 
+    ns.UILinuxDropdown = function(selected) {
+
+        linuxDropdown(selected);
+    };
+
     // Linux stuff {{{
     /**
      * Prepare Linux Dropdown with the list of distro.
@@ -23,17 +28,32 @@ var megasync = (function() {
      * creates an HTML dropdown with the list of distros we support.
      *
      */
-    function linuxDropdown() {
+    function linuxDropdown(selected) {
 
         var is64    = browserdetails().is64bit;
         var $select = $('.megasync-scr-pad').empty();
         var $list   = $('.megasync-dropdown-list');
         $('.megasync-overlay').addClass('linux');
-        linuxClients.forEach(function(client) {
 
-            var icon = client.name.toLowerCase().replace(/[^a-z]/g, '');
+        if (typeof selected !== "function") {
+            /**
+             * Default click handler 
+             * @param {jquery} $element     Element that has been clicked.
+             */
+            selected = function followLink($element) {
+                window.location = $element.attr('link');
+            }
+        }
+
+        linuxClients.forEach(function(client, id) {
+
+            var icon = client.name.toLowerCase().match(/([a-z]+)/i)[1];
+            icon = (icon === 'red') ? 'redhat' : icon;
+
             $('<div/>').addClass('megasync-dropdown-link ' + icon)
                 .text(client.name)
+                .data('client', client.name)
+                .data('client-id', id)
                 .attr('link', ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32")))
                 .appendTo($select);
         });
@@ -41,7 +61,7 @@ var megasync = (function() {
 
             $('.megasync-dropdown span').removeClass('active').text($(this).text());
             $list.addClass('hidden');
-            window.location = $(this).attr('link');
+            selected($(this));
         });
         $('.megasync-dropdown span').rebind('click', function() {
 
@@ -66,13 +86,18 @@ var megasync = (function() {
      */
     function linuxDropdownResizeHandler() {
 
+        var $main = $('.megasync-dropdown:visible');
         var $pane = $('.megasync-dropdown-scroll');
-        var jsp = $pane.data('jsp');
+        var jsp   = $pane.data('jsp');
         var $list = $('.megasync-dropdown-list');
         var overlayHeight = $('.megasync-overlay').outerHeight();
         var listHeight = $('.megasync-scr-pad').outerHeight() + 72;
-        var listPosition = $list.offset().top;
 
+        if ($main.parent('.sync-button-block').length) {
+            $list.css({'top': $main.position().top-10, 'left': $main.offset().left + $main.width()/2});
+        }
+
+        var listPosition = $list.offset().top;
         if (overlayHeight < (listHeight + listPosition)) {
             $('.megasync-list-arrow').removeClass('hidden inactive');
             $pane.height(overlayHeight - listPosition - 72);

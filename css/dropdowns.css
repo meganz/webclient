@@ -123,3 +123,11 @@
 .link-button .dropdown.body:not(.popup) .dropdown-white-arrow {
     margin-left: -107px;
 }
+.dropdown.contact-preview {
+    min-width: 238px;
+    max-width: 320px;
+    position:fixed;
+}
+.dropdown.contact-preview .contacts-info.body {
+    padding: 2px 4px 4px 4px;
+}

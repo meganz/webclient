@@ -7,7 +7,7 @@
  * @author Mike Hamburg
  * @author Dan Boneh
  * 
- * Version 1.0.0
+ * Version 1.0.3
  */
 
 /*jslint indent: 2, bitwise: false, nomen: false, plusplus: false, white: false, regexp: false */
@@ -71,6 +71,11 @@ var sjcl = {
 
 if(typeof module !== 'undefined' && module.exports){
   module.exports = sjcl;
+}
+if (typeof define === "function") {
+    define([], function () {
+        return sjcl;
+    });
 }
 /** @fileOverview Low-level AES implementation.
  *
@@ -356,7 +361,7 @@ sjcl.bitArray = {
       return a1.concat(a2);
     }
     
-    var out, i, last = a1[a1.length-1], shift = sjcl.bitArray.getPartial(last);
+    var last = a1[a1.length-1], shift = sjcl.bitArray.getPartial(last);
     if (shift === 32) {
       return a1.concat(a2);
     } else {
@@ -465,6 +470,20 @@ sjcl.bitArray = {
    */
   _xor4: function(x,y) {
     return [x[0]^y[0],x[1]^y[1],x[2]^y[2],x[3]^y[3]];
+  },
+
+  /** byteswap a word array inplace.
+   * (does not handle partial words)
+   * @param {sjcl.bitArray} a word array
+   * @return {sjcl.bitArray} byteswapped array
+   */
+  byteswapM: function(a) {
+    var i, v, m = 0xff00;
+    for (i = 0; i < a.length; ++i) {
+      v = a[i];
+      a[i] = (v >>> 24) | ((v >>> 8) & m) | ((v & m) << 8) | (v << 24);
+    }
+    return a;
   }
 };
 /** @fileOverview Bit array codec implementations.
@@ -517,7 +536,7 @@ sjcl.codec.utf8String = {
 sjcl.codec.hex = {
   /** Convert from a bitArray to a hex string. */
   fromBits: function (arr) {
-    var out = "", i, x;
+    var out = "", i;
     for (i=0; i<arr.length; i++) {
       out += ((arr[i]|0)+0xF00000000000).toString(16).substr(4);
     }
@@ -533,6 +552,119 @@ sjcl.codec.hex = {
       out.push(parseInt(str.substr(i,8),16)^0);
     }
     return sjcl.bitArray.clamp(out, len*4);
+  }
+};
+
+/** @fileOverview Bit array codec implementations.
+ *
+ * @author Marco Munizaga
+ */
+
+//patch arraybuffers if they don't exist
+if (typeof(ArrayBuffer) === 'undefined') {
+  (function(globals){
+      "use strict";
+      globals.ArrayBuffer = function(){};
+      globals.DataView = function(){};
+  }(this));
+}
+
+/** @namespace ArrayBuffer */
+sjcl.codec.arrayBuffer = {
+  /** Convert from a bitArray to an ArrayBuffer. 
+   * Will default to 8byte padding if padding is undefined*/
+  fromBits: function (arr, padding, padding_count) {
+    var out, i, ol, tmp, smallest;
+    padding = padding==undefined  ? true : padding
+    padding_count = padding_count || 8
+
+    if (arr.length === 0) {
+      return new ArrayBuffer(0);
+    }
+
+    ol = sjcl.bitArray.bitLength(arr)/8;
+
+    //check to make sure the bitLength is divisible by 8, if it isn't 
+    //we can't do anything since arraybuffers work with bytes, not bits
+    if ( sjcl.bitArray.bitLength(arr)%8 !== 0 ) {
+      throw new sjcl.exception.invalid("Invalid bit size, must be divisble by 8 to fit in an arraybuffer correctly")
+    }
+
+    if (padding && ol%padding_count !== 0){
+      ol += padding_count - (ol%padding_count);
+    }
+
+
+    //padded temp for easy copying
+    tmp = new DataView(new ArrayBuffer(arr.length*4));
+    for (i=0; i<arr.length; i++) {
+      tmp.setUint32(i*4, (arr[i]<<32)); //get rid of the higher bits
+    }
+
+    //now copy the final message if we are not going to 0 pad
+    out = new DataView(new ArrayBuffer(ol));
+
+    //save a step when the tmp and out bytelength are ===
+    if (out.byteLength === tmp.byteLength){
+      return tmp.buffer;
+    }
+
+    smallest = tmp.byteLength < out.byteLength ? tmp.byteLength : out.byteLength;
+    for(i=0; i<smallest; i++){
+      out.setUint8(i,tmp.getUint8(i));
+    }
+
+
+    return out.buffer
+  },
+
+  toBits: function (buffer) {
+    var i, out=[], len, inView, tmp;
+
+    if (buffer.byteLength === 0) {
+      return [];
+    }
+
+    inView = new DataView(buffer);
+    len = inView.byteLength - inView.byteLength%4;
+
+    for (var i = 0; i < len; i+=4) {
+      out.push(inView.getUint32(i));
+    }
+
+    if (inView.byteLength%4 != 0) {
+      tmp = new DataView(new ArrayBuffer(4));
+      for (var i = 0, l = inView.byteLength%4; i < l; i++) {
+        //we want the data to the right, because partial slices off the starting bits
+        tmp.setUint8(i+4-l, inView.getUint8(len+i)); // big-endian, 
+      }
+      out.push(
+        sjcl.bitArray.partial( (inView.byteLength%4)*8, tmp.getUint32(0) )
+      ); 
+    }
+    return out;
+  },
+
+
+
+  /** Prints a hex output of the buffer contents, akin to hexdump **/
+  hexDumpBuffer: function(buffer){
+      var stringBufferView = new DataView(buffer)
+      var string = ''
+      var pad = function (n, width) {
+          n = n + '';
+          return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+      }
+
+      for (var i = 0; i < stringBufferView.byteLength; i+=2) {
+          if (i%16 == 0) string += ('\n'+(i).toString(16)+'\t')
+          string += ( pad(stringBufferView.getUint16(i).toString(16),4) + ' ')
+      }
+
+      if ( typeof console === undefined ){
+        console = console || {log:function(){}} //fix for IE
+      }
+      console.log(string.toUpperCase())
   }
 };
 
@@ -836,6 +968,27 @@ sjcl.mode.ccm = {
    */
   name: "ccm",
   
+  _progressListeners: [],
+
+  listenProgress: function (cb) {
+    sjcl.mode.ccm._progressListeners.push(cb);
+  },
+
+  unListenProgress: function (cb) {
+    var index = sjcl.mode.ccm._progressListeners.indexOf(cb);
+    if (index > -1) {
+      sjcl.mode.ccm._progressListeners.splice(index, 1);
+    }
+  },
+
+  _callProgressListener: function (val) {
+    var p = sjcl.mode.ccm._progressListeners.slice(), i;
+
+    for (i = 0; i < p.length; i += 1) {
+      p[i](val);
+    }
+  },
+
   /** Encrypt in CCM mode.
    * @static
    * @param {Object} prf The pseudorandom function.  It must have a block size of 16 bytes.
@@ -846,7 +999,7 @@ sjcl.mode.ccm = {
    * @return {bitArray} The encrypted data, an array of bytes.
    */
   encrypt: function(prf, plaintext, iv, adata, tlen) {
-    var L, i, out = plaintext.slice(0), tag, w=sjcl.bitArray, ivl = w.bitLength(iv) / 8, ol = w.bitLength(out) / 8;
+    var L, out = plaintext.slice(0), tag, w=sjcl.bitArray, ivl = w.bitLength(iv) / 8, ol = w.bitLength(out) / 8;
     tlen = tlen || 64;
     adata = adata || [];
     
@@ -880,7 +1033,7 @@ sjcl.mode.ccm = {
   decrypt: function(prf, ciphertext, iv, adata, tlen) {
     tlen = tlen || 64;
     adata = adata || [];
-    var L, i, 
+    var L,
         w=sjcl.bitArray,
         ivl = w.bitLength(iv) / 8,
         ol = w.bitLength(ciphertext), 
@@ -911,39 +1064,16 @@ sjcl.mode.ccm = {
     return out.data;
   },
 
-  /* Compute the (unencrypted) authentication tag, according to the CCM specification
-   * @param {Object} prf The pseudorandom function.
-   * @param {bitArray} plaintext The plaintext data.
-   * @param {bitArray} iv The initialization value.
-   * @param {bitArray} adata The authenticated data.
-   * @param {Number} tlen the desired tag length, in bits.
-   * @return {bitArray} The tag, but not yet encrypted.
-   * @private
-   */
-  _computeTag: function(prf, plaintext, iv, adata, tlen, L) {
-    // compute B[0]
-    var q, mac, field = 0, offset = 24, tmp, i, macData = [], w=sjcl.bitArray, xor = w._xor4;
-
-    tlen /= 8;
-  
-    // check tag length and message length
-    if (tlen % 2 || tlen < 4 || tlen > 16) {
-      throw new sjcl.exception.invalid("ccm: invalid tag length");
-    }
-  
-    if (adata.length > 0xFFFFFFFF || plaintext.length > 0xFFFFFFFF) {
-      // I don't want to deal with extracting high words from doubles.
-      throw new sjcl.exception.bug("ccm: can't deal with 4GiB or more data");
-    }
+  _macAdditionalData: function (prf, adata, iv, tlen, ol, L) {
+    var mac, tmp, i, macData = [], w=sjcl.bitArray, xor = w._xor4;
 
     // mac the flags
     mac = [w.partial(8, (adata.length ? 1<<6 : 0) | (tlen-2) << 2 | L-1)];
 
     // mac the iv and length
     mac = w.concat(mac, iv);
-    mac[3] |= w.bitLength(plaintext)/8;
+    mac[3] |= ol;
     mac = prf.encrypt(mac);
-    
   
     if (adata.length) {
       // mac the associated data.  start with its length...
@@ -960,7 +1090,37 @@ sjcl.mode.ccm = {
         mac = prf.encrypt(xor(mac, macData.slice(i,i+4).concat([0,0,0])));
       }
     }
+
+    return mac;
+  },
+
+  /* Compute the (unencrypted) authentication tag, according to the CCM specification
+   * @param {Object} prf The pseudorandom function.
+   * @param {bitArray} plaintext The plaintext data.
+   * @param {bitArray} iv The initialization value.
+   * @param {bitArray} adata The authenticated data.
+   * @param {Number} tlen the desired tag length, in bits.
+   * @return {bitArray} The tag, but not yet encrypted.
+   * @private
+   */
+  _computeTag: function(prf, plaintext, iv, adata, tlen, L) {
+    // compute B[0]
+    var mac, i, w=sjcl.bitArray, xor = w._xor4;
+
+    tlen /= 8;
   
+    // check tag length and message length
+    if (tlen % 2 || tlen < 4 || tlen > 16) {
+      throw new sjcl.exception.invalid("ccm: invalid tag length");
+    }
+  
+    if (adata.length > 0xFFFFFFFF || plaintext.length > 0xFFFFFFFF) {
+      // I don't want to deal with extracting high words from doubles.
+      throw new sjcl.exception.bug("ccm: can't deal with 4GiB or more data");
+    }
+
+    mac = sjcl.mode.ccm._macAdditionalData(prf, adata, iv, tlen, w.bitLength(plaintext)/8, L);
+
     // mac the plaintext
     for (i=0; i<plaintext.length; i+=4) {
       mac = prf.encrypt(xor(mac, plaintext.slice(i,i+4).concat([0,0,0])));
@@ -982,7 +1142,7 @@ sjcl.mode.ccm = {
    * @private
    */
   _ctrMode: function(prf, data, iv, tag, tlen, L) {
-    var enc, i, w=sjcl.bitArray, xor = w._xor4, ctr, b, l = data.length, bl=w.bitLength(data);
+    var enc, i, w=sjcl.bitArray, xor = w._xor4, ctr, l = data.length, bl=w.bitLength(data), n = l/50, p = n;
 
     // start the ctr
     ctr = w.concat([w.partial(8,L-1)],iv).concat([0,0,0]).slice(0,4);
@@ -994,6 +1154,10 @@ sjcl.mode.ccm = {
     if (!l) { return {tag:tag, data:[]}; }
     
     for (i=0; i<l; i+=4) {
+      if (i > n) {
+        sjcl.mode.ccm._callProgressListener(i/l);
+        n += p;
+      }
       ctr[3]++;
       enc = prf.encrypt(ctr);
       data[i]   ^= enc[0];
@@ -1003,6 +1167,253 @@ sjcl.mode.ccm = {
     }
     return { tag:tag, data:w.clamp(data,bl) };
   }
+};
+/** @fileOverview Really fast & small implementation of CCM using JS' array buffers
+ *
+ * @author Marco Munizaga
+ */
+
+/** @namespace CTR mode with CBC MAC. */
+
+sjcl.arrayBuffer = sjcl.arrayBuffer || {};
+
+//patch arraybuffers if they don't exist
+if (typeof(ArrayBuffer) === 'undefined') {
+  (function(globals){
+      "use strict";
+      globals.ArrayBuffer = function(){};
+      globals.DataView = function(){};
+  }(this));
+}
+
+
+sjcl.arrayBuffer.ccm = {
+  mode: "ccm",
+
+  defaults: {
+    tlen:128 //this is M in the NIST paper
+  },
+
+  /** Encrypt in CCM mode. Meant to return the same exact thing as the bitArray ccm to work as a drop in replacement
+   * @static
+   * @param {Object} prf The pseudorandom function.  It must have a block size of 16 bytes.
+   * @param {bitArray} plaintext The plaintext data.
+   * @param {bitArray} iv The initialization value.
+   * @param {bitArray} [adata=[]] The authenticated data.
+   * @param {Number} [tlen=64] the desired tag length, in bits.
+   * @return {bitArray} The encrypted data, an array of bytes.
+   */
+  compat_encrypt: function(prf, plaintext, iv, adata, tlen){
+    var plaintext_buffer = sjcl.codec.arrayBuffer.fromBits(plaintext, true, 16),
+        ol = sjcl.bitArray.bitLength(plaintext)/8,
+        encrypted_obj,
+        ct,
+        tag;
+
+    tlen = tlen || 64;
+    adata = adata || [];
+
+    encrypted_obj = sjcl.arrayBuffer.ccm.encrypt(prf, plaintext_buffer, iv, adata, tlen, ol);
+    ct = sjcl.codec.arrayBuffer.toBits(encrypted_obj.ciphertext_buffer);
+
+    ct = sjcl.bitArray.clamp(ct, ol*8);
+
+
+    return sjcl.bitArray.concat(ct, encrypted_obj.tag);
+  },
+
+  /** Decrypt in CCM mode. Meant to imitate the bitArray ccm 
+   * @static
+   * @param {Object} prf The pseudorandom function.  It must have a block size of 16 bytes.
+   * @param {bitArray} ciphertext The ciphertext data.
+   * @param {bitArray} iv The initialization value.
+   * @param {bitArray} [[]] adata The authenticated data.
+   * @param {Number} [64] tlen the desired tag length, in bits.
+   * @return {bitArray} The decrypted data.
+   */
+  compat_decrypt: function(prf, ciphertext, iv, adata, tlen){
+    tlen = tlen || 64;
+    adata = adata || [];
+    var L, i, 
+        w=sjcl.bitArray,
+        ol = w.bitLength(ciphertext), 
+        out = w.clamp(ciphertext, ol - tlen),
+        tag = w.bitSlice(ciphertext, ol - tlen), tag2,
+        ciphertext_buffer = sjcl.codec.arrayBuffer.fromBits(out, true, 16);
+
+    var plaintext_buffer = sjcl.arrayBuffer.ccm.decrypt(prf, ciphertext_buffer, iv, tag, adata, tlen, (ol-tlen)/8);
+    return sjcl.bitArray.clamp(sjcl.codec.arrayBuffer.toBits(plaintext_buffer), ol-tlen);
+
+  },
+
+  /** Really fast ccm encryption, uses arraybufer and mutates the plaintext buffer
+   * @static
+   * @param {Object} prf The pseudorandom function.  It must have a block size of 16 bytes. 
+   * @param {ArrayBuffer} plaintext_buffer The plaintext data.
+   * @param {bitArray} iv The initialization value.
+   * @param {ArrayBuffer} [adata=[]] The authenticated data.
+   * @param {Number} [tlen=128] the desired tag length, in bits.
+   * @return {ArrayBuffer} The encrypted data, in the same array buffer as the given plaintext, but given back anyways
+   */
+  encrypt: function(prf, plaintext_buffer, iv, adata, tlen, ol){
+    var auth_blocks, mac, L, w = sjcl.bitArray,
+      ivl = w.bitLength(iv) / 8;
+
+    //set up defaults
+    adata = adata || [];
+    tlen = tlen || sjcl.arrayBuffer.ccm.defaults.tlen;
+    ol = ol || plaintext_buffer.byteLength;
+    tlen = Math.ceil(tlen/8);
+    
+    for (L=2; L<4 && ol >>> 8*L; L++) {}
+    if (L < 15 - ivl) { L = 15-ivl; }
+    iv = w.clamp(iv,8*(15-L));
+
+    //prf should use a 256 bit key to make precomputation attacks infeasible
+
+    mac = sjcl.arrayBuffer.ccm._computeTag(prf, plaintext_buffer, iv, adata, tlen, ol, L);
+
+    //encrypt the plaintext and the mac 
+    //returns the mac since the plaintext will be left encrypted inside the buffer
+    mac = sjcl.arrayBuffer.ccm._ctrMode(prf, plaintext_buffer, iv, mac, tlen, L);
+
+
+    //the plaintext_buffer has been modified so it is now the ciphertext_buffer
+    return {'ciphertext_buffer':plaintext_buffer, 'tag':mac};
+  },
+
+  /** Really fast ccm decryption, uses arraybufer and mutates the given buffer
+   * @static
+   * @param {Object} prf The pseudorandom function.  It must have a block size of 16 bytes. 
+   * @param {ArrayBuffer} ciphertext_buffer The Ciphertext data.
+   * @param {bitArray} iv The initialization value.
+   * @param {bitArray} The authentication tag for the ciphertext
+   * @param {ArrayBuffer} [adata=[]] The authenticated data.
+   * @param {Number} [tlen=128] the desired tag length, in bits.
+   * @return {ArrayBuffer} The decrypted data, in the same array buffer as the given buffer, but given back anyways
+   */
+  decrypt: function(prf, ciphertext_buffer, iv, tag, adata, tlen, ol){
+    var mac, mac2, i, L, w = sjcl.bitArray, 
+      ivl = w.bitLength(iv) / 8;
+
+    //set up defaults
+    adata = adata || [];
+    tlen = tlen || sjcl.arrayBuffer.ccm.defaults.tlen;
+    ol = ol || ciphertext_buffer.byteLength;
+    tlen = Math.ceil(tlen/8) ;
+
+    for (L=2; L<4 && ol >>> 8*L; L++) {}
+    if (L < 15 - ivl) { L = 15-ivl; }
+    iv = w.clamp(iv,8*(15-L));
+    
+    //prf should use a 256 bit key to make precomputation attacks infeasible
+
+    //decrypt the buffer
+    mac = sjcl.arrayBuffer.ccm._ctrMode(prf, ciphertext_buffer, iv, tag, tlen, L);
+
+    mac2 = sjcl.arrayBuffer.ccm._computeTag(prf, ciphertext_buffer, iv, adata, tlen, ol, L);
+
+    //check the tag
+    if (!sjcl.bitArray.equal(mac, mac2)){
+      throw new sjcl.exception.corrupt("ccm: tag doesn't match");
+    }
+
+    return ciphertext_buffer;
+
+  },
+
+  /* Compute the (unencrypted) authentication tag, according to the CCM specification
+   * @param {Object} prf The pseudorandom function.
+   * @param {ArrayBuffer} data_buffer The plaintext data in an arraybuffer.
+   * @param {bitArray} iv The initialization value.
+   * @param {bitArray} adata The authenticated data.
+   * @param {Number} tlen the desired tag length, in bits.
+   * @return {bitArray} The tag, but not yet encrypted.
+   * @private
+   */
+  _computeTag: function(prf, data_buffer, iv, adata, tlen, ol, L){
+    var i, plaintext, mac, data, data_blocks_size, data_blocks,
+      w = sjcl.bitArray, tmp, macData;
+
+    mac = sjcl.mode.ccm._macAdditionalData(prf, adata, iv, tlen, ol, L);
+
+    if (data_buffer.byteLength !== 0) {
+      data = new DataView(data_buffer);
+      //set padding bytes to 0
+      for (i=ol; i< data_buffer.byteLength; i++){
+        data.setUint8(i,0);
+      }
+
+      //now to mac the plaintext blocks
+      for (i=0; i < data.byteLength; i+=16){
+        mac[0] ^= data.getUint32(i);
+        mac[1] ^= data.getUint32(i+4);
+        mac[2] ^= data.getUint32(i+8);
+        mac[3] ^= data.getUint32(i+12);
+
+        mac = prf.encrypt(mac);
+      }
+    }
+
+    return sjcl.bitArray.clamp(mac,tlen*8);
+  },
+
+  /** CCM CTR mode.
+   * Encrypt or decrypt data and tag with the prf in CCM-style CTR mode.
+   * Mutates given array buffer
+   * @param {Object} prf The PRF.
+   * @param {ArrayBuffer} data_buffer The data to be encrypted or decrypted.
+   * @param {bitArray} iv The initialization vector.
+   * @param {bitArray} tag The authentication tag.
+   * @param {Number} tlen The length of th etag, in bits.
+   * @return {Object} An object with data and tag, the en/decryption of data and tag values.
+   * @private
+   */
+  _ctrMode: function(prf, data_buffer, iv, mac, tlen, L){
+    var data, ctr, word0, word1, word2, word3, keyblock, i, w = sjcl.bitArray, xor = w._xor4, n = data_buffer.byteLength/50, p = n;
+
+    ctr = new DataView(new ArrayBuffer(16)); //create the first block for the counter
+
+    //prf should use a 256 bit key to make precomputation attacks infeasible
+
+    // start the ctr
+    ctr = w.concat([w.partial(8,L-1)],iv).concat([0,0,0]).slice(0,4);
+
+    // en/decrypt the tag
+    mac = w.bitSlice(xor(mac,prf.encrypt(ctr)), 0, tlen*8);
+
+    ctr[3]++;
+    if (ctr[3]===0) ctr[2]++; //increment higher bytes if the lowest 4 bytes are 0
+
+    if (data_buffer.byteLength !== 0) {
+      data = new DataView(data_buffer);
+      //now lets encrypt the message
+      for (i=0; i<data.byteLength;i+=16){
+        if (i > n) {
+          sjcl.mode.ccm._callProgressListener(i/data_buffer.byteLength);
+          n += p;
+        }
+        keyblock = prf.encrypt(ctr);
+
+        word0 = data.getUint32(i);
+        word1 = data.getUint32(i+4);
+        word2 = data.getUint32(i+8);
+        word3 = data.getUint32(i+12);
+
+        data.setUint32(i,word0 ^ keyblock[0]);
+        data.setUint32(i+4, word1 ^ keyblock[1]);
+        data.setUint32(i+8, word2 ^ keyblock[2]);
+        data.setUint32(i+12, word3 ^ keyblock[3]);
+
+        ctr[3]++;
+        if (ctr[3]===0) ctr[2]++; //increment higher bytes if the lowest 4 bytes are 0
+      }
+    }
+
+    //return the mac, the ciphered data is available through the same data_buffer that was given
+    return mac;
+  }
+
 };
 /** @fileOverview OCB 2.0 implementation
  *
@@ -1297,7 +1708,7 @@ sjcl.mode.gcm = {
    * @param {Number} tlen The length of the tag, in bits.
    */
   _ctrMode: function(encrypt, prf, data, adata, iv, tlen) {
-    var H, J0, S0, enc, i, ctr, tag, last, l, bl, abl, ivbl, w=sjcl.bitArray, xor=w._xor4;
+    var H, J0, S0, enc, i, ctr, tag, last, l, bl, abl, ivbl, w=sjcl.bitArray;
 
     // Calculate data lengths
     l = data.length;
@@ -1722,14 +2133,16 @@ sjcl.prng.prototype = {
       loadTimeCollector: this._bind(this._loadTimeCollector),
       mouseCollector: this._bind(this._mouseCollector),
       keyboardCollector: this._bind(this._keyboardCollector),
-      accelerometerCollector: this._bind(this._accelerometerCollector)
-    }
+      accelerometerCollector: this._bind(this._accelerometerCollector),
+      touchCollector: this._bind(this._touchCollector)
+    };
 
     if (window.addEventListener) {
       window.addEventListener("load", this._eventListener.loadTimeCollector, false);
       window.addEventListener("mousemove", this._eventListener.mouseCollector, false);
       window.addEventListener("keypress", this._eventListener.keyboardCollector, false);
       window.addEventListener("devicemotion", this._eventListener.accelerometerCollector, false);
+      window.addEventListener("touchmove", this._eventListener.touchCollector, false);
     } else if (document.attachEvent) {
       document.attachEvent("onload", this._eventListener.loadTimeCollector);
       document.attachEvent("onmousemove", this._eventListener.mouseCollector);
@@ -1750,6 +2163,7 @@ sjcl.prng.prototype = {
       window.removeEventListener("mousemove", this._eventListener.mouseCollector, false);
       window.removeEventListener("keypress", this._eventListener.keyboardCollector, false);
       window.removeEventListener("devicemotion", this._eventListener.accelerometerCollector, false);
+      window.removeEventListener("touchmove", this._eventListener.touchCollector, false);
     } else if (document.detachEvent) {
       document.detachEvent("onload", this._eventListener.loadTimeCollector);
       document.detachEvent("onmousemove", this._eventListener.mouseCollector);
@@ -1872,8 +2286,31 @@ sjcl.prng.prototype = {
   },
   
   _mouseCollector: function (ev) {
-    var x = ev.x || ev.clientX || ev.offsetX || 0, y = ev.y || ev.clientY || ev.offsetY || 0;
-    sjcl.random.addEntropy([x,y], 2, "mouse");
+    var x, y;
+
+    try {
+      x = ev.x || ev.clientX || ev.offsetX || 0;
+      y = ev.y || ev.clientY || ev.offsetY || 0;
+    } catch (err) {
+      // Event originated from a secure element. No mouse position available.
+      x = 0;
+      y = 0;
+    }
+
+    if (x != 0 && y!= 0) {
+      sjcl.random.addEntropy([x,y], 2, "mouse");
+    }
+
+    this._addCurrentTimeToEntropy(0);
+  },
+
+  _touchCollector: function(ev) {
+    var touch = ev.touches[0] || ev.changedTouches[0];
+    var x = touch.pageX || touch.clientX,
+        y = touch.pageY || touch.clientY;
+
+    sjcl.random.addEntropy([x,y],1,"touch");
+
     this._addCurrentTimeToEntropy(0);
   },
   
@@ -1882,7 +2319,7 @@ sjcl.prng.prototype = {
   },
 
   _addCurrentTimeToEntropy: function (estimatedEntropy) {
-    if (window && window.performance && typeof window.performance.now === "function") {
+    if (typeof window !== 'undefined' && window.performance && typeof window.performance.now === "function") {
       //how much entropy do we want to add here?
       sjcl.random.addEntropy(window.performance.now(), estimatedEntropy, "loadtime");
     } else {
@@ -1891,11 +2328,15 @@ sjcl.prng.prototype = {
   },
   _accelerometerCollector: function (ev) {
     var ac = ev.accelerationIncludingGravity.x||ev.accelerationIncludingGravity.y||ev.accelerationIncludingGravity.z;
-    var or = "";
     if(window.orientation){
-      or = window.orientation;
+      var or = window.orientation;
+      if (typeof or === "number") {
+        sjcl.random.addEntropy(or, 1, "accelerometer");
+      }
     }
-    sjcl.random.addEntropy([ac,or], 3, "accelerometer");
+    if (ac) {
+      sjcl.random.addEntropy(ac, 2, "accelerometer");
+    }
     this._addCurrentTimeToEntropy(0);
   },
 
@@ -1925,16 +2366,26 @@ sjcl.prng.prototype = {
 sjcl.random = new sjcl.prng(6);
 
 (function(){
+  // function for getting nodejs crypto module. catches and ignores errors.
+  function getCryptoModule() {
+    try {
+      return require('crypto');
+    }
+    catch (e) {
+      return null;
+    }
+  }
+
   try {
-    var buf, crypt, getRandomValues, ab;
+    var buf, crypt, ab;
+
     // get cryptographically strong entropy depending on runtime environment
-    if (typeof module !== 'undefined' && module.exports) {
-      // get entropy for node.js
-      crypt = require('crypto');
+    if (typeof module !== 'undefined' && module.exports && (crypt = getCryptoModule()) && crypt.randomBytes) {
       buf = crypt.randomBytes(1024/8);
+      buf = new Uint32Array(new Uint8Array(buf).buffer);
       sjcl.random.addEntropy(buf, 1024, "crypto.randomBytes");
 
-    } else if (window && Uint32Array) {
+    } else if (typeof window !== 'undefined' && typeof Uint32Array !== 'undefined') {
       ab = new Uint32Array(32);
       if (window.crypto && window.crypto.getRandomValues) {
         window.crypto.getRandomValues(ab);
@@ -1951,9 +2402,11 @@ sjcl.random = new sjcl.prng(6);
       // no getRandomValues :-(
     }
   } catch (e) {
-    console.log("There was an error collecting entropy from the browser:");
-    console.log(e);
-    //we do not want the library to fail due to randomness not being maintained.
+    if (typeof window !== 'undefined' && window.console) {
+      console.log("There was an error collecting entropy from the browser:");
+      console.log(e);
+      //we do not want the library to fail due to randomness not being maintained.
+    }
   }
 }());
 /** @fileOverview Convenince functions centered around JSON encapsulation.
@@ -1962,7 +2415,7 @@ sjcl.random = new sjcl.prng(6);
  * @author Mike Hamburg
  * @author Dan Boneh
  */
- 
+
  /** @namespace JSON encapsulation */
  sjcl.json = {
   /** Default values for encryption */
@@ -2013,7 +2466,7 @@ sjcl.random = new sjcl.prng(6);
       plaintext = sjcl.codec.utf8String.toBits(plaintext);
     }
     if (typeof adata === "string") {
-      adata = sjcl.codec.utf8String.toBits(adata);
+      p.adata = adata = sjcl.codec.utf8String.toBits(adata);
     }
     prp = new sjcl.cipher[p.cipher](password);
 
@@ -2022,7 +2475,11 @@ sjcl.random = new sjcl.prng(6);
     rp.key = password;
 
     /* do the encryption */
-    p.ct = sjcl.mode[p.mode].encrypt(prp, plaintext, p.iv, adata, p.ts);
+    if (p.mode === "ccm" && sjcl.arrayBuffer && sjcl.arrayBuffer.ccm && plaintext instanceof ArrayBuffer) {
+      p.ct = sjcl.arrayBuffer.ccm.encrypt(prp, plaintext, p.iv, adata, p.ts);
+    } else {
+      p.ct = sjcl.mode[p.mode].encrypt(prp, plaintext, p.iv, adata, p.ts);
+    }
 
     //return j.encode(j._subtract(p, j.defaults));
     return p;
@@ -2085,13 +2542,21 @@ sjcl.random = new sjcl.prng(6);
     prp = new sjcl.cipher[p.cipher](password);
 
     /* do the decryption */
-    ct = sjcl.mode[p.mode].decrypt(prp, p.ct, p.iv, adata, p.ts);
+    if (p.mode === "ccm" && sjcl.arrayBuffer && sjcl.arrayBuffer.ccm && p.ct instanceof ArrayBuffer) {
+      ct = sjcl.arrayBuffer.ccm.decrypt(prp, p.ct, p.iv, p.tag, adata, p.ts);
+    } else {
+      ct = sjcl.mode[p.mode].decrypt(prp, p.ct, p.iv, adata, p.ts);
+    }
 
     /* return the json data */
     j._add(rp, p);
     rp.key = password;
 
-    return sjcl.codec.utf8String.fromBits(ct);
+    if (params.raw === 1) {
+      return ct;
+    } else {
+      return sjcl.codec.utf8String.fromBits(ct);
+    }
   },
 
   /** Simple decryption function.
@@ -2107,7 +2572,7 @@ sjcl.random = new sjcl.prng(6);
     var j = sjcl.json;
     return j._decrypt(password, j.decode(ciphertext), params, rp);
   },
-  
+
   /** Encode a flat structure into a JSON string.
    * @param {Object} obj The structure to encode.
    * @return {String} A JSON string.
@@ -2145,7 +2610,7 @@ sjcl.random = new sjcl.prng(6);
     }
     return out+'}';
   },
-  
+
   /** Decode a simple (flat) JSON string into a structure.  The ciphertext,
    * adata, salt and iv will be base64-decoded.
    * @param {String} str The string.
@@ -2154,23 +2619,25 @@ sjcl.random = new sjcl.prng(6);
    */
   decode: function (str) {
     str = str.replace(/\s/g,'');
-    if (!str.match(/^\{.*\}$/)) { 
+    if (!str.match(/^\{.*\}$/)) {
       throw new sjcl.exception.invalid("json decode: this isn't json!");
     }
     var a = str.replace(/^\{|\}$/g, '').split(/,/), out={}, i, m;
     for (i=0; i<a.length; i++) {
-      if (!(m=a[i].match(/^(?:(["']?)([a-z][a-z0-9]*)\1):(?:(\d+)|"([a-z0-9+\/%*_.@=\-]*)")$/i))) {
+      if (!(m=a[i].match(/^\s*(?:(["']?)([a-z][a-z0-9]*)\1)\s*:\s*(?:(-?\d+)|"([a-z0-9+\/%*_.@=\-]*)"|(true|false))$/i))) {
         throw new sjcl.exception.invalid("json decode: this isn't json!");
       }
-      if (m[3]) {
+      if (m[3] != null) {
         out[m[2]] = parseInt(m[3],10);
-      } else {
-        out[m[2]] = m[2].match(/^(ct|salt|iv)$/) ? sjcl.codec.base64.toBits(m[4]) : unescape(m[4]);
+      } else if (m[4] != null) {
+        out[m[2]] = m[2].match(/^(ct|adata|salt|iv)$/) ? sjcl.codec.base64.toBits(m[4]) : unescape(m[4]);
+      } else if (m[5] != null) {
+        out[m[2]] = m[5] === 'true';
       }
     }
     return out;
   },
-  
+
   /** Insert all elements of src into target, modifying and returning target.
    * @param {Object} target The object to be modified.
    * @param {Object} src The object to pull data from.
@@ -2192,7 +2659,7 @@ sjcl.random = new sjcl.prng(6);
     }
     return target;
   },
-  
+
   /** Remove all elements of minus from plus.  Does not modify plus.
    * @private
    */
@@ -2207,7 +2674,7 @@ sjcl.random = new sjcl.prng(6);
 
     return out;
   },
-  
+
   /** Return only the specified elements of src.
    * @private
    */
@@ -2252,19 +2719,17 @@ sjcl.misc._pbkdf2Cache = {};
  */
 sjcl.misc.cachedPbkdf2 = function (password, obj) {
   var cache = sjcl.misc._pbkdf2Cache, c, cp, str, salt, iter;
-  
+
   obj = obj || {};
   iter = obj.iter || 1000;
-  
+
   /* open the cache for this password and iteration count */
   cp = cache[password] = cache[password] || {};
   c = cp[iter] = cp[iter] || { firstSalt: (obj.salt && obj.salt.length) ?
                      obj.salt.slice(0) : sjcl.random.randomWords(2,0) };
-          
+
   salt = (obj.salt === undefined) ? c.firstSalt : obj.salt;
-  
+
   c[salt] = c[salt] || sjcl.misc.pbkdf2(password, salt, obj.iter);
   return { key: c[salt].slice(0), salt:salt.slice(0) };
 };
-
-

@@ -753,7 +753,7 @@ function init_page() {
                 if (dl) {
                     dl.onDownloadProgress = dlprogress;
                     dl.onDownloadComplete = dlcomplete;
-                    dl.onDownloadError = dlerror;
+                    dl.onDownloadError = M.dlerror;
                     $tr.remove();
                 }
             }
@@ -1126,6 +1126,7 @@ function topmenuUI() {
                 .safeHTML('<div class="membership-status @@">@@</div>', cssClass, purchasedPlan);
             $('.context-menu-divider.upgrade-your-account').addClass('pro');
             $('.membership-popup.pro-popup');
+            $('body').removeClass('free');
         }
         else {
             // Show the free badge
@@ -1133,6 +1134,7 @@ function topmenuUI() {
             $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
             $('.membership-status').addClass('free');
             $('.membership-status').text(l[435]);
+            $('body').addClass('free');
         }
 
         $('.membership-status').show();

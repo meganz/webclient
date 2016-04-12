@@ -519,7 +519,7 @@ function MegaData()
                     mega.attr.get(u, 'a', true, false)
                         .done(function (res) {
                             if (typeof res !== 'number' && res.length > 5) {
-                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
+                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/png'});
                                 avatars[u] = {
                                     data: blob,
                                     url: myURL.createObjectURL(blob)
@@ -1776,16 +1776,23 @@ function MegaData()
 
             M.renderMain();
 
-            if (fminitialized && (id.substr(0, 6) !== 'search')) {
-                if ($('#treea_' + M.currentdirid).length === 0) {
-                    var n = M.d[M.currentdirid];
-                    if (n && n.p) {
-                        treeUIopen(n.p, false, true);
+            if (fminitialized) {
+                if (id.substr(0, 6) === 'search') {
+                    if ($.transferClose) {
+                        $.transferClose();
                     }
                 }
-                treeUIopen(M.currentdirid, M.currentdirid === 'contacts');
+                else {
+                    if ($('#treea_' + M.currentdirid).length === 0) {
+                        var n = M.d[M.currentdirid];
+                        if (n && n.p) {
+                            treeUIopen(n.p, false, true);
+                        }
+                    }
+                    treeUIopen(M.currentdirid, M.currentdirid === 'contacts');
 
-                $('#treea_' + M.currentdirid).addClass('opened');
+                    $('#treea_' + M.currentdirid).addClass('opened');
+                }
             }
             if (d) {
                 console.timeEnd('time for rendering');

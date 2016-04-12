@@ -52,7 +52,7 @@ var ContactVerified = React.createClass({
             crypt.getPubEd25519(contact.u)
                 .done(function() {
                     if(self.isMounted()) {
-                        self.forceUpdate();
+                        self.safeForceUpdate();
                     }
                 })
         }
@@ -153,7 +153,7 @@ var AvatarImage = React.createClass({
 
                     delete _noAvatars[contact.u];
 
-                    self.forceUpdate();
+                    self.safeForceUpdate();
                 })
                 .fail(function(e) {
                     _noAvatars[contact.u] = true;

@@ -514,7 +514,7 @@ function MegaData()
         }
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
-            if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
+            if ((M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0) && !avatars[u]) {
                 waitingPromises.push(
                     mega.attr.get(u, 'a', true, false)
                         .done(function (res) {

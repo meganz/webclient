@@ -488,10 +488,18 @@ var ConversationMessage = React.createClass({
 
                         }
                         var dropdown = null;
+                        if (!M.u[contact.u]) {
+                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+                                'u': contact.u,
+                                'name': contact.name,
+                                'm': contact.email,
+                                'c': 0
+                            }));
+                        }
                         if (M.u[contact.u]) {
                             // Only show this dropdown in case this user is a contact, e.g. don't show it if thats me
                             // OR it is a share contact, etc.
-                            if (contact.c === 1) {
+                            if (M.u[contact.u].c === 1) {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
                                     icon="tiny-icon grey-down-arrow">
@@ -529,22 +537,21 @@ var ConversationMessage = React.createClass({
                                     </DropdownsUI.Dropdown>
                                 </ButtonsUI.Button>;
                             }
-                        }
-                        else {
-                            dropdown = <ButtonsUI.Button
-                                className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
-                                <DropdownsUI.Dropdown
-                                    className="white-context-menu shared-contact-dropdown"
-                                    noArrow={true}
-                                    positionMy="left bottom"
-                                    positionAt="right bottom"
-                                    horizOffset={4}
-                                >
-                                    <DropdownsUI.DropdownItem
-                                        icon="rounded-grey-plus"
-                                        label={__("Add contact")}
-                                        onClick={() => {
+                            else if (M.u[contact.u].c === 0) {
+                                dropdown = <ButtonsUI.Button
+                                    className="default-white-button tiny-button"
+                                    icon="tiny-icon grey-down-arrow">
+                                    <DropdownsUI.Dropdown
+                                        className="white-context-menu shared-contact-dropdown"
+                                        noArrow={true}
+                                        positionMy="left bottom"
+                                        positionAt="right bottom"
+                                        horizOffset={4}
+                                    >
+                                        <DropdownsUI.DropdownItem
+                                            icon="rounded-grey-plus"
+                                            label={__("Add contact")}
+                                            onClick={() => {
                                             M.inviteContact(M.u[u_handle].m, contactEmail);
 
                                             // Contact invited
@@ -558,11 +565,12 @@ var ConversationMessage = React.createClass({
                                             closeDialog();
                                             msgDialog('info', title, msg);
                                         }}
-                                    />
-                                    {deleteButtonOptional ? <hr /> : null}
-                                    {deleteButtonOptional}
-                                </DropdownsUI.Dropdown>
-                            </ButtonsUI.Button>;
+                                        />
+                                        {deleteButtonOptional ? <hr /> : null}
+                                        {deleteButtonOptional}
+                                    </DropdownsUI.Dropdown>
+                                </ButtonsUI.Button>;
+                            }
                         }
 
                         contacts.push(
@@ -586,7 +594,7 @@ var ConversationMessage = React.createClass({
                                         }
                                         {dropdown}
                                         <div className="data-block-bg">
-                                            <ContactsUI.Avatar className="medium-avatar share" contact={contact} />
+                                            <ContactsUI.AvatarImage className="medium-avatar share" contact={contact} />
                                         </div>
                                     </div>
                                     <div className="clear"></div>

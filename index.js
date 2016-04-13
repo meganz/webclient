@@ -1160,13 +1160,13 @@ function topmenuUI() {
             $('.top-menu-item.register').text(l[968]);
             $('.top-menu-item.clouddrive').show();
 
-            if ($.len(M.c[M.RootID] || {})) {
-                alarm.ephemeralSession.render();
-            }
-            else if (isNonActivatedAccount()) {
+            // If they have purchased Pro but not activated yet, show a warning
+            if (isNonActivatedAccount()) {
                 alarm.nonActivatedAccount.render();
             }
-            else if (page !== 'register') {
+            
+            // Otherwise show the ephemeral session warning
+            else if (($.len(M.c[M.RootID] || {})) && (page !== 'register')) {
                 alarm.ephemeralSession.render();
             }
         }

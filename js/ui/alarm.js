@@ -167,18 +167,23 @@ var alarm = {
     
         /**
          * Show the popup
-         * @param {Boolean} log Whether to log this event or not
+         * @param {Boolean} recentPurchase Flag to immediately show the popup and log the event
          */
-        render: function(log) {
+        render: function(recentPurchase) {
 
             // Cache lookups
             var $container = $('.warning-popup-icon.non-activated-account');
             var $dialog = $container.find('.top-warning-popup');
 
-            // Log event
-            if (log) {
+            // If they just purchased it, log specific event
+            if (recentPurchase) {
                 megaAnalytics.log('pro', 'showNonActivatedAccountDialog');
             }
+            
+            // If the user has previously seen an ephemeral dialog and they closed it,
+            // then they purchased a plan then this forces the dialog to popup. This means 
+            // this dialog always shows so it is an incentive to confirm their email.
+            alarm.seen = false;
 
             // Hide other dialogs that may be open
             alarm.hideAllWarningPopups();

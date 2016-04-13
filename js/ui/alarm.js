@@ -207,14 +207,17 @@ var alarm = {
         render: function() {
 
             // If their last payment info is not set by the API, then their plan is not currently expired.
-            // Also if they've already seen the popup, then don't keep showing it again or it's annoying.
             if (this.lastPayment === null) {
                 return false;
             }
+            
+            // Ignored payment provider IDs (not applicable or no longer in use)
+            var gatewayIgnoreList = [1, 2, 3, 7, 8, 13];
+            var gatewayId = this.lastPayment.gw;
 
             // Don't display the popup for Apple or Google as they are recurring subscriptions. If the lastPayment is 
             // set then it means they have purposefully cancelled their account and would not want to see any warnings.
-            if ((this.lastPayment.gwname === 'iTunes') || (this.lastPayment.gwname === 'Google')) {
+            if (gatewayIgnoreList.indexOf(gatewayId) > -1) {
                 return false;
             }
 
@@ -233,12 +236,12 @@ var alarm = {
             // Work out the number of months their previous plan was for e.g. 1 month or 3 months
             var planMonths = this.lastPayment.m;
             var planMonthsPluralisation = (planMonths > 1) ? l[6788] : l[913];
-
-            // Set the payment provider name and icon
-            var gatewayName = this.lastPayment.gwname;
+            
+            // Get the display name, if it's an Astropay subgateway, then it will have it's own display name
+            var gatewayInfo = getGatewayName(gatewayId);
             var extraData = (typeof this.lastPayment.gwd !== 'undefined') ? this.lastPayment.gwd : null;
-                gatewayName = (extraData) ? extraData.gwname : gatewayName;
-            var gatewayDisplayName = this.normaliseGatewayName(gatewayName, extraData);
+            var gatewayName = (extraData) ? extraData.gwname : gatewayInfo.name;
+            var gatewayDisplayName = (extraData) ? extraData.label : gatewayInfo.displayName;
 
             // Display
             $dialog.find('.header-pro-plan').text(proPlanName);

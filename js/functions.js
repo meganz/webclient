@@ -4533,11 +4533,16 @@ function getProPlan(planNum) {
 }
 
 /**
- * Returns the name of the gateway / payment provider and display name
+ * Returns the name of the gateway / payment provider and display name. The API will only
+ * return the gateway ID which is unique on the API and will not change.
+ * 
  * @param {Number} gatewayId The number of the gateway/provider from the API
- * @returns {String}
+ * @returns {Object} Returns an object with two keys, the 'name' which is a unique string
+ *                   for the provider which can be used for displaying icons etc, and the
+ *                   'displayName' which is the translated name for that provider (however
+ *                   company names are not translated).
  */
-function getGateway(gatewayId) {
+function getGatewayName(gatewayId) {
     
     var gateways = [
         {
@@ -4593,11 +4598,11 @@ function getGateway(gatewayId) {
             displayName: 'reserved'  // TBD
         },
         {
-            name: 'windowsphone',           // 13
-            displayName: 'Windows Phone'
+            name: 'windowsphone',    // 13
+            displayName: l[8660]     // Windows Phone
         },
         {
-            name: 'tpay',           // 14
+            name: 'tpay',            // 14
             displayName: 'T-Pay'    
         }
     ];

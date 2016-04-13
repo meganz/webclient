@@ -1,6 +1,6 @@
 /**
- * Various warning triangle popups from the top header. This covers 
- * cases for over quota, ephemeral session, non activated accounts 
+ * Various warning triangle popups from the top header. This covers
+ * cases for over quota, ephemeral session, non activated accounts
  * after purchase and PRO plan expired warnings.
  */
 var alarm = {
@@ -189,7 +189,7 @@ var alarm = {
             alarm.hideAllWarningPopups();
             alarm.initWarningIconButton($container, $dialog);
             alarm.showWarningPopup($container, $dialog);     
-        }        
+        }
     },
     
     

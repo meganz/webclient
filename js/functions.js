@@ -4511,3 +4511,96 @@ if (typeof sjcl !== 'undefined') {
         return result;
     };
 })(window);
+
+/**
+ * Get a string for the payment plan number
+ * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
+ */
+function getProPlan(planNum) {
+
+    switch (planNum) {
+        case 1:
+            return l[5819];     // PRO I
+        case 2:
+            return l[6125];     // PRO II
+        case 3:
+            return l[6126];     // PRO III
+        case 4:
+            return l[6234];     // LITE
+        default:
+            return l[435];      // FREE
+    }
+}
+
+/**
+ * Returns the name of the gateway / payment provider and display name
+ * @param {Number} gatewayId The number of the gateway/provider from the API
+ * @returns {String}
+ */
+function getGateway(gatewayId) {
+    
+    var gateways = [
+        {
+            name: 'voucher',        // 0
+            displayName: l[487]     // Voucher code
+        },
+        {
+            name: 'paypal',         // 1
+            displayName: l[1233]    // PayPal
+        },
+        {
+            name: 'apple',          // 2
+            displayName: 'Apple'
+        },
+        {
+            name: 'google',         // 3
+            displayName: 'Google'
+        },
+        {
+            name: 'bitcoin',        // 4
+            displayName: l[6802]    // Bitcoin
+        },
+        {
+            name: 'dynamicpay',     // 5
+            displayName: l[7109]    // UnionPay
+        },
+        {
+            name: 'fortumo',                               // 6
+            displayName: l[7219] + ' (' + l[7110] + ')'    // Mobile (Fortumo)
+        },
+        {
+            name: 'stripe',         // 7
+            displayName: l[7111]    // Credit Card
+        },
+        {
+            name: 'perfunctio',     // 8
+            displayName: l[7111]    // Credit Card
+        },
+        {
+            name: 'infobip',                        // 9
+            displayName: l[7219] + ' (Centilli)'    // Mobile (Centilli)
+        },
+        {
+            name: 'paysafecard',        // 10
+            displayName: 'paysafecard'
+        },
+        {
+            name: 'astropay',        // 11
+            displayName: 'AstroPay'
+        },
+        {
+            name: 'reserved',        // 12
+            displayName: 'reserved'  // TBD
+        },
+        {
+            name: 'windowsphone',           // 13
+            displayName: 'Windows Phone'
+        },
+        {
+            name: 'tpay',           // 14
+            displayName: 'T-Pay'    
+        }
+    ];
+    
+    return gateways[gatewayId];
+}

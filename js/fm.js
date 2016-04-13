@@ -1,23 +1,3 @@
-/**
- * Get a string for the payment plan number
- * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
- */
-function getProPlan(planNum) {
-
-    switch (planNum) {
-        case 1:
-            return l[5819];     // PRO I
-        case 2:
-            return l[6125];     // PRO II
-        case 3:
-            return l[6126];     // PRO III
-        case 4:
-            return l[6234];     // LITE
-        default:
-            return l[435];      // FREE
-    }
-}
-
 function voucherCentering(button)
 {
     var popupBlock = $('.fm-voucher-popup');

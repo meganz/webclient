@@ -1152,7 +1152,7 @@ function topmenuUI() {
         }
         
         // Show PRO plan expired warning popup (if applicable)
-        warnPopup.showProPlanExpired();
+        alarm.planExpired.render();
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {
@@ -1161,15 +1161,13 @@ function topmenuUI() {
             $('.top-menu-item.clouddrive').show();
 
             if ($.len(M.c[M.RootID] || {})) {
-                warnPopup.showEphemeral();
+                alarm.ephemeralSession.render();
             }
-
-            if (isNonActivatedAccount()) {
-                warnPopup.showNonActivatedAccount();
+            else if (isNonActivatedAccount()) {
+                alarm.nonActivatedAccount.render();
             }
-
-            if (page !== 'register') {
-                warnPopup.showEphemeral();
+            else if (page !== 'register') {
+                alarm.ephemeralSession.render();
             }
         }
 

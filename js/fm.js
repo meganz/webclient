@@ -3036,7 +3036,7 @@ function accountUI() {
         else {
             // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
-                warnPopup.showNonActivatedAccount(true);
+                alarm.nonActivatedAccount.render(true);
             }
 
             $('.fm-account-overview').removeClass('hidden');

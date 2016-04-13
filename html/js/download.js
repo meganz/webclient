@@ -288,7 +288,7 @@ function importFile() {
         // Check response and if over quota show a special warning dialog
         callback: function (result) {
             if (result === EOVERQUOTA) {
-                warnPopup.showOverQuota();
+                alarm.overQuota.render();
             }
         }
     });

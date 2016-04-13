@@ -62,11 +62,11 @@ var astroPayDialog = {
         var taxPlaceholder = l[7990].replace('%1', this.selectedProvider.extra.taxIdLabel);
 
         // If they have previously paid before with Astropay
-        if ((warnPopup.lastPaymentInfo) && (warnPopup.lastPaymentInfo.gwd)) {
+        if ((alarm.planExpired.lastPayment) && (alarm.planExpired.lastPayment.gwd)) {
 
             // Get the extra data from the gateway details
-            var firstLastName = warnPopup.lastPaymentInfo.gwd.name;
-            var taxNum = warnPopup.lastPaymentInfo.gwd.cpf;
+            var firstLastName = alarm.planExpired.lastPayment.gwd.name;
+            var taxNum = alarm.planExpired.lastPayment.gwd.cpf;
             
             // Prefill the user's name and tax details
             this.$dialog.find('.astropay-name-field').val(firstLastName);
@@ -1108,12 +1108,12 @@ var proPage = {
         var lastGatewayName = null;
         
         // If they have paid before and their plan has expired, then re-select their last payment method
-        if (warnPopup.lastPaymentInfo) {
+        if (alarm.planExpired.lastPayment) {
 
             // Get the last gateway they paid with
-            var lastPaymentInfo = warnPopup.lastPaymentInfo;
-            var gatewayData = (typeof lastPaymentInfo.gwd !== 'undefined') ? lastPaymentInfo.gwd : null;
-                lastGatewayName = (gatewayData) ? gatewayData.gwname : lastPaymentInfo.gwname;
+            var lastPayment = alarm.planExpired.lastPayment;
+            var gatewayData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
+                lastGatewayName = (gatewayData) ? gatewayData.gwname : lastPayment.gwname;
             
             // Get the elements which need to be set
             var $gatewayInput = $('#' + lastGatewayName);
@@ -1279,10 +1279,10 @@ var proPage = {
         }
 
         // If there is data about any previous plan they purchased
-        if (warnPopup.lastPaymentInfo) {
+        if (alarm.planExpired.lastPayment) {
 
             // Get the number of months for the plan they last paid for
-            var lastPaymentMonths = warnPopup.lastPaymentInfo.m;
+            var lastPaymentMonths = alarm.planExpired.lastPayment.m;
             
             // Find the radio option with the same number of months 
             var $monthOption = $(".payment-duration[data-plan-months='" + lastPaymentMonths + "']");

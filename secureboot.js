@@ -1430,7 +1430,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
-    jsl.push({f:'js/ui/warningPopup.js', n: 'warningpopup_js', j:1,w:1});
+    jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
 
     // MEGA CHAT
     if (location.host === 'mega.nz' || !megaChatIsDisabled) {

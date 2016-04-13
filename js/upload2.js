@@ -406,7 +406,7 @@ var ulmanager = {
             if (res === EOVERQUOTA) {
 
                 // Show a warning popup
-                warnPopup.showOverQuota();
+                alarm.overQuota.render();
 
                 // Return early so it does not retry automatically and spam the API server with requests
                 return false;
@@ -598,7 +598,7 @@ var ulmanager = {
 
                 // If over quota show a special warning popup
                 if (res === EOVERQUOTA) {
-                    warnPopup.showOverQuota();
+                    alarm.overQuota.render();
                 }
                 else {
                     // Otherwise show 'Upload failed - Error uploading asset [filename]'

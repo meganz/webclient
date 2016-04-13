@@ -114,9 +114,9 @@ var warnPopup = {
         
         // Set the payment provider name and icon
         var gatewayName = warnPopup.lastPaymentInfo.gwname;
-        var gatewayData = (typeof warnPopup.lastPaymentInfo.gwd !== 'undefined') ? warnPopup.lastPaymentInfo.gwd : null;
-            gatewayName = (gatewayData) ? gatewayData.gwname : gatewayName;
-        var gatewayDisplayName = warnPopup.normaliseGatewayName(gatewayName, gatewayData);
+        var extraData = (typeof warnPopup.lastPaymentInfo.gwd !== 'undefined') ? warnPopup.lastPaymentInfo.gwd : null;
+            gatewayName = (extraData) ? extraData.gwname : gatewayName;
+        var gatewayDisplayName = warnPopup.normaliseGatewayName(gatewayName, extraData);
                 
         // Display
         $dialog.find('.header-pro-plan').text(proPlanName);

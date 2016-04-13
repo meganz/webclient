@@ -9474,7 +9474,7 @@ function _bigint_asm ( stdlib, foreign, buffer ) {
 
         // `D` is zero? WTF?!
 
-        // calculate `e` — the power of 2 of the normalization factor
+        // calculate `e` - the power of 2 of the normalization factor
         while ( (d & 0x80000000) == 0 ) {
             d = d << 1;
             e = e + 1|0;

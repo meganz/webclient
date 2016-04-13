@@ -4627,10 +4627,7 @@ function MegaData()
         if (d) {
             dlmanager.logger.error('dlerror', gid, error);
         }
-        else if (error === EOVERQUOTA) {
-            srvlog('onDownloadError :: ' + error + ' [EOVERQUOTA]');
-        }
-        else {
+        else if (error !== EOVERQUOTA) {
             srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
         }
 

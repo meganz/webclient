@@ -99,38 +99,7 @@ var Avatar = React.createClass({
             verifiedElement = <ContactVerified contact={this.props.contact} className={this.props.verifiedClassName} />
         }
 
-        if($avatar.find("img").length > 0) {
-            displayedAvatar = <div className={classes} style={this.props.style}>
-                {verifiedElement}
-                <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
-            </div>;
-        } else {
-            var tempClasses = $avatar.attr('class');
-            var colorNum = tempClasses.split("color")[1].split(" ")[0];
-            classes += " color" + colorNum;
-
-            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={$(useravatar.contact(contact)).text()}></div></div>;
-
-        }
-
-        return displayedAvatar;
-    }
-});
-
-var AvatarImage = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
-        var contact = this.props.contact;
-
-        var imgUrl = useravatar.imgUrl(contact.u);
-
-        var displayedAvatar;
-
-        displayedAvatar = <img src={imgUrl} style={this.props.imgStyles} className="avatar-img" />;
-
         if (!avatars[contact.u] && (!_noAvatars[contact.u] || _noAvatars[contact.u] !== true)) {
-            var self = this;
-
             var loadAvatarPromise;
             if (!_noAvatars[contact.u]) {
                 loadAvatarPromise = mega.attr.get(contact.u, 'a', true, false);
@@ -158,6 +127,20 @@ var AvatarImage = React.createClass({
                 .fail(function(e) {
                     _noAvatars[contact.u] = true;
                 });
+
+        }
+
+        if($avatar.find("img").length > 0) {
+            displayedAvatar = <div className={classes} style={this.props.style}>
+                {verifiedElement}
+                <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
+            </div>;
+        } else {
+            var tempClasses = $avatar.attr('class');
+            var colorNum = tempClasses.split("color")[1].split(" ")[0];
+            classes += " color" + colorNum;
+
+            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={$(useravatar.contact(contact)).text()}></div></div>;
 
         }
 
@@ -321,6 +304,5 @@ module.exports = {
     Avatar,
     ContactPickerWidget,
     ContactVerified,
-    ContactPresence,
-    AvatarImage
+    ContactPresence
 };

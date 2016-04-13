@@ -35,22 +35,7 @@
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
-.offline .small-rounded-avatar, .offline.small-rounded-avatar {
-	background-color: #CCCCCC;
-}
-.offline .small-rounded-avatar img {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-	-moz-opacity: 0.5;
-	-khtml-opacity: 0.5;
-	opacity: 0.5;
-	-webkit-filter: grayscale(100%);
-	-moz-filter: grayscale(100%);
-	-ms-filter: grayscale(100%);
-	-o-filter: grayscale(100%);
-	filter: grayscale(100%);
-	filter: url(grayscale.svg);
-	filter: gray;
-}
+
 .medium-avatar {
     width: 160px;
     height: 160px;

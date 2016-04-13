@@ -594,7 +594,7 @@ var ConversationMessage = React.createClass({
                                         }
                                         {dropdown}
                                         <div className="data-block-bg">
-                                            <ContactsUI.AvatarImage className="medium-avatar share" contact={contact} />
+                                            <ContactsUI.Avatar className="medium-avatar share" contact={contact} />
                                         </div>
                                     </div>
                                     <div className="clear"></div>

@@ -143,75 +143,6 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
         }
     }
 };
-ChatdIntegration.prototype.alterParticipants = function(chatRoom, included, excluded, forced) {
-    var self = this;
-
-    console.error('alterParticipants', chatRoom, included, excluded);
-
-    if (included || excluded) {
-        if (included.indexOf(u_handle) > -1) {
-            removeValue(included, u_handle);
-        }
-
-        var doSendMsg = function() {
-            /*if (!forced) {
-                var msg = chatRoom.protocolHandler.alterParticipants(clone(included), clone(excluded));
-                if (!msg) {
-                    self.logger.error("Failed to do altPart: " + msg);
-                }
-                else {
-
-                    var r = self.chatd.submit(base64urldecode(chatRoom.chatId), msg);
-
-                    // append in the UI as a message
-                    var alterPartMessage = new Message(
-                        chatRoom,
-                        chatRoom.messagesBuff,
-                        {
-                            'messageId': r,
-                            'internalId': r,
-                            'userId': u_handle,
-                            'message': msg,
-                            'textContents': "",
-                            'delay': unixtime(),
-                            'orderValue': unixtime(),
-                            'sent': true
-                        }
-                    );
-                    alterPartMessage.dialogType = 'alterParticipants';
-                    alterPartMessage.meta = {
-                        'excluded': excluded,
-                        'included': included,
-                    };
-
-
-                    chatRoom.messagesBuff.messages.push(alterPartMessage);
-
-                    $(chatRoom.messagesBuff).trigger('onNewMessageReceived', alterPartMessage);
-
-                }
-            }
-            else {
-                if (included) {
-                    included.forEach(function(v) {
-                        if (!chatRoom.protocolHandler.otherParticipants.has(v)) {
-                            chatRoom.protocolHandler.otherParticipants.add(v);
-                        }
-                    });
-                }
-                if (excluded) {
-                    excluded.forEach(function (v) {
-                        chatRoom.protocolHandler.otherParticipants.delete(v);
-                    });
-                }
-
-            }*/
-        };
-
-
-        self.waitForProtocolHandler(chatRoom, doSendMsg);
-    }
-};
 
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var self = this;
@@ -279,9 +210,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     });
 
                     if (included.length > 0 || excluded.length > 0) {
-                        if (actionPacket.ou === u_handle) {
-                            //self.alterParticipants(chatRoom, included, excluded);
-                        }
                         chatRoom.trackDataChange();
                     }
                 }
@@ -572,10 +500,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
-                    // add group participant in strongvelope
-                    chatRoom.protocolHandler.addParticipant(eventData.userId);
-                    // also add to our list
-                    chatRoom.members[eventData.userId] = eventData.priv;
+                    function addParticipant() {
+                        // add group participant in strongvelope
+                        chatRoom.protocolHandler.addParticipant(eventData.userId);
+                        // also add to our list
+                        chatRoom.members[eventData.userId] = eventData.priv;
+                    }
+                    self.waitForProtocolHandler(chatRoom, addParticipant);
                 }
 
                 if (eventData.userId === u_handle) {
@@ -584,10 +515,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 }
             }
             else if (eventData.priv === 255) {
-                // remove group participant in strongvelope
-                chatRoom.protocolHandler.removeParticipant(eventData.userId);
-                // also remove from our list
-                delete chatRoom.members[eventData.userId];
+                function deleteParticipant() {
+                    // remove group participant in strongvelope
+                    chatRoom.protocolHandler.removeParticipant(eventData.userId);
+                    // also remove from our list
+                    delete chatRoom.members[eventData.userId];
+                }
+                self.waitForProtocolHandler(chatRoom, deleteParticipant);
             }
         }
     });

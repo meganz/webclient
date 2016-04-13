@@ -630,6 +630,7 @@ var strongvelope = {};
         this.uniqueDeviceId = uniqueDeviceId;
         this._inUse = false;
         this.participantChange = false;
+        this.counter = 0;
     };
 
 
@@ -812,9 +813,6 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.updateSenderKey = function() {
 
-        var dateStamp;
-        var counter;
-        var prefix; // unique device id prefix, as a number
 
         if (this.keyId && (this.keyId !== this._sentKeyId)) {
             // We can return early, as our current sender key has not even been
@@ -825,34 +823,9 @@ var strongvelope = {};
         if (this.keyId) {
             // Juggle the key IDs.
             this.previousKeyId = this.keyId;
-            var keyIdComponents = ns._splitKeyId(this.keyId);
-            dateStamp = keyIdComponents[0];
-            counter = keyIdComponents[1];
-            prefix = keyIdComponents[2];
-
-            var newDateStamp = ns._dateStampNow();
-            if (newDateStamp !== dateStamp) {
-                dateStamp = newDateStamp;
-                counter = 0;
-            }
-            else {
-                if (counter >= 0xffff) {
-                    logger.critical('This should hardly happen, but 2^16 keys were used for the day. Bailing out!');
-                    throw new Error('This should hardly happen, but 2^16 keys were used for the day. Bailing out!');
-                }
-                counter = (counter + 1) & 0xffff;
-            }
         }
-        else {
-            dateStamp  = ns._dateStampNow();
-            counter = 0;
-            var a32words = str_to_a32(this.uniqueDeviceId);
-            prefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
-            if (prefix === -1) {
-                throw new Error('This should never happen, the unique device id was not set correctly');
-            }
-        }
-        this.keyId = ns._encodeKeyId(counter);
+        this.counter = (this.counter + 1) & 0xffff;
+        this.keyId = ns._encodeKeyId(this.counter);
 
         // Now the new sender key.
         var secretKey = new Uint8Array(SECRET_KEY_SIZE);
@@ -1357,6 +1330,7 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.encryptTo = function(message, destination) {
         var encryptedMessages = new Array();
+
         // Check we're in a chat with this destination, or a new chat.
         if (destination && !this.otherParticipants.has(destination)) {
             if (this.otherParticipants.size === 0) {
@@ -1382,6 +1356,8 @@ var strongvelope = {};
             this.updateSenderKey();
             encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_KEYED, "message": this.getKeyBlob()});
             this._sentKeyId = this.keyId;
+            this.includeParticipants.clear();
+            this.excludeParticipants.clear();
             this.participantChange = false;
         }
 
@@ -1570,24 +1546,12 @@ var strongvelope = {};
                 return result;
             }
             // Do group participant update.
-            var actulIncludeParticipants = [];
-            var actulExcludeParticipants = [];
             parsedMessage.includeParticipants.forEach(function (item) {
-                if (!self.otherParticipants.has(item)) {
-                    actulIncludeParticipants.push(item);
-                }
-                // update group participant
-                self.addParticipant(item, true);
+                self.addParticipant(item);
             });
             parsedMessage.excludeParticipants.forEach(function (item) {
-                if (self.otherParticipants.has(item)) {
-                    actulExcludeParticipants.push(item);
-                }
-                self.removeParticipant(item, true);
+                self.removeParticipant(item);
             });
-            // update result
-            result.includeParticipants = actulIncludeParticipants;
-            result.excludeParticipants = actulExcludeParticipants;
             return result;
         }
 
@@ -1808,17 +1772,12 @@ var strongvelope = {};
         if (typeof isInclude === 'undefined') {
             isInclude = false;
         }
+
         if (participant !== this.ownHandle) {
             if (!this.otherParticipants.has(participant)) {
                 this.otherParticipants.add(participant);
             }
-            // Add participant into includeParticipants so it will not include the previous sender key for the new participant.
-            if (isInclude === true) {
-                if (!this.includeParticipants.has(participant)) {
-                    this.includeParticipants.add(participant);
-                }
-                this.participantChange = true;
-            }
+            this.participantChange = true;
         }
     };
 
@@ -1833,6 +1792,7 @@ var strongvelope = {};
         if (typeof isExclude === 'undefined') {
             isExclude = false;
         }
+
         // remove myself from the groupchat.
         if (participant === this.ownHandle) {
             // clean up
@@ -1846,12 +1806,7 @@ var strongvelope = {};
             if (this.otherParticipants.has(participant)) {
                 this.otherParticipants.delete(participant);
             }
-            if (isExclude === true) {
-                if (!this.excludeParticipants.has(participant)) {
-                    this.excludeParticipants.add(participant);
-                }
-                this.participantChange = true;
-            }
+            this.participantChange = true;
         }
     };
     /**
@@ -2024,7 +1979,7 @@ var strongvelope = {};
     };
 
     strongvelope.ProtocolHandler.prototype.setKeyID = function(keyxId, keyId) {
-        console.log('update key id');
+
         if (keyxId & TEMPKEYIDFLAG !== TEMPKEYIDFLAG) {
             logger.critical('Temporary key ID is not correct');
         }
@@ -2041,7 +1996,7 @@ var strongvelope = {};
 
     strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) { 
         for (var i=0; i<keys.length;i++) {
-            console.log('seed key id:' + keys[i].keyid);
+
             var keyidStr = a32_to_str([keys[i].keyid]);
             if (this.participantKeys[keys[i].userid] && this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
                 logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + keys[i].userid);
@@ -2053,7 +2008,7 @@ var strongvelope = {};
                     pubEd25519[keys[i].userid])) {
                 var key = parsedKey.keys[0];
                 var isOwnMessage = (keys[i].userid === this.ownHandle);
-                console.log('from:' + keys[i].userid);
+
 
                 var decryptedKeys = this._decryptKeysFrom(key,
                                              keys[i].userid,

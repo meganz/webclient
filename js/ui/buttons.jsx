@@ -58,6 +58,9 @@ var Button = React.createClass({
         }.bind(this))
     },
     onBlur: function(e) {
+        if (!this.isMounted()) {
+            return;
+        }
         var $element = $(ReactDOM.findDOMNode(this));
 
         if (e && e.target && $(e.target).is($element)) {

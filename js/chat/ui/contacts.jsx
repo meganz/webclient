@@ -215,18 +215,20 @@ var ContactCard = React.createClass({
                 }
             }
 
-            contextMenu = <ButtonsUI.Button
-                className="default-white-button tiny-button"
-                icon="tiny-icon grey-down-arrow">
-                <DropdownsUI.Dropdown className="contact-card-dropdown"
-                    positionMy="right top"
-                    positionAt="right bottom"
-                    vertOffset={4}
-                    noArrow={true}
-                >
-                    {moreDropdowns}
-                </DropdownsUI.Dropdown>
-            </ButtonsUI.Button>;
+            if (moreDropdowns.length > 0) {
+                contextMenu = <ButtonsUI.Button
+                    className="default-white-button tiny-button"
+                    icon="tiny-icon grey-down-arrow">
+                    <DropdownsUI.Dropdown className="contact-card-dropdown"
+                                          positionMy="right top"
+                                          positionAt="right bottom"
+                                          vertOffset={4}
+                                          noArrow={true}
+                    >
+                        {moreDropdowns}
+                    </DropdownsUI.Dropdown>
+                </ButtonsUI.Button>;
+            }
         }
 
         return <div

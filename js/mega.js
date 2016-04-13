@@ -3252,6 +3252,7 @@ function MegaData()
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
             }
 
+
             this.u[userId].addChangeListener(this.onContactChanged);
 
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {

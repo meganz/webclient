@@ -686,9 +686,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             });
         });
         $(chatRoom).rebind('alterUserPrivilege.chatdInt', function(e, contactHash, newPriv) {
-            console.error("Not implemented on API yet.");
-
-            return;
             asyncApiReq({
                 "a":"mcup",
                 "id": chatRoom.chatId,

@@ -222,6 +222,7 @@ var ConversationRightArea = React.createClass({
 
                     {isReadOnlyElement}
                     {contactsList}
+                    <div className="clear"></div>
 
                     <div className="buttons-block">
                         {startAudioCallButton}

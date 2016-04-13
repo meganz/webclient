@@ -83,9 +83,16 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             chatJids.push(megaChat.karere.getBareJid());
             var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group", undefined, undefined, undefined, true);
 
-            $promise = resp[2];
-
-            resp[1].show();
+            if (resp instanceof MegaPromise) {
+                if (resp.state() === 'rejected') {
+                    console.error("openChat failed. Maybe tried to start a private chat with a non contact?");
+                    return;
+                }
+            }
+            else {
+                $promise = resp[2];
+                resp[1].show();
+            }
         }
         else if(roomType === "group") {
             megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain].show();

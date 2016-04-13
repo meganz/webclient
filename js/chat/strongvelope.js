@@ -756,50 +756,9 @@ var strongvelope = {};
      *     `true` on successful seeding, `false` on failure.
      */
     strongvelope.ProtocolHandler.prototype.seed = function(messages) {
-
+        // This is only needed for legacy messages.
         this._batchParseAndExtractKeys(messages);
 
-        var a32words = str_to_a32(this.uniqueDeviceId);
-        var myPrefix = a32words.length > 0 ? a32words[a32words.length-1] : -1;
-        if (myPrefix === -1) {
-            throw new Error('This should never happen, the unique device id was not set correctly');
-        }
-
-        // Find our own most recent (highest) sender key ID.
-        var highestDateCount = -1;
-        var secondHighestDateCount = -1;
-        var ownKeys = this.participantKeys[this.ownHandle];
-        for (var keyId in ownKeys) {
-            if (ownKeys.hasOwnProperty(keyId)) {
-                var a32words = str_to_a32(keyId);
-                if (a32words.length <= 1) {
-                    // This key appears to be from an older protocol version as it only contains a single
-                    // 32bit part. We can not seed from an older key
-                    continue;
-                }
-
-                // We can only start re-using an existing key if it was from this device, so check
-                // the prefixes are the same
-                var prefix = a32words[0];
-                if (prefix === myPrefix) {
-                    var keyDateCounter = a32words[a32words.length-1];
-                    if ((keyDateCounter > highestDateCount)) {
-                        secondHighestDateCount = highestDateCount;
-                        highestDateCount = keyDateCounter;
-                    }
-                }
-            }
-        }
-        if (highestDateCount === -1) {
-            return false;
-        }
-
-        this.keyId = a32_to_str([myPrefix]) + a32_to_str([highestDateCount]);
-
-        if (secondHighestDateCount !== -1) {
-            this.previousKeyId = a32_to_str([myPrefix]) + a32_to_str([secondHighestDateCount]);
-        }
-        // TOGO: if detect user management message, flag participantChange to be ture and return true.
         return true;
     };
 

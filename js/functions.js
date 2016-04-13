@@ -522,6 +522,7 @@ function populate_l() {
     l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
     l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
+    l[7945] = l[7945].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
@@ -2032,8 +2033,7 @@ function mKeyDialog(ph, fl) {
         name: 'unknown.unknown'
     }));
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
 
     $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e) {
         $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
@@ -2041,11 +2041,6 @@ function mKeyDialog(ph, fl) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
         }
     });
-
-    // Bolden text on instruction message
-    var $instructionMessage = $('.dlkey-dialog .instruction-message');
-    var instructionText = $instructionMessage.html().replace('[B]', '<b>').replace('[/B]', '</b>');
-    $instructionMessage.html(instructionText);
 
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
 
@@ -2055,11 +2050,16 @@ function mKeyDialog(ph, fl) {
         if (key) {
             // Remove the ! from the key which is exported from the export dialog
             key = key.replace('!', '');
-            promise.resolve(key);
 
-            $('.fm-dialog.dlkey-dialog').addClass('hidden');
-            $('.fm-dialog-overlay').addClass('hidden');
-            document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;
+            var newHash = (fl ? '#F!' : '#!') + ph + '!' + key;
+
+            if (location.hash !== newHash) {
+                promise.resolve(key);
+
+                fm_hideoverlay();
+                $('.fm-dialog.dlkey-dialog').addClass('hidden');
+                location.hash = newHash;
+            }
         }
         else {
             promise.reject();
@@ -2067,7 +2067,7 @@ function mKeyDialog(ph, fl) {
     });
     $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function(e) {
         $('.fm-dialog.dlkey-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
+        fm_hideoverlay();
         promise.reject();
     });
 

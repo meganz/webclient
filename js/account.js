@@ -277,7 +277,11 @@ function u_setrsa(rsakey) {
                     if (ASSERT(u_type === 3, 'Invalid activation procedure.')) {
                         var user = {
                             u: u_attr.u,
-                            c: u_attr.c,
+
+                            // u_attr.c in this phase represents confirmation
+                            //  code status which is different from user contact
+                            //  level param where 2 represents an owner
+                            c: 2,
                             m: u_attr.email
                         };
                         process_u([user]);

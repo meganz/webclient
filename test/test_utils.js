@@ -55,27 +55,4 @@ var testutils = {};
         throw new Error("Unable to copy obj! Its type isn't supported.");
     };
 
-
-    if (!Array.from) {
-        /**
-         * Iterates over an iterable and returns an Array object.
-         *
-         * Polyfill for PhantomJS, which doesn't have Array.from.
-         *
-         * @param {Object} anIterable
-         *     An iterable (containing the `forEach()` method) to convert.
-         * @return {Array}
-         *     Array representation.
-         */
-        Array.from = function(anIterable) {
-
-            var result = [];
-
-            anIterable.forEach(function _iterableToArrayIterator(item) {
-                result.push(item);
-            });
-
-            return result;
-        };
-    }
 }());

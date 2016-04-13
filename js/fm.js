@@ -2889,13 +2889,20 @@ function fmtopUI() {
     if (M.currentrootid === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
         $('.fm-right-files-block').addClass('rubbish-bin');
-    } else {
+    }
+    else {
         $('.fm-right-files-block').removeClass('rubbish-bin');
         if (M.currentrootid === M.InboxID) {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+        }
+        else if (M.currentdirid === 'contacts'
+                || M.currentdirid === 'ipc'
+                || M.currentdirid === 'opc'
+                || (String(M.currentdirid).length === 11
+                    && M.currentdirid.substr(0, 6) !== 'search')) {
+
             $('.fm-add-user').removeClass('hidden');
             $('.fm-left-panel').addClass('contacts-panel');
             if (M.currentdirid === 'ipc') {
@@ -2905,7 +2912,8 @@ function fmtopUI() {
                 $('.fm-contact-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
             }
-        } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
+        }
+        else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
@@ -4463,17 +4471,20 @@ function avatarDialog(close)
         {
             cropButton: $('#fm-change-avatar'),
             dragDropUploadPrompt:l[1390],
+            outputFormat: 'image/jpeg',
             onCrop: function(croppedDataURI)
             {
+                if (croppedDataURI.length > 64 * 1024) {
+                    return msgDialog('warninga', l[8645], l[8646]);
+                }
                 var data = dataURLToAB(croppedDataURI);
                 mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
-                var blob = new Blob([data], {type: 'image/jpeg'});
-                avatars[u_handle] =
-                    {
-                        data: blob,
-                        url: myURL.createObjectURL(blob)
-                    }
-                    $('.fm-account-avatar').html(useravatar.contact(u_handle));
+                var blob = new Blob([data], {type: 'image/png'});
+                avatars[u_handle] = {
+                    data: blob,
+                    url: myURL.createObjectURL(blob)
+                };
+                $('.fm-account-avatar').html(useravatar.contact(u_handle));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },
@@ -4936,6 +4947,9 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
+        if (!is_fm()) {
+            return;
+        }
         if (self.is_active()) {
             self.deactivate();
             return false;
@@ -5993,8 +6007,12 @@ function transferPanelUI()
         }
     });
 
-    $('.transfer-pause-icon').rebind('click', function()
-    {
+    $('.transfer-pause-icon').rebind('click', function() {
+
+        if (dlmanager.isOverQuota) {
+            return dlmanager.showOverQuotaDialog();
+        }
+
         if (!$(this).hasClass('disabled')) {
             if ($(this).hasClass('active')) {
                 // terms of service
@@ -6654,7 +6672,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if ($(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if (!is_fm() || $(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6805,7 +6823,7 @@ function sectionUIopen(id) {
         $('.fm-blocks-view.fm').addClass('hidden');
     }
 
-    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc' && String(M.currentdirid).length !== 11) {
         $('.fm-left-panel').removeClass('contacts-panel');
         $('.fm-right-header').removeClass('requests-panel');
         $('.fm-received-requests').removeClass('active');
@@ -9654,7 +9672,7 @@ function propertiesDialog(close)
                 }
                 p.t4 = rights;
                 p.t6 = l[5905];
-                p.t7 = mega.utils.fullUsername(user.h);
+                p.t7 = htmlentities(mega.utils.fullUsername(user.h));
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -9976,7 +9994,7 @@ function slideshow(id, close)
         return false;
     }
 
-    var n = M.d[id];
+    var n = M.getNodeByHandle(id);
     if (n && RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
@@ -10032,18 +10050,36 @@ function slideshow(id, close)
                 return;
             }
         }
-        M.addDownload([slideshowid]);
-    });
 
-    $('.slideshow-getlink').rebind('click', function() {
-
-        if (u_type === 0) {
-            ephemeralDialog(l[1005]);
+        if (M.d[slideshowid]) {
+            M.addDownload([slideshowid]);
         }
         else {
-            initCopyrightsDialog([slideshowid]);
+            M.addDownload([n]);
         }
     });
+
+
+    if (M.d[slideshowid]) {
+        $('.slideshow-getlink')
+            .show()
+            .rebind('click', function() {
+                if (u_type === 0) {
+                    ephemeralDialog(l[1005]);
+                }
+                else {
+                    initCopyrightsDialog([slideshowid]);
+                }
+            })
+            .next('.slideshow-line')
+                .show();
+    }
+    else {
+        $('.slideshow-getlink')
+            .hide()
+                .next('.slideshow-line')
+                    .hide();
+    }
 
     if (previews[id]) {
         previewsrc(previews[id].src);
@@ -10083,19 +10119,28 @@ function fetchsrc(id)
         delete pfails[id];
     }
 
-    var n = M.d[id];
+    var n = M.getNodeByHandle(id);
+    if (!n) {
+        console.error('handle "%s" not found...', id);
+        return false;
+    }
+
     preqs[id] = 1;
     var treq = {};
     treq[id] = {fa: n.fa, k: n.key};
     api_getfileattr(treq, 1, function(ctx, id, uint8arr)
     {
         previewimg(id, uint8arr);
-        if (!n.fa || n.fa.indexOf(':0*') < 0)
-        {
-            if (d)
+        if (!n.fa || n.fa.indexOf(':0*') < 0) {
+            if (d) {
                 console.log('Thumbnail found missing on preview, creating...', id, n);
-            var aes = new sjcl.cipher.aes([n.key[0], n.key[1], n.key[2], n.key[3]]);
-            createthumbnail(false, aes, id, uint8arr);
+            }
+            var aes = new sjcl.cipher.aes([
+                n.key[0] ^ n.key[4],
+                n.key[1] ^ n.key[5],
+                n.key[2] ^ n.key[6],
+                n.key[3] ^ n.key[7]]);
+            createnodethumbnail(n.h, aes, id, uint8arr);
         }
         if (id == slideshowid)
             fetchnext();
@@ -10215,7 +10260,6 @@ function fm_thumbnails()
         }
         if (y)
             fa_tnwait = y;
-
         if (a > 0)
         {
             fa_reqcnt += a;
@@ -10246,15 +10290,19 @@ function fm_thumbnails()
                     blob = new Blob([uint8arr.buffer]);
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
-                if (M.d[node] && M.d[node].seen && M.currentdirid === cdid)
-                    fm_thumbnail_render(M.d[node]);
+
+                var targetNode = M.getNodeByHandle(node);
+
+                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
+                    fm_thumbnail_render(targetNode);
+                }
 
                 // deduplicate in view when there is a duplicate fa:
-                if (M.d[node] && fa_duplicates[M.d[node].fa] > 0)
+                if (targetNode && fa_duplicates[targetNode.fa] > 0)
                 {
                     for (var i in M.v)
                     {
-                        if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
+                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
                         {
                             thumbnails[M.v[i].h] = thumbnails[node];
                             if (M.v[i].seen && M.currentdirid === cdid)
@@ -10269,10 +10317,11 @@ function fm_thumbnails()
         console.timeEnd('fm_thumbnails');
 }
 
-function fm_thumbnail_render(n) {
 
+function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
-        var e = $('#' + n.h + '.file-block');
+
+        var e = M.chat ? $('#' + n.h + '.img-block') : $('#' + n.h + '.file-block');
 
         if (e.length > 0) {
             e = e.find('img:first');
@@ -10496,7 +10545,6 @@ mega.utils.fullUsername = function username(userHandle) {
 
         // Convert to string and escape for XSS
         result = String(result);
-        result = htmlentities(result);
     }
 
     return result;
@@ -10543,7 +10591,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var fullOwnersName = mega.utils.fullUsername(ownersHandle);
+        var fullOwnersName = htmlentities(mega.utils.fullUsername(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
         // Access rights

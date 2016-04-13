@@ -579,7 +579,20 @@ function pro_pay() {
     var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 36e5) ? 1 : 0;
 
     // uts = User Transaction Sale
-    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m, bq: fromBandwidthDialog }, {
+    var uts = {
+        a:  'uts',
+        it:  0,
+        si:  apiId,
+        p:   price,
+        c:   currency,
+        aff: aff,
+        m:   m,
+        bq:  fromBandwidthDialog
+    };
+    if (mega.uaoref) {
+        uts.uao = escapeHTML(mega.uaoref);
+    }
+    api_req(uts, {
         callback: function (utsResult) {
 
             // Store the sale ID to check with API later
@@ -622,8 +635,10 @@ function pro_pay() {
                 else if (pro_paymentmethod === 'paysafecard') {
                     pro_m = 10;
                 }
-
-
+                else if (pro_paymentmethod === 'tpay') {
+                    pro_m = tpay.gatewayId; // 14
+                }
+                
                 // If AstroPay, send extra details
                 else if (pro_paymentmethod.indexOf('astropay') > -1) {
                     pro_m = astroPayDialog.gatewayId;
@@ -710,6 +725,11 @@ function pro_pay() {
                                     proPage.hideLoadingOverlay();
                                     astroPayDialog.showError(utcResult);
                                 }
+                            }
+
+                            // If tpay, redirect over there
+                            else if (pro_m === tpay.gatewayId) {
+                                tpay.redirectToSite(utcResult);
                             }
                         }
                     }
@@ -1854,6 +1874,23 @@ var fortumo = {
     redirectToSite: function(utsResult) {
 
         window.location = 'https://megapay.nz/?saleid=' + utsResult;
+    }
+};
+
+/**
+ * Code for tpay mobile payments
+ */
+var tpay = {
+
+    gatewayId: 14,
+
+    /**
+     * Redirect to the site
+     * @param {String} utcResult (a saleid)
+     */
+    redirectToSite: function(utcResult) {
+
+        window.location = 'https://megapay.nz/gwtp.html?provider=tpay&saleid=' + utcResult['EUR']['saleids'] + "&params=" + utcResult['EUR']['params'];
     }
 };
 

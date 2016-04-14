@@ -14197,13 +14197,13 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .membership-step2 .membership-radio-label {
     color: #444;
     font-family: "source_sans_proregular", sans-serif;
-    font-size: 13px;
+    font-size: 14px;
 }
 .membership-step2 .membership-radio-label.checked {
     font-family: "source_sans_prosemibold", sans-serif;
 }
 .membership-step2 .membership-radio-label > strong {
-    color: #999;
+    color: #555;
     font-family: "source_sans_proregular", sans-serif;
 }
 .membership-step2 .membership-radio-label .hyphen {
@@ -14308,13 +14308,14 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 }
 .membership-step2 .provider-details {
     display: inline-block;
-    font-family: "source_sans_prosemibold", Arial;
+    font-family: "source_sans_prosemibold", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 26px;
     vertical-align: middle;
 }
 .membership-step2 .provider-details .provider-name {
     display: inline-block;
+    font-family: "source_sans_proregular", Helvetica, Arial, sans-serif;
     overflow: hidden;
     padding-bottom: 1px;
     text-overflow: ellipsis;
@@ -14322,8 +14323,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     white-space: nowrap;
     width: 150px;
 }
+.membership-step2 .payment-method:hover .provider-name,
 .membership-step2 .provider-details.checked .provider-name {
-    font-family: "source_sans_prosemibold", Arial;
+    font-family: "source_sans_prosemibold", Helvetica, Arial, sans-serif;
 }
 .membership-step2 .provider-details .provider-icon {
     margin-right: 4px;

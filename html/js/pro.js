@@ -988,7 +988,9 @@ var proPage = {
                 proPage.renderPaymentProviderOptions(secondaryGatewayOptions, 'secondary');
 
                 // Change radio button states when clicked
-                proPage.initPaymentMethodRadioOptions();
+                proPage.initPaymentMethodRadioButtons();
+                proPage.preselectPreviousPaymentOption();
+                proPage.updateDurationOptionsOnProviderChange();
                 proPage.initShowMoreOptionsButton();
 
                 // Update the pricing and whether is a regular payment or subscription
@@ -1047,50 +1049,40 @@ var proPage = {
         // Loop through gateway providers (change to use list from API soon)
         for (var i = 0, length = gatewayOptions.length; i < length; i++) {
 
-            var gatewayOption = gatewayOptions[i];
             var $gateway = $template.clone();
-
+            var gatewayOpt = gatewayOptions[i];
+            var gatewayId = gatewayOpt.gatewayId;
+            
+            // Get the gateway name and display name
+            var gatewayInfo = getGatewayName(gatewayId);
+            var gatewayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gatewayInfo.name;
+            var displayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gatewayInfo.displayName;
+            
+            // If it couldn't find the name (e.g. new provider, use the name from the API)
+            if (gatewayInfo.name === 'unknown') {
+                displayName = gatewayOpt.displayName;
+            }
+            
             // Add disabled class if this payment method is not supported for this plan
-            if ((gatewayOption.supportsExpensivePlans === 0) && (selectedPlanNum !== 4)) {
+            if ((gatewayOpt.supportsExpensivePlans === 0) && (selectedPlanNum !== 4)) {
                 $gateway.addClass('disabled');
                 $gateway.attr('title', l[7162]);
             }
 
-            // If the voucher/pre-paid balance option
-            if (gatewayOption.gatewayName === 'voucher') {
-
+            // If the voucher/balance option, 
+            if ((gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
+                
                 // Show "Balance (x.xx)" if they have enough to purchase this plan
-                if (balanceFloat >= planPriceFloat) {
-                    gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
-                }
-                else {
-                    // Otherwise show "Voucher code"
-                    gatewayOption.displayName = l[487];
-                }
-            }
-
-            // If wire transfer option, need to translate that
-            else if (gatewayOption.gatewayName === 'wiretransfer') {
-                gatewayOption.displayName = l[6198];
-            }
-
-            // If a mobile payment provider e.g. Centili or Fortumo change text to: Mobile (Centili)
-            else if (gatewayOption.mobilePaymentProvider) {
-                gatewayOption.displayName = l[7219] + ' (' + htmlentities(gatewayOption.displayName) + ')';
-            }
-
-            // Otherwise get display name from what was sent from API
-            else {
-                gatewayOption.displayName = htmlentities(gatewayOption.displayName);
+                displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
             }
 
             // Create a radio button with icon for each payment gateway
             $gateway.removeClass('template');
-            $gateway.find('input').attr('name', gatewayOption.gatewayName);
-            $gateway.find('input').attr('id', gatewayOption.gatewayName);
-            $gateway.find('input').val(gatewayOption.gatewayName);
-            $gateway.find('.provider-icon').addClass(gatewayOption.gatewayName);
-            $gateway.find('.provider-name').safeHTML(gatewayOption.displayName);
+            $gateway.find('input').attr('name', gatewayName);
+            $gateway.find('input').attr('id', gatewayName);
+            $gateway.find('input').val(gatewayName);
+            $gateway.find('.provider-icon').addClass(gatewayName);
+            $gateway.find('.provider-name').safeHTML(displayName);
 
             // Build the html
             gatewayHtml += $gateway.prop('outerHTML');
@@ -1103,7 +1095,41 @@ var proPage = {
     /**
      * Change payment method radio button states when clicked
      */
-    initPaymentMethodRadioOptions: function() {
+    initPaymentMethodRadioButtons: function() {
+        
+        // Cache selector
+        var $paymentOptionsList = $('.payment-options-list');
+        
+        // Add click handler to all payment methods
+        $paymentOptionsList.find('.payment-method').rebind('click', function() {
+
+            var $this = $(this);
+
+            // Don't let the user select this option if it's disabled e.g. it is disabled because
+            // they must select a cheaper plan to work with this payment provider e.g. Fortumo
+            if ($this.hasClass('disabled')) {
+                return false;
+            }
+
+            // Remove checked state from all radio inputs
+            $paymentOptionsList.find('.membership-radio').removeClass('checked');
+            $paymentOptionsList.find('.provider-details').removeClass('checked');
+            $paymentOptionsList.find('input').prop('checked', false);
+
+            // Add checked state for this radio button
+            $this.find('input').prop('checked', true);
+            $this.find('.membership-radio').addClass('checked');
+            $this.find('.provider-details').addClass('checked');
+
+            proPage.updateTextDependingOnRecurring();
+            proPage.updateDurationOptionsOnProviderChange();
+        });
+    },
+    
+    /**
+     * Preselect an option they previously paid with if applicable
+     */
+    preselectPreviousPaymentOption: function() {
         
         // If they have paid before and their plan has expired, then re-select their last payment method
         if (alarm.planExpired.lastPayment) {
@@ -1111,6 +1137,8 @@ var proPage = {
             // Get the last gateway they paid with
             var lastPayment = alarm.planExpired.lastPayment;
             var gatewayId = lastPayment.gw;
+            
+            gatewayId = 4;
             
             // Get the gateway name, if it's an Astropay subgateway, then it will have it's own name
             var gatewayInfo = getGatewayName(gatewayId);
@@ -1141,7 +1169,7 @@ var proPage = {
                 }
             }
             else {
-                // Otherwise select the first available payment option
+                // Otherwise select the first available payment option because this provider is no longer available
                 proPage.preselectFirstPaymentOption();
             }
         }
@@ -1149,32 +1177,6 @@ var proPage = {
             // Otherwise select the first available payment option
             proPage.preselectFirstPaymentOption();
         }
-
-        // Add click handler to all payment methods
-        var paymentOptionsList = $('.payment-options-list');
-        paymentOptionsList.find('.payment-method').rebind('click', function() {
-
-            var $this = $(this);
-
-            // Don't let the user select this option if it's disabled e.g. it is disabled because
-            // they must select a cheaper plan to work with this payment provider e.g. Fortumo
-            if ($this.hasClass('disabled')) {
-                return false;
-            }
-
-            // Remove checked state from all radio inputs
-            paymentOptionsList.find('.membership-radio').removeClass('checked');
-            paymentOptionsList.find('.provider-details').removeClass('checked');
-            paymentOptionsList.find('input').prop('checked', false);
-
-            // Add checked state for this radio button
-            $this.find('input').prop('checked', true);
-            $this.find('.membership-radio').addClass('checked');
-            $this.find('.provider-details').addClass('checked');
-
-            proPage.updateTextDependingOnRecurring();
-            proPage.updateDurationOptionsOnProviderChange();
-        });
     },
     
     /**

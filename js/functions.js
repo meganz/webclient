@@ -4603,7 +4603,7 @@ function getGatewayName(gatewayId) {
         },
         14: {
             name: 'tpay',
-            displayName: 'T-Pay'    
+            displayName: l[7219] + ' (T-Pay)'       // Mobile (T-Pay)
         },
         999: {
             name: 'wiretransfer',
@@ -4611,5 +4611,14 @@ function getGatewayName(gatewayId) {
         }
     };
     
-    return gateways[gatewayId];
+    // If the gateway exists, return it
+    if (typeof gateways[gatewayId] !== 'undefined') {
+        return gateways[gatewayId];
+    }
+    
+    // Otherwise return a placeholder for currently unknown ones
+    return {
+        name: 'unknown',
+        displayName: 'Unknown'
+    };
 }

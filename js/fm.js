@@ -9791,26 +9791,6 @@ function propertiesDialog(close)
     }
 }
 
-function paypalDialog(url, close)
-{
-    if (close)
-    {
-        $('.fm-dialog.paypal-dialog').addClass('hidden');
-        fm_hideoverlay();
-        $.dialog = false;
-        return false;
-    }
-    $.dialog = 'paypal';
-    $('.fm-dialog.paypal-dialog').removeClass('hidden');
-    fm_showoverlay();
-    $('.fm-dialog.paypal-dialog a').attr('href', url);
-    $('.paypal-dialog .fm-dialog-close').unbind('click');
-    $('.paypal-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        paypalDialog(false, 1);
-    });
-}
-
 function termsDialog(close, pp)
 {
     if (close)

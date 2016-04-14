@@ -8571,12 +8571,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     margin: -217px 0 0 -302px;
     overflow: hidden;
 }
-.fm-dialog.paypal-dialog {
-    width: 480px;
-    height: 200px;
-    margin: -100px 0 0 -240px;
-    overflow: hidden;
-}
 .fm-dialog.generic-dialog {
     width: auto;
     height: auto;

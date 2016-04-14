@@ -9875,25 +9875,6 @@ function termsDialog(close, pp)
     });
 }
 
-function slingshotDialog(close)
-{
-    if (close)
-    {
-        $('.fm-dialog.slingshot-dialog').addClass('hidden');
-        fm_hideoverlay();
-        $.dialog = false;
-        return false;
-    }
-    $('.slingshot-dialog .fm-dialog-button.fm-terms-agree,.slingshot-dialog .fm-dialog-close').unbind('click');
-    $('.slingshot-dialog .fm-dialog-button.fm-terms-agree,.slingshot-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        slingshotDialog(1);
-    });
-    $('.fm-dialog.slingshot-dialog').removeClass('hidden');
-    fm_showoverlay();
-    $.dialog = 'slingshot';
-}
-
 var previews = {};
 var preqs = {};
 var pfails = {};

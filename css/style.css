@@ -1328,25 +1328,6 @@ input.radioOn, input.radioOff {
     overflow-y: scroll;
     overflow-x: hidden;
 }
-.slingshot-main {
-    color: #595959;
-    font-size: 15px;
-    line-height: 23px;
-}
-.slingshot-dialog .slingshot-main {
-    padding: 5px 20px 20px 20px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.slingshot-top-txt {
-    padding: 12px 12px 12px 12px;
-    height: 300px;
-    line-height: 21px;
-    margin-bottom: 5px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
 .blog-article {
     padding: 50px 0 30px 0;
     text-align: left;
@@ -8590,12 +8571,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     margin: -217px 0 0 -302px;
     overflow: hidden;
 }
-.fm-dialog.slingshot-dialog {
-    width: 604px;
-    height: 434px;
-    margin: -217px 0 0 -302px;
-    overflow: hidden;
-}
 .fm-dialog.paypal-dialog {
     width: 480px;
     height: 200px;
@@ -9048,12 +9023,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: -moz-calc(100% - 129px);
     height: calc(100% - 129px);
     margin: 15px 0 20px 0;
-}
-.slingshot-body {
-    height: 100%;
-    height: -webkit-calc(100% - 82px);
-    height: -moz-calc(100% - 82px);
-    height: calc(100% - 82px);
 }
 .fm-share-empty {
     background-image: url(../images/mega/share-folder.png?v=1);

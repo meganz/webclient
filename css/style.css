@@ -1808,7 +1808,6 @@ a.blog-button:hover {
 .black {
     color: black;
 }
-
 /* Small notification icons on top of the notification avatar */
 .nt-revocation-of-incoming .notification-avatar-icon {
     background-position: -10px -153px;
@@ -5084,11 +5083,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(19,224,60,1);
 }
 .nw-fm-left-icon.rubbish-bin.filled:hover::after, .nw-fm-left-icon.rubbish-bin.filled.active::after {
-    -webkit-transition: background-color 0.2s, opacity 0.2s ;
-    -moz-transition: background-color 0.2s, opacity 0.2s ;
-    -o-transition: background-color 0.2s, opacity 0.2s ;
-    -ms-transition: background-color 0.2s, opacity 0.2s ;
-    transition: background-color  0.2s, opacity 0.2s;
+    -webkit-transition: background-color 0.2s, opacity 0.2s;
+    -moz-transition: background-color 0.2s, opacity 0.2s;
+    -o-transition: background-color 0.2s, opacity 0.2s;
+    -ms-transition: background-color 0.2s, opacity 0.2s;
+    transition: background-color 0.2s, opacity 0.2s;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
@@ -5787,10 +5786,7 @@ th.grid-first-th {
     background-repeat: repeat;
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-    background-image: linear-gradient(45deg, rgba(222,222,222,0.6) 25%, transparent 25%),
-                      linear-gradient(-45deg, rgba(222,222,222,0.6) 25%, transparent 25%),
-                      linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.6) 75%),
-                      linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.6) 75%);
+    background-image: linear-gradient(45deg, rgba(222,222,222,0.6) 25%, transparent 25%),  linear-gradient(-45deg, rgba(222,222,222,0.6) 25%, transparent 25%),  linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.6) 75%),  linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.6) 75%);
 }
 .contact-block-view-avatar {
     margin: 17px 0 5px 18px;
@@ -10281,7 +10277,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     color: #333333;
 }
 .green-bg, .membershtip-medium-txt.red-bg, .membershtip-medium-txt.gray-bg, .membershtip-medium-txt.blue-bg {
-	-moz-border-radius: 10px;
+    -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     border-radius: 5px;
     -webkit-box-sizing: border-box;
@@ -10297,13 +10293,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     cursor: pointer;
 }
 .membershtip-medium-txt.red-bg {
-	background-color: #D32200;
+    background-color: #D32200;
 }
 .membershtip-medium-txt.blue-bg {
-	background-color: #1FA4E5;
+    background-color: #1FA4E5;
 }
 .membershtip-medium-txt.gray-bg {
-	background-color: #4c4c4c;
+    background-color: #4c4c4c;
 }
 .membership-small-txt {
     font-size: 13px;
@@ -10332,7 +10328,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     width: 235px;
 }
 .free .membership-usage-bl.storage, .free .fm-account-blocks.storage {
-    width: 100%; 
+    width: 100%;
 }
 .free .membership-usage-bl.bandwidth, .free .fm-account-blocks.bandwidth {
     display: none;
@@ -11769,7 +11765,7 @@ table {
 .st-main-block .notification-popup .jspPane, .main-scroll-block .notification-popup .jspPane {
     min-width: 0;
 }
-.st-mid-white-block, .download-mid-white-block {
+.st-mid-white-block, .download-mid-white-block, .top-head + .main-scroll-block {
     height: -webkit-calc(100% - 48px);
     height: -moz-calc(100% - 48px);
     height: calc(100% - 48px);
@@ -12184,7 +12180,7 @@ table {
     background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: center -786px;
     background-repeat: no-repeat;
-    margin: 12px 0 25px 0;
+    margin: 52px 0 25px 0;
 }
 .st-main-info {
     font-size: 21px;
@@ -12291,10 +12287,12 @@ table {
     border-radius: 12px;
     font-size: 13px;
     margin: 8px 0 0 0;
+    cursor: pointer;
+}
+.st-bottom-scroll-button.grey-arrow {
     background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: center -1397px;
     background-repeat: no-repeat;
-    cursor: pointer;
 }
 .scroll .st-bottom-scroll-button {
     background-position: center -1317px;
@@ -12563,6 +12561,13 @@ body.new-startpage {
     background-image: url(../images/mega/new-start-full1.png);
     background-position: left -1463px;
     background-repeat: no-repeat;
+}
+.mega-info .st-full-block {
+    display: block;
+    padding: 12px 0 0 0;
+}
+.mega-info .st-main-bottom.floating {
+    display: none;
 }
 .nw-bottom-copyrights {
     font-size: 13px;
@@ -23181,11 +23186,9 @@ body.pro:after {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
 }
-
 .sync-bottom-block .megasync-dropdown {
     margin: 0px;
 }
-
 .linux .megasync-dropdown {
     display: block;
 }
@@ -23295,12 +23298,10 @@ body.pro:after {
     z-index: 10;
     top: 122px;
 }
-
 .megasync-dropdown-list .jspPane {
     min-width: 280px;
     max-width: 280px;
 }
-
 .megasync-dropdown-pad {
     background-color: white;
     -moz-border-radius: 4px;
@@ -23314,7 +23315,6 @@ body.pro:after {
     box-sizing: border-box;
     padding: 36px 0 4px 0;
 }
-
 .megasync-dropdown-scroll .jspVerticalBar {
     width: 10px;
 }

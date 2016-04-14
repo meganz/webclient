@@ -64,14 +64,12 @@ function startMega() {
 }
 
 function mainScroll() {
-    $('.main-scroll-block').jScrollPane({
+        $('.main-scroll-block').jScrollPane({
         showArrows: true,
         arrowSize: 5,
         animateScroll: true,
-        verticalDragMinHeight: 150,
         enableKeyboardNavigation: true
     });
-    $('.main-scroll-block').unbind('jsp-scroll-y');
     jScrollFade('.main-scroll-block');
     if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
         scrollMenu();
@@ -149,6 +147,7 @@ function init_page() {
             && page.substr(0, 6) !== 'signup'
             && page !== 'register'
             && page !== 'terms'
+            && page !== 'mega'
             && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
         register_txt = l[1291];
         document.location.hash = 'signup' + localStorage.signupcode;
@@ -579,6 +578,10 @@ function init_page() {
     }
     else if (page == 'privacy') {
         parsepage(pages['privacy']);
+    }
+    else if (page == 'mega') {
+        parsepage(pages['mega']);
+        megainfotxt();
     }
     else if (page == 'privacycompany') {
         parsepage(pages['privacycompany']);
@@ -1625,6 +1628,9 @@ function topmenuUI() {
         else if (className.indexOf('privacypolicy') > -1) {
             document.location.hash = 'privacy';
         }
+        else if (className.indexOf('mega') > -1) {
+            document.location.hash = 'mega';
+        }
         else if (className.indexOf('copyright') > -1) {
             document.location.hash = 'copyright';
         }
@@ -1830,7 +1836,7 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
     $('#startholder').safeHTML(translate(pages['transferwidget']) + pagehtml);
     $('#startholder').show();
-    mainScroll();
+    Soon(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
         if (page !== 'start' && page !== 'download') {
             mainScroll();
@@ -1871,14 +1877,14 @@ window.onhashchange = function() {
         flhashchange = true;
     }
 
-    if (tpage == '#info' && page == 'start') {
+    if (tpage == '#info' && page == 'start' && tpage == '#mega') {
         if (!$.infoscroll) {
             startpageScroll();
         }
         return false;
     }
 
-    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start') {
+    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start' ) {
         if ($.infoscroll) {
             startpageMain();
         }

@@ -71,19 +71,18 @@ function init_start() {
         }
     });
     $('.st-bottom-scroll-button.scrolldown').rebind('click', function(event) {
-        startpageScroll();
+        if (page === 'download') {
+            document.location.hash = '#mega';
+        } else {
+            startpageScroll();
+        }
     });
-
 
     $('.st-bottom-scroll-button.scrollup').rebind('click', function(event) {
         startpageMain();
     });
 
-
     var el = '.st-mid-white-block';
-    if (page === 'download') {
-        el = '.download-mid-white-block';
-    }
 
     $(el).rebind('mousewheel', function(e) {
         if (e && e.originalEvent
@@ -121,20 +120,12 @@ function jScrollStart() {
 }
 
 
-
-
 function startpageScroll(blockSwing) {
-    if (page === 'download') {
-        $('.st-bottom-scroll-button.scrollup').text(l[1375]);
-    }
     $.infoscroll = true;
     if ($.hideTopMenu) {
         $.hideTopMenu();
     }
     var el = '.st-mid-white-block';
-    if (page === 'download') {
-        el = '.download-mid-white-block';
-    }
     $(el).addClass('active');
     $('.st-main-bottom.scroll.floating').show();
     $('.st-full-block').removeClass('hidden');
@@ -198,9 +189,6 @@ function startpageMain() {
         $('.widget-block').hide();
     }
     var el = '.st-mid-white-block';
-    if (page === 'download') {
-        el = '.download-mid-white-block';
-    }
     $(el).show();
     $('.top-head').show();
     deleteScrollPanel('.st-main-block', 'jsp');
@@ -211,15 +199,9 @@ function startpageMain() {
         scrollTop: 0
     }, '300', 'swing', function() {
         var el = '.st-mid-white-block';
-        if (page === 'download') {
-            el = '.download-mid-white-block';
-        }
     });
     setTimeout(function() {
         var el = '.st-mid-white-block';
-        if (page === 'download') {
-            el = '.download-mid-white-block';
-        }
         $(el).removeClass('active');
         $.startscrolling = false;
         if (page === 'start') {

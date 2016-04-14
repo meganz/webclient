@@ -486,7 +486,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
         chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
-        // TODO: need to update all buffered messages which are using keyxid.
+
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();
         }

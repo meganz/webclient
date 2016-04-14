@@ -2,6 +2,7 @@ var React = require("react");
 var utils = require('./../../../ui/utils.jsx');
 var getMessageString = require('./utils.jsx').getMessageString;
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+var ContactsUI = require('./../contacts.jsx');
 
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],

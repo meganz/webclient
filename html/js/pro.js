@@ -1013,10 +1013,15 @@ var proPage = {
             // Show the button
             $showMoreButton.removeClass('hidden');
 
-            // On click show the other payment options and then hide the button
+            // On clicking 'Click here to show more payment options' 
             $showMoreButton.click(function() {
+                
+                // Show the other payment options and then hide the button
                 $('.payment-options-list.secondary').removeClass('hidden');
                 $showMoreButton.hide();
+                
+                // Trigger resize or you can't scroll to the bottom of the page anymore
+                $(window).trigger('resize');
             });
         }
     },

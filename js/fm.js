@@ -9791,26 +9791,6 @@ function propertiesDialog(close)
     }
 }
 
-function paypalDialog(url, close)
-{
-    if (close)
-    {
-        $('.fm-dialog.paypal-dialog').addClass('hidden');
-        fm_hideoverlay();
-        $.dialog = false;
-        return false;
-    }
-    $.dialog = 'paypal';
-    $('.fm-dialog.paypal-dialog').removeClass('hidden');
-    fm_showoverlay();
-    $('.fm-dialog.paypal-dialog a').attr('href', url);
-    $('.paypal-dialog .fm-dialog-close').unbind('click');
-    $('.paypal-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        paypalDialog(false, 1);
-    });
-}
-
 function termsDialog(close, pp)
 {
     if (close)
@@ -9873,25 +9853,6 @@ function termsDialog(close, pp)
             $.termsDeny();
         termsDialog(1);
     });
-}
-
-function slingshotDialog(close)
-{
-    if (close)
-    {
-        $('.fm-dialog.slingshot-dialog').addClass('hidden');
-        fm_hideoverlay();
-        $.dialog = false;
-        return false;
-    }
-    $('.slingshot-dialog .fm-dialog-button.fm-terms-agree,.slingshot-dialog .fm-dialog-close').unbind('click');
-    $('.slingshot-dialog .fm-dialog-button.fm-terms-agree,.slingshot-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        slingshotDialog(1);
-    });
-    $('.fm-dialog.slingshot-dialog').removeClass('hidden');
-    fm_showoverlay();
-    $.dialog = 'slingshot';
 }
 
 var previews = {};

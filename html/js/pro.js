@@ -9,6 +9,16 @@ var pro_package,
     saleId = null,
     pro_do_next = null;
 
+var UTQA_RESPONSE_INDEX_ID = 0;
+var UTQA_RESPONSE_INDEX_ACCOUNTLEVEL = 1;
+var UTQA_RESPONSE_INDEX_STORAGE = 2;
+var UTQA_RESPONSE_INDEX_TRANSFER = 3;
+var UTQA_RESPONSE_INDEX_MONTHS = 4;
+var UTQA_RESPONSE_INDEX_PRICE = 5;
+var UTQA_RESPONSE_INDEX_CURRENCY = 6;
+var UTQA_RESPONSE_INDEX_MONTHLYBASEPRICE = 7;
+
+
 /**
  * Code for the AstroPay dialog on the second step of the Pro page
  */
@@ -495,7 +505,7 @@ function pro_continue()
     selectedProPackage = membershipPlans[selectedProPackageIndex];
 
     // Get the months and price
-    var selectedPlanMonths = selectedProPackage[4];
+    var selectedPlanMonths = selectedProPackage[UTQA_RESPONSE_INDEX_MONTHS];
 
     if (selectedPlanMonths < 12) {
         pro_package = 'pro' + account_type_num + '_month';
@@ -571,9 +581,9 @@ function pro_pay() {
     }
 
     // Data for API request
-    var apiId = selectedProPackage[0];
-    var price = selectedProPackage[5];
-    var currency = selectedProPackage[6];
+    var apiId = selectedProPackage[UTQA_RESPONSE_INDEX_ID];
+    var price = selectedProPackage[UTQA_RESPONSE_INDEX_PRICE];
+    var currency = selectedProPackage[UTQA_RESPONSE_INDEX_CURRENCY];
 
     // Convert from boolean to integer for API
     var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 36e5) ? 1 : 0;
@@ -804,12 +814,12 @@ var proPage = {
         for (var i = 0, length = membershipPlans.length; i < length; i++) {
 
             // Get plan details
-            var accountLevel = parseInt(membershipPlans[i][1]);
-            var planStorageGigabytes = parseInt(membershipPlans[i][2]);
-            var months = parseInt(membershipPlans[i][4]);
+            var accountLevel = parseInt(membershipPlans[i][UTQA_RESPONSE_INDEX_ACCOUNTLEVEL]);
+            var planStorageGigabytes = parseInt(membershipPlans[i][UTQA_RESPONSE_INDEX_STORAGE]);
+            var months = parseInt(membershipPlans[i][UTQA_RESPONSE_INDEX_MONTHS]);
 
             // If their current storage usage is more than the plan's grey it out
-            if ((months === 1) && (currentStorageGigabytes > planStorageGigabytes)) {
+            if ((months !== 12) && (currentStorageGigabytes > planStorageGigabytes)) {
 
                 // Grey out the plan
                 $membershipStepOne.find('.reg-st3-membership-bl.pro' + accountLevel).addClass('sub-optimal-plan');
@@ -1036,8 +1046,8 @@ var proPage = {
         // Get their plan price from the currently selected duration radio button
         var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
         var selectedPlan = membershipPlans[selectedPlanIndex];
-        var selectedPlanNum = selectedPlan[1];
-        var selectedPlanPrice = selectedPlan[5];
+        var selectedPlanNum = selectedPlan[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL];
+        var selectedPlanPrice = selectedPlan[UTQA_RESPONSE_INDEX_PRICE];
 
         // Convert to float for numeric comparisons
         var planPriceFloat = parseFloat(selectedPlanPrice);
@@ -1210,7 +1220,7 @@ var proPage = {
 
         var planIndex = $selectDurationOption.parent().attr('data-plan-index');
         var currentPlan = membershipPlans[planIndex];
-        var numOfMonths = currentPlan[4];
+        var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
         var subscribeOrPurchase = (selectedProvider.supportsRecurring) ? l[6172] : l[6190].toLowerCase();
 
         // Set to /month, /year or /one time next to the price
@@ -1237,8 +1247,8 @@ var proPage = {
         // Sort plan durations by lowest number of months first
         membershipPlans.sort(function (planA, planB) {
 
-            var numOfMonthsPlanA = planA[4];
-            var numOfMonthsPlanB = planB[4];
+            var numOfMonthsPlanA = planA[UTQA_RESPONSE_INDEX_MONTHS];
+            var numOfMonthsPlanB = planB[UTQA_RESPONSE_INDEX_MONTHS];
 
             if (numOfMonthsPlanA < numOfMonthsPlanB) {
                 return -1;
@@ -1259,11 +1269,11 @@ var proPage = {
             var currentPlan = membershipPlans[i];
 
             // If match on the membership plan, display that pricing option in the dropdown
-            if (currentPlan[1] == account_type_num) {
+            if (currentPlan[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL] == account_type_num) {
 
                 // Get the price and number of months duration
-                var price = currentPlan[5];
-                var numOfMonths = currentPlan[4];
+                var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE];
+                var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
                 var monthsWording = l[922];     // 1 month
 
                 // Change wording depending on number of months
@@ -1368,15 +1378,20 @@ var proPage = {
             planIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
         }
 
-        // Get the current plan price
         var currentPlan = membershipPlans[planIndex];
-        var price = currentPlan[5].split('.');
+
+         // Change the wording to month or year
+        var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
+        var monthOrYearWording = (numOfMonths !== 12) ? l[931] : l[932];
+
+        // Get the current plan price
+        var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE].split('.');
+        if (numOfMonths !== 12) {
+            // Use the monthly base price instead
+            price = currentPlan[UTQA_RESPONSE_INDEX_MONTHLYBASEPRICE].split('.');
+        }
         var dollars = price[0];
         var cents = price[1];
-
-        // Change the wording to month or year
-        var numOfMonths = currentPlan[4];
-        var monthOrYearWording = (numOfMonths === 1) ? l[931] : l[932];
 
         // Update the price of the plan
         $('.membership-step2 .reg-st3-bott-title.price .num').safeHTML(
@@ -1411,7 +1426,7 @@ var proPage = {
             // Get the plan's number of months
             var planIndex = $(durationOption).attr('data-plan-index');
             var currentPlan = membershipPlans[planIndex];
-            var numOfMonths = currentPlan[4];
+            var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
 
             // If the currently selected payment option e.g. Wire transfer
             // doesn't support a 1 month payment hide the option
@@ -1446,17 +1461,22 @@ var proPage = {
         for (var i = 0, length = membershipPlans.length; i < length; i++) {
 
             // Get plan details
-            var accountLevel = membershipPlans[i][1];
-            var months = membershipPlans[i][4];
-            var price = membershipPlans[i][5];
+            var accountLevel = membershipPlans[i][UTQA_RESPONSE_INDEX_ACCOUNTLEVEL];
+            var months = membershipPlans[i][UTQA_RESPONSE_INDEX_MONTHS];
+            var price = membershipPlans[i][UTQA_RESPONSE_INDEX_PRICE];
             var priceParts = price.split('.');
             var dollars = priceParts[0];
             var cents = priceParts[1];
 
+            var monthlyBasePrice = membershipPlans[i][UTQA_RESPONSE_INDEX_MONTHLYBASEPRICE];
+            var monthlyBasePriceParts = monthlyBasePrice.split('.');
+            var monthlyBasePriceDollars = monthlyBasePriceParts[0];
+            var monthlyBasePriceCents = monthlyBasePriceParts[1];
+
             // Show only monthly prices in the boxes
-            if (months === 1) {
+            if (months !== 12) {
                 $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
-                    dollars + '<span class="small">.' + cents + ' &euro;</span>'
+                    monthlyBasePriceDollars + '<span class="small">.' + monthlyBasePriceCents + ' &euro;</span>'
                 );
             }
 
@@ -1761,7 +1781,7 @@ var voucherDialog = {
             selectedProPackage = membershipPlans[selectedProPackageIndex];
 
             // Get the plan price
-            var selectedPlanPrice = selectedProPackage[5];
+            var selectedPlanPrice = selectedProPackage[UTQA_RESPONSE_INDEX_PRICE];
 
             // Warn them about insufficient funds
             if ((parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {

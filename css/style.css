@@ -4934,6 +4934,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .astropay-payment-reminder .mega-payment-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll -113px -487px;
     background-size: 150px auto;
+    border-radius: 36px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
     height: 36px;
     left: 26px;
     top: 0;
@@ -13950,6 +13952,7 @@ h5.main-italic-header {
 }
 .duration-options-list .payment-duration .membership-radio-label {
     background: none;
+    cursor: pointer;
     font-family: 'source_sans_proregular';
     padding-left: 0;
     position: relative;

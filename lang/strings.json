@@ -12758,5 +12758,17 @@
     "8657": {
         "text": "EXPIRED",
         "context": "A label on the PRO plan expired dialog for showing the date when their last PRO plan purchase expired."
+    },
+    "8658": {
+        "text": "your first name",
+        "context": "Placeholder text for the user's first name field when creating an account."
+    },
+    "8659": {
+        "text": "your last name",
+        "context": "Placeholder text for the user's last name field when creating an account."
+    },
+    "8660": {
+        "text": "Windows Phone",
+        "context": "A phone running the Windows Phone operating system."
     }
 }

@@ -3189,6 +3189,9 @@
     "8655": "\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c",
     "8656": "\u0412\u044b\u0431\u0440\u0430\u0442\u044c\u2026",
     "8657": "\u0418\u0421\u0422\u0415\u041a\u0410\u0415\u0422",
+    "8658": "your first name",
+    "8659": "your last name",
+    "8660": "Windows Phone",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3241,6 +3244,7 @@
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
-        "choose": 8656
+        "choose": 8656,
+        "windows-phone": 8660
     }
 }

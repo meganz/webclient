@@ -440,6 +440,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         {
                             'messageId': eventData.messageId,
                             'userId': u_handle,
+                            'keyid': eventData.keyid,
                             'message': eventData.message,
                             'textContents': v.textContents ? v.textContents : "",
                             'delay': v.delay,

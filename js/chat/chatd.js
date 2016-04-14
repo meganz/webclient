@@ -95,7 +95,8 @@ Chatd.MsgField = {
     'MSGID' : 0,
     'USERID' : 1,
     'TIMESTAMP' : 2,
-    'MESSAGE' : 3
+    'MESSAGE' : 3,
+    'KEYID' : 4
 };
 
 Chatd.Const = {
@@ -729,13 +730,14 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
 
         // write the new message to the message buffer and mark as in sending state
         // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
-        this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message];
+        this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message.message, keyId];
 
         this.chatd.trigger('onMessageUpdated', {
             chatId: base64urlencode(this.chatId),
             id: this.highnum,
             state: 'PENDING',
-            message: message
+            keyid: keyId,
+            message: message.message
         });
         
         this.sending[msgxid] = this.highnum;
@@ -851,6 +853,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
         id: num,
         state: "CONFIRMED",
         messageId: base64urlencode(msgid),
+        keyid: this.buf[num][Chatd.MsgField.KEYID],
         message: this.buf[num][Chatd.MsgField.MESSAGE]
     });
 

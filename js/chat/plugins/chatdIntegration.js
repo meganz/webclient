@@ -636,7 +636,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 delete chatRoom.notDecryptedBuffer[messageId];
                             }
                             else if (v && !v.payload) {
-                                self.logger.error("Could not decrypt: ", v)
+                                self.logger.error("Could not decrypt: ", v);
                             }
                             self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
                         });

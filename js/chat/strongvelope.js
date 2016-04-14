@@ -1037,9 +1037,12 @@ var strongvelope = {};
      *     Outgoing message content encoded in TLV records, and a flag
      *     indicating whether the message is keyed.
      */
-    strongvelope.ProtocolHandler.prototype._assembleBody = function(message) {
+    strongvelope.ProtocolHandler.prototype._assembleBody = function(message, keyId) {
 
-        var senderKey = this.participantKeys[this.ownHandle][this.keyId];
+        if (!this.participantKeys[this.ownHandle][keyId]) {
+            throw new Error('No cached chat key for user!');
+        }
+        var senderKey = this.participantKeys[this.ownHandle][keyId];
 
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
@@ -1057,6 +1060,16 @@ var strongvelope = {};
             this._keyEncryptionCount++;
         }
 
+        // Assemble rest of message.
+        content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
+                                           String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP))
+                    + content;
+
+        // Sign message.
+        content = this._signContent(content);
+
+        // Return assembled total message.
+        content = String.fromCharCode(PROTOCOL_VERSION) + content;
         return content;
     };
 
@@ -1130,20 +1143,9 @@ var strongvelope = {};
 
         var assembledMessage = null;
         // Assemble main message body.
-        assembledMessage = this._assembleBody(message);
-        var messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
-        // Assemble rest of message.
-        var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
-                                           String.fromCharCode(messageType))
-                    + assembledMessage;
+        assembledMessage = this._assembleBody(message, this.keyId);
 
-        // Sign message.
-        content = this._signContent(content);
-
-        // Return assembled total message.
-        content = String.fromCharCode(PROTOCOL_VERSION) + content;
-
-        encryptedMessages.push({"type": messageType, "message": content});
+        encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_FOLLOWUP, "message": assembledMessage});
 
         return encryptedMessages;
     };

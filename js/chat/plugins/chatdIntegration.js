@@ -896,10 +896,10 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     return tmpPromise;
 };
 
-ChatdIntegration.prototype.updateMessage = function(chatRoom, num, newMessage) {
+ChatdIntegration.prototype.updateMessage = function(chatRoom, msgid, keyid, newMessage) {
     // a msgupd is only possible up to ten minutes after the indicated (client-supplied) UTC timestamp.
     var self = this;
-    self.chatd.modify(base64urldecode(chatRoom.chatId), num, newMessage);
+    self.chatd.modify(base64urldecode(chatRoom.chatId), msgid, keyid, newMessage);
 };
 
 // decorate ALL functions which require shard to be available before executing

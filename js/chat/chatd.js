@@ -683,8 +683,8 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
     this.multicmd(cmds);
 };
 
-Chatd.Shard.prototype.msgupd = function(chatId, msgid, message) {
-    this.cmd(Chatd.Opcode.MSGUPD, chatId + Chatd.Const.UNDEFINED + msgid + this.chatd.pack32le(0) + this.chatd.pack32le(message.length) + message);
+Chatd.Shard.prototype.msgupd = function(chatId, msgid, message, keyid) {
+    this.cmd(Chatd.Opcode.MSGUPD, chatId + Chatd.Const.UNDEFINED + msgid + this.chatd.pack32le(0) + this.chatd.pack16le(0) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message);
 };
 
 // message storage subsystem
@@ -913,14 +913,14 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
     });
 };
 
-Chatd.prototype.msgmodify = function(chatId, msgid, msg) {
+Chatd.prototype.msgmodify = function(chatId, msgid, keyid, msg) {
     // an existing message has been modified
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].msgmodify(msgid, msg);
+        this.chatIdMessages[chatId].msgmodify(msgid, keyid, msg);
     }
 };
 
-Chatd.Messages.prototype.msgmodify = function(chatId, msgid, msg) {
+Chatd.Messages.prototype.msgmodify = function(chatId, msgid, keyid, msg) {
     // CHECK: is it more efficient to maintain a full hash msgid -> num?
     // FIXME: eliminate namespace clash collision risk
     for (var i = this.highnum; i > this.lownum; i--) {

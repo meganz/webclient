@@ -11753,7 +11753,7 @@ table {
     -webkit-border-radius: 24px;
     border-radius: 24px;
 }
-.st-main-block, .main-scroll-block {
+.st-main-block {
     height: 100%;
     overflow: hidden;
 }
@@ -12175,12 +12175,15 @@ table {
     left: 275px;
     top: 195px;
 }
+.st-main-anchor {
+    height: 40px;
+}
 .st-main-logo {
     height: 120px;
     background-image: url(../images/mega/new-startpage-sprite-v4.png);
     background-position: center -786px;
     background-repeat: no-repeat;
-    margin: 52px 0 25px 0;
+    margin: 12px 0 25px 0;
 }
 .st-main-info {
     font-size: 21px;
@@ -12301,7 +12304,7 @@ body.new-startpage {
     min-width: 200px;
 }
 .st-full-block {
-    padding: 20px 0 0 0;
+    padding: 60px 0 0 0;
 }
 .st-red-block {
     background-color: #D32200;

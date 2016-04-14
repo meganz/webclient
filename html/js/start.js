@@ -129,9 +129,7 @@ function startpageScroll(blockSwing) {
     $(el).addClass('active');
     $('.st-main-bottom.scroll.floating').show();
     $('.st-full-block').removeClass('hidden');
-    if (page === 'start') {
-        document.location.hash = '#info';
-    }
+
     if (blockSwing) {
         $('.st-main-block').scrollTop($('.st-main-block').height());
         startpageJSP();

@@ -64,12 +64,14 @@ function startMega() {
 }
 
 function mainScroll() {
-        $('.main-scroll-block').jScrollPane({
+    $('.main-scroll-block').jScrollPane({
         showArrows: true,
         arrowSize: 5,
         animateScroll: true,
+        verticalDragMinHeight: 150,
         enableKeyboardNavigation: true
     });
+    $('.main-scroll-block').unbind('jsp-scroll-y');
     jScrollFade('.main-scroll-block');
     if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
         scrollMenu();
@@ -1877,7 +1879,7 @@ window.onhashchange = function() {
         flhashchange = true;
     }
 
-    if (tpage == '#info' && page == 'start' && tpage == '#mega') {
+    if (tpage == '#info' && page == 'start') {
         if (!$.infoscroll) {
             startpageScroll();
         }

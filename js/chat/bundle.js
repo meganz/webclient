@@ -22037,46 +22037,7 @@
 	            verifiedElement = React.makeElement(ContactVerified, { contact: this.props.contact, className: this.props.verifiedClassName });
 	        }
 
-	        if ($avatar.find("img").length > 0) {
-	            displayedAvatar = React.makeElement(
-	                "div",
-	                { className: classes, style: this.props.style },
-	                verifiedElement,
-	                React.makeElement("img", { src: $("img", $avatar).attr("src"), style: this.props.imgStyles })
-	            );
-	        } else {
-	            var tempClasses = $avatar.attr('class');
-	            var colorNum = tempClasses.split("color")[1].split(" ")[0];
-	            classes += " color" + colorNum;
-
-	            displayedAvatar = React.makeElement(
-	                "div",
-	                { className: classes, style: this.props.style },
-	                verifiedElement,
-	                React.makeElement("div", { className: letterClass, "data-user-letter": $(useravatar.contact(contact)).text() })
-	            );
-	        }
-
-	        return displayedAvatar;
-	    }
-	});
-
-	var AvatarImage = React.createClass({
-	    displayName: "AvatarImage",
-
-	    mixins: [MegaRenderMixin, RenderDebugger],
-	    render: function render() {
-	        var contact = this.props.contact;
-
-	        var imgUrl = useravatar.imgUrl(contact.u);
-
-	        var displayedAvatar;
-
-	        displayedAvatar = React.makeElement("img", { src: imgUrl, style: this.props.imgStyles, className: "avatar-img" });
-
 	        if (!avatars[contact.u] && (!_noAvatars[contact.u] || _noAvatars[contact.u] !== true)) {
-	            var self = this;
-
 	            var loadAvatarPromise;
 	            if (!_noAvatars[contact.u]) {
 	                loadAvatarPromise = mega.attr.get(contact.u, 'a', true, false);
@@ -22101,6 +22062,26 @@
 	            }).fail(function (e) {
 	                _noAvatars[contact.u] = true;
 	            });
+	        }
+
+	        if ($avatar.find("img").length > 0) {
+	            displayedAvatar = React.makeElement(
+	                "div",
+	                { className: classes, style: this.props.style },
+	                verifiedElement,
+	                React.makeElement("img", { src: $("img", $avatar).attr("src"), style: this.props.imgStyles })
+	            );
+	        } else {
+	            var tempClasses = $avatar.attr('class');
+	            var colorNum = tempClasses.split("color")[1].split(" ")[0];
+	            classes += " color" + colorNum;
+
+	            displayedAvatar = React.makeElement(
+	                "div",
+	                { className: classes, style: this.props.style },
+	                verifiedElement,
+	                React.makeElement("div", { className: letterClass, "data-user-letter": $(useravatar.contact(contact)).text() })
+	            );
 	        }
 
 	        return displayedAvatar;
@@ -22274,8 +22255,7 @@
 	    Avatar: Avatar,
 	    ContactPickerWidget: ContactPickerWidget,
 	    ContactVerified: ContactVerified,
-	    ContactPresence: ContactPresence,
-	    AvatarImage: AvatarImage
+	    ContactPresence: ContactPresence
 	};
 
 /***/ },
@@ -23738,7 +23718,7 @@
 	                                    React.makeElement(
 	                                        "div",
 	                                        { className: "data-block-bg" },
-	                                        React.makeElement(ContactsUI.AvatarImage, { className: "medium-avatar share", contact: contact })
+	                                        React.makeElement(ContactsUI.Avatar, { className: "medium-avatar share", contact: contact })
 	                                    )
 	                                ),
 	                                React.makeElement("div", { className: "clear" })

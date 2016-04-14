@@ -2,7 +2,6 @@ var React = require("react");
 
 var utils = require('./../../../ui/utils.jsx');
 var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
-var ContactsUI = require('./../../ui/contacts.jsx');
 
 var ConversationMessageMixin = {
     mixins: [MegaRenderMixin],

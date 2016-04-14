@@ -1,9 +1,6 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
-var ContactsUI = require('./../../ui/contacts.jsx');
-
+var getMessageString = require('./utils.jsx').getMessageString;
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 
 var GenericConversationMessage = React.createClass({

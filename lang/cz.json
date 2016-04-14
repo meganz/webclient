@@ -3189,6 +3189,9 @@
     "8655": "Obnovit",
     "8656": "Zvolit...",
     "8657": "VYPR\u0160ELO",
+    "8658": "your first name",
+    "8659": "your last name",
+    "8660": "Windows Phone",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3241,6 +3244,7 @@
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
-        "choose": 8656
+        "choose": 8656,
+        "windows-phone": 8660
     }
 }

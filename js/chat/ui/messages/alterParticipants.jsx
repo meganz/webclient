@@ -4,6 +4,7 @@ var utils = require('./../../../ui/utils.jsx');
 var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+var getMessageString = require('./utils.jsx').getMessageString;
 
 var AlterParticipantsConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],

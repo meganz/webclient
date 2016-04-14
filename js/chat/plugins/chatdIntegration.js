@@ -210,6 +210,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     });
 
                     if (included.length > 0 || excluded.length > 0) {
+                        if (included.length > 0) {
+                            ChatdIntegration._ensureKeysAreLoaded([], included);
+                        }
+
                         chatRoom.trackDataChange();
                     }
                 }

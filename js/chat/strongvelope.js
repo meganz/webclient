@@ -1150,7 +1150,26 @@ var strongvelope = {};
         return encryptedMessages;
     };
 
+    /**
+     * Encrypts a message with an old message's key to support message editing.
+     *
+     * @method
+     * @param {String} message
+     *     Data message to encrypt. If `null` or `undefined`, no message payload
+     *     will be encoded (i. e. it's a "blind" management message).
+     * @param {String} keyId
+     *     keyId of the encryption key
+     * @returns {String}
+     *     Encrypted outgoing message.
+     */
+    strongvelope.ProtocolHandler.prototype.encryptWithKeyId = function(message, keyId) {
+        var keyIdStr = a32_to_str([keyId]);
+        var assembledMessage = null;
+        // Assemble main message body.
+        assembledMessage = this._assembleBody(message, keyIdStr);
 
+        return assembledMessage;
+    };
     /**
      * Update local sender key cache and get sender key.
      *
@@ -1505,6 +1524,11 @@ var strongvelope = {};
             }
             this.participantChange = true;
         }
+    };
+
+    strongvelope.ProtocolHandler.prototype.getKeyId = function() {
+
+        return str_to_a32(this.keyId)[0];
     };
 
     // utility functions

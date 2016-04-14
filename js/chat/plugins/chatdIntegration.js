@@ -875,11 +875,15 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
             }
 
             if (result !== false) {
-                var keyid = str_to_a32(chatRoom.protocolHandler.keyId)[0];
+                var keyid = chatRoom.protocolHandler.getKeyId();
 
                 tmpPromise.resolve(
                     self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)
                 );
+                /*var msgnum = self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid);
+                var msg = 'Edited!';
+                var cipher = chatRoom.protocolHandler.encryptWithKeyId(msg, keyid);
+                self.updateMessage(chatRoom, msgnum, cipher);*/
             }
             else {
                 tmpPromise.reject();
@@ -896,10 +900,10 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     return tmpPromise;
 };
 
-ChatdIntegration.prototype.updateMessage = function(chatRoom, msgid, keyid, newMessage) {
+ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage) {
     // a msgupd is only possible up to ten minutes after the indicated (client-supplied) UTC timestamp.
     var self = this;
-    self.chatd.modify(base64urldecode(chatRoom.chatId), msgid, keyid, newMessage);
+    self.chatd.modify(base64urldecode(chatRoom.chatId), msgnum, newMessage);
 };
 
 // decorate ALL functions which require shard to be available before executing

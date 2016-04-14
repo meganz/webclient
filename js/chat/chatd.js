@@ -450,12 +450,13 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
                 break;
             case Chatd.Opcode.MSGUPD:
+            case Chatd.Opcode.MSGUPDX:
                 self.keepAliveTimerRestart();
-                len = self.chatd.unpack32le(cmd.substr(29,4));
-                self.logger.log("Message '" + base64urlencode(cmd.substr(16,8)) + "' EDIT/DELETION: " + cmd.substr(33,len));
-                len += 33;
+                len = self.chatd.unpack32le(cmd.substr(35,4));
+                self.logger.log("Message '" + base64urlencode(cmd.substr(16,8)) + "' EDIT/DELETION: " + cmd.substr(39,len));
+                len += 39;
 
-                self.chatd.msgmodify(cmd.substr(1,8), cmd.substr(9,8), cmd.substr(33,len));
+                self.chatd.msgmodify(cmd.substr(1,8), cmd.substr(9,8), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
                 break;
 
             case Chatd.Opcode.SEEN:
@@ -683,8 +684,12 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
     this.multicmd(cmds);
 };
 
-Chatd.Shard.prototype.msgupd = function(chatId, msgid, message, keyid) {
-    this.cmd(Chatd.Opcode.MSGUPD, chatId + Chatd.Const.UNDEFINED + msgid + this.chatd.pack32le(0) + this.chatd.pack16le(0) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message);
+Chatd.Shard.prototype.msgupd = function(chatId, msgid, timestamp, message, keyid) {
+    this.cmd(Chatd.Opcode.MSGUPD, chatId + Chatd.Const.UNDEFINED + msgid + this.chatd.pack32le(timestamp) + this.chatd.pack16le(0) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message);
+};
+
+Chatd.Shard.prototype.msgupdx = function(chatId, msgxid, timestamp, message, keyxid) {
+    this.cmd(Chatd.Opcode.MSGUPDX, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack16le(0) + this.chatd.pack32le(keyxid) + this.chatd.pack32le(message.length) + message);
 };
 
 // message storage subsystem
@@ -758,13 +763,15 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
 
     // TODO: LP: Mathias: this variable is not used, why ?
     var mintimestamp = Math.floor(new Date().getTime()/1000)-600;
+    var keyid = this.buf[msgnum][Chatd.MsgField.KEYID];
 
     // modify pending message so that a potential resend includes the change
     if (this.sending[this.buf[msgnum][Chatd.MsgField.MSGID]]) {
         this.buf[msgnum][Chatd.MsgField.MESSAGE] = message;
+        self.chatd.chatIdShard[this.chatId].msgupdx(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.TIMESTAMP], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
     }
     else if (self.chatd.chatIdShard[this.chatId].isOnline()) {
-        self.chatd.chatIdShard[this.chatId].msgupd(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], message);
+        self.chatd.chatIdShard[this.chatId].msgupd(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.TIMESTAMP], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
     }
 
     this.chatd.trigger('onMessageModify', {
@@ -777,6 +784,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
         chatId: base64urlencode(this.chatId),
         id: msgnum,
         state: 'EDITING',
+        keyid: keyid,
         message: message
     });
 
@@ -806,7 +814,8 @@ Chatd.Messages.prototype.resend = function() {
             self.chatd.chatIdShard[this.chatId].msgupd(
                 this.chatId,
                 this.buf[msgnum][Chatd.MsgField.MSGID],
-                this.buf[msgnum][Chatd.MsgField.MESSAGE]
+                this.buf[msgnum][Chatd.MsgField.MESSAGE],
+                this.buf[msgnum][Chatd.MsgField.KEYID]
             );
         }
     }
@@ -876,7 +885,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
 
     // we now have a proper msgid, resend MSGUPD in case the edit crossed the execution of the command
     if (this.modified[num]) {
-        self.chatd.msgupd(chatId, msgid, this.buf[num][Chatd.MsgField.MESSAGE]);
+        self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, this.buf[num][Chatd.MsgField.MESSAGE], this.buf[num][Chatd.MsgField.KEYID]);
     }
 };
 
@@ -913,14 +922,14 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
     });
 };
 
-Chatd.prototype.msgmodify = function(chatId, msgid, keyid, msg) {
+Chatd.prototype.msgmodify = function(chatId, msgid, updated, keyid, msg) {
     // an existing message has been modified
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].msgmodify(msgid, keyid, msg);
+        this.chatIdMessages[chatId].msgmodify(msgid, updated, keyid, msg);
     }
 };
 
-Chatd.Messages.prototype.msgmodify = function(chatId, msgid, keyid, msg) {
+Chatd.Messages.prototype.msgmodify = function(chatId, msgid, updated, keyid, msg) {
     // CHECK: is it more efficient to maintain a full hash msgid -> num?
     // FIXME: eliminate namespace clash collision risk
     for (var i = this.highnum; i > this.lownum; i--) {
@@ -932,11 +941,12 @@ Chatd.Messages.prototype.msgmodify = function(chatId, msgid, keyid, msg) {
                     delete this.modified[i];
                 }
                 else {
-                    this.chatd.chatIdShard[chatId].msgupd(chatId, msgid, msg);
+                    this.chatd.chatIdShard[chatId].msgupd(chatId, msgid, msg, keyid);
                 }
             }
             else {
                 this.buf[i][Chatd.MsgField.MESSAGE] = msg;
+                this.buf[i][Chatd.MsgField.TIMESTAMP] = this.buf[i][Chatd.MsgField.TIMESTAMP] + updated -1;
             }
 
             break;

@@ -210,6 +210,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     });
 
                     if (included.length > 0 || excluded.length > 0) {
+                        if (included.length > 0) {
+                            ChatdIntegration._ensureKeysAreLoaded([], included);
+                        }
+
                         chatRoom.trackDataChange();
                     }
                 }
@@ -385,6 +389,10 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
     };
 };
 ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
+    console.error(
+        messages, users
+    );
+
     var promises = [];
     if (Array.isArray(messages)) {
         messages.forEach(function (msgObject) {

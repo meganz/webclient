@@ -1104,41 +1104,50 @@ var proPage = {
      * Change payment method radio button states when clicked
      */
     initPaymentMethodRadioOptions: function() {
-
-        var lastGatewayName = null;
         
         // If they have paid before and their plan has expired, then re-select their last payment method
         if (alarm.planExpired.lastPayment) {
 
             // Get the last gateway they paid with
             var lastPayment = alarm.planExpired.lastPayment;
-            var gatewayData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
-                lastGatewayName = (gatewayData) ? gatewayData.gwname : lastPayment.gwname;
+            var gatewayId = lastPayment.gw;
             
-            // Get the elements which need to be set
-            var $gatewayInput = $('#' + lastGatewayName);
-            var $membershipRadio = $gatewayInput.parent();
-            var $providerDetails = $membershipRadio.next();
-            var $secondaryPaymentOptions = $('.payment-options-list.secondary');
-            var $showMoreButton = $('.membership-step2 .provider-show-more');
+            // Get the gateway name, if it's an Astropay subgateway, then it will have it's own name
+            var gatewayInfo = getGatewayName(gatewayId);
+            var extraData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
+            var gatewayName = (typeof lastPayment.gwd !== 'undefined') ? extraData.gwname : gatewayInfo.name;
+
+            // Find the gateway
+            var $gatewayInput = $('#' + gatewayName);
             
-            // Set to checked
-            $gatewayInput.prop('checked', true);
-            $membershipRadio.addClass('checked');
-            $providerDetails.addClass('checked');
-            
-            // If the gateway is in the secondary list, then show the secondary list and hide the button
-            if ($secondaryPaymentOptions.find('#' + lastGatewayName).prop('checked')) {
-                $secondaryPaymentOptions.removeClass('hidden');
-                $showMoreButton.hide();
+            // If it is still in the list (e.g. valid provider still)
+            if ($gatewayInput.length) {
+                
+                // Get the elements which need to be set
+                var $membershipRadio = $gatewayInput.parent();
+                var $providerDetails = $membershipRadio.next();
+                var $secondaryPaymentOptions = $('.payment-options-list.secondary');
+                var $showMoreButton = $('.membership-step2 .provider-show-more');
+
+                // Set to checked
+                $gatewayInput.prop('checked', true);
+                $membershipRadio.addClass('checked');
+                $providerDetails.addClass('checked');
+
+                // If the gateway is in the secondary list, then show the secondary list and hide the button
+                if ($secondaryPaymentOptions.find('#' + gatewayName).prop('checked')) {
+                    $secondaryPaymentOptions.removeClass('hidden');
+                    $showMoreButton.hide();
+                }
+            }
+            else {
+                // Otherwise select the first available payment option
+                proPage.preselectFirstPaymentOption();
             }
         }
         else {
-            // Pre-select the first option in the primary list of providers
-            var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
-            $paymentOption.find('input').attr('checked', 'checked');
-            $paymentOption.find('.membership-radio').addClass('checked');
-            $paymentOption.find('.provider-details').addClass('checked');
+            // Otherwise select the first available payment option
+            proPage.preselectFirstPaymentOption();
         }
 
         // Add click handler to all payment methods
@@ -1167,6 +1176,18 @@ var proPage = {
             proPage.updateDurationOptionsOnProviderChange();
         });
     },
+    
+    /**
+     * Preselects the first payment option in the list of payment providers
+     */
+    preselectFirstPaymentOption: function() {
+        
+        // Find and select the first payment option
+        var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
+        $paymentOption.find('input').attr('checked', 'checked');
+        $paymentOption.find('.membership-radio').addClass('checked');
+        $paymentOption.find('.provider-details').addClass('checked');
+    },
 
     /**
      * Updates the text on the page depending on the payment option they've selected and
@@ -1186,8 +1207,6 @@ var proPage = {
         var currentPlan = membershipPlans[planIndex];
         var numOfMonths = currentPlan[4];
         var subscribeOrPurchase = (selectedProvider.supportsRecurring) ? l[6172] : l[6190].toLowerCase();
-        var durationOrRenewal = (selectedProvider.supportsRecurring) ? l[6977] : l[6817];
-        var getTwoMonthsFree = (selectedProvider.supportsRecurring) ? l[6978] : l[1148];
 
         // Set to /month, /year or /one time next to the price
         if (selectedProvider.supportsRecurring && (numOfMonths === 1)) {

@@ -4544,68 +4544,72 @@ function getProPlan(planNum) {
  */
 function getGatewayName(gatewayId) {
     
-    var gateways = [
-        {
-            name: 'voucher',        // 0
+    var gateways = {
+        0: {
+            name: 'voucher',
             displayName: l[487]     // Voucher code
         },
-        {
-            name: 'paypal',         // 1
+        1: {
+            name: 'paypal',
             displayName: l[1233]    // PayPal
         },
-        {
-            name: 'apple',          // 2
+        2: {
+            name: 'apple',
             displayName: 'Apple'
         },
-        {
-            name: 'google',         // 3
+        3: {
+            name: 'google',
             displayName: 'Google'
         },
-        {
-            name: 'bitcoin',        // 4
+        4: {
+            name: 'bitcoin',
             displayName: l[6802]    // Bitcoin
         },
-        {
-            name: 'dynamicpay',     // 5
+        5: {
+            name: 'dynamicpay',
             displayName: l[7109]    // UnionPay
         },
-        {
-            name: 'fortumo',                               // 6
+        6: {
+            name: 'fortumo',
             displayName: l[7219] + ' (' + l[7110] + ')'    // Mobile (Fortumo)
         },
-        {
-            name: 'stripe',         // 7
+        7: {
+            name: 'stripe',
             displayName: l[7111]    // Credit Card
         },
-        {
-            name: 'perfunctio',     // 8
+        8: {
+            name: 'perfunctio',
             displayName: l[7111]    // Credit Card
         },
-        {
-            name: 'infobip',                        // 9
+        9: {
+            name: 'infobip',
             displayName: l[7219] + ' (Centilli)'    // Mobile (Centilli)
         },
-        {
-            name: 'paysafecard',        // 10
+        10: {
+            name: 'paysafecard',
             displayName: 'paysafecard'
         },
-        {
-            name: 'astropay',        // 11
+        11: {
+            name: 'astropay',
             displayName: 'AstroPay'
         },
-        {
-            name: 'reserved',        // 12
-            displayName: 'reserved'  // TBD
+        12: {
+            name: 'reserved',
+            displayName: 'reserved' // TBD
         },
-        {
-            name: 'windowsphone',    // 13
-            displayName: l[8660]     // Windows Phone
+        13: {
+            name: 'windowsphone',
+            displayName: l[8660]    // Windows Phone
         },
-        {
-            name: 'tpay',            // 14
+        14: {
+            name: 'tpay',
             displayName: 'T-Pay'    
+        },
+        999: {
+            name: 'wiretransfer',
+            displayName: l[6198]    // Wire transfer
         }
-    ];
+    };
     
     return gateways[gatewayId];
 }

@@ -214,7 +214,7 @@ var alarm = {
             // Ignored payment provider IDs (not applicable or no longer in use)
             var gatewayIgnoreList = [1, 2, 3, 7, 8, 13];
             var gatewayId = this.lastPayment.gw;
-
+            
             // Don't display the popup for Apple or Google as they are recurring subscriptions. If the lastPayment is 
             // set then it means they have purposefully cancelled their account and would not want to see any warnings.
             if (gatewayIgnoreList.indexOf(gatewayId) > -1) {
@@ -254,7 +254,7 @@ var alarm = {
 
             // Add button click handlers
             this.initChooseButton($dialog);
-            this.initRenewButton($dialog);
+            this.initRenewButton($dialog, proNum);
 
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();

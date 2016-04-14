@@ -3406,7 +3406,9 @@ function MegaData()
             msgDialog('warninga', l[135], 'Operation not permitted.');
             return false;
         }
+
         loadingDialog.show();
+
         if (t.length === 11 && !u_pubkeys[t]) {
             var keyCachePromise = api_cachepubkeys([t]);
             keyCachePromise.done(function _cachepubkeyscomplete() {
@@ -3422,9 +3424,12 @@ function MegaData()
             return false;
         }
 
+        var importNodes = Object($.onImportCopyNodes).length;
+
         var a = this.isNodeObject(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var ops = {a: 'p', t: t, n: a, i: requesti};
         var s = fm_getsharenodes(t);
+
         if (s.length > 0) {
             var mn = [];
             for (i in a) {
@@ -3432,6 +3437,12 @@ function MegaData()
             }
             ops.cr = crypto_makecr(mn, s, true);
         }
+
+        if (importNodes) {
+            // #4290 'strict mode'
+            ops.sm = 1;
+        }
+
         api_req(ops, {
             cn: cn,
             del: del,
@@ -3443,6 +3454,14 @@ function MegaData()
                         callback(res);
                     }
                     renderNew();
+
+                    if (importNodes && Object(res.f).length < importNodes) {
+                        msgDialog('warninga', l[882],
+                            'We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.'
+                                .replace('%1', Object(res.f).length)
+                                .replace('%2', importNodes)
+                        );
+                    }
                 }
                 if (typeof res === 'number' && res < 0) {
                     loadingDialog.hide();

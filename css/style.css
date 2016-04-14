@@ -11941,7 +11941,7 @@ table {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     left: 300px;
-    bottom: 50px;
+    bottom: 48px;
     padding: 34px 0 0 0;
     z-index: 10;
 }
@@ -12175,9 +12175,6 @@ table {
     left: 275px;
     top: 195px;
 }
-.st-main-anchor {
-    height: 40px;
-}
 .st-main-logo {
     height: 120px;
     background-image: url(../images/mega/new-startpage-sprite-v4.png);
@@ -12223,7 +12220,7 @@ table {
     margin: 0 0 0 0;
     text-align: center;
     background-color: #2c2b2a;
-    height: 50px;
+    height: 48px;
 }
 .st-scroll-to {
     position: absolute;
@@ -12289,7 +12286,7 @@ table {
     -webkit-border-radius: 12px;
     border-radius: 12px;
     font-size: 13px;
-    margin: 8px 0 0 0;
+    margin: 7px 0 0 0;
     cursor: pointer;
 }
 .st-bottom-scroll-button.grey-arrow {
@@ -19641,7 +19638,7 @@ a.blog-article-button {
     height: 130px;
     width: 100%;
     position: absolute;
-    bottom: 50px;
+    bottom: 48px;
     padding: 32px 28px 0 28px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;

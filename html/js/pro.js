@@ -1060,7 +1060,7 @@ var proPage = {
             
             // If it couldn't find the name (e.g. new provider, use the name from the API)
             if (gatewayInfo.name === 'unknown') {
-                displayName = gatewayOpt.displayName;
+                continue;
             }
             
             // Add disabled class if this payment method is not supported for this plan
@@ -1137,8 +1137,6 @@ var proPage = {
             // Get the last gateway they paid with
             var lastPayment = alarm.planExpired.lastPayment;
             var gatewayId = lastPayment.gw;
-            
-            gatewayId = 4;
             
             // Get the gateway name, if it's an Astropay subgateway, then it will have it's own name
             var gatewayInfo = getGatewayName(gatewayId);

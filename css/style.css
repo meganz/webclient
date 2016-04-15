@@ -13387,6 +13387,9 @@ h5.main-italic-header {
     top: 10px;
     z-index: 10;
     display: none;
+    background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
+    height: 16px;
+    width: 16px;
 }
 .loading .register-loading-icon {
     display: block;

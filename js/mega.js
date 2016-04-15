@@ -3497,7 +3497,9 @@ function MegaData()
                 i: requesti
             });
             if (node && node.p) {
-                if (M.c[node.p] && M.c[node.p][h]) {
+                var parent = node.p;
+
+                if (M.c[parent] && M.c[parent][h]) {
                     delete M.c[node.p][h];
                 }
                 // Update M.v it's used for slideshow preview at least
@@ -3511,11 +3513,8 @@ function MegaData()
                     M.c[t] = [];
                 }
                 M.c[t][h] = 1;
-                removeUInode(h);
-                this.nodeAttr({
-                        h: h,
-                        p: t
-                    });
+                this.nodeAttr({ h: h, p: t });
+                removeUInode(h, parent);
                 newnodes.push(node);
             }
         }

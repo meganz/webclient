@@ -62,6 +62,7 @@ function dl_g(res) {
     $('.download.content-block').removeClass('hidden');
     $('.download-button.to-clouddrive').hide();
     $('.download-button.throught-browser').hide();
+    $('.download-button.with-megasync').hide();
 
     if (res === ETOOMANY) {
         $('.download.content-block').addClass('not-available-user');
@@ -87,21 +88,6 @@ function dl_g(res) {
                 $(this).removeClass('active');
             }
         });
-        $('.download-button.with-megasync').rebind('click', function(e) {
-            if (!$(this).hasClass('downloading')) {
-                loadingDialog.show();
-                megasync.isInstalled(function(err, is) {
-                    // If 'msd' (MegaSync download) flag is turned on and application is installed
-                    loadingDialog.hide();
-                    if (res.msd !== 0 && (!err || is)) {
-                        $('.megasync-overlay').removeClass('downloading');
-                        megasync.download(dlpage_ph, dlpage_key);
-                    } else {
-                        megasyncOverlay();
-                    }
-                });
-            }
-        });
         var key = dlpage_key;
         var fdl_file = false;
 
@@ -118,6 +104,21 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
+            $('.download-button.with-megasync').show().rebind('click', function(e) {
+                if (!$(this).hasClass('downloading')) {
+                    loadingDialog.show();
+                    megasync.isInstalled(function(err, is) {
+                        // If 'msd' (MegaSync download) flag is turned on and application is installed
+                        loadingDialog.hide();
+                        if (res.msd !== 0 && (!err || is)) {
+                            $('.megasync-overlay').removeClass('downloading');
+                            megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
+                        } else {
+                            megasyncOverlay();
+                        }
+                    });
+                }
+            });
             $('.download-button.throught-browser').show().rebind('click', function() {
                 $(this).unbind('click');
                 browserDownload();
@@ -142,13 +143,13 @@ function dl_g(res) {
                 onDownloadProgress: dlprogress,
                 onDownloadComplete: dlcomplete,
                 onDownloadStart: dlstart,
-                onDownloadError: dlerror,
+                onDownloadError: M.dlerror,
                 onBeforeDownloadComplete: function() { }
             };
-            
+
             var filename = htmlentities(fdl_file.n) || 'unknown';
             var filenameLength = filename.length;
-            
+
             $('.file-info .download.info-txt.filename').text(filename).attr('title', filename);
             $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));
             $('.info-block .block-view-file-type').addClass(fileIcon({ name: filename }));
@@ -171,6 +172,7 @@ function dl_g(res) {
         else {
             mKeyDialog(dlpage_ph)
                 .fail(function() {
+                    $('.download.error-text.message').text(l[7427]).removeClass('hidden');
                     $('.info-block .block-view-file-type').addClass(fileIcon({name:'unknown'}));
                     $('.file-info .download.info-txt').text('Unknown');
                 });
@@ -292,41 +294,6 @@ function importFile() {
     });
 
     dl_import = false;
-}
-
-function dlerror(dl, error)
-{
-    var errorstr='';
-    var tempe=false;
-
-    if (error === EOVERQUOTA) {
-        tempe = l[1673];
-    } else if (error === ETOOMANYCONNECTIONS) {
-        errorstr = l[18];
-    } else if (error === ESID) {
-        errorstr = l[19];
-    } else if (error === ETEMPUNAVAIL) {
-        tempe = l[233];
-    } else if (error === EBLOCKED) {
-        tempe = l[23];
-    } else if (error === ENOENT) {
-        tempe = l[22];
-    } else if (error === EACCESS) {
-        tempe = l[23];
-    } else if (error === EKEY) {
-        tempe = l[24];
-    } else if (error === EAGAIN) {
-        tempe = l[233];
-    } else {
-        tempe = l[233];
-    }
-
-    if (tempe)
-    {
-        $('.download.error-icon').text(tempe);
-        $('.download.error-icon').removeClass('hidden');
-        $('.download.icons-block').addClass('hidden');
-    }
 }
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)

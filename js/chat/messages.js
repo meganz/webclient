@@ -451,6 +451,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
                     self.lastMessageId = self.messages.getItem(self.messages.length - 1).messageId;
 
+                    if (v.textContents) {
+                        self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, confirmedMessage);
+                    }
+
                     found = true;
 
                     return false; // break

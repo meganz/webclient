@@ -85,8 +85,6 @@ Our JavaScript Files
   caching of meta-data in ``IndexedDB``
 * ``js/mega.js`` -- ``MegaData`` class which does most of the data
   handling (but also some FM UI interaction)
-* ``js/megapix.js`` -- client side canvas based thumbnail creation
-  (because thumbnails are encrypted, too)
 * ``js/mouse.js`` -- captures mouse events for entropy collection
 * ``js/notify.js`` -- contains the notifications logic
 * ``js/thumbnail.js`` -- client side canvas based thumbnail creation
@@ -100,16 +98,9 @@ Our JavaScript Files
 Vendor JavaScript Files
 -----------------------
 
-* ``asmcrypto.js`` -- general-purpose cryptographic library
-* ``jquery.jscrollpane.js`` -- ``jScrollpane`` jQuery plugin for
-  custom scrollbars
-* ``js/checkboxes.js`` -- jQuery iOS styled checkboxes
-* ``jquery.mousewheel.js`` -- jQuery ``mousewheel`` plugin for cross
-  browser mousewheel event handling
-* ``jquery-x.y.z.js`` -- jQuery library
-* ``jquery-ui-x.y.z.js`` -- jQuery user interface for various UI
-  functionality, such as: rubber-band selection, drag & drop
-* ``zxcvbn.js`` -- password strength verification library (including
-  dictionary table)
-* ``exif.js`` -- library that we use to read the EXIF flags from
-  images prior to client side thumbnail creation
+* ``aesasm.js`` -- general-purpose cryptographic library
+* ``rsaasm.js`` -- general-purpose cryptographic library
+* ``sjcl.js`` -- Stanford Javascript Crypto Library.
+  This is a modified version with some minor changes, see c211e4ce and de5c3dce
+
+See [js/vendor/README.md](https://github.com/meganz/webclient/blob/master/js/vendor/README.md) for more.

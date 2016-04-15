@@ -219,7 +219,6 @@ var ConversationsList = React.createClass({
             'className': "nw-conversations-item current-calling",
             'data-jid': ''
         };
-        var callName;
 
         var megaChat = this.props.megaChat;
 
@@ -232,7 +231,6 @@ var ConversationsList = React.createClass({
             if (user) {
                 currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
                 currentCallingContactStatusProps['data-jid'] = room.roomJid;
-                callName = room.getRoomTitle();
 
                 if (room.roomJid == megaChat.currentlyOpenedChat) {
                     currentCallingContactStatusProps.className += " selected";
@@ -444,9 +442,11 @@ var ConversationsApp = React.createClass({
                         <div className="fm-empty-messages-bg"></div>
                         <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
                         <div className="fm-not-logged-text">
-                            <div className="fm-not-logged-description">
-                                Login or create an account to <span className="red">get 50GB FREE</span> and get messages from your friends and coworkers.
-                            </div>
+                            <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
+                                __html: __(l[8634])
+                                    .replace("[S]", "<span className='red'>")
+                                    .replace("[/S]", "</span>")
+                            }}></div>
                             <div className="fm-not-logged-button login">
                                 {__(l[193])}
                             </div>

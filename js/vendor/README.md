@@ -41,9 +41,9 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/aaronpowell/db.js/compare/master...meganz:master)
 
 ---
-[dcraw.js]: Dave Coffin's raw photo decoder.
+[dcraw.js]: Dave Coffin's raw photo decoder [dcraw.c](http://www.cybercom.net/~dcoffin/dcraw/) ported to JavaScript using [Emscripten]
 
-> NB: This was ported to JavaScript using Emscripten.
+> NB: To compile from C source, fork the repo and run `build.sh`.
 
 ---
 [es6-shim]: ECMAScript 6 compatibility shims for legacy JavaScript engines.
@@ -127,11 +127,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/jwagner/smartcrop.js/compare/master...meganz:master)
 
 ---
-[version-compare.js]: Compares two software version numbers (e.g. "1.7.1" or "1.2b"). This is used to show whether there is a site or extension update available.
-
-> This is released into the [public domain](https://en.wikipedia.org/wiki/Public_domain_software).
-
----
 [zxcvbn.js]: A realistic password strength estimator.
 
 > NB: We are using a custom, unobfuscated build which was created using:
@@ -147,18 +142,29 @@ Unless otherwise noted, they were released under a [MIT License].
 > Use output in compiled.js
 > ```
 
+---
+[chat/strophe.light.js]: Strophe.js is an XMPP library for JavaScript.
+
+> NB: We are using a custom build which was created using:
+> 
+> ```bash
+> git clone https://github.com/strophe/strophejs.git
+> cd strophejs
+> git checkout 30033f05eded0bb079e8c06a75045f195068d896
+> npm install
+> make strophe.light.js
+> ```
 
 ---
----
-
 
 [MIT License]: <https://opensource.org/licenses/MIT>
+[Emscripten]: <http://emscripten.org/>
 [asmcrypto.js]: <https://github.com/vibornoff/asmcrypto.js/tree/v0.0.10>
 [autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
-[dcraw.js]: <http://www.cybercom.net/~dcoffin/dcraw/>
+[dcraw.js]: <https://github.com/meganz/dcraw.js>
 [es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
@@ -180,5 +186,5 @@ Unless otherwise noted, they were released under a [MIT License].
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
-[version-compare.js]: <https://gist.github.com/TheDistantSea/8021359>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
+[chat/strophe.light.js]: <https://github.com/strophe/strophejs/tree/30033f05eded0bb079e8c06a75045f195068d896>

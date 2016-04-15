@@ -558,8 +558,10 @@ ClassFile.prototype.run = function(task_done) {
                 if (error === EOVERQUOTA) {
                     dlmanager.logger.warn(this + ' Got EOVERQUOTA, holding...');
                     dlmanager.showOverQuotaDialog(onGetUrlError);
+                    this.dlGetUrlErrors = 0;
                 }
                 else {
+                    dlmanager.dlRetryInterval *= 1.2;
                     this.dl.retry_t = setTimeout(onGetUrlError, dlmanager.dlRetryInterval);
                     dlmanager.logger.warn(this + ' Retry to fetch url in %dms, error:%s',
                                             dlmanager.dlRetryInterval, error);

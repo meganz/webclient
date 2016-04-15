@@ -42,6 +42,9 @@ describe("chat messages unit test", function () {
     };
 
     var dumpMessagesBuffer = function(messagesBuff) {
+        if (!window.d) {
+            return;
+        }
         for(var i = 1; i <= 32; i++) {
             console.debug(
                 'message #' + i + ' is: ' +
@@ -142,7 +145,7 @@ describe("chat messages unit test", function () {
         }
         fakeChatInt.chatd.trigger("onMessagesHistoryDone", {"chatId": fakeChatRoom.chatId});
 
-        
+
         //messagesBuff.messages.forEach(function(v) {
         //    console.error(v.messageId, v.orderValue, v.delay);
         //})
@@ -203,7 +206,7 @@ describe("chat messages unit test", function () {
             var messagesBuff = createNewMessagesBuff();
             messagesBuff.markAllAsSeen();
             dumpMessagesBuffer(messagesBuff);
-            console.error(messagesBuff.lastSeen, messagesBuff.lastDelivered);
+            // console.error(messagesBuff.lastSeen, messagesBuff.lastDelivered);
             assert.strictEqual(messagesBuff.lastSeen, "messageId31");
             assert.strictEqual(messagesBuff.lastDelivered, "messageId31");
         });

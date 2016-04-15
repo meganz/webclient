@@ -467,62 +467,25 @@ var strongvelope = {};
         return parsedContent;
     };
 
-
     /**
-     * An object containing a participant's secret key information. One of these
-     * objects is used per participant. Each element within is indexed by the
-     * participant's sender keyId, referencing a value of the symmetric sender
-     * key.
+     * Utility functions to pack a 16bit number in little endian.
      *
-     * @typedef {Object} ParticipantKeys
+     * @method
+     * @param x {Number}
+     *     Number to pack
+     * @returns {String}
+     *     Byte array of the number packed in little endian.
      */
+    strongvelope.pack16le = function(x) {
+        var r = '';
 
+        for (var i = 2; i--; ) {
+            r += String.fromCharCode(x & 255);
+            x >>>= 8;
+        }
 
-    /**
-     * An object containing data of a successfully decrypted message..
-     *
-     * @typedef {Object} StrongvelopeMessage
-     * @property {String} sender
-     *     Sender user handle.
-     * @property {Number} type
-     *     Type of message.
-     * @property {String} payload
-     *     Message content/payload.
-     * @property {String} toSend
-     *     An optional element, containing a "blind" management message (no
-     *     payload) to a recipient containing our current sender key. This
-     *     message will contain the current sender key only (as it may leak a
-     *     previous key to new group chat participants).
-     * @property {Array.<String>} includeParticipants
-     *     Participants to include (as of now participants of group chat).
-     *     Only contains elements if the message `type` is
-     *     `strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS`.
-     * @property {Array.<String>} excludeParticipants
-     *     Participants to exclude (as of now not participants of group chat
-     *     anymore). Only contains elements if the message `type` is
-     *     `strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS`.
-     */
-
-
-    /**
-     * An object containing a chat message as received from chatd.
-     *
-     * @typedef {Object} ChatdMessage
-     * @property {String} chatId
-     *     Unique ID of the chat. (Base64 URL encoded 64-bit value.)
-     * @property {Number} id
-     *     XXX What ID is this?
-     * @property {String} messageId
-     *     Unique ID of the individual message within the chat. (Base64 URL
-     *     encoded 64-bit value.)
-     * @property {String} userId
-     *     User handle of the sender.
-     * @property {Number} ts
-     *     UNIX epoch time stamp as an integer in seconds.
-     * @property {String} message
-     *     Message payload (encrypted).
-     */
-
+        return r;
+    };
 
     /**
      * Manages keys, encryption and message encoding.
@@ -1576,7 +1539,7 @@ var strongvelope = {};
             }
             var signedKey = self._signContent(tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS), encryptedKeys));
             signedKey = String.fromCharCode(PROTOCOL_VERSION) + signedKey;
-            keys += (base64urldecode(destination) + self.pack16le(signedKey.length) + signedKey);
+            keys += (base64urldecode(destination) + ns.pack16le(signedKey.length) + signedKey);
         });
         if (keyEncryptionError === true) {
             return false;
@@ -1659,25 +1622,5 @@ var strongvelope = {};
                 return false;
             }
         }
-    };
-
-    /**
-     * Utility functions to pack a 16bit number in little endian.
-     *
-     * @method
-     * @param x {Number}
-     *     Number to pack
-     * @returns {String}
-     *     Byte array of the number packed in little endian.
-     */
-    strongvelope.ProtocolHandler.prototype.pack16le = function(x) {
-        var r = '';
-
-        for (var i = 2; i--; ) {
-            r += String.fromCharCode(x & 255);
-            x >>>= 8;
-        }
-
-        return r;
     };
 }());

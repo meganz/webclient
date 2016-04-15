@@ -471,8 +471,8 @@ input[type="checkbox"] {
     -moz-opacity: 0;
     -khtml-opacity: 0;
     -moz-appearance: none;
-    width: 21px;
-    height: 21px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
 }
 .checkboxOn {
@@ -491,36 +491,61 @@ input[type="checkbox"] {
     float: left;
     cursor: pointer;
 }
-.download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .firefox-dialog .checkboxOff {
-    width: 21px;
-    height: 21px;
-    background-position: left -8514px;
-    background-image: url(../images/mega/main-sprite.png?v=7);
-    background-repeat: no-repeat;
+.checkboxOn, .checkboxOff {
+    width: 16px;
+    height: 16px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
     float: left;
     cursor: pointer;
-    margin: 0 0 0 0;
-    margin: 5px 11px 0 0;
+    background-color: white;
+    margin: 8px 11px 0 0;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    position: relative;
 }
-.download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .firefox-dialog .checkboxOn {
-    width: 21px;
-    height: 21px;
-    background-position: left -8554px;
+.checkboxOn::before, .checkboxOff::before, .checkboxOn::after, .checkboxOff::after {
+    position: absolute;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    width: 16px;
+    height: 16px;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    display: block;
+    content: "";
+}
+.checkboxOn::after, .checkboxOff::after {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    width: 12px;
+    height: 12px;
+    margin: 2.5px;
+}
+.checkboxOn::after {
+    background-position: -2px -8557px;
     background-image: url(../images/mega/main-sprite.png?v=7);
     background-repeat: no-repeat;
-    float: left;
-    cursor: pointer;
-    margin: 0 0 0 0;
-    margin: 5px 11px 0 0;
 }
 .fm-dialog .checkboxOff, .fm-dialog .checkboxOn {
-    margin: 17px 11px 0 6px;
+    margin: 20px 12px 0 7px;
 }
 .top-login-popup .checkboxOn, .top-login-popup .checkboxOff {
+    margin: 15px 12px 0 1px;
+}
+.top-login-popup .loginwarning-checkbox {
     margin: 12px 11px 0 0;
 }
 .new-registration-checkbox .checkboxOn, .new-registration-checkbox .checkboxOff {
-    margin: 0 11px 20px 0;
+    margin: 4px 11px 20px 1px;
 }
 .new-registration-checkbox .register-st2-button {
     float: right;
@@ -544,14 +569,14 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 .fm-dialog .radio-txt, .top-login-popup .radio-txt {
-    padding-top: 19px;
+    padding-top: 18px;
 }
 .top-login-popup .radio-txt {
-    padding-top: 14px;
+    padding-top: 13px;
     font-size: 13px;
 }
 .new-registration-checkbox .radio-txt {
-    padding-top: 3px;
+    padding-top: 2px;
 }
 .radio-txt a {
     color: #D62600;
@@ -1269,10 +1294,10 @@ input.radioOn, input.radioOff {
 .radio-txt {
     float: left;
     font-size: 13px;
-    line-height: 17px;
+    line-height: 20px;
     color: #666666;
     padding-right: 25px;
-    padding-top: 7px;
+    padding-top: 6px;
 }
 .fm-account-overview {
     padding: 0 48px 36px 12px;
@@ -11480,6 +11505,9 @@ table {
     line-height: 22px;
     color: #D90007;
 }
+.expiry a {
+    color: #D90007;
+}
 .fm-account-save-block {
     position: absolute;
     bottom: 0;
@@ -12806,6 +12834,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-position: -2px -392px;
     background-repeat: no-repeat;
     background-size: auto;
+    background-color: transparent;
+    width: 21px;
+    height: 21px;
+}
+.top-login-popup .top-login-warning-bott .checkboxOn::before, .top-login-popup .top-login-warning-bott .checkboxOff::before, .top-login-popup .top-login-warning-bott .checkboxOn::after, .top-login-popup .top-login-warning-bott .checkboxOff::after {
+    display: none;
 }
 .top-login-popup .top-login-warning-bott .checkboxOn {
     background-position: -2px -442px;
@@ -13374,7 +13408,7 @@ h5.main-italic-header {
     float: none;
     margin: 0 0 0 25px;
     display: block;
-    padding: 1px 0;
+    padding: 0;
     color: #3F3F3F;
     margin-bottom: 17px;
 }
@@ -17475,7 +17509,7 @@ a.contact-new-button:hover {
     margin-top: 5px;
 }
 .dev-new-app-right-block .radio-txt {
-    padding-top: 6px;
+    padding-top: 5px;
 }
 .dev-new-app-right-block .reg-st5-complete-button.active {
     min-width: 100px;
@@ -17636,7 +17670,7 @@ p.copyrights-red {
     padding: 48px 20px 46px 20px;
 }
 .copyrights-bottom .new-registration-checkbox .checkboxOn, .copyrights-bottom .new-registration-checkbox .checkboxOff {
-    margin: 2px 0 0 0;
+    margin: 4px 1px 0 0;
 }
 .copyrights-bottom .new-registration-checkbox .radio-txt {
     margin: -1px 0 0 35px;
@@ -21887,8 +21921,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     background-image: url(../images/mega/dialogs-sprite_v6.svg);
     background-position: 0 -4112px;
     background-size: auto;
-    margin: -2px 0 1px -42px;
     cursor: pointer;
+    margin: -1px 0 1px -41px;
+    cursor: pointer;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    width: 21px;
+    height: 21px;
+    background-color: transparent;
+}
+.feedback-label-txt div.checkboxOn::before, .feedback-label-txt .checkboxOff::before, .feedback-label-txt div.checkboxOn::after, .feedback-label-txt .checkboxOff::after {
+    display: none;
 }
 .feedback-label-txt .checkboxOff {
     background-position: 0 -4060px;

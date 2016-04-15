@@ -17,33 +17,9 @@
 <link rel="stylesheet" type="text/css" href="../../css/chat-left-pane.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-feedback.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-common.css" />
-<script type="text/javascript" src="../../js/vendor/jquery-2.2.1.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {  
-    
-	$('.not-sent-indicator').bind('mouseover', function() {
-        var $this = $(this),
-              $notification = $('.not-sent-notification'), 
-              iconTopPos,
-              iconLeftPos,
-              notificatonWidth,
-              notificatonHeight;
-              
-        $notification.removeClass('hidden');      
-        iconTopPos = $this.offset().top,
-        iconLeftPos = $this.offset().left,
-        notificatonWidth = $notification.outerWidth()/2 - 10,
-        notificatonHeight = $notification.outerHeight() + 10;
-        $notification.offset({ top: iconTopPos - notificatonHeight, left: iconLeftPos - notificatonWidth});
-    });
-    
-    $('.not-sent-indicator').bind('mouseout', function() {
-        var $notification = $('.not-sent-notification');
-        $notification.addClass('hidden').removeAttr('style');
-    });
-	
-});
-</script>
+<link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+<link rel="stylesheet" type="text/css" href="../../css/media-print.css" />
+<link rel="stylesheet" type="text/css" href="../../css/rtl.css" />
 </head>
 
 <body>
@@ -131,7 +107,7 @@ $(document).ready(function() {
                         <div class="contacts-info body">
                             <!-- Please add "online/away/busy/offline" classname !-->
                             <div class="user-card-presence online"></div>
-                            <div class="small-rounded-avatar color6"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
+                            <div class="small-rounded-avatar color6">B</div>
                             
                             <div class="default-white-button tiny-button">
                                 <i class="tiny-icon grey-down-arrow"></i>
@@ -181,18 +157,7 @@ $(document).ready(function() {
             </div>
             <!-- End of Right contacts block !-->
             
-            
-            <!-- "Not-sent" notification !-->
-            <div class="dropdown body dropdown-arrow down-arrow not-sent-notification hidden">
-                <i class="dropdown-white-arrow"></i>
-                <div class="dropdown notification-text">
-                    <i class="small-icon conversations"></i>
-                    Message not sent. Retrying...
-                </div>                            
-            </div>
-            <!-- End of "Not-sent" notification !-->
-            
-            
+        
             <!-- Messages component !-->
             <div class="messages-block">
             	
@@ -200,55 +165,37 @@ $(document).ready(function() {
                 	<div class="messages main-pad">
                     	<div class="messages content-area">
                             
-                            <!-- Message block. Please add "not-sent" classname !-->
-                            <div class="message body not-sent">
-                                <div class="message small-rounded-avatar color2"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
+                            <!-- Message DateDivider !-->
+                            <div class="message date-divider">
+                            	Today
+                            </div>
+                            
+                            <!-- Message block !-->
+                            <div class="message body">
+                                <div class="message small-rounded-avatar color6">B</div>
                                 <div class="message content-area">
-                                	<div class="message user-card-name">Me</div>
+                                    
+                                    <div class="message user-card-name">Me</div>
                                     <div class="message date-time">12:35 AM</div>
                                     
                                     <div class="default-white-button tiny-button">
                         				<i class="tiny-icon grey-down-arrow"></i>
                        				 </div>
-                                     
-                                    <div class="message text-block">
-                                        You are now our ruler, <br />so you must come back to us as soon as possible.
-                                    </div>
                                     
-                                    <div class="buttons-block">
-                                        <div class="message circuit-label left">
-                                            Message not sent
-                                        </div>
-                                        <div class="default-white-button right">
-                                                Retry
-                                        </div>
-                                        <div class="default-white-button right red">
-                                                Delete message
-                                        </div>
-                                        <div class="clear"></div>
+                                    <div class="message text-block">
+                                      <!-- Delete message notificqation !-->
+                                      <em>
+                                          <span class="dropdown body notification dropdown-arrow down-arrow">
+                                              <i class="dropdown-white-arrow"></i>
+                                              Encrypted original versions of edited or deleted messages continue to exist on the server but are not displayed.
+                                          </span>
+                                          This message has been deleted
+                                      </em>
+                                      <!-- End of Delete message notificqation !-->
                                     </div>
                                     
                                 </div>
                             </div>
-                            
-                            <!-- Message block. Please add "not-sent retrying" classnames !-->
-                            <div class="message body not-sent retrying">
-                                <div class="message small-rounded-avatar color2"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
-                                <div class="message content-area">
-                                	<div class="message user-card-name">Me</div>
-                                    <div class="message date-time">12:35 AM</div>
-                                    
-                                    <div class="not-sent-indicator">
-                                        <i class="small-icon yellow-triangle"></i>
-                                    </div>
-                                    
-                                    <div class="message text-block">
-                                        You are now our ruler, <br />so you must come back to us as soon as possible.
-                                    </div>
-                                    
-                                </div>
-                            </div>
-                            
                        
                        </div> 
                     </div>

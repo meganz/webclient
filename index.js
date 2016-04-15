@@ -822,12 +822,6 @@ function init_page() {
             if (!m && $('#fmholder').html() == '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
-            if (pfid) {
-                $('.fm-left-menu .folderlink').removeClass('hidden');
-                $('.fm-tree-header.cloud-drive-item span').text(l[808]);
-                $('.fm-tree-header').not('.cloud-drive-item').hide();
-                $('.fm-menu-item').hide();
-            }
         }
         else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
             M.openFolder(id);

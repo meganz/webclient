@@ -35,10 +35,6 @@ body.pro:after {
     background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
     background-size: 276px auto;
 }
-.fm-share-empty {
-    background-image: url(../images/mega/share-folder@2x.png?v=1);
-    background-size: 200px auto;
-}
 .sync-top-logo, .sync-short-block li, .sync-help-center {
     background-image: url(../images/mega/sync-nw-v3@2x.png);
     background-size: 168px auto;
@@ -329,10 +325,6 @@ body.pro:after {
     background-image: url(../images/mega/register-info@2x.png);
     background-size: 120px auto;
 }
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .checkboxOn::after, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contacts-sorting-by.active, .contacts-sorting-type.active, .fm-version-select, .active .fm-dialog-input-clear, .fm-share-add-contacts, .fm-share-pointer, .fm-share-contacts-search, .fm-share-dropdown, .fm-share-permissions-block, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
-    background-image: url(../images/mega/main-sprite@2x.png?v=7);
-    background-size: 50px auto;
-}
 .nlanguage-tooltip-bg, .nlanguage-bottom {
     background-image: url(../images/mega/language-sprite@2x.png);
     background-size: 18px auto;
@@ -349,8 +341,8 @@ body.pro:after {
     background-image: url(../images/mega/rounded-progressbars@2x.png);
     background-size: 64px auto;
 }
-.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password {
-    background-image: url(../images/mega/top-login-sprite@2x_v4.png);
+.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .contains-value .top-search-clear, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow {
+    background-image: url(../images/mega/top-login-sprite_v5@2x.png);
     background-size: 48px auto;
 }
 .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .toast-icon {

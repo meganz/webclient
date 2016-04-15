@@ -980,7 +980,7 @@ Chatd.prototype.pack32le = function(x) {
 
     for (var i = 4; i--; ) {
         r += String.fromCharCode(x & 255);
-        x >>= 8;
+        x >>>= 8;
     }
 
     return r;
@@ -990,7 +990,7 @@ Chatd.prototype.unpack32le = function(x) {
     var r = 0;
 
     for (var i = 4; i--; ) {
-        r = (r << 8)+x.charCodeAt(i);
+        r = ((r << 8) >>>0 )+x.charCodeAt(i);
     }
 
     return r;
@@ -1001,7 +1001,7 @@ Chatd.prototype.pack16le = function(x) {
 
     for (var i = 2; i--; ) {
         r += String.fromCharCode(x & 255);
-        x >>= 8;
+        x >>>= 8;
     }
 
     return r;
@@ -1011,7 +1011,7 @@ Chatd.prototype.unpack16le = function(x) {
     var r = 0;
 
     for (var i = 2; i--; ) {
-        r = (r << 8)+x.charCodeAt(i);
+        r = ((r << 8) >>> 0 )+x.charCodeAt(i);
     }
 
     return r;

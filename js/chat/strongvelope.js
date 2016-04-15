@@ -29,9 +29,6 @@ var strongvelope = {};
     strongvelope.IV_SIZE = 16;
     var IV_SIZE = strongvelope.IV_SIZE;
 
-    // Epoch time stamp granularity from Date.now().
-    var _ONE_DAY = 1000 * 24 * 60 * 60;
-
     // Size in bytes of a key ID.
     var _KEY_ID_SIZE_V0 = 4;
     var _KEY_ID_SIZE_V1 = 8;
@@ -1526,23 +1523,25 @@ var strongvelope = {};
         }
     };
 
+    /**
+     * Get the current keyId.
+     *
+     * @method
+     * @returns {Number}
+     *     Current key Id.
+     */
     strongvelope.ProtocolHandler.prototype.getKeyId = function() {
 
         return str_to_a32(this.keyId)[0];
     };
 
-    // utility functions
-    strongvelope.ProtocolHandler.prototype.pack16le = function(x) {
-        var r = '';
-
-        for (var i = 2; i--; ) {
-            r += String.fromCharCode(x & 255);
-            x >>= 8;
-        }
-
-        return r;
-    };
-
+    /**
+     * Get the assembled key blob.
+     *
+     * @method
+     * @returns {String}
+     *     Byte array of the key blob.
+     */
     strongvelope.ProtocolHandler.prototype.getKeyBlob = function() { 
         var self = this;
 
@@ -1585,11 +1584,29 @@ var strongvelope = {};
         return keys;
     };
 
+    /**
+     * Set the assigned key Id from chatd based on the temporary key Id.
+     *
+     * @method
+     * @param keyxId {Number}
+     *     Temporary key Id.
+     * @param keyId {Number}
+     *     Assigned key Id by chatd.
+     * Note: After it sets the new key Id, it still keeps the old key Id and its keys, the reason is that,
+     *       there is a possibility that message edit happens after key is confirmed but before message is confirmed,
+     *       then it will still need the old temporary key Ids.
+     *       It should be fine as it can tolerate up to 2^16 temporary key Ids.
+     */
     strongvelope.ProtocolHandler.prototype.setKeyID = function(keyxId, keyId) {
 
-        if (keyxId & TEMPKEYIDFLAG !== TEMPKEYIDFLAG) {
-            logger.critical('Temporary key ID is not correct');
+        var keyIdFlag = TEMPKEYIDFLAG >>> 0;
+        if (((keyxId & keyIdFlag) >>> 0 ) !== keyIdFlag) {
+            logger.critical('Temporary key ID is not correct.');
         }
+        if (((keyId & keyIdFlag) >>> 0 ) === keyIdFlag) {
+            logger.critical('Key ID is exceeding threshold.');
+        }
+
         var tempkeyid = a32_to_str([keyxId]);
         var newkeyid = a32_to_str([keyId]);
 
@@ -1601,6 +1618,15 @@ var strongvelope = {};
         this._sentKeyId = newkeyid;
     };
 
+    /**
+     * Seed the keys from chatd so it can be used for history message decryption.
+     *
+     * @method
+     * @param keys {Array}
+     *     Key arrary from chatd.
+     * @returns {Boolean}
+     *     True if no errors and False if error happened.
+     */
     strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) { 
         for (var i=0; i<keys.length;i++) {
 
@@ -1633,5 +1659,25 @@ var strongvelope = {};
                 return false;
             }
         }
+    };
+
+    /**
+     * Utility functions to pack a 16bit number in little endian.
+     *
+     * @method
+     * @param x {Number}
+     *     Number to pack
+     * @returns {String}
+     *     Byte array of the number packed in little endian.
+     */
+    strongvelope.ProtocolHandler.prototype.pack16le = function(x) {
+        var r = '';
+
+        for (var i = 2; i--; ) {
+            r += String.fromCharCode(x & 255);
+            x >>= 8;
+        }
+
+        return r;
     };
 }());

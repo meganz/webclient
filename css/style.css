@@ -13069,9 +13069,13 @@ h5.main-italic-header {
     top: 0;
     text-align: center;
 }
-.top-dialog-login-button.loading img {
+.top-dialog-login-button.loading .loading-gif {
+    background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader.gif") no-repeat scroll 0 0 / 16px 16px;
+    box-shadow: none;
+    display: inline;
+    height: 16px;
+    padding: 0 8px;
     width: 16px;
-    margin: 7px 0 0 0;
 }
 .login-register-input input {
     border: 0;

@@ -8456,6 +8456,8 @@ function closeDialog() {
 
 function copyDialog() {
 
+    var copyDialogTooltipTimer;
+
     // Clears already selected sub-folders, and set selection to root
     function selectCopyDialogTabRoot(section) {
 
@@ -8693,6 +8695,49 @@ function copyDialog() {
         }
     });
 
+    $('.copy-dialog .shared-with-me').off('mouseover', '.nw-fm-tree-item');
+    $('.copy-dialog .shared-with-me').on('mouseover', '.nw-fm-tree-item', function() {
+
+        var $item = $(this).find('.nw-fm-tree-folder');
+        var itemLeftPos = $item.offset().left;
+        var itemTopPos = $item.offset().top;
+        var $tooltip = $('.contact-preview');
+        var sharedNodeHandle = $(this).attr('id').replace('mctreea_', '');
+        var ownerHandle = M.d[sharedNodeHandle].u;
+        var ownerEmail = M.u[ownerHandle].m;
+        var ownerName = M.u[ownerHandle].name;
+
+        // Not allowing undefined to be shown like owner name
+        if (typeof ownerName === 'undefined') {
+            ownerName = '';
+        }
+
+        var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') + '\n\
+            <div class="user-card-data no-status">\n\
+                <div class="user-card-email small">' + htmlentities(ownerEmail) + '</div>\n\
+                <div class="user-card-name small">' + htmlentities(ownerName) + ' <span class="grey">(' + l[8664] + ')</span></div>\n\
+            </div>';
+
+        $tooltip.find('.contacts-info.body').safeHTML(html);
+
+        copyDialogTooltipTimer = setTimeout(function () {
+            $tooltip.css({
+                'left': itemLeftPos + (($item.outerWidth() / 2) - ($tooltip.outerWidth() / 2))  + 'px',
+                'top': (itemTopPos - 63) + 'px'
+            });
+            $tooltip.fadeIn(200);
+        }, 1000);
+    });
+
+    $('.copy-dialog .shared-with-me').off('mouseout', '.nw-fm-tree-item');
+    $('.copy-dialog .shared-with-me').on('mouseout', '.nw-fm-tree-item', function() {
+
+        var $tooltip = $('.contact-preview');
+
+        clearTimeout(copyDialogTooltipTimer);
+        $tooltip.fadeOut(200);
+    });
+
     // Handle conversations tab item selection
     $('.copy-dialog').off('click', '.nw-conversations-item');
     $('.copy-dialog').on('click', '.nw-conversations-item', function() {
@@ -8753,6 +8798,8 @@ function copyDialog() {
 }
 
 function moveDialog() {
+
+    var moveDialogTooltipTimer;
 
     // Clears already selected sub-folders, and set selection to root
     function selectMoveDialogTabRoot(section) {
@@ -8975,38 +9022,47 @@ function moveDialog() {
             $btn.addClass('disabled');
         }
     });
-    
+
     $('.move-dialog .shared-with-me').off('mouseover', '.nw-fm-tree-item');
-    $('.move-dialog .shared-with-me').on('mouseover', '.nw-fm-tree-item', function(e) {
+    $('.move-dialog .shared-with-me').on('mouseover', '.nw-fm-tree-item', function() {
+
         var $item = $(this).find('.nw-fm-tree-folder');
         var itemLeftPos = $item.offset().left;
         var itemTopPos = $item.offset().top;
         var $tooltip = $('.contact-preview');
-        var tooltipWidth = 0;
-        var html = '<div class="small-rounded-avatar color6">\n\
-                <div class="avatar-letter">A</div>\n\
-            </div>\n\
+        var sharedNodeHandle = $(this).attr('id').replace('mctreea_', '');
+        var ownerHandle = M.d[sharedNodeHandle].u;
+        var ownerEmail = M.u[ownerHandle].m;
+        var ownerName = M.u[ownerHandle].name;
+
+        // Not allowing undefined to be shown like owner name
+        if (typeof ownerName === 'undefined') {
+            ownerName = '';
+        }
+
+        var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') + '\n\
             <div class="user-card-data no-status">\n\
-                <div class="user-card-name small">Andrei Dymovich <span class="grey">(owner)</span></div>\n\
-                <div class="user-card-email small">ad@mega.nz</div>\n\
+                <div class="user-card-email small">' + htmlentities(ownerEmail) + '</div>\n\
+                <div class="user-card-name small">' + htmlentities(ownerName) + ' <span class="grey">(' + l[8664] + ')</span></div>\n\
             </div>';
 
         $tooltip.find('.contacts-info.body').safeHTML(html);
         
-        tooltipWidth = $tooltip.outerWidth();
-        timer = setTimeout(function () {
+        moveDialogTooltipTimer = setTimeout(function () {
             $tooltip.css({
-                'left': itemLeftPos + ($item.outerWidth()/2 - $tooltip.outerWidth()/2)  + 'px',
-                'top': itemTopPos - 63 + 'px'
+                'left': itemLeftPos + (($item.outerWidth() / 2) - ($tooltip.outerWidth() / 2))  + 'px',
+                'top': (itemTopPos - 63) + 'px'
             });
             $tooltip.fadeIn(200);
         }, 1000);
     });
 
     $('.move-dialog .shared-with-me').off('mouseout', '.nw-fm-tree-item');
-    $('.move-dialog .shared-with-me').on('mouseout', '.nw-fm-tree-item', function(e) {
+    $('.move-dialog .shared-with-me').on('mouseout', '.nw-fm-tree-item', function() {
+
         var $tooltip = $('.contact-preview');
-        clearTimeout(timer);
+
+        clearTimeout(moveDialogTooltipTimer);
         $tooltip.fadeOut(200);
     });
 

@@ -24110,11 +24110,16 @@ a.ui-datepicker-next {
     text-align: center;
 }
 .megasync-img1 {
+    background: rgba(0, 0, 0, 0) url("../images/mega/megasync-img01.png") no-repeat scroll 0 0 / 402px 278px;
+    height: 278px;
     width: 402px;
+    margin: 0 auto;
 }
 .megasync-img2 {
-    width: 399px;
+    background: rgba(0, 0, 0, 0) url("../images/mega/megasync-img02.png") no-repeat scroll 0 0 / 399px 256px;
+    height: 256px;
     margin: 0 0 0 40px;
+    width: 399px;
 }
 .megasync-info-txt {
     position: absolute;

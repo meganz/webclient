@@ -1675,7 +1675,7 @@ var strongvelope = {};
 
         for (var i = 2; i--; ) {
             r += String.fromCharCode(x & 255);
-            x >>= 8;
+            x >>>= 8;
         }
 
         return r;

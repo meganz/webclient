@@ -4678,12 +4678,16 @@ function MegaData()
                  * there is network activity associated with the download, though.
                  */
                 if (page === 'download') {
-                    $('.download.error-icon').text(errorstr);
-                    $('.download.error-icon').removeClass('hidden');
-                    $('.download.icons-block').addClass('hidden');
-
                     if (error === EOVERQUOTA) {
+                        $('.download-info.time-txt .text').text('');
+                        $('.download-info.speed-txt .text').text('');
+                        $('.download.pause-button').addClass('active');
                         $('.download.info-block').addClass('overquota');
+                    }
+                    else {
+                        $('.download.error-icon').text(errorstr);
+                        $('.download.error-icon').removeClass('hidden');
+                        $('.download.icons-block').addClass('hidden');
                     }
                 }
                 else {

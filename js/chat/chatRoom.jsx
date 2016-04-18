@@ -90,7 +90,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
     // Events
     this.bind('onStateChange', function(e, oldState, newState) {
-        self.logger.warn("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
+        self.logger.error("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 
         var resetStateToReady = function() {
             if (self.state != ChatRoom.STATE.LEFT && self.state != ChatRoom.STATE.READY) {
@@ -1509,7 +1509,7 @@ ChatRoom.prototype._clearChatMessagesFromChatd = function() {
 };
 
 ChatRoom.prototype.isReadOnly = function() {
-    return this.members && this.members[u_handle] === 0;
+    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat;
 };
 ChatRoom.prototype.iAmOperator = function() {
     return this.type === "private" || this.members && this.members[u_handle] === 3;

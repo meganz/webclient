@@ -85,7 +85,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
             if (resp instanceof MegaPromise) {
                 if (resp.state() === 'rejected') {
-                    console.error("openChat failed. Maybe tried to start a private chat with a non contact?");
+                    console.warn("openChat failed. Maybe tried to start a private chat with a non contact?");
                     return;
                 }
             }
@@ -1310,7 +1310,7 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
         var allValid = true;
         jids.forEach(function(jid) {
             var contact = self.getContactFromJid(jid);
-            if (!contact || (contact.c !== 1 && contact.c !== 2)) {
+            if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
                 allValid = false;
                 return false;
             }

@@ -947,6 +947,10 @@ function fm_tfsresume(gid) {
                     && $('.download.info-block').hasClass('overquota')
                     || $tr.find('span.transfer-status').hasClass('overquota')) {
 
+                if (page === 'download') {
+                    $('.download.pause-button').addClass('active');
+                }
+
                 return dlmanager.showOverQuotaDialog();
             }
             dlQueue.resume(gid);

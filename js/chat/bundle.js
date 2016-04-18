@@ -6033,7 +6033,7 @@
 	  return element;
 	};
 
-	ReactElement.createElement = function (type, config, children) {
+	ReactElement.makeElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -6084,7 +6084,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.createElement.bind(null, type);
+	  var factory = ReactElement.makeElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -9131,7 +9131,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.createElement(component);
+	    placeholderElement = ReactElement.makeElement(component);
 	  }
 	};
 
@@ -19619,12 +19619,12 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.createElement;
+	var createElement = ReactElement.makeElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
 	if (false) {
-	  createElement = ReactElementValidator.createElement;
+	  createElement = ReactElementValidator.makeElement;
 	  createFactory = ReactElementValidator.createFactory;
 	  cloneElement = ReactElementValidator.cloneElement;
 	}
@@ -20077,7 +20077,7 @@
 	    // succeed and there will likely be errors in render.
 	     false ? warning(validType, 'React.makeElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : undefined;
 
-	    var element = ReactElement.createElement.apply(this, arguments);
+	    var element = ReactElement.makeElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -20102,7 +20102,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -21235,6 +21235,16 @@
 	        } else {
 	            return null;
 	        }
+	    },
+	    safeForceUpdate: function() {
+	        var self = this;
+	        try {
+	            setTimeout(function() {
+	                self.forceUpdate();
+	            }, 75);
+	        } catch(e) {
+	            console.warn(e);
+	        }
 	    }
 	};
 
@@ -21978,7 +21988,7 @@
 
 	            crypt.getPubEd25519(contact.u).done(function () {
 	                if (self.isMounted()) {
-	                    self.forceUpdate();
+	                    self.safeForceUpdate();
 	                }
 	            });
 	        }
@@ -22009,6 +22019,10 @@
 	        var self = this;
 	        var contact = this.props.contact;
 
+	        if (!contact.m && contact.email) {
+	            contact.m = contact.email;
+	        }
+
 	        var $avatar = $(useravatar.contact(contact));
 
 	        var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
@@ -22023,46 +22037,7 @@
 	            verifiedElement = React.makeElement(ContactVerified, { contact: this.props.contact, className: this.props.verifiedClassName });
 	        }
 
-	        if ($avatar.find("img").length > 0) {
-	            displayedAvatar = React.makeElement(
-	                "div",
-	                { className: classes, style: this.props.style },
-	                verifiedElement,
-	                React.makeElement("img", { src: $("img", $avatar).attr("src"), style: this.props.imgStyles })
-	            );
-	        } else {
-	            var tempClasses = $avatar.attr('class');
-	            var colorNum = tempClasses.split("color")[1].split(" ")[0];
-	            classes += " color" + colorNum;
-
-	            displayedAvatar = React.makeElement(
-	                "div",
-	                { className: classes, style: this.props.style },
-	                verifiedElement,
-	                React.makeElement("div", { className: letterClass, "data-user-letter": $(useravatar.contact(contact)).text() })
-	            );
-	        }
-
-	        return displayedAvatar;
-	    }
-	});
-
-	var AvatarImage = React.createClass({
-	    displayName: "AvatarImage",
-
-	    mixins: [MegaRenderMixin, RenderDebugger],
-	    render: function render() {
-	        var contact = this.props.contact;
-
-	        var imgUrl = useravatar.imgUrl(contact.u);
-
-	        var displayedAvatar;
-
-	        displayedAvatar = React.makeElement("img", { src: imgUrl, style: this.props.imgStyles, className: "avatar-img" });
-
 	        if (!avatars[contact.u] && (!_noAvatars[contact.u] || _noAvatars[contact.u] !== true)) {
-	            var self = this;
-
 	            var loadAvatarPromise;
 	            if (!_noAvatars[contact.u]) {
 	                loadAvatarPromise = mega.attr.get(contact.u, 'a', true, false);
@@ -22083,10 +22058,30 @@
 
 	                delete _noAvatars[contact.u];
 
-	                self.forceUpdate();
+	                self.safeForceUpdate();
 	            }).fail(function (e) {
 	                _noAvatars[contact.u] = true;
 	            });
+	        }
+
+	        if ($avatar.find("img").length > 0) {
+	            displayedAvatar = React.makeElement(
+	                "div",
+	                { className: classes, style: this.props.style },
+	                verifiedElement,
+	                React.makeElement("img", { src: $("img", $avatar).attr("src"), style: this.props.imgStyles })
+	            );
+	        } else {
+	            var tempClasses = $avatar.attr('class');
+	            var colorNum = tempClasses.split("color")[1].split(" ")[0];
+	            classes += " color" + colorNum;
+
+	            displayedAvatar = React.makeElement(
+	                "div",
+	                { className: classes, style: this.props.style },
+	                verifiedElement,
+	                React.makeElement("div", { className: letterClass, "data-user-letter": $(useravatar.contact(contact)).text() })
+	            );
 	        }
 
 	        return displayedAvatar;
@@ -22260,8 +22255,7 @@
 	    Avatar: Avatar,
 	    ContactPickerWidget: ContactPickerWidget,
 	    ContactVerified: ContactVerified,
-	    ContactPresence: ContactPresence,
-	    AvatarImage: AvatarImage
+	    ContactPresence: ContactPresence
 	};
 
 /***/ },
@@ -23494,13 +23488,10 @@
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
 
-	                                    if (!src || !src.seen) {
+	                                    if (!src || src !== v) {
 	                                        M.v.push(v);
 	                                        if (!v.seen) {
 	                                            v.seen = 1;
-	                                        }
-	                                        if (src) {
-	                                            src.seen = 1;
 	                                        }
 	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }
@@ -23614,9 +23605,17 @@
 	                            });
 	                        }
 	                        var dropdown = null;
+	                        if (!M.u[contact.u]) {
+	                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+	                                'u': contact.u,
+	                                'name': contact.name,
+	                                'm': contact.email,
+	                                'c': 0
+	                            }));
+	                        }
 	                        if (M.u[contact.u]) {
 
-	                            if (contact.c === 1) {
+	                            if (M.u[contact.u].c === 1) {
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
@@ -23651,40 +23650,40 @@
 	                                        deleteButtonOptional
 	                                    )
 	                                );
-	                            }
-	                        } else {
-	                            dropdown = React.makeElement(
-	                                ButtonsUI.Button,
-	                                {
-	                                    className: "default-white-button tiny-button",
-	                                    icon: "tiny-icon grey-down-arrow" },
-	                                React.makeElement(
-	                                    DropdownsUI.Dropdown,
+	                            } else if (M.u[contact.u].c === 0) {
+	                                dropdown = React.makeElement(
+	                                    ButtonsUI.Button,
 	                                    {
-	                                        className: "white-context-menu shared-contact-dropdown",
-	                                        noArrow: true,
-	                                        positionMy: "left bottom",
-	                                        positionAt: "right bottom",
-	                                        horizOffset: 4
-	                                    },
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
-	                                        icon: "rounded-grey-plus",
-	                                        label: __("Add contact"),
-	                                        onClick: function onClick() {
-	                                            M.inviteContact(M.u[u_handle].m, contactEmail);
+	                                        className: "default-white-button tiny-button",
+	                                        icon: "tiny-icon grey-down-arrow" },
+	                                    React.makeElement(
+	                                        DropdownsUI.Dropdown,
+	                                        {
+	                                            className: "white-context-menu shared-contact-dropdown",
+	                                            noArrow: true,
+	                                            positionMy: "left bottom",
+	                                            positionAt: "right bottom",
+	                                            horizOffset: 4
+	                                        },
+	                                        React.makeElement(DropdownsUI.DropdownItem, {
+	                                            icon: "rounded-grey-plus",
+	                                            label: __("Add contact"),
+	                                            onClick: function onClick() {
+	                                                M.inviteContact(M.u[u_handle].m, contactEmail);
 
-	                                            var title = l[150];
+	                                                var title = l[150];
 
-	                                            var msg = l[5898].replace('[X]', contactEmail);
+	                                                var msg = l[5898].replace('[X]', contactEmail);
 
-	                                            closeDialog();
-	                                            msgDialog('info', title, msg);
-	                                        }
-	                                    }),
-	                                    deleteButtonOptional ? React.makeElement("hr", null) : null,
-	                                    deleteButtonOptional
-	                                )
-	                            );
+	                                                closeDialog();
+	                                                msgDialog('info', title, msg);
+	                                            }
+	                                        }),
+	                                        deleteButtonOptional ? React.makeElement("hr", null) : null,
+	                                        deleteButtonOptional
+	                                    )
+	                                );
+	                            }
 	                        }
 
 	                        contacts.push(React.makeElement(
@@ -23696,7 +23695,7 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
-	                                    htmlentities(mega.utils.fullUsername(contact.u))
+	                                    mega.utils.fullUsername(contact.u)
 	                                ),
 	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
 	                                React.makeElement(

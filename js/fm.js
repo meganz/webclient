@@ -1220,7 +1220,7 @@ function isValidShareLink()
     return valid;
 }
 
-function removeUInode(h) {
+function removeUInode(h, parent) {
 
     var n = M.d[h],
         i = 0;
@@ -1325,7 +1325,8 @@ function removeUInode(h) {
     }
 
     if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
-        M.openFolder(RootbyId(h));
+        parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
+        M.openFolder(parent);
     }
 }
 
@@ -6910,17 +6911,6 @@ function sectionUIopen(id) {
         $('.section').addClass('hidden');
         $('.section.' + id).removeClass('hidden');
     }
-
-
-    if ($.fah_abort_timer) {
-        clearTimeout($.fah_abort_timer);
-    }
-
-    if (id === 'conversations') {
-        $.fah_abort_timer = setTimeout(function() {
-            fa_handler.abort();
-        }, 2000);
-    }
 }
 
 function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
@@ -10633,7 +10623,7 @@ function fm_resize_handler() {
 /*
  * fullUsername
  *
- * @param {String} userHandle
+ * @param {String|Object} userHandle
  * @returns {String} result An first and last user name or email
  */
 mega.utils.fullUsername = function username(userHandle) {
@@ -10646,6 +10636,9 @@ mega.utils.fullUsername = function username(userHandle) {
 
         // Convert to string and escape for XSS
         result = String(result);
+    }
+    else if (typeof userHandle === 'object' && (userHandle.u || userHandle.h) && userHandle.m) {
+        result = userHandle.name && $.trim(userHandle.name) || userHandle.m;
     }
 
     return result;

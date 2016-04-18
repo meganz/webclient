@@ -8685,13 +8685,13 @@ function copyDialog() {
         }
     });
 
-    $('.copy-dialog .shared-with-me').off('mouseover', '.nw-fm-tree-item');
-    $('.copy-dialog .shared-with-me').on('mouseover', '.nw-fm-tree-item', function() {
+    $('.copy-dialog .shared-with-me').off('mouseenter', '.nw-fm-tree-item');
+    $('.copy-dialog .shared-with-me').on('mouseenter', '.nw-fm-tree-item', function() {
 
         var $item = $(this).find('.nw-fm-tree-folder');
         var itemLeftPos = $item.offset().left;
         var itemTopPos = $item.offset().top;
-        var $tooltip = $('.contact-preview');
+        var $tooltip = $('.copy-dialog .contact-preview');
         var sharedNodeHandle = $(this).attr('id').replace('mctreea_', '');
         var ownerHandle = M.d[sharedNodeHandle].u;
         var ownerEmail = M.u[ownerHandle].m;
@@ -8716,16 +8716,16 @@ function copyDialog() {
                 'top': (itemTopPos - 63) + 'px'
             });
             $tooltip.fadeIn(200);
-        }, 1000);
+        }, 200);
     });
 
-    $('.copy-dialog .shared-with-me').off('mouseout', '.nw-fm-tree-item');
-    $('.copy-dialog .shared-with-me').on('mouseout', '.nw-fm-tree-item', function() {
+    $('.copy-dialog .shared-with-me').off('mouseleave', '.nw-fm-tree-item');
+    $('.copy-dialog .shared-with-me').on('mouseleave', '.nw-fm-tree-item', function() {
 
-        var $tooltip = $('.contact-preview');
+        var $tooltip = $('.copy-dialog .contact-preview');
 
         clearTimeout(copyDialogTooltipTimer);
-        $tooltip.fadeOut(200);
+        $tooltip.hide();
     });
 
     // Handle conversations tab item selection
@@ -9013,13 +9013,13 @@ function moveDialog() {
         }
     });
 
-    $('.move-dialog .shared-with-me').off('mouseover', '.nw-fm-tree-item');
-    $('.move-dialog .shared-with-me').on('mouseover', '.nw-fm-tree-item', function() {
+    $('.move-dialog .shared-with-me').off('mouseenter', '.nw-fm-tree-item');
+    $('.move-dialog .shared-with-me').on('mouseenter', '.nw-fm-tree-item', function() {
 
         var $item = $(this).find('.nw-fm-tree-folder');
         var itemLeftPos = $item.offset().left;
         var itemTopPos = $item.offset().top;
-        var $tooltip = $('.contact-preview');
+        var $tooltip = $('.move-dialog .contact-preview');
         var sharedNodeHandle = $(this).attr('id').replace('mctreea_', '');
         var ownerHandle = M.d[sharedNodeHandle].u;
         var ownerEmail = M.u[ownerHandle].m;
@@ -9044,16 +9044,16 @@ function moveDialog() {
                 'top': (itemTopPos - 63) + 'px'
             });
             $tooltip.fadeIn(200);
-        }, 1000);
+        }, 200);
     });
 
-    $('.move-dialog .shared-with-me').off('mouseout', '.nw-fm-tree-item');
-    $('.move-dialog .shared-with-me').on('mouseout', '.nw-fm-tree-item', function() {
+    $('.move-dialog .shared-with-me').off('mouseleave', '.nw-fm-tree-item');
+    $('.move-dialog .shared-with-me').on('mouseleave', '.nw-fm-tree-item', function() {
 
-        var $tooltip = $('.contact-preview');
+        var $tooltip = $('.move-dialog .contact-preview');
 
         clearTimeout(moveDialogTooltipTimer);
-        $tooltip.fadeOut(200);
+        $tooltip.hide();
     });
 
     $('.move-dialog .dialog-move-button').rebind('click', function() {

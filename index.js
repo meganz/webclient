@@ -767,7 +767,7 @@ function init_page() {
     /**
      * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
      */
-    else if (page.substr(0, 7) == 'voucher') {
+    else if (page.substr(0, 7) === 'voucher') {
 
         // Get the voucher code from the URL which is 20 characters in length
         var voucherCode = page.substr(7, 20);
@@ -776,12 +776,19 @@ function init_page() {
         localStorage.setItem('voucher', voucherCode);
 
         // If not logged in, direct them to login or register first
-        if (!u_type) {
+        if (u_type === false) {
             login_txt = l[7712];
             document.location.hash = 'login';
             return false;
         }
-        else {
+        else if (u_type < 3) {
+            // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and
+            // make sure they confirm first otherwise we get lots of chargebacks from users paying in the wrong account
+            msgDialog('warningb', l[8666], l[8665], false, function() {
+                location.hash = 'pro';
+            });
+        }
+        else {            
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
             document.location.hash = 'redeem';
             return false;
@@ -789,7 +796,7 @@ function init_page() {
     }
 
     // Load the direct voucher redeem page
-    else if (page.substr(0, 6) == 'redeem') {
+    else if (page.substr(0, 6) === 'redeem') {
         loadingDialog.show();
         parsepage(pages['redeem']);
         redeem.init();

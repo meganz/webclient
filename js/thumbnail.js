@@ -184,6 +184,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 var u8 = new Uint8Array(ThumbFR.result);
                 var dv = new DataView(u8.buffer);
 
+                if (u8.byteLength < 4) {
+                    console.error('Unable to create thumbnail, data too short...');
+                    return;
+                }
+
                 if (dv.getUint32(0) === 0x89504e47) {
                     img.isPNG = true;
                 }
@@ -192,14 +197,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 img.dataSize = u8.byteLength;
                 img.is64bit = browserdetails(ua).is64bit;
 
-                if (thumbHandler) {
-                    return thumbHandler(u8.buffer, function(ab) {
-                        if (ab) {
-                            __render_thumb(img, ab);
-                        }
-                    });
-                }
-
                 // Deal with huge images...
                 if (!img.is64bit && img.dataSize > (36 * 1024 * 1024)) {
                     // Let dcraw try to extract a thumbnail
@@ -207,6 +204,14 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                         isRawImage = isRawImage || 'not-really';
                     }
                     img.huge = true;
+                }
+
+                if (thumbHandler) {
+                    return thumbHandler(u8.buffer, function(ab) {
+                        if (ab) {
+                            __render_thumb(img, ab);
+                        }
+                    });
                 }
 
                 if (isRawImage) {

@@ -6911,17 +6911,6 @@ function sectionUIopen(id) {
         $('.section').addClass('hidden');
         $('.section.' + id).removeClass('hidden');
     }
-
-
-    if ($.fah_abort_timer) {
-        clearTimeout($.fah_abort_timer);
-    }
-
-    if (id === 'conversations') {
-        $.fah_abort_timer = setTimeout(function() {
-            fa_handler.abort();
-        }, 2000);
-    }
 }
 
 function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {

@@ -505,8 +505,6 @@ var strongvelope = {};
      * @param {String} [myPubEd25519]
      *     Our public signing key (Ed25519, optional, can be derived upon
      *     instantiation from private key).
-     * @param {String} [uniqueDeviceId]
-     *     A 32bit prefix that should be unique for this device, for this user
      *
      * @property {String} ownHandle
      *     Our own user handle (u_handle).
@@ -530,11 +528,9 @@ var strongvelope = {};
      *     An array of participants' user handles to include in the chat.
      * @property {Array.<String>} excludeParticipants
      *     An array of participants' user handles to exclude from the chat.
-     * @property {String} uniqueDeviceId
-     *     A 32bit prefix that should be unique for this device, for this user
      */
     strongvelope.ProtocolHandler = function(ownHandle, myPrivCu25519,
-            myPrivEd25519, myPubEd25519, uniqueDeviceId) {
+            myPrivEd25519, myPubEd25519) {
 
         this.ownHandle = ownHandle || u_handle;
         this.myPrivCu25519 = myPrivCu25519 || u_privCu25519;
@@ -554,8 +550,6 @@ var strongvelope = {};
         this.otherParticipants = new Set();
         this.includeParticipants = new Set();
         this.excludeParticipants = new Set();
-        this.uniqueDeviceId = uniqueDeviceId;
-        this._inUse = false;
         this.participantChange = false;
         this.counter = 0;
     };
@@ -1444,10 +1438,7 @@ var strongvelope = {};
      * @param participant {String}
      *     participant's user handle.
      */
-    strongvelope.ProtocolHandler.prototype.addParticipant = function(participant, isInclude) {
-        if (typeof isInclude === 'undefined') {
-            isInclude = false;
-        }
+    strongvelope.ProtocolHandler.prototype.addParticipant = function(participant) {
 
         if (participant !== this.ownHandle) {
             if (!this.otherParticipants.has(participant)) {
@@ -1464,10 +1455,7 @@ var strongvelope = {};
      * @param participant {String}
      *     participant's user handle.
      */
-    strongvelope.ProtocolHandler.prototype.removeParticipant = function(participant, isExclude) {
-        if (typeof isExclude === 'undefined') {
-            isExclude = false;
-        }
+    strongvelope.ProtocolHandler.prototype.removeParticipant = function(participant) {
 
         // remove myself from the groupchat.
         if (participant === this.ownHandle) {

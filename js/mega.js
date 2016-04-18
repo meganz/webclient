@@ -514,7 +514,7 @@ function MegaData()
         }
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
-            if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
+            if ((M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0) && !avatars[u]) {
                 waitingPromises.push(
                     mega.attr.get(u, 'a', true, false)
                         .done(function (res) {
@@ -1326,7 +1326,7 @@ function MegaData()
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             else if (M.currentdirid === 'contacts') {
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6772]);
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
             else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
@@ -3497,7 +3497,9 @@ function MegaData()
                 i: requesti
             });
             if (node && node.p) {
-                if (M.c[node.p] && M.c[node.p][h]) {
+                var parent = node.p;
+
+                if (M.c[parent] && M.c[parent][h]) {
                     delete M.c[node.p][h];
                 }
                 // Update M.v it's used for slideshow preview at least
@@ -3511,11 +3513,8 @@ function MegaData()
                     M.c[t] = [];
                 }
                 M.c[t][h] = 1;
-                removeUInode(h);
-                this.nodeAttr({
-                        h: h,
-                        p: t
-                    });
+                this.nodeAttr({ h: h, p: t });
+                removeUInode(h, parent);
                 newnodes.push(node);
             }
         }
@@ -4739,12 +4738,16 @@ function MegaData()
                  * there is network activity associated with the download, though.
                  */
                 if (page === 'download') {
-                    $('.download.error-icon').text(errorstr);
-                    $('.download.error-icon').removeClass('hidden');
-                    $('.download.icons-block').addClass('hidden');
-
                     if (error === EOVERQUOTA) {
+                        $('.download-info.time-txt .text').text('');
+                        $('.download-info.speed-txt .text').text('');
+                        $('.download.pause-button').addClass('active');
                         $('.download.info-block').addClass('overquota');
+                    }
+                    else {
+                        $('.download.error-icon').text(errorstr);
+                        $('.download.error-icon').removeClass('hidden');
+                        $('.download.icons-block').addClass('hidden');
                     }
                 }
                 else {

@@ -24,16 +24,6 @@ var ConversationMessageMixin = {
         if (message.authorContact) {
             contact = message.authorContact;
         }
-        else if (message.userId) {
-            if (!M.u[message.userId]) {
-                // data is still loading!
-                return null;
-            }
-            contact = M.u[message.userId];
-        }
-        else if (message.getFromJid) {
-            contact = megaChat.getContactFromJid(message.getFromJid());
-        }
         else if (message.meta && message.meta.userId) {
             contact = M.u[message.meta.userId];
             if (!contact) {
@@ -43,6 +33,16 @@ var ConversationMessageMixin = {
                     'c': 0,
                 }
             }
+        }
+        else if (message.userId) {
+            if (!M.u[message.userId]) {
+                // data is still loading!
+                return null;
+            }
+            contact = M.u[message.userId];
+        }
+        else if (message.getFromJid) {
+            contact = megaChat.getContactFromJid(message.getFromJid());
         }
         else {
             console.error("No idea how to render this: ", this.props);

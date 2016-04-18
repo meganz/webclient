@@ -785,7 +785,7 @@ function init_page() {
             // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and
             // make sure they confirm first otherwise we get lots of chargebacks from users paying in the wrong account
             msgDialog('warningb', l[8666], l[8665], false, function() {
-                location.hash = 'pro';
+                location.hash = 'fm';
             });
         }
         else {            

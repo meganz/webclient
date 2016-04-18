@@ -1067,7 +1067,7 @@
     "1838": "\u5728\u96f2\u7aef\uff0c\u522a\u9664\u7684\u6a94\u6848\u5c07\u88ab\u79fb\u5230\u5783\u573e\u593e\u4e2d\u7279\u6b8a\u7684\"SyncDebris\"\u5b50\u8cc7\u6599\u593e\uff0c\u4e14\u53ef\u5f9e\u90a3\u627e\u56de(\u5982\u6709\u9700\u8981\u53ef\u4f7f\u7528MEGA\u5167\u5efa\u641c\u5c0b)\u3002\u5728\u672c\u6a5f\u96fb\u8166\uff0c\u6bcf\u4e00\u540c\u6b65\u8cc7\u6599\u593e\u5c07\u6709\u4e00\u96b1\u85cf\"Debris\"\u8cc7\u6599\u593e\u653e\u7f6e\u522a\u9664\u7684\u9805\u76ee\u3002",
     "1860": "\u60a8\u53ef\u5f9e[A]App Store[\/A]\u4e0b\u8f09\u4e26\u5b89\u88dd\u6211\u5011\u7684iOS app\u3002",
     "1862": "\u60a8\u53ef\u5f9e[A]Google Play[\/A]\u4e0b\u8f09\u4e26\u5b89\u88dd\u6211\u5011\u7684Android app\u3002",
-    "1863": "\u6211\u5011\u81f4\u529b\u65bc\u63d0\u4f9b\u884c\u52d5\u88dd\u7f6e\u5c08\u7528\u7684[A]apps[\/A]\uff0c\u5305\u542b[B]iOS[\/B]\u8207[C]Android[\/C]\u3002",
+    "1863": "\u6211\u5011\u81f4\u529b\u65bc\u63d0\u4f9b\u884c\u52d5\u88dd\u7f6e\u5c08\u7528\u7684[A]apps[\/A]\uff0c\u5305\u542b[B]iOS[\/B]\uff0c[C]Android[\/C]\u8207[D]Windows Phone[\/D]\u3002",
     "1864": "\u932f\u8aa4\u5831\u544a",
     "1867": "\u8b1d\u8b1d\u60a8\u7684\u5408\u4f5c!",
     "1868": "\u50b3\u9001\u5831\u544a",
@@ -3189,6 +3189,15 @@
     "8655": "\u66f4\u65b0",
     "8656": "\u9078\u64c7...",
     "8657": "\u904e\u671f\u65e5",
+    "8658": "\u60a8\u7684\u540d\u5b57",
+    "8659": "\u60a8\u7684\u59d3\u6c0f",
+    "8660": "Windows\u624b\u6a5f",
+    "8661": "MEGA\u662f\u4ec0\u9ebc\uff1f",
+    "8662": "\u9078\u64c7\u5168\u90e8",
+    "8663": "\u53d6\u6d88\u5168\u9078",
+    "8664": "\u64c1\u6709\u8005",
+    "8665": "\u8acb\u81f3\u60a8\u8a3b\u518a\u6642\u767b\u8a18\u7684\u96fb\u5b50\u4fe1\u7bb1\u6536\u4fe1\uff0c\u4e26\u65bc\u4ed8\u6b3e\u524d\u5b8c\u6210\u60a8\u7684\u5e33\u865f\u78ba\u8a8d\u624b\u7e8c\uff0c\u4ee5\u8b93MEGA\u53ef\u4ee5\u5c07\u60a8\u7684\u6b3e\u9805\u5b58\u5165\u6b63\u78ba\u7684\u5e33\u865f\u3002",
+    "8666": "\u78ba\u8a8d\u60a8\u7684\u8a3b\u518a",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3241,6 +3250,9 @@
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
-        "choose": 8656
+        "choose": 8656,
+        "windows-phone": 8660,
+        "confirm-email-message": 8665,
+        "confirm-email-title": 8666
     }
 }

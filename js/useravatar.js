@@ -299,7 +299,7 @@ var useravatar = (function() {
 
     /**
      * Returns a contact avatar
-     * @param {String} user
+     * @param {String|Object} user
      * @param {String} className
      * @param {String} element
      * @returns {String}
@@ -337,7 +337,13 @@ var useravatar = (function() {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        var letters = mega.utils.fullUsername(user.u);
+        var letters = "";
+        if (typeof user === 'object' && user.u && !M.u[user.u]) {
+            letters = mega.utils.fullUsername(user);
+        }
+        else {
+            letters = mega.utils.fullUsername(user.u);
+        }
 
         return _letters(letters, user.u, className, element);
     };

@@ -221,7 +221,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     border-radius: 100%;
 }
 .logo::before, .logo::after {
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: -3px -3px;
     background-repeat: no-repeat;
     content: '';
@@ -4637,7 +4637,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -webkit-border-radius: 8px;
     border-radius: 8px;
     background-color: rgba(255,255,255,0.3);
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: -4px -60px;
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
@@ -4803,7 +4803,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 24px;
     width: 24px;
     margin: 12px 8px 0 4px;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: -9px -205px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -4894,7 +4894,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: -3px -473px;
     background-repeat: no-repeat;
     background-color: rgba(255,255,255,0.3);
@@ -8607,7 +8607,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     color: #999999;
     display: inline-block;
     padding: 0 0 0 26px;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: -8px -511px;
     background-repeat: no-repeat;
     float: none;
@@ -10280,7 +10280,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     margin-top: -12px;
     width: 44px;
     float: right;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: 2px -420px;
     background-repeat: no-repeat;
 }
@@ -10629,7 +10629,7 @@ table {
     height: 16px;
 }
 .top-user-status-item.active {
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: right -663px;
     background-repeat: no-repeat;
 }
@@ -10643,7 +10643,7 @@ table {
 .top-menu-item.contains-submenu {
     font-family: 'source_sans_proregular', Arial;
     background-repeat: no-repeat;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: left -348px;
     background-repeat: no-repeat;
 }
@@ -11790,7 +11790,7 @@ table {
     margin: -130px 0 0 -130px;
 }
 .st-main-button-icon, .st-main-button-icon-hovered {
-    background-image: url(../images/mega/new-startpage-sprite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite_v5.png);
     background-position: center 60px;
     background-repeat: no-repeat;
     width: 260px;
@@ -11814,7 +11814,7 @@ table {
     width: 130px;
     height: 100px;
     position: absolute;
-    background-image: url(../images/mega/new-startpage-sprite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite_v5.png);
     background-position: center -545px;
     background-repeat: no-repeat;
     left: 285px;
@@ -11832,7 +11832,7 @@ table {
 }
 .st-main-logo {
     height: 120px;
-    background-image: url(../images/mega/new-startpage-sprite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite_v5.png);
     background-position: center -786px;
     background-repeat: no-repeat;
     margin: 12px 0 25px 0;
@@ -11905,7 +11905,7 @@ table {
     height: 29px;
     width: 29px;
     display: inline-block;
-    background-image: url(../images/mega/new-startpage-sprite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite_v5.png);
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -11945,7 +11945,7 @@ table {
     cursor: pointer;
 }
 .st-bottom-scroll-button.grey-arrow {
-    background-image: url(../images/mega/new-startpage-sprite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite_v5.png);
     background-position: center -1397px;
     background-repeat: no-repeat;
 }
@@ -12229,7 +12229,7 @@ body.new-startpage {
     color: white;
     line-height: 21px;
     padding: 13px 0 10px 26px;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-repeat: no-repeat;
     background-position: -11px -723px;
     margin: 0;
@@ -12242,7 +12242,7 @@ body.new-startpage {
     width: 26px;
     height: 26px;
     float: right;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-repeat: no-repeat;
     background-position: -6px -854px;
     margin: 11px 0 0 9px;
@@ -12448,7 +12448,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     margin-left: 0;
 }
 .top-login-warning-arrow {
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: 2px -420px;
     background-repeat: no-repeat;
     width: 30px;
@@ -17229,7 +17229,7 @@ code, c {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: #5b5a59;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: -9px -941px;
     background-repeat: no-repeat;
     margin: 8px 0 0 240px;
@@ -21507,9 +21507,9 @@ a.top-login-forgot-pass {
     display: inline-block;
     border-radius: 12px;
     text-transform: uppercase;
-    background-image: url(../images/mega/nw-fm-sprite_v16.svg);
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-repeat: no-repeat;
-    background-position: 4px -9646px;
+    background-position: -6px -981px;
     color: rgba(255,255,255,0.7) !important;
     padding-left: 24px;
     background-repeat: no-repeat;
@@ -23358,7 +23358,7 @@ a.opensource-icon-txt.coming-soon {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/new-startpage-sprite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite_v5.png);
     background-position: center -940px;
     background-repeat: no-repeat;
     height: 210px;
@@ -24095,7 +24095,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 .bottom-info.icon {
     width: 66px;
     height: 66px;
-    background-image: url(../images/mega/new-startpage-sprite-v4.png);
+    background-image: url(../images/mega/new-startpage-sprite_v5.png);
     background-position: 1px -1468px;
     background-repeat: no-repeat;
 }

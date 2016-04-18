@@ -3189,9 +3189,15 @@
     "8655": "Yenile",
     "8656": "Se\u00e7in...",
     "8657": "S\u00dcRES\u0130 DOLDU",
-    "8658": "your first name",
-    "8659": "your last name",
+    "8658": "ad\u0131n\u0131z",
+    "8659": "soyad\u0131n\u0131z",
     "8660": "Windows Phone",
+    "8661": "What is MEGA?",
+    "8662": "Select all",
+    "8663": "Deselect all",
+    "8664": "owner",
+    "8665": "Please check your registration email and confirm your account before you pay, so that MEGA can credit your payment to the correct account.",
+    "8666": "Confirm your registration",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3245,6 +3251,8 @@
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
         "choose": 8656,
-        "windows-phone": 8660
+        "windows-phone": 8660,
+        "confirm-email-message": 8665,
+        "confirm-email-title": 8666
     }
 }

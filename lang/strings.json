@@ -12770,5 +12770,29 @@
     "8660": {
         "text": "Windows Phone",
         "context": "A phone running the Windows Phone operating system."
+    },
+    "8661": {
+        "text": "What is MEGA?",
+        "context": "A link that the user can click to learn more about MEGA."
+    },
+    "8662": {
+        "text": "Select all",
+        "context": "A label for any 'Select' button, link, etc."
+    },
+    "8663": {
+        "text": "Deselect all",
+        "context": "A label for any 'Select' button, link, etc."
+    },
+    "8664": {
+        "text": "owner",
+        "context": "A tooltip for move and copy dialogs in the Shared with me tab. When a user moves the mouse pointer over an item, the tooltip will show the owner's email address and if exists the owner's first and last name. The text \"(owner)\" will be shown next to the owner's name or over their email address if the owner's first and last name doesn't exist."
+    },
+    "8665": {
+        "text": "Please check your registration email and confirm your account before you pay, so that MEGA can credit your payment to the correct account.",
+        "context": "A dialog message to get the user to confirm their email account before buying a PRO plan."
+    },
+    "8666": {
+        "text": "Confirm your registration",
+        "context": "A dialog title to get the user to confirm their email account before buying a PRO plan."
     }
 }

@@ -3192,6 +3192,12 @@
     "8658": "seu primeiro nome",
     "8659": "seu \u00faltimo nome",
     "8660": "Windows Phone",
+    "8661": "O que \u00e9 MEGA?",
+    "8662": "Select all",
+    "8663": "Deselect all",
+    "8664": "propriet\u00e1rio",
+    "8665": "Por favor, verifique seu e-mail de inscri\u00e7\u00e3o e confirme a sua conta antes de pagar, de modo que MEGA pode creditar o seu pagamento para a conta correta.",
+    "8666": "Confirmar sua inscri\u00e7\u00e3o",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3245,6 +3251,8 @@
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
         "choose": 8656,
-        "windows-phone": 8660
+        "windows-phone": 8660,
+        "confirm-email-message": 8665,
+        "confirm-email-title": 8666
     }
 }

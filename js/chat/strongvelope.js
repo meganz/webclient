@@ -1206,7 +1206,6 @@ var strongvelope = {};
                 return false;
             }
             var result = {
-                version: parsedMessage.protocolVersion,
                 sender: parsedMessage.invitor,
                 type: parsedMessage.type,
                 includeParticipants: parsedMessage.includeParticipants,
@@ -1305,7 +1304,6 @@ var strongvelope = {};
         }
 
         var result = {
-            version: parsedMessage.protocolVersion,
             sender: sender,
             type: parsedMessage.type,
             payload: cleartext,
@@ -1386,7 +1384,6 @@ var strongvelope = {};
         }
 
         var result = {
-            version: parsedMessage.protocolVersion,
             sender: sender,
             type: parsedMessage.type,
             payload: cleartext,

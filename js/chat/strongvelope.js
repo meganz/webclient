@@ -1582,30 +1582,30 @@ var strongvelope = {};
         for (var i=0; i<keys.length;i++) {
 
             var keyidStr = a32_to_str([keys[i].keyid]);
-            if (this.participantKeys[keys[i].userid] && this.participantKeys[keys[i].userid][keys[i].keyid] && this.participantKeys[keys[i].userid][keys[i].keyid] !== keys[i].key) {
-                logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + keys[i].userid);
+            if (this.participantKeys[keys[i].userId] && this.participantKeys[keys[i].userId][keys[i].keyid] && this.participantKeys[keys[i].userId][keys[i].keyid] !== keys[i].key) {
+                logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + keys[i].userId);
             }
             var parsedKey = ns._parseMessageContent(keys[i].key);
 
             if (ns._verifyMessage(parsedKey.signedContent,
                     parsedKey.signature,
-                    pubEd25519[keys[i].userid])) {
+                    pubEd25519[keys[i].userId])) {
                 var key = parsedKey.keys[0];
-                var isOwnMessage = (keys[i].userid === this.ownHandle);
+                var isOwnMessage = (keys[i].userId === this.ownHandle);
 
 
                 var decryptedKeys = this._decryptKeysFrom(key,
-                                             keys[i].userid,
+                                             keys[i].userId,
                                              isOwnMessage);
-                if (!this.participantKeys[keys[i].userid]) {
-                    this.participantKeys[keys[i].userid] = {};
+                if (!this.participantKeys[keys[i].userId]) {
+                    this.participantKeys[keys[i].userId] = {};
                 }
-                this.participantKeys[keys[i].userid][keyidStr] = decryptedKeys[0];
+                this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
             }
             else {
                 logger.critical('Signature invalid for key from *** on ***');
                 logger.error('Signature invalid for message from '
-                             + keys[i].userid + ' with keyid ' + keys[i].keyid);
+                             + keys[i].userId + ' with keyid ' + keys[i].keyid);
 
                 return false;
             }

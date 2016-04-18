@@ -402,6 +402,12 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
                 );
             }
 
+            if (!pubEd25519[msgObject.userId]) {
+                promises.push(
+                    crypt.getPubEd25519(msgObject.userId)
+                );
+            }
+
             if (!u_pubkeys[msgObject.userId]) {
                 promises.push(
                     crypt.getPubRSA(msgObject.userId)
@@ -418,6 +424,12 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
             if (!pubCu25519[userId]) {
                 promises.push(
                     crypt.getPubCu25519(userId)
+                );
+            }
+
+            if (!pubEd25519[userId]) {
+                promises.push(
+                    crypt.getPubEd25519(userId)
                 );
             }
 

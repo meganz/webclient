@@ -558,7 +558,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
                     keys.push(
                         {
-                            userid : base64urlencode(cmd.substr(index,8)),
+                            userId : base64urlencode(cmd.substr(index,8)),
                             keyid  : self.chatd.unpack32le(cmd.substr(index + 8,4)),
                             keylen : keylen,
                             key  : cmd.substr(index + 14,keylen)

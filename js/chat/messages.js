@@ -14,6 +14,7 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'keyid': true,
 
             'message': true,
+
             'textContents': false,
 
             'delay': true,
@@ -494,8 +495,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.chatd.rebind('onMessageKeysDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        var keys = eventData.keys;
+        var seedKeys = function() {
+            chatRoom.protocolHandler.seedKeys(keys);
+        };
+        ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
 
-        chatRoom.protocolHandler.seedKeys(eventData.keys);
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();
         }

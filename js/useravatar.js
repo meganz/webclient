@@ -337,12 +337,11 @@ var useravatar = (function() {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        var letters = "";
-        if (typeof user === 'object' && user.u && !M.u[user.u]) {
-            letters = mega.utils.fullUsername(user);
-        }
-        else {
-            letters = mega.utils.fullUsername(user.u);
+        var letters = M.getNameByHandle(user.u);
+        
+        if (!letters) {
+            // XXX: not a known user?
+            letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
         }
 
         return _letters(letters, user.u, className, element);

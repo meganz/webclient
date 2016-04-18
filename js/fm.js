@@ -9663,7 +9663,7 @@ function propertiesDialog(close)
                 }
                 p.t4 = rights;
                 p.t6 = l[5905];
-                p.t7 = htmlentities(mega.utils.fullUsername(user.h));
+                p.t7 = htmlentities(M.getNameByHandle(user.h));
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -10520,30 +10520,6 @@ function fm_resize_handler() {
     }
 }
 
-/*
- * fullUsername
- *
- * @param {String|Object} userHandle
- * @returns {String} result An first and last user name or email
- */
-mega.utils.fullUsername = function username(userHandle) {
-
-    // User name
-    var result = '';
-
-    if (M.u[userHandle]) {
-        result = M.u[userHandle].name && $.trim(M.u[userHandle].name) || M.u[userHandle].m;
-
-        // Convert to string and escape for XSS
-        result = String(result);
-    }
-    else if (typeof userHandle === 'object' && (userHandle.u || userHandle.h) && userHandle.m) {
-        result = userHandle.name && $.trim(userHandle.name) || userHandle.m;
-    }
-
-    return result;
-};
-
 function sharedFolderUI() {
     /* jshint -W074 */
     var nodeData = M.d[M.currentdirid];
@@ -10585,7 +10561,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var fullOwnersName = htmlentities(mega.utils.fullUsername(ownersHandle));
+        var fullOwnersName = htmlentities(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
         // Access rights
@@ -10719,7 +10695,7 @@ function fingerprintDialog(userid) {
     $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
     $this.find('.contact-details-user-name')
-        .text(mega.utils.fullUsername(user.u)) // escape HTML things
+        .text(M.getNameByHandle(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
@@ -10809,7 +10785,7 @@ function contactUI() {
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
         $('.contact-top-details .contact-details-user-name').text(
-            mega.utils.fullUsername(user.u)
+            M.getNameByHandle(user.u)
         );
         $('.contact-top-details .contact-details-email').text(user.m);
 

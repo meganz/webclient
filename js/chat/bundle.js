@@ -870,7 +870,7 @@
 	    var name = jid.split("@")[0];
 
 	    if (contact) {
-	        name = mega.utils.fullUsername(contact.u);
+	        name = M.getNameByHandle(contact.u);
 	    }
 
 	    assert(name, "Name not found for jid: " + jid);
@@ -21962,7 +21962,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "nw-conversations-name" },
-	                    mega.utils.fullUsername(contact.u)
+	                    M.getNameByHandle(contact.u)
 	                )
 	            )
 	        );
@@ -22154,7 +22154,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "user-card-name small" },
-	                    mega.utils.fullUsername(contact.u)
+	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
@@ -23695,7 +23695,7 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
-	                                    mega.utils.fullUsername(contact.u)
+	                                    M.getNameByHandle(contact.u)
 	                                ),
 	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
 	                                React.makeElement(
@@ -23869,7 +23869,7 @@
 	            }
 
 	            if (textMessage.splice) {
-	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
 	                if (message.currentCallCounter) {
 	                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
@@ -23877,7 +23877,7 @@
 	                textMessage = tmpMsg;
 	                textMessage = textMessage.replace("[[ ", "<span className=\"grey-color\">").replace("]]", "</span>");
 	            } else {
-	                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+	                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 	            }
 
 	            message.textContents = textMessage;

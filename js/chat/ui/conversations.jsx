@@ -279,11 +279,10 @@ var ConversationsList = React.createClass({
                 contact = chatRoom.megaChat.getContactFromJid(contact);
 
                 if (contact && contact.c === 0) {
-                    // skip & leave, a non-contact conversation, e.g. contact removed.
+                    // a non-contact conversation, e.g. contact removed - mark as read only
                     Soon(function () {
-                        chatRoom.destroy();
+                        chatRoom.privateReadOnlyChat = true;
                     });
-                    return;
                 }
             }
 

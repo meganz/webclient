@@ -1220,7 +1220,7 @@ function isValidShareLink()
     return valid;
 }
 
-function removeUInode(h) {
+function removeUInode(h, parent) {
 
     var n = M.d[h],
         i = 0;
@@ -1325,7 +1325,8 @@ function removeUInode(h) {
     }
 
     if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
-        M.openFolder(RootbyId(h));
+        parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
+        M.openFolder(parent);
     }
 }
 

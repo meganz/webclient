@@ -573,7 +573,7 @@ var ConversationMessage = React.createClass({
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{mega.utils.fullUsername(contact.u)}</div>
+                                    <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :

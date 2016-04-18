@@ -23695,7 +23695,7 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
-	                                    mega.utils.fullUsername(contact.u)
+	                                    M.getNameByHandle(contact.u)
 	                                ),
 	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
 	                                React.makeElement(

@@ -12777,11 +12777,11 @@
     },
     "8662": {
         "text": "Select all",
-        "context": "A label for any 'Select' button, link, etc."
+        "context": "Label for any 'Select all' button, link, etc. - (String as short as possible)."
     },
     "8663": {
         "text": "Deselect all",
-        "context": "A label for any 'Select' button, link, etc."
+        "context": "Label for any 'Deselect all' button, link, etc. - (String as short as possible)."
     },
     "8664": {
         "text": "owner",

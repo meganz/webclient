@@ -8714,8 +8714,8 @@ function copyDialog() {
 
         var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') + '\n\
             <div class="user-card-data no-status">\n\
-                <div class="user-card-email small">' + htmlentities(ownerEmail) + '</div>\n\
                 <div class="user-card-name small">' + htmlentities(ownerName) + ' <span class="grey">(' + l[8664] + ')</span></div>\n\
+                <div class="user-card-email small">' + htmlentities(ownerEmail) + '</div>\n\
             </div>';
 
         $tooltip.find('.contacts-info.body').safeHTML(html);
@@ -9042,8 +9042,8 @@ function moveDialog() {
 
         var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') + '\n\
             <div class="user-card-data no-status">\n\
-                <div class="user-card-email small">' + htmlentities(ownerEmail) + '</div>\n\
                 <div class="user-card-name small">' + htmlentities(ownerName) + ' <span class="grey">(' + l[8664] + ')</span></div>\n\
+                <div class="user-card-email small">' + htmlentities(ownerEmail) + '</div>\n\
             </div>';
 
         $tooltip.find('.contacts-info.body').safeHTML(html);

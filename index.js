@@ -788,7 +788,7 @@ function init_page() {
                 location.hash = 'fm';
             });
         }
-        else {            
+        else {
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
             document.location.hash = 'redeem';
             return false;

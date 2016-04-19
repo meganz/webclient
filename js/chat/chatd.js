@@ -90,13 +90,14 @@ Chatd.Priv = {
     'FULL' : 2,
     'OPER' : 3
 };
-
+// message's edited time is (TIMESTAMP + UPDATED - 1).
 Chatd.MsgField = {
     'MSGID' : 0,
     'USERID' : 1,
     'TIMESTAMP' : 2,
     'MESSAGE' : 3,
-    'KEYID' : 4
+    'KEYID' : 4,
+    'UPDATED' : 5
 };
 
 Chatd.Const = {
@@ -674,7 +675,7 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
         var type = messageObj.type;
         var cmd = '';
         if (type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {// this is key message;
-            cmd = [Chatd.Opcode.NEWKEY, chatId + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];   
+            cmd = [Chatd.Opcode.NEWKEY, chatId + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];
         } else {
             cmd = [Chatd.Opcode.NEWMSG, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack16le(0) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];
         }
@@ -946,7 +947,7 @@ Chatd.Messages.prototype.msgmodify = function(chatId, msgid, updated, keyid, msg
             }
             else {
                 this.buf[i][Chatd.MsgField.MESSAGE] = msg;
-                this.buf[i][Chatd.MsgField.TIMESTAMP] = this.buf[i][Chatd.MsgField.TIMESTAMP] + updated -1;
+                this.buf[i][Chatd.MsgField.UPDATED] = updated;
             }
 
             break;

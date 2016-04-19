@@ -3011,9 +3011,8 @@ var doProRegister = function($dialog) {
                     $('.pro-register-dialog').addClass('hidden');
                     $('.fm-dialog.registration-page-success').unbind('click');
 
-                    // They need to have confirmed their email before continuing to step 2 otherwise we get users
-                    // accidentally in an ephemeral session and paying under that so their payment gets lost.
-                    var skipConfirmationStep = false;
+                    // If true this means they do not need to confirm their email before continuing to step 2
+                    var skipConfirmationStep = true;
 
                     if (skipConfirmationStep) {
                         closeDialog();

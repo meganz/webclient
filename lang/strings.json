@@ -12777,11 +12777,11 @@
     },
     "8662": {
         "text": "Select all",
-        "context": "A label for any 'Select' button, link, etc."
+        "context": "Label for any 'Select all' button, link, etc. - (String as short as possible)."
     },
     "8663": {
         "text": "Deselect all",
-        "context": "A label for any 'Select' button, link, etc."
+        "context": "Label for any 'Deselect all' button, link, etc. - (String as short as possible)."
     },
     "8664": {
         "text": "owner",
@@ -12794,5 +12794,25 @@
     "8666": {
         "text": "Confirm your registration",
         "context": "A dialog title to get the user to confirm their email account before buying a PRO plan."
+    },
+    "8667": {
+        "text": "If you want to subscribe for a yearly PRO account, you can wire transfer funds to either of our bank accounts:",
+        "context": "An instruction on the wire transfer dialog. Both wire transfer options are shown immediately after."
+    },
+    "8668": {
+        "text": "IBAN",
+        "context": "This is an acronym for International Bank Account Number. https:\/\/en.wikipedia.org\/wiki\/International_Bank_Account_Number\r\n\r\nOnly translate if this is commonly referred to as something else in your country. "
+    },
+    "8669": {
+        "text": "Not applicable for NZ banks",
+        "context": "The International Bank Account Number is not valid or applicable for New Zealand banks."
+    },
+    "8670": {
+        "text": "If your email address is too long for the 'Reference' field it should be placed in the 'Comments' field.",
+        "context": "A note on the wire transfer dialog."
+    },
+    "8671": {
+        "text": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+        "context": "A note on the wire transfer dialog."
     }
 }

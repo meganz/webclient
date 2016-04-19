@@ -1169,7 +1169,7 @@ function showTransferToast(t_type, t_length, isPaused) {
         }
 
         clearTimeout(timer);
-        $toast.removeClass('second').addClass('visible');
+        $toast.removeClass('second hidden').addClass('visible');
         timer = setTimeout(function() {
             hideTransferToast($toast);
         }, 5000);
@@ -9001,7 +9001,7 @@ function showToast(toastClass, notification, buttonLabel) {
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
         .find('.toast-col:first-child span').safeHTML(notification);
 
-    $toast.addClass('visible');
+    $toast.removeClass('hidden').addClass('visible');
 
     timeout = setTimeout(function() {
         hideToast();

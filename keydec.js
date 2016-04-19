@@ -79,6 +79,7 @@ function crypto_process_sharekey(handle, key) {
 function crypto_processkey(me, master_aes, file, OUT) {
     var id = me;
     var key, k, n;
+    var missingKeyHandle = '';
 
     // do I own the file? (user key is guaranteed to be first in .k)
     var p = file.k.indexOf(id + ':');
@@ -194,18 +195,28 @@ function crypto_processkey(me, master_aes, file, OUT) {
                     OUT.hash = file.hash;
                 }
             }
+            else {
+                console.log('Missing name for a node ' + file.h);
+                missingKeyHandle = file.h;
+            }
+        }
+        else {
+            console.log('Node attributes are not decryptable ' + file.h);
+            missingKeyHandle = file.h;
         }
     }
     else {
         if (d) {
             console.log("Received no suitable key: " + file.h);
-        }
-
-        if (!missingkeys[file.h]) {
-            newmissingkeys = true;
-            missingkeys[file.h] = true;
+            missingKeyHandle = file.h;
         }
     }
+
+    if (!missingKeyHandle[missingKeyHandle]) {
+        newmissingkeys = true;
+        missingkeys[missingKeyHandle] = true;
+    }
+
 }
 
 function encrypt_key(cipher, a) {

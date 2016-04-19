@@ -3899,6 +3899,7 @@ var rsa2aes = {};
 function crypto_processkey(me, master_aes, file) {
     var logger = MegaLogger.getLogger('crypt');
     var id, key, k, n, decKey;
+    var missingKeyHandle = '';
 
     if (!file.k) {
         if (!keycache[file.h]) {
@@ -4058,30 +4059,23 @@ function crypto_processkey(me, master_aes, file) {
             }
             else {
                 logger.error('Missing name for node "%s"', file.h, file);
-
-                if (!missingkeys[file.h]) {
-                    newmissingkeys = true;
-                    missingkeys[file.h] = true;
-                }
+                missingKeyHandle = file.h;
             }
         }
         else {
-            logger.errro('Node attributes are not decryptable "%s"', file.h, file);
-            
-            if (!missingkeys[file.h]) {
-                newmissingkeys = true;
-                missingkeys[file.h] = true;
-            }
+            logger.error('Node attributes are not decryptable "%s"', file.h, file);
+            missingKeyHandle = file.h;
         }
     }
     else {
         logger.error("Received no suitable key: " + file.h);
-
-        if (!missingkeys[file.h]) {
-            newmissingkeys = true;
-            missingkeys[file.h] = true;
-        }
+        missingKeyHandle = file.h;
         keycache[file.h] = file.k;
+    }
+    
+    if (!missingKeyHandle[missingKeyHandle]) {
+        newmissingkeys = true;
+        missingkeys[missingKeyHandle] = true;
     }
 }
 
@@ -4139,6 +4133,7 @@ var newmissingkeys = false;
 
 function crypto_reqmissingkeys() {
     var logger = MegaLogger.getLogger('crypt');
+
     if (!newmissingkeys) {
         logger.debug('No new missing keys.');
         return;

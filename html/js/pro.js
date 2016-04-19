@@ -324,14 +324,29 @@ function init_pro()
         // it may quickly switch to the pro_payment_method page if they have preselected a plan
         loadingDialog.show();
 
-        // Get the membership plans. This call will return an array of arrays. Each array contains this data:
-        // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
-        // More data can be retrieved with 'f : 1'
-        api_req({ a : 'utqa' }, {
+        // Get the membership plans.
+        api_req({ a : 'utqa', nf: 1 }, {
             callback: function (result)
             {
+                // The rest of the webclient expects this data in an array format
+                // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
+                var results = [];
+                for (var i = 0; i<result.length; i++)
+                {
+                    results.push([
+                        result[i]["id"],
+                        result[i]["al"], // account level
+                        result[i]["s"], // storage
+                        result[i]["t"], // transfer
+                        result[i]["m"], // months
+                        result[i]["p"], // price
+                        result[i]["c"], // currency
+                        result[i]["mbp"] // monthly base price
+                    ]);
+                }
+
                 // Store globally
-                membershipPlans = result;
+                membershipPlans = results;
 
                 // Render the plan details
                 proPage.populateMembershipPlans();

@@ -15490,7 +15490,7 @@ span.browsers-update {
     line-height: 21px;
     color: #666666;
     padding: 15px 0 0px 22px;
-    background-image: url(../images/mega/mobile-sprite-v6.png?v=4);
+    background-image: url(../images/mega/mobile-sprite_v7.png);
     background-repeat: no-repeat;
     background-position: -813px -1536px;
 }
@@ -15503,7 +15503,7 @@ span.browsers-update {
     float: left;
     width: 448px;
     height: 200px;
-    background-image: url(../images/mega/mobile-sprite-v6.png?v=4);
+    background-image: url(../images/mega/mobile-sprite_v7.png);
     background-repeat: no-repeat;
     background-position: -488px -433px;
     margin-bottom: 28px;
@@ -15582,9 +15582,9 @@ span.browsers-update {
     margin: 3px 5px;
     cursor: pointer;
     padding: 6px 15px 0 0;
-    background-image: url(../images/mega/mobile-sprite-v6.png?v=4);
+    background-image: url(../images/mega/download-buttons-sprite.png);
     background-repeat: no-repeat;
-    background-position: -462px -248px;
+    background-position: -463px 9px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -15613,10 +15613,10 @@ span.browsers-update {
     cursor: default;
 }
 .sync-button.mac {
-    background-position: 15px -329px;
+    background-position: 15px -71px;
 }
 .sync-button.linux {
-    background-position: -462px -324px;
+    background-position: -463px -66px;
 }
 .linux-install-txt {
     text-align: center;
@@ -15644,7 +15644,7 @@ span.browsers-update {
     padding-top: 0;
 }
 .google-play-button {
-    background-position: -336px -1449px;
+    background-position: -335px -172px;
     width: 220px;
 }
 .google-play-button:hover {
@@ -15652,7 +15652,7 @@ span.browsers-update {
     min-width: 184px;
 }
 .win-phone-button {
-    background-position: 16px -1450px;
+    background-position: 18px -173px;
     width: 251px;
     min-width: 184px;
 }
@@ -15660,7 +15660,7 @@ span.browsers-update {
     width: 257px;
 }
 .chrome-app-button {
-    background-image: url(../images/mega/chrome-app1.png);
+    background-image: url(../images/mega/chrome-app_v2.png);
     background-position: center -157px;
     background-repeat: no-repeat;
 }
@@ -15668,12 +15668,12 @@ span.browsers-update {
     width: 260px;
     height: 60px;
     margin: 38px auto 26px auto;
-    background-image: url(../images/mega/chrome-app1.png);
+    background-image: url(../images/mega/chrome-app_v2.png);
     background-position: -230px top;
     background-repeat: no-repeat;
 }
 .chrome-app-scr {
-    background-image: url(../images/mega/chrome-app1.png);
+    background-image: url(../images/mega/chrome-app_v2.png);
     background-position: center -155px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -15703,9 +15703,9 @@ a.manual-install-link {
     font-family: 'Open Sans Semibold Italic', Arial;
 }
 .chrome-app-button.new-app {
-    background-image: url(../images/mega/chrome-app1.png);
+    background-image: url(../images/mega/download-buttons-sprite.png);
     background-repeat: no-repeat;
-    background-position: -230px -614px;
+    background-position: 10px -397px;
 }
 .sync-button-txt {
     display: block;
@@ -15729,7 +15729,7 @@ a.manual-install-link {
     padding-top: 5px;
 }
 .blackberry-button {
-    background-position: 22px -1560px;
+    background-position: 24px -283px;
     width: 184px;
     min-width: 184px;
 }
@@ -15737,7 +15737,7 @@ a.manual-install-link {
     width: 190px;
 }
 .ios-button {
-    background-position: -340px -1565px;
+    background-position: -339px -289px;
     width: 204px;
     min-width: 184px;
 }
@@ -15745,8 +15745,8 @@ a.manual-install-link {
     width: 210px;
 }
 .ff-bott-button {
-    background-position: 10px -249px;
-    padding: 16px 15px 0 0;
+    background-position: 10px 8px;
+    padding: 9px 15px 0 0;
     min-width: 259px;
 }
 .sync-button:hover, .ios-button:hover, .google-play-button:hover, .ff-bott-button:hover, .blackberry-button:hover, .chrome-app-button:hover, .win-phone-button:hover {
@@ -15773,7 +15773,7 @@ a.manual-install-link {
     color: #777777;
     font-family: "source_sans_prosemibold";
     font-size: 17px;
-    line-height: 15px;
+    line-height: 20px;
     padding-left: 70px;
     white-space: nowrap;
 }
@@ -15823,7 +15823,7 @@ a.manual-install-link {
     width: 80px;
     height: 78px;
     float: left;
-    background-image: url(../images/mega/mobile-sprite-v6.png?v=4);
+    background-image: url(../images/mega/mobile-sprite_v7.png);
     background-repeat: no-repeat;
     background-position: -465px -1122px;
     margin: 15px 0 17px 0;
@@ -15902,7 +15902,7 @@ a.manual-install-link {
 }
 .chrome-bott-icons {
     height: 140px;
-    background-image: url(../images/mega/mobile-sprite-v6.png?v=4);
+    background-image: url(../images/mega/mobile-sprite_v7.png);
     background-repeat: no-repeat;
     background-position: 0 -768px;
 }
@@ -15922,7 +15922,7 @@ a.manual-install-link {
     margin: 10px 10px 0 10px;
     cursor: pointer;
     padding: 0 15px 0 70px;
-    background-image: url(../images/mega/chrome-app1.png);
+    background-image: url(../images/mega/chrome-app_v2.png);
     background-repeat: no-repeat;
     background-position: -644px 8px;
     -moz-box-sizing: border-box;
@@ -15947,7 +15947,7 @@ a.manual-install-link {
 .chrome-download-button:hover, a.chrome-download-button:hover {
     background-color: #DB0605;
     border: 2px solid #DB0605;
-    background-image: url(../images/mega/mobile-sprite-v6.png?v=4);
+    background-image: url(../images/mega/mobile-sprite_v7.png);
     background-repeat: no-repeat;
     background-position: -4px -919px;
     color: white;
@@ -19309,12 +19309,13 @@ a.blog-article-button {
 }
 .products-top-arrow {
     position: absolute;
-    width: 20px;
+    width: 16px;
     height: 9px;
-    left: 137px;
+    left: 50%;
+    margin-left: -8px;
     top: 0;
-    background-image: url(../images/mega/mobile-sprite-v6.png?v=1);
-    background-position: right -1449px;
+    background-image: url(../images/mega/download-buttons-sprite.png);
+    background-position: right -436px;
     background-repeat: no-repeat;
     display: none;
 }

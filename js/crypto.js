@@ -4056,6 +4056,22 @@ function crypto_processkey(me, master_aes, file) {
                     file.fav = 1;
                 }
             }
+            else {
+                logger.error('Missing name for node "%s"', file.h, file);
+
+                if (!missingkeys[file.h]) {
+                    newmissingkeys = true;
+                    missingkeys[file.h] = true;
+                }
+            }
+        }
+        else {
+            logger.errro('Node attributes are not decryptable "%s"', file.h, file);
+            
+            if (!missingkeys[file.h]) {
+                newmissingkeys = true;
+                missingkeys[file.h] = true;
+            }
         }
     }
     else {

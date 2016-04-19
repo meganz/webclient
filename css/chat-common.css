@@ -1,4 +1,4 @@
-.disabled, .offline .user-card-name, .offline .user-card-email {
+.disabled {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;

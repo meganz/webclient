@@ -3127,6 +3127,7 @@ var doProRegister = function($dialog) {
                     $('.pro-register-dialog').addClass('hidden');
                     $('.fm-dialog.registration-page-success').unbind('click');
 
+                    // If true this means they do not need to confirm their email before continuing to step 2
                     var skipConfirmationStep = true;
 
                     if (skipConfirmationStep) {

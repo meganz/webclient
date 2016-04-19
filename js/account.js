@@ -505,7 +505,7 @@ function generateAvatarMeta(user_hash) {
         contact = {}; // dummy obj.
     }
 
-    var fullName = mega.utils.fullUsername(user_hash);
+    var fullName = M.getNameByHandle(user_hash);
 
     var shortName = fullName.substr(0, 1).toUpperCase();
     var avatar = avatars[contact.u];
@@ -519,7 +519,7 @@ function generateAvatarMeta(user_hash) {
     else {
         M.u.forEach(function(k, v) {
             var c = M.u[v];
-            var n = mega.utils.fullUsername(v);
+            var n = M.getNameByHandle(v);
 
             if (!n || !c) {
                 return; // skip, contact not found

@@ -3189,9 +3189,15 @@
     "8655": "Obnovi\u0165",
     "8656": "Vyberte...",
     "8657": "EXPIROVAN\u00c9",
-    "8658": "your first name",
-    "8659": "your last name",
+    "8658": "va\u0161e krstn\u00e9 meno",
+    "8659": "va\u0161e priezvisko",
     "8660": "Windows Phone",
+    "8661": "What is MEGA?",
+    "8662": "Select all",
+    "8663": "Deselect all",
+    "8664": "owner",
+    "8665": "Please check your registration email and confirm your account before you pay, so that MEGA can credit your payment to the correct account.",
+    "8666": "Confirm your registration",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3245,6 +3251,8 @@
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
         "choose": 8656,
-        "windows-phone": 8660
+        "windows-phone": 8660,
+        "confirm-email-message": 8665,
+        "confirm-email-title": 8666
     }
 }

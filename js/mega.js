@@ -3457,7 +3457,7 @@ function MegaData()
 
                     if (importNodes && Object(res.f).length < importNodes) {
                         msgDialog('warninga', l[882],
-                            'We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.'
+                            l[8683]
                                 .replace('%1', Object(res.f).length)
                                 .replace('%2', importNodes)
                         );

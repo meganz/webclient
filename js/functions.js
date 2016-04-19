@@ -4099,7 +4099,9 @@ var watchdog = Object.freeze({
                 break;
 
             case 'setsid':
-                if (dlmanager.isOverQuota) {
+                if (typeof dlmanager === 'object'
+                        && dlmanager.isOverQuota) {
+
                     // another tab fired a login/register while this one has an overquota state
                     var sid = strg.data;
                     delay('watchdog:setsid', function() {

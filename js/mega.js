@@ -514,7 +514,7 @@ function MegaData()
         }
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
-            if ((M.u[u].c === 1 || M.u[u].c === 2) && !avatars[u]) {
+            if ((M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0) && !avatars[u]) {
                 waitingPromises.push(
                     mega.attr.get(u, 'a', true, false)
                         .done(function (res) {
@@ -1028,7 +1028,7 @@ function MegaData()
                                 <td>\n\
                                     ' + avatar + ' \
                                     <div class="fm-chat-user-info todo-star">\n\
-                                        <div class="fm-chat-user">' + htmlentities(mega.utils.fullUsername(node.u)) + '</div>\n\
+                                        <div class="fm-chat-user">' + htmlentities(M.getNameByHandle(node.u)) + '</div>\n\
                                         <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
                                     </div>\n\
                                 </td>\n\
@@ -1092,7 +1092,7 @@ function MegaData()
                 if (M.currentdirid === 'shares') {// render shares tab
                     // Handle of initial share owner
                     var ownersHandle = M.v[i].su;
-                    var fullContactName = htmlentities(mega.utils.fullUsername(ownersHandle));
+                    var fullContactName = htmlentities(M.getNameByHandle(ownersHandle));
 
                     cs = M.contactstatus(M.v[i].h);
                     contains = fm_contains(cs.files, cs.folders);
@@ -1326,7 +1326,7 @@ function MegaData()
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             else if (M.currentdirid === 'contacts') {
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6772]);
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
             else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
@@ -3516,7 +3516,9 @@ function MegaData()
                 i: requesti
             });
             if (node && node.p) {
-                if (M.c[node.p] && M.c[node.p][h]) {
+                var parent = node.p;
+
+                if (M.c[parent] && M.c[parent][h]) {
                     delete M.c[node.p][h];
                 }
                 // Update M.v it's used for slideshow preview at least
@@ -3530,11 +3532,8 @@ function MegaData()
                     M.c[t] = [];
                 }
                 M.c[t][h] = 1;
-                removeUInode(h);
-                this.nodeAttr({
-                        h: h,
-                        p: t
-                    });
+                this.nodeAttr({ h: h, p: t });
+                removeUInode(h, parent);
                 newnodes.push(node);
             }
         }
@@ -4148,6 +4147,62 @@ function MegaData()
         }
     };
 
+    /**
+     * Retrieve an user object by its handle
+     * @param {String} handle The user's handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUserByHandle = function(handle) {
+        var user = false;
+
+        if (Object(M.u).hasOwnProperty(handle)) {
+            user = M.u[handle];
+
+            if (user instanceof MegaDataObject) {
+                user = user._data;
+            }
+        }
+
+        return user;
+    };
+
+    /**
+     * Retrieve the name of an user or ufs node by its handle
+     * @param {String} handle The handle
+     * @return {String} the name, of an empty string if not found
+     */
+    this.getNameByHandle = function(handle) {
+        var result = '';
+
+        handle = String(handle);
+
+        if (handle.length === 11) {
+            var user = this.getUserByHandle(handle);
+
+            if (user) {
+                // XXX: fallback to email
+                result = user.name && $.trim(user.name) || user.m;
+            }
+        }
+        else if (handle.length === 8) {
+            var node = this.getNodeByHandle(handle);
+
+            if (node) {
+                result = node.name;
+            }
+        }
+        else {
+            console.error('getNameByHandle: Unsupported handle "%s"', handle);
+        }
+
+        return String(result);
+    };
+
+    /**
+     * Retrieve an ufs node by its handle
+     * @param {String} handle The node's handle
+     * @return {Object} The node object, of false if not found
+     */
     this.getNodeByHandle = function(handle) {
         if (Object(M.d).hasOwnProperty(handle)) {
             return M.d[handle];
@@ -4164,6 +4219,11 @@ function MegaData()
         return false;
     };
 
+    /**
+     * Check whether an object is an ufs node
+     * @param {String} n The object to check
+     * @return {Boolean}
+     */
     this.isNodeObject = function(n) {
         return typeof n === 'object' && Array.isArray(n.key) && n.key.length === 8;
     };
@@ -4697,12 +4757,16 @@ function MegaData()
                  * there is network activity associated with the download, though.
                  */
                 if (page === 'download') {
-                    $('.download.error-icon').text(errorstr);
-                    $('.download.error-icon').removeClass('hidden');
-                    $('.download.icons-block').addClass('hidden');
-
                     if (error === EOVERQUOTA) {
+                        $('.download-info.time-txt .text').text('');
+                        $('.download-info.speed-txt .text').text('');
+                        $('.download.pause-button').addClass('active');
                         $('.download.info-block').addClass('overquota');
+                    }
+                    else {
+                        $('.download.error-icon').text(errorstr);
+                        $('.download.error-icon').removeClass('hidden');
+                        $('.download.icons-block').addClass('hidden');
                     }
                 }
                 else {
@@ -5974,6 +6038,29 @@ function execsc(actionPackets, callback) {
         // Action packet for the mcc
         else if (actionPacket.a === 'mcc') {
             $(window).trigger('onChatCreatedActionPacket', actionPacket);
+        }
+        // Action packet for 'Set Email'
+        else if (actionPacket.a === 'se') {
+            var emailChangeAccepted = (actionPacket.s === 3
+                                       && typeof actionPacket.e === 'string'
+                                       && actionPacket.e.indexOf('@') !== -1);
+
+            if (emailChangeAccepted) {
+                var user = M.getUserByHandle(actionPacket.u);
+
+                if (user) {
+                    user.m = actionPacket.e;
+                    process_u([user]);
+
+                    if (actionPacket.u === u_handle) {
+                        u_attr.email = user.m;
+
+                        if (M.currentdirid === 'account/profile') {
+                            $('.nw-fm-left-icon.account').trigger('click');
+                        }
+                    }
+                }
+            }
         }
         else {
             if (d) {

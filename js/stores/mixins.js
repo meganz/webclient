@@ -337,6 +337,16 @@ var MegaRenderMixin = {
         } else {
             return null;
         }
+    },
+    safeForceUpdate: function() {
+        var self = this;
+        try {
+            setTimeout(function() {
+                self.forceUpdate();
+            }, 75);
+        } catch(e) {
+            console.warn(e);
+        }
     }
 };
 

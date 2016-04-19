@@ -383,13 +383,10 @@ var ConversationMessage = React.createClass({
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
 
-                                    if (!src || !src.seen) {
+                                    if (!src || src !== v) {
                                         M.v.push(v);
                                         if (!v.seen) {
                                             v.seen = 1; // HACK
-                                        }
-                                        if (src) {
-                                            src.seen = 1; // HACK
                                         }
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }
@@ -488,10 +485,18 @@ var ConversationMessage = React.createClass({
 
                         }
                         var dropdown = null;
+                        if (!M.u[contact.u]) {
+                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+                                'u': contact.u,
+                                'name': contact.name,
+                                'm': contact.email,
+                                'c': 0
+                            }));
+                        }
                         if (M.u[contact.u]) {
                             // Only show this dropdown in case this user is a contact, e.g. don't show it if thats me
                             // OR it is a share contact, etc.
-                            if (contact.c === 1) {
+                            if (M.u[contact.u].c === 1) {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
                                     icon="tiny-icon grey-down-arrow">
@@ -529,22 +534,21 @@ var ConversationMessage = React.createClass({
                                     </DropdownsUI.Dropdown>
                                 </ButtonsUI.Button>;
                             }
-                        }
-                        else {
-                            dropdown = <ButtonsUI.Button
-                                className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
-                                <DropdownsUI.Dropdown
-                                    className="white-context-menu shared-contact-dropdown"
-                                    noArrow={true}
-                                    positionMy="left bottom"
-                                    positionAt="right bottom"
-                                    horizOffset={4}
-                                >
-                                    <DropdownsUI.DropdownItem
-                                        icon="rounded-grey-plus"
-                                        label={__("Add contact")}
-                                        onClick={() => {
+                            else if (M.u[contact.u].c === 0) {
+                                dropdown = <ButtonsUI.Button
+                                    className="default-white-button tiny-button"
+                                    icon="tiny-icon grey-down-arrow">
+                                    <DropdownsUI.Dropdown
+                                        className="white-context-menu shared-contact-dropdown"
+                                        noArrow={true}
+                                        positionMy="left bottom"
+                                        positionAt="right bottom"
+                                        horizOffset={4}
+                                    >
+                                        <DropdownsUI.DropdownItem
+                                            icon="rounded-grey-plus"
+                                            label={__("Add contact")}
+                                            onClick={() => {
                                             M.inviteContact(M.u[u_handle].m, contactEmail);
 
                                             // Contact invited
@@ -558,17 +562,18 @@ var ConversationMessage = React.createClass({
                                             closeDialog();
                                             msgDialog('info', title, msg);
                                         }}
-                                    />
-                                    {deleteButtonOptional ? <hr /> : null}
-                                    {deleteButtonOptional}
-                                </DropdownsUI.Dropdown>
-                            </ButtonsUI.Button>;
+                                        />
+                                        {deleteButtonOptional ? <hr /> : null}
+                                        {deleteButtonOptional}
+                                    </DropdownsUI.Dropdown>
+                                </ButtonsUI.Button>;
+                            }
                         }
 
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{htmlentities(mega.utils.fullUsername(contact.u))}</div>
+                                    <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :
@@ -757,7 +762,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -768,7 +773,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
             }
 
             message.textContents = textMessage;

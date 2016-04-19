@@ -21,7 +21,7 @@ var ContactsListItem = React.createClass({
                     <div className="nw-contact-status"></div>
                     <div className="nw-conversations-unread">0</div>
                     <div className="nw-conversations-name">
-                        {mega.utils.fullUsername(contact.u)}
+                        {M.getNameByHandle(contact.u)}
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@ var ContactVerified = React.createClass({
             crypt.getPubEd25519(contact.u)
                 .done(function() {
                     if(self.isMounted()) {
-                        self.forceUpdate();
+                        self.safeForceUpdate();
                     }
                 })
         }
@@ -80,6 +80,10 @@ var Avatar = React.createClass({
         var self = this;
         var contact = this.props.contact;
 
+        if (!contact.m && contact.email) {
+            contact.m = contact.email;
+        }
+
         var $avatar = $(useravatar.contact(contact));
 
         var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
@@ -95,38 +99,7 @@ var Avatar = React.createClass({
             verifiedElement = <ContactVerified contact={this.props.contact} className={this.props.verifiedClassName} />
         }
 
-        if($avatar.find("img").length > 0) {
-            displayedAvatar = <div className={classes} style={this.props.style}>
-                {verifiedElement}
-                <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
-            </div>;
-        } else {
-            var tempClasses = $avatar.attr('class');
-            var colorNum = tempClasses.split("color")[1].split(" ")[0];
-            classes += " color" + colorNum;
-
-            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={$(useravatar.contact(contact)).text()}></div></div>;
-
-        }
-
-        return displayedAvatar;
-    }
-});
-
-var AvatarImage = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
-        var contact = this.props.contact;
-
-        var imgUrl = useravatar.imgUrl(contact.u);
-
-        var displayedAvatar;
-
-        displayedAvatar = <img src={imgUrl} style={this.props.imgStyles} className="avatar-img" />;
-
         if (!avatars[contact.u] && (!_noAvatars[contact.u] || _noAvatars[contact.u] !== true)) {
-            var self = this;
-
             var loadAvatarPromise;
             if (!_noAvatars[contact.u]) {
                 loadAvatarPromise = mega.attr.get(contact.u, 'a', true, false);
@@ -149,11 +122,25 @@ var AvatarImage = React.createClass({
 
                     delete _noAvatars[contact.u];
 
-                    self.forceUpdate();
+                    self.safeForceUpdate();
                 })
                 .fail(function(e) {
                     _noAvatars[contact.u] = true;
                 });
+
+        }
+
+        if($avatar.find("img").length > 0) {
+            displayedAvatar = <div className={classes} style={this.props.style}>
+                {verifiedElement}
+                <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
+            </div>;
+        } else {
+            var tempClasses = $avatar.attr('class');
+            var colorNum = tempClasses.split("color")[1].split(" ")[0];
+            classes += " color" + colorNum;
+
+            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={$(useravatar.contact(contact)).text()}></div></div>;
 
         }
 
@@ -222,7 +209,7 @@ var ContactCard = React.createClass({
                 {contextMenu}
 
                 <div className="user-card-data">
-                    <div className="user-card-name small">{mega.utils.fullUsername(contact.u)}</div>
+                    <div className="user-card-name small">{M.getNameByHandle(contact.u)}</div>
                     <div className="user-card-email small">{contact.m}</div>
                 </div>
             </div>;
@@ -317,6 +304,5 @@ module.exports = {
     Avatar,
     ContactPickerWidget,
     ContactVerified,
-    ContactPresence,
-    AvatarImage
+    ContactPresence
 };

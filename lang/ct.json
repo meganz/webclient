@@ -1067,7 +1067,7 @@
     "1838": "\u5728\u96f2\u7aef\uff0c\u522a\u9664\u7684\u6a94\u6848\u5c07\u88ab\u79fb\u5230\u5783\u573e\u593e\u4e2d\u7279\u6b8a\u7684\"SyncDebris\"\u5b50\u8cc7\u6599\u593e\uff0c\u4e14\u53ef\u5f9e\u90a3\u627e\u56de(\u5982\u6709\u9700\u8981\u53ef\u4f7f\u7528MEGA\u5167\u5efa\u641c\u5c0b)\u3002\u5728\u672c\u6a5f\u96fb\u8166\uff0c\u6bcf\u4e00\u540c\u6b65\u8cc7\u6599\u593e\u5c07\u6709\u4e00\u96b1\u85cf\"Debris\"\u8cc7\u6599\u593e\u653e\u7f6e\u522a\u9664\u7684\u9805\u76ee\u3002",
     "1860": "\u60a8\u53ef\u5f9e[A]App Store[\/A]\u4e0b\u8f09\u4e26\u5b89\u88dd\u6211\u5011\u7684iOS app\u3002",
     "1862": "\u60a8\u53ef\u5f9e[A]Google Play[\/A]\u4e0b\u8f09\u4e26\u5b89\u88dd\u6211\u5011\u7684Android app\u3002",
-    "1863": "\u6211\u5011\u81f4\u529b\u65bc\u63d0\u4f9b\u884c\u52d5\u88dd\u7f6e\u5c08\u7528\u7684[A]apps[\/A]\uff0c\u5305\u542b[B]iOS[\/B]\u8207[C]Android[\/C]\u3002",
+    "1863": "\u6211\u5011\u81f4\u529b\u65bc\u63d0\u4f9b\u884c\u52d5\u88dd\u7f6e\u5c08\u7528\u7684[A]apps[\/A]\uff0c\u5305\u542b[B]iOS[\/B]\uff0c[C]Android[\/C]\u8207[D]Windows Phone[\/D]\u3002",
     "1864": "\u932f\u8aa4\u5831\u544a",
     "1867": "\u8b1d\u8b1d\u60a8\u7684\u5408\u4f5c!",
     "1868": "\u50b3\u9001\u5831\u544a",
@@ -3189,6 +3189,15 @@
     "8655": "\u66f4\u65b0",
     "8656": "\u9078\u64c7...",
     "8657": "\u904e\u671f\u65e5",
+    "8658": "your first name",
+    "8659": "your last name",
+    "8660": "Windows Phone",
+    "8661": "What is MEGA?",
+    "8662": "Select all",
+    "8663": "Deselect all",
+    "8664": "owner",
+    "8665": "Please check your registration email and confirm your account before you pay, so that MEGA can credit your payment to the correct account.",
+    "8666": "Confirm your registration",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3241,6 +3250,9 @@
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
-        "choose": 8656
+        "choose": 8656,
+        "windows-phone": 8660,
+        "confirm-email-message": 8665,
+        "confirm-email-title": 8666
     }
 }

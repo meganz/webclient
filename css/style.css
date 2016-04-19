@@ -16615,8 +16615,29 @@ strong, b {
     color: #333333;
     padding: 20px 0 17px 0;
 }
+.fm-dialog.wire-transfer-dialog {
+    width: 900px;
+}
+.wire-transfer-dialog li {
+    padding-bottom: 0;
+}
+.wire-transfer-dialog .separator {
+    border: 1px solid #adadad;
+    margin: 0 0 15px;
+}
+.wire-transfer-options {
+    overflow: auto;
+}
 .wire-transfer-details {
+    background: #fafafa none repeat scroll 0 0;
+    border-radius: 7px;
+    float: left;
     margin-bottom: 20px;
+    padding: 15px;
+    width: 49%;
+}
+.wire-transfer-details:last-child {
+    float: right;
 }
 /* Make the wire transfer details mouse selectable */
 .resellers-top-txt .wire-transfer-details th {

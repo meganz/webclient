@@ -1771,7 +1771,12 @@ var wireTransferDialog = {
 
         // If logged in, pre-populate email address into wire transfer details
         if (typeof u_attr !== 'undefined') {
-            wireTransferDialog.$dialog.find('.email-address').text(u_attr.email);
+            
+            // Replace the @ with -at- so the bank will accept it on the form
+            var email = u_attr.email;
+                email = email.replace('@', '-at-');
+            
+            wireTransferDialog.$dialog.find('.email-address').text(email);
         }
 
         // Update plan price in the dialog

@@ -11,10 +11,6 @@ body.pro:after {
     background-image: url(../images/mega/bitcoin-v7@2x.png);
     background-size: 200px auto;
 }
-.top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url(../images/mega/lang-selection-sprite-v2@2x.png);
-    background-size: 92px auto;
-}
 .provider-icon {
     background-image: url(../images/mega/payment-provider-icons-v1@2x.png);
     background-size: 20px auto;
@@ -324,10 +320,6 @@ body.pro:after {
 .register-info-icon {
     background-image: url(../images/mega/register-info@2x.png);
     background-size: 120px auto;
-}
-.nlanguage-tooltip-bg, .nlanguage-bottom {
-    background-image: url(../images/mega/language-sprite@2x.png);
-    background-size: 18px auto;
 }
 .download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon, .toast-close-button {
     background-image: url(../images/mega/download-sprite-v6@2x.png);

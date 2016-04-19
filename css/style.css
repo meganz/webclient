@@ -296,49 +296,6 @@ a.nlanguage-lnk.language-template {
     background: #D31A00;
     border: 2px solid #D31A00;
 }
-.nlanguage-tooltip {
-    display: none;
-    position: absolute;
-    left: -5px;
-    top: 0;
-    width: 1px;
-    margin-top: -1px;
-    z-index: 1;
-}
-a.nlanguage-lnk:hover .nlanguage-tooltip {
-    display: block;
-}
-.nlanguage-tooltip-bg {
-    display: block;
-    background-image: url(../images/mega/language-sprite.png);
-    background-position: right top;
-    background-repeat: no-repeat;
-    padding-right: 13px;
-    float: right;
-}
-.nlanguage-tooltip-main {
-    display: block;
-    height: 26px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    font-size: 14px;
-    line-height: 24px;
-    color: white;
-    padding: 0 5px 0 10px;
-    position: relative;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    -webkit-border-bottom-right-radius: 0;
-    -moz-border-radius-bottomright: 0;
-    border-bottom-right-radius: 0;
-    -webkit-border-top-right-radius: 0;
-    -moz-border-radius-topright: 0;
-    border-top-right-radius: 0;
-    background-color: rgba(0,0,0,0.85);
-    white-space: nowrap;
-}
 .nlanguage-bottom {
     color: #5F5F5D;
     font-size: 14px;
@@ -347,8 +304,8 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     padding: 16px 0 0 38px;
-    background-position: 9px -249px;
-    background-image: url(../images/mega/language-sprite.png);
+    background-position: 0px -1037px;
+    background-image: url(../images/mega/top-sprite_v4.svg);
     background-repeat: no-repeat;
 }
 .nlanguage-bottom a, .nlanguage-bottom a:link, .nlanguage-bottom a:visited, .nlanguage-bottom a:hover, .nlanguage-bottom a:active {
@@ -405,16 +362,16 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
     vertical-align: middle;
 }
 .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url("../images/mega/lang-selection-sprite-v2.png");
-    background-position: -83px 0;
+    background-image: url(../images/mega/top-sprite_v4.svg);
+    background-position: -13px -1108px;
     background-repeat: no-repeat;
     display: inline-block;
-    height: 6px;
+    height: 7px;
     opacity: 0.6;
     position: relative;
     top: 1px;
     vertical-align: middle;
-    width: 9px;
+    width: 11px;
 }
 .languages-dialog .show-more-languages .round-arrow.opened span {
     -webkit-transform: rotate(180deg);
@@ -1604,13 +1561,12 @@ a.blog-button:hover {
     color: rgba(255, 255, 255, 0.8);
 }
 .top-change-language-icon {
-    background-image: url("../images/mega/lang-selection-sprite-v2.png");
-    background-position: 0 0;
+    background-image: url(../images/mega/top-sprite_v4.svg);
+    background-position: -10px -1016px;
     background-repeat: no-repeat;
     height: 18px;
     position: relative;
     width: 16px;
-    background-position: 0px 1px;
     float: left;
     top: 3px;
     margin: 0 0 0 -1px;

@@ -84,8 +84,8 @@ function dl_g(res) {
                 $(this).addClass('active');
             }
             else {
-                fm_tfsresume('dl_' + fdl_queue_var.ph);
                 $(this).removeClass('active');
+                fm_tfsresume('dl_' + fdl_queue_var.ph);
             }
         });
         var key = dlpage_key;

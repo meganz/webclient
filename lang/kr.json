@@ -3198,6 +3198,11 @@
     "8664": "\uc18c\uc720\uc790",
     "8665": "MEGA\uac00 \uc62c\ubc14\ub978 \uacc4\uc815\uc5d0 \ub2f9\uc2e0\uc758 \uacb0\uc81c\ub97c \ub4f1\ub85d\ud560 \uc218 \uc788\ub3c4\ub85d, \ub4f1\ub85d\ud55c \uc774\uba54\uc77c\uc744 \ud655\uc778\ud558\uace0 \uacc4\uc815\uc744 \uc2b9\uc778\ud558\uc138\uc694.",
     "8666": "\ub4f1\ub85d\uc744 \ud655\uc778\ud558\uc138\uc694",
+    "8667": "If you want to subscribe for a yearly PRO account, you can wire transfer funds to either of our bank accounts:",
+    "8668": "IBAN",
+    "8669": "Not applicable for NZ banks",
+    "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
+    "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3253,6 +3258,11 @@
         "choose": 8656,
         "windows-phone": 8660,
         "confirm-email-message": 8665,
-        "confirm-email-title": 8666
+        "confirm-email-title": 8666,
+        "wire-transfer-main-instruction": 8667,
+        "iban": 8668,
+        "not-applicable-nz-banks": 8669,
+        "wire-transfer-reference-field-note": 8670,
+        "iban-note": 8671
     }
 }

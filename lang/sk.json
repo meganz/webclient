@@ -3198,6 +3198,11 @@
     "8664": "vlastn\u00edk",
     "8665": "Pros\u00edm, skontrolujte si svoj registra\u010dn\u00fd email a potvr\u010fte svoj \u00fa\u010det predt\u00fdm ako budete plati\u0165, aby MEGA mohlo prip\u00edsa\u0165 platbu ku spr\u00e1vnemu \u00fa\u010dtu.",
     "8666": "Potvr\u010fte svoju registr\u00e1ciu",
+    "8667": "If you want to subscribe for a yearly PRO account, you can wire transfer funds to either of our bank accounts:",
+    "8668": "IBAN",
+    "8669": "Not applicable for NZ banks",
+    "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
+    "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3253,6 +3258,11 @@
         "choose": 8656,
         "windows-phone": 8660,
         "confirm-email-message": 8665,
-        "confirm-email-title": 8666
+        "confirm-email-title": 8666,
+        "wire-transfer-main-instruction": 8667,
+        "iban": 8668,
+        "not-applicable-nz-banks": 8669,
+        "wire-transfer-reference-field-note": 8670,
+        "iban-note": 8671
     }
 }

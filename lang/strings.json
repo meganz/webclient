@@ -12827,6 +12827,34 @@
         "text": "No Results",
         "context": "Displayed message when the user makes a search and there is 'No Results' for the search."
     },
+    "8675": {
+        "text": "Add contacts",
+        "context": "A button title which is shown in empty views when you can add contacts."
+    },
+    "8676": {
+        "text": "Files imported",
+        "context": "A message which is shown when some files have been imported."
+    },
+    "8677": {
+        "text": "On your device",
+        "context": "A title header that refers to where do you do the actions. This is found in 'Clear Offline files' and 'Clear cache' inside 'Settings' -> 'Advanced' section."
+    },
+    "8679": {
+        "text": "On MEGA",
+        "context": "A title header that refers to where do you do the action. This is found in 'Empty Rubbish Bin' inside 'Settings' -> 'Advanced' section."
+    },
+    "8681": {
+        "text": "Are you sure you want to delete this item from Offline?",
+        "context": "An alert message which is shown when the user removes one item from the Offline section."
+    },
+    "8682": {
+        "text": "Are you sure you want to delete these items from Offline?",
+        "context": "An alert message which is shown when the user removes various items from the Offline section."
+    },
+    "8683": {
+        "text": "We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.",
+        "context": "An error shown when importing a folder link and some of the folder's files failed to import."
+    },
     "8684": {
         "text": "Send and close",
         "context": "A button label to send the user's feedback and close the dialog."

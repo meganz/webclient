@@ -3215,6 +3215,8 @@
     "8683": "Det gick inte att importera alla filer, sannolikt eftersom vissa av dem togs ned. Operationen avslutades med% 1% 2-noder har importerats.",
     "8684": "Skicka och st\u00e4ng",
     "8685": "Var v\u00e4nlig f\u00f6rklara varf\u00f6r du vill avsluta din MEGA-plan",
+    "8686": "undecrypted folder",
+    "8687": "undecrypted file",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

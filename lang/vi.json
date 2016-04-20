@@ -3215,6 +3215,8 @@
     "8683": "We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.",
     "8684": "G\u1eedi \u0111i v\u00e0 ho\u00e0n t\u1ea5t",
     "8685": "Xin qu\u00fd kh\u00e1ch vui l\u00f2ng cung c\u1ea5p l\u00fd do d\u1eebng s\u1eed d\u1ee5ng d\u1ecbch v\u1ee5:",
+    "8686": "undecrypted folder",
+    "8687": "undecrypted file",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -3215,6 +3215,8 @@
     "8683": "We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.",
     "8684": "Send and close",
     "8685": "Please explain why you don&#039;t wish to renew your plan:",
+    "8686": "undecrypted folder",
+    "8687": "undecrypted file",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

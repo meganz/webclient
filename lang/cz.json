@@ -3215,6 +3215,8 @@
     "8683": "Nepoda\u0159ilo se n\u00e1m importovat v\u0161echny soubory, pravd\u011bpodobn\u011b proto, \u017ee n\u011bkter\u00e9 byly ukon\u010deny. Operace skon\u010dila s \u00fasp\u011b\u0161n\u011b impotov\u00e1na %1 z %2 uzl\u016f.",
     "8684": "Odeslat a zav\u0159\u00edt",
     "8685": "Vysv\u011btlete, pro\u010d si nep\u0159ejete obnovit sv\u016fj pl\u00e1n:",
+    "8686": "undecrypted folder",
+    "8687": "undecrypted file",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

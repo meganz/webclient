@@ -297,13 +297,10 @@ var GenericConversationMessage = React.createClass({
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
 
-                                    if (!src || !src.seen) {
+                                    if (!src || src !== v) {
                                         M.v.push(v);
                                         if (!v.seen) {
                                             v.seen = 1; // HACK
-                                        }
-                                        if (src) {
-                                            src.seen = 1; // HACK
                                         }
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }
@@ -402,10 +399,18 @@ var GenericConversationMessage = React.createClass({
 
                         }
                         var dropdown = null;
+                        if (!M.u[contact.u]) {
+                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+                                'u': contact.u,
+                                'name': contact.name,
+                                'm': contact.email,
+                                'c': 0
+                            }));
+                        }
                         if (M.u[contact.u]) {
                             // Only show this dropdown in case this user is a contact, e.g. don't show it if thats me
                             // OR it is a share contact, etc.
-                            if (contact.c === 1) {
+                            if (M.u[contact.u] && M.u[contact.u].c === 1) {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
                                     icon="tiny-icon grey-down-arrow">
@@ -444,7 +449,7 @@ var GenericConversationMessage = React.createClass({
                                 </ButtonsUI.Button>;
                             }
                         }
-                        else {
+                        else if (M.u[contact.u] && M.u[contact.u].c === 0) {
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
                                 icon="tiny-icon grey-down-arrow">
@@ -482,7 +487,7 @@ var GenericConversationMessage = React.createClass({
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{mega.utils.fullUsername(contact.u)}</div>
+                                    <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :
@@ -671,7 +676,7 @@ var GenericConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -682,7 +687,7 @@ var GenericConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
             }
 
             message.textContents = textMessage;

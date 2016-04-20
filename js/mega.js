@@ -4165,12 +4165,18 @@ function MegaData()
                 // XXX: fallback to email
                 result = user.name && $.trim(user.name) || user.m;
             }
+            else {
+                result = handle;
+            }
         }
         else if (handle.length === 8) {
             var node = this.getNodeByHandle(handle);
 
             if (node) {
                 result = node.name;
+            }
+            else {
+                result = handle;
             }
         }
         else {

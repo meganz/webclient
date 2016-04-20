@@ -90,7 +90,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
     // Events
     this.bind('onStateChange', function(e, oldState, newState) {
-        self.logger.error("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
+        self.logger.log("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 
         var resetStateToReady = function() {
             if (self.state != ChatRoom.STATE.LEFT && self.state != ChatRoom.STATE.READY) {
@@ -654,7 +654,7 @@ ChatRoom.prototype.getRoomTitle = function() {
         participants.forEach(function(contactHash) {
             if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
                 names.push(
-                    M.u[contactHash] ? mega.utils.fullUsername(contactHash) : "non contact"
+                    M.u[contactHash] ? M.getNameByHandle(contactHash) : "non contact"
                 );
             }
         });

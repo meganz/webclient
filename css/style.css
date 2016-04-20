@@ -4977,10 +4977,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .astropay-payment-reminder .first-message, .astropay-payment-reminder .second-message {
     margin-top: 20px;
 }
-.astropay-payment-reminder .warning-button.renew:hover {
+.astropay-payment-reminder .warning-button.renew:hover, .astropay-payment-reminder .warning-button.close:hover {
     background-color: rgba(39, 183, 0, 0.25);
 }
-.astropay-payment-reminder .warning-button.renew:hover span {
+.astropay-payment-reminder .warning-button.renew:hover span, .astropay-payment-reminder .warning-button.close:hover span {
     color: #27b700;
 }
 .astropay-payment-reminder .plan-expired-checkbox {

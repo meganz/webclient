@@ -284,6 +284,9 @@ var alarm = {
 
                 // Set a flag so it doesn't show each time
                 alarm.seen = true;
+                
+                // Add a log
+                api_req({ a: 'log', e: 99606, m: 'User chose a new plan from the plan expiry dialog' });
 
                 // Go to the first step of the Pro page so they can choose a new plan
                 document.location.hash = 'pro';
@@ -305,6 +308,9 @@ var alarm = {
 
                 // Set a flag so it doesn't show each time
                 alarm.seen = true;
+                
+                // Add a log
+                api_req({ a: 'log', e: 99607, m: 'User chose to renew existing plan from the plan expiry dialog' });
 
                 // Get the link for the Pro page second step e.g. #pro_lite, #pro_1 etc
                 var proLink = (proNum === 4) ? 'lite' : proNum;

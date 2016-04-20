@@ -41,7 +41,6 @@
     height: 100%;
     display: table;
 }
-
 .messages.main-pad {
     display: table;
     width: 100%;
@@ -74,7 +73,7 @@
 }
 .messages.notification .info > span {
     padding: 0 0 16px 0;
-    display:block;
+    display: block;
 }
 .messages.notification .info p {
     font-size: 14px;
@@ -84,13 +83,13 @@
     margin: 0;
 }
 .messages.notification .info p i {
-    position:absolute;
+    position: absolute;
     left: 0;
-    margin:4px 0 0 0;
+    margin: 4px 0 0 0;
 }
 .messages.notification .info p strong {
-    display:block;
-    color:#666666;
+    display: block;
+    color: #666666;
 }
 .message.body {
     padding: 0 24px 0 24px;
@@ -105,13 +104,28 @@
     color: #666666;
 }
 .message.small-rounded-avatar {
-    margin: 3px 0 0 0;
+    margin: 2px 0 0 0;
 }
 .message.text-block {
-    margin: 2px 30px 0 0;
+    margin: 3px 30px 0 0;
     word-wrap: break-word;
     min-height: 20px;
-    position:relative;
+    position: relative;
+}
+.not-sent.retrying .message.text-block {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
+.message.text-block em {
+    font-family: 'Open Sans Italic';
+    font-size: 12px;
+    color: rgba(43,166,222,0.7);
+    display: inline-block;
+    position: relative;
+    font-style: normal;
+    cursor: default;
 }
 .message.text-block a {
     color: #2BA6DE;
@@ -196,18 +210,24 @@
 .message.shared-data {
     margin: 0 0 4px 0;
 }
-.not-sent.message.body {
+.not-sent.message.body:not(.retrying) {
     background-color: rgba(255, 51, 58, 0.7);
     padding: 9px 24px 12px 24px;
 }
-.not-sent .message.user-card-name, .not-sent .message.text-block {
+.not-sent:not(.retrying) .message.user-card-name, .not-sent:not(.retrying) .message.text-block {
     color: white;
 }
-.not-sent .message.date-time {
+.not-sent:not(.retrying) .message.date-time {
     color: rgba(255,255,255,0.84);
 }
-.not-sent .red {
+.not-sent:not(.retrying) .red {
     color: #E54C51;
+}
+.not-sent-indicator {
+    position:absolute;
+    z-index: 10;
+    right: 20px;
+    margin: 5px 0 0 0;
 }
 .message.circuit-label {
     display: block;
@@ -245,4 +265,15 @@
     position: absolute;
     right: 24px;
     margin-top: -15px;
+}
+.message.warning-text {
+    font-size: 11px;
+    line-height: 20px;
+    color: #999999;
+    font-family: 'Open Sans Italic';
+    padding: 11px 0 0 7px;
+    margin: 0 0 -1px 0;
+}
+.message.warning-text i {
+    margin: 0 5px 0 0;
 }

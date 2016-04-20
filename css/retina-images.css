@@ -1,3 +1,4 @@
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);
@@ -12,10 +13,6 @@ body.pro:after {
 }
 .astropay-payment-reminder .mega-payment-icon {
     background-image: url("../images/mega/bitcoin-v7@2x.png");
-}
-.top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url(../images/mega/lang-selection-sprite-v2@2x.png);
-    background-size: 92px auto;
 }
 .provider-icon {
     background-image: url(../images/mega/payment-provider-icons-v1@2x.png);
@@ -36,10 +33,6 @@ body.pro:after {
 .slideshow-icon, .slideshow-download span, .slideshow-prev-icon, .slideshow-next-icon, .slideshow-pending, .slideshow-error-icon, .slideshow-error-button, .slideshow-progress-icon {
     background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
     background-size: 276px auto;
-}
-.fm-share-empty {
-    background-image: url(../images/mega/share-folder@2x.png?v=1);
-    background-size: 200px auto;
 }
 .sync-top-logo, .sync-short-block li, .sync-help-center {
     background-image: url(../images/mega/sync-nw-v3@2x.png);
@@ -331,14 +324,7 @@ body.pro:after {
     background-image: url(../images/mega/register-info@2x.png);
     background-size: 120px auto;
 }
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contacts-sorting-by.active, .contacts-sorting-type.active, .fm-version-select, .active .fm-dialog-input-clear, .fm-share-add-contacts, .fm-share-pointer, .fm-share-contacts-search, .fm-share-dropdown, .fm-share-permissions-block, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow, .astropay-payment-reminder .checkboxOff, .astropay-payment-reminder .checkboxOn {
-    background-image: url(../images/mega/main-sprite@2x.png?v=7);
-    background-size: 50px auto;
-}
-.nlanguage-tooltip-bg, .nlanguage-bottom {
-    background-image: url(../images/mega/language-sprite@2x.png);
-    background-size: 18px auto;
-}
+
 .download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon, .toast-close-button {
     background-image: url(../images/mega/download-sprite-v6@2x.png);
     background-size: 257px auto;
@@ -351,8 +337,8 @@ body.pro:after {
     background-image: url(../images/mega/rounded-progressbars@2x.png);
     background-size: 64px auto;
 }
-.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password {
-    background-image: url(../images/mega/top-login-sprite@2x_v4.png);
+.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .contains-value .top-search-clear, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow {
+    background-image: url(../images/mega/top-login-sprite_v5@2x.png);
     background-size: 48px auto;
 }
 .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .toast-icon {
@@ -379,8 +365,8 @@ body.pro:after {
     background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
     background-size: 755px auto;
 }
-.sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow, .win-phone-button, .products-top-arrow {
-    background-image: url(../images/mega/mobile-sprite-v6@2x.png?v=4);
+.sync-list-txt, .sync-icon, .mobile-icon, .ff-icon, .chrome-icon, .mobile-small-icon, .chrome-bott-icons .ads-top-arrow {
+    background-image: url(../images/mega/mobile-sprite_v7@2x.png);
     background-size: 836px auto;
 }
 .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
@@ -423,9 +409,13 @@ body.pro:after {
     background-image: url(../images/mega/opensource-v2@2x.png);
     background-size: 100px auto;
 }
-.st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button, .upload-overlay-icon, .bottom-info.icon, .loading-info li::after {
-    background-image: url(../images/mega/new-startpage-sprite-v4@2x.png);
+.st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-scroll-button.grey-arrow, .upload-overlay-icon, .bottom-info.icon {
+    background-image: url(../images/mega/new-startpage-sprite_v5@2x.png);
     background-size: 356px auto;
+}
+.loading-info li::after {
+    background-image: url(../images/mega/loading-sprite_v2@2x.png);
+    background-size: 222px auto;
 }
 .powered-logo, .powered-arrow {
     background-image: url(../images/mega/instra-sprite@2x.png);
@@ -471,12 +461,16 @@ body.pro:after {
     background-image: url(../images/mega/quota-sprite@2x.png);
     background-size: 240px auto;
 }
-.chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-app-button.new-app, .chrome-download-button, a.chrome-download-button {
-    background-image: url(../images/mega/chrome-app1@2x.png);
+.chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-download-button, a.chrome-download-button {
+    background-image: url(../images/mega/chrome-app_v2@2x.png);
     background-size: 700px auto;
 }
+.chrome-app-button.new-app, .sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button, .chrome-app-button, .win-phone-button, .products-top-arrow {
+    background-image: url(../images/mega/download-buttons-sprite@2x.png);
+    background-size: 530px auto;
+}
 .chrome-download-button:hover, a.chrome-download-button:hover {
-    background-image: url(../images/mega/mobile-sprite-v6@2x.png?v=4);
+    background-image: url(../images/mega/mobile-sprite_v7@2x.png);
     background-size: 836px auto;
 }
 .backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon, .login-register-input.green-tick {

@@ -233,7 +233,7 @@ var useravatar = (function() {
 
         if (!u_handle) {
             /* No user */
-            return staticpath + 'images/mega/default-top-avatar.png';
+            return '';
         }
 
         try {
@@ -253,7 +253,7 @@ var useravatar = (function() {
 
         // If no user, return default avatar
         if (!u_handle) {
-            return staticpath + 'images/mega/default-avatar.png';
+            return '';
         }
 
         return ns.imgUrl(u_handle);

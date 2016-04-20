@@ -546,7 +546,6 @@ var strongvelope = {};
         this._sentKeyId = null;
         this.participantKeys = {};
         this.participantKeys[this.ownHandle] = {};
-        this.participantSenderKeys = [];
         this.otherParticipants = new Set();
         this.includeParticipants = new Set();
         this.excludeParticipants = new Set();
@@ -790,7 +789,6 @@ var strongvelope = {};
                                                     false);
 
         var result = asmCrypto.bytes_to_string(cipherBytes);
-        this.participantSenderKeys[destination] = result;
         return result;
     };
     /**
@@ -1111,7 +1109,7 @@ var strongvelope = {};
      * @param {String} message
      *     Data message to encrypt. If `null` or `undefined`, no message payload
      *     will be encoded (i. e. it's a "blind" management message).
-     * @param {String} keyId
+     * @param {Number} keyId
      *     keyId of the encryption key
      * @returns {String}
      *     Encrypted outgoing message.

@@ -1082,7 +1082,7 @@ Chat.prototype.getContactNameFromJid = function(jid) {
 
 
     if (contact) {
-        name = mega.utils.fullUsername(contact.u);
+        name = M.getNameByHandle(contact.u);
     }
 
     assert(name, "Name not found for jid: " + jid);

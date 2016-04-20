@@ -1284,7 +1284,7 @@ var proPage = {
             var currentPlan = membershipPlans[i];
 
             // If match on the membership plan, display that pricing option in the dropdown
-            if (currentPlan[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL] === account_type_num) {
+            if (currentPlan[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL] === parseInt(account_type_num)) {
 
                 // Get the price and number of months duration
                 var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE];

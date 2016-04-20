@@ -2406,6 +2406,7 @@ function MegaData()
 
         var folders = [],
             sub, cs, sm, fid, sharedFolder, html;
+        var nodeName = '';
 
         for (var i in this.c[id]) {
             if (this.d[i] && this.d[i].t === 1) {
@@ -2443,7 +2444,14 @@ function MegaData()
                     sharedFolder += ' shared-folder-item';
                 }
 
-                html = '<span class="context-menu-item ' + sharedFolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
+                if (missingkeys[fid]) {
+                    nodeName = l[8590];
+                }
+                else {
+                    nodeName = this.d[fid].name;
+                }
+
+                html = '<span class="context-menu-item ' + sharedFolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(nodeName) + '</span>' + sm;
 
                 $('#csb_' + id).append(html);
             }

@@ -3212,9 +3212,11 @@
     "8679": "MEGA&#039;da",
     "8681": "Bu \u00f6\u011feyi \u00c7evrimd\u0131\u015f\u0131&#039;dan silmek iste\u011finizden emin misiniz?",
     "8682": "Bu \u00f6\u011feleri \u00c7evrimd\u0131\u015f\u0131&#039;dan silmek iste\u011finizden emin misiniz?",
-    "8683": "We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.",
+    "8683": "T\u00fcm dosyalar\u0131 i\u00e7e aktaram\u0131yoruz, b\u00fcy\u00fck ihtimalle baz\u0131lar\u0131 \u00e7\u00f6km\u00fc\u015f. Operasyon %2 d\u00fc\u011f\u00fcmden %1 tanesinin i\u00e7e aktar\u0131lmas\u0131yla sonland\u0131.",
     "8684": "G\u00f6nder ve kapat",
     "8685": "L\u00fctfen plan\u0131n\u0131z\u0131 neden yenilemek istemedi\u011finizi a\u00e7\u0131klay\u0131n:",
+    "8686": "undecrypted folder",
+    "8687": "undecrypted file",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

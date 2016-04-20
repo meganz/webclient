@@ -12862,5 +12862,13 @@
     "8685": {
         "text": "Please explain why you don't wish to renew your plan:",
         "context": "A message on the payment plan expiry dialog to ask the user why they do not wish to renew their PRO plan."
+    },
+    "8686": {
+        "text": "undecrypted folder",
+        "context": "String which will show for every undecrypted folder. Note this's different then 'undecryptable folder' which already exists in dictionary under 8590 key."
+    },
+    "8687": {
+        "text": "undecrypted file",
+        "context": "String which will show for every undecrypted folder. Note this's different then 'undecryptable folder' which already exists in dictionary under 8588 key."
     }
 }

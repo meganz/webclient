@@ -3215,6 +3215,8 @@
     "8683": "Uvoz vseh datotek ni bil mo\u017een, najverjetneje zato, ker so bile nekatere odstranjene. Naloga se je zaklju\u010dila z %1 od %2 uspe\u0161no uvo\u017eenih povezav.",
     "8684": "Po\u0161lji in zapri",
     "8685": "Prosim, obrazlo\u017eite, zakaj ne \u017eelite obnoviti svojega plana:",
+    "8686": "undecrypted folder",
+    "8687": "undecrypted file",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

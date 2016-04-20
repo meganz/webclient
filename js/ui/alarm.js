@@ -88,7 +88,7 @@ var alarm = {
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();
             alarm.initWarningIconButton($container, $dialog);
-            alarm.showWarningPopup($container, $dialog);  
+            alarm.showWarningPopup($container, $dialog);
         },
         
         /**
@@ -130,7 +130,7 @@ var alarm = {
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();
             alarm.initWarningIconButton($container, $dialog);
-            alarm.showWarningPopup($container, $dialog);  
+            alarm.showWarningPopup($container, $dialog);
         },
         
         /**
@@ -152,7 +152,7 @@ var alarm = {
 
                 // Hide the dialog and go to register page
                 $dialog.removeClass('active');
-                document.location.hash = 'register';      
+                document.location.hash = 'register';
             });
         }
     },
@@ -160,7 +160,7 @@ var alarm = {
     
     /**
      * Shows after creating an ephemeral session, then trying to purchase a Pro plan,
-     * then it asks you to register, then continue purchasing the Pro plan, then the 
+     * then it asks you to register, then continue purchasing the Pro plan, then the
      * popup will show because they still haven't confirmed their email yet
      */
     nonActivatedAccount: {
@@ -181,14 +181,14 @@ var alarm = {
             }
             
             // If the user has previously seen an ephemeral dialog and they closed it,
-            // then they purchased a plan then this forces the dialog to popup. This means 
+            // then they purchased a plan then this forces the dialog to popup. This means
             // this dialog always shows so it is an incentive to confirm their email.
             alarm.seen = false;
 
             // Hide other dialogs that may be open
             alarm.hideAllWarningPopups();
             alarm.initWarningIconButton($container, $dialog);
-            alarm.showWarningPopup($container, $dialog);     
+            alarm.showWarningPopup($container, $dialog);
         }
     },
     
@@ -199,7 +199,7 @@ var alarm = {
     planExpired: {
         
         /** All the user's last payment information from the API */
-        lastPayment: null,    
+        lastPayment: null,
         
         /**
          * Show the popup
@@ -215,7 +215,7 @@ var alarm = {
             var gatewayIgnoreList = [1, 2, 3, 7, 8, 13];
             var gatewayId = this.lastPayment.gw;
             
-            // Don't display the popup for Apple or Google as they are recurring subscriptions. If the lastPayment is 
+            // Don't display the popup for Apple or Google as they are recurring subscriptions. If the lastPayment is
             // set then it means they have purposefully cancelled their account and would not want to see any warnings.
             if (gatewayIgnoreList.indexOf(gatewayId) > -1) {
                 return false;
@@ -259,7 +259,7 @@ var alarm = {
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();
             alarm.initWarningIconButton($container, $dialog);
-            alarm.showWarningPopup($container, $dialog);        
+            alarm.showWarningPopup($container, $dialog);
         },
         
         /**
@@ -307,7 +307,7 @@ var alarm = {
         },
 
         /**
-         * Return a translated string for the Gateway Name / Payment Provider Name. If an AstroPay 
+         * Return a translated string for the Gateway Name / Payment Provider Name. If an AstroPay
          * gateway it will return the relevant sub gateway e.g. Visa, MasterCard, Bradesco etc.
          * @param {String} gatewayName The name on the API
          * @param {Object} gatewayData Any additional data from the API about the gateway
@@ -350,10 +350,10 @@ var alarm = {
             var date = new Date(timestamp * 1000);
             var year = date.getFullYear();
             var month = (date.getMonth() + 1);
-                month = (month < 10) ? '0' + month : month;
+            var monthPadded = (month < 10) ? '0' + month : month;
             var day = (date.getDate() < 10) ? '0' + date.getDate() : date.getDate();
 
-            return year + '-' + month + '-' + day;
-        }        
+            return year + '-' + monthPadded + '-' + day;
+        }
     }
 };

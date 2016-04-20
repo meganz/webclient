@@ -101,7 +101,7 @@ var redeem = {
             callback : function (result) {
                 
                 // If successful result
-                if (typeof result == 'object' && result.balance && result.balance[0]) {
+                if (typeof result === 'object' && result.balance && result.balance[0]) {
                     
                     // Update the balance
                     redeem.accountBalance = parseFloat(result.balance[0][0]);
@@ -127,17 +127,17 @@ var redeem = {
                 // The rest of the webclient expects this data in an array format
                 // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
                 var results = [];
-                for (var i = 0; i<result.length; i++)
+                for (var i = 0; i < result.length; i++)
                 {
                     results.push([
-                        result[i]["id"],
-                        result[i]["al"], // account level
-                        result[i]["s"], // storage
-                        result[i]["t"], // transfer
-                        result[i]["m"], // months
-                        result[i]["p"], // price
-                        result[i]["c"], // currency
-                        result[i]["mbp"] // monthly base price
+                        result[i]['id'],
+                        result[i]['al'], // account level
+                        result[i]['s'],  // storage
+                        result[i]['t'],  // transfer
+                        result[i]['m'],  // months
+                        result[i]['p'],  // price
+                        result[i]['c'],  // currency
+                        result[i]['mbp'] // monthly base price
                     ]);
                 }
 

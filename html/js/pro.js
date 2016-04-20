@@ -331,7 +331,7 @@ function init_pro()
                 // The rest of the webclient expects this data in an array format
                 // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
                 var results = [];
-                for (var i = 0; i<result.length; i++)
+                for (var i = 0; i < result.length; i++)
                 {
                     results.push([
                         result[i]["id"],
@@ -1038,7 +1038,7 @@ var proPage = {
             // Show the button
             $showMoreButton.removeClass('hidden');
 
-            // On clicking 'Click here to show more payment options' 
+            // On clicking 'Click here to show more payment options'
             $showMoreButton.click(function() {
                 
                 // Show the other payment options and then hide the button
@@ -1099,7 +1099,7 @@ var proPage = {
                 $gateway.attr('title', l[7162]);
             }
 
-            // If the voucher/balance option, 
+            // If the voucher/balance option
             if ((gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
                 
                 // Show "Balance (x.xx)" if they have enough to purchase this plan
@@ -1284,7 +1284,7 @@ var proPage = {
             var currentPlan = membershipPlans[i];
 
             // If match on the membership plan, display that pricing option in the dropdown
-            if (currentPlan[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL] == account_type_num) {
+            if (currentPlan[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL] === account_type_num) {
 
                 // Get the price and number of months duration
                 var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE];
@@ -1333,10 +1333,10 @@ var proPage = {
             // Get the number of months for the plan they last paid for
             var lastPaymentMonths = alarm.planExpired.lastPayment.m;
             
-            // Find the radio option with the same number of months 
+            // Find the radio option with the same number of months
             var $monthOption = $(".payment-duration[data-plan-months='" + lastPaymentMonths + "']");
 
-            // If it can find it then select the radio option. Note: In some 
+            // If it can find it then select the radio option. Note: In some
             // cases this may not be available (e.g. with upcoming A/B testing
             if ($monthOption.length) {
                 $monthOption.find('input').prop('checked', true);
@@ -1395,7 +1395,7 @@ var proPage = {
 
         var currentPlan = membershipPlans[planIndex];
 
-         // Change the wording to month or year
+        // Change the wording to month or year
         var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
         var monthOrYearWording = (numOfMonths !== 12) ? l[931] : l[932];
 

@@ -4537,7 +4537,7 @@ function getProPlan(planNum) {
 /**
  * Returns the name of the gateway / payment provider and display name. The API will only
  * return the gateway ID which is unique on the API and will not change.
- * 
+ *
  * @param {Number} gatewayId The number of the gateway/provider from the API
  * @returns {Object} Returns an object with two keys, the 'name' which is a unique string
  *                   for the provider which can be used for displaying icons etc, and the

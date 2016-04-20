@@ -5706,7 +5706,7 @@ th.grid-first-th {
     background-repeat: repeat;
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-    background-image: linear-gradient(45deg, rgba(222,222,222,0.6) 25%, transparent 25%),  linear-gradient(-45deg, rgba(222,222,222,0.6) 25%, transparent 25%),  linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.6) 75%),  linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.6) 75%);
+    background-image: linear-gradient(45deg, rgba(222,222,222,0.6) 25%, transparent 25%), linear-gradient(-45deg, rgba(222,222,222,0.6) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.6) 75%), linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.6) 75%);
 }
 .contact-block-view-avatar {
     margin: 17px 0 5px 18px;
@@ -9475,7 +9475,7 @@ span.orange {
     -o-transition: opacity 200ms ease-in-out;
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
     opacity: 0.3;
@@ -11856,36 +11856,6 @@ table {
 }
 .bottom-pages .st-social-block {
     display: none;
-}
-.st-bottom-button {
-    height: 29px;
-    width: 29px;
-    display: inline-block;
-    background-image: url(../images/mega/new-startpage-sprite_v5.png);
-    background-repeat: no-repeat;
-    cursor: pointer;
-}
-.st-bottom-button.st-google-button {
-    background-position: -93px -1233px;
-    position: relative;
-    margin: 0 5px;
-}
-.st-bottom-button.st-google-button:hover {
-    background-position: -93px -1173px;
-}
-.st-bottom-button.st-facebook-button {
-    background-position: -49px -1233px;
-    margin: 0 5px;
-}
-.st-bottom-button.st-facebook-button:hover {
-    background-position: -49px -1173px;
-}
-.st-bottom-button.st-twitter-button {
-    background-position: left -1233px;
-    margin: 0 5px;
-}
-.st-bottom-button.st-twitter-button:hover {
-    background-position: left -1173px;
 }
 .st-bottom-scroll-button {
     display: inline-block;
@@ -18273,27 +18243,21 @@ a.ff-extension-button:hover {
     cursor: pointer;
 }
 .search-path-icon.cloud-drive {
-
     background-position: -13px -2260px;
 }
 .search-path-icon.folder {
-
     background-position: 1px -2114px;
 }
 .search-path-icon.shared-folder {
-
     background-position: 1px -2174px;
 }
 .search-path-icon.recycle-item {
-
     background-position: -13px -2310px;
 }
 .search-path-icon.contacts-item {
-
     background-position: -13px -2400px;
 }
 .search-path-icon.inbox-item {
-
     background-position: -13px -2355px;
 }
 .search-path-icon img {

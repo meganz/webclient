@@ -585,7 +585,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
-
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
                 var cacheKey = chatRoom.chatId + "_" + v.messageId;
                 if (v.messageId && self._processedMessages[cacheKey]) {
@@ -613,7 +612,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     hist.push(v);
                 }
             });
-            
+
             if (hist.length > 0) {
                 var decryptMessages = function() {
                     try {

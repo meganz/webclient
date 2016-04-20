@@ -831,6 +831,7 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
             for (high = this.highnum; high > low; high--) {
                 if (!this.sending[this.buf[high][Chatd.MsgField.MSGID]]) break;
             }
+
             this.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
             break;
         }

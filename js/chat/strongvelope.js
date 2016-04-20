@@ -1440,8 +1440,8 @@ var strongvelope = {};
         if (participant !== this.ownHandle) {
             if (!this.otherParticipants.has(participant)) {
                 this.otherParticipants.add(participant);
+                this.participantChange = true;
             }
-            this.participantChange = true;
         }
     };
 
@@ -1466,8 +1466,8 @@ var strongvelope = {};
         else {
             if (this.otherParticipants.has(participant)) {
                 this.otherParticipants.delete(participant);
+                this.participantChange = true;
             }
-            this.participantChange = true;
         }
     };
 
@@ -1533,6 +1533,14 @@ var strongvelope = {};
     };
 
     /**
+     * Set participant change to be ture, so it will rotate the key next time it tries to send out a message.
+     *
+     * @method
+     */
+    strongvelope.ProtocolHandler.prototype.setParticipantChange = function() {
+        this.participantChange = true;
+    };
+    /**
      * Set the assigned key Id from chatd based on the temporary key Id.
      *
      * @method
@@ -1579,9 +1587,6 @@ var strongvelope = {};
         for (var i=0; i<keys.length;i++) {
 
             var keyidStr = a32_to_str([keys[i].keyid]);
-            if (this.participantKeys[keys[i].userId] && this.participantKeys[keys[i].userId][keys[i].keyid] && this.participantKeys[keys[i].userId][keys[i].keyid] !== keys[i].key) {
-                logger.critical('Key does not match with the previous key of keyid:' + keys[i].keyid + ' from user: ' + keys[i].userId);
-            }
             var parsedKey = ns._parseMessageContent(keys[i].key);
 
             if (ns._verifyMessage(parsedKey.signedContent,

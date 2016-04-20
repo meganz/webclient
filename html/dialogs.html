@@ -140,7 +140,6 @@
                 [$7972]
             </div>
             <div class="fm-dialog-new-folder-input">
-                <div class="fm-dialog-input-clear"></div>
                 <div class="fm-dialog-new-folder-pad decryption-key">
                     <span class="icon"></span>
                     <input name="dialog-new-folder" type="text" placeholder="[$7971]" value="" />
@@ -672,28 +671,6 @@
     </div>
 </div>
 
-<div class="fm-dialog slingshot-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">Welcome, Slingshot Customer!</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div class="slingshot-body">
-        <div class="slingshot-main">
-            [$6885]
-            <br><br>
-            Questions or comments? Please contact our <a href="mailto:support@mega.nz" class="red">customer support department</a> for assistance. </br>
-            <div style="width:100%; text-align:center; margin-top:15px;">
-                <img src="{staticpath}images/mega/slingshot.png"> <img src="{staticpath}images/mega/m-logo.png">
-            </div>
-        </div>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button fm-terms-agree"><span>[$507]</span></div>
-        <div class="clear"></div>
-    </div>
-</div>
-
 <div class="fm-dialog languages-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$1038]</div>
@@ -713,11 +690,6 @@
         </div>
         <div class="tier-two-languages"></div>
         <a class="language-template nlanguage-lnk" data-lang-code="">
-            <span class="nlanguage-tooltip">
-                <span class="nlanguage-tooltip-bg">
-                    <span class="nlanguage-tooltip-main"></span>
-                </span>
-            </span>
             <span class="native-language-name"></span>
             <span class="beta hidden">BETA</span>
         </a>
@@ -726,18 +698,6 @@
         <div class="fm-dialog-button fm-languages-save"><span>[$776]</span></div>
         <div class="nlanguage-bottom"> [$671] <a href="mailto:translate@mega.nz">[$672]</a> </div>
         <div class="clear"></div>
-    </div>
-</div>
-
-<div class="fm-dialog paypal-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$1039]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div class="paypal-body">
-        <a href="" target="_blank" rel="noreferrer"><img src="{staticpath}images/mega/paypal-checkout.png"></a><br>
-        <a href="" target="_blank" rel="noreferrer"><img src="{staticpath}images/mega/paypal-cards.png"></a>
     </div>
 </div>
 
@@ -1136,7 +1096,7 @@
           <div class="checkboxOn login-checkbox"></div>
           <label class="radio-txt">[$192]</label>
 
-          <div class="top-dialog-login-button"><span>[$171] <i><img alt="" src="{staticpath}images/mega/ajax-loader.gif"></i></span></div>
+          <div class="top-dialog-login-button"><span>[$171] <i><span class="loading-gif"></span></i></span></div>
           <div class="clear"></div>
         </div>
     </div>
@@ -1209,7 +1169,7 @@
                 <div class="password-status-warning hidden">
                 </div>
             </div>
-            <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif" /></div>
+            <div class="register-loading-icon"></div>
             <input type="text" name="login-password" id="register-password" value="[$909]"   class="have-placeholder" />
         </div>
         <div class="new-registration">
@@ -1764,14 +1724,14 @@
                     <div class="megasync-header">
                         [$8426]
                     </div>
-                    <img alt="Megasync" src="{staticpath}images/mega/megasync-img01.png" class="megasync-img1"/>
+                    <div class="megasync-img1"></div>
                 </div>
 
                 <div class="megasync-slide slide2">
                     <div class="megasync-header">
                         [$8427]
                     </div>
-                    <img alt="Megasync" src="{staticpath}images/mega/megasync-img02.png" class="megasync-img2" />
+                    <div class="megasync-img2"></div>
                     <div class="megasync-info-txt">
                         [$8428]
                     </div>
@@ -2145,7 +2105,7 @@
     </div>
 </div>
 
-<div class="toast-notification common-toast">
+<div class="toast-notification common-toast hidden">
     <div class="toast-icon"></div>
   	<div class="toast-body">
         <div class="toast-col">

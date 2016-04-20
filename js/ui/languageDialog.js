@@ -162,7 +162,6 @@ var langDialog = {
 
             // Update the template details
             $langHtml.attr('data-lang-code', langCode);
-            $langHtml.find('.nlanguage-tooltip-main').text(englishName);
             $langHtml.find('.native-language-name').text(nativeName);
 
             // Chrome/Safari not showing tooltip so use title text

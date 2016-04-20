@@ -149,6 +149,7 @@ function init_page() {
             && page.substr(0, 6) !== 'signup'
             && page !== 'register'
             && page !== 'terms'
+            && page !== 'mega'
             && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
         register_txt = l[1291];
         document.location.hash = 'signup' + localStorage.signupcode;
@@ -580,6 +581,10 @@ function init_page() {
     else if (page == 'privacy') {
         parsepage(pages['privacy']);
     }
+    else if (page == 'mega') {
+        parsepage(pages['mega']);
+        megainfotxt();
+    }
     else if (page == 'privacycompany') {
         parsepage(pages['privacycompany']);
     }
@@ -823,12 +828,6 @@ function init_page() {
             }
             if (!m && $('#fmholder').html() == '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
-            }
-            if (pfid) {
-                $('.fm-left-menu .folderlink').removeClass('hidden');
-                $('.fm-tree-header.cloud-drive-item span').text(l[808]);
-                $('.fm-tree-header').not('.cloud-drive-item').hide();
-                $('.fm-menu-item').hide();
             }
         }
         else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
@@ -1632,6 +1631,9 @@ function topmenuUI() {
         else if (className.indexOf('privacypolicy') > -1) {
             document.location.hash = 'privacy';
         }
+        else if (className.indexOf('mega') > -1) {
+            document.location.hash = 'mega';
+        }
         else if (className.indexOf('copyright') > -1) {
             document.location.hash = 'copyright';
         }
@@ -1837,7 +1839,7 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
     $('#startholder').safeHTML(translate(pages['transferwidget']) + pagehtml);
     $('#startholder').show();
-    mainScroll();
+    Soon(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
         if (page !== 'start' && page !== 'download') {
             mainScroll();
@@ -1885,7 +1887,7 @@ window.onhashchange = function() {
         return false;
     }
 
-    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start') {
+    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start' ) {
         if ($.infoscroll) {
             startpageMain();
         }

@@ -1095,7 +1095,6 @@ function MegaData()
                 // Undecryptable node indicators
                 if (missingkeys[nodeHandle]) {
                     undecryptableClass = 'undecryptable';
-                    fName = 'undecrypted ' + nodeType;
                     fIcon = 'generic';
                     ftype = l[7381];// i.e. 'unknown'
 
@@ -1106,9 +1105,11 @@ function MegaData()
 
                     if (nodeType === 'folder') {
                         titleTooltip += l[8595];
+                        fName = l[8686];// i.e. 'undecrypted folder'
                     }
                     else if (nodeType === 'file') {
                         titleTooltip += l[8602];
+                        fName = l[8687];// i.e. 'undecrypted file'
                     }
                 }
 
@@ -2302,7 +2303,7 @@ function MegaData()
                         // Undecryptable node indicators
                         if (missingkeys[curItemHandle]) {
                             undecryptableClass = 'undecryptable';
-                            fName = 'undecrypted folder';
+                            fName = l[8686];
                             fIcon = 'generic';
 
                             var exportLink = new mega.Share.ExportLink({});
@@ -2323,7 +2324,7 @@ function MegaData()
                             + openedc + ' ' + sExportLink + ' ' + undecryptableClass
                             + '" title="' + titleTooltip + '">\n\
                                             <span ' + arrowIcon + '></span>\n\
-                                            <span class="nw-fm-tree-folder' + sharedfolder + '">' + fName + '</span>\n\
+                                            <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(fName) + '</span>\n\
                                             <span class="data-item-icon"></span>\n\
                                         </span>\n\
                                         <ul id="' + _sub + curItemHandle + '" ' + ulc + '></ul>\n\

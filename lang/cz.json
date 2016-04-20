@@ -1917,6 +1917,7 @@
     "6788": "m\u011bs\u00edc\u016f",
     "6789": "Pozastaven\u00fd \u00fa\u010det",
     "6793": "Obnovit m\u00edsto vysyp\u00e1n\u00edm ko\u0161e",
+    "6794": "Vysypat ko\u0161",
     "6795": "Opravdu chcete trvale odebrat v\u0161echny polo\u017eky z va\u0161eho ko\u0161e?Tuto akci nem\u016f\u017eete vr\u00e1tit zp\u011bt!",
     "6796": "M\u011bs\u00ed\u010dn\u00ed p\u0159edpatn\u00e9 \"PRO Lite\"",
     "6797": "Ro\u010dn\u00ed p\u0159edpatn\u00e9 \"PRO Lite\"",
@@ -3198,11 +3199,15 @@
     "8664": "vlastn\u00edk",
     "8665": "Ov\u011b\u0159te sv\u016fj registra\u010dn\u00ed e-mail a potvr\u010fte sv\u016fj \u00fa\u010det ne\u017e zaplat\u00edte, aby MEGA mohlo p\u0159ipsat platbu na spr\u00e1vn\u00fd \u00fa\u010det.",
     "8666": "Potvr\u010fte svou registraci",
-    "8667": "If you want to subscribe for a yearly PRO account, you can wire transfer funds to either of our bank accounts:",
+    "8667": "Pokud se chcete p\u0159ihl\u00e1sit k odb\u011bru ro\u010dn\u00edho \u00fa\u010dtu PRO, m\u016f\u017eete bezhotovostn\u011b p\u0159ev\u00e9st prost\u0159edky na jeden z na\u0161ich bankovn\u00edch \u00fa\u010dt\u016f:",
     "8668": "IBAN",
-    "8669": "Not applicable for NZ banks",
-    "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
-    "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8669": "Nelze pou\u017e\u00edt pro NZ banky",
+    "8670": "Pokud je va\u0161e e-mailov\u00e1 adresa p\u0159\u00edli\u0161 dlouh\u00e1 pro pole &#039;Reference&#039;, m\u011bla by b\u00fdt um\u00edst\u011bna do pole &#039;Koment\u00e1\u0159e&#039;.",
+    "8671": "Evropsk\u00e9 zem\u011b p\u0159ijaly standard zn\u00e1m\u00fd jako International Bank Account Number (IBAN - mezin\u00e1rodn\u00ed \u010d\u00edslo bankovn\u00edho \u00fa\u010dtu). Nov\u00fd Z\u00e9land tento standard nep\u0159ijal, tak\u017ee pokud pot\u0159ebujete zadat IBAN, za\u0161lete prost\u0159edky na n\u00e1\u0161 \u00fa\u010det v Lucenbursku.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

@@ -1917,6 +1917,7 @@
     "6788": "meses",
     "6789": "Cuenta suspendida",
     "6793": "Recupera espacio vaciando la papelera",
+    "6794": "Vac\u00eda la Papelera",
     "6795": "\u00bfEst\u00e1 seguro de querer eliminar de forma permanente todos los archivos de su Papelera? \u00a1Esta acci\u00f3n no se puede deshacer!",
     "6796": "Suscripci\u00f3n mensual \"PRO Lite\"",
     "6797": "Suscripci\u00f3n anual \"PRO Lite\"",
@@ -3203,6 +3204,10 @@
     "8669": "Not applicable for NZ banks",
     "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
     "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

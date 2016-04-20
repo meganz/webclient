@@ -1917,6 +1917,7 @@
     "6788": "mesecev",
     "6789": "Suspendiran ra\u010dun",
     "6793": "Pridobite prostor s \u010di\u0161\u010denjem Ko\u0161a",
+    "6794": "Izbri\u0161i ko\u0161",
     "6795": "Ali ste prepri\u010dani, da \u017eelite trajno izbrisati vse predmete iz Ko\u0161a? Tega dejanja ne morete povrniti!",
     "6796": "\"PRO Lite\" mese\u010dna naro\u010dnina",
     "6797": "\"PRO Lite\" letna naro\u010dnina",
@@ -3203,6 +3204,10 @@
     "8669": "Not applicable for NZ banks",
     "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
     "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

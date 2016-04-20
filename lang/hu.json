@@ -1917,6 +1917,7 @@
     "6788": "h\u00f3nap",
     "6789": "Felf\u00fcggesztett fi\u00f3k",
     "6793": "Lemezter\u00fclet felszabad\u00edt\u00e1sa a Lomt\u00e1r \u00fcr\u00edt\u00e9s\u00e9vel",
+    "6794": "Lomt\u00e1r ki\u00fcr\u00edt\u00e9se",
     "6795": "Biztosan szeretn\u00e9 v\u00e9glegesen t\u00f6r\u00f6lni az \u00f6sszes elemet Szemetesl\u00e1d\u00e1j\u00e1b\u00f3l?Ez a m\u0171velet nem vonhat\u00f3 vissza!",
     "6796": "\"PRO Lite\" havi el\u0151fizet\u00e9s",
     "6797": "\"PRO Lite\" \u00e9ves el\u0151fizet\u00e9s",
@@ -3203,6 +3204,10 @@
     "8669": "Not applicable for NZ banks",
     "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
     "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

@@ -17,6 +17,7 @@ self.onmessage = function(e) {
     rsa2aes        = {};
     missingkeys    = {};
     rsasharekeys   = {};
+    lostandfound   = {};
     newmissingkeys = false;
 
     for (var i in nodes) {
@@ -42,6 +43,7 @@ self.onmessage = function(e) {
         jid            : evd.jid,
         rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
         rsasharekeys   : Object.keys(rsasharekeys).length && rsasharekeys,
+        lostandfound   : Object.keys(lostandfound).length && lostandfound,
         u_sharekeys    : Object.keys(new_sharekeys).length && new_sharekeys,
         missingkeys    : missingkeys,
         newmissingkeys : newmissingkeys,
@@ -58,6 +60,7 @@ var d, u_privk, u_k_aes, u_sharekeys;
 
 var rsa2aes = {};
 var missingkeys = {};
+var lostandfound = {};
 var newmissingkeys = false;
 var rsasharekeys = {};
 
@@ -79,7 +82,7 @@ function crypto_process_sharekey(handle, key) {
 function crypto_processkey(me, master_aes, file, OUT) {
     var id = me;
     var key, k, n;
-    var missingKeyHandle = '';
+    var success = false;
 
     // do I own the file? (user key is guaranteed to be first in .k)
     var p = file.k.indexOf(id + ':');
@@ -156,8 +159,12 @@ function crypto_processkey(me, master_aes, file, OUT) {
             }
         }
 
-        var ab = base64_to_ab(file.a);
-        var o = dec_attr(ab, k);
+        if (d && !file.a) {
+            console.log('Missing attribute for node "%s"', file.h, file);
+        }
+
+        var ab = file.a && base64_to_ab(file.a);
+        var o = ab && dec_attr(ab, k);
 
         // if (d) console.log('dec_attr', file.h, key,ab,k, o && o.n, o);
 
@@ -194,29 +201,29 @@ function crypto_processkey(me, master_aes, file, OUT) {
                 if (file.hash) {
                     OUT.hash = file.hash;
                 }
-            }
-            else {
-                console.log('Missing name for a node ' + file.h);
-                missingKeyHandle = file.h;
+
+                success = true;
             }
         }
-        else {
-            console.log('Node attributes are not decryptable ' + file.h);
-            missingKeyHandle = file.h;
+    }
+
+    if (success) {
+        // Update global variable which holds data about missing keys
+        // so DOM can be updated accordingly
+        if (missingkeys[file.h]) {
+            lostandfound[file.h] = true;
         }
     }
     else {
         if (d) {
-            console.log("Received no suitable key: " + file.h);
-            missingKeyHandle = file.h;
+            console.log('Received no suitable key for "%s"', file.h, file);
+        }
+
+        if (!missingkeys[file.h]) {
+            newmissingkeys = true;
+            missingkeys[file.h] = true;
         }
     }
-
-    if (!missingKeyHandle[missingKeyHandle]) {
-        newmissingkeys = true;
-        missingkeys[missingKeyHandle] = true;
-    }
-
 }
 
 function encrypt_key(cipher, a) {

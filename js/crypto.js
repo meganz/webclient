@@ -3899,7 +3899,7 @@ var rsa2aes = {};
 function crypto_processkey(me, master_aes, file) {
     var logger = MegaLogger.getLogger('crypt');
     var id, key, k, n, decKey;
-    var missingKeyHandle = '';
+    var success = false;
 
     if (!file.k) {
         if (!keycache[file.h]) {
@@ -3982,12 +3982,6 @@ function crypto_processkey(me, master_aes, file) {
                         return;
                     }
                     k = decKey;
-                    
-                    // Update global variable which holds data about missing keys
-                    // so DOM can be updated accordingly
-                    if (missingkeys[file.h]) {
-                        delete missingkeys[file.h];
-                    }
                 }
             }
             else {
@@ -4056,27 +4050,33 @@ function crypto_processkey(me, master_aes, file) {
                 if (file.ar.fav) {
                     file.fav = 1;
                 }
-            }
-            else {
-                logger.error('Missing name for node "%s"', file.h, file);
-                missingKeyHandle = file.h;
+
+                success = true;
             }
         }
-        else {
-            logger.error('Node attributes are not decryptable "%s"', file.h, file);
-            missingKeyHandle = file.h;
+    }
+
+    if (success) {
+        // Update global variable which holds data about missing keys
+        // so DOM can be updated accordingly
+        if (missingkeys[file.h]) {
+            delete missingkeys[file.h];
         }
     }
     else {
-        logger.error("Received no suitable key: " + file.h);
-        missingKeyHandle = file.h;
-        keycache[file.h] = file.k;
+        logger.warn('Received no suitable key for "%s"', file.h, file);
+
+        if (!missingkeys[file.h]) {
+            newmissingkeys = true;
+            missingkeys[file.h] = true;
+        }
+
+        if (file.k) {
+            keycache[file.h] = file.k;
+        }
     }
-    
-    if (!missingKeyHandle[missingKeyHandle]) {
-        newmissingkeys = true;
-        missingkeys[missingKeyHandle] = true;
-    }
+
+    return success;
 }
 
 function api_updfkey(h) {

@@ -2294,6 +2294,14 @@ mSpawnWorker.prototype = {
         if (reply.rsasharekeys) {
             $.extend(rsasharekeys, reply.rsasharekeys);
         }
+        if (reply.lostandfound) {
+            if (!job.lostandfound) {
+                job.lostandfound = reply.lostandfound;
+            }
+            else {
+                $.extend(job.lostandfound, reply.lostandfound);
+            }
+        }
 
         Soon(this.postNext.bind(this));
         if (++job.done === this.nworkers) {
@@ -2317,6 +2325,15 @@ mSpawnWorker.prototype = {
                 }
                 catch (ex) {
                     console.error(ex);
+                }
+            }
+
+            // Update global variable which holds data about missing keys
+            // so DOM can be updated accordingly
+            if (job.lostandfound) {
+                for (var handle in job.lostandfound) {
+                    // no hasOwnProperty here
+                    delete missingkeys[handle];
                 }
             }
 

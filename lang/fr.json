@@ -1917,6 +1917,7 @@
     "6788": "mois",
     "6789": "Compte d\u00e9sactiv\u00e9",
     "6793": "R\u00e9cup\u00e9rer de l'espace libre en vidant la Corbeille",
+    "6794": "Vider la Corbeille",
     "6795": "\u00cates-vous s\u00fbr de vouloir supprimer de fa\u00e7on permanente tous les \u00e9l\u00e9ments  de votre Corbeille?Cette action ne peut pas \u00eatre annul\u00e9e !",
     "6796": "Abonnement \"PRO Lite\" mensuel",
     "6797": "Abonnement \"PRO Lite\" annuel",
@@ -3198,6 +3199,15 @@
     "8664": "owner",
     "8665": "Please check your registration email and confirm your account before you pay, so that MEGA can credit your payment to the correct account.",
     "8666": "Confirm your registration",
+    "8667": "If you want to subscribe for a yearly PRO account, you can wire transfer funds to either of our bank accounts:",
+    "8668": "IBAN",
+    "8669": "Not applicable for NZ banks",
+    "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
+    "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3253,6 +3263,14 @@
         "choose": 8656,
         "windows-phone": 8660,
         "confirm-email-message": 8665,
-        "confirm-email-title": 8666
+        "confirm-email-title": 8666,
+        "wire-transfer-main-instruction": 8667,
+        "iban": 8668,
+        "not-applicable-nz-banks": 8669,
+        "wire-transfer-reference-field-note": 8670,
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

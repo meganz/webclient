@@ -211,6 +211,11 @@ var alarm = {
                 return false;
             }
             
+            // Don't show this dialog if they have already said they don't want to see it again
+            if (localStorage.getItem('planExpiredDialogDisabled')) {
+                return false;
+            }
+            
             // Ignored payment provider IDs (not applicable or no longer in use)
             var gatewayIgnoreList = [1, 2, 3, 7, 8, 13];
             var gatewayId = this.lastPayment.gw;
@@ -255,6 +260,9 @@ var alarm = {
             // Add button click handlers
             this.initChooseButton($dialog);
             this.initRenewButton($dialog, proNum);
+            this.initDontShowAgainButton($dialog);
+            this.initFeedbackMessageKeyup($dialog);
+            this.initSendAndCloseButton($container, $dialog);
 
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();
@@ -305,39 +313,96 @@ var alarm = {
                 document.location.hash = 'pro_' + proLink;
             });
         },
-
+        
         /**
-         * Return a translated string for the Gateway Name / Payment Provider Name. If an AstroPay
-         * gateway it will return the relevant sub gateway e.g. Visa, MasterCard, Bradesco etc.
-         * @param {String} gatewayName The name on the API
-         * @param {Object} gatewayData Any additional data from the API about the gateway
-         * @returns {String} Returns the name of the gateway for display
+         * Initialise the 'Do not show again' button. When clicked it will show a text area and
+         * a button for the user to send some feedback about why they don't want to renew their plan.
+         * @param {Object} $dialog The dialog
          */
-        normaliseGatewayName: function(gatewayName, gatewayData) {
-
-            // If AstroPay then the API has an exact name for that gatway
-            if (gatewayData) {
-                return gatewayData.label;           // Visa, Mastercard etc
-            }
-            else if (gatewayName === 'Infobip') {
-                return l[7219] + ' (Centilli)';     // Mobile (Centilli)
-            }
-            else if (gatewayName === 'T-Pay') {
-                return l[7219] + ' (T-Pay)';        // Mobile (T-Pay)
-            }
-            else if (gatewayName === 'Fortumo') {
-                return l[7219] + ' (Fortumo)';      // Mobile (Fortumo)
-            }
-            else if (gatewayName === 'voucher') {
-                return l[487] + ' / ' + l[7108];    // Voucher code / Balance
-            }
-            else if (gatewayName === 'wiretransfer') {
-                return l[6198];                     // Wire transfer
-            }
-            else {
-                // As a default, return name of the gateway from the API
-                return gatewayName;
-            }
+        initDontShowAgainButton: function($dialog) {
+            
+            // Add click handler for the checkbox and its label
+            $dialog.find('.plan-expired-checkbox, .plan-expired-checkbox-label').rebind('click', function() {
+                
+                var $checkbox = $dialog.find('.plan-expired-checkbox');
+                
+                // If checked
+                if ($checkbox.hasClass('checkboxOn')) {
+                    
+                    // Uncheck the box
+                    $checkbox.removeClass('checkboxOn').addClass('checkboxOff');
+                    
+                    // Hide the feedback text area and button, show the payment messages/buttons
+                    $dialog.find('.first-message, .second-message').removeClass('hidden');
+                    $dialog.find('.warning-button.choose, .warning-button.renew').removeClass('hidden');
+                    $dialog.find('.confirm-reason, .warning-button.close').addClass('hidden');
+                }
+                else {
+                    // Otherwise check the box
+                    $checkbox.removeClass('checkboxOff').addClass('checkboxOn');
+                    
+                    // Hide the payment messages/buttons, show the feedback text area and button
+                    $dialog.find('.first-message, .second-message').addClass('hidden');
+                    $dialog.find('.warning-button.choose, .warning-button.renew').addClass('hidden');
+                    $dialog.find('.confirm-reason, .warning-button.close').removeClass('hidden');
+                }
+            });
+        },
+        
+        /**
+         * Enable or disable the Send and close button depending on if they've entered enough characters
+         * @param {Object} $dialog The dialog
+         */
+        initFeedbackMessageKeyup: function($dialog) {
+            
+            // On entry into the text area
+            $dialog.find('.confirm-reason-message').rebind('keyup', function() {
+                
+                // If the message is less than 10 characters, keep the button disabled
+                if ($(this).val().length < 10) {
+                    $dialog.find('.warning-button.close').addClass('disabled');
+                }
+                else {
+                    // Otherwise enable it
+                    $dialog.find('.warning-button.close').removeClass('disabled');
+                }
+            });
+        },
+        
+        /**
+         * Initialises the button to send the user's feedback
+         * @param {Object} $container The dialog container which includes the warning icon
+         * @param {Object} $dialog The dialog
+         */
+        initSendAndCloseButton: function($container, $dialog) {
+            
+            // On the Send and close button
+            $dialog.find('.warning-button.close').rebind('click', function() {
+                
+                // Set the feedback message for the response
+                var feedback = $dialog.find('.confirm-reason-message').val();
+                var email = u_attr.email;
+                var jsonData = JSON.stringify({ feedback: feedback, email: email });
+                
+                // Do nothing if less than 10 characters
+                if (feedback.length < 10) {
+                    return false;
+                }
+                
+                // Send the feedback
+                api_req({
+                    a: 'clog',
+                    t: 'doNotWantToRenewPlanFeedback',
+                    d: jsonData
+                });
+                
+                // Close the dialog and never show again
+                localStorage.setItem('planExpiredDialogDisabled', '1');
+                
+                // Hide the warning icon and the dialog
+                $container.addClass('hidden');
+                $dialog.addClass('hidden');
+            });
         },
 
         /**

@@ -491,7 +491,7 @@ input[type="checkbox"] {
     float: left;
     cursor: pointer;
 }
-.download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .firefox-dialog .checkboxOff {
+.download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .firefox-dialog .checkboxOff, .astropay-payment-reminder .checkboxOff {
     width: 21px;
     height: 21px;
     background-position: left -8514px;
@@ -502,7 +502,7 @@ input[type="checkbox"] {
     margin: 0 0 0 0;
     margin: 5px 11px 0 0;
 }
-.download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .firefox-dialog .checkboxOn {
+.download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .firefox-dialog .checkboxOn, .astropay-payment-reminder .checkboxOn {
     width: 21px;
     height: 21px;
     background-position: left -8554px;
@@ -4982,6 +4982,29 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .astropay-payment-reminder .warning-button.renew:hover span {
     color: #27b700;
+}
+.astropay-payment-reminder .plan-expired-checkbox {
+    margin-top: 20px;
+}
+.astropay-payment-reminder .plan-expired-checkbox-label {
+    margin-top: 14px;
+}
+.astropay-payment-reminder .confirm-reason {
+    margin-top: 15px;
+}
+.astropay-payment-reminder .confirm-reason > label {
+    display: block;
+}
+.astropay-payment-reminder .confirm-reason-message {
+    background: #fafafa none repeat scroll 0 0;
+    border: 0 none;
+    border-radius: 5px;
+    color: rgb(102, 102, 102);
+    font-size: 13px;
+    height: 62px;
+    margin-top: 5px;
+    padding: 10px;
+    width: 276px;
 }
 
 .top-search-bl {

@@ -291,7 +291,7 @@
 
         <a class="fm-avatar"><img alt="" src="{avatar-top}"/></a>
 
-        <div class="activity-status-block">
+        <div class="activity-status-block hidden">
             <div class="loading-animation"></div>
             <div class="activity-status offline"></div>
         </div>
@@ -318,8 +318,6 @@
         </div>
 
 
-
-        <div class="language-popup-icon hidden"></div>
         <div class="right notification-button">
             <div class="notification-num hidden">0</div>      
             <div class="cloud-popup-icon"></div>
@@ -327,10 +325,9 @@
                 1 [$2041] [$2042]
             </div>
         </div>
-        <div class="notification-popup empty">
+        <div class="notification-popup empty hidden">
             <div class="notification-arrow"></div>
             <div class="notification-header"> 
-                <a href="#notificationsettings" class="notification-settings hidden"></a>
                 <div class="notification-txt">[$862]</div>
             </div>
             <div class="notification-scroll">
@@ -373,22 +370,83 @@
 
         <div class="top-chat-notification hidden"><span class="notification-num" style="display: none;">0</span></div>
 
-        <div class="warning-popup-icon">
+        
+        <div class="warning-popup-icon ephemeral-session hidden">
             <div class="warning-icon-area"></div>
             <div class="top-warning-popup">
                 <div class="warning-popup-arrow"></div> 
                 <div class="warning-popup-body">
-                    <div class="warning-header">You are using an ephemeral session.</div>
-                    <!-- [$881] !-->
-                    The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your <span class="green">free 50 GB of secure storage space in the cloud!</span>
+                    <div class="warning-header">[$8643]</div>
+                    <div class="description">[$8644]</div>
                 </div>
                 <div class="fm-notifications-bottom"> 
                     <div class="fm-dialog-button warning-button"><span>[$779]</span></div> 
                 </div>
             </div>
         </div>
+        
+        <div class="warning-popup-icon over-quota hidden">
+            <div class="warning-icon-area"></div>
+            <div class="top-warning-popup">
+                <div class="warning-popup-arrow"></div> 
+                <div class="warning-popup-body">
+                    <div class="warning-header">[$1010]</div>
+                    [$5929]
+                    <p class="description">[$5931]</p>
+                </div>
+                <div class="fm-notifications-bottom"> 
+                    <div class="fm-dialog-button warning-button"><span>[$5549]</span></div> 
+                </div>
+            </div>
+        </div>
+        
+        <div class="warning-popup-icon non-activated-account hidden">
+            <div class="warning-icon-area"></div>
+            <div class="top-warning-popup not-activated">
+                <div class="warning-popup-arrow"></div> 
+                <div class="warning-popup-body">
+                    <div class="warning-gray-icon mailbox-icon"></div>
+                    [$5847]
+                </div>
+            </div>
+        </div>
+        
+        <div class="warning-popup-icon astropay-payment-reminder hidden">
+            <div class="warning-icon-area"></div>
+            <div class="top-warning-popup">
+                <div class="warning-popup-arrow"></div> 
+                <div class="warning-popup-body">
+                    <div class="left-block">
+                        <div class="mega-payment-icon"></div>
+                    </div>
+                    <div class="right-block">
+                        <div class="warning-header">[$8651]</div>
+                        <div class="last-payment-info">
+                            <span class="purchased-label">[$8652]</span>
+                            <span class="purchased-date">yyyy-mm-dd</span>
+                            <span class="expired-label">[$8657]</span>
+                            <span class="expired-date">yyyy-mm-dd</span>
+                        </div>
+                        <div class="first-message">[$8653]</div>
+                        <div class="second-message">[$8654]</div>
+                        <div class="confirm-reason hidden">
+                            <label>[$8685]</label>
+                            <textarea class="confirm-reason-message" placeholder="[$8525]"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="fm-notifications-bottom">
+                    <div class="plan-expired-checkbox checkboxOff"></div>
+                    <label class="plan-expired-checkbox-label radio-txt">[$229]</label>
+                    
+                    <div class="fm-dialog-button warning-button renew"><span>[$8655]</span></div>
+                    <div class="fm-dialog-button warning-button choose"><span>[$8656]</span></div>
+                    <div class="fm-dialog-button warning-button close disabled hidden"><span>[$8684]</span></div>
+                </div>
+            </div>
+        </div>
 
-        <div class="top-search-bl">
+        <div class="top-search-bl hidden">
             <div class="top-search-clear">
                 <div class="top-clear-button"></div>
                 <input type="text" value="[$102]" placeholder="[$102]" class="top-search-input"/>

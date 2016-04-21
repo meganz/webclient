@@ -382,7 +382,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             var cacheKey = chatRoom.chatId + "_" + eventData.messageId;
             // if the message has already been decrypted, then just bail.
             if (self.chatRoom.megaChat.plugins.chatdIntegration._processedMessages[cacheKey]) {
-                return ;
+                return;
             }
             self.messages.push(msgObject);
 
@@ -415,10 +415,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return;
         }
 
-        self.haveMessages = true;
-
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
-            self.retrieveChatHistory(true);
+            self.haveMessages = true;
+
+            if (!self.messages[eventData.messageId]) {
+                self.retrieveChatHistory(true);
+            }
         }
     });
 

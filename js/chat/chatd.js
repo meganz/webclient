@@ -33,6 +33,8 @@ var Chatd = function(userId, options) {
 
     // debug mode
     [
+        // 'onRoomConnected',
+        // 'onRoomDisconnected',
         // 'onMessageUpdated',
         // 'onMessageConfirm',
         // 'onMessageReject',
@@ -219,6 +221,26 @@ Chatd.Shard = function(chatd, shard) {
     );
 };
 
+/**
+ * Trigger multiple events for each chat which this shard relates to.
+ * (used to trigger events related to room changes because of a shard disconnect/connect)
+ *
+ * @param evtName
+ */
+Chatd.Shard.prototype.triggerEventOnAllChats = function(evtName) {
+    var self = this;
+
+    Object.keys(self.chatd.chatIdShard).forEach(function(chatId) {
+        var shard = self.chatd.chatIdShard[chatId];
+
+        if (shard === self) {
+            self.chatd.trigger(evtName, {
+                chatId: base64urlencode(chatId)
+            });
+        }
+    });
+};
+
 // is this chatd connection currently active?
 Chatd.Shard.prototype.isOnline = function() {
     return this.s && this.s.readyState == this.s.OPEN;
@@ -235,7 +257,10 @@ Chatd.Shard.prototype.reconnect = function() {
         self.logger.log('chatd connection established');
         self.triggerSendIfAble();
         self.rejoinexisting();
-        self.resendpending();
+        // Resending of pending message should be done via the integration code, since it have more info and a direct
+        // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
+        // self.resendpending();
+        self.triggerEventOnAllChats('onRoomConnected');
     };
 
     self.s.onerror = function(e) {
@@ -254,6 +279,7 @@ Chatd.Shard.prototype.reconnect = function() {
         clearTimeout(self.keepAliveTimer);
         self.joinedChatIds = {};
         self.connectionRetryManager.gotDisconnected();
+        self.triggerEventOnAllChats('onRoomDisconnected');
     };
 };
 
@@ -431,6 +457,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         self.logger.error("Not sure how to handle priv: " + priv +".");
                     }
                 }
+                
                 self.chatd.trigger('onMembersUpdated', {
                     userId: userId,
                     chatId: chatId,

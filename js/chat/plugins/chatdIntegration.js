@@ -503,7 +503,41 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
     var chatRoomId = chatRoom.roomJid.split("@")[0];
 
-    // chatd events
+    self.chatd.rebind('onRoomConnected.chatdInt' + chatRoomId, function(e, eventData) {
+        var foundChatRoom = self._getChatRoomFromEventData(eventData);
+
+        if (!foundChatRoom) {
+            self.logger.warn("Room not found for: ", e, eventData);
+            return;
+        }
+
+        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+            if(chatRoom.state === ChatRoom.STATE.JOINING) {
+                chatRoom.setState(
+                    ChatRoom.STATE.READY
+                );
+            }
+        }
+    });
+
+    self.chatd.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function(e, eventData) {
+        var foundChatRoom = self._getChatRoomFromEventData(eventData);
+
+        if (!foundChatRoom) {
+            self.logger.warn("Room not found for: ", e, eventData);
+            return;
+        }
+
+        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+            if(chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
+                chatRoom.setState(
+                    ChatRoom.STATE.JOINING,
+                    true
+                );
+            }
+        }
+    });
+            // chatd events
     self.chatd.rebind('onMembersUpdated.chatdInt' + chatRoomId, function(e, eventData) {
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
 
@@ -860,12 +894,28 @@ ChatdIntegration.prototype.sendNewKey = function(chatRoom, keyxid, keyBlob) {
     self.chatd.cmd(Chatd.Opcode.NEWKEY, base64urldecode(chatRoom.chatId), keybody);
 };
 
-ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
+ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
     // allocate transactionid for the new message (it must be shown with status "delivering" in the UI;
     // edits and cancellations at that stage must be applied to the locally queued version that gets
     // resent until confirmation and then to the confirmed msgid)
     var self = this;
 
+    var messageContents = messageObject.getContents() ? messageObject.getContents() : "";
+    var encryptedMessageContents = messageObject.encryptedMessageContents ? messageObject.encryptedMessageContents : undefined;
+    var tmpPromise = new MegaPromise();
+
+    if (encryptedMessageContents) {
+        console.error("Re-using previously encrypted payload and key for message: ", messageObject);
+        // was already encrypted, don't re-encrypt and just reuse the previous payload (arr[0]) and keyid (arr[1])
+        tmpPromise.resolve(
+            self.chatd.submit(
+                base64urldecode(chatRoom.chatId),
+                encryptedMessageContents[0],
+                encryptedMessageContents[1]
+            )
+        );
+        return tmpPromise;
+    }
     var promises = [];
     var participants = Object.keys(chatRoom.members);
     removeValue(participants, u_handle);
@@ -875,21 +925,23 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     );
 
 
-    var tmpPromise = new MegaPromise();
+
 
     var _runEncryption = function() {
 
         try {
             var result;
             if (chatRoom.type === "private") {
-                result = chatRoom.protocolHandler.encryptTo(message, participants[0]);
+                result = chatRoom.protocolHandler.encryptTo(messageContents, participants[0]);
             }
             else {
-                result = chatRoom.protocolHandler.encryptTo(message);
+                result = chatRoom.protocolHandler.encryptTo(messageContents);
             }
 
             if (result !== false) {
                 var keyid = chatRoom.protocolHandler.getKeyId();
+
+                messageObject.encryptedMessageContents = [result, keyid];
 
                 tmpPromise.resolve(
                     self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)

@@ -1053,8 +1053,6 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
 
-    var messageContents = messageObject.getContents() ? messageObject.getContents() : "";
-
     var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
         return MegaPromise.reject();
@@ -1062,7 +1060,7 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
 
     return megaChat.plugins.chatdIntegration.sendMessage(
         self,
-        messageObject.getContents()
+        messageObject
     );
 
 

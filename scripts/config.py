@@ -12,7 +12,7 @@ here.
 import os
 
 # Checkers to run. Available options for checkers are:
-# "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++"
+# "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++", 'htmlhint'
 checkers = ['validator', 'htmlhint', 'jshint', 'jscs']
 
 # Extra options for designated checkers.

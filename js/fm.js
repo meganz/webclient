@@ -1,23 +1,3 @@
-/**
- * Get a string for the payment plan number
- * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
- */
-function getProPlan(planNum) {
-
-    switch (planNum) {
-        case 1:
-            return l[5819];     // PRO I
-        case 2:
-            return l[6125];     // PRO II
-        case 3:
-            return l[6126];     // PRO III
-        case 4:
-            return l[6234];     // LITE
-        default:
-            return l[435];      // FREE
-    }
-}
-
 function voucherCentering(button)
 {
     var popupBlock = $('.fm-voucher-popup');
@@ -326,7 +306,6 @@ function initUI() {
     {
         $('.fm-tree-header.cloud-drive-item').text(l[164]);
         $('.fm-tree-header').not('.cloud-drive-item').show();
-        $('.fm-menu-item').show();
         $('.fm-left-menu .folderlink').addClass('hidden');
         $('.fm-main').removeClass('active-folder-link');
     }
@@ -599,7 +578,6 @@ function initUI() {
     };
     InitFileDrag();
     createFolderUI();
-    cSortMenuUI();
     M.buildRootSubMenu();
     initContextUI();
     copyDialog();
@@ -1171,7 +1149,7 @@ function showTransferToast(t_type, t_length, isPaused) {
         }
 
         clearTimeout(timer);
-        $toast.removeClass('second').addClass('visible');
+        $toast.removeClass('second hidden').addClass('visible');
         timer = setTimeout(function() {
             hideTransferToast($toast);
         }, 5000);
@@ -2697,67 +2675,6 @@ function initContextUI() {
     $(document).trigger('onInitContextUI');
 }
 
-function cSortMenuUI()
-{
-    $('.contacts-arrows').unbind('click');
-    $('.contacts-arrows').bind('click', function(e)
-    {
-        var menuBlock = $('.sorting-menu');
-        var bottomPosition = $('body').outerHeight() - $(menuBlock).outerHeight();
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            menuBlock.removeClass('hidden');
-            $(this).addClass('active');
-            var topl = 0, jsp = $('.fm-tree-panel').data('jsp');
-            if (jsp)
-                topl = jsp.getContentPositionY();
-            menuBlock.css('top', $(this).position().top - topl + 95);
-            menuBlock.css('left', $(this).position().left + 35);
-            if (bottomPosition - $(menuBlock).position().top < 50)
-                menuBlock.css('top', bottomPosition - 50);
-        }
-        else
-        {
-            $('.fm-main').bind('click');
-            menuBlock.addClass('hidden');
-            $(this).removeClass('active');
-        }
-        return false;
-    });
-
-    $('.contacts-sorting-by').unbind('click');
-    $('.contacts-sorting-by').bind('click', function(e)
-    {
-        var c = $(this).attr('class');
-        if (c && c.indexOf('name') > -1)
-        {
-            localStorage.csort = 'name';
-            localStorage.csortd = 1;
-        }
-        else if (c && c.indexOf('shares') > -1)
-        {
-            localStorage.csort = 'shares';
-            localStorage.csortd = -1;
-        } else if (c && c.indexOf('chat-activity') > -1)
-        {
-            localStorage.csort = 'chat-activity';
-            localStorage.csortd = -1;
-        }
-        M.renderContacts();
-    });
-
-    $('.contacts-sorting-type').unbind('click');
-    $('.contacts-sorting-type').bind('click', function(e)
-    {
-        var c = $(this).attr('class');
-        if (c && c.indexOf('desc') > -1)
-            localStorage.csortd = -1;
-        else
-            localStorage.csortd = 1;
-        M.renderContacts();
-    });
-}
-
 function createFolderUI() {
 
     $('.fm-new-folder').rebind('click', function(e) {
@@ -3035,10 +2952,9 @@ function accountUI() {
             sectionClass = 'reseller';
         }
         else {
-
-            // this is the main entry point for users who just had upgraded their accounts
+            // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
-                showNonActivatedAccountDialog(true);
+                alarm.nonActivatedAccount.render(true);
             }
 
             $('.fm-account-overview').removeClass('hidden');
@@ -6697,16 +6613,21 @@ function treeUI()
         if (e.type === 'contextmenu') {
             $('.nw-fm-tree-item').removeClass('dragover');
             $(this).addClass('dragover');
-            $.selected = [id];
+            $.selected = $(this).parents('ul').find('.selected').attrs('id')
+                .map(function(id) {
+                    return id.replace(/^treea_/, '');
+                });
             return !!contextMenuUI(e, 1);
         }
-        var c = $(e.target).attr('class');
-        if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+        var c = $(e.target);
+        if (e.type === "click" && e.shiftKey) {
+            $(this).addClass('selected');
+        } else if (c.hasClass('nw-fm-arrow-icon')) {
             treeUIexpand(id);
         } else {
-            var c = $(this).attr('class');
-            if (c && c.indexOf('opened') > -1)
+            if (c.hasClass('opened')) {
                 treeUIexpand(id);
+            }
             M.openFolder(id);
         }
         return false;
@@ -9078,7 +8999,7 @@ function showToast(toastClass, notification, buttonLabel) {
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
         .find('.toast-col:first-child span').safeHTML(notification);
 
-    $toast.addClass('visible');
+    $toast.removeClass('hidden').addClass('visible');
 
     timeout = setTimeout(function() {
         hideToast();
@@ -9827,26 +9748,6 @@ function propertiesDialog(close) {
 }
 /* jshint +W074 */
 
-function paypalDialog(url, close)
-{
-    if (close)
-    {
-        $('.fm-dialog.paypal-dialog').addClass('hidden');
-        fm_hideoverlay();
-        $.dialog = false;
-        return false;
-    }
-    $.dialog = 'paypal';
-    $('.fm-dialog.paypal-dialog').removeClass('hidden');
-    fm_showoverlay();
-    $('.fm-dialog.paypal-dialog a').attr('href', url);
-    $('.paypal-dialog .fm-dialog-close').unbind('click');
-    $('.paypal-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        paypalDialog(false, 1);
-    });
-}
-
 function termsDialog(close, pp)
 {
     if (close)
@@ -9909,25 +9810,6 @@ function termsDialog(close, pp)
             $.termsDeny();
         termsDialog(1);
     });
-}
-
-function slingshotDialog(close)
-{
-    if (close)
-    {
-        $('.fm-dialog.slingshot-dialog').addClass('hidden');
-        fm_hideoverlay();
-        $.dialog = false;
-        return false;
-    }
-    $('.slingshot-dialog .fm-dialog-button.fm-terms-agree,.slingshot-dialog .fm-dialog-close').unbind('click');
-    $('.slingshot-dialog .fm-dialog-button.fm-terms-agree,.slingshot-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        slingshotDialog(1);
-    });
-    $('.fm-dialog.slingshot-dialog').removeClass('hidden');
-    fm_showoverlay();
-    $.dialog = 'slingshot';
 }
 
 var previews = {};

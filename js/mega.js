@@ -3503,7 +3503,9 @@ function MegaData()
             msgDialog('warninga', l[135], 'Operation not permitted.');
             return false;
         }
+
         loadingDialog.show();
+
         if (t.length === 11 && !u_pubkeys[t]) {
             var keyCachePromise = api_cachepubkeys([t]);
             keyCachePromise.done(function _cachepubkeyscomplete() {
@@ -3519,9 +3521,12 @@ function MegaData()
             return false;
         }
 
+        var importNodes = Object($.onImportCopyNodes).length;
+
         var a = this.isNodeObject(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var ops = {a: 'p', t: t, n: a, i: requesti};
         var s = fm_getsharenodes(t);
+
         if (s.length > 0) {
             var mn = [];
             for (i in a) {
@@ -3529,6 +3534,12 @@ function MegaData()
             }
             ops.cr = crypto_makecr(mn, s, true);
         }
+
+        if (importNodes) {
+            // #4290 'strict mode'
+            ops.sm = 1;
+        }
+
         api_req(ops, {
             cn: cn,
             del: del,
@@ -3540,7 +3551,17 @@ function MegaData()
                         callback(res);
                     }
                     renderNew();
+
+                    if (importNodes && nodesCount < importNodes) {
+                        msgDialog('warninga', l[882],
+                            l[8683]
+                                .replace('%1', nodesCount)
+                                .replace('%2', importNodes)
+                        );
+                    }
                 }
+                var nodesCount;
+
                 if (typeof res === 'number' && res < 0) {
                     loadingDialog.hide();
                     if (typeof callbackError === "function") {
@@ -3548,6 +3569,7 @@ function MegaData()
                     }
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
+
                 if (ctx.del) {
                     var j = [];
                     for (var i in ctx.cn) {
@@ -3555,11 +3577,15 @@ function MegaData()
                         api_req({a: 'd', n: cn[i], i: requesti});
                     }
                 }
+
                 newnodes = [];
+
                 if (res.u) {
                     process_u(res.u, true);
                 }
+
                 if (res.f) {
+                    nodesCount = Object(res.f).length;
                     process_f(res.f, onCopyNodesDone);
                 }
                 else {

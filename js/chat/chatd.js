@@ -962,16 +962,11 @@ Chatd.prototype.msgcheck = function(chatId, msgid) {
 };
 
 Chatd.Messages.prototype.check = function(chatId, msgid) {
-    this.chatd.trigger('onMessageCheck', {
-        chatId: base64urlencode(chatId),
-        messageId: base64urlencode(msgid)
-    });
-
-    if (this.buf[this.highnum]) {
-        // if the newest held message is not current, initiate a fetch of newer messages just in case
-        if (this.buf[this.highnum][Chatd.MsgField.MSGID] !== msgid) {
-            this.chatd.cmd(Chatd.Opcode.HIST, chatId, this.chatd.pack32le(32));
-        }
+    if (Object.keys(this.buf).length === 0) {
+        this.chatd.trigger('onMessageCheck', {
+            chatId: base64urlencode(chatId),
+            messageId: base64urlencode(msgid)
+        });
     }
 };
 

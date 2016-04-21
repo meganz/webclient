@@ -3552,14 +3552,16 @@ function MegaData()
                     }
                     renderNew();
 
-                    if (importNodes && Object(res.f).length < importNodes) {
+                    if (importNodes && nodesCount < importNodes) {
                         msgDialog('warninga', l[882],
                             l[8683]
-                                .replace('%1', Object(res.f).length)
+                                .replace('%1', nodesCount)
                                 .replace('%2', importNodes)
                         );
                     }
                 }
+                var nodesCount;
+
                 if (typeof res === 'number' && res < 0) {
                     loadingDialog.hide();
                     if (typeof callbackError === "function") {
@@ -3567,6 +3569,7 @@ function MegaData()
                     }
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
+
                 if (ctx.del) {
                     var j = [];
                     for (var i in ctx.cn) {
@@ -3574,11 +3577,15 @@ function MegaData()
                         api_req({a: 'd', n: cn[i], i: requesti});
                     }
                 }
+
                 newnodes = [];
+
                 if (res.u) {
                     process_u(res.u, true);
                 }
+
                 if (res.f) {
+                    nodesCount = Object(res.f).length;
                     process_f(res.f, onCopyNodesDone);
                 }
                 else {

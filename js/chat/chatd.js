@@ -893,11 +893,11 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
 
 Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, updated, keyid, msg) {
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg, this.storedkey);
+        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg);
     }
 };
 
-Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg, key) {
+Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg) {
     var id;
 
     if (newmsg) {
@@ -908,7 +908,7 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
     }
 
     // store message
-    this.buf[id] = [msgid, userId, timestamp, updated, keyid, msg];
+    this.buf[id] = [msgid, userId, timestamp, msg, keyid, updated];
 
     this.chatd.trigger('onMessageStore', {
         chatId: base64urlencode(this.chatId),
@@ -918,7 +918,6 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
         ts: timestamp,
         updated: updated,
         keyid : keyid,
-        key : key,
         message: msg,
         isNew: newmsg
     });

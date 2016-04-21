@@ -4007,8 +4007,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.linked {
     padding-right: 22px;
 }
-.nw-fm-tree-item.linked .link-icon {
-    top: 1px;
+.nw-fm-tree-item .data-item-icon {
+    top: 2px;
     right: 7px;
 }
 .nw-fm-tree-item:hover {
@@ -5578,8 +5578,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-position: -7px -1469px;
 }
 th.grid-first-th {
-    width: 30px;
-    padding: 0;
+    width: 50px;
+    padding: 0 0 0 3px;
 }
 .grid-sixth-th {
     width: 45px;
@@ -5614,31 +5614,32 @@ th.grid-first-th {
     padding-left: 12px;
 }
 .grid-table td:first-child, .grid-share-table td:first-child {
-    padding: 0;
+    padding: 0 0 0 3px;
 }
 .grid-table.contacts td:first-child, .contacts-view .grid-table-header th:first-child {
     padding: 0 10px 0 16px;
 }
-.grid-status-icon, .file-status-icon, .contact-status-icon {
+.grid-status-icon, .file-status-icon, .contact-status-icon, .undecryptable .file-status-icon, .undecryptable .file-status-icon.star {
     height: 24px;
     width: 25px;
     display: block;
     background-image: url(../images/mega/nw-fm-sprite_v16.svg);
     background-repeat: no-repeat;
     background-position: -7px -1494px;
+    background-size: auto;
 }
 .file-status-icon {
     background-image: none;
 }
-.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
-    background-image: url(../images/mega/register-big-sprite-v7.png);
+.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down.nw-fm-tree-item .data-item-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
+    background-image: url(../images/mega/register-big-sprite-v8.png);
     background-repeat: no-repeat;
     background-position: -69px -963px;
 }
 .grid-status-icon.star {
     background-position: -64px -961px;
 }
-.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .link-icon {
+.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .data-item-icon {
     position: absolute;
     left: 6px;
     top: 6px;
@@ -5646,29 +5647,52 @@ th.grid-first-th {
     z-index: 10;
     width: 20px;
 }
-.link-icon {
+.data-item-icon {
     left: auto;
-    right: 6px;
-    background-position: -106px -963px;
+    right: 5px;
     display: none;
 }
-.taken-down .link-icon {
+.linked .data-item-icon {
+    background-position: -106px -963px;
+}
+.taken-down .data-item-icon, .taken-down.nw-fm-tree-item .data-item-icon {
     background-position: -146px -963px;
 }
 .taken-down .grid-status-icon, .taken-down .grid-status-icon.star {
     background-position: -176px -961px;
 }
 .taken-down .file-status-icon {
-    background-position: -180px -963px;
+    background-position: -181px -963px;
+}
+.undecryptable.nw-fm-tree-item .data-item-icon {
+    background-image: url(../images/mega/nw-fm-sprite_v15.svg);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -15px -2639px;
+}
+.undecryptable .grid-status-icon, .undecryptable .grid-status-icon.star {
+    background-image: url(../images/mega/nw-fm-sprite_v15.svg);
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: -9px -2637px;
+}
+.undecryptable .file-status-icon, .undecryptable .file-status-icon.star {
+    background-position: -14px -2639px;
 }
 .grid-table .taken-down td, .taken-down .file-block-title, .taken-down .nw-fm-tree-folder, .taken-down .tranfer-filetype-txt, .taken-down .propreties-dark-txt {
-    color: #D90007
+    color: #D90007;
 }
-.own-data .link-icon {
+.grid-table .undecryptable td {
+    color: #999999;
+}
+.grid-table .undecryptable .tranfer-filetype-txt, .undecryptable .file-block-title, .undecryptable .nw-fm-tree-folder, .undecryptable .shared-folder-name, .undecryptable .shared-folder-info, .undecryptable .propreties-dark-txt {
+    color: #FFA500;
+}
+.own-data .data-item-icon {
     left: 3px;
     top: 2px;
 }
-.linked .link-icon {
+.linked .data-item-icon, .taken-down.linked .data-item-icon, .undecryptable.nw-fm-tree-item .data-item-icon  {
     display: block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
@@ -6775,7 +6799,7 @@ table {
 .long-path .fm-breadcrumbs-block {
     max-width: -webkit-calc(100% - 230px);
     max-width: -moz-calc(100% - 230px);
- max- width: calc(100% - 230px);
+    max-width: calc(100% - 230px);
     height: 38px;
 }
 .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs {
@@ -9605,7 +9629,7 @@ span.orange {
     left: 13px;
     top: 13px;
 }
-.properties-dialog .link-icon {
+.properties-dialog .data-item-icon {
     left: 225px;
     top: 13px;
 }
@@ -12988,7 +13012,7 @@ h5.main-italic-header {
 .reg-success-icon, .payment-confirmation .icon {
     width: 200px;
     height: 192px;
-    background-image: url(../images/mega/register-big-sprite-v7.png);
+    background-image: url(../images/mega/register-big-sprite-v8.png);
     background-position: left top;
     background-repeat: no-repeat;
     margin: 30px auto 4px auto;
@@ -13246,7 +13270,7 @@ h5.main-italic-header {
 .reg-st3-membership-icon, .membership-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/register-big-sprite-v7.png);
+    background-image: url(../images/mega/register-big-sprite-v8.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 0 0 0 -35px;
@@ -14314,7 +14338,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     height: 82px;
     width: 82px;
     float: left;
-    background-image: url(../images/mega/register-big-sprite-v7.png);
+    background-image: url(../images/mega/register-big-sprite-v8.png);
     background-position: center -960px;
     background-repeat: no-repeat;
     margin-top: 28px;
@@ -21354,7 +21378,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/register-big-sprite-v7.png);
+    background-image: url(../images/mega/register-big-sprite-v8.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
@@ -23219,7 +23243,7 @@ body.pro:after {
     left: 9px;
     top: 50%;
     margin: -15px 0 0 0;
-    background-image: url(../images/mega/register-big-sprite-v7.png);
+    background-image: url(../images/mega/register-big-sprite-v8.png);
     background-position: -85px -860px;
 }
 .clipboard .toast-icon {

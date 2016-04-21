@@ -462,16 +462,7 @@ function MegaData()
 
     this.filterByParent = function(id) {
         this.filterBy(function(node) {
-            // if this is a contact, DONT check for .name
-            if (node.c) {
-                return (node.p === id) || (node.p && node.p.length === 11 && id === 'shares');
-            }
-            else if (
-                (node.name && node.p === id) ||
-                (node.name && node.p && node.p.length === 11 && id === 'shares')
-            ) {
-                return true;
-            }
+            return (node.p === id) || (node.p && (node.p.length === 11) && (id === 'shares'));
         });
     };
 
@@ -1067,34 +1058,68 @@ function MegaData()
         function renderLayout(u, n_cache) {
             var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
-                sExportLink, sLinkIcon, takenDown, takenDownTitle,
+                sExportLink, additionClass, titleTooltip, fName, fIcon, takenDown, takenDownTitle,
+                undecryptableClass = '',
                 iShareNum = 0,
-                s, ftype, c, cc, star;
+                nodeType = '',
+                s, ftype, cc, star;
 
             for (var i in M.v) {
-                if (!M.v[i].name) {
-                    DEBUG('Skipping M.v node with no name.', M.v[i]);
-                    continue;
-                }
+
+                var nodeData = M.v[i];
+                var nodeHandle = nodeData.h;
+
                 s  = '';
-                c  = '';
+                nodeType  = '';
                 cc = null;
-                if (M.v[i].t) {
+                undecryptableClass = '';
+                titleTooltip = '';
+                fName = '';
+                fIcon = '';
+                ftype = '';
+
+                if (nodeData.t) {
                     ftype = l[1049];
-                    c = ' folder';
+                    nodeType = 'folder';
+                    fIcon = 'folder';
                 }
                 else {
                     ftype = filetype(M.v[i].name);
                     s = htmlentities(bytesToSize(M.v[i].s));
+                    nodeType = 'file';
                 }
-                star = M.v[i].fav ? ' star' : '';
+                star = nodeData.fav ? ' star' : '';
+
+                fName = htmlentities(nodeData.name);
+
+                // Undecryptable node indicators
+                if (missingkeys[nodeHandle]) {
+                    undecryptableClass = 'undecryptable';
+                    fIcon = 'generic';
+                    ftype = l[7381];// i.e. 'unknown'
+
+                    // Taken down item
+                    if (nodeData && nodeData.shares && nodeData.shares.EXP && nodeData.shares.EXP.down) {
+                        titleTooltip = (nodeData.t === 1) ? (l[7705] + '\n') : (l[7704] + '\n');
+                    }
+
+                    if (nodeType === 'folder') {
+                        titleTooltip += l[8595];
+                        fName = l[8686];// i.e. 'undecrypted folder'
+                    }
+                    else if (nodeType === 'file') {
+                        titleTooltip += l[8602];
+                        fName = l[8687];// i.e. 'undecrypted file'
+                    }
+                }
 
                 if (M.currentdirid === 'shares') {// render shares tab
+
                     // Handle of initial share owner
                     var ownersHandle = M.v[i].su;
                     var fullContactName = htmlentities(M.getNameByHandle(ownersHandle));
 
-                    cs = M.contactstatus(M.v[i].h);
+                    cs = M.contactstatus(nodeHandle);
                     contains = fm_contains(cs.files, cs.folders);
                     u_h = ownersHandle || M.v[i].p;
                     rights = l[55];
@@ -1107,11 +1132,11 @@ function MegaData()
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
                     }
-                    if (M.v[i].r === 1) {
+                    if (nodeData.r === 1) {
                         rights = l[56];
                         rightsclass = ' read-and-write';
                     }
-                    else if (M.v[i].r === 2) {
+                    else if (nodeData.r === 2) {
                         rights = l[57];
                         rightsclass = ' full-access';
                     }
@@ -1120,15 +1145,17 @@ function MegaData()
                         t = '.shared-blocks-scrolling';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
-                        html = '<a class="file-block folder" id="'
-                            + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
+                        html = '<a class="file-block folder ' + undecryptableClass + '" id="'
+                            + htmlentities(nodeHandle) + '" title="'
+                            + titleTooltip + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass) + '"></span><span class="file-settings-icon">'
-                            + '</span><span class="file-icon-area">'
-                            + '<span class="block-view-file-type folder"></span></span>'
-                                 + avatar
+                            + htmlentities(rightsclass)
+                            + '"></span><span class="file-settings-icon">' +
+                            '</span><span class="file-icon-area">'
+                            + '<span class="block-view-file-type ' + fIcon + '"></span></span>'
+                            + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
-                            + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
+                            + fName + '</span><span class="shared-folder-info">by '
                             + fullContactName + '</span></span></a>';
                     }
                     else {
@@ -1136,11 +1163,13 @@ function MegaData()
                         el = 'tr';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '">'
+                        html = '<tr id="' + htmlentities(nodeHandle)
+                            + '" class="' + undecryptableClass + '" title="'
+                            + titleTooltip + '">'
                             + '<td width="30"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div>'
                             + '<div class="shared-folder-info-block"><div class="shared-folder-name">'
-                            + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">'
+                            + fName + '</div><div class="shared-folder-info">'
                             + htmlentities(contains)
                             + '</div></div> </td><td width="240">'
                             + avatar
@@ -1159,17 +1188,17 @@ function MegaData()
 
                 // switching from contacts tab
                 else if (M.currentdirid.length === 11 && M.currentrootid === 'contacts') {
-                    cs = M.contactstatus(M.v[i].h);
+                    cs = M.contactstatus(nodeHandle);
                     contains = fm_contains(cs.files, cs.folders);
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
                     }
                     var rights = l[55], rightsclass = ' read-only';
-                    if (M.v[i].r === 1) {
+                    if (nodeData.r === 1) {
                         rights = l[56];
                         rightsclass = ' read-and-write';
                     }
-                    else if (M.v[i].r === 2) {
+                    else if (nodeData.r === 2) {
                         rights = l[57];
                         rightsclass = ' full-access';
                     }
@@ -1177,27 +1206,30 @@ function MegaData()
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.contact-details-view .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block folder">\n\
+                        /* jshint -W043 */
+                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block folder">\n\
                                     <span class="file-status-icon"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="shared-folder-access ' + rightsclass + '"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type folder-shared"><img alt=""></span>\n\
                                     </span>\n\
-                                    <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
+                                    <span class="file-block-title">' + fName + '</span>\n\
                                 </a>';
+                        /* jshint +W043 */
                     }
                     else {
                         t = '.contacts-details-block .grid-table.shared-with-me';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
+                        /* jshint -W043 */
+                        html = '<tr id="' + htmlentities(nodeHandle) + '">\n\
                                     <td width="30">\n\
                                         <span class="grid-status-icon"></span>\n\
                                     </td>\n\
                                     <td>\n\
                                         <div class="shared-folder-icon"></div>\n\
                                         <div class="shared-folder-info-block">\n\
-                                            <div class="shared-folder-name">' + htmlentities(M.v[i].name) + '</div>\n\
+                                            <div class="shared-folder-name">' + fName + '</div>\n\
                                             <div class="shared-folder-info">' + contains + '</div>\n\
                                         </div>\n\
                                     </td>\n\
@@ -1208,80 +1240,108 @@ function MegaData()
                                         <a class="grid-url-arrow"></a>\n\
                                     </td>\n\
                                 </tr>';
+                        /* jshint +W043 */
                     }
                 }
                 else {
 
-                    if (M.v[i].shares) {
-                        iShareNum = Object.keys(M.v[i].shares).length;
+                    if (nodeData.shares) {
+                        iShareNum = Object.keys(nodeData.shares).length;
                     }
                     else {
                         iShareNum = 0;
                     }
                     bShare = (
-                        (M.v[i].shares && M.v[i].shares.EXP && iShareNum > 1)
-                        || (M.v[i].shares && !M.v[i].shares.EXP && iShareNum)
-                        || M.ps[M.v[i].h])
+                        (nodeData.shares && nodeData.shares.EXP && iShareNum > 1)
+                        || (nodeData.shares && !nodeData.shares.EXP && iShareNum)
+                        || M.ps[nodeHandle])
                         ? true : false;
-                    sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
-                    sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
-                    takenDown = '';
-                    takenDownTitle = '';
+                    sExportLink = (nodeData.shares && nodeData.shares.EXP) ? 'linked' : '';
+                    additionClass = '';
+                    fIcon = fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name });
 
-                    if (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) {
-                        takenDown = 'taken-down';
-                        takenDownTitle = (M.v[i].t === 1) ? l[7705] : l[7704];
+                    if (nodeData && nodeData.shares && nodeData.shares.EXP && nodeData.shares.EXP.down) {
+                        additionClass = 'taken-down';
+
+                        if (nodeData.t === 1) {// folder
+                            titleTooltip = l[7705];
+
+                            // Undecryptable node indicators
+                            if (missingkeys[nodeHandle]) {
+                                titleTooltip += '\n' + l[8595];
+                            }
+                        }
+                        else {// file
+                            titleTooltip = l[7704];
+
+                            // Undecryptable node indicators
+                            if (missingkeys[nodeHandle]) {
+                                titleTooltip += '\n' + l[8602];
+                            }
+                        }
+
                     }
 
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
+                        /* jshint -W043 */
+                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block '
+                            + nodeType + ' ' + sExportLink + ' ' + additionClass + ' '
+                            + undecryptableClass + '" title="' + titleTooltip + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
-                                    <span class="' + sLinkIcon + '"></span>\n\
+                                    <span class="data-item-icon"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type '
+                            + fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name })
+                            + '"><img alt="" /></span>\n\
                                     </span>\n\
-                                    <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
+                                    <span class="file-block-title">' + fName + '</span>\n\
                                 </a>';
+                        /* jshint +W043 */
                     }
 
                     // List view
                     else {
-                        if (M.lastColumn && M.v[i].p !== "contacts") {
-                            time = time2date(M.v[i][M.lastColumn] || M.v[i].ts);
+                        if (M.lastColumn && nodeData.p !== "contacts") {
+                            time = time2date(nodeData[M.lastColumn] || nodeData.ts);
                         }
                         else {
-                            time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
+                            time = time2date(nodeData.ts
+                                || (nodeData.p === 'contacts' && M.contactstatus(nodeHandle).ts));
                         }
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
-                                    <td width="30">\n\
+                        /* jshint -W043 */
+                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="'
+                            + nodeType + ' ' + additionClass + ' '
+                            + undecryptableClass + '" title="' + titleTooltip + '">\n\
+                                    <td width="50">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"> </span>\n\
-                                        <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
+                                        <span class="transfer-filtype-icon '
+                            + fileIcon({t: nodeData.t, share: bShare, name: nodeData.name}) + '"> </span>\n\
+                                        <span class="tranfer-filetype-txt">' + fName + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
                                     <td width="130">' + ftype + '</td>\n\
                                     <td width="120">' + time + '</td>\n\
                                     <td width="62" class="grid-url-field own-data ' + sExportLink + '">\n\
                                         <a class="grid-url-arrow"></a>\n\
-                                        <span class="' + sLinkIcon + '"></span>\n\
+                                        <span class="data-item-icon"></span>\n\
                                     </td>\n\
                                 </tr>';
+                        /* jshint +W043 */
                     }
 
-                    if (!(M.v[i].seen = n_cache > files++)) {
-                        cc = [i, html, M.v[i].h, M.v[i].t];
+                    if (!(nodeData.seen = n_cache > files++)) {
+                        cc = [i, html, nodeHandle, nodeData.t];
                     }
                 }
-
-                mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u, cc);
+                mInsertNode(nodeData, M.v[i-1], M.v[i+1], t, el, html, u, cc);
             }
         }// renderLayout END
 
@@ -1686,7 +1746,7 @@ function MegaData()
                 chatui(id);
             }
         }
-        else if ((!id || !M.d[id]) && id !== 'transfers') {
+        else if ((!id || !M.d[id]) && (id !== 'transfers')) {
             id = this.RootID;
         }
 
@@ -1717,7 +1777,7 @@ function MegaData()
             // Force cleaning the current cloud contents and showing an empty msg
             M.renderMain();
         }
-        else if (id && id.substr(0, 7) !== 'account' && id.substr(0, 13) !== 'notifications') {
+        else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 13) !== 'notifications')) {
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');
@@ -2071,7 +2131,12 @@ function MegaData()
             _a = 'treea_',
             rebuild = false,
             sharedfolder, openedc, arrowIcon,
-            ulc, expandedc, buildnode, containsc, cns, html, sExportLink, sLinkIcon,
+            ulc, expandedc, buildnode, containsc, cns, html, sExportLink,
+            fName = '',
+            curItemHandle = '',
+            undecryptableClass = '',
+            titleTooltip = '',
+            fIcon = '',
             prefix;
 
         var share = new mega.Share({});
@@ -2152,7 +2217,7 @@ function MegaData()
             folders = [];
 
             for (var i in this.c[n.h]) {
-                if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
+                if (this.d[i] && (this.d[i].t === 1)) {
                     folders.push(this.d[i]);
                 }
             }
@@ -2161,8 +2226,9 @@ function MegaData()
             // sort by name is default in the tree
             treePanelSortElements(prefix, folders, {
                 name: function(a, b) {
-                    if (a.name)
+                    if (a.name) {
                         return a.name.localeCompare(b.name);
+                    }
                 }
             });
 
@@ -2180,7 +2246,13 @@ function MegaData()
                     expandedc = '';
                     buildnode = false;
                     containsc = '';
-                    cns = M.c[folders[ii].h];
+                    curItemHandle = folders[ii].h;
+                    cns = M.c[curItemHandle];
+                    undecryptableClass = '';
+                    titleTooltip = '';
+                    fIcon = '';
+
+                    fName = htmlentities(folders[ii].name);
 
                     if (cns) {
                         for (var cn in cns) {
@@ -2189,58 +2261,75 @@ function MegaData()
                                 containsc = 'contains-folders';
                                 break;
                             }
+                            /* jshint +W073 */
                         }
                     }
-                    if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h]) {
+                    if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[curItemHandle]) {
                         buildnode = Boolean(containsc);
                     }
                     if (buildnode) {
                         ulc = 'class="opened"';
                         expandedc = 'expanded';
                     }
-                    else if (Object(fmconfig.treenodes).hasOwnProperty(folders[ii].h)) {
-                        fmtreenode(folders[ii].h, false);
+                    else if (Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
+                        fmtreenode(curItemHandle, false);
                     }
                     sharedfolder = '';
 
                     // Check is there a full and pending share available, exclude public link shares i.e. 'EXP'
-                    if (share.isShareExist([folders[ii].h], true, true, false)) {
+                    if (share.isShareExist([curItemHandle], true, true, false)) {
                         sharedfolder = ' shared-folder';
                     }
 
                     openedc = '';
-                    if (M.currentdirid === folders[ii].h) {
+                    if (M.currentdirid === curItemHandle) {
                         openedc = 'opened';
                     }
 
-                    var k = $('#' + _li + folders[ii].h).length;
+                    var k = $('#' + _li + curItemHandle).length;
 
                     if (k) {
                         if (containsc) {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc)
+                            $('#' + _li + curItemHandle + ' .nw-fm-tree-item').addClass(containsc)
                                 .find('span').eq(0).addClass('nw-fm-arrow-icon');
                         }
                         else {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders')
+                            $('#' + _li + curItemHandle + ' .nw-fm-tree-item').removeClass('contains-folders')
                                 .find('span').eq(0).removeClass('nw-fm-arrow-icon');
                         }
                     }
                     else {
-                        sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
-                        sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
+
+                        // Undecryptable node indicators
+                        if (missingkeys[curItemHandle]) {
+                            undecryptableClass = 'undecryptable';
+                            fName = l[8686];
+                            fIcon = 'generic';
+
+                            var exportLink = new mega.Share.ExportLink({});
+                            titleTooltip = exportLink.isTakenDown(curItemHandle) ? (l[7705] + '\n') : '';
+                            titleTooltip += l[8595];
+                        }
+
+                        sExportLink = (M.d[curItemHandle].shares && M.d[curItemHandle].shares.EXP) ? 'linked' : '';
                         arrowIcon = '';
 
                         if (containsc) {
                             arrowIcon = 'class="nw-fm-arrow-icon"';
                         }
-                        html = '<li id="' + _li + folders[ii].h + '">\n\
-                                        <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
+                        /* jshint -W043 */
+                        html = '<li id="' + _li + curItemHandle + '">\n\
+                                        <span  id="' + _a + htmlentities(curItemHandle)
+                            + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' '
+                            + openedc + ' ' + sExportLink + ' ' + undecryptableClass
+                            + '" title="' + titleTooltip + '">\n\
                                             <span ' + arrowIcon + '></span>\n\
-                                            <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
-                                            <span class="' + sLinkIcon + '"></span>\n\
+                                            <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(fName) + '</span>\n\
+                                            <span class="data-item-icon"></span>\n\
                                         </span>\n\
-                                        <ul id="' + _sub + folders[ii].h + '" ' + ulc + '></ul>\n\
+                                        <ul id="' + _sub + curItemHandle + '" ' + ulc + '></ul>\n\
                                     </li>';
+                        /* jshint +W043 */
 
                         if (folders[ii - 1] && $('#' + _li + folders[ii - 1].h).length > 0) {
                             $('#' + _li + folders[ii - 1].h).after(html);
@@ -2253,12 +2342,12 @@ function MegaData()
                         }
                     }
 
-                    if (_ts_l && folders[ii].name) {
-                        if (folders[ii].name.toLowerCase().indexOf(_ts_l) === -1) {
-                            $('#' + _li + folders[ii].h).addClass('tree-item-on-search-hidden');
+                    if (_ts_l) {
+                        if (fName.toLowerCase().indexOf(_ts_l) === -1) {
+                            $('#' + _li + curItemHandle).addClass('tree-item-on-search-hidden');
                         }
                         else {
-                            $('#' + _li + folders[ii].h).parents('li').removeClass('tree-item-on-search-hidden');
+                            $('#' + _li + curItemHandle).parents('li').removeClass('tree-item-on-search-hidden');
                         }
                     }
                     if (buildnode) {
@@ -2266,7 +2355,7 @@ function MegaData()
                     }
 
                     if (fminitialized) {
-                        var nodeHandle = folders[ii].h;
+                        var nodeHandle = curItemHandle;
 
                         if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
                             sharedUInode(nodeHandle);
@@ -2318,9 +2407,10 @@ function MegaData()
 
         var folders = [],
             sub, cs, sm, fid, sharedFolder, html;
+        var nodeName = '';
 
         for (var i in this.c[id]) {
-            if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
+            if (this.d[i] && this.d[i].t === 1) {
                 folders.push(this.d[i]);
             }
         }
@@ -2330,8 +2420,9 @@ function MegaData()
             // localeCompare is not supported in IE10, >=IE11 only
             // sort by name is default in the tree
             folders.sort(function(a, b) {
-                if (a.name)
+                if (a.name) {
                     return a.name.localeCompare(b.name);
+                }
             });
 
             for (var i in folders) {
@@ -2354,7 +2445,14 @@ function MegaData()
                     sharedFolder += ' shared-folder-item';
                 }
 
-                html = '<span class="context-menu-item ' + sharedFolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
+                if (missingkeys[fid]) {
+                    nodeName = l[8686];
+                }
+                else {
+                    nodeName = this.d[fid].name;
+                }
+
+                html = '<span class="context-menu-item ' + sharedFolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(nodeName) + '</span>' + sm;
 
                 $('#csb_' + id).append(html);
             }
@@ -3244,7 +3342,6 @@ function MegaData()
                         this.u[userId][key] = u[key];
                     }
                 }
-
 
                 u = this.u[userId];
             }
@@ -6095,6 +6192,9 @@ function execsc(actionPackets, callback) {
                     }
                 }
             });
+
+            // Remove processed item from the queue
+            async_treestate = [];
         }
         if (newnodes.length > 0 && fminitialized) {
             renderNew();
@@ -6295,10 +6395,7 @@ function fm_getnodes(nodeId, ignore)
                         }
                         continue;
                     }
-                    // ToDo: check this condition
-                    if (M.d[n].name || ignore) {
-                        nodes.push(n);
-                    }
+                    nodes.push(n);
                     if (M.d[n].t === 1) {
                         procnode(n);
                     }
@@ -8002,12 +8099,10 @@ function balance2pro(callback)
 
             // Add link-icon to list view
             $('.own-data', $nodeId).addClass('linked');
-            $('.own-data span', $nodeId).eq(0).addClass('link-icon');
 
             // Add link-icon to grid view
             if ($nodeId.hasClass('file-block')) {
                 $nodeId.addClass('linked');
-                $('span', $nodeId).eq(1).addClass('link-icon');
             }
         }
 
@@ -8015,9 +8110,6 @@ function balance2pro(callback)
 
             // Add link-icon to left panel
             $tree.addClass('linked');
-
-            // Add class to the third from the list
-            $(' span', $tree).eq(2).addClass('link-icon');
         }
     };
 
@@ -8031,14 +8123,12 @@ function balance2pro(callback)
 
         // Remove link icon from list view
         $('#' + nodeId + ' .own-data').removeClass('linked');
-        $('#' + nodeId + ' .own-data span').removeClass('link-icon');
 
         // Remove link icon from grid view
         $('#' + nodeId + '.file-block').removeClass('linked');
-        $('#' + nodeId + '.file-block span').removeClass('link-icon');
 
         // Remove link icon from left panel
-        $('#treeli_' + nodeId + ' span').removeClass('linked link-icon');
+        $('#treeli_' + nodeId + ' span').removeClass('linked');
     };
 
     /**
@@ -8073,6 +8163,8 @@ function balance2pro(callback)
      */
     UiExportLink.prototype.addTakenDownIcon = function(nodeId) {
 
+        var titleTooltip = '';
+
         // Add taken-down to list view
         $('.grid-table.fm #' + nodeId).addClass('taken-down');
 
@@ -8084,12 +8176,28 @@ function balance2pro(callback)
 
         // Add title, mouse popup
         if (M.d[nodeId].t === 1) {// Item is folder
-            $('.grid-table.fm #' + nodeId).attr('title', l[7705]);
-            $('#' + nodeId + '.file-block').attr('title', l[7705]);
+
+            titleTooltip = l[7705];
+
+            // Undecryptable node indicators
+            if (missingkeys[nodeId]) {
+                titleTooltip += '\n' + l[8595];
+            }
+
+            $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
+            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
         }
         else {// Item is file
-            $('.grid-table.fm #' + nodeId).attr('title', l[7704]);
-            $('#' + nodeId + '.file-block').attr('title', l[7704]);
+
+            titleTooltip = l[7704];
+
+            // Undecryptable node indicators
+            if (missingkeys[nodeId]) {
+                titleTooltip += '\n' + l[8602];
+            }
+
+            $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
+            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
         }
     };
 

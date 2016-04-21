@@ -6112,7 +6112,7 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && M.currentrootid !== M.RubbishID) {
+        if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.context-menu-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
@@ -6214,6 +6214,15 @@ function contextMenuUI(e, ll) {
             items = menuItems();
             for (var item in items) {
                 $(menuCMI).filter(item).show();
+            }
+
+            // Hide context menu items not needed for undecrypted nodes
+            if (missingkeys[id]) {
+                $(menuCMI).filter('.add-star-item').hide();
+                $(menuCMI).filter('.download-item').hide();
+                $(menuCMI).filter('.rename-item').hide();
+                $(menuCMI).filter('.copy-item').hide();
+                $(menuCMI).filter('.getlink-item').hide();
             }
         }
         else {
@@ -6877,7 +6886,12 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }
             i++;
         }
-        if (ids[0] === 'contacts' && M.currentdirid && String(M.currentdirid).length === 11 && M.currentrootid == 'contacts') {
+        if (
+            (ids[0] === 'contacts')
+            && M.currentdirid
+            && (String(M.currentdirid).length === 11)
+            && (M.currentrootid === 'contacts')
+            ) {
             sectionUIopen('contacts');
         } else if (ids[0] === 'contacts') {
             // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the
@@ -9389,6 +9403,7 @@ function browserDialog(close) {
     $('.browsers-info-header').text(bh);
     $('.browsers-info-header p').text(bt);
 }
+
 browserDialog.isWeak = function() {
     var result = {};
     var ua = String(navigator.userAgent);
@@ -9402,16 +9417,18 @@ browserDialog.isWeak = function() {
     result.weak = result.edge || result.ie11 || result.ie10 || result.safari;
 
     return result.weak && result;
-}
+};
 
-function propertiesDialog(close)
-{
-    var pd = $('.fm-dialog.properties-dialog'),
-        c = $('.properties-elements-counter span');
+/* jshint -W074 */
+function propertiesDialog(close) {
+
+    var pd = $('.fm-dialog.properties-dialog');
+    var c = $('.properties-elements-counter span');
+
     $(document).unbind('MegaNodeRename.Properties');
     $(document).unbind('MegaCloseDialog.Properties');
-    if (close)
-    {
+
+    if (close) {
         $.dialog = false;
         delete $.propertiesDialog;
         fm_hideoverlay();
@@ -9419,8 +9436,10 @@ function propertiesDialog(close)
         $('.contact-list-icon').removeClass('active');
         $('.properties-context-menu').fadeOut(200);
         $.hideContextMenu();
+
         return true;
     }
+
     $.propertiesDialog = $.dialog = 'properties';
     fm_showoverlay();
 
@@ -9429,46 +9448,64 @@ function propertiesDialog(close)
 
     var exportLink = new mega.Share.ExportLink({});
     var isTakenDown = exportLink.isTakenDown($.selected);
-    if (isTakenDown) {
-        pd.addClass('taken-down');
-        showToast('clipboard', l[7703]);
+    var isUndecrypted = missingkeys[$.selected];
+    var notificationText = '';
+
+    if (isTakenDown || isUndecrypted) {
+        if (isTakenDown) {
+            pd.addClass('taken-down');
+            notificationText  = l[7703] + '\n';
+        }
+        if (isUndecrypted) {
+            pd.addClass('undecryptable');
+
+            if (M.d[$.selected].t) {// folder
+                notificationText  += l[8595];
+            }
+            else {// file
+                notificationText  += l[8602];
+            }
+        }
+        showToast('clipboard', notificationText);
     }
 
     $('.properties-elements-counter span').text('');
-    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
-    {
+    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
             e.click();
     });
-    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function()
-    {
+
+    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function() {
         propertiesDialog(1);
     });
+
     var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
-    for (var i in $.selected)
-    {
-        n = M.d[$.selected[i]];
-        if (!n) {
-            console.error('propertiesDialog: invalid node', $.selected[i]);
-        }
-        else if (n.t) {
-            var nodes = fm_getnodes(n.h);
-            for (var i in nodes) {
-                if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
-                    size += M.d[nodes[i]].s;
-                    sfilecnt++;
-                }
-                else {
-                    sfoldercnt++;
-                }
+
+    for (var i in $.selected) {
+        if ($.selected.hasOwnProperty(i)) {
+            n = M.d[$.selected[i]];
+            if (!n) {
+                console.error('propertiesDialog: invalid node', $.selected[i]);
             }
-            foldercnt++;
-        }
-        else {
-            filecnt++
-            size += n.s;
+            else if (n.t) {
+                var nodes = fm_getnodes(n.h);
+                for (i in nodes) {
+                    if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
+                        size += M.d[nodes[i]].s;
+                        sfilecnt++;
+                    }
+                    else {
+                        sfoldercnt++;
+                    }
+                }
+                foldercnt++;
+            }
+            else {
+                filecnt++;
+                size += n.s;
+            }
         }
     }
     if (!n) {
@@ -9476,45 +9513,48 @@ function propertiesDialog(close)
         return propertiesDialog(1);
     }
 
-    var star = ''
+    var star = '';
     if (n.fav)
         star = ' star';
     pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star)
 
-    if (fileIcon(n).indexOf('shared') > -1)
+    if (fileIcon(n).indexOf('shared') > -1) {
         pd.addClass('shared');
-    if (typeof n.r == "number")
-    {
-        var cs = M.contactstatus(n.h)
+    }
+
+    if (typeof n.r === "number") {
+        var cs = M.contactstatus(n.h);
         var zclass = "read-only";
-        if (n.r == 1) {
-            zclass = "read-and-write"
-        } else if (n.r == 2) {
-            zclass = "full-access"
+
+        if (n.r === 1) {
+            zclass = "read-and-write";
         }
-        pd.addClass('shared shared-with-me ' + zclass)
+        else if (n.r === 2) {
+            zclass = "full-access";
+        }
+        pd.addClass('shared shared-with-me ' + zclass);
     }
 
     var p = {}, user = Object(M.d[n.su || n.p]);
-    if (d) console.log('propertiesDialog', n, user);
-    if ((filecnt + foldercnt) == 1)
-    {
+
+    if (d) {
+        console.log('propertiesDialog', n, user);
+    }
+
+    if ((filecnt + foldercnt) === 1) {
         p.t6 = '';
         p.t7 = '';
 
-        if (filecnt)
-        {
+        if (filecnt) {
             p.t3 = l[87] + ':';
             p.t5 = ' second';
 
-            if (n.mtime)
-            {
+            if (n.mtime) {
                 p.t6 = l[94] + ':';
                 p.t7 = htmlentities(time2date(n.mtime));
             }
         }
-        else
-        {
+        else {
             p.t3 = l[894] + ':';
             p.t5 = '';
         }
@@ -9531,13 +9571,18 @@ function propertiesDialog(close)
         else if (n.h === M.RubbishID) {
             p.t2 = htmlentities(l[167]);
         }
+        // 'Shared with me' tab, info dialog, undecrypted nodes
+        else if (missingkeys[n.h]) {
+            p.t2 = htmlentities(l[8649]);
+        }
+
         p.t4 = bytesToSize(size);
         p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
         p.t8 = p.t9 ? (l[896] + ':') : '';
         p.t10 = '';
         p.t11 = '';
-        if (foldercnt)
-        {
+
+        if (foldercnt) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
@@ -9701,6 +9746,7 @@ function propertiesDialog(close)
         }
     }
 }
+/* jshint +W074 */
 
 function termsDialog(close, pp)
 {

@@ -3215,8 +3215,8 @@
     "8683": "No hemos podido importar todos los archivos, probablemente porque algunos han sido eliminados. La operaci\u00f3n ha terminado con %1 de %2 nodos importados con \u00e9xito.",
     "8684": "Enviar y cerrar",
     "8685": "Por favor, cu\u00e9ntanos por qu\u00e9 no deseas renovar tu plan:",
-    "8686": "undecrypted folder",
-    "8687": "undecrypted file",
+    "8686": "carpeta no desencriptada",
+    "8687": "fichero no desencriptado",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

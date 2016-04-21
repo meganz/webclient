@@ -7532,7 +7532,7 @@ function fillShareDialogWithContent() {
             if (M.u[userHandle] && M.u[userHandle].c && (M.u[userHandle].c === 1)) {
                 user = M.u[userHandle];
                 email = user.m;
-                name = mega.utils.fullUsername(userHandle);
+                name = M.getNameByHandle(userHandle);
                 shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
 
                 generateShareDialogRow(name, email, shareRights, userHandle);
@@ -8637,11 +8637,12 @@ function copyDialog() {
             ownerName = '';
         }
 
-        var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') + '\n\
-            <div class="user-card-data no-status">\n\
-                <div class="user-card-name small">' + htmlentities(ownerName) + ' <span class="grey">(' + l[8664] + ')</span></div>\n\
-                <div class="user-card-email small">' + htmlentities(ownerEmail) + '</div>\n\
-            </div>';
+        var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') +
+            '<div class="user-card-data no-status">' +
+                '<div class="user-card-name small">' + htmlentities(ownerName) +
+                    ' <span class="grey">(' + l[8664] + ')</span></div>' +
+                '<div class="user-card-email small">' + htmlentities(ownerEmail) +
+                '</div></div>';
 
         $tooltip.find('.contacts-info.body').safeHTML(html);
 
@@ -8965,11 +8966,12 @@ function moveDialog() {
             ownerName = '';
         }
 
-        var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') + '\n\
-            <div class="user-card-data no-status">\n\
-                <div class="user-card-name small">' + htmlentities(ownerName) + ' <span class="grey">(' + l[8664] + ')</span></div>\n\
-                <div class="user-card-email small">' + htmlentities(ownerEmail) + '</div>\n\
-            </div>';
+        var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') +
+            '<div class="user-card-data no-status">' +
+                '<div class="user-card-name small">' + htmlentities(ownerName) +
+                    ' <span class="grey">(' + l[8664] + ')</span></div>' +
+                '<div class="user-card-email small">' + htmlentities(ownerEmail) +
+                '</div></div>';
 
         $tooltip.find('.contacts-info.body').safeHTML(html);
         

@@ -149,6 +149,7 @@ function init_page() {
             && page.substr(0, 6) !== 'signup'
             && page !== 'register'
             && page !== 'terms'
+            && page !== 'mega'
             && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
         register_txt = l[1291];
         document.location.hash = 'signup' + localStorage.signupcode;
@@ -580,6 +581,10 @@ function init_page() {
     else if (page == 'privacy') {
         parsepage(pages['privacy']);
     }
+    else if (page == 'mega') {
+        parsepage(pages['mega']);
+        megainfotxt();
+    }
     else if (page == 'privacycompany') {
         parsepage(pages['privacycompany']);
     }
@@ -767,7 +772,7 @@ function init_page() {
     /**
      * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
      */
-    else if (page.substr(0, 7) == 'voucher') {
+    else if (page.substr(0, 7) === 'voucher') {
 
         // Get the voucher code from the URL which is 20 characters in length
         var voucherCode = page.substr(7, 20);
@@ -776,10 +781,17 @@ function init_page() {
         localStorage.setItem('voucher', voucherCode);
 
         // If not logged in, direct them to login or register first
-        if (!u_type) {
+        if (u_type === false) {
             login_txt = l[7712];
             document.location.hash = 'login';
             return false;
+        }
+        else if (u_type < 3) {
+            // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and
+            // make sure they confirm first otherwise we get lots of chargebacks from users paying in the wrong account
+            msgDialog('warningb', l[8666], l[8665], false, function() {
+                location.hash = 'fm';
+            });
         }
         else {
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
@@ -789,7 +801,7 @@ function init_page() {
     }
 
     // Load the direct voucher redeem page
-    else if (page.substr(0, 6) == 'redeem') {
+    else if (page.substr(0, 6) === 'redeem') {
         loadingDialog.show();
         parsepage(pages['redeem']);
         redeem.init();
@@ -816,12 +828,6 @@ function init_page() {
             }
             if (!m && $('#fmholder').html() == '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
-            }
-            if (pfid) {
-                $('.fm-left-menu .folderlink').removeClass('hidden');
-                $('.fm-tree-header.cloud-drive-item span').text(l[808]);
-                $('.fm-tree-header').not('.cloud-drive-item').hide();
-                $('.fm-menu-item').hide();
             }
         }
         else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
@@ -1150,6 +1156,9 @@ function topmenuUI() {
                 megaChat.renderMyStatus();
             }
         }
+        
+        // Show PRO plan expired warning popup (if applicable)
+        alarm.planExpired.render();
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {
@@ -1157,67 +1166,14 @@ function topmenuUI() {
             $('.top-menu-item.register').text(l[968]);
             $('.top-menu-item.clouddrive').show();
 
-            if ($.len(M.c[M.RootID] || {})) {
-                var body;
-                var header;
-                var lstr = String(l[881]);
-                var dot = lstr.indexOf('.') + 1;
-
-                // 881 is a long string of plain text, adapt it to the new warning layout
-                if (lang === 'en' || dot === 0) {
-                    header = 'You are using an ephemeral session.';
-                    body = lstr.substr(dot);
-                }
-                else {
-                    header = lstr.substr(0, dot);
-                    body = lstr.substr(dot);
-                }
-                // Look for "50 GB" to turn green the last sentence
-                var sep = body.split('50');
-                if (sep.length > 1) {
-                    var wrd = sep[0].split(/\s+/).filter(String);
-                    var green = wrd.pop() + ' 50' + sep[1];
-                    body = htmlentities(wrd.join(" ")) + ' <span class="green">' + htmlentities(green) + '</span>';
-                }
-                else {
-                    body = htmlentities(body);
-                }
-                header = htmlentities(header);
-
-                $('.top-warning-popup .warning-popup-body').safeHTML(
-                    '<div class="warning-header">' + header.trim() + '</div>' + body.trim()
-                );
-                $('.top-warning-popup .warning-button span').text(l[779]);
-
-                $('.warning-popup-icon').removeClass('hidden');
-                $('.warning-icon-area').rebind('click', function (e) {
-
-                    var c = $('.top-warning-popup').attr('class');
-
-                    if (c && c.indexOf('active') > -1) {
-                        $('.top-warning-popup').removeClass('active');
-                    }
-                    else {
-                        $('.top-warning-popup').addClass('active');
-                    }
-                });
-                $('.top-warning-popup').rebind('click', function (e) {
-
-                    if (isNonActivatedAccount()) {
-                        return;
-                    }
-
-                    $('.top-warning-popup').removeClass('active');
-                    document.location.hash = 'register';
-                });
-            }
-
+            // If they have purchased Pro but not activated yet, show a warning
             if (isNonActivatedAccount()) {
-                showNonActivatedAccountDialog();
+                alarm.nonActivatedAccount.render();
             }
-
-            if (page !== 'register') {
-                $('.top-warning-popup').addClass('active');
+            
+            // Otherwise show the ephemeral session warning
+            else if (($.len(M.c[M.RootID] || {})) && (page !== 'register')) {
+                alarm.ephemeralSession.render();
             }
         }
 
@@ -1625,6 +1581,9 @@ function topmenuUI() {
         else if (className.indexOf('privacypolicy') > -1) {
             document.location.hash = 'privacy';
         }
+        else if (className.indexOf('mega') > -1) {
+            document.location.hash = 'mega';
+        }
         else if (className.indexOf('copyright') > -1) {
             document.location.hash = 'copyright';
         }
@@ -1830,7 +1789,7 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
     $('#startholder').safeHTML(translate(pages['transferwidget']) + pagehtml);
     $('#startholder').show();
-    mainScroll();
+    Soon(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
         if (page !== 'start' && page !== 'download') {
             mainScroll();
@@ -1878,7 +1837,7 @@ window.onhashchange = function() {
         return false;
     }
 
-    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start') {
+    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start' ) {
         if ($.infoscroll) {
             startpageMain();
         }

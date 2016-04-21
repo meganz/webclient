@@ -84,8 +84,8 @@ function dl_g(res) {
                 $(this).addClass('active');
             }
             else {
-                fm_tfsresume('dl_' + fdl_queue_var.ph);
                 $(this).removeClass('active');
+                fm_tfsresume('dl_' + fdl_queue_var.ph);
             }
         });
         var key = dlpage_key;
@@ -112,7 +112,7 @@ function dl_g(res) {
                         loadingDialog.hide();
                         if (res.msd !== 0 && (!err || is)) {
                             $('.megasync-overlay').removeClass('downloading');
-                            megasync.download(dlpage_ph, dlpage_key);
+                            megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
                         } else {
                             megasyncOverlay();
                         }
@@ -288,7 +288,7 @@ function importFile() {
         // Check response and if over quota show a special warning dialog
         callback: function (result) {
             if (result === EOVERQUOTA) {
-                ulmanager.showOverQuotaDialog();
+                alarm.overQuota.render();
             }
         }
     });

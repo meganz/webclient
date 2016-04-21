@@ -233,7 +233,7 @@ var useravatar = (function() {
 
         if (!u_handle) {
             /* No user */
-            return staticpath + 'images/mega/default-top-avatar.png';
+            return '';
         }
 
         try {
@@ -253,7 +253,7 @@ var useravatar = (function() {
 
         // If no user, return default avatar
         if (!u_handle) {
-            return staticpath + 'images/mega/default-avatar.png';
+            return '';
         }
 
         return ns.imgUrl(u_handle);
@@ -299,7 +299,7 @@ var useravatar = (function() {
 
     /**
      * Returns a contact avatar
-     * @param {String} user
+     * @param {String|Object} user
      * @param {String} className
      * @param {String} element
      * @returns {String}
@@ -337,7 +337,12 @@ var useravatar = (function() {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        var letters = mega.utils.fullUsername(user.u);
+        var letters = M.getNameByHandle(user.u);
+        
+        if (!letters) {
+            // XXX: not a known user?
+            letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
+        }
 
         return _letters(letters, user.u, className, element);
     };

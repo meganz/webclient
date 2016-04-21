@@ -130,6 +130,8 @@ def dev(build_bundle=False, branch_name=''):
         else:
             print('Branch already exists on beta, updating instead.\n')
             with cd(remote_branch_path):
+                # Force revert the bundle.js IF it was re-built in earlier deployments
+                run('git checkout js/chat/bundle.js')
                 run('git pull --update-shallow')
                 run('git log -1')
 

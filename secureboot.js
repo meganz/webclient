@@ -1061,7 +1061,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 25, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 26, writable : false });
 
     // Do not report exceptions if this build is older than 20 days
     var exTimeLeft = ((buildVersion.timestamp + (20 * 86400)) * 1000) > Date.now();
@@ -1430,6 +1430,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+    jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
 
     // MEGA CHAT
     if (location.host === 'mega.nz' || !megaChatIsDisabled) {
@@ -1456,6 +1457,7 @@ else if (!b_u)
         jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1, w:7});
@@ -1555,8 +1557,10 @@ else if (!b_u)
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
-    if (typeof Number.isNaN !== 'function'
-            || typeof Set === 'undefined') {
+    if (
+        typeof Number.isNaN !== 'function' ||
+        typeof Set === 'undefined'
+    ) {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
@@ -1584,6 +1588,7 @@ else if (!b_u)
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+        'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
         'backup': {f:'html/backup.html', n: 'backup', j:0},
         'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
@@ -1639,6 +1644,7 @@ else if (!b_u)
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
+        'mega': ['mega'],
         'takedown': ['takedown'],
         'mobile': ['mobile'],
         'sync': ['sync','sync_js', 'megasync_js'],
@@ -1998,12 +2004,33 @@ else if (!b_u)
         // if (d) console.log('done',(jsl_current+jsl_fm_current));
         // if (d) console.log('total',jsl_total);
         var p = Math.floor((jsl_current+jsl_fm_current)/jsl_total*100);
+        var deg = 0;
+        var leftProgressBlock = document.getElementById('loadinganimleft');
+        var rightProgressBlock = document.getElementById('loadinganimright');
         if ((p > jsl_perc) && (p <= 100))
         {
             jsl_perc = p;
             if (d) console.log('jsl.progress... ' + p + '%', (jsl_current+jsl_fm_current), jsl_total);
             if (is_extension) p=100;
-            document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
+            deg = 360 * p / 100;
+            if (deg <= 180) {
+                rightProgressBlock.style.webkitTransform = 'rotate(' + deg + 'deg)';
+                rightProgressBlock.style.MozTransform = 'rotate(' + deg + 'deg)';
+                rightProgressBlock.style.msTransform = 'rotate(' + deg + 'deg)';
+                rightProgressBlock.style.OTransform = 'rotate(' + deg + 'deg)';
+                rightProgressBlock.style.transform = 'rotate(' + deg + 'deg)';
+            } else {
+                rightProgressBlock.style.webkitTransform = 'rotate(180deg)';
+                rightProgressBlock.style.MozTransform = 'rotate(180deg)';
+                rightProgressBlock.style.msTransform = 'rotate(180deg)';
+                rightProgressBlock.style.OTransform = 'rotate(180deg)';
+                rightProgressBlock.style.transform = 'rotate(180deg)';
+                leftProgressBlock.style.webkitTransform = 'rotate(' + (deg - 180) + 'deg)';
+                leftProgressBlock.style.MozTransform = 'rotate(' + (deg - 180) + 'deg)';
+                leftProgressBlock.style.msTransform = 'rotate(' + (deg - 180) + 'deg)';
+                leftProgressBlock.style.OTransform = 'rotate(' + (deg - 180) + 'deg)';
+                leftProgressBlock.style.transform = 'rotate(' + (deg - 180) + 'deg)';
+            }
         }
     }
     var jsl_loaded={};
@@ -2115,24 +2142,25 @@ else if (!b_u)
         if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
         else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-sprite-v4.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-sprite-v4@2x.png);background-size: 356px auto;}}';
+        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -94px -468px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -94px -408px;}.st-bottom-button.st-facebook-button {background-position: -49px -468px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -408px;}.st-bottom-button.st-twitter-button {background-position: left -468px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {    background-position: left -408px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2@2x.png);    background-size: 222px auto;}}';
 
         mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
             .innerHTML =
                 '<div class="loading-mid-white-block">'+
-                '   <div class="mid-centered-block">'+
-                '       <div class="loading-cloud">'+
-                '           <div class="loading-progress-bar percents-1" id="loadinganim">'+
-                '               <div></div>'+
-                '           </div>'+
-                '       </div>'+
-                // '       <div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div>'+
-                '   </div>'+
-                '   <div class="st-social-block-load" id="bootbottom">'+
-                '       <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
-                '       <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
-                '       <a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a>'+
-                '   </div>'+
+                '    <div class="loading-cloud">'+
+                '        <div class="loading-percentage">'+
+                '            <ul>'+
+                '                <li class="right-c"><p id="loadinganimright"><span></span></p></li>'+
+                '                <li class="left-c"><p  id="loadinganimleft"><span></span></p></li>'+
+                '            </ul>'+
+                '        </div>'+
+                '        <div class="loading-m-block"></div>'+
+                '    </div>'+
+                '    <div class="st-social-block-load" id="bootbottom">'+
+                '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
+                '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
+                '    <a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a>'+
+                '    </div>'+
                 '</div>';
     }
     var u_storage, loginresponse, u_sid, dl_res;

@@ -216,6 +216,7 @@
 	            'chatdIntegration': ChatdIntegration,
 	            'callManager': CallManager,
 	            'urlFilter': UrlFilter,
+	            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
 	            'karerePing': KarerePing
@@ -869,7 +870,7 @@
 	    var name = jid.split("@")[0];
 
 	    if (contact) {
-	        name = mega.utils.fullUsername(contact.u);
+	        name = M.getNameByHandle(contact.u);
 	    }
 
 	    assert(name, "Name not found for jid: " + jid);
@@ -20511,7 +20512,6 @@
 	            'className': "nw-conversations-item current-calling",
 	            'data-jid': ''
 	        };
-	        var callName;
 
 	        var megaChat = this.props.megaChat;
 
@@ -20524,7 +20524,6 @@
 	            if (user) {
 	                currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
 	                currentCallingContactStatusProps['data-jid'] = room.roomJid;
-	                callName = room.getRoomTitle();
 
 	                if (room.roomJid == megaChat.currentlyOpenedChat) {
 	                    currentCallingContactStatusProps.className += " selected";
@@ -21235,6 +21234,16 @@
 	            return this._reactInternalInstance._currentElement._owner._instance;
 	        } else {
 	            return null;
+	        }
+	    },
+	    safeForceUpdate: function() {
+	        var self = this;
+	        try {
+	            setTimeout(function() {
+	                self.forceUpdate();
+	            }, 75);
+	        } catch(e) {
+	            console.warn(e);
 	        }
 	    }
 	};
@@ -21953,7 +21962,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "nw-conversations-name" },
-	                    mega.utils.fullUsername(contact.u)
+	                    M.getNameByHandle(contact.u)
 	                )
 	            )
 	        );
@@ -21979,7 +21988,7 @@
 
 	            crypt.getPubEd25519(contact.u).done(function () {
 	                if (self.isMounted()) {
-	                    self.forceUpdate();
+	                    self.safeForceUpdate();
 	                }
 	            });
 	        }
@@ -22010,6 +22019,10 @@
 	        var self = this;
 	        var contact = this.props.contact;
 
+	        if (!contact.m && contact.email) {
+	            contact.m = contact.email;
+	        }
+
 	        var $avatar = $(useravatar.contact(contact));
 
 	        var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
@@ -22024,46 +22037,7 @@
 	            verifiedElement = React.makeElement(ContactVerified, { contact: this.props.contact, className: this.props.verifiedClassName });
 	        }
 
-	        if ($avatar.find("img").length > 0) {
-	            displayedAvatar = React.makeElement(
-	                "div",
-	                { className: classes, style: this.props.style },
-	                verifiedElement,
-	                React.makeElement("img", { src: $("img", $avatar).attr("src"), style: this.props.imgStyles })
-	            );
-	        } else {
-	            var tempClasses = $avatar.attr('class');
-	            var colorNum = tempClasses.split("color")[1].split(" ")[0];
-	            classes += " color" + colorNum;
-
-	            displayedAvatar = React.makeElement(
-	                "div",
-	                { className: classes, style: this.props.style },
-	                verifiedElement,
-	                React.makeElement("div", { className: letterClass, "data-user-letter": $(useravatar.contact(contact)).text() })
-	            );
-	        }
-
-	        return displayedAvatar;
-	    }
-	});
-
-	var AvatarImage = React.createClass({
-	    displayName: "AvatarImage",
-
-	    mixins: [MegaRenderMixin, RenderDebugger],
-	    render: function render() {
-	        var contact = this.props.contact;
-
-	        var imgUrl = useravatar.imgUrl(contact.u);
-
-	        var displayedAvatar;
-
-	        displayedAvatar = React.makeElement("img", { src: imgUrl, style: this.props.imgStyles, className: "avatar-img" });
-
 	        if (!avatars[contact.u] && (!_noAvatars[contact.u] || _noAvatars[contact.u] !== true)) {
-	            var self = this;
-
 	            var loadAvatarPromise;
 	            if (!_noAvatars[contact.u]) {
 	                loadAvatarPromise = mega.attr.get(contact.u, 'a', true, false);
@@ -22084,10 +22058,30 @@
 
 	                delete _noAvatars[contact.u];
 
-	                self.forceUpdate();
+	                self.safeForceUpdate();
 	            }).fail(function (e) {
 	                _noAvatars[contact.u] = true;
 	            });
+	        }
+
+	        if ($avatar.find("img").length > 0) {
+	            displayedAvatar = React.makeElement(
+	                "div",
+	                { className: classes, style: this.props.style },
+	                verifiedElement,
+	                React.makeElement("img", { src: $("img", $avatar).attr("src"), style: this.props.imgStyles })
+	            );
+	        } else {
+	            var tempClasses = $avatar.attr('class');
+	            var colorNum = tempClasses.split("color")[1].split(" ")[0];
+	            classes += " color" + colorNum;
+
+	            displayedAvatar = React.makeElement(
+	                "div",
+	                { className: classes, style: this.props.style },
+	                verifiedElement,
+	                React.makeElement("div", { className: letterClass, "data-user-letter": $(useravatar.contact(contact)).text() })
+	            );
 	        }
 
 	        return displayedAvatar;
@@ -22160,7 +22154,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "user-card-name small" },
-	                    mega.utils.fullUsername(contact.u)
+	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
@@ -22261,8 +22255,7 @@
 	    Avatar: Avatar,
 	    ContactPickerWidget: ContactPickerWidget,
 	    ContactVerified: ContactVerified,
-	    ContactPresence: ContactPresence,
-	    AvatarImage: AvatarImage
+	    ContactPresence: ContactPresence
 	};
 
 /***/ },
@@ -23495,13 +23488,10 @@
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
 
-	                                    if (!src || !src.seen) {
+	                                    if (!src || src !== v) {
 	                                        M.v.push(v);
 	                                        if (!v.seen) {
 	                                            v.seen = 1;
-	                                        }
-	                                        if (src) {
-	                                            src.seen = 1;
 	                                        }
 	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }
@@ -23615,9 +23605,17 @@
 	                            });
 	                        }
 	                        var dropdown = null;
+	                        if (!M.u[contact.u]) {
+	                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+	                                'u': contact.u,
+	                                'name': contact.name,
+	                                'm': contact.email,
+	                                'c': 0
+	                            }));
+	                        }
 	                        if (M.u[contact.u]) {
 
-	                            if (contact.c === 1) {
+	                            if (M.u[contact.u].c === 1) {
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
@@ -23652,40 +23650,40 @@
 	                                        deleteButtonOptional
 	                                    )
 	                                );
-	                            }
-	                        } else {
-	                            dropdown = React.makeElement(
-	                                ButtonsUI.Button,
-	                                {
-	                                    className: "default-white-button tiny-button",
-	                                    icon: "tiny-icon grey-down-arrow" },
-	                                React.makeElement(
-	                                    DropdownsUI.Dropdown,
+	                            } else if (M.u[contact.u].c === 0) {
+	                                dropdown = React.makeElement(
+	                                    ButtonsUI.Button,
 	                                    {
-	                                        className: "white-context-menu shared-contact-dropdown",
-	                                        noArrow: true,
-	                                        positionMy: "left bottom",
-	                                        positionAt: "right bottom",
-	                                        horizOffset: 4
-	                                    },
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
-	                                        icon: "rounded-grey-plus",
-	                                        label: __("Add contact"),
-	                                        onClick: function onClick() {
-	                                            M.inviteContact(M.u[u_handle].m, contactEmail);
+	                                        className: "default-white-button tiny-button",
+	                                        icon: "tiny-icon grey-down-arrow" },
+	                                    React.makeElement(
+	                                        DropdownsUI.Dropdown,
+	                                        {
+	                                            className: "white-context-menu shared-contact-dropdown",
+	                                            noArrow: true,
+	                                            positionMy: "left bottom",
+	                                            positionAt: "right bottom",
+	                                            horizOffset: 4
+	                                        },
+	                                        React.makeElement(DropdownsUI.DropdownItem, {
+	                                            icon: "rounded-grey-plus",
+	                                            label: __("Add contact"),
+	                                            onClick: function onClick() {
+	                                                M.inviteContact(M.u[u_handle].m, contactEmail);
 
-	                                            var title = l[150];
+	                                                var title = l[150];
 
-	                                            var msg = l[5898].replace('[X]', contactEmail);
+	                                                var msg = l[5898].replace('[X]', contactEmail);
 
-	                                            closeDialog();
-	                                            msgDialog('info', title, msg);
-	                                        }
-	                                    }),
-	                                    deleteButtonOptional ? React.makeElement("hr", null) : null,
-	                                    deleteButtonOptional
-	                                )
-	                            );
+	                                                closeDialog();
+	                                                msgDialog('info', title, msg);
+	                                            }
+	                                        }),
+	                                        deleteButtonOptional ? React.makeElement("hr", null) : null,
+	                                        deleteButtonOptional
+	                                    )
+	                                );
+	                            }
 	                        }
 
 	                        contacts.push(React.makeElement(
@@ -23697,7 +23695,7 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
-	                                    htmlentities(mega.utils.fullUsername(contact.u))
+	                                    M.getNameByHandle(contact.u)
 	                                ),
 	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
 	                                React.makeElement(
@@ -23871,7 +23869,7 @@
 	            }
 
 	            if (textMessage.splice) {
-	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
 	                if (message.currentCallCounter) {
 	                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
@@ -23879,7 +23877,7 @@
 	                textMessage = tmpMsg;
 	                textMessage = textMessage.replace("[[ ", "<span className=\"grey-color\">").replace("]]", "</span>");
 	            } else {
-	                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+	                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 	            }
 
 	            message.textContents = textMessage;
@@ -24564,9 +24562,6 @@
 	                $.doDD(e, ui, 'over', 1);
 	            },
 	            out: function out(e, ui) {
-	                var c1 = $(e.srcElement).attr('class'),
-	                    c2 = $(e.target).attr('class');
-	                if (c2 && c2.indexOf('fm-menu-item') > -1 && c1 && (c1.indexOf('cloud') > -1 || c1.indexOf('cloud') > -1)) return false;
 	                $.doDD(e, ui, 'out', 1);
 	            }
 	        };
@@ -26430,7 +26425,7 @@
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
-	        return htmlentities(self.megaChat.getContactNameFromJid(participants[0]));
+	        return self.megaChat.getContactNameFromJid(participants[0]);
 	    } else {
 	        assert(false, "invalid room type");
 	        return "[invalid room type]";

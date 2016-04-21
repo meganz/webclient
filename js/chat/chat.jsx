@@ -201,6 +201,7 @@ var Chat = function() {
             'chatdIntegration': ChatdIntegration,
             'callManager': CallManager,
             'urlFilter': UrlFilter,
+            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'karerePing': KarerePing
@@ -1026,7 +1027,7 @@ Chat.prototype.getContactNameFromJid = function(jid) {
 
 
     if (contact) {
-        name = mega.utils.fullUsername(contact.u);
+        name = M.getNameByHandle(contact.u);
     }
 
     assert(name, "Name not found for jid: " + jid);

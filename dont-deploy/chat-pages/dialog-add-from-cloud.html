@@ -19,6 +19,85 @@
 <link rel="stylesheet" type="text/css" href="../../css/chat-feedback.css" />
 <link rel="stylesheet" type="text/css" href="../../css/chat-common.css" />
 <link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+
+<!-- jQuery: -->
+<script src="../../js/vendor/jquery-2.2.1.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        //Tooltip positioning
+        function tooltipInit($elem, $tooltip, arrow, tooltipOffset) {
+            var elemLeftPos, elemTopPos, elemWidth, elemHeight;
+            var tooltipLeftPos, tooltipTopPos, tooltipWidth, tooltipHeight;
+            var docWidth, docHeight;
+            var tooltipClass;
+
+            if ($elem && $tooltip) {
+                elemLeftPos = $elem.offset().left;
+                elemTopPos = $elem.offset().top;
+                elemWidth = $elem.outerWidth();
+                elemHeight = $elem.outerHeight();
+                tooltipWidth = $tooltip.outerWidth();
+                tooltipHeight = $tooltip.outerHeight();
+                docWidth = $(window).width();
+                docHeight = $(window).height();
+                $tooltip.removeClass('dropdown-arrow left-arrow right-arrow up-arrow down-arrow').removeAttr('style');
+
+               // Default Tooltip offset
+                if (!tooltipOffset) {
+                    tooltipOffset = 7;
+                }
+
+                if (elemTopPos - tooltipHeight - tooltipOffset > 10) {
+                    tooltipLeftPos = elemLeftPos + elemWidth/2 - tooltipWidth/2;
+                    tooltipTopPos = elemTopPos - tooltipHeight - tooltipOffset;
+                    tooltipClass = arrow ? 'dropdown-arrow down-arrow' : '';
+                } 
+                else if (docHeight - (elemTopPos + elemHeight + tooltipHeight + tooltipOffset) > 10) {
+                    tooltipLeftPos = elemLeftPos + elemWidth/2 - tooltipWidth/2;
+                    tooltipTopPos = elemTopPos + elemHeight + tooltipOffset;
+                    tooltipClass = arrow ? 'dropdown-arrow up-arrow' : ''; 
+                }
+                else if (elemLeftPos - tooltipWidth - tooltipOffset > 10) {
+                    tooltipLeftPos = elemLeftPos - tooltipWidth - tooltipOffset;
+                    tooltipTopPos = elemTopPos + elemHeight/2 - tooltipHeight/2;
+                    tooltipClass = arrow ? 'dropdown-arrow right-arrow' : ''; 
+                }
+                else {
+                    tooltipLeftPos = elemLeftPos + elemWidth + tooltipOffset;
+                    tooltipTopPos = elemTopPos + elemHeight/2 - tooltipHeight/2;
+                    tooltipClass = arrow ? 'dropdown-arrow left-arrow' : ''; 
+                }
+                $tooltip.css({
+                    'left': tooltipLeftPos,
+                    'top': tooltipTopPos
+                });
+                // Arrow Tooltip Class
+                $tooltip.addClass(tooltipClass);
+            }
+        }
+
+        $('.fm-dialog.add-from-cloud td').bind('mouseover tooltip', function() {
+            var $icon = $(this).find('.transfer-filtype-icon'),
+                  $tooltip = $('.dropdown.img-preview');
+            if ($icon.hasClass('image')) {
+                $tooltip.removeClass('hidden').removeClass('dropdown-arrow left-arrow right-arrow up-arrow down-arrow').removeAttr('style');
+                tooltipInit($icon, $tooltip, 1);
+            }
+        });
+        $('.fm-dialog.add-from-cloud td').bind('mouseout tooltip', function() {
+            var $icon = $(this).find('.transfer-filtype-icon'),
+                  $tooltip = $('.dropdown.img-preview');
+            if ($icon.hasClass('image')) {
+                $tooltip.addClass('hidden');
+            }
+        });
+
+    });
+
+</script>
+
 </head>
 
 <body class="overlayed">
@@ -28,12 +107,16 @@
 <div class="fm-dialog add-from-cloud">
     <div class="fm-dialog-close"></div>
     <div class="fm-dialog-title">Add from your Cloud Drive</div>
-    <div class="dropdown body dropdown-arrow img-preview down-arrow">
+    
+    <!-- Image preview tooltip !-->
+    <div class="dropdown body img-preview hidden">
         <i class="dropdown-white-arrow"></i>
         <div class="dropdown img-wrapper">
             <img alt="" src="../../images/temp/avatar-img.jpg" />
         </div>
-     </div>
+    </div>
+    <!-- End of Image preview tooltip !-->
+     
     <div class="fm-dialog-content">
         <!-- Please add "long-path" if theres not enough space for breadcrumbs path !-->
         <div class="fm-breadcrumbs-block">

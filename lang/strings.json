@@ -7671,6 +7671,10 @@
         "text": "Recover space by emptying the rubbish bin",
         "context": "Explain the user that he can recover space by emptying the Rubbish Bin"
     },
+    "6794": {
+        "text": "Empty the rubbish bin",
+        "context": "Title of the button to empty the Rubbish Bin (action!)"
+    },
     "6795": {
         "text": "Are you sure you want to permanently remove all items from your rubbish bin?\r\nYou cannot undo this action.",
         "context": "Warn the user that by emptying the Rubbish Bin the files will be permanently deleted and the action cannot be reversed!"
@@ -12714,5 +12718,157 @@
     "8646": {
         "text": "Your image exceeded the maximum file size of 64 KB. Please try again with a smaller file.",
         "context": "An error dialog message when a user tried to upload an avatar image which was too large."
+    },
+    "8647": {
+        "text": "Failed to copy the MEGA link to your clipboard.",
+        "context": "Message of the dialog displayed when fails the process\/request to copy a MEGA link to the clipboard."
+    },
+    "8648": {
+        "text": "Error copying link",
+        "context": "Title of the dialog displayed when fails the process\/request to copy a MEGA link to the clipboard - (String as short as possible)."
+    },
+    "8649": {
+        "text": "Unknown until decryption",
+        "context": "This means that the name of the file or folder is unknown until it has been decrypted. This is shown instead of the file\/folder name in the Info dialog."
+    },
+    "8650": {
+        "text": "Your enquiry is too short. Please give us more details about your issue \/ query.",
+        "context": "Error message when a given query is too short when emailing mega support via the \"Get Support\" option on the website. They are not allowed to send questions of only a few words."
+    },
+    "8651": {
+        "text": "Your %1 plan has expired.",
+        "context": "A title for the PRO plan expired dialog. Please leave the %1 placeholder which will be replaced with the PRO plan name e.g. PRO III."
+    },
+    "8652": {
+        "text": "PURCHASED",
+        "context": "A label on the PRO plan expired dialog for showing the date when they last purchased a PRO plan."
+    },
+    "8653": {
+        "text": "Click [S]Renew[\/S] to purchase your %1 plan (%2) using %3 %4.",
+        "context": "This is an instruction on the PRO plan expired dialog. Please leave the [S][\/S] tags which will be replaced with bold text at runtime, but do translate the word Renew inside. The %1 placeholder will be replaced with the PRO plan name e.g. PRO III. The %2 placeholder will be replaced with the plan duration e.g. 1 month. The %3 placeholder will be an icon. The %4 placeholder will be the name of payment provider."
+    },
+    "8654": {
+        "text": "Otherwise click [S]Choose[\/S] to select a different plan or payment option.",
+        "context": "This is a second instruction on the PRO plan expired dialog. Please leave the [S][\/S] tags which will be replaced with bold text at runtime, but do translate the word Choose inside."
+    },
+    "8655": {
+        "text": "Renew",
+        "context": "This is a button on the PRO plan expired dialog. It will renew their most recent PRO plan (it will take them back to the pro page and pre-select as many things as it can so that the user can repurchase)"
+    },
+    "8656": {
+        "text": "Choose...",
+        "context": "This is a button on the PRO plan expired dialog. It will let the user choose a different PRO plan."
+    },
+    "8657": {
+        "text": "EXPIRED",
+        "context": "A label on the PRO plan expired dialog for showing the date when their last PRO plan purchase expired."
+    },
+    "8658": {
+        "text": "your first name",
+        "context": "Placeholder text for the user's first name field when creating an account."
+    },
+    "8659": {
+        "text": "your last name",
+        "context": "Placeholder text for the user's last name field when creating an account."
+    },
+    "8660": {
+        "text": "Windows Phone",
+        "context": "A phone running the Windows Phone operating system."
+    },
+    "8661": {
+        "text": "What is MEGA?",
+        "context": "A link that the user can click to learn more about MEGA."
+    },
+    "8662": {
+        "text": "Select all",
+        "context": "Label for any 'Select all' button, link, etc. - (String as short as possible)."
+    },
+    "8663": {
+        "text": "Deselect all",
+        "context": "Label for any 'Deselect all' button, link, etc. - (String as short as possible)."
+    },
+    "8664": {
+        "text": "owner",
+        "context": "A tooltip for move and copy dialogs in the Shared with me tab. When a user moves the mouse pointer over an item, the tooltip will show the owner's email address and if exists the owner's first and last name. The text \"(owner)\" will be shown next to the owner's name or over their email address if the owner's first and last name doesn't exist."
+    },
+    "8665": {
+        "text": "Please check your registration email and confirm your account before you pay, so that MEGA can credit your payment to the correct account.",
+        "context": "A dialog message to get the user to confirm their email account before buying a PRO plan."
+    },
+    "8666": {
+        "text": "Confirm your registration",
+        "context": "A dialog title to get the user to confirm their email account before buying a PRO plan."
+    },
+    "8667": {
+        "text": "If you want to subscribe for a yearly PRO account, you can wire transfer funds to either of our bank accounts:",
+        "context": "An instruction on the wire transfer dialog. Both wire transfer options are shown immediately after."
+    },
+    "8668": {
+        "text": "IBAN",
+        "context": "This is an acronym for International Bank Account Number. https:\/\/en.wikipedia.org\/wiki\/International_Bank_Account_Number\r\n\r\nOnly translate if this is commonly referred to as something else in your country. "
+    },
+    "8669": {
+        "text": "Not applicable for NZ banks",
+        "context": "The International Bank Account Number is not valid or applicable for New Zealand banks."
+    },
+    "8670": {
+        "text": "If your email address is too long for the 'Reference' field it should be placed in the 'Comments' field.",
+        "context": "A note on the wire transfer dialog."
+    },
+    "8671": {
+        "text": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+        "context": "A note on the wire transfer dialog."
+    },
+    "8673": {
+        "text": "Add files",
+        "context": "Title of button in empty views for user to add files."
+    },
+    "8674": {
+        "text": "No Results",
+        "context": "Displayed message when the user makes a search and there is 'No Results' for the search."
+    },
+    "8675": {
+        "text": "Add contacts",
+        "context": "A button title which is shown in empty views when you can add contacts."
+    },
+    "8676": {
+        "text": "Files imported",
+        "context": "A message which is shown when some files have been imported."
+    },
+    "8677": {
+        "text": "On your device",
+        "context": "A title header that refers to where do you do the actions. This is found in 'Clear Offline files' and 'Clear cache' inside 'Settings' -> 'Advanced' section."
+    },
+    "8679": {
+        "text": "On MEGA",
+        "context": "A title header that refers to where do you do the action. This is found in 'Empty Rubbish Bin' inside 'Settings' -> 'Advanced' section."
+    },
+    "8681": {
+        "text": "Are you sure you want to delete this item from Offline?",
+        "context": "An alert message which is shown when the user removes one item from the Offline section."
+    },
+    "8682": {
+        "text": "Are you sure you want to delete these items from Offline?",
+        "context": "An alert message which is shown when the user removes various items from the Offline section."
+    },
+    "8683": {
+        "text": "We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.",
+        "context": "An error shown when importing a folder link and some of the folder's files failed to import."
+    },
+    "8684": {
+        "text": "Send and close",
+        "context": "A button label to send the user's feedback and close the dialog."
+    },
+    "8685": {
+        "text": "Please explain why you don't wish to renew your plan:",
+        "context": "A message on the payment plan expiry dialog to ask the user why they do not wish to renew their PRO plan."
+    },
+    "8686": {
+        "text": "undecrypted folder",
+        "context": "String which will show for every undecrypted folder. Note this's different then 'undecryptable folder' which already exists in dictionary under 8590 key."
+    },
+    "8687": {
+        "text": "undecrypted file",
+        "context": "String which will show for every undecrypted folder. Note this's different then 'undecryptable folder' which already exists in dictionary under 8588 key."
     }
 }

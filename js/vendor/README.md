@@ -10,7 +10,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > 
 > ```bash
 > git clone https://github.com/vibornoff/asmcrypto.js.git
-> git checkout v0.0.10
+> git checkout v0.0.11
 > npm install
 > grunt --with="common,utils,exports,globals,aes,aes-ecb,aes-cbc,aes-ctr,aes-ccm,aes-gcm,aes-exports,aes-ecb-exports,aes-cbc-exports,aes-ctr-exports,aes-ccm-exports,aes-gcm-exports,hash,sha256,sha256-exports,sha512,sha512-exports,hmac,hmac-sha256,hmac-sha512,hmac-sha256-exports,hmac-sha512-exports,rng,rng-exports,rng-globals,bn,bn-exports,rsa,rsa-raw,rsa-keygen-exports,rsa-raw-exports" devel
 > In our code special UTF-8 characters are removed for better SHA-256 hashing performance so a few comments were changed:
@@ -142,10 +142,20 @@ Unless otherwise noted, they were released under a [MIT License].
 > Use output in compiled.js
 > ```
 
+---
+[chat/strophe.light.js]: Strophe.js is an XMPP library for JavaScript.
+
+> NB: We are using a custom build which was created using:
+> 
+> ```bash
+> git clone https://github.com/strophe/strophejs.git
+> cd strophejs
+> git checkout 30033f05eded0bb079e8c06a75045f195068d896
+> npm install
+> make strophe.light.js
+> ```
 
 ---
----
-
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>
@@ -177,3 +187,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
+[chat/strophe.light.js]: <https://github.com/strophe/strophejs/tree/30033f05eded0bb079e8c06a75045f195068d896>

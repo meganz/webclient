@@ -13,7 +13,7 @@ import os
 
 # Checkers to run. Available options for checkers are:
 # "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++", 'htmlhint'
-checkers = ['validator', 'jshint', 'jscs']
+checkers = ['validator', 'htmlhint', 'jshint', 'jscs']
 
 # Extra options for designated checkers.
 # This configuration needs an entry for every encountered checker if the

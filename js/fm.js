@@ -6604,16 +6604,21 @@ function treeUI()
         if (e.type === 'contextmenu') {
             $('.nw-fm-tree-item').removeClass('dragover');
             $(this).addClass('dragover');
-            $.selected = [id];
+            $.selected = $(this).parents('ul').find('.selected').attrs('id')
+                .map(function(id) {
+                    return id.replace(/^treea_/, '');
+                });
             return !!contextMenuUI(e, 1);
         }
-        var c = $(e.target).attr('class');
-        if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+        var c = $(e.target);
+        if (e.type === "click" && e.shiftKey) {
+            $(this).addClass('selected');
+        } else if (c.hasClass('nw-fm-arrow-icon')) {
             treeUIexpand(id);
         } else {
-            var c = $(this).attr('class');
-            if (c && c.indexOf('opened') > -1)
+            if (c.hasClass('opened')) {
                 treeUIexpand(id);
+            }
             M.openFolder(id);
         }
         return false;

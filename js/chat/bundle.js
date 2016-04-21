@@ -870,7 +870,7 @@
 	    var name = jid.split("@")[0];
 
 	    if (contact) {
-	        name = mega.utils.fullUsername(contact.u);
+	        name = M.getNameByHandle(contact.u);
 	    }
 
 	    assert(name, "Name not found for jid: " + jid);
@@ -6033,7 +6033,7 @@
 	  return element;
 	};
 
-	ReactElement.makeElement = function (type, config, children) {
+	ReactElement.createElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -6084,7 +6084,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.makeElement.bind(null, type);
+	  var factory = ReactElement.createElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -9131,7 +9131,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.makeElement(component);
+	    placeholderElement = ReactElement.createElement(component);
 	  }
 	};
 
@@ -19619,12 +19619,12 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.makeElement;
+	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
 	if (false) {
-	  createElement = ReactElementValidator.makeElement;
+	  createElement = ReactElementValidator.createElement;
 	  createFactory = ReactElementValidator.createFactory;
 	  cloneElement = ReactElementValidator.cloneElement;
 	}
@@ -20077,7 +20077,7 @@
 	    // succeed and there will likely be errors in render.
 	     false ? warning(validType, 'React.makeElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : undefined;
 
-	    var element = ReactElement.makeElement.apply(this, arguments);
+	    var element = ReactElement.createElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -20102,7 +20102,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -21962,7 +21962,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "nw-conversations-name" },
-	                    mega.utils.fullUsername(contact.u)
+	                    M.getNameByHandle(contact.u)
 	                )
 	            )
 	        );
@@ -22154,7 +22154,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "user-card-name small" },
-	                    mega.utils.fullUsername(contact.u)
+	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
@@ -23695,7 +23695,7 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
-	                                    mega.utils.fullUsername(contact.u)
+	                                    M.getNameByHandle(contact.u)
 	                                ),
 	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
 	                                React.makeElement(
@@ -23869,7 +23869,7 @@
 	            }
 
 	            if (textMessage.splice) {
-	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
 	                if (message.currentCallCounter) {
 	                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
@@ -23877,7 +23877,7 @@
 	                textMessage = tmpMsg;
 	                textMessage = textMessage.replace("[[ ", "<span className=\"grey-color\">").replace("]]", "</span>");
 	            } else {
-	                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+	                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 	            }
 
 	            message.textContents = textMessage;
@@ -24562,9 +24562,6 @@
 	                $.doDD(e, ui, 'over', 1);
 	            },
 	            out: function out(e, ui) {
-	                var c1 = $(e.srcElement).attr('class'),
-	                    c2 = $(e.target).attr('class');
-	                if (c2 && c2.indexOf('fm-menu-item') > -1 && c1 && (c1.indexOf('cloud') > -1 || c1.indexOf('cloud') > -1)) return false;
 	                $.doDD(e, ui, 'out', 1);
 	            }
 	        };

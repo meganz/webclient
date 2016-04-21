@@ -573,7 +573,7 @@ var ConversationMessage = React.createClass({
                         contacts.push(
                             <div key={contact.u}>
                                 <div className="message shared-info">
-                                    <div className="message data-title">{mega.utils.fullUsername(contact.u)}</div>
+                                    <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
                                             <ContactsUI.ContactVerified className="big" contact={contact} /> :
@@ -762,7 +762,7 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
                 if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
@@ -773,7 +773,7 @@ var ConversationMessage = React.createClass({
                     .replace("]]", "</span>");
             }
             else {
-                textMessage = textMessage.replace("[X]", htmlentities(mega.utils.fullUsername(contact.u)));
+                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
             }
 
             message.textContents = textMessage;
@@ -1480,8 +1480,6 @@ var ConversationPanel = React.createClass({
             },
             out: function (e, ui)
             {
-                var c1 = $(e.srcElement).attr('class'),c2 = $(e.target).attr('class');
-                if (c2 && c2.indexOf('fm-menu-item') > -1 && c1 && (c1.indexOf('cloud') > -1 || c1.indexOf('cloud') > -1)) return false;
                 $.doDD(e,ui,'out',1);
             }
         };

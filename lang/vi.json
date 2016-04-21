@@ -1917,6 +1917,7 @@
     "6788": "th\u00e1ng",
     "6789": "T\u00e0i kho\u1ea3n b\u1ecb \u0111\u00ecnh ch\u1ec9",
     "6793": "D\u1ecdn d\u1eb9p c\u00e1c d\u1eef li\u1ec7u trong Th\u00f9ng R\u00e1c \u0111\u1ec3 l\u1ea5y th\u00eam dung l\u01b0\u1ee3ng tr\u1ed1ng",
+    "6794": "D\u1ecdn Th\u00f9ng R\u00e1c",
     "6795": "B\u1ea1n c\u00f3 ch\u1eafc mu\u1ed1n x\u00f3a b\u1ecf v\u0129nh vi\u1ec5n nh\u1eefng m\u1ee5c n\u00e0y hay kh\u00f4ng?M\u1ed9t khi th\u1ef1c hi\u1ec7n s\u1ebd kh\u00f4ng th\u1ec3 l\u1ea5y l\u1ea1i \u0111\u01b0\u1ee3c!",
     "6796": "Thu\u00ea bao \"PRO Lite\" h\u1eb1ng th\u00e1ng",
     "6797": "Thu\u00ea bao \"PRO Lite\" h\u1eb1ng n\u0103m",
@@ -3203,6 +3204,10 @@
     "8669": "Not applicable for NZ banks",
     "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
     "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

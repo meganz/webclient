@@ -1917,6 +1917,7 @@
     "6788": "mesiacov",
     "6789": "Pozastaven\u00fd \u00fa\u010det",
     "6793": "Obnovenie priestoru vysypan\u00edm smetn\u00e9ho ko\u0161a",
+    "6794": "Vypr\u00e1zdni\u0165 k\u00f4\u0161",
     "6795": "Ste si ist\u00fd, \u017ee chcete permanentne odstr\u00e1ni\u0165 v\u0161etky polo\u017eky z Ko\u0161a?T\u00e1to akcia je nezvratn\u00e1.",
     "6796": "\"PRO Lite\" mesa\u010dn\u00e9 predplatn\u00e9",
     "6797": "\"PRO Lite\" ro\u010dn\u00e9 predplatn\u00e9",
@@ -3198,11 +3199,15 @@
     "8664": "vlastn\u00edk",
     "8665": "Pros\u00edm, skontrolujte si svoj registra\u010dn\u00fd email a potvr\u010fte svoj \u00fa\u010det predt\u00fdm ako budete plati\u0165, aby MEGA mohlo prip\u00edsa\u0165 platbu ku spr\u00e1vnemu \u00fa\u010dtu.",
     "8666": "Potvr\u010fte svoju registr\u00e1ciu",
-    "8667": "If you want to subscribe for a yearly PRO account, you can wire transfer funds to either of our bank accounts:",
+    "8667": "Pokia\u013e si chcete predplati\u0165 ro\u010dn\u00fd PRO \u00fa\u010det, m\u00f4\u017eete financie previes\u0165 na ktor\u00fdko\u013evek z na\u0161ich \u00fa\u010dtov:",
     "8668": "IBAN",
-    "8669": "Not applicable for NZ banks",
-    "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
-    "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8669": "Neaplikovate\u013en\u00e9 pre Novo Z\u00e9landsk\u00e9 banky.",
+    "8670": "Pokia\u013e je va\u0161a emailov\u00e1 adresa pr\u00edli\u0161 dlh\u00e1 pre pol\u00ed\u010dko &quot;Referencia&quot;, mala by by\u0165 vp\u00edsan\u00e1 do pol\u00ed\u010dka &quot;Koment\u00e1re&quot;",
+    "8671": "Eur\u00f3pske krajiny si osvojili \u0161tandard International Bank Account Number (IBAN). Nov\u00fd Z\u00e9land tento \u0161tandard zatia\u013e nevyu\u017e\u00edva, tak\u017ee ak potrebujete zada\u0165 IBAN, peniaze po\u0161lite na n\u00e1\u0161 Luxemburgsk\u00fd \u00fa\u010det.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

@@ -1917,6 +1917,7 @@
     "6788": "luni",
     "6789": "Cont suspendat",
     "6793": "Recupereaz\u0103 spa\u0163iu golind co\u015ful de gunoi",
+    "6794": "Gole\u015fte co\u015ful de gunoi",
     "6795": "Sigur dore\u015fti s\u0103 elimini permanent toate elementele din co\u015ful de gunoi?Nu po\u0163i anula aceast\u0103 ac\u0163iune.",
     "6796": "Abonament lunar \u201ePRO Lite\u201d",
     "6797": "Abonament anual \u201ePRO Lite\u201d",
@@ -3203,6 +3204,10 @@
     "8669": "Not applicable for NZ banks",
     "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
     "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

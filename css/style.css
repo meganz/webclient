@@ -4762,7 +4762,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-image: url(../images/mega/top-sprite_v4.svg);
     background-position: -9px -205px;
     background-repeat: no-repeat;
-    cursor: pointer;
     background-color: rgba(255,255,255,0.3);
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
@@ -4772,6 +4771,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -o-transition: background-color 200ms ease-in-out;
     -ms-transition: background-color 200ms ease-in-out;
     transition: background-color 200ms ease-in-out;
+}
+.cloud-popup-icon {
+    cursor: pointer;
 }
 .new-notification-info {
     height: 24px;
@@ -4838,6 +4840,92 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-position: center 1px;
     background-repeat: no-repeat;
 }
+
+/* PRO plan expired dialog */
+.astropay-payment-reminder .warning-popup-body {
+    display: table;
+}
+.astropay-payment-reminder .left-block {
+    display: table-cell;
+    padding-top: 3px;
+    width: 48px;
+}
+.astropay-payment-reminder .mega-payment-icon {
+    background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll -113px -487px;
+    background-size: 150px auto;
+    border-radius: 36px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    height: 36px;
+    left: 26px;
+    top: 0;
+    width: 36px;
+}
+.astropay-payment-reminder .right-block {
+    display: table-cell;
+    padding-left: 20px;
+    vertical-align: top;
+    width: 100%;
+}
+.astropay-payment-reminder .warning-header {
+    font-family: "source_sans_prolight";
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.astropay-payment-reminder .last-payment-info {
+    font-family: 'source_sans_prosemibold', Arial;
+    font-size: 13px;
+}
+.astropay-payment-reminder .purchased-label, .astropay-payment-reminder .expired-label {
+    color: #ff3333;
+}
+.astropay-payment-reminder .expired-label {
+    padding-left: 20px;
+}
+.astropay-payment-reminder .renew-text, .astropay-payment-reminder .choose-text {
+    font-family: 'source_sans_prosemibold', Arial;
+}
+.astropay-payment-reminder .purchased-date, .astropay-payment-reminder .expired-date {
+    padding-left: 5px;
+}
+.astropay-payment-reminder .provider-icon {
+    padding-bottom: 2px;
+}
+.astropay-payment-reminder .gateway-name {
+    font-family: 'source_sans_prosemibold', Arial;
+}
+.astropay-payment-reminder .first-message, .astropay-payment-reminder .second-message {
+    margin-top: 20px;
+}
+.astropay-payment-reminder .warning-button.renew:hover, .astropay-payment-reminder .warning-button.close:hover {
+    background-color: rgba(39, 183, 0, 0.25);
+}
+.astropay-payment-reminder .warning-button.renew:hover span, .astropay-payment-reminder .warning-button.close:hover span {
+    color: #27b700;
+}
+.astropay-payment-reminder .plan-expired-checkbox {
+    margin-top: 20px;
+}
+.astropay-payment-reminder .plan-expired-checkbox-label {
+    margin-top: 14px;
+}
+.astropay-payment-reminder .confirm-reason {
+    margin-top: 15px;
+}
+.astropay-payment-reminder .confirm-reason > label {
+    display: block;
+}
+.astropay-payment-reminder .confirm-reason-message {
+    background: #fafafa none repeat scroll 0 0;
+    border: 0 none;
+    border-radius: 5px;
+    color: rgb(102, 102, 102);
+    font-size: 13px;
+    height: 62px;
+    margin-top: 5px;
+    padding: 10px;
+    width: 276px;
+}
+
 .top-search-bl {
     float: right;
     height: 24px;
@@ -13486,6 +13574,7 @@ h5.main-italic-header {
 }
 .duration-options-list .payment-duration .membership-radio-label {
     background: none;
+    cursor: pointer;
     font-family: 'source_sans_proregular';
     padding-left: 0;
     position: relative;
@@ -13739,13 +13828,13 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .membership-step2 .membership-radio-label {
     color: #444;
     font-family: "source_sans_proregular", sans-serif;
-    font-size: 13px;
+    font-size: 14px;
 }
 .membership-step2 .membership-radio-label.checked {
     font-family: "source_sans_prosemibold", sans-serif;
 }
 .membership-step2 .membership-radio-label > strong {
-    color: #999;
+    color: #555;
     font-family: "source_sans_proregular", sans-serif;
 }
 .membership-step2 .membership-radio-label .hyphen {
@@ -13850,13 +13939,14 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 }
 .membership-step2 .provider-details {
     display: inline-block;
-    font-family: "source_sans_prosemibold", Arial;
+    font-family: "source_sans_prosemibold", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 26px;
     vertical-align: middle;
 }
 .membership-step2 .provider-details .provider-name {
     display: inline-block;
+    font-family: "source_sans_proregular", Helvetica, Arial, sans-serif;
     overflow: hidden;
     padding-bottom: 1px;
     text-overflow: ellipsis;
@@ -13864,8 +13954,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     white-space: nowrap;
     width: 150px;
 }
+.membership-step2 .payment-method:hover .provider-name,
 .membership-step2 .provider-details.checked .provider-name {
-    font-family: "source_sans_prosemibold", Arial;
+    font-family: "source_sans_prosemibold", Helvetica, Arial, sans-serif;
 }
 .membership-step2 .provider-details .provider-icon {
     margin-right: 4px;
@@ -21332,17 +21423,18 @@ a.top-login-forgot-pass {
 .pro-register-paypal-dialog .reg-success-icon.unionpay, .payment-confirmation .icon.unionpay {
     background-position: center -846px;
 }
-/* logged in PRO account, but not activated */
+/* Logged in PRO account, but not activated by email */
 .top-warning-popup.not-activated {
-    cursor: default;
+    padding-bottom: 15px;
 }
 .top-warning-popup.not-activated .mailbox-icon {
-    background: url(../images/mega/email_confirmation_warning.png) 0 0 no-repeat;
-    background-size: 100px 100px;
-    width: 100px;
-    height: 100px;
+    background: url(../images/mega/email-confirmation.png) 0 0 no-repeat;
+    background-size: 100px 100px;        
     float: left;
-    margin-right: 10px;
+    height: 100px;
+    margin-right: 20px;
+    margin-top: -10px;
+    width: 100px;
 }
 .top-warning-popup.not-activated p {
     margin-top: 10px;

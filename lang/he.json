@@ -1917,6 +1917,7 @@
     "6788": "\u05d7\u05d5\u05d3\u05e9\u05d9\u05dd",
     "6789": "\u05d7\u05e9\u05d1\u05d5\u05df \u05de\u05d5\u05e9\u05d4\u05d4",
     "6793": "\u05e7\u05d1\u05dc \u05e2\u05d5\u05d3 \u05de\u05e7\u05d5\u05dd \u05e2\u05dc \u05d9\u05d3\u05d9 \u05e4\u05d9\u05e0\u05d5\u05d9 \u05e4\u05d7 \u05d4\u05d0\u05e9\u05e4\u05d4",
+    "6794": "\u05e8\u05d5\u05e7\u05df \u05d0\u05ea \u05e4\u05d7 \u05d4\u05d0\u05e9\u05e4\u05d4",
     "6795": "\u05d4\u05d0\u05dd \u05d0\u05ea\u05d4 \u05d1\u05d8\u05d5\u05d7 \u05db\u05d9 \u05d1\u05e8\u05e6\u05d5\u05e0\u05da \u05dc\u05de\u05d7\u05d5\u05e7 \u05dc\u05e6\u05de\u05d9\u05ea\u05d5\u05ea \u05d0\u05ea \u05db\u05dc \u05d4\u05e4\u05e8\u05d9\u05d8\u05d9\u05dd \u05de\u05d7 \u05d4\u05d0\u05e9\u05e4\u05d4 \u05e9\u05dc\u05da?\u05dc\u05d0 \u05ea\u05d5\u05db\u05dc \u05dc\u05d7\u05d6\u05d5\u05e8 \u05d1\u05da!",
     "6796": "\u05de\u05e0\u05d5\u05d9 \u05d7\u05d5\u05d3\u05e9\u05d9 \"PRO Lite\"",
     "6797": "\u05de\u05e0\u05d5\u05d9 \u05e9\u05e0\u05ea\u05d9 \"PRO Lite\"",
@@ -3203,6 +3204,10 @@
     "8669": "Not applicable for NZ banks",
     "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
     "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

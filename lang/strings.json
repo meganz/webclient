@@ -7671,6 +7671,10 @@
         "text": "Recover space by emptying the rubbish bin",
         "context": "Explain the user that he can recover space by emptying the Rubbish Bin"
     },
+    "6794": {
+        "text": "Empty the rubbish bin",
+        "context": "Title of the button to empty the Rubbish Bin (action!)"
+    },
     "6795": {
         "text": "Are you sure you want to permanently remove all items from your rubbish bin?\r\nYou cannot undo this action.",
         "context": "Warn the user that by emptying the Rubbish Bin the files will be permanently deleted and the action cannot be reversed!"
@@ -12814,5 +12818,21 @@
     "8671": {
         "text": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
         "context": "A note on the wire transfer dialog."
+    },
+    "8673": {
+        "text": "Add files",
+        "context": "Title of button in empty views for user to add files."
+    },
+    "8674": {
+        "text": "No Results",
+        "context": "Displayed message when the user makes a search and there is 'No Results' for the search."
+    },
+    "8684": {
+        "text": "Send and close",
+        "context": "A button label to send the user's feedback and close the dialog."
+    },
+    "8685": {
+        "text": "Please explain why you don't wish to renew your plan:",
+        "context": "A message on the payment plan expiry dialog to ask the user why they do not wish to renew their PRO plan."
     }
 }

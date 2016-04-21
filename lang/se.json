@@ -1917,6 +1917,7 @@
     "6788": "m\u00e5nader",
     "6789": "Kontot avst\u00e4ngt",
     "6793": "Frig\u00f6r utrymme genom att t\u00f6mma papperskorgen",
+    "6794": "Empty the rubbish bin",
     "6795": "\u00c4r du s\u00e4ker p\u00e5 att du vill ta bort alla objekt fr\u00e5n din soptunna?Du kan inte \u00e5ngra den h\u00e4r \u00e5tg\u00e4rden!",
     "6796": "\"PRO Lite\" m\u00e5nads prenumeration",
     "6797": "\"PRO Lite\" \u00e5rlig prenumeration",
@@ -3203,6 +3204,10 @@
     "8669": "Not applicable for NZ banks",
     "8670": "If your email address is too long for the &#039;Reference&#039; field it should be placed in the &#039;Comments&#039; field.",
     "8671": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Luxembourg account.",
+    "8673": "Add files",
+    "8674": "No Results",
+    "8684": "Send and close",
+    "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3263,6 +3268,9 @@
         "iban": 8668,
         "not-applicable-nz-banks": 8669,
         "wire-transfer-reference-field-note": 8670,
-        "iban-note": 8671
+        "iban-note": 8671,
+        "folderlink-partial-import-warning": 8683,
+        "send-and-close": 8684,
+        "please-explain-message": 8685
     }
 }

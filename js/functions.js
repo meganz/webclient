@@ -521,9 +521,7 @@ function populate_l() {
     l[1965] = l[1965].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
     l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
     l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1371] = l[1371].replace('2014', '2015');
     l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
-    l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');
     l[7945] = l[7945].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
@@ -532,7 +530,17 @@ function populate_l() {
     l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
     l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');
-
+    l[5931] = l[5931].replace('[A]', '<a class="red" href="#fm/account">').replace('[/A]', '</a>');
+    l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
+    l[8651] = l[8651].replace('%1', '<span class="header-pro-plan"></span>');
+    l[8653] = l[8653].replace('[S]', '<span class="renew-text">').replace('[/S]', '</span>');
+    l[8653] = l[8653].replace('%1', '<span class="pro-plan"></span>');
+    l[8653] = l[8653].replace('%2', '<span class="plan-duration"></span>');
+    l[8653] = l[8653].replace('%3', '<span class="provider-icon"></span>');
+    l[8653] = l[8653].replace('%4', '<span class="gateway-name"></span>');
+    l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
+    l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
+    
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
@@ -1026,22 +1034,6 @@ function bytesToSize(bytes, precision) {
     else {
         return parseInt(bytes) + ' ' + s_b;
     }
-}
-
-function showNonActivatedAccountDialog(log) {
-    if (log) {
-        megaAnalytics.log("pro", "showNonActivatedAccountDialog");
-    }
-
-    var $dialog = $('.top-warning-popup');
-    $dialog.addClass('not-activated');
-    $('.warning-green-icon', $dialog).remove();
-    $('.fm-notifications-bottom', $dialog).hide();
-    $('.warning-popup-body', $dialog)
-        .unbind('click')
-        .empty()
-        .append($("<div class='warning-gray-icon mailbox-icon'></div>"))
-        .append(l[5847]); //TODO: l[]
 }
 
 function logincheckboxCheck(ch_id) {
@@ -4521,3 +4513,114 @@ if (typeof sjcl !== 'undefined') {
         return result;
     };
 })(window);
+
+/**
+ * Get a string for the payment plan number
+ * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
+ */
+function getProPlan(planNum) {
+
+    switch (planNum) {
+        case 1:
+            return l[5819];     // PRO I
+        case 2:
+            return l[6125];     // PRO II
+        case 3:
+            return l[6126];     // PRO III
+        case 4:
+            return l[6234];     // LITE
+        default:
+            return l[435];      // FREE
+    }
+}
+
+/**
+ * Returns the name of the gateway / payment provider and display name. The API will only
+ * return the gateway ID which is unique on the API and will not change.
+ *
+ * @param {Number} gatewayId The number of the gateway/provider from the API
+ * @returns {Object} Returns an object with two keys, the 'name' which is a unique string
+ *                   for the provider which can be used for displaying icons etc, and the
+ *                   'displayName' which is the translated name for that provider (however
+ *                   company names are not translated).
+ */
+function getGatewayName(gatewayId) {
+    
+    var gateways = {
+        0: {
+            name: 'voucher',
+            displayName: l[487]     // Voucher code
+        },
+        1: {
+            name: 'paypal',
+            displayName: l[1233]    // PayPal
+        },
+        2: {
+            name: 'apple',
+            displayName: 'Apple'
+        },
+        3: {
+            name: 'google',
+            displayName: 'Google'
+        },
+        4: {
+            name: 'bitcoin',
+            displayName: l[6802]    // Bitcoin
+        },
+        5: {
+            name: 'dynamicpay',
+            displayName: l[7109]    // UnionPay
+        },
+        6: {
+            name: 'fortumo',
+            displayName: l[7219] + ' (' + l[7110] + ')'    // Mobile (Fortumo)
+        },
+        7: {
+            name: 'stripe',
+            displayName: l[7111]    // Credit Card
+        },
+        8: {
+            name: 'perfunctio',
+            displayName: l[7111]    // Credit Card
+        },
+        9: {
+            name: 'infobip',
+            displayName: l[7219] + ' (Centilli)'    // Mobile (Centilli)
+        },
+        10: {
+            name: 'paysafecard',
+            displayName: 'paysafecard'
+        },
+        11: {
+            name: 'astropay',
+            displayName: 'AstroPay'
+        },
+        12: {
+            name: 'reserved',
+            displayName: 'reserved' // TBD
+        },
+        13: {
+            name: 'windowsphone',
+            displayName: l[8660]    // Windows Phone
+        },
+        14: {
+            name: 'tpay',
+            displayName: l[7219] + ' (T-Pay)'       // Mobile (T-Pay)
+        },
+        999: {
+            name: 'wiretransfer',
+            displayName: l[6198]    // Wire transfer
+        }
+    };
+    
+    // If the gateway exists, return it
+    if (typeof gateways[gatewayId] !== 'undefined') {
+        return gateways[gatewayId];
+    }
+    
+    // Otherwise return a placeholder for currently unknown ones
+    return {
+        name: 'unknown',
+        displayName: 'Unknown'
+    };
+}

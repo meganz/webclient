@@ -770,6 +770,29 @@ Chat.prototype.init = function() {
         }
     });
 
+    $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function() {
+        var $this = $(this),
+            $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
+            iconTopPos,
+            iconLeftPos,
+            notificatonWidth,
+            notificatonHeight;
+
+
+        $notification.removeClass('hidden');
+        iconTopPos = $this.offset().top,
+            iconLeftPos = $this.offset().left,
+            notificatonWidth = $notification.outerWidth()/2 - 10,
+            notificatonHeight = $notification.outerHeight() + 10;
+        $notification.offset({ top: iconTopPos - notificatonHeight, left: iconLeftPos - notificatonWidth});
+    });
+
+    $(document.body).delegate('.tooltip-trigger', 'mouseout.notsentindicator click.notsentindicator', function() {
+        // hide all tooltips
+        var $notification = $('.tooltip');
+        $notification.addClass('hidden').removeAttr('style');
+    });
+
     self.trigger("onInit");
 };
 

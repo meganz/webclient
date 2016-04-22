@@ -270,9 +270,11 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
-            self.joined = true;
-            if (chatRoom.state === ChatRoom.STATE.JOINING) {
-                chatRoom.setState(ChatRoom.STATE.READY);
+            if (eventData.userId === u_handle) {
+                self.joined = true;
+                if (chatRoom.state === ChatRoom.STATE.JOINING) {
+                    chatRoom.setState(ChatRoom.STATE.READY);
+                }
             }
         }
     });
@@ -334,6 +336,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.lastMessageId = eventData.newest;
             self.haveMessages = true;
             self.trackDataChange();
+
+            if (!self.messages[eventData.newest]) {
+                self.retrieveChatHistory(true);
+            }
         }
     });
 

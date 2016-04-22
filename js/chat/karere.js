@@ -1431,8 +1431,15 @@ makeMetaAware(Karere);
             }
         }
         else if (message.getElementsByTagName("composing").length > 0) {
-            if (!self._triggerEvent("ComposingMessage", eventData)) {
-                return true; // always return true, because of how Strophe.js handlers work.
+            var composingTag = message.getElementsByTagName("composing")[0];
+            if (composingTag.parentNode.type !== "error") {
+                if (!self._triggerEvent("ComposingMessage", eventData)) {
+                    return true; // always return true, because of how Strophe.js handlers work.
+                }
+            }
+            else {
+                // do nothing on error
+                return true;
             }
         }
 

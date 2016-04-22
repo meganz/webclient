@@ -66,9 +66,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.options = {
 
         /**
-         * Send any queued messages if the room is not READY
+         * Don't resend any messages in the queue, if older then Xs
          */
-        'sendMessageQueueIfNotReadyTimeout': 6500, // XX: why is this so slow? optimise please.
+        'dontResendAutomaticallyQueuedMessagesOlderThen': 1*60,
 
         /**
          * The maximum time allowed for plugins to set the state of the room to PLUGINS_READY
@@ -163,6 +163,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
                         self.setState(ChatRoom.STATE.PLUGINS_READY);
                     }
                 });
+        }
+        else if (newState === ChatRoom.STATE.JOINING) {
+            self._preloadMessageQueue();
         }
         else if (newState === ChatRoom.STATE.READY) {
             self._flushMessagesQueue();
@@ -1012,7 +1015,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
     if (
         megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
         self.arePluginsForcingMessageQueue(message) ||
-        (self.state != ChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0)
+        self.state !== ChatRoom.STATE.READY
     ) {
 
         var event = new $.Event("onQueueMessage");
@@ -1026,11 +1029,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
             return false;
         }
 
-        self.logger.debug("Queueing: ", eventObject);
-
-
-        self._messagesQueue.push(eventObject);
-
+        self._queueMessage(eventObject);
         self.appendMessage(eventObject);
     }
     else {
@@ -1038,6 +1037,8 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
             .done(function(internalId) {
                 eventObject.internalId = internalId;
             });
+
+        self._queueMessage(eventObject);
         self.appendMessage(eventObject);
     }
 };
@@ -1056,6 +1057,11 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
         return MegaPromise.reject();
+    }
+
+    if (messageObject.setDelay) {
+        // guarantee that all message's .delay would be === current time (e.g. the last time we tried to send them)
+        messageObject.setDelay(unixtime());
     }
 
     return megaChat.plugins.chatdIntegration.sendMessage(
@@ -1324,6 +1330,78 @@ ChatRoom.prototype.recover = function() {
     return $startChatPromise;
 };
 
+ChatRoom.prototype._ensureMessageQueueKvIsInitialised = function() {
+    var self = this;
+
+    if (!self._messagesQueueKvStorage) {
+        self._messagesQueueKvStorage = new IndexedDBKVStorage("queuedmsgs", {
+            murSeed: 0x800F0002
+        });
+    }
+}
+/**
+ * Will grab all data from idbkv -> ._messagesQueue
+ * @private
+ */
+ChatRoom.prototype._preloadMessageQueue = function() {
+    var self = this;
+
+    self._ensureMessageQueueKvIsInitialised();
+
+    var prefix = self.roomJid.split("@")[0];
+
+    self._messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
+        var msg = new KarereEventObjects.OutgoingMessage(
+            v.toJid,
+            v.fromJid,
+            v.type,
+            v.messageId,
+            v.contents,
+            v.meta,
+            v.delay,
+            v.state,
+            v.roomJid,
+            v.seen
+        );
+
+        [
+            "textContents", "internalId", "requiresManualRetry"
+        ].forEach(function (prop) {
+            msg[prop] = v[prop];
+        });
+
+        self._queueMessage(msg);
+        self.appendMessage(msg);
+    });
+};
+
+/**
+ * Will persist all ._messagesQueue -> idbkv
+ *
+ * @private
+ */
+ChatRoom.prototype._persistMessageQueue = function(removedItem) {
+    var self = this;
+
+
+    self._ensureMessageQueueKvIsInitialised();
+
+    if (!removedItem) {
+        self._messagesQueue.forEach(function(msg) {
+            var cacheKey = self.roomJid.split("@")[0] + ":" + msg.messageId;
+
+            self._messagesQueueKvStorage.hasItem(cacheKey)
+                .fail(function() {
+                    self._messagesQueueKvStorage.setItem(cacheKey, msg);
+                })
+        });
+    }
+    else {
+        var cacheKey = self.roomJid.split("@")[0] + ":" + removedItem.messageId;
+        self._messagesQueueKvStorage.removeItem(cacheKey);
+    }
+};
+
 /**
  * This method will be called on room state change, only when the mpenc's state is === READY
  *
@@ -1332,23 +1410,68 @@ ChatRoom.prototype.recover = function() {
 ChatRoom.prototype._flushMessagesQueue = function() {
     var self = this;
 
+    self.trigger('onMessageQueuePreFlush');
+
     self.logger.debug("Chat room state set to ready, will flush queue: ", self._messagesQueue);
+
 
     if (self._messagesQueue.length > 0) {
         $.each(self._messagesQueue, function(k, v) {
             if (!v || v.deleted) {
                 return; //continue;
             }
+            if (unixtime() - v.delay <= self.options.dontResendAutomaticallyQueuedMessagesOlderThen) {
+                self._sendMessageToTransport(v)
+                    .done(function(internalId) {
+                        v.internalId = internalId;
+                    });
+            }
+            else {
+                self._dequeueMessage(v);
+                v.requiresManualRetry = true;
+                self._queueMessage(v);
 
-            self._sendMessageToTransport(v)
-                .done(function(internalId) {
-                    v.internalId = internalId;
-                });
+                $(v).trigger('onChange', [v, 'requiresManualRetry', undefined, true]);
+            }
+
+
         });
-        self._messagesQueue = [];
-
-        self.megaChat.trigger('onMessageQueueFlushed', self);
     }
+
+    self._messagesQueue = [];
+
+    self.megaChat.trigger('onMessageQueueFlushed', self);
+    self.trackDataChange();
+};
+
+/**
+ * This method will be called on room state change, only when the mpenc's state is === READY
+ *
+ * @private
+ */
+ChatRoom.prototype._queueMessage = function(msg) {
+    var self = this;
+
+
+   if(self._messagesQueue.indexOf(msg) === -1) {
+       self._messagesQueue.push(msg);
+       self._persistMessageQueue();
+       self.trackDataChange();
+   }
+};
+
+/**
+ * This method will be called on room state change, only when the mpenc's state is === READY
+ *
+ * @private
+ */
+ChatRoom.prototype._dequeueMessage = function(msg) {
+    var self = this;
+
+   if(removeValue(self._messagesQueue, msg) === true) {
+       self._persistMessageQueue(msg);
+       self.trackDataChange();
+   }
 };
 
 ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {

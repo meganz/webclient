@@ -1350,6 +1350,30 @@ var ConversationPanel = React.createClass({
                     {sendContactDialog}
 
 
+                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">
+                        <i className="dropdown-white-arrow"></i>
+                        <div className="dropdown notification-text">
+                            <i className="small-icon conversations"></i>
+                            {__("Message not sent. Will retry later.")}
+                        </div>
+                    </div>
+
+                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden">
+                        <i className="dropdown-white-arrow"></i>
+                        <div className="dropdown notification-text">
+                            <i className="small-icon conversations"></i>
+                            {__("Message not sent. Click here if you want to re-send it.")}
+                        </div>
+                    </div>
+
+                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden">
+                        <i className="dropdown-white-arrow"></i>
+                        <div className="dropdown notification-text">
+                            <i className="small-icon conversations"></i>
+                            {__("Message not sent. Click here if you want to cancel it.")}
+                        </div>
+                    </div>
+
                     <div className={"messages-block " + additionalClass}>
                         <div className="messages scroll-area">
                             <utils.JScrollPane options={{

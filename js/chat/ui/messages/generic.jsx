@@ -13,6 +13,26 @@ var GenericConversationMessage = React.createClass({
         msg.message = "";
         msg.deleted = true;
         chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
+
+        //TODO: chatd delete!
+    },
+    doCancelRetry: function(e, msg) {
+        e.preventDefault(e);
+        e.stopPropagation(e);
+        var chatRoom = this.props.chatRoom;
+
+        chatRoom._dequeueMessage(msg);
+        chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
+    },
+    doRetry: function(e, msg) {
+        e.preventDefault(e);
+        e.stopPropagation(e);
+        var chatRoom = this.props.chatRoom;
+
+        chatRoom._sendMessageToTransport(msg)
+            .done(function(internalId) {
+                msg.internalId = internalId;
+            });
     },
     doRetry: function(e, msg) {
         e.preventDefault(e);
@@ -41,7 +61,7 @@ var GenericConversationMessage = React.createClass({
         var additionalClasses = "";
         var buttonsBlock = null;
         var spinnerElement = null;
-        
+        var messageNotSendIndicator = null;
         var messageIsNowBeingSent = false;
 
         // if this is a text msg.
@@ -95,16 +115,18 @@ var GenericConversationMessage = React.createClass({
                         message.sending = false;
                         additionalClasses += " not-sent";
 
-                        buttonsBlock = <div className="buttons-block">
-                            <div className="message circuit-label left">{__(l[8003])}</div>
-                            <div className="default-white-button right" onClick={(e) => {
-                                self.doRetry(e, message);
-                            }}>{__(l[1364])}</div>
-                            <div className="default-white-button right red" onClick={(e) => {
-                                self.doDelete(e, message);
-                            }}>{__(l[8004])}</div>
-                            <div className="clear"></div>
-                        </div>;
+                        $(message).trigger(
+                            'onChange',
+                            [
+                                message,
+                                "sending",
+                                true,
+                                false
+                            ]
+                        );
+                        additionalClasses += " not-sent retrying";
+
+                        buttonsBlock = null;
                     }
                     else {
                         additionalClasses += " sending";
@@ -583,33 +605,37 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 var messageActionButtons = null;
-
-                if (message.getState() !== Message.STATE.NOT_SENT) {
+                if (message.getState() === Message.STATE.NOT_SENT) {
                     messageActionButtons = null;
-                    /*<ButtonsUI.Button
-                     className="default-white-button tiny-button"
-                     icon="tiny-icon grey-down-arrow">
-                     <DropdownsUI.Dropdown
-                     className="white-context-menu message-dropdown"
-                     positionMy="right top"
-                     positionAt="right bottom"
-                     vertOffset={4}
-                     noArrow={true}
-                     >
-                     <DropdownsUI.DropdownItem icon="writing-pen" label={__(l[1342])} onClick={() => {
-                     console.error("TBD!");
-                     }}/>
-                     <DropdownsUI.DropdownItem icon="quotes" label={__(l[8012])} onClick={() => {
-                     console.error("TBD!");
-                     }}/>
 
-                     <hr />
-
-                     <DropdownsUI.DropdownItem icon="red-cross" label={__(l[1730])} className="red" onClick={(e) => {
-                     self.doDelete(e, message);
-                     }}/>
-                     </DropdownsUI.Dropdown>
-                     </ButtonsUI.Button> */
+                    if (!spinnerElement) {
+                        if (!message.requiresManualRetry) {
+                            messageNotSendIndicator = <div className="not-sent-indicator tooltip-trigger"
+                                                           data-tooltip="not-sent-notification">
+                                <i className="small-icon yellow-triangle"></i>
+                            </div>;
+                        }
+                        else {
+                            messageNotSendIndicator = <div className="not-sent-indicator">
+                                    <span className="tooltip-trigger"
+                                          key="retry"
+                                          data-tooltip="not-sent-notification-manual"
+                                          onClick={(e) => {
+                                            self.doRetry(e, message);
+                                        }}>
+                                      <i className="small-icon refresh-circle"></i>
+                                </span>
+                                <span className="tooltip-trigger"
+                                      key="cancel"
+                                      data-tooltip="not-sent-notification-cancel"
+                                      onClick={(e) => {
+                                                self.doCancelRetry(e, message);
+                                            }}>
+                                        <i className="small-icon red-cross"></i>
+                                </span>
+                            </div>;
+                        }
+                    }
                 }
 
                 var avatar = null;
@@ -657,6 +683,7 @@ var GenericConversationMessage = React.createClass({
 
                             {messageActionButtons}
                             <span>{message.messageId}:{message.orderValue}/{time2date(message.delay)}</span>
+                            {messageNotSendIndicator}
                             {messageDisplayBlock}
                             {buttonsBlock}
                             {spinnerElement}

@@ -3215,8 +3215,8 @@
     "8683": "Nepodarilo sa n\u00e1m importova\u0165 v\u0161etky s\u00fabory, pravdepodobne preto, \u017ee niekto\u00e9 z nich boli odstr\u00e1nen\u00e9. Oper\u00e1cia skon\u010dila s \u00faspe\u0161ne naimportovan\u00fdmi %1 z %2   polo\u017ekami.",
     "8684": "Posla\u0165 a zavrie\u0165",
     "8685": "Pros\u00edm vysvetlite pre\u010do si neprajete pred\u013a\u017ei\u0165 svoj pl\u00e1n:",
-    "8686": "undecrypted folder",
-    "8687": "undecrypted file",
+    "8686": "nede\u0161ifrovan\u00fd prie\u010dinok",
+    "8687": "nede\u0161ifrovan\u00fd s\u00fabor",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

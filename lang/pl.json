@@ -3215,8 +3215,8 @@
     "8683": "Nie mo\u017cemy zaimportowa\u0107 wszystkich plik\u00f3w, poniewa\u017c niekt\u00f3re z nich zosta\u0142y usuni\u0119te. Operacje zako\u0144czy\u0142a si\u0119 zaimportowaniem %1 z %2 plik\u00f3w.",
     "8684": "Wy\u015blij i zamknij",
     "8685": "Prosimy o podanie powod\u00f3w dla kt\u00f3rych nie planujesz odnowi\u0107 swojego planu:",
-    "8686": "undecrypted folder",
-    "8687": "undecrypted file",
+    "8686": "niezaszyfrowany katalog",
+    "8687": "niezaszyfrowany plik",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

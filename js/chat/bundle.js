@@ -701,6 +701,25 @@
 	        }
 	    });
 
+	    $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function () {
+	        var $this = $(this),
+	            $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
+	            iconTopPos,
+	            iconLeftPos,
+	            notificatonWidth,
+	            notificatonHeight;
+
+	        $notification.removeClass('hidden');
+	        iconTopPos = $this.offset().top, iconLeftPos = $this.offset().left, notificatonWidth = $notification.outerWidth() / 2 - 10, notificatonHeight = $notification.outerHeight() + 10;
+	        $notification.offset({ top: iconTopPos - notificatonHeight, left: iconLeftPos - notificatonWidth });
+	    });
+
+	    $(document.body).delegate('.tooltip-trigger', 'mouseout.notsentindicator click.notsentindicator', function () {
+
+	        var $notification = $('.tooltip');
+	        $notification.addClass('hidden').removeAttr('style');
+	    });
+
 	    self.trigger("onInit");
 	};
 
@@ -24483,6 +24502,39 @@
 	                sendContactDialog,
 	                React.makeElement(
 	                    "div",
+	                    { className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden" },
+	                    React.makeElement("i", { className: "dropdown-white-arrow" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dropdown notification-text" },
+	                        React.makeElement("i", { className: "small-icon conversations" }),
+	                        __("Message not sent. Will retry later.")
+	                    )
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden" },
+	                    React.makeElement("i", { className: "dropdown-white-arrow" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dropdown notification-text" },
+	                        React.makeElement("i", { className: "small-icon conversations" }),
+	                        __("Message not sent. Click here if you want to re-send it.")
+	                    )
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden" },
+	                    React.makeElement("i", { className: "dropdown-white-arrow" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dropdown notification-text" },
+	                        React.makeElement("i", { className: "small-icon conversations" }),
+	                        __("Message not sent. Click here if you want to cancel it.")
+	                    )
+	                ),
+	                React.makeElement(
+	                    "div",
 	                    { className: "messages-block " + additionalClass },
 	                    React.makeElement(
 	                        "div",
@@ -26605,7 +26657,7 @@
 
 	    this.options = {
 
-	        'sendMessageQueueIfNotReadyTimeout': 6500,
+	        'dontResendAutomaticallyQueuedMessagesOlderThen': 1 * 60,
 
 	        'pluginsReadyTimeout': 60000,
 
@@ -26674,6 +26726,8 @@
 	                    self.setState(ChatRoom.STATE.PLUGINS_READY);
 	                }
 	            });
+	        } else if (newState === ChatRoom.STATE.JOINING) {
+	            self._preloadMessageQueue();
 	        } else if (newState === ChatRoom.STATE.READY) {
 	            self._flushMessagesQueue();
 	        }
@@ -27255,7 +27309,7 @@
 
 	    eventObject.textContents = message;
 
-	    if (megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED || self.arePluginsForcingMessageQueue(message) || self.state != ChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0) {
+	    if (megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED || self.arePluginsForcingMessageQueue(message) || self.state !== ChatRoom.STATE.READY) {
 
 	        var event = new $.Event("onQueueMessage");
 
@@ -27265,15 +27319,14 @@
 	            return false;
 	        }
 
-	        self.logger.debug("Queueing: ", eventObject);
-
-	        self._messagesQueue.push(eventObject);
-
+	        self._queueMessage(eventObject);
 	        self.appendMessage(eventObject);
 	    } else {
 	        self._sendMessageToTransport(eventObject).done(function (internalId) {
 	            eventObject.internalId = internalId;
 	        });
+
+	        self._queueMessage(eventObject);
 	        self.appendMessage(eventObject);
 	    }
 	};
@@ -27285,6 +27338,11 @@
 	    var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
 	    if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
 	        return MegaPromise.reject();
+	    }
+
+	    if (messageObject.setDelay) {
+
+	        messageObject.setDelay(unixtime());
 	    }
 
 	    return megaChat.plugins.chatdIntegration.sendMessage(self, messageObject);
@@ -27463,8 +27521,57 @@
 	    return $startChatPromise;
 	};
 
+	ChatRoom.prototype._ensureMessageQueueKvIsInitialised = function () {
+	    var self = this;
+
+	    if (!self._messagesQueueKvStorage) {
+	        self._messagesQueueKvStorage = new IndexedDBKVStorage("queuedmsgs", {
+	            murSeed: 0x800F0002
+	        });
+	    }
+	};
+	ChatRoom.prototype._preloadMessageQueue = function () {
+	    var self = this;
+
+	    self._ensureMessageQueueKvIsInitialised();
+
+	    var prefix = self.roomJid.split("@")[0];
+
+	    self._messagesQueueKvStorage.eachPrefixItem(prefix, function (v, k) {
+	        var msg = new KarereEventObjects.OutgoingMessage(v.toJid, v.fromJid, v.type, v.messageId, v.contents, v.meta, v.delay, v.state, v.roomJid, v.seen);
+
+	        ["textContents", "internalId", "requiresManualRetry"].forEach(function (prop) {
+	            msg[prop] = v[prop];
+	        });
+
+	        self._queueMessage(msg);
+	        self.appendMessage(msg);
+	    });
+	};
+
+	ChatRoom.prototype._persistMessageQueue = function (removedItem) {
+	    var self = this;
+
+	    self._ensureMessageQueueKvIsInitialised();
+
+	    if (!removedItem) {
+	        self._messagesQueue.forEach(function (msg) {
+	            var cacheKey = self.roomJid.split("@")[0] + ":" + msg.messageId;
+
+	            self._messagesQueueKvStorage.hasItem(cacheKey).fail(function () {
+	                self._messagesQueueKvStorage.setItem(cacheKey, msg);
+	            });
+	        });
+	    } else {
+	        var cacheKey = self.roomJid.split("@")[0] + ":" + removedItem.messageId;
+	        self._messagesQueueKvStorage.removeItem(cacheKey);
+	    }
+	};
+
 	ChatRoom.prototype._flushMessagesQueue = function () {
 	    var self = this;
+
+	    self.trigger('onMessageQueuePreFlush');
 
 	    self.logger.debug("Chat room state set to ready, will flush queue: ", self._messagesQueue);
 
@@ -27473,14 +27580,42 @@
 	            if (!v || v.deleted) {
 	                return;
 	            }
+	            if (unixtime() - v.delay <= self.options.dontResendAutomaticallyQueuedMessagesOlderThen) {
+	                self._sendMessageToTransport(v).done(function (internalId) {
+	                    v.internalId = internalId;
+	                });
+	            } else {
+	                self._dequeueMessage(v);
+	                v.requiresManualRetry = true;
+	                self._queueMessage(v);
 
-	            self._sendMessageToTransport(v).done(function (internalId) {
-	                v.internalId = internalId;
-	            });
+	                $(v).trigger('onChange', [v, 'requiresManualRetry', undefined, true]);
+	            }
 	        });
-	        self._messagesQueue = [];
+	    }
 
-	        self.megaChat.trigger('onMessageQueueFlushed', self);
+	    self._messagesQueue = [];
+
+	    self.megaChat.trigger('onMessageQueueFlushed', self);
+	    self.trackDataChange();
+	};
+
+	ChatRoom.prototype._queueMessage = function (msg) {
+	    var self = this;
+
+	    if (self._messagesQueue.indexOf(msg) === -1) {
+	        self._messagesQueue.push(msg);
+	        self._persistMessageQueue();
+	        self.trackDataChange();
+	    }
+	};
+
+	ChatRoom.prototype._dequeueMessage = function (msg) {
+	    var self = this;
+
+	    if (removeValue(self._messagesQueue, msg) === true) {
+	        self._persistMessageQueue(msg);
+	        self.trackDataChange();
 	    }
 	};
 

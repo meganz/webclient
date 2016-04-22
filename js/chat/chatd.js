@@ -66,7 +66,6 @@ var Chatd = function(userId, options) {
                    console.error(evt, JSON.stringify(arguments[1]));
                }
            });
-    });
 };
 
 makeObservable(Chatd);

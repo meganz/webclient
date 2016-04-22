@@ -782,8 +782,6 @@ var ConversationPanel = React.createClass({
             },
             out: function (e, ui)
             {
-                var c1 = $(e.srcElement).attr('class'),c2 = $(e.target).attr('class');
-                if (c2 && c2.indexOf('fm-menu-item') > -1 && c1 && (c1.indexOf('cloud') > -1 || c1.indexOf('cloud') > -1)) return false;
                 $.doDD(e,ui,'out',1);
             }
         };

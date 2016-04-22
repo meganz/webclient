@@ -168,11 +168,11 @@
 .dropdown.body.tooltip {
     position: fixed;
     visibility:collapse;
-    -webkit-transition: visibility 100ms ease-in-out;
-    -moz-transition: visibility 100ms ease-in-out;
-    -o-transition: visibility 100ms ease-in-out;
-    -ms-transition: visibility 100ms ease-in-out;
-    transition: visibility 100ms ease-in-out;
+    -webkit-transition: visibility 200ms ease-in-out;
+    -moz-transition: visibility 200ms ease-in-out;
+    -o-transition: visibility 200ms ease-in-out;
+    -ms-transition: visibility 200ms ease-in-out;
+    transition: visibility 200ms ease-in-out;
 }
 .dropdown.body.tooltip.visible {
     visibility: visible;

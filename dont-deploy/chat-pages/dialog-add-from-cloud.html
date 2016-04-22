@@ -26,74 +26,81 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        //Tooltip positioning
-        function tooltipInit($elem, $tooltip, arrow, tooltipOffset) {
-            var elemLeftPos, elemTopPos, elemWidth, elemHeight;
-            var tooltipLeftPos, tooltipTopPos, tooltipWidth, tooltipHeight;
-            var docWidth, docHeight;
-            var tooltipClass;
+        /**
+         * tooltipInit
+         *
+         * @param {String} elements classname/id, element that will have tooltip. Starts with "." or "#"
+         * @param {String} tooltip special classname/id, element that will have tooltip. Starts with "." or "#"
+         * @param {Boolean} should we have arrow or not
+         * @param {Number} tooltip offset from hovered element, default is 7px
+        */
+        function tooltipInit(hoveredBlock, tooltipClass, arrow, tooltipOffset) {
+            var $hoveredBlock = $(hoveredBlock);
+            var $tooltip = $('.tooltip' + tooltipClass);
+            
+            // Tooltip positioning
+            function tooltipPositioning($el) {
+                var elLeftPos, elTopPos, elWidth, elHeight;
+                var tooltipLeftPos, tooltipTopPos, tooltipWidth, tooltipHeight;
+                var docWidth, docHeight;
+                var arrowClass;
+    
+                if ($el && $tooltip) {
+                    elLeftPos = $el.offset().left;
+                    elTopPos = $el.offset().top;
+                    elWidth = $el.outerWidth();
+                    elHeight = $el.outerHeight();
+                    tooltipWidth = $tooltip.outerWidth();
+                    tooltipHeight = $tooltip.outerHeight();
+                    docWidth = $(window).width();
+                    docHeight = $(window).height();
+                    $tooltip.removeClass('dropdown-arrow left-arrow right-arrow up-arrow down-arrow').removeAttr('style');
 
-            if ($elem && $tooltip) {
-                elemLeftPos = $elem.offset().left;
-                elemTopPos = $elem.offset().top;
-                elemWidth = $elem.outerWidth();
-                elemHeight = $elem.outerHeight();
-                tooltipWidth = $tooltip.outerWidth();
-                tooltipHeight = $tooltip.outerHeight();
-                docWidth = $(window).width();
-                docHeight = $(window).height();
-                $tooltip.removeClass('dropdown-arrow left-arrow right-arrow up-arrow down-arrow').removeAttr('style');
+                    // Default Tooltip offset
+                    if (!tooltipOffset) {
+                        tooltipOffset = 7;
+                    }
 
-               // Default Tooltip offset
-                if (!tooltipOffset) {
-                    tooltipOffset = 7;
-                }
+                    if (elTopPos - tooltipHeight - tooltipOffset > 10) {
+                        tooltipLeftPos = elLeftPos + elWidth/2 - tooltipWidth/2;
+                        tooltipTopPos = elTopPos - tooltipHeight - tooltipOffset;
+                        arrowClass = arrow ? 'dropdown-arrow down-arrow' : '';
+                    } 
+                    else if (docHeight - (elTopPos + elHeight + tooltipHeight + tooltipOffset) > 10) {
+                        tooltipLeftPos = elLeftPos + elWidth/2 - tooltipWidth/2;
+                        tooltipTopPos = elTopPos + elHeight + tooltipOffset;
+                        arrowClass = arrow ? 'dropdown-arrow up-arrow' : ''; 
+                    }
+                    else if (elLeftPos - tooltipWidth - tooltipOffset > 10) {
+                        tooltipLeftPos = elLeftPos - tooltipWidth - tooltipOffset;
+                        tooltipTopPos = elTopPos + elHeight/2 - tooltipHeight/2;
+                        arrowClass = arrow ? 'dropdown-arrow right-arrow' : ''; 
+                    }
+                    else {
+                        tooltipLeftPos = elLeftPos + elWidth + tooltipOffset;
+                        tooltipTopPos = elTopPos + elHeight/2 - tooltipHeight/2;
+                        arrowClass = arrow ? 'dropdown-arrow left-arrow' : ''; 
+                    }
 
-                if (elemTopPos - tooltipHeight - tooltipOffset > 10) {
-                    tooltipLeftPos = elemLeftPos + elemWidth/2 - tooltipWidth/2;
-                    tooltipTopPos = elemTopPos - tooltipHeight - tooltipOffset;
-                    tooltipClass = arrow ? 'dropdown-arrow down-arrow' : '';
-                } 
-                else if (docHeight - (elemTopPos + elemHeight + tooltipHeight + tooltipOffset) > 10) {
-                    tooltipLeftPos = elemLeftPos + elemWidth/2 - tooltipWidth/2;
-                    tooltipTopPos = elemTopPos + elemHeight + tooltipOffset;
-                    tooltipClass = arrow ? 'dropdown-arrow up-arrow' : ''; 
+                    $tooltip.css({
+                        'left': tooltipLeftPos,
+                        'top': tooltipTopPos
+                    });
+                    $tooltip.addClass(arrowClass);
                 }
-                else if (elemLeftPos - tooltipWidth - tooltipOffset > 10) {
-                    tooltipLeftPos = elemLeftPos - tooltipWidth - tooltipOffset;
-                    tooltipTopPos = elemTopPos + elemHeight/2 - tooltipHeight/2;
-                    tooltipClass = arrow ? 'dropdown-arrow right-arrow' : ''; 
-                }
-                else {
-                    tooltipLeftPos = elemLeftPos + elemWidth + tooltipOffset;
-                    tooltipTopPos = elemTopPos + elemHeight/2 - tooltipHeight/2;
-                    tooltipClass = arrow ? 'dropdown-arrow left-arrow' : ''; 
-                }
-                $tooltip.css({
-                    'left': tooltipLeftPos,
-                    'top': tooltipTopPos
-                });
-                // Arrow Tooltip Class
-                $tooltip.addClass(tooltipClass);
             }
+
+            $hoveredBlock.bind('mouseover', function() {
+                tooltipPositioning($(this));
+                $tooltip.addClass('visible');
+            });
+            $hoveredBlock.bind('mouseout', function() {
+                $tooltip.removeClass('visible');
+            });
         }
 
-        $('.fm-dialog.add-from-cloud td').bind('mouseover tooltip', function() {
-            var $icon = $(this).find('.transfer-filtype-icon'),
-                  $tooltip = $('.dropdown.img-preview');
-            if ($icon.hasClass('image')) {
-                $tooltip.removeClass('hidden').removeClass('dropdown-arrow left-arrow right-arrow up-arrow down-arrow').removeAttr('style');
-                tooltipInit($icon, $tooltip, 1);
-            }
-        });
-        $('.fm-dialog.add-from-cloud td').bind('mouseout tooltip', function() {
-            var $icon = $(this).find('.transfer-filtype-icon'),
-                  $tooltip = $('.dropdown.img-preview');
-            if ($icon.hasClass('image')) {
-                $tooltip.addClass('hidden');
-            }
-        });
-
+        tooltipInit(('.transfer-filtype-icon.image'), ('.img-preview'), 1);
+        
     });
 
 </script>
@@ -109,7 +116,7 @@
     <div class="fm-dialog-title">Add from your Cloud Drive</div>
     
     <!-- Image preview tooltip !-->
-    <div class="dropdown body img-preview hidden">
+    <div class="dropdown body tooltip img-preview">
         <i class="dropdown-white-arrow"></i>
         <div class="dropdown img-wrapper">
             <img alt="" src="../../images/temp/avatar-img.jpg" />

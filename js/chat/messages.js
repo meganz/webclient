@@ -352,6 +352,20 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
+    self.chatd.rebind('onMessagesHistoryRetrieve.messagesBuff' + chatRoomId, function(e, eventData) {
+                var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+
+        if (!chatRoom) {
+            self.logger.warn("Message not found for: ", e, eventData);
+            return;
+        }
+        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+                    self.haveMessages = true;
+            self.trackDataChange();
+            self.retrieveChatHistory(true);
+        }
+    });
+
     self.chatd.rebind('onMessageStore.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
@@ -484,15 +498,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 // its ok, this happens when a system/protocol message was sent
                 return;
             }
-        }
-    });
-
-    self.chatd.rebind('onMessagesHistoryRequest.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
-            self.isRetrievingHistory = true;
-            self.trackDataChange();
         }
     });
 

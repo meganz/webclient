@@ -496,6 +496,9 @@ Chatd.Shard.prototype.exec = function(a) {
                         // that..
                         if (!self.joinedChatIds[chatId]) {
                             self.joinedChatIds[chatId] = true;
+                            self.chatd.trigger('onMessagesHistoryRetrieve', {
+                                chatId: chatId
+                            });
                         }
                     }
                     else if (priv === -1) {

@@ -72,7 +72,7 @@ var ContactPresence = React.createClass({
     }
 });
 
-var _noAvatars = {};
+var _noAvatars = window._noAvatars = {};
 
 var Avatar = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
@@ -116,11 +116,14 @@ var Avatar = React.createClass({
                             data: blob,
                             url: myURL.createObjectURL(blob)
                         };
+
+                        useravatar.loaded(contact);
+
+                        delete _noAvatars[contact.u];
                     }
-
-                    useravatar.loaded(contact);
-
-                    delete _noAvatars[contact.u];
+                    else {
+                        _noAvatars[contact.u] = true;
+                    }
 
                     self.safeForceUpdate();
                 })

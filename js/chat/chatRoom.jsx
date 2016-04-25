@@ -646,11 +646,6 @@ ChatRoom.prototype.leave = function(notifyOtherDevices) {
     self._leaving = true;
 
 
-    if (notifyOtherDevices === true) {
-        self.megaChat.sendBroadcastAction(self.roomJid, "conv-end", {roomJid: self.roomJid});
-    }
-
-
     if (self.roomJid.indexOf("@") != -1) {
         self.setState(ChatRoom.STATE.LEAVING);
         return self.megaChat.karere.leaveChat(self.roomJid).done(function() {

@@ -55,6 +55,8 @@
 }
 .message-preview {
     position: absolute;
+    height: auto;
+    min-height: 20px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;

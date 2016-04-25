@@ -101,7 +101,7 @@ var redeem = {
             callback : function (result) {
                 
                 // If successful result
-                if (typeof result == 'object' && result.balance && result.balance[0]) {
+                if (typeof result === 'object' && result.balance && result.balance[0]) {
                     
                     // Update the balance
                     redeem.accountBalance = parseFloat(result.balance[0][0]);
@@ -120,12 +120,29 @@ var redeem = {
         
         // This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
-        // More data can be retrieved with 'f : 1'
-        api_req({ a : 'utqa' }, {
+        
+        api_req({ a : 'utqa', nf: 1 }, {
             callback: function (result) {
-                
+
+                // The rest of the webclient expects this data in an array format
+                // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
+                var results = [];
+                for (var i = 0; i < result.length; i++)
+                {
+                    results.push([
+                        result[i]['id'],
+                        result[i]['al'], // account level
+                        result[i]['s'],  // storage
+                        result[i]['t'],  // transfer
+                        result[i]['m'],  // months
+                        result[i]['p'],  // price
+                        result[i]['c'],  // currency
+                        result[i]['mbp'] // monthly base price
+                    ]);
+                }
+
                 // Update the list of plans
-                redeem.membershipPlans = result;
+                redeem.membershipPlans = results;
                 
                 // Get all the available pro plans
                 redeem.calculateBestProPlan();

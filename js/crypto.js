@@ -3899,6 +3899,7 @@ var rsa2aes = {};
 function crypto_processkey(me, master_aes, file) {
     var logger = MegaLogger.getLogger('crypt');
     var id, key, k, n, decKey;
+    var success = false;
 
     if (!file.k) {
         if (!keycache[file.h]) {
@@ -4049,18 +4050,33 @@ function crypto_processkey(me, master_aes, file) {
                 if (file.ar.fav) {
                     file.fav = 1;
                 }
+
+                success = true;
             }
         }
     }
+
+    if (success) {
+        // Update global variable which holds data about missing keys
+        // so DOM can be updated accordingly
+        if (missingkeys[file.h]) {
+            delete missingkeys[file.h];
+        }
+    }
     else {
-        logger.error("Received no suitable key: " + file.h);
+        logger.warn('Received no suitable key for "%s"', file.h, file);
 
         if (!missingkeys[file.h]) {
             newmissingkeys = true;
             missingkeys[file.h] = true;
         }
-        keycache[file.h] = file.k;
+
+        if (file.k) {
+            keycache[file.h] = file.k;
+        }
     }
+
+    return success;
 }
 
 function api_updfkey(h) {
@@ -4117,6 +4133,7 @@ var newmissingkeys = false;
 
 function crypto_reqmissingkeys() {
     var logger = MegaLogger.getLogger('crypt');
+
     if (!newmissingkeys) {
         logger.debug('No new missing keys.');
         return;

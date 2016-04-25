@@ -9,6 +9,16 @@ var pro_package,
     saleId = null,
     pro_do_next = null;
 
+var UTQA_RESPONSE_INDEX_ID = 0;
+var UTQA_RESPONSE_INDEX_ACCOUNTLEVEL = 1;
+var UTQA_RESPONSE_INDEX_STORAGE = 2;
+var UTQA_RESPONSE_INDEX_TRANSFER = 3;
+var UTQA_RESPONSE_INDEX_MONTHS = 4;
+var UTQA_RESPONSE_INDEX_PRICE = 5;
+var UTQA_RESPONSE_INDEX_CURRENCY = 6;
+var UTQA_RESPONSE_INDEX_MONTHLYBASEPRICE = 7;
+
+
 /**
  * Code for the AstroPay dialog on the second step of the Pro page
  */
@@ -50,10 +60,7 @@ var astroPayDialog = {
      */
     updateDialogDetails: function() {
 
-        // Add the provider icon and name into the translated string
-        var displayName = htmlentities(this.selectedProvider.displayName);
-        var iconAndName = '<span class="provider-icon"></span><span class="provider-name">' + displayName + '</span>';
-        var information = l[7991].replace('%1', iconAndName);
+        // Get the gateway name
         var gatewayName = this.selectedProvider.gatewayName;
 
         // Change icon and payment provider name
@@ -64,9 +71,20 @@ var astroPayDialog = {
         var taxLabel = l[7989].replace('%1', this.selectedProvider.extra.taxIdLabel);
         var taxPlaceholder = l[7990].replace('%1', this.selectedProvider.extra.taxIdLabel);
 
+        // If they have previously paid before with Astropay
+        if ((alarm.planExpired.lastPayment) && (alarm.planExpired.lastPayment.gwd)) {
+
+            // Get the extra data from the gateway details
+            var firstLastName = alarm.planExpired.lastPayment.gwd.name;
+            var taxNum = alarm.planExpired.lastPayment.gwd.cpf;
+            
+            // Prefill the user's name and tax details
+            this.$dialog.find('.astropay-name-field').val(firstLastName);
+            this.$dialog.find('.astropay-tax-field').val(taxNum);
+        }
+
         // Change the tax labels
-        this.$dialog.find('.astropay-information').safeHTML(information);
-        this.$dialog.find('.astropay-label.tax').safeHTML(taxLabel);
+        this.$dialog.find('.astropay-label.tax').text(taxLabel);
         this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);
     },
 
@@ -306,14 +324,29 @@ function init_pro()
         // it may quickly switch to the pro_payment_method page if they have preselected a plan
         loadingDialog.show();
 
-        // Get the membership plans. This call will return an array of arrays. Each array contains this data:
-        // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
-        // More data can be retrieved with 'f : 1'
-        api_req({ a : 'utqa' }, {
+        // Get the membership plans.
+        api_req({ a : 'utqa', nf: 1 }, {
             callback: function (result)
             {
+                // The rest of the webclient expects this data in an array format
+                // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
+                var results = [];
+                for (var i = 0; i < result.length; i++)
+                {
+                    results.push([
+                        result[i]["id"],
+                        result[i]["al"], // account level
+                        result[i]["s"], // storage
+                        result[i]["t"], // transfer
+                        result[i]["m"], // months
+                        result[i]["p"], // price
+                        result[i]["c"], // currency
+                        result[i]["mbp"] // monthly base price
+                    ]);
+                }
+
                 // Store globally
-                membershipPlans = result;
+                membershipPlans = results;
 
                 // Render the plan details
                 proPage.populateMembershipPlans();
@@ -402,7 +435,7 @@ function pro_next_step(proPlanName) {
     if (proPlanName === undefined) {
         // this came from skipConfirmationStep
         var plan = $('.reg-st3-membership-bl.selected').data('payment');
-        proPlanName = (plan === 4 ? 'lite' : Array(++plan).join("i"));
+        proPlanName = (plan === 4 ? 'lite' : Array(++plan).join('i'));
     }
     else if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -487,7 +520,7 @@ function pro_continue()
     selectedProPackage = membershipPlans[selectedProPackageIndex];
 
     // Get the months and price
-    var selectedPlanMonths = selectedProPackage[4];
+    var selectedPlanMonths = selectedProPackage[UTQA_RESPONSE_INDEX_MONTHS];
 
     if (selectedPlanMonths < 12) {
         pro_package = 'pro' + account_type_num + '_month';
@@ -563,9 +596,9 @@ function pro_pay() {
     }
 
     // Data for API request
-    var apiId = selectedProPackage[0];
-    var price = selectedProPackage[5];
-    var currency = selectedProPackage[6];
+    var apiId = selectedProPackage[UTQA_RESPONSE_INDEX_ID];
+    var price = selectedProPackage[UTQA_RESPONSE_INDEX_PRICE];
+    var currency = selectedProPackage[UTQA_RESPONSE_INDEX_CURRENCY];
 
     // Convert from boolean to integer for API
     var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 36e5) ? 1 : 0;
@@ -658,7 +691,7 @@ function pro_pay() {
                             loadingDialog.hide();
 
                             // If an error code
-                            if (typeof utcResult == 'number' && utcResult < 0) {
+                            if (typeof utcResult === 'number' && utcResult < 0) {
                                 if (utcResult == EOVERQUOTA) {
                                     alert(l[514]);
                                 }
@@ -796,12 +829,12 @@ var proPage = {
         for (var i = 0, length = membershipPlans.length; i < length; i++) {
 
             // Get plan details
-            var accountLevel = parseInt(membershipPlans[i][1]);
-            var planStorageGigabytes = parseInt(membershipPlans[i][2]);
-            var months = parseInt(membershipPlans[i][4]);
+            var accountLevel = parseInt(membershipPlans[i][UTQA_RESPONSE_INDEX_ACCOUNTLEVEL]);
+            var planStorageGigabytes = parseInt(membershipPlans[i][UTQA_RESPONSE_INDEX_STORAGE]);
+            var months = parseInt(membershipPlans[i][UTQA_RESPONSE_INDEX_MONTHS]);
 
             // If their current storage usage is more than the plan's grey it out
-            if ((months === 1) && (currentStorageGigabytes > planStorageGigabytes)) {
+            if ((months !== 12) && (currentStorageGigabytes > planStorageGigabytes)) {
 
                 // Grey out the plan
                 $membershipStepOne.find('.reg-st3-membership-bl.pro' + accountLevel).addClass('sub-optimal-plan');
@@ -980,7 +1013,9 @@ var proPage = {
                 proPage.renderPaymentProviderOptions(secondaryGatewayOptions, 'secondary');
 
                 // Change radio button states when clicked
-                proPage.initPaymentMethodRadioOptions();
+                proPage.initPaymentMethodRadioButtons();
+                proPage.preselectPreviousPaymentOption();
+                proPage.updateDurationOptionsOnProviderChange();
                 proPage.initShowMoreOptionsButton();
 
                 // Update the pricing and whether is a regular payment or subscription
@@ -1003,10 +1038,15 @@ var proPage = {
             // Show the button
             $showMoreButton.removeClass('hidden');
 
-            // On click show the other payment options and then hide the button
+            // On clicking 'Click here to show more payment options'
             $showMoreButton.click(function() {
+                
+                // Show the other payment options and then hide the button
                 $('.payment-options-list.secondary').removeClass('hidden');
                 $showMoreButton.hide();
+                
+                // Trigger resize or you can't scroll to the bottom of the page anymore
+                $(window).trigger('resize');
             });
         }
     },
@@ -1021,8 +1061,8 @@ var proPage = {
         // Get their plan price from the currently selected duration radio button
         var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
         var selectedPlan = membershipPlans[selectedPlanIndex];
-        var selectedPlanNum = selectedPlan[1];
-        var selectedPlanPrice = selectedPlan[5];
+        var selectedPlanNum = selectedPlan[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL];
+        var selectedPlanPrice = selectedPlan[UTQA_RESPONSE_INDEX_PRICE];
 
         // Convert to float for numeric comparisons
         var planPriceFloat = parseFloat(selectedPlanPrice);
@@ -1039,50 +1079,40 @@ var proPage = {
         // Loop through gateway providers (change to use list from API soon)
         for (var i = 0, length = gatewayOptions.length; i < length; i++) {
 
-            var gatewayOption = gatewayOptions[i];
             var $gateway = $template.clone();
-
+            var gatewayOpt = gatewayOptions[i];
+            var gatewayId = gatewayOpt.gatewayId;
+            
+            // Get the gateway name and display name
+            var gatewayInfo = getGatewayName(gatewayId);
+            var gatewayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gatewayInfo.name;
+            var displayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gatewayInfo.displayName;
+            
+            // If it couldn't find the name (e.g. new provider, use the name from the API)
+            if (gatewayInfo.name === 'unknown') {
+                continue;
+            }
+            
             // Add disabled class if this payment method is not supported for this plan
-            if ((gatewayOption.supportsExpensivePlans === 0) && (selectedPlanNum !== 4)) {
+            if ((gatewayOpt.supportsExpensivePlans === 0) && (selectedPlanNum !== 4)) {
                 $gateway.addClass('disabled');
                 $gateway.attr('title', l[7162]);
             }
 
-            // If the voucher/pre-paid balance option
-            if (gatewayOption.gatewayName === 'voucher') {
-
+            // If the voucher/balance option
+            if ((gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
+                
                 // Show "Balance (x.xx)" if they have enough to purchase this plan
-                if (balanceFloat >= planPriceFloat) {
-                    gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
-                }
-                else {
-                    // Otherwise show "Voucher code"
-                    gatewayOption.displayName = l[487];
-                }
-            }
-
-            // If wire transfer option, need to translate that
-            else if (gatewayOption.gatewayName === 'wiretransfer') {
-                gatewayOption.displayName = l[6198];
-            }
-
-            // If a mobile payment provider e.g. Centili or Fortumo change text to: Mobile (Centili)
-            else if (gatewayOption.mobilePaymentProvider) {
-                gatewayOption.displayName = l[7219] + ' (' + htmlentities(gatewayOption.displayName) + ')';
-            }
-
-            // Otherwise get display name from what was sent from API
-            else {
-                gatewayOption.displayName = htmlentities(gatewayOption.displayName);
+                displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
             }
 
             // Create a radio button with icon for each payment gateway
             $gateway.removeClass('template');
-            $gateway.find('input').attr('name', gatewayOption.gatewayName);
-            $gateway.find('input').attr('id', gatewayOption.gatewayName);
-            $gateway.find('input').val(gatewayOption.gatewayName);
-            $gateway.find('.provider-icon').addClass(gatewayOption.gatewayName);
-            $gateway.find('.provider-name').safeHTML(gatewayOption.displayName);
+            $gateway.find('input').attr('name', gatewayName);
+            $gateway.find('input').attr('id', gatewayName);
+            $gateway.find('input').val(gatewayName);
+            $gateway.find('.provider-icon').addClass(gatewayName);
+            $gateway.find('.provider-name').safeHTML(displayName);
 
             // Build the html
             gatewayHtml += $gateway.prop('outerHTML');
@@ -1095,18 +1125,13 @@ var proPage = {
     /**
      * Change payment method radio button states when clicked
      */
-    initPaymentMethodRadioOptions: function() {
-
-        // Pre-select the first option in the list
-        var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
-        $paymentOption.find('input').attr('checked', 'checked');
-        $paymentOption.find('input').addClass('checked');
-        $paymentOption.find('.membership-radio').addClass('checked');
-        $paymentOption.find('.provider-details').addClass('checked');
-
+    initPaymentMethodRadioButtons: function() {
+        
+        // Cache selector
+        var $paymentOptionsList = $('.payment-options-list');
+        
         // Add click handler to all payment methods
-        var paymentOptionsList = $('.payment-options-list');
-        paymentOptionsList.find('.payment-method').rebind('click', function() {
+        $paymentOptionsList.find('.payment-method').rebind('click', function() {
 
             var $this = $(this);
 
@@ -1117,9 +1142,9 @@ var proPage = {
             }
 
             // Remove checked state from all radio inputs
-            paymentOptionsList.find('.membership-radio').removeClass('checked');
-            paymentOptionsList.find('.provider-details').removeClass('checked');
-            paymentOptionsList.find('input').prop('checked', false);
+            $paymentOptionsList.find('.membership-radio').removeClass('checked');
+            $paymentOptionsList.find('.provider-details').removeClass('checked');
+            $paymentOptionsList.find('input').prop('checked', false);
 
             // Add checked state for this radio button
             $this.find('input').prop('checked', true);
@@ -1129,6 +1154,69 @@ var proPage = {
             proPage.updateTextDependingOnRecurring();
             proPage.updateDurationOptionsOnProviderChange();
         });
+    },
+    
+    /**
+     * Preselect an option they previously paid with if applicable
+     */
+    preselectPreviousPaymentOption: function() {
+        
+        // If they have paid before and their plan has expired, then re-select their last payment method
+        if (alarm.planExpired.lastPayment) {
+
+            // Get the last gateway they paid with
+            var lastPayment = alarm.planExpired.lastPayment;
+            var gatewayId = lastPayment.gw;
+            
+            // Get the gateway name, if it's an Astropay subgateway, then it will have it's own name
+            var gatewayInfo = getGatewayName(gatewayId);
+            var extraData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
+            var gatewayName = (typeof lastPayment.gwd !== 'undefined') ? extraData.gwname : gatewayInfo.name;
+
+            // Find the gateway
+            var $gatewayInput = $('#' + gatewayName);
+            
+            // If it is still in the list (e.g. valid provider still)
+            if ($gatewayInput.length) {
+                
+                // Get the elements which need to be set
+                var $membershipRadio = $gatewayInput.parent();
+                var $providerDetails = $membershipRadio.next();
+                var $secondaryPaymentOptions = $('.payment-options-list.secondary');
+                var $showMoreButton = $('.membership-step2 .provider-show-more');
+
+                // Set to checked
+                $gatewayInput.prop('checked', true);
+                $membershipRadio.addClass('checked');
+                $providerDetails.addClass('checked');
+
+                // If the gateway is in the secondary list, then show the secondary list and hide the button
+                if ($secondaryPaymentOptions.find('#' + gatewayName).prop('checked')) {
+                    $secondaryPaymentOptions.removeClass('hidden');
+                    $showMoreButton.hide();
+                }
+            }
+            else {
+                // Otherwise select the first available payment option because this provider is no longer available
+                proPage.preselectFirstPaymentOption();
+            }
+        }
+        else {
+            // Otherwise select the first available payment option
+            proPage.preselectFirstPaymentOption();
+        }
+    },
+    
+    /**
+     * Preselects the first payment option in the list of payment providers
+     */
+    preselectFirstPaymentOption: function() {
+        
+        // Find and select the first payment option
+        var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
+        $paymentOption.find('input').attr('checked', 'checked');
+        $paymentOption.find('.membership-radio').addClass('checked');
+        $paymentOption.find('.provider-details').addClass('checked');
     },
 
     /**
@@ -1147,10 +1235,8 @@ var proPage = {
 
         var planIndex = $selectDurationOption.parent().attr('data-plan-index');
         var currentPlan = membershipPlans[planIndex];
-        var numOfMonths = currentPlan[4];
+        var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
         var subscribeOrPurchase = (selectedProvider.supportsRecurring) ? l[6172] : l[6190].toLowerCase();
-        var durationOrRenewal = (selectedProvider.supportsRecurring) ? l[6977] : l[6817];
-        var getTwoMonthsFree = (selectedProvider.supportsRecurring) ? l[6978] : l[1148];
 
         // Set to /month, /year or /one time next to the price
         if (selectedProvider.supportsRecurring && (numOfMonths === 1)) {
@@ -1176,8 +1262,8 @@ var proPage = {
         // Sort plan durations by lowest number of months first
         membershipPlans.sort(function (planA, planB) {
 
-            var numOfMonthsPlanA = planA[4];
-            var numOfMonthsPlanB = planB[4];
+            var numOfMonthsPlanA = planA[UTQA_RESPONSE_INDEX_MONTHS];
+            var numOfMonthsPlanB = planB[UTQA_RESPONSE_INDEX_MONTHS];
 
             if (numOfMonthsPlanA < numOfMonthsPlanB) {
                 return -1;
@@ -1198,11 +1284,11 @@ var proPage = {
             var currentPlan = membershipPlans[i];
 
             // If match on the membership plan, display that pricing option in the dropdown
-            if (currentPlan[1] == account_type_num) {
+            if (currentPlan[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL] === parseInt(account_type_num)) {
 
                 // Get the price and number of months duration
-                var price = currentPlan[5];
-                var numOfMonths = currentPlan[4];
+                var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE];
+                var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
                 var monthsWording = l[922];     // 1 month
 
                 // Change wording depending on number of months
@@ -1219,6 +1305,7 @@ var proPage = {
                 // Update months and price
                 $durationOption.removeClass('template');
                 $durationOption.attr('data-plan-index', i);
+                $durationOption.attr('data-plan-months', numOfMonths);
                 $durationOption.find('.duration').text(monthsWording);
                 $durationOption.find('.price').text(price);
 
@@ -1240,11 +1327,30 @@ var proPage = {
             }
         }
 
-        // Pre-select the first option
+        // If there is data about any previous plan they purchased
+        if (alarm.planExpired.lastPayment) {
+
+            // Get the number of months for the plan they last paid for
+            var lastPaymentMonths = alarm.planExpired.lastPayment.m;
+            
+            // Find the radio option with the same number of months
+            var $monthOption = $(".payment-duration[data-plan-months='" + lastPaymentMonths + "']");
+
+            // If it can find it then select the radio option. Note: In some
+            // cases this may not be available (e.g. with upcoming A/B testing
+            if ($monthOption.length) {
+                $monthOption.find('input').prop('checked', true);
+                $monthOption.find('.membership-radio').addClass('checked');
+                $monthOption.find('.membership-radio-label').addClass('checked');
+                return true;
+            }
+        }
+        
+        // Otherwise pre-select the first option available
         var $firstOption = $('.duration-options-list .payment-duration:not(.template').first();
+        $firstOption.find('input').prop('checked', true);
         $firstOption.find('.membership-radio').addClass('checked');
         $firstOption.find('.membership-radio-label').addClass('checked');
-        $firstOption.find('input').attr('checked', 'checked');
     },
 
     /**
@@ -1287,15 +1393,20 @@ var proPage = {
             planIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
         }
 
-        // Get the current plan price
         var currentPlan = membershipPlans[planIndex];
-        var price = currentPlan[5].split('.');
-        var dollars = price[0];
-        var cents = price[1];
 
         // Change the wording to month or year
-        var numOfMonths = currentPlan[4];
-        var monthOrYearWording = (numOfMonths === 1) ? l[931] : l[932];
+        var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
+        var monthOrYearWording = (numOfMonths !== 12) ? l[931] : l[932];
+
+        // Get the current plan price
+        var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE].split('.');
+        if (numOfMonths !== 12) {
+            // Use the monthly base price instead
+            price = currentPlan[UTQA_RESPONSE_INDEX_MONTHLYBASEPRICE].split('.');
+        }
+        var dollars = price[0];
+        var cents = price[1];
 
         // Update the price of the plan
         $('.membership-step2 .reg-st3-bott-title.price .num').safeHTML(
@@ -1330,7 +1441,7 @@ var proPage = {
             // Get the plan's number of months
             var planIndex = $(durationOption).attr('data-plan-index');
             var currentPlan = membershipPlans[planIndex];
-            var numOfMonths = currentPlan[4];
+            var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
 
             // If the currently selected payment option e.g. Wire transfer
             // doesn't support a 1 month payment hide the option
@@ -1365,17 +1476,22 @@ var proPage = {
         for (var i = 0, length = membershipPlans.length; i < length; i++) {
 
             // Get plan details
-            var accountLevel = membershipPlans[i][1];
-            var months = membershipPlans[i][4];
-            var price = membershipPlans[i][5];
+            var accountLevel = membershipPlans[i][UTQA_RESPONSE_INDEX_ACCOUNTLEVEL];
+            var months = membershipPlans[i][UTQA_RESPONSE_INDEX_MONTHS];
+            var price = membershipPlans[i][UTQA_RESPONSE_INDEX_PRICE];
             var priceParts = price.split('.');
             var dollars = priceParts[0];
             var cents = priceParts[1];
 
+            var monthlyBasePrice = membershipPlans[i][UTQA_RESPONSE_INDEX_MONTHLYBASEPRICE];
+            var monthlyBasePriceParts = monthlyBasePrice.split('.');
+            var monthlyBasePriceDollars = monthlyBasePriceParts[0];
+            var monthlyBasePriceCents = monthlyBasePriceParts[1];
+
             // Show only monthly prices in the boxes
-            if (months === 1) {
+            if (months !== 12) {
                 $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
-                    dollars + '<span class="small">.' + cents + ' &euro;</span>'
+                    monthlyBasePriceDollars + '<span class="small">.' + monthlyBasePriceCents + ' &euro;</span>'
                 );
             }
 
@@ -1680,7 +1796,7 @@ var voucherDialog = {
             selectedProPackage = membershipPlans[selectedProPackageIndex];
 
             // Get the plan price
-            var selectedPlanPrice = selectedProPackage[5];
+            var selectedPlanPrice = selectedProPackage[UTQA_RESPONSE_INDEX_PRICE];
 
             // Warn them about insufficient funds
             if ((parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
@@ -1771,7 +1887,12 @@ var wireTransferDialog = {
 
         // If logged in, pre-populate email address into wire transfer details
         if (typeof u_attr !== 'undefined') {
-            wireTransferDialog.$dialog.find('.email-address').text(u_attr.email);
+            
+            // Replace the @ with -at- so the bank will accept it on the form
+            var email = u_attr.email;
+                email = email.replace('@', '-at-');
+            
+            wireTransferDialog.$dialog.find('.email-address').text(email);
         }
 
         // Update plan price in the dialog

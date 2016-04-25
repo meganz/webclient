@@ -513,8 +513,8 @@ ClassFile.prototype.run = function(task_done) {
     }.bind(this);
 
     dlmanager.dlGetUrl(this.dl, function(error, res, o) {
-        var cancelOnInit = function() {
-            if (!this.dl || this.dl.cancelled) {
+        var cancelOnInit = function(force) {
+            if (!this.dl || this.dl.cancelled || force) {
                 if (d) {
                     dlmanager.logger.error('Knock, knock..', this.dl);
                 }
@@ -532,10 +532,11 @@ ClassFile.prototype.run = function(task_done) {
             error = true;
         }
         else if (error) {
-            /* failed */
+            var fatal = (error === EBLOCKED);
+
             this.dlGetUrlErrors = (this.dlGetUrlErrors | 0) + 1;
 
-            if (this.dl.zipid && this.dlGetUrlErrors > 20) {
+            if (this.dl.zipid && (fatal || this.dlGetUrlErrors > 20)) {
                 // Prevent stuck ZIP downloads if there are repetitive errors for some of the files
                 // TODO: show notification to the user about empty files in the zip?
                 console.error('Too many errors for "' + this.dl.n + '", saving as 0-bytes...');
@@ -546,6 +547,9 @@ ClassFile.prototype.run = function(task_done) {
                 catch (e) {
                     setTransferStatus(this.dl, e, true);
                 }
+            }
+            else if (fatal) {
+                cancelOnInit(true);
             }
             else {
                 var onGetUrlError = function onGetUrlError() {
@@ -562,6 +566,9 @@ ClassFile.prototype.run = function(task_done) {
                 }
                 else {
                     dlmanager.dlRetryInterval *= 1.2;
+                    if (dlmanager.dlRetryInterval > 600000) {
+                        dlmanager.dlRetryInterval = 600000;
+                    }
                     this.dl.retry_t = setTimeout(onGetUrlError, dlmanager.dlRetryInterval);
                     dlmanager.logger.warn(this + ' Retry to fetch url in %dms, error:%s',
                                             dlmanager.dlRetryInterval, error);

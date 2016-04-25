@@ -97,7 +97,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen'
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup'
         ];
 
         for (var n in u_attr) {
@@ -155,6 +155,11 @@ function u_checklogin3a(res, ctx) {
             if (typeof u_attr.flags.mcs !== 'undefined') {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
             }
+        }
+        
+        // If their PRO plan has expired and Last User Payment info is set, configure the dialog
+        if (typeof u_attr.lup !== 'undefined') {
+            alarm.planExpired.lastPayment = u_attr.lup;
         }
 
         if (!u_attr.email) {

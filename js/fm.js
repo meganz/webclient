@@ -1,23 +1,3 @@
-/**
- * Get a string for the payment plan number
- * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
- */
-function getProPlan(planNum) {
-
-    switch (planNum) {
-        case 1:
-            return l[5819];     // PRO I
-        case 2:
-            return l[6125];     // PRO II
-        case 3:
-            return l[6126];     // PRO III
-        case 4:
-            return l[6234];     // LITE
-        default:
-            return l[435];      // FREE
-    }
-}
-
 function voucherCentering(button)
 {
     var popupBlock = $('.fm-voucher-popup');
@@ -326,7 +306,6 @@ function initUI() {
     {
         $('.fm-tree-header.cloud-drive-item').text(l[164]);
         $('.fm-tree-header').not('.cloud-drive-item').show();
-        $('.fm-menu-item').show();
         $('.fm-left-menu .folderlink').addClass('hidden');
         $('.fm-main').removeClass('active-folder-link');
     }
@@ -599,7 +578,6 @@ function initUI() {
     };
     InitFileDrag();
     createFolderUI();
-    cSortMenuUI();
     M.buildRootSubMenu();
     initContextUI();
     copyDialog();
@@ -1171,7 +1149,7 @@ function showTransferToast(t_type, t_length, isPaused) {
         }
 
         clearTimeout(timer);
-        $toast.removeClass('second').addClass('visible');
+        $toast.removeClass('second hidden').addClass('visible');
         timer = setTimeout(function() {
             hideTransferToast($toast);
         }, 5000);
@@ -2697,67 +2675,6 @@ function initContextUI() {
     $(document).trigger('onInitContextUI');
 }
 
-function cSortMenuUI()
-{
-    $('.contacts-arrows').unbind('click');
-    $('.contacts-arrows').bind('click', function(e)
-    {
-        var menuBlock = $('.sorting-menu');
-        var bottomPosition = $('body').outerHeight() - $(menuBlock).outerHeight();
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            menuBlock.removeClass('hidden');
-            $(this).addClass('active');
-            var topl = 0, jsp = $('.fm-tree-panel').data('jsp');
-            if (jsp)
-                topl = jsp.getContentPositionY();
-            menuBlock.css('top', $(this).position().top - topl + 95);
-            menuBlock.css('left', $(this).position().left + 35);
-            if (bottomPosition - $(menuBlock).position().top < 50)
-                menuBlock.css('top', bottomPosition - 50);
-        }
-        else
-        {
-            $('.fm-main').bind('click');
-            menuBlock.addClass('hidden');
-            $(this).removeClass('active');
-        }
-        return false;
-    });
-
-    $('.contacts-sorting-by').unbind('click');
-    $('.contacts-sorting-by').bind('click', function(e)
-    {
-        var c = $(this).attr('class');
-        if (c && c.indexOf('name') > -1)
-        {
-            localStorage.csort = 'name';
-            localStorage.csortd = 1;
-        }
-        else if (c && c.indexOf('shares') > -1)
-        {
-            localStorage.csort = 'shares';
-            localStorage.csortd = -1;
-        } else if (c && c.indexOf('chat-activity') > -1)
-        {
-            localStorage.csort = 'chat-activity';
-            localStorage.csortd = -1;
-        }
-        M.renderContacts();
-    });
-
-    $('.contacts-sorting-type').unbind('click');
-    $('.contacts-sorting-type').bind('click', function(e)
-    {
-        var c = $(this).attr('class');
-        if (c && c.indexOf('desc') > -1)
-            localStorage.csortd = -1;
-        else
-            localStorage.csortd = 1;
-        M.renderContacts();
-    });
-}
-
 function createFolderUI() {
 
     $('.fm-new-folder').rebind('click', function(e) {
@@ -3035,10 +2952,9 @@ function accountUI() {
             sectionClass = 'reseller';
         }
         else {
-
-            // this is the main entry point for users who just had upgraded their accounts
+            // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
-                showNonActivatedAccountDialog(true);
+                alarm.nonActivatedAccount.render(true);
             }
 
             $('.fm-account-overview').removeClass('hidden');
@@ -6196,7 +6112,7 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && M.currentrootid !== M.RubbishID) {
+        if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.context-menu-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
@@ -6298,6 +6214,15 @@ function contextMenuUI(e, ll) {
             items = menuItems();
             for (var item in items) {
                 $(menuCMI).filter(item).show();
+            }
+
+            // Hide context menu items not needed for undecrypted nodes
+            if (missingkeys[id]) {
+                $(menuCMI).filter('.add-star-item').hide();
+                $(menuCMI).filter('.download-item').hide();
+                $(menuCMI).filter('.rename-item').hide();
+                $(menuCMI).filter('.copy-item').hide();
+                $(menuCMI).filter('.getlink-item').hide();
             }
         }
         else {
@@ -6688,16 +6613,21 @@ function treeUI()
         if (e.type === 'contextmenu') {
             $('.nw-fm-tree-item').removeClass('dragover');
             $(this).addClass('dragover');
-            $.selected = [id];
+            $.selected = $(this).parents('ul').find('.selected').attrs('id')
+                .map(function(id) {
+                    return id.replace(/^treea_/, '');
+                });
             return !!contextMenuUI(e, 1);
         }
-        var c = $(e.target).attr('class');
-        if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+        var c = $(e.target);
+        if (e.type === "click" && e.shiftKey) {
+            $(this).addClass('selected');
+        } else if (c.hasClass('nw-fm-arrow-icon')) {
             treeUIexpand(id);
         } else {
-            var c = $(this).attr('class');
-            if (c && c.indexOf('opened') > -1)
+            if (c.hasClass('opened')) {
                 treeUIexpand(id);
+            }
             M.openFolder(id);
         }
         return false;
@@ -6956,7 +6886,12 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }
             i++;
         }
-        if (ids[0] === 'contacts' && M.currentdirid && String(M.currentdirid).length === 11 && M.currentrootid == 'contacts') {
+        if (
+            (ids[0] === 'contacts')
+            && M.currentdirid
+            && (String(M.currentdirid).length === 11)
+            && (M.currentrootid === 'contacts')
+            ) {
             sectionUIopen('contacts');
         } else if (ids[0] === 'contacts') {
             // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the
@@ -9064,7 +8999,7 @@ function showToast(toastClass, notification, buttonLabel) {
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
         .find('.toast-col:first-child span').safeHTML(notification);
 
-    $toast.addClass('visible');
+    $toast.removeClass('hidden').addClass('visible');
 
     timeout = setTimeout(function() {
         hideToast();
@@ -9468,6 +9403,7 @@ function browserDialog(close) {
     $('.browsers-info-header').text(bh);
     $('.browsers-info-header p').text(bt);
 }
+
 browserDialog.isWeak = function() {
     var result = {};
     var ua = String(navigator.userAgent);
@@ -9481,16 +9417,18 @@ browserDialog.isWeak = function() {
     result.weak = result.edge || result.ie11 || result.ie10 || result.safari;
 
     return result.weak && result;
-}
+};
 
-function propertiesDialog(close)
-{
-    var pd = $('.fm-dialog.properties-dialog'),
-        c = $('.properties-elements-counter span');
+/* jshint -W074 */
+function propertiesDialog(close) {
+
+    var pd = $('.fm-dialog.properties-dialog');
+    var c = $('.properties-elements-counter span');
+
     $(document).unbind('MegaNodeRename.Properties');
     $(document).unbind('MegaCloseDialog.Properties');
-    if (close)
-    {
+
+    if (close) {
         $.dialog = false;
         delete $.propertiesDialog;
         fm_hideoverlay();
@@ -9498,8 +9436,10 @@ function propertiesDialog(close)
         $('.contact-list-icon').removeClass('active');
         $('.properties-context-menu').fadeOut(200);
         $.hideContextMenu();
+
         return true;
     }
+
     $.propertiesDialog = $.dialog = 'properties';
     fm_showoverlay();
 
@@ -9508,46 +9448,64 @@ function propertiesDialog(close)
 
     var exportLink = new mega.Share.ExportLink({});
     var isTakenDown = exportLink.isTakenDown($.selected);
-    if (isTakenDown) {
-        pd.addClass('taken-down');
-        showToast('clipboard', l[7703]);
+    var isUndecrypted = missingkeys[$.selected];
+    var notificationText = '';
+
+    if (isTakenDown || isUndecrypted) {
+        if (isTakenDown) {
+            pd.addClass('taken-down');
+            notificationText  = l[7703] + '\n';
+        }
+        if (isUndecrypted) {
+            pd.addClass('undecryptable');
+
+            if (M.d[$.selected].t) {// folder
+                notificationText  += l[8595];
+            }
+            else {// file
+                notificationText  += l[8602];
+            }
+        }
+        showToast('clipboard', notificationText);
     }
 
     $('.properties-elements-counter span').text('');
-    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
-    {
+    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
             e.click();
     });
-    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function()
-    {
+
+    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function() {
         propertiesDialog(1);
     });
+
     var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
-    for (var i in $.selected)
-    {
-        n = M.d[$.selected[i]];
-        if (!n) {
-            console.error('propertiesDialog: invalid node', $.selected[i]);
-        }
-        else if (n.t) {
-            var nodes = fm_getnodes(n.h);
-            for (var i in nodes) {
-                if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
-                    size += M.d[nodes[i]].s;
-                    sfilecnt++;
-                }
-                else {
-                    sfoldercnt++;
-                }
+
+    for (var i in $.selected) {
+        if ($.selected.hasOwnProperty(i)) {
+            n = M.d[$.selected[i]];
+            if (!n) {
+                console.error('propertiesDialog: invalid node', $.selected[i]);
             }
-            foldercnt++;
-        }
-        else {
-            filecnt++
-            size += n.s;
+            else if (n.t) {
+                var nodes = fm_getnodes(n.h);
+                for (i in nodes) {
+                    if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
+                        size += M.d[nodes[i]].s;
+                        sfilecnt++;
+                    }
+                    else {
+                        sfoldercnt++;
+                    }
+                }
+                foldercnt++;
+            }
+            else {
+                filecnt++;
+                size += n.s;
+            }
         }
     }
     if (!n) {
@@ -9555,45 +9513,48 @@ function propertiesDialog(close)
         return propertiesDialog(1);
     }
 
-    var star = ''
+    var star = '';
     if (n.fav)
         star = ' star';
     pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star)
 
-    if (fileIcon(n).indexOf('shared') > -1)
+    if (fileIcon(n).indexOf('shared') > -1) {
         pd.addClass('shared');
-    if (typeof n.r == "number")
-    {
-        var cs = M.contactstatus(n.h)
+    }
+
+    if (typeof n.r === "number") {
+        var cs = M.contactstatus(n.h);
         var zclass = "read-only";
-        if (n.r == 1) {
-            zclass = "read-and-write"
-        } else if (n.r == 2) {
-            zclass = "full-access"
+
+        if (n.r === 1) {
+            zclass = "read-and-write";
         }
-        pd.addClass('shared shared-with-me ' + zclass)
+        else if (n.r === 2) {
+            zclass = "full-access";
+        }
+        pd.addClass('shared shared-with-me ' + zclass);
     }
 
     var p = {}, user = Object(M.d[n.su || n.p]);
-    if (d) console.log('propertiesDialog', n, user);
-    if ((filecnt + foldercnt) == 1)
-    {
+
+    if (d) {
+        console.log('propertiesDialog', n, user);
+    }
+
+    if ((filecnt + foldercnt) === 1) {
         p.t6 = '';
         p.t7 = '';
 
-        if (filecnt)
-        {
+        if (filecnt) {
             p.t3 = l[87] + ':';
             p.t5 = ' second';
 
-            if (n.mtime)
-            {
+            if (n.mtime) {
                 p.t6 = l[94] + ':';
                 p.t7 = htmlentities(time2date(n.mtime));
             }
         }
-        else
-        {
+        else {
             p.t3 = l[894] + ':';
             p.t5 = '';
         }
@@ -9610,13 +9571,18 @@ function propertiesDialog(close)
         else if (n.h === M.RubbishID) {
             p.t2 = htmlentities(l[167]);
         }
+        // 'Shared with me' tab, info dialog, undecrypted nodes
+        else if (missingkeys[n.h]) {
+            p.t2 = htmlentities(l[8649]);
+        }
+
         p.t4 = bytesToSize(size);
         p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
         p.t8 = p.t9 ? (l[896] + ':') : '';
         p.t10 = '';
         p.t11 = '';
-        if (foldercnt)
-        {
+
+        if (foldercnt) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
@@ -9780,26 +9746,7 @@ function propertiesDialog(close)
         }
     }
 }
-
-function paypalDialog(url, close)
-{
-    if (close)
-    {
-        $('.fm-dialog.paypal-dialog').addClass('hidden');
-        fm_hideoverlay();
-        $.dialog = false;
-        return false;
-    }
-    $.dialog = 'paypal';
-    $('.fm-dialog.paypal-dialog').removeClass('hidden');
-    fm_showoverlay();
-    $('.fm-dialog.paypal-dialog a').attr('href', url);
-    $('.paypal-dialog .fm-dialog-close').unbind('click');
-    $('.paypal-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        paypalDialog(false, 1);
-    });
-}
+/* jshint +W074 */
 
 function termsDialog(close, pp)
 {
@@ -9863,25 +9810,6 @@ function termsDialog(close, pp)
             $.termsDeny();
         termsDialog(1);
     });
-}
-
-function slingshotDialog(close)
-{
-    if (close)
-    {
-        $('.fm-dialog.slingshot-dialog').addClass('hidden');
-        fm_hideoverlay();
-        $.dialog = false;
-        return false;
-    }
-    $('.slingshot-dialog .fm-dialog-button.fm-terms-agree,.slingshot-dialog .fm-dialog-close').unbind('click');
-    $('.slingshot-dialog .fm-dialog-button.fm-terms-agree,.slingshot-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        slingshotDialog(1);
-    });
-    $('.fm-dialog.slingshot-dialog').removeClass('hidden');
-    fm_showoverlay();
-    $.dialog = 'slingshot';
 }
 
 var previews = {};

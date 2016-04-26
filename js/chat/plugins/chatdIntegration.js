@@ -1008,26 +1008,33 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
 };
 
 ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage) {
-    // a msgupd is only possible up to ten minutes after the indicated (client-supplied) UTC timestamp.
+    // a msgupd is only possible up to 1hour after the indicated (client-supplied) UTC timestamp.
+    var cipher;
+
     var self = this;
     var rawChatId = base64urldecode(chatRoom.chatId);
-    var chatMessages = self.chatd.chatIdMessages[rawChatId];
-    if (!chatMessages) {
-        return;
-    }
+    if (newMessage !== "") {
+        var chatMessages = self.chatd.chatIdMessages[rawChatId];
+        if (!chatMessages) {
+            return;
+        }
 
-    var msg = chatMessages.buf[msgnum];
-    if (!msg) {
-        return;
+        var msg = chatMessages.buf[msgnum];
+        if (!msg) {
+            return;
+        }
+        var keyId = msg[Chatd.MsgField.KEYID];
+        cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId);
     }
-    var keyId = msg[Chatd.MsgField.KEYID];
-    var cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId);
+    else {
+        cipher = "";
+    }
 
     return self.chatd.modify(rawChatId, msgnum, cipher);
 };
 
 ChatdIntegration.prototype.deleteMessage = function(chatRoom, msgnum) {
-    // a msgupd is only possible up to ten minutes after the indicated (client-supplied) UTC timestamp.
+    // a msgupd is only possible up to 1hour after the indicated (client-supplied) UTC timestamp.
     var self = this;
     return self.updateMessage(chatRoom, msgnum, "");
 };

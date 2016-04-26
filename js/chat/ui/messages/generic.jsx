@@ -4,7 +4,8 @@ var getMessageString = require('./utils.jsx').getMessageString;
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var ContactsUI = require('./../contacts.jsx');
 
-var MESSAGE_NOT_EDITABLE_TIMEOUT = 30000;
+/* 1h as confirmed by Mathias */
+var MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],

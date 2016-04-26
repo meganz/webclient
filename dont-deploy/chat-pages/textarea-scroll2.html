@@ -26,24 +26,39 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
-    var $textarea = $('.chat-textarea-scroll textarea'),
-          $textareaScrollBlock = $('.chat-textarea-scroll'),
-          $textareaClone = $('.chat-textarea-scroll .message-preview'),
-          $textareaWrapper = $('.chat-textarea-scroll .textarea-wrapper')
-          textareaLineHeight = 20;
+initTextareaScrolling('.chat-textarea-scroll');
+
+/**
+ * initTextareaScrolling
+ *
+ * @param {String} Textarea wrapper block classname/id. Should start with "." or "#"
+ * @param {Number} Textarea max height. Default is 100
+ */
+function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
+    var $textarea = $(textareaScrollWrapper).find('textarea'),
+          $textareaClone,
+          textareaLineHeight = parseInt($textarea.css('line-height'))
+          textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
+
+    // Textarea Clone block to define height of autoresizeable textarea   
+    if (!$textarea.next('div').length) {
+        $('<div></div>').insertAfter('textarea');
+    }
+    $textareaClone = $textarea.next('div');
 
     $textarea.bind('keyup keydown', function(e) {
         var $this = $(this),
+              $textareaScrollBlock = $(textareaScrollWrapper),
               $textareaCloneSpan,
               textareaContent = $this.val(),
-              clength = textareaContent.length,
-              cursorPosition = $textarea.getCursorPosition(),
+              cursorPosition = $this.getCursorPosition(),
               jsp = $textareaScrollBlock.data('jsp'),
               viewLimitBottom = 0, 
               viewLimitTop = 0,
-              scrPos = 0
+              scrPos = 0,
               viewRatio = 0;
 
+        // Set textarea height according to  textarea clone height
         textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
         textareaContent = textareaContent.replace(/\n/g,'<br />');
         $textareaClone.html(textareaContent+'<br />');
@@ -53,25 +68,29 @@ $(document).ready(function() {
         scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
         viewRatio = Math.round($textareaCloneSpan.height() + scrPos);
 
-        if ($textareaWrapper.height() >= 100) {
-            $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+        // Textarea wrapper scrolling init
+        if ($textareaClone.height() >= textareaMaxHeight) {
+            $($textareaScrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
             if (!jsp) {
-                $textarea.focus();
+                $this.focus();
             }
         } else if (jsp) {
             jsp.destroy();
+            $this.focus();
         }
 
+        // Scrolling according cursor position
         if (viewRatio > viewLimitBottom || viewRatio < viewLimitTop) {
             jsp = $textareaScrollBlock.data('jsp');
             if ($textareaCloneSpan.height() > 0 && jsp) {
-                    jsp.scrollToY($textareaCloneSpan.height() - textareaLineHeight);
+                jsp.scrollToY($textareaCloneSpan.height() - textareaLineHeight);
             } else if (jsp) {
                 jsp.scrollToY(0);
             }
         }
     });
 
+    // Get textarea cursor position
     $.fn.getCursorPosition = function(){
         var el = $(this).get(0),
               pos = 0;
@@ -87,6 +106,8 @@ $(document).ready(function() {
         }
         return pos;
     }
+}
+
 
 });
 </script>
@@ -268,10 +289,8 @@ $(document).ready(function() {
                         </div>
                         <!-- Block for jScrollpane !-->
                         <div class="chat-textarea-scroll">
-                            <div class="textarea-wrapper">
-                        	    <textarea name="messages-textarea" placeholder="Write a message..."></textarea>
-                                <div class="message-preview"></div>
-                            </div>
+                            <textarea name="messages-textarea" placeholder="Write a message..."></textarea>
+                            <div class="textarea-preview"></div>
                         </div>
                     </div>
                 </div>

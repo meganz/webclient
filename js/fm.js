@@ -57,6 +57,86 @@ function initContactsGridScrolling() {
 }
 
 /**
+ * initTextareaScrolling
+ *
+ * @param {String} Textarea wrapper block classname/id. Should start with "." or "#"
+ * @param {Number} Textarea max height. Default is 100
+ */
+function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
+    var $textarea = $(textareaScrollWrapper).find('textarea'),
+          $textareaClone,
+          textareaLineHeight = parseInt($textarea.css('line-height'))
+          textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
+
+    // Textarea Clone block to define height of autoresizeable textarea   
+    if (!$textarea.next('div').length) {
+        $('<div></div>').insertAfter('textarea');
+    }
+    $textareaClone = $textarea.next('div');
+
+    $textarea.bind('keyup keydown', function(e) {
+        var $this = $(this),
+              $textareaScrollBlock = $(textareaScrollWrapper),
+              $textareaCloneSpan,
+              textareaContent = $this.val(),
+              cursorPosition = $this.getCursorPosition(),
+              jsp = $textareaScrollBlock.data('jsp'),
+              viewLimitBottom = 0, 
+              viewLimitTop = 0,
+              scrPos = 0,
+              viewRatio = 0;
+
+        // Set textarea height according to  textarea clone height
+        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
+        textareaContent = textareaContent.replace(/\n/g,'<br />');
+        $textareaClone.html(textareaContent+'<br />');
+        $this.height($textareaClone.height());
+        $textareaCloneSpan = $textareaClone.children('span');
+        viewLimitBottom = parseInt($textareaClone.css('min-height'));
+        scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
+        viewRatio = Math.round($textareaCloneSpan.height() + scrPos);
+
+        // Textarea wrapper scrolling init
+        if ($textareaClone.height() >= textareaMaxHeight) {
+            $($textareaScrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+            if (!jsp) {
+                $this.focus();
+            }
+        } else if (jsp) {
+            jsp.destroy();
+            $this.focus();
+        }
+
+        // Scrolling according cursor position
+        if (viewRatio > viewLimitBottom || viewRatio < viewLimitTop) {
+            jsp = $textareaScrollBlock.data('jsp');
+            if ($textareaCloneSpan.height() > 0 && jsp) {
+                jsp.scrollToY($textareaCloneSpan.height() - textareaLineHeight);
+            } else if (jsp) {
+                jsp.scrollToY(0);
+            }
+        }
+    });
+
+    // Get textarea cursor position
+    $.fn.getCursorPosition = function(){
+        var el = $(this).get(0),
+              pos = 0;
+        if ('selectionStart' in el) {
+            pos=el.selectionStart;
+        } else if('selection' in document) {
+            el.focus();
+            var sel = document.selection.createRange(),
+                  selLength = document.selection.createRange().text.length;
+
+            sel.moveStart('character', -el.value.length);
+            pos = sel.text.length - selLength;
+        }
+        return pos;
+    }
+}
+
+/**
  * Sent Contact Requests
  *
  *

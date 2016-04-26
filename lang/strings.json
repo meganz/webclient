@@ -12870,5 +12870,13 @@
     "8687": {
         "text": "undecrypted file",
         "context": "String which will show for every undecrypted folder. Note this's different then 'undecryptable folder' which already exists in dictionary under 8588 key."
+    },
+    "8688": {
+        "text": "Awaiting email confirmation.",
+        "context": "Message displayed to reminder the user what to do to complete the account creation process."
+    },
+    "8690": {
+        "text": "You don't have access to the selected download path. Please select a different download path and try again.",
+        "context": "Message displayed when the process\/request to download a file\/folder failed because the app or the user does not have access to the selected file\/folder."
     }
 }

@@ -3217,6 +3217,8 @@
     "8685": "Prosimy o podanie powod\u00f3w dla kt\u00f3rych nie planujesz odnowi\u0107 swojego planu:",
     "8686": "niezaszyfrowany katalog",
     "8687": "niezaszyfrowany plik",
+    "8688": "Awaiting email confirmation.",
+    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

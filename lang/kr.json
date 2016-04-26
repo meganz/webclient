@@ -3217,6 +3217,8 @@
     "8685": "\uc65c \uc694\uae08\uc81c\ub97c \uc5f0\uc7a5\ud558\uc9c0 \uc54a\uc73c\ub824\ub294\uc9c0 \uc774\uc720\ub97c \uc368\uc8fc\uc138\uc694:",
     "8686": "undecrypted folder",
     "8687": "undecrypted file",
+    "8688": "Awaiting email confirmation.",
+    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

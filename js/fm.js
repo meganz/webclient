@@ -2485,7 +2485,6 @@ function initContextUI() {
 
             // Show the share dialog
             $shareDialog.removeClass('hidden');
-            $('.export-links-warning').removeClass('hidden');
 
             // Hide the optional message by default.
             // This gets enabled if user want to share

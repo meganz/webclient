@@ -400,6 +400,8 @@ Chatd.Shard.prototype.join = function(chatId) {
     // send a `JOIN` (if no local messages are buffered) or a `JOINRANGEHIST` (if local messages are buffered)
     if (Object.keys(this.chatd.chatIdMessages[chatId].buf).length === 0) {
         this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
+        // send out `HIST` after a fresh `JOIN`
+        this.cmd(Chatd.Opcode.HIST, chatId + this.chatd.pack32le(-32));
     } else {
         this.chatd.joinrangehist(chatId);
     }
@@ -496,9 +498,6 @@ Chatd.Shard.prototype.exec = function(a) {
                         // that..
                         if (!self.joinedChatIds[chatId]) {
                             self.joinedChatIds[chatId] = true;
-                            self.chatd.trigger('onMessagesHistoryRetrieve', {
-                                chatId: chatId
-                            });
                         }
                     }
                     else if (priv === -1) {
@@ -604,11 +603,11 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.REJECT:
                 self.keepAliveTimerRestart();
-                self.logger.log("Command was rejected: " + self.chatd.unpack32le(cmd.substr(9,4)) + " / " + self.chatd.unpack32le(cmd.substr(13,4)));
+                self.logger.log("Command was rejected, chatId : " + base64urlencode(cmd.substr(1,8)) +" / msgId : " + base64urlencode(cmd.substr(9,8)) +" / opcode: " + cmd.substr(17,1) + " / reason: " + cmd.substr(18,1));
 
-                if (self.chatd.unpack32le(cmd.substr(9,4)) == Chatd.Opcode.NEWMSG) {
+                if (cmd.charCodeAt(17) == Chatd.Opcode.NEWMSG) {
                     // the message was rejected
-                    self.chatd.msgconfirm(cmd.substr(1,8), false);
+                    self.chatd.msgconfirm(cmd.substr(9,8), false);
                 }
 
                 len = 17;
@@ -926,6 +925,7 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
     }
 };
 
+// msgid can be false in case of rejections
 Chatd.prototype.msgconfirm = function(msgxid, msgid) {
     // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
     for (var chatId in this.chatIdMessages) {

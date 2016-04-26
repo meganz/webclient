@@ -493,61 +493,9 @@ Chat.prototype.init = function() {
         var meta = eventObject.getMeta();
         var fromMyDevice = Karere.getNormalizedBareJid(eventObject.getFromJid()) === self.karere.getBareJid();
 
-        if (eventObject.getAction() === "sync") {
-            room = self.chats[meta.roomJid];
-            room.sendMessagesSyncResponse(eventObject);
-        }
-        else if (eventObject.getAction() === "syncResponse") {
-            room = self.chats[meta.roomJid];
-            room.handleSyncResponse(eventObject);
-        }
-        else if (eventObject.getAction() === "cancel-attachment" && fromMyDevice === true) {
-            if (fromMyDevice === true) {
-                room = self.chats[meta.roomJid];
-                room.cancelAttachment(
-                    meta.messageId,
-                    meta.nodeId
-                );
-            }
-        }
-        else if (eventObject.getAction() === "conv-end") {
-            if (fromMyDevice === true) {
-                room = self.chats[meta.roomJid];
-                if (room && room._leaving !== true) {
-                    room.destroy(false);
-                }
-            }
-            else {
-                //TODO: if this is not a 'private' conversation, there should be no "Close chat" button
-                //TODO: add conversation ended class to to the room container
-                room = self.chats[meta.roomJid];
-                if (room) {
-                    room._conversationEnded(eventObject.getFromJid());
-                }
-            }
-        }
-        else if (eventObject.getAction() === "conv-start" && fromMyDevice === true) {
-            if (fromMyDevice) {
-                room = self.chats[meta.roomJid];
-                if (!room) {
-                    self.openChat(meta.participants, meta.type, undefined, undefined, undefined, false);
-                }
-            }
-            else {
-                room = self.chats[meta.roomJid];
-                if (!room) {
-                    [room.$messages].forEach(function(v, k) {
-                        $(k).addClass("conv-start")
-                            .removeClass("conv-end");
-                    });
 
-                }
+        self.logger.warn("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
 
-            }
-        }
-        else {
-            self.logger.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
-        }
     });
 
     // UI events

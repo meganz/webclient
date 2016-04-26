@@ -515,10 +515,13 @@ function MegaData()
                                     data: blob,
                                     url: myURL.createObjectURL(blob)
                                 };
+
+                                delete _noAvatars[u];
                             }
                             useravatar.loaded(u);
                         })
                         .fail(function() {
+                            delete _noAvatars[u];
                             delete avatars[u];
                             useravatar.loaded(u);
                         })
@@ -3287,6 +3290,7 @@ function MegaData()
                 );
 
                 avatars[u_handle] = undefined;
+                delete _noAvatars[u_handle];
                 M.avatars();
             }
         });
@@ -5809,6 +5813,7 @@ function execsc(actionPackets, callback) {
 
                         if (attributeName === '+a') {
                             avatars[actionPacketUserId] = undefined;
+                            delete _noAvatars[actionPacketUserId];
                             loadavatars = true;
                         }
                         else if (attributeName === 'firstname' || attributeName === 'lastname') {

@@ -465,47 +465,7 @@
 	        var meta = eventObject.getMeta();
 	        var fromMyDevice = Karere.getNormalizedBareJid(eventObject.getFromJid()) === self.karere.getBareJid();
 
-	        if (eventObject.getAction() === "sync") {
-	            room = self.chats[meta.roomJid];
-	            room.sendMessagesSyncResponse(eventObject);
-	        } else if (eventObject.getAction() === "syncResponse") {
-	            room = self.chats[meta.roomJid];
-	            room.handleSyncResponse(eventObject);
-	        } else if (eventObject.getAction() === "cancel-attachment" && fromMyDevice === true) {
-	            if (fromMyDevice === true) {
-	                room = self.chats[meta.roomJid];
-	                room.cancelAttachment(meta.messageId, meta.nodeId);
-	            }
-	        } else if (eventObject.getAction() === "conv-end") {
-	            if (fromMyDevice === true) {
-	                room = self.chats[meta.roomJid];
-	                if (room && room._leaving !== true) {
-	                    room.destroy(false);
-	                }
-	            } else {
-
-	                room = self.chats[meta.roomJid];
-	                if (room) {
-	                    room._conversationEnded(eventObject.getFromJid());
-	                }
-	            }
-	        } else if (eventObject.getAction() === "conv-start" && fromMyDevice === true) {
-	            if (fromMyDevice) {
-	                room = self.chats[meta.roomJid];
-	                if (!room) {
-	                    self.openChat(meta.participants, meta.type, undefined, undefined, undefined, false);
-	                }
-	            } else {
-	                room = self.chats[meta.roomJid];
-	                if (!room) {
-	                    [room.$messages].forEach(function (v, k) {
-	                        $(k).addClass("conv-start").removeClass("conv-end");
-	                    });
-	                }
-	            }
-	        } else {
-	            self.logger.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
-	        }
+	        self.logger.warn("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
 	    });
 
 	    $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
@@ -22009,7 +21969,7 @@
 	    }
 	});
 
-	var _noAvatars = {};
+	var _noAvatars = window._noAvatars = {};
 
 	var Avatar = React.createClass({
 	    displayName: "Avatar",
@@ -22052,11 +22012,13 @@
 	                        data: blob,
 	                        url: myURL.createObjectURL(blob)
 	                    };
+
+	                    useravatar.loaded(contact);
+
+	                    delete _noAvatars[contact.u];
+	                } else {
+	                    _noAvatars[contact.u] = true;
 	                }
-
-	                useravatar.loaded(contact);
-
-	                delete _noAvatars[contact.u];
 
 	                self.safeForceUpdate();
 	            }).fail(function (e) {
@@ -26462,10 +26424,6 @@
 	    var self = this;
 
 	    self._leaving = true;
-
-	    if (notifyOtherDevices === true) {
-	        self.megaChat.sendBroadcastAction(self.roomJid, "conv-end", { roomJid: self.roomJid });
-	    }
 
 	    if (self.roomJid.indexOf("@") != -1) {
 	        self.setState(ChatRoom.STATE.LEAVING);

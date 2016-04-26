@@ -1003,7 +1003,7 @@ var strongvelope = {};
                                            encryptedMessage.nonce);
 
         content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
-                                            this.keyId);
+                                            keyId);
 
         // Only include ciphertext if it's not empty (non-blind message).
         if (encryptedMessage.ciphertext !== null) {

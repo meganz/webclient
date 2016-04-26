@@ -4,17 +4,21 @@ var getMessageString = require('./utils.jsx').getMessageString;
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var ContactsUI = require('./../contacts.jsx');
 
+var MESSAGE_NOT_EDITABLE_TIMEOUT = 30000;
+
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
     doDelete: function(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
         var chatRoom = this.props.chatRoom;
+
+        if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED) {
+            chatRoom.megaChat.plugins.chatdIntegration.deleteMessage(chatRoom, msg.orderValue);
+        }
+
         msg.message = "";
         msg.deleted = true;
-        chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
-
-        //TODO: chatd delete!
     },
     doCancelRetry: function(e, msg) {
         e.preventDefault(e);
@@ -672,6 +676,31 @@ var GenericConversationMessage = React.createClass({
                 }
                 else {
                     messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>;
+                }
+                if (!message.deleted) {
+                    if (contact && contact.u === u_handle && (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT) {
+                        messageActionButtons = <ButtonsUI.Button
+                            className="default-white-button tiny-button"
+                            icon="tiny-icon grey-down-arrow">
+                            <DropdownsUI.Dropdown
+                                className="white-context-menu attachments-dropdown"
+                                noArrow={true}
+                                positionMy="left bottom"
+                                positionAt="right bottom"
+                                horizOffset={4}
+                            >
+                                <DropdownsUI.DropdownItem
+                                    icon="red-cross"
+                                    label={__(l[1730])}
+                                    className="red"
+                                    onClick={(e) => {
+                                        self.doDelete(e, message);
+                                }}
+                                />
+                            </DropdownsUI.Dropdown>
+                        </ButtonsUI.Button>;
+
+                    }
                 }
 
                 return (

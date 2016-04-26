@@ -67,7 +67,9 @@ var ChatdIntegration = function(megaChat) {
             var chatRoomJid = self.chatIdToRoomJid[chatId];
             if (chatRoomJid) {
                 var chatRoom = self.megaChat.chats[chatRoomJid];
-                chatRoom.setState(ChatRoom.STATE.JOINING, true);
+                if (chatRoom) {
+                    chatRoom.setState(ChatRoom.STATE.JOINING, true);
+                }
             }
         });
     });
@@ -1008,7 +1010,26 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
 ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage) {
     // a msgupd is only possible up to ten minutes after the indicated (client-supplied) UTC timestamp.
     var self = this;
-    self.chatd.modify(base64urldecode(chatRoom.chatId), msgnum, newMessage);
+    var rawChatId = base64urldecode(chatRoom.chatId);
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    if (!chatMessages) {
+        return;
+    }
+
+    var msg = chatMessages.buf[msgnum];
+    if (!msg) {
+        return;
+    }
+    var keyId = msg[Chatd.MsgField.KEYID];
+    var cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId);
+
+    return self.chatd.modify(rawChatId, msgnum, cipher);
+};
+
+ChatdIntegration.prototype.deleteMessage = function(chatRoom, msgnum) {
+    // a msgupd is only possible up to ten minutes after the indicated (client-supplied) UTC timestamp.
+    var self = this;
+    return self.updateMessage(chatRoom, msgnum, "");
 };
 
 // decorate ALL functions which require shard to be available before executing

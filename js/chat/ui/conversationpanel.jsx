@@ -1102,7 +1102,7 @@ var ConversationPanel = React.createClass({
         var grouped = false;
 
         self.props.messagesBuff.messages.forEach(function(v, k) {
-            if (v.deleted !== 1 && !v.protocol && v.revoked !== true) {
+            if (/*v.deleted !== 1 && */!v.protocol && v.revoked !== true) {
                 var shouldRender = true;
                 if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
                     shouldRender = false;

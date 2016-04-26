@@ -1396,7 +1396,8 @@ function checkUserLogin() {
      * Stores a user attribute for oneself.
      *
      * @param attribute {string}
-     *     Name of the attribute.
+     *     Name of the attribute. The max length is 16 characters. Note that the
+     *     * and ! characters may be added so usually you only have 14 to work with.
      * @param value {object}
      *     Value of the user attribute. Public properties are of type {string},
      *     private ones have to be an object with key/value pairs.

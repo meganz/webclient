@@ -212,7 +212,7 @@ var alarm = {
             }
             
             // Don't show this dialog if they have already said they don't want to see it again
-            if (localStorage.getItem('planExpiredDialogDisabled')) {
+            if (typeof this.lastPayment.dontShow !== 'undefined') {
                 return false;
             }
             
@@ -402,8 +402,13 @@ var alarm = {
                     d: jsonData
                 });
                 
-                // Close the dialog and never show again
-                localStorage.setItem('planExpiredDialogDisabled', '1');
+                // Never show the dialog again for this account
+                mega.attr.set(
+                    'hideProExpired',
+                    '1',                    // Simple flag
+                    false,                  // Private attribute
+                    true                    // Non-historic, won't retain previous values on the API server
+                );
                 
                 // Hide the warning icon and the dialog
                 $container.addClass('hidden');

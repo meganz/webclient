@@ -162,6 +162,9 @@ var TypingArea = React.createClass({
     componentDidMount: function() {
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
+
+        var $container = $(ReactDOM.findDOMNode(this));
+        initTextareaScrolling($('.chat-textarea-scroll', $container));
     },
     componentWillUnmount: function() {
         var self = this;
@@ -187,41 +190,13 @@ var TypingArea = React.createClass({
         if (!self.props.chatRoom.isCurrentlyActive) {
             return;
         }
-
-        // typeArea resizing
-        var $textarea = $('textarea.messages-textarea', $container);
-        var textareaHeight = $textarea.outerHeight();
-        var $hiddenDiv = $('.message-preview', $container);
-        var $pane = $('.chat-textarea-scroll', $container);
-        var $jsp;
-
-        if (textareaHeight != $hiddenDiv.height()) {
-            $textarea.css('height', $hiddenDiv.height());
-
-            if ($hiddenDiv.outerHeight() > 100) {
-                $pane.jScrollPane({
-                    enableKeyboardNavigation: false,
-                    showArrows: true,
-                    arrowSize: 5
-                });
-                $jsp = $pane.data('jsp');
-                $textarea.blur();
-                $textarea.focus();
-                $jsp.scrollByY(0);
-            }
-            else {
-                $jsp = $pane.data('jsp');
-                if ($jsp) {
-                    $jsp.destroy();
-                    $textarea.blur();
-                    $textarea.focus();
-                }
-            }
-
-            if (self.props.onUpdate) {
-                self.props.onUpdate();
-            }
+        // faking a keyup to trigger a textarea resize, until Andrey fixes this.
+        if(!self.isMounted()) {
+            return;
         }
+
+        var $container = $(ReactDOM.findDOMNode(this));
+        $('.chat-textarea-scroll', $container).triggerHandler('keyup');
 
     },
     isActive: function () {
@@ -257,7 +232,6 @@ var TypingArea = React.createClass({
                     {self.props.children}
                 </div>
                 <div className="chat-textarea-scroll">
-                    <div className="textarea-wrapper">
                         <textarea
                             className={messageTextAreaClasses}
                             placeholder={__(l[8009])}
@@ -272,7 +246,6 @@ var TypingArea = React.createClass({
                         <div className="message-preview" dangerouslySetInnerHTML={{
                                                 __html: typedMessage.replace(/\s/g, "&nbsp;")
                                             }}></div>
-                    </div>
                 </div>
             </div>
         </div>

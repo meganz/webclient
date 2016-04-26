@@ -762,12 +762,12 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
     this.multicmd(cmds);
 };
 
-Chatd.Shard.prototype.msgupd = function(chatId, msgid, timestamp, message, keyid) {
-    this.cmd(Chatd.Opcode.MSGUPD, chatId + Chatd.Const.UNDEFINED + msgid + this.chatd.pack32le(timestamp) + this.chatd.pack16le(0) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message);
+Chatd.Shard.prototype.msgupd = function(chatId, msgid, updatedelta, message, keyid) {
+    this.cmd(Chatd.Opcode.MSGUPD, chatId + Chatd.Const.UNDEFINED + msgid + this.chatd.pack16le(updatedelta) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message);
 };
 
-Chatd.Shard.prototype.msgupdx = function(chatId, msgxid, timestamp, message, keyxid) {
-    this.cmd(Chatd.Opcode.MSGUPDX, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack16le(0) + this.chatd.pack32le(keyxid) + this.chatd.pack32le(message.length) + message);
+Chatd.Shard.prototype.msgupdx = function(chatId, msgxid, updatedelta, message, keyxid) {
+    this.cmd(Chatd.Opcode.MSGUPDX, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack16le(updatedelta) + this.chatd.pack32le(keyxid) + this.chatd.pack32le(message.length) + message);
 };
 
 // message storage subsystem
@@ -846,10 +846,10 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     // modify pending message so that a potential resend includes the change
     if (this.sending[this.buf[msgnum][Chatd.MsgField.MSGID]]) {
         this.buf[msgnum][Chatd.MsgField.MESSAGE] = message;
-        self.chatd.chatIdShard[this.chatId].msgupdx(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.TIMESTAMP], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
+        self.chatd.chatIdShard[this.chatId].msgupdx(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1, message, this.buf[msgnum][Chatd.MsgField.KEYID]);
     }
     else if (self.chatd.chatIdShard[this.chatId].isOnline()) {
-        self.chatd.chatIdShard[this.chatId].msgupd(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.TIMESTAMP], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
+        self.chatd.chatIdShard[this.chatId].msgupd(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1, message, this.buf[msgnum][Chatd.MsgField.KEYID]);
     }
 
     this.chatd.trigger('onMessageModify', {

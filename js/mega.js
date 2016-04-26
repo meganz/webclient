@@ -5844,7 +5844,7 @@ function execsc(actionPackets, callback) {
             if (actionPacket.o === u_handle) {
 
                 // If access right are undefined then share is deleted
-                if (typeof actionPacket.r == "undefined") {
+                if (typeof actionPacket.r === "undefined") {
                     M.delNodeShare(actionPacket.n, actionPacket.u);
                 }
                 else if (M.d[actionPacket.n]
@@ -5887,7 +5887,7 @@ function execsc(actionPackets, callback) {
                 }
 
                 if (typeof actionPacket.o !== 'undefined') {
-                    if (typeof actionPacket.r == "undefined") {
+                    if (typeof actionPacket.r === "undefined") {
                         if (d) {
                             console.log('delete a share');
                         }

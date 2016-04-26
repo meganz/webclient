@@ -1538,7 +1538,6 @@ else if (!b_u)
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
 
 
@@ -1553,6 +1552,8 @@ else if (!b_u)
 
     jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
+
+    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});

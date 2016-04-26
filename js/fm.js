@@ -81,7 +81,6 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
               textareaContent = $this.val(),
               cursorPosition = $this.getCursorPosition(),
               jsp = $textareaScrollBlock.data('jsp'),
-              viewLimitBottom = 0, 
               viewLimitTop = 0,
               scrPos = 0,
               viewRatio = 0;
@@ -92,13 +91,12 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
         $textareaClone.html(textareaContent+'<br />');
         $this.height($textareaClone.height());
         $textareaCloneSpan = $textareaClone.children('span');
-        viewLimitBottom = parseInt($textareaClone.css('min-height'));
         scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
         viewRatio = Math.round($textareaCloneSpan.height() + scrPos);
 
         // Textarea wrapper scrolling init
-        if ($textareaClone.height() >= textareaMaxHeight) {
-            $($textareaScrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+        if ($textareaClone.height() > textareaMaxHeight) {
+            $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
             if (!jsp) {
                 $this.focus();
             }
@@ -108,7 +106,7 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
         }
 
         // Scrolling according cursor position
-        if (viewRatio > viewLimitBottom || viewRatio < viewLimitTop) {
+        if (viewRatio > textareaLineHeight || viewRatio < viewLimitTop) {
             jsp = $textareaScrollBlock.data('jsp');
             if ($textareaCloneSpan.height() > 0 && jsp) {
                 jsp.scrollToY($textareaCloneSpan.height() - textareaLineHeight);
@@ -1831,47 +1829,9 @@ function addContactUI() {
         $('.add-user-notification').removeClass('active');
     });
 
-    function addContactAreaResizing() {
-
-        var txt = $('.add-user-notification textarea'),
-            txtHeight = txt.outerHeight(),
-            hiddenDiv = $('.add-contact-hidden'),
-            pane = $('.add-user-nt-scrolling'),
-            content = txt.val(),
-            api;
-
-        content = content.replace(/\n/g, '<br />');
-        hiddenDiv.html(encodeURI(content) + '<br/>');
-
-        if (txtHeight !== hiddenDiv.outerHeight()) {
-            txt.height(hiddenDiv.outerHeight());
-
-            if ($('.add-user-textarea').outerHeight() >= 50) {
-                pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-                api = pane.data('jsp');
-                txt.blur();
-                txt.focus();
-                api.scrollByY(0);
-            }
-            else {
-                api = pane.data('jsp');
-
-                if (api) {
-                    api.destroy();
-                    txt.blur();
-                    txt.focus();
-                }
-            }
-        }
-    }
-
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
         initAddDialogMultiInputPlugin();
     }
-
-    $('.add-user-notification textarea').on('keyup', function() {
-        addContactAreaResizing();
-    });
 
     $('.fm-empty-contacts .fm-empty-button').rebind('mouseover', function() {
         $('.fm-empty-contacts').addClass('hovered');
@@ -1949,7 +1909,7 @@ function addContactUI() {
                 $d.css('right', 8 + 'px');
             }
 
-            addContactAreaResizing();
+            initTextareaScrolling('.add-user-textarea', 39);
             focusOnInput();
         }
 
@@ -11119,6 +11079,9 @@ var cancelSubscriptionDialog = {
         // Show the dialog
         this.$dialog.removeClass('hidden');
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // Init textarea scrolling
+        initTextareaScrolling('.cancel-textarea', 126);
 
         // Init functionality
         this.enableButtonWhenReasonEntered();

@@ -2138,6 +2138,7 @@ a.nt-settings-button:hover span {
 }
 .jspPane {
     position: absolute;
+    min-width: 100%;
 }
 .jspVerticalBar {
     position: absolute;
@@ -2165,9 +2166,6 @@ a.nt-settings-button:hover span {
 }
 .jspTrack {
     position: relative;
-}
-.jspPane {
-    width: 100% !important;
 }
 .jspDrag {
     background-color: rgb(102, 102, 102);
@@ -7861,7 +7859,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin-top: 12px;
 }
 .feedback-textarea-bl, .cancel-textarea-bl {
-    height: 96px;
+    height: 86px;
     background-image: none;
     padding: 0;
     margin: -4px 0 0 0;
@@ -7875,13 +7873,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 140px;
 }
 .feedback-textarea-scroll {
-    height: 96px;
+    height: 86px;
+    padding: 7px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .cancel-textarea-scroll {
     height: 140px;
+    padding: 7px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .add-user-nt-scrolling, .share-message-scroll {
     height: 50px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 6px 0 5px 0;
 }
 .add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .feedback-textarea-scroll .jspDrag, .cancel-textarea-scroll .jspDrag {
     width: 4px;
@@ -7895,8 +7905,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #999999;
     width: 100%;
     margin: 0;
-    height: 50px;
-    padding: 0;
+    height: 39px;
+    padding: 0 10px 0 3px;
     -webkit-appearance: caret;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -7904,27 +7914,44 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     resize: none;
     font-family: 'source_sans_proregular', Arial;
     overflow: hidden;
-    min-height: 36px;
+    min-height: 39px;
+}
+.feedback-textarea {
+    height: 72px;
+    line-height: 0;
+    font-size: 0;
 }
 .feedback-textarea-scroll textarea, .feedback-hidden {
-    height: 96px;
+    height: 72px;
+    min-height: 72px;
+    padding: 0 10px;
     font-size: 13px;
+}
+.cancel-textarea {
+    height: 126px;
+    line-height: 0;
+    font-size: 0;
 }
 .cancel-textarea-scroll textarea, .cancel-hidden {
     color: black;
     font-size: 13px;
-    height: 125px;
+    height: 126px;
+    padding: 0 10px;
+    min-height: 126px;
 }
 .add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden, .feedback-dialog .feedback-dialog-hidden {
-    display: none;
+    position: absolute;
     height: auto;
-    overflow: visible;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
 }
 .add-user-textarea, .share-message-textarea {
-    padding: 7px 10px 7px 3px;
-}
-.feedback-textarea, .cancel-textarea {
-    padding: 7px 10px;
+    height: 39px;
+    position: relative;
+    line-height: 0;
+    font-size: 0;
 }
 .add-user-nt-scrolling textarea::selection, .share-message-scrolling textarea::selection {
     background-color: #333333;
@@ -21509,9 +21536,19 @@ a.top-login-forgot-pass {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
+    font-size: 0;
+    line-height: 0;
 }
 .feedback-dialog-textarea {
     height: 96px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 8px 0;
+    position: relative;
+}
+.feedback-dialog-textarea .jspPane {
+    min-width: 0;
 }
 .feedback-dialog-textarea textarea, .feedback-dialog-hidden {
     background-color: transparent;
@@ -21519,15 +21556,19 @@ a.top-login-forgot-pass {
     border: 0;
     resize: none;
     font-size: 14px;
-    line-height: 24px;
     color: #999999;
     width: 100%;
-    padding: 0 17px;
-    height: 30px;
+    padding: 0 12px;
+    margin: 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     overflow: hidden;
+    height: 80px;
+    line-height: 20px;
+}
+.feedback-dialog-hidden {
+    min-height: 80px;
 }
 .feedback-dialog-textarea textarea::selection {
     background: rgba(255,255,255,0.15);
@@ -21535,13 +21576,9 @@ a.top-login-forgot-pass {
 .feedback-dialog-textarea textarea::-moz-selection {
  background: rgba(255,255,255,0.15);
 }
-.feedback-dialog-textarea textarea, .feedback-dialog-hidden {
-    padding: 0;
-    height: 78px;
-    line-height: 18px;
-}
 .feedback-dialog-scr {
-    padding: 9px 17px;
+    position: relative;
+    height: 80px;
 }
 .feedback-dialog-textarea .jspDrag {
     background-color: rgba(255, 255, 255, 1);

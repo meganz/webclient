@@ -53,7 +53,6 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
               textareaContent = $this.val(),
               cursorPosition = $this.getCursorPosition(),
               jsp = $textareaScrollBlock.data('jsp'),
-              viewLimitBottom = 0, 
               viewLimitTop = 0,
               scrPos = 0,
               viewRatio = 0;
@@ -64,13 +63,12 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
         $textareaClone.html(textareaContent+'<br />');
         $this.height($textareaClone.height());
         $textareaCloneSpan = $textareaClone.children('span');
-        viewLimitBottom = parseInt($textareaClone.css('min-height'));
         scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
         viewRatio = Math.round($textareaCloneSpan.height() + scrPos);
 
         // Textarea wrapper scrolling init
-        if ($textareaClone.height() >= textareaMaxHeight) {
-            $($textareaScrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+        if ($textareaClone.height() > textareaMaxHeight) {
+            $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
             if (!jsp) {
                 $this.focus();
             }
@@ -80,7 +78,7 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
         }
 
         // Scrolling according cursor position
-        if (viewRatio > viewLimitBottom || viewRatio < viewLimitTop) {
+        if (viewRatio > textareaLineHeight || viewRatio < viewLimitTop) {
             jsp = $textareaScrollBlock.data('jsp');
             if ($textareaCloneSpan.height() > 0 && jsp) {
                 jsp.scrollToY($textareaCloneSpan.height() - textareaLineHeight);

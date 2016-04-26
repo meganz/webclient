@@ -57,6 +57,84 @@ function initContactsGridScrolling() {
 }
 
 /**
+ * initTextareaScrolling
+ *
+ * @param {String} Textarea wrapper block classname/id. Should start with "." or "#"
+ * @param {Number} Textarea max height. Default is 100
+ */
+function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
+    var $textarea = $(textareaScrollWrapper).find('textarea'),
+          $textareaClone,
+          textareaLineHeight = parseInt($textarea.css('line-height'))
+          textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
+
+    // Textarea Clone block to define height of autoresizeable textarea   
+    if (!$textarea.next('div').length) {
+        $('<div></div>').insertAfter('textarea');
+    }
+    $textareaClone = $textarea.next('div');
+
+    $textarea.bind('keyup keydown', function(e) {
+        var $this = $(this),
+              $textareaScrollBlock = $(textareaScrollWrapper),
+              $textareaCloneSpan,
+              textareaContent = $this.val(),
+              cursorPosition = $this.getCursorPosition(),
+              jsp = $textareaScrollBlock.data('jsp'),
+              viewLimitTop = 0,
+              scrPos = 0,
+              viewRatio = 0;
+
+        // Set textarea height according to  textarea clone height
+        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
+        textareaContent = textareaContent.replace(/\n/g,'<br />');
+        $textareaClone.html(textareaContent+'<br />');
+        $this.height($textareaClone.height());
+        $textareaCloneSpan = $textareaClone.children('span');
+        scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
+        viewRatio = Math.round($textareaCloneSpan.height() + scrPos);
+
+        // Textarea wrapper scrolling init
+        if ($textareaClone.height() > textareaMaxHeight) {
+            $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+            if (!jsp) {
+                $this.focus();
+            }
+        } else if (jsp) {
+            jsp.destroy();
+            $this.focus();
+        }
+
+        // Scrolling according cursor position
+        if (viewRatio > textareaLineHeight || viewRatio < viewLimitTop) {
+            jsp = $textareaScrollBlock.data('jsp');
+            if ($textareaCloneSpan.height() > 0 && jsp) {
+                jsp.scrollToY($textareaCloneSpan.height() - textareaLineHeight);
+            } else if (jsp) {
+                jsp.scrollToY(0);
+            }
+        }
+    });
+
+    // Get textarea cursor position
+    $.fn.getCursorPosition = function(){
+        var el = $(this).get(0),
+              pos = 0;
+        if ('selectionStart' in el) {
+            pos=el.selectionStart;
+        } else if('selection' in document) {
+            el.focus();
+            var sel = document.selection.createRange(),
+                  selLength = document.selection.createRange().text.length;
+
+            sel.moveStart('character', -el.value.length);
+            pos = sel.text.length - selLength;
+        }
+        return pos;
+    }
+}
+
+/**
  * Sent Contact Requests
  *
  *
@@ -1751,47 +1829,9 @@ function addContactUI() {
         $('.add-user-notification').removeClass('active');
     });
 
-    function addContactAreaResizing() {
-
-        var txt = $('.add-user-notification textarea'),
-            txtHeight = txt.outerHeight(),
-            hiddenDiv = $('.add-contact-hidden'),
-            pane = $('.add-user-nt-scrolling'),
-            content = txt.val(),
-            api;
-
-        content = content.replace(/\n/g, '<br />');
-        hiddenDiv.html(encodeURI(content) + '<br/>');
-
-        if (txtHeight !== hiddenDiv.outerHeight()) {
-            txt.height(hiddenDiv.outerHeight());
-
-            if ($('.add-user-textarea').outerHeight() >= 50) {
-                pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-                api = pane.data('jsp');
-                txt.blur();
-                txt.focus();
-                api.scrollByY(0);
-            }
-            else {
-                api = pane.data('jsp');
-
-                if (api) {
-                    api.destroy();
-                    txt.blur();
-                    txt.focus();
-                }
-            }
-        }
-    }
-
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
         initAddDialogMultiInputPlugin();
     }
-
-    $('.add-user-notification textarea').on('keyup', function() {
-        addContactAreaResizing();
-    });
 
     $('.fm-empty-contacts .fm-empty-button').rebind('mouseover', function() {
         $('.fm-empty-contacts').addClass('hovered');
@@ -1869,7 +1909,7 @@ function addContactUI() {
                 $d.css('right', 8 + 'px');
             }
 
-            addContactAreaResizing();
+            initTextareaScrolling('.add-user-textarea', 39);
             focusOnInput();
         }
 
@@ -7796,6 +7836,7 @@ function initShareDialogMultiInputPlugin() {
                 // where they can add a custom message to the pending share request
                 if (checkIfContactExists(item.id) === false) {
                     $('.share-message').show();
+                    initTextareaScrolling('.share-message-textarea', 39);
                 }
 
                 $('.dialog-share-button').removeClass('disabled');
@@ -8218,44 +8259,6 @@ function initShareDialog() {
     $('.share-message textarea').rebind('blur', function() {
         var $this = $(this);
         $('.share-message').removeClass('active');
-    });
-
-    function shareMessageResizing() {
-
-      var txt = $('.share-message textarea'),
-          txtHeight =  txt.outerHeight(),
-          hiddenDiv = $('.share-message-hidden'),
-          pane = $('.share-message-scrolling'),
-          content = txt.val(),
-          api;
-
-      content = content.replace(/\n/g, '<br />');
-      hiddenDiv.html(encodeURI(content) + '<br/>');
-
-      if (txtHeight !== hiddenDiv.outerHeight() ) {
-        txt.height(hiddenDiv.outerHeight());
-
-        if ( $('.share-message-textarea').outerHeight()>=50) {
-            pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
-            api = pane.data('jsp');
-            txt.blur();
-            txt.focus();
-            api.scrollByY(0);
-        }
-        else {
-            api = pane.data('jsp');
-
-            if (api) {
-              api.destroy();
-              txt.blur();
-              txt.focus();
-            }
-        }
-      }
-    }
-
-    $('.share-message textarea').rebind('keyup', function() {
-        shareMessageResizing();
     });
 }
 
@@ -11039,6 +11042,9 @@ var cancelSubscriptionDialog = {
         // Show the dialog
         this.$dialog.removeClass('hidden');
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // Init textarea scrolling
+        initTextareaScrolling('.cancel-textarea', 126);
 
         // Init functionality
         this.enableButtonWhenReasonEntered();

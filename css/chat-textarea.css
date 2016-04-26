@@ -37,7 +37,7 @@
 .textarea-wrapper {
     position: relative;
 }
-.chat-textarea-scroll textarea, .message-preview, .message.textarea-scroll textarea {
+.chat-textarea-scroll textarea, .chat-textarea-scroll textarea + div, .message.textarea-scroll textarea {
     font-size: 13px;
     line-height: 20px;
     width: 100%;
@@ -53,14 +53,16 @@
     box-sizing: border-box;
     display: block;
 }
-.message-preview {
+.chat-textarea-scroll textarea + div,  .message.textarea-block textarea + div {
     position: absolute;
+    height: auto;
+    min-height: 20px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
 }
-.message.textarea-block textarea, .message.textarea-scroll .message-preview {
+.message.textarea-block textarea, .message.textarea-block textarea + div {
     font-size: 13px;
     margin: 0 0 2px 0;
 }
@@ -69,9 +71,6 @@
     font-size: 0;
     line-height: 0;
     position: relative;
-}
-.message.textarea-block .hidden-block {
-    display: none;
 }
 .chat-textarea-scroll textarea::-webkit-input-placeholder {
  color:#CCCCCC;

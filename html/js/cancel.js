@@ -210,6 +210,8 @@
         $(obj.opt.fbDlgClass + ' .feedback-textarea-bl textarea').val('');
         $('.fm-dialog' + obj.opt.fbDlgClass).removeClass('hidden');
 
+        initTextareaScrolling('.feedback-textarea', 72);
+
         $.dialog = obj.opt.fbDlgName;
 
         // Send feedback button listener
@@ -248,47 +250,12 @@
             }
         });
 
-        $('.feedback-textarea-bl textarea').on('keyup', function() {
-            obj._feedbackAreaResizing();
-        });
-
         $('.reset-success-st3 input[type=radio]').rebind('change', function() {
             $('.reset-success-st3 .radioOn').removeClass('radioOn').addClass('radioOff');
             $('.reset-success-st3 .radio-txt').removeClass('active');
             $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn').next().addClass('active');
         });
 
-    };
-
-    AccountClosure.prototype._feedbackAreaResizing = function() {
-        var txt = $('.feedback-textarea-bl textarea'),
-            txtHeight = txt.outerHeight(),
-            hiddenDiv = $('.feedback-hidden'),
-            pane = $('.feedback-textarea-scroll'),
-            content = txt.val(),
-            api;
-        content = content.replace(/\n/g, '<br />');
-        hiddenDiv.html(content + '<br/>');
-
-        if (txtHeight !== hiddenDiv.outerHeight()) {
-            txt.height(hiddenDiv.outerHeight());
-
-            if ($('.feedback-textarea').outerHeight() >= 96) {
-                pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-                api = pane.data('jsp');
-                txt.blur();
-                txt.focus();
-                api.scrollByY(0);
-            }
-            else {
-                api = pane.data('jsp');
-                if (api) {
-                    api.destroy();
-                    txt.blur();
-                    txt.focus();
-                }
-            }
-        }
     };
 
     //export

@@ -4625,6 +4625,10 @@ function getGatewayName(gatewayId) {
             name: 'tpay',
             displayName: l[7219] + ' (T-Pay)'       // Mobile (T-Pay)
         },
+        15: {
+            name: 'directreseller',
+            displayName: 'Vesta'
+        },
         999: {
             name: 'wiretransfer',
             displayName: l[6198]    // Wire transfer

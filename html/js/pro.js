@@ -663,6 +663,9 @@ function pro_pay() {
                 else if (pro_paymentmethod === 'tpay') {
                     pro_m = tpay.gatewayId; // 14
                 }
+                else if (pro_paymentmethod === 'directreseller') {
+                    pro_m = directReseller.gatewayId; // 15
+                }
                 
                 // If AstroPay, send extra details
                 else if (pro_paymentmethod.indexOf('astropay') > -1) {
@@ -755,6 +758,10 @@ function pro_pay() {
                             // If tpay, redirect over there
                             else if (pro_m === tpay.gatewayId) {
                                 tpay.redirectToSite(utcResult);
+                            }
+
+                            else if (pro_m == directReseller.gatewayId) {
+                                directReseller.redirectToSite(utcResult);
                             }
                         }
                     }
@@ -1958,6 +1965,27 @@ var tpay = {
     }
 };
 
+/**
+ * Code for directReseller payments such as Gary's 6media thing
+ */
+var directReseller = {
+
+    gatewayId: 15,
+
+    /**
+     * Redirect to the site
+     * @param {String} utcResult (a saleid)
+     */
+    redirectToSite: function(utcResult) {
+        var provider = utcResult['EUR']['provider'];
+        var params = utcResult['EUR']['params'];
+        if (provider === 1)
+        {
+            params = atob(params);
+            window.location = 'http://mega.and1.tw/zh_tw/order_mega.php?' + params;
+        }
+    }
+};
 
 /**
  * Code for paysafecard

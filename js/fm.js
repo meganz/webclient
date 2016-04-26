@@ -7836,6 +7836,7 @@ function initShareDialogMultiInputPlugin() {
                 // where they can add a custom message to the pending share request
                 if (checkIfContactExists(item.id) === false) {
                     $('.share-message').show();
+                    initTextareaScrolling('.share-message-textarea', 39);
                 }
 
                 $('.dialog-share-button').removeClass('disabled');
@@ -8258,44 +8259,6 @@ function initShareDialog() {
     $('.share-message textarea').rebind('blur', function() {
         var $this = $(this);
         $('.share-message').removeClass('active');
-    });
-
-    function shareMessageResizing() {
-
-      var txt = $('.share-message textarea'),
-          txtHeight =  txt.outerHeight(),
-          hiddenDiv = $('.share-message-hidden'),
-          pane = $('.share-message-scrolling'),
-          content = txt.val(),
-          api;
-
-      content = content.replace(/\n/g, '<br />');
-      hiddenDiv.html(encodeURI(content) + '<br/>');
-
-      if (txtHeight !== hiddenDiv.outerHeight() ) {
-        txt.height(hiddenDiv.outerHeight());
-
-        if ( $('.share-message-textarea').outerHeight()>=50) {
-            pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
-            api = pane.data('jsp');
-            txt.blur();
-            txt.focus();
-            api.scrollByY(0);
-        }
-        else {
-            api = pane.data('jsp');
-
-            if (api) {
-              api.destroy();
-              txt.blur();
-              txt.focus();
-            }
-        }
-      }
-    }
-
-    $('.share-message textarea').rebind('keyup', function() {
-        shareMessageResizing();
     });
 }
 

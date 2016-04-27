@@ -923,6 +923,7 @@ function transferPanelContextMenu(target)
         }
     }
 
+
     // XXX: Hide context-menu's menu-up/down items for now to check if that's the
     // origin of some problems, users can still use the new d&d logic to move transfers
     menuitems.filter('.move-up,.move-down').hide();
@@ -10828,6 +10829,20 @@ function fingerprintDialog(userid) {
         });
     fm_showoverlay();
 }
+
+
+    $( '#datepicker' ).datepicker({
+                 inline: true,
+                //nextText: '&rarr;',
+                //prevText: '&larr;',
+                showOtherMonths: true,
+                //dateFormat: 'dd MM yy',
+                dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                //showOn: "button",
+                //buttonImage: "img/calendar-blue.png",
+                //buttonImageOnly: true,
+                });
+     })
 
 function contactUI() {
     $('.nw-contact-item').removeClass('selected');

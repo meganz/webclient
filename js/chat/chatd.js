@@ -575,6 +575,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.MSGID:
                 self.keepAliveTimerRestart();
+
                 self.logger.log("Sent message ID confirmed: '" + base64urlencode(cmd.substr(9,8)) + "'");
 
                 self.chatd.msgconfirm(cmd.substr(1,8), cmd.substr(9,8));
@@ -665,7 +666,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         keyid:  self.chatd.unpack32le(cmd.substr(13,4))
                     }
                 );
-
+                self.chatd.updatekeyid(cmd.substr(1,8), self.chatd.unpack32le(cmd.substr(13,4)), self.chatd.unpack32le(cmd.substr(9,4)));
                 len = 17;
                 break;
             default:
@@ -738,6 +739,15 @@ Chatd.prototype.modify = function(chatId, msgnum, message) {
     }
 
     return this.chatIdMessages[chatId].modify(msgnum, message);
+};
+
+// update keyid based on the returned keyid/keyxid from chatd
+Chatd.prototype.updatekeyid = function(chatId, keyid, keyxid) {
+    if (!this.chatIdMessages[chatId]) {
+        return false;
+    }
+
+    return this.chatIdMessages[chatId].updatekeyid(keyid, keyxid);
 };
 
 Chatd.Shard.prototype.msg = function(chatId, messages) {
@@ -813,7 +823,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
 
         // write the new message to the message buffer and mark as in sending state
         // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
-        this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message.message, keyId];
+        this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message.message, keyId, 0];
 
         this.chatd.trigger('onMessageUpdated', {
             chatId: base64urlencode(this.chatId),
@@ -834,6 +844,16 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
         this.chatd.chatIdShard[this.chatId].msg(this.chatId, messageConstructs);
     }
     return this.highnum;
+};
+
+Chatd.Messages.prototype.updatekeyid = function(keyid, keyxid) {
+    var self = this;
+
+    for (var id = self.lownum; id <= self.highnum; id++) {
+        if (self.buf[id] && (self.buf[id][Chatd.MsgField.KEYID] === keyxid)) {
+            self.buf[id][Chatd.MsgField.KEYID] = keyid;
+        }
+    }
 };
 
 Chatd.Messages.prototype.modify = function(msgnum, message) {
@@ -981,11 +1001,11 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
 
 Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, updated, keyid, msg) {
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg, this.storedkey);
+        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg);
     }
 };
 
-Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg, key) {
+Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, updated, keyid, msg) {
     var id;
 
     if (newmsg) {
@@ -996,7 +1016,7 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
     }
 
     // store message
-    this.buf[id] = [msgid, userId, timestamp, updated, keyid, msg];
+    this.buf[id] = [msgid, userId, timestamp, msg, keyid, updated];
 
     this.chatd.trigger('onMessageStore', {
         chatId: base64urlencode(this.chatId),
@@ -1006,7 +1026,6 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
         ts: timestamp,
         updated: updated,
         keyid : keyid,
-        key : key,
         message: msg,
         isNew: newmsg
     });

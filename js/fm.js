@@ -61,8 +61,9 @@ function initContactsGridScrolling() {
  *
  * @param {String} Textarea wrapper block classname/id. Should start with "." or "#"
  * @param {Number} Textarea max height. Default is 100
+ * @param {Boolean} If we need to bind window resize event
  */
-function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
+function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight, resizeEvent) {
     var $textarea = $(textareaScrollWrapper).find('textarea'),
           $textareaClone,
           textareaLineHeight = parseInt($textarea.css('line-height'))
@@ -74,12 +75,11 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
     }
     $textareaClone = $textarea.next('div');
 
-    $textarea.bind('keyup keydown', function(e) {
-        var $this = $(this),
-              $textareaScrollBlock = $(textareaScrollWrapper),
+    function textareaScrolling(keyEvents) {
+        var $textareaScrollBlock = $(textareaScrollWrapper),
               $textareaCloneSpan,
-              textareaContent = $this.val(),
-              cursorPosition = $this.getCursorPosition(),
+              textareaContent = $textarea.val(),
+              cursorPosition = $textarea.getCursorPosition(),
               jsp = $textareaScrollBlock.data('jsp'),
               viewLimitTop = 0,
               scrPos = 0,
@@ -89,7 +89,7 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
         textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
         textareaContent = textareaContent.replace(/\n/g,'<br />');
         $textareaClone.html(textareaContent+'<br />');
-        $this.height($textareaClone.height());
+        $textarea.height($textareaClone.height());
         $textareaCloneSpan = $textareaClone.children('span');
         scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
         viewRatio = Math.round($textareaCloneSpan.height() + scrPos);
@@ -97,12 +97,14 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
         // Textarea wrapper scrolling init
         if ($textareaClone.height() > textareaMaxHeight) {
             $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
-            if (!jsp) {
-                $this.focus();
+            if (!jsp && keyEvents) {
+                $textarea.focus();
             }
         } else if (jsp) {
             jsp.destroy();
-            $this.focus();
+            if (keyEvents) {
+                $textarea.focus();
+            }
         }
 
         // Scrolling according cursor position
@@ -114,10 +116,10 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
                 jsp.scrollToY(0);
             }
         }
-    });
+    }
 
     // Get textarea cursor position
-    $.fn.getCursorPosition = function(){
+    $.fn.getCursorPosition = function() {
         var el = $(this).get(0),
               pos = 0;
         if ('selectionStart' in el) {
@@ -131,6 +133,22 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight) {
             pos = sel.text.length - selLength;
         }
         return pos;
+    }
+    
+    // Init textarea scrolling
+    textareaScrolling();
+
+    // Reinit scrolling after keyup/keydown/paste events
+    $textarea.on('keyup keydown paste', function() {
+        textareaScrolling(1);
+    });
+
+    // Bind window resize if textarea is resizeable
+    if (resizeEvent) {
+        var eventName = textareaScrollWrapper.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '');
+        $(window).bind('resize.' + eventName, function () {
+            textareaScrolling();
+        });
     }
 }
 

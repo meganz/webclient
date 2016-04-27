@@ -531,10 +531,10 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.MSGUPDX:
                 self.keepAliveTimerRestart();
                 len = self.chatd.unpack32le(cmd.substr(35,4));
-                self.logger.log("Message '" + base64urlencode(cmd.substr(16,8)) + "' EDIT/DELETION: " + cmd.substr(39,len));
+                self.logger.log("Message '" + base64urlencode(cmd.substr(17,8)) + "' EDIT/DELETION: " + cmd.substr(39,len));
                 len += 39;
 
-                self.chatd.msgmodify(cmd.substr(1,8), cmd.substr(9,8), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
+                self.chatd.msgmodify(cmd.substr(1,8), cmd.substr(17,8), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
                 break;
 
             case Chatd.Opcode.SEEN:
@@ -763,11 +763,11 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
 };
 
 Chatd.Shard.prototype.msgupd = function(chatId, msgid, updatedelta, message, keyid) {
-    this.cmd(Chatd.Opcode.MSGUPD, chatId + Chatd.Const.UNDEFINED + msgid + this.chatd.pack16le(updatedelta) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message);
+    this.cmd(Chatd.Opcode.MSGUPD, chatId + Chatd.Const.UNDEFINED + msgid + this.chatd.pack32le(0) + this.chatd.pack16le(updatedelta) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message);
 };
 
 Chatd.Shard.prototype.msgupdx = function(chatId, msgxid, updatedelta, message, keyxid) {
-    this.cmd(Chatd.Opcode.MSGUPDX, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack16le(updatedelta) + this.chatd.pack32le(keyxid) + this.chatd.pack32le(message.length) + message);
+    this.cmd(Chatd.Opcode.MSGUPDX, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(0) + this.chatd.pack16le(updatedelta) + this.chatd.pack32le(keyxid) + this.chatd.pack32le(message.length) + message);
 };
 
 // message storage subsystem

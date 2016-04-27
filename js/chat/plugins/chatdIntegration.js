@@ -1013,22 +1013,18 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
 
     var self = this;
     var rawChatId = base64urldecode(chatRoom.chatId);
-    if (newMessage !== "") {
-        var chatMessages = self.chatd.chatIdMessages[rawChatId];
-        if (!chatMessages) {
-            return;
-        }
 
-        var msg = chatMessages.buf[msgnum];
-        if (!msg) {
-            return;
-        }
-        var keyId = msg[Chatd.MsgField.KEYID];
-        cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId);
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    if (!chatMessages) {
+        return;
     }
-    else {
-        cipher = "";
+
+    var msg = chatMessages.buf[msgnum];
+    if (!msg) {
+        return;
     }
+    var keyId = msg[Chatd.MsgField.KEYID];
+    cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId);
 
     return self.chatd.modify(rawChatId, msgnum, cipher);
 };

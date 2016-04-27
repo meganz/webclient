@@ -712,7 +712,7 @@ var GenericConversationMessage = React.createClass({
                             {datetime}
 
                             {messageActionButtons}
-                            <span>{message.messageId}:{message.orderValue}/{time2date(message.delay)}</span>
+                            <span>{message.messageId}@{message.orderValue}:{message.internalId}/{time2date(message.delay)}</span>
                             {messageNotSendIndicator}
                             {messageDisplayBlock}
                             {buttonsBlock}

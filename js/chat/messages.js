@@ -226,8 +226,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.lastSent = null;
     self.lastDelivered = null;
     self.isRetrievingHistory = false;
-    self.firstMessageId = null;
-    self.lastMessageId = null;
     self.lastDeliveredMessageRetrieved = false;
     self.lastSeenMessageRetrieved = false;
     self.retrievedAllMessages = false;
@@ -316,6 +314,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             //        chatRoom.appendMessage(messageObject);
             //    }
             //});
+            if (self.expectedMessagesCount > 0) {
+                self.retrievedAllMessages = true;
+            }
+            delete self.expectedMessagesCount;
 
             $(self).trigger('onHistoryFinished');
             self.trackDataChange();
@@ -323,44 +325,25 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     });
 
 
-    self.chatd.rebind('onMessagesHistoryInfo.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (!chatRoom) {
-            self.logger.warn("Message not found for: ", e, eventData);
-            return;
-        }
-
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
-            self.firstMessageId = eventData.oldest;
-            self.lastMessageId = eventData.newest;
-            self.haveMessages = true;
-            self.trackDataChange();
-
-            if (!self.messages[eventData.newest]) {
-                self.retrieveChatHistory(true);
-            }
-        }
-    });
-
     self.chatd.rebind('onMessagesHistoryRequest.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.isRetrievingHistory = true;
+            self.expectedMessagesCount = eventData.count * -1;
             self.trackDataChange();
         }
     });
 
     self.chatd.rebind('onMessagesHistoryRetrieve.messagesBuff' + chatRoomId, function(e, eventData) {
-                var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
         if (!chatRoom) {
             self.logger.warn("Message not found for: ", e, eventData);
             return;
         }
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
-                    self.haveMessages = true;
+            self.haveMessages = true;
             self.trackDataChange();
             self.retrieveChatHistory(true);
         }
@@ -390,9 +373,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             if (eventData.messageId === self.lastDelivered) {
                 self.lastDeliveredMessageRetrieved = true;
             }
-            if (eventData.messageId === self.firstMessageId) {
-                self.retrievedAllMessages = true;
-            }
 
             // is my own message?
             // mark as sent, since the msg was echoed from the server
@@ -407,6 +387,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.messages.push(msgObject);
 
             if (!eventData.isNew) {
+                self.expectedMessagesCount--;
                 if (eventData.userId !== u_handle) {
                     if (self.lastDeliveredMessageRetrieved === true) {
                         // received a message from history, which was NOT marked as received, e.g. was sent during
@@ -476,11 +457,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         }
                     );
 
-
+                    self.chatRoom._dequeueMessage(v);
                     self.messages.removeByKey(v.messageId);
                     self.messages.push(confirmedMessage);
-
-                    self.lastMessageId = self.messages.getItem(self.messages.length - 1).messageId;
 
                     if (v.textContents) {
                         self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, confirmedMessage);
@@ -496,6 +475,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             });
             if (!found) {
                 // its ok, this happens when a system/protocol message was sent
+                console.error("Not found: ", eventData.id);
                 return;
             }
         }
@@ -662,7 +642,7 @@ MessagesBuff.prototype.haveMoreHistory = function() {
     if (!self.haveMessages) {
         return false;
     }
-    else if (!self.firstMessageId || !self.messages[self.firstMessageId]) {
+    else if (self.retrievedAllMessages === false) {
         return true;
     }
     else {

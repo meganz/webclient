@@ -1333,8 +1333,8 @@ ChatRoom.prototype.recover = function() {
 ChatRoom.prototype._ensureMessageQueueKvIsInitialised = function() {
     var self = this;
 
-    if (!self._messagesQueueKvStorage) {
-        self._messagesQueueKvStorage = new IndexedDBKVStorage("queuedmsgs", {
+    if (!self.megaChat._messagesQueueKvStorage) {
+        self.megaChat._messagesQueueKvStorage = new IndexedDBKVStorage("queuedmsgs", {
             murSeed: 0x800F0002
         });
     }
@@ -1350,7 +1350,7 @@ ChatRoom.prototype._preloadMessageQueue = function() {
 
     var prefix = self.roomJid.split("@")[0];
 
-    self._messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
+    self.megaChat._messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
         var msg = new KarereEventObjects.OutgoingMessage(
             v.toJid,
             v.fromJid,
@@ -1365,7 +1365,7 @@ ChatRoom.prototype._preloadMessageQueue = function() {
         );
 
         [
-            "textContents", "internalId", "requiresManualRetry"
+            "textContents", "requiresManualRetry"
         ].forEach(function (prop) {
             msg[prop] = v[prop];
         });
@@ -1390,15 +1390,15 @@ ChatRoom.prototype._persistMessageQueue = function(removedItem) {
         self._messagesQueue.forEach(function(msg) {
             var cacheKey = self.roomJid.split("@")[0] + ":" + msg.messageId;
 
-            self._messagesQueueKvStorage.hasItem(cacheKey)
+            self.megaChat._messagesQueueKvStorage.hasItem(cacheKey)
                 .fail(function() {
-                    self._messagesQueueKvStorage.setItem(cacheKey, msg);
+                    self.megaChat._messagesQueueKvStorage.setItem(cacheKey, msg);
                 })
         });
     }
     else {
         var cacheKey = self.roomJid.split("@")[0] + ":" + removedItem.messageId;
-        self._messagesQueueKvStorage.removeItem(cacheKey);
+        self.megaChat._messagesQueueKvStorage.removeItem(cacheKey);
     }
 };
 
@@ -1468,10 +1468,23 @@ ChatRoom.prototype._queueMessage = function(msg) {
 ChatRoom.prototype._dequeueMessage = function(msg) {
     var self = this;
 
-   if(removeValue(self._messagesQueue, msg) === true) {
-       self._persistMessageQueue(msg);
-       self.trackDataChange();
-   }
+    var found = false;
+    self._messagesQueue.forEach(function(v, k) {
+        if(v.messageId === msg.messageId) {
+            self._messagesQueue.splice(k, 1);
+            found = true;
+            return false; // break
+        } else {
+            return true; // continue
+        }
+    });
+    if (!found) {
+        self.logger.warn("Could not dequeue message: ", msg);
+    }
+
+
+   self._persistMessageQueue(msg);
+   self.trackDataChange();
 };
 
 ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {

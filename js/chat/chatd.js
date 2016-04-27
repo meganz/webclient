@@ -49,23 +49,24 @@ var Chatd = function(userId, options) {
         // 'onMessageReceived',
         // 'onMessageLastReceived',
         // 'onRetentionChanged',
-        // 'onMessagesHistoryInfo',
         // 'onMembersUpdated',
         // 'onMessagesHistoryDone',
         // 'onMessagesHistoryRequest',
     ].forEach(function(evt) {
-               if (arguments[1].shard) {
-                   var tmp = $.extend({}, arguments[1]);
-                   delete tmp.shard;
-                   tmp.shard = "shard#" + arguments[1].shard.shard;
-                   console.error(evt, JSON.stringify(
-                       tmp
-                   ));
-               }
-               else {
-                   console.error(evt, JSON.stringify(arguments[1]));
-               }
-           });
+        self.rebind(evt + '.chatd', function(e) {
+            if (arguments[1].shard) {
+                var tmp = $.extend({}, arguments[1]);
+                delete tmp.shard;
+                tmp.shard = "shard#" + arguments[1].shard.shard;
+                console.error(evt, JSON.stringify(
+                    tmp
+                ));
+            }
+            else {
+                console.error(evt, JSON.stringify(arguments[1]));
+            }
+        });
+   });
 };
 
 makeObservable(Chatd);

@@ -2,6 +2,7 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
+var Tooltips = require("./tooltips.jsx");
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
 
@@ -175,6 +176,38 @@ var BrowserEntries = React.createClass({
             var isFolder = node.t === 1;
             var isSelected = self.state.selected.indexOf(node.h) !== -1;
 
+            var tooltipElement = null;
+
+            var icon = <span className={"transfer-filtype-icon " + fileIcon(node)}> </span>;
+
+            if (fileIcon(node) === "graphic" && node.fa) {
+                var src = thumbnails[node.h];
+                if (!src) {
+                    src = M.getNodeByHandle(node.h);
+
+
+                    M.v.push(node);
+                    if (!node.seen) {
+                        node.seen = 1; // HACK
+                    }
+                    delay('thumbnails', fm_thumbnails, 90);
+                    src = window.noThumbURI || '';
+                }
+                icon = <Tooltips.Tooltip withArrow={true}>
+                    <Tooltips.Handler className={"transfer-filtype-icon " + fileIcon(node)}>&nbsp;</Tooltips.Handler>
+                    <Tooltips.Contents className={"img-preview"}>
+                        <div className="dropdown img-wrapper img-block" id={node.h}>
+                            <img alt=""
+                                 className={"thumbnail-placeholder " + node.h}
+                                 src={src}
+                                 width="120"
+                                 height="120"
+                            />
+                        </div>
+                    </Tooltips.Contents>
+                </Tooltips.Tooltip>;
+            }
+
             items.push(
                 <tr
                     className={(isFolder ? " folder" :"") + (isSelected ? " ui-selected" : "")}
@@ -190,7 +223,7 @@ var BrowserEntries = React.createClass({
                         <span className={"grid-status-icon" + (node.fav ? " star" : "")}></span>
                     </td>
                     <td>
-                        <span className={"transfer-filtype-icon " + fileIcon(node)}> </span>
+                        {icon}
                         <span className={"tranfer-filetype-txt"}>{node.name}</span>
                     </td>
                     <td>{!isFolder ? bytesToSize(node.s) : ""}</td>

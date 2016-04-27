@@ -850,7 +850,7 @@ Chatd.Messages.prototype.updatekeyid = function(keyid, keyxid) {
     var self = this;
 
     for (var id = self.lownum; id <= self.highnum; id++) {
-        if (self.buf[id] && (self.buf[id][Chatd.MsgField.KEYID] === keyxid)) {
+        if (self.buf[id] && ((self.buf[id][Chatd.MsgField.KEYID] >>> 0) === keyxid)) {
             self.buf[id][Chatd.MsgField.KEYID] = keyid;
         }
     }

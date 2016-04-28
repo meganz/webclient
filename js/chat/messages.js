@@ -20,7 +20,7 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'delay': true,
 
             'orderValue': false,
-
+            'updated': false,
             'sent': false,
             'deleted': false,
             'revoked': false,
@@ -430,6 +430,48 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (self.chatRoom.chatId !== chatRoom.chatId) {
             return; // ignore event
+        }
+
+        if (eventData.state === "EDITED") {
+            var editedMessage = new Message(
+                chatRoom,
+                self,
+                {
+                    'messageId': eventData.messageId,
+                    'userId': u_handle,
+                    'keyid': eventData.keyid,
+                    'message': eventData.message,
+                    'updated': eventData.updated,
+                    'orderValue': eventData.id,
+                    'sent': true
+                }
+            );
+            var _runDecryption = function() {
+                try {
+                        var decrypted = chatRoom.protocolHandler.decryptFrom(
+                            editedMessage.message,
+                            editedMessage.userId,
+                            editedMessage.keyid,
+                            false
+                        );
+                        if (decrypted) {
+                            //if the edited payload is an empty string, it means the message has been deleted.
+                            chatRoom.messagesBuff.messages[editedMessage.messageId].textContents = decrypted.payload;
+                            self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, chatRoom.messagesBuff.messages[editedMessage.messageId]);
+                        }
+                    } catch(e) {
+                        self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
+                    }
+                };
+
+                var promises = [];
+                promises.push(
+                    ChatdIntegration._ensureKeysAreLoaded([editedMessage])
+                );
+
+                MegaPromise.allDone(promises).always(function() {
+                    _runDecryption();
+                });
         }
         if (eventData.state === "CONFIRMED") {
             self.haveMessages = true;

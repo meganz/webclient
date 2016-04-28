@@ -865,12 +865,13 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     var keyid = this.buf[msgnum][Chatd.MsgField.KEYID];
 
     // modify pending message so that a potential resend includes the change
+    this.buf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
     if (this.sending[this.buf[msgnum][Chatd.MsgField.MSGID]]) {
         this.buf[msgnum][Chatd.MsgField.MESSAGE] = message;
-        self.chatd.chatIdShard[this.chatId].msgupdx(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1, message, this.buf[msgnum][Chatd.MsgField.KEYID]);
+        self.chatd.chatIdShard[this.chatId].msgupdx(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.UPDATED], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
     }
     else if (self.chatd.chatIdShard[this.chatId].isOnline()) {
-        self.chatd.chatIdShard[this.chatId].msgupd(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1, message, this.buf[msgnum][Chatd.MsgField.KEYID]);
+        self.chatd.chatIdShard[this.chatId].msgupd(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.UPDATED], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
     }
 
     this.chatd.trigger('onMessageModify', {
@@ -922,6 +923,7 @@ Chatd.Messages.prototype.resend = function() {
             self.chatd.chatIdShard[this.chatId].msgupd(
                 this.chatId,
                 this.buf[msgnum][Chatd.MsgField.MSGID],
+                this.buf[msgnum][Chatd.MsgField.UPDATED],
                 this.buf[msgnum][Chatd.MsgField.MESSAGE],
                 this.buf[msgnum][Chatd.MsgField.KEYID]
             );
@@ -996,7 +998,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
 
     // we now have a proper msgid, resend MSGUPD in case the edit crossed the execution of the command
     if (this.modified[num]) {
-        self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, this.buf[num][Chatd.MsgField.MESSAGE], this.buf[num][Chatd.MsgField.KEYID]);
+        self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, this.buf[num][Chatd.MsgField.UPDATED], this.buf[num][Chatd.MsgField.MESSAGE], this.buf[num][Chatd.MsgField.KEYID]);
     }
 };
 
@@ -1039,25 +1041,26 @@ Chatd.prototype.msgmodify = function(chatId, msgid, updated, keyid, msg) {
     }
 };
 
-Chatd.Messages.prototype.msgmodify = function(chatId, msgid, updated, keyid, msg) {
+Chatd.Messages.prototype.msgmodify = function(msgid, updated, keyid, msg) {
     // CHECK: is it more efficient to maintain a full hash msgid -> num?
     // FIXME: eliminate namespace clash collision risk
     for (var i = this.highnum; i > this.lownum; i--) {
         if (this.buf[i][Chatd.MsgField.MSGID] === msgid) {
             // if we modified the message, remove from this.modified.
-            // if someone else did before us, resend the MSGUPD (might be redundant)
-            if (this.modified[i]) {
-                if (this.buf[i][Chatd.MsgField.MESSAGE] === msg) {
-                    delete this.modified[i];
-                }
-                else {
-                    this.chatd.chatIdShard[chatId].msgupd(chatId, msgid, msg, keyid);
-                }
-            }
-            else {
-                this.buf[i][Chatd.MsgField.MESSAGE] = msg;
-                this.buf[i][Chatd.MsgField.UPDATED] = updated;
-            }
+
+            this.buf[i][Chatd.MsgField.MESSAGE] = msg;
+            this.buf[i][Chatd.MsgField.UPDATED] = updated;
+
+            this.chatd.trigger('onMessageUpdated', {
+                chatId: base64urlencode(this.chatId),
+                id: i,
+                state: 'EDITED',
+                keyid: keyid,
+                message: msg,
+                messageId : base64urlencode(msgid),
+                updated: updated - 1
+            });
+            delete this.modified[i];
 
             break;
         }

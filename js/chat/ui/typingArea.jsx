@@ -77,6 +77,12 @@ var TypingArea = React.createClass({
             self.typingTimeout = null;
         }
 
+        if (self.iAmTyping) {
+            // only trigger event if needed.
+            if (self.props.onUpdate) {
+                self.props.onUpdate();
+            }
+        }
         if (room && room.state === ChatRoom.STATE.READY && self.iAmTyping === true) {
             room.megaChat.karere.sendComposingPaused(room.roomJid);
             self.iAmTyping = false;
@@ -143,9 +149,9 @@ var TypingArea = React.createClass({
             self.typing();
         }
 
-        if (self.props.onUpdate) {
-            self.props.onUpdate();
-        }
+        // if (self.props.onUpdate) {
+        //     self.props.onUpdate();
+        // }
     },
     focusTypeArea: function () {
         if (this.props.disabled) {
@@ -165,6 +171,9 @@ var TypingArea = React.createClass({
 
         var $container = $(ReactDOM.findDOMNode(this));
         initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
+        $('.chat-textarea-scroll textarea', $container).rebind('autoresized.typingArea', function() {
+            self.handleWindowResize();
+        });
 
     },
     componentWillUnmount: function() {
@@ -198,6 +207,10 @@ var TypingArea = React.createClass({
 
         var $container = $(ReactDOM.findDOMNode(this));
         $('.chat-textarea-scroll', $container).triggerHandler('keyup');
+
+        if (self.props.onUpdate) {
+            self.props.onUpdate();
+        }
 
     },
     isActive: function () {

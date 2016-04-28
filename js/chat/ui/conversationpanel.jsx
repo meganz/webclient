@@ -1405,6 +1405,7 @@ var ConversationPanel = React.createClass({
                                 disabled={room.isReadOnly()}
                                 onUpdate={() => {
                                     self.handleWindowResize();
+                                    $('.jScrollPaneContainer', self.findDOMNode()).trigger('forceResize');
                                 }}
                                 onConfirm={(messageContents) => {
                                     self.props.chatRoom.sendMessage(messageContents);

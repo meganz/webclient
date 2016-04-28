@@ -44,6 +44,9 @@ var JScrollPane = React.createClass({
             }
         });
 
+        $elem.rebind('forceResize.jsp' + self.getUniqueId(), function(e) {
+            self.onResize();
+        });
         $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize);
         self.onResize();
     },

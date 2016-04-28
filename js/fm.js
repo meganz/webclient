@@ -117,6 +117,7 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
                 jsp.scrollToY(0);
             }
         }
+        $textarea.trigger('autoresized');
     }
 
     // Get textarea cursor position

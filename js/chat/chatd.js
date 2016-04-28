@@ -828,6 +828,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
 
         this.chatd.trigger('onMessageUpdated', {
             chatId: base64urlencode(this.chatId),
+            userId: base64urlencode(this.buf[this.highnum][Chatd.MsgField.USERID]),
             id: this.highnum,
             state: 'PENDING',
             keyid: keyId,
@@ -882,6 +883,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
 
     this.chatd.trigger('onMessageUpdated', {
         chatId: base64urlencode(this.chatId),
+        userId: base64urlencode(this.buf[msgnum][Chatd.MsgField.USERID]),
         id: msgnum,
         state: 'EDITING',
         keyid: keyid,
@@ -972,6 +974,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     this.buf[num][Chatd.MsgField.MSGID] = msgid;
     this.chatd.trigger('onMessageUpdated', {
         chatId: base64urlencode(chatId),
+        userId: base64urlencode(this.buf[num][Chatd.MsgField.USERID]),
         id: num,
         state: "CONFIRMED",
         messageId: base64urlencode(msgid),
@@ -1053,6 +1056,7 @@ Chatd.Messages.prototype.msgmodify = function(msgid, updated, keyid, msg) {
 
             this.chatd.trigger('onMessageUpdated', {
                 chatId: base64urlencode(this.chatId),
+                userId: base64urlencode(this.buf[i][Chatd.MsgField.USERID]),
                 id: i,
                 state: 'EDITED',
                 keyid: keyid,

@@ -438,7 +438,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self,
                 {
                     'messageId': eventData.messageId,
-                    'userId': u_handle,
+                    'userId': eventData.userId,
                     'keyid': eventData.keyid,
                     'message': eventData.message,
                     'updated': eventData.updated,
@@ -489,7 +489,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         self,
                         {
                             'messageId': eventData.messageId,
-                            'userId': u_handle,
+                            'userId': eventData.userId,
                             'keyid': eventData.keyid,
                             'message': eventData.message,
                             'textContents': v.textContents ? v.textContents : "",

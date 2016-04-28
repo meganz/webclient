@@ -701,7 +701,9 @@ var ConversationPanel = React.createClass({
             attachCloudDialog: false,
             messagesToggledInCall: false,
             editingMessageId: false,
-            sendContactDialog: false
+            sendContactDialog: false,
+            confirmDeleteDialog: false,
+            messageToBeDeleted: null
         };
     },
 
@@ -1195,8 +1197,14 @@ var ConversationPanel = React.createClass({
                             grouped={grouped}
                             isBeingEdited={self.state.editingMessageId === v.messageId}
                             onEditDone={(messageContents) => {
-                            self.setState({'editingMessageId': false});
-                        }}
+                                self.setState({'editingMessageId': false});
+                            }}
+                            onDeleteClicked={(e, msg) => {
+                                self.setState({
+                                    'confirmDeleteDialog': true,
+                                    'messageToBeDeleted': msg
+                                });
+                            }}
                         />
                     );
                 }
@@ -1291,6 +1299,47 @@ var ConversationPanel = React.createClass({
                 }}
             />
         }
+        
+        var confirmDeleteDialog = null;
+        if (self.state.confirmDeleteDialog === true) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__("Delete message")}
+                name="delete-message"
+                onClose={() => {
+                    self.setState({'confirmDeleteDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    var msg = self.state.messageToBeDeleted;
+                    if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED) {
+                        room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.orderValue);
+                    }
+
+                    msg.message = "";
+                    msg.deleted = true;
+
+                    self.setState({
+                        'confirmDeleteDialog': false,
+                        'messageToBeDeleted': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__("Are you sure you want to delete this message?")}
+                    </div>
+
+                    <GenericConversationMessage
+                        className="dialog-wrapper"
+                        message={self.state.messageToBeDeleted}
+                        chatRoom={room}
+                        hideActionButtons={true}
+                    />
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
 
         var additionalClass = "";
         if (
@@ -1348,6 +1397,7 @@ var ConversationPanel = React.createClass({
 
                     {attachCloudDialog}
                     {sendContactDialog}
+                    {confirmDeleteDialog}
 
 
                     <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">

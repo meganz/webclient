@@ -106,7 +106,7 @@
     line-height: 20px;
     color: #666666;
 }
-.message.body.dialog-wraper {
+.message.body.dialog-wrapper {
     border: 1px solid rgba(0,0,0,0.05);
     background-color: rgba(0,0,0,0.02);
     -webkit-box-sizing: border-box;
@@ -118,10 +118,10 @@
     margin: 24px 12px;
     padding: 13px 15px 13px 15px;
 }
-.dialog-wraper .message.text-block {
+.dialog-wrapper .message.text-block {
     margin-right: 0;
 }
-.dialog-wraper .message.text-block {
+.dialog-wrapper .message.text-block {
     font-size: 14px;
     color: #666666;
 }

@@ -12,14 +12,8 @@ var GenericConversationMessage = React.createClass({
     doDelete: function(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
-        var chatRoom = this.props.chatRoom;
 
-        if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED) {
-            chatRoom.megaChat.plugins.chatdIntegration.deleteMessage(chatRoom, msg.orderValue);
-        }
-
-        msg.message = "";
-        msg.deleted = true;
+        this.props.onDeleteClicked(e, this.props.message);
     },
     doCancelRetry: function(e, msg) {
         e.preventDefault(e);
@@ -51,7 +45,6 @@ var GenericConversationMessage = React.createClass({
     },
     render: function () {
         var self = this;
-        var cssClasses = "message body";
 
         var message = this.props.message;
         var megaChat = this.props.chatRoom.megaChat;
@@ -68,6 +61,10 @@ var GenericConversationMessage = React.createClass({
         var spinnerElement = null;
         var messageNotSendIndicator = null;
         var messageIsNowBeingSent = false;
+
+        if (this.props.className) {
+            additionalClasses += this.props.className;
+        }
 
         // if this is a text msg.
         if (
@@ -609,6 +606,11 @@ var GenericConversationMessage = React.createClass({
                 }
             }
             else {
+                // this is a text message.
+
+                if (message.textContents === "") {
+                    message.deleted = true;
+                }
                 var messageActionButtons = null;
                 if (message.getState() === Message.STATE.NOT_SENT) {
                     messageActionButtons = null;
@@ -675,6 +677,17 @@ var GenericConversationMessage = React.createClass({
                     >
                     </TypingAreaUI.TypingArea>;
                 }
+                else if(message.deleted) {
+                    messageDisplayBlock =  <div className="message text-block">
+                        <em>
+                            <span className="dropdown body notification dropdown-arrow down-arrow">
+                                <i className="dropdown-white-arrow"></i>
+                                This message was deleted by the user or just failed to decrypt.
+                            </span>
+                            {__("This message has been deleted or failed to decrypt.")}
+                        </em>
+                    </div>;
+                }
                 else {
                     messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>;
                 }
@@ -711,8 +724,7 @@ var GenericConversationMessage = React.createClass({
                             {name}
                             {datetime}
 
-                            {messageActionButtons}
-                            <span>{message.messageId}@{message.orderValue}:{message.internalId}/{time2date(message.delay)}</span>
+                            {self.props.hideActionButtons ? null : messageActionButtons}
                             {messageNotSendIndicator}
                             {messageDisplayBlock}
                             {buttonsBlock}
@@ -824,7 +836,7 @@ var GenericConversationMessage = React.createClass({
             }
 
             return (
-                <div className="message body" data-id={"id" + message.messageId}>
+                <div className={message.messageId + " message body" + additionalClasses} data-id={"id" + message.messageId}>
                     <div className="feedback round-icon-block">
                         <i className={"round-icon " + message.cssClass}></i>
                     </div>

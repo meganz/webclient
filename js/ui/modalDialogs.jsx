@@ -3,8 +3,15 @@ var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 var Tooltips = require("./tooltips.jsx");
+var Forms = require("./forms.jsx");
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
+
+var ExtraFooterElement = React.createClass({
+    render() {
+        return this.props.children;
+    }
+});
 
 var ModalDialog = React.createClass({
     mixins: [MegaRenderMixin],
@@ -48,17 +55,39 @@ var ModalDialog = React.createClass({
             self.props.onClose(self);
         }
     },
-    renderChildren: function () {
-        return React.Children.map(this.props.children, function (child) {
-            return React.cloneElement(child, {});
-        }.bind(this))
-    },
     render: function() {
         var self = this;
 
         var classes = "fm-dialog " + self.props.className;
 
         var footer = null;
+
+        var extraFooterElements = [];
+        var otherElements = [];
+
+        var x = 0;
+        React.Children.forEach(self.props.children, function (child) {
+            if (!child) {
+                // skip if undefined
+                return;
+            }
+
+            if (
+                child.type.displayName === 'ExtraFooterElement'
+            ) {
+                extraFooterElements.push(React.cloneElement(child, {
+                    key: x++
+                }));
+            }
+            else {
+                otherElements.push(
+                    React.cloneElement(child, {
+                        key: x++
+                    })
+                );
+            }
+        }.bind(this));
+
 
         if(self.props.buttons) {
             var buttons = [];
@@ -75,6 +104,7 @@ var ModalDialog = React.createClass({
             });
 
             footer = <div className="fm-dialog-footer">
+                {extraFooterElements}
                 {buttons}
                 <div className="clear"></div>
             </div>;
@@ -89,7 +119,7 @@ var ModalDialog = React.createClass({
                     }
 
                     <div className="fm-dialog-content">
-                        {self.renderChildren()}
+                        {otherElements}
                     </div>
 
                     {footer}
@@ -523,9 +553,98 @@ var SelectContactDialog = React.createClass({
     }
 });
 
+var ConfirmDialog = React.createClass({
+    mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            'confirmLabel': __("Continue"),
+            'cancelLabel': __("Cancel")
+        }
+    },
+    getInitialState: function() {
+        return {
+        }
+    },
+    onConfirmClicked: function() {
+        if (this.props.onConfirmClicked) {
+            this.props.onConfirmClicked();
+        }
+    },
+    render: function() {
+        var self = this;
+
+        if (mega.config.get('confirmModal_' + self.props.name) === true)  {
+            if (this.props.onConfirmClicked) {
+                // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
+                setTimeout(function() {
+                    self.props.onConfirmClicked();
+                }, 75);
+            }
+            return null;
+        }
+
+        var classes = "delete-message " + self.props.className;
+
+
+        return (
+            <ModalDialog
+                title={this.props.title}
+                className={classes}
+                onClose={() => {
+                    self.props.onClose(self);
+                }}
+                buttons={[
+                        {
+                            "label": self.props.confirmLabel,
+                            "key": "select",
+                            "className": null,
+                            "onClick": function(e) {
+                                self.onConfirmClicked();
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        },
+                        {
+                            "label": self.props.cancelLabel,
+                            "key": "cancel",
+                            "onClick": function(e) {
+                                self.props.onClose(self);
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        },
+            ]}>
+                <div className="fm-dialog-content">
+                    {self.props.children}
+                </div>
+                <ExtraFooterElement>
+                    <div className="footer-checkbox">
+                        <Forms.Checkbox
+                            name="delete-confirm"
+                            id="delete-confirm"
+                            onLabelClick={(e, state) => {
+                                console.error(e, state);
+                                if (state === true) {
+                                    mega.config.set('confirmModal_' + self.props.name, true);
+                                }
+                                else {
+                                    mega.config.set('confirmModal_' + self.props.name, false);
+                                }
+                            }}
+                            >
+                            {l['7039']}
+                            </Forms.Checkbox>
+                    </div>
+                </ExtraFooterElement>
+            </ModalDialog>
+        );
+    }
+});
 
 module.exports = window.ModalDialogUI = {
     ModalDialog,
     CloudBrowserDialog,
-    SelectContactDialog
+    SelectContactDialog,
+    ConfirmDialog,
+    ExtraFooterElement
 };

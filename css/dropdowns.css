@@ -155,15 +155,13 @@
     display: block;
 }
 .dropdown.notification-text {
-    height: 32px;
     font-size: 14px;
-    line-height: 32px;
+    line-height: 19px;
     color: #666666; white-space:nowrap;
-    padding:0 15px 0 12px;
+    padding: 7px 15px 5px 12px;
 }
 .dropdown.notification-text i {
-    margin: 0 5px 0 0;
-    vertical-align: middle;
+    margin: 0 8px 0 -1px;
 }
 .dropdown.body.tooltip {
     position: fixed;

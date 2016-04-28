@@ -923,7 +923,6 @@ function transferPanelContextMenu(target)
         }
     }
 
-
     // XXX: Hide context-menu's menu-up/down items for now to check if that's the
     // origin of some problems, users can still use the new d&d logic to move transfers
     menuitems.filter('.move-up,.move-down').hide();
@@ -6248,12 +6247,54 @@ function contextMenuUI(e, ll) {
         }
     });
 
+    setContextMenuGetLinkText();
     adjustContextMenuPosition(e, m);
 
     disableCircularTargets('#fi_');
 
     m.removeClass('hidden');
     e.preventDefault();
+}
+
+/**
+ * Sets the text in the context menu for the Get link and Remove link items. If there are
+ * more than one nodes selected then the text will be pluralised. If all the selected nodes
+ * have public links already then the text will change to 'Update link/s'.
+ */
+function setContextMenuGetLinkText() {
+            
+    var numOfExistingPublicLinks = 0;
+    var numOfSelectedNodes = $.selected.length;
+    var getLinkText = '';
+    
+    // Loop through all selected nodes
+    for (var i = 0; i < numOfSelectedNodes; i++) {
+        
+        // Get the node handle of the current node
+        var nodeHandle = $.selected[i];
+        
+        // If it has a public link, then increment the count
+        if (typeof M.d[nodeHandle].ph !== 'undefined') {
+            numOfExistingPublicLinks++;
+        }
+    }
+    
+    // If all the selected nodes have existing public links, set text to 'Update links' or 'Update link'
+    if (numOfSelectedNodes === numOfExistingPublicLinks) {
+        getLinkText = (numOfSelectedNodes > 1) ? l[8733] : l[8732];
+    }
+    else {
+        // Otherwise change text to 'Get links' or 'Get link' if there are selected nodes without links
+        getLinkText = (numOfSelectedNodes > 1) ? l[8734] : l[59];
+    }
+    
+    // If there are multiple nodes with existing links selected, set text to 'Remove links', otherwise 'Remove link'
+    var removeLinkText = (numOfExistingPublicLinks > 1) ? l[8735] : l[6821];
+    
+    // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
+    var $contextMenu = $('.context-menu');
+    $contextMenu.find('.getlink-menu-text').text(getLinkText);
+    $contextMenu.find('.removelink-menu-text').text(removeLinkText);
 }
 
 /**
@@ -9176,7 +9217,12 @@ function itemExportLinkHtml(item) {
 
     var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize, folderClass = '',
         html = '';
-
+        
+    var nodeHandle = item.h;
+    
+    // Add a hover text for the icon
+    var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
+    
     // Shared item type is folder
     if (item.t) {
         type = 'F';
@@ -9195,11 +9241,16 @@ function itemExportLinkHtml(item) {
     fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
     fileUrlKey = key ? '!' + a32_to_base64(key) : '';
 
-    html = '<div class="export-link-item' + folderClass + '">'
+    html = '<div class="export-link-item' + folderClass + '" data-node-handle="' + nodeHandle + '">'
          +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
          +      '<div class="export-link-text-pad">'
          +          '<div class="export-link-txt">'
-         +               '<span class="export-item-title">' + htmlentities(item.name) + '</span><span class="export-link-gray-txt">' + fileSize + '</span>'
+         +               '<span class="export-item-title">' + htmlentities(item.name) + '</span>'
+         +               '<span class="export-link-gray-txt">' + fileSize + '</span>'
+         +               '<span class="export-link-expiry-container hidden">'
+         +                    '<span class="export-link-expiry-icon" title="' + expiresTitleText + '"></span>'
+         +                    '<span class="export-link-expiry"></span>'
+         +               '</span>'
          +          '</div>'
          +          '<div id="file-link-block" class="file-link-block">'
          +              '<span class="icon"></span>'
@@ -10829,20 +10880,6 @@ function fingerprintDialog(userid) {
         });
     fm_showoverlay();
 }
-
-
-    $( '#datepicker' ).datepicker({
-                 inline: true,
-                //nextText: '&rarr;',
-                //prevText: '&larr;',
-                showOtherMonths: true,
-                //dateFormat: 'dd MM yy',
-                dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                //showOn: "button",
-                //buttonImage: "img/calendar-blue.png",
-                //buttonImageOnly: true,
-                });
-     })
 
 function contactUI() {
     $('.nw-contact-item').removeClass('selected');

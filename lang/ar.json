@@ -3286,6 +3286,13 @@
     "8760": "\u0627\u0644\u0631\u0648\u0627\u0628\u0637 \u0645\u062d\u0630\u0648\u0641\u0629",
     "8761": " \u200f\u0627\u062d\u0641\u0638 \u0627\u0644\u0635\u0648\u0631",
     "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+    "8763": "Sun",
+    "8764": "Mon",
+    "8765": "Tue",
+    "8766": "Wed",
+    "8767": "Thu",
+    "8768": "Fri",
+    "8769": "Sat",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3368,6 +3375,13 @@
         "learn-more": 8742,
         "payment-success-message": 8755,
         "empty-contacts": 6786,
-        "ephemeral-create-account-message": 8762
+        "ephemeral-create-account-message": 8762,
+        "sun": 8763,
+        "mon": 8764,
+        "tue": 8765,
+        "wed": 8766,
+        "thu": 8767,
+        "fri": 8768,
+        "sat": 8769
     }
 }

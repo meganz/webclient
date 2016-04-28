@@ -3560,7 +3560,7 @@ img.blog-new-logos {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: 2px -496px;
     background-repeat: no-repeat;
     -webkit-transition: background-color 200ms ease-in-out;
@@ -3624,7 +3624,7 @@ img.blog-new-logos {
     bottom: -16px;
     left: 50%;
     margin: 0 0 0 -8px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -5px -2117px;
     background-repeat: no-repeat;
 }
@@ -3663,7 +3663,7 @@ img.blog-new-logos {
     height: 18px;
     left: 11px;
     top: 6px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -132px -3180px;
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
@@ -6145,7 +6145,7 @@ table {
     background-position: -14px -7566px;
 }
 .rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.folder-shared {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -7px -1974px;
 }
 .focused .rename-input-bl .transfer-filtype-icon.folder {
@@ -6477,7 +6477,7 @@ table {
     background-position: center -4614px;
 }
 .export-icon.folder-shared, .export-icon.folder {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -7px -2680px;
 }
 .dragger-icon.flash, .export-icon.flash, .share-folder-icon div.flash {
@@ -7842,7 +7842,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #666666;
     padding: 0 10px 0 42px;
     margin: 0;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: 3px -1890px;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -7863,7 +7863,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     border-radius: 5px;
     background-color: rgba(0,0,0,0.05);
     height: 50px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -3px -3527px;
     background-repeat: no-repeat;
     padding: 0 0 0 31px;
@@ -8253,7 +8253,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     position: relative;
 }
 .dlkey-dialog .decryption-key .icon {
-    background-image: url("../images/mega/dialogs-sprite_v8.svg");
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -6px -5510px;
     background-repeat: no-repeat;
     height: 22px;
@@ -8754,12 +8754,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     opacity: 0.01;
     width: 10px;
 }
-.fm-dialog-close, .btn-close-dialog, .ui-datepicker-close, .export-links-warning-close {
+.fm-dialog-close, .btn-close-dialog, .export-links-warning-close {
     cursor: pointer;
     height: 30px;
     width: 30px;
     background-position: -53px -4825px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     position: absolute;
     right: 10px;
@@ -9226,7 +9226,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     float: left;
     width: 106px;
     height: 75px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
 }
 .notification-dialog .fm-notification-icon {
@@ -9310,7 +9310,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     display: inline;
 }
 .delete-contact.multiple .fm-del-contact-avatar {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: -5px -3080px;
     background-color: rgba(0,0,0,0.2);
@@ -9333,7 +9333,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     line-height: 21px;
     color: #999999;
     padding: 15px 0 0 23px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -1px -1829px;
     background-repeat: no-repeat;
 }
@@ -9355,7 +9355,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 100%;
     position: absolute;
     left: 0;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: left -2771px;
     background-repeat: repeat-x;
     z-index: 100;
@@ -9412,13 +9412,40 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding-right: 10px;
 }
 .export-link-gray-txt {
-    color: #999999;
+    color: #999;
     display: table-cell;
     font-size: 14px;
     line-height: 24px;
     border-left: 2px solid rgba(0,0,0,0.05);
     padding-left: 10px;
+    padding-right: 10px;
     height: 24px;
+    vertical-align: top;
+}
+.export-link-expiry-container {
+    border-left: 2px solid rgba(0,0,0,0.05);
+    display: table-cell;
+    padding-left: 10px;
+    position: relative;    
+}
+.export-link-expiry-icon {
+    background-image: url("../images/mega/dialogs-sprite_v10.svg");
+    background-position: -138px -5513px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 18px;
+    left: 10px;
+    position: absolute;
+    top: 3px;
+    width: 18px;
+    z-index: 1;
+}
+.export-link-expiry {
+    color: #999;
+    font-size: 14px;
+    height: 24px;
+    line-height: 24px;
+    padding-left: 25px;
     vertical-align: top;
 }
 .copy-keys-button {
@@ -9597,7 +9624,7 @@ span.orange {
     width: 30px;
     float: right;
     background-position: -54px -4874px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -9713,20 +9740,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .shared-with-me.read-only .properties-elements-counter span {
     background-color: #61D2FF;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -81px -238px;
     background-repeat: no-repeat;
 }
 .shared-with-me.read-and-write .properties-elements-counter span {
     background-color: #FFD300;
     background-position: -81px -207px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
 }
 .shared-with-me.full-access .properties-elements-counter span {
     background-color: #00E22C;
     background-position: -81px -174px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
 }
 .multiple .properties-file-icon div:nth-child(2) {
@@ -10688,7 +10715,7 @@ table {
     background-position: 5px -3716px;
 }
 .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
 }
 .full-access .context-menu-icon {
@@ -17433,7 +17460,7 @@ code, c {
 }
 .notification-empty-icon {
     height: 225px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: center -3245px;
     background-repeat: no-repeat;
 }
@@ -19718,7 +19745,7 @@ span.incoming-call-name {
     top: 4px;
     width: 32px;
     height: 16px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -2px -3669px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -19747,7 +19774,7 @@ span.incoming-call-name {
     display: block;
     width: 32px;
     height: 16px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -122px -3719px;
     background-repeat: no-repeat;
 }
@@ -20381,7 +20408,7 @@ ul.token-input-list-mega {
 }
 .multiple-input-warning .arrow {
     height: 32px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: right -2009px;
     position: absolute;
@@ -20437,7 +20464,7 @@ li.token-input-token-mega p {
 li.token-input-token-mega .input-close {
     height: 20px;
     width: 10px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -94px -460px;
     background-repeat: no-repeat;
     display: block;
@@ -20612,7 +20639,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     left: 50%;
     margin-left: -9px;
     width: 18px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: left -3831px;
 }
@@ -20641,7 +20668,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: center -535px;
     -webkit-box-shadow: none;
@@ -20688,13 +20715,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     cursor: pointer;
 }
 .share-search-result.selected {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: right -748px;
 }
 .share-dialog-img {
     height: 90px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: center 8px;
 }
@@ -20703,7 +20730,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 25px;
     height: 25px;
     z-index: 10;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -81px -84px;
     background-repeat: no-repeat;
 }
@@ -20750,7 +20777,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 25px;
     height: 25px;
     left: 0;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -89px -134px;
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -20818,27 +20845,162 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .share-dialog-permissions {
     float: right;
 }
+.expiry-date-select-container {
+    position: relative;
+}
 .expiry-date-select {
-    padding-left: 10px;
+    padding-left: 0;
+    text-indent: 10px;
     width: 162px;
 }
 .pro-only .expiry-date-select {
     cursor: default;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
     opacity: 0.3;
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
 }
+
+/* Style for datepicker dialog (override existing jQuery UI ones) */
+#ui-datepicker-div {
+    width: auto;
+}
+#ui-datepicker-div .ui-state-default.ui-state-active,
+#ui-datepicker-div .ui-widget-content .ui-state-default.ui-state-active,
+#ui-datepicker-div .ui-widget-header .ui-state-default.ui-state-active {
+    background: #777;
+    border: medium none;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 0;
+}
+#ui-datepicker-div a.ui-state-default.ui-state-hover {
+  background: #777 none repeat scroll 0 0;
+  border: medium none;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+#ui-datepicker-div td span,
+#ui-datepicker-div td a {
+    padding: 7px 0.2em;
+    text-align: center;
+}
+#ui-datepicker-div .ui-state-default,
+#ui-datepicker-div .ui-widget-content .ui-state-default,
+#ui-datepicker-div .ui-widget-header .ui-state-default {
+    background: none;
+    border: medium none;
+    color: #777;
+}
+#ui-datepicker-div .ui-datepicker-title {
+    color: #666;
+    font-family: "source_sans_prolight";
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 28px;
+    margin: 0 90px;
+    text-align: center;
+}
+#ui-datepicker-div .ui-icon.ui-icon-circle-triangle-w {
+    background: rgba(0, 0, 0, 0) url("../images/mega/dialogs-sprite_v10.svg") no-repeat scroll -138px -5392px;
+    height: 24px;
+    width: 24px;
+}
+#ui-datepicker-div .ui-icon.ui-icon-circle-triangle-e {
+    background: rgba(0, 0, 0, 0) url("../images/mega/dialogs-sprite_v10.svg") no-repeat scroll -138px -5431px;
+    height: 24px;
+    width: 24px;
+}
+#ui-datepicker-div .ui-datepicker-prev {
+    cursor: pointer;
+    height: auto;
+    left: 88px;
+    top: 13px;
+    width: auto;
+}
+#ui-datepicker-div .ui-datepicker-prev.ui-state-hover.ui-datepicker-prev-hover {
+    background: none;
+    border: medium none;
+}
+#ui-datepicker-div .ui-datepicker-next {
+    border: medium none;
+    cursor: pointer;
+    display: inline-block;
+    height: auto;
+    right: 87px;
+    top: 13px;
+    width: auto;
+}
+#ui-datepicker-div .ui-datepicker-next.ui-state-hover.ui-datepicker-next-hover {
+    background: none;
+    border: medium none;
+}
+#ui-datepicker-div th {
+    border: 0 none;
+    color: #666;
+    font-family: "source_sans_prolight";
+    font-size: 13px;
+    font-weight: normal;
+    letter-spacing: 0;
+    padding: 0 0 16px 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+#ui-datepicker-div td {
+    border: 0 none;
+    height: 32px;
+    padding: 0;
+    width: 43px;
+}
+#ui-datepicker-div .ui-widget-header {
+    background: none;
+    border: medium none;
+    color: #777;
+    font-family: "source_sans_prolight";
+    font-weight: normal;
+    margin-bottom: 15px;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+#ui-datepicker-div .ui-state-disabled,
+#ui-datepicker-div .ui-widget-content .ui-state-disabled,
+#ui-datepicker-div .ui-widget-header .ui-state-disabled {
+    color: #999;
+    font-family: "source_sans_prolight";
+    font-size: 12px;
+    letter-spacing: 0;
+}
+#ui-datepicker-div .ui-widget-header .close-icon {
+    background: red;
+    height: 5px;
+    width: 5px;
+}
+#ui-datepicker-div .ui-datepicker-buttonpane {
+    border: medium none;
+}
+#ui-datepicker-div.ui-widget-content .ui-datepicker-buttonpane .ui-datepicker-close {
+    background: rgba(0, 0, 0, 0) url("../images/mega/dialogs-sprite_v10.svg") no-repeat scroll -135px -5350px;
+    height: 24px;
+    position: absolute;
+    right: 12px;
+    top: 6px;
+    width: 24px;
+}
+
 /* New style radio buttons */
 .fm-links-export-options {
     margin-top: 10px;
 }
 .fm-link-select-label {
+    color: #777;
+    font-family: "source_sans_prosemibold";
     font-size: 13px;
     line-height: 17px;
-    color: #666666;
     margin-left: 22px;
 }
 .fm-link-select-label a {
@@ -20888,7 +21050,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 }
 .button-separator {
-    border-left: 1px solid #ebebeb;
+    border-left: 2px solid #ebebeb;
     display: inline-block;
     height: 13px;
     margin: 9px 10px 0 10px;
@@ -20896,7 +21058,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     vertical-align: top;
 }
 .link-handle .icon, .link-decryption-key .icon, .link-handle-and-key .icon, .file-link-block .icon {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -9px -5350px;
     background-repeat: no-repeat;
     height: 22px;
@@ -20908,7 +21070,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-position: -9px -5430px;
 }
 .link-decryption-key .icon {
-    background-position: -6px -5510px;
+    background-position: -6px -5509px;
     width: 24px;
 }
 .link-decryption-key.selected .icon, .link-decryption-key:hover .icon, .decryption-key .file-link-block .icon {
@@ -20965,7 +21127,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #D90007;
 }
 .fm-expiry-dropdown {
-    display: block;
+  display: block;
+  position: relative;
 }
 .expiry-date .fm-links-dropdown {
     float: right;
@@ -20980,7 +21143,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: center -5194px;
     background-repeat: no-repeat;
     position: absolute;
@@ -21021,7 +21184,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     display: block;
     left: 50%;
     margin-left: -12px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: center -5028px;
     background-repeat: no-repeat;
 }
@@ -21035,7 +21198,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     top: 3px;
     left: 12px;
     display: block;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: -87px -277px;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -21072,7 +21235,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     height: 20px;
     float: right;
     margin: 13px 7px 0 7px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: -91px -826px;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -21141,7 +21304,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     cursor: pointer;
 }
 .import-contacts-service.imported {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: right -2163px;
     background-repeat: no-repeat;
 }
@@ -21153,7 +21316,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     float: left;
     margin: 12px 0 0 10px;
     font-family: 'source_sans_prosemibold', Arial;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -11px -2074px;
     background-repeat: no-repeat;
 }
@@ -21167,7 +21330,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background-color: rgba(0,0,0,0.2);
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: 1px -2137px;
     background-repeat: no-repeat;
     -webkit-transition: background-color 200ms ease-in-out;
@@ -21203,7 +21366,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     position: absolute;
     bottom: -6px;
     right: 12px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -5px -2117px;
     background-repeat: no-repeat;
 }
@@ -21213,7 +21376,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     top: 5px;
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -2px -3178px;
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -21301,7 +21464,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .copy-dialog-empty-icon, .move-dialog-empty-icon {
     height: 166px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: center -867px;
     background-repeat: no-repeat;
 }
@@ -21717,7 +21880,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     float: left;
     width: 60px;
     height: 60px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: 0 -3927px;
     margin-left: 20px;
@@ -21744,7 +21907,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     padding: 0;
 }
 .feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: 0 -4112px;
     background-size: auto;
     cursor: pointer;
@@ -21796,7 +21959,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     font-size: 14px;
     line-height: 18px;
     font-family: 'source_sans_proregular', Arial;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-repeat: no-repeat;
     background-position: 2px -4011px;
     margin: 0 0 0 12px;
@@ -23185,7 +23348,7 @@ body.pro:after {
 }
 .nw-fm-dialog-title span, .bandwidth-text-bl .star {
     width: 15px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -50px -1551px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -23284,7 +23447,7 @@ body.pro:after {
     padding-top: 9px;
 }
 .bandwidth-back-button {
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -95px -1551px;
     background-repeat: no-repeat;
     font-size: 14px;
@@ -23650,7 +23813,7 @@ div.camera-bottom-txt {
     width: 100px;
     height: 100px;
     margin: 8px auto 31px auto;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
+    background-image: url(../images/mega/dialogs-sprite_v10.svg);
     background-position: -29px -4228px;
     background-repeat: no-repeat;
 }
@@ -23667,103 +23830,6 @@ div.camera-bottom-txt {
     color: #666666;
     padding: 20px 0 0 0;
     margin: 0;
-}
-.ui-datepicker {
-    border: 4px solid rgba(0,0,0,0.15);
-    background-color: white;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    width: 340px;
-    padding-bottom: 25px;
-    text-align: center;
-    margin: -36px 0 0 -4px;
-    display: none;
-}
-.ui-datepicker-header {
-    display: inline-block;
-    position: relative;
-    padding: 14px 0 29px 0;
-}
-.ui-datepicker a, .ui-datepicker span, .ui-datepicker td, .ui-datepicker th {
-    font-family: 'source_sans_prolight';
-    text-transform: uppercase;
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 24px;
-    color: #666666;
-    cursor: default;
-    padding: 0;
-}
-.ui-datepicker th {
-    padding-bottom: 12px;
-}
-.ui-datepicker td {
-    height: 32px;
-}
-.ui-datepicker-header span {
-    padding: 0 2px;
-}
-a.ui-datepicker-prev, a.ui-datepicker-next {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    left: -34px;
-    background-image: url(../images/mega/dialogs-sprite_v8.svg);
-    background-position: -30px -4180px;
-    background-repeat: no-repeat;
-    cursor: pointer;
-}
-a.ui-datepicker-next {
-    left: auto;
-    right: -34px;
-    background-position: -108px -4180px;
-}
-.ui-datepicker-prev span, .ui-datepicker-next span, .ui-datepicker-current {
-    display: none;
-}
-.ui-datepicker-calendar {
-    width: 100%;
-}
-.ui-datepicker td a {
-    display: inline-block;
-    width: 43px;
-    height: 32px;
-    line-height: 32px;
-    color: #666666;
-    font-family: 'source_sans_proregular';
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    cursor: pointer;
-}
-.ui-datepicker td a:hover {
-    background-color: rgba(119,119,119,0.1);
-}
-.ui-datepicker td a.ui-state-active {
-    background-color: #777777;
-    color: white;
-}
-.ui-datepicker td span {
-    color: #999999;
-    font-size: 12px;
-}
-.ui-datepicker-close {
-    border: 0;
-    background-color: white;
-    padding: 0;
-    -moz-appearance: none;
-    top: 10px;
 }
 .fm-account-button {
     display: block;
@@ -24848,35 +24914,56 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     margin-left: 0px;
 }
 
-.pro-only-feature{
+.pro-only-feature {
     color: #ff3333;
 }
-
-.dialog-feature-toggle{
+.export-links-dialog .get-pro.hidden {
+    display: none;
+}
+.export-links-dialog .get-pro {
+    background-color: #ff3333;
+    border-radius: 9px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    float: right;
+    font-size: 12px;
+    padding: 3px 13px;
+    position: relative;
+    top: -3px;
+}
+.export-links-dialog .get-pro:hover {
+    box-shadow: 0 0 0 3px rgba(255, 51, 51, 0.4);
+}
+.export-links-dialog .dialog-feature-toggle.hidden {
+    display: none;
+}
+.export-links-dialog .dialog-feature-toggle {    
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1));
+    box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+    border: solid 1px rgba(0, 0, 0, 0.05);
+    border-radius: 40px;
+    cursor: pointer;
     display: inline-block;
     float: right;
     height: 20px;
     width: 36px;
-    background-image: linear-gradient(-179deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.10) 100%);
-    border: 1px solid rgba(0,0,0,0.05);
-    box-shadow: inset 0px 1px 1px 0px rgba(0,0,0,0.05);
-    border-radius: 40px;
-    cursor: pointer;
 }
-
-.dialog-feature-switch{
-    height: 15px;
+.export-links-dialog .dialog-feature-toggle.toggle-on {
+    background-image: linear-gradient(to bottom, rgba(18, 224, 60, 0.7), #13e03c);
+}
+.export-links-dialog .dialog-feature-switch {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    height: 14px;
     margin-left: 2px;
-    margin-top: 1px;
-    width: 15px;
-    border-radius: 15px;
-    background: #FFFFFF;
-    border: 1px solid rgba(0,0,0,0.05);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    cursor: pointer;
+    margin-top: 2px;
+    width: 14px;
 }
-
-.reveal-feature-toggle{
+.export-links-dialog .reveal-feature-toggle {
     font-family: 'source_sans_proregular';
     font-size: 12px;
     color: #777777;
@@ -24885,149 +24972,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     margin-bottom: 20px;
     cursor: pointer;
 }
-
-body {
-    background: url('../img/darkdenim3.png') repeat 0 0 #555;
+.export-links-dialog .disabled-overlay {
+    background: #fff none repeat scroll 0 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.7;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
-/* DatePicker Container */
-.ui-datepicker {
-    width: 400px;
-    height: auto;
-    margin: 5px auto 0;
-    font: 9pt Arial, sans-serif;
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-}
-.ui-datepicker a {
-    text-decoration: none;
-}
-/* DatePicker Table */
-.ui-datepicker table {
-    width: 100%;
-}
-.ui-datepicker-header {
-    background: url('../img/dark_leather.png') repeat 0 0 #000;
-    color: #e0e0e0;
-    font-weight: bold;
-    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, 2);
-    -moz-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
-    box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
-    text-shadow: 1px -1px 0px #000;
-    filter: dropshadow(color=#000, offx=1, offy=-1);
-    line-height: 30px;
-    border-width: 1px 0 0 0;
-    border-style: solid;
-    border-color: #111;
-}
-.ui-datepicker-title {
-    text-align: center;
-}
-.ui-datepicker-prev, .ui-datepicker-next {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    cursor: pointer;
-    background-image: url('../img/arrow.png');
-    background-repeat: no-repeat;
-    line-height: 600%;
-    overflow: hidden;
-}
-.ui-datepicker-prev {
-    float: left;
-    background-position: center -30px;
-}
-.ui-datepicker-next {
-    float: right;
-    background-position: center 0px;
-}
-.ui-datepicker thead {
-    background-color: #f7f7f7;
-    background-image: -moz-linear-gradient(top,  #f7f7f7 0%, #f1f1f1 100%);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f7f7f7), color-stop(100%,#f1f1f1));
-    background-image: -webkit-linear-gradient(top,  #f7f7f7 0%,#f1f1f1 100%);
-    background-image: -o-linear-gradient(top,  #f7f7f7 0%,#f1f1f1 100%);
-    background-image: -ms-linear-gradient(top,  #f7f7f7 0%,#f1f1f1 100%);
-    background-image: linear-gradient(top,  #f7f7f7 0%,#f1f1f1 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f1f1f1',GradientType=0 );
-    border-bottom: 1px solid #bbb;
-}
-.ui-datepicker th {
-    text-transform: uppercase;
-    font-size: 6pt;
-    padding: 5px 0;
-    color: #666666;
-    text-shadow: 1px 0px 0px #fff;
-    filter: dropshadow(color=#fff, offx=1, offy=0);
-}
-.ui-datepicker tbody td {
-    padding: 0;
-    border-right: 1px solid #bbb;
-}
-.ui-datepicker tbody td:last-child {
-    border-right: 0px;
-}
-.ui-datepicker tbody tr {
-    border-bottom: 1px solid #bbb;
-}
-.ui-datepicker tbody tr:last-child {
-    border-bottom: 0px;
-}
-.ui-datepicker td span, .ui-datepicker td a {
-    display: inline-block;
-    font-weight: bold;
-    text-align: center;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    color: #666666;
-    text-shadow: 1px 1px 0px #fff;
-    filter: dropshadow(color=#fff, offx=1, offy=1);
-}
-.ui-datepicker-calendar .ui-state-default {
-    background: #ededed;
-    background: -moz-linear-gradient(top,  #ededed 0%, #dedede 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ededed), color-stop(100%,#dedede));
-    background: -webkit-linear-gradient(top,  #ededed 0%,#dedede 100%);
-    background: -o-linear-gradient(top,  #ededed 0%,#dedede 100%);
-    background: -ms-linear-gradient(top,  #ededed 0%,#dedede 100%);
-    background: linear-gradient(top,  #ededed 0%,#dedede 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#dedede',GradientType=0 );
-    -webkit-box-shadow: inset 1px 1px 0px 0px rgba(250, 250, 250, .5);
-    -moz-box-shadow: inset 1px 1px 0px 0px rgba(250, 250, 250, .5);
-    box-shadow: inset 1px 1px 0px 0px rgba(250, 250, 250, .5);
-}
-.ui-datepicker-calendar .ui-state-hover {
-    background: #f7f7f7;
-}
-.ui-datepicker-calendar .ui-state-active {
-    background: #6eafbf;
-    -webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
-    -moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
-    box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
-    color: #e0e0e0;
-    text-shadow: 0px 1px 0px #4d7a85;
-    filter: dropshadow(color=#4d7a85, offx=0, offy=1);
-    border: 1px solid #55838f;
-    position: relative;
-    margin: -1px;
-}
-.ui-datepicker-unselectable .ui-state-default {
-    background: #f4f4f4;
-    color: #b4b3b3;
-}
-.ui-datepicker-calendar td:first-child .ui-state-active {
-    width: 29px;
-    margin-left: 0;
-}
-.ui-datepicker-calendar td:last-child .ui-state-active {
-    width: 29px;
-    margin-right: 0;
-}
-.ui-datepicker-calendar tr:last-child .ui-state-active {
-    height: 29px;
-    margin-bottom: 0;
-}
-
-

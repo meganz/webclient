@@ -65,7 +65,7 @@ var notify = {
                 }
 
                 // Get the current UNIX timestamp and the last time delta (the last time the user saw a notification)
-                var currentTime = notify.getCurrentTimestamp();
+                var currentTime = unixtime();
                 var lastTimeDelta = (result.ltd) ? result.ltd : 0;
                 var notifications = result.c;
                 var pendingContactUsers = result.u;
@@ -116,7 +116,7 @@ var notify = {
         var notification = actionPacket;                // The action packet
         var id = makeid(10);                            // Make random ID
         var type = notification.a;                      // Type of notification e.g. share
-        var currentTime = notify.getCurrentTimestamp(); // Get the current timestamps in seconds
+        var currentTime = unixtime();                   // Get the current timestamps in seconds
         var seen = false;                               // New notification, so mark as unread
         var userHandle = notification.u;                // User handle e.g. new share from this user
 
@@ -141,15 +141,6 @@ var notify = {
         if (notify.$popup.hasClass('active')) {
             notify.renderNotifications();
         }
-    },
-
-    /**
-     * Gets the current UNIX timestamp
-     * @returns {Number} Returns an integer with the current UNIX timestamp (in seconds)
-     */
-    getCurrentTimestamp: function() {
-
-        return Math.round(new Date().getTime() / 1000);
     },
 
     /**
@@ -960,7 +951,7 @@ var notify = {
     renderPaymentReminder: function($notificationHtml, notification) {
 
         // Find the time difference between the current time and the plan expiry time
-        var currentTimestamp = notify.getCurrentTimestamp();
+        var currentTimestamp = unixtime();
         var expiringTimestamp = notification.data.ts;
         var secondsDifference = (expiringTimestamp - currentTimestamp);
 

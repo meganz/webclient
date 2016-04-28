@@ -165,7 +165,7 @@
             $('.feedback-button-send, .feedback-button-cancel', self.$dialog).removeClass('disabled');
         });
         
-        initTextareaScrolling('.feedback-dialog-scr', 80);
+        initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
 
         $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
             var dialog = self.$dataReportDialog;

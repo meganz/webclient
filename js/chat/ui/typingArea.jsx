@@ -164,7 +164,8 @@ var TypingArea = React.createClass({
         window.addEventListener('resize', self.handleWindowResize);
 
         var $container = $(ReactDOM.findDOMNode(this));
-        initTextareaScrolling('.chat-textarea-scroll', 100, true);
+        initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
+
     },
     componentWillUnmount: function() {
         var self = this;

@@ -26,17 +26,18 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
-initTextareaScrolling('.chat-textarea-scroll', 100, true);
+initTextareaScrolling($('.chat-textarea-scroll textarea'), 100, true);
 
 /**
  * initTextareaScrolling
  *
- * @param {String} Textarea wrapper block classname/id. Should start with "." or "#"
+ * @param {Object} $textarea. DOM textarea element.
  * @param {Number} Textarea max height. Default is 100
  * @param {Boolean} If we need to bind window resize event
  */
-function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight, resizeEvent) {
-    var $textarea = $(textareaScrollWrapper).find('textarea'),
+function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
+    var textareaWrapperClass = $textarea.parent().attr('class'),
+          wrapperClassSelector = '.' + textareaWrapperClass.replace(/[_\s]/g, ' .'),
           $textareaClone,
           textareaLineHeight = parseInt($textarea.css('line-height'))
           textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
@@ -48,7 +49,7 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight, resize
     $textareaClone = $textarea.next('div');
 
     function textareaScrolling(keyEvents) {
-        var $textareaScrollBlock = $(textareaScrollWrapper),
+        var $textareaScrollBlock = $(wrapperClassSelector),
               $textareaCloneSpan,
               textareaContent = $textarea.val(),
               cursorPosition = $textarea.getCursorPosition(),
@@ -111,13 +112,14 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight, resize
     textareaScrolling();
 
     // Reinit scrolling after keyup/keydown/paste events
+    $textarea.off('keyup keydown paste');
     $textarea.on('keyup keydown paste', function() {
         textareaScrolling(1);
     });
 
     // Bind window resize if textarea is resizeable
     if (resizeEvent) {
-        var eventName = textareaScrollWrapper.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '');
+        var eventName = textareaWrapperClass.replace(/[_\s]/g, '');
         $(window).bind('resize.' + eventName, function () {
             textareaScrolling();
         });

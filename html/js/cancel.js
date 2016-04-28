@@ -210,7 +210,7 @@
         $(obj.opt.fbDlgClass + ' .feedback-textarea-bl textarea').val('');
         $('.fm-dialog' + obj.opt.fbDlgClass).removeClass('hidden');
 
-        initTextareaScrolling('.feedback-textarea', 72);
+        initTextareaScrolling($('.feedback-textarea textarea'), 72);
 
         $.dialog = obj.opt.fbDlgName;
 

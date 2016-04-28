@@ -59,12 +59,13 @@ function initContactsGridScrolling() {
 /**
  * initTextareaScrolling
  *
- * @param {String} Textarea wrapper block classname/id. Should start with "." or "#"
+ * @param {Object} $textarea. DOM textarea element.
  * @param {Number} Textarea max height. Default is 100
  * @param {Boolean} If we need to bind window resize event
  */
-function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight, resizeEvent) {
-    var $textarea = $(textareaScrollWrapper).find('textarea'),
+function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
+    var textareaWrapperClass = $textarea.parent().attr('class'),
+          wrapperClassSelector = '.' + textareaWrapperClass.replace(/[_\s]/g, ' .'),
           $textareaClone,
           textareaLineHeight = parseInt($textarea.css('line-height'))
           textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
@@ -76,7 +77,7 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight, resize
     $textareaClone = $textarea.next('div');
 
     function textareaScrolling(keyEvents) {
-        var $textareaScrollBlock = $(textareaScrollWrapper),
+        var $textareaScrollBlock = $(wrapperClassSelector),
               $textareaCloneSpan,
               textareaContent = $textarea.val(),
               cursorPosition = $textarea.getCursorPosition(),
@@ -134,18 +135,19 @@ function initTextareaScrolling (textareaScrollWrapper, textareaMaxHeight, resize
         }
         return pos;
     }
-    
+
     // Init textarea scrolling
     textareaScrolling();
 
     // Reinit scrolling after keyup/keydown/paste events
+    $textarea.off('keyup keydown paste');
     $textarea.on('keyup keydown paste', function() {
         textareaScrolling(1);
     });
 
     // Bind window resize if textarea is resizeable
     if (resizeEvent) {
-        var eventName = textareaScrollWrapper.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '');
+        var eventName = textareaWrapperClass.replace(/[_\s]/g, '');
         $(window).bind('resize.' + eventName, function () {
             textareaScrolling();
         });
@@ -1927,7 +1929,7 @@ function addContactUI() {
                 $d.css('right', 8 + 'px');
             }
 
-            initTextareaScrolling('.add-user-textarea', 39);
+            initTextareaScrolling($('.add-user-textarea textarea'), 39);
             focusOnInput();
         }
 
@@ -7854,7 +7856,7 @@ function initShareDialogMultiInputPlugin() {
                 // where they can add a custom message to the pending share request
                 if (checkIfContactExists(item.id) === false) {
                     $('.share-message').show();
-                    initTextareaScrolling('.share-message-textarea', 39);
+                    initTextareaScrolling($('.share-message-textarea textarea'), 39);
                 }
 
                 $('.dialog-share-button').removeClass('disabled');
@@ -11062,7 +11064,7 @@ var cancelSubscriptionDialog = {
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
         // Init textarea scrolling
-        initTextareaScrolling('.cancel-textarea', 126);
+        initTextareaScrolling($('.cancel-textarea textarea'), 126);
 
         // Init functionality
         this.enableButtonWhenReasonEntered();

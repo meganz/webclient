@@ -5837,7 +5837,7 @@ function execsc(actionPackets, callback) {
                 fa: actionPacket.fa
             });
         }
-        else if (actionPacket.a === 's' && !folderlink) {
+        else if ((actionPacket.a === 's' || actionPacket.a === 's2') && !folderlink) {
             var tsharekey = '';
             var prockey = false;
 
@@ -5982,7 +5982,13 @@ function execsc(actionPackets, callback) {
 
             crypto_share_rsa2aes();
 
-            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            if (actionPacket.a === 's2') {
+                processPS([actionPacket]);
+            }
+
+            if (fminitialized) {
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            }
         }
         else if (actionPacket.a === 'k' && !folderlink) {
             if (actionPacket.sr)
@@ -6117,9 +6123,6 @@ function execsc(actionPackets, callback) {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
             notify.notifyFromActionPacket(actionPacket);
-        }
-        else if (actionPacket.a === 's2') {
-            processPS([actionPacket]);
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
@@ -7130,7 +7133,9 @@ function processPS(pendingShares, ignoreDB) {
                     // Add the pending share to state
                     M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
 
-                    sharedUInode(nodeHandle);
+                    if (fminitialized) {
+                        sharedUInode(nodeHandle);
+                    }
                 }
             }
         }

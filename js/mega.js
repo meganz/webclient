@@ -143,11 +143,12 @@ function MegaData()
         this.v = [];
         this.c = {};
 
-        this.u = new MegaDataMap();
-        var self = this;
-        this.u.addChangeListener(function() {
-            self.onContactsChanged();
-        });
+        if (typeof MegaDataMap !== 'undefined') {
+            this.u = new MegaDataMap();
+            this.u.addChangeListener(function() {
+                M.onContactsChanged();
+            });
+        }
 
         this.t = {};
         this.opc = {};
@@ -6245,8 +6246,6 @@ function execsc(actionPackets, callback) {
         }
     }
 }
-
-var M = new MegaData();
 
 function fm_updatekey(h, k)
 {

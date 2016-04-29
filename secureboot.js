@@ -8,6 +8,7 @@ var maintenance = false;
 var androidsplash = false;
 var silent_loading = false;
 var cookiesDisabled = false;
+var lastactive = Date.now();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
@@ -853,7 +854,15 @@ function siteLoadError(error, filename) {
     alert(message.join("\n\n"));
 }
 
-if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
+// is_mobile=1
+if (location.hash === '#test') {
+    window.location.hash = '#!84Vl0ADI!Fj9EOhlQu4mN_ZwlUNIHCD6xc2xMKCEjSFvEEvypx9o';
+}
+
+if (location.hash.substr(1, 1) === '!') {
+    m = false;
+}
+else if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
     tag.name = "viewport";
@@ -1368,72 +1377,77 @@ else if (!b_u)
     var langFilepath = getLanguageFilePath(lang);
 
     jsl.push({f:langFilepath, n: 'lang', j:3});
-    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
-    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-    jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
-    jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
-    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
-    jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
-
-    jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-    jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-    jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
-    jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
-    jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-    jsl.push({f:'js/account.js', n: 'user_js', j:1});
-    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
-    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/vendor/jquery-ui-1.11.4.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
-    jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
-    jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
-    jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
-    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
-    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-    jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
-    jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
-    jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
-    jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
-    jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-    jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
-    jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
+    jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
+    jsl.push({f:'js/account.js', n: 'user_js', j:1});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+
+    if (!is_mobile) {
+
+        jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
+        jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+        jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
+        jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+        jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
+        jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
+        jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+
+        jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
+        jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
+        jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
+        jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
+        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
+
+        jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
+        jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
+        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+        jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
+        jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
+        jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
+        jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+        jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
+        jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
+        jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
+        jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+        jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
+        jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
+        jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
 
 
-    // notifications
-    jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
-    jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
-    jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
-    jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+        // notifications
+        jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
+        jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
+        jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
+        jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
-    // Other
-    jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
-    jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
+        // Other
+        jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
+        jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
 
-    // Google Import Contacts
-    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
+        // Google Import Contacts
+        jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
-    // UI Elements
-    jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
-    jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
-    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
-    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
-    jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
-    jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
-    jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+        // UI Elements
+        jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
+        jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
+        jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+        jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+    } // !is_mobile
 
     // MEGA CHAT
-    if (location.host === 'mega.nz' || !megaChatIsDisabled) {
+    if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
@@ -1470,75 +1484,81 @@ else if (!b_u)
     }
     // END OF MEGA CHAT
 
-    jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-    jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
     // Transfers
-    jsl.push({f:'js/xhr2.js', n: 'xhr_js', j:1});
-    jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
-    jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+    jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
+    jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
+    jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
     {
         is_chrome_firefox |= 4;
-        jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
+        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j:1,w:3});
     }
     else
     {
-        jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-        jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+        jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
+        jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     }
-    jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
-    jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
-    jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
+    jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
+    jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
+    jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
+
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
-    jsl.push({f:'html/start.html', n: 'start', j:0});
-    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-    jsl.push({f:'html/key.html', n: 'key', j:0});
-    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
-    jsl.push({f:'html/pro.html', n: 'pro', j:0});
-    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
-    jsl.push({f:'html/login.html', n: 'login', j:0});
-    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
-    jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
-    jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
-    jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
-    jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
-    jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-    jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-messages.css', n: 'chat_messages_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-share-links.css', n: 'chat_share_links_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-textarea.css', n: 'chat_textarea_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-typing.css', n: 'chat_typing_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-calls.css', n: 'chat_calls_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-
-    jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
-    jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-    jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
-    jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
-    jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+
+    if (!is_mobile) {
+        jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+        jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
+
+        jsl.push({f:'html/start.html', n: 'start', j:0});
+        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+        jsl.push({f:'html/key.html', n: 'key', j:0});
+        jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+        jsl.push({f:'html/pro.html', n: 'pro', j:0});
+        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+        jsl.push({f:'html/login.html', n: 'login', j:0});
+        jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+        jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
+        jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
+        jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
+        jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
+        jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-messages.css', n: 'chat_messages_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-share-links.css', n: 'chat_share_links_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-textarea.css', n: 'chat_textarea_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-typing.css', n: 'chat_typing_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-calls.css', n: 'chat_calls_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
+
+        jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
+        jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
+        jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+        jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
+        jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
+        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    } // !is_mobile
 
 
 
@@ -1557,10 +1577,9 @@ else if (!b_u)
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
-    if (
-        typeof Number.isNaN !== 'function' ||
-        typeof Set === 'undefined'
-    ) {
+    if (!is_mobile
+            && (typeof Number.isNaN !== 'function'
+                || typeof Set === 'undefined')) {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }

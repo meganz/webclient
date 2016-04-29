@@ -156,7 +156,7 @@ function u_checklogin3a(res, ctx) {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
             }
         }
-        
+
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if (typeof u_attr.lup !== 'undefined') {
             alarm.planExpired.lastPayment = u_attr.lup;
@@ -177,6 +177,11 @@ function u_checklogin3a(res, ctx) {
 
         if (r == 3) {
             // Load/initialise the authentication system.
+            if (!attribCache) {
+                attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
+                attribCache.syncNameTimer = {};
+                attribCache.uaPacketParser = uaPacketParser;
+            }
             authring.initAuthenticationSystem();
             return mBroadcaster.crossTab.initialize(function() {
                 ctx.checkloginresult(ctx, r);
@@ -1495,12 +1500,6 @@ function checkUserLogin() {
 
 })(this);
 
-var attribCache = new IndexedDBKVStorage('attrib', {
-    murSeed: 0x800F0002
-});
-
-attribCache.syncNameTimer = {};
-
 /**
  * Process action-packet for attribute updates.
  *
@@ -1508,7 +1507,7 @@ attribCache.syncNameTimer = {};
  * @param {String}  userHandle      User handle
  * @param {Boolean} ownActionPacket Whether the action-packet was issued by myself
  */
-attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
+function uaPacketParser(attrName, userHandle, ownActionPacket) {
     var logger = MegaLogger.getLogger('account');
     var cacheKey = userHandle + "_" + attrName;
 
@@ -1555,3 +1554,5 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
 
     return removeItemPromise;
 };
+
+var attribCache = false;

@@ -9,7 +9,9 @@ function dlinfo(ph,key,next)
     dl_next = next;
 
     $('.widget-block').addClass('hidden');
-    if (!m) init_start();
+    if (!is_mobile) {
+        init_start();
+    }
     if (dlMethod == FlashIO)
     {
         $('.fm-dialog.download-dialog').removeClass('hidden');
@@ -30,11 +32,22 @@ function dlinfo(ph,key,next)
         api_req({ a: 'g', p: ph, 'ad': showAd() }, { callback: dl_g });
     }
 
-    // Initialise ads
-    megaAds.init();
+    if (is_mobile) {
+        $('.ads-left-block').hide();
+        $('.ads-right-block').hide();
+        $('.download.bottom-buttons').hide();
 
-    // Initialise slide show
-    gifSlider.init();
+        Soon(function() {
+            $('.top-head div').children().not('.logo').hide();
+        });
+    }
+    else {
+        // Initialise ads
+        megaAds.init();
+
+        // Initialise slide show
+        gifSlider.init();
+    }
 }
 
 function dl_g(res) {
@@ -104,7 +117,11 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
-            $('.download-button.with-megasync').show().rebind('click', function(e) {
+            if (!is_mobile) {
+                $('.download-button.to-clouddrive').show();
+                $('.download-button.with-megasync').show();
+            }
+            $('.download-button.with-megasync').rebind('click', function(e) {
                 if (!$(this).hasClass('downloading')) {
                     loadingDialog.show();
                     megasync.isInstalled(function(err, is) {
@@ -124,7 +141,7 @@ function dl_g(res) {
                 browserDownload();
             });
 
-            $('.download-button.to-clouddrive').show().rebind('click', start_import);
+            $('.download-button.to-clouddrive').rebind('click', start_import);
 
             if (dl_next === 2)
             {
@@ -194,7 +211,8 @@ function browserDownload() {
             && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
         firefoxDialog();
     }
-    else if (browserDialog.isWeak()
+    else if (!is_mobile
+            && browserDialog.isWeak()
             && fdl_filesize > 1048576000
             && !localStorage.browserDialog) {
         browserDialog();

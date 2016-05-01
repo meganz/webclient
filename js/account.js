@@ -1114,7 +1114,7 @@ function checkUserLogin() {
     };
 
     if (is_karma) {
-        mega.attr = ns;
+        mega.config = ns;
     }
     else {
         Object.defineProperty(mega, 'config', {

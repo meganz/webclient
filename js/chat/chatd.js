@@ -626,7 +626,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     self.chatd.msgconfirm(cmd.substr(9,8), false);
                 }
 
-                len = 17;
+                len = 18;
                 break;
 
             case Chatd.Opcode.HISTDONE:

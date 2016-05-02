@@ -20,7 +20,7 @@ var GenericConversationMessage = React.createClass({
         e.stopPropagation(e);
         var chatRoom = this.props.chatRoom;
 
-        chatRoom._dequeueMessage(msg);
+        //TODO: new chatd api for dequeueing msgs
         chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
     },
     doRetry: function(e, msg) {
@@ -680,11 +680,7 @@ var GenericConversationMessage = React.createClass({
                 else if(message.deleted) {
                     messageDisplayBlock =  <div className="message text-block">
                         <em>
-                            <span className="dropdown body notification dropdown-arrow down-arrow">
-                                <i className="dropdown-white-arrow"></i>
-                                This message was deleted by the user or just failed to decrypt.
-                            </span>
-                            {__("This message has been deleted or failed to decrypt.")}
+                            {__("This message has been deleted.")}
                         </em>
                     </div>;
                 }

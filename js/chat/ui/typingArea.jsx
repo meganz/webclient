@@ -194,14 +194,11 @@ var TypingArea = React.createClass({
         self.handleWindowResize();
     },
     handleWindowResize: function (e, scrollToBottom) {
-        var $container = $(ReactDOM.findDOMNode(this));
         var self = this;
-
-        if (!self.props.chatRoom.isCurrentlyActive) {
+        if(!self.isMounted()) {
             return;
         }
-        // faking a keyup to trigger a textarea resize, until Andrey fixes this.
-        if(!self.isMounted()) {
+        if (!self.props.chatRoom.isCurrentlyActive) {
             return;
         }
 

@@ -486,7 +486,7 @@ Chat.prototype.init = function() {
                 var room = self.chats[eventData.roomJid];
 
                 if (room) {
-                    self.sendBroadcastAction("conv-start", {roomJid: room.roomJid, type: room.type, participants: room.getParticipants()});
+                    //self.sendBroadcastAction("conv-start", {roomJid: room.roomJid, type: room.type, participants: room.getParticipants()});
                 }
             }
         }
@@ -509,72 +509,7 @@ Chat.prototype.init = function() {
     this.karere.bind("onChatMessage", function() {
         self._onChatMessage.apply(self, arguments);
     });
-
-    this.karere.bind("onActionMessage", function(e, eventObject) {
-        if (eventObject.isMyOwn(self.karere) === true || e.isPropagationStopped() === true) {
-            return;
-        }
-
-        var room;
-        var meta = eventObject.getMeta();
-        var fromMyDevice = Karere.getNormalizedBareJid(eventObject.getFromJid()) === self.karere.getBareJid();
-
-        if (eventObject.getAction() === "sync") {
-            room = self.chats[meta.roomJid];
-            room.sendMessagesSyncResponse(eventObject);
-        }
-        else if (eventObject.getAction() === "syncResponse") {
-            room = self.chats[meta.roomJid];
-            room.handleSyncResponse(eventObject);
-        }
-        else if (eventObject.getAction() === "cancel-attachment" && fromMyDevice === true) {
-            if (fromMyDevice === true) {
-                room = self.chats[meta.roomJid];
-                room.cancelAttachment(
-                    meta.messageId,
-                    meta.nodeId
-                );
-            }
-        }
-        else if (eventObject.getAction() === "conv-end") {
-            if (fromMyDevice === true) {
-                room = self.chats[meta.roomJid];
-                if (room && room._leaving !== true) {
-                    room.destroy(false);
-                }
-            }
-            else {
-                //TODO: if this is not a 'private' conversation, there should be no "Close chat" button
-                //TODO: add conversation ended class to to the room container
-                room = self.chats[meta.roomJid];
-                if (room) {
-                    room._conversationEnded(eventObject.getFromJid());
-                }
-            }
-        }
-        else if (eventObject.getAction() === "conv-start" && fromMyDevice === true) {
-            if (fromMyDevice) {
-                room = self.chats[meta.roomJid];
-                if (!room) {
-                    self.openChat(meta.participants, meta.type, undefined, undefined, undefined, false);
-                }
-            }
-            else {
-                room = self.chats[meta.roomJid];
-                if (!room) {
-                    [room.$messages].forEach(function(v, k) {
-                        $(k).addClass("conv-start")
-                            .removeClass("conv-end");
-                    });
-
-                }
-
-            }
-        }
-        else {
-            self.logger.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
-        }
-    });
+    
 
     // UI events
     $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
@@ -887,7 +822,7 @@ Chat.prototype.updateSectionUnreadCount = function() {
         if (unreadCount > 0) {
             $('.new-messages-indicator')
                 .text(
-                unreadCount
+                unreadCount > 9 ? "9+" : unreadCount
             )
                 .removeClass('hidden');
         }
@@ -1784,31 +1719,6 @@ Chat.prototype.renderListing = function() {
                 $('.fm-empty-conversations').removeClass('hidden');
             }
         }
-    }
-};
-
-/**
- * Broadcast an action (to all of my devices) + optionally to a specific room.
- *
- * @param [toRoomJid] {String}
- * @param action {String}
- * @param [meta] {Object}
- */
-Chat.prototype.sendBroadcastAction = function(toRoomJid, action, meta) {
-    var self = this;
-
-
-    if (arguments.length === 2) {
-        meta = action;
-        action = toRoomJid;
-        toRoomJid = undefined;
-    }
-
-    var messageId = self.karere.generateMessageId(self.karere.getJid() + (toRoomJid ? toRoomJid : ""), JSON.stringify([action, meta]));
-
-    self.karere.sendAction(self.karere.getBareJid(), action, meta, messageId);
-    if (toRoomJid) {
-        self.karere.sendAction(toRoomJid, action, meta, messageId);
     }
 };
 

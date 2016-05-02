@@ -623,7 +623,6 @@ var ConfirmDialog = React.createClass({
                             name="delete-confirm"
                             id="delete-confirm"
                             onLabelClick={(e, state) => {
-                                console.error(e, state);
                                 if (state === true) {
                                     mega.config.set('confirmModal_' + self.props.name, true);
                                 }

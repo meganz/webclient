@@ -405,12 +405,7 @@ var useravatar = (function() {
                     if (typeof res !== 'number' && res.length > 5) {
                         try {
                             var ab = base64_to_ab(res);
-                            var blob = new Blob([ab], {type: 'image/jpeg'});
-
-                            avatars[handle] = {
-                                data: blob,
-                                url: myURL.createObjectURL(blob)
-                            };
+                            ns.setUserAvatar(handle, ab);
 
                             logger.info('User-avatar retrieval for "%s" successful.', handle, ab, avatars[handle]);
 
@@ -432,12 +427,51 @@ var useravatar = (function() {
         };
 
         /**
+         * Set user-avatar based on its handle
+         * @param {String} handle The user handle
+         * @param {String} ab     ArrayBuffer with the avatar data
+         * @param {String} mime   mime-type (optional)
+         */
+        ns.setUserAvatar = function(handle, ab, mime) {
+            // deal with typedarrays
+            ab = ab.buffer || ab;
+
+            if (ab instanceof ArrayBuffer) {
+                // check if overwritting and cleanup
+                if (avatars[handle]) {
+                    try {
+                        myURL.revokeObjectURL(avatars[handle].url);
+                    }
+                    catch (ex) {
+                        logger.warn(ex);
+                    }
+                }
+
+                var blob = new Blob([ab], {type: mime || 'image/jpeg'});
+
+                avatars[handle] = {
+                    data: blob,
+                    url: myURL.createObjectURL(blob)
+                };
+            }
+            else {
+                logger.warn('setUserAvatar: Provided data is not an ArrayBuffer.', ab);
+            }
+        };
+
+        /**
          * Invalidate user-avatar cache, if any
          * @param {String} handle The user handle
          */
         ns.invalidateAvatar = function(handle) {
             logger.debug('Invalidating user-avatar for "%s"...', handle);
-            avatars[handle] = missingAvatars[handle] = null;
+
+            if (pendingGetters[handle]) {
+                // this could indicate an out-of-sync flow, or calling M.avatars() twice...
+                logger.error('Invalidating user-avatar which is being retrieved!', handle);
+            }
+
+            avatars[handle] = missingAvatars[handle] = undefined;
         };
 
         if (d) {

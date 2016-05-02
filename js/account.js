@@ -1527,8 +1527,7 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
                 logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
             }
             else if (attrName === '+a') {
-                avatars[userHandle] = undefined;
-                M.avatars();
+                M.avatars(userHandle);
             }
             else if (attrName === '*!authring') {
                 authring.getContacts('Ed25519');

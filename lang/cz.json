@@ -3217,8 +3217,10 @@
     "8685": "Vysv\u011btlete, pro\u010d si nep\u0159ejete obnovit sv\u016fj pl\u00e1n:",
     "8686": "nede\u0161ifrovan\u00e1 slo\u017eka",
     "8687": "nede\u0161ifrovan\u00fd soubor",
-    "8688": "Awaiting email confirmation.",
-    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8688": "\u010cek\u00e1n\u00ed na potvrzen\u00ed e-mailu.",
+    "8690": "Nem\u00e1te p\u0159\u00edstup k vybran\u00e9 cest\u011b stahov\u00e1n\u00ed. Vyberte jinou cestu stahov\u00e1n\u00ed a zkuste to znovu.",
+    "8691": "Please go to your inbox and click the link to confirm your account.",
+    "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

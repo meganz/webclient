@@ -3217,8 +3217,10 @@
     "8685": "Por favor, cu\u00e9ntanos por qu\u00e9 no deseas renovar tu plan:",
     "8686": "carpeta no desencriptada",
     "8687": "fichero no desencriptado",
-    "8688": "Awaiting email confirmation.",
+    "8688": "Esperando email de confirmaci\u00f3n.",
     "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8691": "Please go to your inbox and click the link to confirm your account.",
+    "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

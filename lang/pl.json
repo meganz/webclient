@@ -3217,8 +3217,10 @@
     "8685": "Prosimy o podanie powod\u00f3w dla kt\u00f3rych nie planujesz odnowi\u0107 swojego planu:",
     "8686": "niezaszyfrowany katalog",
     "8687": "niezaszyfrowany plik",
-    "8688": "Awaiting email confirmation.",
-    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8688": "Oczekiwanie na potwierdzenie adresu email.",
+    "8690": "Nie masz dost\u0119pu do wskazanego katalogu. Wybierz inny katalog i spr\u00f3buj ponownie.",
+    "8691": "Please go to your inbox and click the link to confirm your account.",
+    "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

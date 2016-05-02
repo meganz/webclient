@@ -3217,8 +3217,10 @@
     "8685": "Pros\u00edm vysvetlite pre\u010do si neprajete pred\u013a\u017ei\u0165 svoj pl\u00e1n:",
     "8686": "nede\u0161ifrovan\u00fd prie\u010dinok",
     "8687": "nede\u0161ifrovan\u00fd s\u00fabor",
-    "8688": "Awaiting email confirmation.",
-    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8688": "\u010cak\u00e1 sa na potvrdenie emailu.",
+    "8690": "Nem\u00e1te pr\u00edstup k ceste pre s\u0165ahovanie. Zvo\u013ete in\u00fa cestu a sk\u00faste to znovu.",
+    "8691": "Pros\u00edm cho\u010fte do svojej doru\u010denej po\u0161ty a kliknite na odkaz pre potvrdenie svojho \u00fa\u010dtu.",
+    "8692": "Pre chybu vo vykreslovan\u00ed v Chrome\/Chromium prehliada\u010doch sa MEGA ned\u00e1 pou\u017e\u00edva\u0165 v re\u017eime 110% pribl\u00ed\u017eenia. Pros\u00edme, stla\u010dte Ctrl\/Cmd + 0 pre obnovenie stup\u0148a pribl\u00ed\u017eenia alebo pou\u017e\u00edvajte Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

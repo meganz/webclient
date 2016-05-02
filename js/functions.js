@@ -4642,3 +4642,22 @@ function getGatewayName(gatewayId) {
         displayName: 'Unknown'
     };
 }
+
+/*
+ * Alert about 110% zoom level in Chrome/Chromium
+ */
+mega.utils.chrome110ZoomLevelNotification = function() {
+
+    var dpr = window.devicePixelRatio;
+
+    if ($.browser.chrome) {
+        if ((dpr === 2.200000047683716) || (dpr === 1.100000023841858)) {
+            showToast('settings', 'MEGA cannot be used at 110% zoom. Please zoom either in, or out.', '');
+        }
+        else {
+            hideToast();
+        }
+    }
+};
+
+mBroadcaster.once('fm:initialized', mega.utils.chrome110ZoomLevelNotification);

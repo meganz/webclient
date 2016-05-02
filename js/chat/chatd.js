@@ -292,7 +292,7 @@ Chatd.Shard.prototype.reconnect = function() {
         self.logger.log('chatd connection established');
         self.triggerSendIfAble();
         self.rejoinexisting();
-        //self.clearpending();
+        self.clearpending();
         self.restore();
         self.chatd.trigger('onOpen', {
             shard: self
@@ -884,7 +884,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     var self = this;
 
     // TODO: LP: Mathias: this variable is not used, why ?
-    var mintimestamp = Math.floor(new Date().getTime()/1000)-600;
+    var mintimestamp = Math.floor(new Date().getTime()/1000);
     var keyid = this.buf[msgnum][Chatd.MsgField.KEYID];
 
     // modify pending message so that a potential resend includes the change
@@ -924,10 +924,6 @@ Chatd.Messages.prototype.clearpending = function() {
     var self = this;
     this.sendingList.forEach(function(msgxid) {
         self.persist(msgxid);
-    });
-    var prefix = base64urlencode(self.chatId);
-    self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
-        self.persist(v.messageId);
     });
     this.sending = {};
     this.sendingList = [];
@@ -1153,7 +1149,8 @@ Chatd.Messages.prototype.persist = function(messageId) {
                         'timestamp' : self.buf[num][Chatd.MsgField.TIMESTAMP],
                         'message' : self.buf[num][Chatd.MsgField.MESSAGE],
                         'keyId' : self.buf[num][Chatd.MsgField.KEYID],
-                        'updated' : self.buf[num][Chatd.MsgField.UPDATED]
+                        'updated' : self.buf[num][Chatd.MsgField.UPDATED],
+                        'edited' : self.modified[num] ? 1 : 0
                     });
                 });
         });
@@ -1174,7 +1171,7 @@ Chatd.Messages.prototype.restore = function() {
         var messageConstructs = [];
         // write the new message to the message buffer and mark as in sending state
         // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
-        self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, 0];
+        self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated];
 
         self.chatd.trigger('onMessageUpdated', {
             chatId: base64urlencode(self.chatId),
@@ -1192,6 +1189,9 @@ Chatd.Messages.prototype.restore = function() {
         // if we believe to be online, send immediately
         if (self.chatd.chatIdShard[self.chatId].isOnline()) {
             self.chatd.chatIdShard[self.chatId].msg(self.chatId, messageConstructs);
+            if (v.edited === 1) {
+                self.chatd.chatIdShard[self.chatId].msgupdx(self.chatId, v.messageId, v.updated, v.message, v.keyId);
+            }
         }
     });
 

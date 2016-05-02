@@ -2139,6 +2139,7 @@ a.nt-settings-button:hover span {
 .jspPane {
     position: absolute;
     min-width: 100%;
+    max-width: 100%;
 }
 .jspVerticalBar {
     position: absolute;
@@ -21571,8 +21572,6 @@ a.top-login-forgot-pass {
     overflow: hidden;
     height: 80px;
     line-height: 20px;
-}
-.feedback-dialog-hidden {
     min-height: 80px;
 }
 .feedback-dialog-textarea textarea::selection {
@@ -23810,7 +23809,7 @@ a.ui-datepicker-next {
     padding: 46px 64px 8px 0;
 }
 .profile-form.change-email-section {
-    margin-bottom: 95px;
+    margin-bottom: 25px;
     padding-top: 0;
 }
 /* MegaSync dialog */

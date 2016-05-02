@@ -165,10 +165,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
                 });
         }
         else if (newState === ChatRoom.STATE.JOINING) {
-            self._preloadMessageQueue();
         }
         else if (newState === ChatRoom.STATE.READY) {
-            self._flushMessagesQueue();
         }
     });
 
@@ -389,29 +387,6 @@ ChatRoom.prototype.getStateAsText = function() {
 
 
 /**
- * Return current type of call (if there is active call, if not === false)
- *
- * @returns {String|Boolean}
- */
-ChatRoom.prototype.getCurrentCallType = function() {
-    var self = this;
-    var opts = self.callSession ? self.callSession.getMediaOptions() : null;
-
-    if (!self.callSession || self.callSession.isStarted() === false) {
-        return false;
-    }
-    else if (opts.video === true && opts.audio === true) {
-        return "video-call";
-    }
-    else if (opts.video === false && opts.audio === true) {
-        return "audio-call";
-    }
-    else {
-        return "none";
-    }
-};
-
-/**
  * Change/set the type of the room
  *
  * @param type
@@ -440,8 +415,6 @@ ChatRoom.prototype.setType = function(type) {
  */
 ChatRoom.prototype.setUsers = function(jids) {
     this.users = clone(jids);
-
-    this.refreshUI();
 };
 
 
@@ -572,18 +545,6 @@ ChatRoom.prototype.getRoomOwner = function() {
 };
 
 /**
- * Check if i'm the owner of the room
- *
- * @returns {boolean}
- */
-ChatRoom.prototype.iAmRoomOwner = function() {
-    var self = this;
-
-    var users = self.getOrderedUsers();
-
-    return users[0] === self.megaChat.karere.getJid();
-};
-/**
  * Get a list of the current participants for this room, excluding my jid (or if provided, exlucding any of the jids
  * founds in arr `jids`).
  *
@@ -666,41 +627,6 @@ ChatRoom.prototype.getRoomTitle = function() {
 };
 
 
-/**
- * Get room css icon
- *
- * @returns {string}
- */
-ChatRoom.prototype.getRoomIcon = function() {
-    var self = this;
-    if (this.type == "private") {
-        var participants = self.getParticipantsExceptMe();
-        var presence = self.megaChat.karere.getPresence(participants[0]);
-
-        var targetClassName = "offline";
-        if (!presence || presence == Karere.PRESENCE.OFFLINE) {
-            targetClassName = "offline";
-        }
-        else if (presence == Karere.PRESENCE.AWAY) {
-            targetClassName = "away";
-        }
-        else if (presence == Karere.PRESENCE.BUSY) {
-            targetClassName = "busy";
-        }
-        else if (presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
-            targetClassName = "online";
-        }
-        else {
-            targetClassName = "offline";
-        }
-
-        return targetClassName;
-    }
-    else {
-        assert(false, "invalid room type");
-        return "[invalid room type]";
-    }
-};
 
 /**
  * Leave this chat room
@@ -937,18 +863,6 @@ ChatRoom.prototype.appendMessage = function(message) {
 
 
 /**
- * Will refresh the room's chat messages scroll pane
- */
-ChatRoom.prototype.refreshScrollUI = function() {
-    // TODO: remove me.
-};
-
-ChatRoom.prototype.refreshUI = function() {
-    // TODO: remove me.
-};
-
-
-/**
  * Returns the actual DOM Element from the Mega's main navigation (tree) that is related to this chat room.
  *
  * @returns {*|jQuery|HTMLElement}
@@ -1029,7 +943,6 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
             return false;
         }
 
-        self._queueMessage(eventObject);
         self.appendMessage(eventObject);
     }
     else {
@@ -1037,8 +950,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
             .done(function(internalId) {
                 eventObject.internalId = internalId;
             });
-
-        self._queueMessage(eventObject);
+        
         self.appendMessage(eventObject);
     }
 };
@@ -1072,20 +984,6 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
 
 };
 
-/**
-
- /**
- * Alias for sendAction, which will queue the action in case the room/enc is not ready.
- *
- * @param message
- * @param meta
- */
-ChatRoom.prototype.sendAction = function(action, message, meta) {
-    var self = this;
-    meta.action = action;
-
-    self.sendMessage(message, meta);
-};
 
 /**
  * Helper for accessing options.mediaOptions;
@@ -1291,7 +1189,9 @@ ChatRoom.prototype.renderContactTree = function() {
     var count = self.messagesBuff.getUnreadCount();
 
     if (count > 0) {
-        $count.text(count);
+        $count.text(
+            count > 9 ? "9+" : count
+        );
         $navElement.addClass("unread");
     }
     else if (count === 0) {
@@ -1330,210 +1230,6 @@ ChatRoom.prototype.recover = function() {
     return $startChatPromise;
 };
 
-ChatRoom.prototype._ensureMessageQueueKvIsInitialised = function() {
-    var self = this;
-
-    if (!self.megaChat._messagesQueueKvStorage) {
-        self.megaChat._messagesQueueKvStorage = new IndexedDBKVStorage("queuedmsgs", {
-            murSeed: 0x800F0002
-        });
-    }
-}
-/**
- * Will grab all data from idbkv -> ._messagesQueue
- * @private
- */
-ChatRoom.prototype._preloadMessageQueue = function() {
-    var self = this;
-
-    self._ensureMessageQueueKvIsInitialised();
-
-    var prefix = self.roomJid.split("@")[0];
-
-    self.megaChat._messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
-        var msg = new KarereEventObjects.OutgoingMessage(
-            v.toJid,
-            v.fromJid,
-            v.type,
-            v.messageId,
-            v.contents,
-            v.meta,
-            v.delay,
-            v.state,
-            v.roomJid,
-            v.seen
-        );
-
-        [
-            "textContents", "requiresManualRetry"
-        ].forEach(function (prop) {
-            msg[prop] = v[prop];
-        });
-
-        self._queueMessage(msg);
-        self.appendMessage(msg);
-    });
-};
-
-/**
- * Will persist all ._messagesQueue -> idbkv
- *
- * @private
- */
-ChatRoom.prototype._persistMessageQueue = function(removedItem) {
-    var self = this;
-
-
-    self._ensureMessageQueueKvIsInitialised();
-
-    if (!removedItem) {
-        self._messagesQueue.forEach(function(msg) {
-            var cacheKey = self.roomJid.split("@")[0] + ":" + msg.messageId;
-
-            self.megaChat._messagesQueueKvStorage.hasItem(cacheKey)
-                .fail(function() {
-                    self.megaChat._messagesQueueKvStorage.setItem(cacheKey, msg);
-                })
-        });
-    }
-    else {
-        var cacheKey = self.roomJid.split("@")[0] + ":" + removedItem.messageId;
-        self.megaChat._messagesQueueKvStorage.removeItem(cacheKey);
-    }
-};
-
-/**
- * This method will be called on room state change, only when the mpenc's state is === READY
- *
- * @private
- */
-ChatRoom.prototype._flushMessagesQueue = function() {
-    var self = this;
-
-    self.trigger('onMessageQueuePreFlush');
-
-    self.logger.debug("Chat room state set to ready, will flush queue: ", self._messagesQueue);
-
-
-    if (self._messagesQueue.length > 0) {
-        $.each(self._messagesQueue, function(k, v) {
-            if (!v || v.deleted) {
-                return; //continue;
-            }
-            if (unixtime() - v.delay <= self.options.dontResendAutomaticallyQueuedMessagesOlderThen) {
-                self._sendMessageToTransport(v)
-                    .done(function(internalId) {
-                        v.internalId = internalId;
-                    });
-            }
-            else {
-                self._dequeueMessage(v);
-                v.requiresManualRetry = true;
-                self._queueMessage(v);
-
-                $(v).trigger('onChange', [v, 'requiresManualRetry', undefined, true]);
-            }
-
-
-        });
-    }
-
-    self._messagesQueue = [];
-
-    self.megaChat.trigger('onMessageQueueFlushed', self);
-    self.trackDataChange();
-};
-
-/**
- * This method will be called on room state change, only when the mpenc's state is === READY
- *
- * @private
- */
-ChatRoom.prototype._queueMessage = function(msg) {
-    var self = this;
-
-
-   if(self._messagesQueue.indexOf(msg) === -1) {
-       self._messagesQueue.push(msg);
-       self._persistMessageQueue();
-       self.trackDataChange();
-   }
-};
-
-/**
- * This method will be called on room state change, only when the mpenc's state is === READY
- *
- * @private
- */
-ChatRoom.prototype._dequeueMessage = function(msg) {
-    var self = this;
-
-    var found = false;
-    self._messagesQueue.forEach(function(v, k) {
-        if(v.messageId === msg.messageId) {
-            self._messagesQueue.splice(k, 1);
-            found = true;
-            return false; // break
-        } else {
-            return true; // continue
-        }
-    });
-    if (!found) {
-        self.logger.warn("Could not dequeue message: ", msg);
-    }
-
-
-   self._persistMessageQueue(msg);
-   self.trackDataChange();
-};
-
-ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
-    var self = this;
-
-    var contact = self.megaChat.getContactFromJid(fullJid);
-
-    if (!contact) {
-        self.logger.error('contact not found: ' + fullJid);
-
-        return;
-    }
-
-
-    var $av = $(useravatar.contact(contact.u))
-    var cls = $av.attr('class');
-    var style = $av.attr('style');
-    $av.attr({'class': '', 'style':''});
-
-    var $element = $('<div class="nw-contact-avatar"></div>').append(
-        $av
-    );
-    $element.addClass(cls);
-    $element.addClass(contact.u);
-    $element.attr({style: style});
-
-
-    // TODO: implement verification logic
-    if (contact.verified) {
-        $element.addClass('verified');
-    }
-
-    return $element;
-};
-
-ChatRoom.prototype._waitingForOtherParticipants = function() {
-    var self = this;
-
-    var otherUsersInRoom = false;
-
-    Object.keys(self.getUsers()).forEach(function(v, k) {
-        if (v.indexOf(self.megaChat.karere.getBareJid()) === -1) {
-            otherUsersInRoom = true;
-            return false; // break
-        }
-    });
-    return !otherUsersInRoom;
-};
-
 ChatRoom.prototype._restartConversation = function() {
     var self = this;
 
@@ -1566,21 +1262,6 @@ ChatRoom.prototype._conversationEnded = function(userFullJid) {
             $(k).addClass("conv-end")
                 .removeClass("conv-start");
         });
-
-
-        $('.fm-chat-file-button.fm-chat-inline-dialog-button-end-chat span', self.$messages).remove();
-
-        //self.appendDomMessage(
-        //    self.generateInlineDialog(
-        //        "user-left",
-        //        userFullJid,
-        //        "user-left",
-        //        "Conversation ended by user: " + self.megaChat.getContactNameFromJid(userFullJid),
-        //        [],
-        //        {},
-        //        !self.isActive()
-        //    )
-        //);
     }
 };
 
@@ -1600,25 +1281,6 @@ ChatRoom.prototype._conversationStarted = function(userBareJid) {
 
 
     self.setState(ChatRoom.STATE.READY);
-};
-ChatRoom.prototype.cancelAttachment = function(messageId, nodeId) {
-    var self = this;
-
-    var msg = self.messagesBuff.getMessageById(messageId);
-
-    if (msg && msg.meta && msg.meta.attachments && msg.meta.attachments[nodeId]) {
-        var meta = clone(msg.getMeta());
-        meta.attachments[nodeId].canceled = true;
-        msg.setMeta(meta); // trigger change event
-    }
-
-
-    var $container = $('.attachments-container[data-message-id="' + messageId + '"] .nw-chat-sharing-body[data-node-id="' + nodeId + '"]', self.$messages);
-    if ($container.length > 0) {
-        $('.nw-chat-button:first', $container).after($('<em>Canceled</em>'));
-
-        $('.nw-chat-button', $container).remove();
-    }
 };
 
 

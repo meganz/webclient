@@ -15,6 +15,7 @@ var Chatd = function(userId, options) {
     self.messagesQueueKvStorage = new IndexedDBKVStorage("chatdqueuedmsgs", {
             murSeed: 0x800F0002
         });
+
     /**
      * Set to true when this chatd instance is (being) destroyed
      * @type {boolean}

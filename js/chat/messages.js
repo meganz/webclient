@@ -498,8 +498,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                             'sent': true
                         }
                     );
-
-                    self.chatRoom._dequeueMessage(v);
+                    
                     self.messages.removeByKey(v.messageId);
                     self.messages.push(confirmedMessage);
 

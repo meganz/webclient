@@ -625,7 +625,7 @@ var ConversationAudioVideoPanel = React.createClass({
         var unreadDiv = null;
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
         if (unreadCount > 0) {
-            unreadDiv = <div className="unread-messages">{unreadCount}</div>
+            unreadDiv = <div className="unread-messages">{unreadCount > 9 ? "9+" : unreadCount}</div>
         }
 
         var additionalClass = "";

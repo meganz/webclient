@@ -854,33 +854,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     waitingForPromises
                 );
             });
-
-
-        chatRoom.rebind('onMessageQueuePreFlush.chatdInt', function(e) {
-            chatRoom.messagesBuff.messages.forEach(function(msg) {
-                if (msg.getState() === Message.STATE.NOT_SENT) {
-                    if (msg.sending === false) {
-                        chatRoom._queueMessage(msg);
-                    }
-                    else {
-                        // the message is being sent at the moment.
-                        var evtName = "onChange.flush" + msg.messageId.replace(".", "_");
-                        $(msg).rebind(evtName, function(e, msg, propertyName, oldVal, newVal) {
-                            if (propertyName === "sending" && oldVal === true && newVal === false) {
-                                // the message failed to be sent, but mean while, the ChatRoom's state got into READY
-                                // so to send it now, we will prefill the messages queue again
-                                if (msg.sending === false && msg.getState() === Message.STATE.NOT_SENT) {
-                                    if (chatRoom.state === ChatRoom.STATE.READY) {
-                                        chatRoom._flushMessagesQueue();
-                                        $(msg).unbind(evtName);
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-        });
     }
 
 

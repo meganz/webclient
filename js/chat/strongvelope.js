@@ -1565,7 +1565,7 @@ var strongvelope = {};
         var newkeyid = a32_to_str([keyId]);
 
         if (!this.participantKeys[this.ownHandle][tempkeyid]) {
-            logger.critical('Temporary key does not exist with ID ' + tempkeyid);
+            return ;
         }  
         this.participantKeys[this.ownHandle][newkeyid] = this.participantKeys[this.ownHandle][tempkeyid];
         this.keyId = newkeyid;

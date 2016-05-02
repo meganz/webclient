@@ -11,6 +11,10 @@ var Chatd = function(userId, options) {
     // maps chatIds to the Message object
     self.chatIdMessages = {};
 
+    // local cache of the Message object
+    self.messagesQueueKvStorage = new IndexedDBKVStorage("chatdqueuedmsgs", {
+            murSeed: 0x800F0002
+        });
     /**
      * Set to true when this chatd instance is (being) destroyed
      * @type {boolean}
@@ -52,6 +56,7 @@ var Chatd = function(userId, options) {
         // 'onMembersUpdated',
         // 'onMessagesHistoryDone',
         // 'onMessagesHistoryRequest',
+        // 'onMessageDiscard',
     ].forEach(function(evt) {
         self.rebind(evt + '.chatd', function(e) {
             if (arguments[1].shard) {
@@ -86,13 +91,14 @@ Chatd.Opcode = {
     'RETENTION' : 7,
     'HIST' : 8,
     'RANGE' : 9,
-    'MSGID' : 10,
+    'NEWMSGID' : 10,
     'REJECT' : 11,
     'HISTDONE' : 13,
     'NEWKEY' : 17,
     'KEYID' : 18,
     'JOINRANGEHIST' : 19,
-    'MSGUPDX' : 20
+    'MSGUPDX' : 20,
+    'MSGID' : 21
 };
 
 // privilege levels
@@ -285,8 +291,8 @@ Chatd.Shard.prototype.reconnect = function() {
         self.logger.log('chatd connection established');
         self.triggerSendIfAble();
         self.rejoinexisting();
-        self.clearpending();
-
+        //self.clearpending();
+        self.restore();
         self.chatd.trigger('onOpen', {
             shard: self
         });
@@ -384,6 +390,13 @@ Chatd.Shard.prototype.clearpending = function() {
     var self = this;
     for (var chatId in this.chatIds) {
         self.chatd.chatIdMessages[chatId].clearpending();
+    }
+};
+
+Chatd.Shard.prototype.restore = function() {
+    var self = this;
+    for (var chatId in this.chatIds) {
+        self.chatd.chatIdMessages[chatId].restore();
     }
 };
 
@@ -574,7 +587,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 len = 21;
                 break;
 
-            case Chatd.Opcode.MSGID:
+            case Chatd.Opcode.NEWMSGID:
                 self.keepAliveTimerRestart();
 
                 self.logger.log("Sent message ID confirmed: '" + base64urlencode(cmd.substr(9,8)) + "'");
@@ -668,6 +681,13 @@ Chatd.Shard.prototype.exec = function(a) {
                     }
                 );
                 self.chatd.updatekeyid(cmd.substr(1,8), self.chatd.unpack32le(cmd.substr(13,4)), self.chatd.unpack32le(cmd.substr(9,4)));
+                len = 17;
+                break;
+            case Chatd.Opcode.MSGID:
+                //self.keepAliveTimerRestart();
+                self.logger.log("MSG already exists: " + base64urlencode(cmd.substr(1,8)) + " - " + base64urlencode(cmd.substr(9,8)));
+                // TODO: discard from the pending list.
+                self.chatd.discard(cmd.substr(1,8));
                 len = 17;
                 break;
             default:
@@ -837,6 +857,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
         
         this.sending[msgxid] = this.highnum;
         this.sendingList.push(msgxid);
+        this.persist();
 
         messageConstructs.push({"msgxid":msgxid, "timestamp":timestamp,"keyid":keyId, "message":message.message, "type":message.type});
     };
@@ -899,6 +920,14 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
 
 Chatd.Messages.prototype.clearpending = function() {
     // mapping of transactionids of messages being sent to the numeric index of this.buf
+    var self = this;
+    this.sendingList.forEach(function(msgxid) {
+        self.persist(msgxid);
+    });
+    var prefix = base64urlencode(self.chatId);
+    self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
+        self.persist(v.messageId);
+    });
     this.sending = {};
     this.sendingList = [];
 
@@ -963,11 +992,29 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
     }
 };
 
+Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, updated, keyid, msg) {
+    if (this.chatIdMessages[chatId]) {
+        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg);
+    }
+};
+
+Chatd.prototype.discard = function(msgxid) {
+    for (var chatId in this.chatIdMessages) {
+        if (this.chatIdMessages[chatId].sending[msgxid]) {
+            if (this.chatIdMessages[chatId]) {
+                this.chatIdMessages[chatId].discard(msgxid);
+            }
+            break;
+        }
+    }
+};
+
 // msgid can be false in case of rejections
 Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     var self = this;
     var num = this.sending[msgxid];
 
+    this.persist(msgxid);
     removeValue(this.sendingList, msgxid);
     delete this.sending[msgxid];
 
@@ -1002,12 +1049,6 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     // we now have a proper msgid, resend MSGUPD in case the edit crossed the execution of the command
     if (this.modified[num]) {
         self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, this.buf[num][Chatd.MsgField.UPDATED], this.buf[num][Chatd.MsgField.MESSAGE], this.buf[num][Chatd.MsgField.KEYID]);
-    }
-};
-
-Chatd.prototype.msgstore = function(newmsg, chatId, userId, msgid, timestamp, updated, keyid, msg) {
-    if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].store(newmsg, userId, msgid, timestamp, updated, keyid, msg);
     }
 };
 
@@ -1071,6 +1112,89 @@ Chatd.Messages.prototype.msgmodify = function(msgid, updated, keyid, msg) {
     }
 };
 
+// discard message from message queue
+Chatd.Messages.prototype.discard = function(msgxid) {
+    var self = this;
+    var num = self.sending[msgxid];
+    if (!num) {
+        return ;
+    }
+
+    self.chatd.trigger('onMessageUpdated', {
+        chatId: base64urlencode(self.chatId),
+        userId: base64urlencode(self.buf[num][Chatd.MsgField.USERID]),
+        id: num,
+        state: 'DISCARDED',
+        keyid: self.buf[num][Chatd.MsgField.KEYID],
+        message: self.buf[num][Chatd.MsgField.MESSAGE]
+    });
+
+    self.persist(msgxid);
+    removeValue(self.sendingList, msgxid);
+    delete self.sending[msgxid];
+    delete self.buf[num];
+};
+
+Chatd.Messages.prototype.persist = function(messageId) {
+    var self = this;
+
+    if (!messageId) {
+        self.sendingList.forEach(function(msgxid) {
+            var cacheKey = base64urlencode(self.chatId) + ":" + msgxid;
+
+            self.chatd.messagesQueueKvStorage.hasItem(cacheKey)
+                .fail(function() {
+
+                    var num = self.sending[msgxid];
+                    self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
+                        'messageId' : msgxid,
+                        'userId' : self.buf[num][Chatd.MsgField.USERID],
+                        'timestamp' : self.buf[num][Chatd.MsgField.TIMESTAMP],
+                        'message' : self.buf[num][Chatd.MsgField.MESSAGE],
+                        'keyId' : self.buf[num][Chatd.MsgField.KEYID],
+                        'updated' : self.buf[num][Chatd.MsgField.UPDATED]
+                    });
+                });
+        });
+    }
+    else {
+        var cacheKey = base64urlencode(self.chatId) + ":" + messageId;
+        self.chatd.messagesQueueKvStorage.removeItem(cacheKey);
+    }
+};
+
+Chatd.Messages.prototype.restore = function() {
+    var self = this;
+
+    var prefix = base64urlencode(self.chatId);
+
+    self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
+
+        var messageConstructs = [];
+        // write the new message to the message buffer and mark as in sending state
+        // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
+        self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, 0];
+
+        self.chatd.trigger('onMessageUpdated', {
+            chatId: base64urlencode(self.chatId),
+            userId: base64urlencode(self.buf[self.highnum][Chatd.MsgField.USERID]),
+            id: self.highnum,
+            state: 'PENDING',
+            keyid: v.keyId,
+            message: v.message
+        });
+
+        self.sending[v.messageId] = self.highnum;
+        self.sendingList.push(v.messageId);
+
+        messageConstructs.push({"msgxid":v.messageId, "timestamp":v.timestamp,"keyid":v.keyId, "message":v.message, "type":1});
+        // if we believe to be online, send immediately
+        if (self.chatd.chatIdShard[self.chatId].isOnline()) {
+            self.chatd.chatIdShard[self.chatId].msg(self.chatId, messageConstructs);
+        }
+    });
+
+};
 Chatd.prototype.msgcheck = function(chatId, msgid) {
     if (this.chatIdMessages[chatId]) {
         this.chatIdMessages[chatId].check(chatId, msgid);

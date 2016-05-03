@@ -4650,25 +4650,46 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     var dpr = window.devicePixelRatio;
     var pf = navigator.platform.toUpperCase();
+    var brokenRatios = [
+        2.200000047683716,// 110% retina
+        1.100000023841858,// 110% non-retina
+        1.3320000171661377,// 67% retina
+        0.6660000085830688,// 67% non-retian, 33% retina
+        0.3330000042915344// 33% non-retina
+    ];
 
     if ($.browser.chrome) {
-        if (
-            (dpr === 2.200000047683716)// 110% retina
-            || (dpr === 1.100000023841858)// 100% non-retina
-            || (dpr === 1.3320000171661377)// 67% retina
-            || (dpr === 0.6660000085830688)// 67% non-retina and 33% retina
-            || (dpr === 0.3330000042915344)// 33% non-retina
-            ) {
-            if (pf.indexOf('MAC') >= 0) {
-                $('.nw-dark-overlay').addClass('mac');
-            } else {
-                $('.nw-dark-overlay').removeClass('mac');
-            }
+
+        $('.nw-dark-overlay').removeClass('mac');
+        $('.nw-dark-overlay.zoom-overlay').removeClass('zoom-67 zoom-33');
+
+        if (pf.indexOf('MAC') >= 0) {
+            $('.nw-dark-overlay').addClass('mac');
+        }
+
+        // zoom level110%
+        if ((dpr === 2.200000047683716) || (dpr === 1.100000023841858)) {
             $('.nw-dark-overlay.zoom-overlay').fadeIn(400);
         }
-        else {
+
+        // 67% both or 33% retina
+        if ((dpr === 1.3320000171661377) || (dpr === 0.6660000085830688)) {
+            $('.nw-dark-overlay.zoom-overlay')
+                .addClass('zoom-67')
+                .fadeIn(400);
+        }
+
+        // 33% non-retina
+        if (dpr === 0.3330000042915344) {
+            $('.nw-dark-overlay.zoom-overlay')
+                .addClass('zoom-33')
+                .fadeIn(400);
+        }
+
+        if (brokenRatios.indexOf(dpr) === -1) {
             $('.nw-dark-overlay.zoom-overlay').fadeOut(200);
         }
+
     }
 };
 

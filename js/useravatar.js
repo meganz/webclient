@@ -18,6 +18,8 @@ var useravatar = (function() {
         '#ffcc00'
     ];
 
+    var logger = MegaLogger.getLogger('useravatar');
+
     /**
      * List of TWO-letters avatars that we ever generated. It's useful to replace
      * the moment we discover the real avatar associate with that avatar
@@ -240,7 +242,7 @@ var useravatar = (function() {
             return ns.imgUrl(u_handle);
         }
         catch (ex) {
-            console.error(ex);
+            logger.error(ex);
             return '';
         }
     };
@@ -267,8 +269,10 @@ var useravatar = (function() {
     ns.loaded = function(user) {
 
         if (typeof user !== "string") {
+            logger.warn('Invalid user-handle provided!', user);
             return false;
         }
+        logger.debug('Processing loaded user-avatar', user);
 
         if (user === u_handle) {
             // my avatar!
@@ -338,7 +342,7 @@ var useravatar = (function() {
         }
 
         var letters = M.getNameByHandle(user.u);
-        
+
         if (!letters) {
             // XXX: not a known user?
             letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
@@ -346,6 +350,136 @@ var useravatar = (function() {
 
         return _letters(letters, user.u, className, element);
     };
+
+    // Generic logic to retrieve and process user-avatars
+    // from either server-side or local-cache
+    (function loadAvatarStub(ns) {
+        // hold pending promises waiting for avatar data
+        var pendingGetters = {};
+        // hold user-avatar handle who failed to retrieve
+        var missingAvatars = {};
+
+        /**
+         * Load the avatar associated with an user handle
+         * @param {String} handle The user handle
+         * @return {MegaPromise}
+         */
+        ns.loadAvatar = function(handle) {
+            // Ensure this is a sane call...
+            if (typeof handle !== 'string' || handle.length !== 11) {
+                logger.error('Unable to retrieve user-avatar, invalid handle!', handle);
+                return MegaPromise.reject(EARGS);
+            }
+            if (missingAvatars[handle]) {
+                // If the retrieval already failed for the current session
+                logger.warn('User-avatar retrieval for "%s" had failed...', handle, missingAvatars[handle]);
+                return MegaPromise.reject(missingAvatars[handle]);
+            }
+            if (pendingGetters[handle]) {
+                // It's already pending, return associated promise
+                logger.warn('User-avatar retrieval for "%s" already pending...', handle);
+                return pendingGetters[handle];
+            }
+            if (avatars[handle]) {
+                logger.warn('User-avatar for "%s" is already loaded...', handle, avatars[handle]);
+                return MegaPromise.resolve(EEXIST);
+            }
+
+            var promise = new MegaPromise();
+            pendingGetters[handle] = promise;
+
+            var reject = function(error) {
+                logger.warn('User-avatar retrieval for "%s" failed...', handle, error);
+
+                missingAvatars[handle] = error;
+                promise.reject.apply(promise, arguments);
+            };
+
+            logger.debug('Initiating user-avatar retrieval for "%s"...', handle);
+
+            mega.attr.get(handle, 'a', true, false)
+                .fail(reject)
+                .done(function(res) {
+                    var error = res;
+
+                    if (typeof res !== 'number' && res.length > 5) {
+                        try {
+                            var ab = base64_to_ab(res);
+                            ns.setUserAvatar(handle, ab);
+
+                            logger.info('User-avatar retrieval for "%s" successful.', handle, ab, avatars[handle]);
+
+                            return promise.resolve();
+                        }
+                        catch (ex) {
+                            error = ex;
+                        }
+                    }
+
+                    reject(error);
+                })
+                .always(function() {
+                    delete pendingGetters[handle];
+                    ns.loaded(handle);
+                });
+
+            return promise;
+        };
+
+        /**
+         * Set user-avatar based on its handle
+         * @param {String} handle The user handle
+         * @param {String} ab     ArrayBuffer with the avatar data
+         * @param {String} mime   mime-type (optional)
+         */
+        ns.setUserAvatar = function(handle, ab, mime) {
+            // deal with typedarrays
+            ab = ab.buffer || ab;
+
+            if (ab instanceof ArrayBuffer) {
+                // check if overwritting and cleanup
+                if (avatars[handle]) {
+                    try {
+                        myURL.revokeObjectURL(avatars[handle].url);
+                    }
+                    catch (ex) {
+                        logger.warn(ex);
+                    }
+                }
+
+                var blob = new Blob([ab], {type: mime || 'image/jpeg'});
+
+                avatars[handle] = {
+                    data: blob,
+                    url: myURL.createObjectURL(blob)
+                };
+            }
+            else {
+                logger.warn('setUserAvatar: Provided data is not an ArrayBuffer.', ab);
+            }
+        };
+
+        /**
+         * Invalidate user-avatar cache, if any
+         * @param {String} handle The user handle
+         */
+        ns.invalidateAvatar = function(handle) {
+            logger.debug('Invalidating user-avatar for "%s"...', handle);
+
+            if (pendingGetters[handle]) {
+                // this could indicate an out-of-sync flow, or calling M.avatars() twice...
+                logger.error('Invalidating user-avatar which is being retrieved!', handle);
+            }
+
+            avatars[handle] = missingAvatars[handle] = undefined;
+        };
+
+        if (d) {
+            ns._pendingGetters = pendingGetters;
+            ns._missingAvatars = missingAvatars;
+        }
+
+    })(ns);
 
     Soon(registerCssColors);
 

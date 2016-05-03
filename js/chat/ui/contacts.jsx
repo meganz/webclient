@@ -72,7 +72,7 @@ var ContactPresence = React.createClass({
     }
 });
 
-var _noAvatars = window._noAvatars = {};
+var _noAvatars = {};
 
 var Avatar = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
@@ -99,38 +99,14 @@ var Avatar = React.createClass({
             verifiedElement = <ContactVerified contact={this.props.contact} className={this.props.verifiedClassName} />
         }
 
-        if (!avatars[contact.u] && (!_noAvatars[contact.u] || _noAvatars[contact.u] !== true)) {
-            var loadAvatarPromise;
-            if (!_noAvatars[contact.u]) {
-                loadAvatarPromise = mega.attr.get(contact.u, 'a', true, false);
-            }
-            else {
-                loadAvatarPromise = _noAvatars[contact.u];
-            }
-
-            loadAvatarPromise
-                .done(function(r) {
-                    if (typeof r !== 'number' && r.length > 5) {
-                        var blob = new Blob([str_to_ab(base64urldecode(r))], {type: 'image/jpeg'});
-                        avatars[contact.u] = {
-                            data: blob,
-                            url: myURL.createObjectURL(blob)
-                        };
-
-                        useravatar.loaded(contact);
-
-                        delete _noAvatars[contact.u];
-                    }
-                    else {
-                        _noAvatars[contact.u] = true;
-                    }
-
+        if (!avatars[contact.u] && !_noAvatars[contact.u]) {
+            useravatar.loadAvatar(contact.u)
+                .done(function() {
                     self.safeForceUpdate();
                 })
                 .fail(function(e) {
                     _noAvatars[contact.u] = true;
                 });
-
         }
 
         if($avatar.find("img").length > 0) {

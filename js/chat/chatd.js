@@ -1165,6 +1165,9 @@ Chatd.Messages.prototype.restore = function() {
     var self = this;
 
     var prefix = base64urlencode(self.chatId);
+    // 1 hour is agreed by everyone.
+    var MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
+    var mintimestamp = Math.floor(new Date().getTime()/1000);
 
     self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
 
@@ -1173,25 +1176,42 @@ Chatd.Messages.prototype.restore = function() {
         // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
         self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated];
 
-        self.chatd.trigger('onMessageUpdated', {
-            chatId: base64urlencode(self.chatId),
-            userId: base64urlencode(self.buf[self.highnum][Chatd.MsgField.USERID]),
-            id: self.highnum,
-            state: 'PENDING',
-            keyid: v.keyId,
-            message: v.message
-        });
+        // if it does not expire, do auto send.
+        if (mintimestamp - v.timestamp < MESSAGE_NOT_EDITABLE_TIMEOUT) {
 
-        self.sending[v.messageId] = self.highnum;
-        self.sendingList.push(v.messageId);
+            self.chatd.trigger('onMessageUpdated', {
+                chatId: base64urlencode(self.chatId),
+                userId: base64urlencode(self.buf[self.highnum][Chatd.MsgField.USERID]),
+                id: self.highnum,
+                state: 'PENDING',
+                keyid: v.keyId,
+                message: v.message,
+                ts: v.timestamp
+            });
 
-        messageConstructs.push({"msgxid":v.messageId, "timestamp":v.timestamp,"keyid":v.keyId, "message":v.message, "type":1});
-        // if we believe to be online, send immediately
-        if (self.chatd.chatIdShard[self.chatId].isOnline()) {
-            self.chatd.chatIdShard[self.chatId].msg(self.chatId, messageConstructs);
-            if (v.edited === 1) {
-                self.chatd.chatIdShard[self.chatId].msgupdx(self.chatId, v.messageId, v.updated, v.message, v.keyId);
+            self.sending[v.messageId] = self.highnum;
+            self.sendingList.push(v.messageId);
+
+            messageConstructs.push({"msgxid":v.messageId, "timestamp":v.timestamp,"keyid":v.keyId, "message":v.message, "type":1});
+            // if we believe to be online, send immediately
+            if (self.chatd.chatIdShard[self.chatId].isOnline()) {
+                self.chatd.chatIdShard[self.chatId].msg(self.chatId, messageConstructs);
+                if (v.edited === 1) {
+                    self.chatd.chatIdShard[self.chatId].msgupdx(self.chatId, v.messageId, v.updated, v.message, v.keyId);
+                }
             }
+        }
+        else {
+            // if it expires, require manul send.
+            self.chatd.trigger('onMessageUpdated', {
+                chatId: base64urlencode(self.chatId),
+                userId: base64urlencode(self.buf[self.highnum][Chatd.MsgField.USERID]),
+                id: self.highnum,
+                state: 'EXPIRED',
+                keyid: v.keyId,
+                message: v.message,
+                ts:v.timestamp
+            });
         }
     });
 

@@ -442,6 +442,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'keyid': eventData.keyid,
                     'message': eventData.message,
                     'updated': eventData.updated,
+                    'delay' : eventData.ts,
                     'orderValue': eventData.id,
                     'sent': true
                 }

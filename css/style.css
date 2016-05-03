@@ -18569,6 +18569,8 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
     -khtml-opacity: 0.9;
     opacity: 0.9;
     z-index: 400;
+    left:0;
+    top:0;
 }
 .slideshow-dialog {
     min-width: 700px;

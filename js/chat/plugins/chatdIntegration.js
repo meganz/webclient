@@ -1008,6 +1008,28 @@ ChatdIntegration.prototype.deleteMessage = function(chatRoom, msgnum) {
     return self.updateMessage(chatRoom, msgnum, "");
 };
 
+/**
+ * Discard a message from the sending queue
+ *
+ * @param chatRoom
+ * @param msgnum
+ */
+ChatdIntegration.prototype.discardMessage = function(chatRoom, msgnum) {
+    var self = this;
+    var rawChatId = base64urldecode(chatRoom.chatId);
+
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    if (!chatMessages) {
+        return;
+    }
+
+    var msg = chatMessages.buf[msgnum];
+    if (!msg) {
+        return false;
+    }
+    return chatMessages.discard(msgnum);
+};
+
 // decorate ALL functions which require shard to be available before executing
 [
     'retrieveHistory',

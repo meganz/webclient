@@ -21,7 +21,7 @@ var Message = function(chatRoom, messagesBuff, vals) {
 
             'orderValue': false,
             'updated': false,
-            'sent': false,
+            'sent': Message.STATE.NOT_SENT,
             'deleted': false,
             'revoked': false,
         },
@@ -52,7 +52,6 @@ Message.prototype.getState = function() {
         return Message.STATE.NULL;
     }
 
-    var lastReceivedMessage = Message._mockupNonLoadedMessage(mb.lastDelivered, mb.messages[mb.lastDelivered], 0);
     var lastSeenMessage = Message._mockupNonLoadedMessage(mb.lastSeen, mb.messages[mb.lastSeen], 0);
 
     if (self.userId === u_handle) {
@@ -60,13 +59,16 @@ Message.prototype.getState = function() {
         if (self.deleted === true) {
             return Message.STATE.DELETED;
         }
-        else if (self.sent === false) {
+        else if (self.sent === Message.STATE.NOT_SENT) {
             return Message.STATE.NOT_SENT;
         }
-        else if (self.sent === true && self.orderValue > lastReceivedMessage.orderValue) {
+        else if (self.sent === Message.STATE.SENT) {
             return Message.STATE.SENT;
         }
-        else if (self.sent === true && self.orderValue <= lastReceivedMessage.orderValue) {
+        else if (self.sent === Message.STATE.NOT_SENT_EXPIRED) {
+            return Message.STATE.NOT_SENT_EXPIRED;
+        }
+        else if (self.sent === true) {
             return Message.STATE.DELIVERED;
         }
         else {
@@ -96,11 +98,12 @@ Message.prototype.getState = function() {
 Message.STATE = {
     'NULL': 0,
     'NOT_SEEN': 1,
-    'NOT_SENT': 20,
-    'SENT': 10,
+    'SENT': 10, /* SENT = CONFIRMED */
+    'NOT_SENT_EXPIRED': 14,
+    'NOT_SENT': 20, /* NOT_SENT = PENDING */
     'DELIVERED': 30,
     'SEEN': 40,
-    'DELETED': 8
+    'DELETED': 8,
 };
 Message.MANAGEMENT_MESSAGE_TYPES = {
     "MANAGEMENT": "\0",
@@ -377,7 +380,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             // is my own message?
             // mark as sent, since the msg was echoed from the server
             if (eventData.userId === u_handle) {
-                msgObject.sent = true;
+                msgObject.sent = Message.STATE.SENT;
             }
             var cacheKey = chatRoom.chatId + "_" + eventData.messageId;
             // if the message has already been decrypted, then just bail.
@@ -431,6 +434,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (self.chatRoom.chatId !== chatRoom.chatId) {
             return; // ignore event
         }
+        console.error(eventData.id, eventData.state, eventData);
 
         if (eventData.state === "EDITED") {
             var editedMessage = new Message(
@@ -474,53 +478,63 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     _runDecryption();
                 });
         }
-        if (eventData.state === "CONFIRMED") {
+        else if (eventData.state === "CONFIRMED") {
             self.haveMessages = true;
 
             if (!eventData.id) {
                 debugger;
             }
 
-            var found = false;
+            var foundMessage = self.getByInternalId(eventData.id);
 
-            self.messages.every(function(v, k) {
-                if (v.internalId === eventData.id) {
-                    var confirmedMessage = new Message(
-                        chatRoom,
-                        self,
-                        {
-                            'messageId': eventData.messageId,
-                            'userId': eventData.userId,
-                            'keyid': eventData.keyid,
-                            'message': eventData.message,
-                            'textContents': v.textContents ? v.textContents : "",
-                            'delay': v.delay,
-                            'orderValue': eventData.id,
-                            'sent': true
-                        }
-                    );
-                    
-                    self.messages.removeByKey(v.messageId);
-                    self.messages.push(confirmedMessage);
-
-                    if (v.textContents) {
-                        self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, confirmedMessage);
+            if (foundMessage) {
+                var confirmedMessage = new Message(
+                    chatRoom,
+                    self,
+                    {
+                        'messageId': eventData.messageId,
+                        'userId': eventData.userId,
+                        'keyid': eventData.keyid,
+                        'message': eventData.message,
+                        'textContents': foundMessage.textContents ? foundMessage.textContents : "",
+                        'delay': foundMessage.delay,
+                        'orderValue': eventData.id,
+                        'sent': true
                     }
+                );
 
-                    found = true;
+                self.messages.removeByKey(foundMessage.messageId);
+                self.messages.push(confirmedMessage);
 
-                    return false; // break
+                if (foundMessage.textContents) {
+                    self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, confirmedMessage);
                 }
-                else {
-                    return true;
-                }
-            });
-            if (!found) {
+            }
+            else {
                 // its ok, this happens when a system/protocol message was sent
                 console.error("Not found: ", eventData.id);
                 return;
             }
         }
+        else if (eventData.state === "EXPIRED") {
+            self.haveMessages = true;
+
+            if (!eventData.id) {
+                debugger;
+            }
+
+            var foundMessage = self.getByInternalId(eventData.id);
+
+            if (foundMessage) {
+                foundMessage.sent = Message.STATE.NOT_SENT_EXPIRED;
+            }
+            else {
+                // its ok, this happens when a system/protocol message was sent
+                console.error("Not found: ", eventData.id);
+                return;
+            }
+        }
+        // NO NEED to handle PENDING, all messages when created are initialised with STATE = PENDING
     });
 
     self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
@@ -567,6 +581,25 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 };
 
 
+MessagesBuff.prototype.getByInternalId = function(internalId) {
+    assert(internalId, 'missing internalId');
+
+    var self = this;
+    var found = false;
+
+    self.messages.every(function(v, k) {
+        if (v.internalId === internalId) {
+
+            found = v;
+
+            return false; // break
+        }
+        else {
+            return true;
+        }
+    });
+    return found;
+};
 MessagesBuff.prototype.getUnreadCount = function() {
     return this._unreadCountCache;
 };

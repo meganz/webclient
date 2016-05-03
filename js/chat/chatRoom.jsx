@@ -926,33 +926,13 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
 
     eventObject.textContents = message;
 
-    if (
-        megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
-        self.arePluginsForcingMessageQueue(message) ||
-        self.state !== ChatRoom.STATE.READY
-    ) {
 
-        var event = new $.Event("onQueueMessage");
-
-        self.megaChat.trigger(event, [
-            eventObject,
-            self
-        ]);
-
-        if (event.isPropagationStopped()) {
-            return false;
-        }
-
-        self.appendMessage(eventObject);
-    }
-    else {
-        self._sendMessageToTransport(eventObject)
-            .done(function(internalId) {
-                eventObject.internalId = internalId;
-            });
-        
-        self.appendMessage(eventObject);
-    }
+    self.appendMessage(eventObject);
+    
+    self._sendMessageToTransport(eventObject)
+        .done(function(internalId) {
+            eventObject.internalId = internalId;
+        });
 };
 
 /**

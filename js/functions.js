@@ -4649,16 +4649,19 @@ function getGatewayName(gatewayId) {
 mega.utils.chrome110ZoomLevelNotification = function() {
 
     var dpr = window.devicePixelRatio;
+    var pf = navigator.platform.toUpperCase();
 
     if ($.browser.chrome) {
         if ((dpr === 2.200000047683716) || (dpr === 1.100000023841858)) {
-            $('.slideshow-overlay').fadeIn(400);
-            showToast('settings', l[8692], '');
+            if (pf.indexOf('MAC') >= 0) {
+                $('.nw-dark-overlay').addClass('mac');
+            } else {
+                $('.nw-dark-overlay').removeClass('mac');
+            }
+            $('.nw-dark-overlay.zoom-overlay').fadeIn(400);
         }
         else {
-            hideToast();
-            $('.slideshow-overlay').fadeOut(200);
-
+            $('.nw-dark-overlay.zoom-overlay').fadeOut(200);
         }
     }
 };

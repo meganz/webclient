@@ -24204,13 +24204,17 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 
 /* Zoom overlay */
 .zoom-overlay-content {
-    width: 540px;
+    max-width: 580px;
     position: absolute;
     left: 50%;
     top: 50%;
-    margin: -184px 0 0 -270px;
+    margin: -203px 0 0 -270px;
     text-align: center;
     font-size: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 20px;
 }
 .zoom-overlay-icon {
     width: 160px;

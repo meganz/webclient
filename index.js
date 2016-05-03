@@ -255,6 +255,56 @@ function init_page() {
         closeDialog();
     }
 
+    if (localStorage._proRegisterAccount) {
+        var acc = JSON.parse(localStorage._proRegisterAccount);
+        delete localStorage._proRegisterAccount;
+
+        var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
+        var $button = $('.resend-email-button', $dialog);
+
+        $dialog.addClass('special').show();
+        $('input', $dialog).val(acc.email);
+
+        $button.rebind('click', function _click() {
+            var ctx = {
+                callback: function(res) {
+                    loadingDialog.hide();
+
+                    if (res !== 0) {
+                        console.error('sendsignuplink failed', res);
+
+                        $button.addClass('disabled');
+                        $button.unbind('click');
+
+                        var tick = 26;
+                        var timer = setInterval(function() {
+                            if (--tick === 0) {
+                                clearInterval(timer);
+                                $button.text('Resend');
+                                $button.removeClass('disabled');
+                                $button.rebind('click', _click);
+                            }
+                            else {
+                                $button.text('\u23F1 ' + tick + '...');
+                            }
+                        }, 1000);
+
+                        alert(l[200]);
+                    }
+                    else {
+                        closeDialog();
+                        fm_showoverlay();
+                        $dialog.removeClass('hidden');
+                    }
+                }
+            };
+            loadingDialog.show();
+            sendsignuplink(acc.name, acc.email, acc.password, ctx);
+        });
+        fm_showoverlay();
+        return;
+    }
+
     var fmwasinitialized = !!fminitialized;
     if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid)) {
 
@@ -1156,7 +1206,7 @@ function topmenuUI() {
                 megaChat.renderMyStatus();
             }
         }
-        
+
         // Show PRO plan expired warning popup (if applicable)
         alarm.planExpired.render();
     }
@@ -1170,7 +1220,7 @@ function topmenuUI() {
             if (isNonActivatedAccount()) {
                 alarm.nonActivatedAccount.render();
             }
-            
+
             // Otherwise show the ephemeral session warning
             else if (($.len(M.c[M.RootID] || {})) && (page !== 'register')) {
                 alarm.ephemeralSession.render();

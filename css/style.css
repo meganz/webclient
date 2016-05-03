@@ -24216,6 +24216,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     box-sizing: border-box;
     padding: 0 20px;
 }
+.zoom-67 .zoom-overlay-content {
+        zoom: 270%;
+}
+.zoom-33 .zoom-overlay-content {
+        zoom: 140%;
+}
 .zoom-overlay-icon {
     width: 160px;
     height: 160px;

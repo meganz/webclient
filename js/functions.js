@@ -4652,7 +4652,12 @@ mega.utils.chrome110ZoomLevelNotification = function() {
     var pf = navigator.platform.toUpperCase();
 
     if ($.browser.chrome) {
-        if ((dpr === 2.200000047683716) || (dpr === 1.100000023841858)) {
+        if (
+            (dpr === 2.200000047683716)
+            || (dpr === 1.100000023841858)
+            || (dpr === 0.6660000085830688)
+            || (dpr === 0.3330000042915344)
+            ) {
             if (pf.indexOf('MAC') >= 0) {
                 $('.nw-dark-overlay').addClass('mac');
             } else {

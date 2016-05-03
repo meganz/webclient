@@ -4653,10 +4653,11 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     if ($.browser.chrome) {
         if (
-            (dpr === 2.200000047683716)
-            || (dpr === 1.100000023841858)
-            || (dpr === 0.6660000085830688)
-            || (dpr === 0.3330000042915344)
+            (dpr === 2.200000047683716)// 110% retina
+            || (dpr === 1.100000023841858)// 100% non-retina
+            || (dpr === 1.3320000171661377)// 67% retina
+            || (dpr === 0.6660000085830688)// 67% non-retina and 33% retina
+            || (dpr === 0.3330000042915344)// 33% non-retina
             ) {
             if (pf.indexOf('MAC') >= 0) {
                 $('.nw-dark-overlay').addClass('mac');

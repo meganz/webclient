@@ -4652,12 +4652,15 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     if ($.browser.chrome) {
         if ((dpr === 2.200000047683716) || (dpr === 1.100000023841858)) {
-            showToast('settings', 'MEGA cannot be used at 110% zoom. Please zoom either in, or out.', '');
+            $('.slideshow-overlay').fadeIn(400);
+            showToast('settings', l[8692], '');
         }
         else {
             hideToast();
+            $('.slideshow-overlay').fadeOut(200);
+
         }
     }
 };
 
-mBroadcaster.once('fm:initialized', mega.utils.chrome110ZoomLevelNotification);
+mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);

@@ -199,6 +199,7 @@ var ConversationsList = React.createClass({
         }
     },
     handleWindowResize: function() {
+
         var contentPanelConversations = document.querySelector('.content-panel.conversations');
         if (
             !contentPanelConversations ||
@@ -312,6 +313,11 @@ var ConversationsList = React.createClass({
 
 var ConversationsApp = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    getInitialState: function() {
+        return {
+            'leftPaneWidth': mega.config.get('leftPaneWidth')
+        };
+    },
     startChatClicked: function(contact, e) {
         e.preventDefault();
         window.location = "#fm/chat/" + contact.u;
@@ -384,13 +390,57 @@ var ConversationsApp = React.createClass({
                 return false;
 
             }
-        }); 
+        });
+
+        var lPane = $('.conversationsApp .fm-left-panel');
+
+        self.fmConfigThrottling = null;
+        self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function() {
+            clearTimeout(self.fmConfigThrottling);
+            self.fmConfigThrottling = setTimeout(function fmConfigThrottlingLeftPaneResize() {
+                self.setState({
+                    'leftPaneWidth': mega.config.get('leftPaneWidth')
+                });
+            }, 500);
+            lPane.width(mega.config.get('leftPaneWidth'));
+            $('.fm-tree-panel', lPane).width(mega.config.get('leftPaneWidth'));
+            $('.jScrollPaneContainer', lPane).trigger('forceResize');
+        });
+
+
+        $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
+
+        if (fmconfig.leftPaneWidth) {
+            lPane.width(Math.min(
+                $.leftPaneResizableChat.options.maxWidth,
+                Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)
+            ));
+        }
+
+        $($.leftPaneResizableChat).on('resize', function() {
+            var w = lPane.width();
+            if (w >= $.leftPaneResizableChat.options.maxWidth) {
+                $('.left-pane-drag-handle').css('cursor', 'w-resize')
+            } else if (w <= $.leftPaneResizableChat.options.minWidth) {
+                $('.left-pane-drag-handle').css('cursor', 'e-resize')
+            } else {
+                $('.left-pane-drag-handle').css('cursor', 'we-resize')
+            }
+        });
+
+        $($.leftPaneResizableChat).on('resizestop', function() {
+            $('.fm-left-panel').width(
+                lPane.width()
+            );
+        });
+
         this.handleWindowResize();
 
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
         $(document).unbind('keydown.megaChatTextAreaFocus');
+        mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
     },
     componentDidUpdate: function() {
         this.handleWindowResize();
@@ -415,9 +465,10 @@ var ConversationsApp = React.createClass({
 
         var leftPanelStyles = {};
 
-        if (fmconfig && fmconfig.leftPaneWidth) {
-            leftPanelStyles.width = fmconfig.leftPaneWidth;
+        if (self.state.leftPaneWidth) {
+            leftPanelStyles.width = self.state.leftPaneWidth;
         }
+
 
         return (
             <div className="conversationsApp" key="conversationsApp">

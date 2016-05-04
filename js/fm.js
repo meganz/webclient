@@ -909,7 +909,7 @@ function initUI() {
         setTimeout(browserDialog, 2000);
     }
 
-    var lPane = $('.fm-left-panel')
+    var lPane = $('.fm-left-panel');
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
         'minWidth': 200,

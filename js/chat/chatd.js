@@ -174,6 +174,8 @@ Chatd.Shard = function(chatd, shard) {
 
     self.keepAliveTimer = null;
 
+    self.needRestore = true;
+
     self.connectionRetryManager = new ConnectionRetryManager(
         {
             functions: {
@@ -293,7 +295,6 @@ Chatd.Shard.prototype.reconnect = function() {
         self.triggerSendIfAble();
         self.rejoinexisting();
         self.clearpending();
-        self.restore();
         self.chatd.trigger('onOpen', {
             shard: self
         });
@@ -349,6 +350,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
         console.error("MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+
         self.cmdq += String.fromCharCode(opCode)+cmd;
     });
 
@@ -632,13 +634,15 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.HISTDONE:
                 self.keepAliveTimerRestart();
                 self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
-
+                if (self.needRestore === true) {
+                    self.restore();
+                    self.needRestore = false;
+                }
                 self.chatd.trigger('onMessagesHistoryDone',
                     {
                         chatId: base64urlencode(cmd.substr(1,8))
                     }
                 );
-
                 len = 9;
                 break;
             case Chatd.Opcode.NEWKEY:
@@ -746,6 +750,7 @@ Chatd.prototype.join = function(chatId, shard, url) {
 
 // submit a new message to the chatId
 Chatd.prototype.submit = function(chatId, messages, keyId) {
+
     if (this.chatIdMessages[chatId]) {
         return this.chatIdMessages[chatId].submit(messages, keyId);
     }
@@ -768,7 +773,7 @@ Chatd.prototype.updatekeyid = function(chatId, keyid, keyxid) {
     if (!this.chatIdMessages[chatId]) {
         return false;
     }
-
+    this.chatIdMessages[chatId].updatepersistencykeyid(keyid, keyxid);
     return this.chatIdMessages[chatId].updatekeyid(keyid, keyxid);
 };
 
@@ -1068,7 +1073,7 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
         messageId: base64urlencode(msgid),
         userId: base64urlencode(userId),
         ts: timestamp,
-        updated: updated,
+        updated: updated - 1,
         keyid : keyid,
         message: msg,
         isNew: newmsg
@@ -1161,6 +1166,26 @@ Chatd.Messages.prototype.persist = function(messageId) {
     }
 };
 
+Chatd.Messages.prototype.updatepersistencykeyid = function(keyid, keyxid) {
+    var self = this;
+    var prefix = base64urlencode(self.chatId);
+
+    self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
+        if ((v.keyId >>> 0) === keyxid) {
+            var cacheKey = base64urlencode(self.chatId) + ":" + v.messageId;
+            self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
+                'messageId' : v.messageId,
+                'userId' : v.userId,
+                'timestamp' : v.timestamp,
+                'message' : v.message,
+                'keyId' : keyid,
+                'updated' : v.updated,
+                'edited' : v.edited
+            });
+        }
+    });
+};
+
 Chatd.Messages.prototype.restore = function() {
     var self = this;
 
@@ -1214,8 +1239,8 @@ Chatd.Messages.prototype.restore = function() {
             });
         }
     });
-
 };
+
 Chatd.prototype.msgcheck = function(chatId, msgid) {
     if (this.chatIdMessages[chatId]) {
         this.chatIdMessages[chatId].check(chatId, msgid);

@@ -12,7 +12,6 @@ var ConversationsUI = require('./../ui/conversations.jsx');
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
-
     getInitialState: function () {
         return {
             typedMessage: this.props.initialText ? this.props.initialText : ""
@@ -64,6 +63,16 @@ var TypingArea = React.createClass({
             self.stoppedTyping();
         }, 2000);
     },
+    triggerOnUpdate: function() {
+        if (!this.props.onUpdate) {
+            return;
+        }
+
+        if (this.state.typedMessage != this.lastTypedMessage) {
+            this.lastTypedMessage = this.state.typedMessage;
+            this.props.onUpdate();
+        }
+    },
     stoppedTyping: function () {
         if (this.props.disabled) {
             return;
@@ -79,9 +88,7 @@ var TypingArea = React.createClass({
 
         if (self.iAmTyping) {
             // only trigger event if needed.
-            if (self.props.onUpdate) {
-                self.props.onUpdate();
-            }
+            self.triggerOnUpdate();
         }
         if (room && room.state === ChatRoom.STATE.READY && self.iAmTyping === true) {
             room.megaChat.karere.sendComposingPaused(room.roomJid);
@@ -205,9 +212,7 @@ var TypingArea = React.createClass({
         var $container = $(ReactDOM.findDOMNode(this));
         $('.chat-textarea-scroll', $container).triggerHandler('keyup');
 
-        if (self.props.onUpdate) {
-            self.props.onUpdate();
-        }
+        self.triggerOnUpdate();
 
     },
     isActive: function () {

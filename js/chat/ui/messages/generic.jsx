@@ -3,12 +3,51 @@ var utils = require('./../../../ui/utils.jsx');
 var getMessageString = require('./utils.jsx').getMessageString;
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var ContactsUI = require('./../contacts.jsx');
+var TypingAreaUI = require('./../typingArea.jsx');
 
 /* 1h as confirmed by Mathias */
 var MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
+    getInitialState: function() {
+        return {
+            'editing': false
+        };
+    },
+    componentWillUpdate: function(nextProps, nextState) {
+        // $(document).rebind('keyup.megaChatEditTextareaClose' + chatRoom.roomJid, function(e) {
+        //     if (!self.state.editingMessageId) {
+        //         return;
+        //     }
+        //
+        //     var megaChat = self.props.chatRoom.megaChat;
+        //     if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === self.props.chatRoom.roomJid) {
+        //         if (e.keyCode === 27) {
+        //             self.setState({'editingMessageId': false});
+        //             e.preventDefault();
+        //             e.stopPropagation();
+        //             return false;
+        //         }
+        //
+        //     }
+        // });
+    },
+    componentDidUpdate: function(oldProps, oldState) {
+        var self = this;
+        if (self.state.editing === true && self.isMounted()) {
+            var $generic = $(self.findDOMNode());
+            var $textarea = $('textarea', $generic);
+            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
+                $textarea.focus();
+                moveCursortoToEnd($textarea[0]);
+            }
+        }
+    },
+    componentWillUnmount: function() {
+        var self = this;
+        $(document).unbind('keyup.megaChatEditTextareaClose' + self.props.chatRoom.roomJid);
+    },
     doDelete: function(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
@@ -22,16 +61,6 @@ var GenericConversationMessage = React.createClass({
 
         //TODO: new chatd api for dequeueing msgs
         chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
-    },
-    doRetry: function(e, msg) {
-        e.preventDefault(e);
-        e.stopPropagation(e);
-        var chatRoom = this.props.chatRoom;
-
-        chatRoom._sendMessageToTransport(msg)
-            .done(function(internalId) {
-                msg.internalId = internalId;
-            });
     },
     doRetry: function(e, msg) {
         e.preventDefault(e);
@@ -659,19 +688,23 @@ var GenericConversationMessage = React.createClass({
                 }
 
                 var messageDisplayBlock;
-                if (self.props.isBeingEdited === true) {
+                if (self.state.editing === true) {
                     messageDisplayBlock = <TypingAreaUI.TypingArea
                         iconClass="small-icon writing-pen textarea-icon"
                         initialText={message.textContents}
                         chatRoom={self.props.chatRoom}
                         className="edit-typing-area"
                         onUpdate={() => {
-                                    self.forceUpdate();
-                                }}
+                            self.safeForceUpdate();
+                        }}
                         onConfirm={(messageContents) => {
+                            message.textContents = messageContents;
+                            self.setState({'editing': false});
+
                             if (self.props.onEditDone) {
                                 self.props.onEditDone(messageContents);
                             }
+
                             return true;
                         }}
                     >
@@ -699,6 +732,17 @@ var GenericConversationMessage = React.createClass({
                                 positionAt="right bottom"
                                 horizOffset={4}
                             >
+                                <DropdownsUI.DropdownItem
+                                    icon="writing-pen"
+                                    label={__(l[1342])}
+                                    className=""
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        self.setState({'editing': true});
+                                }}
+                                />
+                                <hr/>
                                 <DropdownsUI.DropdownItem
                                     icon="red-cross"
                                     label={__(l[1730])}

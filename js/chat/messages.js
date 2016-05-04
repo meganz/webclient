@@ -446,7 +446,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'keyid': eventData.keyid,
                     'message': eventData.message,
                     'updated': eventData.updated,
-                    'delay' : eventData.ts,
+                    'delay' : eventData.ts ? eventData.ts : unixtime(),
                     'orderValue': eventData.id,
                     'sent': true
                 }
@@ -454,15 +454,20 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             var _runDecryption = function() {
                 try {
                         var decrypted = chatRoom.protocolHandler.decryptFrom(
-                            editedMessage.message,
-                            editedMessage.userId,
-                            editedMessage.keyid,
+                            eventData.message,
+                            eventData.userId,
+                            eventData.keyid,
                             false
                         );
                         if (decrypted) {
                             //if the edited payload is an empty string, it means the message has been deleted.
-                            chatRoom.messagesBuff.messages[editedMessage.messageId].textContents = decrypted.payload;
-                            self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, chatRoom.messagesBuff.messages[editedMessage.messageId]);
+                            editedMessage.textContents = decrypted.payload;
+                            chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
+                            chatRoom.messagesBuff.messages.push(editedMessage);
+
+                            self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
+                                chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
+                            );
                         }
                     } catch(e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);

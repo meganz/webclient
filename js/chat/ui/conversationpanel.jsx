@@ -700,7 +700,6 @@ var ConversationPanel = React.createClass({
             currentlyTyping: [],
             attachCloudDialog: false,
             messagesToggledInCall: false,
-            editingMessageId: false,
             sendContactDialog: false,
             confirmDeleteDialog: false,
             messageToBeDeleted: null
@@ -912,24 +911,6 @@ var ConversationPanel = React.createClass({
                 }
             }
         });
-
-
-        $(document).rebind('keyup.megaChatEditTextareaClose' + chatRoom.roomJid, function(e) {
-            if (!self.state.editingMessageId) {
-                return;
-            }
-
-            var megaChat = self.props.chatRoom.megaChat;
-            if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === self.props.chatRoom.roomJid) {
-                if (e.keyCode === 27) {
-                    self.setState({'editingMessageId': false});
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-
-            }
-        });
     },
     componentWillUnmount: function() {
         var self = this;
@@ -942,8 +923,6 @@ var ConversationPanel = React.createClass({
 
         megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
         megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
-
-        $(document).unbind('keyup.megaChatEditTextareaClose' + self.props.chatRoom.roomJid);
     },
     componentDidUpdate: function() {
         var self = this;
@@ -1178,10 +1157,6 @@ var ConversationPanel = React.createClass({
                             key={v.messageId}
                             contact={M.u[v.userId]}
                             grouped={grouped}
-                            isBeingEdited={self.state.editingMessageId === v.messageId}
-                            onEditDone={(messageContents) => {
-                            self.setState({'editingMessageId': false});
-                        }}
                         />
                     }
 
@@ -1195,9 +1170,12 @@ var ConversationPanel = React.createClass({
                             key={v.messageId}
                             contact={contact}
                             grouped={grouped}
-                            isBeingEdited={self.state.editingMessageId === v.messageId}
                             onEditDone={(messageContents) => {
-                                self.setState({'editingMessageId': false});
+                                room.megaChat.plugins.chatdIntegration.updateMessage(
+                                    room,
+                                    v.orderValue,
+                                    messageContents
+                                );
                             }}
                             onDeleteClicked={(e, msg) => {
                                 self.setState({

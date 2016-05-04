@@ -2187,7 +2187,6 @@
     "7118": "%ld fotek",
     "7119": "%ld vide\u00ed",
     "7120": "%1$ld fotek, %2$ld vide\u00ed",
-    "7121": "%1$ld z %2$ld",
     "7122": "Tato aplikace nem\u00e1 p\u0159\u00edstup k va\u0161im fotk\u00e1m nebo vide\u00edm.",
     "7123": "P\u0159\u00edstup m\u016f\u017eete povolit v Nastaven\u00ed ochrany osobn\u00edch \u00fadaj\u016f.",
     "7124": "\u017d\u00e1dn\u00e9 fotky nebo videa",
@@ -3219,8 +3218,9 @@
     "8687": "nede\u0161ifrovan\u00fd soubor",
     "8688": "\u010cek\u00e1n\u00ed na potvrzen\u00ed e-mailu.",
     "8690": "Nem\u00e1te p\u0159\u00edstup k vybran\u00e9 cest\u011b stahov\u00e1n\u00ed. Vyberte jinou cestu stahov\u00e1n\u00ed a zkuste to znovu.",
-    "8691": "Please go to your inbox and click the link to confirm your account.",
-    "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
+    "8691": "P\u0159ejd\u011bte do sv\u00e9 p\u0159\u00edchoz\u00ed po\u0161ty a klikn\u011bte na odkaz pro potvrzen\u00ed va\u0161eho \u00fa\u010dtu.",
+    "8692": "Kv\u016fli chyb\u011b vykreslov\u00e1n\u00ed v prohl\u00ed\u017ee\u010d\u00edch Chrome a Chromium nem\u016f\u017ee b\u00fdt MEGA pou\u017eito p\u0159i 110% zv\u011bt\u0161en\u00ed. Pou\u017eijte zv\u011bt\u0161en\u00ed, zmen\u0161en\u00ed, stiskn\u011bte Ctrl\/Cmd + 0 pro obnoven\u00ed \u00farovn\u011b zv\u011bt\u0161en\u00ed nebo p\u0159ejd\u011bte na Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3284,6 +3284,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

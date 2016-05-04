@@ -2187,7 +2187,6 @@
     "7118": "%ld Fotos",
     "7119": "%ld V\u00eddeos",
     "7120": "%1$ld Fotos, %2$ld V\u00eddeos",
-    "7121": "%1$ld de %2$ld",
     "7122": "Este aplicativo n\u00e3o possui acesso \u00e0s suas fotos e v\u00eddeos.",
     "7123": "Voc\u00ea pode habilitar acesso nas Configura\u00e7\u00f5es de Privacidade.",
     "7124": "N\u00e3o h\u00e1 Fotos ou V\u00eddeos",
@@ -2561,12 +2560,12 @@
     "7512": "%d arquivos movidos para a Lixeira!",
     "7513": "Erro de permiss\u00f5es",
     "7514": "Verifique suas permiss\u00f5es nesta pasta",
-    "7515": "Pasta compartilhada!",
+    "7515": "Pasta compartilhada",
     "7516": "Arquivo importado!",
     "7517": "Selecione os itens",
     "7518": "%lu fotos",
     "7519": "%lu foto",
-    "7520": "Camera Uploads ativada!",
+    "7520": "Camera Uploads ativada",
     "7521": "%lu item selecionado",
     "7522": "%lu itens selecionados",
     "7523": "Camera Uploads ser\u00e1 desativada, porque voc\u00ea n\u00e3o tem espa\u00e7o suficiente no seu dispositivo",
@@ -2577,7 +2576,7 @@
     "7528": "Tem certeza que deseja remover% @ da sua lista de contatos?",
     "7529": "Tem certeza que deseja remover %d usu\u00e1rios da sua lista de contatos?",
     "7530": "%d contatos removidos ",
-    "7531": "Contato %@ removido!",
+    "7531": "Contato %@ removido",
     "7532": "Este contato n\u00e3o tem e-mail",
     "7533": "Esta pasta j\u00e1 n\u00e3o se encontra partilhada",
     "7534": "Apenas de leitura",
@@ -3221,6 +3220,7 @@
     "8690": "Voc\u00ea n\u00e3o possui acesso ao caminho de download selecionado. Por favor, selecione outro caminho ou tente novamente.",
     "8691": "Por favor, entre em sua inbox e clique no link de confirma\u00e7\u00e3o da conta.",
     "8692": "Devido a um bug de renderiza\u00e7\u00e3o nos navegadores Chrome\/Chromium, MEGA n\u00e3o pode ser utilizado com 110% de zoom. Por favor, pressione Ctrl\/Cmd + 0 para resetar o n\u00edvel de zoom, ou utilize o Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3284,6 +3284,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

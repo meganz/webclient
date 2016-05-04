@@ -2187,7 +2187,6 @@
     "7118": "%ld Foto's",
     "7119": "%ld Video's",
     "7120": "%1$ld Foto's, %2$ld Video's",
-    "7121": "%1$ld of %2$ld",
     "7122": "Deze app heeft geen toegang tot uw foto's of video's.",
     "7123": "U kunt de toegang inschakelen in de Privacy Instellingen.",
     "7124": "Geen Foto's of Video's",
@@ -2561,7 +2560,7 @@
     "7512": "%d bestanden gewijzigd naar de Vuilnisbak",
     "7513": "Permissie fout",
     "7514": "Bekijk uw rechten voor deze map",
-    "7515": "Map gedeeld!",
+    "7515": "Map gedeeld",
     "7516": "Bestand ge\u00efmporteerd!",
     "7517": "Geselecteerde items",
     "7518": "%lu foto's",
@@ -2577,9 +2576,9 @@
     "7528": "Weet u zeker dat u %@ uit uw contactenlijst wilt verwijderen?",
     "7529": "Weet u zeker dat u %d gebruikers uit uw contactenlijst wilt verwijderen?",
     "7530": "%d contacten verwijderd",
-    "7531": "Contact %@ verwijderd!",
+    "7531": "Contact %@ verwijderd",
     "7532": "Dit contactpersoon heeft geen email adres",
-    "7533": "Map verlaten!",
+    "7533": "Map verlaten",
     "7534": "Alleen lezen",
     "7535": "Beveiligingsopties",
     "7536": "Geen email account ingesteld op uw device",
@@ -3221,6 +3220,7 @@
     "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
     "8691": "Please go to your inbox and click the link to confirm your account.",
     "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3284,6 +3284,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

@@ -2187,7 +2187,6 @@
     "7118": "%ld Kuvaa",
     "7119": "%ld Videota",
     "7120": "%1$ld Kuvaa, %2$ld Videota",
-    "7121": "%1$ld %2$ld:sta",
     "7122": "T\u00e4ll\u00e4 sovelluksella ei ole p\u00e4\u00e4syoikeutta kuviisi tai videoihisi.",
     "7123": "Voit sallia p\u00e4\u00e4syn Yksityisyysasetuksissa.",
     "7124": "Ei kuvia tai videoita",
@@ -3221,6 +3220,7 @@
     "8690": "Ei p\u00e4\u00e4sy\u00e4 valittuun latauspolkuun. Ole hyv\u00e4 ja valitse toinen latauspolku ja yrit\u00e4 uudelleen.",
     "8691": "Please go to your inbox and click the link to confirm your account.",
     "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3284,6 +3284,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

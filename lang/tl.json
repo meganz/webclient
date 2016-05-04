@@ -2187,7 +2187,6 @@
     "7118": "%ld Photos",
     "7119": "%ld Videos",
     "7120": "%1$ld Photos, %2$ld Videos",
-    "7121": "%1$ld of %2$ld",
     "7122": "Ang app na ito ay walang access sa inyong litrato o videos.",
     "7123": "Pwede mong paganahin ang access sa Privacy Settings.",
     "7124": "Walang mga litrato o video",
@@ -3054,7 +3053,7 @@
     "8510": "Mapapahi lahat ng inyong local data at lala-log out ka sa loob ng %d segundo.",
     "8511": "Ang inyong account ay hindi ma-aupgrade buhat sa app. Icontact ang support@mega.nz para iaupgrade ang inyong account.",
     "8512": "Basahin pa",
-    "8513": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.Upload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.Inside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.For more info, please check our website:Mobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.htmlDesktop - https:\/\/mega.nz\/Note: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+    "8513": "Ang MEGA ay isang secure na cloud storage na nagbibigay ng libreng 50 GB storage space. Hindi gaya sa ibang cloud storage providers, ang inyong data ay encrypted at idedecrypt lamang ng inyong devices at hindi namin.Iupload ang inyong files pamula sa inyong smartphone o tablet at hanapin, itabi, i-download, i-stream, tingnan, ibahagi, palitan ng pangalan o pahiin ang inyong files, kahit anong oras, saan mang device, kahit saan. Ibahagi ang inyong folders sa inyong mga contacts at makita kaagad ang kanilang updates.Ang ibig sabihin ng proseso ng encryption ay hindi namin ma-access o maiireset ang inyong password kaya't KAILANGAN mong tandaan ito (liban na lamang kung naka-back up ang iyong Master Key) o mawawala ang iyong access sa mga stored files mo.Sa loob ng app, pupwede mong i-upgrade ang iyong storage space at bandwidth quota sa pamamagitan ng buwanan o taunang subscription.PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.PRO I subscription: \u20ac9.99 (US$9.99) kada buwan o \u20ac99.99 (US$99.99) kada taon ay magbibigay sa inyo ng 500 GB na storage space o 2 TB ng bandwidth kada buwan.PRO II subscription: \u20ac19.99 (US$19.99) kada buwan o \u20ac199.99 (US$199.99) kada taon ay magbibigay ng 2 TB na storage space o 4 TB na bandwidth kada buwan.PRO III subscription: \u20ac29.99 (US$29.99) kada buwan o \u20ac299.99 (US$299.99) kada taon ay magbibigay sa iyo ng 4 TB na storage space o 8 TB ng bandwidth kada buwan.Para sa dagdag pang impormasyon, bumisita sa website:Mobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.htmlDesktop - https:\/\/mega.nz\/Paalala: Para sa desktop access sa iyong mga files, kailangan gumamit nang MEGA ng mga browsers na pupwede sa HTML5 para mahandle ang mga advance features. Iminumungkahi naming gumamit ng Mozilla Firefox at Google Chrome. Pero, ang bersyong pang-mobile ng mga browsers ay hindi pupwedeng umaaccess sa Mega cloud storage system.",
     "8514": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
     "8515": "Pagganahin ang DEBUG mode",
     "8516": "Isang log ang gagawin sa Offline section (MEGAiOS.log).",
@@ -3221,6 +3220,7 @@
     "8690": "Wala kang access sa iyong napililng download path. Maaari kang pumili ng ibang download path at muling subukan ito.",
     "8691": "Pumunta sa iyong inbox at i-click ang link para kumpirmahin ang inyong link.",
     "8692": "Dahil sa rendering bug sa Chrome\/Chromium browsers, ang MEGA ay hindi pupwedeng magamit sa 110% zoom. Pupwedeng sa zoom in o zoom out at ipress ang Ctrl\/Cmd + 0 para maireset ang zoom level o palitan ito ng Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3284,6 +3284,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

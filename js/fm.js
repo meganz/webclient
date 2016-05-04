@@ -10342,6 +10342,8 @@ function fm_resize_handler() {
         console.time('fm_resize_handler');
     }
 
+    mega.utils.chrome110ZoomLevelNotification();
+    
     $('.transfer-scrolling-table').css({
         'height': (
              $('.fm-transfers-block').outerHeight()
@@ -10430,16 +10432,20 @@ function fm_resize_handler() {
         megaChat.resized();
     }
 
-
-    $('.fm-right-files-block, .fm-right-account-block').css({
-        'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
-    });
+    $('.fm-right-files-block, .fm-right-account-block')
+        .filter(':visible')
+        .css({
+            'margin-left': ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel:visible').width()) + "px"
+        });
 
     var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
-    $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
-        'height': shared_block_height + "px",
-        'min-height': shared_block_height + "px"
-    });
+
+    if (!isNaN(shared_block_height)) {
+        $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
+            'height': shared_block_height + "px",
+            'min-height': shared_block_height + "px"
+        });
+    }
 
     if (d) {
         console.timeEnd('fm_resize_handler');

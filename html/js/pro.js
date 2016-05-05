@@ -802,6 +802,9 @@ var proPage = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
+            
+            // Don't show the plan expiry dialog anymore for this session
+            alarm.planExpired.lastPayment = null;
 
             // If last payment was Bitcoin, we need to redirect to the account page
             if (this.lastPaymentProviderId === 4) {

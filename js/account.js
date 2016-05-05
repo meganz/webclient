@@ -1114,7 +1114,7 @@ function checkUserLogin() {
     };
 
     if (is_karma) {
-        mega.attr = ns;
+        mega.config = ns;
     }
     else {
         Object.defineProperty(mega, 'config', {
@@ -1396,7 +1396,8 @@ function checkUserLogin() {
      * Stores a user attribute for oneself.
      *
      * @param attribute {string}
-     *     Name of the attribute.
+     *     Name of the attribute. The max length is 16 characters. Note that the
+     *     * and ! characters may be added so usually you only have 14 to work with.
      * @param value {object}
      *     Value of the user attribute. Public properties are of type {string},
      *     private ones have to be an object with key/value pairs.
@@ -1526,8 +1527,7 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
                 logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
             }
             else if (attrName === '+a') {
-                avatars[userHandle] = undefined;
-                M.avatars();
+                M.avatars(userHandle);
             }
             else if (attrName === '*!authring') {
                 authring.getContacts('Ed25519');

@@ -465,47 +465,7 @@
 	        var meta = eventObject.getMeta();
 	        var fromMyDevice = Karere.getNormalizedBareJid(eventObject.getFromJid()) === self.karere.getBareJid();
 
-	        if (eventObject.getAction() === "sync") {
-	            room = self.chats[meta.roomJid];
-	            room.sendMessagesSyncResponse(eventObject);
-	        } else if (eventObject.getAction() === "syncResponse") {
-	            room = self.chats[meta.roomJid];
-	            room.handleSyncResponse(eventObject);
-	        } else if (eventObject.getAction() === "cancel-attachment" && fromMyDevice === true) {
-	            if (fromMyDevice === true) {
-	                room = self.chats[meta.roomJid];
-	                room.cancelAttachment(meta.messageId, meta.nodeId);
-	            }
-	        } else if (eventObject.getAction() === "conv-end") {
-	            if (fromMyDevice === true) {
-	                room = self.chats[meta.roomJid];
-	                if (room && room._leaving !== true) {
-	                    room.destroy(false);
-	                }
-	            } else {
-
-	                room = self.chats[meta.roomJid];
-	                if (room) {
-	                    room._conversationEnded(eventObject.getFromJid());
-	                }
-	            }
-	        } else if (eventObject.getAction() === "conv-start" && fromMyDevice === true) {
-	            if (fromMyDevice) {
-	                room = self.chats[meta.roomJid];
-	                if (!room) {
-	                    self.openChat(meta.participants, meta.type, undefined, undefined, undefined, false);
-	                }
-	            } else {
-	                room = self.chats[meta.roomJid];
-	                if (!room) {
-	                    [room.$messages].forEach(function (v, k) {
-	                        $(k).addClass("conv-start").removeClass("conv-end");
-	                    });
-	                }
-	            }
-	        } else {
-	            self.logger.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
-	        }
+	        self.logger.warn("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
 	    });
 
 	    $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
@@ -6033,7 +5993,7 @@
 	  return element;
 	};
 
-	ReactElement.createElement = function (type, config, children) {
+	ReactElement.makeElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -6084,7 +6044,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.createElement.bind(null, type);
+	  var factory = ReactElement.makeElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -9131,7 +9091,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.createElement(component);
+	    placeholderElement = ReactElement.makeElement(component);
 	  }
 	};
 
@@ -19619,12 +19579,12 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.createElement;
+	var createElement = ReactElement.makeElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
 	if (false) {
-	  createElement = ReactElementValidator.createElement;
+	  createElement = ReactElementValidator.makeElement;
 	  createFactory = ReactElementValidator.createFactory;
 	  cloneElement = ReactElementValidator.cloneElement;
 	}
@@ -20077,7 +20037,7 @@
 	    // succeed and there will likely be errors in render.
 	     false ? warning(validType, 'React.makeElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : undefined;
 
-	    var element = ReactElement.createElement.apply(this, arguments);
+	    var element = ReactElement.makeElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -20102,7 +20062,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -22037,27 +21997,8 @@
 	            verifiedElement = React.makeElement(ContactVerified, { contact: this.props.contact, className: this.props.verifiedClassName });
 	        }
 
-	        if (!avatars[contact.u] && (!_noAvatars[contact.u] || _noAvatars[contact.u] !== true)) {
-	            var loadAvatarPromise;
-	            if (!_noAvatars[contact.u]) {
-	                loadAvatarPromise = mega.attr.get(contact.u, 'a', true, false);
-	            } else {
-	                loadAvatarPromise = _noAvatars[contact.u];
-	            }
-
-	            loadAvatarPromise.done(function (r) {
-	                if (typeof r !== 'number' && r.length > 5) {
-	                    var blob = new Blob([str_to_ab(base64urldecode(r))], { type: 'image/jpeg' });
-	                    avatars[contact.u] = {
-	                        data: blob,
-	                        url: myURL.createObjectURL(blob)
-	                    };
-	                }
-
-	                useravatar.loaded(contact);
-
-	                delete _noAvatars[contact.u];
-
+	        if (!avatars[contact.u] && !_noAvatars[contact.u]) {
+	            useravatar.loadAvatar(contact.u).done(function () {
 	                self.safeForceUpdate();
 	            }).fail(function (e) {
 	                _noAvatars[contact.u] = true;
@@ -26462,10 +26403,6 @@
 	    var self = this;
 
 	    self._leaving = true;
-
-	    if (notifyOtherDevices === true) {
-	        self.megaChat.sendBroadcastAction(self.roomJid, "conv-end", { roomJid: self.roomJid });
-	    }
 
 	    if (self.roomJid.indexOf("@") != -1) {
 	        self.setState(ChatRoom.STATE.LEAVING);

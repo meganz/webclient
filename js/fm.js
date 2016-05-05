@@ -4231,8 +4231,8 @@ function accountUI() {
                 if (e) {
                     mega.attr.set('a', 'none', true, false);
 
-                    delete avatars[u_handle];
-                    $('.fm-account-avatar').html(useravatar.contact(u_handle));
+                    useravatar.invalidateAvatar(u_handle);
+                    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle));
                     $('.fm-avatar img').attr('src', useravatar.mine());
                     $('.fm-account-remove-avatar').hide();
                 }
@@ -4396,13 +4396,11 @@ function avatarDialog(close)
                     return msgDialog('warninga', l[8645], l[8646]);
                 }
                 var data = dataURLToAB(croppedDataURI);
-                mega.attr.set('a', base64urlencode(ab_to_str(data)), true, false);
-                var blob = new Blob([data], {type: 'image/png'});
-                avatars[u_handle] = {
-                    data: blob,
-                    url: myURL.createObjectURL(blob)
-                };
-                $('.fm-account-avatar').html(useravatar.contact(u_handle));
+
+                mega.attr.set('a', ab_to_base64(data), true, false);
+                useravatar.setUserAvatar(u_handle, data, this.outputFormat);
+
+                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },

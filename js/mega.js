@@ -492,37 +492,32 @@ function MegaData()
         return M.getFilterBy(function(node) { return node.p === M.InboxID; });
     };
 
-    this.avatars = function()
+    this.avatars = function(userPurgeList)
     {
-        if (!M.c.contacts)
+        if (!M.c.contacts) {
             M.c.contacts = {};
+        }
         if (u_handle) {
             M.c.contacts[u_handle] = 1;
+        }
+
+        if (userPurgeList) {
+            // if provided, invalidate the pointed user avatars.
+            if (!Array.isArray(userPurgeList)) {
+                userPurgeList = [userPurgeList];
+            }
+            userPurgeList.forEach(useravatar.invalidateAvatar);
         }
 
         if (d) {
             console.time('M.avatars');
         }
+
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
-            if ((M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0) && !avatars[u]) {
-                waitingPromises.push(
-                    mega.attr.get(u, 'a', true, false)
-                        .done(function (res) {
-                            if (typeof res !== 'number' && res.length > 5) {
-                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/png'});
-                                avatars[u] = {
-                                    data: blob,
-                                    url: myURL.createObjectURL(blob)
-                                };
-                            }
-                            useravatar.loaded(u);
-                        })
-                        .fail(function() {
-                            delete avatars[u];
-                            useravatar.loaded(u);
-                        })
-                );
+            if (!avatars[u] && (M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0)) {
+
+                waitingPromises.push(useravatar.loadAvatar(u));
             }
         });
 
@@ -530,30 +525,14 @@ function MegaData()
             .allDone(
                 waitingPromises
             ).always(function() {
-                // trigger UI refresh
-                M.renderAvatars();
 
                 if (d) {
                     console.timeEnd('M.avatars');
                 }
             });
 
-
         delete M.c.contacts[u_handle];
     };
-
-    this.renderAvatars = function()
-    {
-        $('.contact-block-view-avatar').each(function(i, e)
-        {
-            var c = $(e).attr('class');
-        });
-
-        $('.avatar').each(function(i, e)
-        {
-            var c = $(e).attr('class');
-        });
-    }
 
     this.contactstatus = function(h, wantTimeStamp) {
         var folders = 0;
@@ -3286,8 +3265,9 @@ function MegaData()
                     u_attr.name
                 );
 
-                avatars[u_handle] = undefined;
-                M.avatars();
+                if (fminitialized) {
+                    M.avatars(u_handle);
+                }
             }
         });
     },
@@ -5808,8 +5788,10 @@ function execsc(actionPackets, callback) {
                         var attributeName = attrs[j];
 
                         if (attributeName === '+a') {
-                            avatars[actionPacketUserId] = undefined;
-                            loadavatars = true;
+                            if (!loadavatars) {
+                                loadavatars = [];
+                            }
+                            loadavatars.push(actionPacketUserId);
                         }
                         else if (attributeName === 'firstname' || attributeName === 'lastname') {
                             attribCache.uaPacketParser(attributeName, actionPacketUserId, true);
@@ -5832,14 +5814,14 @@ function execsc(actionPackets, callback) {
                 fa: actionPacket.fa
             });
         }
-        else if (actionPacket.a === 's' && !folderlink) {
+        else if ((actionPacket.a === 's' || actionPacket.a === 's2') && !folderlink) {
             var tsharekey = '';
             var prockey = false;
 
             if (actionPacket.o === u_handle) {
 
                 // If access right are undefined then share is deleted
-                if (typeof actionPacket.r == "undefined") {
+                if (typeof actionPacket.r === "undefined") {
                     M.delNodeShare(actionPacket.n, actionPacket.u);
                 }
                 else if (M.d[actionPacket.n]
@@ -5882,7 +5864,7 @@ function execsc(actionPackets, callback) {
                 }
 
                 if (typeof actionPacket.o !== 'undefined') {
-                    if (typeof actionPacket.r == "undefined") {
+                    if (typeof actionPacket.r === "undefined") {
                         if (d) {
                             console.log('delete a share');
                         }
@@ -5977,7 +5959,13 @@ function execsc(actionPackets, callback) {
 
             crypto_share_rsa2aes();
 
-            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            if (actionPacket.a === 's2') {
+                processPS([actionPacket]);
+            }
+
+            if (fminitialized) {
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            }
         }
         else if (actionPacket.a === 'k' && !folderlink) {
             if (actionPacket.sr)
@@ -6113,9 +6101,6 @@ function execsc(actionPackets, callback) {
             M.drawReceivedContactRequests([actionPacket]);
             notify.notifyFromActionPacket(actionPacket);
         }
-        else if (actionPacket.a === 's2') {
-            processPS([actionPacket]);
-        }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
 
@@ -6226,7 +6211,7 @@ function execsc(actionPackets, callback) {
             renderNew();
         }
         if (loadavatars) {
-            M.avatars();
+            M.avatars(loadavatars);
         }
         if (M.viewmode) {
             fm_thumbnails();
@@ -7125,7 +7110,9 @@ function processPS(pendingShares, ignoreDB) {
                     // Add the pending share to state
                     M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
 
-                    sharedUInode(nodeHandle);
+                    if (fminitialized) {
+                        sharedUInode(nodeHandle);
+                    }
                 }
             }
         }

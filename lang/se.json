@@ -3217,6 +3217,8 @@
     "8685": "Var v\u00e4nlig f\u00f6rklara varf\u00f6r du vill avsluta din MEGA-plan",
     "8686": "undecrypted folder",
     "8687": "undecrypted file",
+    "8688": "Awaiting email confirmation.",
+    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

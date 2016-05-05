@@ -563,11 +563,11 @@ function init_page() {
                 return;
             }
             loadingDialog.show();
-            CMS.watch('help2:' + lang, function () {
+            CMS.watch('help.' + lang, function () {
                 window.helpTemplate = null;
                 doRenderHelp();
             });
-            CMS.get(['help2:' + lang, 'help:' + lang + '.json'], function (err, content, json) {
+            CMS.get(['help.' + lang, 'help.' + lang + '.json'], function (err, content, json) {
                 helpdata = json.object
                 parsepage(window.helpTemplate = content.html);
                 init_help();

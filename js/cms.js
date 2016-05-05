@@ -75,7 +75,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         if (verify_cms_content(content, signature, id)) {
             switch (mime) {
             case 3: // html
-                content = ab_to_str(content).replace(/{cmspath}/g, CMS.getUrl());
+                content = ab_to_str(content).replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
                 next(false, { html: content, mime: mime});
                 return loaded(id);
     
@@ -202,7 +202,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             delete fetching[id];
             cmsBackoff = 0; /* reset backoff */
         };
-        var url = (localStorage.cms || "https://cms.mega.nz/content/") + id;
+        var url = CMS.getUrl() + id;
         q.open("GET", url);
         q.responseType = 'arraybuffer';
         q.send();
@@ -314,7 +314,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
         },
 
         getUrl: function() {
-            return (localStorage.cms || "https://cms.mega.nz/content/");
+            return localStorage.cms || "https://cms2.mega.nz/";
         },
     
         on: function(id, callback)

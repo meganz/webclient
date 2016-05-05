@@ -301,7 +301,7 @@ function init_page() {
                 }
             };
             loadingDialog.show();
-            sendsignuplink(acc.name, acc.email, acc.password, ctx);
+            sendsignuplink(acc.name, acc.email, acc.password, ctx, true);
         });
         fm_showoverlay();
         return;

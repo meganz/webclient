@@ -3192,7 +3192,7 @@ var doProRegister = function($dialog) {
         rv.email = $('#register-email', $dialog).val();
         rv.name = rv.first + ' ' + rv.last;
 
-        sendsignuplink(rv.name, rv.email, rv.password, ctx);
+        sendsignuplink(rv.name, rv.email, rv.password, ctx, true);
     };
 
 

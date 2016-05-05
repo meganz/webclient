@@ -3221,6 +3221,11 @@
     "8691": "Por favor, entre em sua inbox e clique no link de confirma\u00e7\u00e3o da conta.",
     "8692": "Devido a um bug de renderiza\u00e7\u00e3o nos navegadores Chrome\/Chromium, MEGA n\u00e3o pode ser utilizado com 110% de zoom. Por favor, pressione Ctrl\/Cmd + 0 para resetar o n\u00edvel de zoom, ou utilize o Firefox.",
     "8693": "Devido a um bug de renderiza\u00e7\u00e3o em navegadores Chrome\/Chromium, MEGA n\u00e3o poder\u00e1 ser utilizado neste n\u00edvel de zoom. Por favor, aplique mais um n\u00edvel, ou remova o zoom, pressionando Crtl\/CMD + 0 para resetar o n\u00edvel de zoom, ou utilize o Firefox.",
+    "8694": "Definir data de validade",
+    "8695": "Apenas PRO",
+    "8696": "upgrade para o profissional",
+    "8697": "Selecione a data",
+    "8698": "Expira %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

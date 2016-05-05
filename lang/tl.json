@@ -3221,6 +3221,11 @@
     "8691": "Pumunta sa iyong inbox at i-click ang link para kumpirmahin ang inyong link.",
     "8692": "Dahil sa rendering bug sa Chrome\/Chromium browsers, ang MEGA ay hindi pupwedeng magamit sa 110% zoom. Pupwedeng sa zoom in o zoom out at ipress ang Ctrl\/Cmd + 0 para maireset ang zoom level o palitan ito ng Firefox.",
     "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
+    "8694": "Set expiry date",
+    "8695": "PRO Only",
+    "8696": "Upgrade to PRO",
+    "8697": "Select date",
+    "8698": "Expires %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

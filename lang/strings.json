@@ -12886,5 +12886,25 @@
     "8693": {
         "text": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
         "context": "In Chrome\/Chromium browsers, the MEGA web layout is broken on different zoom levels, 110%, 67% and 33%."
+    },
+    "8694": {
+        "text": "Set expiry date",
+        "context": "A label in the Get Link dialog which allows the user to set an expiry date on their public link."
+    },
+    "8695": {
+        "text": "PRO Only",
+        "context": "A label to indicate that this is a PRO only feature. For example, the user needs a PRO account to set an expiry date on their public link."
+    },
+    "8696": {
+        "text": "Upgrade to PRO",
+        "context": "A button label which when clicked will take the user to the PRO page to purchase a PRO plan."
+    },
+    "8697": {
+        "text": "Select date",
+        "context": "A text label inside the date picker to tell the user to select the date."
+    },
+    "8698": {
+        "text": "Expires %1",
+        "context": "A label on any row in the Get Link dialog with a public link that has an expiry date. The %1 will be replaced at runtime with the expiry date and time."
     }
 }

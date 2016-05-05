@@ -3333,7 +3333,12 @@ function MegaData()
 
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
-                mDBadd('u', clone(u.toJS ? u.toJS() : u));
+                var cleanedUpUserData = clone(u.toJS ? u.toJS() : u);
+                delete cleanedUpUserData.presence;
+                delete cleanedUpUserData.presenceMtime;
+                delete cleanedUpUserData.shortName;
+                delete cleanedUpUserData.name;
+                mDBadd('u', cleanedUpUserData);
             }
 
             this.syncUsersFullname(userId);

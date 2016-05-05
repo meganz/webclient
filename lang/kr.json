@@ -3221,6 +3221,11 @@
     "8691": "\uc218\uc2e0\ud568\uc5d0 \uac00\uc11c \uacc4\uc815 \ud655\uc778 \ub9c1\ud06c\ub97c \ud074\ub9ad\ud558\uc138\uc694.",
     "8692": "\ud06c\ub86c\/\ud06c\ub85c\ubbf8\uc5c4 \ube0c\ub77c\uc6b0\uc800\uc758 \ub80c\ub354\ub9c1 \ubc84\uadf8\ub85c \uc778\ud558\uc5ec, MEGA\ub294 110% \ud655\ub300\ub97c \uc0ac\uc6a9\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ud655\ub300, \ucd95\uc18c\ub97c \ud558\ub824\uba74 Ctrl\/Cmd + 0\uc744 \uc774\uc6a9\ud558\uc5ec \ud655\ub300 \uc218\uc900\uc744 \uc7ac\uc124\uc815\ud558\uac70\ub098 Firefox\ub85c \ubcc0\uacbd\ud558\uc138\uc694.",
     "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
+    "8694": "Set expiry date",
+    "8695": "PRO Only",
+    "8696": "Upgrade to PRO",
+    "8697": "Select date",
+    "8698": "Expires %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

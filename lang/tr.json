@@ -3221,6 +3221,11 @@
     "8691": "L\u00fctfen gelen kutunuzu kontrol edin ve hesab\u0131n\u0131z\u0131 onaylamak i\u00e7in linke t\u0131klay\u0131n.",
     "8692": "Chrome\/Chromium tabanl\u0131 taray\u0131c\u0131larda olan bir grafik i\u015fleme hatas\u0131ndan dolay\u0131, MEGA %110 yak\u0131nla\u015ft\u0131rmada kullan\u0131lamaz. Yak\u0131nla\u015ft\u0131rmay\u0131 s\u0131f\u0131rlamak i\u00e7in ya yak\u0131nla\u015ft\u0131r\u0131n, uzakla\u015ft\u0131r\u0131n, Ctrl\/Cmd + 0 yada Firefox kullan\u0131n.",
     "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
+    "8694": "Set expiry date",
+    "8695": "PRO Only",
+    "8696": "Upgrade to PRO",
+    "8697": "Select date",
+    "8698": "Expires %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

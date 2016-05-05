@@ -22094,12 +22094,12 @@
 	                { className: "user-card-data" },
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-name small" },
+	                    { className: "user-card-name" },
 	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-email small" },
+	                    { className: "user-card-email" },
 	                    contact.m
 	                )
 	            )

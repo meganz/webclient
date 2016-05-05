@@ -1119,7 +1119,7 @@ function checkUserLogin() {
     };
 
     if (is_karma) {
-        mega.attr = ns;
+        mega.config = ns;
     }
     else {
         Object.defineProperty(mega, 'config', {
@@ -1526,8 +1526,7 @@ function uaPacketParser(attrName, userHandle, ownActionPacket) {
                 logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
             }
             else if (attrName === '+a') {
-                avatars[userHandle] = undefined;
-                M.avatars();
+                M.avatars(userHandle);
             }
             else if (attrName === '*!authring') {
                 authring.getContacts('Ed25519');

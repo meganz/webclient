@@ -2187,7 +2187,6 @@
     "7118": "%ld Fotos",
     "7119": "%ld Videos",
     "7120": "%1$ld Fotos, %2$ld Videos",
-    "7121": "%1$ld von %2$ld",
     "7122": "Diese App hat keinen Zugriff auf Ihre Fotos und Videos",
     "7123": "Sie k\u00f6nnen den Zugriff in Ihren Privatsph\u00e4reneinstellungen freigeben.",
     "7124": "Keine Fotos oder Videos",
@@ -3219,6 +3218,9 @@
     "8687": "undecrypted file",
     "8688": "Awaiting email confirmation.",
     "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8691": "Please go to your inbox and click the link to confirm your account.",
+    "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3282,6 +3284,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

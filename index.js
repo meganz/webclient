@@ -64,6 +64,8 @@ function startMega() {
     } else {
         mega_custom_boot_fn();
     }
+
+    mBroadcaster.sendMessage('zoomLevelCheck');
 }
 
 function mainScroll() {
@@ -1805,6 +1807,7 @@ function parsepage(pagehtml, pp) {
         if (page !== 'start' && page !== 'download') {
             mainScroll();
         }
+        mega.utils.chrome110ZoomLevelNotification();
     });
     $('.nw-bottom-block').addClass(lang);
     if (typeof UIkeyevents === 'function') {

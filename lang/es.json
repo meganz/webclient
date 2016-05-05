@@ -2187,7 +2187,6 @@
     "7118": "%ld Fotos",
     "7119": "%ld Videos",
     "7120": "%1$ld Fotos, %2$ld Videos",
-    "7121": "%1$ld de %2$ld",
     "7122": "Esta aplicaci\u00f3n no tiene acceso a tus fotos o videos",
     "7123": "Puedes activar el acceso en Ajustes de Privacidad",
     "7124": "No hay Fotos o Videos",
@@ -2865,7 +2864,7 @@
     "7994": "\u00bfQu\u00e9 duraci\u00f3n de membres\u00eda deseas?",
     "7995": "\u00bfEst\u00e1s satisfecho con tu plan de pagos?",
     "7996": "Pulsa [S]COMPRAR[\/S] cuando est\u00e9s satisfecho con tus opciones de pago. Se te mostrar\u00e1 un nuevo di\u00e1logo o ser\u00e1s redirigido a una nueva p\u00e1gina para completar tu compra.",
-    "7997": "Charla",
+    "7997": "Chat",
     "7998": "Para ayudarnos a mejorar el servicio, ser\u00eda genial que pudieses puntuar tu experiencia con [X]?",
     "8000": "No hay historial de conversaciones",
     "8001": "No hay historial de chat con %s",
@@ -3217,8 +3216,11 @@
     "8685": "Por favor, cu\u00e9ntanos por qu\u00e9 no deseas renovar tu plan:",
     "8686": "carpeta no desencriptada",
     "8687": "fichero no desencriptado",
-    "8688": "Awaiting email confirmation.",
+    "8688": "Esperando email de confirmaci\u00f3n.",
     "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8691": "Please go to your inbox and click the link to confirm your account.",
+    "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3282,6 +3284,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

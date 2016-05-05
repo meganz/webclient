@@ -384,7 +384,7 @@ var ConversationsApp = React.createClass({
         $('.fm-right-files-block, .fm-right-account-block')
             .filter(':visible')
             .css({
-                'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+                'margin-left': ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px"
             });
     },
     render: function() {

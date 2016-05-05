@@ -2187,7 +2187,6 @@
     "7118": "%ld Fotiek",
     "7119": "%ld Vide\u00ed",
     "7120": "%1$ld Fotiek, %2$ld Vide\u00ed",
-    "7121": "%1$ld z %2$ld",
     "7122": "T\u00e1to aplik\u00e1cia nem\u00e1 pr\u00edstup k va\u0161im fotk\u00e1m alebo vide\u00e1m.",
     "7123": "Pr\u00edstup m\u00f4\u017eete povoli\u0165 v Nastaveniach s\u00fakromia.",
     "7124": "\u017diadne Fotky ani Vide\u00e1",
@@ -3217,8 +3216,11 @@
     "8685": "Pros\u00edm vysvetlite pre\u010do si neprajete pred\u013a\u017ei\u0165 svoj pl\u00e1n:",
     "8686": "nede\u0161ifrovan\u00fd prie\u010dinok",
     "8687": "nede\u0161ifrovan\u00fd s\u00fabor",
-    "8688": "Awaiting email confirmation.",
-    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8688": "\u010cak\u00e1 sa na potvrdenie emailu.",
+    "8690": "Nem\u00e1te pr\u00edstup k ceste pre s\u0165ahovanie. Zvo\u013ete in\u00fa cestu a sk\u00faste to znovu.",
+    "8691": "Pros\u00edm cho\u010fte do svojej doru\u010denej po\u0161ty a kliknite na odkaz pre potvrdenie svojho \u00fa\u010dtu.",
+    "8692": "Pre chybu vo vykreslovan\u00ed v Chrome\/Chromium prehliada\u010doch sa MEGA ned\u00e1 pou\u017e\u00edva\u0165 v re\u017eime 110% pribl\u00ed\u017eenia. Pros\u00edme, stla\u010dte Ctrl\/Cmd + 0 pre obnovenie stup\u0148a pribl\u00ed\u017eenia alebo pou\u017e\u00edvajte Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3282,6 +3284,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

@@ -150,3 +150,18 @@
     margin: 0 5px 0 0;
     vertical-align: middle;
 }
+.dropdown.contact-preview {
+    min-width: 238px;
+    max-width: 320px;
+    position:fixed;
+}
+.dropdown.contact-preview .contacts-info.body {
+    padding: 2px 4px 4px 4px;
+}
+.dropdown.body.img-preview {
+    padding: 4px;
+    position: fixed;
+}
+.img-preview .dropdown.img-wrapper {
+    width: 176px;
+}

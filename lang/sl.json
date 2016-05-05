@@ -2187,7 +2187,6 @@
     "7118": "%ld fotografij",
     "7119": "%ld videov",
     "7120": "%1$ld fotografij, %2$ld videov",
-    "7121": "%1$ld od %2$ld",
     "7122": "Ta app nima dostopa do va\u0161ih fotografij ali videov.",
     "7123": "Dostop lahko omogo\u010dite v Nastavitvah Zasebnosti.",
     "7124": "Ni fotografij ali videov",
@@ -3217,8 +3216,16 @@
     "8685": "Prosim, obrazlo\u017eite, zakaj ne \u017eelite obnoviti svojega plana:",
     "8686": "nedekriptirana mapa",
     "8687": "nedekriptirana datoteka",
-    "8688": "Awaiting email confirmation.",
-    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8688": "V pri\u010dakovanju e-po\u0161tne potrditve",
+    "8690": "Nimate dostopa do izbrane mape za prevzemanje. Prosim, izberite drugo mapo za prevzemanje in poskusite ponovno.",
+    "8691": "Prosim, pojdite v svojo e-po\u0161to in kliknite povezavo v sporo\u010dilu, da potrdite ra\u010dun.",
+    "8692": "Zaradi te\u017eave s prikazom v Chrome\/Chromium brskljalnikih, se MEGA ne more uporabljati pri 110% stopnji pove\u010dave. Prosim, izberite pove\u010danje, pomanj\u0161anje, pritisnite Ctrl\/Cmd + 0 za ponastavitev stopnje velikosti, ali uporabite Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
+    "8694": "Set expiry date",
+    "8695": "PRO Only",
+    "8696": "Upgrade to PRO",
+    "8697": "Select date",
+    "8698": "Expires %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3282,6 +3289,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

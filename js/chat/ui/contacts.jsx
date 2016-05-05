@@ -188,8 +188,8 @@ var ContactCard = React.createClass({
                 {contextMenu}
 
                 <div className="user-card-data">
-                    <div className="user-card-name small">{M.getNameByHandle(contact.u)}</div>
-                    <div className="user-card-email small">{contact.m}</div>
+                    <div className="user-card-name">{M.getNameByHandle(contact.u)}</div>
+                    <div className="user-card-email">{contact.m}</div>
                 </div>
             </div>;
     }

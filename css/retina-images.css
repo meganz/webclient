@@ -324,7 +324,6 @@ body.pro:after {
     background-image: url(../images/mega/register-info@2x.png);
     background-size: 120px auto;
 }
-
 .download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon, .toast-close-button {
     background-image: url(../images/mega/download-sprite-v6@2x.png);
     background-size: 257px auto;
@@ -476,5 +475,9 @@ body.pro:after {
 .backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon, .login-register-input.green-tick {
     background-image: url(../images/mega/encr-sprite@2x_v1.png);
     background-size: 216px;
+}
+.zoom-overlay-icon, .zoom-overlay-key::after {
+    background-image: url(../images/mega/zoom-sprite@2x.png);
+    background-size: 160px auto;
 }
 }

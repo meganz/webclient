@@ -3794,14 +3794,14 @@ label.iPhoneCheckLabelOff span {
     box-sizing: border-box;
 }
 .nw-tree-panel-header + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 72px);
-    height: -moz-calc(100% - 72px);
-    height: calc(100% - 72px);
+    height: -webkit-calc(100% - 70px);
+    height: -moz-calc(100% - 70px);
+    height: calc(100% - 70px);
 }
 .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 170px);
-    height: -moz-calc(100% - 170px);
-    height: calc(100% - 170px);
+    height: -webkit-calc(100% - 168px);
+    height: -moz-calc(100% - 168px);
+    height: calc(100% - 168px);
 }
 .fm-contact-requests, .fm-received-requests {
     height: 48px;
@@ -3996,6 +3996,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-fm-tree-item {
     display: block;
+    line-height: 0;
     background-color: rgba(217,0,7,0);
     padding-right: 13px;
     -webkit-transition: all 150ms ease-in-out;
@@ -4005,7 +4006,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     transition: all 150ms ease-in-out;
 }
 .nw-fm-tree-item.linked {
-    padding-right: 22px;
+    padding-right: 26px;
 }
 .nw-fm-tree-item .data-item-icon {
     top: 2px;
@@ -4077,9 +4078,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-position: center -9880px;
 }
 .nw-fm-tree-folder {
-    display: block;
+    display: inline-block;
     margin-left: 22px;
     padding-left: 27px;
+    max-width: -webkit-calc(100% -22px);
+    max-width: -moz-calc(100% - 22px);
+    max-width: calc(100% - 22px);
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
     white-space: nowrap;
     cursor: default;
     font-size: 13px;
@@ -4263,7 +4270,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     margin: 20px 2px 0 12px;
 }
 .files-grid-view .fm-chat-user-info .nw-contact-status, .fm-blocks-view .fm-chat-user-info .nw-contact-status, .shared-grid-view .fm-chat-user-info .nw-contact-status, .shared-blocks-view .fm-chat-user-info .nw-contact-status, .files-grid-view.contacts-view .nw-contact-status {
-    margin: 8px 6px 0 0px;
+    margin: 4px 6px 0 0px;
 }
 .grid-scrolling-table, .grid-scrolling-table .jspPane {
     min-height: 100%;
@@ -19698,26 +19705,47 @@ span.incoming-call-name {
 .icoming-call-button.video-call:hover {
     background-color: rgba(6,160,236,1);
 }
-.contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar {
+.contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar, .shared-with-me .nw-contact-avatar {
     position: absolute;
-    margin: -2px 0 0 0;
+    margin: -1px 0 0 0;
 }
-.shared-with-me .nw-contact-avatar {
-    position: absolute;
-    margin: 3px 0 0 0;
+.fm-chat-user-status {
+    line-height: 16px;
 }
 .shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info, .contact-requests-grid td .fm-chat-user-info, .sent-requests-grid td .fm-chat-user-info {
     float: none;
-    margin: 1px 0 0 44px;
+    margin: 0 0 0 44px;
 }
 .sent-requests-grid td .fm-chat-user-info {
-    margin: 1px 0 0 44px;
+    margin: 0 0 0 44px;
 }
 .grid-table.sent-requests td:last-child, .grid-table.contact-requests td:last-child {
     padding-right: 8px;
 }
+.fm-share-user-info {
+    display: table;
+    vertical-align: middle;
+    width: 185px;
+    table-layout: fixed;
+    float: left;
+    height: 34px;
+    margin: 7px 0 0 8px;
+    white-space: nowrap;
+    color: #333333;
+}
+.fm-share-centered {
+    display: table-cell;
+    vertical-align: middle;
+}
+.fm-share-centered .fm-chat-user + .contact-email {
+    margin-bottom: -1px;
+}
+.fm-share-centered div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
 .sent-requests-grid td .email .fm-chat-user-info {
-    margin: 7px 0 8px 44px;
+    margin: 8px 0 8px 44px;
 }
 .shared-folder-icon {
     background-image: url(../images/mega/shared-sprite_v3.svg);
@@ -19731,7 +19759,7 @@ span.incoming-call-name {
 .shared-folder-info-block {
     padding: 0 0 0 51px;
     font-size: 13px;
-    line-height: 17px;
+    line-height: 18px;
     display: block;
     position: relative;
 }
@@ -20534,7 +20562,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     border-radius: 100%;
 }
 .email .nw-contact-avatar {
-    background-position: center -571px;
+    background-position: center -572px;
 }
 .gmail .nw-contact-avatar {
     background-position: center -674px;
@@ -20550,6 +20578,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .email .fm-chat-user-email {
     display: none;
+}
+.ipc .left.email, .opc .left.email {
+    min-height: 34px;
 }
 .share-search-result {
     cursor: pointer;
@@ -20672,15 +20703,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
-.share-dialog-contact-bl .fm-chat-user {
-    padding-top: 7px;
-    white-space: nowrap;
-    width: 100%;
-    overflow: hidden;
-    color: #333333;
-    text-overflow: ellipsis;
-    overflow: hidden;
 }
 .share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select {
     float: left;

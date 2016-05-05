@@ -7466,33 +7466,44 @@ function shareDialogContentCheck() {
     }
 }
 
-function addShareDialogContactToContent(type, id, av, name, permClass, permText, exportLink) {
+function addShareDialogContactToContent(userEmail, type, id, av, userName, permClass, permText, exportLink) {
 
     var html = '',
         htmlEnd = '',
         item = '',
         exportClass = '';
 
+    var contactEmailHtml = '';
+
+    if (userEmail !== userName) {
+        contactEmailHtml = '<div class="contact-email">'
+            + htmlentities(userEmail)
+            + '</div>';
+    }
 
     if (exportLink) {
         item = itemExportLinkHtml(M.d[exportLink]);
         exportClass = 'share-item-bl';
     }
     else {
-        item = av +   '<div class="fm-chat-user-info">'
-               +       '<div class="fm-chat-user">' + htmlentities(name) + '</div>'
-               +   '</div>';
+        item = av 
+            + '<div class="fm-share-user-info">'
+            + '<div class="fm-share-centered">'
+            + '<div class="fm-chat-user">' + htmlentities(userName) + '</div>'
+            + contactEmailHtml
+            + '</div>'
+            + '</div>';
     }
 
     html = '<div class="share-dialog-contact-bl ' + exportClass + ' ' + type + '" id="sdcbl_' + id + '">'
-           +   item
-           +   '<div class="share-dialog-remove-button"></div>'
-           +   '<div class="share-dialog-permissions ' + permClass + '">'
-           +       '<span></span>' + permText
-           +   '</div>';
+           + item
+           + '<div class="share-dialog-remove-button"></div>'
+           + '<div class="share-dialog-permissions ' + permClass + '">'
+           + '<span></span>' + permText
+           +  '</div>';
 
 
-    htmlEnd = '   <div class="clear"></div>'
+    htmlEnd = '<div class="clear"></div>'
               + '</div>';
 
     return html + htmlEnd;
@@ -7518,7 +7529,7 @@ function fillShareDialogWithContent() {
             if (M.u[userHandle] && M.u[userHandle].c && (M.u[userHandle].c === 1)) {
                 user = M.u[userHandle];
                 email = user.m;
-                name = (user.name && user.name.length > 1) ? user.name : user.m;
+                name = M.getNameByHandle(userHandle);
                 shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
 
                 generateShareDialogRow(name, email, shareRights, userHandle);
@@ -7578,7 +7589,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     removeFromMultiInputDDL('.share-multiple-input', {id: email, name: email});
 
     rowId = (userHandle) ? userHandle : email;
-    html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
+    html = addShareDialogContactToContent(email, '', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
     $('.share-dialog .share-dialog-contacts').safeAppend(html);
 }
@@ -8367,6 +8378,8 @@ function closeDialog() {
 
 function copyDialog() {
 
+    var copyDialogTooltipTimer;
+
     // Clears already selected sub-folders, and set selection to root
     function selectCopyDialogTabRoot(section) {
 
@@ -8604,6 +8617,50 @@ function copyDialog() {
         }
     });
 
+    $('.copy-dialog .shared-with-me').off('mouseenter', '.nw-fm-tree-item');
+    $('.copy-dialog .shared-with-me').on('mouseenter', '.nw-fm-tree-item', function() {
+
+        var $item = $(this).find('.nw-fm-tree-folder');
+        var itemLeftPos = $item.offset().left;
+        var itemTopPos = $item.offset().top;
+        var $tooltip = $('.copy-dialog .contact-preview');
+        var sharedNodeHandle = $(this).attr('id').replace('mctreea_', '');
+        var ownerHandle = M.d[sharedNodeHandle].u;
+        var ownerEmail = M.u[ownerHandle].m;
+        var ownerName = M.u[ownerHandle].name;
+
+        // Not allowing undefined to be shown like owner name
+        if (typeof ownerName === 'undefined') {
+            ownerName = '';
+        }
+
+        var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') +
+            '<div class="user-card-data no-status">' +
+                '<div class="user-card-name small">' + htmlentities(ownerName) +
+                    ' <span class="grey">(' + l[8664] + ')</span></div>' +
+                '<div class="user-card-email small">' + htmlentities(ownerEmail) +
+                '</div></div>';
+
+        $tooltip.find('.contacts-info.body').safeHTML(html);
+
+        copyDialogTooltipTimer = setTimeout(function () {
+            $tooltip.css({
+                'left': itemLeftPos + (($item.outerWidth() / 2) - ($tooltip.outerWidth() / 2))  + 'px',
+                'top': (itemTopPos - 63) + 'px'
+            });
+            $tooltip.fadeIn(200);
+        }, 200);
+    });
+
+    $('.copy-dialog .shared-with-me').off('mouseleave', '.nw-fm-tree-item');
+    $('.copy-dialog .shared-with-me').on('mouseleave', '.nw-fm-tree-item', function() {
+
+        var $tooltip = $('.copy-dialog .contact-preview');
+
+        clearTimeout(copyDialogTooltipTimer);
+        $tooltip.hide();
+    });
+
     // Handle conversations tab item selection
     $('.copy-dialog').off('click', '.nw-conversations-item');
     $('.copy-dialog').on('click', '.nw-conversations-item', function() {
@@ -8665,10 +8722,12 @@ function copyDialog() {
 
 function moveDialog() {
 
+    var moveDialogTooltipTimer;
+
     // Clears already selected sub-folders, and set selection to root
     function selectMoveDialogTabRoot(section) {
 
-        var $btn = $('.dialog-move-button');
+        var $btn = $('.dialog-move-button'), timer;
 
         $('.move-dialog .nw-fm-tree-item').removeClass('selected');
 
@@ -8692,7 +8751,6 @@ function moveDialog() {
     };
 
     $('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').rebind('click', function() {
-
         closeDialog();
     });
 
@@ -8886,6 +8944,50 @@ function moveDialog() {
         if (typeof $.mcselected == 'undefined') {
             $btn.addClass('disabled');
         }
+    });
+
+    $('.move-dialog .shared-with-me').off('mouseenter', '.nw-fm-tree-item');
+    $('.move-dialog .shared-with-me').on('mouseenter', '.nw-fm-tree-item', function() {
+
+        var $item = $(this).find('.nw-fm-tree-folder');
+        var itemLeftPos = $item.offset().left;
+        var itemTopPos = $item.offset().top;
+        var $tooltip = $('.move-dialog .contact-preview');
+        var sharedNodeHandle = $(this).attr('id').replace('mctreea_', '');
+        var ownerHandle = M.d[sharedNodeHandle].u;
+        var ownerEmail = M.u[ownerHandle].m;
+        var ownerName = M.u[ownerHandle].name;
+
+        // Not allowing undefined to be shown like owner name
+        if (typeof ownerName === 'undefined') {
+            ownerName = '';
+        }
+
+        var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') +
+            '<div class="user-card-data no-status">' +
+                '<div class="user-card-name small">' + htmlentities(ownerName) +
+                    ' <span class="grey">(' + l[8664] + ')</span></div>' +
+                '<div class="user-card-email small">' + htmlentities(ownerEmail) +
+                '</div></div>';
+
+        $tooltip.find('.contacts-info.body').safeHTML(html);
+        
+        moveDialogTooltipTimer = setTimeout(function () {
+            $tooltip.css({
+                'left': itemLeftPos + (($item.outerWidth() / 2) - ($tooltip.outerWidth() / 2))  + 'px',
+                'top': (itemTopPos - 63) + 'px'
+            });
+            $tooltip.fadeIn(200);
+        }, 200);
+    });
+
+    $('.move-dialog .shared-with-me').off('mouseleave', '.nw-fm-tree-item');
+    $('.move-dialog .shared-with-me').on('mouseleave', '.nw-fm-tree-item', function() {
+
+        var $tooltip = $('.move-dialog .contact-preview');
+
+        clearTimeout(moveDialogTooltipTimer);
+        $tooltip.hide();
     });
 
     $('.move-dialog .dialog-move-button').rebind('click', function() {

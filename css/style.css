@@ -23339,7 +23339,7 @@ body.pro:after {
     display: block;
 }
 .opensource-top-icon {
-    background-image: url("../images/mega/opensource-v2.png");
+    background-image: url("../images/mega/opensource-v3.png");
     background-position: -30px 1px;
     background-repeat: no-repeat;
     float: left;
@@ -23382,16 +23382,19 @@ body.pro:after {
     float: left;
     padding: 22px 0;
     text-align: center;
-    width: 25%;
+    width: 33%;
 }
 .opensource-icon {
     display: block;
     width: 102px;
     height: 102px;
-    background-image: url(../images/mega/opensource-v2.png);
+    background-image: url(../images/mega/opensource-v3.png);
     background-repeat: no-repeat;
     background-position: center -109px;
     margin: 0 auto;
+}
+.opensource-icon.webclient {
+    background-position: center -109px;
 }
 .opensource-icon.firefox {
     background-position: center -249px;
@@ -23399,20 +23402,23 @@ body.pro:after {
 .opensource-icon.chrome {
     background-position: center -389px;
 }
+.opensource-icon.thunderbird {
+    background-position: center -1229px;
+}
+.opensource-icon.sdk {
+    background-position: center -809px;
+}
 .opensource-icon.megasync {
     background-position: center -529px;
-}
-.opensource-icon.ios {
-    background-position: center -950px;
 }
 .opensource-icon.android {
     background-position: center -669px;
 }
+.opensource-icon.ios {
+    background-position: center -950px;
+}
 .opensource-icon.windowsphone {
     background-position: center -1090px;
-}
-.opensource-icon.sdk {
-    background-position: center -809px;
 }
 .opensource-icon.coming-soon {
     cursor: default;

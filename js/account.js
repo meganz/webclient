@@ -1090,11 +1090,8 @@ function checkUserLogin() {
 
         var push = function() {
             if (u_type === 3 && !pfid && !folderlink) {
-                if (timer) {
-                    clearTimeout(timer);
-                }
                 // through a timer to prevent floods
-                timer = setTimeout(store, 9701);
+                timer = delay('fmconfig:store', store, 9701);
             }
             else {
                 localStorage.fmconfig = JSON.stringify(fmconfig);

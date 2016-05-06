@@ -4627,7 +4627,7 @@ function getGatewayName(gatewayId) {
         },
         15: {
             name: 'directreseller',
-            displayName: 'Vesta'
+            displayName: l[6952] + ' (6media)'
         },
         999: {
             name: 'wiretransfer',

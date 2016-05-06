@@ -3221,11 +3221,13 @@
     "8691": "\u0631\u062c\u0627\u0621 \u0627\u0644\u0630\u0647\u0627\u0628 \u0625\u0644\u0649 \u0635\u0646\u062f\u0648\u0642\u0643 \u0627\u0644\u0648\u0627\u0631\u062f \u0648\u0627\u0644\u0636\u063a\u0637 \u0639\u0644\u0649 \u0627\u0644\u0631\u0627\u0628\u0637 \u0644\u062a\u0623\u0643\u064a\u062f \u062d\u0633\u0627\u0628\u0643.",
     "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
     "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
-    "8694": "Set expiry date",
-    "8695": "PRO Only",
-    "8696": "Upgrade to PRO",
-    "8697": "Select date",
-    "8698": "Expires %1",
+    "8694": "\u0636\u0639 \u062a\u0627\u0631\u064a\u062e \u0644\u0627\u0646\u062a\u0647\u0627\u0621 \u0627\u0644\u0635\u0644\u0627\u062d\u064a\u0629",
+    "8695": "\u0644\u0645\u0634\u062a\u0631\u0643\u064a \u0628\u0631\u0648 \u0641\u0642\u0637",
+    "8696": "\u0631\u0642 \u062d\u0633\u0627\u0628\u0643 \u0625\u0644\u0649 \u0628\u0631\u0648",
+    "8697": "\u0627\u062e\u062a\u0631 \u0627\u0644\u062a\u0627\u0631\u064a\u062e",
+    "8698": "\u064a\u0646\u062a\u0647\u064a %1",
+    "8699": "Clear completed transfers",
+    "8700": "Thunderbird Extension",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3274,7 +3276,7 @@
         "support-too-short": 8650,
         "your-plan-has-expired": 8651,
         "purchased": 8652,
-        "expired": 8657,
+        "expired": 1664,
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
@@ -3294,6 +3296,8 @@
         "pro-only": 8695,
         "get-pro": 8696,
         "select-date": 8697,
-        "expires-x": 8698
+        "expires-x": 8698,
+        "clear-completed-transfers": 8699,
+        "thunderbird-extension": 8700
     }
 }

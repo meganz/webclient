@@ -3226,6 +3226,8 @@
     "8696": "Mejora a PRO",
     "8697": "Selecciona fecha",
     "8698": "Caduca %1",
+    "8699": "Clear completed transfers",
+    "8700": "Thunderbird Extension",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3274,7 +3276,7 @@
         "support-too-short": 8650,
         "your-plan-has-expired": 8651,
         "purchased": 8652,
-        "expired": 8657,
+        "expired": 1664,
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
@@ -3294,6 +3296,8 @@
         "pro-only": 8695,
         "get-pro": 8696,
         "select-date": 8697,
-        "expires-x": 8698
+        "expires-x": 8698,
+        "clear-completed-transfers": 8699,
+        "thunderbird-extension": 8700
     }
 }

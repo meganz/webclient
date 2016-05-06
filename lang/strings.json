@@ -12906,5 +12906,13 @@
     "8698": {
         "text": "Expires %1",
         "context": "A label on any row in the Get Link dialog with a public link that has an expiry date. The %1 will be replaced at runtime with the expiry date and time."
+    },
+    "8699": {
+        "text": "Clear completed transfers",
+        "context": "A button on the download screen to clear (remove) the completed file transfers from the list which shows which files are currently being uploaded or downloaded."
+    },
+    "8700": {
+        "text": "Thunderbird Extension",
+        "context": "This is our MEGAbird extension for the Thunderbird email client. It allows uploading large files to MEGA then linking them in the email. See also: https:\/\/addons.mozilla.org\/en-US\/thunderbird\/addon\/megabird\/"
     }
 }

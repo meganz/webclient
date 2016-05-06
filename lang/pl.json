@@ -3218,14 +3218,16 @@
     "8687": "niezaszyfrowany plik",
     "8688": "Oczekiwanie na potwierdzenie adresu email.",
     "8690": "Nie masz dost\u0119pu do wskazanego katalogu. Wybierz inny katalog i spr\u00f3buj ponownie.",
-    "8691": "Please go to your inbox and click the link to confirm your account.",
-    "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
-    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
-    "8694": "Set expiry date",
-    "8695": "PRO Only",
-    "8696": "Upgrade to PRO",
-    "8697": "Select date",
-    "8698": "Expires %1",
+    "8691": "Sprawd\u017a swoj\u0105 poczt\u0119 i kliknij w link w celu potwierdzenia swojej rejestracji.",
+    "8692": "Ze wzgl\u0119du na b\u0142\u0105d wyst\u0119puj\u0105cy w przegl\u0105darkach Chrome\/Chromium, MEGA ne mo\u017ce by\u0107 u\u017cywane przy powi\u0119kszeniu 110%. Prosz\u0119 wybra\u0107 inny powi\u0119kszenie, pomniejsz\u0119nie lub klikn\u0105\u0107 Ctrl\/Cms + 0 aby zresetowa\u0107 ustawienie lub skorzysta\u0107 z Firefox.",
+    "8693": "Ze wzgl\u0119du na b\u0142\u0105d wyst\u0119puj\u0105cy w przegl\u0105darkach Chrome\/Chromium, MEGA ne mo\u017ce by\u0107 u\u017cywane przy takim powi\u0119kszeniu. Prosz\u0119 wybra\u0107 inny powi\u0119kszenie, pomniejsz\u0119nie lub klikn\u0105\u0107 Ctrl\/Cms + 0 aby zresetowa\u0107 ustawienie lub skorzysta\u0107 z Firefox.",
+    "8694": "Ustaw dat\u0119 wyga\u015bni\u0119cia",
+    "8695": "Tylko PRO",
+    "8696": "Zmie\u0144 na PRO",
+    "8697": "Wybierz dat\u0119",
+    "8698": "Wygasa %1",
+    "8699": "Clear completed transfers",
+    "8700": "Thunderbird Extension",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3274,7 +3276,7 @@
         "support-too-short": 8650,
         "your-plan-has-expired": 8651,
         "purchased": 8652,
-        "expired": 8657,
+        "expired": 1664,
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
@@ -3294,6 +3296,8 @@
         "pro-only": 8695,
         "get-pro": 8696,
         "select-date": 8697,
-        "expires-x": 8698
+        "expires-x": 8698,
+        "clear-completed-transfers": 8699,
+        "thunderbird-extension": 8700
     }
 }

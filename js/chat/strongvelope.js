@@ -143,7 +143,8 @@ var strongvelope = {};
     strongvelope.MESSAGE_TYPES = {
         GROUP_KEYED:        0x00,
         GROUP_FOLLOWUP:     0x01,
-        ALTER_PARTICIPANTS: 0x02
+        ALTER_PARTICIPANTS: 0x02,
+        TRUNCATE:           0x03
     };
     var MESSAGE_TYPES = strongvelope.MESSAGE_TYPES;
     var _KEYED_MESSAGES = [MESSAGE_TYPES.GROUP_KEYED,
@@ -1195,7 +1196,8 @@ var strongvelope = {};
         var parsedMessage = ns._parseMessageContent(message.message);
 
         var self = this;
-        if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+        if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS
+                || parsedMessage.type === MESSAGE_TYPES.TRUNCATE) {
             // Sanity checks.
             if (setutils.intersection(new Set(parsedMessage.includeParticipants),
                         new Set(parsedMessage.excludeParticipants)).size > 0) {
@@ -1581,7 +1583,7 @@ var strongvelope = {};
      * @returns {Boolean}
      *     True if no errors and False if error happened.
      */
-    strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) { 
+    strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) {
         for (var i=0; i<keys.length;i++) {
 
             var keyidStr = a32_to_str([keys[i].keyid]);

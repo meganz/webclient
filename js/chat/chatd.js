@@ -551,7 +551,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.logger.log("Message '" + base64urlencode(cmd.substr(17,8)) + "' EDIT/DELETION: " + cmd.substr(39,len));
                 len += 39;
 
-                self.chatd.msgmodify(cmd.substr(1,8), cmd.substr(17,8), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
+                self.chatd.msgmodify(cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
                 break;
 
             case Chatd.Opcode.SEEN:
@@ -1080,16 +1080,18 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
     });
 };
 
-Chatd.prototype.msgmodify = function(chatId, msgid, updated, keyid, msg) {
+Chatd.prototype.msgmodify = function(chatId, userid, msgid, updated, keyid, msg) {
     // an existing message has been modified
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].msgmodify(msgid, updated, keyid, msg);
+        this.chatIdMessages[chatId].msgmodify(userid, msgid, updated, keyid, msg);
     }
 };
 
-Chatd.Messages.prototype.msgmodify = function(msgid, updated, keyid, msg) {
+Chatd.Messages.prototype.msgmodify = function(userid, msgid, updated, keyid, msg) {
     // CHECK: is it more efficient to maintain a full hash msgid -> num?
     // FIXME: eliminate namespace clash collision risk
+    var msgnum = this.lownum;
+
     for (var i = this.highnum; i > this.lownum; i--) {
         if (this.buf[i][Chatd.MsgField.MSGID] === msgid) {
             // if we modified the message, remove from this.modified.
@@ -1097,19 +1099,39 @@ Chatd.Messages.prototype.msgmodify = function(msgid, updated, keyid, msg) {
             this.buf[i][Chatd.MsgField.MESSAGE] = msg;
             this.buf[i][Chatd.MsgField.UPDATED] = updated;
 
-            this.chatd.trigger('onMessageUpdated', {
-                chatId: base64urlencode(this.chatId),
-                userId: base64urlencode(this.buf[i][Chatd.MsgField.USERID]),
-                id: i,
-                state: 'EDITED',
-                keyid: keyid,
-                message: msg,
-                messageId : base64urlencode(msgid),
-                updated: updated - 1
-            });
-            delete this.modified[i];
-
-            break;
+            if (keyid === 0) {
+            // if this is message truncate
+                this.chatd.trigger('onMessageUpdated', {
+                    chatId: base64urlencode(this.chatId),
+                    userId: userid,
+                    id: i,
+                    state: 'TRUNCATED',
+                    keyid: keyid,
+                    message: msg,
+                    messageId : base64urlencode(msgid),
+                });
+                msgnum = i;
+            } else {
+                this.chatd.trigger('onMessageUpdated', {
+                    chatId: base64urlencode(this.chatId),
+                    userId: base64urlencode(this.buf[i][Chatd.MsgField.USERID]),
+                    id: i,
+                    state: 'EDITED',
+                    keyid: keyid,
+                    message: msg,
+                    messageId : base64urlencode(msgid),
+                    updated: updated - 1
+                });
+                delete this.modified[i];
+                break;
+            }
+        }
+        if (keyid === 0) {
+        // if this is message truncate
+            if (i < msgnum) {
+                this.discard(this.buf[i][Chatd.MsgField.MSGID]);
+                delete this.buf[i];
+            }
         }
     }
 };

@@ -960,10 +960,6 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
                 tmpPromise.resolve(
                     self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)
                 );
-                /*var msgnum = self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid);
-                var msg = 'Edited!';
-                var cipher = chatRoom.protocolHandler.encryptWithKeyId(msg, keyid);
-                self.updateMessage(chatRoom, msgnum, cipher);*/
             }
             else {
                 tmpPromise.reject();

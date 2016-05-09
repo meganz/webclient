@@ -436,7 +436,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
         console.error(eventData.id, eventData.state, eventData);
 
-        if (eventData.state === "EDITED") {
+        if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
             var editedMessage = new Message(
                 chatRoom,
                 self,

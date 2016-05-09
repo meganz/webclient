@@ -1103,7 +1103,7 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, updated, keyid, msg
             // if this is message truncate
                 this.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(this.chatId),
-                    userId: userid,
+                    userId: base64urlencode(userid),
                     id: i,
                     state: 'TRUNCATED',
                     keyid: keyid,

@@ -1165,6 +1165,11 @@ function topmenuUI() {
         $('.top-menu-item.logout,.context-menu-divider.logout').show();
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
         $('.fm-avatar').show();
+        $('.top-login-button').hide();
+        $('.membership-status').show();
+        $('.top-change-language').hide();
+        $('.create-account-button').hide();
+        $('.membership-status-block').show();
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1194,8 +1199,6 @@ function topmenuUI() {
             $('.membership-status').text(l[435]);
             $('body').addClass('free');
         }
-
-        $('.membership-status').show();
 
         if (is_fm()) {
             $('.top-menu-item.refresh-item').removeClass('hidden');

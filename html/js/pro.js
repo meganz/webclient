@@ -1889,11 +1889,10 @@ var wireTransferDialog = {
         });
 
         // If logged in, pre-populate email address into wire transfer details
-        if (typeof u_attr !== 'undefined') {
+        if (typeof u_attr !== 'undefined' && u_attr.email) {
 
             // Replace the @ with -at- so the bank will accept it on the form
-            var email = u_attr.email;
-                email = email.replace('@', '-at-');
+            var email = String(u_attr.email).replace('@', '-at-');
 
             wireTransferDialog.$dialog.find('.email-address').text(email);
         }
@@ -3115,7 +3114,7 @@ var doProRegister = function($dialog) {
 
     var registeraccount = function()
     {
-        var done = function() {
+        var done = function(login) {
             loadingDialog.hide();
             $('.pro-register-dialog').addClass('hidden');
             $('.fm-dialog.registration-page-success').unbind('click');
@@ -3125,7 +3124,13 @@ var doProRegister = function($dialog) {
 
             if (skipConfirmationStep) {
                 closeDialog();
-                localStorage._proRegisterAccount = JSON.stringify(rv);
+                topmenuUI();
+                if (!login) {
+                    localStorage._proRegisterAccount = JSON.stringify(rv);
+                }
+                else {
+                    $('.fm-avatar img').attr('src', useravatar.top());
+                }
                 pro_next_step();
             }
             else {
@@ -3171,7 +3176,7 @@ var doProRegister = function($dialog) {
                             else {
                                 u_type = r;
                                 u_checked = true;
-                                done();
+                                done(true);
                             }
                         }
                     };

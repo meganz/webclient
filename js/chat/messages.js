@@ -451,37 +451,53 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'sent': true
                 }
             );
-            var _runDecryption = function() {
-                try {
-                        var decrypted = chatRoom.protocolHandler.decryptFrom(
-                            eventData.message,
-                            eventData.userId,
-                            eventData.keyid,
-                            false
-                        );
-                        if (decrypted) {
-                            //if the edited payload is an empty string, it means the message has been deleted.
-                            editedMessage.textContents = decrypted.payload;
-                            chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
-                            chatRoom.messagesBuff.messages.push(editedMessage);
 
-                            self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
-                                chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
-                            );
-                        }
-                    } catch(e) {
-                        self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
+            if (eventData.state === "TRUNCATED") {
+                chatRoom.messagesBuff.messages.forEach(function(v, k) {
+
+                    if (v.orderValue < eventData.id) {
+                        // remove the messages with orderValue < eventData.id from message buffer.
+                        // TODO: need to confirm with Lyubo about whether the following message deletion code is correct.
+                        self.chatRoom.messagesBuff.messages[v.messageId].protocol = true;
+                        self.chatRoom.messagesBuff.messages.removeByKey(v.messageId);
                     }
-                };
-
-                var promises = [];
-                promises.push(
-                    ChatdIntegration._ensureKeysAreLoaded([editedMessage])
-                );
-
-                MegaPromise.allDone(promises).always(function() {
-                    _runDecryption();
                 });
+            }
+            var _runDecryption = function() {
+                try
+                {
+                    var decrypted = chatRoom.protocolHandler.decryptFrom(
+                        eventData.message,
+                        eventData.userId,
+                        eventData.keyid,
+                        false
+                    );
+                    if (decrypted) {
+                        //if the edited payload is an empty string, it means the message has been deleted.
+                        editedMessage.textContents = decrypted.payload;
+                        if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                            editedMessage.textContents = 'History deleted by ' + decrypted.sender;
+                        }
+                        chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
+                        chatRoom.messagesBuff.messages.push(editedMessage);
+
+                        self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
+                            chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
+                        );
+                    }
+                } catch(e) {
+                    self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
+                }
+            };
+
+            var promises = [];
+            promises.push(
+                ChatdIntegration._ensureKeysAreLoaded([editedMessage])
+            );
+
+            MegaPromise.allDone(promises).always(function() {
+                _runDecryption();
+            });
         }
         else if (eventData.state === "CONFIRMED") {
             self.haveMessages = true;

@@ -1093,7 +1093,7 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, updated, keyid, msg
     var msgnum = this.lownum;
 
     for (var i = this.highnum; i > this.lownum; i--) {
-        if (this.buf[i][Chatd.MsgField.MSGID] === msgid) {
+        if (this.buf[i] && this.buf[i][Chatd.MsgField.MSGID] === msgid) {
             // if we modified the message, remove from this.modified.
 
             this.buf[i][Chatd.MsgField.MESSAGE] = msg;
@@ -1128,7 +1128,7 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, updated, keyid, msg
         }
         if (keyid === 0) {
         // if this is message truncate
-            if (i < msgnum) {
+            if (i < msgnum && this.buf[i]) {
                 this.discard(this.buf[i][Chatd.MsgField.MSGID]);
                 delete this.buf[i];
             }

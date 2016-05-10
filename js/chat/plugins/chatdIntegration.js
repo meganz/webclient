@@ -693,6 +693,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 };
                                 chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
                             }
+                            else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                                chatRoom.messagesBuff.messages[messageId].textContents = 'History deleted by ' + v.sender;
+                            }
                             else if (v && (v.type === 0 || v.type === 2)) {
                                 // this is a system message
                                 chatRoom.messagesBuff.messages[messageId].protocol = true;
@@ -798,6 +801,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     excluded: decrypted.excludeParticipants
                                 };
                                 chatRoom.messagesBuff.messages[msgObject.messageId].dialogType = "alterParticipants";
+                            } else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                                chatRoom.messagesBuff.messages[msgObject.messageId].textContents = 'History deleted by ' + decrypted.sender;
                             }
                             else {
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;

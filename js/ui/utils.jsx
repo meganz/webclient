@@ -44,8 +44,8 @@ var JScrollPane = React.createClass({
             }
         });
 
-        $elem.rebind('forceResize.jsp' + self.getUniqueId(), function(e) {
-            self.onResize();
+        $elem.rebind('forceResize.jsp' + self.getUniqueId(), function(e, forced, scrollPositionYPerc) {
+            self.onResize(forced, scrollPositionYPerc);
         });
         $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize);
         self.onResize();
@@ -65,19 +65,46 @@ var JScrollPane = React.createClass({
             );
         }
     },
-    onResize: function() {
-        if (!this.isMounted()) {
+    eventuallyReinitialise: function(forced, scrollPositionYPerc) {
+        var self = this;
+
+        if (!self.isMounted()) {
             return;
         }
 
-        var $elem = $(ReactDOM.findDOMNode(this));
+        var $elem = $(ReactDOM.findDOMNode(self));
 
+        var currHeights = [$('.jspPane', $elem).outerHeight(), $elem.outerHeight()];
+
+        if (forced || self._lastHeights != currHeights) {
+            self._lastHeights = currHeights;
+            var $jsp = $elem.data('jsp');
+            if ($jsp) {
+                if (scrollPositionYPerc) {
+
+                    if (scrollPositionYPerc === -1) {
+                        $elem.one('jsp-initialised', function () {
+                            $jsp.scrollToBottom();
+                        });
+                    }
+                    else {
+                        $elem.one('jsp-initialised', function () {
+                            $jsp.scrollToPercentY(scrollPositionYPerc);
+                        });
+                    }
+                }
+                $jsp.reinitialise();
+            }
+        }
+    },
+    onResize: function(forced, scrollPositionYPerc) {
+        if (!this.isMounted()) {
+            return;
+        }
+        
         this.setWidthHeightIfEmpty();
 
-        var $jsp = $elem.data('jsp');
-        if ($jsp) {
-            $jsp.reinitialise();
-        }
+        this.eventuallyReinitialise(forced, scrollPositionYPerc);
     },
     componentDidUpdate: function() {
         this.onResize();

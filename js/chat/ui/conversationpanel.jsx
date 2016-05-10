@@ -724,19 +724,7 @@ var ConversationPanel = React.createClass({
         var $jsp = self.$messages.data("jsp");
         if ($jsp) {
             var perc = $jsp.getPercentScrolledY();
-
-
-            if (scrollToBottom) {
-                self.$messages.one('jsp-initialised', function () {
-                    $jsp.scrollToBottom();
-                });
-            }
-            else {
-                self.$messages.one('jsp-initialised', function () {
-                    $jsp.scrollToPercentY($jsp.getPercentScrolledY(perc));
-                });
-            }
-            $jsp.reinitialise();
+            self.$messages.trigger('forceResize', [true, scrollToBottom ? -1 : perc]);
         }
 
         room.renderContactTree();
@@ -829,6 +817,7 @@ var ConversationPanel = React.createClass({
 
             self.lastScrollHeight = $jsp.getContentHeight();
             self.lastScrollPosition = scrollPositionY;
+            self.lastScrollPositionPerc = $jsp.getPercentScrolledY();
         });
 
         self.$messages.rebind('jsp-initialised.conversationsPanel' + self.props.chatRoom.roomJid, function(e) {
@@ -936,39 +925,8 @@ var ConversationPanel = React.createClass({
         var $container = $(ReactDOM.findDOMNode(this));
         var self = this;
 
-        if (!self.props.chatRoom.isCurrentlyActive) {
+        if (!self.props.chatRoom.isCurrentlyActive || !self.isMounted() || !self.$messages) {
             return;
-        }
-
-        // typeArea resizing
-        var $textarea = $('.main-typing-area textarea.messages-textarea', $container);
-        var textareaHeight =  $textarea.outerHeight();
-        var $hiddenDiv = $('.main-typing-area .message-preview', $container);
-        var $pane = $('.main-typing-area .chat-textarea-scroll', $container);
-        var $jsp;
-
-        if (textareaHeight != $hiddenDiv.height()) {
-            $textarea.css('height', $hiddenDiv.height());
-
-            if ($hiddenDiv.outerHeight() > 100) {
-                $pane.jScrollPane({
-                    enableKeyboardNavigation:false,
-                    showArrows:true,
-                    arrowSize:5
-                });
-                $jsp = $pane.data('jsp');
-                $textarea.blur();
-                $textarea.focus();
-                $jsp.scrollByY(0);
-            }
-            else {
-                $jsp = $pane.data('jsp');
-                if ($jsp) {
-                    $jsp.destroy();
-                    $textarea.blur();
-                    $textarea.focus();
-                }
-            }
         }
 
         // Important. Please insure we have correct height detection for Chat messages block.
@@ -1170,12 +1128,25 @@ var ConversationPanel = React.createClass({
                             key={v.messageId}
                             contact={contact}
                             grouped={grouped}
+                            onUpdate={() => {
+                                self.onResizeDoUpdate();
+                            }}
+                            onEditStarted={($domElement) => {
+                                var $jsp = self.$messages.data('jsp');
+                                if (!verge.inViewport($domElement)) {
+                                    $jsp.scrollToElement($domElement);
+                                }
+                            }}
                             onEditDone={(messageContents) => {
-                                room.megaChat.plugins.chatdIntegration.updateMessage(
-                                    room,
-                                    v.orderValue,
-                                    messageContents
-                                );
+                                if (messageContents) {
+                                    room.megaChat.plugins.chatdIntegration.updateMessage(
+                                        room,
+                                        v.orderValue,
+                                        messageContents
+                                    );
+                                }
+                                var $jsp = self.$messages.data('jsp');
+                                $jsp.scrollToBottom();
                             }}
                             onDeleteClicked={(e, msg) => {
                                 self.setState({
@@ -1415,7 +1386,7 @@ var ConversationPanel = React.createClass({
                                                 arrowSize:5,
                                                 animateDuration: 70,
                                                 animateScroll: false,
-                                                maintainPosition: false
+                                                maintainPosition: true
                                             }}
                                                chatRoom={self.props.chatRoom}
                                                messagesToggledInCall={self.state.messagesToggledInCall}

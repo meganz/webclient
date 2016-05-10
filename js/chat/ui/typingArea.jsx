@@ -35,9 +35,12 @@ var TypingArea = React.createClass({
             typedMessage: self.state.typedMessage + " " + txt + " "
         });
 
+        var $container = $(ReactDOM.findDOMNode(this));
+        var $textarea = $('.chat-textarea:visible textarea:visible', $container);
+
         setTimeout(function () {
-            $('.chat-textarea:visible textarea').click();
-            moveCursortoToEnd($('.chat-textarea:visible textarea')[0]);
+            $textarea.click();
+            moveCursortoToEnd($textarea[0]);
         }, 100);
     },
 
@@ -64,12 +67,25 @@ var TypingArea = React.createClass({
         }, 2000);
     },
     triggerOnUpdate: function() {
-        if (!this.props.onUpdate) {
+        if (!this.props.onUpdate || !this.isMounted()) {
             return;
         }
 
+        var shouldTriggerUpdate = false;
         if (this.state.typedMessage != this.lastTypedMessage) {
             this.lastTypedMessage = this.state.typedMessage;
+            shouldTriggerUpdate = true;
+        }
+        if (!shouldTriggerUpdate) {
+            var $container = $(ReactDOM.findDOMNode(this));
+            var $textarea = $('.chat-textarea:visible textarea:visible', $container);
+            if (!this._lastTextareaHeight || this._lastTextareaHeight !== $textarea.height()) {
+                this._lastTextareaHeight = $textarea.height();
+                shouldTriggerUpdate = true;
+            }
+        }
+
+        if (shouldTriggerUpdate) {
             this.props.onUpdate();
         }
     },
@@ -94,6 +110,35 @@ var TypingArea = React.createClass({
             room.megaChat.karere.sendComposingPaused(room.roomJid);
             self.iAmTyping = false;
         }
+    },
+    onCancelClicked: function(e) {
+        var self = this;
+        self.setState({typedMessage: ""});
+        self.props.onConfirm(false);
+        self.triggerOnUpdate();
+    },
+    onSaveClicked: function(e) {
+        var self = this;
+
+        if (self.props.disabled || !self.isMounted()) {
+            return;
+        }
+
+        var $container = $(ReactDOM.findDOMNode(self));
+        var val = $('.chat-textarea:visible textarea:visible', $container).val();
+
+        if ($.trim(val).length > 0) {
+            if (self.props.onConfirm(val) !== true) {
+                self.setState({typedMessage: ""});
+            }
+            self.triggerOnUpdate();
+            return;
+        }
+        else {
+            // if the val is empty, then trigger a cancel edit message...
+            self.onCancelClicked(e);
+        }
+
     },
     onTypeAreaKeyDown: function (e) {
         if (this.props.disabled) {
@@ -181,24 +226,27 @@ var TypingArea = React.createClass({
         $('.chat-textarea-scroll textarea', $container).rebind('autoresized.typingArea', function() {
             self.handleWindowResize();
         });
+        self.triggerOnUpdate();
 
     },
     componentWillUnmount: function() {
         var self = this;
         var chatRoom = self.props.chatRoom;
-        var megaChat = chatRoom.megaChat;
-
+        self.triggerOnUpdate();
         window.removeEventListener('resize', self.handleWindowResize);
     },
     componentDidUpdate: function () {
         var self = this;
         var room = this.props.chatRoom;
 
-        if (room.isCurrentlyActive) {
-            this.focusTypeArea();
-        }
+        if (room.isCurrentlyActive && self.isMounted()) {
+            if ($('textarea:focus,select:focus,input:focus').size() === 0) {
+                // no other element is focused...
+                this.focusTypeArea();
+            }
 
-        self.handleWindowResize();
+            self.handleWindowResize();
+        }
     },
     handleWindowResize: function (e, scrollToBottom) {
         var self = this;
@@ -208,9 +256,6 @@ var TypingArea = React.createClass({
         if (!self.props.chatRoom.isCurrentlyActive) {
             return;
         }
-
-        var $container = $(ReactDOM.findDOMNode(this));
-        $('.chat-textarea-scroll', $container).triggerHandler('keyup');
 
         self.triggerOnUpdate();
 
@@ -229,6 +274,25 @@ var TypingArea = React.createClass({
         var typedMessage = htmlentities(self.state.typedMessage).replace(/\n/g, '<br/>');
         typedMessage = typedMessage + '<br/>';
 
+        var buttons = null;
+
+        if (self.props.showButtons === true) {
+            buttons = [
+                <ButtonsUI.Button
+                    key="save"
+                    className="default-white-button right"
+                    icon=""
+                    onClick={self.onSaveClicked}
+                    label={__(l[776])} />,
+
+                <ButtonsUI.Button
+                    key="cancel"
+                    className="default-white-button right"
+                    icon=""
+                    onClick={self.onCancelClicked}
+                    label={__(l[1718])} />
+            ];
+        }
         return <div className={"typingarea-component" + self.props.className}>
             <div className="chat-textarea">
                 <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
@@ -264,6 +328,7 @@ var TypingArea = React.createClass({
                                             }}></div>
                 </div>
             </div>
+            {buttons}
         </div>
     }
 });

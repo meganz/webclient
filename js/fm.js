@@ -65,6 +65,7 @@ function initContactsGridScrolling() {
  */
 function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
     var textareaWrapperClass = $textarea.parent().attr('class'),
+          $parent = $textarea.parent(),
           wrapperClassSelector = '.' + textareaWrapperClass.replace(/[_\s]/g, ' .'),
           $textareaClone,
           textareaLineHeight = parseInt($textarea.css('line-height'))
@@ -77,7 +78,7 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
     $textareaClone = $textarea.next('div');
 
     function textareaScrolling(keyEvents) {
-        var $textareaScrollBlock = $(wrapperClassSelector),
+        var $textareaScrollBlock = $parent,
               $textareaCloneSpan,
               textareaContent = $textarea.val(),
               cursorPosition = $textarea.getCursorPosition(),

@@ -42,6 +42,16 @@ var GenericConversationMessage = React.createClass({
                 $textarea.focus();
                 moveCursortoToEnd($textarea[0]);
             }
+            if (oldState.editing === false) {
+                if (self.props.onEditStarted) {
+                    self.props.onEditStarted($generic);
+                }
+            }
+        }
+        else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
+            if (self.props.onUpdate) {
+                self.props.onUpdate();
+            }
         }
     },
     componentWillUnmount: function() {
@@ -693,12 +703,19 @@ var GenericConversationMessage = React.createClass({
                         iconClass="small-icon writing-pen textarea-icon"
                         initialText={message.textContents}
                         chatRoom={self.props.chatRoom}
+                        showButtons={true}
                         className="edit-typing-area"
                         onUpdate={() => {
                             self.safeForceUpdate();
+
+                            if (self.props.onUpdate) {
+                                self.props.onUpdate();
+                            }
                         }}
                         onConfirm={(messageContents) => {
-                            message.textContents = messageContents;
+                            if (messageContents) {
+                                message.textContents = messageContents;
+                            }
                             self.setState({'editing': false});
 
                             if (self.props.onEditDone) {
@@ -707,8 +724,7 @@ var GenericConversationMessage = React.createClass({
 
                             return true;
                         }}
-                    >
-                    </TypingAreaUI.TypingArea>;
+                    />;
                 }
                 else if(message.deleted) {
                     messageDisplayBlock =  <div className="message text-block">
@@ -721,7 +737,11 @@ var GenericConversationMessage = React.createClass({
                     messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>;
                 }
                 if (!message.deleted) {
-                    if (contact && contact.u === u_handle && (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT) {
+                    if (
+                        contact && contact.u === u_handle &&
+                        (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
+                        self.state.editing !== true
+                    ) {
                         messageActionButtons = <ButtonsUI.Button
                             className="default-white-button tiny-button"
                             icon="tiny-icon grey-down-arrow">
@@ -737,8 +757,9 @@ var GenericConversationMessage = React.createClass({
                                     label={__(l[1342])}
                                     className=""
                                     onClick={(e) => {
-                                        e.preventDefault();
                                         e.stopPropagation();
+                                        e.preventDefault();
+
                                         self.setState({'editing': true});
                                 }}
                                 />

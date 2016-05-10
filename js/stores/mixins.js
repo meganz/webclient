@@ -340,13 +340,12 @@ var MegaRenderMixin = {
     },
     safeForceUpdate: function() {
         var self = this;
-        try {
-            setTimeout(function() {
+        
+        setTimeout(function() {
+            if (self.isMounted()) {
                 self.forceUpdate();
-            }, 75);
-        } catch(e) {
-            console.warn(e);
-        }
+            }
+        }, 75);
     }
 };
 

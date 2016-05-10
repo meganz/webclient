@@ -87,6 +87,13 @@ var Dropdown = React.createClass({
             }
         }
     },
+    componentWillUnmount: function() {
+        if (this.props.active) {
+            // fake an active=false so that any onActiveChange handlers would simply trigger back UI to the state
+            // in which this element is not active any more (since it would be removed from the DOM...)
+            this.onActiveChange(false);
+        }
+    },
     render: function() {
         var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
 

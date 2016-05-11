@@ -75,17 +75,17 @@ function mainScroll() {
     });
     $('.main-scroll-block').unbind('jsp-scroll-y');
     jScrollFade('.main-scroll-block');
-    if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
+    if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage' || page == 'sdk' || page == 'dev') {
         scrollMenu();
     }
 }
 
 function scrollMenu() {
     $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
-        if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
-            var sc = scrollPositionY - 30;
+        if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage' || page == 'sdk' || page == 'dev') {
+            var sc = scrollPositionY;
             if (isAtTop) {
-                sc = 30;
+                sc = 0;   
             }
             if ($('.main-scroll-block .jspPane').height() - sc - $('.new-left-menu-block').height() - $('.nw-bottom-block').height() - 100 < 0) {
                 sc = $('.main-scroll-block .jspPane').height()

@@ -83,9 +83,9 @@ function mainScroll() {
 function scrollMenu() {
     $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
         if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage' || page == 'sdk' || page == 'dev') {
-            var sc = scrollPositionY;
+            var sc = scrollPositionY + 30;
             if (isAtTop) {
-                sc = 0;   
+                sc = 30;   
             }
             if ($('.main-scroll-block .jspPane').height() - sc - $('.new-left-menu-block').height() - $('.nw-bottom-block').height() - 100 < 0) {
                 sc = $('.main-scroll-block .jspPane').height()

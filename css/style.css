@@ -16948,8 +16948,7 @@ a.contact-new-button:hover {
 .new-left-menu-block {
     width: 241px;
     float: left;
-    padding: 0 0 0 2px;
-    margin-top: 30px;
+    padding: 30px 0 0 2px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

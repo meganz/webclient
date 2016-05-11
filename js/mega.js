@@ -5229,6 +5229,10 @@ function MegaData()
             }
         }
 
+        if (ul.skipfile) {
+            showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
+        }
+
         this.mobile_ul_completed = true;
         for (var i in this.mobileuploads)
         {

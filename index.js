@@ -63,6 +63,7 @@ function startMega() {
     }
 
     mBroadcaster.sendMessage('zoomLevelCheck');
+    $('#pwdmanhelper input').val('');
 }
 
 function mainScroll() {
@@ -1158,7 +1159,7 @@ function topmenuUI() {
                 megaChat.renderMyStatus();
             }
         }
-        
+
         // Show PRO plan expired warning popup (if applicable)
         alarm.planExpired.render();
     }
@@ -1172,7 +1173,7 @@ function topmenuUI() {
             if (isNonActivatedAccount()) {
                 alarm.nonActivatedAccount.render();
             }
-            
+
             // Otherwise show the ephemeral session warning
             else if (($.len(M.c[M.RootID] || {})) && (page !== 'register')) {
                 alarm.ephemeralSession.render();

@@ -540,7 +540,7 @@ function populate_l() {
     l[8653] = l[8653].replace('%4', '<span class="gateway-name"></span>');
     l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
-    
+
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
@@ -4171,6 +4171,19 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
+    if (navigator.mozGetUserMedia) {
+        var creds = passwordManager.pickFormFields(form);
+        if (creds) {
+            $('#pmh_username').val(creds.usr);
+            $('#pmh_password').val(creds.pwd);
+            $('#pwdmanhelper').submit();
+            Soon(function() {
+                $('#pwdmanhelper input').val('');
+                $(form).find('input').val('');
+            });
+        }
+        return;
+    }
     if (is_chrome_firefox || typeof history !== "object") {
         return false;
     }
@@ -4186,6 +4199,51 @@ function passwordManager(form) {
     }).submit();
     return true;
 }
+passwordManager.knownForms = Object.freeze({
+    '#form_login_header': {
+        usr: '#login-name',
+        pwd: '#login-password'
+    },
+    '#login_form': {
+        usr: '#login-name2',
+        pwd: '#login-password2'
+    },
+    '#register_form': {
+        usr: '#register-email',
+        pwd: '#register-password'
+    }
+});
+passwordManager.pickFormFields = function(form) {
+    var result = null;
+    var $form = $(form);
+
+    if ($form.length) {
+        if ($form.length !== 1) {
+            console.error('Unexpected form selector', form);
+        }
+        else {
+            form = passwordManager.knownForms[form];
+            if (form) {
+                result = {
+                    usr: $form.find(form.usr).val(),
+                    pwd: $form.find(form.pwd).val(),
+
+                    selector: {
+                        usr: form.usr,
+                        pwd: form.pwd
+                    }
+                };
+
+                if (!(result.usr && result.pwd)) {
+                    result = false;
+                }
+            }
+        }
+    }
+
+    return result;
+};
+
 
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2Lightweight(el) {
@@ -4563,7 +4621,7 @@ function getProPlan(planNum) {
  *                   company names are not translated).
  */
 function getGatewayName(gatewayId) {
-    
+
     var gateways = {
         0: {
             name: 'voucher',
@@ -4630,12 +4688,12 @@ function getGatewayName(gatewayId) {
             displayName: l[6198]    // Wire transfer
         }
     };
-    
+
     // If the gateway exists, return it
     if (typeof gateways[gatewayId] !== 'undefined') {
         return gateways[gatewayId];
     }
-    
+
     // Otherwise return a placeholder for currently unknown ones
     return {
         name: 'unknown',

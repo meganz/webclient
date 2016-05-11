@@ -2823,7 +2823,7 @@ var bitcoinDialog = {
 };
 
 
-function showLoginDialog() {
+function showLoginDialog(email) {
     megaAnalytics.log("pro", "loginDialog");
     $.dialog = 'pro-login-dialog';
 
@@ -2851,7 +2851,7 @@ function showLoginDialog() {
 
     $('.input-email', $dialog)
         .data('placeholder', l[195])
-        .val(l[195]);
+        .val(email || l[195]);
 
     $('.input-password', $dialog)
         .data('placeholder', l[909])
@@ -3129,6 +3129,7 @@ var doProRegister = function($dialog) {
                     localStorage._proRegisterAccount = JSON.stringify(rv);
                 }
                 else {
+                    showToast('megasync', "You have been successfully logged in.");
                     $('.fm-avatar img').attr('src', useravatar.top());
                 }
                 pro_next_step();
@@ -3168,7 +3169,13 @@ var doProRegister = function($dialog) {
                                 $('.login-register-input.email .top-loginp-tooltip-txt', $dialog)
                                     .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
 
-                                msgDialog('warninga', l[1578], l[218]);
+                                msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
+                                    if (e) {
+                                        $('.pro-register-dialog').addClass('hidden');
+                                        signupPromptDialog.hide();
+                                        showLoginDialog(rv.email);
+                                    }
+                                });
                             }
                             else if (r === EBLOCKED) {
                                 alert(l[730]);

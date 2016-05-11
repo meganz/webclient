@@ -89,7 +89,7 @@ var GenericConversationMessage = React.createClass({
         var megaChat = this.props.chatRoom.megaChat;
         var chatRoom = this.props.chatRoom;
         var contact = self.getContact();
-        var timestampInt = self.getTimestamp();
+        var timestampInt = self.getTimestamp() + (message.updated ? message.updated : 0);
         var timestamp = self.getTimestampAsString();
 
         var textMessage;
@@ -734,7 +734,10 @@ var GenericConversationMessage = React.createClass({
                     </div>;
                 }
                 else {
-                    messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html: textMessage}}></div>;
+                    if (message.updated >= 0) {
+                        textMessage = textMessage + " <em>" + __("(edited)") + "</em>";
+                    }
+                    messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;
                 }
                 if (!message.deleted) {
                     if (

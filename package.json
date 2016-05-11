@@ -56,7 +56,7 @@
   "devDependencies": {
     "eslint": "^1.10.3",
     "eslint-loader": "^1.1.1",
-    "htmlhint": "^0.9.12",
+    "htmlhint": "0.9.12",
     "istanbul": "^0.4.2",
     "jscpd": "^0.6.1",
     "jscs": "^2.10.1",

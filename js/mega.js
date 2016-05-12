@@ -2229,7 +2229,7 @@ function MegaData()
                     titleTooltip = '';
                     fIcon = '';
 
-                    fName = htmlentities(folders[ii].name);
+                    fName = folders[ii].name;
 
                     if (cns) {
                         for (var cn in cns) {

@@ -3226,7 +3226,7 @@
     "8696": "upgrade para o profissional",
     "8697": "Selecione a data",
     "8698": "Expira %1",
-    "8699": "Limpar transfer\u00eancias",
+    "8699": "Limpar itens completos",
     "8700": "Extens\u00e3o para Thunderbird",
     "8703": "Escreva e-mail do usu\u00e1rio",
     "8704": "Importar do telefone",
@@ -3337,6 +3337,8 @@
         "update-links": 8733,
         "get-links": 8734,
         "remove-links": 8735,
-        "set-new-expiry-date": 8736
+        "set-new-expiry-date": 8736,
+        "international-missing-children-title": 8737,
+        "international-missing-children-body-text": 8738
     }
 }

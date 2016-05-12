@@ -3337,6 +3337,8 @@
         "update-links": 8733,
         "get-links": 8734,
         "remove-links": 8735,
-        "set-new-expiry-date": 8736
+        "set-new-expiry-date": 8736,
+        "international-missing-children-title": 8737,
+        "international-missing-children-body-text": 8738
     }
 }

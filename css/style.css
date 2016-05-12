@@ -11493,12 +11493,20 @@ table {
 .st-main-block .notification-popup .jspPane, .main-scroll-block .notification-popup .jspPane {
     min-width: 0;
 }
-.st-mid-white-block, .download-mid-white-block, .top-head + .main-scroll-block {
+.st-mid-white-block, .download-mid-white-block {
     height: -webkit-calc(100% - 48px);
     height: -moz-calc(100% - 48px);
     height: calc(100% - 48px);
     min-height: 590px;
     position: relative;
+}
+.main-scroll-block {
+    height: 100%;
+}
+.top-head + .main-scroll-block, .top-head + .dev-nw-gray-bg {
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
 }
 .st-mid-white-block {
     position: relative;
@@ -16947,6 +16955,7 @@ a.contact-new-button:hover {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    position: absolute;
 }
 .new-right-content-block {
     margin-left: 241px;

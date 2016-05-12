@@ -14199,6 +14199,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.wiretransfer {
     background-position: 0 -3960px;
 }
+.provider-icon.directreseller {
+    background-position: 0 -3540px;
+}
 .membership-new-offer text {
     font-weight: normal;
 }

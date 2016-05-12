@@ -548,7 +548,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.MSGUPDX:
                 self.keepAliveTimerRestart();
                 len = self.chatd.unpack32le(cmd.substr(35,4));
-                self.logger.log("Message '" + base64urlencode(cmd.substr(17,8)) + "' EDIT/DELETION: " + cmd.substr(39,len));
+                self.logger.log("Message '" + base64urlencode(cmd.substr(17,8)) + "' EDIT/DELETION: in " + base64urlencode(cmd.substr(1,8)) + ' from ' + base64urlencode(cmd.substr(9,8))  + ' with '+ cmd.substr(39,len));
                 len += 39;
 
                 self.chatd.msgmodify(cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack16le(cmd.substr(29,2)), self.chatd.unpack32le(cmd.substr(31,4)), cmd.substr(39,len));
@@ -1073,7 +1073,7 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
         messageId: base64urlencode(msgid),
         userId: base64urlencode(userId),
         ts: timestamp,
-        updated: updated - 1,
+        updated: updated,
         keyid : keyid,
         message: msg,
         isNew: newmsg
@@ -1120,7 +1120,7 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, updated, keyid, msg
                     keyid: keyid,
                     message: msg,
                     messageId : base64urlencode(msgid),
-                    updated: updated - 1
+                    updated: updated
                 });
                 delete this.modified[i];
                 break;
@@ -1170,15 +1170,17 @@ Chatd.Messages.prototype.persist = function(messageId) {
                 .fail(function() {
 
                     var num = self.sending[msgxid];
-                    self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
-                        'messageId' : msgxid,
-                        'userId' : self.buf[num][Chatd.MsgField.USERID],
-                        'timestamp' : self.buf[num][Chatd.MsgField.TIMESTAMP],
-                        'message' : self.buf[num][Chatd.MsgField.MESSAGE],
-                        'keyId' : self.buf[num][Chatd.MsgField.KEYID],
-                        'updated' : self.buf[num][Chatd.MsgField.UPDATED],
-                        'edited' : self.modified[num] ? 1 : 0
-                    });
+                    if (num) {
+                        self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
+                            'messageId' : msgxid,
+                            'userId' : self.buf[num][Chatd.MsgField.USERID],
+                            'timestamp' : self.buf[num][Chatd.MsgField.TIMESTAMP],
+                            'message' : self.buf[num][Chatd.MsgField.MESSAGE],
+                            'keyId' : self.buf[num][Chatd.MsgField.KEYID],
+                            'updated' : self.buf[num][Chatd.MsgField.UPDATED],
+                            'edited' : self.modified[num] ? 1 : 0
+                        });
+                    }
                 });
         });
     }

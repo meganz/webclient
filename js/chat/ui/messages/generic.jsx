@@ -734,7 +734,7 @@ var GenericConversationMessage = React.createClass({
                     </div>;
                 }
                 else {
-                    if (message.updated >= 0) {
+                    if (message.updated > 0) {
                         textMessage = textMessage + " <em>" + __("(edited)") + "</em>";
                     }
                     messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;

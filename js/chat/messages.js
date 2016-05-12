@@ -366,7 +366,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'keyid': eventData.keyid,
                     'message': eventData.message,
                     'delay': eventData.ts,
-                    'orderValue': eventData.id
+                    'orderValue': eventData.id,
+                    'updated': eventData.updated
                 }
             );
 

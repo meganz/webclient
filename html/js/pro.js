@@ -760,7 +760,8 @@ function pro_pay() {
                                 tpay.redirectToSite(utcResult);
                             }
 
-                            else if (pro_m == directReseller.gatewayId) {
+                            // If 6media, redirect to the site
+                            else if (pro_m === directReseller.gatewayId) {
                                 directReseller.redirectToSite(utcResult);
                             }
                         }
@@ -1974,13 +1975,13 @@ var directReseller = {
 
     /**
      * Redirect to the site
-     * @param {String} utcResult (a saleid)
+     * @param {String} utcResult A sale ID
      */
     redirectToSite: function(utcResult) {
         var provider = utcResult['EUR']['provider'];
         var params = utcResult['EUR']['params'];
-        if (provider === 1)
-        {
+        
+        if (provider === 1) {
             params = atob(params);
             window.location = 'http://mega.and1.tw/zh_tw/order_mega.php?' + params;
         }

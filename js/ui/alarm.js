@@ -212,7 +212,7 @@ var alarm = {
             }
             
             // Don't show this dialog if they have already said they don't want to see it again
-            if (localStorage.getItem('planExpiredDialogDisabled')) {
+            if (typeof this.lastPayment.dontShow !== 'undefined') {
                 return false;
             }
             
@@ -286,7 +286,7 @@ var alarm = {
                 alarm.seen = true;
                 
                 // Add a log
-                api_req({ a: 'log', e: 99606, m: 'User chose a new plan from the plan expiry dialog' });
+                api_req({ a: 'log', e: 99608, m: 'User chose a new plan from the plan expiry dialog' });
 
                 // Go to the first step of the Pro page so they can choose a new plan
                 document.location.hash = 'pro';
@@ -310,7 +310,7 @@ var alarm = {
                 alarm.seen = true;
                 
                 // Add a log
-                api_req({ a: 'log', e: 99607, m: 'User chose to renew existing plan from the plan expiry dialog' });
+                api_req({ a: 'log', e: 99609, m: 'User chose to renew existing plan from the plan expiry dialog' });
 
                 // Get the link for the Pro page second step e.g. #pro_lite, #pro_1 etc
                 var proLink = (proNum === 4) ? 'lite' : proNum;
@@ -402,8 +402,13 @@ var alarm = {
                     d: jsonData
                 });
                 
-                // Close the dialog and never show again
-                localStorage.setItem('planExpiredDialogDisabled', '1');
+                // Never show the dialog again for this account
+                mega.attr.set(
+                    'hideProExpired',
+                    '1',                    // Simple flag
+                    false,                  // Private attribute
+                    true                    // Non-historic, won't retain previous values on the API server
+                );
                 
                 // Hide the warning icon and the dialog
                 $container.addClass('hidden');

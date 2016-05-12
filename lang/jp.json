@@ -2187,7 +2187,6 @@
     "7118": "\u30d5\u30a9\u30c8%ld\u3053",
     "7119": "\u30d3\u30c7\u30aa%ld\u3053",
     "7120": "\u5199\u771f%1$ld\u3053\u3001\u30d3\u30c7\u30aa%2$ld\u3053",
-    "7121": "%1$ld\u5168\u4f53\u306f %2$ld",
     "7122": "\u3053\u306e\u30a2\u30d7\u30ea\u3067\u306f\u3042\u306a\u305f\u306e\u30d5\u30a9\u30c8\u3084\u30d3\u30c7\u30aa\u306b\u30a2\u30af\u30bb\u30b9\u3067\u304d\u307e\u305b\u3093\u3002",
     "7123": "\u30d7\u30e9\u30a4\u30d0\u30b7\u30fc\u8a2d\u5b9a\u304b\u3089\u30a2\u30af\u30bb\u30b9\u3092\u6709\u52b9\u306b\u3067\u304d\u307e\u3059\u3002",
     "7124": "\u30d5\u30a9\u30c8\u3084\u30d3\u30c7\u30aa\u306a\u3057",
@@ -3217,6 +3216,16 @@
     "8685": "Please explain why you don&#039;t wish to renew your plan:",
     "8686": "undecrypted folder",
     "8687": "undecrypted file",
+    "8688": "Awaiting email confirmation.",
+    "8690": "You don&#039;t have access to the selected download path. Please select a different download path and try again.",
+    "8691": "Please go to your inbox and click the link to confirm your account.",
+    "8692": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
+    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
+    "8694": "Set expiry date",
+    "8695": "PRO Only",
+    "8696": "Upgrade to PRO",
+    "8697": "Select date",
+    "8698": "Expires %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3280,6 +3289,11 @@
         "iban-note": 8671,
         "folderlink-partial-import-warning": 8683,
         "send-and-close": 8684,
-        "please-explain-message": 8685
+        "please-explain-message": 8685,
+        "set-expiry-date": 8694,
+        "pro-only": 8695,
+        "get-pro": 8696,
+        "select-date": 8697,
+        "expires-x": 8698
     }
 }

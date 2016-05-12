@@ -1970,8 +1970,9 @@ var tpay = {
 };
 
 /**
- * Code for directReseller payments such as Gary's 6media thing
+ * Code for directReseller payments such as Gary's 6media
  */
+/* jshint -W003 */
 var directReseller = {
 
     gatewayId: 15,

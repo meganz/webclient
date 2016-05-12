@@ -3220,12 +3220,14 @@
     "8690": "Nem\u00e1te pr\u00edstup k ceste pre s\u0165ahovanie. Zvo\u013ete in\u00fa cestu a sk\u00faste to znovu.",
     "8691": "Pros\u00edm cho\u010fte do svojej doru\u010denej po\u0161ty a kliknite na odkaz pre potvrdenie svojho \u00fa\u010dtu.",
     "8692": "Pre chybu vo vykreslovan\u00ed v Chrome\/Chromium prehliada\u010doch sa MEGA ned\u00e1 pou\u017e\u00edva\u0165 v re\u017eime 110% pribl\u00ed\u017eenia. Pros\u00edme, stla\u010dte Ctrl\/Cmd + 0 pre obnovenie stup\u0148a pribl\u00ed\u017eenia alebo pou\u017e\u00edvajte Firefox.",
-    "8693": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
-    "8694": "Set expiry date",
-    "8695": "PRO Only",
-    "8696": "Upgrade to PRO",
-    "8697": "Select date",
-    "8698": "Expires %1",
+    "8693": "Pre chybu vo vykreslovan\u00ed v Chrome\/Chromium prehliada\u010doch sa MEGA ned\u00e1 pou\u017e\u00edva\u0165 v tomto re\u017eime pribl\u00ed\u017eenia. Pros\u00edme, stla\u010dte Ctrl\/Cmd + 0 pre obnovenie stup\u0148a pribl\u00ed\u017eenia alebo pou\u017e\u00edvajte Firefox.",
+    "8694": "Nastavte d\u00e1tum expir\u00e1cie",
+    "8695": "iba PRO",
+    "8696": "Vylep\u0161ite na PRO",
+    "8697": "Vyberte d\u00e1tum",
+    "8698": "Expiruje %1",
+    "8699": "Clear completed transfers",
+    "8700": "Thunderbird Extension",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3274,7 +3276,7 @@
         "support-too-short": 8650,
         "your-plan-has-expired": 8651,
         "purchased": 8652,
-        "expired": 8657,
+        "expired": 1664,
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
@@ -3294,6 +3296,8 @@
         "pro-only": 8695,
         "get-pro": 8696,
         "select-date": 8697,
-        "expires-x": 8698
+        "expires-x": 8698,
+        "clear-completed-transfers": 8699,
+        "thunderbird-extension": 8700
     }
 }

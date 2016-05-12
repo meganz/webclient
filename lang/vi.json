@@ -3150,7 +3150,7 @@
     "8615": "G\u00f3i PRO III h\u1eb1ng th\u00e1ng",
     "8616": "Cung c\u1ea5p 200 GB kh\u00f4ng gian l\u01b0u tr\u1eef v\u00e0 1 TB b\u0103ng th\u00f4ng cho c\u00e1c phi\u00ean truy\u1ec1n t\u1ea3i cho m\u1ed7i th\u00e1ng trong m\u1ed9t n\u0103m.",
     "8617": "G\u00f3i LITE h\u1eb1ng n\u0103m",
-    "8618": "This gives you 200 GB of storage space and 1 TB of bandwidth for one month.",
+    "8618": "Cung c\u1ea5p 200 GB kh\u00f4ng gian l\u01b0u tr\u1eef v\u00e0 1 TB b\u0103ng th\u00f4ng cho c\u00e1c phi\u00ean truy\u1ec1n t\u1ea3i trong m\u1ed9t th\u00e1ng.",
     "8619": "G\u00f3i LITE h\u1eb1ng th\u00e1ng",
     "8620": "T\u1ea3i xu\u1ed1ng t\u1ec7p tin th\u1ea5t b\u1ea1i. Xin th\u1eed l\u1ea1i.",
     "8621": "Failed to load incoming shared items from MEGA. Please try again or click on refresh.",
@@ -3226,6 +3226,8 @@
     "8696": "Upgrade to PRO",
     "8697": "Select date",
     "8698": "Expires %1",
+    "8699": "Clear completed transfers",
+    "8700": "Thunderbird Extension",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3274,7 +3276,7 @@
         "support-too-short": 8650,
         "your-plan-has-expired": 8651,
         "purchased": 8652,
-        "expired": 8657,
+        "expired": 1664,
         "renew-plan-instruction": 8653,
         "choose-different-plan-instruction": 8654,
         "renew": 8655,
@@ -3294,6 +3296,8 @@
         "pro-only": 8695,
         "get-pro": 8696,
         "select-date": 8697,
-        "expires-x": 8698
+        "expires-x": 8698,
+        "clear-completed-transfers": 8699,
+        "thunderbird-extension": 8700
     }
 }

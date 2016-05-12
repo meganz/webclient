@@ -9109,7 +9109,7 @@ function showToast(toastClass, notification, buttonLabel) {
 
     timeout = setTimeout(function() {
         hideToast();
-    }, 5000);
+    }, 7000);
 
     if (buttonLabel) {
         $('.common-toast .toast-button').safeHTML(buttonLabel);
@@ -9132,7 +9132,7 @@ function showToast(toastClass, notification, buttonLabel) {
     {
         timeout = setTimeout(function() {
             hideToast();
-        }, 5000);
+        }, 7000);
     });
 }
 

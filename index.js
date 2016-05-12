@@ -75,15 +75,15 @@ function mainScroll() {
     });
     $('.main-scroll-block').unbind('jsp-scroll-y');
     jScrollFade('.main-scroll-block');
-    if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
+    if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
         scrollMenu();
     }
 }
 
 function scrollMenu() {
     $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
-        if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
-            var sc = scrollPositionY - 30;
+        if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
+            var sc = scrollPositionY + 30;
             if (isAtTop) {
                 sc = 30;
             }

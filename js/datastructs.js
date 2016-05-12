@@ -571,7 +571,7 @@ MegaDataSortedMap.prototype.exists = function(keyValue) {
 
 MegaDataSortedMap.prototype.keys = function() {
     var self = this;
-    return self._sortedVals;
+    return clone(self._sortedVals);
 };
 
 MegaDataSortedMap.prototype.values = function() {

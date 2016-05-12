@@ -453,17 +453,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             );
 
-            if (eventData.state === "TRUNCATED") {
-                chatRoom.messagesBuff.messages.forEach(function(v, k) {
-
-                    if (v.orderValue < eventData.id) {
-                        // remove the messages with orderValue < eventData.id from message buffer.
-                        // TODO: need to confirm with Lyubo about whether the following message deletion code is correct.
-                        self.chatRoom.messagesBuff.messages[v.messageId].protocol = true;
-                        self.chatRoom.messagesBuff.messages.removeByKey(v.messageId);
-                    }
-                });
-            }
             var _runDecryption = function() {
                 try
                 {
@@ -477,14 +466,31 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         //if the edited payload is an empty string, it means the message has been deleted.
                         editedMessage.textContents = decrypted.payload;
                         if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                            editedMessage.textContents = 'History deleted by ' + decrypted.sender;
+                            editedMessage.dialogType = 'truncated';
+                            editedMessage.userId = decrypted.sender;
                         }
                         chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
                         chatRoom.messagesBuff.messages.push(editedMessage);
 
-                        self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
+                        chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
                             chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
                         );
+
+
+                        if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                            var messageKeys = chatRoom.messagesBuff.messages.keys();
+
+                            for (var i = 0; i < messageKeys.length; i++) {
+                                var v = chatRoom.messagesBuff.messages[messageKeys[i]];
+
+                                if (v.orderValue < eventData.id) {
+                                    // remove the messages with orderValue < eventData.id from message buffer.
+                                    chatRoom.messagesBuff.messages.removeByKey(v.messageId);
+                                }
+                            }
+                        }
+
+
                     }
                 } catch(e) {
                     self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);

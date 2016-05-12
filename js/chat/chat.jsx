@@ -4,10 +4,6 @@ var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
 
-
-var disableMpEnc = true;
-
-
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 

@@ -14,6 +14,7 @@ var getMessageString = require('./messages/utils.jsx').getMessageString;
 
 var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
 var AlterParticipantsConversationMessage = require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
+var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
 
 
 
@@ -247,43 +248,44 @@ var ConversationRightArea = React.createClass({
                         </ButtonsUI.Button>
 
                         {endCallButton}
-                        {
-                            room.type === "group" ?
-                                <div className="link-button red" onClick={() => {
-                                   room.leave(true);
-                                }}>
-                                    <i className="small-icon rounded-stop"></i>
-                                    {__(l[8633])}
-                                </div>
-                                : null
-                        }
-                        {
-                            room.type === "group" ?
-                                <div className="link-button red" onClick={() => {
-                                    Object.keys(room.members).forEach(function (h) {
-                                        if (h !== u_handle) {
-                                            api_req({
-                                                a: 'mcr',
-                                                id: room.chatId,
-                                                u: h
-                                            });
-                                        }
-                                    });
-                                    api_req({
-                                        a: 'mcr',
-                                        id: room.chatId,
-                                        u: u_handle
-                                    });
 
-                                   room.leave(true);
-                                }}>
-                                    <i className="small-icon rounded-stop"></i>
-                                    {__("(DEBUG) Destroy")}
-                                </div>
-                                : null
+                        { room.iAmOperator() ? (
+                            <div className="link-button red" onClick={() => {
+                                var chatMessages = room.messagesBuff.messages;
+                                if (chatMessages.length > 0) {
+                                    var lastChatMessageId = null;
+                                    var i = chatMessages.length - 1;
+                                    while(lastChatMessageId == null && i >= 0) {
+                                        var message = chatMessages.getItem(i);
+                                        if (message instanceof Message) {
+                                            lastChatMessageId = message.messageId;
+                                        }
+                                        i--;
+                                    }
+                                    if (lastChatMessageId) {
+                                        asyncApiReq({
+                                            a: 'mct',
+                                            id: room.chatId,
+                                            m: lastChatMessageId
+                                        })
+                                            .fail(function(r) {
+                                                if(r === -2) {
+                                                    msgDialog(
+                                                        'warninga',
+                                                        l[135],
+                                                        __("You don't have the permissions to truncate this conversation.")
+                                                    );
+                                                }
+                                            });
+                                    }
+                                }
+                            }}>
+                                <i className="small-icon rounded-stop"></i>
+                                {__("Truncate")}
+                            </div>
+                        ) : null
                         }
                     </div>
-
                 </div>
             </div>
         </div>
@@ -1110,6 +1112,15 @@ var ConversationPanel = React.createClass({
                     var messageInstance = null;
                     if (v.dialogType === 'alterParticipants') {
                         messageInstance = <AlterParticipantsConversationMessage
+                            message={v}
+                            chatRoom={room}
+                            key={v.messageId}
+                            contact={M.u[v.userId]}
+                            grouped={grouped}
+                        />
+                    }
+                    else if (v.dialogType === 'truncated') {
+                        messageInstance = <TruncatedMessage
                             message={v}
                             chatRoom={room}
                             key={v.messageId}

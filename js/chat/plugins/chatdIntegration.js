@@ -167,6 +167,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     if (!chatParticipants) {
         self.logger.error("actionPacket returned no chat participants: ", chatParticipants, ", removing chat.");
         //TODO: remove/destroy chat?
+        return false;
     }
     var chatJids = [];
     Object.keys(chatParticipants).forEach(function(k) {
@@ -694,7 +695,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
                             }
                             else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                                chatRoom.messagesBuff.messages[messageId].textContents = 'History deleted by ' + v.sender;
+                                chatRoom.messagesBuff.messages[messageId].dialogType = 'truncated';
+                                chatRoom.messagesBuff.messages[messageId].userId = v.sender;
                             }
                             else if (v && (v.type === 0 || v.type === 2)) {
                                 // this is a system message
@@ -802,7 +804,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 };
                                 chatRoom.messagesBuff.messages[msgObject.messageId].dialogType = "alterParticipants";
                             } else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                                chatRoom.messagesBuff.messages[msgObject.messageId].textContents = 'History deleted by ' + decrypted.sender;
+                                var msg = chatRoom.messagesBuff.messages[msgObject.messageId];
+                                msg.dialogType = 'truncated';
+                                msg.userId = decrypted.sender;
                             }
                             else {
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;

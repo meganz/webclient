@@ -586,7 +586,7 @@ function pro_pay() {
     }
 
     // Otherwise if Union Pay, show bouncing coin while loading
-    else if ((pro_paymentmethod === 'dynamicpay') || (pro_paymentmethod === 'paysafecard')) {
+    else if ((pro_paymentmethod === 'dynamicpay') || (pro_paymentmethod === 'paysafecard') || (pro_paymentmethod === 'directreseller')) {
         proPage.showLoadingOverlay('transferring');
     }
 

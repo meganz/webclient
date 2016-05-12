@@ -1737,6 +1737,7 @@ function MegaData()
             }
         }
 
+        this.previousdirid = this.currentdirid;
         this.currentdirid = id;
         this.currentrootid = RootbyId(id);
 
@@ -1819,6 +1820,10 @@ function MegaData()
                 var currentdirid = M.currentdirid;
                 if (id.substr(0, 6) === 'search') {
                     currentdirid = M.RootID;
+
+                    if (M.d[M.previousdirid]) {
+                        currentdirid = M.previousdirid;
+                    }
                 }
 
                 if ($('#treea_' + currentdirid).length === 0) {

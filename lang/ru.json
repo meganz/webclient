@@ -3264,6 +3264,7 @@
     "8736": "\u041d\u043e\u0432\u044b\u0439 \u0441\u0440\u043e\u043a \u0433\u043e\u0434\u043d\u043e\u0441\u0442\u0438",
     "8737": "25 May - International Missing Children&#039;s Day",
     "8738": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
+    "8742": "Learn more",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3342,6 +3343,7 @@
         "set-new-expiry-date": 8736,
         "international-missing-children-title": 8737,
         "international-missing-children-body-text": 8738,
-        "test-string": 8739
+        "test-string": 8739,
+        "learn-more": 8742
     }
 }

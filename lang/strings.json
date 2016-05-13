@@ -13058,5 +13058,9 @@
     "8738": {
         "text": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
         "context": "The main text for a public banner that will be displayed to all users, explaining our strong position on the issue of child abuse."
+    },
+    "8742": {
+        "text": "Learn more",
+        "context": "A button label on the Public Service Announcement banner. This button will take them to a page where they can learn more information."
     }
 }

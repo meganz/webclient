@@ -139,6 +139,11 @@ var DropdownContactsSelector = React.createClass({
                     contacts={this.props.contacts}
                     megaChat={this.props.megaChat}
                     exclude={this.props.exclude}
+                    multiple={this.props.multiple}
+                    onSelectDone={this.props.onSelectDone}
+                    multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
+                    singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}
+                    nothingSelectedButtonLabel={this.props.nothingSelectedButtonLabel}
                     onClick={(contact, e) => {
                             this.props.onClick(contact, e);
                             this.props.closeDropdown();

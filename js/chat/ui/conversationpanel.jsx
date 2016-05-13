@@ -221,8 +221,11 @@ var ConversationRightArea = React.createClass({
                                 exclude={
                                     excludedParticipants
                                 }
+                                multiple={true}
                                 className="popup add-participant-selector"
-                                onClick={this.props.onAddParticipantSelected}
+                                singleSelectedButtonLabel={__("Start Group Conversation")}
+                                onSelectDone={this.props.onAddParticipantSelected}
+                                
                                 />
                         </ButtonsUI.Button>
 
@@ -1329,7 +1332,7 @@ var ConversationPanel = React.createClass({
                         onAttachFromCloudClicked={function() {
                             self.setState({'attachCloudDialog': true});
                         }}
-                        onAddParticipantSelected={function(contact, e) {
+                        onAddParticipantSelected={function(contactHashes) {
                             if (self.props.chatRoom.type == "private") {
                                 var megaChat = self.props.chatRoom.megaChat;
 
@@ -1339,13 +1342,13 @@ var ConversationPanel = React.createClass({
                                     'onNewGroupChatRequest',
                                     [
                                         self.props.chatRoom.getContactParticipantsExceptMe().concat(
-                                            [contact.u]
+                                            contactHashes
                                         )
                                     ]
                                 );
                             }
                             else {
-                                self.props.chatRoom.trigger('onAddUserRequest', [contact.u]);
+                                self.props.chatRoom.trigger('onAddUserRequest', contactHashes);
                             }
                         }}
                     />

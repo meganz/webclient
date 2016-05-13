@@ -3449,7 +3449,7 @@ var showSignupPromptDialog = function() {
                         showRegisterDialog();
                     }
                     else {
-                        var msg = 'You have previously logged in using this browser. Are you sure you want to create a new account?';
+                        var msg = l[8743];
                         msgDialog('confirmation', l[1193], msg, null, function(res) {
                             if (res) {
                                 showRegisterDialog();

@@ -282,7 +282,7 @@ function init_page() {
                         var timer = setInterval(function() {
                             if (--tick === 0) {
                                 clearInterval(timer);
-                                $button.text('Resend');
+                                $button.text(l[8744]);
                                 $button.removeClass('disabled');
                                 $button.rebind('click', _click);
                             }

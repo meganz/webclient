@@ -85,7 +85,7 @@ var psa = {
         // Move the file manager up
         psa.resizeFileManagerHeight();
         
-        // If the window is resized
+        // Add a handler to fix the layout if the window is resized
         $(window).rebind('resize.bottomNotification', function() {
             psa.resizeFileManagerHeight();
             psa.repositionAccountLoadingBar();
@@ -104,14 +104,13 @@ var psa = {
         var announcement = psa.getAnouncementDetails();
         
         // Populate the details
-        var $psa = $('.public-service-anouncement');
-        
+        var $psa = $('.public-service-anouncement');        
         $psa.addClass(announcement.cssClass);
         $psa.find('.title').safeHTML(announcement.title);          // The messages could have HTML e.g. bold text
         $psa.find('.messageA').safeHTML(announcement.messageA);
-        $psa.find('.messageB').safeHTML(announcement.messageB);
-        $psa.find('.view-more-info').text(announcement.buttonText);
+        $psa.find('.messageB').safeHTML(announcement.messageB);        
         $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
+        $psa.find('.view-more-info .text').text(announcement.buttonText);
     },
     
     /**

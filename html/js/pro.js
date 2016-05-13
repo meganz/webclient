@@ -3159,7 +3159,7 @@ var doProRegister = function($dialog) {
                     localStorage._proRegisterAccount = JSON.stringify(rv);
                 }
                 else {
-                    showToast('megasync', "You have been successfully logged in.");
+                    showToast('megasync', l[8745]);
                     $('.fm-avatar img').attr('src', useravatar.top());
                 }
                 pro_next_step();

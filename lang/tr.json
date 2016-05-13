@@ -3262,6 +3262,8 @@
     "8734": "Ba\u011flant\u0131lar\u0131 al",
     "8735": "Ba\u011flant\u0131lar\u0131 kald\u0131r",
     "8736": "Yeni vade tarihini se\u00e7in",
+    "8737": "25 May - International Missing Children&#039;s Day",
+    "8738": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3339,6 +3341,7 @@
         "remove-links": 8735,
         "set-new-expiry-date": 8736,
         "international-missing-children-title": 8737,
-        "international-missing-children-body-text": 8738
+        "international-missing-children-body-text": 8738,
+        "test-string": 8739
     }
 }

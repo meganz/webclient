@@ -13050,5 +13050,13 @@
     "8736": {
         "text": "Set new expiry date",
         "context": "A label for a dropdown box on the Get Link dialog. This lets the user set an expiry date on a public link. After this time the link will no longer work."
+    },
+    "8737": {
+        "text": "25 May - International Missing Children's Day",
+        "context": "A title for a public banner that will be displayed to all users."
+    },
+    "8738": {
+        "text": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
+        "context": "The main text for a public banner that will be displayed to all users, explaining our strong position on the issue of child abuse."
     }
 }

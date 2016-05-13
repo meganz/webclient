@@ -119,9 +119,6 @@ function init_page() {
         $('body').attr('class', '');
     }
 
-    // Initialise the Public Service Announcement system
-    psa.init();
-
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
 
@@ -931,6 +928,10 @@ function init_page() {
         parsepage(pages['start'], 'start');
         init_start();
     }
+        
+    // Initialise the Public Service Announcement system
+    psa.init();
+    
     topmenuUI();
     loggedout = false;
     flhashchange = false;

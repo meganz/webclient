@@ -22,7 +22,7 @@ var psa = {
      * Show the dialog if they have not seen the announcement yet
      */
     init: function() {
-        
+              
         // If logged in and completed registration fully
         if ((u_type === 3) && (page.indexOf('pro') === -1)) {
                     
@@ -31,12 +31,7 @@ var psa = {
             
             // Only show the announcement if they have not seen the current announcement
             if ((psa.lastSeenAnnounceNum < psa.currentAnnounceNum) || (localStorage.alwaysShowPsa === '1')) {
-
-                // Show the announcement
-                psa.prefillAnnouncementDetails();
-                psa.addCloseButtonHandler();
-                psa.addMoreInfoButtonHandler();
-                psa.showAnnouncement();
+                psa.configAndShowAnnouncement();
             }
         }
         
@@ -44,6 +39,11 @@ var psa = {
         // immediately visiting the #pro page which would show the raised file manager with whitespace underneath.
         else if (psa.visible) {
             psa.hideAnnouncement();
+        }
+        
+        // Otherwise not logged in, request PSA number from API
+        else {
+            psa.requestFlags();
         }
     },
     
@@ -60,6 +60,18 @@ var psa = {
         
         // Set the current announcement number
         psa.currentAnnounceNum = currentAnnounceNum;
+    },
+    
+    /**
+     * Wrapper function to configure the announcement details and show it
+     */
+    configAndShowAnnouncement: function() {
+                
+        // Show the announcement
+        psa.prefillAnnouncementDetails();
+        psa.addCloseButtonHandler();
+        psa.addMoreInfoButtonHandler();
+        psa.showAnnouncement();        
     },
     
     /**
@@ -82,31 +94,54 @@ var psa = {
         // Currently being shown
         psa.visible = true;
     },
-    
+        
     /**
      * Update the details of the announcement depending on the current one
      */
     prefillAnnouncementDetails: function() {
         
-        // Current announcement - to be fetched from the CMS in future
-        var announcement = {
-            title: l[8537],         // Important notice:
-            messageA: l[8737],      // Mega will be changing its terms...
-            messageB: l[8738],      // Thank you for using MEGA
-            buttonText: l[8538],    // View Blog Post
-            buttonLink: 'blog_36'   // Blog 36 has more details about the TOS changes
-        };
-        
-        // Replace bold text
-        announcement.messageA = announcement.messageA.replace('[B]', '<b>').replace('[/B]', '</b>');
+        // Get the relevant announcement
+        var announcement = psa.getAnouncementDetails();
         
         // Populate the details
         var $psa = $('.public-service-anouncement');
-        $psa.find('.title').safeHTML(announcement.title);
+        
+        $psa.addClass(announcement.cssClass);
+        $psa.find('.title').safeHTML(announcement.title);          // The messages could have HTML e.g. bold text
         $psa.find('.messageA').safeHTML(announcement.messageA);
         $psa.find('.messageB').safeHTML(announcement.messageB);
-        $psa.find('.view-more-info').safeHTML(announcement.buttonText);
-        $psa.find('.view-more-info').attr('data-continue-link', htmlentities(announcement.buttonLink));
+        $psa.find('.view-more-info').text(announcement.buttonText);
+        $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
+    },
+    
+    /**
+     * Gets the current announcement details
+     * @returns {Object} Returns an object with the current announcement details
+     */
+    getAnouncementDetails: function() {
+      
+        // Current announcements - to be fetched from the CMS in future
+        var announcements = {
+            1: {
+                title: l[8537],         // Important notice:
+                messageA: l[8535],      // Mega will be changing its terms...
+                messageB: l[8536],      // Thank you for using MEGA
+                buttonText: l[8538],    // View Blog Post
+                buttonLink: 'blog_36',  // Blog 36 has more details about the TOS changes
+                cssClass: ''            // Default CSS class
+            },
+            2: {       
+                title: l[8737],         // 25 May - International Missing Children...
+                messageA: l[8738],      // In support of missing and exploited children...
+                messageB: ' ',
+                buttonText: l[8742],    // Learn more
+                buttonLink: 'blog_41',
+                cssClass: 'blue'
+            }
+        };
+        
+        // Return the relevant object
+        return announcements[psa.currentAnnounceNum];
     },
     
     /**
@@ -248,5 +283,23 @@ var psa = {
             // Reset to the bottom
             $('.loader-progressbar').css('bottom', 0);
         }
+    },
+    
+    /**
+     * Get the PSA number manually from the API
+     */
+    requestFlags: function() {
+        
+        // Make Get Miscellaneous Flags (gmf) API request
+        api_req({ a: 'gmf' }, {
+            callback: function(result) {
+                
+                // Set the number indicating which PSA we want to show
+                psa.currentAnnounceNum = result.psa;
+                
+                // Show the announcement
+                psa.configAndShowAnnouncement();
+            }
+        });
     }
 };

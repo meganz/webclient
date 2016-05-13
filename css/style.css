@@ -24196,6 +24196,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     background-position: 1px -1468px;
     background-repeat: no-repeat;
 }
+.public-service-anouncement.blue .icon {
+    background: url(../images/mega/flower.svg);
+    height: 80px;
+    width: 80px;
+}
 .bottom-info.content h4 {
     color: #FF333A;
     font-size: 24px;

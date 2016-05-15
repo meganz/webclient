@@ -1120,6 +1120,10 @@
 
 	    this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
+	    if (M.u[u] && !M.u[u].presence) {
+	        M.u[u].presence = this.karere.getPresence(megaChat.getJidFromNodeId(u));
+	    }
+
 	    self.renderMyStatus();
 	};
 
@@ -5993,7 +5997,7 @@
 	  return element;
 	};
 
-	ReactElement.makeElement = function (type, config, children) {
+	ReactElement.createElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -6044,7 +6048,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.makeElement.bind(null, type);
+	  var factory = ReactElement.createElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -9091,7 +9095,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.makeElement(component);
+	    placeholderElement = ReactElement.createElement(component);
 	  }
 	};
 
@@ -19579,12 +19583,12 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.makeElement;
+	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
 	if (false) {
-	  createElement = ReactElementValidator.makeElement;
+	  createElement = ReactElementValidator.createElement;
 	  createFactory = ReactElementValidator.createFactory;
 	  cloneElement = ReactElementValidator.cloneElement;
 	}
@@ -20037,7 +20041,7 @@
 	    // succeed and there will likely be errors in render.
 	     false ? warning(validType, 'React.makeElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : undefined;
 
-	    var element = ReactElement.makeElement.apply(this, arguments);
+	    var element = ReactElement.createElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -20062,7 +20066,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -20612,7 +20616,7 @@
 	    handleWindowResize: function handleWindowResize() {
 
 	        $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
-	            'margin-left': $('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width() + "px"
+	            'margin-left': $('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() + "px"
 	        });
 	    },
 	    render: function render() {
@@ -22094,12 +22098,12 @@
 	                { className: "user-card-data" },
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-name small" },
+	                    { className: "user-card-name" },
 	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-email small" },
+	                    { className: "user-card-email" },
 	                    contact.m
 	                )
 	            )

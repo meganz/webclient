@@ -1816,22 +1816,20 @@ function MegaData()
             M.renderMain();
 
             if (fminitialized) {
+                var currentdirid = M.currentdirid;
                 if (id.substr(0, 6) === 'search') {
-                    if ($.transferClose) {
-                        $.transferClose();
-                    }
+                    currentdirid = M.RootID;
                 }
-                else {
-                    if ($('#treea_' + M.currentdirid).length === 0) {
-                        var n = M.d[M.currentdirid];
-                        if (n && n.p) {
-                            treeUIopen(n.p, false, true);
-                        }
-                    }
-                    treeUIopen(M.currentdirid, M.currentdirid === 'contacts');
 
-                    $('#treea_' + M.currentdirid).addClass('opened');
+                if ($('#treea_' + currentdirid).length === 0) {
+                    var n = M.d[currentdirid];
+                    if (n && n.p) {
+                        treeUIopen(n.p, false, true);
+                    }
                 }
+                treeUIopen(currentdirid, currentdirid === 'contacts');
+
+                $('#treea_' + currentdirid).addClass('opened');
             }
             if (d) {
                 console.timeEnd('time for rendering');
@@ -2231,7 +2229,7 @@ function MegaData()
                     titleTooltip = '';
                     fIcon = '';
 
-                    fName = htmlentities(folders[ii].name);
+                    fName = folders[ii].name;
 
                     if (cns) {
                         for (var cn in cns) {
@@ -3333,7 +3331,12 @@ function MegaData()
 
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
-                mDBadd('u', clone(u.toJS ? u.toJS() : u));
+                var cleanedUpUserData = clone(u.toJS ? u.toJS() : u);
+                delete cleanedUpUserData.presence;
+                delete cleanedUpUserData.presenceMtime;
+                delete cleanedUpUserData.shortName;
+                delete cleanedUpUserData.name;
+                mDBadd('u', cleanedUpUserData);
             }
 
             this.syncUsersFullname(userId);
@@ -5224,6 +5227,10 @@ function MegaData()
                     }
                 });
             }
+        }
+
+        if (ul.skipfile) {
+            showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
         }
 
         this.mobile_ul_completed = true;

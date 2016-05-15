@@ -8751,10 +8751,6 @@
         "text": "%1$ld Photos, %2$ld Videos",
         "context": ""
     },
-    "7121": {
-        "text": "%1$ld of %2$ld",
-        "context": ""
-    },
     "7122": {
         "text": "This app does not have access to your photos or videos.",
         "context": ""
@@ -12878,5 +12874,181 @@
     "8690": {
         "text": "You don't have access to the selected download path. Please select a different download path and try again.",
         "context": "Message displayed when the process\/request to download a file\/folder failed because the app or the user does not have access to the selected file\/folder."
+    },
+    "8691": {
+        "text": "Please go to your inbox and click the link to confirm your account.",
+        "context": "This text is shown just after creating an account to remind the user what they need to do in order to complete the account creation process."
+    },
+    "8692": {
+        "text": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at 110% zoom. Please either zoom in, zoom out, press Ctrl\/Cmd + 0 to reset the zoom level or switch to Firefox.",
+        "context": "An error message for Chrome\/Chromium browsers which have a current zoom level of 110%."
+    },
+    "8693": {
+        "text": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
+        "context": "In Chrome\/Chromium browsers, the MEGA web layout is broken on different zoom levels, 110%, 67% and 33%."
+    },
+    "8694": {
+        "text": "Set expiry date",
+        "context": "A label in the Get Link dialog which allows the user to set an expiry date on their public link."
+    },
+    "8695": {
+        "text": "PRO Only",
+        "context": "A label to indicate that this is a PRO only feature. For example, the user needs a PRO account to set an expiry date on their public link."
+    },
+    "8696": {
+        "text": "Upgrade to PRO",
+        "context": "A button label which when clicked will take the user to the PRO page to purchase a PRO plan."
+    },
+    "8697": {
+        "text": "Select date",
+        "context": "A text label inside the date picker to tell the user to select the date."
+    },
+    "8698": {
+        "text": "Expires %1",
+        "context": "A label on any row in the Get Link dialog with a public link that has an expiry date. The %1 will be replaced at runtime with the expiry date and time."
+    },
+    "8699": {
+        "text": "Clear completed transfers",
+        "context": "A button on the download screen to clear (remove) the completed file transfers from the list which shows which files are currently being uploaded or downloaded."
+    },
+    "8700": {
+        "text": "Thunderbird Extension",
+        "context": "This is our MEGAbird extension for the Thunderbird email client. It allows uploading large files to MEGA then linking them in the email. See also: https:\/\/addons.mozilla.org\/en-US\/thunderbird\/addon\/megabird\/"
+    },
+    "8703": {
+        "text": "Write the user's e-mail",
+        "context": "write option"
+    },
+    "8704": {
+        "text": "Import from phone",
+        "context": "import from phone option"
+    },
+    "8705": {
+        "text": "Add contact and share",
+        "context": "Menu option to add a contact to your contact list."
+    },
+    "8706": {
+        "text": "Export",
+        "context": "button label"
+    },
+    "8707": {
+        "text": "%s will be downloaded. Are you sure?",
+        "context": "Alert text before download asking if the user wants to go ahead with the download"
+    },
+    "8708": {
+        "text": "You do not have an application capable of opening the file %s. Do you want to continue with the download?",
+        "context": "Alert text before download where the file the user is going to download won't be able to be opened"
+    },
+    "8709": {
+        "text": "Error. Please, try again.",
+        "context": "An error when attempting to perform an action, asking the user to try again. (This will be used when there is a problem getting the root node)"
+    },
+    "8710": {
+        "text": "View source code",
+        "context": "Link to the public code of the app"
+    },
+    "8711": {
+        "text": "Add a new contact to begin sharing",
+        "context": "Add new contacts before starting to share with them."
+    },
+    "8712": {
+        "text": "Internal SD card",
+        "context": "internal SD card option"
+    },
+    "8713": {
+        "text": "External SD card",
+        "context": "external SD card option"
+    },
+    "8714": {
+        "text": "Error. Folder not created",
+        "context": "error message when creating a folder"
+    },
+    "8715": {
+        "text": "Rubbish Bin emptied successfully",
+        "context": "success message when emptying the RB"
+    },
+    "8716": {
+        "text": "Error. The Rubbish Bin was not emptied",
+        "context": "error message when emptying the RB"
+    },
+    "8717": {
+        "text": "Owner's E-mail",
+        "context": "category in sort by action"
+    },
+    "8718": {
+        "text": "PIN Code Type",
+        "context": "A title for an option to let the user choose the type of Personal Identification Number they want to use e.g. 4 digit PIN or 6 digit PIN."
+    },
+    "8719": {
+        "text": "4 digit PIN",
+        "context": "A Personal Identification Number with 4 digits."
+    },
+    "8720": {
+        "text": "6 digit PIN",
+        "context": "A Personal Identification Number with 6 digits."
+    },
+    "8721": {
+        "text": "Alphanumeric PIN",
+        "context": "PIN alphanumeric"
+    },
+    "8722": {
+        "text": "Sent to Inbox",
+        "context": "A success message after sending a file to the Inbox."
+    },
+    "8723": {
+        "text": "Error. Not sent to Inbox",
+        "context": "error message when sending a node to Inbox"
+    },
+    "8724": {
+        "text": "Creation Date",
+        "context": "Let's the user sort by the date when the files\/folders were created. It could also could be used as a column title on a list of files\/folders."
+    },
+    "8725": {
+        "text": "Modification Date",
+        "context": "category in sort by action, where the user can sort files by the date they were last modified."
+    },
+    "8726": {
+        "text": "Invite",
+        "context": "A button on a dialog which invites a contact to join MEGA."
+    },
+    "8727": {
+        "text": "Do you want to send an invitation to %s?",
+        "context": "confirmation message before sending an invitation to a contact"
+    },
+    "8728": {
+        "text": "Contact request successfully sent to %s. You can check the status in the Sent Requests tab.",
+        "context": "success message when sending a contact request, also informing the user where they can find information on the contact request they just made"
+    },
+    "8729": {
+        "text": "Please log out before creating the account",
+        "context": "alert when clicking a newsignup link while already being logged in"
+    },
+    "8730": {
+        "text": "Logs are now enabled",
+        "context": "Confirmation message when enabling logs in the app"
+    },
+    "8731": {
+        "text": "Logs are now disabled",
+        "context": "Confirmation message when disabling logs in the app"
+    },
+    "8732": {
+        "text": "Update link",
+        "context": "A right click context menu item. This will let the user update a public link with additional information. For example the public link can now be updated with an expiry time."
+    },
+    "8733": {
+        "text": "Update links",
+        "context": "A right click context menu item. This will let the user update multiple public links with additional information. For example the public links can now be updated with an expiry time."
+    },
+    "8734": {
+        "text": "Get links",
+        "context": "A right click context menu item. This will let the user create multiple public links for the selected folders and files."
+    },
+    "8735": {
+        "text": "Remove links",
+        "context": "A right click context menu item. This will let the user remove multiple public links for the selected folders and files."
+    },
+    "8736": {
+        "text": "Set new expiry date",
+        "context": "A label for a dropdown box on the Get Link dialog. This lets the user set an expiry date on a public link. After this time the link will no longer work."
     }
 }

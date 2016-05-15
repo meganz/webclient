@@ -3794,14 +3794,14 @@ label.iPhoneCheckLabelOff span {
     box-sizing: border-box;
 }
 .nw-tree-panel-header + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 72px);
-    height: -moz-calc(100% - 72px);
-    height: calc(100% - 72px);
+    height: -webkit-calc(100% - 70px);
+    height: -moz-calc(100% - 70px);
+    height: calc(100% - 70px);
 }
 .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 170px);
-    height: -moz-calc(100% - 170px);
-    height: calc(100% - 170px);
+    height: -webkit-calc(100% - 168px);
+    height: -moz-calc(100% - 168px);
+    height: calc(100% - 168px);
 }
 .fm-contact-requests, .fm-received-requests {
     height: 48px;
@@ -3996,6 +3996,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-fm-tree-item {
     display: block;
+    line-height: 0;
     background-color: rgba(217,0,7,0);
     padding-right: 13px;
     -webkit-transition: all 150ms ease-in-out;
@@ -4005,7 +4006,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     transition: all 150ms ease-in-out;
 }
 .nw-fm-tree-item.linked {
-    padding-right: 22px;
+    padding-right: 26px;
 }
 .nw-fm-tree-item .data-item-icon {
     top: 2px;
@@ -4077,9 +4078,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-position: center -9880px;
 }
 .nw-fm-tree-folder {
-    display: block;
+    display: inline-block;
     margin-left: 22px;
     padding-left: 27px;
+    max-width: -webkit-calc(100% -22px);
+    max-width: -moz-calc(100% - 22px);
+    max-width: calc(100% - 22px);
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
     white-space: nowrap;
     cursor: default;
     font-size: 13px;
@@ -4263,7 +4270,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     margin: 20px 2px 0 12px;
 }
 .files-grid-view .fm-chat-user-info .nw-contact-status, .fm-blocks-view .fm-chat-user-info .nw-contact-status, .shared-grid-view .fm-chat-user-info .nw-contact-status, .shared-blocks-view .fm-chat-user-info .nw-contact-status, .files-grid-view.contacts-view .nw-contact-status {
-    margin: 8px 6px 0 0px;
+    margin: 4px 6px 0 0px;
 }
 .grid-scrolling-table, .grid-scrolling-table .jspPane {
     min-height: 100%;
@@ -4840,7 +4847,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-position: center 1px;
     background-repeat: no-repeat;
 }
-
 /* PRO plan expired dialog */
 .astropay-payment-reminder .warning-popup-body {
     display: table;
@@ -4925,7 +4931,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding: 10px;
     width: 276px;
 }
-
 .top-search-bl {
     float: right;
     height: 24px;
@@ -5692,7 +5697,7 @@ th.grid-first-th {
     left: 3px;
     top: 2px;
 }
-.linked .data-item-icon, .taken-down.linked .data-item-icon, .undecryptable.nw-fm-tree-item .data-item-icon  {
+.linked .data-item-icon, .taken-down.linked .data-item-icon, .undecryptable.nw-fm-tree-item .data-item-icon {
     display: block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
@@ -11488,12 +11493,20 @@ table {
 .st-main-block .notification-popup .jspPane, .main-scroll-block .notification-popup .jspPane {
     min-width: 0;
 }
-.st-mid-white-block, .download-mid-white-block, .top-head + .main-scroll-block {
+.st-mid-white-block, .download-mid-white-block {
     height: -webkit-calc(100% - 48px);
     height: -moz-calc(100% - 48px);
     height: calc(100% - 48px);
     min-height: 590px;
     position: relative;
+}
+.main-scroll-block {
+    height: 100%;
+}
+.top-head + .main-scroll-block, .top-head + .dev-nw-gray-bg {
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
 }
 .st-mid-white-block {
     position: relative;
@@ -13978,8 +13991,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     white-space: nowrap;
     width: 150px;
 }
-.membership-step2 .payment-method:hover .provider-name,
-.membership-step2 .provider-details.checked .provider-name {
+.membership-step2 .payment-method:hover .provider-name, .membership-step2 .provider-details.checked .provider-name {
     font-family: "source_sans_prosemibold", Helvetica, Arial, sans-serif;
 }
 .membership-step2 .provider-details .provider-icon {
@@ -14194,6 +14206,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 }
 .provider-icon.wiretransfer {
     background-position: 0 -3960px;
+}
+.provider-icon.directreseller {
+    background-position: 0 -3540px;
 }
 .membership-new-offer text {
     font-weight: normal;
@@ -16940,6 +16955,7 @@ a.contact-new-button:hover {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    position: absolute;
 }
 .new-right-content-block {
     margin-left: 241px;
@@ -18569,6 +18585,8 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
     -khtml-opacity: 0.9;
     opacity: 0.9;
     z-index: 400;
+    left: 0;
+    top: 0;
 }
 .slideshow-dialog {
     min-width: 700px;
@@ -19699,26 +19717,47 @@ span.incoming-call-name {
 .icoming-call-button.video-call:hover {
     background-color: rgba(6,160,236,1);
 }
-.contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar {
+.contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar, .shared-with-me .nw-contact-avatar {
     position: absolute;
-    margin: -2px 0 0 0;
+    margin: -1px 0 0 0;
 }
-.shared-with-me .nw-contact-avatar {
-    position: absolute;
-    margin: 3px 0 0 0;
+.fm-chat-user-status {
+    line-height: 16px;
 }
 .shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info, .contact-requests-grid td .fm-chat-user-info, .sent-requests-grid td .fm-chat-user-info {
     float: none;
-    margin: 1px 0 0 44px;
+    margin: 0 0 0 44px;
 }
 .sent-requests-grid td .fm-chat-user-info {
-    margin: 1px 0 0 44px;
+    margin: 0 0 0 44px;
 }
 .grid-table.sent-requests td:last-child, .grid-table.contact-requests td:last-child {
     padding-right: 8px;
 }
+.fm-share-user-info {
+    display: table;
+    vertical-align: middle;
+    width: 185px;
+    table-layout: fixed;
+    float: left;
+    height: 34px;
+    margin: 7px 0 0 8px;
+    white-space: nowrap;
+    color: #333333;
+}
+.fm-share-centered {
+    display: table-cell;
+    vertical-align: middle;
+}
+.fm-share-centered .fm-chat-user + .contact-email {
+    margin-bottom: -1px;
+}
+.fm-share-centered div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
 .sent-requests-grid td .email .fm-chat-user-info {
-    margin: 7px 0 8px 44px;
+    margin: 8px 0 8px 44px;
 }
 .shared-folder-icon {
     background-image: url(../images/mega/shared-sprite_v3.svg);
@@ -19732,7 +19771,7 @@ span.incoming-call-name {
 .shared-folder-info-block {
     padding: 0 0 0 51px;
     font-size: 13px;
-    line-height: 17px;
+    line-height: 18px;
     display: block;
     position: relative;
 }
@@ -20535,7 +20574,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     border-radius: 100%;
 }
 .email .nw-contact-avatar {
-    background-position: center -571px;
+    background-position: center -572px;
 }
 .gmail .nw-contact-avatar {
     background-position: center -674px;
@@ -20551,6 +20590,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .email .fm-chat-user-email {
     display: none;
+}
+.ipc .left.email, .opc .left.email {
+    min-height: 34px;
 }
 .share-search-result {
     cursor: pointer;
@@ -20673,15 +20715,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
-.share-dialog-contact-bl .fm-chat-user {
-    padding-top: 7px;
-    white-space: nowrap;
-    width: 100%;
-    overflow: hidden;
-    color: #333333;
-    text-overflow: ellipsis;
-    overflow: hidden;
 }
 .share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select {
     float: left;
@@ -21453,7 +21486,7 @@ a.top-login-forgot-pass {
 }
 .top-warning-popup.not-activated .mailbox-icon {
     background: url(../images/mega/email-confirmation.png) 0 0 no-repeat;
-    background-size: 100px 100px;        
+    background-size: 100px 100px;
     float: left;
     height: 100px;
     margin-right: 20px;
@@ -23318,7 +23351,7 @@ body.pro:after {
     display: block;
 }
 .opensource-top-icon {
-    background-image: url("../images/mega/opensource-v2.png");
+    background-image: url("../images/mega/opensource-v3.png");
     background-position: -30px 1px;
     background-repeat: no-repeat;
     float: left;
@@ -23361,16 +23394,19 @@ body.pro:after {
     float: left;
     padding: 22px 0;
     text-align: center;
-    width: 25%;
+    width: 33%;
 }
 .opensource-icon {
     display: block;
     width: 102px;
     height: 102px;
-    background-image: url(../images/mega/opensource-v2.png);
+    background-image: url(../images/mega/opensource-v3.png);
     background-repeat: no-repeat;
     background-position: center -109px;
     margin: 0 auto;
+}
+.opensource-icon.webclient {
+    background-position: center -109px;
 }
 .opensource-icon.firefox {
     background-position: center -249px;
@@ -23378,20 +23414,23 @@ body.pro:after {
 .opensource-icon.chrome {
     background-position: center -389px;
 }
+.opensource-icon.thunderbird {
+    background-position: center -1229px;
+}
+.opensource-icon.sdk {
+    background-position: center -809px;
+}
 .opensource-icon.megasync {
     background-position: center -529px;
-}
-.opensource-icon.ios {
-    background-position: center -950px;
 }
 .opensource-icon.android {
     background-position: center -669px;
 }
+.opensource-icon.ios {
+    background-position: center -950px;
+}
 .opensource-icon.windowsphone {
     background-position: center -1090px;
-}
-.opensource-icon.sdk {
-    background-position: center -809px;
 }
 .opensource-icon.coming-soon {
     cursor: default;
@@ -24203,6 +24242,97 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 }
 /* End of Bottom notification */
 
+/* Zoom overlay */
+.zoom-overlay-content {
+    max-width: 580px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -203px 0 0 -270px;
+    text-align: center;
+    font-size: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 20px;
+}
+.zoom-67 .zoom-overlay-content {
+        zoom: 170%;
+}
+.zoom-33 .zoom-overlay-content {
+        zoom: 340%;
+}
+.zoom-overlay-icon {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+    background: url(../images/mega/zoom-sprite.png) 0px 0px no-repeat;
+}
+.zoom-overlay-txt {
+    padding: 58px 0 38px 0;
+    font-size: 16px;
+    line-height: 32px;
+    color: white;
+}
+.zoom-overlay-key {
+    width: 48px;
+    height: 48px;
+    margin: 0 4px;
+    position: relative;
+    display: inline-block;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.15);
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.15);
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjgiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjciLz4KICA8L2xpbmVhckdyYWRpZW50PgogIDxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9InVybCgjZ3JhZC11Y2dnLWdlbmVyYXRlZCkiIC8+Cjwvc3ZnPg==);
+    background: -moz-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.7) 100%);
+    background: -webkit-linear-gradient(top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.7) 100%);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.7) 100%);
+}
+.zoom-overlay-key::before {
+    position:absolute;
+    content: '';
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0px -3px 0px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: inset 0px -3px 0px 0px rgba(0,0,0,0.3);
+    box-shadow: inset 0px -3px 0px 0px rgba(0,0,0,0.3);
+}
+.zoom-overlay-key::after {
+    position:absolute;
+    content: '';
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: url(../images/mega/zoom-sprite.png) center -363px no-repeat;
+}
+.zoom-overlay-key.ctrl::after {
+    background-position: -25px -171px;
+}
+.mac .zoom-overlay-key.ctrl::after {
+    background-position: -25px -261px;
+}
+.zoom-overlay-key.ctrl {
+    width: 80px;
+    height: 48px;
+    margin: 0 4px 0 17px;
+}
+/*End of Zoom overlay */
 
 /* Small font-size settings option */
 .fontsize1 .nw-fm-tree-header input {

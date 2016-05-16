@@ -68,6 +68,13 @@
     font-weight: normal;
     font-style: normal;
 }
+@font-face {
+    font-family: 'VentiCF-Bold';
+    src: url('../fonts/VentiCF-Bold.eot?#iefix') format('embedded-opentype'), url('../fonts/VentiCF-Bold.otf') format('opentype'),
+         url('../fonts/VentiCF-Bold.woff') format('woff'), url('../fonts/VentiCF-Bold.ttf') format('truetype'), url('../fonts/VentiCF-Bold.svg#VentiCF-Bold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
 body, td, th {
     font-size: 13px;
     color: #333333;
@@ -24243,8 +24250,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 }
 .bottom-info.blue h4 {
     color: #699ac7;
-    font-family: 'source_sans_prosemibold';
+    font-family: 'VentiCF-Bold';
     font-size: 24px;    
+}
+.bottom-info.blue .messageA {
+    color: #405b80;
 }
 .bottom-info.blue .view-more-info {
     border-radius: 3px;
@@ -24272,6 +24282,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     border: solid 1px #3f5c80;
     background-image: linear-gradient(to top, #3e5d80, #4477b3);
     border: solid 1px #3f5c80;
+    font-size: 14px;
 }
 .bottom-info.blue .button.close:hover {
     background: #3e5d80;

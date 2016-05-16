@@ -2229,7 +2229,7 @@ function MegaData()
                     titleTooltip = '';
                     fIcon = '';
 
-                    fName = htmlentities(folders[ii].name);
+                    fName = folders[ii].name;
 
                     if (cns) {
                         for (var cn in cns) {
@@ -5227,6 +5227,10 @@ function MegaData()
                     }
                 });
             }
+        }
+
+        if (ul.skipfile) {
+            showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
         }
 
         this.mobile_ul_completed = true;

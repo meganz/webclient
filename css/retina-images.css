@@ -340,8 +340,8 @@ body.pro:after {
     background-image: url(../images/mega/top-login-sprite_v5@2x.png);
     background-size: 48px auto;
 }
-.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down .data-item-icon, .toast-icon {
-    background-image: url(../images/mega/register-big-sprite-v8@2x.png);
+.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down .data-item-icon, .toast-icon, .resend-email-button {
+    background-image: url(../images/mega/register-big-sprite-v9@2x.png);
     background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {
@@ -405,7 +405,7 @@ body.pro:after {
     background-size: 886px auto;
 }
 .opensource-top-icon, .opensource-icon {
-    background-image: url(../images/mega/opensource-v2@2x.png);
+    background-image: url(../images/mega/opensource-v3@2x.png);
     background-size: 100px auto;
 }
 .st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-scroll-button.grey-arrow, .upload-overlay-icon, .bottom-info.icon {

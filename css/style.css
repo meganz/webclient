@@ -5637,7 +5637,7 @@ th.grid-first-th {
     background-image: none;
 }
 .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down.nw-fm-tree-item .data-item-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
-    background-image: url(../images/mega/register-big-sprite-v8.png);
+    background-image: url(../images/mega/register-big-sprite-v9.png);
     background-repeat: no-repeat;
     background-position: -69px -963px;
 }
@@ -8298,8 +8298,13 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     min-height: 254px;
     margin: -178px 0 0 -196px
 }
-.fm-dialog.registration-success {
-    margin-top: -163px;
+.fm-dialog.registration-page-success {
+    width: 360px;
+    margin: -160px 0 0 -180px;
+}
+.fm-dialog.registration-page-success.special {
+    width: 480px;
+    margin: -160px 0 0 -240px;
 }
 .fm-dialog.bandwidth-dialog {
     width: 964px;
@@ -11493,12 +11498,20 @@ table {
 .st-main-block .notification-popup .jspPane, .main-scroll-block .notification-popup .jspPane {
     min-width: 0;
 }
-.st-mid-white-block, .download-mid-white-block, .top-head + .main-scroll-block {
+.st-mid-white-block, .download-mid-white-block {
     height: -webkit-calc(100% - 48px);
     height: -moz-calc(100% - 48px);
     height: calc(100% - 48px);
     min-height: 590px;
     position: relative;
+}
+.main-scroll-block {
+    height: 100%;
+}
+.top-head + .main-scroll-block, .top-head + .dev-nw-gray-bg {
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
 }
 .st-mid-white-block {
     position: relative;
@@ -13017,10 +13030,14 @@ h5.main-italic-header {
 .reg-success-icon, .payment-confirmation .icon {
     width: 200px;
     height: 192px;
-    background-image: url(../images/mega/register-big-sprite-v8.png);
-    background-position: left top;
+    background-image: url(../images/mega/register-big-sprite-v9.png);
+    background-position: center -1021px;
     background-repeat: no-repeat;
     margin: 30px auto 4px auto;
+}
+.registration-page-success .reg-success-icon {
+    height: 126px;
+    background-position: center -1021px;
 }
 .reset-success .reg-success-icon {
     margin: 14px auto 0 auto;
@@ -13045,6 +13062,80 @@ h5.main-italic-header {
 }
 .reset-success .reg-success-txt {
     padding: 10px 30px 20px 30px;
+}
+.reg-resend-email {
+    display: table;
+    width: 100%;
+}
+.reg-resend-input-bl {
+    display: table-cell;
+    padding:0 12px 0 0;
+    vertical-align: top;
+}
+.reg-resend-input-bl input {
+    display: block;
+    width: 100%;
+    min-height: 36px;
+    max-height: 36px;
+    font-size: 13px;
+    line-height:32px;
+    color: #666666;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding:0 15px;
+    border: 2px solid rgba(0,0,0,0.15);
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.reg-resend-button-bl {
+    display: table-cell;
+    width: 92px;
+    vertical-align: top;
+}
+.resend-email-button {
+    height: 36px;
+    background-color: #777777;
+    color: white;
+    font-size: 13px;
+    line-height: 36px;
+    padding: 0 16px 0 35px;
+    margin: 0;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-transition: background-color 200ms ease-in-out;
+    -moz-transition: background-color 200ms ease-in-out;
+    -o-transition: background-color 200ms ease-in-out;
+    -ms-transition: background-color 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    white-space: nowrap;
+    cursor: pointer;
+    background-image: url(../images/mega/register-big-sprite-v9.png);
+    background-position: 12px 7px;
+}
+.resend-email-button:hover {
+    background-color: #666666;
+}
+.reg-success-normal {
+    padding-top: 25px;
+}
+.reg-success-special {
+    padding: 0 32px 34px 32px;
+    display: none;
+}
+.special .reg-success-normal {
+    display: none;
+}
+.special .reg-success-special {
+    display: block;
+}
+.reg-success-special .reg-success-txt {
+        padding: 18px 55px 32px 55px;
 }
 .fm-dialog-top-text {
     padding: 0 8px;
@@ -13275,7 +13366,7 @@ h5.main-italic-header {
 .reg-st3-membership-icon, .membership-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/register-big-sprite-v8.png);
+    background-image: url(../images/mega/register-big-sprite-v9.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 0 0 0 -35px;
@@ -14199,6 +14290,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.wiretransfer {
     background-position: 0 -3960px;
 }
+.provider-icon.directreseller {
+    background-position: 0 -3540px;
+}
 .membership-new-offer text {
     font-weight: normal;
 }
@@ -14342,7 +14436,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     height: 82px;
     width: 82px;
     float: left;
-    background-image: url(../images/mega/register-big-sprite-v8.png);
+    background-image: url(../images/mega/register-big-sprite-v9.png);
     background-position: center -960px;
     background-repeat: no-repeat;
     margin-top: 28px;
@@ -16944,6 +17038,7 @@ a.contact-new-button:hover {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    position: absolute;
 }
 .new-right-content-block {
     margin-left: 241px;
@@ -21399,7 +21494,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/register-big-sprite-v8.png);
+    background-image: url(../images/mega/register-big-sprite-v9.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
@@ -23264,7 +23359,7 @@ body.pro:after {
     left: 9px;
     top: 50%;
     margin: -15px 0 0 0;
-    background-image: url(../images/mega/register-big-sprite-v8.png);
+    background-image: url(../images/mega/register-big-sprite-v9.png);
     background-position: -85px -860px;
 }
 .clipboard .toast-icon {
@@ -23339,7 +23434,7 @@ body.pro:after {
     display: block;
 }
 .opensource-top-icon {
-    background-image: url("../images/mega/opensource-v2.png");
+    background-image: url("../images/mega/opensource-v3.png");
     background-position: -30px 1px;
     background-repeat: no-repeat;
     float: left;
@@ -23382,16 +23477,19 @@ body.pro:after {
     float: left;
     padding: 22px 0;
     text-align: center;
-    width: 25%;
+    width: 33%;
 }
 .opensource-icon {
     display: block;
     width: 102px;
     height: 102px;
-    background-image: url(../images/mega/opensource-v2.png);
+    background-image: url(../images/mega/opensource-v3.png);
     background-repeat: no-repeat;
     background-position: center -109px;
     margin: 0 auto;
+}
+.opensource-icon.webclient {
+    background-position: center -109px;
 }
 .opensource-icon.firefox {
     background-position: center -249px;
@@ -23399,20 +23497,23 @@ body.pro:after {
 .opensource-icon.chrome {
     background-position: center -389px;
 }
+.opensource-icon.thunderbird {
+    background-position: center -1229px;
+}
+.opensource-icon.sdk {
+    background-position: center -809px;
+}
 .opensource-icon.megasync {
     background-position: center -529px;
-}
-.opensource-icon.ios {
-    background-position: center -950px;
 }
 .opensource-icon.android {
     background-position: center -669px;
 }
+.opensource-icon.ios {
+    background-position: center -950px;
+}
 .opensource-icon.windowsphone {
     background-position: center -1090px;
-}
-.opensource-icon.sdk {
-    background-position: center -809px;
 }
 .opensource-icon.coming-soon {
     cursor: default;

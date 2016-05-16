@@ -4174,13 +4174,26 @@ function passwordManager(form) {
     if (navigator.mozGetUserMedia) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            $('#pmh_username').val(creds.usr);
-            $('#pmh_password').val(creds.pwd);
-            $('#pwdmanhelper').submit();
-            Soon(function() {
-                $('#pwdmanhelper input').val('');
-                $(form).find('input').val('');
-            });
+            // prepare pwd to be stored encrypted
+            // format: "~:<keypw>:<userhash>"
+            var pwd = creds.pwd;
+
+            if (!passwordManager.getStoredCredentials(pwd)) {
+                var keypw = prepare_key_pw(pwd);
+                var pwaes = new sjcl.cipher.aes(keypw);
+                var hash = stringhash(creds.usr.toLowerCase(), pwaes);
+
+                pwd = '~:' + a32_to_base64(keypw) + ':' + hash;
+
+                $('#pmh_username').val(creds.usr);
+                $('#pmh_password').val(pwd);
+                $('#pwdmanhelper').submit();
+                Soon(function() {
+                    $('#pwdmanhelper input').val('');
+                    $(form).find('input').val('');
+                    $('iframe#dummyTestFrame').attr('src', 'about:blank');
+                });
+            }
         }
         return;
     }
@@ -4213,6 +4226,33 @@ passwordManager.knownForms = Object.freeze({
         pwd: '#register-password'
     }
 });
+passwordManager.getStoredCredentials = function(password) {
+    // Retrieve `keypw` and `userhash` from pwd string
+    var result = null;
+
+    if (String(password).substr(0, 2) === '~:') {
+        var parts = password.substr(2).split(':');
+
+        if (parts.length === 2) {
+            try {
+                var hash = parts[1];
+                var keypw = base64_to_a32(parts[0]);
+
+                if (base64_to_a32(hash).length === 2
+                        && keypw.length === 4) {
+
+                    result = {
+                        hash: hash,
+                        keypw: keypw
+                    };
+                }
+            }
+            catch (e) {}
+        }
+    }
+
+    return result;
+};
 passwordManager.pickFormFields = function(form) {
     var result = null;
     var $form = $(form);

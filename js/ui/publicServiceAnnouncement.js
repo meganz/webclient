@@ -2,7 +2,8 @@
  * This file handles the Public Service Announcements. One announcement will
  * appear at the bottom of the page in an overlay at a time. The announcements
  * come from a hard coded list initially. Once a user has seen an announcement
- * they will mark it as read on the API server.
+ * they will mark it as read on the API server. If a user is not logged in 
+ * then it will mark that announcement as seen in localStorage.
  */
 var psa = {
     
@@ -17,6 +18,21 @@ var psa = {
     
     /** If the PSA is currently being shown */
     visible: false,
+            
+    /**
+     * If logged in, the User Get ('ug') API response sets the current and last seen announcement numbers
+     * @param {Number} currentAnnounceNum A number sent by the API
+     * @param {String} lastSeenAttr A private attribute encoded as Base64 to be decrypted which contains a number
+     */
+    setInitialValues: function(currentAnnounceNum, lastSeenAttr) {
+                
+        // If they have a stored value on the API that contains which
+        // announcement they have seen then decrypt it and set it
+        psa.lastSeenAttr = lastSeenAttr;
+        
+        // Set the current announcement number
+        psa.currentAnnounceNum = currentAnnounceNum;
+    },
     
     /**
      * Show the dialog if they have not seen the announcement yet
@@ -29,10 +45,8 @@ var psa = {
             // Decrypt the attribute which stores which announcement they have seen
             psa.decryptPrivateAttribute();
             
-            // Only show the announcement if they have not seen the current announcement
-            if ((psa.lastSeenAnnounceNum < psa.currentAnnounceNum) || (localStorage.alwaysShowPsa === '1')) {
-                psa.configAndShowAnnouncement();
-            }
+            // Show the announcement if they have not seen the current announcement
+            psa.configAndShowAnnouncement();
         }
         
         // Otherwise if the PSA is currently visible, then hide it. This prevents bug after seeing an announcement and
@@ -48,61 +62,54 @@ var psa = {
     },
     
     /**
-     * Sets the current announcement number and last seen announcement number
-     * @param {Number} currentAnnounceNum A number sent by the API
-     * @param {type} lastSeenAttr A private attribute to be decrypted which contains a number
+     * Decrypt the private user attribute
+     * @returns {Number} Returns an integer containing the last announcement number they have seen
      */
-    setInitialValues: function(currentAnnounceNum, lastSeenAttr) {
-                
-        // If they have a stored value on the API that contains which
-        // announcement they have seen then decrypt it and set it
-        psa.lastSeenAttr = lastSeenAttr;
+    decryptPrivateAttribute: function() {
         
-        // Set the current announcement number
-        psa.currentAnnounceNum = currentAnnounceNum;
+        // If the private attribute has been set on the API
+        if (psa.lastSeenAttr !== null) {
+            
+            try {
+                // Try decode, decrypt, convert from TLV into a JS object, then get the number
+                var decodedAttr = base64urldecode(psa.lastSeenAttr);
+                var clearContainer = tlvstore.blockDecrypt(decodedAttr, u_k);
+                var decryptedAttr = tlvstore.tlvRecordsToContainer(clearContainer, true);
+                
+                // Set the announcement number
+                psa.lastSeenAnnounceNum = parseInt(decryptedAttr.num);
+            }
+            catch (exception) {
+                
+                // Set the last seen to the current one so the announcement won't show
+                psa.lastSeenAnnounceNum = psa.currentAnnounceNum;
+            }
+        }
     },
     
     /**
      * Wrapper function to configure the announcement details and show it
      */
     configAndShowAnnouncement: function() {
-                
-        // Show the announcement
-        psa.prefillAnnouncementDetails();
-        psa.addCloseButtonHandler();
-        psa.addMoreInfoButtonHandler();
-        psa.showAnnouncement();        
-    },
-    
-    /**
-     * Shows the announcement
-     */
-    showAnnouncement: function() {
-        
-        // Show the PSA
-        $('body').addClass('notification');
-        
-        // Move the file manager up
-        psa.resizeFileManagerHeight();
-        
-        // Add a handler to fix the layout if the window is resized
-        $(window).rebind('resize.bottomNotification', function() {
-            psa.resizeFileManagerHeight();
-            psa.repositionAccountLoadingBar();
-        });
-        
-        // Currently being shown
-        psa.visible = true;
-    },
-        
-    /**
-     * Update the details of the announcement depending on the current one
-     */
-    prefillAnnouncementDetails: function() {
         
         // Get the relevant announcement
         var announcement = psa.getAnouncementDetails();
         
+        // Only show the announcement if they have not seen the current announcement
+        if ((psa.lastSeenAnnounceNum < psa.currentAnnounceNum) || (localStorage.alwaysShowPsa === '1')) {
+            psa.prefillAnnouncementDetails(announcement);
+            psa.addCloseButtonHandler();
+            psa.addMoreInfoButtonHandler();
+            psa.showAnnouncement();
+        }
+    },
+            
+    /**
+     * Update the details of the announcement depending on the current one
+     * @param {Object} announcement The announcement details as an object
+     */
+    prefillAnnouncementDetails: function(announcement) {
+                
         // Populate the details
         var $psa = $('.public-service-anouncement');        
         $psa.addClass(announcement.cssClass);
@@ -112,7 +119,7 @@ var psa = {
         $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
         $psa.find('.view-more-info .text').text(announcement.buttonText);
     },
-    
+                
     /**
      * Gets the current announcement details
      * @returns {Object} Returns an object with the current announcement details
@@ -140,34 +147,16 @@ var psa = {
         };
         
         // Return the relevant object
-        return announcements[psa.currentAnnounceNum];
-    },
-    
-    /**
-     * Decrypt the private user attribute
-     * @returns {Number} Returns an integer containing the last announcement number they have seen
-     */
-    decryptPrivateAttribute: function() {
-        
-        // If the private attribute has been set on the API
-        if (psa.lastSeenAttr !== null) {
-            
-            try {
-                // Try decode, decrypt, convert from TLV into a JS object, then get the number
-                var clearContainer = tlvstore.blockDecrypt(base64urldecode(psa.lastSeenAttr), u_k);
-                var decryptedAttr = tlvstore.tlvRecordsToContainer(clearContainer, true);
-                
-                // Set the announcement number
-                psa.lastSeenAnnounceNum = parseInt(decryptedAttr.num);
-            }
-            catch (exception) {
-                
-                // Set the last seen to the current one so the announcement won't show
-                psa.lastSeenAnnounceNum = psa.currentAnnounceNum;
-            }
+        if (typeof announcements[psa.currentAnnounceNum] !== 'undefined') {
+            return announcements[psa.currentAnnounceNum];
         }
-    },
-    
+        
+        // Undefined announcement number, reset to 0, so it will not show
+        psa.currentAnnounceNum = 0;
+        
+        return false;
+    },    
+        
     /**
      * Adds the close button functionality
      */
@@ -177,11 +166,9 @@ var psa = {
         $('body').off('click', '.public-service-anouncement .button.close');
         $('body').on('click', '.public-service-anouncement .button.close', function() {
             
-            // Hide the banner
+            // Hide the banner and store that they have seen this PSA
             psa.hideAnnouncement();
-            
-            // Store that they have seen it on the API side
-            mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnounceNum) }, false, true);
+            psa.saveLastPsaSeen();
         });
     },
     
@@ -194,31 +181,71 @@ var psa = {
         $('body').off('click', '.public-service-anouncement .button.view-more-info');
         $('body').on('click', '.public-service-anouncement .button.view-more-info', function() {
             
-            // Hide the banner
-            psa.hideAnnouncement();
-            
             // Get the page link for this announcement
             var pageLink = $(this).attr('data-continue-link');
             
-            // Convert to string because method expects a string
-            var currentAnnounceNumStr = String(psa.currentAnnounceNum);
-            
-            // Store that they have seen it on the API side
-            var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
-            
-            // If they are still loading their account (the loading animation is visible)
-            if ($('.dark-overlay').is(':visible') || $('.light-overlay').is(':visible')) {
+            // Hide the banner and save the PSA as seen
+            psa.hideAnnouncement();
+            psa.saveLastPsaSeen(function() {
                 
-                // Open a new tab (and hopefully don't trigger popup blocker)
-                window.open('https://mega.nz/#' + pageLink, '_blank');
-            }
-            else {
-                // Otherwise their account is loaded, so redirect normally after save
-                savePromise.done(function(result) {
+                // If they are still loading their account (the loading animation is visible)
+                if ($('.dark-overlay').is(':visible') || $('.light-overlay').is(':visible')) {
 
-                    // Redirect normally
+                    // Open a new tab (and hopefully don't trigger popup blocker)
+                    window.open('https://mega.nz/#' + pageLink, '_blank');
+                }
+                else {                    
+                    // Otherwise redirect normally
                     document.location.hash = pageLink;
-                });
+                }
+            });
+        });
+    },
+        
+    /**
+     * Shows the announcement
+     */
+    showAnnouncement: function() {
+        
+        // Show the PSA
+        $('body').addClass('notification');
+        
+        // Move the file manager up
+        psa.resizeFileManagerHeight();
+        
+        // Add a handler to fix the layout if the window is resized
+        $(window).rebind('resize.bottomNotification', function() {
+            psa.resizeFileManagerHeight();
+            psa.repositionAccountLoadingBar();
+        });
+        
+        // Currently being shown
+        psa.visible = true;
+    },
+    
+    /**
+     * Get the PSA number manually from the API
+     */
+    requestFlags: function() {
+        
+        // Get the last announcement number they have seen from localStorage
+        if (localStorage.getItem('lastSeenAnnounceNum') !== null) {
+            psa.lastSeenAnnounceNum = localStorage.getItem('lastSeenAnnounceNum');
+        }
+        
+        // Make Get Miscellaneous Flags (gmf) API request
+        api_req({ a: 'gmf' }, {
+            callback: function(result) {
+                
+                // If successful result
+                if ((result) && (typeof result.psa !== 'undefined')) {
+                    
+                    // Set the number indicating which PSA we want to show
+                    psa.currentAnnounceNum = result.psa;
+                    
+                    // Show the announcement
+                    psa.configAndShowAnnouncement();
+                }
             }
         });
     },
@@ -230,7 +257,7 @@ var psa = {
         
         // Move the progress bar back to the 0 position
         $('.loader-progressbar').css('bottom', 0);
-                
+        
         // Hide the announcement
         $('body').removeClass('notification');
         
@@ -246,6 +273,36 @@ var psa = {
         
         // Set to no longer visible
         psa.visible = false;
+    },
+        
+    /**
+     * Saves the current announcement number they have seen to a user attribute if logged in, otherwise to localStorage
+     * @param {Function} callbackFunction The callback function run once saved
+     */
+    saveLastPsaSeen: function(callbackFunction) {
+        
+        // If the callback is not specified, default to an anonymous function
+        callbackFunction = callbackFunction || function() {};
+        
+        // If logged in and completed registration
+        if (u_type === 3) {
+            
+            // Convert to string because method expects a string, then store that they have seen it on the API side
+            var currentAnnounceNumStr = String(psa.currentAnnounceNum);
+            var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
+            
+            // On completion, run the callback function
+            savePromise.done(function() {
+                callbackFunction();
+            });
+        }
+        else {
+            // Otherwise store that they have seen it in localStorage
+            localStorage.setItem('lastSeenAnnounceNum', psa.currentAnnounceNum);
+            
+            // Run the callback function
+            callbackFunction();
+        }
     },
     
     /**
@@ -282,23 +339,5 @@ var psa = {
             // Reset to the bottom
             $('.loader-progressbar').css('bottom', 0);
         }
-    },
-    
-    /**
-     * Get the PSA number manually from the API
-     */
-    requestFlags: function() {
-        
-        // Make Get Miscellaneous Flags (gmf) API request
-        api_req({ a: 'gmf' }, {
-            callback: function(result) {
-                
-                // Set the number indicating which PSA we want to show
-                psa.currentAnnounceNum = result.psa;
-                
-                // Show the announcement
-                psa.configAndShowAnnouncement();
-            }
-        });
-    }
+    }    
 };

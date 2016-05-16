@@ -707,7 +707,7 @@ function init_page() {
             var html = '';
             var a = 4;
 
-            $('.about').append(content.html);
+            $('.about').safeHTML(content.html);
             $('.team-person-block').sort(function () {
                 return (Math.round(Math.random()) - 0.5);
             }).each(function (i, element) {

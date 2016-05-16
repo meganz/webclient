@@ -325,7 +325,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
                 userHashes.push(
                     {
                         'u': contact.u,
-                        'p': 1
+                        'p': 2
                     }
                 );
             });
@@ -742,7 +742,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "a":"mci",
                 "id": chatRoom.chatId,
                 "u": contactHash,
-                "p": 1
+                "p": 2
             });
         });
 
@@ -766,7 +766,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             contactHashes.forEach(function(k) {
                 users.push({
                     'u': k,
-                    'p': 3
+                    'p': 2
                 });
             });
 

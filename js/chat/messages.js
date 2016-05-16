@@ -438,6 +438,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         console.error(eventData.id, eventData.state, eventData);
 
         if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
+            var timestamp = (
+                eventData.state === "EDITED" ? chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime()
+            );
+
             var editedMessage = new Message(
                 chatRoom,
                 self,
@@ -447,11 +451,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'keyid': eventData.keyid,
                     'message': eventData.message,
                     'updated': eventData.updated,
-                    'delay' : eventData.ts ? eventData.ts : unixtime(),
+                    'delay' : timestamp,
                     'orderValue': eventData.id,
                     'sent': true
                 }
             );
+            console.error(editedMessage);
 
             var _runDecryption = function() {
                 try

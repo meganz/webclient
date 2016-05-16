@@ -21,6 +21,27 @@ var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
 
 var ConversationRightArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    componentDidUpdate: function() {
+        var self = this;
+        if (!self.isMounted()) {
+            return;
+        }
+
+        var $node = $(self.findDOMNode());
+
+
+        var fitHeight = $('.chat-contacts-list .jspPane', $node).height();
+        var maxHeight = $('.chat-right-pad', $node).innerHeight() - $('.buttons-block', $node).innerHeight();
+
+        if (maxHeight < fitHeight) {
+            fitHeight = Math.max(maxHeight, 48);
+        }
+
+        $('.chat-contacts-list', $node).height(
+            fitHeight
+        );
+
+    },
     render: function() {
         var self = this;
         var room = this.props.chatRoom;
@@ -116,18 +137,8 @@ var ConversationRightArea = React.createClass({
                             dropdowns.push(
                                 <DropdownsUI.DropdownItem
                                     key="privFullAcc" icon="human-profile"
-                                    label={__("Change privilage to Full access")} onClick={() => {
+                                    label={__("Change privilege to Full access")} onClick={() => {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 2]);
-                                    }}/>
-                            );
-                        }
-
-                        if (room.members[contactHash] !== 1) {
-                            dropdowns.push(
-                                <DropdownsUI.DropdownItem
-                                    key="privReadWrite" icon="human-profile"
-                                    label={__("Change privilage to Read & Write")} onClick={() => {
-                                        $(room).trigger('alterUserPrivilege', [contactHash, 1]);
                                     }}/>
                             );
                         }
@@ -138,10 +149,14 @@ var ConversationRightArea = React.createClass({
                     }
                     else if (room.members[u_handle] === 1) {
                         // read write
+                        // should not happen.
 
                     }
                     else if (room.isReadOnly()) {
                         // read only
+                    }
+                    else {
+                        // should not happen.
                     }
 
 
@@ -151,12 +166,11 @@ var ConversationRightArea = React.createClass({
                     }
                     else if (room.members[contactHash] === 2) {
                         privilege = <abbr title="Full access">$</abbr>;
-                    } 
-                    else if (room.members[contactHash] === 1) {
-                        privilege = <abbr title="Read & Write"></abbr>;
-                    }
-                    else if (room.members[contactHash] === 0) {
+                    } else if (room.members[contactHash] === 0) {
                         privilege = <abbr title="Removed">-</abbr>;
+                    }
+                    else {
+                        // should not happen.
                     }
                 }
 
@@ -193,8 +207,13 @@ var ConversationRightArea = React.createClass({
                 <div className="chat-right-pad">
 
                     {isReadOnlyElement}
-                    {contactsList}
-                    <div className="clear"></div>
+                    <div className="chat-contacts-list">
+                        <utils.JScrollPane chatRoom={room}>
+                            <div className="chat-contacts-list-inner">
+                                {contactsList}
+                            </div>
+                        </utils.JScrollPane>
+                    </div>
 
                     <div className="buttons-block">
                         {startAudioCallButton}
@@ -1052,7 +1071,14 @@ var ConversationPanel = React.createClass({
                     shouldRender = false;
                 }
 
-                var curTimeMarker = time2lastSeparator((new Date(v.delay * 1000).toISOString()));
+                var timestamp = v.delay;
+                if (v.updated) {
+                    timestamp = timestamp + v.updated;
+                    grouped = false;
+                    lastMessageFrom = null;
+                    lastGroupedMessageTimeStamp = null;
+                }
+                var curTimeMarker = time2lastSeparator((new Date(timestamp * 1000).toISOString()));
 
                 if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
                     lastTimeMarker = curTimeMarker;
@@ -1068,7 +1094,6 @@ var ConversationPanel = React.createClass({
 
                 if (shouldRender === true) {
                     var userId = v.userId;
-                    var timestamp = v.delay;
                     if (!userId && v.fromJid) {
                         var contact = room.megaChat.getContactFromJid(v.fromJid);
                         if (contact && contact.u) {
@@ -1078,7 +1103,7 @@ var ConversationPanel = React.createClass({
 
                     if (
                         v instanceof KarereEventObjects.OutgoingMessage ||
-                        v instanceof Message
+                        (v instanceof Message && !v.updated)
                     ) {
 
                         // the grouping logic for messages.

@@ -30,10 +30,11 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
     function verify_cms_content(content, signature, objectId) {
         var hash  = asmCrypto.SHA256.bytes(content);
         signature = asmCrypto.string_to_bytes(ab_to_str(signature));
+        var i;
 
     
         try {
-            for (var i = 0; i < signPubKey.__global.length; ++i) {
+            for (i = 0; i < signPubKey.__global.length; ++i) {
                 if (nacl.sign.detached.verify(hash, signature, signPubKey.__global[i])) {
                     /* It's a valid signature */
                     return true;
@@ -41,7 +42,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
             }
 
             if (signPubKey[objectId]) {
-                for (var i = 0; i < signPubKey[objectId].length; ++i) {
+                for (i = 0; i < signPubKey[objectId].length; ++i) {
                     if (nacl.sign.detached.verify(hash, signature, signPubKey[objectId][i])) {
                         /* It's a valid signature */
                         return true;

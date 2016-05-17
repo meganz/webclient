@@ -879,6 +879,8 @@ ChatdIntegration.prototype.join = function(chatRoom) {
         'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.'
     );
 
+    self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
+    
     self.chatd.join(
         base64urldecode(chatRoom.chatId),
         chatRoom.chatShard,
@@ -887,7 +889,6 @@ ChatdIntegration.prototype.join = function(chatRoom) {
             .replace("31.216.147.155", "chattest.userstorage.mega.co.nz")
     );
 
-    self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
 };
 
 ChatdIntegration.prototype.retrieveHistory = function(chatRoom, numOfMessages) {

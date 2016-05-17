@@ -26,6 +26,7 @@ function shallowEqual(objA, objB) {
 
 var MAX_ALLOWED_DEBOUNCED_UPDATES = 1;
 var DEBOUNCED_UPDATE_TIMEOUT = 40;
+var REENABLE_UPDATES_AFTER_TIMEOUT = 300;
 
 var MAX_TRACK_CHANGES_RECURSIVE_DEPTH = 1;
 var _propertyTrackChangesVars = {
@@ -63,7 +64,7 @@ var MegaRenderMixin = {
 
         if (self.debounceTimer) {
            clearTimeout(self.debounceTimer);
-            console.error(self.getUniqueId(), self.skippedUpdates + 1);
+            // console.error(self.getUniqueId(), self.skippedUpdates + 1);
            self.skippedUpdates++;
         }
         var TIMEOUT_VAL = DEBOUNCED_UPDATE_TIMEOUT;
@@ -73,7 +74,7 @@ var MegaRenderMixin = {
         }
 
         self.debounceTimer = setTimeout(function() {
-            self.forceUpdate();
+            self.eventuallyUpdate();
             self.debounceTimer = null;
             self.skippedUpdates = 0;
         }, TIMEOUT_VAL);
@@ -128,14 +129,41 @@ var MegaRenderMixin = {
         return true;
     },
     eventuallyUpdate: function() {
-        if (!this._wasRendered) {
+        var self = this;
+
+        if (self._updatesDisabled === true) {
             return;
         }
-        if (!this.isComponentVisible()) {
+        if (!self._wasRendered || (self._wasRendered && !self.isMounted())) {
+            return;
+        }
+        if (!self.isComponentVisible()) {
             return;
         }
 
-        this.forceUpdate();
+        self.safeForceUpdate();
+    },
+    tempDisableUpdates: function(forHowLong) {
+        var self = this;
+        self._updatesDisabled = true;
+        if (self._updatesReenableTimer) {
+            clearTimeout(self._updatesRenableTimer);
+        }
+
+        var timeout = forHowLong ?
+            forHowLong : (
+                self.REENABLE_UPDATES_AFTER_TIMEOUT ?
+                    self.REENABLE_UPDATES_AFTER_TIMEOUT : REENABLE_UPDATES_AFTER_TIMEOUT
+            );
+
+        self._updatesReenableTimer = setTimeout(function() {
+            self.tempEnableUpdates();
+        }, timeout);
+    },
+    tempEnableUpdates: function() {
+        clearTimeout(this._updatesReenableTimer);
+        this._updatesDisabled = false;
+        this.eventuallyUpdate();
     },
     onResizeDoUpdate: function() {
         if (!this.isMounted() || this._pendingForceUpdate === true) {
@@ -222,7 +250,7 @@ var MegaRenderMixin = {
         var self = this;
         depth = depth || 0;
 
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
             return;
         }
 
@@ -258,7 +286,7 @@ var MegaRenderMixin = {
     },
     shouldComponentUpdate: function(nextProps, nextState) {
         var shouldRerender = false;
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
             return false;
         }
 
@@ -294,7 +322,7 @@ var MegaRenderMixin = {
     onPropOrStateUpdated: function() {
         if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this, this.getElementName(), arguments);
 
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
             return;
         }
 
@@ -345,7 +373,7 @@ var MegaRenderMixin = {
             if (self.isMounted()) {
                 self.forceUpdate();
             }
-        }, 75);
+        }, 0);
     }
 };
 

@@ -201,6 +201,17 @@ var ConversationRightArea = React.createClass({
             )   :
             room.getContactParticipants();
 
+        var dontShowTruncateButton = false;
+        if (
+            !room.iAmOperator() ||
+            room.messagesBuff.messages.length === 0 ||
+            (
+                room.messagesBuff.messages.length === 1 &&
+                room.messagesBuff.messages.getItem(0).dialogType === "truncated"
+            )
+        ) {
+            dontShowTruncateButton = true;
+        }
 
         return <div className="chat-right-area">
             <div className="chat-right-area conversation-details-scroll">
@@ -271,7 +282,7 @@ var ConversationRightArea = React.createClass({
 
                         {endCallButton}
 
-                        { room.iAmOperator() ? (
+                        { !dontShowTruncateButton ? (
                             <div className="link-button red" onClick={() => {
                                 if (self.props.onTruncateClicked) {
                                     self.props.onTruncateClicked();
@@ -867,6 +878,11 @@ var ConversationPanel = React.createClass({
         var self = this;
         var chatRoom = self.props.chatRoom;
         var megaChat = self.props.chatRoom.megaChat;
+
+        $(chatRoom.messagesBuff).rebind('onHistoryFinished.cp', function() {
+            self.eventuallyUpdate();
+        });
+
         megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid, function(e, eventObject) {
             if (!self.isMounted()) {
                 return;

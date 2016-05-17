@@ -419,6 +419,10 @@ Chatd.Shard.prototype.join = function(chatId) {
         this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
         // send out `HIST` after a fresh `JOIN`
         this.cmd(Chatd.Opcode.HIST, chatId + this.chatd.pack32le(-32));
+        this.chatd.trigger('onMessagesHistoryRequest', {
+            count: 32,
+            chatId: base64urlencode(chatId)
+        });
     } else {
         this.chatd.joinrangehist(chatId);
     }
@@ -976,6 +980,10 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
             }
 
             this.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
+            this.chatd.trigger('onMessagesHistoryRequest', {
+                count: 32,
+                chatId: base64urlencode(chatId)
+            });
             break;
         }
     }

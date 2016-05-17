@@ -315,6 +315,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             delete self.expectedMessagesCount;
 
             $(self).trigger('onHistoryFinished');
+
             self.trackDataChange();
         }
     });

@@ -3262,9 +3262,21 @@
     "8734": "\u53d6\u5f97\u5206\u4eab\u9023\u7d50",
     "8735": "\u79fb\u9664\u5206\u4eab\u9023\u7d50",
     "8736": "\u8a2d\u5b9a\u65b0\u7684\u5230\u671f\u65e5",
-    "8737": "25 May - International Missing Children&#039;s Day",
-    "8738": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
-    "8742": "Learn more",
+    "8737": "5\u670825\u65e5 - \u570b\u969b\u5931\u8e64\u5152\u7ae5\u65e5",
+    "8738": "\u70ba\u4e86\u5e6b\u52a9\u5931\u8e64\u548c\u53d7\u8650\u5152\u7ae5\uff0cMEGA\u7d55\u4e0d\u5bb9\u8a31\u4f7f\u7528\u5176\u7cfb\u7d71\u5171\u4eab\u975e\u6cd5\u7684\u6a94\u6848\u8207\u5167\u5bb9\u3002\u82e5\u6709\u4efb\u4f55\u5152\u7ae5\u8272\u60c5\u548c\u8650\u5f85\u5152\u7ae5\u4e4b\u5167\u5bb9\uff0c\u5c07\u6703\u652f\u6301\u4e26\u914d\u5408\u76f8\u95dc\u7576\u5c40\u9032\u884c\u8abf\u67e5\u3002",
+    "8742": "\u77ad\u89e3\u66f4\u591a",
+    "8743": "\u60a8\u4e4b\u524d\u6709\u4f7f\u7528\u6b64\u700f\u89bd\u5668\u767b\u5165\u904e\u3002\u78ba\u5b9a\u8981\u5275\u5efa\u4e00\u500b\u65b0\u7684\u5e33\u6236\u55ce\uff1f",
+    "8744": "\u91cd\u65b0\u767c\u9001",
+    "8745": "\u60a8\u5df2\u7d93\u6210\u529f\u767b\u5165\u3002",
+    "8746": "\u958b\u555f\u6a94\u6848\u9023\u7d50\u5931\u6557 [{0}]",
+    "8747": "\u958b\u555f\u9023\u7d50\u5931\u6557",
+    "8748": "\u6b63\u5728\u958b\u555f\u6a94\u6848\u9023\u7d50...",
+    "8749": "\u6b63\u5728\u958b\u555f\u8cc7\u6599\u593e\u9023\u7d50...",
+    "8750": "\u958b\u555fMEGA\u9023\u7d50",
+    "8751": "\u8cbc\u4e0aMEGA\u9023\u7d50\uff1a",
+    "8752": "\u532f\u5165\u81f3 {0}",
+    "8753": "\u6a94\u6848\u9023\u7d50",
+    "8754": "\u8cc7\u6599\u593e\u9023\u7d50",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3344,6 +3356,7 @@
         "international-missing-children-title": 8737,
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
-        "learn-more": 8742
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

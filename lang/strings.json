@@ -12917,7 +12917,7 @@
     },
     "8703": {
         "text": "Write the user's e-mail",
-        "context": "write option"
+        "context": "In the \"add contact\" screen you have two options: \"write the user's e-mail\" or \"import from phone\" a contact"
     },
     "8704": {
         "text": "Import from phone",
@@ -13062,5 +13062,53 @@
     "8742": {
         "text": "Learn more",
         "context": "A button label on the Public Service Announcement banner. This button will take them to a page where they can learn more information."
+    },
+    "8743": {
+        "text": "You have previously logged in using this browser. Are you sure you want to create a new account?",
+        "context": "This dialog message is shown as part of the PRO purchase flow. If it is detected that a user has previously had an account in this web browser, then we want to make sure the payment is attributed to that account, rather than the user mistakenly registering a new account."
+    },
+    "8744": {
+        "text": "Resend",
+        "context": "A button to resend the email confirmation as part of a PRO plan purchase."
+    },
+    "8745": {
+        "text": "You have been successfully logged in.",
+        "context": "A toast notification to tell the user that they have been logged in successfully."
+    },
+    "8746": {
+        "text": "Open link failed [{0}]",
+        "context": "A dialog message which is displayed when the process to open a link failed. Preserve the [{0}] code because it is for including the error code or the error message at runtime."
+    },
+    "8747": {
+        "text": "Open link failed",
+        "context": "The title of a dialog which is displayed when the process to open a link failed."
+    },
+    "8748": {
+        "text": "Opening file link...",
+        "context": "A progress indicator message which is shown when opening a file link to import\/download."
+    },
+    "8749": {
+        "text": "Opening folder link...",
+        "context": "A progress indicator message which is shown when opening a folder link to import\/download."
+    },
+    "8750": {
+        "text": "Open MEGA link",
+        "context": "A label for any 'Open MEGA link' button, link, text, title, etc. Try to preserve the MEGA brand name as uppercase."
+    },
+    "8751": {
+        "text": "Paste MEGA link:",
+        "context": "A label for a dialog message to import\/download a MEGA link."
+    },
+    "8752": {
+        "text": "Import to {0}",
+        "context": "A Label for a dialog which is shown when a user is trying to import a MEGA link. Preserve the {0} code because it is for including the name of the destination folder at runtime."
+    },
+    "8753": {
+        "text": "File link",
+        "context": "A label for any 'File link' button, link, text, title, etc."
+    },
+    "8754": {
+        "text": "Folder link",
+        "context": "A label for any 'Folder link' button, link, text, title, etc."
     }
 }

@@ -3262,9 +3262,21 @@
     "8734": "Z\u00edska\u0165 odkazy",
     "8735": "Odstr\u00e1ni\u0165 odkazy",
     "8736": "Nastavte nov\u00fd d\u00e1tum expir\u00e1cie",
-    "8737": "25 May - International Missing Children&#039;s Day",
-    "8738": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
-    "8742": "Learn more",
+    "8737": "25 M\u00e1j - Medzin\u00e1rodn\u00fd De\u0148 Det\u00ed",
+    "8738": "Pre pomoc ch\u00fdbaj\u00facim a zneu\u017e\u00edvan\u00fdm de\u0165om, MEGA potvrdzuje, \u017ee netoleruje vyu\u017e\u00edvanie svojich syst\u00e9mov pre zdie\u013eanie neleg\u00e1lneho obsahu a bude podporova\u0165 autority vo vy\u0161etrovan\u00ed a st\u00edhan\u00ed pri v\u0161etk\u00fdch obvinaniach o materi\u00e1li s detskou pornografiou a materi\u00e1loch o zneu\u017e\u00edvan\u00ed det\u00ed.",
+    "8742": "Zisti viac",
+    "8743": "V tomto prehliada\u010di ste u\u017e boli prihl\u00e1sen\u00fd. Ste si ist\u00fd, \u017ee si chcete vytvori\u0165 nov\u00fd \u00fa\u010det?",
+    "8744": "Odosla\u0165 znovu",
+    "8745": "Boli ste \u00faspe\u0161ne prihl\u00e1sen\u00fd.",
+    "8746": "Otv\u00e1ranie odkazu zlyhalo [{0}]",
+    "8747": "Otv\u00e1ranie odkazu zlyhalo",
+    "8748": "Otv\u00e1ranie odkazu na s\u00fabor...",
+    "8749": "Otv\u00e1ranie odkazu na prie\u010dinok...",
+    "8750": "Otvori\u0165 MEGA odkaz",
+    "8751": "Vlo\u017ei\u0165 MEGA odkaz:",
+    "8752": "Importova\u0165 do {0}",
+    "8753": "Odkaz na s\u00fabor",
+    "8754": "Odkaz na prie\u010dinok",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3344,6 +3356,7 @@
         "international-missing-children-title": 8737,
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
-        "learn-more": 8742
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

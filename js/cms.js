@@ -1,13 +1,13 @@
 (function(window) {
     /** Our trusted public keys {{{ */
     var signPubKey = {
-        "__global": [
-            "gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4=",
-            "NdRND9yN\/xE3VVzOtSKpuNwzWykTTcrDN2HMWrCLJJY="
-        ],
-        "sync": [
-            "9tNqH\/pHLXLJ20Ie316S5wIvdwCNohjR+e4TGt6F3BI="
-        ]
+    "__global": [
+        "gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4=",
+        "9M\/+x5ZZJGeSVvYXC+1vXZ0sTFiGi4WpMjZ8qcQeFLs="
+    ],
+    "sync": [
+        "J0K5p5rZjOjxli\/uioSP1yneQtoW2QTl3zXN\/Q3H3Mc="
+    ]
     };
     /** }}} */
 

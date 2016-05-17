@@ -92,8 +92,8 @@ function doregister() {
 function registeraccount() {
     var ctx = {
         callback: function(res) {
-            loadingDialog.hide();
             if (res === 0) {
+                loadingDialog.hide();
                 passwordManager($('#register_form'));
                 if (m) {
                     done_text1 = l[216];
@@ -123,21 +123,40 @@ function registeraccount() {
                 }
                 api_req(ops);
             }
+            else if (res === EACCESS || res === EEXIST) {
+
+                var passwordaes = new sjcl.cipher.aes(prepare_key_pw(rv.password));
+                var uh = stringhash(rv.email.toLowerCase(), passwordaes);
+                var ctx = {
+                    checkloginresult: function(ctx, r) {
+                        loadingDialog.hide();
+
+                        if (!r) {
+                            if (m) {
+                                alert(l[219]);
+                            }
+                            else {
+                                $('.login-register-input.email .top-loginp-tooltip-txt')
+                                    .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
+                                $('.login-register-input.email').addClass('incorrect');
+                                msgDialog('warninga', 'Error', l[7869]);
+                            }
+                        }
+                        else if (r === EBLOCKED) {
+                            alert(l[730]);
+                        }
+                        else {
+                            passwordManager($('#register_form'));
+                            showToast('megasync', l[8745]);
+                            boot_auth(ctx, r);
+                        }
+                    }
+                };
+                u_login(ctx, rv.email, rv.password, uh, true);
+            }
             else {
-                if (res === EACCESS) {
-                    alert(l[218]);
-                }
-                else if (res === EEXIST) {
-                    if (m) {
-                        alert(l[219]);
-                    }
-                    else {
-                        $('.login-register-input.email .top-loginp-tooltip-txt')
-                            .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
-                        $('.login-register-input.email').addClass('incorrect');
-                        msgDialog('warninga', 'Error', l[7869]);
-                    }
-                }
+                loadingDialog.hide();
+                msgDialog('warninga', 'Error', l[200], res);
             }
         }
     };

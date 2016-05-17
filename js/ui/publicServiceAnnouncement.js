@@ -38,10 +38,15 @@ var psa = {
      * Show the dialog if they have not seen the announcement yet
      */
     init: function() {
-              
+        
+        // Get the last announcement number they have seen from localStorage
+        if (localStorage.getItem('lastSeenAnnounceNum') !== null) {
+            psa.lastSeenAnnounceNum = localStorage.getItem('lastSeenAnnounceNum');
+        }
+        
         // If logged in and completed registration fully
-        if ((u_type === 3) && (page.indexOf('pro') === -1)) {
-                    
+        if (u_type === 3) {
+            
             // Decrypt the attribute which stores which announcement they have seen
             psa.decryptPrivateAttribute();
             
@@ -49,15 +54,9 @@ var psa = {
             psa.configAndShowAnnouncement();
         }
         
-        // Otherwise if the PSA is currently visible, then hide it. This prevents bug after seeing an announcement and
-        // immediately visiting the #pro page which would show the raised file manager with whitespace underneath.
-        else if (psa.visible) {
-            psa.hideAnnouncement();
-        }
-        
-        // Otherwise not logged in, request PSA number from API
+        // Otherwise not logged in, request current PSA number from API
         else {
-            psa.requestFlags();
+            psa.requestCurrentPsaAndShowAnnouncement();
         }
     },
     
@@ -95,12 +94,18 @@ var psa = {
         // Get the relevant announcement
         var announcement = psa.getAnouncementDetails();
         
-        // Only show the announcement if they have not seen the current announcement
+        // Only show the announcement if they have not seen the current announcement.
+        // The localStorage.alwaysShowPsa is a test variable to force show the PSA
         if ((psa.lastSeenAnnounceNum < psa.currentAnnounceNum) || (localStorage.alwaysShowPsa === '1')) {
             psa.prefillAnnouncementDetails(announcement);
             psa.addCloseButtonHandler();
             psa.addMoreInfoButtonHandler();
             psa.showAnnouncement();
+        }
+        else {
+            // If they viewed the site while not logged in, then logged in with
+            // an account that had already seen this PSA then this hides it
+            psa.hideAnnouncement();
         }
     },
             
@@ -224,14 +229,9 @@ var psa = {
     },
     
     /**
-     * Get the PSA number manually from the API
+     * Get the PSA number manually from the API. This is a public API call so it's available for not logged in users.
      */
-    requestFlags: function() {
-        
-        // Get the last announcement number they have seen from localStorage
-        if (localStorage.getItem('lastSeenAnnounceNum') !== null) {
-            psa.lastSeenAnnounceNum = localStorage.getItem('lastSeenAnnounceNum');
-        }
+    requestCurrentPsaAndShowAnnouncement: function() {
         
         // Make Get Miscellaneous Flags (gmf) API request
         api_req({ a: 'gmf' }, {
@@ -284,6 +284,10 @@ var psa = {
         // If the callback is not specified, default to an anonymous function
         callbackFunction = callbackFunction || function() {};
         
+        // Always store that they have seen it in localStorage. This is useful if they 
+        // then log out, then the PSA should still stay hidden and not re-show itself
+        localStorage.setItem('lastSeenAnnounceNum', psa.currentAnnounceNum);
+        
         // If logged in and completed registration
         if (u_type === 3) {
             
@@ -297,9 +301,6 @@ var psa = {
             });
         }
         else {
-            // Otherwise store that they have seen it in localStorage
-            localStorage.setItem('lastSeenAnnounceNum', psa.currentAnnounceNum);
-            
             // Run the callback function
             callbackFunction();
         }

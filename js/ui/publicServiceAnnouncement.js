@@ -75,8 +75,29 @@ var psa = {
                 var clearContainer = tlvstore.blockDecrypt(decodedAttr, u_k);
                 var decryptedAttr = tlvstore.tlvRecordsToContainer(clearContainer, true);
                 
-                // Set the announcement number
-                psa.lastSeenAnnounceNum = parseInt(decryptedAttr.num);
+                // Convert the last seen number to an integer and get the last seen number from localStorage
+                var lastSeenNumFromApi = parseInt(decryptedAttr.num);
+                var lastSeenNumFromLocalStore = localStorage.getItem('lastSeenAnnounceNum');
+                
+                // If the user account has seen the PSA at some point while they were logged in
+                if (lastSeenNumFromApi > lastSeenNumFromLocalStore) {
+                    
+                    // Update localStorage, then it won't re-appear on log out
+                    localStorage.setItem('lastSeenAnnounceNum', lastSeenNumFromApi);
+                    
+                    // Set the announcement number
+                    psa.lastSeenAnnounceNum = lastSeenNumFromApi;
+                }
+                
+                // Otherwise if localStorage is more up-to-date
+                else if (lastSeenNumFromLocalStore > lastSeenNumFromApi) {
+                    
+                    // Store that they have seen it on the API side
+                    mega.attr.set('lastPsaSeen', { num: String(lastSeenNumFromLocalStore) }, false, true);
+                    
+                    // Set the announcement number
+                    psa.lastSeenAnnounceNum = lastSeenNumFromLocalStore;
+                }
             }
             catch (exception) {
                 

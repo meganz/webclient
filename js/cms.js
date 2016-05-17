@@ -1,6 +1,4 @@
-var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
-
-(function(window, asmCrypto) {
+(function(window) {
     /** Our trusted public keys {{{ */
     var signPubKey = {
         "__global": [
@@ -13,14 +11,18 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
     };
     /** }}} */
 
-    for (var sub in signPubKey) {
-        if (!signPubKey.hasOwnProperty(sub)) {
-            continue;
+    var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
+
+    mBroadcaster.once('startMega', function() {
+        for (var sub in signPubKey) {
+            if (!signPubKey.hasOwnProperty(sub)) {
+                continue;
+            }
+            for (var l = 0; l < signPubKey[sub].length; ++l) {
+                signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
+            }
         }
-        for (var l = 0; l < signPubKey[sub].length; ++l) {
-            signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
-        }
-    }
+    });
     
     var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
     var fetching = {};
@@ -347,7 +349,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
     /* Make it public */
     window.CMS = CMS;
 
-})(this, asmCrypto);
+})(this);
 
 CMS.on('corporate', function()
 {

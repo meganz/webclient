@@ -8310,13 +8310,20 @@ function clearScrollPanel(from) {
 
 function closeDialog() {
 
-    var logger = MegaLogger.getLogger('closeDialog');
+    if (d) {
+        MegaLogger.getLogger('closeDialog').debug($.dialog);
+    }
 
-    logger.debug($.dialog);
+    if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
+        fm_hideoverlay();
+        $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');
+    }
+
     if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
     }
+
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');

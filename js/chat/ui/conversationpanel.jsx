@@ -273,33 +273,8 @@ var ConversationRightArea = React.createClass({
 
                         { room.iAmOperator() ? (
                             <div className="link-button red" onClick={() => {
-                                var chatMessages = room.messagesBuff.messages;
-                                if (chatMessages.length > 0) {
-                                    var lastChatMessageId = null;
-                                    var i = chatMessages.length - 1;
-                                    while(lastChatMessageId == null && i >= 0) {
-                                        var message = chatMessages.getItem(i);
-                                        if (message instanceof Message) {
-                                            lastChatMessageId = message.messageId;
-                                        }
-                                        i--;
-                                    }
-                                    if (lastChatMessageId) {
-                                        asyncApiReq({
-                                            a: 'mct',
-                                            id: room.chatId,
-                                            m: lastChatMessageId
-                                        })
-                                            .fail(function(r) {
-                                                if(r === -2) {
-                                                    msgDialog(
-                                                        'warninga',
-                                                        l[135],
-                                                        __("You don't have the permissions to truncate this conversation.")
-                                                    );
-                                                }
-                                            });
-                                    }
+                                if (self.props.onTruncateClicked) {
+                                    self.props.onTruncateClicked();
                                 }
                             }}>
                                 <i className="small-icon rounded-stop"></i>
@@ -714,7 +689,7 @@ var ConversationAudioVideoPanel = React.createClass({
 });
 var ConversationPanel = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
-
+    lastScrollPositionPerc: 1,
     getInitialState: function() {
         return {
             startCallPopupIsActive: false,
@@ -748,7 +723,17 @@ var ConversationPanel = React.createClass({
         var $jsp = self.$messages.data("jsp");
         if ($jsp) {
             var perc = $jsp.getPercentScrolledY();
-            self.$messages.trigger('forceResize', [true, scrollToBottom ? -1 : perc]);
+            self.$messages.trigger('forceResize', [
+                true,
+                scrollToBottom ? (
+                    self.lastScrollPositionPerc ? self.lastScrollPositionPerc : -1
+                )
+                :
+                perc
+            ]);
+            if (scrollToBottom) {
+                self.lastScrollPositionPerc = 1;
+            }
         }
 
         room.renderContactTree();
@@ -828,6 +813,7 @@ var ConversationPanel = React.createClass({
                     self.props.chatRoom.messagesBuff.haveMoreHistory()
                 ) {
                     self.props.chatRoom.messagesBuff.retrieveChatHistory();
+                    self.forceUpdate();
                     self.lastUpdatedScrollHeight = $jsp.getContentHeight();
                 }
             }
@@ -849,6 +835,7 @@ var ConversationPanel = React.createClass({
 
             if (self.lastScrolledToBottom === true) {
                 $jsp.scrollToBottom();
+                self.lastScrollPositionPerc = 1;
             }
             else {
                 var prevPosY = (
@@ -1016,8 +1003,11 @@ var ConversationPanel = React.createClass({
                 self.props.messagesBuff.messagesHistoryIsLoading() === true
             )
         ) {
+            var loadingStyles = {
+                top: self.$messages ? (self.$messages.outerHeight() / 2) : "50%"
+            };
             messagesList.push(
-                <div className="loading-spinner light active" key="loadingSpinner"><div className="main-loader"></div></div>
+                <div className="loading-spinner light active manual-management" key="loadingSpinner" style={loadingStyles}><div className="main-loader"></div></div>
             );
         } else if (
             self.props.messagesBuff.joined === true && (
@@ -1186,6 +1176,7 @@ var ConversationPanel = React.createClass({
                                 }
                                 var $jsp = self.$messages.data('jsp');
                                 $jsp.scrollToBottom();
+                                self.lastScrollPositionPerc = 1;
                             }}
                             onDeleteClicked={(e, msg) => {
                                 self.setState({
@@ -1334,6 +1325,60 @@ var ConversationPanel = React.createClass({
             </ModalDialogsUI.ConfirmDialog>
         }
 
+        var confirmTruncateDialog = null;
+        if (self.state.truncateDialog === true) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__("Truncate")}
+                name="truncate-conversation"
+                onClose={() => {
+                    self.setState({'truncateDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    var chatMessages = room.messagesBuff.messages;
+                    if (chatMessages.length > 0) {
+                        var lastChatMessageId = null;
+                        var i = chatMessages.length - 1;
+                        while(lastChatMessageId == null && i >= 0) {
+                            var message = chatMessages.getItem(i);
+                            if (message instanceof Message) {
+                                lastChatMessageId = message.messageId;
+                            }
+                            i--;
+                        }
+                        if (lastChatMessageId) {
+                            asyncApiReq({
+                                a: 'mct',
+                                id: room.chatId,
+                                m: lastChatMessageId
+                            })
+                                .fail(function(r) {
+                                    if(r === -2) {
+                                        msgDialog(
+                                            'warninga',
+                                            l[135],
+                                            __("You don't have the permissions to truncate this conversation.")
+                                        );
+                                    }
+                                });
+                        }
+                    }
+
+                    self.setState({
+                        'truncateDialog': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__("Are you sure you want to truncate this conversation?")}
+                    </div>
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
+
         var additionalClass = "";
         if (
             additionalClass.length === 0 &&
@@ -1353,6 +1398,9 @@ var ConversationPanel = React.createClass({
                         megaChat={this.props.chatRoom.megaChat}
                         onAttachFromComputerClicked={function() {
                             self.uploadFromComputer();
+                        }}
+                        onTruncateClicked={function() {
+                            self.setState({'truncateDialog': true});
                         }}
                         onAttachFromCloudClicked={function() {
                             self.setState({'attachCloudDialog': true});
@@ -1391,6 +1439,7 @@ var ConversationPanel = React.createClass({
                     {attachCloudDialog}
                     {sendContactDialog}
                     {confirmDeleteDialog}
+                    {confirmTruncateDialog}
 
 
                     <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">
@@ -1425,7 +1474,7 @@ var ConversationPanel = React.createClass({
                                                 arrowSize:5,
                                                 animateDuration: 70,
                                                 animateScroll: false,
-                                                maintainPosition: true
+                                                maintainPosition: false
                                             }}
                                                chatRoom={self.props.chatRoom}
                                                messagesToggledInCall={self.state.messagesToggledInCall}

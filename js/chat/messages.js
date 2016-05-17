@@ -259,7 +259,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.lastSeen = eventData.messageId;
-            self.messages.trackDataChange();
+            self.trackDataChange();
         }
     });
     self.chatd.rebind('onMembersUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
@@ -285,7 +285,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.lastSent = eventData.messageId;
-            self.messages.trackDataChange();
+            self.trackDataChange();
         }
     });
 
@@ -309,14 +309,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.$msgsHistoryLoading.resolve();
             }
 
-            //self.messages.forEach(function(v, k) {
-            //    var messageObject = self.chatdInt._getKarereObjFromChatdObj(v);
-            //
-            //    if (messageObject) {
-            //        messageObject.orderValue = v.id;
-            //        chatRoom.appendMessage(messageObject);
-            //    }
-            //});
             if (self.expectedMessagesCount > 0) {
                 self.retrievedAllMessages = true;
             }
@@ -456,7 +448,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'sent': true
                 }
             );
-            console.error(editedMessage);
 
             var _runDecryption = function() {
                 try
@@ -716,7 +707,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
             -32
         );
 
-        self.messages.trackDataChange();
+        self.trackDataChange();
 
 
         var timeoutPromise = createTimeoutPromise(function() {
@@ -729,7 +720,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
                 self.$msgsHistoryLoading.reject();
             })
             .always(function() {
-                self.messages.trackDataChange();
+                self.trackDataChange();
             });
 
         self.$msgsHistoryLoading.fail(function() {

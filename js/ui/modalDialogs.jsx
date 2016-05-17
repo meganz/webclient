@@ -583,8 +583,7 @@ var ConfirmDialog = React.createClass({
             return null;
         }
 
-        var classes = "delete-message " + self.props.className;
-
+        var classes = "delete-message " + self.props.name + " " + self.props.className;
 
         return (
             <ModalDialog

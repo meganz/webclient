@@ -159,3 +159,9 @@
     margin: -12px 0 0 0;
 }
 /* End of Delete message dialog */
+
+/* Confirm truncate dialog */
+.fm-dialog.truncate-conversation .fm-dialog-content {
+    margin-bottom: 24px;
+}
+/* End of confirm truncate dialog */

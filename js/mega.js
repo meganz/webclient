@@ -44,11 +44,11 @@ if (typeof loadingDialog === 'undefined') {
     var loadingDialog = {};
     loadingDialog.show = function() {
         $('.dark-overlay').show();
-        $('.loading-spinner').removeClass('hidden').addClass('active');
+        $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
     };
     loadingDialog.hide = function() {
         $('.dark-overlay').hide();
-        $('.loading-spinner').addClass('hidden').removeClass('active');
+        $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
    };
 }
 if (typeof loadingInitDialog === 'undefined') {
@@ -68,7 +68,7 @@ if (typeof loadingInitDialog === 'undefined') {
         }
         this.hide();
         $('.light-overlay').show();
-        $('.loading-spinner').removeClass('hidden').addClass('init active');
+        $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('init active');
         this.active = true;
     };
     loadingInitDialog.step1 = function() {
@@ -103,7 +103,7 @@ if (typeof loadingInitDialog === 'undefined') {
         this.active = false;
         this.progress = false;
         $('.light-overlay').hide();
-        $('.loading-spinner').addClass('hidden').removeClass('init active');
+        $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
         $('.loader-percents').width('0%');

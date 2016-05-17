@@ -64,12 +64,12 @@ var Chatd = function(userId, options) {
                 var tmp = $.extend({}, arguments[1]);
                 delete tmp.shard;
                 tmp.shard = "shard#" + arguments[1].shard.shard;
-                console.error(evt, JSON.stringify(
+                console.error(evt, unixtime(), JSON.stringify(
                     tmp
                 ));
             }
             else {
-                console.error(evt, JSON.stringify(arguments[1]));
+                console.error(evt, unixtime(), JSON.stringify(arguments[1]));
             }
         });
    });
@@ -349,7 +349,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
     {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
-        console.error("MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+        console.error(unixtime(), "MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
         self.cmdq += String.fromCharCode(opCode)+cmd;
     });
@@ -358,7 +358,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
 };
 
 Chatd.Shard.prototype.cmd = function(opCode, cmd) {
-    console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+    console.error(unixtime(), "CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
     this.cmdq += String.fromCharCode(opCode)+cmd;
 

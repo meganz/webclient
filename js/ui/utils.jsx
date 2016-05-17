@@ -94,11 +94,6 @@ var JScrollPane = React.createClass({
                             $jsp.scrollToBottom();
                         });
                     }
-                    else {
-                        $elem.one('jsp-initialised', function () {
-                            $jsp.scrollToPercentY(scrollPositionYPerc);
-                        });
-                    }
                 }
                 $jsp.reinitialise();
             }

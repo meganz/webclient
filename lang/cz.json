@@ -3262,6 +3262,21 @@
     "8734": "Z\u00edskat odkazy",
     "8735": "Odebrat odkazy",
     "8736": "Nastavit nov\u00e9 datum vypr\u0161en\u00ed",
+    "8737": "25. kv\u011btna - Mezin\u00e1rodn\u00ed den ztracen\u00fdch d\u011bt\u00ed",
+    "8738": "Na podporu ztracen\u00fdch a zneu\u017e\u00edv\u00e1n\u00fdch d\u011bt\u00ed, MEGA potvrzuje, \u017ee nebude tolerovat pou\u017e\u00edv\u00e1n\u00ed sv\u00fdch syst\u00e9m\u016f pro sd\u00edlen\u00ed neleg\u00e1ln\u00edho obsahu a bude podporovat \u00fa\u0159ady p\u0159i vy\u0161et\u0159ov\u00e1n\u00ed a st\u00edh\u00e1n\u00ed v\u0161ech obvin\u011bn\u00ed z d\u011btsk\u00e9 pornografie a materi\u00e1l\u016f t\u00fdkaj\u00edc\u00edch se zneu\u017e\u00edv\u00e1n\u00ed d\u00edt\u011bte .",
+    "8742": "Zjistit v\u00edce",
+    "8743": "V minulosti jste se ji\u017e p\u0159ihl\u00e1sili pomoc\u00ed tohoho prohl\u00ed\u017ee\u010de. Opravdu chcete vytvo\u0159it nov\u00fd \u00fa\u010det.",
+    "8744": "Odeslat znovu",
+    "8745": "Byli jste \u00fasp\u011b\u0161n\u011b p\u0159ihl\u00e1\u0161eni.",
+    "8746": "Otev\u0159en\u00ed odkazu selhalo [{0}]",
+    "8747": "Otev\u0159en\u00ed odkazu selhalo",
+    "8748": "Otev\u00edr\u00e1n\u00ed odkazu na soubor...",
+    "8749": "Otev\u00edr\u00e1n\u00ed odkazu na sllo\u017eku...",
+    "8750": "Otev\u0159\u00edt odkaz MEGA",
+    "8751": "Vlo\u017eit odkaz MEGA:",
+    "8752": "Importovat do {0}",
+    "8753": "Odkaz na soubor",
+    "8754": "Odkaz na slo\u017eku",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3339,6 +3354,9 @@
         "remove-links": 8735,
         "set-new-expiry-date": 8736,
         "international-missing-children-title": 8737,
-        "international-missing-children-body-text": 8738
+        "international-missing-children-body-text": 8738,
+        "test-string": 8739,
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

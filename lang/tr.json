@@ -3262,6 +3262,21 @@
     "8734": "Ba\u011flant\u0131lar\u0131 al",
     "8735": "Ba\u011flant\u0131lar\u0131 kald\u0131r",
     "8736": "Yeni vade tarihini se\u00e7in",
+    "8737": "25 May\u0131s - Uluslararas\u0131 Kay\u0131p \u00c7ocuklar G\u00fcn\u00fc",
+    "8738": "Kay\u0131p ve s\u00f6m\u00fcrgedeki \u00e7ocuklara destek olarak, MEGA sistemini yasa d\u0131\u015f\u0131 i\u00e7erik payla\u015f\u0131mlar\u0131na kar\u015f\u0131 tolerans g\u00f6sterilmeyece\u011fini, soru\u015fturma ve kovu\u015fturma yetkililerini her t\u00fcrl\u00fc \u00e7ocuk pornografisi ve \u00e7ocuk istismar\u0131 iddialar\u0131nda destekleyece\u011fini onaylar.",
+    "8742": "Daha fazla",
+    "8743": "Bu taray\u0131c\u0131da \u00f6nceden ba\u015fka bir hesaba giri\u015f yapt\u0131n\u0131z. Yeni hesap yaratmak istedi\u011finizden emin misiniz?",
+    "8744": "Tekrar g\u00f6nder",
+    "8745": "Ba\u015far\u0131yla giri\u015f yapt\u0131n\u0131z.",
+    "8746": "Ba\u011flant\u0131 a\u00e7\u0131lamad\u0131 [{0}]",
+    "8747": "Ba\u011flant\u0131 a\u00e7\u0131lamad\u0131",
+    "8748": "Dosya ba\u011flant\u0131s\u0131 a\u00e7\u0131l\u0131yor...",
+    "8749": "Klas\u00f6r ba\u011flant\u0131s\u0131 a\u00e7\u0131l\u0131yor...",
+    "8750": "MEGA ba\u011flant\u0131s\u0131n\u0131 a\u00e7",
+    "8751": "MEGA ba\u011flant\u0131s\u0131n\u0131 yap\u0131\u015ft\u0131r:",
+    "8752": "{0} dizinine aktar.",
+    "8753": "Dosya ba\u011flant\u0131s\u0131",
+    "8754": "Klas\u00f6r ba\u011flant\u0131s\u0131",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3339,6 +3354,9 @@
         "remove-links": 8735,
         "set-new-expiry-date": 8736,
         "international-missing-children-title": 8737,
-        "international-missing-children-body-text": 8738
+        "international-missing-children-body-text": 8738,
+        "test-string": 8739,
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

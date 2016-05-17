@@ -3262,6 +3262,21 @@
     "8734": "Obter links",
     "8735": "remover links",
     "8736": "Definir nova data de validade",
+    "8737": "25 de Maio - Dia Internacional das Crian\u00e7as Desaparecidas",
+    "8738": "Em apoio as crian\u00e7as abusadas e desaparecidas, o MEGA confirma que n\u00e3o tolera o uso de seus sistemas para o compartilhamento de conte\u00fado ilegal, e dar\u00e1 apoio as autoridades na investiga\u00e7\u00e3o de acusa\u00e7\u00f5es de envolvimento em pornografia infantil e material de abuso de crian\u00e7as.",
+    "8742": "Leia mais",
+    "8743": "Voc\u00ea j\u00e1 se conectou utilizando este navegador. Tem certeza que deseja criar uma nova conta?",
+    "8744": "Reenviar",
+    "8745": "Voc\u00ea foi conectado com sucesso",
+    "8746": "Open link failed [{0}]",
+    "8747": "Open link failed",
+    "8748": "Opening file link...",
+    "8749": "Opening folder link...",
+    "8750": "Open MEGA link",
+    "8751": "Paste MEGA link:",
+    "8752": "Import to {0}",
+    "8753": "File link",
+    "8754": "Folder link",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3339,6 +3354,9 @@
         "remove-links": 8735,
         "set-new-expiry-date": 8736,
         "international-missing-children-title": 8737,
-        "international-missing-children-body-text": 8738
+        "international-missing-children-body-text": 8738,
+        "test-string": 8739,
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

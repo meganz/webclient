@@ -91,8 +91,8 @@ var psa = {
         // Current announcement - to be fetched from the CMS in future
         var announcement = {
             title: l[8537],         // Important notice:
-            messageA: l[8535],      // Mega will be changing its terms...
-            messageB: l[8536],      // Thank you for using MEGA
+            messageA: l[8737],      // Mega will be changing its terms...
+            messageB: l[8738],      // Thank you for using MEGA
             buttonText: l[8538],    // View Blog Post
             buttonLink: 'blog_36'   // Blog 36 has more details about the TOS changes
         };

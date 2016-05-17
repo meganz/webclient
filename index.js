@@ -1419,6 +1419,9 @@ function topmenuUI() {
                     if (account.stype !== 'S') {
                         $elm.safeHTML('@@ <span class="red">@@</span>', l[987], time2date(account.expiry));
                     }
+                    else if (Array.isArray(account.sgw)) {
+                        $elm.safeHTML('<span class="red">(@@)</span>', account.sgw.join(', '));
+                    }
                     else {
                         $elm.text('');
                     }

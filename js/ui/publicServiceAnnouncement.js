@@ -2,7 +2,7 @@
  * This file handles the Public Service Announcements. One announcement will
  * appear at the bottom of the page in an overlay at a time. The announcements
  * come from a hard coded list initially. Once a user has seen an announcement
- * they will mark it as read on the API server. If a user is not logged in 
+ * they will mark it as read on the API server. If a user is not logged in
  * then it will mark that announcement as seen in localStorage.
  */
 var psa = {
@@ -137,11 +137,11 @@ var psa = {
     prefillAnnouncementDetails: function(announcement) {
                 
         // Populate the details
-        var $psa = $('.public-service-anouncement');        
+        var $psa = $('.public-service-anouncement');
         $psa.addClass(announcement.cssClass);
         $psa.find('.title').safeHTML(announcement.title);          // The messages could have HTML e.g. bold text
         $psa.find('.messageA').safeHTML(announcement.messageA);
-        $psa.find('.messageB').safeHTML(announcement.messageB);        
+        $psa.find('.messageB').safeHTML(announcement.messageB);
         $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
         $psa.find('.view-more-info .text').text(announcement.buttonText);
     },
@@ -162,7 +162,7 @@ var psa = {
                 buttonLink: 'blog_36',  // Blog 36 has more details about the TOS changes
                 cssClass: ''            // Default CSS class
             },
-            2: {       
+            2: {
                 title: l[8737],         // 25 May - International Missing Children...
                 messageA: l[8738],      // In support of missing and exploited children...
                 messageB: ' ',
@@ -181,8 +181,8 @@ var psa = {
         psa.currentAnnounceNum = 0;
         
         return false;
-    },    
-        
+    },
+    
     /**
      * Adds the close button functionality
      */
@@ -220,7 +220,7 @@ var psa = {
                     // Open a new tab (and hopefully don't trigger popup blocker)
                     window.open('https://mega.nz/#' + pageLink, '_blank');
                 }
-                else {                    
+                else {
                     // Otherwise redirect normally
                     document.location.hash = pageLink;
                 }
@@ -305,7 +305,7 @@ var psa = {
         // If the callback is not specified, default to an anonymous function
         callbackFunction = callbackFunction || function() {};
         
-        // Always store that they have seen it in localStorage. This is useful if they 
+        // Always store that they have seen it in localStorage. This is useful if they
         // then log out, then the PSA should still stay hidden and not re-show itself
         localStorage.setItem('lastSeenAnnounceNum', psa.currentAnnounceNum);
         
@@ -361,5 +361,5 @@ var psa = {
             // Reset to the bottom
             $('.loader-progressbar').css('bottom', 0);
         }
-    }    
+    }
 };

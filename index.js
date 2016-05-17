@@ -1415,11 +1415,13 @@ function topmenuUI() {
                     $parent = $('.membership-popup.pro-popup');
 
                     $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
-                    var p = '';
+                    var $elm = $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt');
                     if (account.stype !== 'S') {
-                        p = escapeHTML(l[987]) + ' <span class="red">' + time2date(account.expiry) + '</span>';
+                        $elm.safeHTML('@@ <span class="red">@@</span>', l[987], time2date(account.expiry));
                     }
-                    $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').safeHTML(p);
+                    else {
+                        $elm.text('');
+                    }
 
                     // Update current plan to PRO I, PRO II, PRO III or LITE in popup
                     $('.membership-icon-pad .membership-big-txt.red').text(planName);

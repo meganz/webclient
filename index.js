@@ -615,11 +615,11 @@ function init_page() {
                 return;
             }
             loadingDialog.show();
-            CMS.watch('help2:' + lang, function () {
+            CMS.watch('help.' + lang, function () {
                 window.helpTemplate = null;
                 doRenderHelp();
             });
-            CMS.get(['help2:' + lang, 'help:' + lang + '.json'], function (err, content, json) {
+            CMS.get(['help.' + lang, 'help.' + lang + '.json'], function (err, content, json) {
                 helpdata = json.object
                 parsepage(window.helpTemplate = content.html);
                 init_help();
@@ -700,15 +700,17 @@ function init_page() {
         }
     }
     else if (page == 'about') {
-        parsepage(pages['about']);
-        $('.team-person-block').removeClass('first');
-        var html = '';
-        var a = 4;
+        loadingDialog.show();
+        CMS.get("team", function(err, content) {
+            parsepage(pages['about']);
 
-        $('.team-person-block').sort(function () {
+            var html = '';
+            var a = 4;
+
+            $('.about').safeHTML(content.html);
+            $('.team-person-block').sort(function () {
                 return (Math.round(Math.random()) - 0.5);
-            })
-            .each(function (i, element) {
+            }).each(function (i, element) {
                 if (a == 4) {
                     html += element.outerHTML.replace('team-person-block', 'team-person-block first');
                     a = 0;
@@ -719,10 +721,15 @@ function init_page() {
                 a++;
             });
 
-        $('#emailp').html($('#emailp').text().replace('jobs@mega.nz',
-            '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
-        $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
-        mainScroll();
+            $('#emailp').safeHTML($('#emailp').text().replace('jobs@mega.nz',
+                '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
+            $('.new-bottom-pages.about').safeHTML(html + '<div class="clear"></div>');
+            topmenuUI();
+            loadingDialog.hide();
+            mainScroll();
+
+        });
+        return;
     }
     else if (page == 'sourcecode') {
         parsepage(pages['sourcecode']);

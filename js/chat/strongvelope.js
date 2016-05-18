@@ -777,6 +777,7 @@ var strongvelope = {};
 
                 return false;
             }
+
             logger.info('Encrypting sender keys for ' + destination + ' using RSA.');
 
             return crypt.rsaEncryptString(clearText, pubKey);
@@ -1002,9 +1003,6 @@ var strongvelope = {};
         // Assemble message content.
         var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.NONCE),
                                            encryptedMessage.nonce);
-
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
-                                            keyId);
 
         // Only include ciphertext if it's not empty (non-blind message).
         if (encryptedMessage.ciphertext !== null) {
@@ -1518,6 +1516,7 @@ var strongvelope = {};
             keysIncluded = [senderKey];
 
             encryptedKeys = self._encryptKeysTo(keysIncluded, destination);
+
             if (encryptedKeys === false) {
                 // Something went wrong, and we can't encrypt to that destination.
                 keyEncryptionError = true;
@@ -1611,6 +1610,24 @@ var strongvelope = {};
 
                 return false;
             }
+        }
+    };
+
+    /**
+     * Restore the keys from local cache.
+     *
+     * @method
+     * @param keyxid {Number}
+     *     Temp key id.
+     * @param keys {Array}
+     *     Key arrary from chatd.
+     */
+    strongvelope.ProtocolHandler.prototype.restoreKeys = function(keyxid, keys) {
+
+        this.seedKeys(keys);
+        var keyCount = keyxid &0x00ff;
+        if (keyCount > this.counter) {
+            this.counter = keyCount + 1;
         }
     };
 }());

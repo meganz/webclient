@@ -587,6 +587,22 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
+    self.chatd.rebind('onMessageKeyRestore.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        var keyxid = eventData.keyid;
+        var keys = eventData.keys;
+        console.log('onMessageKeyRestore');
+        console.log(chatRoom);
+        var seedKeys = function() {
+            chatRoom.protocolHandler.restoreKeys(keyxid, keys);
+        };
+        ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+
+        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+            self.trackDataChange();
+        }
+    });
+
     self.addChangeListener(function() {
         var newCounter = 0;
         self.messages.forEach(function(v, k) {

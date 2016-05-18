@@ -118,7 +118,8 @@ Chatd.MsgField = {
     'TIMESTAMP' : 2,
     'MESSAGE' : 3,
     'KEYID' : 4,
-    'UPDATED' : 5
+    'UPDATED' : 5,
+    'TYPE' : 6
 };
 
 Chatd.Const = {
@@ -294,7 +295,7 @@ Chatd.Shard.prototype.reconnect = function() {
         self.logger.log('chatd connection established');
         self.triggerSendIfAble();
         self.rejoinexisting();
-        self.clearpending();
+        self.resendpending();
         self.chatd.trigger('onOpen', {
             shard: self
         });
@@ -685,6 +686,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         keyid:  self.chatd.unpack32le(cmd.substr(13,4))
                     }
                 );
+                self.chatd.keyconfirm(self.chatd.unpack32le(cmd.substr(9,4)));
                 self.chatd.updatekeyid(cmd.substr(1,8), self.chatd.unpack32le(cmd.substr(13,4)), self.chatd.unpack32le(cmd.substr(9,4)));
                 len = 17;
                 break;
@@ -840,27 +842,23 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
 
     for (var i = 0; i<messages.length; i++) {
         var message = messages[i];
-        if (message.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
-            messageConstructs.push({"msgxid":0, "timestamp":0,"keyid":keyId, "message":message.message, "type":message.type});
-            continue;
-        }
         // allocate a transactionid for the new message
-        var msgxid = this.chatd.nexttransactionid();
+        var msgxid = (message.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) ? (keyId >>> 0): this.chatd.nexttransactionid();
         var timestamp = Math.floor(new Date().getTime()/1000);
 
         // write the new message to the message buffer and mark as in sending state
         // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
-        this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message.message, keyId, 0];
-
-        this.chatd.trigger('onMessageUpdated', {
-            chatId: base64urlencode(this.chatId),
-            userId: base64urlencode(this.buf[this.highnum][Chatd.MsgField.USERID]),
-            id: this.highnum,
-            state: 'PENDING',
-            keyid: keyId,
-            message: message.message
-        });
-        
+        this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message.message, keyId, 0, message.type];
+        if (message.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+            this.chatd.trigger('onMessageUpdated', {
+                chatId: base64urlencode(this.chatId),
+                userId: base64urlencode(this.buf[this.highnum][Chatd.MsgField.USERID]),
+                id: this.highnum,
+                state: 'PENDING',
+                keyid: keyId,
+                message: message.message
+            });
+        }
         this.sending[msgxid] = this.highnum;
         this.sendingList.push(msgxid);
         this.persist();
@@ -896,7 +894,9 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     this.buf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
     if (this.sending[this.buf[msgnum][Chatd.MsgField.MSGID]]) {
         this.buf[msgnum][Chatd.MsgField.MESSAGE] = message;
-        self.chatd.chatIdShard[this.chatId].msgupdx(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.UPDATED], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
+        if (self.chatd.chatIdShard[this.chatId].isOnline()) {
+            self.chatd.chatIdShard[this.chatId].msgupdx(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.UPDATED], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
+        }
     }
     else if (self.chatd.chatIdShard[this.chatId].isOnline()) {
         self.chatd.chatIdShard[this.chatId].msgupd(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], this.buf[msgnum][Chatd.MsgField.UPDATED], message, this.buf[msgnum][Chatd.MsgField.KEYID]);
@@ -941,13 +941,29 @@ Chatd.Messages.prototype.resend = function() {
     var self = this;
 
     // resend all pending new messages and modifications
+        // 1 hour is agreed by everyone.
+    var MESSAGE_EXPIRY = 60*60;
+    var mintimestamp = Math.floor(new Date().getTime()/1000);
     this.sendingList.forEach(function(msgxid) {
-        self.chatd.chatIdShard[self.chatId].msg(
-            self.chatId,
-            msgxid,
-            self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],
-            self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE]
-        );
+        if (mintimestamp - self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
+            var messageConstructs = [];
+            messageConstructs.push({"msgxid":msgxid, "timestamp":self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],"keyid":self.buf[self.sending[msgxid]][Chatd.MsgField.KEYID], "message":self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE], "type":self.buf[self.sending[msgxid]][Chatd.MsgField.TYPE]});
+            self.chatd.chatIdShard[self.chatId].msg(
+                self.chatId,
+                messageConstructs
+            );
+        } else {
+            // if it expires, require manul send.
+            self.chatd.trigger('onMessageUpdated', {
+                chatId: base64urlencode(self.chatId),
+                userId: base64urlencode(self.buf[self.sending[msgxid]][Chatd.MsgField.USERID]),
+                id: self.sending[msgxid],
+                state: 'EXPIRED',
+                keyid: self.buf[self.sending[msgxid]][Chatd.MsgField.KEYID],
+                message: self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE],
+                ts:self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP]
+            });
+        }
     });
 
     // resend all pending modifications of completed messages
@@ -988,6 +1004,20 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
         if (this.chatIdMessages[chatId].sending[msgxid]) {
             if (this.chatIdMessages[chatId]) {
                 this.chatIdMessages[chatId].confirm(chatId, msgxid, msgid);
+            }
+            break;
+        }
+    }
+};
+
+// msgid can be false in case of rejections
+Chatd.prototype.keyconfirm = function(keyxid) {
+
+    // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
+    for (var chatId in this.chatIdMessages) {
+        if (this.chatIdMessages[chatId].sending[keyxid]) {
+            if (this.chatIdMessages[chatId]) {
+                this.chatIdMessages[chatId].persist(keyxid);
             }
             break;
         }
@@ -1065,7 +1095,7 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
     }
 
     // store message
-    this.buf[id] = [msgid, userId, timestamp, msg, keyid, updated];
+    this.buf[id] = [msgid, userId, timestamp, msg, keyid, updated, strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP];
 
     this.chatd.trigger('onMessageStore', {
         chatId: base64urlencode(this.chatId),
@@ -1178,7 +1208,8 @@ Chatd.Messages.prototype.persist = function(messageId) {
                             'message' : self.buf[num][Chatd.MsgField.MESSAGE],
                             'keyId' : self.buf[num][Chatd.MsgField.KEYID],
                             'updated' : self.buf[num][Chatd.MsgField.UPDATED],
-                            'edited' : self.modified[num] ? 1 : 0
+                            'edited' : self.modified[num] ? 1 : 0,
+                            'type' : self.buf[num][Chatd.MsgField.TYPE]
                         });
                     }
                 });
@@ -1195,7 +1226,7 @@ Chatd.Messages.prototype.updatepersistencykeyid = function(keyid, keyxid) {
     var prefix = base64urlencode(self.chatId);
 
     self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
-        if ((v.keyId >>> 0) === keyxid) {
+        if (((v.keyId >>> 0) === keyxid) && (v.type !== strongvelope.MESSAGE_TYPES.GROUP_KEYED)) {
             var cacheKey = base64urlencode(self.chatId) + ":" + v.messageId;
             self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
                 'messageId' : v.messageId,
@@ -1204,7 +1235,8 @@ Chatd.Messages.prototype.updatepersistencykeyid = function(keyid, keyxid) {
                 'message' : v.message,
                 'keyId' : keyid,
                 'updated' : v.updated,
-                'edited' : v.edited
+                'edited' : v.edited,
+                'type' : v.type
             });
         }
     });
@@ -1212,56 +1244,27 @@ Chatd.Messages.prototype.updatepersistencykeyid = function(keyid, keyxid) {
 
 Chatd.Messages.prototype.restore = function() {
     var self = this;
-
     var prefix = base64urlencode(self.chatId);
-    // 1 hour is agreed by everyone.
-    var MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
-    var mintimestamp = Math.floor(new Date().getTime()/1000);
+    var count = 0;
+    var promises = [];
+    promises.push(
+        self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
 
-    self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
-
-        var messageConstructs = [];
-        // write the new message to the message buffer and mark as in sending state
-        // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
-        self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated];
-
-        // if it does not expire, do auto send.
-        if (mintimestamp - v.timestamp < MESSAGE_NOT_EDITABLE_TIMEOUT) {
-
-            self.chatd.trigger('onMessageUpdated', {
-                chatId: base64urlencode(self.chatId),
-                userId: base64urlencode(self.buf[self.highnum][Chatd.MsgField.USERID]),
-                id: self.highnum,
-                state: 'PENDING',
-                keyid: v.keyId,
-                message: v.message,
-                ts: v.timestamp
-            });
-
+            self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
             self.sending[v.messageId] = self.highnum;
             self.sendingList.push(v.messageId);
-
-            messageConstructs.push({"msgxid":v.messageId, "timestamp":v.timestamp,"keyid":v.keyId, "message":v.message, "type":1});
-            // if we believe to be online, send immediately
-            if (self.chatd.chatIdShard[self.chatId].isOnline()) {
-                self.chatd.chatIdShard[self.chatId].msg(self.chatId, messageConstructs);
-                if (v.edited === 1) {
-                    self.chatd.chatIdShard[self.chatId].msgupdx(self.chatId, v.messageId, v.updated, v.message, v.keyId);
-                }
+            if (v.edited === 1) {
+                self.modified[self.highnum] = 1;
             }
-        }
-        else {
-            // if it expires, require manul send.
-            self.chatd.trigger('onMessageUpdated', {
-                chatId: base64urlencode(self.chatId),
-                userId: base64urlencode(self.buf[self.highnum][Chatd.MsgField.USERID]),
-                id: self.highnum,
-                state: 'EXPIRED',
-                keyid: v.keyId,
-                message: v.message,
-                ts:v.timestamp
-            });
-        }
+            count++;
+        })
+    );
+    var _resendPending = function() {
+        self.resend();
+        self.chatd.hist(self.chatId, count);
+    };
+    MegaPromise.allDone(promises).always(function() {
+        _resendPending();
     });
 };
 

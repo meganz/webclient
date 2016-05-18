@@ -42,6 +42,23 @@ var tlvstore = (function () {
         return key + '\u0000' + length + value;
     };
 
+    /**
+     * Generates a binary encoded TLV element from a key-value pair.
+     * There is no separator in between and the length is fixted 2 bytes.
+     * 
+     * @param key {string}
+     *     ASCII string label of record's key.
+     * @param value {string}
+     *     Byte string payload of record.
+     * @returns {string}
+     *     Single binary encoded TLV record.
+     * @private
+     */
+    ns.toTlvElement = function(key, value) {
+        var length = String.fromCharCode(value.length >>> 8)
+                   + String.fromCharCode(value.length & 0xff);
+        return key + length + value;
+    };
 
     /**
      * Generates a binary encoded TLV record container from an object containing
@@ -95,6 +112,36 @@ var tlvstore = (function () {
         return { 'record': [key, value], 'rest': rest };
     };
 
+    /**
+     * Splits and decodes a TLV element off of a container into a key-value pair and
+     * returns the element and the rest.
+     *
+     * @param tlvContainer {String}
+     *     Single binary encoded container of TLV elements.
+     * @returns {Object|Boolean}
+     *     Object containing two parts: `element` contains an array of two
+     *      (key and value of the decoded TLV element) and `rest` containing
+     *     the remainder of the tlvContainer still to decode. In case of decoding
+     *     errors, `false` is returned.
+     */
+    ns.splitSingleTlvElement = function(tlvContainer) {
+        var keyLength = 1;
+        var key = tlvContainer.substring(0, keyLength);
+        var valueLength = (tlvContainer.charCodeAt(keyLength)) << 8
+                        | tlvContainer.charCodeAt(keyLength + 1);
+        var value = tlvContainer.substring(keyLength + 2, keyLength + valueLength + 2);
+        var rest = tlvContainer.substring(keyLength + valueLength + 2);
+
+        // Consistency checks.
+        if ((valueLength !== value.length)
+                || (rest.length !== tlvContainer.length - (keyLength + valueLength + 2))) {
+            ns._logger.info('Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
+
+            return false;
+        }
+
+        return { 'record': [key, value], 'rest': rest };
+    };
 
     /**
      * Decodes a binary encoded container of TLV records into an object

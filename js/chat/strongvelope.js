@@ -412,9 +412,12 @@ var strongvelope = {};
 
         parsedContent.protocolVersion = binaryMessage.charCodeAt(0);
         var rest = binaryMessage.substring(1);
-
+        if (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) {
+            rest = binaryMessage.substring(2);
+            parsedContent[_TLV_MAPPING[TLV_TYPES.MESSAGE_TYPE]] = binaryMessage.charCodeAt(1);
+        }
         while (rest.length > 0) {
-            part = tlvstore.splitSingleTlvRecord(rest);
+            part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ? tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
             tlvType = part.record[0].charCodeAt(0);
             tlvVariable = _TLV_MAPPING[tlvType];
             value = part.record[1];
@@ -635,6 +638,7 @@ var strongvelope = {};
         // TOGO: make sure the messages are ordered from latest to oldest.
         for (var i = 0;i < messages.length; i++) {
             // if the message is from chat API.
+
             if (messages[i].userId !== COMMANDER) {
 
                 extracted = this._parseAndExtractKeys(messages[i]);
@@ -777,6 +781,7 @@ var strongvelope = {};
 
                 return false;
             }
+
             logger.info('Encrypting sender keys for ' + destination + ' using RSA.');
 
             return crypt.rsaEncryptString(clearText, pubKey);
@@ -1000,29 +1005,21 @@ var strongvelope = {};
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
         // Assemble message content.
-        var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.NONCE),
+        var content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
                                            encryptedMessage.nonce);
-
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
-                                            keyId);
 
         // Only include ciphertext if it's not empty (non-blind message).
         if (encryptedMessage.ciphertext !== null) {
-            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
+            content += tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.PAYLOAD),
                                             encryptedMessage.ciphertext);
             this._keyEncryptionCount++;
         }
 
-        // Assemble rest of message.
-        content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
-                                           String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP))
-                    + content;
-
         // Sign message.
-        content = this._signContent(content);
+        content = this._signContent(senderKey + content) + content;
 
         // Return assembled total message.
-        content = String.fromCharCode(PROTOCOL_VERSION) + content;
+        content = String.fromCharCode(PROTOCOL_VERSION) + String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP) + content;
         return content;
     };
 
@@ -1041,10 +1038,10 @@ var strongvelope = {};
 
         var signature = ns._signMessage(content,
                                         this.myPrivEd25519, this.myPubEd25519);
-        var signatureRecord = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.SIGNATURE),
+        var signatureRecord = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.SIGNATURE),
                                                    signature);
 
-        return signatureRecord + content;
+        return signatureRecord;
     };
 
 
@@ -1351,11 +1348,16 @@ var strongvelope = {};
 
             return false;
         }
-        var senderKey = null;
+
         var keyidStr = a32_to_str([keyid]);
+        var senderKey = this.participantKeys[sender][keyidStr];
+        if (!senderKey) {
+            logger.critical('Message does not have a sender key for :' + sender);
+            return false;
+        }
 
         if (parsedMessage) {
-            if (ns._verifyMessage(parsedMessage.signedContent,
+            if (ns._verifyMessage(senderKey + parsedMessage.signedContent,
                                   parsedMessage.signature,
                                   pubEd25519[sender])) {
                     senderKey = this.participantKeys[sender][keyidStr];
@@ -1367,11 +1369,6 @@ var strongvelope = {};
 
                     return false;
             }
-        }
-
-        if (!senderKey) {
-            logger.critical('Message does not have a sender key for :' + sender);
-            return false;
         }
 
         // Decrypt message payload.
@@ -1518,13 +1515,13 @@ var strongvelope = {};
             keysIncluded = [senderKey];
 
             encryptedKeys = self._encryptKeysTo(keysIncluded, destination);
+
             if (encryptedKeys === false) {
                 // Something went wrong, and we can't encrypt to that destination.
                 keyEncryptionError = true;
             }
-            var signedKey = self._signContent(tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS), encryptedKeys));
-            signedKey = String.fromCharCode(PROTOCOL_VERSION) + signedKey;
-            keys += (base64urldecode(destination) + ns.pack16le(signedKey.length) + signedKey);
+
+            keys += (base64urldecode(destination) + ns.pack16le(encryptedKeys.length) + encryptedKeys);
         });
         if (keyEncryptionError === true) {
             return false;
@@ -1587,30 +1584,34 @@ var strongvelope = {};
         for (var i=0; i<keys.length;i++) {
 
             var keyidStr = a32_to_str([keys[i].keyid]);
-            var parsedKey = ns._parseMessageContent(keys[i].key);
+            var key = keys[i].key;
+            var isOwnMessage = (keys[i].userId === this.ownHandle);
 
-            if (ns._verifyMessage(parsedKey.signedContent,
-                    parsedKey.signature,
-                    pubEd25519[keys[i].userId])) {
-                var key = parsedKey.keys[0];
-                var isOwnMessage = (keys[i].userId === this.ownHandle);
-
-
-                var decryptedKeys = this._decryptKeysFrom(key,
-                                             keys[i].userId,
-                                             isOwnMessage);
-                if (!this.participantKeys[keys[i].userId]) {
-                    this.participantKeys[keys[i].userId] = {};
-                }
-                this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
+            var decryptedKeys = this._decryptKeysFrom(key,
+                                         keys[i].userId,
+                                         isOwnMessage);
+            if (!this.participantKeys[keys[i].userId]) {
+                this.participantKeys[keys[i].userId] = {};
             }
-            else {
-                logger.critical('Signature invalid for key from *** on ***');
-                logger.error('Signature invalid for message from '
-                             + keys[i].userId + ' with keyid ' + keys[i].keyid);
+            this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
+        }
+    };
 
-                return false;
-            }
+    /**
+     * Restore the keys from local cache.
+     *
+     * @method
+     * @param keyxid {Number}
+     *     Temp key id.
+     * @param keys {Array}
+     *     Key arrary from chatd.
+     */
+    strongvelope.ProtocolHandler.prototype.restoreKeys = function(keyxid, keys) {
+
+        this.seedKeys(keys);
+        var keyCount = keyxid &0x00ff;
+        if (keyCount > this.counter) {
+            this.counter = keyCount + 1;
         }
     };
 }());

@@ -13110,5 +13110,9 @@
     "8754": {
         "text": "Folder link",
         "context": "A label for any 'Folder link' button, link, text, title, etc."
+    },
+    "8755": {
+        "text": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+        "context": "A message displayed on the payment success screen letting users know the expected timeframes for their account to be unlocked."
     }
 }

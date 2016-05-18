@@ -33,15 +33,27 @@
 }
 .chat-right-pad {
     padding: 20px 22px 22px 22px;
+    height: -webkit-calc(100% - 44px);
+    width: -webkit-calc(100% - 44px);
+}
+.chat-contacts-list {
+    max-height: -webkit-calc(100% - 185px);
+    max-height: -moz-calc(100% - 185px);
+    max-height: calc(100% - 185px);
+    min-height: 50px;
+}
+.chat-contacts-list .buttons-block {
+    min-height: 192px;
+}
+.chat-contacts-list-inner {
+    width: 100%;
 }
 .chat-right-pad .contacts-info.body {
     padding: 8px 0 6px 0;
+    max-width: 98% !important;
 }
 .chat-right-area.conversation-details-scroll {
     height: 100%;
-    height: -webkit-calc(100% - 98px);
-    height: -moz-calc(100% - 98px);
-    height: calc(100% - 98px);
 }
 .contacts-info.body {
     padding: 6px 0;

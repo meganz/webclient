@@ -1746,6 +1746,15 @@ Chat.prototype.createAndShowPrivateRoomFor = function(h) {
     return this.getPrivateRoom(h);
 };
 
+Chat.prototype.createAndShowGroupRoomFor = function(contactHashes) {
+    this.trigger(
+        'onNewGroupChatRequest',
+        [
+            contactHashes
+        ]
+    );
+};
+
 /**
  * Debug/dev/testing function
  *

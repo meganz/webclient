@@ -31,6 +31,10 @@ var Button = React.createClass({
                 }
             });
 
+            $(document).rebind('closeDropdowns.' + self.getUniqueId(), function(e) {
+                self.onBlur();
+            });
+
             // change the focused state to any other buttons in this group
             if (this.props.group) {
                 if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
@@ -72,6 +76,7 @@ var Button = React.createClass({
         ) {
             this.setState({focused: false});
             $(document).unbind('keyup.button' + this.getUniqueId());
+            $(document).rebind('closeDropdowns.' + this.getUniqueId());
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         }
 

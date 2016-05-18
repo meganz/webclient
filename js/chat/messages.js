@@ -259,7 +259,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.lastSeen = eventData.messageId;
-            self.messages.trackDataChange();
+            self.trackDataChange();
         }
     });
     self.chatd.rebind('onMembersUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
@@ -285,7 +285,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.lastSent = eventData.messageId;
-            self.messages.trackDataChange();
+            self.trackDataChange();
         }
     });
 
@@ -309,14 +309,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.$msgsHistoryLoading.resolve();
             }
 
-            //self.messages.forEach(function(v, k) {
-            //    var messageObject = self.chatdInt._getKarereObjFromChatdObj(v);
-            //
-            //    if (messageObject) {
-            //        messageObject.orderValue = v.id;
-            //        chatRoom.appendMessage(messageObject);
-            //    }
-            //});
             if (self.expectedMessagesCount > 0) {
                 self.retrievedAllMessages = true;
             }
@@ -438,6 +430,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         console.error(eventData.id, eventData.state, eventData);
 
         if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
+            var timestamp = (
+                eventData.state === "EDITED" ? chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime()
+            );
+
             var editedMessage = new Message(
                 chatRoom,
                 self,
@@ -447,7 +443,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'keyid': eventData.keyid,
                     'message': eventData.message,
                     'updated': eventData.updated,
-                    'delay' : eventData.ts ? eventData.ts : unixtime(),
+                    'delay' : timestamp,
                     'orderValue': eventData.id,
                     'sent': true
                 }
@@ -727,7 +723,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
             -32
         );
 
-        self.messages.trackDataChange();
+        self.trackDataChange();
 
 
         var timeoutPromise = createTimeoutPromise(function() {
@@ -740,7 +736,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
                 self.$msgsHistoryLoading.reject();
             })
             .always(function() {
-                self.messages.trackDataChange();
+                self.trackDataChange();
             });
 
         self.$msgsHistoryLoading.fail(function() {

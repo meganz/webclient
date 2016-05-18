@@ -32,12 +32,41 @@
 .fm-dialog .contacts-info.body.contacts-search:nth-child(odd) {
     background-color: white;
 }
-.fm-dialog .contacts-info.body.contacts-search.selected {
-    background-color: rgba(240,240,240,1);
+.contacts-info.body.contacts-search.selected {
+    background-color: #2ba6de;
+    color: white;
+}
+.contacts-info.body.contacts-search.selected:nth-child(odd) {
+    background-color: #2ba6de;
+}
+.contacts-info.body.contacts-search.selected span,
+.contacts-info.body.contacts-search.selected .user-card-email {
+    color: white;
+}
+.contacts-info.body.contacts-search.selected .user-card-presence {
+    background-color: white;
 }
 .fm-dialog .contacts-search-header {
     padding-top: 10px;
 }
+
+.contacts-search .user-card-name span {
+    margin-top: -4px;
+    color: #666666;
+}
+.contacts-search-footer {
+    height: 46px;
+    display: block;
+}
+.contacts-search-footer em {
+    display: block;
+    color: #2ba6de;
+    font-style: normal;
+    text-align: center;
+    line-height: 46px;
+    vertical-align: middle;
+}
+
 /* End of Send Contact Dialog */
 
 /* Add From Cloud Dialog */
@@ -130,3 +159,9 @@
     margin: -12px 0 0 0;
 }
 /* End of Delete message dialog */
+
+/* Confirm truncate dialog */
+.fm-dialog.truncate-conversation .fm-dialog-content {
+    margin-bottom: 24px;
+}
+/* End of confirm truncate dialog */

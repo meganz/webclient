@@ -318,10 +318,14 @@ var ConversationsApp = React.createClass({
             'leftPaneWidth': mega.config.get('leftPaneWidth')
         };
     },
-    startChatClicked: function(contact, e) {
-        e.preventDefault();
-        window.location = "#fm/chat/" + contact.u;
-        var room = this.props.megaChat.createAndShowPrivateRoomFor(contact.u);
+    startChatClicked: function(selected) {
+        if (selected.length === 1) {
+            window.location = "#fm/chat/" + selected[0];
+            this.props.megaChat.createAndShowPrivateRoomFor(selected[0]);
+        }
+        else {
+            this.props.megaChat.createAndShowGroupRoomFor(selected);
+        }
     },
     componentDidMount: function() {
         var self = this;
@@ -488,7 +492,8 @@ var ConversationsApp = React.createClass({
                                 <DropdownsUI.DropdownContactsSelector
                                     contacts={this.props.contacts}
                                     megaChat={this.props.megaChat}
-                                    onClick={this.startChatClicked}
+                                    onSelectDone={this.startChatClicked}
+                                    multiple={true}
                                     />
                             </ButtonsUI.Button>
                         </div>

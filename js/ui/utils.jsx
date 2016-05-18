@@ -21,7 +21,14 @@ var JScrollPane = React.createClass({
 
         $elem.find('.jspContainer').replaceWith(
             function() {
-                return $elem.find('.jspPane').children();
+                var $children = $elem.find('.jspPane').children();
+                if ($children.size() === 0 || $children.size() > 1) {
+                    console.error(
+                        "JScrollPane on element: ", $elem, "encountered multiple (or zero) children nodes.",
+                        "Mean while, JScrollPane should always (!) have 1 children element."
+                    );
+                }
+                return $children;
             }
         );
 
@@ -85,11 +92,6 @@ var JScrollPane = React.createClass({
                     if (scrollPositionYPerc === -1) {
                         $elem.one('jsp-initialised', function () {
                             $jsp.scrollToBottom();
-                        });
-                    }
-                    else {
-                        $elem.one('jsp-initialised', function () {
-                            $jsp.scrollToPercentY(scrollPositionYPerc);
                         });
                     }
                 }

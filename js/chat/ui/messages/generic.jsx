@@ -89,7 +89,7 @@ var GenericConversationMessage = React.createClass({
         var megaChat = this.props.chatRoom.megaChat;
         var chatRoom = this.props.chatRoom;
         var contact = self.getContact();
-        var timestampInt = self.getTimestamp() + (message.updated ? message.updated : 0);
+        var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();
 
         var textMessage;

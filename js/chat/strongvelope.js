@@ -635,6 +635,7 @@ var strongvelope = {};
         // TOGO: make sure the messages are ordered from latest to oldest.
         for (var i = 0;i < messages.length; i++) {
             // if the message is from chat API.
+
             if (messages[i].userId !== COMMANDER) {
 
                 extracted = this._parseAndExtractKeys(messages[i]);
@@ -1017,7 +1018,7 @@ var strongvelope = {};
                     + content;
 
         // Sign message.
-        content = this._signContent(content);
+        content = this._signContent(senderKey + content) + content;
 
         // Return assembled total message.
         content = String.fromCharCode(PROTOCOL_VERSION) + content;
@@ -1042,7 +1043,7 @@ var strongvelope = {};
         var signatureRecord = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.SIGNATURE),
                                                    signature);
 
-        return signatureRecord + content;
+        return signatureRecord;
     };
 
 
@@ -1349,11 +1350,16 @@ var strongvelope = {};
 
             return false;
         }
-        var senderKey = null;
+
         var keyidStr = a32_to_str([keyid]);
+        var senderKey = this.participantKeys[sender][keyidStr];
+        if (!senderKey) {
+            logger.critical('Message does not have a sender key for :' + sender);
+            return false;
+        }
 
         if (parsedMessage) {
-            if (ns._verifyMessage(parsedMessage.signedContent,
+            if (ns._verifyMessage(senderKey + parsedMessage.signedContent,
                                   parsedMessage.signature,
                                   pubEd25519[sender])) {
                     senderKey = this.participantKeys[sender][keyidStr];
@@ -1365,11 +1371,6 @@ var strongvelope = {};
 
                     return false;
             }
-        }
-
-        if (!senderKey) {
-            logger.critical('Message does not have a sender key for :' + sender);
-            return false;
         }
 
         // Decrypt message payload.
@@ -1521,9 +1522,8 @@ var strongvelope = {};
                 // Something went wrong, and we can't encrypt to that destination.
                 keyEncryptionError = true;
             }
-            var signedKey = self._signContent(tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS), encryptedKeys));
-            signedKey = String.fromCharCode(PROTOCOL_VERSION) + signedKey;
-            keys += (base64urldecode(destination) + ns.pack16le(signedKey.length) + signedKey);
+
+            keys += (base64urldecode(destination) + ns.pack16le(encryptedKeys.length) + encryptedKeys);
         });
         if (keyEncryptionError === true) {
             return false;
@@ -1586,30 +1586,16 @@ var strongvelope = {};
         for (var i=0; i<keys.length;i++) {
 
             var keyidStr = a32_to_str([keys[i].keyid]);
-            var parsedKey = ns._parseMessageContent(keys[i].key);
+            var key = keys[i].key;
+            var isOwnMessage = (keys[i].userId === this.ownHandle);
 
-            if (ns._verifyMessage(parsedKey.signedContent,
-                    parsedKey.signature,
-                    pubEd25519[keys[i].userId])) {
-                var key = parsedKey.keys[0];
-                var isOwnMessage = (keys[i].userId === this.ownHandle);
-
-
-                var decryptedKeys = this._decryptKeysFrom(key,
-                                             keys[i].userId,
-                                             isOwnMessage);
-                if (!this.participantKeys[keys[i].userId]) {
-                    this.participantKeys[keys[i].userId] = {};
-                }
-                this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
+            var decryptedKeys = this._decryptKeysFrom(key,
+                                         keys[i].userId,
+                                         isOwnMessage);
+            if (!this.participantKeys[keys[i].userId]) {
+                this.participantKeys[keys[i].userId] = {};
             }
-            else {
-                logger.critical('Signature invalid for key from *** on ***');
-                logger.error('Signature invalid for message from '
-                             + keys[i].userId + ' with keyid ' + keys[i].keyid);
-
-                return false;
-            }
+            this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
         }
     };
 

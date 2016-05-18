@@ -636,7 +636,8 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.keepAliveTimerRestart();
                 self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
                 if (self.needRestore === true) {
-                    self.restore();
+                    // TOVG: disable restore for now as it is not stable.
+                    // self.restore();
                     self.needRestore = false;
                 }
                 self.chatd.trigger('onMessagesHistoryDone',
@@ -1260,8 +1261,10 @@ Chatd.Messages.prototype.restore = function() {
         })
     );
     var _resendPending = function() {
-        self.resend();
-        self.chatd.hist(self.chatId, count);
+        if (count > 0) {
+            self.resend();
+            self.chatd.hist(self.chatId, count);
+        }
     };
     MegaPromise.allDone(promises).always(function() {
         _resendPending();

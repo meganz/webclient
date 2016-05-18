@@ -3277,6 +3277,7 @@
     "8752": "Import to {0}",
     "8753": "\u0421\u0441\u044b\u043b\u043a\u0430 \u043d\u0430 \u0444\u0430\u0439\u043b",
     "8754": "\u0421\u0441\u044b\u043b\u043a\u0430 \u043d\u0430 \u043f\u0430\u043f\u043a\u0443",
+    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

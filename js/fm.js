@@ -2199,7 +2199,16 @@ function fmremove() {
     else if (RootbyId($.selected[0]) === M.RubbishID) {
         msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
             if (e) {
+                var tmp = null;
+                if (String(M.currentdirid).substr(0, 7) === 'search/') {
+                    tmp = M.currentdirid;
+                    M.currentdirid = M.getNodeByHandle($.selected[0]).p || M.RubbishID;
+                }
                 M.clearRubbish(1);
+
+                if (tmp) {
+                    M.currentdirid = tmp;
+                }
             }
         });
         $('.fm-dialog-button.notification-button').each(function(i, e) {
@@ -7486,7 +7495,7 @@ function addShareDialogContactToContent(userEmail, type, id, av, userName, permC
         exportClass = 'share-item-bl';
     }
     else {
-        item = av 
+        item = av
             + '<div class="fm-share-user-info">'
             + '<div class="fm-share-centered">'
             + '<div class="fm-chat-user">' + htmlentities(userName) + '</div>'
@@ -8978,7 +8987,7 @@ function moveDialog() {
                 '</div></div>';
 
         $tooltip.find('.contacts-info.body').safeHTML(html);
-        
+
         moveDialogTooltipTimer = setTimeout(function () {
             $tooltip.css({
                 'left': itemLeftPos + (($item.outerWidth() / 2) - ($tooltip.outerWidth() / 2))  + 'px',
@@ -10451,7 +10460,7 @@ function fm_resize_handler() {
     }
 
     mega.utils.chrome110ZoomLevelNotification();
-    
+
     $('.transfer-scrolling-table').css({
         'height': (
              $('.fm-transfers-block').outerHeight()

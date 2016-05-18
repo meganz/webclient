@@ -412,7 +412,10 @@ var strongvelope = {};
 
         parsedContent.protocolVersion = binaryMessage.charCodeAt(0);
         var rest = binaryMessage.substring(1);
-
+        if (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) {
+            rest = binaryMessage.substring(2);
+            parsedContent[_TLV_MAPPING[TLV_TYPES.MESSAGE_TYPE]] = binaryMessage.charCodeAt(1);
+        }
         while (rest.length > 0) {
             part = tlvstore.splitSingleTlvRecord(rest);
             tlvType = part.record[0].charCodeAt(0);
@@ -1012,16 +1015,11 @@ var strongvelope = {};
             this._keyEncryptionCount++;
         }
 
-        // Assemble rest of message.
-        content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
-                                           String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP))
-                    + content;
-
         // Sign message.
         content = this._signContent(senderKey + content) + content;
 
         // Return assembled total message.
-        content = String.fromCharCode(PROTOCOL_VERSION) + content;
+        content = String.fromCharCode(PROTOCOL_VERSION) + String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP) + content;
         return content;
     };
 

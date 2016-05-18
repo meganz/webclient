@@ -721,9 +721,9 @@ function init_page() {
                 a++;
             });
 
-            $('#emailp').html($('#emailp').text().replace('jobs@mega.nz',
+            $('#emailp').safeHTML($('#emailp').text().replace('jobs@mega.nz',
                 '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
-            $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
+            $('.new-bottom-pages.about').safeHTML(html + '<div class="clear"></div>');
             topmenuUI();
             loadingDialog.hide();
             mainScroll();

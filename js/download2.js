@@ -717,11 +717,11 @@ var dlmanager = {
 
                 if ($dialog.is(':visible')) {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
-                    $countdown.text(secondsToTimeShort(timeLeft));
+                    $countdown.safeHTML(secondsToTime(timeLeft, 1));
 
                     this._overQuotaTimeLeftTick =
                         setInterval(function() {
-                            $countdown.text(secondsToTimeShort(timeLeft--));
+                            $countdown.safeHTML(secondsToTime(timeLeft--, 1));
                         }, 1000);
                 }
             }.bind(this)

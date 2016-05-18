@@ -942,8 +942,8 @@ function secondsToTime(secs, html_format) {
     var returnvar = hours + ':' + minutes + ':' + seconds;
 
     if (html_format) {
-        hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
-        returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
+        hours = (hours !== '00') ? (hours + '<span>h</span> ') : '';
+        returnvar = hours + minutes + '<span>m</span> ' + seconds + '<span>s</span>';
     }
     return returnvar;
 }

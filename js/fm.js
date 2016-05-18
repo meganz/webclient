@@ -9120,25 +9120,26 @@ function showToast(toastClass, notification, buttonLabel) {
         hideToast();
     }, 7000);
 
+    var closeSelector = '.toast-close-button';
     if (buttonLabel) {
         $('.common-toast .toast-button').safeHTML(buttonLabel);
-    } else {
+    }
+    else {
+        closeSelector += ', .common-toast .toast-button';
         $('.common-toast .toast-button').safeHTML(l[726]);
     }
 
-    $('.toast-close-button').rebind('click', function()
-    {
-        $('.toast-notification').removeClass('visible');
+    $(closeSelector)
+        .rebind('click', function() {
+            $('.toast-notification').removeClass('visible');
+            clearTimeout(timeout);
+        });
+
+    $toast.rebind('mouseover', function() {
         clearTimeout(timeout);
     });
 
-    $toast.rebind('mouseover', function()
-    {
-        clearTimeout(timeout);
-    });
-
-    $toast.rebind('mouseout', function()
-    {
+    $toast.rebind('mouseout', function() {
         timeout = setTimeout(function() {
             hideToast();
         }, 7000);

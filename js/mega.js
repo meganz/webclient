@@ -2206,13 +2206,21 @@ function MegaData()
 
             // localCompare >=IE10, FF and Chrome OK
             // sort by name is default in the tree
-            treePanelSortElements(prefix, folders, {
+            var treePanelSortOptions = {
                 name: function(a, b) {
                     if (a.name) {
                         return a.name.localeCompare(b.name);
                     }
                 }
-            });
+            };
+            if (typeof Intl !== 'undefined' && Intl.Collator) {
+                var intl = new Intl.Collator('co', { numeric: true });
+
+                treePanelSortOptions.name = function(a, b) {
+                    return intl.compare(a.name, b.name);
+                };
+            }
+            treePanelSortElements(prefix, folders, treePanelSortOptions);
 
             // In case of copy and move dialogs
             if (typeof dialog !== 'undefined') {

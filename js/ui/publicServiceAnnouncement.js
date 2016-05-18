@@ -132,23 +132,7 @@ var psa = {
             psa.hideAnnouncement();
         }
     },
-            
-    /**
-     * Update the details of the announcement depending on the current one
-     * @param {Object} announcement The announcement details as an object
-     */
-    prefillAnnouncementDetails: function(announcement) {
-                
-        // Populate the details
-        var $psa = $('.public-service-anouncement');
-        $psa.addClass(announcement.cssClass);
-        $psa.find('.title').safeHTML(announcement.title);          // The messages could have HTML e.g. bold text
-        $psa.find('.messageA').safeHTML(announcement.messageA);
-        $psa.find('.messageB').safeHTML(announcement.messageB);
-        $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
-        $psa.find('.view-more-info .text').text(announcement.buttonText);
-    },
-                
+                    
     /**
      * Gets the current announcement details
      * @returns {Object} Returns an object with the current announcement details
@@ -182,8 +166,23 @@ var psa = {
         
         // Undefined announcement number, reset to 0, so it will not show
         psa.currentAnnounceNum = 0;
-        
         return false;
+    },
+                
+    /**
+     * Update the details of the announcement depending on the current one
+     * @param {Object} announcement The announcement details as an object
+     */
+    prefillAnnouncementDetails: function(announcement) {
+                
+        // Populate the details
+        var $psa = $('.public-service-anouncement');
+        $psa.addClass(announcement.cssClass);
+        $psa.find('.title').safeHTML(announcement.title);          // The messages could have HTML e.g. bold text
+        $psa.find('.messageA').safeHTML(announcement.messageA);
+        $psa.find('.messageB').safeHTML(announcement.messageB);
+        $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
+        $psa.find('.view-more-info .text').text(announcement.buttonText);
     },
     
     /**
@@ -257,8 +256,10 @@ var psa = {
      */
     requestCurrentPsaAndShowAnnouncement: function() {
         
-        // Don't repeat the same request if we already know the current announce number in local state
+        // If we already know the current announce number in local state
         if (psa.fetchedFlags) {
+            
+            // Show the announcement and return early so the API request is not repeated for each page view
             psa.configAndShowAnnouncement();
             return false;
         }

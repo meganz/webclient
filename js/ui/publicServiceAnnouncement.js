@@ -18,6 +18,9 @@ var psa = {
     
     /** If the PSA is currently being shown */
     visible: false,
+    
+    /** If the Get Misc Flags request has already been performed for non logged in users */
+    fetchedFlags: false,
             
     /**
      * If logged in, the User Get ('ug') API response sets the current and last seen announcement numbers
@@ -254,6 +257,12 @@ var psa = {
      */
     requestCurrentPsaAndShowAnnouncement: function() {
         
+        // Don't repeat the same request if we already know the current announce number in local state
+        if (psa.fetchedFlags) {
+            psa.configAndShowAnnouncement();
+            return false;
+        }
+        
         // Make Get Miscellaneous Flags (gmf) API request
         api_req({ a: 'gmf' }, {
             callback: function(result) {
@@ -263,6 +272,9 @@ var psa = {
                     
                     // Set the number indicating which PSA we want to show
                     psa.currentAnnounceNum = result.psa;
+                    
+                    // Set this flag so we don't repeat API requests
+                    psa.fetchedFlags = true;
                     
                     // Show the announcement
                     psa.configAndShowAnnouncement();

@@ -269,16 +269,20 @@ var psa = {
             callback: function(result) {
                 
                 // If successful result
-                if ((result) && (typeof result.psa !== 'undefined')) {
+                if (result) {
                     
-                    // Set the number indicating which PSA we want to show
-                    psa.currentAnnounceNum = result.psa;
-                    
-                    // Set this flag so we don't repeat API requests
+                    // Set a flag so we don't repeat API requests
                     psa.fetchedFlags = true;
-                    
-                    // Show the announcement
-                    psa.configAndShowAnnouncement();
+                
+                    // If a PSA is enabled
+                    if (typeof result.psa !== 'undefined') {
+
+                        // Set the number indicating which PSA we want to show
+                        psa.currentAnnounceNum = result.psa;
+
+                        // Show the announcement
+                        psa.configAndShowAnnouncement();
+                    }
                 }
             }
         });

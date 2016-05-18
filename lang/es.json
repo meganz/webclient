@@ -3262,9 +3262,21 @@
     "8734": "Obtener enlaces",
     "8735": "Eliminar enlaces",
     "8736": "Fijar nueva fecha de caducidad",
-    "8737": "25 May - International Missing Children&#039;s Day",
-    "8738": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
-    "8742": "Learn more",
+    "8737": "25 de Mayo - D\u00eda Internacional de los Ni\u00f1os Desaparecidos",
+    "8738": "Como muestra de apoyo a los ni\u00f1os desaparecidos y explotados, MEGA reafirma que no tolera el uso de sus sistemas para compartir contenido ilegal, y que ayudar\u00e1 a las autoridades en la investigaci\u00f3n y persecuci\u00f3n de todas las denuncias de material relacionado con pornograf\u00eda infantil y abusos a los ni\u00f1os.",
+    "8742": "Descubra m\u00e1s",
+    "8743": "Ya has accedido antes con este navegador. \u00bfSeguro que quieres crear una nueva cuenta?",
+    "8744": "Reenviar",
+    "8745": "Ha sido conectado con \u00e9xito.",
+    "8746": "Fall\u00f3 la apertura de enlace [{0}]",
+    "8747": "Fall\u00f3 la apertura de enlace",
+    "8748": "Abriendo el enlace de archivo...",
+    "8749": "Abriendo el enlace de carpeta...",
+    "8750": "Abrir enlace MEGA",
+    "8751": "Pega en enlace MEGA:",
+    "8752": "Importar en {0}",
+    "8753": "Enlace de archivo",
+    "8754": "Enlace de carpeta",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3344,6 +3356,7 @@
         "international-missing-children-title": 8737,
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
-        "learn-more": 8742
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

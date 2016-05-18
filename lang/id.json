@@ -3265,6 +3265,18 @@
     "8737": "25 May - International Missing Children&#039;s Day",
     "8738": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
     "8742": "Learn more",
+    "8743": "You have previously logged in using this browser. Are you sure you want to create a new account?",
+    "8744": "Resend",
+    "8745": "You have been successfully logged in.",
+    "8746": "Open link failed [{0}]",
+    "8747": "Open link failed",
+    "8748": "Opening file link...",
+    "8749": "Opening folder link...",
+    "8750": "Open MEGA link",
+    "8751": "Paste MEGA link:",
+    "8752": "Import to {0}",
+    "8753": "File link",
+    "8754": "Folder link",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3344,6 +3356,7 @@
         "international-missing-children-title": 8737,
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
-        "learn-more": 8742
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

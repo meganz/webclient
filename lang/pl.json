@@ -3262,9 +3262,21 @@
     "8734": "Pobierz linki",
     "8735": "Usu\u0144 linki",
     "8736": "Ustaw now\u0105 dat\u0119 wyga\u015bni\u0119cia",
-    "8737": "25 May - International Missing Children&#039;s Day",
-    "8738": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
-    "8742": "Learn more",
+    "8737": "25 Maja - Mi\u0119dzynarodowy Dzie\u0144 Zagionych Dzieci",
+    "8738": "W celu przeciwstawieniu si\u0119 wykorzystywaniu dzieci, MEGA potwierdza, \u017ce nie b\u0119dzie telerowa\u0107 u\u017cywania aplikacji do udost\u0119pnienia nielegalnych tre\u015bci i b\u0119dzie wsp\u00f3\u0142pracowa\u0107 z organami Pa\u0144stw w celu usuwania takich tre\u015bci.",
+    "8742": "Wi\u0119cej",
+    "8743": "Poprzednio u\u017cywa\u0142e\u015b tej przegl\u0105darki do logowania. Czy na pewno chcesz utworzy\u0107 nowe konto?",
+    "8744": "Wy\u015blin ponownie",
+    "8745": "Logowanie powiod\u0142o si\u0119.",
+    "8746": "Otwieranie linku nie powiod\u0142o si\u0119 [{0}]",
+    "8747": "Otwarcie nie powiod\u0142o si\u0119",
+    "8748": "Otwieranie linku...",
+    "8749": "Otwieranie linku...",
+    "8750": "Otw\u00f3rz link MEGA",
+    "8751": "Wklej link MEGA:",
+    "8752": "Importuj do {0}",
+    "8753": "Link do pliku",
+    "8754": "Link do katalogu",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3344,6 +3356,7 @@
         "international-missing-children-title": 8737,
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
-        "learn-more": 8742
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

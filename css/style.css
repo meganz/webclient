@@ -24333,7 +24333,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 }
 .bottom-info.blue h4 {
     color: #699ac7;
-    font-family: 'VentiCF-Bold';
+    font-family: 'VentiCF-Bold', 'source_sans_prosemibold', sans-serif;
     font-size: 24px;    
 }
 .bottom-info.blue .messageA {

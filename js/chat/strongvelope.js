@@ -417,7 +417,7 @@ var strongvelope = {};
             parsedContent[_TLV_MAPPING[TLV_TYPES.MESSAGE_TYPE]] = binaryMessage.charCodeAt(1);
         }
         while (rest.length > 0) {
-            part = tlvstore.splitSingleTlvRecord(rest);
+            part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ? tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
             tlvType = part.record[0].charCodeAt(0);
             tlvVariable = _TLV_MAPPING[tlvType];
             value = part.record[1];
@@ -1005,12 +1005,12 @@ var strongvelope = {};
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
         // Assemble message content.
-        var content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.NONCE),
+        var content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
                                            encryptedMessage.nonce);
 
         // Only include ciphertext if it's not empty (non-blind message).
         if (encryptedMessage.ciphertext !== null) {
-            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
+            content += tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.PAYLOAD),
                                             encryptedMessage.ciphertext);
             this._keyEncryptionCount++;
         }
@@ -1038,7 +1038,7 @@ var strongvelope = {};
 
         var signature = ns._signMessage(content,
                                         this.myPrivEd25519, this.myPubEd25519);
-        var signatureRecord = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.SIGNATURE),
+        var signatureRecord = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.SIGNATURE),
                                                    signature);
 
         return signatureRecord;

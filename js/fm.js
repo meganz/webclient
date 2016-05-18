@@ -641,6 +641,7 @@ function initUI() {
         $('.context-menu-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
+        $('.nw-fm-tree-item.hovered').removeClass('hovered');
 
         // Set to default
         a = $('.context-menu.files-menu,.context-menu.download');
@@ -655,22 +656,20 @@ function initUI() {
         $('#csb_' + M.RootID).empty();
     };
 
-    $('#fmholder').unbind('click.contextmenu');
-    $('#fmholder').bind('click.contextmenu', function(e)
-    {
+    $('#fmholder').rebind('click.contextmenu', function(e) {
         $.hideContextMenu(e);
-        if ($.hideTopMenu)
+        if ($.hideTopMenu) {
             $.hideTopMenu(e);
-        var c = $(e.target).attr('class');
+        }
+        var $target = $(e.target);
 
-
-        if ($(e.target).attr('data-reactid')) {
+        if ($target.attr('data-reactid')) {
             return; // never return false, if this is an event triggered by a React element....
         }
-        if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1)) {
+        if ($target.attr('type') !== 'file'
+                && !$target.is('.upgradelink, .campaign-logo, .resellerbuy, .linkified')) {
             return false;
         }
-
     });
 
     $('.fm-back-button').rebind('click', function(e) {
@@ -6613,29 +6612,50 @@ function treeUI()
         }
     });
 
-    $('.fm-tree-panel .nw-fm-tree-item:visible').unbind('click.treeUI contextmenu.treeUI');
-    $('.fm-tree-panel .nw-fm-tree-item:visible').bind('click.treeUI contextmenu.treeUI', function(e) {
-        var id = $(this).attr('id').replace('treea_', '');
+    $('.fm-tree-panel .nw-fm-tree-item:visible').rebind('click.treeUI, contextmenu.treeUI', function(e) {
+        var $this = $(this);
+        var id = $this.attr('id').replace('treea_', '');
+
         if (e.type === 'contextmenu') {
             $('.nw-fm-tree-item').removeClass('dragover');
-            $(this).addClass('dragover');
-            $.selected = $(this).parents('ul').find('.selected').attrs('id')
-                .map(function(id) {
-                    return id.replace(/^treea_/, '');
+            $this.addClass('dragover');
+
+            var $uls = $this.parents('ul').find('.selected');
+
+            if ($uls.length > 1) {
+                $.selected = $uls.attrs('id')
+                    .map(function(id) {
+                        return id.replace('treea_', '');
+                    });
+            }
+            else {
+                $.selected = [id];
+
+                Soon(function() {
+                    $this.addClass('hovered');
                 });
+            }
             return !!contextMenuUI(e, 1);
         }
-        var c = $(e.target);
-        if (e.type === "click" && e.shiftKey) {
-            $(this).addClass('selected');
-        } else if (c.hasClass('nw-fm-arrow-icon')) {
+
+        var $target = $(e.target);
+        if ($target.hasClass('nw-fm-arrow-icon')) {
             treeUIexpand(id);
-        } else {
-            if (c.hasClass('opened')) {
+        }
+        else if (e.shiftKey) {
+            $this.addClass('selected');
+        }
+        else {
+            // plain click, remove all .selected from e.shiftKey
+            $('#treesub_' + M.currentrootid + ' .nw-fm-tree-item').removeClass('selected');
+            $this.addClass('selected');
+
+            if ($target.hasClass('opened')) {
                 treeUIexpand(id);
             }
             M.openFolder(id);
         }
+
         return false;
     });
 

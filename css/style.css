@@ -4019,7 +4019,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     top: 2px;
     right: 7px;
 }
-.nw-fm-tree-item:hover {
+.nw-fm-tree-item:hover, .nw-fm-tree-item.hovered {
     background-color: rgba(217,0,7,0.2);
     color: white;
 }

@@ -57,7 +57,7 @@
 }
 .contacts-info.body {
     padding: 6px 0;
-    position: relative;
+    /*position: relative;*/
     clear: both;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;

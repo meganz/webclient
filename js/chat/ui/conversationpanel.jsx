@@ -255,7 +255,8 @@ var ConversationRightArea = React.createClass({
                                 className="popup add-participant-selector"
                                 singleSelectedButtonLabel={__("Start Group Conversation")}
                                 onSelectDone={this.props.onAddParticipantSelected}
-                                
+                                positionMy="center top"
+                                positionAt="left bottom"
                                 />
                         </ButtonsUI.Button>
 

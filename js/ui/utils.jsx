@@ -136,6 +136,9 @@ var RenderTo = React.createClass({
             $(this.popup).css(this.props.style);
         }
         this.props.element.appendChild(this.popup);
+        if (this.props.popupDidMount) {
+            this.props.popupDidMount(this.popup);
+        }
         this._renderLayer();
     },
     componentDidUpdate: function() {
@@ -143,6 +146,9 @@ var RenderTo = React.createClass({
     },
     componentWillUnmount: function() {
         ReactDOM.unmountComponentAtNode(this.popup);
+        if (this.props.popupWillUnmount) {
+            this.props.popupWillUnmount(this.popup);
+        }
         this.props.element.removeChild(this.popup);
     },
     _renderLayer: function() {

@@ -31,6 +31,13 @@ var Button = React.createClass({
                 }
             });
 
+            $(window).rebind('hashchange.button' + self.getUniqueId(), function(e) {
+                console.error(self, self.state.focused);
+                if (self.state.focused === true) {
+                    self.onBlur();
+                }
+            });
+
             $(document).rebind('closeDropdowns.' + self.getUniqueId(), function(e) {
                 self.onBlur();
             });
@@ -57,6 +64,19 @@ var Button = React.createClass({
                 active: this.state.focused,
                 closeDropdown: function() {
                     self.setState({'focused': false});
+                },
+                onActiveChange: function(newVal) {
+                    var $element = $(self.findDOMNode());
+                    var $scrollables = $element.parents('.jScrollPaneContainer');
+                    if (newVal === true) {
+                        $element.parents('.jspScrollable').attr('data-scroll-disabled', true);
+                    }
+                    else {
+                        $element.parents('.jspScrollable').removeAttr('data-scroll-disabled');
+                    }
+                    if (child.props.onActiveChange) {
+                        child.props.onActiveChange.call(this, newVal);
+                    }
                 }
             });
         }.bind(this))
@@ -67,17 +87,15 @@ var Button = React.createClass({
         }
         var $element = $(ReactDOM.findDOMNode(this));
 
-        if (e && e.target && $(e.target).is($element)) {
-            return;
-        }
-
         if(
             (!e || !$(e.target).parents(".button").is($element))
         ) {
             this.setState({focused: false});
             $(document).unbind('keyup.button' + this.getUniqueId());
-            $(document).rebind('closeDropdowns.' + this.getUniqueId());
+            $(document).unbind('closeDropdowns.' + this.getUniqueId());
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+
+            $(window).unbind('hashchange.button' + this.getUniqueId());
         }
 
 
@@ -94,12 +112,14 @@ var Button = React.createClass({
         if(
             $(e.target).parents(".popup").parents('.button').is($element) && this.state.focused === true
         ) {
+            console.error(1);
             e.preventDefault();
             e.stopPropagation();
             return;
         }
 
         if ($(e.target).is("input,textarea,select")) {
+            console.error(2);
             return
         }
 

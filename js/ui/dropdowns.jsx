@@ -1,5 +1,4 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
@@ -14,16 +13,6 @@ var Dropdown = React.createClass({
         }
     },
     onActiveChange: function(newVal) {
-        var $element = $(ReactDOM.findDOMNode(this));
-
-        var $scrollables = $element.parents('.jScrollPaneContainer');
-        if (newVal === true) {
-            $element.parents('.jspScrollable').attr('data-scroll-disabled', true);
-        }
-        else {
-            $element.parents('.jspScrollable').removeAttr('data-scroll-disabled');
-        }
-
         if (this.props.onActiveChange) {
             this.props.onActiveChange(newVal);
         }
@@ -33,9 +22,9 @@ var Dropdown = React.createClass({
 
         if (this.props.active === true) {
             if (this.getOwnerElement()) {
-                var $element = $(ReactDOM.findDOMNode(this));
+                var $element = $(this.popupElement);
                 var parentDomNode = $element.parents('.button');
-                var positionToElement = parentDomNode;
+                var positionToElement = $('.button.active:visible');
                 var offsetLeft = 0;
                 var $container = $element.parents('.jspPane:first');
 
@@ -101,9 +90,7 @@ var Dropdown = React.createClass({
         if (this.props.active !== true) {
             classes += " hidden";
 
-            return (
-                <div className={classes}></div>
-            );
+            return null;
         }
         else {
             var styles;
@@ -117,11 +104,21 @@ var Dropdown = React.createClass({
                 };
             }
 
+            var self = this;
+
             return (
-                <div className={classes} style={styles}>
-                    {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
-                    {this.props.children}
-                </div>
+                <utils.RenderTo element={document.body} className={classes} style={styles}
+                    popupDidMount={(popupElement) => {
+                        self.popupElement = popupElement;
+                    }}
+                    popupWillUnmount={(popupElement) => {
+                        delete self.popupElement;
+                    }}>
+                    <div>
+                        {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
+                        {this.props.children}
+                    </div>
+                </utils.RenderTo>
             );
         }
     }
@@ -133,7 +130,9 @@ var DropdownContactsSelector = React.createClass({
     render: function() {
         var self = this;
 
-        return <Dropdown className="popup contacts-search" active={this.props.active} closeDropdown={this.props.closeDropdown} ref="dropdown">
+        return <Dropdown className={"popup contacts-search " + this.props.className} active={this.props.active} closeDropdown={this.props.closeDropdown} ref="dropdown"
+                         positionMy={this.props.positionMy} positionAt={this.props.positionAt}
+                >
             <div className="popup contacts-search">
                 <ContactsUI.ContactPickerWidget
                     contacts={this.props.contacts}
@@ -200,7 +199,10 @@ var DropdownItem = React.createClass({
 
         return <div
                     className={"dropdown-item " + self.props.className}
-                    onClick={self.props.onClick ? self.props.onClick : self.onClick}
+                    onClick={self.props.onClick ? (e) => {
+                        $(document).trigger('closeDropdowns');;
+                        self.props.onClick(e);
+                    } : self.onClick}
                 >
                     {icon}
                     {label}
@@ -234,7 +236,7 @@ var DropdownEmojiSelector = React.createClass({
     },
     componentDidUpdate: function() {
         var self = this;
-        var $element = $(self.findDOMNode());
+        var $element = $('.popup.emoji-one:visible');
 
         $('.popup-scroll-area.emoji-one', $element).rebind('jsp-user-scroll-y.emojis', function(e, pos) {
             self.rerender();
@@ -260,8 +262,8 @@ var DropdownEmojiSelector = React.createClass({
         // (w/h + margin)
         var emojiHeight = 42;
         var emojiWidth = 42;
-        var emojiContainerWidth = 360;
-        var jspHeight = 336;
+        var emojiContainerWidth = 336;
+        var jspHeight = 420;
         var bufferRows = 6;
         var emojisPerRow = Math.floor(emojiContainerWidth / (emojiWidth - 5));
         var visibleEmojiRows = Math.floor(jspHeight / emojiHeight);
@@ -504,7 +506,7 @@ var DropdownEmojiSelector = React.createClass({
         return <Dropdown className="popup emoji-one" {...self.props} ref="dropdown" onActiveChange={(newValue) => {
             // reset state if the dropdown is hidden
             if (newValue === false) {
-                self.setState(self.getInitialState);
+                self.setState(self.getInitialState());
             }
             else {
                 self.setState({'isActive': true});

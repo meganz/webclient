@@ -419,6 +419,26 @@ var ContactPickerWidget = React.createClass({
             );
         });
 
+        var innerDivStyles = {};
+
+        if (contacts.length < 6) {
+            innerDivStyles['height'] = Math.max(48, contacts.length * 48);
+            innerDivStyles['overflow'] = "visible";
+        }
+
+        if (contacts.length === 0) {
+            var noContactsMsg = "";
+            if (M.u.length < 2) {
+                noContactsMsg = __("You have no contacts.");
+            }
+            else {
+                noContactsMsg = __("No contacts found matching your query.");
+            }
+
+            contacts = <em>{noContactsMsg}</em>;
+        }
+
+
         return <div>
             <div className={"contacts-search-header " + this.props.headerClasses}>
                 <i className="small-icon search-icon"></i>
@@ -432,7 +452,7 @@ var ContactPickerWidget = React.createClass({
             </div>
 
             <utils.JScrollPane className="contacts-search-scroll">
-                <div>
+                <div style={innerDivStyles}>
                     {contacts}
                 </div>
             </utils.JScrollPane>

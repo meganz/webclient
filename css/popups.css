@@ -10,7 +10,7 @@
     left: auto !important;
 }
 .popup.add-participant-selector .dropdown-white-arrow {
-    margin-left: 36px;
+    margin-left: 50px;
 }
 .contacts-search-header {
     line-height: 48px;
@@ -80,7 +80,7 @@ color: #cccccc;
     margin: 14px 3px 1px 0;
 }
 .contacts-search-scroll {
-    height: 288px !important;
+    height: 288px;
     overflow: hidden;
 }
 .contacts-search-scroll, .contacts-search-scroll .jspPane {
@@ -89,6 +89,18 @@ color: #cccccc;
 }
 .contacts-search-scroll .jspPane {
     min-height: 100%;
+}
+.contacts-search-scroll .jspContainer {
+    max-height: 336px;
+}
+.contacts-search-scroll .jspPane em {
+    text-align: center;
+    display: block;
+    height: 48px;
+    line-height: 48px;
+    vertical-align: middle;
+    font-style: normal;
+    color: #666;
 }
 .popup .contacts-info.body.contacts-search {
     height: 48px;
@@ -110,6 +122,9 @@ color: #cccccc;
 /* End of Search contacts popup */
 
 /* Emoji one popup */
+.popup.emoji-one {
+    height: 428px;
+}
 .popup-header.emoji-one, .popup-footer.emoji-one {
     height: 48px;
     border-bottom: 1px solid #e5e5e5;

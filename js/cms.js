@@ -283,6 +283,19 @@
         },
     
         loaded: loaded,
+
+        /**
+         *  Load unsigned images (HTTP images) instead
+         *  of letting the CMS loading the signed images.
+         *  We assume it's secure enough because the content that references
+         *  the images are signed.
+         *
+         *  @param {String} Hash 256 of the image
+         *  @returns {String} URL
+         */
+        img2: function insegureImageLoading(id) {
+            return this.getUrl() + "/unsigned/" + id;
+        },
     
         img: function(id) {
             if (!assets[id]) {

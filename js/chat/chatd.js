@@ -122,6 +122,12 @@ Chatd.MsgField = {
     'TYPE' : 6
 };
 
+Chatd.MsgType = {
+    'KEY' : strongvelope.MESSAGE_TYPES.GROUP_KEYED,
+    'MESSAGE' : strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP,
+    'EDIT' : strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP + 1
+};
+
 Chatd.Const = {
     'UNDEFINED' : '\0\0\0\0\0\0\0\0'
 };
@@ -795,7 +801,7 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
         var message = messageObj.message;
         var type = messageObj.type;
         var cmd = '';
-        if (type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {// this is key message;
+        if (type === Chatd.MsgType.KEY) {// this is key message;
             cmd = [Chatd.Opcode.NEWKEY, chatId + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];
         } else {
             cmd = [Chatd.Opcode.NEWMSG, chatId + Chatd.Const.UNDEFINED + msgxid + this.chatd.pack32le(timestamp) + this.chatd.pack16le(0) + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];
@@ -848,13 +854,13 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
     for (var i = 0; i<messages.length; i++) {
         var message = messages[i];
         // allocate a transactionid for the new message
-        var msgxid = (message.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) ? (keyId >>> 0): this.chatd.nexttransactionid();
+        var msgxid = (message.type === Chatd.MsgType.KEY) ? (keyId >>> 0): this.chatd.nexttransactionid();
         var timestamp = Math.floor(new Date().getTime()/1000);
 
         // write the new message to the message buffer and mark as in sending state
         // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
         this.buf[++this.highnum] = [msgxid, this.chatd.userId, timestamp, message.message, keyId, 0, message.type];
-        if (message.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+        if (message.type === Chatd.MsgType.MESSAGE) {
             this.chatd.trigger('onMessageUpdated', {
                 chatId: base64urlencode(this.chatId),
                 userId: base64urlencode(this.buf[this.highnum][Chatd.MsgField.USERID]),
@@ -882,7 +888,7 @@ Chatd.Messages.prototype.updatekeyid = function(keyid, keyxid) {
     var self = this;
 
     for (var id = self.highnum; id >= self.lownum; id--) {
-        if (self.buf[id] && (self.buf[id][Chatd.MsgField.TYPE] === strongvelope.MESSAGE_TYPES.GROUP_KEYED)) {
+        if (self.buf[id] && (self.buf[id][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY)) {
             // if it detects next key message, stop.
             break;
         }
@@ -995,9 +1001,9 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
     // console.error("RANGE: ", chatId);
 
     for (low = this.lownum; low <= this.highnum; low++) {
-        if (this.buf[low] && !this.sending[this.buf[low][Chatd.MsgField.MSGID]]) {
+        if (this.buf[low] && !this.sending[this.buf[low][Chatd.MsgField.MSGID]] && (this.buf[low][Chatd.MsgField.TYPE] === Chatd.MsgType.MESSAGE)) {
             for (high = this.highnum; high > low; high--) {
-                if (!this.sending[this.buf[high][Chatd.MsgField.MSGID]]) break;
+                if (!this.sending[this.buf[high][Chatd.MsgField.MSGID]] && (this.buf[low][Chatd.MsgField.TYPE] === Chatd.MsgType.MESSAGE)) break;
             }
 
             this.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
@@ -1108,7 +1114,7 @@ Chatd.Messages.prototype.store = function(newmsg, userId, msgid, timestamp, upda
     }
 
     // store message
-    this.buf[id] = [msgid, userId, timestamp, msg, keyid, updated, strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP];
+    this.buf[id] = [msgid, userId, timestamp, msg, keyid, updated, Chatd.MsgType.MESSAGE];
 
     this.chatd.trigger('onMessageStore', {
         chatId: base64urlencode(this.chatId),
@@ -1247,7 +1253,7 @@ Chatd.Messages.prototype.updatepersistencykeyid = function(keyid, keyxid) {
     var prefix = base64urlencode(self.chatId);
 
     self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
-        if (((v.keyId >>> 0) === keyxid) && (v.type !== strongvelope.MESSAGE_TYPES.GROUP_KEYED)) {
+        if (((v.keyId >>> 0) === keyxid) && (v.type !== Chatd.MsgType.KEY)) {
             var cacheKey = base64urlencode(self.chatId) + ":" + v.messageId;
             self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
                 'messageId' : v.messageId,

@@ -881,7 +881,11 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
 Chatd.Messages.prototype.updatekeyid = function(keyid, keyxid) {
     var self = this;
 
-    for (var id = self.lownum; id <= self.highnum; id++) {
+    for (var id = self.highnum; id >= self.lownum; id--) {
+        if (self.buf[id] && (self.buf[id][Chatd.MsgField.TYPE] === strongvelope.MESSAGE_TYPES.GROUP_KEYED)) {
+            // if it detects next key message, stop.
+            break;
+        }
         if (self.buf[id] && ((self.buf[id][Chatd.MsgField.KEYID] >>> 0) === keyxid)) {
             self.buf[id][Chatd.MsgField.KEYID] = keyid;
         }
@@ -1026,7 +1030,7 @@ Chatd.prototype.keyconfirm = function(keyxid) {
     for (var chatId in this.chatIdMessages) {
         if (this.chatIdMessages[chatId].sending[keyxid]) {
             if (this.chatIdMessages[chatId]) {
-                this.chatIdMessages[chatId].persist(keyxid);
+                this.chatIdMessages[chatId].confirmkey(keyxid);
             }
             break;
         }
@@ -1196,6 +1200,14 @@ Chatd.Messages.prototype.discard = function(msgxid) {
     removeValue(self.sendingList, msgxid);
     delete self.sending[msgxid];
     delete self.buf[num];
+};
+
+Chatd.Messages.prototype.confirmkey = function(keyxid) {
+    if (this.sending[keyxid]) {
+        this.persist(keyxid);
+        removeValue(this.sendingList, keyxid);
+        delete this.sending[keyxid];
+    }
 };
 
 Chatd.Messages.prototype.persist = function(messageId) {

@@ -45,6 +45,8 @@ var tlvstore = (function () {
     /**
      * Generates a binary encoded TLV element from a key-value pair.
      * There is no separator in between and the length is fixted 2 bytes.
+     * If the length of the value is bigger than 0xffff, then it will use 0xffff
+     * as the length, and append the value after.
      * 
      * @param key {string}
      *     ASCII string label of record's key.
@@ -57,6 +59,10 @@ var tlvstore = (function () {
     ns.toTlvElement = function(key, value) {
         var length = String.fromCharCode(value.length >>> 8)
                    + String.fromCharCode(value.length & 0xff);
+        if (value.length > 0xffff) {
+            length = String.fromCharCode(0xff)
+                   + String.fromCharCode(0xff);
+        }
         return key + length + value;
     };
 
@@ -115,6 +121,8 @@ var tlvstore = (function () {
     /**
      * Splits and decodes a TLV element off of a container into a key-value pair and
      * returns the element and the rest.
+     * Note: if the length is 0xffff, which means the appended value is longer than 0xffff,
+     * it means the rest is the value.
      *
      * @param tlvContainer {String}
      *     Single binary encoded container of TLV elements.
@@ -130,8 +138,12 @@ var tlvstore = (function () {
         var valueLength = (tlvContainer.charCodeAt(keyLength)) << 8
                         | tlvContainer.charCodeAt(keyLength + 1);
         var value = tlvContainer.substring(keyLength + 2, keyLength + valueLength + 2);
-        var rest = tlvContainer.substring(keyLength + valueLength + 2);
 
+        if (valueLength === 0xffff) {
+            value = tlvContainer.substring(keyLength + 2);
+            valueLength = value.length;
+        }
+        var rest = tlvContainer.substring(keyLength + valueLength + 2);
         // Consistency checks.
         if ((valueLength !== value.length)
                 || (rest.length !== tlvContainer.length - (keyLength + valueLength + 2))) {

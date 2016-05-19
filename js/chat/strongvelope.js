@@ -403,11 +403,9 @@ var strongvelope = {};
             recipients: [], keys: [], keyIds: [],
             includeParticipants: [], excludeParticipants: []
         };
-        var currentTlvType = null;
         var part;
         var tlvType;
         var tlvVariable;
-        var lastTlvType = -1;
         var value;
 
         parsedContent.protocolVersion = binaryMessage.charCodeAt(0);
@@ -465,7 +463,6 @@ var strongvelope = {};
             }
 
             rest = part.rest;
-            lastTlvType = tlvType;
         }
 
         return parsedContent;

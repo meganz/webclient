@@ -540,7 +540,8 @@ function populate_l() {
     l[8653] = l[8653].replace('%4', '<span class="gateway-name"></span>');
     l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
-
+    l[8535] = l[8535].replace('[B]', '<b>').replace('[/B]', '</b>');
+    
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
@@ -942,8 +943,8 @@ function secondsToTime(secs, html_format) {
     var returnvar = hours + ':' + minutes + ':' + seconds;
 
     if (html_format) {
-        hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
-        returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
+        hours = (hours !== '00') ? (hours + '<span>h</span> ') : '';
+        returnvar = hours + minutes + '<span>m</span> ' + seconds + '<span>s</span>';
     }
     return returnvar;
 }

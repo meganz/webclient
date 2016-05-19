@@ -3262,6 +3262,22 @@
     "8734": "Hanki linkit",
     "8735": "Poista linkit",
     "8736": "Aseta uusi vanhentumisp\u00e4iv\u00e4",
+    "8737": "25. toukokuuta - Kansainv\u00e4linen kadonneiden lasten p\u00e4iv\u00e4",
+    "8738": "Tukeakseen kadonneita ja hyv\u00e4ksik\u00e4ytettyj\u00e4 lapsia MEGA vahvistaa, ett\u00e4 se ei suvaitse laittoman sis\u00e4ll\u00f6n jakamista j\u00e4rjestelm\u00e4ss\u00e4\u00e4n ja MEGA auttaa viranomaisia kaikissa v\u00e4itetyiss\u00e4 lapsiporno- ja lasten hyv\u00e4ksik\u00e4ytt\u00f6materiaalin tutkinnassa ja syytteeseenpanossa.",
+    "8742": "Lis\u00e4tietoja",
+    "8743": "Olet aiemmin kirjautunut sis\u00e4\u00e4n t\u00e4ll\u00e4 selaimella. Haluatko varmasti luoda uuden k\u00e4ytt\u00e4j\u00e4tilin?",
+    "8744": "L\u00e4het\u00e4 uudelleen",
+    "8745": "Olet kirjautunut sis\u00e4\u00e4n onnistuneesti.",
+    "8746": "Linkin avaus ep\u00e4onnistui [{0}]",
+    "8747": "Linkin avaus ep\u00e4onnistui",
+    "8748": "Avataan tiedostolinkki\u00e4...",
+    "8749": "Avataan kansiolinkki\u00e4...",
+    "8750": "Avaa MEGA-linkki",
+    "8751": "Liit\u00e4 MEGA-linkki:",
+    "8752": "Tuo kohteeseen {0}",
+    "8753": "Tiedostolinkki",
+    "8754": "Kansiolinkki",
+    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3339,6 +3355,9 @@
         "remove-links": 8735,
         "set-new-expiry-date": 8736,
         "international-missing-children-title": 8737,
-        "international-missing-children-body-text": 8738
+        "international-missing-children-body-text": 8738,
+        "test-string": 8739,
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

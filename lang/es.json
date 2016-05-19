@@ -3262,6 +3262,22 @@
     "8734": "Obtener enlaces",
     "8735": "Eliminar enlaces",
     "8736": "Fijar nueva fecha de caducidad",
+    "8737": "25 de Mayo - D\u00eda Internacional de los Ni\u00f1os Desaparecidos",
+    "8738": "Como muestra de apoyo a los ni\u00f1os desaparecidos y explotados, MEGA reafirma que no tolera el uso de sus sistemas para compartir contenido ilegal, y que ayudar\u00e1 a las autoridades en la investigaci\u00f3n y persecuci\u00f3n de todas las denuncias de material relacionado con pornograf\u00eda infantil y abusos a los ni\u00f1os.",
+    "8742": "Descubra m\u00e1s",
+    "8743": "Ya has accedido antes con este navegador. \u00bfSeguro que quieres crear una nueva cuenta?",
+    "8744": "Reenviar",
+    "8745": "Ha sido conectado con \u00e9xito.",
+    "8746": "Fall\u00f3 la apertura de enlace [{0}]",
+    "8747": "Fall\u00f3 la apertura de enlace",
+    "8748": "Abriendo el enlace de archivo...",
+    "8749": "Abriendo el enlace de carpeta...",
+    "8750": "Abrir enlace MEGA",
+    "8751": "Pega en enlace MEGA:",
+    "8752": "Importar en {0}",
+    "8753": "Enlace de archivo",
+    "8754": "Enlace de carpeta",
+    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3339,6 +3355,9 @@
         "remove-links": 8735,
         "set-new-expiry-date": 8736,
         "international-missing-children-title": 8737,
-        "international-missing-children-body-text": 8738
+        "international-missing-children-body-text": 8738,
+        "test-string": 8739,
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

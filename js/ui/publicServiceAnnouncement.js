@@ -2,7 +2,8 @@
  * This file handles the Public Service Announcements. One announcement will
  * appear at the bottom of the page in an overlay at a time. The announcements
  * come from a hard coded list initially. Once a user has seen an announcement
- * they will mark it as read on the API server.
+ * they will mark it as read on the API server. If a user is not logged in
+ * then it will mark that announcement as seen in localStorage.
  */
 var psa = {
     
@@ -18,39 +19,13 @@ var psa = {
     /** If the PSA is currently being shown */
     visible: false,
     
-    /**
-     * Show the dialog if they have not seen the announcement yet
-     */
-    init: function() {
-        
-        // If logged in and completed registration fully
-        if ((u_type === 3) && (page.indexOf('pro') === -1)) {
-                    
-            // Decrypt the attribute which stores which announcement they have seen
-            psa.decryptPrivateAttribute();
+    /** If the Get Misc Flags request has already been performed for non logged in users */
+    fetchedFlags: false,
             
-            // Only show the announcement if they have not seen the current announcement
-            if ((psa.lastSeenAnnounceNum < psa.currentAnnounceNum) || (localStorage.alwaysShowPsa === '1')) {
-
-                // Show the announcement
-                psa.prefillAnnouncementDetails();
-                psa.addCloseButtonHandler();
-                psa.addMoreInfoButtonHandler();
-                psa.showAnnouncement();
-            }
-        }
-        
-        // Otherwise if the PSA is currently visible, then hide it. This prevents bug after seeing an announcement and
-        // immediately visiting the #pro page which would show the raised file manager with whitespace underneath.
-        else if (psa.visible) {
-            psa.hideAnnouncement();
-        }
-    },
-    
     /**
-     * Sets the current announcement number and last seen announcement number
+     * If logged in, the User Get ('ug') API response sets the current and last seen announcement numbers
      * @param {Number} currentAnnounceNum A number sent by the API
-     * @param {type} lastSeenAttr A private attribute to be decrypted which contains a number
+     * @param {String} lastSeenAttr A private attribute encoded as Base64 to be decrypted which contains a number
      */
     setInitialValues: function(currentAnnounceNum, lastSeenAttr) {
                 
@@ -63,50 +38,29 @@ var psa = {
     },
     
     /**
-     * Shows the announcement
+     * Show the dialog if they have not seen the announcement yet
      */
-    showAnnouncement: function() {
+    init: function() {
         
-        // Show the PSA
-        $('body').addClass('notification');
+        // Get the last announcement number they have seen from localStorage
+        if (localStorage.getItem('lastSeenAnnounceNum') !== null) {
+            psa.lastSeenAnnounceNum = localStorage.getItem('lastSeenAnnounceNum');
+        }
         
-        // Move the file manager up
-        psa.resizeFileManagerHeight();
+        // If logged in and completed registration fully
+        if (u_type === 3) {
+            
+            // Decrypt the attribute which stores which announcement they have seen
+            psa.decryptPrivateAttribute();
+            
+            // Show the announcement if they have not seen the current announcement
+            psa.configAndShowAnnouncement();
+        }
         
-        // If the window is resized
-        $(window).rebind('resize.bottomNotification', function() {
-            psa.resizeFileManagerHeight();
-            psa.repositionAccountLoadingBar();
-        });
-        
-        // Currently being shown
-        psa.visible = true;
-    },
-    
-    /**
-     * Update the details of the announcement depending on the current one
-     */
-    prefillAnnouncementDetails: function() {
-        
-        // Current announcement - to be fetched from the CMS in future
-        var announcement = {
-            title: l[8537],         // Important notice:
-            messageA: l[8535],      // Mega will be changing its terms...
-            messageB: l[8536],      // Thank you for using MEGA
-            buttonText: l[8538],    // View Blog Post
-            buttonLink: 'blog_36'   // Blog 36 has more details about the TOS changes
-        };
-        
-        // Replace bold text
-        announcement.messageA = announcement.messageA.replace('[B]', '<b>').replace('[/B]', '</b>');
-        
-        // Populate the details
-        var $psa = $('.public-service-anouncement');
-        $psa.find('.title').safeHTML(announcement.title);
-        $psa.find('.messageA').safeHTML(announcement.messageA);
-        $psa.find('.messageB').safeHTML(announcement.messageB);
-        $psa.find('.view-more-info').safeHTML(announcement.buttonText);
-        $psa.find('.view-more-info').attr('data-continue-link', htmlentities(announcement.buttonLink));
+        // Otherwise not logged in, request current PSA number from API
+        else {
+            psa.requestCurrentPsaAndShowAnnouncement();
+        }
     },
     
     /**
@@ -120,11 +74,33 @@ var psa = {
             
             try {
                 // Try decode, decrypt, convert from TLV into a JS object, then get the number
-                var clearContainer = tlvstore.blockDecrypt(base64urldecode(psa.lastSeenAttr), u_k);
+                var decodedAttr = base64urldecode(psa.lastSeenAttr);
+                var clearContainer = tlvstore.blockDecrypt(decodedAttr, u_k);
                 var decryptedAttr = tlvstore.tlvRecordsToContainer(clearContainer, true);
                 
-                // Set the announcement number
-                psa.lastSeenAnnounceNum = parseInt(decryptedAttr.num);
+                // Convert the last seen number to an integer and get the last seen number from localStorage
+                var lastSeenNumFromApi = parseInt(decryptedAttr.num);
+                var lastSeenNumFromLocalStore = localStorage.getItem('lastSeenAnnounceNum');
+                
+                // If the user account has seen the PSA at some point while they were logged in
+                if (lastSeenNumFromApi > lastSeenNumFromLocalStore) {
+                    
+                    // Update localStorage, then it won't re-appear on log out
+                    localStorage.setItem('lastSeenAnnounceNum', lastSeenNumFromApi);
+                    
+                    // Set the announcement number
+                    psa.lastSeenAnnounceNum = lastSeenNumFromApi;
+                }
+                
+                // Otherwise if localStorage is more up-to-date
+                else if (lastSeenNumFromLocalStore > lastSeenNumFromApi) {
+                    
+                    // Store that they have seen it on the API side
+                    mega.attr.set('lastPsaSeen', { num: String(lastSeenNumFromLocalStore) }, false, true);
+                    
+                    // Set the announcement number
+                    psa.lastSeenAnnounceNum = lastSeenNumFromLocalStore;
+                }
             }
             catch (exception) {
                 
@@ -132,6 +108,81 @@ var psa = {
                 psa.lastSeenAnnounceNum = psa.currentAnnounceNum;
             }
         }
+    },
+    
+    /**
+     * Wrapper function to configure the announcement details and show it
+     */
+    configAndShowAnnouncement: function() {
+        
+        // Get the relevant announcement
+        var announcement = psa.getAnouncementDetails();
+        
+        // Only show the announcement if they have not seen the current announcement.
+        // The localStorage.alwaysShowPsa is a test variable to force show the PSA
+        if ((psa.lastSeenAnnounceNum < psa.currentAnnounceNum) || (localStorage.alwaysShowPsa === '1')) {
+            psa.prefillAnnouncementDetails(announcement);
+            psa.addCloseButtonHandler();
+            psa.addMoreInfoButtonHandler();
+            psa.showAnnouncement();
+        }
+        else {
+            // If they viewed the site while not logged in, then logged in with
+            // an account that had already seen this PSA then this hides it
+            psa.hideAnnouncement();
+        }
+    },
+                    
+    /**
+     * Gets the current announcement details
+     * @returns {Object} Returns an object with the current announcement details
+     */
+    getAnouncementDetails: function() {
+      
+        // Current announcements - to be fetched from the CMS in future
+        var announcements = {
+            1: {
+                title: l[8537],         // Important notice:
+                messageA: l[8535],      // Mega will be changing its terms...
+                messageB: l[8536],      // Thank you for using MEGA
+                buttonText: l[8538],    // View Blog Post
+                buttonLink: 'blog_36',  // Blog 36 has more details about the TOS changes
+                cssClass: ''            // Default CSS class
+            },
+            2: {
+                title: l[8737],         // 25 May - International Missing Children...
+                messageA: l[8738],      // In support of missing and exploited children...
+                messageB: ' ',
+                buttonText: l[8742],    // Learn more
+                buttonLink: 'blog_41',
+                cssClass: 'blue'
+            }
+        };
+        
+        // Return the relevant object
+        if (typeof announcements[psa.currentAnnounceNum] !== 'undefined') {
+            return announcements[psa.currentAnnounceNum];
+        }
+        
+        // Undefined announcement number, reset to 0, so it will not show
+        psa.currentAnnounceNum = 0;
+        return false;
+    },
+                
+    /**
+     * Update the details of the announcement depending on the current one
+     * @param {Object} announcement The announcement details as an object
+     */
+    prefillAnnouncementDetails: function(announcement) {
+                
+        // Populate the details
+        var $psa = $('.public-service-anouncement');
+        $psa.addClass(announcement.cssClass);
+        $psa.find('.title').safeHTML(announcement.title);          // The messages could have HTML e.g. bold text
+        $psa.find('.messageA').safeHTML(announcement.messageA);
+        $psa.find('.messageB').safeHTML(announcement.messageB);
+        $psa.find('.view-more-info').attr('data-continue-link', announcement.buttonLink);
+        $psa.find('.view-more-info .text').text(announcement.buttonText);
     },
     
     /**
@@ -143,11 +194,9 @@ var psa = {
         $('body').off('click', '.public-service-anouncement .button.close');
         $('body').on('click', '.public-service-anouncement .button.close', function() {
             
-            // Hide the banner
+            // Hide the banner and store that they have seen this PSA
             psa.hideAnnouncement();
-            
-            // Store that they have seen it on the API side
-            mega.attr.set('lastPsaSeen', { num: String(psa.currentAnnounceNum) }, false, true);
+            psa.saveLastPsaSeen();
         });
     },
     
@@ -160,31 +209,81 @@ var psa = {
         $('body').off('click', '.public-service-anouncement .button.view-more-info');
         $('body').on('click', '.public-service-anouncement .button.view-more-info', function() {
             
-            // Hide the banner
-            psa.hideAnnouncement();
-            
             // Get the page link for this announcement
             var pageLink = $(this).attr('data-continue-link');
             
-            // Convert to string because method expects a string
-            var currentAnnounceNumStr = String(psa.currentAnnounceNum);
-            
-            // Store that they have seen it on the API side
-            var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
-            
-            // If they are still loading their account (the loading animation is visible)
-            if ($('.dark-overlay').is(':visible') || $('.light-overlay').is(':visible')) {
+            // Hide the banner and save the PSA as seen
+            psa.hideAnnouncement();
+            psa.saveLastPsaSeen(function() {
                 
-                // Open a new tab (and hopefully don't trigger popup blocker)
-                window.open('https://mega.nz/#' + pageLink, '_blank');
-            }
-            else {
-                // Otherwise their account is loaded, so redirect normally after save
-                savePromise.done(function(result) {
+                // If they are still loading their account (the loading animation is visible)
+                if ($('.dark-overlay').is(':visible') || $('.light-overlay').is(':visible')) {
 
-                    // Redirect normally
+                    // Open a new tab (and hopefully don't trigger popup blocker)
+                    window.open('https://mega.nz/#' + pageLink, '_blank');
+                }
+                else {
+                    // Otherwise redirect normally
                     document.location.hash = pageLink;
-                });
+                }
+            });
+        });
+    },
+        
+    /**
+     * Shows the announcement
+     */
+    showAnnouncement: function() {
+        
+        // Show the PSA
+        $('body').addClass('notification');
+        
+        // Move the file manager up
+        psa.resizeFileManagerHeight();
+        
+        // Add a handler to fix the layout if the window is resized
+        $(window).rebind('resize.bottomNotification', function() {
+            psa.resizeFileManagerHeight();
+            psa.repositionAccountLoadingBar();
+        });
+        
+        // Currently being shown
+        psa.visible = true;
+    },
+    
+    /**
+     * Get the PSA number manually from the API. This is a public API call so it's available for not logged in users.
+     */
+    requestCurrentPsaAndShowAnnouncement: function() {
+        
+        // If we already know the current announce number in local state
+        if (psa.fetchedFlags) {
+            
+            // Show the announcement and return early so the API request is not repeated for each page view
+            psa.configAndShowAnnouncement();
+            return false;
+        }
+        
+        // Make Get Miscellaneous Flags (gmf) API request
+        api_req({ a: 'gmf' }, {
+            callback: function(result) {
+                
+                // If successful result
+                if (result) {
+                    
+                    // Set a flag so we don't repeat API requests
+                    psa.fetchedFlags = true;
+                
+                    // If a PSA is enabled
+                    if (typeof result.psa !== 'undefined') {
+
+                        // Set the number indicating which PSA we want to show
+                        psa.currentAnnounceNum = result.psa;
+
+                        // Show the announcement
+                        psa.configAndShowAnnouncement();
+                    }
+                }
             }
         });
     },
@@ -196,7 +295,7 @@ var psa = {
         
         // Move the progress bar back to the 0 position
         $('.loader-progressbar').css('bottom', 0);
-                
+        
         // Hide the announcement
         $('body').removeClass('notification');
         
@@ -212,6 +311,37 @@ var psa = {
         
         // Set to no longer visible
         psa.visible = false;
+    },
+        
+    /**
+     * Saves the current announcement number they have seen to a user attribute if logged in, otherwise to localStorage
+     * @param {Function} callbackFunction The callback function run once saved
+     */
+    saveLastPsaSeen: function(callbackFunction) {
+        
+        // If the callback is not specified, default to an anonymous function
+        callbackFunction = callbackFunction || function() {};
+        
+        // Always store that they have seen it in localStorage. This is useful if they
+        // then log out, then the PSA should still stay hidden and not re-show itself
+        localStorage.setItem('lastSeenAnnounceNum', psa.currentAnnounceNum);
+        
+        // If logged in and completed registration
+        if (u_type === 3) {
+            
+            // Convert to string because method expects a string, then store that they have seen it on the API side
+            var currentAnnounceNumStr = String(psa.currentAnnounceNum);
+            var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
+            
+            // On completion, run the callback function
+            savePromise.done(function() {
+                callbackFunction();
+            });
+        }
+        else {
+            // Run the callback function
+            callbackFunction();
+        }
     },
     
     /**

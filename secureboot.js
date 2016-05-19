@@ -2166,6 +2166,7 @@ else if (!b_u)
     }
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
+    
     if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
@@ -2197,6 +2198,7 @@ else if (!b_u)
         lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
+    
     function boot_auth(u_ctx,r)
     {
         u_type = r;

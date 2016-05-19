@@ -3262,6 +3262,22 @@
     "8734": "H\u00e4mta l\u00e4nkar",
     "8735": "Ta bort l\u00e4nkar",
     "8736": "Ange nytt utg\u00e5ngsdatum",
+    "8737": "25 May - Internationella dagen f\u00f6r saknade barn",
+    "8738": "Till st\u00f6d f\u00f6r f\u00f6rsvunna och utnyttjade barn, bekr\u00e4ftar MEGA att vi inte tolererar anv\u00e4ndningen av v\u00e5ra system f\u00f6r att dela olagligt inneh\u00e5ll och kommer att st\u00f6dja myndigheterna med utredning och lagf\u00f6ring av alla p\u00e5st\u00e5enden om barnpornografi och barnpornografiskt material.",
+    "8742": "L\u00e4r dig mer",
+    "8743": "Du har tidigare loggat in med den h\u00e4r webbl\u00e4saren. \u00c4r du s\u00e4ker p\u00e5 att du vill skapa ett nytt konto?",
+    "8744": "Skicka igen",
+    "8745": "Du har blivit inloggad",
+    "8746": "Kunde inte \u00f6ppna l\u00e4nk [{0}]",
+    "8747": "Kunde inte \u00f6ppna l\u00e4nk",
+    "8748": "\u00d6ppnar fil l\u00e4nk...",
+    "8749": "\u00d6ppnar mapp l\u00e4nk....",
+    "8750": "\u00d6ppna MEGA l\u00e4nk",
+    "8751": "Klistra in MEGA l\u00e4nk: ",
+    "8752": "Importera till {0}",
+    "8753": "Fil l\u00e4nk",
+    "8754": "Mapp l\u00e4nk",
+    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3339,6 +3355,9 @@
         "remove-links": 8735,
         "set-new-expiry-date": 8736,
         "international-missing-children-title": 8737,
-        "international-missing-children-body-text": 8738
+        "international-missing-children-body-text": 8738,
+        "test-string": 8739,
+        "learn-more": 8742,
+        "payment-success-message": 8755
     }
 }

@@ -1,56 +1,93 @@
-(function(scope) {
+(function(window) {
+    /** Our trusted public keys {{{ */
+    var signPubKey = {
+        "__global": [
+            "gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4=",
+            "9M\/+x5ZZJGeSVvYXC+1vXZ0sTFiGi4WpMjZ8qcQeFLs="
+        ],
+        "sync": [
+            "J0K5p5rZjOjxli\/uioSP1yneQtoW2QTl3zXN\/Q3H3Mc="
+        ]
+    };
+    /** }}} */
 
-    var signPubKey = null;
+    var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
+
+    mBroadcaster.once('startMega', function() {
+        for (var sub in signPubKey) {
+            if (!signPubKey.hasOwnProperty(sub)) {
+                continue;
+            }
+            for (var l = 0; l < signPubKey[sub].length; ++l) {
+                signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
+            }
+        }
+    });
+    
     var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
     var fetching = {};
     var cmsBackoff = 0;
     var cmsFailures = 0;
-    var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
+    
+    function verify_cms_content(content, signature, objectId) {
+        var hash  = asmCrypto.SHA256.bytes(content);
+        signature = asmCrypto.string_to_bytes(ab_to_str(signature));
+        var i;
 
-    function verify_cms_content(content, signature) {
-        var hash = asmCrypto.SHA256.hex(content);
-        signature = ab_to_str(signature);
-
-        if (signPubKey === null) {
-            signPubKey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='));
-        }
-
+    
         try {
-            return nacl.sign.detached.verify(asmCrypto.string_to_bytes(hash),
-                                             asmCrypto.string_to_bytes(signature),
-                                             asmCrypto.string_to_bytes(signPubKey));
+            for (i = 0; i < signPubKey.__global.length; ++i) {
+                if (nacl.sign.detached.verify(hash, signature, signPubKey.__global[i])) {
+                    /* It's a valid signature */
+                    return true;
+                }
+            }
+
+            if (signPubKey[objectId]) {
+                for (i = 0; i < signPubKey[objectId].length; ++i) {
+                    if (nacl.sign.detached.verify(hash, signature, signPubKey[objectId][i])) {
+                        /* It's a valid signature */
+                        return true;
+                    }
+                }
+            }
+
+
         } catch (e) {
             /* rubbish data, invalid anyways */
             return false;
         }
-    }
 
+        /* Invalid signature */
+        return false;
+    }
+    
     function process_cms_response(bytes, next, as, id) {
         var viewer = new Uint8Array(bytes);
-
+    
         var signature = bytes.slice(3, 67); // 64 bytes, signature
         var version = viewer[0];
         var mime = viewer[1];
         var label = ab_to_str(bytes.slice(67, viewer[2] + 67));
         var content = bytes.slice(viewer[2] + 67);
-
+    
         if (as === "download") {
             mime = 0;
         }
-
-        if (verify_cms_content(content, signature)) {
+    
+        if (verify_cms_content(content, signature, id)) {
             switch (mime) {
             case 3: // html
-                content = ab_to_str(content);
+                content = ab_to_str(content).replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
                 next(false, { html: content, mime: mime});
                 return loaded(id);
-
+    
             case 1:
                 var blob = new Blob([content]);
-                content = myURL.createObjectURL(blob);
+                content = window.URL.createObjectURL(blob);
                 next(false, { url: content, mime: mime});
                 return loaded(id);
-
+    
             case 2:
                 try {
                     content = JSON.parse(ab_to_str(content));
@@ -60,7 +97,7 @@
                 }
                 next(false, { object: content, mime: mime});
                 return loaded(id);
-
+    
             default:
                 var io = new MemoryIO("temp", {});
                 io.begin = function() {};
@@ -76,12 +113,12 @@
             next(true, { error: 'Invalid signature', signature: true });
         }
     }
-
+    
     var assets = {};
     var booting = false;
-
+    
     var is_img;
-
+    
     /**
      *  Steps
      *
@@ -102,12 +139,12 @@
                 next.apply(null, responses);
             }
         }
-
+    
         return function(id) {
             return step_done.bind(null, parseInt(id));
         };
     }
-
+    
     /**
      *  Rewrite links. Basically this links
      *  shouldn't trigger the `CMS.get` and force
@@ -116,7 +153,7 @@
     function dl_placeholder(str, sep, rid, id) {
         return "'javascript:void(0)' data-cms-dl='" + id + "'";
     }
-
+    
     /**
      *  Images placeholder. Replace *all* the images
      *  with a placeholder until the image is fully loaded from
@@ -126,7 +163,7 @@
         is_img = true;
         return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" + id + "'";
     }
-
+    
     /**
      *    Internal function to communicate with the BLOB server.
      *
@@ -138,7 +175,7 @@
         if (!id) {
             throw new Error("Calling CMS.doRequest without an ID");
         }
-
+    
         if (typeof CMS_Cache === "object" && CMS_Cache[id]) {
             for (var i in fetching[id]) {
                 if (fetching[id].hasOwnProperty(i)) {
@@ -148,7 +185,7 @@
             delete fetching[id];
             return;
         }
-
+    
         var q = getxhr();
         q.onerror = function() {
             cmsBackoff = Math.min(cmsBackoff + 2000, 60000);
@@ -168,14 +205,14 @@
             delete fetching[id];
             cmsBackoff = 0; /* reset backoff */
         };
-        var url = (localStorage.cms || "https://cms.mega.nz/content/") + id;
+        var url = CMS.getUrl() + id;
         q.open("GET", url);
         q.responseType = 'arraybuffer';
         q.send();
     }
-
+    
     var _listeners = {};
-
+    
     function snapshot_ready() {
         for (var id in fetching) {
             if (fetching.hasOwnProperty(id)) {
@@ -183,7 +220,7 @@
             }
         }
     }
-
+    
     function loadSnapshot() {
         if (!jsl_loaded['cms_snapshot_js']) {
             silent_loading = snapshot_ready;
@@ -191,7 +228,7 @@
             jsl_start();
         }
     }
-
+    
     function loaded(id) {
         if (_listeners[id]) {
             for (var i in _listeners[id]) {
@@ -202,18 +239,18 @@
         }
         CMS.attachEvents();
     }
-
+    
     var curType;
     var curCallback;
     var reRendered = {};
-
+    
     var CMS = {
         watch: function(type, callback)
         {
             curType = type;
             curCallback = callback;
         },
-
+    
         reRender: function(type, nodeId)
         {
             if (type === curType && !reRendered[nodeId]) {
@@ -221,11 +258,11 @@
                 curCallback(nodeId);
             }
         },
-
+    
         isLoading: function() {
             return Object.keys(fetching).length > 0;
         },
-
+    
         attachEvents: function() {
             $('*[data-cms-dl],.cms-asset-download').rebind('click', function(e) {
                 var $this  = $(this);
@@ -233,20 +270,20 @@
                 if (!target) {
                     return;
                 }
-
+    
                 e.preventDefault();
-
+    
                 loadingDialog.show();
                 CMS.get(target, function() {
                     loadingDialog.hide();
                 }, 'download');
-
+    
                 return false;
             });
         },
-
+    
         loaded: loaded,
-
+    
         img: function(id) {
             if (!assets[id]) {
                 this.get(id, function(err, obj) {
@@ -279,6 +316,10 @@
             }
         },
 
+        getUrl: function() {
+            return localStorage.cms || "https://cms2.mega.nz/";
+        },
+    
         on: function(id, callback)
         {
             if (!_listeners[id]) {
@@ -286,7 +327,7 @@
             }
             _listeners[id].push(callback);
         },
-
+    
         imgLoader: function(html, id) {
             if (!assets[id]) {
                 is_img = false;
@@ -294,7 +335,7 @@
                 html = html.replace(new RegExp('([\'"])(i:(' + id + '))([\'"])', 'g'), img_placeholder);
                 // replace download links
                 html = html.replace(new RegExp('([\'"])(d:(' + id + '))([\'"])', 'g'), dl_placeholder);
-
+    
                 if (is_img) {
                     this.get(id);
                 }
@@ -304,9 +345,9 @@
             return html;
         }
     };
-
+    
     /* Make it public */
-    scope.CMS = CMS;
+    window.CMS = CMS;
 
 })(this);
 

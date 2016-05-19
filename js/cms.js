@@ -290,10 +290,10 @@
          *  We assume it's secure enough because the content that references
          *  the images are signed.
          *
-         *  @param {String} 64 digits to represent 256 bits
+         *  @param {String} id  64 digits to represent 256 bits.
          *  @returns {String} URL
          */
-        img2: function insegureImageLoading(id) {
+        img2: function insecureImageLoading(id) {
             return this.getUrl() + "/unsigned/" + id;
         },
     

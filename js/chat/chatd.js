@@ -1235,8 +1235,7 @@ Chatd.Messages.prototype.persist = function(messageId) {
                             'message' : self.buf[num][Chatd.MsgField.MESSAGE],
                             'keyId' : self.buf[num][Chatd.MsgField.KEYID],
                             'updated' : self.buf[num][Chatd.MsgField.UPDATED],
-                            'edited' : self.modified[num] ? 1 : 0,
-                            'type' : self.buf[num][Chatd.MsgField.TYPE]
+                            'type' : self.modified[num] ? Chatd.MsgType.EDIT : self.buf[num][Chatd.MsgField.TYPE]
                         });
                     }
                 });
@@ -1262,7 +1261,6 @@ Chatd.Messages.prototype.updatepersistencykeyid = function(keyid, keyxid) {
                 'message' : v.message,
                 'keyId' : keyid,
                 'updated' : v.updated,
-                'edited' : v.edited,
                 'type' : v.type
             });
         }
@@ -1277,13 +1275,18 @@ Chatd.Messages.prototype.restore = function() {
     promises.push(
         self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
 
-            self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
-            self.sending[v.messageId] = self.highnum;
-            self.sendingList.push(v.messageId);
-            if (v.edited === 1) {
-                self.modified[self.highnum] = 1;
+            if ((v.type !== Chatd.MsgType.EDIT) || ((v.type === Chatd.MsgType.EDIT) && !self.sending[v.messageId])) {
+
+                // if the message is not an edit or an edit with the original message not in the pending list, restore it.
+                self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
+                self.sending[v.messageId] = self.highnum;
+                self.sendingList.push(v.messageId);
+                if (v.type === Chatd.MsgType.EDIT) {
+                    // if the original message is not in the pending list.
+                    self.modified[self.highnum] = 1;
+                }
+                count++;
             }
-            count++;
         })
     );
     var _resendPending = function() {

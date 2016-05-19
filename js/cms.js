@@ -290,7 +290,7 @@
          *  We assume it's secure enough because the content that references
          *  the images are signed.
          *
-         *  @param {String} Hash 256 of the image
+         *  @param {String} 64 digits to represent 256 bits
          *  @returns {String} URL
          */
         img2: function insegureImageLoading(id) {

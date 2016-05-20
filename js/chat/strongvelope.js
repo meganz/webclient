@@ -660,12 +660,14 @@ var strongvelope = {};
                 // If we sent the message, pick first recipient for getting the
                 // sender key (e. g. for history loading).
                 var keyIndex = isOwnMessage ? 0 : myIndex;
-                var otherHandle = isOwnMessage
+                var otherHandle = (isOwnMessage && (parsedMessage.keys[keyIndex].length < _RSA_ENCRYPTION_THRESHOLD))
                                 ? parsedMessage.recipients[0]
                                 : message.userId;
                 if (keyIndex >= 0) {
                     // Decrypt message key(s).
-                    var decryptedKeys = this._decryptKeysFor(parsedMessage.keys[keyIndex],
+                    var encryptedKey = (isOwnMessage && (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ? parsedMessage.ownKey : parsedMessage.keys[keyIndex];
+
+                    var decryptedKeys = this._decryptKeysFor(encryptedKey,
                                                              parsedMessage.nonce,
                                                              otherHandle,
                                                              isOwnMessage);

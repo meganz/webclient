@@ -571,7 +571,7 @@ var strongvelope = {};
         var parsedMessage = ns._parseMessageContent(message.message);
         var result = { parsedMessage: parsedMessage, senderKeys: {}};
 
-        if (parsedMessage && (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
+        if (parsedMessage && (parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) && (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
             if (ns._verifyMessage(parsedMessage.signedContent,
                                   parsedMessage.signature,
                                   pubEd25519[message.userId])) {
@@ -580,16 +580,16 @@ var strongvelope = {};
                 // If we sent the message, pick first recipient for getting the
                 // sender key (e. g. for history loading).
                 var keyIndex = isOwnMessage ? 0 : myIndex;
-                var otherHandle = message.userId;
-                if (parsedMessage.protocolVersion < PROTOCOL_VERSION) {
-                    otherHandle = isOwnMessage ? parsedMessage.recipients[0] : message.userId;
-                }
+                var otherHandle = (isOwnMessage && (parsedMessage.keys[keyIndex].length < _RSA_ENCRYPTION_THRESHOLD))
+                                 ? parsedMessage.recipients[0]
+                                 : message.userId;
                 if (keyIndex >= 0) {
                     // Decrypt message key(s).
-                    var decryptedKeys = this._legacyDecryptKeysFor(parsedMessage.keys[keyIndex],
-                                                             parsedMessage.nonce,
-                                                             otherHandle,
-                                                             isOwnMessage);
+                    var encryptedKey = (isOwnMessage && (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ? parsedMessage.ownKey : parsedMessage.keys[keyIndex];
+                    var decryptedKeys = this._legacyDecryptKeysFor( encryptedKey,
+                                                                    parsedMessage.nonce,
+                                                                    otherHandle,
+                                                                    isOwnMessage);
                     // Update local sender key cache.
                     if (!this.participantKeys[message.userId]) {
                         this.participantKeys[message.userId] = {};

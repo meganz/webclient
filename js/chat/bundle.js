@@ -20699,13 +20699,8 @@
 	                            "div",
 	                            { className: "fm-not-logged-text" },
 	                            React.makeElement("div", { className: "fm-not-logged-description", dangerouslySetInnerHTML: {
-	                                    __html: __(l[8634]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
+	                                    __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
 	                                } }),
-	                            React.makeElement(
-	                                "div",
-	                                { className: "fm-not-logged-button login" },
-	                                __(l[193])
-	                            ),
 	                            React.makeElement(
 	                                "div",
 	                                { className: "fm-not-logged-button create-account" },

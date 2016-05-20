@@ -441,12 +441,12 @@ var ConversationsApp = React.createClass({
                     <div className="fm-empty-pad">
                         <div className="fm-empty-messages-bg"></div>
                         <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
-                        <div className="fm-not-logged-text">
+                        <div className="fm-not-logged-text">                            
                             <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
                                 __html: __(l[8762])
-                                    .replace("[S]", "<span className='red'>")
-                                    .replace("[/S]", "</span>")
-                            }}></div>
+                                     .replace("[S]", "<span className='red'>")
+                                     .replace("[/S]", "</span>")
+                             }}></div>
                             <div className="fm-not-logged-button create-account">
                                 {__(l[968])}
                             </div>

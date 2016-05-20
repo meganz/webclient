@@ -447,9 +447,6 @@ var ConversationsApp = React.createClass({
                                     .replace("[S]", "<span className='red'>")
                                     .replace("[/S]", "</span>")
                             }}></div>
-                            <div className="fm-not-logged-button login">
-                                {__(l[193])}
-                            </div>
                             <div className="fm-not-logged-button create-account">
                                 {__(l[968])}
                             </div>

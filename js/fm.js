@@ -287,11 +287,6 @@ function initUI() {
         document.location.hash = 'register';
     });
 
-    $('.not-logged .fm-not-logged-button.login').rebind('click', function()
-    {
-        document.location.hash = 'login';
-    });
-
     $('.fm-dialog-overlay').rebind('click.fm', function()
     {
         closeDialog();

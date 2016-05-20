@@ -453,6 +453,8 @@ function populate_l() {
     if (lang === 'en') {
         l[1] = 'Go Pro';
     }
+    l[8634] = l[8634].replace("[S]", "<span class='red'>")
+            .replace("[/S]", "</span>");
     l[438] = l[438].replace('[X]', '');
     l['439a'] = l[439];
     l[439] = l[439].replace('[X1]', '').replace('[X2]', '');

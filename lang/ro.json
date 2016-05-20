@@ -1913,6 +1913,7 @@
     "6781": "Acest lucru este realizat cel mai bine \u00eent\u00e2lnindu-v\u0103 fa\u0163\u0103 \u00een fa\u0163\u0103. Dac\u0103 ai un alt canal verificat deja precum OTR sau PGP verificat, l-ai putea folosi \u015fi pe acela.",
     "6782": "Datele de autentificare:",
     "6783": "Aprob\u0103 datele de autentificare",
+    "6786": "Nicio grij\u0103! Po\u0163i ad\u0103uga contacte noi cu u\u015furin\u0163\u0103 prin e-mail sau prin a importa contactele existente de pe alte servicii.",
     "6787": "Niciun folder partajat cu tine",
     "6788": "luni",
     "6789": "Cont suspendat",
@@ -3277,6 +3278,14 @@
     "8752": "Import\u0103 \u00een {0}",
     "8753": "Linkul fi\u015fierului",
     "8754": "Linkul folderului",
+    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8756": "Save Image",
+    "8757": "Generating links...",
+    "8758": "Links copied",
+    "8759": "Link removed",
+    "8760": "Links removed",
+    "8761": "Save Images",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3357,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

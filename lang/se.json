@@ -1913,6 +1913,7 @@
     "6781": "Detta g\u00f6rs b\u00e4st i verkliga livet genom att m\u00f6ta ansikte mot ansikte. Om du har en annan redan verifierad kanal s\u00e5som verifieras OTR eller PGP, kan du \u00e4ven anv\u00e4nda det.",
     "6782": "Dina referenser:",
     "6783": "Godk\u00e4nn referenser",
+    "6786": "Worry not! You can easily add new contacts by email or import existing contacts from other services.",
     "6787": "Inga delade mappar med dig",
     "6788": "m\u00e5nader",
     "6789": "Kontot avst\u00e4ngt",
@@ -3277,6 +3278,14 @@
     "8752": "Importera till {0}",
     "8753": "Fil l\u00e4nk",
     "8754": "Mapp l\u00e4nk",
+    "8755": "Tack! Ditt konto kommer att uppgraderas s\u00e5 snart vi f\u00e5r en bekr\u00e4ftelse p\u00e5 din betalning fr\u00e5n v\u00e5r betalningstj\u00e4nst . Om du har betalat med bankkort eller kreditkort och du inte har f\u00e5tt ditt MEGA PRO konto inom n\u00e5gra timmar, v\u00e4nligen kontakta oss p\u00e5 support@mega.nz. Om du har betalat med en bank\u00f6verf\u00f6ring l\u00e5t 4-5 dagar g\u00e5 f\u00f6r betalningen skall registreras.",
+    "8756": "Spara bild",
+    "8757": "Skapar l\u00e4nkar....",
+    "8758": "L\u00e4nkar kopierade",
+    "8759": "L\u00e4nk borttagen",
+    "8760": "L\u00e4nkar borttagna",
+    "8761": "Spara bilder",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3357,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

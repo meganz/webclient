@@ -1913,6 +1913,7 @@
     "6781": "Ez legink\u00e1bb a val\u00f3s \u00e9letbe van szemt\u0151l szembe. Ha m\u00e1r van egy m\u00e1sik \u00e9rv\u00e9nyes\u00edtett csatorn\u00e1d, mint az OTR vagy PGP, haszn\u00e1lhatod azt is.",
     "6782": "Hiteles\u00edt\u0151 adatok:",
     "6783": "Hiteles\u00edt\u0151 adatok jov\u00e1hagy\u00e1sa",
+    "6786": "Ne agg\u00f3dj! K\u00f6nnyen hozz\u00e1 tudsz adni \u00faj partnereket email c\u00edm alapj\u00e1n vagy l\u00e9tez\u0151ket import\u00e1lni egy\u00e9b szolg\u00e1ltat\u00e1sokb\u00f3l.",
     "6787": "Nincsenek megosztott k\u00f6nyvt\u00e1rak",
     "6788": "h\u00f3nap",
     "6789": "Felf\u00fcggesztett fi\u00f3k",
@@ -3277,6 +3278,14 @@
     "8752": "Import to {0}",
     "8753": "File link",
     "8754": "Folder link",
+    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8756": "Save Image",
+    "8757": "Generating links...",
+    "8758": "Links copied",
+    "8759": "Link removed",
+    "8760": "Links removed",
+    "8761": "Save Images",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3357,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

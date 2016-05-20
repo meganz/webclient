@@ -1913,6 +1913,7 @@
     "6781": "Esto es mejor hacerlo en el mundo real, cara a cara. Si tienes alg\u00fan otro canal ya verificado, como OTR o PGP, podr\u00edas utilizarlo.",
     "6782": "Tus credenciales:",
     "6783": "Aceptar las credenciales",
+    "6786": "\u00a1No te preocupes! Puedes a\u00f1adir nuevos contactos de forma sencilla por email o importando los existentes de otros servicios.",
     "6787": "o hay carpetas compartidas contigo",
     "6788": "meses",
     "6789": "Cuenta suspendida",
@@ -2492,11 +2493,11 @@
     "7444": "El fichero que est\u00e1s intentado descargar es m\u00e1s grande que el espacio disponible.",
     "7445": "El fichero que est\u00e1s intentado abrir es m\u00e1s grande que el espacio disponible.",
     "7446": "Enlace del archivo no disponible",
-    "7447": "Esto podr\u00eda deberse a los siguientes motivos:\\n- El archivo ha sido eliminado debido a una violaci\u00f3n de los TdS\/PUA.\\n- URL no v\u00e1lida - el enlace al que intentas acceder no existe.\\n- El archivo ha sido desactivado por el usuario.",
+    "7447": "Esto podr\u00eda deberse a los siguientes motivos:- El archivo ha sido eliminado debido a una violaci\u00f3n de los TdS\/PUA.- URL no v\u00e1lida - el enlace al que intentas acceder no existe.- El archivo ha sido desactivado por el usuario.",
     "7448": "Descarga iniciada",
     "7449": "La carpeta que est\u00e1s intentado descargar es m\u00e1s grande que el espacio disponible",
     "7450": "La carpeta '%@' no puede ser creada",
-    "7451": "Esto podr\u00eda deberse a los siguientes motivos:\\n- El enlace de la carpeta ha sido eliminado debido a una violaci\u00f3n de los TdS\/PdU.\\n- URL no v\u00e1lida - el enlace al que intentas acceder no existe.\\n- El enlace de la carpeta ha sido desactivado por el usuario.",
+    "7451": "Esto podr\u00eda deberse a los siguientes motivos:- El enlace de la carpeta ha sido eliminado debido a una violaci\u00f3n de los TdS\/PdU.- URL no v\u00e1lida - el enlace al que intentas acceder no existe.- El enlace de la carpeta ha sido desactivado por el usuario.",
     "7452": "No hay conexi\u00f3n a internet",
     "7453": "Enlace a carpeta vac\u00eda",
     "7454": "Actualmente, este enlace no contiene ning\u00fan archivo.",
@@ -3277,6 +3278,14 @@
     "8752": "Importar en {0}",
     "8753": "Enlace de archivo",
     "8754": "Enlace de carpeta",
+    "8755": "\u00a1Gracias! Tu cuenta se actualizar\u00e1 en cuanto nuestro proveedor nos confirme el pago. Si has pagado con  tarjeta de cr\u00e9dito o de d\u00e9bito y no has recibido tu cuenta PRO dentro de unas horas, por favor env\u00edanos un correo a support@mega.nz. Si has pagado a trav\u00e9s de transferencia bancaria por favor espera 4-5 d\u00edas para que se confirme el pago.",
+    "8756": "Guardar imagen",
+    "8757": "Generando enlaces...",
+    "8758": "Enlaces copiados",
+    "8759": "Enlace eliminado",
+    "8760": "Enlaces eliminados",
+    "8761": "Guardar im\u00e1genes",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3357,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

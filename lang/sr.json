@@ -1913,6 +1913,7 @@
     "6781": "\u041e\u0432\u043e \u0458\u0435 \u043d\u0430\u0458\u0431\u043e\u0459\u0435 \u0443\u0440\u0430\u0434\u0438\u0442\u0438 \u0443 \u0441\u0442\u0432\u0430\u0440\u043d\u043e\u043c \u0436\u0438\u0432\u043e\u0442\u0443 \u0441\u0430\u0441\u0442\u0430\u0458\u0443\u045b\u0438 \u0441\u0435 \u043b\u0438\u0446\u0435\u043c \u0443 \u043b\u0438\u0446\u0435. \u0410\u043a\u043e \u0438\u043c\u0430\u0442\u0435 \u0434\u0440\u0443\u0433\u0438 \u0432\u0435\u045b \u0432\u0435\u0440\u0438\u0444\u0438\u043a\u043e\u0432\u0430\u043d\u0438 \u043a\u0430\u043d\u0430\u043b \u0448\u0442\u043e \u0441\u0443 \u0432\u0435\u0440\u0438\u0444\u0438\u043a\u043e\u0432\u0430\u043d\u0438 OTR \u0438\u043b\u0438 PGP, \u043c\u043e\u0436\u0435\u0442\u0435 \u0442\u0430\u043a\u043e\u0452\u0435 \u043a\u043e\u0440\u0438\u0441\u0442\u0438\u0442\u0438 \u0438 \u0442\u043e.",
     "6782": "\u0412\u0430\u0448\u0438 \u043f\u043e\u0434\u0430\u0446\u0438:",
     "6783": "\u041e\u0434\u043e\u0431\u0440\u0438 \u043f\u043e\u0434\u0430\u0442\u043a\u0435",
+    "6786": "\u041d\u0435 \u0431\u0440\u0438\u043d\u0438\u0442\u0435! \u041c\u043e\u0436\u0435\u0442\u0435 \u043b\u0430\u043a\u043e \u0434\u043e\u0434\u0430\u0442\u0438 \u043d\u043e\u0432\u0435 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u0435 \u043f\u0440\u0435\u043a\u043e email-\u0430 \u0438\u043b\u0438 \u0443\u0432\u0435\u0441\u0442\u0438 \u043f\u043e\u0441\u0442\u043e\u0458\u0435\u045b\u0435 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u0435 \u0441\u0430 \u0434\u0440\u0443\u0433\u0438\u0445 \u0441\u0435\u0440\u0432\u0438\u0441\u0430.",
     "6787": "\u041d\u0435\u043c\u0430 \u043f\u043e\u0434\u0435\u0459\u0435\u043d\u0438\u0445 \u0444\u043e\u043b\u0434\u0435\u0440\u0430 \u0441\u0430 \u0412\u0430\u043c\u0430",
     "6788": "\u043c\u0435\u0441\u0435\u0446\u0438",
     "6789": "\u0421\u0443\u0441\u043f\u0435\u043d\u0434\u043e\u0432\u0430\u043d \u043d\u0430\u043b\u043e\u0433",
@@ -3278,6 +3279,13 @@
     "8753": "\u041b\u0438\u043d\u043a \u0434\u043e \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430",
     "8754": "\u041b\u0438\u043d\u043a \u0434\u043e \u0434\u0438\u0440\u0435\u043a\u0442\u043e\u0440\u0438\u0458\u0443\u043c\u0430",
     "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8756": "Save Image",
+    "8757": "Generating links...",
+    "8758": "Links copied",
+    "8759": "Link removed",
+    "8760": "Links removed",
+    "8761": "Save Images",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

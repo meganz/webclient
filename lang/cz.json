@@ -1913,6 +1913,7 @@
     "6781": "To se v re\u00e1ln\u00e9m \u017eivot\u011b nejl\u00e9pe d\u011bl\u00e1 setk\u00e1n\u00edm tv\u00e1\u0159\u00ed v tv\u00e1\u0159. Pokud m\u00e1te jin\u00fd, ji\u017e ov\u011b\u0159en\u00fd kan\u00e1l, jako je ov\u011b\u0159en\u00e9 OTR nebo PGP (zabezpe\u010den\u00ed zas\u00edl\u00e1n\u00ed zpr\u00e1v), m\u016f\u017eete ho tak\u00e9 pou\u017e\u00edt.",
     "6782": "Va\u0161e p\u0159ihla\u0161ovac\u00ed \u00fadaje:",
     "6783": "Schv\u00e1lit p\u0159ihla\u0161ovac\u00ed \u00fadaje",
+    "6786": "Nebojte! M\u016f\u017eete jednodu\u0161e p\u0159idat nov\u00e9 kontakty pomoc\u00ed e-mailu nebo importovat existuj\u00edc\u00ed kontakty z jin\u00fdch slu\u017eeb.",
     "6787": "\u017d\u00e1dn\u00e9 sd\u00edlen\u00e9 slo\u017eky s v\u00e1mi",
     "6788": "m\u011bs\u00edc\u016f",
     "6789": "Pozastaven\u00fd \u00fa\u010det",
@@ -3278,6 +3279,13 @@
     "8753": "Odkaz na soubor",
     "8754": "Odkaz na slo\u017eku",
     "8755": "D\u011bkujeme! V\u00e1\u0161 \u00fa\u010det bude upradov\u00e1n, jakmile obdr\u017e\u00edme potvrzen\u00ed o va\u0161\u00ed platb\u011b od na\u0161eho poskytovatele platebn\u00edch slu\u017eeb. Pokud jste zaplatili debetn\u00ed nebo kreditn\u00ed kartou a neobdr\u017eeli jste sv\u016fj \u00fa\u010det MEGA PRO b\u011bhem n\u011bkolika hodin, obra\u0165te se na n\u00e1s na support@mega.nz. Pokud jste zaplatili bankovn\u00edm p\u0159evodem, vy\u010dkejte 4-5 dn\u00ed na p\u0159ips\u00e1n\u00ed platby.",
+    "8756": "Ulo\u017eit obr\u00e1zek",
+    "8757": "Generov\u00e1n\u00ed odkaz\u016f...",
+    "8758": "Odkazy zkop\u00edrov\u00e1ny",
+    "8759": "Odkaz odebr\u00e1n",
+    "8760": "Odkazy odebr\u00e1ny",
+    "8761": "Ulo\u017eit obr\u00e1zky",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

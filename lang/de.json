@@ -1913,6 +1913,7 @@
     "6781": "Der beste Weg ist ein pers\u00f6nliches Treffen. Sollten Sie \u00fcber einen bereits verifizierten sicheren Kommunikationskanal verf\u00fcgen, z.B. verifiziertes OTR oder PGP, so k\u00f6nnen Sie stattdessen diesen verwenden.",
     "6782": "Ihre Logindaten:",
     "6783": "Login-Informationen best\u00e4tigen",
+    "6786": "Worry not! You can easily add new contacts by email or import existing contacts from other services.",
     "6787": "Keine eingehenden Ordnerfreigaben",
     "6788": "Monate",
     "6789": "Account blockiert",
@@ -3278,6 +3279,13 @@
     "8753": "File link",
     "8754": "Folder link",
     "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8756": "Save Image",
+    "8757": "Generating links...",
+    "8758": "Links copied",
+    "8759": "Link removed",
+    "8760": "Links removed",
+    "8761": "Save Images",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

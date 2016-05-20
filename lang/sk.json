@@ -1913,6 +1913,7 @@
     "6781": "Toto je najlep\u0161ie osobne v re\u00e1lnom \u017eivote. pokia\u013e m\u00e1te in\u00e9 overen\u00e9 sp\u00f4soby ako napr\u00edklad ovren\u00e9 OTR alebo PGP, m\u00f4\u017ete ich taktie\u017e pou\u017ei\u0165.",
     "6782": "Va\u0161e osobn\u00e9 \u00fadaje:",
     "6783": "Schv\u00e1li\u0165 poverenia",
+    "6786": "Worry not! You can easily add new contacts by email or import existing contacts from other services.",
     "6787": "Neboli s vami zdie\u013ean\u00e9 \u017eiadne prie\u010dinky",
     "6788": "mesiacov",
     "6789": "Pozastaven\u00fd \u00fa\u010det",
@@ -3277,7 +3278,14 @@
     "8752": "Importova\u0165 do {0}",
     "8753": "Odkaz na s\u00fabor",
     "8754": "Odkaz na prie\u010dinok",
-    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8755": "\u010eakujeme, v\u00e1\u0161 \u00fa\u010det bude vylep\u0161en\u00fd hne\u010f ako dostaneme inform\u00e1ciu o va\u0161ej platbe. Ak ste platili debetnou alebo kreditnou kartou a nedostali ste MEGA PRO \u00fa\u010det do nieko\u013ek\u00fdch hod\u00edn, pros\u00edme, kontaktujte n\u00e1s na support@mega.nz. Ak ste platili bankov\u00fdm prevodom, dajte spracovaniu platby 4-5 dn\u00ed.",
+    "8756": "Ulo\u017ei\u0165 obr\u00e1zok",
+    "8757": "Generovanie odkazov...",
+    "8758": "Odkazy skop\u00edrovan\u00e9",
+    "8759": "Odkaz odstr\u00e1nen\u00fd",
+    "8760": "Odkazy odstr\u00e1nen\u00e9",
+    "8761": "Ulo\u017ei\u0165 obr\u00e1zky",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

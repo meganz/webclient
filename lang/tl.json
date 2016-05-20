@@ -1913,6 +1913,7 @@
     "6781": "Ito ay magandang gawin ng harapan at personal. Kung meron kang ibang verified channel gaya ng verified OTR at PGP, pwede mo itong gamitin.",
     "6782": "Ang iyong credentials:",
     "6783": "Payagan ang credentials",
+    "6786": "Wag mag-alala! Madali kang makakapalalagay ng mga bagong contact sa pamamagitan ng email o mag-import ng mga datihang contacts galing sa ibang serbisyo.",
     "6787": "Walang binahaging folders sa iyo",
     "6788": "buwan",
     "6789": "Suspendidong account",
@@ -3278,6 +3279,13 @@
     "8753": "Link ng file",
     "8754": "Link ng folder",
     "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8756": "Save Image",
+    "8757": "Generating links...",
+    "8758": "Links copied",
+    "8759": "Link removed",
+    "8760": "Links removed",
+    "8761": "Save Images",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

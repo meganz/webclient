@@ -1913,6 +1913,7 @@
     "6781": "Esto es mejor hacerlo en el mundo real, cara a cara. Si tienes alg\u00fan otro canal ya verificado, como OTR o PGP, podr\u00edas utilizarlo.",
     "6782": "Tus credenciales:",
     "6783": "Aceptar las credenciales",
+    "6786": "\u00a1No te preocupes! Puedes a\u00f1adir nuevos contactos de forma sencilla por email o importando los existentes de otros servicios.",
     "6787": "o hay carpetas compartidas contigo",
     "6788": "meses",
     "6789": "Cuenta suspendida",
@@ -3277,7 +3278,14 @@
     "8752": "Importar en {0}",
     "8753": "Enlace de archivo",
     "8754": "Enlace de carpeta",
-    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8755": "\u00a1Gracias! Tu cuenta se actualizar\u00e1 en cuanto nuestro proveedor nos confirme el pago. Si has pagado con  tarjeta de cr\u00e9dito o de d\u00e9bito y no has recibido tu cuenta PRO dentro de unas horas, por favor env\u00edanos un correo a support@mega.nz. Si has pagado a trav\u00e9s de transferencia bancaria por favor espera 4-5 d\u00edas para que se confirme el pago.",
+    "8756": "Guardar imagen",
+    "8757": "Generando enlaces...",
+    "8758": "Enlaces copiados",
+    "8759": "Enlace eliminado",
+    "8760": "Enlaces eliminados",
+    "8761": "Guardar im\u00e1genes",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

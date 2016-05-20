@@ -1913,6 +1913,7 @@
     "6781": "\u5b9f\u969b\u306b\u9854\u3092\u5408\u308f\u305b\u308b\u306e\u304c\u4e00\u756a\u3044\u3044\u65b9\u6cd5\u3067\u3059\u3002\u3059\u3067\u306b\u8a8d\u8a3c\u6e08\u307f\u306eOTR\u3084PGR\u304c\u3042\u308c\u3070\u3001\u305d\u308c\u3092\u4f7f\u3046\u306e\u3082\u826f\u3044\u3067\u3057\u3087\u3046\u3002",
     "6782": "\u672c\u4eba\u78ba\u8a8d:",
     "6783": "\u8eab\u5206\u8a8d\u8a3c",
+    "6786": "\u3054\u5fc3\u914d\u306a\u304f\uff01\u77e5\u308a\u5408\u3044\u306e\u8ffd\u52a0\u306f\u3001\u30e1\u30fc\u30eb\u306b\u3088\u3063\u3066\u3001\u307e\u305f\u306f\u4ed6\u306e\u30b5\u30fc\u30d3\u30b9\u304b\u3089\u65e2\u5b58\u306e\u77e5\u308a\u5408\u3044\u3092\u30a4\u30f3\u30dd\u30fc\u30c8\u3059\u308b\u3053\u3068\u306b\u3088\u3063\u3066\u3067\u304d\u307e\u3059\u3002",
     "6787": "\u3042\u306a\u305f\u3068\u5171\u6709\u3057\u3066\u3044\u308b\u30d5\u30a9\u30eb\u30c0\u306f\u3042\u308a\u307e\u305b\u3093\u3002",
     "6788": "\u304b\u6708",
     "6789": "\u30a2\u30ab\u30a6\u30f3\u30c8\u4fdd\u7559\u4e2d",
@@ -3278,6 +3279,13 @@
     "8753": "File link",
     "8754": "Folder link",
     "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8756": "Save Image",
+    "8757": "Generating links...",
+    "8758": "Links copied",
+    "8759": "Link removed",
+    "8760": "Links removed",
+    "8761": "Save Images",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

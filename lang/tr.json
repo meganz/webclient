@@ -1913,6 +1913,7 @@
     "6781": "Bu en iyi ger\u00e7ek hayatta, y\u00fcz y\u00fcze toplant\u0131 ile yap\u0131l\u0131r. Do\u011frulanm\u0131\u015f OTR veya PGP gibi ba\u015fka \u00f6nceden do\u011frulanm\u0131\u015f bir kanal varsa onu da kullanabilirsiniz. ",
     "6782": "Kimlik bilgileriniz:",
     "6783": "Kimlik bilgilerini onayla",
+    "6786": "Endi\u015felenmeyin! E-posta yoluyla kolayca yeni ki\u015filer ekleyebilir veya di\u011fer hizmetlerden mevcut ki\u015fileri i\u00e7e aktarabilirsiniz.",
     "6787": "Sizinle payla\u015f\u0131lan klas\u00f6r yok",
     "6788": "ay",
     "6789": "Ask\u0131ya al\u0131nan hesap",
@@ -3278,6 +3279,13 @@
     "8753": "Dosya ba\u011flant\u0131s\u0131",
     "8754": "Klas\u00f6r ba\u011flant\u0131s\u0131",
     "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8756": "G\u00f6rseli Kaydet",
+    "8757": "Ba\u011flant\u0131lar olu\u015fturuluyor...",
+    "8758": "Ba\u011flant\u0131lar kopyaland\u0131",
+    "8759": "Ba\u011flant\u0131 kald\u0131r\u0131ld\u0131",
+    "8760": "Ba\u011flant\u0131lar kald\u0131r\u0131ld\u0131",
+    "8761": "G\u00f6rselleri Kaydet",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

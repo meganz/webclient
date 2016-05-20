@@ -691,7 +691,7 @@
     "1313": "Sis\u00e4\u00e4nkirjautuminen ep\u00e4onnistui",
     "1319": "Salasana on liian lyhyt",
     "1323": "Sis\u00e4\u00e4nkirjautuminen",
-    "1325": "Luo linkki",
+    "1325": "Luodaan linkki\u00e4",
     "1329": "Odottaa",
     "1331": "S\u00e4hk\u00f6posti",
     "1332": "Vahvista rekister\u00f6inti",
@@ -1913,6 +1913,7 @@
     "6781": "T\u00e4m\u00e4 onnistuu parhaiten tapaamalla kasvotusten. Jos sinulla on p\u00e4\u00e4sy toiseen jo-varmistettuun kanavaan, kuten varmennettu OTR tai PGP, voit k\u00e4ytt\u00e4\u00e4 my\u00f6s sit\u00e4.",
     "6782": "Varmenteesi:",
     "6783": "Todennusvaltuutus",
+    "6786": "Ei h\u00e4t\u00e4\u00e4! Voit lis\u00e4t\u00e4 uusia yhteystietoja helposti s\u00e4hk\u00f6postitse tai tuomalla jo olemassaolevia muista palveluista.",
     "6787": "Ei sinulle jaettuja kansioita",
     "6788": "kuukausia",
     "6789": "J\u00e4\u00e4dytetty k\u00e4ytt\u00e4j\u00e4tili",
@@ -2851,7 +2852,7 @@
     "7979": "Ole hyv\u00e4 ja kirjoita palautteesi t\u00e4h\u00e4n:",
     "7982": "Sinulla on liikaa puutteellisia maksuja viimeisen 12 tunnin aikana, ole hyv\u00e4 ja t\u00e4yt\u00e4 n\u00e4m\u00e4 maksut tai yrit\u00e4 uudelleen huomenna.",
     "7983": "Odottaa vahvistusta",
-    "7984": "Kiitos! Tilisi p\u00e4ivitet\u00e4\u00e4n heti, kun saamme vahvistuksen maksustasi maksupalvelun tarjoajaltamme. Mik\u00e4li et ole saanut MEGA PRO tili\u00e4 p\u00e4iv\u00e4n sis\u00e4ll\u00e4 maksusta, ole hyv\u00e4 ja ota yhteytt\u00e4 meihin osoitteessa support@mega.nz.",
+    "7984": "Kiitos! Tilisi p\u00e4ivitet\u00e4\u00e4n heti, kun saamme vahvistuksen maksustasi maksupalvelun tarjoajaltamme. Mik\u00e4li et ole saanut MEGA PRO -tili\u00e4 p\u00e4iv\u00e4n sis\u00e4ll\u00e4 maksusta, ole hyv\u00e4 ja ota yhteytt\u00e4 meihin osoitteessa support@mega.nz.",
     "7985": "Henkil\u00f6kohtaiset tiedot",
     "7986": "Kirjoita alle koko nimesi ja veronumerosi, jonka j\u00e4lkeen sinut uudelleenohjataan ulkopuoliselle maksusivulle.",
     "7987": "Koko nimi",
@@ -3277,7 +3278,14 @@
     "8752": "Tuo kohteeseen {0}",
     "8753": "Tiedostolinkki",
     "8754": "Kansiolinkki",
-    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8755": "Kiitos! Tilisi p\u00e4ivitet\u00e4\u00e4n heti, kun saamme vahvistuksen maksustasi maksupalvelun tarjoajaltamme. Mik\u00e4li maksoit pankki- tai luottokortilla ja et ole saanut MEGA PRO -tili\u00e4 parin tunnin sis\u00e4\u00e4n maksusta, ole hyv\u00e4 ja ota yhteytt\u00e4 meihin osoitteessa support@mega.nz. Jos maksoit tilisiirrolla, niin ole hyv\u00e4 ja odota maksun vahvistumista 4-5 p\u00e4iv\u00e4\u00e4.",
+    "8756": "Tallenna kuva",
+    "8757": "Luodaan linkkej\u00e4...",
+    "8758": "Linkit kopioitu",
+    "8759": "Linkki poistettu",
+    "8760": "Linkit poistettu",
+    "8761": "Tallenna kuvat",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

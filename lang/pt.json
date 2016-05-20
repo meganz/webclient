@@ -1913,6 +1913,7 @@
     "6781": "Isto \u00e9 melhor se for realizado cara a cara. Se tiver outro canal verificado tal como OTR ou PGP, tamb\u00e9m poder\u00e1 usar isso.",
     "6782": "As tuas credenciais:",
     "6783": "Aprovar credenciais",
+    "6786": "N\u00e3o te preocupes! Podes facilmente adicionar novos contactos por email ou import\u00e1-los atrav\u00e9s de outros servi\u00e7os.",
     "6787": "Sem pastas partilhadas contigo",
     "6788": "meses",
     "6789": "Conta suspensa",
@@ -2229,7 +2230,7 @@
     "7163": "Nenhum cart\u00e3o SD externo detetado",
     "7164": "A fazer upgrade da sua conta",
     "7165": "Cancelar subscri\u00e7\u00e3o",
-    "7166": "A subscri\u00e7\u00e3o foi cancelada corretamente",
+    "7166": "A subscri\u00e7\u00e3o foi cancelada correctamente",
     "7167": "A subscri\u00e7\u00e3o n\u00e3o foi cancelada correctamente. Entre em contacto com support@mega.nz para assist\u00eancia.",
     "7168": "Feche todas as sess\u00f5es",
     "7169": "As restantes sess\u00f5es foram encerradas com sucesso",
@@ -3277,7 +3278,14 @@
     "8752": "Importar para {0} ",
     "8753": "Liga\u00e7\u00e3o do ficheiro",
     "8754": "Liga\u00e7\u00e3o da pasta",
-    "8755": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+    "8755": "Obrigado! A sua conta ir\u00e1 ser actualizada assim que recebermos confirma\u00e7\u00e3o do seu pagamento do fornecedor de pagamento. Se voc\u00ea pagou com cart\u00e3o de d\u00e9bito ou cr\u00e9dito e n\u00e3o tiver recebido a sua conta MEGA PRO no espa\u00e7o de algumas horas, por favor contacte-nos em support@mega.nz. Se pagou com uma transfer\u00eancia banc\u00e1ria por favor aguarde 4-5 dias at\u00e9 que o pagamento seja conclu\u00eddo.",
+    "8756": "Guardar imagem",
+    "8757": "A gerar liga\u00e7\u00f5es...",
+    "8758": "Liga\u00e7\u00f5es copiadas",
+    "8759": "Liga\u00e7\u00e3o removida",
+    "8760": "Liga\u00e7\u00f5es removidas",
+    "8761": "Guardar imagens",
+    "8762": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3358,6 +3366,8 @@
         "international-missing-children-body-text": 8738,
         "test-string": 8739,
         "learn-more": 8742,
-        "payment-success-message": 8755
+        "payment-success-message": 8755,
+        "empty-contacts": 6786,
+        "ephemeral-create-account-message": 8762
     }
 }

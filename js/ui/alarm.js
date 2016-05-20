@@ -5,8 +5,13 @@
  */
 var alarm = {
         
-    /** Whether the popup has been seen or not so it won't keep auto showing on new pages */
-    seen: false,
+    /**
+     * A flag for whether the popup has been seen or not so it won't keep auto showing on new pages
+     * 0 = dialog and icon not hidden (they are visible)
+     * 1 = dialog hidden but icon still visible (so it can be re-opened)
+     * 2 = dialog and icon permanently hidden
+     */
+    hidden: 0,
     
     /**
      * Shows the warning popup
@@ -15,15 +20,21 @@ var alarm = {
      */
     showWarningPopup: function($container, $dialog) {
         
-        // If they have seen it already
-        if (alarm.seen) {
-            
-            // Just show the warning icon and they can click to re-show it if they want
+        // If permanently hidden, make sure it stays hidden
+        if (alarm.hidden === 2) {
+            $container.addClass('hidden');
+            $dialog.removeClass('active');
+        }
+        
+        // If they have seen it already, we still want to let them open the dialog
+        // So just show the warning icon and they can click to re-show the dialog if they want
+        else if (alarm.hidden === 1) {
             $container.removeClass('hidden');
             $dialog.removeClass('active');
         }
+        
+        // Otherwise auto show the dialog and warning icon
         else {
-            // Otherwise auto show the dialog and warning icon
             $container.removeClass('hidden');
             $dialog.addClass('active');
         }
@@ -58,7 +69,7 @@ var alarm = {
                 $dialog.removeClass('active');
                 
                 // Set flag so it doesn't auto show each time
-                alarm.seen = true;
+                alarm.hidden = 1;
             }
             else {
                 // Otherwise show the popup
@@ -101,7 +112,7 @@ var alarm = {
             $dialog.find('.warning-button').click(function() {
                 
                 // Set a flag so it doesn't show each time
-                alarm.seen = true;
+                alarm.hidden = 1;
                 
                 // Go to the Pro page
                 document.location.hash = 'pro';
@@ -148,7 +159,7 @@ var alarm = {
                 }
                 
                 // Set a flag so it doesn't show each time
-                alarm.seen = true;
+                alarm.hidden = 1;
 
                 // Hide the dialog and go to register page
                 $dialog.removeClass('active');
@@ -183,7 +194,7 @@ var alarm = {
             // If the user has previously seen an ephemeral dialog and they closed it,
             // then they purchased a plan then this forces the dialog to popup. This means
             // this dialog always shows so it is an incentive to confirm their email.
-            alarm.seen = false;
+            alarm.hidden = 0;
 
             // Hide other dialogs that may be open
             alarm.hideAllWarningPopups();
@@ -212,7 +223,7 @@ var alarm = {
             }
             
             // Don't show this dialog if they have already said they don't want to see it again
-            if (typeof this.lastPayment.dontShow !== 'undefined') {
+            if ((typeof this.lastPayment.dontShow !== 'undefined') && (this.lastPayment.dontShow === 1)) {
                 return false;
             }
             
@@ -283,7 +294,7 @@ var alarm = {
                 $dialog.removeClass('active');
 
                 // Set a flag so it doesn't show each time
-                alarm.seen = true;
+                alarm.hidden = 1;
                 
                 // Add a log
                 api_req({ a: 'log', e: 99608, m: 'User chose a new plan from the plan expiry dialog' });
@@ -307,7 +318,7 @@ var alarm = {
                 $dialog.removeClass('active');
 
                 // Set a flag so it doesn't show each time
-                alarm.seen = true;
+                alarm.hidden = 1;
                 
                 // Add a log
                 api_req({ a: 'log', e: 99609, m: 'User chose to renew existing plan from the plan expiry dialog' });
@@ -402,12 +413,15 @@ var alarm = {
                     d: jsonData
                 });
                 
+                // Set a flag so the icon and dialog never re-appears
+                alarm.hidden = 2;
+                
                 // Never show the dialog again for this account
                 mega.attr.set(
                     'hideProExpired',
                     '1',                    // Simple flag
-                    false,                  // Private attribute
-                    true                    // Non-historic, won't retain previous values on the API server
+                    false,                  // Set to private attribute
+                    true                    // Set to non-historic, this won't retain previous values on the API server
                 );
                 
                 // Hide the warning icon and the dialog

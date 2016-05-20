@@ -443,7 +443,7 @@ var ConversationsApp = React.createClass({
                         <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
                         <div className="fm-not-logged-text">
                             <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
-                                __html: __(l[8634])
+                                __html: __(l[8762])
                                     .replace("[S]", "<span className='red'>")
                                     .replace("[/S]", "</span>")
                             }}></div>

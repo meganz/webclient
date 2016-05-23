@@ -4901,7 +4901,7 @@
     },
     "2440": {
         "text": "Synchronization will stop.\nDeletions that occur while it is not running will not be propagated.\n\nExit anyway?",
-        "context": ""
+        "context": "Do not translate. This string is not being used since a long time ago."
     },
     "2443": {
         "text": "The destination folder is synced and you already have a file \ninside it with the same name (%1).\nIf you continue the upload, the previous file will be overwritten.\nAre you sure?",
@@ -13146,5 +13146,33 @@
     "8762": {
         "text": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
         "context": "A message on the cloud drive screen when they are on an ephemeral session and they have no files or folders in their account. This prompts them to register an account for extra features. Please keep the [S] and [\/S] tags which will be used to style that text red at runtime."
+    },
+    "8763": {
+        "text": "Sun",
+        "context": "A three letter abbreviation for the word Sunday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8764": {
+        "text": "Mon",
+        "context": "A three letter abbreviation for the word Monday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8765": {
+        "text": "Tue",
+        "context": "A three letter abbreviation for the word Tuesday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8766": {
+        "text": "Wed",
+        "context": "A three letter abbreviation for the word Wednesday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8767": {
+        "text": "Thu",
+        "context": "A three letter abbreviation for the word Thursday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8768": {
+        "text": "Fri",
+        "context": "A three letter abbreviation for the word Friday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8769": {
+        "text": "Sat",
+        "context": "A three letter abbreviation for the word Saturday. This abbreviation will be used inside a datepicker on the Get Link dialog."
     }
 }

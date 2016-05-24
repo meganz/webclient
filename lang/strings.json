@@ -4901,7 +4901,7 @@
     },
     "2440": {
         "text": "Synchronization will stop.\nDeletions that occur while it is not running will not be propagated.\n\nExit anyway?",
-        "context": ""
+        "context": "Do not translate. This string is not being used since a long time ago."
     },
     "2443": {
         "text": "The destination folder is synced and you already have a file \ninside it with the same name (%1).\nIf you continue the upload, the previous file will be overwritten.\nAre you sure?",
@@ -13146,5 +13146,173 @@
     "8762": {
         "text": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
         "context": "A message on the cloud drive screen when they are on an ephemeral session and they have no files or folders in their account. This prompts them to register an account for extra features. Please keep the [S] and [\/S] tags which will be used to style that text red at runtime."
+    },
+    "8763": {
+        "text": "Sun",
+        "context": "A three letter abbreviation for the word Sunday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8764": {
+        "text": "Mon",
+        "context": "A three letter abbreviation for the word Monday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8765": {
+        "text": "Tue",
+        "context": "A three letter abbreviation for the word Tuesday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8766": {
+        "text": "Wed",
+        "context": "A three letter abbreviation for the word Wednesday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8767": {
+        "text": "Thu",
+        "context": "A three letter abbreviation for the word Thursday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8768": {
+        "text": "Fri",
+        "context": "A three letter abbreviation for the word Friday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8769": {
+        "text": "Sat",
+        "context": "A three letter abbreviation for the word Saturday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8770": {
+        "text": "Camera Uploads will be disabled",
+        "context": "Alert title displayed when Camera Uploads will be disabled because of unexpected errors."
+    },
+    "8771": {
+        "text": "Copyright Dispute",
+        "context": "Title for the copyright counter-notice page that gives information on how to dispute a takedown"
+    },
+    "8772": {
+        "text": "Counter-notification Process",
+        "context": "Sub title for the copyright counter-notice page that gives information on the step by step process to dispute a takedown by sending a counter-notification"
+    },
+    "8773": {
+        "text": "MEGA processes all takedown notices submitted to us based on good faith acceptance of the representations from the party submitting the takedown notice. Due to our end-to-end encryption model we have to do so without being able to review the files. Even if we could decrypt them, we could not determine the copyright status without complex analysis and review, which is impractical for the number of files processed each day. We are aware that some agencies submit incorrect takedown notices from time to time, but we are unable to find such errors in advance.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph explains why we have to allow takedowns through without human review."
+    },
+    "8774": {
+        "text": "You may file a counter-notice if you believe that access to a file you have uploaded has been wrongly disabled because it was the subject of an incorrect takedown notice. You should only do so if you are confident that no other party owns copyright in the material, or you have rights to store the material and, if you are sharing it, that you have the right to do so.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph lets the user know that they can file a dispute, but only under certain conditions."
+    },
+    "8775": {
+        "text": "We can only accept a counter-notification directly from the user from whose MEGA account the URL or file has been disabled. For verification, counter-notifications must be submitted from the email address associated with the MEGA account.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph informs the user that they have to be logged into the account that suffered the takedown."
+    },
+    "8776": {
+        "text": "Upon receipt of a counter-notification, MEGA will promptly provide the person who provided the takedown notification with a copy of the counter-notification, and inform that person that MEGA will replace the removed material or cease disabling access to it in 10 business days. If MEGA does not receive any further communication from or on behalf of the person who originally submitted the takedown notice, or such communication that it does receive does not in MEGA's sole opinion adequately justify the original takedown notice, MEGA may, but shall not be obliged to, reinstate the material in approximately 10-14 business days provided it has no reason to believe that the material infringes copyright.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph informs the user of the steps Mega will take after receiving the counter notice."
+    },
+    "8777": {
+        "text": "Nothing in this policy prejudices MEGA's right, agreed to by each user in MEGA's Terms of Service, to remove or disable access to any material at any time, for any reason or no reason.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph informs the user that our Terms of Service still apply and that we can take things down for reasons other than copyright takedowns"
+    },
+    "8778": {
+        "text": "To file a counter-notification with us, you may click the button below to proceed to our dispute form.",
+        "context": "Information regarding the copyright takedown dispute process. This tells the user where to click."
+    },
+    "8779": {
+        "text": "Please understand that:",
+        "context": "Information regarding the copyright takedown dispute process. This is the start of a series of bullet points explaining in fine detail the points that the user must consider before doing a dispute"
+    },
+    "8780": {
+        "text": "When we receive your counter-notice, we pass it, including your address and other contact information, to the party who issued the original takedown notice. By submitting your counter-notice you authorise us to do so;",
+        "context": "Information regarding the copyright takedown dispute process. This informs the user that the details they type will be passed on to the complainant who make the original takedown"
+    },
+    "8781": {
+        "text": "Filing a counter-notification may lead to legal proceedings between you and the complaining party;",
+        "context": "Information regarding the copyright takedown dispute process. This informs the user that this could lead to court"
+    },
+    "8782": {
+        "text": "There may be adverse legal consequences in New Zealand and\/or your jurisdiction if you make a false or bad faith allegation by using this process;",
+        "context": "Information regarding the copyright takedown dispute process. You can get in trouble with the law for providing bad information"
+    },
+    "8783": {
+        "text": "If, when using this counter-notice process, you make a false or bad faith allegation or otherwise breach MEGA\u2019s Terms of Service or this policy and that causes MEGA any loss, costs (including legal costs), damages or other liability, MEGA reserves the right to claim for and recover from you that loss, those costs (including full legal costs on a solicitor client basis), damages and other liability, by deduction from any balance in our account and\/or by proceedings in New Zealand and\/or the jurisdiction of the address in your counter-notice;",
+        "context": "Information regarding the copyright takedown dispute process. Mega can claim costs and other things in court if you provide bad information during a dispute"
+    },
+    "8784": {
+        "text": "This counter-notice process is provided voluntarily by MEGA for the purposes of all applicable copyright takedown and counter-notice regimes in other jurisdictions, but, in doing so, MEGA does not submit itself to any jurisdiction or law other than New Zealand as set out in its Terms of Service. MEGA may amend, suspend or withdraw this counter-notice process at any time, provided that any counter-notices in train at that time shall continue to be processed.",
+        "context": "Information regarding the copyright takedown dispute process. Mega makes this available for all jurisdictions that will accept it, but Mega does not agree to be governed by those laws, and is only 'submitting itself' to New Zealand law"
+    },
+    "8785": {
+        "text": "By filing a counter-notice, you are deemed to have accepted the above terms. If you do not accept the above terms, do not file a counter-notice.",
+        "context": "Information regarding the copyright takedown dispute process. The user should not fill out the form if they did not agree with the things they just read about"
+    },
+    "8786": {
+        "text": "If there is any inconsistency or ambiguity between between the English and other language versions of the above terms, the English version shall prevail. ",
+        "context": "Information regarding the copyright takedown dispute process. This states that the english version of this legal wording is the one that counts, if there is any disagreement between language versions"
+    },
+    "8787": {
+        "text": "You may submit a counter-notification here",
+        "context": "The button label for submitting a copyright counter-notification"
+    },
+    "8788": {
+        "text": "Mega Limited Copyright Agent",
+        "context": "Do not translate 'Mega Limited' as that is the company's name. This is a title for the copyright agent for Mega Limited"
+    },
+    "8789": {
+        "text": "Copyright Counter-Notification",
+        "context": "Title for the copyright dispute counter-notification form"
+    },
+    "8790": {
+        "text": "This notification is a serious legal document - please be careful to be accurate in your copyright infringement counter-notification. You may first wish to consult with an attorney to determine whether you have ownership of the content, or are protected by fair use, license, or other legal basis.",
+        "context": "Subheading for the copyright counter-notification form explaining that it is serious business."
+    },
+    "8791": {
+        "text": "Content Details",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8792": {
+        "text": "URL of the content that has been removed or disabled:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8793": {
+        "text": "Description of the content:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8794": {
+        "text": "Commentary sufficient to explain the mistake or misidentification to the person who filed the original takedown notice:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8795": {
+        "text": "Personal Details",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8796": {
+        "text": "Full Name:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8797": {
+        "text": "Phone Number:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8798": {
+        "text": "MEGA Account Email Address:",
+        "context": "A label on the copyright counter-notification form "
+    },
+    "8799": {
+        "text": "Address Line 1:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8800": {
+        "text": "Address Line 2:",
+        "context": "A label on the copyright counter-notification form "
+    },
+    "8801": {
+        "text": "Other comments (not sent to complainant):",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8802": {
+        "text": "Declarations",
+        "context": "section title on the copyright counter-notification form"
+    },
+    "8803": {
+        "text": "I will accept service of proceedings in New Zealand or in the jurisdiction where my address in this counter-notice is located, from the person who provided MEGA with the original copyright takedown notice or an agent of such person.",
+        "context": "A declaration on the copyright counter-notification form"
+    },
+    "8804": {
+        "text": "I have a good faith belief that the material was removed or disabled as a result of a mistake or misidentification of the material to be removed or disabled.",
+        "context": "A declaration on the copyright counter-notification form "
     }
 }

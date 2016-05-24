@@ -763,7 +763,7 @@ var EMOJI_CATEGORIES = {
             "&#x1F30E;"
         ],
         "earth_asia": [
-            "1F642",
+            "1F30F",
             "&#x1F30F;"
         ],
         "new_moon": [
@@ -783,7 +783,7 @@ var EMOJI_CATEGORIES = {
             "&#x1F314;"
         ],
         "full_moon": [
-            "1F642",
+            "1F315",
             "&#x1F315;"
         ],
         "waning_gibbous_moon": [
@@ -1917,11 +1917,11 @@ var EMOJI_CATEGORIES = {
             "&#x1F4BB;"
         ],
         "printer": [
-            "1F683",
+            "1F5A8",
             "&#x1F5A8;"
         ],
         "alarm_clock": [
-            "1F683",
+            "23F0",
             "&#x23F0;"
         ],
         "hourglass_flowing_sand": [
@@ -2329,7 +2329,7 @@ var EMOJI_CATEGORIES = {
             "&#x1F4D2;"
         ],
         "closed_book": [
-            "1F683",
+            "1F4D5",
             "&#x1F4D5;"
         ],
         "green_book": [
@@ -2381,7 +2381,7 @@ var EMOJI_CATEGORIES = {
             "&#x1F4CF;"
         ],
         "triangular_flag_on_post": [
-            "1F683",
+            "1F6A9",
             "&#x1F6A9;"
         ],
         "flag_white": [
@@ -2393,7 +2393,7 @@ var EMOJI_CATEGORIES = {
             "&#x1F3F4;"
         ],
         "hole": [
-            "1F683",
+            "1F573",
             "&#x1F573;"
         ],
         "file_folder": [
@@ -2513,7 +2513,7 @@ var EMOJI_CATEGORIES = {
             "&#x1F6AB;"
         ],
         "no_entry": [
-            "1F683",
+            "26D4",
             "&#x26D4;"
         ],
         "name_badge": [
@@ -2609,7 +2609,7 @@ var EMOJI_CATEGORIES = {
             "&#x1F202;"
         ],
         "koko": [
-            "1F683",
+            "1F201",
             "&#x1F201;"
         ],
         "u6307": [
@@ -2721,11 +2721,11 @@ var EMOJI_CATEGORIES = {
             "&#x2649;"
         ],
         "gemini": [
-            "1F683",
+            "264A",
             "&#x264A;"
         ],
         "cancer": [
-            "1F683",
+            "264B",
             "&#x264B;"
         ],
         "leo": [
@@ -2737,7 +2737,7 @@ var EMOJI_CATEGORIES = {
             "&#x264D;"
         ],
         "libra": [
-            "1F683",
+            "264E",
             "&#x264E;"
         ],
         "scorpius": [
@@ -2813,7 +2813,7 @@ var EMOJI_CATEGORIES = {
             "&#x23E9;"
         ],
         "rewind": [
-            "1F683",
+            "23EA",
             "&#x23EA;"
         ],
         "arrow_double_up": [
@@ -2825,7 +2825,7 @@ var EMOJI_CATEGORIES = {
             "&#x23EC;"
         ],
         "arrow_right": [
-            "1F683",
+            "27A1",
             "&#x27A1;"
         ],
         "arrow_left": [
@@ -3185,11 +3185,11 @@ var EMOJI_CATEGORIES = {
             "&#x25AB;"
         ],
         "black_large_square": [
-            "1F683",
+            "2B1B",
             "&#x2B1B;"
         ],
         "white_large_square": [
-            "1F683",
+            "2B1C",
             "&#x2B1C;"
         ],
         "black_medium_square": [

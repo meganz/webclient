@@ -4019,7 +4019,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     top: 2px;
     right: 7px;
 }
-.nw-fm-tree-item:hover {
+.nw-fm-tree-item:hover, .nw-fm-tree-item.hovered {
     background-color: rgba(217,0,7,0.2);
     color: white;
 }
@@ -6023,9 +6023,9 @@ table {
     height: -webkit-calc(100% - 24px);
     height: -moz-calc(100% - 24px);
     height: calc(100% - 24px);/*background-image: url(../images/mega/files-grid.png);
-	background-position: left top;
-	background-repeat: repeat;
-	background-size: 4px auto;*/
+    background-position: left top;
+    background-repeat: repeat;
+    background-size: 4px auto;*/
 }
 .transfer-filtype-icon, .fm-browsers-icon, .fm-flags-icon, .fm-member-icon {
     display: block;
@@ -23420,6 +23420,7 @@ body.pro:after {
     text-decoration: underline;
     white-space: nowrap;
     padding-left: 3px;
+    cursor: pointer;
 }
 .toast-button:hover {
     text-decoration: none;
@@ -24334,7 +24335,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 .bottom-info.blue h4 {
     color: #699ac7;
     font-family: 'VentiCF-Bold', 'source_sans_prosemibold', sans-serif;
-    font-size: 24px;    
+    font-size: 24px;
 }
 .bottom-info.blue .messageA {
     color: #405b80;
@@ -24349,7 +24350,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     color: #405b80;
 }
 .bottom-info.blue .view-more-info:hover {
-    background: #ffffff;  
+    background: #ffffff;
 }
 .bottom-info.blue .view-more-info .icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/info-icon.svg") no-repeat scroll 0 0;

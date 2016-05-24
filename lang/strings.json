@@ -7655,6 +7655,10 @@
         "text": "Approve credentials",
         "context": "\"Verify user\" dialog title"
     },
+    "6786": {
+        "text": "Worry not! You can easily add new contacts by email or import existing contacts from other services.",
+        "context": ""
+    },
     "6787": {
         "text": "No shared folders with you",
         "context": ""
@@ -13114,5 +13118,33 @@
     "8755": {
         "text": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
         "context": "A message displayed on the payment success screen letting users know the expected timeframes for their account to be unlocked."
+    },
+    "8756": {
+        "text": "Save Image",
+        "context": "A title which is shown under the action that allows you to save an image to your camera roll."
+    },
+    "8757": {
+        "text": "Generating links...",
+        "context": "A message which is shown when some links to files and\/or folders are being generated."
+    },
+    "8758": {
+        "text": "Links copied",
+        "context": "A message which is shown when some links have been copied to the pasteboard (clipboard)."
+    },
+    "8759": {
+        "text": "Link removed",
+        "context": "A message which is shown when the link to a file or folder has been removed."
+    },
+    "8760": {
+        "text": "Links removed",
+        "context": "A message which is shown when the links to files and\/or folders have been removed."
+    },
+    "8761": {
+        "text": "Save Images",
+        "context": "A title which is shown under the action that allows you to save several images to your camera roll."
+    },
+    "8762": {
+        "text": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+        "context": "A message on the cloud drive screen when they are on an ephemeral session and they have no files or folders in their account. This prompts them to register an account for extra features. Please keep the [S] and [\/S] tags which will be used to style that text red at runtime."
     }
 }

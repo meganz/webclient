@@ -70,7 +70,7 @@ var psa = {
     decryptPrivateAttribute: function() {
         
         // If the private attribute has been set on the API
-        if (psa.lastSeenAttr !== null) {
+        if (psa.lastSeenAttr) {
             
             try {
                 // Try decode, decrypt, convert from TLV into a JS object, then get the number
@@ -214,19 +214,21 @@ var psa = {
             
             // Hide the banner and save the PSA as seen
             psa.hideAnnouncement();
-            psa.saveLastPsaSeen(function() {
-                
-                // If they are still loading their account (the loading animation is visible)
-                if ($('.dark-overlay').is(':visible') || $('.light-overlay').is(':visible')) {
+            psa.saveLastPsaSeen();
+            
+            // If they are still loading their account (the loading animation is visible)
+            if ($('.dark-overlay').is(':visible') || $('.light-overlay').is(':visible')) {
 
-                    // Open a new tab (and hopefully don't trigger popup blocker)
-                    window.open('https://mega.nz/#' + pageLink, '_blank');
-                }
-                else {
-                    // Otherwise redirect normally
-                    document.location.hash = pageLink;
-                }
-            });
+                // Get current URL and remove the hash so it works in development as well
+                var baseUrl = getAppBaseUrl();
+                
+                // Open a new tab (and hopefully don't trigger popup blocker)
+                window.open(baseUrl + '#' + pageLink, '_blank');
+            }
+            else {
+                // Otherwise redirect normally
+                document.location.hash = pageLink;
+            }
         });
     },
         
@@ -315,12 +317,8 @@ var psa = {
         
     /**
      * Saves the current announcement number they have seen to a user attribute if logged in, otherwise to localStorage
-     * @param {Function} callbackFunction The callback function run once saved
      */
-    saveLastPsaSeen: function(callbackFunction) {
-        
-        // If the callback is not specified, default to an anonymous function
-        callbackFunction = callbackFunction || function() {};
+    saveLastPsaSeen: function() {
         
         // Always store that they have seen it in localStorage. This is useful if they
         // then log out, then the PSA should still stay hidden and not re-show itself
@@ -329,18 +327,11 @@ var psa = {
         // If logged in and completed registration
         if (u_type === 3) {
             
-            // Convert to string because method expects a string, then store that they have seen it on the API side
+            // Convert to string because method expects a string
             var currentAnnounceNumStr = String(psa.currentAnnounceNum);
-            var savePromise = mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
             
-            // On completion, run the callback function
-            savePromise.done(function() {
-                callbackFunction();
-            });
-        }
-        else {
-            // Run the callback function
-            callbackFunction();
+            // Store that they have seen it on the API side
+            mega.attr.set('lastPsaSeen', { num: currentAnnounceNumStr }, false, true);
         }
     },
     

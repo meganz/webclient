@@ -1062,7 +1062,9 @@
             }
 
             if (this.loop) {
-                setTimeout(this.looper.bind(this), 15);
+                setTimeout(function() {
+                    this.looper();
+                }.bind(this), 15);
             }
         },
 

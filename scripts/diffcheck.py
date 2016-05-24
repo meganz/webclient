@@ -87,21 +87,20 @@ def get_git_line_sets(base, target):
 
     return file_line_mapping
 
-def get_commits_in_branch():
+def get_commits_in_branch(current_branch=None):
     protected_branches = ['master', 'develop', 'old-design']
 
-    command = 'git symbolic-ref --short -q HEAD'
-    try:
-        current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
-    except CalledProcessError as e:
-        # we might be on a detached HEAD state...
-        if e.returncode > 0:
-            command = 'git show-ref -s -- HEAD'
+    if current_branch is None:
+        try:
+            command = 'git symbolic-ref --short -q HEAD'
             current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
+        except CalledProcessError as e:
+            logging.warn('Unable to query current branch.')
+            return -1, 0
 
     if current_branch in protected_branches:
         logging.warn('In protected branch ({})'.format(current_branch))
-        return -1
+        return -1, 0
 
     command = 'git rev-list --count develop..{}'.format(current_branch)
     commits = int(subprocess.check_output(command.split()).decode('utf8'))
@@ -581,7 +580,7 @@ def reduce_verapp(file_line_mapping, **extra):
     return '\n'.join(result), error_count
 
 
-def main(base, target, norules):
+def main(base, target, norules, branch):
     """
     Run the JSHint and JSCS tests and present output ont eh console via print.
     """
@@ -618,7 +617,7 @@ def main(base, target, norules):
         print('\n\n'.join(results).rstrip())
         sys.exit(1)
 
-    branch_commits, authors = get_commits_in_branch()
+    branch_commits, authors = get_commits_in_branch(branch)
     if branch_commits > 10:
         print('\nToo many commits in this branch, please squash them using scripts/squash.sh')
         if authors > 1:
@@ -644,6 +643,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
     parser.add_argument('--norules', default=False, action='store_true',
                         help="Don't show rule names with description (default: show rules names)")
+    parser.add_argument('--branch', type=str, help='Source branch name.', required=False, default=None)
     parser.add_argument('base',
                         help='base revision or name of base branch')
     parser.add_argument('target', nargs='?', default='',
@@ -652,4 +652,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.base, args.target, args.norules)
+    main(args.base, args.target, args.norules, args.branch)

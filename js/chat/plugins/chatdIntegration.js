@@ -30,21 +30,7 @@ var ChatdIntegration = function(megaChat) {
             //self._detachFromChatRoom(chatRoom);
         });
 
-        asyncApiReq({a: "mcf", d: 1})
-            .done(function(r) {
-                // reopen chats from the MCF response.
-                if (r.c) {
-                    r.c.forEach(function (actionPacket) {
-                        self.openChatFromApi(actionPacket);
-                    });
-                    self.deviceId = r.d;
-
-                    self.mcfHasFinishedPromise.resolve();
-                }
-                else {
-                    self.mcfHasFinishedPromise.reject(r);
-                }
-            })
+        self.retrieveChatsFromApi();
     });
 
     megaChat.rebind("onDestroy.chatdInt", function(e) {
@@ -56,6 +42,71 @@ var ChatdIntegration = function(megaChat) {
     });
 
     return self;
+};
+
+ChatdIntegration.prototype.retrieveChatsFromApi = function() {
+    var self = this;
+    asyncApiReq({a: "mcf", d: 1, v: Chatd.VERSION})
+        .done(function(r) {
+            // reopen chats from the MCF response.
+            if (r.c) {
+                r.c.forEach(function (actionPacket) {
+                    self.openChatFromApi(actionPacket);
+                });
+                self.deviceId = r.d;
+
+                self.mcfHasFinishedPromise.resolve();
+            }
+            else {
+                self.mcfHasFinishedPromise.reject(r);
+            }
+        })
+        .fail(function(r) {
+            if (r === EEXPIRED) {
+                self.requiresUpdate();
+            }
+        });
+};
+
+ChatdIntegration.prototype.requiresUpdate = function() {
+    var self = this;
+
+    if (window.location.toString().indexOf("/chat")) {
+        window.location.hash = '#fm/' + M.RootID;
+    }
+
+    megaChat.destroy();
+    megaChatIsDisabled = true;
+    $('.nw-fm-left-icon.conversations').hide();
+
+    if (localStorage.chatUpdateIgnored == Chatd.VERSION) {
+        return;
+    }
+    if (!is_extension) {
+        var confirmtxt = __(
+            "There is a new version of MegaChat. Do you want reload the page and update to the " +
+            "latest version?"
+        );
+        msgDialog('confirmation', l[1900], confirmtxt, '', function (e) {
+            if (e) {
+                window.location.reload();
+            }
+            else {
+                localStorage.chatUpdateIgnored = Chatd.VERSION;
+            }
+        });
+    }
+    else {
+        msgDialog(
+            'warningb',
+            l[1900],
+            __(
+                "MegaChat had been upgraded and it would be now supported only in our newly released " +
+                "version of MEGA. Please update your extension to continue using MegaChat."
+            )
+        );
+        localStorage.chatUpdateIgnored = Chatd.VERSION;
+    }
 };
 
 ChatdIntegration.prototype._getChatRoomFromEventData = function(eventData) {
@@ -157,12 +208,18 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     if (!actionPacket.url) {
         asyncApiReq({
             a: 'mcurl',
-            id: actionPacket.id
+            id: actionPacket.id,
+            v: Chatd.VERSION
         })
         .done(function(mcurl) {
                 actionPacket.url = mcurl;
                 finishProcess();
-            });
+        })
+        .fail(function(r) {
+            if (r === EEXPIRED) {
+                self.requiresUpdate();
+            }
+        });;
     }
     else {
         finishProcess();
@@ -267,7 +324,8 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             }
             self.waitingChatIdPromises[chatRoom.roomJid] = asyncApiReq({
                 'a': 'mcc',
-                'u': userHashes
+                'u': userHashes,
+                'v': Chatd.VERSION
             })
                 .always(function() {
                     delete self.waitingChatIdPromises[chatRoom.roomJid];
@@ -378,6 +436,21 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
 
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
+
+    self.chatd.rebind('onRoomDisconnected.chatdInt' + chatRoom.roomJid.split("@")[0], function(e, eventData) {
+        var foundChatRoom = self._getChatRoomFromEventData(eventData);
+
+        if (!foundChatRoom) {
+            self.logger.warn("Room not found for: ", e, eventData);
+            return;
+        }
+
+        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+            delete chatRoom.chatId;
+            delete chatRoom.chatShard;
+            delete chatRoom.chatdUrl;
+        }
+    });
 
     if (!chatRoom.messagesBuff) {
         chatRoom.pubCu25519KeyIsMissing = false;

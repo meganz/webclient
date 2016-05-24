@@ -34,6 +34,7 @@ import tempfile
 import subprocess
 import collections
 import config
+from subprocess import CalledProcessError
 
 PLATFORMS = {'posix': 'posix',
              'nt': 'win32'}
@@ -90,7 +91,14 @@ def get_commits_in_branch():
     protected_branches = ['master', 'develop', 'old-design']
 
     command = 'git symbolic-ref --short -q HEAD'
-    current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
+    try:
+        current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
+    except CalledProcessError as e:
+        # we might be on a detached HEAD state...
+        if e.returncode > 0:
+            command = 'git show-ref -s -- HEAD'
+            current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
+
     if current_branch in protected_branches:
         logging.warn('In protected branch ({})'.format(current_branch))
         return -1

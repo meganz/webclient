@@ -902,7 +902,6 @@ var strongvelope = {};
         // Check if sender key is encrypted using RSA.
         if (encryptedKeys.length < _RSA_ENCRYPTION_THRESHOLD) {
             // Using normal chat keys.
-            var receiver = iAmSender ? otherParty : this.ownHandle;
             var cipherBytes = asmCrypto.string_to_bytes(encryptedKeys);
             var keyBytes = asmCrypto.string_to_bytes(
                 this._computeSymmetricKey(otherParty).substring(0, KEY_SIZE));
@@ -1582,11 +1581,11 @@ var strongvelope = {};
 
             var keyidStr = a32_to_str([keys[i].keyid]);
             var key = keys[i].key;
-            var isOwnMessage = (keys[i].userId === this.ownHandle);
+            var isOwnKey = (keys[i].userId === this.ownHandle);
 
             var decryptedKeys = this._decryptKeysFrom(key,
                                          keys[i].userId,
-                                         isOwnMessage);
+                                         isOwnKey);
             if (!this.participantKeys[keys[i].userId]) {
                 this.participantKeys[keys[i].userId] = {};
             }

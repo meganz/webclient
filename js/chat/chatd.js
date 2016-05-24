@@ -646,8 +646,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.keepAliveTimerRestart();
                 self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
                 if (self.needRestore === true) {
-                    // TOVG: disable restore for now as it is not stable.
-                    // self.restore();
+                    self.restore();
                     self.needRestore = false;
                 }
                 self.chatd.trigger('onMessagesHistoryDone',
@@ -697,8 +696,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         keyid:  self.chatd.unpack32le(cmd.substr(13,4))
                     }
                 );
-                self.chatd.keyconfirm(self.chatd.unpack32le(cmd.substr(9,4)));
-                self.chatd.updatekeyid(cmd.substr(1,8), self.chatd.unpack32le(cmd.substr(13,4)), self.chatd.unpack32le(cmd.substr(9,4)));
+                self.chatd.keyconfirm(cmd.substr(1,8), self.chatd.unpack32le(cmd.substr(13,4)));
                 len = 17;
                 break;
             case Chatd.Opcode.MSGID:
@@ -781,15 +779,6 @@ Chatd.prototype.modify = function(chatId, msgnum, message) {
     return this.chatIdMessages[chatId].modify(msgnum, message);
 };
 
-// update keyid based on the returned keyid/keyxid from chatd
-Chatd.prototype.updatekeyid = function(chatId, keyid, keyxid) {
-    if (!this.chatIdMessages[chatId]) {
-        return false;
-    }
-    this.chatIdMessages[chatId].updatepersistencykeyid(keyid, keyxid);
-    return this.chatIdMessages[chatId].updatekeyid(keyid, keyxid);
-};
-
 Chatd.Shard.prototype.msg = function(chatId, messages) {
     var cmds = [];
     for (var i = 0; i<messages.length; i++) {
@@ -854,7 +843,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
     for (var i = 0; i<messages.length; i++) {
         var message = messages[i];
         // allocate a transactionid for the new message
-        var msgxid = (message.type === Chatd.MsgType.KEY) ? (keyId >>> 0): this.chatd.nexttransactionid();
+        var msgxid = this.chatd.nexttransactionid();
         var timestamp = Math.floor(new Date().getTime()/1000);
 
         // write the new message to the message buffer and mark as in sending state
@@ -872,7 +861,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
         }
         this.sending[msgxid] = this.highnum;
         this.sendingList.push(msgxid);
-        this.persist();
+        this.persist(msgxid);
 
         messageConstructs.push({"msgxid":msgxid, "timestamp":timestamp,"keyid":keyId, "message":message.message, "type":message.type});
     };
@@ -884,18 +873,17 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
     return this.highnum;
 };
 
-Chatd.Messages.prototype.updatekeyid = function(keyid, keyxid) {
+Chatd.Messages.prototype.updatekeyid = function(keyid) {
     var self = this;
 
-    for (var id = self.highnum; id >= self.lownum; id--) {
-        if (self.buf[id] && (self.buf[id][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY)) {
-            // if it detects next key message, stop.
-            break;
+    this.sendingList.forEach(function(msgxid) {
+        if (self.buf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
+            return;
         }
-        if (self.buf[id] && ((self.buf[id][Chatd.MsgField.KEYID] >>> 0) === keyxid)) {
-            self.buf[id][Chatd.MsgField.KEYID] = keyid;
+        else {
+            self.buf[self.sending[msgxid]][Chatd.MsgField.KEYID] = keyid;
         }
-    }
+    });
 };
 
 Chatd.Messages.prototype.modify = function(msgnum, message) {
@@ -943,7 +931,7 @@ Chatd.Messages.prototype.clearpending = function() {
     // mapping of transactionids of messages being sent to the numeric index of this.buf
     var self = this;
     this.sendingList.forEach(function(msgxid) {
-        self.persist(msgxid);
+        self.removefrompersist(msgxid);
     });
     this.sending = {};
     this.sendingList = [];
@@ -969,15 +957,17 @@ Chatd.Messages.prototype.resend = function() {
             );
         } else {
             // if it expires, require manul send.
-            self.chatd.trigger('onMessageUpdated', {
-                chatId: base64urlencode(self.chatId),
-                userId: base64urlencode(self.buf[self.sending[msgxid]][Chatd.MsgField.USERID]),
-                id: self.sending[msgxid],
-                state: 'EXPIRED',
-                keyid: self.buf[self.sending[msgxid]][Chatd.MsgField.KEYID],
-                message: self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE],
-                ts:self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP]
-            });
+            if (self.buf[self.sending[msgxid]][Chatd.MsgField.TYPE] !== Chatd.MsgType.KEY) {
+                self.chatd.trigger('onMessageUpdated', {
+                    chatId: base64urlencode(self.chatId),
+                    userId: base64urlencode(self.buf[self.sending[msgxid]][Chatd.MsgField.USERID]),
+                    id: self.sending[msgxid],
+                    state: 'EXPIRED',
+                    keyid: self.buf[self.sending[msgxid]][Chatd.MsgField.KEYID],
+                    message: self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE],
+                    ts:self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP]
+                });
+            }
         }
     });
 
@@ -1030,16 +1020,10 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
 };
 
 // msgid can be false in case of rejections
-Chatd.prototype.keyconfirm = function(keyxid) {
+Chatd.prototype.keyconfirm = function(chatId, keyid) {
 
-    // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
-    for (var chatId in this.chatIdMessages) {
-        if (this.chatIdMessages[chatId].sending[keyxid]) {
-            if (this.chatIdMessages[chatId]) {
-                this.chatIdMessages[chatId].confirmkey(keyxid);
-            }
-            break;
-        }
+    if (this.chatIdMessages[chatId]) {
+        this.chatIdMessages[chatId].confirmkey(keyid);
     }
 };
 
@@ -1065,7 +1049,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     var self = this;
     var num = this.sending[msgxid];
 
-    this.persist(msgxid);
+    this.removefrompersist(msgxid);
     removeValue(this.sendingList, msgxid);
     delete this.sending[msgxid];
 
@@ -1202,18 +1186,29 @@ Chatd.Messages.prototype.discard = function(msgxid) {
         message: self.buf[num][Chatd.MsgField.MESSAGE]
     });
 
-    self.persist(msgxid);
+    self.removefrompersist(msgxid);
     removeValue(self.sendingList, msgxid);
     delete self.sending[msgxid];
     delete self.buf[num];
 };
 
-Chatd.Messages.prototype.confirmkey = function(keyxid) {
-    if (this.sending[keyxid]) {
-        this.persist(keyxid);
-        removeValue(this.sendingList, keyxid);
-        delete this.sending[keyxid];
-    }
+Chatd.Messages.prototype.confirmkey = function(keyid) {
+    var self = this;
+    var firstkeyxid;
+    this.sendingList.forEach(function(msgxid) {
+        if (self.buf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
+            firstkeyxid = self.buf[self.sending[msgxid]][Chatd.MsgField.MSGID];
+            return;
+        }
+    });
+    var cacheKey = base64urlencode(self.chatId) + ":" + firstkeyxid;
+    self.chatd.messagesQueueKvStorage.removeItem(cacheKey);
+    removeValue(this.sendingList, firstkeyxid);
+    delete this.sending[firstkeyxid];
+
+    // update all the keyid in pending and persist list first.
+    this.updatekeyid(keyid);
+    this.updatepersistencykeyid(keyid);
 };
 
 Chatd.Messages.prototype.persist = function(messageId) {
@@ -1222,37 +1217,52 @@ Chatd.Messages.prototype.persist = function(messageId) {
     if (!messageId) {
         self.sendingList.forEach(function(msgxid) {
             var cacheKey = base64urlencode(self.chatId) + ":" + msgxid;
-
-            self.chatd.messagesQueueKvStorage.hasItem(cacheKey)
-                .fail(function() {
-
-                    var num = self.sending[msgxid];
-                    if (num) {
-                        self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
-                            'messageId' : msgxid,
-                            'userId' : self.buf[num][Chatd.MsgField.USERID],
-                            'timestamp' : self.buf[num][Chatd.MsgField.TIMESTAMP],
-                            'message' : self.buf[num][Chatd.MsgField.MESSAGE],
-                            'keyId' : self.buf[num][Chatd.MsgField.KEYID],
-                            'updated' : self.buf[num][Chatd.MsgField.UPDATED],
-                            'type' : self.modified[num] ? Chatd.MsgType.EDIT : self.buf[num][Chatd.MsgField.TYPE]
-                        });
-                    }
+            var num = self.sending[msgxid];
+            if (num) {
+                self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
+                    'messageId' : msgxid,
+                    'userId' : self.buf[num][Chatd.MsgField.USERID],
+                    'timestamp' : self.buf[num][Chatd.MsgField.TIMESTAMP],
+                    'message' : self.buf[num][Chatd.MsgField.MESSAGE],
+                    'keyId' : self.buf[num][Chatd.MsgField.KEYID],
+                    'updated' : self.buf[num][Chatd.MsgField.UPDATED],
+                    'type' : self.modified[num] ? Chatd.MsgType.EDIT : self.buf[num][Chatd.MsgField.TYPE]
                 });
+            }
         });
     }
     else {
-        var cacheKey = base64urlencode(self.chatId) + ":" + messageId;
-        self.chatd.messagesQueueKvStorage.removeItem(cacheKey);
+        var num = self.sending[messageId];
+        if (num) {
+            var cacheKey = base64urlencode(self.chatId) + ":" + messageId;
+            self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
+                'messageId' : messageId,
+                'userId' : self.buf[num][Chatd.MsgField.USERID],
+                'timestamp' : self.buf[num][Chatd.MsgField.TIMESTAMP],
+                'message' : self.buf[num][Chatd.MsgField.MESSAGE],
+                'keyId' : self.buf[num][Chatd.MsgField.KEYID],
+                'updated' : self.buf[num][Chatd.MsgField.UPDATED],
+                'type' : self.modified[num] ? Chatd.MsgType.EDIT : self.buf[num][Chatd.MsgField.TYPE]
+            });
+        }
     }
 };
 
-Chatd.Messages.prototype.updatepersistencykeyid = function(keyid, keyxid) {
+Chatd.Messages.prototype.removefrompersist = function(messageId) {
+    var self = this;
+    var cacheKey = base64urlencode(self.chatId) + ":" + messageId;
+    self.chatd.messagesQueueKvStorage.removeItem(cacheKey);
+};
+
+Chatd.Messages.prototype.updatepersistencykeyid = function(keyid) {
     var self = this;
     var prefix = base64urlencode(self.chatId);
 
     self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
-        if (((v.keyId >>> 0) === keyxid) && (v.type !== Chatd.MsgType.KEY)) {
+        if (v.type === Chatd.MsgType.KEY) {
+            return ;
+        }
+        else {
             var cacheKey = base64urlencode(self.chatId) + ":" + v.messageId;
             self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
                 'messageId' : v.messageId,
@@ -1271,12 +1281,54 @@ Chatd.Messages.prototype.restore = function() {
     var self = this;
     var prefix = base64urlencode(self.chatId);
     var count = 0;
+    var tempkeyid = 0xffff0001;
+    var pendingkey = false;
     var promises = [];
+    var keys = [];
+    var iskey = false;
+    var previouskeyid;
+    var trivialkeys = [];
+
     promises.push(
         self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
 
-            if ((v.type !== Chatd.MsgType.EDIT) || ((v.type === Chatd.MsgType.EDIT) && !self.sending[v.messageId])) {
+            if (v.type === Chatd.MsgType.KEY ) {
+                // if the previous message is a key message, then the previous key is a trivial key.
+                if (iskey) {
+                    trivialkeys.push(previouskeyid);
+                }
 
+                pendingkey = true;
+                ++tempkeyid;
+                v.keyId = tempkeyid;
+
+                var index = 0;
+                var len = v.message.length;
+
+                while (index < len) {
+                    var recipient = v.message.substr(index, 8);
+                    var keylen = self.chatd.unpack16le(v.message.substr(index + 8,2));
+                    var key = v.message.substr(index + 10, keylen);
+                    if (recipient === v.userId) {
+                        keys.push({
+                            'userId' : base64urlencode(v.userId),
+                            'key' : key,
+                            'keyid' : tempkeyid
+                        });
+                        break;
+                    }
+                    index += (10 + keylen);
+                }
+                iskey = true;
+                previouskeyid = v.messageId;
+            }
+            else {
+                iskey = false;
+            }
+            if ((v.type !== Chatd.MsgType.EDIT) || ((v.type === Chatd.MsgType.EDIT) && !self.sending[v.messageId])) {
+                if (pendingkey ) {
+                    v.keyId = tempkeyid;
+                }
                 // if the message is not an edit or an edit with the original message not in the pending list, restore it.
                 self.buf[++self.highnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
                 self.sending[v.messageId] = self.highnum;
@@ -1290,9 +1342,20 @@ Chatd.Messages.prototype.restore = function() {
         })
     );
     var _resendPending = function() {
+
         if (count > 0) {
+            self.chatd.trigger('onMessageKeyRestore',
+                {
+                    chatId: base64urlencode(self.chatId),
+                    keyxid : tempkeyid,
+                    keys  : keys
+                }
+            );
             self.resend();
-            self.chatd.hist(self.chatId, count);
+            self.chatd.joinrangehist(self.chatId);
+            for (var keyid in trivialkeys) {
+                self.removefrompersist(keyid);
+            }
         }
     };
     MegaPromise.allDone(promises).always(function() {

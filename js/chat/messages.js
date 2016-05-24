@@ -430,7 +430,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
         console.error(eventData.id, eventData.state, eventData);
 
-        if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
+        if (eventData.state === "EDITED" || eventData.state === "TRUNCATED" /*|| eventData.state === "EXPIRED"*/) {
             var timestamp = (
                 eventData.state === "EDITED" ? chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime()
             );
@@ -460,6 +460,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         false
                     );
                     if (decrypted) {
+
                         //if the edited payload is an empty string, it means the message has been deleted.
                         editedMessage.textContents = decrypted.payload;
                         if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {

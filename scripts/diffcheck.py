@@ -86,6 +86,24 @@ def get_git_line_sets(base, target):
 
     return file_line_mapping
 
+def get_commits_in_branch():
+    protected_branches = ['master', 'develop', 'old-design']
+
+    command = 'git symbolic-ref --short -q HEAD'
+    current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
+    if current_branch in protected_branches:
+        logging.warn('In protected branch ({})'.format(current_branch))
+        return -1
+
+    command = 'git rev-list --count develop..{}'.format(current_branch)
+    commits = int(subprocess.check_output(command.split()).decode('utf8'))
+    # logging.info('{} commits in branch {}'.format(commits, current_branch))
+
+    command = 'git shortlog -s --no-merges develop..{}'.format(current_branch)
+    authors = len(subprocess.check_output(command.split()).decode('utf8').rstrip().split('\n'))
+    # logging.info('{} authors worked in branch {}'.format(authors, current_branch))
+
+    return commits, authors
 
 def reduce_jshint(file_line_mapping, **extra):
     """
@@ -590,6 +608,15 @@ def main(base, target, norules):
     if total_errors > 0:
         logging.info('Output of reduced results ...')
         print('\n\n'.join(results).rstrip())
+        sys.exit(1)
+
+    branch_commits, authors = get_commits_in_branch()
+    if branch_commits > 10:
+        print('\nToo many commits in this branch, please squash them using scripts/squash.sh')
+        if authors > 1:
+            print('WARNING: {} authors have contributed in this branch, '
+                  'consider squashing your commits only\n         by manually running '
+                  '"git rebase -i --autosquash develop", unless they do not care.'.format(authors))
         sys.exit(1)
 
     print('\nEverything seems Ok.')

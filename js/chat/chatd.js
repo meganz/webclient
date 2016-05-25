@@ -183,8 +183,6 @@ Chatd.Shard = function(chatd, shard) {
 
     self.needRestore = true;
 
-    self.isReopen = false;
-
     self.connectionRetryManager = new ConnectionRetryManager(
         {
             functions: {
@@ -303,7 +301,7 @@ Chatd.Shard.prototype.reconnect = function() {
         self.logger.log('chatd connection established');
         self.triggerSendIfAble();
         self.rejoinexisting();
-        self.isReopen = true;
+        self.resendpending();
         self.chatd.trigger('onOpen', {
             shard: self
         });
@@ -652,10 +650,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     self.restore();
                     self.needRestore = false;
                 }
-                if (self.isReopen) {
-                    self.resendpending();
-                    self.isReopen = false;
-                }
+
                 self.chatd.trigger('onMessagesHistoryDone',
                     {
                         chatId: base64urlencode(cmd.substr(1,8))

@@ -15,7 +15,7 @@
     padding: 2px;
 }
 .conversation-panels, .conversation-panel {
-        -webkit-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 100%;
@@ -47,21 +47,21 @@
 .chat-right-head-txt {
     font-size: 18px;
     line-height: 22px;
-     color:#666666;
-     padding: 0 0 0 0;
+    color: #666666;
+    padding: 0 0 0 0;
 }
 .chat-grey-counter {
     float: right;
     background-color: #777777;
     height: 16px;
-        padding: 0 6px;
+    padding: 0 6px;
     margin: 2px 0 0 0;
     -moz-border-radius: 4px;
--webkit-border-radius: 4px;
-border-radius: 4px;
-color: white;
-font-size: 11px; 
-line-height: 16px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    color: white;
+    font-size: 11px;
+    line-height: 16px;
 }
 .chat-contacts-list {
     max-height: -webkit-calc(100% - 306px);

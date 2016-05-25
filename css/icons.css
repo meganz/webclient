@@ -29,7 +29,7 @@
     opacity: 0.6;
 }
 .link-button.red > .small-icon {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     -moz-opacity: 0.8;
     -khtml-opacity: 0.8;
     opacity: 0.8;
@@ -126,7 +126,7 @@
     background-position: -44px -497px;
 }
 .small-icon.conversation-icon {
-        background-position: -44px -533px;
+    background-position: -44px -533px;
 }
 .small-icon.cogwheel-icon {
     background-position: -44px -577px;
@@ -178,7 +178,7 @@
     background-position: -28px -3268px;
 }
 .small-icon.grey-crossed-mic {
-    background-position: -65px -3268px; 
+    background-position: -65px -3268px;
 }
 .small-icon.clock-icon {
     background-position: -2px -3200px;
@@ -286,10 +286,10 @@
     background-position: -3px -986px;
 }
 .dropdown-item:hover .small-icon.eye-icon {
-        background-position: -84px -497px;
+    background-position: -84px -497px;
 }
 .dropdown-item:hover .small-icon.conversation-icon {
-        background-position: -84px -533px;
+    background-position: -84px -533px;
 }
 .dropdown-item:hover .small-icon.cogwheel-icon {
     background-position: -84px -577px;

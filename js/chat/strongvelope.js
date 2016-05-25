@@ -541,10 +541,7 @@ var strongvelope = {};
             this.myPubEd25519 = crypt.getPubKeyFromPrivKey(this.myPrivEd25519, 'Ed25519');
         }
 
-        this._keyEncryptionCount = 0;
         this.keyId = null;
-        this.previousKeyId = null;
-        this._sentKeyId = null;
         this.participantKeys = {};
         this.participantKeys[this.ownHandle] = {};
         this.otherParticipants = new Set();
@@ -694,17 +691,6 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.updateSenderKey = function() {
 
-
-        if (this.keyId && (this.keyId !== this._sentKeyId)) {
-            // We can return early, as our current sender key has not even been
-            // sent to other participants, yet.
-            return;
-        }
-
-        if (this.keyId) {
-            // Juggle the key IDs.
-            this.previousKeyId = this.keyId;
-        }
         this.counter = (this.counter + 1) & 0xffff;
         this.keyId = ns._encodeKeyId(this.counter);
 
@@ -712,8 +698,6 @@ var strongvelope = {};
         var secretKey = new Uint8Array(SECRET_KEY_SIZE);
         asmCrypto.getRandomValues(secretKey);
         this.participantKeys[this.ownHandle][this.keyId] = asmCrypto.bytes_to_string(secretKey);
-
-        this._keyEncryptionCount = 0;
     };
 
     /**
@@ -889,13 +873,11 @@ var strongvelope = {};
      *     Encrypted Key(s).
      * @param {String} otherParty
      *     User handle of the other party.
-     * @param {Boolean} [iAmSender]
-     *     If true, the message was sent by us (default: false).
      * @returns {Array.<String>}
      *     All symmetric keys in an array.
      */
     strongvelope.ProtocolHandler.prototype._decryptKeysFrom = function(
-            encryptedKeys, otherParty, iAmSender) {
+            encryptedKeys, otherParty) {
 
         var clear = '';
 
@@ -926,21 +908,6 @@ var strongvelope = {};
 
         return result;
     };
-
-    /**
-     * An object containing the encrypted and TLV encoded recipient key IDs and
-     * sender keys.
-     *
-     * @typedef {Object} EncryptedSenderKeys
-     * @property {String} recipients
-     *     TLV encoded recipients for keys.
-     * @property {String} keys
-     *     TLV encoded, encrypted sender key to recipients.
-     * @property {String} keyIds
-     *     TLV encoded key IDs.
-     */
-
-
 
     /**
      * Tracks the participant set from others, included and excluded participant
@@ -1008,7 +975,6 @@ var strongvelope = {};
         if (encryptedMessage.ciphertext !== null) {
             content += tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.PAYLOAD),
                                             encryptedMessage.ciphertext);
-            this._keyEncryptionCount++;
         }
 
         // Sign message.
@@ -1076,12 +1042,11 @@ var strongvelope = {};
         }
 
         // if the key is rotated , generate a new key and send it out.
-        if ((this.previousKeyId === null && this.keyId === null) || 
+        if ((this.keyId === null) ||
             (this.participantChange === true)) {
 
             this.updateSenderKey();
             encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_KEYED, "message": this.getKeyBlob()});
-            this._sentKeyId = this.keyId;
             this.includeParticipants.clear();
             this.excludeParticipants.clear();
             this.participantChange = false;
@@ -1451,7 +1416,6 @@ var strongvelope = {};
         if (participant === this.ownHandle) {
             // clean up
             this.keyId = null;
-            //this.previousKeyId = null;? should I still be able to check the history messages?
             this.otherParticipants.clear();
             this.includeParticipants.clear();
             this.excludeParticipants.clear();
@@ -1548,23 +1512,14 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.setKeyID = function(keyxId, keyId) {
 
-        var keyIdFlag = TEMPKEYIDFLAG >>> 0;
-        if (((keyxId & keyIdFlag) >>> 0 ) !== keyIdFlag) {
-            logger.critical('Temporary key ID is not correct.');
-        }
-        if (((keyId & keyIdFlag) >>> 0 ) === keyIdFlag) {
-            logger.critical('Key ID is exceeding threshold.');
-        }
-
         var tempkeyid = a32_to_str([keyxId]);
         var newkeyid = a32_to_str([keyId]);
 
         if (!this.participantKeys[this.ownHandle][tempkeyid]) {
-            return ;
+            throw new Error('No cached chat key for given key id!');
         }  
         this.participantKeys[this.ownHandle][newkeyid] = this.participantKeys[this.ownHandle][tempkeyid];
         this.keyId = newkeyid;
-        this._sentKeyId = newkeyid;
     };
 
     /**
@@ -1605,9 +1560,9 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype.restoreKeys = function(keyxid, keys) {
 
         this.seedKeys(keys);
-        var keyCount = keyxid &0x00ff;
+        var keyCount = keyxid & 0x00ff;
         if (keyCount > this.counter) {
-            this.counter = keyCount + 1;
+            this.counter = keyCount;
         }
     };
 }());

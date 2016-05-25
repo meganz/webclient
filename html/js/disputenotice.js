@@ -2,7 +2,9 @@ var copyright = copyright || {};
 
 // Validate the email address
 copyright.validateEmail = function(email) {
-    var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+    var re1 = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*/
+    var re2 = /@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+    var re = new RegExp(re1.source + re2.source);
     var match = re.exec(email);
     if (match === null) return false;
 
@@ -64,22 +66,26 @@ copyright.validateDisputeForm = function() {
         proceed = true;
         if ($(e).val() !== '' && $(copyrightwork[i]).val() !== '' && $(explanation[i]).val() === '') {
             proceed = false;
-            msgDialog('warninga', l[135], escapeHTML("Please provide commentary sufficient to explain the mistake or misidentification."));
+            msgDialog('warninga', l[135], 
+                escapeHTML(l[8809]));
             return false;
         }
         if ($(e).val() !== '' && $(copyrightwork[i]).val() === '') {
             proceed = false;
-            msgDialog('warninga', l[135], escapeHTML("Please provide a description of the content that has been taken down."));
+            msgDialog('warninga', l[135], 
+                escapeHTML(l[8810]));
             return false;
         }
         if ($(e).val() === '' || $(copyrightwork[i]).val() === '') {
             proceed = false;
-            msgDialog('warninga', l[135], escapeHTML("Please supply the URL of the content that has been taken down."));
+            msgDialog('warninga', l[135], 
+                escapeHTML(l[8811]));
             return false;
         } else {
             if (!copyright.validateUrl($(e).val())) {
                 proceed = false;
-                msgDialog('warninga', l[135], escapeHTML("Please enter a valid MEGA link to the content that has been taken down."));
+                msgDialog('warninga', l[135], 
+                    escapeHTML(l[8812]));
                 return false;
             }
         }
@@ -87,18 +93,18 @@ copyright.validateDisputeForm = function() {
     if (!proceed) return false;
 
     if ($('input.copyrightowner').val() === '') {
-        msgDialog('warninga', l[135], escapeHTML("Please supply your full name."), false, function() {
+        msgDialog('warninga', l[135], escapeHTML(l[662]), false, function() {
             $('input.copyrightowner').focus();
         });
         return false;
     }
     else if ($('input.phonenumber').val() === '') {
-        msgDialog('warninga', l[135], escapeHTML("Please supply your phone number."), false, function() {
+        msgDialog('warninga', l[135], escapeHTML(l[8813]), false, function() {
             $('input.phonenumber').focus();
         });
         return false;
     } else if (!copyright.validatePhoneNumber($('input.phonenumber').val())) {
-        msgDialog('warninga', l[135], escapeHTML("Please supply a valid phone number."), false, function() {
+        msgDialog('warninga', l[135], escapeHTML(l[8814]), false, function() {
             $('input.phonenumber').focus();
         });
         return false;
@@ -115,7 +121,7 @@ copyright.validateDisputeForm = function() {
         return false;
     }
     else if ($('input.address').val() === '') {
-        msgDialog('warninga', l[135], escapeHTML("Please supply your address."), false, function() {
+        msgDialog('warninga', l[135], escapeHTML(l[8815]), false, function() {
             $('input.address').focus();
         });
         return false;
@@ -134,11 +140,11 @@ copyright.validateDisputeForm = function() {
     
     // The checkboxes depend on the type
     if (proceed && !$('.cn_check1 .checkinput').attr('checked')) {
-        msgDialog('warninga', l[135], escapeHTML("Please acknowledge that you will accept service of proceedings in New Zealand or in the jurisdiction where my address in this counter-notice is located, from the person who provided MEGA with the original copyright takedown notice or an agent of such person."));
+        msgDialog('warninga', l[135], escapeHTML(l[8816]));
         return false;
     }
     else if (!$('.cn_check2 .checkinput').attr('checked')) {
-        msgDialog('warninga', l[135], escapeHTML("Please acknowledge that you have a good faith belief that the material was removed or disabled as a result of a mistake or misidentification of the material to be removed or disabled."));
+        msgDialog('warninga', l[135], escapeHTML(l[8817]));
         return false;
     }
 
@@ -187,18 +193,18 @@ copyright.init_cndispute = function() {
                         if (response == -9) {
                             // ENOENT error
                             msgDialog('warninga',
-                                escapeHTML(l[135]), escapeHTML("The link you provided is either invalid or is not the subject of a takedown notice."), false);
+                                escapeHTML(l[135]), escapeHTML(l[8818]), false);
                             return false;
                         } 
                         if (response == -12) {
                             // EEXIST error, they have already made a dispute for this link
                             msgDialog('warninga',
-                                escapeHTML(l[135]), escapeHTML("You have already made a counter-notification against this link."), false);
+                                escapeHTML(l[135]), escapeHTML(l[8819]), false);
                             return false;
                         } else if (response == -11) {
                             // Access
                             msgDialog('warninga',
-                                escapeHTML(l[135]), escapeHTML("The MEGA account provided did not match the owner of the link."), false);
+                                escapeHTML(l[135]), escapeHTML(l[8820]), false);
                             return false;
                         } else {
                             // Generic (probably args)
@@ -236,7 +242,7 @@ copyright.init_cndispute = function() {
         }
     });
 
-    $('.select select').rebind('change', function(e) {        
+    $('.select select').rebind('change', function(e) {
         if ($(this).val() !== 0) {
             $(this).parent().addClass('selected');
             $(this).parent().find('.affiliate-select-txt')

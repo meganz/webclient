@@ -15,6 +15,16 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.dropdown.body hr {
+    margin:8px 0; padding:0; border:0; height: 1px;
+}
+.dropdown.body hr::before {
+    content: '';
+    position:absolute;
+    width: 100%;
+    left:0;
+    height: 1px; background-color: #EEEEEE;
+}
 .dropdown.body.popup {
     width: 360px;
     padding: 0;
@@ -105,6 +115,29 @@
     background-color: #AAAAAA;
     color: white;
 }
+.dropdown-item.tick-item.active {
+    color:#333333;
+    font-family: 'source_sans_prosemibold';
+    padding-right: 24px;
+}
+.dropdown-item.tick-item.active:hover {
+    color: white;
+}
+.dropdown-item.tick-item.active::before {
+    content: '';
+    width: 11px;
+    height: 8px;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    margin: -4px 0 0 0;
+    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-repeat: no-repeat;
+    background-position: -49px -627px;
+}
+.dropdown-item.tick-item.active:hover::before {
+    background-position: -89px -627px;
+}
 .dropdown-item.red {
     color: #E44C51;
 }
@@ -115,6 +148,12 @@
 .dropdown-item i {
     margin: 0 9px 1px 0;
     vertical-align: middle;
+}
+.dropdown-items-info {
+    font-size: 13px;
+    line-height: 17px;
+    color: #999999;
+    padding: 0 4px 6px 4px;
 }
 .dropdown.body hr {
     border: 0;

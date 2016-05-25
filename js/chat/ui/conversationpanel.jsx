@@ -142,6 +142,15 @@ var ConversationRightArea = React.createClass({
                                     }}/>
                             );
                         }
+                        if (room.members[contactHash] !== 0) {
+                            dropdowns.push(
+                                <DropdownsUI.DropdownItem
+                                    key="privReadOnly" icon="human-profile"
+                                    label={__("Change privilege to Read-only")} onClick={() => {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 0]);
+                                    }}/>
+                            );
+                        }
                     }
                     else if (room.members[u_handle] === 2) {
                         // full access
@@ -253,7 +262,9 @@ var ConversationRightArea = React.createClass({
                                 }
                                 multiple={true}
                                 className="popup add-participant-selector"
-                                singleSelectedButtonLabel={__("Start Group Conversation")}
+                                singleSelectedButtonLabel={__("Add to group conversation")}
+                                multipleSelectedButtonLabel={__("Add to group conversation")}
+                                nothingSelectedButtonLabel={__("Select one or more contacts to continue")}
                                 onSelectDone={this.props.onAddParticipantSelected}
                                 positionMy="center top"
                                 positionAt="left bottom"
@@ -1458,7 +1469,7 @@ var ConversationPanel = React.createClass({
                                 );
                             }
                             else {
-                                self.props.chatRoom.trigger('onAddUserRequest', contactHashes);
+                                self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
                             }
                         }}
                     />

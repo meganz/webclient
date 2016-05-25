@@ -940,8 +940,9 @@ Chatd.Messages.prototype.clearpending = function() {
     this.modified = {};
 };
 
-Chatd.Messages.prototype.resend = function() {
+Chatd.Messages.prototype.resend = function(restore) {
     var self = this;
+    restore = (typeof restore === 'undefined') ? false : restore;
 
     // resend all pending new messages and modifications
         // 1 hour is agreed by everyone.
@@ -962,7 +963,7 @@ Chatd.Messages.prototype.resend = function() {
                     chatId: base64urlencode(self.chatId),
                     userId: base64urlencode(self.buf[self.sending[msgxid]][Chatd.MsgField.USERID]),
                     id: self.sending[msgxid],
-                    state: 'EXPIRED',
+                    state: restore ? 'RESTOREDEXPIRED' : 'EXPIRED',
                     keyid: self.buf[self.sending[msgxid]][Chatd.MsgField.KEYID],
                     message: self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE],
                     ts:self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP]
@@ -1351,7 +1352,7 @@ Chatd.Messages.prototype.restore = function() {
                     keys  : keys
                 }
             );
-            self.resend();
+            self.resend(true);
             self.chatd.joinrangehist(self.chatId);
             for (var keyid in trivialkeys) {
                 self.removefrompersist(keyid);

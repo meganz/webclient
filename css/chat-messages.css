@@ -254,6 +254,12 @@
     right: 24px;
     float: none;
     margin: 2px 0 0 0;
+    z-index: 100;
+}
+.not-sent .message.content-area > .default-white-button.tiny-button,
+.sending .message.content-area > .default-white-button.tiny-button {
+    right: 48px;
+    margin-top: 5px;
 }
 .message.content-area .small-blue-spinner {
     position: absolute;

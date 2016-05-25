@@ -32,7 +32,6 @@ var Button = React.createClass({
             });
 
             $(window).rebind('hashchange.button' + self.getUniqueId(), function(e) {
-                console.error(self, self.state.focused);
                 if (self.state.focused === true) {
                     self.onBlur();
                 }

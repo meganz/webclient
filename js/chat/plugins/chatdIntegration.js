@@ -737,12 +737,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "u": u_handle // optional, email or handle of other user to remove. If not provided the requester is removed.
             });
         });
-        $(chatRoom).rebind('onAddUserRequest.chatdInt', function(e, contactHash) {
-            asyncApiReq({
-                "a":"mci",
-                "id": chatRoom.chatId,
-                "u": contactHash,
-                "p": 2
+        $(chatRoom).rebind('onAddUserRequest.chatdInt', function(e, contactHashes) {
+            contactHashes.forEach(function(h) {
+                asyncApiReq({
+                    "a":"mci",
+                    "id": chatRoom.chatId,
+                    "u": h,
+                    "p": 2
+                });
             });
         });
 

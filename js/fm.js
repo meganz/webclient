@@ -2884,7 +2884,11 @@ function fmtopUI() {
                     && M.currentdirid.substr(0, 6) !== 'search')) {
 
             $('.fm-add-user').removeClass('hidden');
-            $('.fm-left-panel').addClass('contacts-panel');
+
+
+            // don't add .contacts-panel to ALL .fm-left-panel's
+            $('.fm-left-panel:visible').addClass('contacts-panel');
+            
             if (M.currentdirid === 'ipc') {
                 $('.fm-received-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');

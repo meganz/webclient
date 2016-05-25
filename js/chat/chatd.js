@@ -153,13 +153,12 @@ Chatd.Shard = function(chatd, shard) {
         {
             functions: {
                 reconnect: function(connectionRetryManager) {
-                    //console.error("reconnect was called");
                     // TODO: change this to use the new API method for retrieving a mcurl for a specific shard 
                     // (not chat)
                     var firstChatId = Object.keys(self.chatIds)[0];
                     asyncApiReq({
                         a: 'mcurl',
-                        id: firstChatId,
+                        id: base64urlencode(firstChatId),
                         v: Chatd.VERSION
                     })
                         .done(function(mcurl) {

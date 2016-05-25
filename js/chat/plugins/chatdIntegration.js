@@ -72,41 +72,45 @@ ChatdIntegration.prototype.requiresUpdate = function() {
     var self = this;
 
     if (window.location.toString().indexOf("/chat")) {
-        window.location.hash = '#fm/' + M.RootID;
+        $('.nw-fm-left-icon.cloud-drive').triggerHandler('click')
     }
 
     megaChat.destroy();
     megaChatIsDisabled = true;
     $('.nw-fm-left-icon.conversations').hide();
 
-    if (localStorage.chatUpdateIgnored == Chatd.VERSION) {
-        return;
-    }
-    if (!is_extension) {
-        var confirmtxt = __(
-            "There is a new version of MegaChat. Do you want reload the page and update to the " +
-            "latest version?"
-        );
-        msgDialog('confirmation', l[1900], confirmtxt, '', function (e) {
-            if (e) {
-                window.location.reload();
-            }
-            else {
-                localStorage.chatUpdateIgnored = Chatd.VERSION;
-            }
-        });
-    }
-    else {
-        msgDialog(
-            'warningb',
-            l[1900],
-            __(
-                "MegaChat had been upgraded and it would be now supported only in our newly released " +
-                "version of MEGA. Please update your extension to continue using MegaChat."
-            )
-        );
-        localStorage.chatUpdateIgnored = Chatd.VERSION;
-    }
+    // because msgDialog would be closed on location.hash change... we need to do this a bit later....
+    Soon(function() {
+
+        if (localStorage.chatUpdateIgnored === String(Chatd.VERSION)) {
+            return;
+        }
+        if (!is_extension) {
+            var confirmtxt = __(
+                "There is a new version of MegaChat. Do you want reload the page and update to the " +
+                "latest version?"
+            );
+            msgDialog('confirmation', l[1900], confirmtxt, '', function (e) {
+                if (e) {
+                    window.location.reload();
+                }
+                else {
+                    localStorage.chatUpdateIgnored = Chatd.VERSION;
+                }
+            });
+        }
+        else {
+            msgDialog(
+                'warningb',
+                l[1900],
+                __(
+                    "MegaChat had been upgraded and it would be now supported only in our newly released " +
+                    "version of MEGA. Please update your extension to continue using MegaChat."
+                )
+            );
+            localStorage.chatUpdateIgnored = Chatd.VERSION;
+        }
+    });
 };
 
 ChatdIntegration.prototype._getChatRoomFromEventData = function(eventData) {
@@ -219,7 +223,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
             if (r === EEXPIRED) {
                 self.requiresUpdate();
             }
-        });;
+        });
     }
     else {
         finishProcess();

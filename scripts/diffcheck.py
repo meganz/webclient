@@ -102,7 +102,7 @@ def get_commits_in_branch(current_branch=None):
         logging.warn('In protected branch ({})'.format(current_branch))
         return -1, 0
 
-    command = 'git rev-list --count develop..{}'.format(current_branch)
+    command = 'git rev-list --no-merges --count develop..{}'.format(current_branch)
     commits = int(subprocess.check_output(command.split()).decode('utf8'))
     # logging.info('{} commits in branch {}'.format(commits, current_branch))
 

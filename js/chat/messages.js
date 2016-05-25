@@ -542,6 +542,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 return;
             }
         }
+        else if (eventData.state === "DISCARDED") {
+            var foundMessage = self.getByInternalId(eventData.id);
+            if (foundMessage) {
+                chatRoom.messagesBuff.messages.removeByKey(foundMessage.messageId);
+            }
+        }
         else if (eventData.state === "EXPIRED") {
             self.haveMessages = true;
 

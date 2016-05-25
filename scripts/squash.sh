@@ -13,7 +13,7 @@ if [ "$current_branch" = "$target_branch" ]; then
     exit 1
 fi
 
-GIT_EDITOR='sed -i "2,\$s/pick/fixup/"' git rebase -i --autosquash $target_branch
+GIT_EDITOR='sed -i "2,\$s/pick/squash/"' git rebase -i --autosquash $target_branch
 
 if [ $? -ne 0 ]; then
     echo "Rebasing failed."

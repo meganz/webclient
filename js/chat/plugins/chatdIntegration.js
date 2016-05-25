@@ -737,12 +737,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "u": u_handle // optional, email or handle of other user to remove. If not provided the requester is removed.
             });
         });
-        $(chatRoom).rebind('onAddUserRequest.chatdInt', function(e, contactHash) {
-            asyncApiReq({
-                "a":"mci",
-                "id": chatRoom.chatId,
-                "u": contactHash,
-                "p": 2
+        $(chatRoom).rebind('onAddUserRequest.chatdInt', function(e, contactHashes) {
+            contactHashes.forEach(function(h) {
+                asyncApiReq({
+                    "a":"mci",
+                    "id": chatRoom.chatId,
+                    "u": h,
+                    "p": 2
+                });
             });
         });
 
@@ -929,7 +931,9 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
     var tmpPromise = new MegaPromise();
 
     if (encryptedMessageContents) {
-        console.error("Re-using previously encrypted payload and key for message: ", messageObject);
+        // XX: should this be a .error ? or a .warn call ? maybe it should be changed to .debug ?
+        self.logger.warn("Re-using previously encrypted payload and key for message: ", messageObject);
+
         // was already encrypted, don't re-encrypt and just reuse the previous payload (arr[0]) and keyid (arr[1])
         tmpPromise.resolve(
             self.chatd.submit(
@@ -1012,6 +1016,44 @@ ChatdIntegration.prototype.deleteMessage = function(chatRoom, msgnum) {
     // a msgupd is only possible up to 1hour after the indicated (client-supplied) UTC timestamp.
     var self = this;
     return self.updateMessage(chatRoom, msgnum, "");
+};
+
+ChatdIntegration.prototype.discardMessage = function(chatRoom, msgnum) {
+    var self = this;
+    var rawChatId = base64urldecode(chatRoom.chatId);
+
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    if (!chatMessages) {
+        return;
+    }
+
+    var msg = chatMessages.buf[msgnum];
+    if (!msg) {
+        return false;
+    }
+
+
+    return chatMessages.discard(msgnum);
+};
+
+ChatdIntegration.prototype.resendPendingMessage = function(chatRoom, msgnum) {
+    var self = this;
+    var rawChatId = base64urldecode(chatRoom.chatId);
+
+    assert(msgnum, 'missing msgnum');
+
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    if (!chatMessages) {
+        return;
+    }
+
+    var msg = chatMessages.buf[msgnum];
+    if (!msg) {
+        return false;
+    }
+
+
+    return chatMessages.resend(false, msgnum);
 };
 
 /**

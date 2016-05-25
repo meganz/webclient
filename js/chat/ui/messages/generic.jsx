@@ -69,15 +69,17 @@ var GenericConversationMessage = React.createClass({
         e.stopPropagation(e);
         var chatRoom = this.props.chatRoom;
 
-        //TODO: new chatd api for dequeueing msgs
         chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
+        chatRoom.megaChat.plugins.chatdIntegration.discardMessage(
+            chatRoom, msg.internalId ? msg.internalId : msg.orderValue
+        );
     },
     doRetry: function(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
         var chatRoom = this.props.chatRoom;
 
-        chatRoom._sendMessageToTransport(msg)
+        chatRoom._sendMessageToTransport(msg, true)
             .done(function(internalId) {
                 msg.internalId = internalId;
             });

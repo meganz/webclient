@@ -537,6 +537,26 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             }
             else {
+                // its ok, this happens when a system/protocol message was sent OR this message was re-sent by chatd
+                // after the page had been reloaded
+                self.logger.warn("Not found: ", eventData.id);
+                return;
+            }
+        }
+        else if (eventData.state === "DISCARDED") {
+            // messages was already sent, but the confirmation was not received, so this is a dup and should be removed
+            self.haveMessages = true;
+
+            if (!eventData.id) {
+                debugger;
+            }
+
+            var foundMessage = self.getByInternalId(eventData.id);
+
+            if (foundMessage) {
+                self.messages.removeByKey(foundMessage.messageId);
+            }
+            else {
                 // its ok, this happens when a system/protocol message was sent
                 console.error("Not found: ", eventData.id);
                 return;
@@ -559,6 +579,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             if (foundMessage) {
                 foundMessage.sent = Message.STATE.NOT_SENT_EXPIRED;
+                foundMessage.requiresManualRetry = true;
             }
             else {
                 // its ok, this happens when a system/protocol message was sent
@@ -566,7 +587,82 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 return;
             }
         }
-        // NO NEED to handle PENDING, all messages when created are initialised with STATE = PENDING
+        else if (eventData.state === "RESTOREDEXPIRED") {
+            self.haveMessages = true;
+
+            if (!eventData.id) {
+                debugger;
+            }
+
+            // x = {
+            //     "chatId": "5oH6FNO5bLA",
+            //     "userId": "cypQ7i9inlY",
+            //     "id": 536870913,
+            //     "state": "RESTOREDEXPIRED",
+            //     "keyid": 80,
+            //     "message": "\u0002\u0001\u0001\u0000@×O³ªn\u0006\t\\¥WZ8}Þ³Ñ0!²KYf\u0006õ6ÜôÁ¬cÉ2båÑb¥\u0003v-¹¶ÙUCå°b·Ù-¡\u000f\u0003\u0000\f\u001e\u001a\u0010{\u000fÙ?V8U00\u0007\u0000\u0005Hô\b¸",
+            //     "ts": 1464103120
+            // };
+
+            var foundMessage = self.getByInternalId(eventData.id);
+
+            if (foundMessage) {
+                self.removeMessageById(foundMessage.messageId);
+            }
+            
+            var outgoingMessage = new KarereEventObjects.OutgoingMessage(
+                    chatRoom.megaChat.getJidFromNodeId(eventData.userId),
+                    chatRoom.megaChat.karere.getJid(),
+                    "groupchat",
+                    "mexp" + eventData.id,
+                    "",
+                    {},
+                    eventData.ts,
+                    Message.STATE.NOT_SENT_EXPIRED,
+                    chatRoom.roomJid
+                );
+            outgoingMessage.internalId = eventData.id;
+            outgoingMessage.orderValue = eventData.id;
+            outgoingMessage.requiresManualRetry = true;
+            outgoingMessage.userId = eventData.userId;
+
+            var _runDecryption = function() {
+                try
+                {
+                    var decrypted = chatRoom.protocolHandler.decryptFrom(
+                        eventData.message,
+                        eventData.userId,
+                        eventData.keyid,
+                        false
+                    );
+                    if (decrypted) {
+
+                        //if the edited payload is an empty string, it means the message has been deleted.
+                        outgoingMessage.contents = decrypted.payload;
+                        chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
+                        chatRoom.messagesBuff.messages.push(outgoingMessage);
+
+                        chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
+                            chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
+                        );
+
+                    }
+                } catch(e) {
+                    self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
+                }
+            };
+
+            var promises = [];
+            promises.push(
+                ChatdIntegration._ensureKeysAreLoaded([outgoingMessage])
+            );
+
+            MegaPromise.allDone(promises).always(function() {
+                _runDecryption();
+            });
+        }
+
+        // pending would be handled automatically, because all NEW messages are set with state === NOT_SENT (== PENDING)
     });
 
     self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {

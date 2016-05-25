@@ -142,6 +142,15 @@ var ConversationRightArea = React.createClass({
                                     }}/>
                             );
                         }
+                        if (room.members[contactHash] !== 0) {
+                            dropdowns.push(
+                                <DropdownsUI.DropdownItem
+                                    key="privReadOnly" icon="human-profile"
+                                    label={__("Change privilege to Read-only")} onClick={() => {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 0]);
+                                    }}/>
+                            );
+                        }
                     }
                     else if (room.members[u_handle] === 2) {
                         // full access
@@ -253,7 +262,9 @@ var ConversationRightArea = React.createClass({
                                 }
                                 multiple={true}
                                 className="popup add-participant-selector"
-                                singleSelectedButtonLabel={__("Start Group Conversation")}
+                                singleSelectedButtonLabel={__("Add to group conversation")}
+                                multipleSelectedButtonLabel={__("Add to group conversation")}
+                                nothingSelectedButtonLabel={__("Select one or more contacts to continue")}
                                 onSelectDone={this.props.onAddParticipantSelected}
                                 positionMy="center top"
                                 positionAt="left bottom"
@@ -1079,12 +1090,6 @@ var ConversationPanel = React.createClass({
                 }
 
                 var timestamp = v.delay;
-                if (v.updated) {
-                    timestamp = timestamp + v.updated;
-                    grouped = false;
-                    lastMessageFrom = null;
-                    lastGroupedMessageTimeStamp = null;
-                }
                 var curTimeMarker = time2lastSeparator((new Date(timestamp * 1000).toISOString()));
 
                 if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
@@ -1110,7 +1115,7 @@ var ConversationPanel = React.createClass({
 
                     if (
                         v instanceof KarereEventObjects.OutgoingMessage ||
-                        (v instanceof Message && !v.updated)
+                        v instanceof Message
                     ) {
 
                         // the grouping logic for messages.
@@ -1187,8 +1192,34 @@ var ConversationPanel = React.createClass({
                                 if (messageContents) {
                                     room.megaChat.plugins.chatdIntegration.updateMessage(
                                         room,
-                                        v.orderValue,
+                                        v.internalId ? v.internalId : v.orderValue,
                                         messageContents
+                                    );
+                                    if (v.textContents) {
+                                        v.textContents = messageContents;
+                                    }
+                                    if (v.contents) {
+                                        v.contents = messageContents;
+                                    }
+                                    if (v.emoticonShortcutsProcessed) {
+                                        v.emoticonShortcutsProcessed = false;
+                                    }
+                                    if (v.emoticonsProcessed) {
+                                        v.emoticonsProcessed = false;
+                                    }
+                                    if (v.messageHtml) {
+                                        delete v.messageHtml;
+                                    }
+
+
+                                    $(v).trigger(
+                                        'onChange',
+                                        [
+                                            v,
+                                            "textContents",
+                                            "",
+                                            messageContents
+                                        ]
                                     );
                                 }
                                 var $jsp = self.$messages.data('jsp');
@@ -1314,7 +1345,7 @@ var ConversationPanel = React.createClass({
                     else if (
                         msg.getState() === Message.STATE.NOT_SENT || msg.getState() === Message.STATE.NOT_SENT_EXPIRED
                     ) {
-                        room.megaChat.plugins.chatdIntegration.discardMessage(room, msg.orderValue);                    
+                        room.megaChat.plugins.chatdIntegration.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);                    
                     }
 
                     msg.message = "";
@@ -1438,7 +1469,7 @@ var ConversationPanel = React.createClass({
                                 );
                             }
                             else {
-                                self.props.chatRoom.trigger('onAddUserRequest', contactHashes);
+                                self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
                             }
                         }}
                     />

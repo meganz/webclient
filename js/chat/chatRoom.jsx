@@ -814,7 +814,21 @@ ChatRoom.prototype.appendMessage = function(message) {
         return false; // dont show any system messages (from the conf room)
     }
 
-    if (
+    if (message instanceof KarereEventObjects.OutgoingMessage) {
+        $(message).rebind('onChange.rerenderOnChangeHandler' + this.roomJid.split("@")[0], function(
+            msg,
+            property,
+            oldVal,
+            newVal
+        ) {
+            console.error('onChange', arguments);
+
+            if (property === "textContents") {
+                self.trackDataChange();
+            }
+        });
+    }
+    else if (
         message.getFromJid &&
         message instanceof KarereEventObjects.IncomingMessage &&
         Karere.getNormalizedBareJid(message.getFromJid()) === self.megaChat.karere.getJid()
@@ -941,8 +955,9 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
  * - mark the message as sent or unsent (if the user is not connected)
  *
  * @param messageObject {KarereEventObjects.OutgoingMessage}
+ * @param [isResent] {Boolean|undefined} optional, would force resent if true-ish value is found.
  */
-ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
+ChatRoom.prototype._sendMessageToTransport = function(messageObject, isResent) {
     var self = this;
     var megaChat = this.megaChat;
 
@@ -956,12 +971,23 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
         messageObject.setDelay(unixtime());
     }
 
-    return megaChat.plugins.chatdIntegration.sendMessage(
-        self,
-        messageObject
-    );
-
-
+    if (isResent) {
+        var msgxid = messageObject.internalId ? messageObject.internalId : messageObject.orderValue;
+        if (megaChat.plugins.chatdIntegration.resendPendingMessage(self,
+                msgxid
+            ) === true) {
+            return MegaPromise.resolve(msgxid);
+        }
+        else {
+            return MegaPromise.reject();
+        }
+    }
+    else {
+        return megaChat.plugins.chatdIntegration.sendMessage(
+            self,
+            messageObject
+        );
+    }
 };
 
 

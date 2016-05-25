@@ -358,6 +358,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
     {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
+
         console.error(unixtime(), "MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
         self.cmdq += String.fromCharCode(opCode)+cmd;
@@ -890,6 +891,8 @@ Chatd.Messages.prototype.updatekeyid = function(keyid) {
 Chatd.Messages.prototype.modify = function(msgnum, message) {
     var self = this;
 
+    console.error("mod", msgnum, message);
+
     // TODO: LP: Mathias: this variable is not used, why ?
     var mintimestamp = Math.floor(new Date().getTime()/1000);
 
@@ -898,6 +901,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     if (this.sendingbuf[msgnum] && this.sending[this.sendingbuf[msgnum][Chatd.MsgField.MSGID]]) {
         this.sendingbuf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
         this.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
+
         if (self.chatd.chatIdShard[this.chatId].isOnline()) {
             // if the orginal message is still in the pending list, send out a msgupx.
             if (this.sending[this.sendingbuf[msgnum][Chatd.MsgField.TYPE]] === Chatd.MsgType.MESSAGE) {
@@ -938,23 +942,29 @@ Chatd.Messages.prototype.clearpending = function() {
     this.modified = {};
 };
 
+/**
+ * Resend all (OR only a specific) messages
+ * @param [restore] {Boolean}
+ */
 Chatd.Messages.prototype.resend = function(restore) {
     var self = this;
     restore = (typeof restore === 'undefined') ? false : restore;
 
     // resend all pending new messages and modifications
-        // 1 hour is agreed by everyone.
+    // 1 hour is agreed by everyone.
     var MESSAGE_EXPIRY = 60*60;
     var mintimestamp = Math.floor(new Date().getTime()/1000);
     this.sendingList.forEach(function(msgxid) {
         if (mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
             var messageConstructs = [];
             messageConstructs.push({"msgxid":msgxid, "timestamp":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],"keyid":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID], "updated":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.UPDATED], "message":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MESSAGE], "type":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE]});
+
             self.chatd.chatIdShard[self.chatId].msg(
                 self.chatId,
                 messageConstructs
             );
-        } else {
+        }
+        else {
             // if it expires, require manul send.
             if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] !== Chatd.MsgType.KEY) {
                 self.chatd.trigger('onMessageUpdated', {
@@ -973,6 +983,11 @@ Chatd.Messages.prototype.resend = function(restore) {
     // resend all pending modifications of completed messages
     /*for (var msgnum in this.modified) {
         if (!this.sending[this.sendingbuf[msgnum][Chatd.MsgField.MSGID]]) {
+            if (targetMsgxid && msgnum !== targetMsgxid) {
+                // skip
+                return;
+            }
+
             self.chatd.chatIdShard[this.chatId].msgupd(
                 this.chatId,
                 this.sendingbuf[msgnum][Chatd.MsgField.MSGID],
@@ -1186,7 +1201,7 @@ Chatd.Messages.prototype.discard = function(msgxid) {
     var self = this;
     var num = self.sending[msgxid];
     if (!num) {
-        return ;
+        return false;
     }
 
     self.chatd.trigger('onMessageUpdated', {
@@ -1203,6 +1218,7 @@ Chatd.Messages.prototype.discard = function(msgxid) {
     removeValue(self.sendingList, msgxid);
     delete self.sending[msgxid];
     delete self.sendingbuf[num];
+    return true;
 };
 
 Chatd.Messages.prototype.confirmkey = function(keyid) {

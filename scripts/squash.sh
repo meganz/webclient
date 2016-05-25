@@ -21,7 +21,11 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ "$1" = "p" -o "$1" = "push" ]; then
-    git push -uf origin $current_branch
+    remote=$(git remote -v | grep "@code.developers.mega.co.nz:web/webclient.git (push)" | awk '{print $1}')
+    if [ "$remote" = "" ]; then
+        remote=origin
+    fi
+    git push -f $remote $current_branch
 fi
 
 exit $?

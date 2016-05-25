@@ -940,7 +940,12 @@ Chatd.Messages.prototype.clearpending = function() {
     this.modified = {};
 };
 
-Chatd.Messages.prototype.resend = function() {
+/**
+ * Resend all (OR only a specific) messages
+ * 
+ * @param [targetMsgxid] String optional msgxid to only resent.
+ */
+Chatd.Messages.prototype.resend = function(targetMsgxid) {
     var self = this;
 
     // resend all pending new messages and modifications
@@ -950,6 +955,10 @@ Chatd.Messages.prototype.resend = function() {
     this.sendingList.forEach(function(msgxid) {
         if (mintimestamp - self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
             var messageConstructs = [];
+            if (targetMsgxid && msgxid !== targetMsgxid) {
+                // skip
+                return;
+            }
             messageConstructs.push({"msgxid":msgxid, "timestamp":self.buf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],"keyid":self.buf[self.sending[msgxid]][Chatd.MsgField.KEYID], "message":self.buf[self.sending[msgxid]][Chatd.MsgField.MESSAGE], "type":self.buf[self.sending[msgxid]][Chatd.MsgField.TYPE]});
             self.chatd.chatIdShard[self.chatId].msg(
                 self.chatId,
@@ -974,6 +983,11 @@ Chatd.Messages.prototype.resend = function() {
     // resend all pending modifications of completed messages
     for (var msgnum in this.modified) {
         if (!this.sending[this.buf[msgnum][Chatd.MsgField.MSGID]]) {
+            if (targetMsgxid && msgnum !== targetMsgxid) {
+                // skip
+                return;
+            }
+
             self.chatd.chatIdShard[this.chatId].msgupd(
                 this.chatId,
                 this.buf[msgnum][Chatd.MsgField.MSGID],
@@ -1174,7 +1188,7 @@ Chatd.Messages.prototype.discard = function(msgxid) {
     var self = this;
     var num = self.sending[msgxid];
     if (!num) {
-        return ;
+        return false;
     }
 
     self.chatd.trigger('onMessageUpdated', {
@@ -1190,6 +1204,7 @@ Chatd.Messages.prototype.discard = function(msgxid) {
     removeValue(self.sendingList, msgxid);
     delete self.sending[msgxid];
     delete self.buf[num];
+    return true;
 };
 
 Chatd.Messages.prototype.confirmkey = function(keyid) {

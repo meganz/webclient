@@ -542,6 +542,25 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 return;
             }
         }
+        else if (eventData.state === "DISCARDED") {
+            // messages was already sent, but the confirmation was not received, so this is a dup and should be removed
+            self.haveMessages = true;
+
+            if (!eventData.id) {
+                debugger;
+            }
+
+            var foundMessage = self.getByInternalId(eventData.id);
+
+            if (foundMessage) {
+                self.messages.removeByKey(foundMessage.messageId);
+            }
+            else {
+                // its ok, this happens when a system/protocol message was sent
+                console.error("Not found: ", eventData.id);
+                return;
+            }
+        }
         else if (eventData.state === "EXPIRED") {
             self.haveMessages = true;
 
@@ -553,6 +572,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             if (foundMessage) {
                 foundMessage.sent = Message.STATE.NOT_SENT_EXPIRED;
+                foundMessage.requiresManualRetry = true;
             }
             else {
                 // its ok, this happens when a system/protocol message was sent
@@ -560,7 +580,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 return;
             }
         }
-        // NO NEED to handle PENDING, all messages when created are initialised with STATE = PENDING
+
+        // pending would be handled automatically, because all NEW messages are set with state === NOT_SENT (== PENDING)
     });
 
     self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {

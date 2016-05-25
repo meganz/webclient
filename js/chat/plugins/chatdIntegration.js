@@ -1039,7 +1039,7 @@ ChatdIntegration.prototype.resendPendingMessage = function(chatRoom, msgnum) {
     var rawChatId = base64urldecode(chatRoom.chatId);
 
     assert(msgnum, 'missing msgnum');
-    
+
     var chatMessages = self.chatd.chatIdMessages[rawChatId];
     if (!chatMessages) {
         return;
@@ -1051,7 +1051,7 @@ ChatdIntegration.prototype.resendPendingMessage = function(chatRoom, msgnum) {
     }
 
 
-    return chatMessages.resend(msgnum);
+    return chatMessages.resend(false, msgnum);
 };
 
 /**

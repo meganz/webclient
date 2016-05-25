@@ -1181,10 +1181,25 @@ var ConversationPanel = React.createClass({
                                 if (messageContents) {
                                     room.megaChat.plugins.chatdIntegration.updateMessage(
                                         room,
-                                        v.orderValue,
+                                        v.internalId ? v.internalId : v.orderValue,
                                         messageContents
                                     );
-                                    v.textContents = messageContents;
+                                    if (v.textContents) {
+                                        v.textContents = messageContents;
+                                    }
+                                    if (v.contents) {
+                                        v.contents = messageContents;
+                                    }
+                                    if (v.emoticonShortcutsProcessed) {
+                                        v.emoticonShortcutsProcessed = false;
+                                    }
+                                    if (v.emoticonsProcessed) {
+                                        v.emoticonsProcessed = false;
+                                    }
+                                    if (v.messageHtml) {
+                                        delete v.messageHtml;
+                                    }
+
 
                                     $(v).trigger(
                                         'onChange',

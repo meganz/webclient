@@ -889,6 +889,8 @@ Chatd.Messages.prototype.updatekeyid = function(keyid) {
 Chatd.Messages.prototype.modify = function(msgnum, message) {
     var self = this;
 
+    console.error("mod", msgnum, message);
+
     // TODO: LP: Mathias: this variable is not used, why ?
     var mintimestamp = Math.floor(new Date().getTime()/1000);
     var keyid = this.buf[msgnum][Chatd.MsgField.KEYID];

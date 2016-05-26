@@ -612,13 +612,14 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     "",
                     {},
                     eventData.ts,
-                    Message.STATE.NOT_SENT_EXPIRED,
+                    Message.STATE.RESTOREDEXPIRED,
                     chatRoom.roomJid
                 );
             outgoingMessage.internalId = eventData.id;
             outgoingMessage.orderValue = eventData.id;
             outgoingMessage.requiresManualRetry = true;
             outgoingMessage.userId = eventData.userId;
+            outgoingMessage.messageId = eventData.messageId;
 
             var _runDecryption = function() {
                 try
@@ -630,7 +631,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         false
                     );
                     if (decrypted) {
-
                         //if the edited payload is an empty string, it means the message has been deleted.
                         outgoingMessage.contents = decrypted.payload;
                         chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);

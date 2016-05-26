@@ -964,6 +964,7 @@ Chatd.Messages.prototype.resend = function(restore) {
                 self.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(self.chatId),
                     userId: base64urlencode(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.USERID]),
+                    messageId: base64urlencode(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MSGID]),
                     id: self.sending[msgxid],
                     state: restore ? 'RESTOREDEXPIRED' : 'EXPIRED',
                     keyid: self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID],

@@ -301,13 +301,12 @@ Chatd.Shard.prototype.reconnect = function() {
         self.logger.log('chatd connection established');
         self.triggerSendIfAble();
         self.rejoinexisting();
-        self.resendpending();
         self.chatd.trigger('onOpen', {
             shard: self
         });
         // Resending of pending message should be done via the integration code, since it have more info and a direct
         // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
-        // self.resendpending();
+        self.resendpending();
         self.triggerEventOnAllChats('onRoomConnected');
     };
 
@@ -974,24 +973,6 @@ Chatd.Messages.prototype.resend = function(restore) {
             }
         }
     });
-
-    // resend all pending modifications of completed messages
-    /*for (var msgnum in this.modified) {
-        if (!this.sending[this.sendingbuf[msgnum][Chatd.MsgField.MSGID]]) {
-            if (targetMsgxid && msgnum !== targetMsgxid) {
-                // skip
-                return;
-            }
-
-            self.chatd.chatIdShard[this.chatId].msgupd(
-                this.chatId,
-                this.sendingbuf[msgnum][Chatd.MsgField.MSGID],
-                this.sendingbuf[msgnum][Chatd.MsgField.UPDATED],
-                this.sendingbuf[msgnum][Chatd.MsgField.MESSAGE],
-                this.sendingbuf[msgnum][Chatd.MsgField.KEYID]
-            );
-        }
-    }*/
 };
 
 // after a reconnect, we tell the chatd the oldest and newest buffered message
@@ -1378,7 +1359,6 @@ Chatd.Messages.prototype.restore = function() {
                 }
             );
             self.resend(true);
-            self.chatd.joinrangehist(self.chatId);
             for (var keyid in trivialkeys) {
                 self.removefrompersist(keyid);
             }

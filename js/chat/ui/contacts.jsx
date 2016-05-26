@@ -167,6 +167,12 @@ var Avatar = React.createClass({
 
 var ContactCard = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    getDefaultProps: function() {
+        return {
+            'dropdownButtonClasses': "default-white-button tiny-button",
+            'dropdownIconClasses': "tiny-icon grey-down-arrow"
+        }
+    },
     render: function() {
         var self = this;
 
@@ -186,27 +192,24 @@ var ContactCard = React.createClass({
             var moreDropdowns = this.props.dropdowns ? this.props.dropdowns : [];
 
             if (contact.c === 1) {
-                moreDropdowns.push(
+                if (moreDropdowns.length > 0) {
+                    moreDropdowns.unshift(
+                        <hr key="separator" />
+                    );
+                }
+                moreDropdowns.unshift(
                     <DropdownsUI.DropdownItem
                             key="view" icon="human-profile" label={__("View Profile")} onClick={() => {
                                 window.location = '#fm/' + contact.u;
                             }} />
                 );
-                if (window.location.hash != '#fm/chat/' + contact.u) {
-                    moreDropdowns.push(
-                        <DropdownsUI.DropdownItem
-                            key={"start_conv_" + contact.u}
-                            icon="conversations" label={__("Open/start Chat")} onClick={() => {
-                                        window.location = '#fm/chat/' + contact.u;
-                                    }}/>
-                    );
-                }
             }
 
             if (moreDropdowns.length > 0) {
                 contextMenu = <ButtonsUI.Button
-                    className="default-white-button tiny-button"
-                    icon="tiny-icon grey-down-arrow">
+                    className={self.props.dropdownButtonClasses}
+                    icon={self.props.dropdownIconClasses}
+                    disabled={self.props.dropdownDisabled}>
                     <DropdownsUI.Dropdown className="contact-card-dropdown"
                                           positionMy="right top"
                                           positionAt="right bottom"

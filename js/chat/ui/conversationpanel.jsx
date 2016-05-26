@@ -31,6 +31,11 @@ var ConversationRightArea = React.createClass({
 
 
         var fitHeight = $('.chat-contacts-list .jspPane', $node).height();
+
+        if (fitHeight === 0) {
+            return;
+        }
+
         var maxHeight = $('.chat-right-pad', $node).innerHeight() - $('.buttons-block', $node).innerHeight();
 
         if (maxHeight < fitHeight) {
@@ -108,49 +113,61 @@ var ConversationRightArea = React.createClass({
                 var dropdowns = [];
                 var privilege = null;
 
+                var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
+
                 if (room.type === "group" && room.members) {
                     var removeParticipantButton = <DropdownsUI.DropdownItem
-                        key="remove" icon="human-profile" label={__("Remove participant")} onClick={() => {
+                        key="remove" icon="rounded-stop" label={__("Remove participant")} onClick={() => {
                                     $(room).trigger('onRemoveUserRequest', [contactHash]);
                                 }}/>;
 
 
                     if (room.iAmOperator()) {
                         // operator
+
+
                         dropdowns.push(
-                            removeParticipantButton
+                            <div key="setPermLabel" className="dropdown-items-info">
+                                {__("Set permission:")}
+                            </div>
                         );
 
 
-                        if (room.members[contactHash] !== 3) {
-                            dropdowns.push(
-                                <DropdownsUI.DropdownItem
-                                    key="privOperator" icon="human-profile"
-                                    label={__("Change privilege to Operator")}
-                                    onClick={() => {
-                                        $(room).trigger('alterUserPrivilege', [contactHash, 3]);
-                                    }}/>
-                            );
-                        }
 
-                        if (room.members[contactHash] !== 2) {
-                            dropdowns.push(
-                                <DropdownsUI.DropdownItem
-                                    key="privFullAcc" icon="human-profile"
-                                    label={__("Change privilege to Full access")} onClick={() => {
-                                        $(room).trigger('alterUserPrivilege', [contactHash, 2]);
-                                    }}/>
-                            );
-                        }
-                        if (room.members[contactHash] !== 0) {
-                            dropdowns.push(
-                                <DropdownsUI.DropdownItem
-                                    key="privReadOnly" icon="human-profile"
-                                    label={__("Change privilege to Read-only")} onClick={() => {
+                        dropdowns.push(
+                            <DropdownsUI.DropdownItem
+                                key="privReadOnly" icon="eye-icon"
+                                className={"tick-item " + (room.members[contactHash] === 0 ? "active" : "")}
+                                label={__("Read-Only")} onClick={() => {
+                                    if (room.members[contactHash] !== 0) {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 0]);
-                                    }}/>
-                            );
-                        }
+                                    }
+                                }}/>
+                        );
+
+                        dropdowns.push(
+                            <DropdownsUI.DropdownItem
+                                key="privFullAcc" icon="conversation-icon"
+                                className={"tick-item " + (room.members[contactHash] === 2 ? "active" : "")}
+                                label={__("Full Access")} onClick={() => {
+                                    if (room.members[contactHash] !== 2) {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 2]);
+                                    }
+                                }}/>
+                        );
+
+                        dropdowns.push(
+                            <DropdownsUI.DropdownItem
+                                key="privOperator" icon="cogwheel-icon"
+                                label={__("Operator")}
+                                className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
+                                onClick={() => {
+                                    if (room.members[contactHash] !== 3) {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 3]);
+                                    }
+                                }}/>
+                        );
+
                     }
                     else if (room.members[u_handle] === 2) {
                         // full access
@@ -169,18 +186,22 @@ var ConversationRightArea = React.createClass({
                     }
 
 
+
                     // other user privilege
                     if (room.members[contactHash] === 3) {
-                        privilege = <abbr title="Operator">@</abbr>;
+                        dropdownIconClasses = "small-icon cogwheel-icon";
                     }
                     else if (room.members[contactHash] === 2) {
-                        privilege = <abbr title="Full access">$</abbr>;
+                        dropdownIconClasses = "small-icon conversation-icon";
                     } else if (room.members[contactHash] === 0) {
-                        privilege = <abbr title="Removed">-</abbr>;
+                        dropdownIconClasses = "small-icon eye-icon";
                     }
                     else {
                         // should not happen.
                     }
+                    dropdowns.push(
+                        removeParticipantButton
+                    );
                 }
 
                 contactsList.push(
@@ -192,7 +213,9 @@ var ConversationRightArea = React.createClass({
                         dropdownPositionMy="right top"
                         dropdownPositionAt="right bottom"
                         dropdowns={dropdowns}
-                        namePrefix={privilege}
+                        dropdownDisabled={!room.iAmOperator()}
+                        dropdownButtonClasses={room.type == "group" ? "button icon-dropdown" : "default-white-button tiny-button"}
+                        dropdownIconClasses={dropdownIconClasses}
                     />
                 );
             }
@@ -201,7 +224,7 @@ var ConversationRightArea = React.createClass({
         var isReadOnlyElement = null;
 
         if (room.isReadOnly()) {
-            isReadOnlyElement = <span className="center">(read only chat)</span>;
+            // isReadOnlyElement = <span className="center">(read only chat)</span>;
         }
         var excludedParticipants = room.type === "group" ?
             (
@@ -221,12 +244,26 @@ var ConversationRightArea = React.createClass({
         ) {
             dontShowTruncateButton = true;
         }
+        
+        var membersHeader = null;
+        
+        if (room.type === "group") {
+            membersHeader = <div className="chat-right-head">
+                <div className="chat-grey-counter">
+                    {Object.keys(room.members).length}
+                </div>
+                <div className="chat-right-head-txt">
+                    {__("Group members")}
+                </div>
+            </div>
+        }
 
         return <div className="chat-right-area">
             <div className="chat-right-area conversation-details-scroll">
                 <div className="chat-right-pad">
 
                     {isReadOnlyElement}
+                    {membersHeader}
                     <div className="chat-contacts-list">
                         <utils.JScrollPane chatRoom={room}>
                             <div className="chat-contacts-list-inner">

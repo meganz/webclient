@@ -200,7 +200,7 @@ var DropdownItem = React.createClass({
         return <div
                     className={"dropdown-item " + self.props.className}
                     onClick={self.props.onClick ? (e) => {
-                        $(document).trigger('closeDropdowns');;
+                        $(document).trigger('closeDropdowns');
                         self.props.onClick(e);
                     } : self.onClick}
                 >

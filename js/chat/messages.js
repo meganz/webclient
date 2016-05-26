@@ -685,8 +685,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
         var keyxid = eventData.keyid;
         var keys = eventData.keys;
-        console.log('onMessageKeyRestore');
-        console.log(chatRoom);
+
         var seedKeys = function() {
             chatRoom.protocolHandler.restoreKeys(keyxid, keys);
         };

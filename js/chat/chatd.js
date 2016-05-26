@@ -638,7 +638,10 @@ Chatd.Shard.prototype.exec = function(a) {
                     // the message was rejected
                     self.chatd.msgconfirm(cmd.substr(9,8), false);
                 }
-
+                if (cmd.charCodeAt(17) === Chatd.Opcode.MSGUPD || cmd.charCodeAt(17) === Chatd.Opcode.MSGUPDX) {
+                    // the edit was rejected
+                    self.chatd.editreject(cmd.substr(1,8), cmd.substr(9,8));
+                }
                 len = 18;
                 break;
 
@@ -837,9 +840,6 @@ Chatd.Messages = function(chatd, chatId) {
     // mapping of transactionids of messages being sent to the numeric index of this.buf
     this.sending = {};
     this.sendingList = [];
-
-    // msgnums of modified messages
-    this.modified = {};
 };
 
 Chatd.Messages.prototype.submit = function(messages, keyId) {
@@ -915,8 +915,6 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
         if (self.chatd.chatIdShard[this.chatId].isOnline()) {
             self.chatd.chatIdShard[this.chatId].msgupd(this.chatId, this.buf[msgnum][Chatd.MsgField.MSGID], mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1, message, this.buf[msgnum][Chatd.MsgField.KEYID]);
         }
-        // record this modification for resending purposes
-        this.modified[msgnum] = 1;
     }
 
     // FIXME: client-side prefiltering for the server-side modification time barrier
@@ -932,9 +930,6 @@ Chatd.Messages.prototype.clearpending = function() {
     this.sending = {};
     this.sendingList = [];
     this.sendingbuf = {};
-
-    // msgnums of modified messages
-    this.modified = {};
 };
 
 /**
@@ -1007,6 +1002,16 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
                 this.chatIdMessages[chatId].confirm(chatId, msgxid, msgid);
             }
             break;
+        }
+    }
+};
+
+// msgid can be false in case of rejections
+Chatd.prototype.editreject = function(chatId, msgid) {
+    // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
+    if (this.chatIdMessages[chatId]) {
+        if (this.chatIdMessages[chatId].sending[msgid]) {
+            this.chatIdMessages[chatId].rejectedit(msgid);
         }
     }
 };
@@ -1199,6 +1204,22 @@ Chatd.Messages.prototype.discard = function(msgxid) {
     return true;
 };
 
+// discard edits from pending list
+Chatd.Messages.prototype.rejectedit = function(msgid) {
+    var self = this;
+    var num = self.sending[msgid];
+
+    if (!num) {
+        return false;
+    }
+
+    self.removefrompersist(msgid);
+    removeValue(self.sendingList, msgid);
+    delete self.sending[msgid];
+    delete self.sendingbuf[num];
+    return true;
+};
+
 Chatd.Messages.prototype.confirmkey = function(keyid) {
     var self = this;
     var firstkeyxid;
@@ -1342,10 +1363,6 @@ Chatd.Messages.prototype.restore = function() {
                 self.sendingbuf[++self.sendingnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
                 self.sending[v.messageId] = self.sendingnum;
                 self.sendingList.push(v.messageId);
-                if (v.type === Chatd.MsgType.EDIT) {
-                    // if the original message is not in the pending list.
-                    self.modified[self.highnum] = 1;
-                }
                 count++;
             }
         })

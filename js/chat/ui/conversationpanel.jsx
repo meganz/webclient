@@ -1117,6 +1117,7 @@ var ConversationPanel = React.createClass({
         var lastTimeMarker;
         var lastMessageFrom = null;
         var lastGroupedMessageTimeStamp = null;
+        var lastMessageState = null;
         var grouped = false;
 
         self.props.messagesBuff.messages.forEach(function(v, k) {
@@ -1128,6 +1129,7 @@ var ConversationPanel = React.createClass({
 
                 var timestamp = v.delay;
                 var curTimeMarker = time2lastSeparator((new Date(timestamp * 1000).toISOString()));
+                var currentState = v.getState ? v.getState() : null;
 
                 if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
                     lastTimeMarker = curTimeMarker;
@@ -1138,6 +1140,7 @@ var ConversationPanel = React.createClass({
                     grouped = false;
                     lastMessageFrom = null;
                     lastGroupedMessageTimeStamp = null;
+                    lastMessageState = false;
                 }
 
 
@@ -1156,7 +1159,14 @@ var ConversationPanel = React.createClass({
                     ) {
 
                         // the grouping logic for messages.
-                        if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
+                        if (lastMessageState !== currentState) {
+                            // don't group if message's state is different
+                            grouped = false;
+                            lastMessageFrom = userId;
+                            lastGroupedMessageTimeStamp = timestamp;
+                            lastMessageState = currentState;
+                        }
+                        else if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
                             if (timestamp - lastGroupedMessageTimeStamp < (5 * 60)) {
                                 grouped = true;
                             }
@@ -1164,6 +1174,7 @@ var ConversationPanel = React.createClass({
                                 grouped = false;
                                 lastMessageFrom = userId;
                                 lastGroupedMessageTimeStamp = timestamp;
+                                lastMessageState = currentState;
                             }
                         }
                         else {

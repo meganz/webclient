@@ -1004,7 +1004,14 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
 
     var msg = chatMessages.buf[msgnum];
     if (!msg) {
-        return;
+        msg = chatMessages.sendingbuf[msgnum & 0xffffffff];
+        if (!msg) {
+            console.error("Update message failed, because msgNum  was not found in either .buf or .sendingbuf", msgnum);
+            return false;
+        }
+        else {
+            msgnum = msgnum & 0xffffffff;
+        }
     }
     var keyId = msg[Chatd.MsgField.KEYID];
     cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId);
@@ -1018,42 +1025,27 @@ ChatdIntegration.prototype.deleteMessage = function(chatRoom, msgnum) {
     return self.updateMessage(chatRoom, msgnum, "");
 };
 
-ChatdIntegration.prototype.discardMessage = function(chatRoom, msgnum) {
+
+ChatdIntegration.prototype.resendPendingMessage = function(chatRoom, msgId) {
     var self = this;
     var rawChatId = base64urldecode(chatRoom.chatId);
+    
+    assert(msgId, 'missing msgnum');
 
     var chatMessages = self.chatd.chatIdMessages[rawChatId];
     if (!chatMessages) {
         return;
     }
 
-    var msg = chatMessages.buf[msgnum];
+    var msgId = base64urldecode(msgId);
+    var msg = chatMessages.sending[msgId];
     if (!msg) {
+        console.error("Update message failed, because msgId  was not found in .sending", msgId);
         return false;
     }
 
 
-    return chatMessages.discard(msgnum);
-};
-
-ChatdIntegration.prototype.resendPendingMessage = function(chatRoom, msgnum) {
-    var self = this;
-    var rawChatId = base64urldecode(chatRoom.chatId);
-
-    assert(msgnum, 'missing msgnum');
-
-    var chatMessages = self.chatd.chatIdMessages[rawChatId];
-    if (!chatMessages) {
-        return;
-    }
-
-    var msg = chatMessages.buf[msgnum];
-    if (!msg) {
-        return false;
-    }
-
-
-    return chatMessages.resend(false, msgnum);
+    return chatMessages.resend(false, msgId);
 };
 
 /**
@@ -1062,20 +1054,22 @@ ChatdIntegration.prototype.resendPendingMessage = function(chatRoom, msgnum) {
  * @param chatRoom
  * @param msgnum
  */
-ChatdIntegration.prototype.discardMessage = function(chatRoom, msgnum) {
+ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
     var self = this;
     var rawChatId = base64urldecode(chatRoom.chatId);
-
     var chatMessages = self.chatd.chatIdMessages[rawChatId];
     if (!chatMessages) {
         return;
     }
 
-    var msg = chatMessages.buf[msgnum];
+    msgId = base64urldecode(msgId);
+
+    var msg = chatMessages.sending[msgId];
     if (!msg) {
+        console.error("Update message failed, because msgId  was not found in .sending", msgId);
         return false;
     }
-    return chatMessages.discard(msgnum);
+    return chatMessages.discard(msgId);
 };
 
 // decorate ALL functions which require shard to be available before executing

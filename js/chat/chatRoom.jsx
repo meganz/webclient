@@ -821,9 +821,7 @@ ChatRoom.prototype.appendMessage = function(message) {
             oldVal,
             newVal
         ) {
-            console.error('onChange', arguments);
-
-            if (property === "textContents") {
+            if (property === "textContents" || property === "contents") {
                 self.trackDataChange();
             }
         });
@@ -972,11 +970,10 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject, isResent) {
     }
 
     if (isResent) {
-        var msgxid = messageObject.internalId ? messageObject.internalId : messageObject.orderValue;
         if (megaChat.plugins.chatdIntegration.resendPendingMessage(self,
-                msgxid
+                messageObject.messageId
             ) === true) {
-            return MegaPromise.resolve(msgxid);
+            return MegaPromise.resolve(messageObject.internalId);
         }
         else {
             return MegaPromise.reject();

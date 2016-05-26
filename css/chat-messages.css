@@ -261,6 +261,10 @@
     right: 48px;
     margin-top: 5px;
 }
+.not-sent.requires-manual-retry .message.content-area > .default-white-button.tiny-button {
+    right: 64px;
+    margin-top: 5px;
+}
 .message.content-area .small-blue-spinner {
     position: absolute;
     right: 24px;
@@ -276,4 +280,8 @@
 }
 .message.warning-text i {
     margin: 0 5px 0 0;
+}
+
+.message.body.dialog-wrapper .not-sent-indicator {
+    display: none;
 }

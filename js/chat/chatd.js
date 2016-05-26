@@ -893,7 +893,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     // modify pending message so that a potential resend includes the change
 
     if (this.sendingbuf[msgnum] && this.sending[this.sendingbuf[msgnum][Chatd.MsgField.MSGID]]) {
-        this.sendingbuf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-this.buf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
+        this.sendingbuf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-this.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
         this.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
 
         if (self.chatd.chatIdShard[this.chatId].isOnline()) {
@@ -935,17 +935,22 @@ Chatd.Messages.prototype.clearpending = function() {
 /**
  * Resend all (OR only a specific) messages
  * @param [restore] {Boolean}
+ * @param [targetMsgxid] String optional msgxid to only resent.
  */
-Chatd.Messages.prototype.resend = function(restore) {
+Chatd.Messages.prototype.resend = function(restore, targetMsgxid) {
     var self = this;
     restore = (typeof restore === 'undefined') ? false : restore;
 
     // resend all pending new messages and modifications
     // 1 hour is agreed by everyone.
-    var MESSAGE_EXPIRY = 60*60;
+    var MESSAGE_EXPIRY = 60*60; // 60*60
     var mintimestamp = Math.floor(new Date().getTime()/1000);
     this.sendingList.forEach(function(msgxid) {
         if ((mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) || (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT)) {
+            if (targetMsgxid && msgxid !== targetMsgxid) {
+                // skip
+                return;
+            }
             var messageConstructs = [];
             messageConstructs.push({"msgxid":msgxid, "timestamp":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],"keyid":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID], "updated":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.UPDATED], "message":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MESSAGE], "type":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE]});
 
@@ -957,6 +962,15 @@ Chatd.Messages.prototype.resend = function(restore) {
         else {
             // if it expires, require manul send.
             if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.MESSAGE) {
+                if (targetMsgxid && msgxid !== targetMsgxid) {
+                    // skip
+                    return;
+                }
+                // the following code is executed when i call .resend(false, [msgId]), which does NOT send the message
+                // to the server, as I would had expected. I think that the correct way is to force the previous IF()
+                // clause to be executed, but since i don't want to break something, i'm leaving this for you (@vincent)
+                debugger;
+
                 self.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(self.chatId),
                     userId: base64urlencode(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.USERID]),

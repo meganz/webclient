@@ -62,7 +62,15 @@ var GenericConversationMessage = React.createClass({
         e.preventDefault(e);
         e.stopPropagation(e);
 
-        this.props.onDeleteClicked(e, this.props.message);
+        if (
+            msg.getState() === Message.STATE.NOT_SENT ||
+            msg.getState() === Message.STATE.NOT_SENT_EXPIRED
+        ) {
+            this.doCancelRetry(e, msg);
+        }
+        else {
+            this.props.onDeleteClicked(e, this.props.message);
+        }
     },
     doCancelRetry: function(e, msg) {
         e.preventDefault(e);
@@ -70,11 +78,14 @@ var GenericConversationMessage = React.createClass({
         var chatRoom = this.props.chatRoom;
 
         chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
+
         chatRoom.megaChat.plugins.chatdIntegration.discardMessage(
-            chatRoom, msg.internalId ? msg.internalId : msg.orderValue
+            chatRoom,
+            msg.messageId
         );
     },
     doRetry: function(e, msg) {
+        var self = this;
         e.preventDefault(e);
         e.stopPropagation(e);
         var chatRoom = this.props.chatRoom;
@@ -82,6 +93,9 @@ var GenericConversationMessage = React.createClass({
         chatRoom._sendMessageToTransport(msg, true)
             .done(function(internalId) {
                 msg.internalId = internalId;
+
+                self.safeForceUpdate();
+
             });
     },
     render: function () {
@@ -155,19 +169,29 @@ var GenericConversationMessage = React.createClass({
 
 
                     if (!messageIsNowBeingSent) {
-                        message.sending = false;
                         additionalClasses += " not-sent";
 
-                        $(message).trigger(
-                            'onChange',
-                            [
-                                message,
-                                "sending",
-                                true,
-                                false
-                            ]
-                        );
-                        additionalClasses += " not-sent retrying";
+                        if (message.sending === true) {
+                            message.sending = false;
+
+
+                            $(message).trigger(
+                                'onChange',
+                                [
+                                    message,
+                                    "sending",
+                                    true,
+                                    false
+                                ]
+                            );
+                        }
+
+                        if (!message.requiresManualRetry) {
+                            additionalClasses += " retrying";
+                        }
+                        else {
+                            additionalClasses += " retrying requires-manual-retry";
+                        }
 
                         buttonsBlock = null;
                     }
@@ -664,24 +688,26 @@ var GenericConversationMessage = React.createClass({
                             </div>;
                         }
                         else {
-                            messageNotSendIndicator = <div className="not-sent-indicator">
-                                    <span className="tooltip-trigger"
-                                          key="retry"
-                                          data-tooltip="not-sent-notification-manual"
-                                          onClick={(e) => {
-                                            self.doRetry(e, message);
-                                        }}>
-                                      <i className="small-icon refresh-circle"></i>
-                                </span>
-                                <span className="tooltip-trigger"
-                                      key="cancel"
-                                      data-tooltip="not-sent-notification-cancel"
-                                      onClick={(e) => {
-                                                self.doCancelRetry(e, message);
+                            if (self.state.editing !== true) {
+                                messageNotSendIndicator = <div className="not-sent-indicator">
+                                        <span className="tooltip-trigger"
+                                              key="retry"
+                                              data-tooltip="not-sent-notification-manual"
+                                              onClick={(e) => {
+                                                self.doRetry(e, message);
                                             }}>
-                                        <i className="small-icon red-cross"></i>
-                                </span>
-                            </div>;
+                                          <i className="small-icon refresh-circle"></i>
+                                    </span>
+                                    <span className="tooltip-trigger"
+                                          key="cancel"
+                                          data-tooltip="not-sent-notification-cancel"
+                                          onClick={(e) => {
+                                                    self.doCancelRetry(e, message);
+                                                }}>
+                                            <i className="small-icon red-cross"></i>
+                                    </span>
+                                </div>;
+                            }
                         }
                     }
                 }
@@ -703,7 +729,7 @@ var GenericConversationMessage = React.createClass({
                 if (self.state.editing === true) {
                     messageDisplayBlock = <TypingAreaUI.TypingArea
                         iconClass="small-icon writing-pen textarea-icon"
-                        initialText={message.textContents}
+                        initialText={message.textContents ? message.textContents : message.contents}
                         chatRoom={self.props.chatRoom}
                         showButtons={true}
                         className="edit-typing-area"

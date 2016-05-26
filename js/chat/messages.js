@@ -433,9 +433,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         eventData.id = (eventData.id>>>0);
 
         if (eventData.state === "EDITED" || eventData.state === "TRUNCATED" /*|| eventData.state === "EXPIRED"*/) {
-            var timestamp = (
-                eventData.state === "EDITED" ? chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime()
-            );
+            var timestamp = chatRoom.messagesBuff.messages[eventData.messageId].delay ?
+                chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime();
 
             var editedMessage = new Message(
                 chatRoom,
@@ -558,11 +557,19 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             if (foundMessage) {
                 self.messages.removeByKey(foundMessage.messageId);
             }
-            else {
-                // its ok, this happens when a system/protocol message was sent
-                console.error("Not found: ", eventData.id);
-                return;
+
+            foundMessage = self.getByInternalId(eventData.messageId);
+
+            if (foundMessage) {
+                self.messages.removeByKey(foundMessage.messageId);
             }
+
+            foundMessage = self.getByInternalId(eventData.messageId);
+
+            if (foundMessage) {
+                self.messages.removeByKey(foundMessage.messageId);
+            }
+
         }
         else if (eventData.state === "EXPIRED") {
             self.haveMessages = true;

@@ -119,10 +119,12 @@
     background-color: #AAAAAA;
     color: white;
 }
+.dropdown-item.tick-item {
+    padding-right: 24px;
+}
 .dropdown-item.tick-item.active {
     color: #333333;
     font-family: 'source_sans_prosemibold';
-    padding-right: 24px;
 }
 .dropdown-item.tick-item.active:hover {
     color: white;

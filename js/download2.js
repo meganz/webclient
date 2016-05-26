@@ -279,7 +279,7 @@ var dlmanager = {
                 var attr = dec_attr(ab, key);
 
                 if (typeof attr === 'object' && typeof attr.n === 'string') {
-                    if (have_ab
+                    if (have_ab && page !== 'download'
                             && res.s <= 48 * 1048576
                             && is_image(attr.n)
                             && (!res.fa

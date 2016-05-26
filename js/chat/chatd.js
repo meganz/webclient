@@ -866,7 +866,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
     if (this.chatd.chatIdShard[this.chatId].isOnline()) {
         this.chatd.chatIdShard[this.chatId].msg(this.chatId, messageConstructs);
     }
-    return this.sendingnum;
+    return (this.sendingnum >>> 0);
 };
 
 Chatd.Messages.prototype.updatekeyid = function(keyid) {
@@ -931,6 +931,7 @@ Chatd.Messages.prototype.clearpending = function() {
     });
     this.sending = {};
     this.sendingList = [];
+    this.sendingbuf = {};
 
     // msgnums of modified messages
     this.modified = {};

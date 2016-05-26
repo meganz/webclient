@@ -429,6 +429,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return; // ignore event
         }
         console.error(eventData.id, eventData.state, eventData);
+        // convert id to unsigned.
+        eventData.id = (eventData.id>>>0);
 
         if (eventData.state === "EDITED" || eventData.state === "TRUNCATED" /*|| eventData.state === "EXPIRED"*/) {
             var timestamp = (

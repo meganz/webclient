@@ -13314,5 +13314,69 @@
     "8804": {
         "text": "I have a good faith belief that the material was removed or disabled as a result of a mistake or misidentification of the material to be removed or disabled.",
         "context": "A declaration on the copyright counter-notification form "
+    },
+    "8805": {
+        "text": "Test Network Connection:",
+        "context": "A title for the Network Diagnostic dialog. This will test the speed of the user's network connection to a storage server."
+    },
+    "8806": {
+        "text": "Network Diagnostics",
+        "context": "A title for the Network Diagnostic dialog. This lets the user test the transfer speed and for various storage servers."
+    },
+    "8807": {
+        "text": "There was an error message while talking to the API server. Please check that this is a valid link.",
+        "context": "An error message when an invalid link is used on the \"Network Diagnostic\" dialog."
+    },
+    "8808": {
+        "text": "Test the speed of your connection to our servers. This will help us to debug your connectivity issues.",
+        "context": "A description of the \"Network diagnostic\" section."
+    },
+    "8809": {
+        "text": "Please provide commentary sufficient to explain the mistake or misidentification.",
+        "context": "A message inside a warning dialog asking the user to fill out the section of the copyright-takedown form. This requires them to give comments on why they think their link was mistakenly taken down."
+    },
+    "8810": {
+        "text": "Please provide a description of the content that has been taken down.",
+        "context": "A message inside an error dialog that asks the user to fill out the section of the copyright takedown dispute form with the description of the link that they are disputing."
+    },
+    "8811": {
+        "text": "Please supply the URL of the content that has been taken down.",
+        "context": "A message inside an error dialog asking the user to fill out the URL section of the copyright takedown dispute form to tell us which link was taken down."
+    },
+    "8812": {
+        "text": "Please enter a valid MEGA link to the content that has been taken down.",
+        "context": "A message inside an error dialog asking the user to provide a valid link, as they must have already given a badly formatted link."
+    },
+    "8813": {
+        "text": "Please supply your phone number.",
+        "context": "A message inside an error dialog asking the user to supply their phone number, as they must have left that field blank."
+    },
+    "8814": {
+        "text": "Please supply a valid phone number.",
+        "context": "A message inside an error dialog asking the user to supply a valid phone number, as they must have added something badly formatted into the input field."
+    },
+    "8815": {
+        "text": "Please supply your address.",
+        "context": "A message inside an error dialog asking the user to supply their address as they must have left the address field of the form blank and it is a required field."
+    },
+    "8816": {
+        "text": "Please acknowledge that you will accept service of proceedings in New Zealand or in the jurisdiction where my address in this counter-notice is located, from the person who provided MEGA with the original copyright takedown notice or an agent of such person.",
+        "context": "A message inside an error dialog when the user has not checked an important disclosure on the copyright takedown dispute form. The disclosure text is repeated in this text and roughly means \"I accept that I can be summoned to a court of law in New Zealand or where I live by the person who did the takedown, or an agent of that person\"."
+    },
+    "8817": {
+        "text": "Please acknowledge that you have a good faith belief that the material was removed or disabled as a result of a mistake or misidentification of the material to be removed or disabled.",
+        "context": "A message inside an error dialog when the user has not checked an important disclosure on the copyright takedown dispute form. The disclosure is repeated in the error text and is asking the user to state that they \"have a good faith belief\" or have good reasons to believe that the takedown (and the material the takedown relates to) they are disputing was a mistake or otherwise wrong."
+    },
+    "8818": {
+        "text": "The link you provided is either invalid or is not the subject of a takedown notice.",
+        "context": "A message inside an error dialog when the user has submitted a link for a copyright takedown dispute, but the link was either not formatted correctly, or has not actually had a takedown happen to it (so cannot be disputed)."
+    },
+    "8819": {
+        "text": "You have already made a counter-notification against this link.",
+        "context": "A message inside an error dialog.\r\nThe user has just tried to dispute a takedown by sending MEGA a takedown counter-notification.\r\nHowever they have already done this before, so they will see this error.\r\n\r\nA counter-notification means \"Sending a notice back to the complainant (who sent MEGA a takedown notice for the link), that counters (or is against) the notice you received\"."
+    },
+    "8820": {
+        "text": "The MEGA account provided did not match the owner of the link.",
+        "context": "A message inside an error dialog. This explains that the email the user provided during a takedown counter-notice (which disputes the takedown) was not the one who created the link."
     }
 }

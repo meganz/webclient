@@ -950,7 +950,7 @@ Chatd.Messages.prototype.resend = function(restore) {
     var MESSAGE_EXPIRY = 60*60;
     var mintimestamp = Math.floor(new Date().getTime()/1000);
     this.sendingList.forEach(function(msgxid) {
-        if (mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
+        if ((mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) || (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT)) {
             var messageConstructs = [];
             messageConstructs.push({"msgxid":msgxid, "timestamp":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],"keyid":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID], "updated":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.UPDATED], "message":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MESSAGE], "type":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE]});
 
@@ -961,7 +961,7 @@ Chatd.Messages.prototype.resend = function(restore) {
         }
         else {
             // if it expires, require manul send.
-            if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] !== Chatd.MsgType.KEY) {
+            if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.MESSAGE) {
                 self.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(self.chatId),
                     userId: base64urlencode(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.USERID]),

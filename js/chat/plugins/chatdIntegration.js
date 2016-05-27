@@ -198,7 +198,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 false
             );
             chatRoom = r[1];
-
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
                 window.location = chatRoom.getRoomUrl();
             }

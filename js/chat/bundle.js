@@ -25699,6 +25699,9 @@
 	                    attachmentMeta.forEach(function (v) {
 	                        var contact = M.u && M.u[v.u] ? M.u[v.u] : v;
 	                        var contactEmail = contact.email ? contact.email : contact.m;
+	                        if (!contactEmail) {
+	                            contactEmail = v.email ? v.email : v.m;
+	                        }
 
 	                        var deleteButtonOptional = null;
 
@@ -25717,48 +25720,50 @@
 	                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
 	                                'u': contact.u,
 	                                'name': contact.name,
-	                                'm': contact.email,
+	                                'm': contact.email ? contact.email : contactEmail,
 	                                'c': 0
 	                            }));
-	                        }
-	                        if (M.u[contact.u]) {
+	                        } else if (M.u[contact.u] && !M.u[contact.u].m) {
 
-	                            if (M.u[contact.u] && M.u[contact.u].c === 1) {
-	                                dropdown = React.makeElement(
-	                                    ButtonsUI.Button,
+	                            M.u[contact.u].m = contact.email ? contact.email : contactEmail;
+	                        }
+
+	                        if (M.u[contact.u] && M.u[contact.u].c === 1) {
+
+	                            dropdown = React.makeElement(
+	                                ButtonsUI.Button,
+	                                {
+	                                    className: 'default-white-button tiny-button',
+	                                    icon: 'tiny-icon grey-down-arrow' },
+	                                React.makeElement(
+	                                    DropdownsUI.Dropdown,
 	                                    {
-	                                        className: 'default-white-button tiny-button',
-	                                        icon: 'tiny-icon grey-down-arrow' },
-	                                    React.makeElement(
-	                                        DropdownsUI.Dropdown,
-	                                        {
-	                                            className: 'white-context-menu shared-contact-dropdown',
-	                                            noArrow: true,
-	                                            positionMy: 'left bottom',
-	                                            positionAt: 'right bottom',
-	                                            horizOffset: 4
-	                                        },
-	                                        React.makeElement(DropdownsUI.DropdownItem, {
-	                                            icon: 'human-profile',
-	                                            label: __(l[5868]),
-	                                            onClick: function onClick() {
-	                                                window.location = "#fm/" + contact.u;
-	                                            }
-	                                        }),
-	                                        React.makeElement('hr', null),
-	                                        null,
-	                                        React.makeElement(DropdownsUI.DropdownItem, {
-	                                            icon: 'conversations',
-	                                            label: __(l[8632]),
-	                                            onClick: function onClick() {
-	                                                window.location = "#fm/chat/" + contact.u;
-	                                            }
-	                                        }),
-	                                        deleteButtonOptional ? React.makeElement('hr', null) : null,
-	                                        deleteButtonOptional
-	                                    )
-	                                );
-	                            }
+	                                        className: 'white-context-menu shared-contact-dropdown',
+	                                        noArrow: true,
+	                                        positionMy: 'left bottom',
+	                                        positionAt: 'right bottom',
+	                                        horizOffset: 4
+	                                    },
+	                                    React.makeElement(DropdownsUI.DropdownItem, {
+	                                        icon: 'human-profile',
+	                                        label: __(l[5868]),
+	                                        onClick: function onClick() {
+	                                            window.location = "#fm/" + contact.u;
+	                                        }
+	                                    }),
+	                                    React.makeElement('hr', null),
+	                                    null,
+	                                    React.makeElement(DropdownsUI.DropdownItem, {
+	                                        icon: 'conversations',
+	                                        label: __(l[8632]),
+	                                        onClick: function onClick() {
+	                                            window.location = "#fm/chat/" + contact.u;
+	                                        }
+	                                    }),
+	                                    deleteButtonOptional ? React.makeElement('hr', null) : null,
+	                                    deleteButtonOptional
+	                                )
+	                            );
 	                        } else if (M.u[contact.u] && M.u[contact.u].c === 0) {
 	                            dropdown = React.makeElement(
 	                                ButtonsUI.Button,

@@ -1159,14 +1159,7 @@ var ConversationPanel = React.createClass({
                     ) {
 
                         // the grouping logic for messages.
-                        if (lastMessageState !== currentState) {
-                            // don't group if message's state is different
-                            grouped = false;
-                            lastMessageFrom = userId;
-                            lastGroupedMessageTimeStamp = timestamp;
-                            lastMessageState = currentState;
-                        }
-                        else if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
+                        if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
                             if (timestamp - lastGroupedMessageTimeStamp < (5 * 60)) {
                                 grouped = true;
                             }

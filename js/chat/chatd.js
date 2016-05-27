@@ -1346,48 +1346,50 @@ Chatd.Messages.prototype.restore = function() {
     promises.push(
         self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
 
-            if (v.type === Chatd.MsgType.KEY ) {
-                // if the previous message is a key message, then the previous key is a trivial key.
-                if (iskey) {
-                    trivialkeys.push(previouskeyid);
-                }
-
-                pendingkey = true;
-                ++tempkeyid;
-                v.keyId = tempkeyid;
-
-                var index = 0;
-                var len = v.message.length;
-
-                while (index < len) {
-                    var recipient = v.message.substr(index, 8);
-                    var keylen = self.chatd.unpack16le(v.message.substr(index + 8,2));
-                    var key = v.message.substr(index + 10, keylen);
-                    if (recipient === v.userId) {
-                        keys.push({
-                            'userId' : base64urlencode(v.userId),
-                            'key' : key,
-                            'keyid' : tempkeyid
-                        });
-                        break;
+            if (v.userId === self.chatd.userId) {
+                if (v.type === Chatd.MsgType.KEY ) {
+                    // if the previous message is a key message, then the previous key is a trivial key.
+                    if (iskey) {
+                        trivialkeys.push(previouskeyid);
                     }
-                    index += (10 + keylen);
-                }
-                iskey = true;
-                previouskeyid = v.messageId;
-            }
-            else {
-                iskey = false;
-            }
-            if ((v.type !== Chatd.MsgType.EDIT) || ((v.type === Chatd.MsgType.EDIT) && !self.sending[v.messageId])) {
-                if (pendingkey ) {
+
+                    pendingkey = true;
+                    ++tempkeyid;
                     v.keyId = tempkeyid;
+
+                    var index = 0;
+                    var len = v.message.length;
+
+                    while (index < len) {
+                        var recipient = v.message.substr(index, 8);
+                        var keylen = self.chatd.unpack16le(v.message.substr(index + 8,2));
+                        var key = v.message.substr(index + 10, keylen);
+                        if (recipient === v.userId) {
+                            keys.push({
+                                'userId' : base64urlencode(v.userId),
+                                'key' : key,
+                                'keyid' : tempkeyid
+                            });
+                            break;
+                        }
+                        index += (10 + keylen);
+                    }
+                    iskey = true;
+                    previouskeyid = v.messageId;
                 }
-                // if the message is not an edit or an edit with the original message not in the pending list, restore it.
-                self.sendingbuf[++self.sendingnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
-                self.sending[v.messageId] = self.sendingnum;
-                self.sendingList.push(v.messageId);
-                count++;
+                else {
+                    iskey = false;
+                }
+                if ((v.type !== Chatd.MsgType.EDIT) || ((v.type === Chatd.MsgType.EDIT) && !self.sending[v.messageId])) {
+                    if (pendingkey ) {
+                        v.keyId = tempkeyid;
+                    }
+                    // if the message is not an edit or an edit with the original message not in the pending list, restore it.
+                    self.sendingbuf[++self.sendingnum] = [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
+                    self.sending[v.messageId] = self.sendingnum;
+                    self.sendingList.push(v.messageId);
+                    count++;
+                }
             }
         })
     );

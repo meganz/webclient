@@ -24528,13 +24528,7 @@
 
 	                    if (v instanceof KarereEventObjects.OutgoingMessage || v instanceof Message) {
 
-	                        if (lastMessageState !== currentState) {
-
-	                            grouped = false;
-	                            lastMessageFrom = userId;
-	                            lastGroupedMessageTimeStamp = timestamp;
-	                            lastMessageState = currentState;
-	                        } else if (!lastMessageFrom || userId && lastMessageFrom === userId) {
+	                        if (!lastMessageFrom || userId && lastMessageFrom === userId) {
 	                            if (timestamp - lastGroupedMessageTimeStamp < 5 * 60) {
 	                                grouped = true;
 	                            } else {
@@ -24733,7 +24727,7 @@
 	                    onConfirmClicked: function onConfirmClicked() {
 	                        var msg = self.state.messageToBeDeleted;
 	                        if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
-	                            room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.orderValue);
+	                            room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        } else if (msg.getState() === Message.STATE.NOT_SENT_EXPIRED) {
 	                            room.megaChat.plugins.chatdIntegration.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        }
@@ -26472,7 +26466,7 @@
 	        e.preventDefault(e);
 	        e.stopPropagation(e);
 
-	        if (msg.getState() === Message.STATE.NOT_SENT || msg.getState() === Message.STATE.NOT_SENT_EXPIRED) {
+	        if (msg.getState() === Message.STATE.NOT_SENT_EXPIRED) {
 	            this.doCancelRetry(e, msg);
 	        } else {
 	            this.props.onDeleteClicked(e, this.props.message);
@@ -27397,14 +27391,8 @@
 	        var timestampInt;
 	        if (message.getDelay) {
 	            timestampInt = message.getDelay();
-	            if (message.updated) {
-	                timestampInt = timestampInt + message.updated;
-	            }
 	        } else if (message.delay) {
 	            timestampInt = message.delay;
-	            if (message.updated) {
-	                timestampInt = timestampInt + message.updated;
-	            }
 	        } else {
 	            timestampInt = unixtime();
 	        }

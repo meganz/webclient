@@ -60,15 +60,9 @@ var ConversationMessageMixin = {
         var timestampInt;
         if (message.getDelay) {
             timestampInt = message.getDelay();
-            if (message.updated) {
-                timestampInt = timestampInt + message.updated;
-            }
         }
         else if (message.delay) {
             timestampInt = message.delay;
-            if (message.updated) {
-                timestampInt = timestampInt + message.updated;
-            }
         }
         else {
             timestampInt = unixtime();

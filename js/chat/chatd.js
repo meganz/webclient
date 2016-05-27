@@ -897,7 +897,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
             this.sendingbuf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-this.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
         }
         this.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
-
+        this.persist(this.sendingbuf[msgnum][Chatd.MsgField.MSGID]);
         if (self.chatd.chatIdShard[this.chatId].isOnline()) {
             // if the orginal message is still in the pending list, send out a msgupx.
             if (this.sending[this.sendingbuf[msgnum][Chatd.MsgField.TYPE]] === Chatd.MsgType.MESSAGE) {

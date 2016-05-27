@@ -1004,7 +1004,7 @@ Chat.prototype.getContactFromJid = function(jid) {
         // user B receives a XMPP presence info that user A is online and tries to render a DOM element which requires
         // the user's name..so this method gets called.
         if (window.d) {
-            //debugger;
+            // debugger;
         }
     }
     return contact;
@@ -1051,7 +1051,9 @@ Chat.prototype.getContactNameFromJid = function(jid) {
         name = M.getNameByHandle(contact.u);
     }
 
-    assert(name, "Name not found for jid: " + jid);
+    if (!name) {
+        name = false;
+    }
 
     return name;
 };
@@ -1245,7 +1247,7 @@ Chat.prototype.getJidFromNodeId = function(nodeId) {
 Chat.prototype.getNodeIdFromJid = function(jid) {
     assert(jid, "Missing jid for getNodeIdFromJid");
 
-    return megaUserIdEncodeForXmpp(nodeId) + "@" + this.options.xmppDomain;
+    return megaJidToUserId(jid);
 };
 
 /**

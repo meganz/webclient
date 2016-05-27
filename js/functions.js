@@ -453,6 +453,8 @@ function populate_l() {
     if (lang === 'en') {
         l[1] = 'Go Pro';
     }
+    l[8634] = l[8634].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
+    l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");    
     l[438] = l[438].replace('[X]', '');
     l['439a'] = l[439];
     l[439] = l[439].replace('[X1]', '').replace('[X2]', '');
@@ -540,6 +542,7 @@ function populate_l() {
     l[8653] = l[8653].replace('%4', '<span class="gateway-name"></span>');
     l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
+    l[8535] = l[8535].replace('[B]', '<b>').replace('[/B]', '</b>');
     
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -942,8 +945,8 @@ function secondsToTime(secs, html_format) {
     var returnvar = hours + ':' + minutes + ':' + seconds;
 
     if (html_format) {
-        hours = (hours !== '00') ? (hours + '<span>h</span>') : '';
-        returnvar = hours + minutes + '<span>m</span>' + seconds + '<span>s</span>';
+        hours = (hours !== '00') ? (hours + '<span>h</span> ') : '';
+        returnvar = hours + minutes + '<span>m</span> ' + seconds + '<span>s</span>';
     }
     return returnvar;
 }
@@ -4625,6 +4628,10 @@ function getGatewayName(gatewayId) {
             name: 'tpay',
             displayName: l[7219] + ' (T-Pay)'       // Mobile (T-Pay)
         },
+        15: {
+            name: 'directreseller',
+            displayName: l[6952] + ' (6media)'
+        },
         999: {
             name: 'wiretransfer',
             displayName: l[6198]    // Wire transfer
@@ -4642,3 +4649,55 @@ function getGatewayName(gatewayId) {
         displayName: 'Unknown'
     };
 }
+
+/*
+ * Alert about 110% zoom level in Chrome/Chromium
+ */
+mega.utils.chrome110ZoomLevelNotification = function() {
+
+    var dpr = window.devicePixelRatio;
+    var pf = navigator.platform.toUpperCase();
+    var brokenRatios = [
+        2.200000047683716,// 110% retina
+        1.100000023841858,// 110% non-retina
+        1.3320000171661377,// 67% retina
+        0.6660000085830688,// 67% non-retian, 33% retina
+        0.3330000042915344// 33% non-retina
+    ];
+
+    if ($.browser.chrome) {
+
+        $('.nw-dark-overlay').removeClass('mac');
+        $('.nw-dark-overlay.zoom-overlay').removeClass('zoom-67 zoom-33');
+
+        if (pf.indexOf('MAC') >= 0) {
+            $('.nw-dark-overlay').addClass('mac');
+        }
+
+        // zoom level110%
+        if ((dpr === 2.200000047683716) || (dpr === 1.100000023841858)) {
+            $('.nw-dark-overlay.zoom-overlay').fadeIn(400);
+        }
+
+        // 67% both or 33% retina
+        if ((dpr === 1.3320000171661377) || (dpr === 0.6660000085830688)) {
+            $('.nw-dark-overlay.zoom-overlay')
+                .addClass('zoom-67')
+                .fadeIn(400);
+        }
+
+        // 33% non-retina
+        if (dpr === 0.3330000042915344) {
+            $('.nw-dark-overlay.zoom-overlay')
+                .addClass('zoom-33')
+                .fadeIn(400);
+        }
+
+        if (brokenRatios.indexOf(dpr) === -1) {
+            $('.nw-dark-overlay.zoom-overlay').fadeOut(200);
+        }
+
+    }
+};
+
+mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);

@@ -156,7 +156,7 @@ function u_checklogin3a(res, ctx) {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
             }
         }
-        
+
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if (typeof u_attr.lup !== 'undefined') {
             alarm.planExpired.lastPayment = u_attr.lup;
@@ -371,8 +371,17 @@ function changepw(currentpw, newpw, ctx) {
     }, ctx);
 }
 
-// an anonymous account must be present - check / create before calling
-function sendsignuplink(name, email, password, ctx) {
+/**
+ * Send account signup/confirmation link.
+ *  an anonymous account must be present - check / create before calling
+ *
+ * @param {String}  name     The user's full name
+ * @param {String}  email    His email
+ * @param {String}  password The password chosen
+ * @param {Object}  ctx      The usual object with a callback to receive the result
+ * @param {Boolean} pro      Whether the signup is part of a pro purchase
+ */
+function sendsignuplink(name, email, password, ctx, pro) {
     var pw_aes = new sjcl.cipher.aes(prepare_key_pw(password));
     var req = {
         a: 'uc',
@@ -381,6 +390,10 @@ function sendsignuplink(name, email, password, ctx) {
         n: base64urlencode(to8(name)),
         m: base64urlencode(email)
     };
+
+    if (pro === true) {
+        req.p = 1;
+    }
 
     api_req(req, ctx);
 }
@@ -1090,11 +1103,8 @@ function checkUserLogin() {
 
         var push = function() {
             if (u_type === 3 && !pfid && !folderlink) {
-                if (timer) {
-                    clearTimeout(timer);
-                }
                 // through a timer to prevent floods
-                timer = setTimeout(store, 9701);
+                timer = delay('fmconfig:store', store, 9701);
             }
             else {
                 localStorage.fmconfig = JSON.stringify(fmconfig);
@@ -1114,7 +1124,7 @@ function checkUserLogin() {
     };
 
     if (is_karma) {
-        mega.attr = ns;
+        mega.config = ns;
     }
     else {
         Object.defineProperty(mega, 'config', {
@@ -1396,7 +1406,8 @@ function checkUserLogin() {
      * Stores a user attribute for oneself.
      *
      * @param attribute {string}
-     *     Name of the attribute.
+     *     Name of the attribute. The max length is 16 characters. Note that the
+     *     * and ! characters may be added so usually you only have 14 to work with.
      * @param value {object}
      *     Value of the user attribute. Public properties are of type {string},
      *     private ones have to be an object with key/value pairs.
@@ -1526,8 +1537,7 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
                 logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
             }
             else if (attrName === '+a') {
-                avatars[userHandle] = undefined;
-                M.avatars();
+                M.avatars(userHandle);
             }
             else if (attrName === '*!authring') {
                 authring.getContacts('Ed25519');

@@ -119,6 +119,14 @@ color: #cccccc;
 .contacts-search .user-card-data {
     padding: 0 30px 0 79px;
 }
+.contacts-search .user-card-email {
+    font-size: 12px;
+    line-height: 14px;
+}
+.contacts-search .user-card-name {
+	font-size: 13px;
+	line-height: 19px;
+}
 /* End of Search contacts popup */
 
 /* Emoji one popup */

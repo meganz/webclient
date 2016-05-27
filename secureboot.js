@@ -1004,9 +1004,10 @@ if (m)
             document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
         }
     }
-    else if (window.location.hash.substr(1, 7) == 'confirm'
-            || window.location.hash.substr(1, 9) == 'newsignup'
-            || window.location.hash.substr(1, 7) == 'account')
+    else if (window.location.hash.substr(1, 7) === 'confirm'
+            || window.location.hash.substr(1, 6) === 'backup'
+            || window.location.hash.substr(1, 9) === 'newsignup'
+            || window.location.hash.substr(1, 7) === 'account')
     {
         var i = 0;
         if (ua.indexOf('windows phone') > -1) {
@@ -2165,6 +2166,7 @@ else if (!b_u)
     }
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
+    
     if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
@@ -2196,6 +2198,7 @@ else if (!b_u)
         lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
+    
     function boot_auth(u_ctx,r)
     {
         u_type = r;

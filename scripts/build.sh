@@ -9,5 +9,5 @@ cat $build_file \
     | sed 's/createElement:/makeElement:/' \
     | sed -E 's/(React\w*)\.createElement/\1.makeElement/' > $temp_file1
 
-cp -f $temp_file1 $build_file
+./scripts/cleaner.js $temp_file1 $build_file
 rm $temp_file1

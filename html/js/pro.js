@@ -77,7 +77,7 @@ var astroPayDialog = {
             // Get the extra data from the gateway details
             var firstLastName = alarm.planExpired.lastPayment.gwd.name;
             var taxNum = alarm.planExpired.lastPayment.gwd.cpf;
-            
+
             // Prefill the user's name and tax details
             this.$dialog.find('.astropay-name-field').val(firstLastName);
             this.$dialog.find('.astropay-tax-field').val(taxNum);
@@ -586,7 +586,7 @@ function pro_pay() {
     }
 
     // Otherwise if Union Pay, show bouncing coin while loading
-    else if ((pro_paymentmethod === 'dynamicpay') || (pro_paymentmethod === 'paysafecard')) {
+    else if ((pro_paymentmethod === 'dynamicpay') || (pro_paymentmethod === 'paysafecard') || (pro_paymentmethod === 'directreseller')) {
         proPage.showLoadingOverlay('transferring');
     }
 
@@ -662,6 +662,9 @@ function pro_pay() {
                 }
                 else if (pro_paymentmethod === 'tpay') {
                     pro_m = tpay.gatewayId; // 14
+                }
+                else if (pro_paymentmethod === 'directreseller') {
+                    pro_m = directReseller.gatewayId; // 15
                 }
                 
                 // If AstroPay, send extra details
@@ -756,6 +759,11 @@ function pro_pay() {
                             else if (pro_m === tpay.gatewayId) {
                                 tpay.redirectToSite(utcResult);
                             }
+
+                            // If 6media, redirect to the site
+                            else if (pro_m === directReseller.gatewayId) {
+                                directReseller.redirectToSite(utcResult);
+                            }
                         }
                     }
                 });
@@ -802,6 +810,9 @@ var proPage = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
+
+            // Don't show the plan expiry dialog anymore for this session
+            alarm.planExpired.lastPayment = null;
 
             // If last payment was Bitcoin, we need to redirect to the account page
             if (this.lastPaymentProviderId === 4) {
@@ -1040,11 +1051,11 @@ var proPage = {
 
             // On clicking 'Click here to show more payment options'
             $showMoreButton.click(function() {
-                
+
                 // Show the other payment options and then hide the button
                 $('.payment-options-list.secondary').removeClass('hidden');
                 $showMoreButton.hide();
-                
+
                 // Trigger resize or you can't scroll to the bottom of the page anymore
                 $(window).trigger('resize');
             });
@@ -1082,17 +1093,17 @@ var proPage = {
             var $gateway = $template.clone();
             var gatewayOpt = gatewayOptions[i];
             var gatewayId = gatewayOpt.gatewayId;
-            
+
             // Get the gateway name and display name
             var gatewayInfo = getGatewayName(gatewayId);
             var gatewayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gatewayInfo.name;
             var displayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gatewayInfo.displayName;
-            
+
             // If it couldn't find the name (e.g. new provider, use the name from the API)
             if (gatewayInfo.name === 'unknown') {
                 continue;
             }
-            
+
             // Add disabled class if this payment method is not supported for this plan
             if ((gatewayOpt.supportsExpensivePlans === 0) && (selectedPlanNum !== 4)) {
                 $gateway.addClass('disabled');
@@ -1101,7 +1112,7 @@ var proPage = {
 
             // If the voucher/balance option
             if ((gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
-                
+
                 // Show "Balance (x.xx)" if they have enough to purchase this plan
                 displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
             }
@@ -1126,10 +1137,10 @@ var proPage = {
      * Change payment method radio button states when clicked
      */
     initPaymentMethodRadioButtons: function() {
-        
+
         // Cache selector
         var $paymentOptionsList = $('.payment-options-list');
-        
+
         // Add click handler to all payment methods
         $paymentOptionsList.find('.payment-method').rebind('click', function() {
 
@@ -1155,19 +1166,19 @@ var proPage = {
             proPage.updateDurationOptionsOnProviderChange();
         });
     },
-    
+
     /**
      * Preselect an option they previously paid with if applicable
      */
     preselectPreviousPaymentOption: function() {
-        
+
         // If they have paid before and their plan has expired, then re-select their last payment method
         if (alarm.planExpired.lastPayment) {
 
             // Get the last gateway they paid with
             var lastPayment = alarm.planExpired.lastPayment;
             var gatewayId = lastPayment.gw;
-            
+
             // Get the gateway name, if it's an Astropay subgateway, then it will have it's own name
             var gatewayInfo = getGatewayName(gatewayId);
             var extraData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
@@ -1175,10 +1186,10 @@ var proPage = {
 
             // Find the gateway
             var $gatewayInput = $('#' + gatewayName);
-            
+
             // If it is still in the list (e.g. valid provider still)
             if ($gatewayInput.length) {
-                
+
                 // Get the elements which need to be set
                 var $membershipRadio = $gatewayInput.parent();
                 var $providerDetails = $membershipRadio.next();
@@ -1206,12 +1217,12 @@ var proPage = {
             proPage.preselectFirstPaymentOption();
         }
     },
-    
+
     /**
      * Preselects the first payment option in the list of payment providers
      */
     preselectFirstPaymentOption: function() {
-        
+
         // Find and select the first payment option
         var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
         $paymentOption.find('input').attr('checked', 'checked');
@@ -1332,7 +1343,7 @@ var proPage = {
 
             // Get the number of months for the plan they last paid for
             var lastPaymentMonths = alarm.planExpired.lastPayment.m;
-            
+
             // Find the radio option with the same number of months
             var $monthOption = $(".payment-duration[data-plan-months='" + lastPaymentMonths + "']");
 
@@ -1345,7 +1356,7 @@ var proPage = {
                 return true;
             }
         }
-        
+
         // Otherwise pre-select the first option available
         var $firstOption = $('.duration-options-list .payment-duration:not(.template').first();
         $firstOption.find('input').prop('checked', true);
@@ -1886,12 +1897,11 @@ var wireTransferDialog = {
         });
 
         // If logged in, pre-populate email address into wire transfer details
-        if (typeof u_attr !== 'undefined') {
-            
+        if (typeof u_attr !== 'undefined' && u_attr.email) {
+
             // Replace the @ with -at- so the bank will accept it on the form
-            var email = u_attr.email;
-                email = email.replace('@', '-at-');
-            
+            var email = String(u_attr.email).replace('@', '-at-');
+
             wireTransferDialog.$dialog.find('.email-address').text(email);
         }
 
@@ -1958,6 +1968,28 @@ var tpay = {
     }
 };
 
+/**
+ * Code for directReseller payments such as Gary's 6media
+ */
+/* jshint -W003 */
+var directReseller = {
+
+    gatewayId: 15,
+
+    /**
+     * Redirect to the site
+     * @param {String} utcResult A sale ID
+     */
+    redirectToSite: function(utcResult) {
+        var provider = utcResult['EUR']['provider'];
+        var params = utcResult['EUR']['params'];
+        
+        if (provider === 1) {
+            params = atob(params);
+            window.location = 'http://mega.and1.tw/zh_tw/order_mega.php?' + params;
+        }
+    }
+};
 
 /**
  * Code for paysafecard
@@ -2821,7 +2853,7 @@ var bitcoinDialog = {
 };
 
 
-function showLoginDialog() {
+function showLoginDialog(email) {
     megaAnalytics.log("pro", "loginDialog");
     $.dialog = 'pro-login-dialog';
 
@@ -2849,7 +2881,7 @@ function showLoginDialog() {
 
     $('.input-email', $dialog)
         .data('placeholder', l[195])
-        .val(l[195]);
+        .val(email || l[195]);
 
     $('.input-password', $dialog)
         .data('placeholder', l[909])
@@ -3110,75 +3142,99 @@ var doProRegister = function($dialog) {
         return false;
     }
 
-
     var registeraccount = function()
     {
+        var done = function(login) {
+            loadingDialog.hide();
+            $('.pro-register-dialog').addClass('hidden');
+            $('.fm-dialog.registration-page-success').unbind('click');
+
+            // If true this means they do not need to confirm their email before continuing to step 2
+            var skipConfirmationStep = true;
+
+            if (skipConfirmationStep) {
+                closeDialog();
+                topmenuUI();
+                if (!login) {
+                    localStorage._proRegisterAccount = JSON.stringify(rv);
+                }
+                else {
+                    showToast('megasync', l[8745]);
+                    $('.fm-avatar img').attr('src', useravatar.top());
+                }
+                pro_next_step();
+            }
+            else {
+                $('.fm-dialog.registration-page-success').removeClass('hidden');
+                fm_showoverlay();
+            }
+        };
+
         var ctx =
         {
             callback : function(res)
             {
-                loadingDialog.hide();
-                if (res == 0)
-                {
+                if (res === 0) {
                     var ops = {a:'up'};
 
                     ops.terms = 'Mq';
-                    ops.firstname = base64urlencode(to8($('#register-firstname', $dialog).val()));
-                    ops.lastname = base64urlencode(to8($('#register-lastname', $dialog).val()));
-                    ops.name2 = base64urlencode(to8($('#register-firstname', $dialog) + ' ' + $('#register-lastname', $dialog).val()));
-                    u_attr.terms=1;
+                    ops.firstname = base64urlencode(to8(rv.first));
+                    ops.lastname = base64urlencode(to8(rv.last));
+                    ops.name2 = base64urlencode(to8(rv.name));
+                    u_attr.terms = 1;
 
                     api_req(ops);
-                    $('.pro-register-dialog').addClass('hidden');
-                    $('.fm-dialog.registration-page-success').unbind('click');
-
-                    // If true this means they do not need to confirm their email before continuing to step 2
-                    var skipConfirmationStep = true;
-
-                    if (skipConfirmationStep) {
-                        closeDialog();
-                        pro_next_step();
-                    }
-                    else {
-                        $('.fm-dialog.registration-page-success').removeClass('hidden');
-                        $('.fm-dialog-overlay').removeClass('hidden');
-                        $('body').addClass('overlayed');
-                    }
+                    done();
                 }
-                else
-                {
-                    if (res == EACCESS) alert(l[218]);
-                    else if (res == EEXIST)
-                    {
-                        if (m) alert(l[219]);
-                        else
-                        {
-                            $('.login-register-input.email .top-loginp-tooltip-txt', $dialog).html(l[1297] + '<div class="white-txt">' + l[1298] + '</div>');
-                            $('.login-register-input.email', $dialog).addClass('incorrect');
-                            msgDialog('warninga','Error',l[219]);
+                else if (res === EACCESS || res === EEXIST) {
 
+                    var passwordaes = new sjcl.cipher.aes(prepare_key_pw(rv.password));
+                    var uh = stringhash(rv.email.toLowerCase(), passwordaes);
+                    var ctx = {
+                        checkloginresult: function(ctx, r) {
                             loadingDialog.hide();
+
+                            if (!r) {
+                                $('.login-register-input.email', $dialog).addClass('incorrect');
+                                $('.login-register-input.email .top-loginp-tooltip-txt', $dialog)
+                                    .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
+
+                                msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
+                                    if (e) {
+                                        $('.pro-register-dialog').addClass('hidden');
+                                        signupPromptDialog.hide();
+                                        showLoginDialog(rv.email);
+                                    }
+                                });
+                            }
+                            else if (r === EBLOCKED) {
+                                alert(l[730]);
+                            }
+                            else {
+                                u_type = r;
+                                u_checked = true;
+                                done(true);
+                            }
                         }
-                    }
+                    };
+                    u_login(ctx, rv.email, rv.password, uh, true);
+                }
+                else {
+                    loadingDialog.hide();
+                    msgDialog('warninga', 'Error', l[200], res);
                 }
             }
         };
 
-        var rv={};
+        var rv = {};
 
-        rv.name = $('#register-firstname', $dialog).val() + ' ' + $('#register-lastname', $dialog).val();
-        rv.email = $('#register-email', $dialog).val();
         rv.password = $('#register-password', $dialog).val();
+        rv.first = $('#register-firstname', $dialog).val();
+        rv.last = $('#register-lastname', $dialog).val();
+        rv.email = $('#register-email', $dialog).val();
+        rv.name = rv.first + ' ' + rv.last;
 
-        var sendsignuplink = function(name,email,password,ctx)
-        {
-            var pw_aes = new sjcl.cipher.aes(prepare_key_pw(password));
-            var req = { a : 'uc', c : base64urlencode(a32_to_str(encrypt_key(pw_aes,u_k))+a32_to_str(encrypt_key(pw_aes,[rand(0x100000000),0,0,rand(0x100000000)]))), n : base64urlencode(to8(name)), m : base64urlencode(email) };
-
-            api_req(req,ctx);
-        };
-
-        sendsignuplink(rv.name,rv.email,rv.password,ctx);
+        sendsignuplink(rv.name, rv.email, rv.password, ctx, true);
     };
 
 
@@ -3379,18 +3435,30 @@ var showSignupPromptDialog = function() {
                 .html('<p>' + l[5842] + '</p>');
 
             $('.fm-dialog-button.pro-login', this.$dialog)
-                .unbind('click.loginrequired')
-                .bind('click.loginrequired', function() {
+                .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
                     showLoginDialog();
                     return false;
                 });
 
             $('.fm-dialog-button.pro-register', this.$dialog)
-                .unbind('click.loginrequired')
-                .bind('click.loginrequired', function() {
+                .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
-                    showRegisterDialog();
+
+                    if (!u_wasloggedin()) {
+                        showRegisterDialog();
+                    }
+                    else {
+                        var msg = l[8743];
+                        msgDialog('confirmation', l[1193], msg, null, function(res) {
+                            if (res) {
+                                showRegisterDialog();
+                            }
+                            else {
+                                showLoginDialog();
+                            }
+                        });
+                    }
                     return false;
                 }).find('span').text(l[1076]);
         });

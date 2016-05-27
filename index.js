@@ -61,6 +61,8 @@ function startMega() {
     } else {
         mega_custom_boot_fn();
     }
+
+    mBroadcaster.sendMessage('zoomLevelCheck');
 }
 
 function mainScroll() {
@@ -73,15 +75,15 @@ function mainScroll() {
     });
     $('.main-scroll-block').unbind('jsp-scroll-y');
     jScrollFade('.main-scroll-block');
-    if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
+    if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
         scrollMenu();
     }
 }
 
 function scrollMenu() {
     $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
-        if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
-            var sc = scrollPositionY - 30;
+        if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
+            var sc = scrollPositionY + 30;
             if (isAtTop) {
                 sc = 30;
             }
@@ -116,9 +118,6 @@ function init_page() {
     else {
         $('body').attr('class', '');
     }
-
-    // Initialise the Public Service Announcement system
-    psa.init();
 
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
@@ -253,6 +252,56 @@ function init_page() {
 
     if (!$.mcImport) {
         closeDialog();
+    }
+
+    if (localStorage._proRegisterAccount) {
+        var acc = JSON.parse(localStorage._proRegisterAccount);
+        delete localStorage._proRegisterAccount;
+
+        var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
+        var $button = $('.resend-email-button', $dialog);
+
+        $dialog.addClass('special').show();
+        $('input', $dialog).val(acc.email);
+
+        $button.rebind('click', function _click() {
+            var ctx = {
+                callback: function(res) {
+                    loadingDialog.hide();
+
+                    if (res !== 0) {
+                        console.error('sendsignuplink failed', res);
+
+                        $button.addClass('disabled');
+                        $button.unbind('click');
+
+                        var tick = 26;
+                        var timer = setInterval(function() {
+                            if (--tick === 0) {
+                                clearInterval(timer);
+                                $button.text(l[8744]);
+                                $button.removeClass('disabled');
+                                $button.rebind('click', _click);
+                            }
+                            else {
+                                $button.text('\u23F1 ' + tick + '...');
+                            }
+                        }, 1000);
+
+                        alert(l[200]);
+                    }
+                    else {
+                        closeDialog();
+                        fm_showoverlay();
+                        $dialog.removeClass('hidden');
+                    }
+                }
+            };
+            loadingDialog.show();
+            sendsignuplink(acc.name, acc.email, acc.password, ctx, true);
+        });
+        fm_showoverlay();
+        return;
     }
 
     var fmwasinitialized = !!fminitialized;
@@ -563,11 +612,11 @@ function init_page() {
                 return;
             }
             loadingDialog.show();
-            CMS.watch('help2:' + lang, function () {
+            CMS.watch('help.' + lang, function () {
                 window.helpTemplate = null;
                 doRenderHelp();
             });
-            CMS.get(['help2:' + lang, 'help:' + lang + '.json'], function (err, content, json) {
+            CMS.get(['help.' + lang, 'help.' + lang + '.json'], function (err, content, json) {
                 helpdata = json.object
                 parsepage(window.helpTemplate = content.html);
                 init_help();
@@ -648,15 +697,17 @@ function init_page() {
         }
     }
     else if (page == 'about') {
-        parsepage(pages['about']);
-        $('.team-person-block').removeClass('first');
-        var html = '';
-        var a = 4;
+        loadingDialog.show();
+        CMS.get("team", function(err, content) {
+            parsepage(pages['about']);
 
-        $('.team-person-block').sort(function () {
+            var html = '';
+            var a = 4;
+
+            $('.about').safeHTML(content.html);
+            $('.team-person-block').sort(function () {
                 return (Math.round(Math.random()) - 0.5);
-            })
-            .each(function (i, element) {
+            }).each(function (i, element) {
                 if (a == 4) {
                     html += element.outerHTML.replace('team-person-block', 'team-person-block first');
                     a = 0;
@@ -667,10 +718,15 @@ function init_page() {
                 a++;
             });
 
-        $('#emailp').html($('#emailp').text().replace('jobs@mega.nz',
-            '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
-        $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
-        mainScroll();
+            $('#emailp').safeHTML($('#emailp').text().replace('jobs@mega.nz',
+                '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
+            $('.new-bottom-pages.about').safeHTML(html + '<div class="clear"></div>');
+            topmenuUI();
+            loadingDialog.hide();
+            mainScroll();
+
+        });
+        return;
     }
     else if (page == 'sourcecode') {
         parsepage(pages['sourcecode']);
@@ -929,6 +985,10 @@ function init_page() {
         parsepage(pages['start'], 'start');
         init_start();
     }
+        
+    // Initialise the Public Service Announcement system
+    psa.init();
+    
     topmenuUI();
     loggedout = false;
     flhashchange = false;
@@ -1113,6 +1173,11 @@ function topmenuUI() {
         $('.top-menu-item.logout,.context-menu-divider.logout').show();
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
         $('.fm-avatar').show();
+        $('.top-login-button').hide();
+        $('.membership-status').show();
+        $('.top-change-language').hide();
+        $('.create-account-button').hide();
+        $('.membership-status-block').show();
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1143,8 +1208,6 @@ function topmenuUI() {
             $('body').addClass('free');
         }
 
-        $('.membership-status').show();
-
         if (is_fm()) {
             $('.top-menu-item.refresh-item').removeClass('hidden');
         }
@@ -1156,7 +1219,7 @@ function topmenuUI() {
                 megaChat.renderMyStatus();
             }
         }
-        
+
         // Show PRO plan expired warning popup (if applicable)
         alarm.planExpired.render();
     }
@@ -1170,7 +1233,7 @@ function topmenuUI() {
             if (isNonActivatedAccount()) {
                 alarm.nonActivatedAccount.render();
             }
-            
+
             // Otherwise show the ephemeral session warning
             else if (($.len(M.c[M.RootID] || {})) && (page !== 'register')) {
                 alarm.ephemeralSession.render();
@@ -1360,11 +1423,16 @@ function topmenuUI() {
                     $parent = $('.membership-popup.pro-popup');
 
                     $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
-                    var p = '';
+                    var $elm = $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt');
                     if (account.stype !== 'S') {
-                        p = escapeHTML(l[987]) + ' <span class="red">' + time2date(account.expiry) + '</span>';
+                        $elm.safeHTML('@@ <span class="red">@@</span>', l[987], time2date(account.expiry));
                     }
-                    $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').safeHTML(p);
+                    else if (Array.isArray(account.sgw)) {
+                        $elm.safeHTML('<span class="red">(@@)</span>', account.sgw.join(', '));
+                    }
+                    else {
+                        $elm.text('');
+                    }
 
                     // Update current plan to PRO I, PRO II, PRO III or LITE in popup
                     $('.membership-icon-pad .membership-big-txt.red').text(planName);
@@ -1794,6 +1862,7 @@ function parsepage(pagehtml, pp) {
         if (page !== 'start' && page !== 'download') {
             mainScroll();
         }
+        mega.utils.chrome110ZoomLevelNotification();
     });
     $('.nw-bottom-block').addClass(lang);
     UIkeyevents();

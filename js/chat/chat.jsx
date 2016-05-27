@@ -1542,6 +1542,10 @@ Chat.prototype.processNewUser = function(u) {
 
     this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
+    if (M.u[u] && !M.u[u].presence) {
+        M.u[u].presence = this.karere.getPresence(megaChat.getJidFromNodeId(u));
+    }
+
     self.renderMyStatus();
 };
 

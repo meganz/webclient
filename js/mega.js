@@ -111,7 +111,52 @@ if (typeof loadingInitDialog === 'undefined') {
     };
 }
 
-// data struct definitions
+/**
+ * @typedef {Object} MEGA_USER_STRUCT
+ *      Access using namespace mega.u
+ *      Access using global variable M.u
+ *      An object holding informations about specific contacts/user identified
+ *      by "handle" as base64 URL encoded 88-bit value.
+ *      Caches informations for current/past full contacts.
+ *      Pending contacts informations are not stored here.
+ * @property {String} u
+ *     Mega user handle as base64 URL encoded 88-bit value.
+ * @property {Number} c
+ *     Contact access right/status: 2: owner, 1: active contact, 0: otherwise.
+ * @property {String} m
+ *     Email address of the contact.
+ * @property {Array} m2
+ *     Array of all emails/phone numbers of a user.
+ * @property {String} name
+ *     Combines users First and Last name defined in user profile.
+ *     If First and Last name in user profile are undefined holds users email.
+ *     It's used at least like index field for search contacts in share dialog.
+ *     It combines `firstname` and `lastname` of user attributes.
+ * @property {String} h
+ *     Holds user handle, value equal to 'u' param. Used only when synching with
+ *     M.d, deeply rooted in code. should not be removed.
+ *     Reason behind it should be searched in file/folders caching structure,
+ *     'h' represents file/folder "handle" as base64 URL encoded 64-bit value.
+ * @property {Number} t
+ *     For active contacts but not for the owner 't' is set to 1. For non active
+ *     contacts and owner it's 'undefined'. Used when synching with M.d, deeply
+ *     rooted in code. should not be removed.
+ *     Reason behind it should be searched in file/folders caching structure,
+ *     't' represents type of item: 2: Cloud Drive root, 1: folder, 0: file
+ * @property {String} p
+ *     Logic inherited from file manager where parent directory 'p' is
+ *     represented by base64 URL encoded 64-bit value.
+ *     Root directory for Cloud Drive is cached in M.RootID.
+ *     This parameter represents top level/root/parent for 'Contacts' tab.
+ *     All contacts are bind to account owner but instead of owners "handle"
+ *     as base64 URL encoded 88-bit value we are using 'contacts'.
+ * @property {Number} ts
+ *     UNIX epoch time stamp as an integer in seconds to record last change of
+ *     parameters values.
+ * @property {Number} lastChatActivity
+ *     UNIX epoch time stamp as an integer in seconds for the last chat
+ *     activity.
+ */
 var MEGA_USER_STRUCT = {
     "u": undefined,
     "c": undefined,
@@ -492,37 +537,32 @@ function MegaData()
         return M.getFilterBy(function(node) { return node.p === M.InboxID; });
     };
 
-    this.avatars = function()
+    this.avatars = function(userPurgeList)
     {
-        if (!M.c.contacts)
+        if (!M.c.contacts) {
             M.c.contacts = {};
+        }
         if (u_handle) {
             M.c.contacts[u_handle] = 1;
+        }
+
+        if (userPurgeList) {
+            // if provided, invalidate the pointed user avatars.
+            if (!Array.isArray(userPurgeList)) {
+                userPurgeList = [userPurgeList];
+            }
+            userPurgeList.forEach(useravatar.invalidateAvatar);
         }
 
         if (d) {
             console.time('M.avatars');
         }
+
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
-            if ((M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0) && !avatars[u]) {
-                waitingPromises.push(
-                    mega.attr.get(u, 'a', true, false)
-                        .done(function (res) {
-                            if (typeof res !== 'number' && res.length > 5) {
-                                var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/png'});
-                                avatars[u] = {
-                                    data: blob,
-                                    url: myURL.createObjectURL(blob)
-                                };
-                            }
-                            useravatar.loaded(u);
-                        })
-                        .fail(function() {
-                            delete avatars[u];
-                            useravatar.loaded(u);
-                        })
-                );
+            if (!avatars[u] && (M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0)) {
+
+                waitingPromises.push(useravatar.loadAvatar(u));
             }
         });
 
@@ -530,30 +570,14 @@ function MegaData()
             .allDone(
                 waitingPromises
             ).always(function() {
-                // trigger UI refresh
-                M.renderAvatars();
 
                 if (d) {
                     console.timeEnd('M.avatars');
                 }
             });
 
-
         delete M.c.contacts[u_handle];
     };
-
-    this.renderAvatars = function()
-    {
-        $('.contact-block-view-avatar').each(function(i, e)
-        {
-            var c = $(e).attr('class');
-        });
-
-        $('.avatar').each(function(i, e)
-        {
-            var c = $(e).attr('class');
-        });
-    }
 
     this.contactstatus = function(h, wantTimeStamp) {
         var folders = 0;
@@ -1758,6 +1782,7 @@ function MegaData()
             }
         }
 
+        this.previousdirid = this.currentdirid;
         this.currentdirid = id;
         this.currentrootid = RootbyId(id);
 
@@ -1837,22 +1862,24 @@ function MegaData()
             M.renderMain();
 
             if (fminitialized) {
+                var currentdirid = M.currentdirid;
                 if (id.substr(0, 6) === 'search') {
-                    if ($.transferClose) {
-                        $.transferClose();
-                    }
-                }
-                else {
-                    if ($('#treea_' + M.currentdirid).length === 0) {
-                        var n = M.d[M.currentdirid];
-                        if (n && n.p) {
-                            treeUIopen(n.p, false, true);
-                        }
-                    }
-                    treeUIopen(M.currentdirid, M.currentdirid === 'contacts');
+                    currentdirid = M.RootID;
 
-                    $('#treea_' + M.currentdirid).addClass('opened');
+                    if (M.d[M.previousdirid]) {
+                        currentdirid = M.previousdirid;
+                    }
                 }
+
+                if ($('#treea_' + currentdirid).length === 0) {
+                    var n = M.d[currentdirid];
+                    if (n && n.p) {
+                        treeUIopen(n.p, false, true);
+                    }
+                }
+                treeUIopen(currentdirid, currentdirid === 'contacts');
+
+                $('#treea_' + currentdirid).addClass('opened');
             }
             if (d) {
                 console.timeEnd('time for rendering');
@@ -2224,13 +2251,21 @@ function MegaData()
 
             // localCompare >=IE10, FF and Chrome OK
             // sort by name is default in the tree
-            treePanelSortElements(prefix, folders, {
+            var treePanelSortOptions = {
                 name: function(a, b) {
                     if (a.name) {
                         return a.name.localeCompare(b.name);
                     }
                 }
-            });
+            };
+            if (typeof Intl !== 'undefined' && Intl.Collator) {
+                var intl = new Intl.Collator('co', { numeric: true });
+
+                treePanelSortOptions.name = function(a, b) {
+                    return intl.compare(a.name, b.name);
+                };
+            }
+            treePanelSortElements(prefix, folders, treePanelSortOptions);
 
             // In case of copy and move dialogs
             if (typeof dialog !== 'undefined') {
@@ -2252,7 +2287,7 @@ function MegaData()
                     titleTooltip = '';
                     fIcon = '';
 
-                    fName = htmlentities(folders[ii].name);
+                    fName = folders[ii].name;
 
                     if (cns) {
                         for (var cn in cns) {
@@ -3286,8 +3321,9 @@ function MegaData()
                     u_attr.name
                 );
 
-                avatars[u_handle] = undefined;
-                M.avatars();
+                if (fminitialized) {
+                    M.avatars(u_handle);
+                }
             }
         });
     },
@@ -3354,7 +3390,12 @@ function MegaData()
 
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
-                mDBadd('u', clone(u.toJS ? u.toJS() : u));
+                var cleanedUpUserData = clone(u.toJS ? u.toJS() : u);
+                delete cleanedUpUserData.presence;
+                delete cleanedUpUserData.presenceMtime;
+                delete cleanedUpUserData.shortName;
+                delete cleanedUpUserData.name;
+                mDBadd('u', cleanedUpUserData);
             }
 
             this.syncUsersFullname(userId);
@@ -5253,6 +5294,10 @@ function MegaData()
             }
         }
 
+        if (ul.skipfile) {
+            showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
+        }
+
         this.mobile_ul_completed = true;
         for (var i in this.mobileuploads)
         {
@@ -5815,8 +5860,10 @@ function execsc(actionPackets, callback) {
                         var attributeName = attrs[j];
 
                         if (attributeName === '+a') {
-                            avatars[actionPacketUserId] = undefined;
-                            loadavatars = true;
+                            if (!loadavatars) {
+                                loadavatars = [];
+                            }
+                            loadavatars.push(actionPacketUserId);
                         }
                         else if (attributeName === 'firstname' || attributeName === 'lastname') {
                             attribCache.uaPacketParser(attributeName, actionPacketUserId, true);
@@ -5839,14 +5886,14 @@ function execsc(actionPackets, callback) {
                 fa: actionPacket.fa
             });
         }
-        else if (actionPacket.a === 's' && !folderlink) {
+        else if ((actionPacket.a === 's' || actionPacket.a === 's2') && !folderlink) {
             var tsharekey = '';
             var prockey = false;
 
             if (actionPacket.o === u_handle) {
 
                 // If access right are undefined then share is deleted
-                if (typeof actionPacket.r == "undefined") {
+                if (typeof actionPacket.r === "undefined") {
                     M.delNodeShare(actionPacket.n, actionPacket.u);
                 }
                 else if (M.d[actionPacket.n]
@@ -5889,7 +5936,7 @@ function execsc(actionPackets, callback) {
                 }
 
                 if (typeof actionPacket.o !== 'undefined') {
-                    if (typeof actionPacket.r == "undefined") {
+                    if (typeof actionPacket.r === "undefined") {
                         if (d) {
                             console.log('delete a share');
                         }
@@ -5984,7 +6031,13 @@ function execsc(actionPackets, callback) {
 
             crypto_share_rsa2aes();
 
-            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            if (actionPacket.a === 's2') {
+                processPS([actionPacket]);
+            }
+
+            if (fminitialized) {
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            }
         }
         else if (actionPacket.a === 'k' && !folderlink) {
             if (actionPacket.sr)
@@ -6120,9 +6173,6 @@ function execsc(actionPackets, callback) {
             M.drawReceivedContactRequests([actionPacket]);
             notify.notifyFromActionPacket(actionPacket);
         }
-        else if (actionPacket.a === 's2') {
-            processPS([actionPacket]);
-        }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
             processPH([actionPacket]);
 
@@ -6233,7 +6283,7 @@ function execsc(actionPackets, callback) {
             renderNew();
         }
         if (loadavatars) {
-            M.avatars();
+            M.avatars(loadavatars);
         }
         if (M.viewmode) {
             fm_thumbnails();
@@ -7132,7 +7182,9 @@ function processPS(pendingShares, ignoreDB) {
                     // Add the pending share to state
                     M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
 
-                    sharedUInode(nodeHandle);
+                    if (fminitialized) {
+                        sharedUInode(nodeHandle);
+                    }
                 }
             }
         }

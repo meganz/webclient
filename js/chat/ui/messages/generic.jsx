@@ -505,7 +505,7 @@ var GenericConversationMessage = React.createClass({
                             // room
                             M.u[contact.u].m = contact.email ? contact.email : contactEmail;
                         }
-                        
+
                         if (M.u[contact.u] && M.u[contact.u].c === 1) {
                             // Only show this dropdown in case this user is a contact, e.g. don't show it if thats me
                             // OR it is a share contact, etc.
@@ -674,7 +674,7 @@ var GenericConversationMessage = React.createClass({
                     return null;
                 }
                 else {
-                    chatRoom.logger.error("Invalid 2nd byte for a management message: ", textContents);
+                    chatRoom.logger.warn("Invalid 2nd byte for a management message: ", textContents);
                     return null;
                 }
             }

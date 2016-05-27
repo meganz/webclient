@@ -89,14 +89,22 @@ if (window.location.hostname == "beta.mega.nz"/* || window.location.hostname == 
             {
                 report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
             }
-            report = JSON.stringify(r? report:{});
+            try {
+                report = JSON.stringify(r ? report : {});
+            } catch(e) {
+            }
 
 
             var sendReport = function() {
-                $.get(
-                    "./logger/",
-                    { c : JSON.stringify(dump), v : report, uh: u_handle, ver: window.megaVersion }
-                );
+                try {
+                    $.get(
+                        "./logger/",
+                        {c: JSON.stringify(dump), v: report, uh: u_handle, ver: window.megaVersion}
+                    );
+                }
+                catch(e) {
+
+                }
             };
             if (window.megaVersion) {
                 sendReport();

@@ -474,6 +474,9 @@ var GenericConversationMessage = React.createClass({
                     attachmentMeta.forEach(function(v) {
                         var contact = M.u && M.u[v.u] ? M.u[v.u] : v;
                         var contactEmail = contact.email ? contact.email : contact.m;
+                        if (!contactEmail) {
+                            contactEmail = v.email ? v.email : v.m;
+                        }
 
                         var deleteButtonOptional = null;
 
@@ -493,51 +496,55 @@ var GenericConversationMessage = React.createClass({
                             M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
                                 'u': contact.u,
                                 'name': contact.name,
-                                'm': contact.email,
+                                'm': contact.email ? contact.email : contactEmail,
                                 'c': 0
                             }));
                         }
-                        if (M.u[contact.u]) {
+                        else if (M.u[contact.u] && !M.u[contact.u].m) {
+                            // if already added from group chat...add the email, since that contact got shared in a chat
+                            // room
+                            M.u[contact.u].m = contact.email ? contact.email : contactEmail;
+                        }
+                        
+                        if (M.u[contact.u] && M.u[contact.u].c === 1) {
                             // Only show this dropdown in case this user is a contact, e.g. don't show it if thats me
                             // OR it is a share contact, etc.
-                            if (M.u[contact.u] && M.u[contact.u].c === 1) {
-                                dropdown = <ButtonsUI.Button
-                                    className="default-white-button tiny-button"
-                                    icon="tiny-icon grey-down-arrow">
-                                    <DropdownsUI.Dropdown
-                                        className="white-context-menu shared-contact-dropdown"
-                                        noArrow={true}
-                                        positionMy="left bottom"
-                                        positionAt="right bottom"
-                                        horizOffset={4}
-                                    >
-                                        <DropdownsUI.DropdownItem
-                                            icon="human-profile"
-                                            label={__(l[5868])}
-                                            onClick={() => {
-                                                window.location = "#fm/" + contact.u;
-                                            }}
-                                        />
-                                        <hr/>
-                                        { null /*<DropdownsUI.DropdownItem
-                                         icon="rounded-grey-plus"
-                                         label={__(l[8631])}
-                                         onClick={() => {
-                                         window.location = "#fm/" + contact.u;
-                                         }}
-                                         />*/}
-                                        <DropdownsUI.DropdownItem
-                                            icon="conversations"
-                                            label={__(l[8632])}
-                                            onClick={() => {
-                                                window.location = "#fm/chat/" + contact.u;
-                                            }}
-                                        />
-                                        {deleteButtonOptional ? <hr /> : null}
-                                        {deleteButtonOptional}
-                                    </DropdownsUI.Dropdown>
-                                </ButtonsUI.Button>;
-                            }
+                            dropdown = <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon grey-down-arrow">
+                                <DropdownsUI.Dropdown
+                                    className="white-context-menu shared-contact-dropdown"
+                                    noArrow={true}
+                                    positionMy="left bottom"
+                                    positionAt="right bottom"
+                                    horizOffset={4}
+                                >
+                                    <DropdownsUI.DropdownItem
+                                        icon="human-profile"
+                                        label={__(l[5868])}
+                                        onClick={() => {
+                                            window.location = "#fm/" + contact.u;
+                                        }}
+                                    />
+                                    <hr/>
+                                    { null /*<DropdownsUI.DropdownItem
+                                     icon="rounded-grey-plus"
+                                     label={__(l[8631])}
+                                     onClick={() => {
+                                     window.location = "#fm/" + contact.u;
+                                     }}
+                                     />*/}
+                                    <DropdownsUI.DropdownItem
+                                        icon="conversations"
+                                        label={__(l[8632])}
+                                        onClick={() => {
+                                            window.location = "#fm/chat/" + contact.u;
+                                        }}
+                                    />
+                                    {deleteButtonOptional ? <hr /> : null}
+                                    {deleteButtonOptional}
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>;
                         }
                         else if (M.u[contact.u] && M.u[contact.u].c === 0) {
                             dropdown = <ButtonsUI.Button

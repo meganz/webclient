@@ -937,9 +937,8 @@ Chatd.Messages.prototype.clearpending = function() {
 /**
  * Resend all (OR only a specific) messages
  * @param [restore] {Boolean}
- * @param [targetMsgxid] String optional msgxid to only resent.
  */
-Chatd.Messages.prototype.resend = function(restore, targetMsgxid) {
+Chatd.Messages.prototype.resend = function(restore) {
     var self = this;
     restore = (typeof restore === 'undefined') ? false : restore;
 
@@ -949,10 +948,6 @@ Chatd.Messages.prototype.resend = function(restore, targetMsgxid) {
     var mintimestamp = Math.floor(new Date().getTime()/1000);
     this.sendingList.forEach(function(msgxid) {
         if ((mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) || (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT)) {
-            if (targetMsgxid && msgxid !== targetMsgxid) {
-                // skip
-                return;
-            }
             var messageConstructs = [];
             messageConstructs.push({"msgxid":msgxid, "timestamp":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],"keyid":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID], "updated":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.UPDATED], "message":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MESSAGE], "type":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE]});
 
@@ -964,15 +959,6 @@ Chatd.Messages.prototype.resend = function(restore, targetMsgxid) {
         else {
             // if it expires, require manul send.
             if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.MESSAGE) {
-                if (targetMsgxid && msgxid !== targetMsgxid) {
-                    // skip
-                    return;
-                }
-                // the following code is executed when i call .resend(false, [msgId]), which does NOT send the message
-                // to the server, as I would had expected. I think that the correct way is to force the previous IF()
-                // clause to be executed, but since i don't want to break something, i'm leaving this for you (@vincent)
-                debugger;
-
                 self.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(self.chatId),
                     userId: base64urlencode(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.USERID]),

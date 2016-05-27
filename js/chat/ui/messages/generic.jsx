@@ -88,14 +88,16 @@ var GenericConversationMessage = React.createClass({
         e.preventDefault(e);
         e.stopPropagation(e);
         var chatRoom = this.props.chatRoom;
-
-        chatRoom._sendMessageToTransport(msg, true)
+        this.doCancelRetry(e, msg);
+        chatRoom._sendMessageToTransport(msg)
             .done(function(internalId) {
                 msg.internalId = internalId;
 
                 self.safeForceUpdate();
 
             });
+
+
     },
     render: function () {
         var self = this;

@@ -1027,28 +1027,6 @@ ChatdIntegration.prototype.deleteMessage = function(chatRoom, msgnum) {
 };
 
 
-ChatdIntegration.prototype.resendPendingMessage = function(chatRoom, msgId) {
-    var self = this;
-    var rawChatId = base64urldecode(chatRoom.chatId);
-    
-    assert(msgId, 'missing msgnum');
-
-    var chatMessages = self.chatd.chatIdMessages[rawChatId];
-    if (!chatMessages) {
-        return;
-    }
-
-    var msgId = base64urldecode(msgId);
-    var msg = chatMessages.sending[msgId];
-    if (!msg) {
-        console.error("Update message failed, because msgId  was not found in .sending", msgId);
-        return false;
-    }
-
-
-    return chatMessages.resend(false, msgId);
-};
-
 /**
  * Discard a message from the sending queue
  *
@@ -1065,10 +1043,15 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
 
     msgId = base64urldecode(msgId);
 
-    var msg = chatMessages.sending[msgId];
-    if (!msg) {
-        console.error("Update message failed, because msgId  was not found in .sending", msgId);
-        return false;
+    if (msgId.length === 0) {
+        debugger;
+    }
+    else {
+        var msg = chatMessages.sending[msgId];
+        if (!msg) {
+            console.error("Update message failed, because msgId  was not found in .sending", msgId);
+            return false;
+        }
     }
     return chatMessages.discard(msgId);
 };

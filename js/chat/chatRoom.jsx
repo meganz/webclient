@@ -953,9 +953,8 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
  * - mark the message as sent or unsent (if the user is not connected)
  *
  * @param messageObject {KarereEventObjects.OutgoingMessage}
- * @param [isResent] {Boolean|undefined} optional, would force resent if true-ish value is found.
  */
-ChatRoom.prototype._sendMessageToTransport = function(messageObject, isResent) {
+ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
 
@@ -969,22 +968,11 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject, isResent) {
         messageObject.setDelay(unixtime());
     }
 
-    if (isResent) {
-        if (megaChat.plugins.chatdIntegration.resendPendingMessage(self,
-                messageObject.messageId
-            ) === true) {
-            return MegaPromise.resolve(messageObject.internalId);
-        }
-        else {
-            return MegaPromise.reject();
-        }
-    }
-    else {
-        return megaChat.plugins.chatdIntegration.sendMessage(
-            self,
-            messageObject
-        );
-    }
+
+    return megaChat.plugins.chatdIntegration.sendMessage(
+        self,
+        messageObject
+    );
 };
 
 

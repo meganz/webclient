@@ -586,10 +586,27 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 foundMessage.requiresManualRetry = true;
             }
             else {
-                // its ok, this happens when a system/protocol message was sent
-                console.error("Not found: ", eventData.id);
-                return;
+                var foundMessage = self.getByInternalId(eventData.id & 0xffffffff);
+
+                if (foundMessage) {
+                    foundMessage.sent = Message.STATE.NOT_SENT_EXPIRED;
+                    foundMessage.requiresManualRetry = true;
+                }
+                else {
+                    // its ok, this happens when a system/protocol message was sent
+                    console.error("Not found: ", eventData.id);
+                    return;
+                }
             }
+            if (foundMessage.messageId !== eventData.messageId) {
+                // messageId had changed. update the messagesBuff
+                self.messages.removeByKey(foundMessage.messageId);
+                foundMessage.messageId = eventData.messageId;
+                self.messages.push(
+                    foundMessage
+                );
+            }
+
         }
         else if (eventData.state === "RESTOREDEXPIRED") {
             self.haveMessages = true;

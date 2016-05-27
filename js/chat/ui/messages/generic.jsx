@@ -63,7 +63,6 @@ var GenericConversationMessage = React.createClass({
         e.stopPropagation(e);
 
         if (
-            msg.getState() === Message.STATE.NOT_SENT ||
             msg.getState() === Message.STATE.NOT_SENT_EXPIRED
         ) {
             this.doCancelRetry(e, msg);

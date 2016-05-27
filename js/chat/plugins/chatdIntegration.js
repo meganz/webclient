@@ -795,7 +795,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             false
                         );
 
-                        if (decrypted && decrypted.payload) {
+                        if (decrypted && typeof(decrypted.payload) !== 'undefined' && decrypted.payload !== null) {
                             chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
                         } else if (decrypted && !decrypted.payload && typeof(decrypted.type) !== 'undefined') {
                             if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
@@ -1022,6 +1022,7 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
 ChatdIntegration.prototype.deleteMessage = function(chatRoom, msgnum) {
     // a msgupd is only possible up to 1hour after the indicated (client-supplied) UTC timestamp.
     var self = this;
+
     return self.updateMessage(chatRoom, msgnum, "");
 };
 

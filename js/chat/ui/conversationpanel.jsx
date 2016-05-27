@@ -1387,11 +1387,11 @@ var ConversationPanel = React.createClass({
                 }}
                 onConfirmClicked={() => {
                     var msg = self.state.messageToBeDeleted;
-                    if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED) {
-                        room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.orderValue);
+                    if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
+                        room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
                     }
                     else if (
-                        msg.getState() === Message.STATE.NOT_SENT || msg.getState() === Message.STATE.NOT_SENT_EXPIRED
+                        msg.getState() === Message.STATE.NOT_SENT_EXPIRED
                     ) {
                         room.megaChat.plugins.chatdIntegration.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);                    
                     }

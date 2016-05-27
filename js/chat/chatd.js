@@ -893,7 +893,9 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     // modify pending message so that a potential resend includes the change
 
     if (this.sendingbuf[msgnum] && this.sending[this.sendingbuf[msgnum][Chatd.MsgField.MSGID]]) {
-        this.sendingbuf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-this.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
+        if (this.sending[this.sendingbuf[msgnum][Chatd.MsgField.TYPE]] === Chatd.MsgType.EDIT) {
+            this.sendingbuf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-this.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
+        }
         this.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
 
         if (self.chatd.chatIdShard[this.chatId].isOnline()) {
@@ -1186,6 +1188,14 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, updated, keyid, msg
         if (keyid === 0) {
         // if this is message truncate
             if (i < msgnum && this.buf[i]) {
+                // clear pending list if there is any.
+                if (this.sending[this.buf[i][Chatd.MsgField.MSGID]]) {
+                    var num = this.sending[this.buf[i][Chatd.MsgField.MSGID]];
+                    this.removefrompersist(this.buf[i][Chatd.MsgField.MSGID]);
+                    removeValue(this.sendingList, this.buf[i][Chatd.MsgField.MSGID]);
+                    delete this.sending[this.buf[i][Chatd.MsgField.MSGID]];
+                    delete this.sendingbuf[num];
+                }
                 this.discard(this.buf[i][Chatd.MsgField.MSGID]);
                 delete this.buf[i];
             }

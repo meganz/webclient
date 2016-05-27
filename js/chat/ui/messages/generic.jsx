@@ -772,7 +772,8 @@ var GenericConversationMessage = React.createClass({
                     if (
                         contact && contact.u === u_handle &&
                         (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
-                        self.state.editing !== true
+                        self.state.editing !== true &&
+                        !message.requiresManualRetry
                     ) {
                         messageActionButtons = <ButtonsUI.Button
                             className="default-white-button tiny-button"

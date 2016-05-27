@@ -731,13 +731,25 @@ Chat.prototype.getRoomFromUrlHash = function(urlHash) {
     if (urlHash.indexOf("#") === 0) {
         urlHash = urlHash.subtr(1, urlHash.length);
     }
-    var contactHash = urlHash.replace("chat/", "");
-    if (!contactHash) {
-        return;
+    if (urlHash.indexOf("chat/g/") > -1) {
+        var foundRoom = null;
+        urlHash = urlHash.replace("chat/g/", "");
+        megaChat.chats.forEach(function(room) {
+            if (!foundRoom && room.roomJid.split("@")[0] === urlHash) {
+                foundRoom = room;
+            }
+        });
+        return foundRoom;
     }
+    else {
+        var contactHash = urlHash.replace("chat/", "");
+        if (!contactHash) {
+            return;
+        }
 
-    var chatRoom = this.getPrivateRoom(contactHash);
-    return chatRoom;
+        var chatRoom = this.getPrivateRoom(contactHash);
+        return chatRoom;
+    }
 };
 
 /**
@@ -1731,7 +1743,7 @@ Chat.prototype.getPrivateRoom = function(h) {
 
     var found = false;
     self.chats.forEach(function(v, k) {
-        if (v.getParticipantsExceptMe()[0] == jid) {
+        if (v.type === "private" && v.getParticipantsExceptMe()[0] == jid) {
             found = v;
             return false; // break;
         }

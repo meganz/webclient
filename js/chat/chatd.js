@@ -945,7 +945,7 @@ Chatd.Messages.prototype.resend = function(restore, targetMsgxid) {
 
     // resend all pending new messages and modifications
     // 1 hour is agreed by everyone.
-    var MESSAGE_EXPIRY = 60*60; // 60*60
+    var MESSAGE_EXPIRY = 60; // 60*60
     var mintimestamp = Math.floor(new Date().getTime()/1000);
     this.sendingList.forEach(function(msgxid) {
         if ((mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) || (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT)) {

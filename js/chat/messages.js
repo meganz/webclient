@@ -322,9 +322,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
 
     self.chatd.rebind('onMessagesHistoryRequest.messagesBuff' + chatRoomId, function(e, eventData) {
+
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
             self.isRetrievingHistory = true;
             self.expectedMessagesCount = eventData.count * -1;
             self.trackDataChange();

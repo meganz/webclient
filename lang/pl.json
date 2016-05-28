@@ -3344,6 +3344,14 @@
     "8818": "Wprowadzony link nie jest poprawny lub nie zosta\u0142 zablokowany.",
     "8819": "Twoje zg\u0142oszenie do tego linku ju\u017c wcze\u015bniej zosta\u0142o zarejestrowane.",
     "8820": "Podane konto MEGA nie jest w\u0142a\u015bcicielem wskazanego linku.",
+    "8822": "Kopiowanie nie powiod\u0142o si\u0119",
+    "8826": "Tryb Debug",
+    "8828": "Elementy udost\u0119pnione z MEGA",
+    "8830": "Elementy udost\u0119pnione z MEGA",
+    "8831": "Kopiowanie...",
+    "8832": "Szczeg\u00f3\u0142y pami\u0119ci",
+    "8833": "Aby zwi\u0119kszy\u0107 limit, mo\u017cesz zarejestrowa\u0107 si\u0119. Dzi\u0119ki temu nie tylko otrzymasz ekstra limit, ale r\u00f3wnie\u017c 50 GB powierzchni na pliki - [B]za darmo[\/B].",
+    "8834": "Pobieranie nie mo\u017ce by\u0107 kontynuowane, poniewa\u017c przekroczsz dost\u0119pny limit przypisany do Twojego adresu IP.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3435,6 +3443,8 @@
         "fri": 8768,
         "sat": 8769,
         "copyright-dispute-title": 8771,
-        "copyright-dispute-subtitle": 8772
+        "copyright-dispute-subtitle": 8772,
+        "user-register-for-bandwidth-and-storage": 8833,
+        "warning-message-for-bandwidth-overquota": 8834
     }
 }

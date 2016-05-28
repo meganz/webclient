@@ -13378,5 +13378,37 @@
     "8820": {
         "text": "The MEGA account provided did not match the owner of the link.",
         "context": "A message inside an error dialog. This explains that the email the user provided during a takedown counter-notice (which disputes the takedown) was not the one who created the link."
+    },
+    "8822": {
+        "text": "Copy failed",
+        "context": "A title on a dialog which is displayed when the process\/request to copy a file\/folder failed."
+    },
+    "8826": {
+        "text": "Debug mode",
+        "context": "A message on the alert dialog which is displayed when the app starts and the debugging mode is enabled."
+    },
+    "8828": {
+        "text": "Item shared from MEGA",
+        "context": "Title for the shared resource or the dialog displayed when the user is sharing a file\/folder from MEGA with another app - (String as short as possible)."
+    },
+    "8830": {
+        "text": "Items shared from MEGA",
+        "context": "Title for the shared resource or the dialog displayed when the user is sharing multiple files\/folders from MEGA with another app - (String as short as possible)."
+    },
+    "8831": {
+        "text": "Copying...",
+        "context": "A progress indicator message when copying a file\/folder to a different parent."
+    },
+    "8832": {
+        "text": "Memory statistics",
+        "context": "A label for any memory (RAM) statistics button, link, text, title, etc."
+    },
+    "8833": {
+        "text": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+        "context": "A message displayed to encourage the user to register an account for extra bandwidth and free storage. Please keep the [B] and [\/B] tags as they will be used to stylise the text at runtime."
+    },
+    "8834": {
+        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
+        "context": "A warning message which is displayed to warn the user about the reason why their download can not proceed because they would be over the bandwidth quota."
     }
 }

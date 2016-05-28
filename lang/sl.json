@@ -3344,6 +3344,14 @@
     "8818": "Povezava, ki ste jo vnesli, je bodisi neveljavna, ali pa ni predmet zahteve po odstranitvi.",
     "8819": "Ste \u017ee vpisali proti-zahtevo za to povezavo.",
     "8820": "Vpisani MEGA ra\u010dun se ne sklada z lastnikom povezave.",
+    "8822": "Kopiranje neuspe\u0161no",
+    "8826": "Razhro\u0161\u010devalni na\u010din",
+    "8828": "Predmet, deljen z MEGA",
+    "8830": "Predmeti, deljeni z MEGA",
+    "8831": "Kopiram...",
+    "8832": "Statistika porabe pomnilnika",
+    "8833": "Za dvig te omejitve, lahko registrirate ra\u010dun. To vam ne bo le ponudilo dodatne pasovne \u0161irine, pa\u010d pa boste pridobili tudi 50 GB varnega shranjevalnega prostora v oblaku - [B]brezpla\u010dno[\/B].",
+    "8834": "Va\u0161ega prevzema nismo mogli sprocesirati, ker bi vas ponesel preko trenutno dovoljene kvote brezpla\u010dnega prenosa za va\u0161 IP naslov.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3435,6 +3443,8 @@
         "fri": 8768,
         "sat": 8769,
         "copyright-dispute-title": 8771,
-        "copyright-dispute-subtitle": 8772
+        "copyright-dispute-subtitle": 8772,
+        "user-register-for-bandwidth-and-storage": 8833,
+        "warning-message-for-bandwidth-overquota": 8834
     }
 }

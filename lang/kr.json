@@ -3344,6 +3344,14 @@
     "8818": "\uc785\ub825\ud558\uc2e0 \ub9c1\ud06c\uac00 \uc798\ubabb\ub418\uc5c8\uac70\ub098 \uac8c\uc2dc \uc911\ub2e8\uc758 \ub300\uc0c1\uc774 \uc544\ub2d9\ub2c8\ub2e4.",
     "8819": "\uc774\ubbf8 \uc774 \ub9c1\ud06c\uc5d0 \ub300\ud55c \uac8c\uc2dc \uc911\ub2e8 \ud55c\uc758\ub97c \ubcf4\ub0c8\uc2b5\ub2c8\ub2e4.",
     "8820": "\uc785\ub825\ud558\uc2e0 MEGA \uacc4\uc815\uc774 \ub9c1\ud06c\uc758 \uc18c\uc720\uc790\uc640 \uc77c\uce58\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.",
+    "8822": "Copy failed",
+    "8826": "Debug mode",
+    "8828": "Item shared from MEGA",
+    "8830": "Items shared from MEGA",
+    "8831": "Copying...",
+    "8832": "Memory statistics",
+    "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+    "8834": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3435,6 +3443,8 @@
         "fri": 8768,
         "sat": 8769,
         "copyright-dispute-title": 8771,
-        "copyright-dispute-subtitle": 8772
+        "copyright-dispute-subtitle": 8772,
+        "user-register-for-bandwidth-and-storage": 8833,
+        "warning-message-for-bandwidth-overquota": 8834
     }
 }

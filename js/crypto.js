@@ -842,6 +842,7 @@ var ETOOMANYCONNECTIONS = -19;
 
 // custom errors
 var ETOOERR = -400;
+var EFQUOTA = -401;
 
 function ssl_needed() {
     var ssl_opt = ['Chrome/'];
@@ -4319,6 +4320,8 @@ function api_strerror(errno) {
         return "Temporarily not available";
     case ETOOMANYCONNECTIONS:
         return "Connection overflow";
+    case EFQUOTA:
+        return "Over Free Quota";
     default:
         break;
     }

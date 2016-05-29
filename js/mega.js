@@ -4880,6 +4880,7 @@ function MegaData()
             case EKEY:
                 errorstr = l[24];
                 break;
+            case EFQUOTA:
             case EOVERQUOTA:
                 errorstr = l[1673];
                 break;

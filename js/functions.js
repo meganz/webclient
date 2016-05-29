@@ -454,7 +454,7 @@ function populate_l() {
         l[1] = 'Go Pro';
     }
     l[8634] = l[8634].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
-    l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");    
+    l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[438] = l[438].replace('[X]', '');
     l['439a'] = l[439];
     l[439] = l[439].replace('[X1]', '').replace('[X2]', '');
@@ -543,7 +543,8 @@ function populate_l() {
     l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
     l[8535] = l[8535].replace('[B]', '<b>').replace('[/B]', '</b>');
-    
+    l[8833] = l[8833].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
@@ -4124,8 +4125,14 @@ var watchdog = Object.freeze({
                         // the other tab must have sent the new sid
                         assert(sid, 'sid not set');
                         api_setsid(sid);
-                        dlmanager.uqFastTrack = 1;
-                        dlmanager._overquotaInfo();
+
+                        if (dlmanager.isOverFreeQuota) {
+                            dlmanager._onQuotaRetry(true, sid);
+                        }
+                        else {
+                            dlmanager.uqFastTrack = 1;
+                            dlmanager._overquotaInfo();
+                        }
                     }, 2000);
                 }
                 break;
@@ -4570,7 +4577,7 @@ function getProPlan(planNum) {
  *                   company names are not translated).
  */
 function getGatewayName(gatewayId) {
-    
+
     var gateways = {
         0: {
             name: 'voucher',
@@ -4641,12 +4648,12 @@ function getGatewayName(gatewayId) {
             displayName: l[6198]    // Wire transfer
         }
     };
-    
+
     // If the gateway exists, return it
     if (typeof gateways[gatewayId] !== 'undefined') {
         return gateways[gatewayId];
     }
-    
+
     // Otherwise return a placeholder for currently unknown ones
     return {
         name: 'unknown',

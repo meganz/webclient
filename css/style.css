@@ -21716,6 +21716,13 @@ a.top-login-forgot-pass {
     border-top: 2px solid rgba(0, 0, 0, .3);
     min-width: 460px;
 }
+.pro-register-dialog .fm-dialog-body {
+    font-size: 15px;
+    line-height: 24px;
+    color: #666666;
+    padding: 0 15px;
+    margin: 0;
+}
 .pro-register-dialog.hidden {
     display: none;
 }

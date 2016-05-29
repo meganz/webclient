@@ -265,6 +265,9 @@ var dlmanager = {
             if (res.d) {
                 error = (res.d ? 2 : 1); // XXX: ???
             }
+            else if (res.efq) {
+                error = EFQUOTA;
+            }
             else if (res.e) {
                 error = res.e;
             }
@@ -289,6 +292,8 @@ var dlmanager = {
                     }
 
                     dlmanager.isOverQuota = false;
+                    dlmanager.isOverFreeQuota = false;
+                    delete localStorage.awaitingConfirmationAccount;
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -598,11 +603,20 @@ var dlmanager = {
     _quotaPushBack: {},
     _dlQuotaListener: [],
 
-    _onQuotaRetry: function DM_onQuotaRetry(getNewUrl) {
+    _onQuotaRetry: function DM_onQuotaRetry(getNewUrl, sid) {
         delay.cancel('overquota:retry');
 
         var ids = dlmanager.getCurrentDownloads();
         $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+
+        if (this.isOverFreeQuota) {
+            closeDialog();
+            topmenuUI();
+
+            if (sid) {
+                this.isOverFreeQuota = sid;
+            }
+        }
 
         if (page === 'download') {
             $('.download.info-block').removeClass('overquota');
@@ -756,15 +770,10 @@ var dlmanager = {
             );
     },
 
-    showOverQuotaDialog: function DM_quotaDialog(dlTask) {
-
-        var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
-        var $button = $dialog.find('.fm-dialog-close');
-        var $overlay = $('.fm-dialog-overlay');
-
+    _setOverQuotaState: function DM_setOverQuotaState(dlTask) {
         this.isOverQuota = true;
         localStorage.seenOverQuotaDialog = Date.now();
-        this.logger.debug('showOverQuotaDialog', dlTask);
+        this.logger.debug('_setOverQuotaState', dlTask);
 
         if (typeof dlTask === "function") {
             this._dlQuotaListener.push(dlTask);
@@ -773,10 +782,46 @@ var dlmanager = {
             this._quotaPushBack[dlTask.gid] = dlTask;
         }
 
-        dlmanager.getCurrentDownloads()
+        this.getCurrentDownloads()
             .forEach(function(gid) {
                 fm_tfspause(gid, true);
             });
+    },
+
+    showOverQuotaRegisterDialog: function DM_quotaDialog(dlTask) {
+
+        this._setOverQuotaState(dlTask);
+
+        // did we get a sid from another tab? (watchdog:setsid)
+        if (typeof this.isOverFreeQuota === 'string') {
+            // Yup, delay a retry...
+            return delay('overfreequota:retry', this._onQuotaRetry.bind(this, true), 1200);
+        }
+        this.isOverFreeQuota = true;
+
+        mega.ui.showRegisterDialog({
+            title: l[17],
+            body: '<p>' + l[8834] + '</p><p>' + l[8833] + '</p><h2>' + l[1095] + '</h2>',
+
+            onAccountCreated: function(gotLoggedIn, accountData) {
+                if (gotLoggedIn) {
+                    dlmanager._onQuotaRetry(true);
+                }
+                else {
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                    mega.ui.sendSignupLinkDialog(accountData);
+                }
+            }
+        });
+    },
+
+    showOverQuotaDialog: function DM_quotaDialog(dlTask) {
+
+        var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+        var $button = $dialog.find('.fm-dialog-close');
+        var $overlay = $('.fm-dialog-overlay');
+
+        this._setOverQuotaState(dlTask);
 
         if ($dialog.is(':visible')) {
             this.logger.info('showOverQuotaDialog', 'visible already.');
@@ -949,6 +994,10 @@ function fm_tfsresume(gid) {
 
                 if (page === 'download') {
                     $('.download.pause-button').addClass('active');
+                }
+
+                if (dlmanager.isOverFreeQuota) {
+                    return dlmanager.showOverQuotaRegisterDialog();
                 }
 
                 return dlmanager.showOverQuotaDialog();

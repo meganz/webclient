@@ -713,16 +713,16 @@ function init_page() {
             mainScroll();
         }
     }
-    else if (page == 'disputenotice') {
-        parsepage(pages['disputenotice']);        
+    else if (page === 'disputenotice') {
+        parsepage(pages['disputenotice']);
         copyright.init_cndispute();
     }
-    else if (page == 'dispute') {
+    else if (page === 'dispute') {
         parsepage(pages['dispute']);
         $('.reg-st5-complete-button').rebind('click', function (e) {
             document.location.hash = 'disputenotice';
         });
-        mainScroll();        
+        mainScroll();
     }
     else if (page.substr(0, 3) == 'pro') {
         var tmp = page.split('/uao=');

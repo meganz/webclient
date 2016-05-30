@@ -3344,6 +3344,14 @@
     "8818": "A liga\u00e7\u00e3o que voc\u00ea indicou \u00e9 inv\u00e1lida ou n\u00e3o \u00e9 alvo de um aviso de remo\u00e7\u00e3o.",
     "8819": "Voc\u00ea j\u00e1 fez uma contra-notifica\u00e7\u00e3o relativamente a esta liga\u00e7\u00e3o.",
     "8820": "A conta MEGA indicada n\u00e3o corresponde ao propriet\u00e1rio da liga\u00e7\u00e3o.",
+    "8822": "Falha ao copiar",
+    "8826": "Modo de depura\u00e7\u00e3o",
+    "8828": "Item partilhado do MEGA",
+    "8830": "Itens partilhados do MEGA",
+    "8831": "A copiar...",
+    "8832": "Estat\u00edsticas de mem\u00f3ria",
+    "8833": "Para aumentar este limite, voc\u00ea pode abrir uma conta.Isto n\u00e3o s\u00f3 dar-lhe-\u00e1 uma largura de banda ampla mas tamb\u00e9m 50 GB de armazenamento seguro na nuvem - [B]gr\u00e1tis[\/B].",
+    "8834": "A sua descarga n\u00e3o p\u00f4de continuar porque iria ultrapassar o seu plafond de transfer\u00eancias gr\u00e1tis para o endere\u00e7o IP.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3435,6 +3443,8 @@
         "fri": 8768,
         "sat": 8769,
         "copyright-dispute-title": 8771,
-        "copyright-dispute-subtitle": 8772
+        "copyright-dispute-subtitle": 8772,
+        "user-register-for-bandwidth-and-storage": 8833,
+        "warning-message-for-bandwidth-overquota": 8834
     }
 }

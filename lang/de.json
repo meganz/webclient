@@ -3344,6 +3344,14 @@
     "8818": "The link you provided is either invalid or is not the subject of a takedown notice.",
     "8819": "You have already made a counter-notification against this link.",
     "8820": "The MEGA account provided did not match the owner of the link.",
+    "8822": "Copy failed",
+    "8826": "Debug mode",
+    "8828": "Item shared from MEGA",
+    "8830": "Items shared from MEGA",
+    "8831": "Copying...",
+    "8832": "Memory statistics",
+    "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+    "8834": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3435,6 +3443,8 @@
         "fri": 8768,
         "sat": 8769,
         "copyright-dispute-title": 8771,
-        "copyright-dispute-subtitle": 8772
+        "copyright-dispute-subtitle": 8772,
+        "user-register-for-bandwidth-and-storage": 8833,
+        "warning-message-for-bandwidth-overquota": 8834
     }
 }

@@ -86,8 +86,7 @@ ChatdIntegration.prototype.requiresUpdate = function() {
             return;
         }
         if (!is_extension) {
-            var confirmtxt = __(l[8840]);
-            msgDialog('confirmation', l[1900], confirmtxt, '', function (e) {
+            msgDialog('confirmation', l[1900], l[8840], '', function (e) {
                 if (e) {
                     window.location.reload();
                 }
@@ -100,7 +99,7 @@ ChatdIntegration.prototype.requiresUpdate = function() {
             msgDialog(
                 'warningb',
                 l[1900],
-                __(l[8841])
+                l[8841]
             );
             localStorage.chatUpdateIgnored = Chatd.VERSION;
         }

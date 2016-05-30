@@ -3352,6 +3352,8 @@
     "8832": "Estad\u00edsticas de memoria",
     "8833": "Para aumentar este l\u00edmite, puedes registrar una cuenta. Esto no solo te dar\u00e1 ancho de banda mucho m\u00e1s amplio, sino tambi\u00e9n 50 GB de espacio de almacenamiento seguro en la nube [B]gratis[\/B].",
     "8834": "Tu descarga no ha podido empezar porque te llevar\u00eda por encima de la cuota de transferencia admitida como usuario gratuito para tu IP.",
+    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3445,6 +3447,8 @@
         "copyright-dispute-title": 8771,
         "copyright-dispute-subtitle": 8772,
         "user-register-for-bandwidth-and-storage": 8833,
-        "warning-message-for-bandwidth-overquota": 8834
+        "warning-message-for-bandwidth-overquota": 8834,
+        "new-version-megachat-message": 8840,
+        "new-version-megachat-extension-message": 8841
     }
 }

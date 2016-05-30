@@ -3352,6 +3352,8 @@
     "8832": "Statistika pam\u011bti",
     "8833": "Pro zv\u00fd\u0161en\u00ed tohoto omezen\u00ed si m\u016f\u017eete zaregistrovat \u00fa\u010det. Z\u00edsk\u00e1te t\u00edm nejen nav\u00edc \u0161\u00ed\u0159ku p\u00e1sma, ale tak\u00e9 50 GB zabezpe\u010den\u00e9ho prostoru \u00falo\u017ei\u0161t\u011b v cloudu - [B]zdarma[\/B].",
     "8834": "Va\u0161e stahov\u00e1n\u00ed nem\u016f\u017ee pokra\u010dovat, proto\u017ee byste p\u0159ekro\u010dili aktu\u00e1ln\u00ed povolen\u00ed bezplatn\u00e9ho p\u0159enosu pro va\u0161i IP adresu.",
+    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3445,6 +3447,8 @@
         "copyright-dispute-title": 8771,
         "copyright-dispute-subtitle": 8772,
         "user-register-for-bandwidth-and-storage": 8833,
-        "warning-message-for-bandwidth-overquota": 8834
+        "warning-message-for-bandwidth-overquota": 8834,
+        "new-version-megachat-message": 8840,
+        "new-version-megachat-extension-message": 8841
     }
 }

@@ -3352,6 +3352,8 @@
     "8832": "Statistici privind memoria",
     "8833": "Pentru a spori aceast\u0103 limit\u0103, po\u0163i \u00eenregistra un cont. Acest lucru nu \u00ee\u0163i va oferi numai l\u0103\u0163ime de band\u0103 suplimentar\u0103 ampl\u0103, ci \u015fi 50 GB de spa\u0163iu de stocare sigur\u0103 \u00een cloud - [B]gratuit[\/B].",
     "8834": "Desc\u0103rcarea nu a putut continua deoarece ar dep\u0103\u015fi cota actual\u0103 pentru transferuri gratuite pentru adresa ta IP.",
+    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3445,6 +3447,8 @@
         "copyright-dispute-title": 8771,
         "copyright-dispute-subtitle": 8772,
         "user-register-for-bandwidth-and-storage": 8833,
-        "warning-message-for-bandwidth-overquota": 8834
+        "warning-message-for-bandwidth-overquota": 8834,
+        "new-version-megachat-message": 8840,
+        "new-version-megachat-extension-message": 8841
     }
 }

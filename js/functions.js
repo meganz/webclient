@@ -4181,6 +4181,32 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
+    if (navigator.mozGetUserMedia) {
+        var creds = passwordManager.pickFormFields(form);
+        if (creds) {
+            // prepare pwd to be stored encrypted
+            // format: "~:<keypw>:<userhash>"
+            var pwd = creds.pwd;
+
+            if (!passwordManager.getStoredCredentials(pwd)) {
+                var keypw = prepare_key_pw(pwd);
+                var pwaes = new sjcl.cipher.aes(keypw);
+                var hash = stringhash(creds.usr.toLowerCase(), pwaes);
+
+                pwd = '~:' + a32_to_base64(keypw) + ':' + hash;
+
+                $('#pmh_username').val(creds.usr);
+                $('#pmh_password').val(pwd);
+                $('#pwdmanhelper').submit();
+                Soon(function() {
+                    $('#pwdmanhelper input').val('');
+                    $(form).find('input').val('');
+                    $('iframe#dummyTestFrame').attr('src', 'about:blank');
+                });
+            }
+        }
+        return;
+    }
     if (is_chrome_firefox || typeof history !== "object") {
         return false;
     }
@@ -4196,6 +4222,78 @@ function passwordManager(form) {
     }).submit();
     return true;
 }
+passwordManager.knownForms = Object.freeze({
+    '#form_login_header': {
+        usr: '#login-name',
+        pwd: '#login-password'
+    },
+    '#login_form': {
+        usr: '#login-name2',
+        pwd: '#login-password2'
+    },
+    '#register_form': {
+        usr: '#register-email',
+        pwd: '#register-password'
+    }
+});
+passwordManager.getStoredCredentials = function(password) {
+    // Retrieve `keypw` and `userhash` from pwd string
+    var result = null;
+
+    if (String(password).substr(0, 2) === '~:') {
+        var parts = password.substr(2).split(':');
+
+        if (parts.length === 2) {
+            try {
+                var hash = parts[1];
+                var keypw = base64_to_a32(parts[0]);
+
+                if (base64_to_a32(hash).length === 2
+                        && keypw.length === 4) {
+
+                    result = {
+                        hash: hash,
+                        keypw: keypw
+                    };
+                }
+            }
+            catch (e) {}
+        }
+    }
+
+    return result;
+};
+passwordManager.pickFormFields = function(form) {
+    var result = null;
+    var $form = $(form);
+
+    if ($form.length) {
+        if ($form.length !== 1) {
+            console.error('Unexpected form selector', form);
+        }
+        else {
+            form = passwordManager.knownForms[form];
+            if (form) {
+                result = {
+                    usr: $form.find(form.usr).val(),
+                    pwd: $form.find(form.pwd).val(),
+
+                    selector: {
+                        usr: form.usr,
+                        pwd: form.pwd
+                    }
+                };
+
+                if (!(result.usr && result.pwd)) {
+                    result = false;
+                }
+            }
+        }
+    }
+
+    return result;
+};
+
 
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2Lightweight(el) {

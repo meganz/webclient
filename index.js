@@ -63,6 +63,7 @@ function startMega() {
     }
 
     mBroadcaster.sendMessage('zoomLevelCheck');
+    $('#pwdmanhelper input').val('');
 }
 
 function mainScroll() {

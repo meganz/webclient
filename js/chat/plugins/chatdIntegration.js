@@ -72,7 +72,7 @@ ChatdIntegration.prototype.requiresUpdate = function() {
     var self = this;
 
     if (window.location.toString().indexOf("/chat")) {
-        $('.nw-fm-left-icon.cloud-drive').triggerHandler('click')
+        $('.nw-fm-left-icon.cloud-drive').triggerHandler('click');
     }
 
     megaChat.destroy();

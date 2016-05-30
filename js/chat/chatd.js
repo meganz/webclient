@@ -153,7 +153,7 @@ Chatd.Shard = function(chatd, shard) {
         {
             functions: {
                 reconnect: function(connectionRetryManager) {
-                    // TODO: change this to use the new API method for retrieving a mcurl for a specific shard 
+                    // TODO: change this to use the new API method for retrieving a mcurl for a specific shard
                     // (not chat)
                     var firstChatId = Object.keys(self.chatIds)[0];
                     asyncApiReq({
@@ -172,8 +172,8 @@ Chatd.Shard = function(chatd, shard) {
                                 }
                             }
                         });
-                    
-                    
+
+
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -526,7 +526,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 len = 17;
                 break;
-            
+
             case Chatd.Opcode.RANGE:
                 self.keepAliveTimerRestart();
                 self.logger.log(

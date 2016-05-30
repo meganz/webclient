@@ -12,6 +12,7 @@
     /** }}} */
 
     var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
+    var isReady = false;
 
     mBroadcaster.once('startMega', function() {
         for (var sub in signPubKey) {
@@ -22,6 +23,7 @@
                 signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
             }
         }
+        isReady = true;
     });
     
     var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
@@ -64,6 +66,12 @@
     
     function process_cms_response(bytes, next, as, id) {
         var viewer = new Uint8Array(bytes);
+
+        if (!isReady) {
+            return setTimeout(function() {
+                process_cms_response(bytes, next, as, id);
+            }, 100);
+        }
     
         var signature = bytes.slice(3, 67); // 64 bytes, signature
         var version = viewer[0];

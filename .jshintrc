@@ -5,16 +5,14 @@
     "freeze": true,
     "futurehostile": true,
     "latedef": "nofunc",
-    "maxcomplexity": 10,
+    "maxcomplexity": 12,
     "maxdepth": 5,
     "noarg": true,
     "nocomma": true,
     "nonbsp": true,
     "nonew": true,
-
     "laxbreak": true,
     "sub": true,
-
     "browser": true,
     "devel": true,
     "typed": true,

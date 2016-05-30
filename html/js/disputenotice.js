@@ -159,7 +159,7 @@ copyright.init_cndispute = function() {
     }
 
     // The sign button needs to validate the form
-    $('.signbtn').rebind('click', function(e) {      
+    $('.signbtn').rebind('click.copydispute', function(e) {      
         
         if (copyright.validateDisputeForm()) {       
             // Show loading dialog
@@ -225,7 +225,7 @@ copyright.init_cndispute = function() {
     });
    
     // Add click and unclick functionality for the custom styled checkboxes
-    $('.cn_check1, .cn_check2, .cn_check3, .cn_check4').rebind('click', function(event) {
+    $('.cn_check1, .cn_check2, .cn_check3, .cn_check4').rebind('click.copydispute', function(event) {
 
         $input = $(this).find('input');
         $checkboxDiv = $(this).find('.checkdiv');
@@ -242,7 +242,7 @@ copyright.init_cndispute = function() {
         }
     });
 
-    $('.select select').rebind('change', function(e) {
+    $('.cn .select select').rebind('change.copydispute', function(e) {
         if ($(this).val() !== 0) {
             $(this).parent().addClass('selected');
             $(this).parent().find('.affiliate-select-txt')
@@ -258,6 +258,6 @@ copyright.init_cndispute = function() {
                 + escapeHTML(isocountries[country]) + '</option>';
         }
     }
-    $('.select.country select').safeHTML(markup);
+    $('.cn .select.country select').safeHTML(markup);
 }
 

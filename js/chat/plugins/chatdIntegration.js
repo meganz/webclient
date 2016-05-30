@@ -640,7 +640,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     return;
                 }
 
-                if (v.userId) {
+                if (v.userId && !v.requiresManualRetry) {
                     var msg = v.getContents ? v.getContents() : v.message;
 
                     chatRoom.notDecryptedBuffer[k] = {

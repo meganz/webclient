@@ -854,7 +854,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
 
         // write the new message to the message buffer and mark as in sending state
         // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
-        this.sendingbuf[++this.sendingnum] = [msgxid, this.chatd.userId, timestamp, message.message, keyId, 0, message.type];
+        this.sendingbuf[++this.sendingnum] = [msgxid, this.chatd.userId, timestamp, message.message, (keyId>>>0), 0, message.type];
         this.sending[msgxid] = this.sendingnum;
         this.sendingList.push(msgxid);
         this.persist(msgxid);
@@ -958,7 +958,7 @@ Chatd.Messages.prototype.resend = function(restore) {
         }
         else {
             // if it expires, require manul send.
-            if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.MESSAGE) {
+            if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] !== Chatd.MsgType.KEY) {
                 self.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(self.chatId),
                     userId: base64urlencode(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.USERID]),
@@ -1239,8 +1239,26 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
             return;
         }
     });
+    var promises = [];
+
     var cacheKey = base64urlencode(self.chatId) + ":" + firstkeyxid;
-    self.chatd.messagesQueueKvStorage.removeItem(cacheKey);
+    promises.push(
+        self.chatd.messagesQueueKvStorage.getItem(cacheKey).done(
+        function(v) {
+            if (v) {
+                self.chatd.messagesQueueKvStorage.setItem(cacheKey, {
+                    'messageId' : v.messageId,
+                    'userId' : v.userId,
+                    'timestamp' : v.timestamp,
+                    'message' : v.message,
+                    'keyId' : keyid,
+                    'updated' : v.updated,
+                    'type' : v.type
+                });
+            }
+        })
+    );
+
     var num = this.sending[firstkeyxid];
     removeValue(this.sendingList, firstkeyxid);
     delete this.sending[firstkeyxid];
@@ -1248,7 +1266,43 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
 
     // update all the keyid in pending and persist list first.
     this.updatekeyid(keyid);
-    this.updatepersistencykeyid(keyid);
+
+    var prefix = base64urlencode(self.chatId);
+
+    var iskey = false;
+    var previouskeyid;
+    var trivialkeys = [];
+
+    promises.push(
+        self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
+
+            if (v.userId === self.chatd.userId) {
+                if (v.type === Chatd.MsgType.KEY ) {
+
+                    // if the previous message is a key message, then the previous key is a trivial key.
+                    if (iskey) {
+                        trivialkeys.push(previouskeyid);
+                    }
+                    iskey = true;
+                    previouskeyid = v.messageId;
+                }
+                else {
+                    iskey =false;
+                }
+            }
+        })
+    );
+
+    var _updatepersistedkeyid = function() {
+        for (var keyidmsgid in trivialkeys) {
+            self.removefrompersist(trivialkeys[keyidmsgid]);
+        }
+        self.updatepersistencykeyid(keyid);
+    };
+
+    MegaPromise.allDone(promises).always(function() {
+        _updatepersistedkeyid();
+    });
 };
 
 Chatd.Messages.prototype.persist = function(messageId) {
@@ -1299,7 +1353,7 @@ Chatd.Messages.prototype.updatepersistencykeyid = function(keyid) {
     var prefix = base64urlencode(self.chatId);
 
     self.chatd.messagesQueueKvStorage.eachPrefixItem(prefix, function(v, k) {
-        if (v.type === Chatd.MsgType.KEY) {
+        if (v.type === Chatd.MsgType.KEY && (((v.keyId & 0xffff0000) >>> 0) === (0xffff0000 >>> 0))) {
             return ;
         }
         else {
@@ -1338,10 +1392,13 @@ Chatd.Messages.prototype.restore = function() {
                     if (iskey) {
                         trivialkeys.push(previouskeyid);
                     }
-
-                    pendingkey = true;
-                    ++tempkeyid;
-                    v.keyId = tempkeyid;
+                    if (((v.keyId & 0xffff0000) >>>0 ) === (0xffff0000 >>>0 )) {
+                        pendingkey = true;
+                        ++tempkeyid;
+                        v.keyId = tempkeyid;
+                    } else {
+                        pendingkey = false;
+                    }
 
                     var index = 0;
                     var len = v.message.length;
@@ -1354,7 +1411,7 @@ Chatd.Messages.prototype.restore = function() {
                             keys.push({
                                 'userId' : base64urlencode(v.userId),
                                 'key' : key,
-                                'keyid' : tempkeyid
+                                'keyid' : v.keyId
                             });
                             break;
                         }
@@ -1366,7 +1423,7 @@ Chatd.Messages.prototype.restore = function() {
                 else {
                     iskey = false;
                 }
-                if ((v.type !== Chatd.MsgType.EDIT) || ((v.type === Chatd.MsgType.EDIT) && !self.sending[v.messageId])) {
+                if ((v.type !== Chatd.MsgType.KEY) || ((v.type === Chatd.MsgType.KEY) && pendingkey)) {
                     if (pendingkey ) {
                         v.keyId = tempkeyid;
                     }
@@ -1380,7 +1437,12 @@ Chatd.Messages.prototype.restore = function() {
         })
     );
     var _resendPending = function() {
-
+        if (iskey) {
+            trivialkeys.push(previouskeyid);
+        }
+        for (var keyid in trivialkeys) {
+            self.removefrompersist(trivialkeys[keyid]);
+        }
         if (count > 0) {
             self.chatd.trigger('onMessageKeyRestore',
                 {
@@ -1390,9 +1452,6 @@ Chatd.Messages.prototype.restore = function() {
                 }
             );
             self.resend(true);
-            for (var keyid in trivialkeys) {
-                self.removefrompersist(keyid);
-            }
         }
     };
     MegaPromise.allDone(promises).always(function() {

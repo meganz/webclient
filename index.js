@@ -255,54 +255,15 @@ function init_page() {
         closeDialog();
     }
 
-    if (localStorage._proRegisterAccount) {
-        var acc = JSON.parse(localStorage._proRegisterAccount);
-        delete localStorage._proRegisterAccount;
+    if (localStorage.awaitingConfirmationAccount) {
+        var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
-        var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
-        var $button = $('.resend-email-button', $dialog);
-
-        $dialog.addClass('special').show();
-        $('input', $dialog).val(acc.email);
-
-        $button.rebind('click', function _click() {
-            var ctx = {
-                callback: function(res) {
-                    loadingDialog.hide();
-
-                    if (res !== 0) {
-                        console.error('sendsignuplink failed', res);
-
-                        $button.addClass('disabled');
-                        $button.unbind('click');
-
-                        var tick = 26;
-                        var timer = setInterval(function() {
-                            if (--tick === 0) {
-                                clearInterval(timer);
-                                $button.text(l[8744]);
-                                $button.removeClass('disabled');
-                                $button.rebind('click', _click);
-                            }
-                            else {
-                                $button.text('\u23F1 ' + tick + '...');
-                            }
-                        }, 1000);
-
-                        alert(l[200]);
-                    }
-                    else {
-                        closeDialog();
-                        fm_showoverlay();
-                        $dialog.removeClass('hidden');
-                    }
-                }
-            };
-            loadingDialog.show();
-            sendsignuplink(acc.name, acc.email, acc.password, ctx, true);
-        });
-        fm_showoverlay();
-        return;
+        if (confirmcode) {
+            delete localStorage.awaitingConfirmationAccount;
+        }
+        else {
+            return mega.ui.sendSignupLinkDialog(acc);
+        }
     }
 
     var fmwasinitialized = !!fminitialized;
@@ -986,10 +947,10 @@ function init_page() {
         parsepage(pages['start'], 'start');
         init_start();
     }
-        
+
     // Initialise the Public Service Announcement system
     psa.init();
-    
+
     topmenuUI();
     loggedout = false;
     flhashchange = false;

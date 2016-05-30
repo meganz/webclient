@@ -121,7 +121,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 ab = dataURLToAB(dataURI);
 
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer);
+                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
             }
 
             if (node) {
@@ -159,7 +159,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     console.log('Storing preview...', n);
                 }
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer);
+                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
             }
 
             if (node) {

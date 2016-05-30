@@ -102,10 +102,11 @@ function registeraccount() {
                     mobileui();
                 }
                 else {
-                    $('.fm-dialog.registration-page-success').removeClass('hidden');
-                    $('.fm-dialog-overlay').removeClass('hidden');
-                    $('body').addClass('overlayed');
                     $('.fm-dialog.registration-page-success').unbind('click');
+                    // $('.fm-dialog.registration-page-success').removeClass('hidden');
+                    // fm_showoverlay();
+                    // ^ legacy confirmation dialog, with no email change option
+                    mega.ui.sendSignupLinkDialog(rv);
                 }
                 var ops = {
                     a: 'up'

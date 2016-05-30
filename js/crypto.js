@@ -3150,7 +3150,9 @@ var faxhrlastgood = {};
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id, type, key, data, ctx) {
-    if (!ctx) {
+    var handle = typeof ctx === 'string' && ctx;
+
+    if (typeof ctx !== 'object') {
         if (!storedattr[id]) {
             storedattr[id] = {};
         }
@@ -3164,15 +3166,22 @@ function api_storefileattr(id, type, key, data, ctx) {
             id: id,
             type: type,
             data: data,
+            handle: handle,
             startTime: Date.now()
         };
     }
 
-    api_req({
+    var req = {
         a: 'ufa',
         s: ctx.data.byteLength,
         ssl: use_ssl
-    }, ctx, n_h ? 1 : 0);
+    };
+
+    if (M.d[ctx.handle] && RightsbyID(ctx.handle) > 1) {
+        req.h = handle;
+    }
+
+    api_req(req, ctx, n_h ? 1 : 0);
 }
 
 function api_getfileattr(fa, type, procfa, errfa) {
@@ -3584,6 +3593,10 @@ function api_faretry(ctx, error, host) {
         ctx.faRetryI = 250;
     }
 
+    if (!ctx.p && error === EACCESS) {
+        api_pfaerror(ctx.handle);
+    }
+
     if (ctx.errfa && ctx.errfa.timeout && ctx.faRetryI > ctx.errfa.timeout) {
         api_faerrlauncher(ctx, host);
     }
@@ -3858,16 +3871,27 @@ function api_attachfileattr(node, id) {
         api_req({ a: 'pfa', n: node, fa: fa }, {
             callback: function(res) {
                 if (res === EACCESS) {
-                    node = M.getNodeByHandle(node);
-
-                    // Got access denied, store 'f' attr to prevent subsequent attemps
-                    if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
-                        api_setattr(node.h, {f: u_handle});
-                    }
+                    api_pfaerror(node);
                 }
             }
         });
     }
+}
+
+/** handle ufa/pfa EACCESS error */
+function api_pfaerror(handle) {
+    var node = M.getNodeByHandle(handle);
+
+    if (d) {
+        console.warn('api_pfaerror for %s', handle, node);
+    }
+
+    // Got access denied, store 'f' attr to prevent subsequent attemps
+    if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
+        return api_setattr(node.h, {f: u_handle});
+    }
+
+    return false;
 }
 
 // generate crypto request response for the given nodes/shares matrix

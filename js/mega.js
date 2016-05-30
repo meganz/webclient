@@ -3364,18 +3364,18 @@ function MegaData()
      *
      * @param {object} u, user object data
      * @param {boolean} ignoreDB, don't write to indexedDB
-     *
-     *
      */
     this.addUser = function(u, ignoreDB) {
-        var userId = '';
         if (u && u.u) {
-            userId = u.u;
+            var userId = u.u;
+
             if (this.u[userId]) {
                 for (var key in u) {
-                    // XXX: 0e443ca6 Hackpatch for contact names bug -- still needed?
-                    if (this.u[userId][key] && key !== 'name')  {
+                    if (this.u[userId].hasOwnProperty(key) && key !== 'name')  {
                         this.u[userId][key] = u[key];
+                    }
+                    else if (d) {
+                        console.warn('addUser: property "%s" not updated.', key, u[key]);
                     }
                 }
 

@@ -86,10 +86,7 @@ ChatdIntegration.prototype.requiresUpdate = function() {
             return;
         }
         if (!is_extension) {
-            var confirmtxt = __(
-                "There is a new version of MegaChat. Do you want reload the page and update to the " +
-                "latest version?"
-            );
+            var confirmtxt = __(l[8840]);
             msgDialog('confirmation', l[1900], confirmtxt, '', function (e) {
                 if (e) {
                     window.location.reload();
@@ -103,10 +100,7 @@ ChatdIntegration.prototype.requiresUpdate = function() {
             msgDialog(
                 'warningb',
                 l[1900],
-                __(
-                    "MegaChat had been upgraded and it would be now supported only in our newly released " +
-                    "version of MEGA. Please update your extension to continue using MegaChat."
-                )
+                __(l[8841])
             );
             localStorage.chatUpdateIgnored = Chatd.VERSION;
         }

@@ -3364,18 +3364,18 @@ function MegaData()
      *
      * @param {object} u, user object data
      * @param {boolean} ignoreDB, don't write to indexedDB
-     *
-     *
      */
     this.addUser = function(u, ignoreDB) {
-        var userId = '';
         if (u && u.u) {
-            userId = u.u;
+            var userId = u.u;
+
             if (this.u[userId]) {
                 for (var key in u) {
-                    // XXX: 0e443ca6 Hackpatch for contact names bug -- still needed?
-                    if (this.u[userId][key] && key !== 'name')  {
+                    if (this.u[userId].hasOwnProperty(key) && key !== 'name')  {
                         this.u[userId][key] = u[key];
+                    }
+                    else if (d) {
+                        console.warn('addUser: property "%s" not updated.', key, u[key]);
                     }
                 }
 
@@ -3935,56 +3935,31 @@ function MegaData()
     };
 
     this.rename = function(itemHandle, newItemName) {
-
-        if (M.d[itemHandle]) {
-            var nodeData = M.d[itemHandle];
-
-            if (nodeData && nodeData.ar) {
-
-                // Update global var with newest data
-                nodeData.ar.n = newItemName;
-
-                var mkat = enc_attr(nodeData.ar, nodeData.key);
-                var attr = ab_to_base64(mkat[0]);
-                var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
-
-                M.nodeAttr({ h: itemHandle, name: newItemName, a: attr });
-                api_req({ a: 'a', n: itemHandle, attr: attr, key: key, i: requesti });
-
-                this.onRenameUIUpdate(itemHandle, newItemName);
-            }
-        }
+        api_setattr(itemHandle, {name: newItemName}, true);
+        this.onRenameUIUpdate(itemHandle, newItemName);
     };
 
     /**
-     * favourite
-     *
-     * Handles item favourite status
-     * @param {Array} nodesId
-     * @param {Boolean} del User action i.e. true - delete from favorites, false - add to favorite
+     * Change node favourite state.
+     * @param {Array}   handles  An array containing node handles
+     * @param {Boolean} del      User action i.e. true - delete from favorites, false - add to favorite
      */
-    this.favourite = function(nodesId, del) {
+    this.favourite = function(handles, del) {
 
-        var mkat, attr, key, node, newFavStarState,
-            nodes = nodesId,
-            toRenderMain = false,
-            exportLink = new mega.Share.ExportLink({});
+        var toRenderMain = false;
+        var newFavStarState = (del) ? 0 : 1;
+        var exportLink = new mega.Share.ExportLink({});
 
-        if (!Array.isArray(nodesId)) {
-            nodes = [nodesId];
+        if (!Array.isArray(handles)) {
+            handles = [handles];
         }
-        newFavStarState = (del) ? 0 : 1;
 
-        $.each(nodes, function(index, value) {
-            node = M.d[value];
-            if (node && node.ar && (node.fav !== newFavStarState) && !exportLink.isTakenDown(value)) {
-                node.ar.fav = newFavStarState;
-                mkat = enc_attr(node.ar, node.key);
-                attr = ab_to_base64(mkat[0]);
-                key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
+        $.each(handles, function(index, handle) {
+            var node = M.d[handle];
+            if (node && (node.fav !== newFavStarState)
+                    && !exportLink.isTakenDown(handle)) {
 
-                M.nodeAttr({ h: node.h, fav: newFavStarState, a: attr });
-                api_req({ a: 'a', n: node.h, attr: attr, key: key, i: requesti });
+                api_setattr(handle, {fav: newFavStarState});
 
                 // Add favourite
                 if (!del) {
@@ -4873,6 +4848,7 @@ function MegaData()
             case EKEY:
                 errorstr = l[24];
                 break;
+            case EFQUOTA:
             case EOVERQUOTA:
                 errorstr = l[1673];
                 break;

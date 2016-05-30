@@ -842,6 +842,7 @@ var ETOOMANYCONNECTIONS = -19;
 
 // custom errors
 var ETOOERR = -400;
+var EFQUOTA = -401;
 
 function ssl_needed() {
     var ssl_opt = ['Chrome/'];
@@ -2425,6 +2426,75 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
     api_req(req, ctx);
 }
 
+/**
+ * Set node attribute.
+ * @param {String}  handle The node's handle.
+ * @param {Object}  attrs  Attributes.
+ * @param {Boolean} shrink Use one-letter attrs.
+ * @return {MegaPromise}
+ */
+function api_setattr(handle, attrs, shrink) {
+    var promise = new MegaPromise();
+    var logger = MegaLogger.getLogger('crypt');
+
+    if (!Object(M.d).hasOwnProperty(handle)) {
+        promise.reject(ENOENT);
+    }
+    else if (typeof attrs !== 'object'
+            || !Object.keys(attrs).length) {
+
+        promise.reject(EARGS);
+    }
+    else {
+        var node = M.d[handle];
+        var ar = Object(node.ar);
+        var cache = {h: handle};
+        var callback = {
+            callback: function(res) {
+                if (res !== 0) {
+                    logger.error('api_setattr', ar, res);
+                    promise.reject(res);
+                }
+                else {
+                    promise.resolve(res);
+                }
+            }
+        };
+
+        for (var i in attrs) {
+            if (attrs.hasOwnProperty(i)) {
+                var name = (shrink ? i[0] : i);
+
+                if (d && ar.hasOwnProperty(name) && ar[name] === attrs[i]) {
+                    logger.warn('api_setattr: attribute "%s" already exists.', name);
+                }
+
+                cache[i] = attrs[i];
+                ar[name] = attrs[i];
+            }
+        }
+
+        try {
+            var mkat = enc_attr(ar, node.key);
+            var attr = ab_to_base64(mkat[0]);
+            var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
+
+            logger.debug('Setting node attributes for "%s"...', handle, cache, ar);
+
+            cache.a = attr;
+            M.nodeAttr(cache);
+
+            api_req({ a: 'a', n: handle, attr: attr, key: key, i: requesti }, callback);
+        }
+        catch (ex) {
+            logger.error(ex);
+            promise.reject(ex);
+        }
+    }
+
+    return promise;
+}
+
 function stringhash(s, aes) {
     var s32 = str_to_a32(s);
     var h32 = [0, 0, 0, 0];
@@ -3080,7 +3150,9 @@ var faxhrlastgood = {};
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id, type, key, data, ctx) {
-    if (!ctx) {
+    var handle = typeof ctx === 'string' && ctx;
+
+    if (typeof ctx !== 'object') {
         if (!storedattr[id]) {
             storedattr[id] = {};
         }
@@ -3094,15 +3166,22 @@ function api_storefileattr(id, type, key, data, ctx) {
             id: id,
             type: type,
             data: data,
+            handle: handle,
             startTime: Date.now()
         };
     }
 
-    api_req({
+    var req = {
         a: 'ufa',
         s: ctx.data.byteLength,
         ssl: use_ssl
-    }, ctx, n_h ? 1 : 0);
+    };
+
+    if (M.d[ctx.handle] && RightsbyID(ctx.handle) > 1) {
+        req.h = handle;
+    }
+
+    api_req(req, ctx, n_h ? 1 : 0);
 }
 
 function api_getfileattr(fa, type, procfa, errfa) {
@@ -3514,6 +3593,10 @@ function api_faretry(ctx, error, host) {
         ctx.faRetryI = 250;
     }
 
+    if (!ctx.p && error === EACCESS) {
+        api_pfaerror(ctx.handle);
+    }
+
     if (ctx.errfa && ctx.errfa.timeout && ctx.faRetryI > ctx.errfa.timeout) {
         api_faerrlauncher(ctx, host);
     }
@@ -3783,12 +3866,32 @@ function api_attachfileattr(node, id) {
     storedattr[id].target = node;
 
     if (fa) {
-        api_req({
-            a: 'pfa',
-            n: node,
-            fa: fa
+        var logger = MegaLogger.getLogger('crypt');
+
+        api_req({ a: 'pfa', n: node, fa: fa }, {
+            callback: function(res) {
+                if (res === EACCESS) {
+                    api_pfaerror(node);
+                }
+            }
         });
     }
+}
+
+/** handle ufa/pfa EACCESS error */
+function api_pfaerror(handle) {
+    var node = M.getNodeByHandle(handle);
+
+    if (d) {
+        console.warn('api_pfaerror for %s', handle, node);
+    }
+
+    // Got access denied, store 'f' attr to prevent subsequent attemps
+    if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
+        return api_setattr(node.h, {f: u_handle});
+    }
+
+    return false;
 }
 
 // generate crypto request response for the given nodes/shares matrix
@@ -4047,8 +4150,12 @@ function crypto_processkey(me, master_aes, file) {
                 file.key = k;
                 file.ar = o;
                 file.name = file.ar.n;
-                if (file.ar.fav) {
-                    file.fav = 1;
+
+                var exclude = {t:1, c:1, n:1};
+                for (var j in o) {
+                    if (o.hasOwnProperty(j) && !exclude[j]) {
+                        file[j] = o[j];
+                    }
                 }
 
                 success = true;
@@ -4319,6 +4426,8 @@ function api_strerror(errno) {
         return "Temporarily not available";
     case ETOOMANYCONNECTIONS:
         return "Connection overflow";
+    case EFQUOTA:
+        return "Over Free Quota";
     default:
         break;
     }

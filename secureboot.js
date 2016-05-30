@@ -1427,6 +1427,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
+    jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
     jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
@@ -1585,6 +1586,9 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+        'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
+        'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
+        'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
         'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
@@ -1642,6 +1646,8 @@ else if (!b_u)
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],
+        'dispute': ['dispute'],
+        'disputenotice': ['disputenotice', 'disputenotice_js'],
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],

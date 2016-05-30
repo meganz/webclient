@@ -10,10 +10,22 @@ var u_privk; // private key
 // returns user type if successful, false if not
 // valid user types are: 0 - anonymous, 1 - email set, 2 - confirmed, but no RSA, 3 - complete
 function u_login(ctx, email, password, uh, permanent) {
+    var keypw;
+
     ctx.result = u_login2;
     ctx.permanent = permanent;
 
-    api_getsid(ctx, email, prepare_key_pw(password), uh);
+    // check whether the pwd came from the browser manager
+    var pwdman = passwordManager.getStoredCredentials(password);
+    if (pwdman) {
+        uh = pwdman.hash;
+        keypw = pwdman.keypw;
+    }
+    else {
+        keypw = prepare_key_pw(password);
+    }
+
+    api_getsid(ctx, email, keypw, uh);
 }
 
 function u_login2(ctx, ks) {

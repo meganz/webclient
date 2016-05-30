@@ -3352,6 +3352,8 @@
     "8832": "Muistitilastot",
     "8833": "Nostaaksesi t\u00e4t\u00e4 kiinti\u00f6t\u00e4, voit rekister\u00f6id\u00e4 k\u00e4ytt\u00e4j\u00e4tilin. T\u00e4m\u00e4 ei ainoastaan anna sinulle runsaasti lis\u00e4liikenn\u00f6inti\u00e4, mutta my\u00f6s 50 GB turvallista tallennustilaa pilvess\u00e4 - [B]ilmaiseksi[\/B].",
     "8834": "Latauksesi ei voi jatkua, koska se ylitt\u00e4isi nykyisen ilmaisen liikenn\u00f6intikiinti\u00f6n IP-osoitteellesi.",
+    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3445,6 +3447,8 @@
         "copyright-dispute-title": 8771,
         "copyright-dispute-subtitle": 8772,
         "user-register-for-bandwidth-and-storage": 8833,
-        "warning-message-for-bandwidth-overquota": 8834
+        "warning-message-for-bandwidth-overquota": 8834,
+        "new-version-megachat-message": 8840,
+        "new-version-megachat-extension-message": 8841
     }
 }

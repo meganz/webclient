@@ -3352,6 +3352,8 @@
     "8832": "Szczeg\u00f3\u0142y pami\u0119ci",
     "8833": "Aby zwi\u0119kszy\u0107 limit, mo\u017cesz zarejestrowa\u0107 si\u0119. Dzi\u0119ki temu nie tylko otrzymasz ekstra limit, ale r\u00f3wnie\u017c 50 GB powierzchni na pliki - [B]za darmo[\/B].",
     "8834": "Pobieranie nie mo\u017ce by\u0107 kontynuowane, poniewa\u017c przekroczsz dost\u0119pny limit przypisany do Twojego adresu IP.",
+    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3445,6 +3447,8 @@
         "copyright-dispute-title": 8771,
         "copyright-dispute-subtitle": 8772,
         "user-register-for-bandwidth-and-storage": 8833,
-        "warning-message-for-bandwidth-overquota": 8834
+        "warning-message-for-bandwidth-overquota": 8834,
+        "new-version-megachat-message": 8840,
+        "new-version-megachat-extension-message": 8841
     }
 }

@@ -537,7 +537,7 @@
 	            console.time('chatReactUiInit');
 	        }
 
-	        self.$conversationsApp = React.createElement(ConversationsUI.ConversationsApp, { megaChat: self, contacts: M.u });
+	        self.$conversationsApp = React.makeElement(ConversationsUI.ConversationsApp, { megaChat: self, contacts: M.u });
 
 	        self.$conversationsAppInstance = ReactDOM.render(self.$conversationsApp, document.querySelector('.section.conversations'));
 
@@ -1450,39 +1450,6 @@
 	  });
 	}
 
-	if (false) {
-	  var ExecutionEnvironment = require('fbjs/lib/ExecutionEnvironment');
-	  if (ExecutionEnvironment.canUseDOM && window.top === window.self) {
-
-	    // First check if devtools is not installed
-	    if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === 'undefined') {
-	      // If we're in Chrome or Firefox, provide a download link if not installed.
-	      if (navigator.userAgent.indexOf('Chrome') > -1 && navigator.userAgent.indexOf('Edge') === -1 || navigator.userAgent.indexOf('Firefox') > -1) {
-	        console.debug('Download the React DevTools for a better development experience: ' + 'https://fb.me/react-devtools');
-	      }
-	    }
-
-	    // If we're in IE8, check to see if we are in compatibility mode and provide
-	    // information on preventing compatibility mode
-	    var ieCompatibilityMode = document.documentMode && document.documentMode < 8;
-
-	    process.env.NODE_ENV !== 'production' ? warning(!ieCompatibilityMode, 'Internet Explorer is running in compatibility mode; please add the ' + 'following tag to your HTML to prevent this from happening: ' + '<meta http-equiv="X-UA-Compatible" content="IE=edge" />') : undefined;
-
-	    var expectedFeatures = [
-	    // shims
-	    Array.isArray, Array.prototype.every, Array.prototype.forEach, Array.prototype.indexOf, Array.prototype.map, Date.now, Function.prototype.bind, Object.keys, String.prototype.split, String.prototype.trim,
-
-	    // shams
-	    Object.create, Object.freeze];
-
-	    for (var i = 0; i < expectedFeatures.length; i++) {
-	      if (!expectedFeatures[i]) {
-	        console.error('One or more ES5 shim/shams expected by React are not available: ' + 'https://fb.me/react-warning-polyfills');
-	        break;
-	      }
-	    }
-	  }
-	}
 
 	module.exports = React;
 
@@ -1594,11 +1561,6 @@
 	   * @internal
 	   */
 	  mountComponent: function (rootID, transaction, context) {
-	    if (false) {
-	      if (context[validateDOMNesting.ancestorInfoContextKey]) {
-	        validateDOMNesting('span', null, context[validateDOMNesting.ancestorInfoContextKey]);
-	      }
-	    }
 
 	    this._rootNodeID = rootID;
 	    if (transaction.useCreateElement) {
@@ -1896,8 +1858,6 @@
 	          // This should match resultList.length and markupList.length when
 	          // we're done.
 	          resultListAssignmentCount += 1;
-	        } else if (false) {
-	          console.error('Danger: Discarding unexpected node:', renderNode);
 	        }
 	      }
 	    }
@@ -2248,11 +2208,6 @@
 	 */
 
 	function invariant(condition, format, a, b, c, d, e, f) {
-	  if (false) {
-	    if (format === undefined) {
-	      throw new Error('invariant requires an error message argument');
-	    }
-	  }
 
 	  if (!condition) {
 	    var error;
@@ -2548,14 +2503,6 @@
 	   * @param {object<string>} methodNames
 	   */
 	  measureMethods: function (object, objectName, methodNames) {
-	    if (false) {
-	      for (var key in methodNames) {
-	        if (!methodNames.hasOwnProperty(key)) {
-	          continue;
-	        }
-	        object[key] = ReactPerf.measure(objectName, methodNames[key], object[key]);
-	      }
-	    }
 	  },
 
 	  /**
@@ -2567,20 +2514,6 @@
 	   * @return {function}
 	   */
 	  measure: function (objName, fnName, func) {
-	    if (false) {
-	      var measuredFunc = null;
-	      var wrapper = function () {
-	        if (ReactPerf.enableMeasure) {
-	          if (!measuredFunc) {
-	            measuredFunc = ReactPerf.storedMeasure(objName, fnName, func);
-	          }
-	          return measuredFunc.apply(this, arguments);
-	        }
-	        return func.apply(this, arguments);
-	      };
-	      wrapper.displayName = objName + '_' + fnName;
-	      return wrapper;
-	    }
 	    return func;
 	  },
 
@@ -2832,7 +2765,7 @@
 	    return true;
 	  }
 	  illegalAttributeNameCache[attributeName] = true;
-	   false ? warning(false, 'Invalid attribute name: `%s`', attributeName) : undefined;
+
 	  return false;
 	}
 
@@ -2840,31 +2773,6 @@
 	  return value == null || propertyInfo.hasBooleanValue && !value || propertyInfo.hasNumericValue && isNaN(value) || propertyInfo.hasPositiveNumericValue && value < 1 || propertyInfo.hasOverloadedBooleanValue && value === false;
 	}
 
-	if (false) {
-	  var reactProps = {
-	    children: true,
-	    dangerouslySetInnerHTML: true,
-	    key: true,
-	    ref: true
-	  };
-	  var warnedProperties = {};
-
-	  var warnUnknownProperty = function (name) {
-	    if (reactProps.hasOwnProperty(name) && reactProps[name] || warnedProperties.hasOwnProperty(name) && warnedProperties[name]) {
-	      return;
-	    }
-
-	    warnedProperties[name] = true;
-	    var lowerCasedName = name.toLowerCase();
-
-	    // data-* attributes should be lowercase; suggest the lowercase version
-	    var standardName = DOMProperty.isCustomAttribute(lowerCasedName) ? lowerCasedName : DOMProperty.getPossibleStandardName.hasOwnProperty(lowerCasedName) ? DOMProperty.getPossibleStandardName[lowerCasedName] : null;
-
-	    // For now, only warn when we have a suggested correction. This prevents
-	    // logging too much when using transferPropsTo.
-	    process.env.NODE_ENV !== 'production' ? warning(standardName == null, 'Unknown DOM property %s. Did you mean %s?', name, standardName) : undefined;
-	  };
-	}
 
 	/**
 	 * Operations for dealing with DOM properties.
@@ -2908,8 +2816,6 @@
 	        return '';
 	      }
 	      return name + '=' + quoteAttributeValueForBrowser(value);
-	    } else if (false) {
-	      warnUnknownProperty(name);
 	    }
 	    return null;
 	  },
@@ -2967,8 +2873,6 @@
 	      }
 	    } else if (DOMProperty.isCustomAttribute(name)) {
 	      DOMPropertyOperations.setValueForAttribute(node, name, value);
-	    } else if (false) {
-	      warnUnknownProperty(name);
 	    }
 	  },
 
@@ -3006,8 +2910,6 @@
 	      }
 	    } else if (DOMProperty.isCustomAttribute(name)) {
 	      node.removeAttribute(name);
-	    } else if (false) {
-	      warnUnknownProperty(name);
 	    }
 	  }
 
@@ -3123,16 +3025,10 @@
 	      !(propertyInfo.mustUseProperty || !propertyInfo.hasSideEffects) ?  false ? invariant(false, 'DOMProperty: Properties that have side effects must use property: %s', propName) : invariant(false) : undefined;
 	      !(propertyInfo.hasBooleanValue + propertyInfo.hasNumericValue + propertyInfo.hasOverloadedBooleanValue <= 1) ?  false ? invariant(false, 'DOMProperty: Value can be one of boolean, overloaded boolean, or ' + 'numeric value, but not a combination: %s', propName) : invariant(false) : undefined;
 
-	      if (false) {
-	        DOMProperty.getPossibleStandardName[lowerCased] = propName;
-	      }
 
 	      if (DOMAttributeNames.hasOwnProperty(propName)) {
 	        var attributeName = DOMAttributeNames[propName];
 	        propertyInfo.attributeName = attributeName;
-	        if (false) {
-	          DOMProperty.getPossibleStandardName[attributeName] = propName;
-	        }
 	      }
 
 	      if (DOMAttributeNamespaces.hasOwnProperty(propName)) {
@@ -3319,37 +3215,6 @@
 
 	var warning = emptyFunction;
 
-	if (false) {
-	  warning = function (condition, format) {
-	    for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-	      args[_key - 2] = arguments[_key];
-	    }
-
-	    if (format === undefined) {
-	      throw new Error('`warning(condition, format, ...args)` requires a warning ' + 'message argument');
-	    }
-
-	    if (format.indexOf('Failed Composite propType: ') === 0) {
-	      return; // Ignore CompositeComponent proptype check.
-	    }
-
-	    if (!condition) {
-	      var argIndex = 0;
-	      var message = 'Warning: ' + format.replace(/%s/g, function () {
-	        return args[argIndex++];
-	      });
-	      if (typeof console !== 'undefined') {
-	        console.error(message);
-	      }
-	      try {
-	        // --- Welcome to debugging React ---
-	        // This error was thrown as a convenience so that you can use this stack
-	        // to find the callsite that caused this warning to fire.
-	        throw new Error(message);
-	      } catch (x) {}
-	    }
-	  };
-	}
 
 	module.exports = warning;
 
@@ -3554,10 +3419,6 @@
 	/** Mapping from reactRootID to `container` nodes. */
 	var containersByReactRootID = {};
 
-	if (false) {
-	  /** __DEV__-only mapping from reactRootID to root elements. */
-	  var rootElementsByReactRootID = {};
-	}
 
 	// Used to store breadth-first search state in findComponentRoot.
 	var findComponentRootReusableArray = [];
@@ -3760,13 +3621,6 @@
 	      context[ownerDocumentContextKey] = container.ownerDocument;
 	    }
 	  }
-	  if (false) {
-	    if (context === emptyObject) {
-	      context = {};
-	    }
-	    var tag = container.nodeName.toLowerCase();
-	    context[validateDOMNesting.ancestorInfoContextKey] = validateDOMNesting.updatedAncestorInfo(null, tag, null);
-	  }
 	  var markup = ReactReconciler.mountComponent(componentInstance, rootID, transaction, context);
 	  componentInstance._renderedComponent._topLevelWrapper = componentInstance;
 	  ReactMount._mountImageIntoNode(markup, container, shouldReuseMarkup, transaction);
@@ -3872,9 +3726,6 @@
 	 */
 	var TopLevelWrapper = function () {};
 	TopLevelWrapper.prototype.isReactComponent = {};
-	if (false) {
-	  TopLevelWrapper.displayName = 'TopLevelWrapper';
-	}
 	TopLevelWrapper.prototype.render = function () {
 	  // this.props is actually a ReactElement
 	  return this.props;
@@ -3932,10 +3783,6 @@
 	      }
 	    });
 
-	    if (false) {
-	      // Record the root element in case it later gets transplanted.
-	      rootElementsByReactRootID[getReactRootID(container)] = getReactRootElementInContainer(container);
-	    }
 
 	    return prevComponent;
 	  },
@@ -3968,7 +3815,7 @@
 	    // Various parts of our code (such as ReactCompositeComponent's
 	    // _renderValidatedComponent) assume that calls to render aren't nested;
 	    // verify that that's the case.
-	     false ? warning(ReactCurrentOwner.current == null, '_renderNewRootComponent(): Render methods should be a pure function ' + 'of props and state; triggering nested component updates from ' + 'render is not allowed. If necessary, trigger nested updates in ' + 'componentDidUpdate. Check the render method of %s.', ReactCurrentOwner.current && ReactCurrentOwner.current.getName() || 'ReactCompositeComponent') : undefined;
+
 
 	    var componentInstance = instantiateReactComponent(nextElement, null);
 	    var reactRootID = ReactMount._registerComponent(componentInstance, container);
@@ -3979,10 +3826,6 @@
 
 	    ReactUpdates.batchedUpdates(batchedMountComponentIntoNode, componentInstance, reactRootID, container, shouldReuseMarkup, context);
 
-	    if (false) {
-	      // Record the root element in case it later gets transplanted.
-	      rootElementsByReactRootID[reactRootID] = getReactRootElementInContainer(container);
-	    }
 
 	    return componentInstance;
 	  },
@@ -4006,11 +3849,10 @@
 	  },
 
 	  _renderSubtreeIntoContainer: function (parentComponent, nextElement, container, callback) {
-	    !ReactElement.isValidElement(nextElement) ?  false ? invariant(false, 'ReactDOM.render(): Invalid component element.%s', typeof nextElement === 'string' ? ' Instead of passing an element string, make sure to instantiate ' + 'it by passing it to React.createElement.' : typeof nextElement === 'function' ? ' Instead of passing a component class, make sure to instantiate ' + 'it by passing it to React.createElement.' :
+	    !ReactElement.isValidElement(nextElement) ?  false ? invariant(false, 'ReactDOM.render(): Invalid component element.%s', typeof nextElement === 'string' ? ' Instead of passing an element string, make sure to instantiate ' + 'it by passing it to React.makeElement.' : typeof nextElement === 'function' ? ' Instead of passing a component class, make sure to instantiate ' + 'it by passing it to React.createElement.' :
 	    // Check if it quacks like an element
 	    nextElement != null && nextElement.props !== undefined ? ' This may be caused by unintentionally loading two independent ' + 'copies of React.' : '') : invariant(false) : undefined;
 
-	     false ? warning(!container || !container.tagName || container.tagName.toUpperCase() !== 'BODY', 'render(): Rendering components directly into document.body is ' + 'discouraged, since its children are often manipulated by third-party ' + 'scripts and browser extensions. This may lead to subtle ' + 'reconciliation issues. Try rendering into a container element created ' + 'for your app.') : undefined;
 
 	    var nextWrappedElement = new ReactElement(TopLevelWrapper, null, null, null, null, null, nextElement);
 
@@ -4035,20 +3877,6 @@
 	    var containerHasReactMarkup = reactRootElement && !!internalGetID(reactRootElement);
 	    var containerHasNonRootReactChild = hasNonRootReactChild(container);
 
-	    if (false) {
-	      process.env.NODE_ENV !== 'production' ? warning(!containerHasNonRootReactChild, 'render(...): Replacing React-rendered children with a new root ' + 'component. If you intended to update the children of this node, ' + 'you should instead have the existing children update their state ' + 'and render the new components instead of calling ReactDOM.render.') : undefined;
-
-	      if (!containerHasReactMarkup || reactRootElement.nextSibling) {
-	        var rootElementSibling = reactRootElement;
-	        while (rootElementSibling) {
-	          if (internalGetID(rootElementSibling)) {
-	            process.env.NODE_ENV !== 'production' ? warning(false, 'render(): Target node has markup rendered by React, but there ' + 'are unrelated nodes as well. This is most commonly caused by ' + 'white-space inserted around server-rendered markup.') : undefined;
-	            break;
-	          }
-	          rootElementSibling = rootElementSibling.nextSibling;
-	        }
-	      }
-	    }
 
 	    var shouldReuseMarkup = containerHasReactMarkup && !prevComponent && !containerHasNonRootReactChild;
 	    var component = ReactMount._renderNewRootComponent(nextWrappedElement, container, shouldReuseMarkup, parentComponent != null ? parentComponent._reactInternalInstance._processChildContext(parentComponent._reactInternalInstance._context) : emptyObject)._renderedComponent.getPublicInstance();
@@ -4108,7 +3936,7 @@
 	    // _renderValidatedComponent) assume that calls to render aren't nested;
 	    // verify that that's the case. (Strictly speaking, unmounting won't cause a
 	    // render but we still don't expect to be in a render call here.)
-	     false ? warning(ReactCurrentOwner.current == null, 'unmountComponentAtNode(): Render methods should be a pure function ' + 'of props and state; triggering nested component updates from render ' + 'is not allowed. If necessary, trigger nested updates in ' + 'componentDidUpdate. Check the render method of %s.', ReactCurrentOwner.current && ReactCurrentOwner.current.getName() || 'ReactCompositeComponent') : undefined;
+
 
 	    !(container && (container.nodeType === ELEMENT_NODE_TYPE || container.nodeType === DOC_NODE_TYPE || container.nodeType === DOCUMENT_FRAGMENT_NODE_TYPE)) ?  false ? invariant(false, 'unmountComponentAtNode(...): Target container is not a DOM element.') : invariant(false) : undefined;
 
@@ -4123,18 +3951,12 @@
 	      var containerID = internalGetID(container);
 	      var isContainerReactRoot = containerID && containerID === ReactInstanceHandles.getReactRootIDFromNodeID(containerID);
 
-	      if (false) {
-	        process.env.NODE_ENV !== 'production' ? warning(!containerHasNonRootReactChild, 'unmountComponentAtNode(): The node you\'re attempting to unmount ' + 'was rendered by React and is not a top-level container. %s', isContainerReactRoot ? 'You may have accidentally passed in a React root node instead ' + 'of its container.' : 'Instead, have the parent component update its state and ' + 'rerender in order to remove this component.') : undefined;
-	      }
 
 	      return false;
 	    }
 	    ReactUpdates.batchedUpdates(unmountComponentFromNode, component, container);
 	    delete instancesByReactRootID[reactRootID];
 	    delete containersByReactRootID[reactRootID];
-	    if (false) {
-	      delete rootElementsByReactRootID[reactRootID];
-	    }
 	    return true;
 	  },
 
@@ -4149,25 +3971,6 @@
 	    var reactRootID = ReactInstanceHandles.getReactRootIDFromNodeID(id);
 	    var container = containersByReactRootID[reactRootID];
 
-	    if (false) {
-	      var rootElement = rootElementsByReactRootID[reactRootID];
-	      if (rootElement && rootElement.parentNode !== container) {
-	        process.env.NODE_ENV !== 'production' ? warning(
-	        // Call internalGetID here because getID calls isValid which calls
-	        // findReactContainerForID (this function).
-	        internalGetID(rootElement) === reactRootID, 'ReactMount: Root element ID differed from reactRootID.') : undefined;
-	        var containerChild = container.firstChild;
-	        if (containerChild && reactRootID === internalGetID(containerChild)) {
-	          // If the container has a new child with the same ID as the old
-	          // root element, then rootElementsByReactRootID[reactRootID] is
-	          // just stale and needs to be updated. The case that deserves a
-	          // warning is when the container is empty.
-	          rootElementsByReactRootID[reactRootID] = containerChild;
-	        } else {
-	          process.env.NODE_ENV !== 'production' ? warning(false, 'ReactMount: Root element has been removed from its original ' + 'container. New container: %s', rootElement.parentNode) : undefined;
-	        }
-	      }
-	    }
 
 	    return container;
 	  },
@@ -4211,10 +4014,6 @@
 
 	    var deepestAncestor = findDeepestCachedAncestor(targetID) || ancestorNode;
 
-	    if (false) {
-	      // This will throw on the next line; give an early warning
-	      process.env.NODE_ENV !== 'production' ? warning(deepestAncestor != null, 'React can\'t find the root component node for data-reactid value ' + '`%s`. If you\'re seeing this message, it probably means that ' + 'you\'ve loaded two copies of React on the page. At this time, only ' + 'a single copy of React can be loaded at a time.', targetID) : undefined;
-	    }
 
 	    firstChildren[0] = deepestAncestor.firstChild;
 	    firstChildren.length = 1;
@@ -4283,33 +4082,12 @@
 	        rootElement.setAttribute(ReactMarkupChecksum.CHECKSUM_ATTR_NAME, checksum);
 
 	        var normalizedMarkup = markup;
-	        if (false) {
-	          // because rootMarkup is retrieved from the DOM, various normalizations
-	          // will have occurred which will not be present in `markup`. Here,
-	          // insert markup into a <div> or <iframe> depending on the container
-	          // type to perform the same normalizations before comparing.
-	          var normalizer;
-	          if (container.nodeType === ELEMENT_NODE_TYPE) {
-	            normalizer = document.createElement('div');
-	            normalizer.innerHTML = markup;
-	            normalizedMarkup = normalizer.innerHTML;
-	          } else {
-	            normalizer = document.createElement('iframe');
-	            document.body.appendChild(normalizer);
-	            normalizer.contentDocument.write(markup);
-	            normalizedMarkup = normalizer.contentDocument.documentElement.outerHTML;
-	            document.body.removeChild(normalizer);
-	          }
-	        }
 
 	        var diffIndex = firstDifferenceIndex(normalizedMarkup, rootMarkup);
 	        var difference = ' (client) ' + normalizedMarkup.substring(diffIndex - 20, diffIndex + 20) + '\n (server) ' + rootMarkup.substring(diffIndex - 20, diffIndex + 20);
 
 	        !(container.nodeType !== DOC_NODE_TYPE) ?  false ? invariant(false, 'You\'re trying to render a component to the document using ' + 'server rendering but the checksum was invalid. This usually ' + 'means you rendered a different component type or props on ' + 'the client from the one on the server, or your render() ' + 'methods are impure. React cannot handle this case due to ' + 'cross-browser quirks by rendering at the document root. You ' + 'should look for environment dependent code in your components ' + 'and ensure the props are the same client and server side:\n%s', difference) : invariant(false) : undefined;
 
-	        if (false) {
-	          process.env.NODE_ENV !== 'production' ? warning(false, 'React attempted to reuse markup in a container but the ' + 'checksum was invalid. This generally means that you are ' + 'using server rendering and the markup generated on the ' + 'server was not what the client was expecting. React injected ' + 'new markup to compensate which works but you have lost many ' + 'of the benefits of server rendering. Instead, figure out ' + 'why the markup being generated is different on the client ' + 'or server:\n%s', difference) : undefined;
-	        }
 	      }
 	    }
 
@@ -4847,7 +4625,7 @@
 
 	function validateInstanceHandle() {
 	  var valid = InstanceHandle && InstanceHandle.traverseTwoPhase && InstanceHandle.traverseEnterLeave;
-	   false ? warning(valid, 'InstanceHandle not injected before use!') : undefined;
+
 	}
 
 	/**
@@ -4891,15 +4669,9 @@
 	     */
 	    injectInstanceHandle: function (InjectedInstanceHandle) {
 	      InstanceHandle = InjectedInstanceHandle;
-	      if (false) {
-	        validateInstanceHandle();
-	      }
 	    },
 
 	    getInstanceHandle: function () {
-	      if (false) {
-	        validateInstanceHandle();
-	      }
 	      return InstanceHandle;
 	    },
 
@@ -5323,9 +5095,6 @@
 	  Mount: null,
 	  injectMount: function (InjectedMount) {
 	    injection.Mount = InjectedMount;
-	    if (false) {
-	      process.env.NODE_ENV !== 'production' ? warning(InjectedMount && InjectedMount.getNode && InjectedMount.getID, 'EventPluginUtils.injection.injectMount(...): Injected Mount ' + 'module is missing getNode or getID.') : undefined;
-	    }
 	  }
 	};
 
@@ -5343,19 +5112,6 @@
 	}
 
 	var validateEventDispatches;
-	if (false) {
-	  validateEventDispatches = function (event) {
-	    var dispatchListeners = event._dispatchListeners;
-	    var dispatchIDs = event._dispatchIDs;
-
-	    var listenersIsArr = Array.isArray(dispatchListeners);
-	    var idsIsArr = Array.isArray(dispatchIDs);
-	    var IDsLen = idsIsArr ? dispatchIDs.length : dispatchIDs ? 1 : 0;
-	    var listenersLen = listenersIsArr ? dispatchListeners.length : dispatchListeners ? 1 : 0;
-
-	    process.env.NODE_ENV !== 'production' ? warning(idsIsArr === listenersIsArr && IDsLen === listenersLen, 'EventPluginUtils: Invalid `event`.') : undefined;
-	  };
-	}
 
 	/**
 	 * Dispatch the event to the listener.
@@ -5381,9 +5137,6 @@
 	function executeDispatchesInOrder(event, simulated) {
 	  var dispatchListeners = event._dispatchListeners;
 	  var dispatchIDs = event._dispatchIDs;
-	  if (false) {
-	    validateEventDispatches(event);
-	  }
 	  if (Array.isArray(dispatchListeners)) {
 	    for (var i = 0; i < dispatchListeners.length; i++) {
 	      if (event.isPropagationStopped()) {
@@ -5409,9 +5162,6 @@
 	function executeDispatchesInOrderStopAtTrueImpl(event) {
 	  var dispatchListeners = event._dispatchListeners;
 	  var dispatchIDs = event._dispatchIDs;
-	  if (false) {
-	    validateEventDispatches(event);
-	  }
 	  if (Array.isArray(dispatchListeners)) {
 	    for (var i = 0; i < dispatchListeners.length; i++) {
 	      if (event.isPropagationStopped()) {
@@ -5450,9 +5200,6 @@
 	 * @return {*} The return value of executing the single dispatch.
 	 */
 	function executeDirectDispatch(event) {
-	  if (false) {
-	    validateEventDispatches(event);
-	  }
 	  var dispatchListener = event._dispatchListeners;
 	  var dispatchID = event._dispatchIDs;
 	  !!Array.isArray(dispatchListener) ?  false ? invariant(false, 'executeDirectDispatch(...): Invalid `event`.') : invariant(false) : undefined;
@@ -5556,24 +5303,6 @@
 	  }
 	};
 
-	if (false) {
-	  /**
-	   * To help development we can get better devtools integration by simulating a
-	   * real browser event.
-	   */
-	  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function' && typeof document !== 'undefined' && typeof document.createEvent === 'function') {
-	    var fakeNode = document.createElement('react');
-	    ReactErrorUtils.invokeGuardedCallback = function (name, func, a, b) {
-	      var boundFunc = func.bind(null, a, b);
-	      var evtType = 'react-' + name;
-	      fakeNode.addEventListener(evtType, boundFunc, false);
-	      var evt = document.createEvent('Event');
-	      evt.initEvent(evtType, false, false);
-	      fakeNode.dispatchEvent(evt);
-	      fakeNode.removeEventListener(evtType, boundFunc, false);
-	    };
-	  }
-	}
 
 	module.exports = ReactErrorUtils;
 
@@ -5931,7 +5660,7 @@
 	 * @param {*} key
 	 * @param {string|object} ref
 	 * @param {*} self A *temporary* helper to detect places where `this` is
-	 * different from the `owner` when React.createElement is called, so that we
+	 * different from the `owner` when React.makeElement is called, so that we
 	 * can warn. We want to get rid of owner and replace string `ref`s with arrow
 	 * functions, and as long as `this` and owner are the same, there will be no
 	 * change in behavior.
@@ -5956,47 +5685,6 @@
 	    _owner: owner
 	  };
 
-	  if (false) {
-	    // The validation flag is currently mutative. We put it on
-	    // an external backing store so that we can freeze the whole object.
-	    // This can be replaced with a WeakMap once they are implemented in
-	    // commonly used development environments.
-	    element._store = {};
-
-	    // To make comparing ReactElements easier for testing purposes, we make
-	    // the validation flag non-enumerable (where possible, which should
-	    // include every environment we run tests in), so the test framework
-	    // ignores it.
-	    if (canDefineProperty) {
-	      Object.defineProperty(element._store, 'validated', {
-	        configurable: false,
-	        enumerable: false,
-	        writable: true,
-	        value: false
-	      });
-	      // self and source are DEV only properties.
-	      Object.defineProperty(element, '_self', {
-	        configurable: false,
-	        enumerable: false,
-	        writable: false,
-	        value: self
-	      });
-	      // Two elements created in two different places should be considered
-	      // equal for testing purposes and therefore we hide it from enumeration.
-	      Object.defineProperty(element, '_source', {
-	        configurable: false,
-	        enumerable: false,
-	        writable: false,
-	        value: source
-	      });
-	    } else {
-	      element._store.validated = false;
-	      element._self = self;
-	      element._source = source;
-	    }
-	    Object.freeze(element.props);
-	    Object.freeze(element);
-	  }
 
 	  return element;
 	};
@@ -6071,10 +5759,6 @@
 	ReactElement.cloneAndReplaceProps = function (oldElement, newProps) {
 	  var newElement = ReactElement(oldElement.type, oldElement.key, oldElement.ref, oldElement._self, oldElement._source, oldElement._owner, newProps);
 
-	  if (false) {
-	    // If the key on the original is valid, then the clone is valid
-	    newElement._store.validated = oldElement._store.validated;
-	  }
 
 	  return newElement;
 	};
@@ -6160,14 +5844,6 @@
 	'use strict';
 
 	var canDefineProperty = false;
-	if (false) {
-	  try {
-	    Object.defineProperty({}, 'x', { get: function () {} });
-	    canDefineProperty = true;
-	  } catch (x) {
-	    // IE will fail on defineProperty
-	  }
-	}
 
 	module.exports = canDefineProperty;
 
@@ -7038,18 +6714,9 @@
 	function getInternalInstanceReadyForUpdate(publicInstance, callerName) {
 	  var internalInstance = ReactInstanceMap.get(publicInstance);
 	  if (!internalInstance) {
-	    if (false) {
-	      // Only warn when we have a callerName. Otherwise we should be silent.
-	      // We're probably calling from enqueueCallback. We don't want to warn
-	      // there because we already warned for the corresponding lifecycle method.
-	      process.env.NODE_ENV !== 'production' ? warning(!callerName, '%s(...): Can only update a mounted or mounting component. ' + 'This usually means you called %s() on an unmounted component. ' + 'This is a no-op. Please check the code for the %s component.', callerName, callerName, publicInstance.constructor.displayName) : undefined;
-	    }
 	    return null;
 	  }
 
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(ReactCurrentOwner.current == null, '%s(...): Cannot update during an existing state transition ' + '(such as within `render`). Render methods should be a pure function ' + 'of props and state.', callerName) : undefined;
-	  }
 
 	  return internalInstance;
 	}
@@ -7068,13 +6735,6 @@
 	   * @final
 	   */
 	  isMounted: function (publicInstance) {
-	    if (false) {
-	      var owner = ReactCurrentOwner.current;
-	      if (owner !== null) {
-	        process.env.NODE_ENV !== 'production' ? warning(owner._warnedAboutRefsInRender, '%s is accessing isMounted inside its render() function. ' + 'render() should be a pure function of props and state. It should ' + 'never access something that requires stale data from the previous ' + 'render, such as refs. Move this logic to componentDidMount and ' + 'componentDidUpdate instead.', owner.getName() || 'A component') : undefined;
-	        owner._warnedAboutRefsInRender = true;
-	      }
-	    }
 	    var internalInstance = ReactInstanceMap.get(publicInstance);
 	    if (internalInstance) {
 	      // During componentWillMount and render this will still be null but after
@@ -7972,9 +7632,6 @@
 
 	var emptyObject = {};
 
-	if (false) {
-	  Object.freeze(emptyObject);
-	}
 
 	module.exports = emptyObject;
 
@@ -8182,9 +7839,6 @@
 	     true ?  false ? invariant(false, 'Encountered invalid React node of type %s', typeof node) : invariant(false) : undefined;
 	  }
 
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(typeof instance.construct === 'function' && typeof instance.mountComponent === 'function' && typeof instance.receiveComponent === 'function' && typeof instance.unmountComponent === 'function', 'Only React Components can be mounted.') : undefined;
-	  }
 
 	  // Sets up the instance. This can probably just move into the constructor now.
 	  instance.construct(node);
@@ -8195,18 +7849,9 @@
 	  instance._mountIndex = 0;
 	  instance._mountImage = null;
 
-	  if (false) {
-	    instance._isOwnerNecessary = false;
-	    instance._warnedAboutRefsInRender = false;
-	  }
 
 	  // Internal instances should fully constructed at this point, so they should
 	  // not get any new fields added to them at this point.
-	  if (false) {
-	    if (Object.preventExtensions) {
-	      Object.preventExtensions(instance);
-	    }
-	  }
 
 	  return instance;
 	}
@@ -8361,14 +8006,7 @@
 	    var canInstantiate = ('prototype' in Component);
 
 	    if (canInstantiate) {
-	      if (false) {
-	        ReactCurrentOwner.current = this;
-	        try {
-	          inst = new Component(publicProps, publicContext, ReactUpdateQueue);
-	        } finally {
-	          ReactCurrentOwner.current = null;
-	        }
-	      } else {
+	      {
 	        inst = new Component(publicProps, publicContext, ReactUpdateQueue);
 	      }
 	    }
@@ -8378,17 +8016,6 @@
 	      inst = new StatelessComponent(Component);
 	    }
 
-	    if (false) {
-	      // This will throw later in _renderValidatedComponent, but add an early
-	      // warning now to help debugging
-	      if (inst.render == null) {
-	        process.env.NODE_ENV !== 'production' ? warning(false, '%s(...): No `render` method found on the returned component ' + 'instance: you may have forgotten to define `render`, returned ' + 'null/false from a stateless component, or tried to render an ' + 'element whose type is a function that isn\'t a React component.', Component.displayName || Component.name || 'Component') : undefined;
-	      } else {
-	        // We support ES6 inheriting from React.Component, the module pattern,
-	        // and stateless components, but not ES6 classes that don't extend
-	        process.env.NODE_ENV !== 'production' ? warning(Component.prototype && Component.prototype.isReactComponent || !canInstantiate || !(inst instanceof Component), '%s(...): React component classes must extend React.Component.', Component.displayName || Component.name || 'Component') : undefined;
-	      }
-	    }
 
 	    // These should be set up in the constructor, but as a convenience for
 	    // simpler class abstractions, we set them up after the fact.
@@ -8402,18 +8029,6 @@
 	    // Store a reference from the instance back to the internal representation
 	    ReactInstanceMap.set(inst, this);
 
-	    if (false) {
-	      // Since plain JS classes are defined without any special initialization
-	      // logic, we can not catch common errors early. Therefore, we have to
-	      // catch them here, at initialization time, instead.
-	      process.env.NODE_ENV !== 'production' ? warning(!inst.getInitialState || inst.getInitialState.isReactClassApproved, 'getInitialState was defined on %s, a plain JavaScript class. ' + 'This is only supported for classes created using React.createClass. ' + 'Did you mean to define a state property instead?', this.getName() || 'a component') : undefined;
-	      process.env.NODE_ENV !== 'production' ? warning(!inst.getDefaultProps || inst.getDefaultProps.isReactClassApproved, 'getDefaultProps was defined on %s, a plain JavaScript class. ' + 'This is only supported for classes created using React.createClass. ' + 'Use a static property to define defaultProps instead.', this.getName() || 'a component') : undefined;
-	      process.env.NODE_ENV !== 'production' ? warning(!inst.propTypes, 'propTypes was defined as an instance property on %s. Use a static ' + 'property to define propTypes instead.', this.getName() || 'a component') : undefined;
-	      process.env.NODE_ENV !== 'production' ? warning(!inst.contextTypes, 'contextTypes was defined as an instance property on %s. Use a ' + 'static property to define contextTypes instead.', this.getName() || 'a component') : undefined;
-	      process.env.NODE_ENV !== 'production' ? warning(typeof inst.componentShouldUpdate !== 'function', '%s has a method called ' + 'componentShouldUpdate(). Did you mean shouldComponentUpdate()? ' + 'The name is phrased as a question because the function is ' + 'expected to return a value.', this.getName() || 'A component') : undefined;
-	      process.env.NODE_ENV !== 'production' ? warning(typeof inst.componentDidUnmount !== 'function', '%s has a method called ' + 'componentDidUnmount(). But there is no such lifecycle method. ' + 'Did you mean componentWillUnmount()?', this.getName() || 'A component') : undefined;
-	      process.env.NODE_ENV !== 'production' ? warning(typeof inst.componentWillRecieveProps !== 'function', '%s has a method called ' + 'componentWillRecieveProps(). Did you mean componentWillReceiveProps()?', this.getName() || 'A component') : undefined;
-	    }
 
 	    var initialState = inst.state;
 	    if (initialState === undefined) {
@@ -8525,12 +8140,6 @@
 	   */
 	  _processContext: function (context) {
 	    var maskedContext = this._maskContext(context);
-	    if (false) {
-	      var Component = this._currentElement.type;
-	      if (Component.contextTypes) {
-	        this._checkPropTypes(Component.contextTypes, maskedContext, ReactPropTypeLocations.context);
-	      }
-	    }
 	    return maskedContext;
 	  },
 
@@ -8545,9 +8154,6 @@
 	    var childContext = inst.getChildContext && inst.getChildContext();
 	    if (childContext) {
 	      !(typeof Component.childContextTypes === 'object') ?  false ? invariant(false, '%s.getChildContext(): childContextTypes must be defined in order to ' + 'use getChildContext().', this.getName() || 'ReactCompositeComponent') : invariant(false) : undefined;
-	      if (false) {
-	        this._checkPropTypes(Component.childContextTypes, childContext, ReactPropTypeLocations.childContext);
-	      }
 	      for (var name in childContext) {
 	        !(name in Component.childContextTypes) ?  false ? invariant(false, '%s.getChildContext(): key "%s" is not defined in childContextTypes.', this.getName() || 'ReactCompositeComponent', name) : invariant(false) : undefined;
 	      }
@@ -8566,12 +8172,6 @@
 	   * @private
 	   */
 	  _processProps: function (newProps) {
-	    if (false) {
-	      var Component = this._currentElement.type;
-	      if (Component.propTypes) {
-	        this._checkPropTypes(Component.propTypes, newProps, ReactPropTypeLocations.prop);
-	      }
-	    }
 	    return newProps;
 	  },
 
@@ -8606,9 +8206,9 @@
 
 	          if (location === ReactPropTypeLocations.prop) {
 	            // Preface gives us something to blacklist in warning module
-	             false ? warning(false, 'Failed Composite propType: %s%s', error.message, addendum) : undefined;
+
 	          } else {
-	             false ? warning(false, 'Failed Context Types: %s%s', error.message, addendum) : undefined;
+
 	          }
 	        }
 	      }
@@ -8682,9 +8282,6 @@
 
 	    var shouldUpdate = this._pendingForceUpdate || !inst.shouldComponentUpdate || inst.shouldComponentUpdate(nextProps, nextState, nextContext);
 
-	    if (false) {
-	      process.env.NODE_ENV !== 'production' ? warning(typeof shouldUpdate !== 'undefined', '%s.shouldComponentUpdate(): Returned undefined instead of a ' + 'boolean value. Make sure to return true or false.', this.getName() || 'ReactCompositeComponent') : undefined;
-	    }
 
 	    if (shouldUpdate) {
 	      this._pendingForceUpdate = false;
@@ -8804,14 +8401,6 @@
 	  _renderValidatedComponentWithoutOwnerOrContext: function () {
 	    var inst = this._instance;
 	    var renderedComponent = inst.render();
-	    if (false) {
-	      // We allow auto-mocks to proceed as if they're returning null.
-	      if (typeof renderedComponent === 'undefined' && inst.render._isMockFunction) {
-	        // This is probably bad practice. Consider warning here and
-	        // deprecating this convenience.
-	        renderedComponent = null;
-	      }
-	    }
 
 	    return renderedComponent;
 	  },
@@ -8845,10 +8434,6 @@
 	    var inst = this.getPublicInstance();
 	    !(inst != null) ?  false ? invariant(false, 'Stateless function components cannot have refs.') : invariant(false) : undefined;
 	    var publicComponentInstance = component.getPublicInstance();
-	    if (false) {
-	      var componentName = component && component.getName ? component.getName() : 'a component';
-	      process.env.NODE_ENV !== 'production' ? warning(publicComponentInstance != null, 'Stateless function components cannot be given refs ' + '(See ref "%s" in %s created by %s). ' + 'Attempts to access this ref will fail.', ref, componentName, this.getName()) : undefined;
-	    }
 	    var refs = inst.refs === emptyObject ? inst.refs = {} : inst.refs;
 	    refs[ref] = publicComponentInstance;
 	  },
@@ -9014,13 +8599,6 @@
 
 	var ReactPropTypeLocationNames = {};
 
-	if (false) {
-	  ReactPropTypeLocationNames = {
-	    prop: 'prop',
-	    context: 'context',
-	    childContext: 'child context'
-	  };
-	}
 
 	module.exports = ReactPropTypeLocationNames;
 
@@ -9250,348 +8828,6 @@
 
 	var validateDOMNesting = emptyFunction;
 
-	if (false) {
-	  // This validation code was written based on the HTML5 parsing spec:
-	  // https://html.spec.whatwg.org/multipage/syntax.html#has-an-element-in-scope
-	  //
-	  // Note: this does not catch all invalid nesting, nor does it try to (as it's
-	  // not clear what practical benefit doing so provides); instead, we warn only
-	  // for cases where the parser will give a parse tree differing from what React
-	  // intended. For example, <b><div></div></b> is invalid but we don't warn
-	  // because it still parses correctly; we do warn for other cases like nested
-	  // <p> tags where the beginning of the second element implicitly closes the
-	  // first, causing a confusing mess.
-
-	  // https://html.spec.whatwg.org/multipage/syntax.html#special
-	  var specialTags = ['address', 'applet', 'area', 'article', 'aside', 'base', 'basefont', 'bgsound', 'blockquote', 'body', 'br', 'button', 'caption', 'center', 'col', 'colgroup', 'dd', 'details', 'dir', 'div', 'dl', 'dt', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hgroup', 'hr', 'html', 'iframe', 'img', 'input', 'isindex', 'li', 'link', 'listing', 'main', 'marquee', 'menu', 'menuitem', 'meta', 'nav', 'noembed', 'noframes', 'noscript', 'object', 'ol', 'p', 'param', 'plaintext', 'pre', 'script', 'section', 'select', 'source', 'style', 'summary', 'table', 'tbody', 'td', 'template', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'track', 'ul', 'wbr', 'xmp'];
-
-	  // https://html.spec.whatwg.org/multipage/syntax.html#has-an-element-in-scope
-	  var inScopeTags = ['applet', 'caption', 'html', 'table', 'td', 'th', 'marquee', 'object', 'template',
-
-	  // https://html.spec.whatwg.org/multipage/syntax.html#html-integration-point
-	  // TODO: Distinguish by namespace here -- for <title>, including it here
-	  // errs on the side of fewer warnings
-	  'foreignObject', 'desc', 'title'];
-
-	  // https://html.spec.whatwg.org/multipage/syntax.html#has-an-element-in-button-scope
-	  var buttonScopeTags = inScopeTags.concat(['button']);
-
-	  // https://html.spec.whatwg.org/multipage/syntax.html#generate-implied-end-tags
-	  var impliedEndTags = ['dd', 'dt', 'li', 'option', 'optgroup', 'p', 'rp', 'rt'];
-
-	  var emptyAncestorInfo = {
-	    parentTag: null,
-
-	    formTag: null,
-	    aTagInScope: null,
-	    buttonTagInScope: null,
-	    nobrTagInScope: null,
-	    pTagInButtonScope: null,
-
-	    listItemTagAutoclosing: null,
-	    dlItemTagAutoclosing: null
-	  };
-
-	  var updatedAncestorInfo = function (oldInfo, tag, instance) {
-	    var ancestorInfo = assign({}, oldInfo || emptyAncestorInfo);
-	    var info = { tag: tag, instance: instance };
-
-	    if (inScopeTags.indexOf(tag) !== -1) {
-	      ancestorInfo.aTagInScope = null;
-	      ancestorInfo.buttonTagInScope = null;
-	      ancestorInfo.nobrTagInScope = null;
-	    }
-	    if (buttonScopeTags.indexOf(tag) !== -1) {
-	      ancestorInfo.pTagInButtonScope = null;
-	    }
-
-	    // See rules for 'li', 'dd', 'dt' start tags in
-	    // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-inbody
-	    if (specialTags.indexOf(tag) !== -1 && tag !== 'address' && tag !== 'div' && tag !== 'p') {
-	      ancestorInfo.listItemTagAutoclosing = null;
-	      ancestorInfo.dlItemTagAutoclosing = null;
-	    }
-
-	    ancestorInfo.parentTag = info;
-
-	    if (tag === 'form') {
-	      ancestorInfo.formTag = info;
-	    }
-	    if (tag === 'a') {
-	      ancestorInfo.aTagInScope = info;
-	    }
-	    if (tag === 'button') {
-	      ancestorInfo.buttonTagInScope = info;
-	    }
-	    if (tag === 'nobr') {
-	      ancestorInfo.nobrTagInScope = info;
-	    }
-	    if (tag === 'p') {
-	      ancestorInfo.pTagInButtonScope = info;
-	    }
-	    if (tag === 'li') {
-	      ancestorInfo.listItemTagAutoclosing = info;
-	    }
-	    if (tag === 'dd' || tag === 'dt') {
-	      ancestorInfo.dlItemTagAutoclosing = info;
-	    }
-
-	    return ancestorInfo;
-	  };
-
-	  /**
-	   * Returns whether
-	   */
-	  var isTagValidWithParent = function (tag, parentTag) {
-	    // First, let's check if we're in an unusual parsing mode...
-	    switch (parentTag) {
-	      // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-inselect
-	      case 'select':
-	        return tag === 'option' || tag === 'optgroup' || tag === '#text';
-	      case 'optgroup':
-	        return tag === 'option' || tag === '#text';
-	      // Strictly speaking, seeing an <option> doesn't mean we're in a <select>
-	      // but
-	      case 'option':
-	        return tag === '#text';
-
-	      // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-intd
-	      // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-incaption
-	      // No special behavior since these rules fall back to "in body" mode for
-	      // all except special table nodes which cause bad parsing behavior anyway.
-
-	      // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-intr
-	      case 'tr':
-	        return tag === 'th' || tag === 'td' || tag === 'style' || tag === 'script' || tag === 'template';
-
-	      // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-intbody
-	      case 'tbody':
-	      case 'thead':
-	      case 'tfoot':
-	        return tag === 'tr' || tag === 'style' || tag === 'script' || tag === 'template';
-
-	      // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-incolgroup
-	      case 'colgroup':
-	        return tag === 'col' || tag === 'template';
-
-	      // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-intable
-	      case 'table':
-	        return tag === 'caption' || tag === 'colgroup' || tag === 'tbody' || tag === 'tfoot' || tag === 'thead' || tag === 'style' || tag === 'script' || tag === 'template';
-
-	      // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-inhead
-	      case 'head':
-	        return tag === 'base' || tag === 'basefont' || tag === 'bgsound' || tag === 'link' || tag === 'meta' || tag === 'title' || tag === 'noscript' || tag === 'noframes' || tag === 'style' || tag === 'script' || tag === 'template';
-
-	      // https://html.spec.whatwg.org/multipage/semantics.html#the-html-element
-	      case 'html':
-	        return tag === 'head' || tag === 'body';
-	    }
-
-	    // Probably in the "in body" parsing mode, so we outlaw only tag combos
-	    // where the parsing rules cause implicit opens or closes to be added.
-	    // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-inbody
-	    switch (tag) {
-	      case 'h1':
-	      case 'h2':
-	      case 'h3':
-	      case 'h4':
-	      case 'h5':
-	      case 'h6':
-	        return parentTag !== 'h1' && parentTag !== 'h2' && parentTag !== 'h3' && parentTag !== 'h4' && parentTag !== 'h5' && parentTag !== 'h6';
-
-	      case 'rp':
-	      case 'rt':
-	        return impliedEndTags.indexOf(parentTag) === -1;
-
-	      case 'caption':
-	      case 'col':
-	      case 'colgroup':
-	      case 'frame':
-	      case 'head':
-	      case 'tbody':
-	      case 'td':
-	      case 'tfoot':
-	      case 'th':
-	      case 'thead':
-	      case 'tr':
-	        // These tags are only valid with a few parents that have special child
-	        // parsing rules -- if we're down here, then none of those matched and
-	        // so we allow it only if we don't know what the parent is, as all other
-	        // cases are invalid.
-	        return parentTag == null;
-	    }
-
-	    return true;
-	  };
-
-	  /**
-	   * Returns whether
-	   */
-	  var findInvalidAncestorForTag = function (tag, ancestorInfo) {
-	    switch (tag) {
-	      case 'address':
-	      case 'article':
-	      case 'aside':
-	      case 'blockquote':
-	      case 'center':
-	      case 'details':
-	      case 'dialog':
-	      case 'dir':
-	      case 'div':
-	      case 'dl':
-	      case 'fieldset':
-	      case 'figcaption':
-	      case 'figure':
-	      case 'footer':
-	      case 'header':
-	      case 'hgroup':
-	      case 'main':
-	      case 'menu':
-	      case 'nav':
-	      case 'ol':
-	      case 'p':
-	      case 'section':
-	      case 'summary':
-	      case 'ul':
-
-	      case 'pre':
-	      case 'listing':
-
-	      case 'table':
-
-	      case 'hr':
-
-	      case 'xmp':
-
-	      case 'h1':
-	      case 'h2':
-	      case 'h3':
-	      case 'h4':
-	      case 'h5':
-	      case 'h6':
-	        return ancestorInfo.pTagInButtonScope;
-
-	      case 'form':
-	        return ancestorInfo.formTag || ancestorInfo.pTagInButtonScope;
-
-	      case 'li':
-	        return ancestorInfo.listItemTagAutoclosing;
-
-	      case 'dd':
-	      case 'dt':
-	        return ancestorInfo.dlItemTagAutoclosing;
-
-	      case 'button':
-	        return ancestorInfo.buttonTagInScope;
-
-	      case 'a':
-	        // Spec says something about storing a list of markers, but it sounds
-	        // equivalent to this check.
-	        return ancestorInfo.aTagInScope;
-
-	      case 'nobr':
-	        return ancestorInfo.nobrTagInScope;
-	    }
-
-	    return null;
-	  };
-
-	  /**
-	   * Given a ReactCompositeComponent instance, return a list of its recursive
-	   * owners, starting at the root and ending with the instance itself.
-	   */
-	  var findOwnerStack = function (instance) {
-	    if (!instance) {
-	      return [];
-	    }
-
-	    var stack = [];
-	    /*eslint-disable space-after-keywords */
-	    do {
-	      /*eslint-enable space-after-keywords */
-	      stack.push(instance);
-	    } while (instance = instance._currentElement._owner);
-	    stack.reverse();
-	    return stack;
-	  };
-
-	  var didWarn = {};
-
-	  validateDOMNesting = function (childTag, childInstance, ancestorInfo) {
-	    ancestorInfo = ancestorInfo || emptyAncestorInfo;
-	    var parentInfo = ancestorInfo.parentTag;
-	    var parentTag = parentInfo && parentInfo.tag;
-
-	    var invalidParent = isTagValidWithParent(childTag, parentTag) ? null : parentInfo;
-	    var invalidAncestor = invalidParent ? null : findInvalidAncestorForTag(childTag, ancestorInfo);
-	    var problematic = invalidParent || invalidAncestor;
-
-	    if (problematic) {
-	      var ancestorTag = problematic.tag;
-	      var ancestorInstance = problematic.instance;
-
-	      var childOwner = childInstance && childInstance._currentElement._owner;
-	      var ancestorOwner = ancestorInstance && ancestorInstance._currentElement._owner;
-
-	      var childOwners = findOwnerStack(childOwner);
-	      var ancestorOwners = findOwnerStack(ancestorOwner);
-
-	      var minStackLen = Math.min(childOwners.length, ancestorOwners.length);
-	      var i;
-
-	      var deepestCommon = -1;
-	      for (i = 0; i < minStackLen; i++) {
-	        if (childOwners[i] === ancestorOwners[i]) {
-	          deepestCommon = i;
-	        } else {
-	          break;
-	        }
-	      }
-
-	      var UNKNOWN = '(unknown)';
-	      var childOwnerNames = childOwners.slice(deepestCommon + 1).map(function (inst) {
-	        return inst.getName() || UNKNOWN;
-	      });
-	      var ancestorOwnerNames = ancestorOwners.slice(deepestCommon + 1).map(function (inst) {
-	        return inst.getName() || UNKNOWN;
-	      });
-	      var ownerInfo = [].concat(
-	      // If the parent and child instances have a common owner ancestor, start
-	      // with that -- otherwise we just start with the parent's owners.
-	      deepestCommon !== -1 ? childOwners[deepestCommon].getName() || UNKNOWN : [], ancestorOwnerNames, ancestorTag,
-	      // If we're warning about an invalid (non-parent) ancestry, add '...'
-	      invalidAncestor ? ['...'] : [], childOwnerNames, childTag).join(' > ');
-
-	      var warnKey = !!invalidParent + '|' + childTag + '|' + ancestorTag + '|' + ownerInfo;
-	      if (didWarn[warnKey]) {
-	        return;
-	      }
-	      didWarn[warnKey] = true;
-
-	      if (invalidParent) {
-	        var info = '';
-	        if (ancestorTag === 'table' && childTag === 'tr') {
-	          info += ' Add a <tbody> to your code to match the DOM tree generated by ' + 'the browser.';
-	        }
-	        process.env.NODE_ENV !== 'production' ? warning(false, 'validateDOMNesting(...): <%s> cannot appear as a child of <%s>. ' + 'See %s.%s', childTag, ancestorTag, ownerInfo, info) : undefined;
-	      } else {
-	        process.env.NODE_ENV !== 'production' ? warning(false, 'validateDOMNesting(...): <%s> cannot appear as a descendant of ' + '<%s>. See %s.', childTag, ancestorTag, ownerInfo) : undefined;
-	      }
-	    }
-	  };
-
-	  validateDOMNesting.ancestorInfoContextKey = '__validateDOMNesting_ancestorInfo$' + Math.random().toString(36).slice(2);
-
-	  validateDOMNesting.updatedAncestorInfo = updatedAncestorInfo;
-
-	  // For testing
-	  validateDOMNesting.isTagValidInContext = function (tag, ancestorInfo) {
-	    ancestorInfo = ancestorInfo || emptyAncestorInfo;
-	    var parentInfo = ancestorInfo.parentTag;
-	    var parentTag = parentInfo && parentInfo.tag;
-	    return isTagValidWithParent(tag, parentTag) && !findInvalidAncestorForTag(tag, ancestorInfo);
-	  };
-	}
 
 	module.exports = validateDOMNesting;
 
@@ -9684,13 +8920,6 @@
 
 	  ReactInjection.Component.injectEnvironment(ReactComponentBrowserEnvironment);
 
-	  if (false) {
-	    var url = ExecutionEnvironment.canUseDOM && window.location.href || '';
-	    if (/[?&]react_perf\b/.test(url)) {
-	      var ReactDefaultPerf = require('./ReactDefaultPerf');
-	      ReactDefaultPerf.start();
-	    }
-	  }
 	}
 
 	module.exports = {
@@ -10151,9 +9380,6 @@
 	 * "dispatch" object that pairs the event with the listener.
 	 */
 	function accumulateDirectionalDispatches(domID, upwards, event) {
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(domID, 'Dispatching id must not be null') : undefined;
-	  }
 	  var phase = upwards ? PropagationPhases.bubbled : PropagationPhases.captured;
 	  var listener = listenerAtPhase(domID, event, phase);
 	  if (listener) {
@@ -10523,9 +9749,6 @@
 	  preventDefault: function () {
 	    this.defaultPrevented = true;
 	    var event = this.nativeEvent;
-	    if (false) {
-	      process.env.NODE_ENV !== 'production' ? warning(event, 'This synthetic event is reused for performance reasons. If you\'re ' + 'seeing this, you\'re calling `preventDefault` on a ' + 'released/nullified synthetic event. This is a no-op. See ' + 'https://fb.me/react-event-pooling for more information.') : undefined;
-	    }
 	    if (!event) {
 	      return;
 	    }
@@ -10540,9 +9763,6 @@
 
 	  stopPropagation: function () {
 	    var event = this.nativeEvent;
-	    if (false) {
-	      process.env.NODE_ENV !== 'production' ? warning(event, 'This synthetic event is reused for performance reasons. If you\'re ' + 'seeing this, you\'re calling `stopPropagation` on a ' + 'released/nullified synthetic event. This is a no-op. See ' + 'https://fb.me/react-event-pooling for more information.') : undefined;
-	    }
 	    if (!event) {
 	      return;
 	    }
@@ -11749,7 +10969,7 @@
 	   * @protected
 	   */
 	  getDOMNode: function () {
-	     false ? warning(this.constructor[didWarnKey], '%s.getDOMNode(...) is deprecated. Please use ' + 'ReactDOM.findDOMNode(instance) instead.', ReactInstanceMap.get(this).getName() || this.tagName || 'Unknown') : undefined;
+
 	    this.constructor[didWarnKey] = true;
 	    return findDOMNode(this);
 	  }
@@ -11789,13 +11009,6 @@
 	 * @return {?DOMElement} The root node of this element.
 	 */
 	function findDOMNode(componentOrElement) {
-	  if (false) {
-	    var owner = ReactCurrentOwner.current;
-	    if (owner !== null) {
-	      process.env.NODE_ENV !== 'production' ? warning(owner._warnedAboutRefsInRender, '%s is accessing getDOMNode or findDOMNode inside its render(). ' + 'render() should be a pure function of props and state. It should ' + 'never access something that requires stale data from the previous ' + 'render, such as refs. Move this logic to componentDidMount and ' + 'componentDidUpdate instead.', owner.getName() || 'A component') : undefined;
-	      owner._warnedAboutRefsInRender = true;
-	    }
-	  }
 	  if (componentOrElement == null) {
 	    return null;
 	  }
@@ -11959,47 +11172,21 @@
 	}
 
 	var legacyPropsDescriptor;
-	if (false) {
-	  legacyPropsDescriptor = {
-	    props: {
-	      enumerable: false,
-	      get: function () {
-	        var component = this._reactInternalComponent;
-	        process.env.NODE_ENV !== 'production' ? warning(false, 'ReactDOMComponent: Do not access .props of a DOM node; instead, ' + 'recreate the props as `render` did originally or read the DOM ' + 'properties/attributes directly from this node (e.g., ' + 'this.refs.box.className).%s', getDeclarationErrorAddendum(component)) : undefined;
-	        return component._currentElement.props;
-	      }
-	    }
-	  };
-	}
 
 	function legacyGetDOMNode() {
-	  if (false) {
-	    var component = this._reactInternalComponent;
-	    process.env.NODE_ENV !== 'production' ? warning(false, 'ReactDOMComponent: Do not access .getDOMNode() of a DOM node; ' + 'instead, use the node directly.%s', getDeclarationErrorAddendum(component)) : undefined;
-	  }
 	  return this;
 	}
 
 	function legacyIsMounted() {
 	  var component = this._reactInternalComponent;
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(false, 'ReactDOMComponent: Do not access .isMounted() of a DOM node.%s', getDeclarationErrorAddendum(component)) : undefined;
-	  }
 	  return !!component;
 	}
 
 	function legacySetStateEtc() {
-	  if (false) {
-	    var component = this._reactInternalComponent;
-	    process.env.NODE_ENV !== 'production' ? warning(false, 'ReactDOMComponent: Do not access .setState(), .replaceState(), or ' + '.forceUpdate() of a DOM node. This is a no-op.%s', getDeclarationErrorAddendum(component)) : undefined;
-	  }
 	}
 
 	function legacySetProps(partialProps, callback) {
 	  var component = this._reactInternalComponent;
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(false, 'ReactDOMComponent: Do not access .setProps() of a DOM node. ' + 'Instead, call ReactDOM.render again at the top level.%s', getDeclarationErrorAddendum(component)) : undefined;
-	  }
 	  if (!component) {
 	    return;
 	  }
@@ -12011,9 +11198,6 @@
 
 	function legacyReplaceProps(partialProps, callback) {
 	  var component = this._reactInternalComponent;
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(false, 'ReactDOMComponent: Do not access .replaceProps() of a DOM node. ' + 'Instead, call ReactDOM.render again at the top level.%s', getDeclarationErrorAddendum(component)) : undefined;
-	  }
 	  if (!component) {
 	    return;
 	  }
@@ -12072,7 +11256,6 @@
 
 	  styleMutationWarning[hash] = true;
 
-	   false ? warning(false, '`%s` was passed a style object that has previously been mutated. ' + 'Mutating `style` is deprecated. Consider cloning it beforehand. Check ' + 'the `render` %s. Previous style: %s. Mutated style: %s.', componentName, owner ? 'of `' + ownerName + '`' : 'using <' + componentName + '>', friendlyStringify(style1), friendlyStringify(style2)) : undefined;
 	}
 
 	/**
@@ -12084,28 +11267,14 @@
 	    return;
 	  }
 	  // Note the use of `==` which checks for null or undefined.
-	  if (false) {
-	    if (voidElementTags[component._tag]) {
-	      process.env.NODE_ENV !== 'production' ? warning(props.children == null && props.dangerouslySetInnerHTML == null, '%s is a void element tag and must not have `children` or ' + 'use `props.dangerouslySetInnerHTML`.%s', component._tag, component._currentElement._owner ? ' Check the render method of ' + component._currentElement._owner.getName() + '.' : '') : undefined;
-	    }
-	  }
 	  if (props.dangerouslySetInnerHTML != null) {
 	    !(props.children == null) ?  false ? invariant(false, 'Can only set one of `children` or `props.dangerouslySetInnerHTML`.') : invariant(false) : undefined;
 	    !(typeof props.dangerouslySetInnerHTML === 'object' && HTML in props.dangerouslySetInnerHTML) ?  false ? invariant(false, '`props.dangerouslySetInnerHTML` must be in the form `{__html: ...}`. ' + 'Please visit https://fb.me/react-invariant-dangerously-set-inner-html ' + 'for more information.') : invariant(false) : undefined;
-	  }
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(props.innerHTML == null, 'Directly setting property `innerHTML` is not permitted. ' + 'For more information, lookup documentation on `dangerouslySetInnerHTML`.') : undefined;
-	    process.env.NODE_ENV !== 'production' ? warning(!props.contentEditable || props.children == null, 'A component is `contentEditable` and contains `children` managed by ' + 'React. It is now your responsibility to guarantee that none of ' + 'those nodes are unexpectedly modified or duplicated. This is ' + 'probably not intentional.') : undefined;
 	  }
 	  !(props.style == null || typeof props.style === 'object') ?  false ? invariant(false, 'The `style` prop expects a mapping from style properties to values, ' + 'not a string. For example, style={{marginRight: spacing + \'em\'}} when ' + 'using JSX.%s', getDeclarationErrorAddendum(component)) : invariant(false) : undefined;
 	}
 
 	function enqueuePutListener(id, registrationName, listener, transaction) {
-	  if (false) {
-	    // IE8 has no API for event capturing and the `onScroll` event doesn't
-	    // bubble.
-	    process.env.NODE_ENV !== 'production' ? warning(registrationName !== 'onScroll' || isEventSupported('scroll', true), 'This browser doesn\'t support the `onScroll` event') : undefined;
-	  }
 	  var container = ReactMount.findReactContainerForID(id);
 	  if (container) {
 	    var doc = container.nodeType === ELEMENT_NODE_TYPE ? container.ownerDocument : container;
@@ -12278,10 +11447,6 @@
 	  this._wrapperState = null;
 	  this._topLevelWrapper = null;
 	  this._nodeWithLegacyProperties = null;
-	  if (false) {
-	    this._unprocessedContextDev = null;
-	    this._processedContextDev = null;
-	  }
 	}
 
 	ReactDOMComponent.displayName = 'ReactDOMComponent';
@@ -12341,17 +11506,7 @@
 	    }
 
 	    assertValidProps(this, props);
-	    if (false) {
-	      if (context[validateDOMNesting.ancestorInfoContextKey]) {
-	        validateDOMNesting(this._tag, this, context[validateDOMNesting.ancestorInfoContextKey]);
-	      }
-	    }
 
-	    if (false) {
-	      this._unprocessedContextDev = context;
-	      this._processedContextDev = processChildContextDev(context, this);
-	      context = this._processedContextDev;
-	    }
 
 	    var mountImage;
 	    if (transaction.useCreateElement) {
@@ -12420,10 +11575,6 @@
 	      } else {
 	        if (propKey === STYLE) {
 	          if (propValue) {
-	            if (false) {
-	              // See `_updateDOMProperties`. style block
-	              this._previousStyle = propValue;
-	            }
 	            propValue = this._previousStyleCopy = assign({}, props.style);
 	          }
 	          propValue = CSSPropertyOperations.createMarkupForStyles(propValue);
@@ -12573,16 +11724,6 @@
 	        break;
 	    }
 
-	    if (false) {
-	      // If the context is reference-equal to the old one, pass down the same
-	      // processed object so the update bailout in ReactReconciler behaves
-	      // correctly (and identically in dev and prod). See #5005.
-	      if (this._unprocessedContextDev !== context) {
-	        this._unprocessedContextDev = context;
-	        this._processedContextDev = processChildContextDev(context, this);
-	      }
-	      context = this._processedContextDev;
-	    }
 
 	    assertValidProps(this, nextProps);
 	    this._updateDOMProperties(lastProps, nextProps, transaction, null);
@@ -12655,10 +11796,6 @@
 	      }
 	      if (propKey === STYLE) {
 	        if (nextProp) {
-	          if (false) {
-	            checkAndWarnForMutatedStyle(this._previousStyleCopy, this._previousStyle, this);
-	            this._previousStyle = nextProp;
-	          }
 	          nextProp = this._previousStyleCopy = assign({}, nextProp);
 	        } else {
 	          this._previousStyleCopy = null;
@@ -12822,14 +11959,7 @@
 	      node.setProps = legacySetProps;
 	      node.replaceProps = legacyReplaceProps;
 
-	      if (false) {
-	        if (canDefineProperty) {
-	          Object.defineProperties(node, legacyPropsDescriptor);
-	        } else {
-	          // updateComponent will update this property on subsequent renders
-	          node.props = this._currentElement.props;
-	        }
-	      } else {
+	      {
 	        // updateComponent will update this property on subsequent renders
 	        node.props = this._currentElement.props;
 	      }
@@ -12970,57 +12100,6 @@
 	  }
 	}
 
-	if (false) {
-	  // 'msTransform' is correct, but the other prefixes should be capitalized
-	  var badVendoredStyleNamePattern = /^(?:webkit|moz|o)[A-Z]/;
-
-	  // style values shouldn't contain a semicolon
-	  var badStyleValueWithSemicolonPattern = /;\s*$/;
-
-	  var warnedStyleNames = {};
-	  var warnedStyleValues = {};
-
-	  var warnHyphenatedStyleName = function (name) {
-	    if (warnedStyleNames.hasOwnProperty(name) && warnedStyleNames[name]) {
-	      return;
-	    }
-
-	    warnedStyleNames[name] = true;
-	    process.env.NODE_ENV !== 'production' ? warning(false, 'Unsupported style property %s. Did you mean %s?', name, camelizeStyleName(name)) : undefined;
-	  };
-
-	  var warnBadVendoredStyleName = function (name) {
-	    if (warnedStyleNames.hasOwnProperty(name) && warnedStyleNames[name]) {
-	      return;
-	    }
-
-	    warnedStyleNames[name] = true;
-	    process.env.NODE_ENV !== 'production' ? warning(false, 'Unsupported vendor-prefixed style property %s. Did you mean %s?', name, name.charAt(0).toUpperCase() + name.slice(1)) : undefined;
-	  };
-
-	  var warnStyleValueWithSemicolon = function (name, value) {
-	    if (warnedStyleValues.hasOwnProperty(value) && warnedStyleValues[value]) {
-	      return;
-	    }
-
-	    warnedStyleValues[value] = true;
-	    process.env.NODE_ENV !== 'production' ? warning(false, 'Style property values shouldn\'t contain a semicolon. ' + 'Try "%s: %s" instead.', name, value.replace(badStyleValueWithSemicolonPattern, '')) : undefined;
-	  };
-
-	  /**
-	   * @param {string} name
-	   * @param {*} value
-	   */
-	  var warnValidStyle = function (name, value) {
-	    if (name.indexOf('-') > -1) {
-	      warnHyphenatedStyleName(name);
-	    } else if (badVendoredStyleNamePattern.test(name)) {
-	      warnBadVendoredStyleName(name);
-	    } else if (badStyleValueWithSemicolonPattern.test(value)) {
-	      warnStyleValueWithSemicolon(name, value);
-	    }
-	  };
-	}
 
 	/**
 	 * Operations for dealing with CSS properties.
@@ -13046,9 +12125,6 @@
 	        continue;
 	      }
 	      var styleValue = styles[styleName];
-	      if (false) {
-	        warnValidStyle(styleName, styleValue);
-	      }
 	      if (styleValue != null) {
 	        serialized += processStyleName(styleName) + ':';
 	        serialized += dangerousStyleValue(styleName, styleValue) + ';';
@@ -13069,9 +12145,6 @@
 	    for (var styleName in styles) {
 	      if (!styles.hasOwnProperty(styleName)) {
 	        continue;
-	      }
-	      if (false) {
-	        warnValidStyle(styleName, styles[styleName]);
 	      }
 	      var styleValue = dangerousStyleValue(styleName, styles[styleName]);
 	      if (styleName === 'float') {
@@ -13628,9 +12701,6 @@
 	  },
 
 	  mountWrapper: function (inst, props) {
-	    if (false) {
-	      LinkedValueUtils.checkPropTypes('input', props, inst._currentElement._owner);
-	    }
 
 	    var defaultValue = props.defaultValue;
 	    inst._wrapperState = {
@@ -13809,7 +12879,7 @@
 	        loggedTypeFailures[error.message] = true;
 
 	        var addendum = getDeclarationErrorAddendum(owner);
-	         false ? warning(false, 'Failed form propType: %s%s', error.message, addendum) : undefined;
+
 	      }
 	    }
 	  },
@@ -14295,9 +13365,6 @@
 	var ReactDOMOption = {
 	  mountWrapper: function (inst, props, context) {
 	    // TODO (yungsters): Remove support for `selected` in <option>.
-	    if (false) {
-	      process.env.NODE_ENV !== 'production' ? warning(props.selected == null, 'Use the `defaultValue` or `value` props on <select> instead of ' + 'setting `selected` on <option>.') : undefined;
-	    }
 
 	    // Look up whether this option is 'selected' via context
 	    var selectValue = context[valueContextKey];
@@ -14343,7 +13410,7 @@
 	      if (typeof child === 'string' || typeof child === 'number') {
 	        content += child;
 	      } else {
-	         false ? warning(false, 'Only strings and numbers are supported as <option> children.') : undefined;
+
 	      }
 	    });
 
@@ -14677,10 +13744,6 @@
 	          subtreeCount += traverseAllChildrenImpl(child, nextName, callback, traverseContext);
 	        }
 	      } else {
-	        if (false) {
-	          process.env.NODE_ENV !== 'production' ? warning(didWarnAboutMaps, 'Using Maps as children is not yet fully supported. It is an ' + 'experimental feature that might be removed. Convert it to a ' + 'sequence / iterable of keyed ReactElements instead.') : undefined;
-	          didWarnAboutMaps = true;
-	        }
 	        // Iterator will provide entry [k,v] tuples rather than values.
 	        while (!(step = iterator.next()).done) {
 	          var entry = step.value;
@@ -14693,18 +13756,6 @@
 	      }
 	    } else if (type === 'object') {
 	      var addendum = '';
-	      if (false) {
-	        addendum = ' If you meant to render a collection of children, use an array ' + 'instead or wrap the object using createFragment(object) from the ' + 'React add-ons.';
-	        if (children._isReactElement) {
-	          addendum = ' It looks like you\'re using an element created by a different ' + 'version of React. Make sure to use only one copy of React.';
-	        }
-	        if (ReactCurrentOwner.current) {
-	          var name = ReactCurrentOwner.current.getName();
-	          if (name) {
-	            addendum += ' Check the render method of `' + name + '`.';
-	          }
-	        }
-	      }
 	      var childrenString = String(children);
 	       true ?  false ? invariant(false, 'Objects are not valid as a React child (found: %s).%s', childrenString === '[object Object]' ? 'object with keys {' + Object.keys(children).join(', ') + '}' : childrenString, addendum) : invariant(false) : undefined;
 	    }
@@ -14804,9 +13855,9 @@
 	      continue;
 	    }
 	    if (props.multiple) {
-	       false ? warning(Array.isArray(props[propName]), 'The `%s` prop supplied to <select> must be an array if ' + '`multiple` is true.%s', propName, getDeclarationErrorAddendum(owner)) : undefined;
+
 	    } else {
-	       false ? warning(!Array.isArray(props[propName]), 'The `%s` prop supplied to <select> must be a scalar ' + 'value if `multiple` is false.%s', propName, getDeclarationErrorAddendum(owner)) : undefined;
+
 	    }
 	  }
 	}
@@ -14874,9 +13925,6 @@
 	  },
 
 	  mountWrapper: function (inst, props) {
-	    if (false) {
-	      checkSelectPropTypes(inst, props);
-	    }
 
 	    var value = LinkedValueUtils.getValue(props);
 	    inst._wrapperState = {
@@ -14996,17 +14044,11 @@
 	  },
 
 	  mountWrapper: function (inst, props) {
-	    if (false) {
-	      LinkedValueUtils.checkPropTypes('textarea', props, inst._currentElement._owner);
-	    }
 
 	    var defaultValue = props.defaultValue;
 	    // TODO (yungsters): Remove support for children content in <textarea>.
 	    var children = props.children;
 	    if (children != null) {
-	      if (false) {
-	        process.env.NODE_ENV !== 'production' ? warning(false, 'Use the `defaultValue` or `value` props instead of setting ' + 'children on <textarea>.') : undefined;
-	      }
 	      !(defaultValue == null) ?  false ? invariant(false, 'If you supply `defaultValue` on a <textarea>, do not pass children.') : invariant(false) : undefined;
 	      if (Array.isArray(children)) {
 	        !(children.length <= 1) ?  false ? invariant(false, '<textarea> can only have at most one child.') : invariant(false) : undefined;
@@ -15246,32 +14288,11 @@
 	  Mixin: {
 
 	    _reconcilerInstantiateChildren: function (nestedChildren, transaction, context) {
-	      if (false) {
-	        if (this._currentElement) {
-	          try {
-	            ReactCurrentOwner.current = this._currentElement._owner;
-	            return ReactChildReconciler.instantiateChildren(nestedChildren, transaction, context);
-	          } finally {
-	            ReactCurrentOwner.current = null;
-	          }
-	        }
-	      }
 	      return ReactChildReconciler.instantiateChildren(nestedChildren, transaction, context);
 	    },
 
 	    _reconcilerUpdateChildren: function (prevChildren, nextNestedChildrenElements, transaction, context) {
 	      var nextChildren;
-	      if (false) {
-	        if (this._currentElement) {
-	          try {
-	            ReactCurrentOwner.current = this._currentElement._owner;
-	            nextChildren = flattenChildren(nextNestedChildrenElements);
-	          } finally {
-	            ReactCurrentOwner.current = null;
-	          }
-	          return ReactChildReconciler.updateChildren(prevChildren, nextChildren, transaction, context);
-	        }
-	      }
 	      nextChildren = flattenChildren(nextNestedChildrenElements);
 	      return ReactChildReconciler.updateChildren(prevChildren, nextChildren, transaction, context);
 	    },
@@ -15579,9 +14600,6 @@
 	function instantiateChild(childInstances, child, name) {
 	  // We found a component instance.
 	  var keyUnique = childInstances[name] === undefined;
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(keyUnique, 'flattenChildren(...): Encountered two children with the same key, ' + '`%s`. Child keys must be unique; when two children share a key, only ' + 'the first child will be used.', name) : undefined;
-	  }
 	  if (child != null && keyUnique) {
 	    childInstances[name] = instantiateReactComponent(child, null);
 	  }
@@ -15707,9 +14725,6 @@
 	  // We found a component instance.
 	  var result = traverseContext;
 	  var keyUnique = result[name] === undefined;
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(keyUnique, 'flattenChildren(...): Encountered two children with the same key, ' + '`%s`. Child keys must be unique; when two children share a key, only ' + 'the first child will be used.', name) : undefined;
-	  }
 	  if (keyUnique && child != null) {
 	    result[name] = child;
 	  }
@@ -16077,9 +15092,6 @@
 	        }
 	      };
 	    } else {
-	      if (false) {
-	        console.error('Attempted to listen to events during the capture phase on a ' + 'browser that does not support the capture phase. Your application ' + 'will not receive some events.');
-	      }
 	      return {
 	        remove: emptyFunction
 	      };
@@ -16240,7 +15252,7 @@
 	function warnSetProps() {
 	  if (!warnedSetProps) {
 	    warnedSetProps = true;
-	     false ? warning(false, 'setProps(...) and replaceProps(...) are deprecated. ' + 'Instead, call render again at the top level.') : undefined;
+
 	  }
 	}
 
@@ -16510,15 +15522,9 @@
 	    }
 	  },
 	  childContextTypes: function (Constructor, childContextTypes) {
-	    if (false) {
-	      validateTypeDef(Constructor, childContextTypes, ReactPropTypeLocations.childContext);
-	    }
 	    Constructor.childContextTypes = assign({}, Constructor.childContextTypes, childContextTypes);
 	  },
 	  contextTypes: function (Constructor, contextTypes) {
-	    if (false) {
-	      validateTypeDef(Constructor, contextTypes, ReactPropTypeLocations.context);
-	    }
 	    Constructor.contextTypes = assign({}, Constructor.contextTypes, contextTypes);
 	  },
 	  /**
@@ -16533,9 +15539,6 @@
 	    }
 	  },
 	  propTypes: function (Constructor, propTypes) {
-	    if (false) {
-	      validateTypeDef(Constructor, propTypes, ReactPropTypeLocations.prop);
-	    }
 	    Constructor.propTypes = assign({}, Constructor.propTypes, propTypes);
 	  },
 	  statics: function (Constructor, statics) {
@@ -16549,7 +15552,7 @@
 	    if (typeDef.hasOwnProperty(propName)) {
 	      // use a warning instead of an invariant so components
 	      // don't show up in prod but not in __DEV__
-	       false ? warning(typeof typeDef[propName] === 'function', '%s: %s type `%s` is invalid; it must be a function, usually from ' + 'React.PropTypes.', Constructor.displayName || 'ReactClass', ReactPropTypeLocationNames[location], propName) : undefined;
+
 	    }
 	  }
 	}
@@ -16636,13 +15639,6 @@
 	          }
 	        } else {
 	          proto[name] = property;
-	          if (false) {
-	            // Add verbose displayName to the function, which helps when looking
-	            // at profiling tools.
-	            if (typeof property === 'function' && spec.displayName) {
-	              proto[name].displayName = spec.displayName + '_' + name;
-	            }
-	          }
 	        }
 	      }
 	    }
@@ -16735,35 +15731,6 @@
 	 */
 	function bindAutoBindMethod(component, method) {
 	  var boundMethod = method.bind(component);
-	  if (false) {
-	    boundMethod.__reactBoundContext = component;
-	    boundMethod.__reactBoundMethod = method;
-	    boundMethod.__reactBoundArguments = null;
-	    var componentName = component.constructor.displayName;
-	    var _bind = boundMethod.bind;
-	    /* eslint-disable block-scoped-var, no-undef */
-	    boundMethod.bind = function (newThis) {
-	      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	        args[_key - 1] = arguments[_key];
-	      }
-
-	      // User is trying to bind() an autobound method; we effectively will
-	      // ignore the value of "this" that the user is trying to use, so
-	      // let's warn.
-	      if (newThis !== component && newThis !== null) {
-	        process.env.NODE_ENV !== 'production' ? warning(false, 'bind(): React component methods may only be bound to the ' + 'component instance. See %s', componentName) : undefined;
-	      } else if (!args.length) {
-	        process.env.NODE_ENV !== 'production' ? warning(false, 'bind(): You are binding a component method to the component. ' + 'React does this for you automatically in a high-performance ' + 'way, so you can safely remove this call. See %s', componentName) : undefined;
-	        return boundMethod;
-	      }
-	      var reboundMethod = _bind.apply(boundMethod, arguments);
-	      reboundMethod.__reactBoundContext = component;
-	      reboundMethod.__reactBoundMethod = method;
-	      reboundMethod.__reactBoundArguments = args;
-	      return reboundMethod;
-	      /* eslint-enable */
-	    };
-	  }
 	  return boundMethod;
 	}
 
@@ -16818,9 +15785,6 @@
 	   * @deprecated
 	   */
 	  setProps: function (partialProps, callback) {
-	    if (false) {
-	      warnSetProps();
-	    }
 	    this.updater.enqueueSetProps(this, partialProps);
 	    if (callback) {
 	      this.updater.enqueueCallback(this, callback);
@@ -16837,9 +15801,6 @@
 	   * @deprecated
 	   */
 	  replaceProps: function (newProps, callback) {
-	    if (false) {
-	      warnSetProps();
-	    }
 	    this.updater.enqueueReplaceProps(this, newProps);
 	    if (callback) {
 	      this.updater.enqueueCallback(this, callback);
@@ -16869,9 +15830,6 @@
 	      // This constructor is overridden by mocks. The argument is used
 	      // by mocks to assert on what gets mounted.
 
-	      if (false) {
-	        process.env.NODE_ENV !== 'production' ? warning(this instanceof Constructor, 'Something is calling a React component directly. Use a factory or ' + 'JSX instead. See: https://fb.me/react-legacyfactory') : undefined;
-	      }
 
 	      // Wire up auto-binding
 	      if (this.__reactAutoBindMap) {
@@ -16889,14 +15847,6 @@
 	      // getInitialState and componentWillMount methods for initialization.
 
 	      var initialState = this.getInitialState ? this.getInitialState() : null;
-	      if (false) {
-	        // We allow auto-mocks to proceed as if they're returning null.
-	        if (typeof initialState === 'undefined' && this.getInitialState._isMockFunction) {
-	          // This is probably bad practice. Consider warning here and
-	          // deprecating this convenience.
-	          initialState = null;
-	        }
-	      }
 	      !(typeof initialState === 'object' && !Array.isArray(initialState)) ?  false ? invariant(false, '%s.getInitialState(): must return an object or null', Constructor.displayName || 'ReactCompositeComponent') : invariant(false) : undefined;
 
 	      this.state = initialState;
@@ -16913,25 +15863,9 @@
 	      Constructor.defaultProps = Constructor.getDefaultProps();
 	    }
 
-	    if (false) {
-	      // This is a tag to indicate that the use of these method names is ok,
-	      // since it's used with createClass. If it's not, then it's likely a
-	      // mistake so we'll warn you to use the static property, property
-	      // initializer or constructor respectively.
-	      if (Constructor.getDefaultProps) {
-	        Constructor.getDefaultProps.isReactClassApproved = {};
-	      }
-	      if (Constructor.prototype.getInitialState) {
-	        Constructor.prototype.getInitialState.isReactClassApproved = {};
-	      }
-	    }
 
 	    !Constructor.prototype.render ?  false ? invariant(false, 'createClass(...): Class specification must implement a `render` method.') : invariant(false) : undefined;
 
-	    if (false) {
-	      process.env.NODE_ENV !== 'production' ? warning(!Constructor.prototype.componentShouldUpdate, '%s has a method called ' + 'componentShouldUpdate(). Did you mean shouldComponentUpdate()? ' + 'The name is phrased as a question because the function is ' + 'expected to return a value.', spec.displayName || 'A component') : undefined;
-	      process.env.NODE_ENV !== 'production' ? warning(!Constructor.prototype.componentWillRecieveProps, '%s has a method called ' + 'componentWillRecieveProps(). Did you mean componentWillReceiveProps()?', spec.displayName || 'A component') : undefined;
-	    }
 
 	    // Reduce time spent doing lookups by setting these on the prototype.
 	    for (var methodName in ReactClassInterface) {
@@ -17018,9 +15952,6 @@
 	 */
 	ReactComponent.prototype.setState = function (partialState, callback) {
 	  !(typeof partialState === 'object' || typeof partialState === 'function' || partialState == null) ?  false ? invariant(false, 'setState(...): takes an object of state variables to update or a ' + 'function which returns an object of state variables.') : invariant(false) : undefined;
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(partialState != null, 'setState(...): You passed an undefined or null state object; ' + 'instead, use forceUpdate().') : undefined;
-	  }
 	  this.updater.enqueueSetState(this, partialState);
 	  if (callback) {
 	    this.updater.enqueueCallback(this, callback);
@@ -17053,30 +15984,6 @@
 	 * we would like to deprecate them, we're not going to move them over to this
 	 * modern base class. Instead, we define a getter that warns if it's accessed.
 	 */
-	if (false) {
-	  var deprecatedAPIs = {
-	    getDOMNode: ['getDOMNode', 'Use ReactDOM.findDOMNode(component) instead.'],
-	    isMounted: ['isMounted', 'Instead, make sure to clean up subscriptions and pending requests in ' + 'componentWillUnmount to prevent memory leaks.'],
-	    replaceProps: ['replaceProps', 'Instead, call render again at the top level.'],
-	    replaceState: ['replaceState', 'Refactor your code to use setState instead (see ' + 'https://github.com/facebook/react/issues/3236).'],
-	    setProps: ['setProps', 'Instead, call render again at the top level.']
-	  };
-	  var defineDeprecationWarning = function (methodName, info) {
-	    if (canDefineProperty) {
-	      Object.defineProperty(ReactComponent.prototype, methodName, {
-	        get: function () {
-	          process.env.NODE_ENV !== 'production' ? warning(false, '%s(...) is deprecated in plain JavaScript React classes. %s', info[0], info[1]) : undefined;
-	          return undefined;
-	        }
-	      });
-	    }
-	  };
-	  for (var fnName in deprecatedAPIs) {
-	    if (deprecatedAPIs.hasOwnProperty(fnName)) {
-	      defineDeprecationWarning(fnName, deprecatedAPIs[fnName]);
-	    }
-	  }
-	}
 
 	module.exports = ReactComponent;
 
@@ -17100,9 +16007,6 @@
 	var warning = __webpack_require__(25);
 
 	function warnTDZ(publicInstance, callerName) {
-	  if (false) {
-	    process.env.NODE_ENV !== 'production' ? warning(false, '%s(...): Can only update a mounted or mounting component. ' + 'This usually means you called %s() on an unmounted component. ' + 'This is a no-op. Please check the code for the %s component.', callerName, callerName, publicInstance.constructor && publicInstance.constructor.displayName || '') : undefined;
-	  }
 	}
 
 	/**
@@ -19591,11 +18495,6 @@
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
-	if (false) {
-	  createElement = ReactElementValidator.createElement;
-	  createFactory = ReactElementValidator.createFactory;
-	  cloneElement = ReactElementValidator.cloneElement;
-	}
 
 	var React = {
 
@@ -19611,7 +18510,7 @@
 
 	  Component: ReactComponent,
 
-	  createElement: createElement,
+	  makeElement: createElement,
 	  cloneElement: cloneElement,
 	  isValidElement: ReactElement.isValidElement,
 
@@ -19667,9 +18566,6 @@
 	 * @private
 	 */
 	function createDOMFactory(tag) {
-	  if (false) {
-	    return ReactElementValidator.createFactory(tag);
-	  }
 	  return ReactElement.createFactory(tag);
 	}
 
@@ -19893,7 +18789,7 @@
 	    // we already showed the warning
 	    return;
 	  }
-	   false ? warning(false, 'Each child in an array or iterator should have a unique "key" prop.' + '%s%s%s', addenda.parentOrOwner || '', addenda.childOwner || '', addenda.url || '') : undefined;
+
 	}
 
 	/**
@@ -20004,14 +18900,14 @@
 	      } catch (ex) {
 	        error = ex;
 	      }
-	       false ? warning(!error || error instanceof Error, '%s: type specification of %s `%s` is invalid; the type checker ' + 'function must return `null` or an `Error` but returned a %s. ' + 'You may have forgotten to pass an argument to the type checker ' + 'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' + 'shape all require an argument).', componentName || 'React class', ReactPropTypeLocationNames[location], propName, typeof error) : undefined;
+
 	      if (error instanceof Error && !(error.message in loggedTypeFailures)) {
 	        // Only monitor this failure once because there tends to be a lot of the
 	        // same error.
 	        loggedTypeFailures[error.message] = true;
 
 	        var addendum = getDeclarationErrorAddendum();
-	         false ? warning(false, 'Failed propType: %s%s', error.message, addendum) : undefined;
+
 	      }
 	    }
 	  }
@@ -20033,17 +18929,17 @@
 	    checkPropTypes(name, componentClass.propTypes, element.props, ReactPropTypeLocations.prop);
 	  }
 	  if (typeof componentClass.getDefaultProps === 'function') {
-	     false ? warning(componentClass.getDefaultProps.isReactClassApproved, 'getDefaultProps is only used on classic React.createClass ' + 'definitions. Use a static property named `defaultProps` instead.') : undefined;
+
 	  }
 	}
 
 	var ReactElementValidator = {
 
-	  createElement: function (type, props, children) {
+	  makeElement: function (type, props, children) {
 	    var validType = typeof type === 'string' || typeof type === 'function';
 	    // We warn in this case but don't throw. We expect the element creation to
 	    // succeed and there will likely be errors in render.
-	     false ? warning(validType, 'React.createElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : undefined;
+
 
 	    var element = ReactElement.createElement.apply(this, arguments);
 
@@ -20074,20 +18970,6 @@
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
-	    if (false) {
-	      if (canDefineProperty) {
-	        Object.defineProperty(validatedFactory, 'type', {
-	          enumerable: false,
-	          get: function () {
-	            process.env.NODE_ENV !== 'production' ? warning(false, 'Factory.type is deprecated. Access the class directly ' + 'before passing it to createFactory.') : undefined;
-	            Object.defineProperty(this, 'type', {
-	              value: type
-	            });
-	            return type;
-	          }
-	        });
-	      }
-	    }
 
 	    return validatedFactory;
 	  },
@@ -20232,20 +19114,6 @@
 	 */
 	function deprecated(fnName, newModule, newPackage, ctx, fn) {
 	  var warned = false;
-	  if (false) {
-	    var newFn = function () {
-	      process.env.NODE_ENV !== 'production' ? warning(warned,
-	      // Require examples in this string must be split to prevent React's
-	      // build tools from mistaking them for real requires.
-	      // Otherwise the build tools will attempt to build a '%s' module.
-	      'React.%s is deprecated. Please use %s.%s from require' + '(\'%s\') ' + 'instead.', fnName, newModule, fnName, newPackage) : undefined;
-	      warned = true;
-	      return fn.apply(ctx, arguments);
-	    };
-	    // We need to make sure all properties of the original fn are copied over.
-	    // In particular, this is needed to support PropTypes
-	    return assign(newFn, fn);
-	  }
 
 	  return fn;
 	}
@@ -20329,7 +19197,7 @@
 	        var unreadDiv = null;
 	        var isUnread = false;
 	        if (unreadCount > 0) {
-	            unreadDiv = React.createElement(
+	            unreadDiv = React.makeElement(
 	                "div",
 	                { className: "unread-messages" },
 	                unreadCount
@@ -20351,12 +19219,12 @@
 	                renderableSummary = lastMessage.getManagementMessageSummaryText();
 	            }
 
-	            lastMessageDiv = React.createElement(
+	            lastMessageDiv = React.makeElement(
 	                "div",
 	                { className: lastMsgDivClasses },
 	                renderableSummary
 	            );
-	            lastMessageDatetimeDiv = React.createElement(
+	            lastMessageDatetimeDiv = React.makeElement(
 	                "div",
 	                { className: "date-time" },
 	                unixtimeToTimeString(lastMessage.delay)
@@ -20366,10 +19234,10 @@
 
 	            var emptyMessage = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
 
-	            lastMessageDiv = React.createElement(
+	            lastMessageDiv = React.makeElement(
 	                "div",
 	                null,
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: lastMsgDivClasses },
 	                    __(emptyMessage)
@@ -20384,17 +19252,17 @@
 	            var activeCamera = null;
 
 	            if (!mediaOptions.audio) {
-	                mutedMicrophone = React.createElement("i", { className: "small-icon grey-crossed-mic" });
+	                mutedMicrophone = React.makeElement("i", { className: "small-icon grey-crossed-mic" });
 	            }
 	            if (mediaOptions.video) {
-	                activeCamera = React.createElement("i", { className: "small-icon grey-videocam" });
+	                activeCamera = React.makeElement("i", { className: "small-icon grey-videocam" });
 	            }
-	            inCallDiv = React.createElement(
+	            inCallDiv = React.makeElement(
 	                "div",
 	                { className: "call-duration" },
 	                mutedMicrophone,
 	                activeCamera,
-	                React.createElement(
+	                React.makeElement(
 	                    "span",
 	                    { className: "call-counter", "data-room-jid": chatRoom.roomJid.split("@")[0] },
 	                    secondsToTimeShort(chatRoom._currentCallCounter)
@@ -20406,14 +19274,14 @@
 
 	        var avatarMeta = generateAvatarMeta(contact.u);
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "li",
 	            { className: classString, id: id, "data-room-jid": roomShortJid, "data-jid": contactJid, onClick: this.props.onConversationClicked },
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "user-card-name conversation-name" },
 	                avatarMeta.fullName,
-	                React.createElement("span", { className: "user-card-presence " + presenceClass })
+	                React.makeElement("span", { className: "user-card-presence " + presenceClass })
 	            ),
 	            unreadDiv,
 	            inCallDiv,
@@ -20528,7 +19396,7 @@
 	                return;
 	            }
 
-	            currConvsList.push(React.createElement(ConversationsListItem, {
+	            currConvsList.push(React.makeElement(ConversationsListItem, {
 	                key: chatRoom.roomJid.split("@")[0],
 	                chatRoom: chatRoom,
 	                messages: chatRoom.messagesBuff,
@@ -20538,10 +19406,10 @@
 	                } }));
 	        });
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            { className: "conversationsList" },
-	            React.createElement(
+	            React.makeElement(
 	                "ul",
 	                { className: "conversations-pane" },
 	                currConvsList
@@ -20636,25 +19504,25 @@
 	            leftPanelStyles.width = fmconfig.leftPaneWidth;
 	        }
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            { className: "conversationsApp", key: "conversationsApp" },
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "fm-left-panel", style: leftPanelStyles },
-	                React.createElement("div", { className: "left-pane-drag-handle" }),
-	                React.createElement(
+	                React.makeElement("div", { className: "left-pane-drag-handle" }),
+	                React.makeElement(
 	                    "div",
 	                    { className: "fm-left-menu conversations" },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "nw-fm-tree-header conversations" },
-	                        React.createElement(
+	                        React.makeElement(
 	                            "span",
 	                            null,
 	                            __(l[7997])
 	                        ),
-	                        React.createElement(
+	                        React.makeElement(
 	                            ButtonsUI.Button,
 	                            {
 	                                group: "conversationsListing",
@@ -20662,7 +19530,7 @@
 	                                disabled: startChatIsDisabled,
 	                                contacts: this.props.contacts
 	                            },
-	                            React.createElement(DropdownsUI.DropdownContactsSelector, {
+	                            React.makeElement(DropdownsUI.DropdownContactsSelector, {
 	                                contacts: this.props.contacts,
 	                                megaChat: this.props.megaChat,
 	                                onClick: this.startChatClicked
@@ -20670,42 +19538,42 @@
 	                        )
 	                    )
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "fm-tree-panel manual-tree-panel-scroll-management", style: leftPanelStyles },
-	                    React.createElement(
+	                    React.makeElement(
 	                        utils.JScrollPane,
 	                        { style: leftPanelStyles },
-	                        React.createElement(
+	                        React.makeElement(
 	                            "div",
 	                            { className: "content-panel conversations" },
-	                            React.createElement(ConversationsList, { chats: this.props.megaChat.chats, megaChat: this.props.megaChat, contacts: this.props.contacts })
+	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats, megaChat: this.props.megaChat, contacts: this.props.contacts })
 	                        )
 	                    )
 	                )
 	            ),
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "fm-right-files-block" },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "fm-empty-messages hidden" },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "fm-empty-pad" },
-	                        React.createElement("div", { className: "fm-empty-messages-bg" }),
-	                        React.createElement(
+	                        React.makeElement("div", { className: "fm-empty-messages-bg" }),
+	                        React.makeElement(
 	                            "div",
 	                            { className: "fm-empty-cloud-txt" },
 	                            __(l[6870])
 	                        ),
-	                        React.createElement(
+	                        React.makeElement(
 	                            "div",
 	                            { className: "fm-not-logged-text" },
-	                            React.createElement("div", { className: "fm-not-logged-description", dangerouslySetInnerHTML: {
+	                            React.makeElement("div", { className: "fm-not-logged-description", dangerouslySetInnerHTML: {
 	                                    __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
 	                                } }),
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "fm-not-logged-button create-account" },
 	                                __(l[968])
@@ -20713,7 +19581,7 @@
 	                        )
 	                    )
 	                ),
-	                React.createElement(ConversationPanelUI.ConversationPanels, _extends({}, this.props, {
+	                React.makeElement(ConversationPanelUI.ConversationPanels, _extends({}, this.props, {
 	                    conversations: this.props.megaChat.chats
 	                }))
 	            )
@@ -20805,13 +19673,13 @@
 	        this.onResize();
 	    },
 	    render: function render() {
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            _extends({ className: this.props.className + " jScrollPaneContainer" }, this.props, { onResize: this.onResize }),
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "jspContainer" },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "jspPane" },
 	                    this.props.children
@@ -21363,10 +20231,10 @@
 
 	        var icon;
 	        if (this.props.icon) {
-	            icon = React.createElement("i", { className: "small-icon " + this.props.icon });
+	            icon = React.makeElement("i", { className: "small-icon " + this.props.icon });
 	        }
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            { className: classes, onClick: this.onClick, style: this.props.style },
 	            icon,
@@ -21479,7 +20347,7 @@
 	        if (this.props.active !== true) {
 	            classes += " hidden";
 
-	            return React.createElement("div", { className: classes });
+	            return React.makeElement("div", { className: classes });
 	        } else {
 	            var styles;
 
@@ -21491,10 +20359,10 @@
 	                };
 	            }
 
-	            return React.createElement(
+	            return React.makeElement(
 	                "div",
 	                { className: classes, style: styles },
-	                !this.props.noArrow ? React.createElement("i", { className: "dropdown-white-arrow" }) : null,
+	                !this.props.noArrow ? React.makeElement("i", { className: "dropdown-white-arrow" }) : null,
 	                this.props.children
 	            );
 	        }
@@ -21510,13 +20378,13 @@
 
 	        var self = this;
 
-	        return React.createElement(
+	        return React.makeElement(
 	            Dropdown,
 	            { className: "popup contacts-search", active: this.props.active, closeDropdown: this.props.closeDropdown, ref: "dropdown" },
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "popup contacts-search" },
-	                React.createElement(ContactsUI.ContactPickerWidget, {
+	                React.makeElement(ContactsUI.ContactPickerWidget, {
 	                    contacts: this.props.contacts,
 	                    megaChat: this.props.megaChat,
 	                    onClick: function onClick(contact, e) {
@@ -21561,7 +20429,7 @@
 
 	        var icon;
 	        if (this.props.icon) {
-	            icon = React.createElement("i", { className: "small-icon " + this.props.icon });
+	            icon = React.makeElement("i", { className: "small-icon " + this.props.icon });
 	        }
 	        var label;
 	        if (this.props.label) {
@@ -21570,13 +20438,13 @@
 
 	        var child = null;
 
-	        child = React.createElement(
+	        child = React.makeElement(
 	            "div",
 	            null,
 	            self.renderChildren()
 	        );
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            {
 	                className: "dropdown-item " + self.props.className,
@@ -21693,11 +20561,11 @@
 	                    txt = slug;
 	                }
 
-	                preview = React.createElement(
+	                preview = React.makeElement(
 	                    "div",
 	                    { className: "emoji-one-preview" },
-	                    React.createElement("span", { className: "emoji-one demo-icon emojione-" + emojiMeta[0] }),
-	                    React.createElement(
+	                    React.makeElement("span", { className: "emoji-one demo-icon emojione-" + emojiMeta[0] }),
+	                    React.makeElement(
 	                        "div",
 	                        { className: "emoji-one title" },
 	                        txt
@@ -21724,7 +20592,7 @@
 	                    var meta = EMOJILIST.EMOJIS[slug];
 
 	                    if (visibleEmojis.indexOf(slug) > -1) {
-	                        curCategoryEmojis.push(React.createElement(
+	                        curCategoryEmojis.push(React.makeElement(
 	                            "div",
 	                            {
 	                                "data-emoji": slug,
@@ -21756,7 +20624,7 @@
 	                                    }
 	                                }
 	                            },
-	                            React.createElement(
+	                            React.makeElement(
 	                                "span",
 	                                {
 	                                    className: "emojione-" + meta[0],
@@ -21765,7 +20633,7 @@
 	                            )
 	                        ));
 	                    } else {
-	                        curCategoryEmojis.push(React.createElement("div", {
+	                        curCategoryEmojis.push(React.makeElement("div", {
 	                            "data-emoji": slug,
 	                            className: "button square-button emoji-one placeholder",
 	                            key: categoryName + "_" + slug + "_pl"
@@ -21774,18 +20642,18 @@
 	                });
 
 	                if (curCategoryEmojis.length > 0) {
-	                    emojis.push(React.createElement(
+	                    emojis.push(React.makeElement(
 	                        "div",
 	                        { key: categoryName, "data-category-name": categoryName, className: "emoji-category-container" },
-	                        emojis.length > 0 ? React.createElement("div", { className: "clear" }) : null,
-	                        React.createElement(
+	                        emojis.length > 0 ? React.makeElement("div", { className: "clear" }) : null,
+	                        React.makeElement(
 	                            "div",
 	                            { className: "emoji-type-txt" },
 	                            categoryTranslations[categoryName] ? categoryTranslations[categoryName] : categoryName
 	                        ),
-	                        React.createElement("div", { className: "clear" }),
+	                        React.makeElement("div", { className: "clear" }),
 	                        curCategoryEmojis,
-	                        React.createElement("div", { className: "clear" })
+	                        React.makeElement("div", { className: "clear" })
 	                    ));
 	                }
 	            });
@@ -21809,7 +20677,7 @@
 	                    activeClass = " active";
 	                }
 
-	                categoryButtons.push(React.createElement(
+	                categoryButtons.push(React.makeElement(
 	                    "div",
 	                    {
 	                        className: "button square-button emoji-one" + activeClass,
@@ -21822,41 +20690,41 @@
 	                            $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollToElement($('.emoji-category-container[data-category-name="' + categoryName + '"]:visible'), true, true);
 	                        }
 	                    },
-	                    React.createElement("i", { className: "small-icon " + categoryIcons[categoryName] })
+	                    React.makeElement("i", { className: "small-icon " + categoryIcons[categoryName] })
 	                ));
 	            });
 
-	            popupContents = React.createElement(
+	            popupContents = React.makeElement(
 	                "div",
 	                null,
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "popup-header emoji-one" },
-	                    preview ? preview : React.createElement(
+	                    preview ? preview : React.makeElement(
 	                        "div",
 	                        { className: "search-block emoji-one" },
-	                        React.createElement("i", { className: "small-icon search-icon" }),
-	                        React.createElement("input", { type: "search",
+	                        React.makeElement("i", { className: "small-icon search-icon" }),
+	                        React.makeElement("input", { type: "search",
 	                            placeholder: __(l[102]),
 	                            ref: "emojiSearchField",
 	                            onChange: this.onSearchChange,
 	                            value: this.state.searchValue })
 	                    )
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    utils.JScrollPane,
 	                    {
 	                        className: "popup-scroll-area emoji-one",
 	                        searchValue: this.state.searchValue,
 	                        browsingCategory: this.state.browsingCategory
 	                    },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "popup-scroll-content emoji-one" },
 	                        emojis
 	                    )
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "popup-footer emoji-one" },
 	                    categoryButtons
@@ -21866,7 +20734,7 @@
 	            popupContents = null;
 	        }
 
-	        return React.createElement(
+	        return React.makeElement(
 	            Dropdown,
 	            _extends({ className: "popup emoji-one" }, self.props, { ref: "dropdown", onActiveChange: function onActiveChange(newValue) {
 
@@ -21910,19 +20778,19 @@
 
 	        classString += " " + this.props.megaChat.xmppPresenceToCssClass(contact.presence);
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            null,
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: classString, onClick: this.props.onContactClicked },
-	                React.createElement("div", { className: "nw-contact-status" }),
-	                React.createElement(
+	                React.makeElement("div", { className: "nw-contact-status" }),
+	                React.makeElement(
 	                    "div",
 	                    { className: "nw-conversations-unread" },
 	                    "0"
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "nw-conversations-name" },
 	                    M.getNameByHandle(contact.u)
@@ -21945,7 +20813,7 @@
 
 	        if (u_authring && u_authring.Ed25519) {
 	            var verifyState = u_authring.Ed25519[contact.u] || {};
-	            verifiedElement = verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ? React.createElement("div", { className: "user-card-verified " + this.props.className }) : null;
+	            verifiedElement = verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ? React.makeElement("div", { className: "user-card-verified " + this.props.className }) : null;
 	        } else {
 	            var self = this;
 
@@ -21968,7 +20836,7 @@
 	        var contact = this.props.contact;
 	        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
 
-	        return React.createElement("div", { className: "user-card-presence " + pres + " " + this.props.className });
+	        return React.makeElement("div", { className: "user-card-presence " + pres + " " + this.props.className });
 	    }
 	});
 
@@ -21997,7 +20865,7 @@
 	        var verifiedElement = null;
 
 	        if (!this.props.hideVerifiedBadge) {
-	            verifiedElement = React.createElement(ContactVerified, { contact: this.props.contact, className: this.props.verifiedClassName });
+	            verifiedElement = React.makeElement(ContactVerified, { contact: this.props.contact, className: this.props.verifiedClassName });
 	        }
 
 	        if (!avatars[contact.u] && !_noAvatars[contact.u]) {
@@ -22009,22 +20877,22 @@
 	        }
 
 	        if ($avatar.find("img").length > 0) {
-	            displayedAvatar = React.createElement(
+	            displayedAvatar = React.makeElement(
 	                "div",
 	                { className: classes, style: this.props.style },
 	                verifiedElement,
-	                React.createElement("img", { src: $("img", $avatar).attr("src"), style: this.props.imgStyles })
+	                React.makeElement("img", { src: $("img", $avatar).attr("src"), style: this.props.imgStyles })
 	            );
 	        } else {
 	            var tempClasses = $avatar.attr('class');
 	            var colorNum = tempClasses.split("color")[1].split(" ")[0];
 	            classes += " color" + colorNum;
 
-	            displayedAvatar = React.createElement(
+	            displayedAvatar = React.makeElement(
 	                "div",
 	                { className: classes, style: this.props.style },
 	                verifiedElement,
-	                React.createElement("div", { className: letterClass, "data-user-letter": $(useravatar.contact(contact)).text() })
+	                React.makeElement("div", { className: letterClass, "data-user-letter": $(useravatar.contact(contact)).text() })
 	            );
 	        }
 
@@ -22052,18 +20920,18 @@
 	            var moreDropdowns = [];
 
 	            if (window.location.hash != '#fm/chat/' + contact.u) {
-	                moreDropdowns.push(React.createElement(DropdownsUI.DropdownItem, {
+	                moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                    key: "start_conv_" + contact.u,
 	                    icon: "conversations", label: __("Open/start Chat"), onClick: function onClick() {
 	                        window.location = '#fm/chat/' + contact.u;
 	                    } }));
 	            }
-	            contextMenu = React.createElement(
+	            contextMenu = React.makeElement(
 	                ButtonsUI.Button,
 	                {
 	                    className: "default-white-button tiny-button",
 	                    icon: "tiny-icon grey-down-arrow" },
-	                React.createElement(
+	                React.makeElement(
 	                    DropdownsUI.Dropdown,
 	                    { className: "contact-card-dropdown",
 	                        positionMy: "right top",
@@ -22071,7 +20939,7 @@
 	                        vertOffset: 4,
 	                        noArrow: true
 	                    },
-	                    React.createElement(DropdownsUI.DropdownItem, { icon: "human-profile", label: __("View Profile"), onClick: function onClick() {
+	                    React.makeElement(DropdownsUI.DropdownItem, { icon: "human-profile", label: __("View Profile"), onClick: function onClick() {
 	                            window.location = '#fm/' + contact.u;
 	                        } }),
 	                    moreDropdowns
@@ -22079,7 +20947,7 @@
 	            );
 	        }
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            {
 	                className: "contacts-info body " + (pres === "offline" ? "offline" : "") + (this.props.className ? " " + this.props.className : ""),
@@ -22089,18 +20957,18 @@
 	                    }
 	                }
 	            },
-	            React.createElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
-	            React.createElement(Avatar, { contact: contact, className: "small-rounded-avatar" }),
+	            React.makeElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
+	            React.makeElement(Avatar, { contact: contact, className: "small-rounded-avatar" }),
 	            contextMenu,
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "user-card-data" },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "user-card-name" },
 	                    M.getNameByHandle(contact.u)
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "user-card-email" },
 	                    contact.m
@@ -22152,7 +21020,7 @@
 	            if (self.props.selected && self.props.selected.indexOf(v.h) !== -1) {
 	                selectedClass = "selected";
 	            }
-	            contacts.push(React.createElement(ContactCard, {
+	            contacts.push(React.makeElement(ContactCard, {
 	                contact: v,
 	                className: "contacts-search " + selectedClass,
 	                onClick: function onClick(contact, e) {
@@ -22165,14 +21033,14 @@
 	            }));
 	        });
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            null,
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "contacts-search-header " + this.props.headerClasses },
-	                React.createElement("i", { className: "small-icon search-icon" }),
-	                React.createElement("input", {
+	                React.makeElement("i", { className: "small-icon search-icon" }),
+	                React.makeElement("input", {
 	                    type: "search",
 	                    placeholder: __(l[8010]),
 	                    ref: "contactSearchField",
@@ -22180,10 +21048,10 @@
 	                    value: this.state.searchValue
 	                })
 	            ),
-	            React.createElement(
+	            React.makeElement(
 	                utils.JScrollPane,
 	                { className: "contacts-search-scroll" },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    null,
 	                    contacts
@@ -23233,33 +22101,33 @@
 	                        message.sending = false;
 	                        additionalClasses += " not-sent";
 
-	                        buttonsBlock = React.createElement(
+	                        buttonsBlock = React.makeElement(
 	                            "div",
 	                            { className: "buttons-block" },
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "message circuit-label left" },
 	                                __(l[8003])
 	                            ),
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "default-white-button right", onClick: function onClick(e) {
 	                                        self.doRetry(e, message);
 	                                    } },
 	                                __(l[1364])
 	                            ),
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "default-white-button right red", onClick: function onClick(e) {
 	                                        self.doDelete(e, message);
 	                                    } },
 	                                __(l[8004])
 	                            ),
-	                            React.createElement("div", { className: "clear" })
+	                            React.makeElement("div", { className: "clear" })
 	                        );
 	                    } else {
 	                        additionalClasses += " sending";
-	                        spinnerElement = React.createElement("div", { className: "small-blue-spinner" });
+	                        spinnerElement = React.makeElement("div", { className: "small-blue-spinner" });
 
 	                        if (!message.sending) {
 	                            message.sending = true;
@@ -23354,21 +22222,21 @@
 	                                    v.delay = message.delay;
 	                                    chatRoom.images.push(v);
 	                                }
-	                                previewButtons = React.createElement(
+	                                previewButtons = React.makeElement(
 	                                    "span",
 	                                    null,
-	                                    React.createElement(DropdownsUI.DropdownItem, { icon: "search-icon", label: __(l[1899]),
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: "search-icon", label: __(l[1899]),
 	                                        onClick: startPreview }),
-	                                    React.createElement("hr", null)
+	                                    React.makeElement("hr", null)
 	                                );
 	                            }
 	                            if (contact.u === u_handle) {
-	                                dropdown = React.createElement(
+	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
 	                                        className: "default-white-button tiny-button",
 	                                        icon: "tiny-icon grey-down-arrow" },
-	                                    React.createElement(
+	                                    React.makeElement(
 	                                        DropdownsUI.Dropdown,
 	                                        {
 	                                            className: "white-context-menu attachments-dropdown",
@@ -23378,51 +22246,51 @@
 	                                            horizOffset: 4
 	                                        },
 	                                        previewButtons,
-	                                        React.createElement(DropdownsUI.DropdownItem, { icon: "rounded-grey-down-arrow", label: __(l[1187]),
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "rounded-grey-down-arrow", label: __(l[1187]),
 	                                            onClick: startDownload }),
-	                                        React.createElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8005]),
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8005]),
 	                                            onClick: addToCloudDrive }),
-	                                        React.createElement("hr", null),
-	                                        React.createElement(DropdownsUI.DropdownItem, { icon: "red-cross", label: __("Revoke"), className: "red",
+	                                        React.makeElement("hr", null),
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "red-cross", label: __("Revoke"), className: "red",
 	                                            onClick: function onClick() {
 	                                                chatRoom.revokeAttachment(v);
 	                                            } })
 	                                    )
 	                                );
 	                            } else {
-	                                dropdown = React.createElement(
+	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
 	                                        className: "default-white-button tiny-button",
 	                                        icon: "tiny-icon grey-down-arrow" },
-	                                    React.createElement(
+	                                    React.makeElement(
 	                                        DropdownsUI.Dropdown,
 	                                        {
 	                                            className: "attachments-dropdown"
 	                                        },
 	                                        previewButtons,
-	                                        React.createElement(DropdownsUI.DropdownItem, { icon: "rounded-grey-down-arrow", label: __(l[1187]),
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "rounded-grey-down-arrow", label: __(l[1187]),
 	                                            onClick: startDownload }),
-	                                        React.createElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8005]),
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8005]),
 	                                            onClick: addToCloudDrive })
 	                                    )
 	                                );
 	                            }
 	                        } else {
-	                            dropdown = React.createElement(ButtonsUI.Button, {
+	                            dropdown = React.makeElement(ButtonsUI.Button, {
 	                                className: "default-white-button tiny-button disabled",
 	                                icon: "tiny-icon grey-down-arrow" });
 	                        }
 
 	                        var attachmentClasses = "message shared-data";
-	                        var preview = React.createElement(
+	                        var preview = React.makeElement(
 	                            "div",
 	                            { className: "data-block-view medium" },
 	                            dropdown,
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "data-block-bg" },
-	                                React.createElement("div", { className: "block-view-file-type " + icon })
+	                                React.makeElement("div", { className: "block-view-file-type " + icon })
 	                            )
 	                        );
 
@@ -23442,17 +22310,17 @@
 	                                    src = window.noThumbURI || '';
 	                                }
 
-	                                preview = src ? React.createElement(
+	                                preview = src ? React.makeElement(
 	                                    "div",
 	                                    { id: v.h, className: "shared-link img-block" },
-	                                    React.createElement("div", { className: "img-overlay", onClick: startPreview }),
-	                                    React.createElement(
+	                                    React.makeElement("div", { className: "img-overlay", onClick: startPreview }),
+	                                    React.makeElement(
 	                                        "div",
 	                                        { className: "button overlay-button", onClick: startPreview },
-	                                        React.createElement("i", { className: "huge-white-icon loupe" })
+	                                        React.makeElement("i", { className: "huge-white-icon loupe" })
 	                                    ),
 	                                    dropdown,
-	                                    React.createElement("img", { alt: "", className: "thumbnail-placeholder " + v.h, src: src,
+	                                    React.makeElement("img", { alt: "", className: "thumbnail-placeholder " + v.h, src: src,
 	                                        width: "120",
 	                                        height: "120",
 	                                        onClick: startPreview
@@ -23461,25 +22329,25 @@
 	                            }
 	                        }
 
-	                        files.push(React.createElement(
+	                        files.push(React.makeElement(
 	                            "div",
 	                            { className: attachmentClasses, key: v.h },
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "message shared-info" },
-	                                React.createElement(
+	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
 	                                    v.name
 	                                ),
-	                                React.createElement(
+	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message file-size" },
 	                                    bytesToSize(v.s)
 	                                )
 	                            ),
 	                            preview,
-	                            React.createElement("div", { className: "clear" })
+	                            React.makeElement("div", { className: "clear" })
 	                        ));
 	                    });
 
@@ -23489,30 +22357,30 @@
 	                    if (this.props.grouped) {
 	                        additionalClasses += " grouped";
 	                    } else {
-	                        avatar = React.createElement(ContactsUI.Avatar, { contact: contact, className: "message small-rounded-avatar" });
-	                        datetime = React.createElement(
+	                        avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: "message small-rounded-avatar" });
+	                        datetime = React.makeElement(
 	                            "div",
 	                            { className: "message date-time",
 	                                title: time2date(timestampInt) },
 	                            timestamp
 	                        );
-	                        name = React.createElement(
+	                        name = React.makeElement(
 	                            "div",
 	                            { className: "message user-card-name" },
 	                            displayName
 	                        );
 	                    }
 
-	                    return React.createElement(
+	                    return React.makeElement(
 	                        "div",
 	                        { className: message.messageId + " message body" + additionalClasses },
 	                        avatar,
-	                        React.createElement(
+	                        React.makeElement(
 	                            "div",
 	                            { className: "message content-area" },
 	                            name,
 	                            datetime,
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "message shared-block" },
 	                                files
@@ -23539,7 +22407,7 @@
 	                        var deleteButtonOptional = null;
 
 	                        if (message.userId === u_handle) {
-	                            deleteButtonOptional = React.createElement(DropdownsUI.DropdownItem, {
+	                            deleteButtonOptional = React.makeElement(DropdownsUI.DropdownItem, {
 	                                icon: "red-cross",
 	                                label: __(l[1730]),
 	                                className: "red",
@@ -23560,12 +22428,12 @@
 	                        if (M.u[contact.u]) {
 
 	                            if (M.u[contact.u].c === 1) {
-	                                dropdown = React.createElement(
+	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
 	                                        className: "default-white-button tiny-button",
 	                                        icon: "tiny-icon grey-down-arrow" },
-	                                    React.createElement(
+	                                    React.makeElement(
 	                                        DropdownsUI.Dropdown,
 	                                        {
 	                                            className: "white-context-menu shared-contact-dropdown",
@@ -23574,33 +22442,33 @@
 	                                            positionAt: "right bottom",
 	                                            horizOffset: 4
 	                                        },
-	                                        React.createElement(DropdownsUI.DropdownItem, {
+	                                        React.makeElement(DropdownsUI.DropdownItem, {
 	                                            icon: "human-profile",
 	                                            label: __(l[5868]),
 	                                            onClick: function onClick() {
 	                                                window.location = "#fm/" + contact.u;
 	                                            }
 	                                        }),
-	                                        React.createElement("hr", null),
+	                                        React.makeElement("hr", null),
 	                                        null,
-	                                        React.createElement(DropdownsUI.DropdownItem, {
+	                                        React.makeElement(DropdownsUI.DropdownItem, {
 	                                            icon: "conversations",
 	                                            label: __(l[8632]),
 	                                            onClick: function onClick() {
 	                                                window.location = "#fm/chat/" + contact.u;
 	                                            }
 	                                        }),
-	                                        deleteButtonOptional ? React.createElement("hr", null) : null,
+	                                        deleteButtonOptional ? React.makeElement("hr", null) : null,
 	                                        deleteButtonOptional
 	                                    )
 	                                );
 	                            } else if (M.u[contact.u].c === 0) {
-	                                dropdown = React.createElement(
+	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
 	                                        className: "default-white-button tiny-button",
 	                                        icon: "tiny-icon grey-down-arrow" },
-	                                    React.createElement(
+	                                    React.makeElement(
 	                                        DropdownsUI.Dropdown,
 	                                        {
 	                                            className: "white-context-menu shared-contact-dropdown",
@@ -23609,7 +22477,7 @@
 	                                            positionAt: "right bottom",
 	                                            horizOffset: 4
 	                                        },
-	                                        React.createElement(DropdownsUI.DropdownItem, {
+	                                        React.makeElement(DropdownsUI.DropdownItem, {
 	                                            icon: "rounded-grey-plus",
 	                                            label: __("Add contact"),
 	                                            onClick: function onClick() {
@@ -23623,46 +22491,46 @@
 	                                                msgDialog('info', title, msg);
 	                                            }
 	                                        }),
-	                                        deleteButtonOptional ? React.createElement("hr", null) : null,
+	                                        deleteButtonOptional ? React.makeElement("hr", null) : null,
 	                                        deleteButtonOptional
 	                                    )
 	                                );
 	                            }
 	                        }
 
-	                        contacts.push(React.createElement(
+	                        contacts.push(React.makeElement(
 	                            "div",
 	                            { key: contact.u },
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "message shared-info" },
-	                                React.createElement(
+	                                React.makeElement(
 	                                    "div",
 	                                    { className: "message data-title" },
 	                                    M.getNameByHandle(contact.u)
 	                                ),
-	                                M.u[contact.u] ? React.createElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
-	                                React.createElement(
+	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: "big", contact: contact }) : null,
+	                                React.makeElement(
 	                                    "div",
 	                                    { className: "user-card-email" },
 	                                    contactEmail
 	                                )
 	                            ),
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "message shared-data" },
-	                                React.createElement(
+	                                React.makeElement(
 	                                    "div",
 	                                    { className: "data-block-view medium" },
-	                                    M.u[contact.u] ? React.createElement(ContactsUI.ContactPresence, { className: "big", contact: contact }) : null,
+	                                    M.u[contact.u] ? React.makeElement(ContactsUI.ContactPresence, { className: "big", contact: contact }) : null,
 	                                    dropdown,
-	                                    React.createElement(
+	                                    React.makeElement(
 	                                        "div",
 	                                        { className: "data-block-bg" },
-	                                        React.createElement(ContactsUI.Avatar, { className: "medium-avatar share", contact: contact })
+	                                        React.makeElement(ContactsUI.Avatar, { className: "medium-avatar share", contact: contact })
 	                                    )
 	                                ),
-	                                React.createElement("div", { className: "clear" })
+	                                React.makeElement("div", { className: "clear" })
 	                            )
 	                        ));
 	                    });
@@ -23673,30 +22541,30 @@
 	                    if (this.props.grouped) {
 	                        additionalClasses += " grouped";
 	                    } else {
-	                        avatar = React.createElement(ContactsUI.Avatar, { contact: contact, className: "message small-rounded-avatar" });
-	                        datetime = React.createElement(
+	                        avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: "message small-rounded-avatar" });
+	                        datetime = React.makeElement(
 	                            "div",
 	                            { className: "message date-time",
 	                                title: time2date(timestampInt) },
 	                            timestamp
 	                        );
-	                        name = React.createElement(
+	                        name = React.makeElement(
 	                            "div",
 	                            { className: "message user-card-name" },
 	                            displayName
 	                        );
 	                    }
 
-	                    return React.createElement(
+	                    return React.makeElement(
 	                        "div",
 	                        { className: message.messageId + " message body" + additionalClasses },
 	                        avatar,
-	                        React.createElement(
+	                        React.makeElement(
 	                            "div",
 	                            { className: "message content-area" },
 	                            name,
 	                            datetime,
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "message shared-block" },
 	                                contacts
@@ -23753,14 +22621,14 @@
 	                if (this.props.grouped) {
 	                    additionalClasses += " grouped";
 	                } else {
-	                    avatar = React.createElement(ContactsUI.Avatar, { contact: contact, className: "message small-rounded-avatar" });
-	                    datetime = React.createElement(
+	                    avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: "message small-rounded-avatar" });
+	                    datetime = React.makeElement(
 	                        "div",
 	                        { className: "message date-time",
 	                            title: time2date(timestampInt) },
 	                        timestamp
 	                    );
-	                    name = React.createElement(
+	                    name = React.makeElement(
 	                        "div",
 	                        { className: "message user-card-name" },
 	                        displayName
@@ -23769,7 +22637,7 @@
 
 	                var messageDisplayBlock;
 	                if (self.props.isBeingEdited === true) {
-	                    messageDisplayBlock = React.createElement(TypingAreaUI.TypingArea, {
+	                    messageDisplayBlock = React.makeElement(TypingAreaUI.TypingArea, {
 	                        iconClass: "small-icon writing-pen textarea-icon",
 	                        initialText: message.textContents,
 	                        chatRoom: self.props.chatRoom,
@@ -23785,14 +22653,14 @@
 	                        }
 	                    });
 	                } else {
-	                    messageDisplayBlock = React.createElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: textMessage } });
+	                    messageDisplayBlock = React.makeElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: textMessage } });
 	                }
 
-	                return React.createElement(
+	                return React.makeElement(
 	                    "div",
 	                    { className: message.messageId + " message body " + additionalClasses },
 	                    avatar,
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "message content-area" },
 	                        name,
@@ -23865,9 +22733,9 @@
 	                    var classes = button.classes;
 	                    var icon;
 	                    if (button.icon) {
-	                        icon = React.createElement("i", { className: "small-icon " + button.icon });
+	                        icon = React.makeElement("i", { className: "small-icon " + button.icon });
 	                    }
-	                    buttons.push(React.createElement(
+	                    buttons.push(React.makeElement(
 	                        "div",
 	                        { className: classes, key: k, onClick: function onClick() {
 	                                button.callback();
@@ -23880,31 +22748,31 @@
 
 	            var buttonsCode;
 	            if (buttons.length > 0) {
-	                buttonsCode = React.createElement(
+	                buttonsCode = React.makeElement(
 	                    "div",
 	                    { className: "buttons-block" },
 	                    buttons,
-	                    React.createElement("div", { className: "clear" })
+	                    React.makeElement("div", { className: "clear" })
 	                );
 	            }
 
-	            return React.createElement(
+	            return React.makeElement(
 	                "div",
 	                { className: "message body", "data-id": "id" + message.messageId },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "feedback round-icon-block" },
-	                    React.createElement("i", { className: "round-icon " + message.cssClass })
+	                    React.makeElement("i", { className: "round-icon " + message.cssClass })
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "message content-area" },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "message date-time" },
 	                        timestamp
 	                    ),
-	                    React.createElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: textMessage } }),
+	                    React.makeElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: textMessage } }),
 	                    buttonsCode
 	                )
 	            );
@@ -23926,29 +22794,29 @@
 
 	            return null;
 	        }
-	        var startAudioCallButton = React.createElement(
+	        var startAudioCallButton = React.makeElement(
 	            "div",
 	            { className: "link-button" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
 	                    if (contact.presence && contact.presence !== "offline") {
 	                        room.startAudioCall();
 	                    }
 	                } },
-	            React.createElement("i", { className: "small-icon audio-call" }),
+	            React.makeElement("i", { className: "small-icon audio-call" }),
 	            __(l[5896])
 	        );
 
-	        var startVideoCallButton = React.createElement(
+	        var startVideoCallButton = React.makeElement(
 	            "div",
 	            { className: "link-button" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
 	                    if (contact.presence && contact.presence !== "offline") {
 	                        room.startVideoCall();
 	                    }
 	                } },
-	            React.createElement("i", { className: "small-icon video-call" }),
+	            React.makeElement("i", { className: "small-icon video-call" }),
 	            __(l[5897])
 	        );
 
-	        var endCallButton = React.createElement(
+	        var endCallButton = React.makeElement(
 	            "div",
 	            { className: "link-button red" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
 	                    if (contact.presence && contact.presence !== "offline") {
@@ -23957,7 +22825,7 @@
 	                        }
 	                    }
 	                } },
-	            React.createElement("i", { className: "small-icon horizontal-red-handset" }),
+	            React.makeElement("i", { className: "small-icon horizontal-red-handset" }),
 	            __(l[5884])
 	        );
 
@@ -23967,36 +22835,36 @@
 	            endCallButton = null;
 	        }
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            { className: "chat-right-area" },
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "chat-right-area conversation-details-scroll" },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "chat-right-pad" },
-	                    React.createElement(ContactsUI.ContactCard, {
+	                    React.makeElement(ContactsUI.ContactCard, {
 	                        contact: contact,
 	                        megaChat: room.megaChat,
 	                        className: "right-chat-contact-card",
 	                        dropdownPositionMy: "right top",
 	                        dropdownPositionAt: "right bottom"
 	                    }),
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "buttons-block" },
 	                        startAudioCallButton,
 	                        startVideoCallButton,
 	                        null,
-	                        React.createElement(
+	                        React.makeElement(
 	                            ButtonsUI.Button,
 	                            {
 	                                className: "link-button dropdown-element",
 	                                icon: "rounded-grey-up-arrow",
 	                                label: __(l[6834] + "...")
 	                            },
-	                            React.createElement(
+	                            React.makeElement(
 	                                DropdownsUI.Dropdown,
 	                                {
 	                                    contacts: this.props.contacts,
@@ -24004,21 +22872,21 @@
 	                                    className: "wide-dropdown send-files-selector",
 	                                    onClick: function onClick() {}
 	                                },
-	                                React.createElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8013]), onClick: function onClick() {
+	                                React.makeElement(DropdownsUI.DropdownItem, { icon: "grey-cloud", label: __(l[8013]), onClick: function onClick() {
 	                                        self.props.onAttachFromCloudClicked();
 	                                    } }),
-	                                React.createElement(DropdownsUI.DropdownItem, { icon: "grey-computer", label: __(l[8014]), onClick: function onClick() {
+	                                React.makeElement(DropdownsUI.DropdownItem, { icon: "grey-computer", label: __(l[8014]), onClick: function onClick() {
 	                                        self.props.onAttachFromComputerClicked();
 	                                    } })
 	                            )
 	                        ),
 	                        endCallButton,
-	                        room.type !== "private" ? React.createElement(
+	                        room.type !== "private" ? React.makeElement(
 	                            "div",
 	                            { className: "link-button red", onClick: function onClick() {
 	                                    room.leaveChat(true);
 	                                } },
-	                            React.createElement("i", { className: "small-icon rounded-stop" }),
+	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            __(l[8633])
 	                        ) : null
 	                    )
@@ -24225,7 +23093,7 @@
 	        var remoteCamEnabled = null;
 
 	        if (callSession.getRemoteMediaOptions().video) {
-	            remoteCamEnabled = React.createElement("i", { className: "small-icon blue-videocam" });
+	            remoteCamEnabled = React.makeElement("i", { className: "small-icon blue-videocam" });
 	        }
 
 	        var localPlayerElement = null;
@@ -24237,15 +23105,15 @@
 	            visiblePanelClass += " visible-panel";
 	        }
 	        if (callSession.getMediaOptions().video === false) {
-	            localPlayerElement = React.createElement(
+	            localPlayerElement = React.makeElement(
 	                "div",
 	                { className: "call local-audio right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "default-white-button tiny-button call", onClick: this.toggleLocalVideoDisplay },
-	                    React.createElement("i", { className: "tiny-icon grey-minus-icon" })
+	                    React.makeElement("i", { className: "tiny-icon grey-minus-icon" })
 	                ),
-	                React.createElement(ContactsUI.Avatar, {
+	                React.makeElement(ContactsUI.Avatar, {
 	                    contact: M.u[u_handle], className: "call semi-big-avatar",
 	                    style: { display: !this.state.localMediaDisplay ? "none" : "" }
 	                })
@@ -24268,16 +23136,16 @@
 	                        console.error("Could not retrieve src object.");
 	                    }
 	                }
-	                localPlayerElement = React.createElement(
+	                localPlayerElement = React.makeElement(
 	                    "div",
 	                    {
 	                        className: "call local-video right-aligned bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "default-white-button tiny-button call", onClick: this.toggleLocalVideoDisplay },
-	                        React.createElement("i", { className: "tiny-icon grey-minus-icon" })
+	                        React.makeElement("i", { className: "tiny-icon grey-minus-icon" })
 	                    ),
-	                    React.createElement("video", {
+	                    React.makeElement("video", {
 	                        className: "localViewport",
 	                        defaultMuted: true,
 	                        muted: true,
@@ -24293,10 +23161,10 @@
 
 	        if (callSession.getRemoteMediaOptions().video === false || !callSession.remotePlayer) {
 	            var contact = chatRoom.megaChat.getContactFromJid(participants[0]);
-	            remotePlayerElement = React.createElement(
+	            remotePlayerElement = React.makeElement(
 	                "div",
 	                { className: "call user-audio" },
-	                React.createElement(ContactsUI.Avatar, { contact: contact, className: "big-avatar", hideVerifiedBadge: true })
+	                React.makeElement(ContactsUI.Avatar, { contact: contact, className: "big-avatar", hideVerifiedBadge: true })
 	            );
 	        } else {
 	            var remotePlayer = callSession.remotePlayer[0];
@@ -24315,10 +23183,10 @@
 	                }
 	            }
 
-	            remotePlayerElement = React.createElement(
+	            remotePlayerElement = React.makeElement(
 	                "div",
 	                { className: "call user-video" },
-	                React.createElement("video", {
+	                React.makeElement("video", {
 	                    autoPlay: true,
 	                    className: "rmtViewport rmtVideo",
 	                    id: "remotevideo_" + callSession.sid,
@@ -24331,7 +23199,7 @@
 	        var unreadDiv = null;
 	        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
 	        if (unreadCount > 0) {
-	            unreadDiv = React.createElement(
+	            unreadDiv = React.makeElement(
 	                "div",
 	                { className: "unread-messages" },
 	                unreadCount
@@ -24343,25 +23211,25 @@
 	        if (additionalClass.length === 0) {
 	            additionalClass = this.state.messagesBlockEnabled === true ? " small-block" : "";
 	        }
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            { className: "call-block" + additionalClass, id: "call-block" },
 	            remotePlayerElement,
 	            localPlayerElement,
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "call top-panel" },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "call top-user-info" },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "span",
 	                        { className: "user-card-name white" },
 	                        displayNames.join(", ")
 	                    ),
 	                    remoteCamEnabled
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    {
 	                        className: "call-duration medium blue call-counter",
@@ -24369,16 +23237,16 @@
 	                    secondsToTimeShort(chatRoom._currentCallCounter)
 	                )
 	            ),
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "call bottom-panel" },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "button call left" + (unreadDiv ? " unread" : ""), onClick: this.toggleMessages },
 	                    unreadDiv,
-	                    React.createElement("i", { className: "big-icon conversations" })
+	                    React.makeElement("i", { className: "big-icon conversations" })
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "button call", onClick: function onClick(e) {
 	                            if (callSession.getMediaOptions().audio === true) {
@@ -24387,9 +23255,9 @@
 	                                callSession.unmuteAudio();
 	                            }
 	                        } },
-	                    React.createElement("i", { className: "big-icon " + (callSession.getMediaOptions().audio ? " microphone" : " crossed-microphone") })
+	                    React.makeElement("i", { className: "big-icon " + (callSession.getMediaOptions().audio ? " microphone" : " crossed-microphone") })
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "button call", onClick: function onClick(e) {
 	                            if (callSession.getMediaOptions().video === true) {
@@ -24398,19 +23266,19 @@
 	                                callSession.unmuteVideo();
 	                            }
 	                        } },
-	                    React.createElement("i", { className: "big-icon " + (callSession.getMediaOptions().video ? " videocam" : " crossed-videocam") })
+	                    React.makeElement("i", { className: "big-icon " + (callSession.getMediaOptions().video ? " videocam" : " crossed-videocam") })
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "button call", onClick: function onClick(e) {
 	                            chatRoom.callSession.endCall();
 	                        } },
-	                    React.createElement("i", { className: "big-icon horizontal-red-handset" })
+	                    React.makeElement("i", { className: "big-icon horizontal-red-handset" })
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "button call right", onClick: this.fullScreenModeToggle },
-	                    React.createElement("i", { className: "big-icon nwse-resize" })
+	                    React.makeElement("i", { className: "big-icon nwse-resize" })
 	                )
 	            )
 	        );
@@ -24728,37 +23596,37 @@
 	        var messagesList = [];
 
 	        if (self.props.messagesBuff.messagesHistoryIsLoading() === true || self.props.messagesBuff.joined === false || self.props.messagesBuff.joined === true && self.props.messagesBuff.haveMessages === true && self.props.messagesBuff.messagesHistoryIsLoading() === true) {
-	            messagesList.push(React.createElement(
+	            messagesList.push(React.makeElement(
 	                "div",
 	                { className: "loading-spinner light active", key: "loadingSpinner" },
-	                React.createElement("div", { className: "main-loader" })
+	                React.makeElement("div", { className: "main-loader" })
 	            ));
 	        } else if (self.props.messagesBuff.joined === true && (self.props.messagesBuff.messages.length === 0 || !self.props.messagesBuff.haveMoreHistory())) {
 	            var headerText = self.props.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
 
 	            headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 
-	            messagesList.push(React.createElement(
+	            messagesList.push(React.makeElement(
 	                "div",
 	                { className: "messages notification", key: "initialMsg" },
-	                React.createElement("div", { className: "header", dangerouslySetInnerHTML: { __html: headerText } }),
-	                React.createElement(
+	                React.makeElement("div", { className: "header", dangerouslySetInnerHTML: { __html: headerText } }),
+	                React.makeElement(
 	                    "div",
 	                    { className: "info" },
 	                    __(l[8080]),
-	                    React.createElement(
+	                    React.makeElement(
 	                        "p",
 	                        null,
-	                        React.createElement("i", { className: "semi-big-icon grey-lock" }),
-	                        React.createElement("span", { dangerouslySetInnerHTML: {
+	                        React.makeElement("i", { className: "semi-big-icon grey-lock" }),
+	                        React.makeElement("span", { dangerouslySetInnerHTML: {
 	                                __html: __(l[8540]).replace("[S]", "<strong>").replace("[/S]", "</strong>")
 	                            } })
 	                    ),
-	                    React.createElement(
+	                    React.makeElement(
 	                        "p",
 	                        null,
-	                        React.createElement("i", { className: "semi-big-icon grey-tick" }),
-	                        React.createElement("span", { dangerouslySetInnerHTML: {
+	                        React.makeElement("i", { className: "semi-big-icon grey-tick" }),
+	                        React.makeElement("span", { dangerouslySetInnerHTML: {
 	                                __html: __(l[8539]).replace("[S]", "<strong>").replace("[/S]", "</strong>")
 	                            } })
 	                    )
@@ -24781,7 +23649,7 @@
 
 	                if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
 	                    lastTimeMarker = curTimeMarker;
-	                    messagesList.push(React.createElement(
+	                    messagesList.push(React.makeElement(
 	                        "div",
 	                        { className: "message date-divider", key: v.messageId + "_marker" },
 	                        curTimeMarker
@@ -24828,7 +23696,7 @@
 	                    }
 	                }
 
-	                messagesList.push(React.createElement(ConversationMessage, {
+	                messagesList.push(React.makeElement(ConversationMessage, {
 	                    message: v,
 	                    chatRoom: room,
 	                    key: v.messageId,
@@ -24868,20 +23736,20 @@
 	                msg = __(l[8629]).replace("%1", namesDisplay[0]);
 	            }
 
-	            typingElement = React.createElement(
+	            typingElement = React.makeElement(
 	                "div",
 	                { className: "typing-block" },
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "typing-text" },
 	                    msg
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "typing-bounce" },
-	                    React.createElement("div", { className: "typing-bounce1" }),
-	                    React.createElement("div", { className: "typing-bounce2" }),
-	                    React.createElement("div", { className: "typing-bounce3" })
+	                    React.makeElement("div", { className: "typing-bounce1" }),
+	                    React.makeElement("div", { className: "typing-bounce2" }),
+	                    React.makeElement("div", { className: "typing-bounce3" })
 	                )
 	            );
 	        } else {}
@@ -24889,7 +23757,7 @@
 	        var attachCloudDialog = null;
 	        if (self.state.attachCloudDialog === true) {
 	            var selected = [];
-	            attachCloudDialog = React.createElement(ModalDialogsUI.CloudBrowserDialog, {
+	            attachCloudDialog = React.makeElement(ModalDialogsUI.CloudBrowserDialog, {
 	                folderSelectNotAllowed: true,
 	                onClose: function onClose() {
 	                    self.setState({ 'attachCloudDialog': false });
@@ -24909,7 +23777,7 @@
 	        var sendContactDialog = null;
 	        if (self.state.sendContactDialog === true) {
 	            var selected = [];
-	            sendContactDialog = React.createElement(ModalDialogsUI.SelectContactDialog, {
+	            sendContactDialog = React.makeElement(ModalDialogsUI.SelectContactDialog, {
 	                megaChat: room.megaChat,
 	                chatRoom: room,
 	                contacts: M.u,
@@ -24933,13 +23801,13 @@
 	            additionalClass = " small-block";
 	        }
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            { className: conversationPanelClasses, onMouseMove: self.onMouseMove, "data-room-jid": self.props.chatRoom.roomJid.split("@")[0] },
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "chat-content-block" },
-	                React.createElement(ConversationRightArea, {
+	                React.makeElement(ConversationRightArea, {
 	                    chatRoom: this.props.chatRoom,
 	                    contacts: self.props.contacts,
 	                    megaChat: this.props.chatRoom.megaChat,
@@ -24950,7 +23818,7 @@
 	                        self.setState({ 'attachCloudDialog': true });
 	                    }
 	                }),
-	                React.createElement(ConversationAudioVideoPanel, {
+	                React.makeElement(ConversationAudioVideoPanel, {
 	                    chatRoom: this.props.chatRoom,
 	                    contacts: self.props.contacts,
 	                    megaChat: this.props.chatRoom.megaChat,
@@ -24962,13 +23830,13 @@
 	                }),
 	                attachCloudDialog,
 	                sendContactDialog,
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "messages-block " + additionalClass },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "messages scroll-area" },
-	                        React.createElement(
+	                        React.makeElement(
 	                            utils.JScrollPane,
 	                            { options: {
 	                                    enableKeyboardNavigation: false,
@@ -24981,10 +23849,10 @@
 	                                chatRoom: self.props.chatRoom,
 	                                messagesToggledInCall: self.state.messagesToggledInCall
 	                            },
-	                            React.createElement(
+	                            React.makeElement(
 	                                "div",
 	                                { className: "messages main-pad" },
-	                                React.createElement(
+	                                React.makeElement(
 	                                    "div",
 	                                    { className: "messages content-area" },
 	                                    messagesList
@@ -24992,11 +23860,11 @@
 	                            )
 	                        )
 	                    ),
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "chat-textarea-block" },
 	                        typingElement,
-	                        React.createElement(
+	                        React.makeElement(
 	                            TypingAreaUI.TypingArea,
 	                            {
 	                                chatRoom: self.props.chatRoom,
@@ -25008,30 +23876,30 @@
 	                                    self.props.chatRoom.sendMessage(messageContents);
 	                                }
 	                            },
-	                            React.createElement(
+	                            React.makeElement(
 	                                ButtonsUI.Button,
 	                                {
 	                                    className: "popup-button",
 	                                    icon: "small-icon grey-medium-plus" },
-	                                React.createElement(
+	                                React.makeElement(
 	                                    DropdownsUI.Dropdown,
 	                                    {
 	                                        className: "wide-dropdown attach-to-chat-popup",
 	                                        vertOffset: 10
 	                                    },
-	                                    React.createElement(DropdownsUI.DropdownItem, {
+	                                    React.makeElement(DropdownsUI.DropdownItem, {
 	                                        icon: "grey-cloud",
 	                                        label: __(l[8011]),
 	                                        onClick: function onClick(e) {
 	                                            self.setState({ 'attachCloudDialog': true });
 	                                        } }),
-	                                    React.createElement(DropdownsUI.DropdownItem, {
+	                                    React.makeElement(DropdownsUI.DropdownItem, {
 	                                        icon: "grey-computer",
 	                                        label: __(l[8014]),
 	                                        onClick: function onClick(e) {
 	                                            self.uploadFromComputer();
 	                                        } }),
-	                                    React.createElement(DropdownsUI.DropdownItem, {
+	                                    React.makeElement(DropdownsUI.DropdownItem, {
 	                                        icon: "square-profile",
 	                                        label: __(l[8628]),
 	                                        onClick: function onClick(e) {
@@ -25083,7 +23951,7 @@
 
 	            var contact = megaChat.getContactFromJid(otherParticipants[0]);
 
-	            conversations.push(React.createElement(ConversationPanel, {
+	            conversations.push(React.makeElement(ConversationPanel, {
 	                chatRoom: chatRoom,
 	                contacts: M.u,
 	                contact: contact,
@@ -25109,21 +23977,21 @@
 
 	                    var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
 
-	                    (pres === "offline" ? contactsListOffline : contactsList).push(React.createElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.megaChat, key: contact.u }));
+	                    (pres === "offline" ? contactsListOffline : contactsList).push(React.makeElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.megaChat, key: contact.u }));
 	                });
 	            }
 	            var emptyMessage = hadLoaded ? l[8008] : l[7006];
 
-	            return React.createElement(
+	            return React.makeElement(
 	                "div",
 	                null,
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "chat-right-area" },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "chat-right-area contacts-list-scroll" },
-	                        React.createElement(
+	                        React.makeElement(
 	                            "div",
 	                            { className: "chat-right-pad" },
 	                            contactsList,
@@ -25131,21 +23999,21 @@
 	                        )
 	                    )
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "empty-block" },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "empty-pad conversations" },
-	                        React.createElement("div", { className: "empty-icon conversations" }),
-	                        React.createElement("div", { className: "empty-title", dangerouslySetInnerHTML: {
+	                        React.makeElement("div", { className: "empty-icon conversations" }),
+	                        React.makeElement("div", { className: "empty-title", dangerouslySetInnerHTML: {
 	                                __html: __(emptyMessage).replace("[P]", "<span>").replace("[/P]", "</span>")
 	                            } })
 	                    )
 	                )
 	            );
 	        } else {
-	            return React.createElement(
+	            return React.makeElement(
 	                "div",
 	                { className: "conversation-panels" },
 	                conversations
@@ -25226,7 +24094,7 @@
 	        if (self.props.buttons) {
 	            var buttons = [];
 	            self.props.buttons.forEach(function (v) {
-	                buttons.push(React.createElement(
+	                buttons.push(React.makeElement(
 	                    "a",
 	                    { href: "javascript:;", className: "default-white-button right" + (v.className ? " " + v.className : ""), onClick: function onClick(e) {
 	                            if (v.onClick) {
@@ -25237,27 +24105,27 @@
 	                ));
 	            });
 
-	            footer = React.createElement(
+	            footer = React.makeElement(
 	                "div",
 	                { className: "fm-dialog-footer" },
 	                buttons,
-	                React.createElement("div", { className: "clear" })
+	                React.makeElement("div", { className: "clear" })
 	            );
 	        }
 
-	        return React.createElement(
+	        return React.makeElement(
 	            utils.RenderTo,
 	            { element: document.body, className: classes },
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                null,
-	                React.createElement("div", { className: "fm-dialog-close", onClick: self.onCloseClicked }),
-	                self.props.title ? React.createElement(
+	                React.makeElement("div", { className: "fm-dialog-close", onClick: self.onCloseClicked }),
+	                self.props.title ? React.makeElement(
 	                    "div",
 	                    { className: "fm-dialog-title" },
 	                    self.props.title
 	                ) : null,
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "fm-dialog-content" },
 	                    self.renderChildren()
@@ -25280,14 +24148,14 @@
 	        if (self.props.sortBy[0] === self.props.id) {
 	            classes += " " + self.props.sortBy[1];
 	        }
-	        return React.createElement(
+	        return React.makeElement(
 	            "th",
 	            { onClick: function onClick(e) {
 	                    e.preventDefault();
 	                    e.stopPropagation();
 	                    self.props.onClick(self.props.id);
 	                } },
-	            React.createElement(
+	            React.makeElement(
 	                "span",
 	                { className: "arrow " + classes },
 	                self.props.label
@@ -25351,7 +24219,7 @@
 	            var isFolder = node.t === 1;
 	            var isSelected = self.state.selected.indexOf(node.h) !== -1;
 
-	            items.push(React.createElement(
+	            items.push(React.makeElement(
 	                "tr",
 	                {
 	                    className: (isFolder ? " folder" : "") + (isSelected ? " ui-selected" : ""),
@@ -25363,39 +24231,39 @@
 	                    },
 	                    key: node.h
 	                },
-	                React.createElement(
+	                React.makeElement(
 	                    "td",
 	                    null,
-	                    React.createElement("span", { className: "grid-status-icon" + (node.fav ? " star" : "") })
+	                    React.makeElement("span", { className: "grid-status-icon" + (node.fav ? " star" : "") })
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "td",
 	                    null,
-	                    React.createElement(
+	                    React.makeElement(
 	                        "span",
 	                        { className: "transfer-filtype-icon " + fileIcon(node) },
 	                        " "
 	                    ),
-	                    React.createElement(
+	                    React.makeElement(
 	                        "span",
 	                        { className: "tranfer-filetype-txt" },
 	                        node.name
 	                    )
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "td",
 	                    null,
 	                    !isFolder ? bytesToSize(node.s) : ""
 	                )
 	            ));
 	        });
-	        return React.createElement(
+	        return React.makeElement(
 	            utils.JScrollPane,
 	            { className: "fm-dialog-grid-scroll" },
-	            React.createElement(
+	            React.makeElement(
 	                "table",
 	                { className: "grid-table fm-dialog-table" },
-	                React.createElement(
+	                React.makeElement(
 	                    "tbody",
 	                    null,
 	                    items
@@ -25512,7 +24380,7 @@
 	                if (self.state.currentlyViewedEntry !== p.h) {
 	                    breadcrumbClasses += " has-next-button";
 	                }
-	                breadcrumb.unshift(React.createElement(
+	                breadcrumb.unshift(React.makeElement(
 	                    "a",
 	                    { className: "fm-breadcrumbs contains-directories " + breadcrumbClasses, key: p.h, onClick: function onClick(e) {
 	                            e.preventDefault();
@@ -25520,10 +24388,10 @@
 	                            self.setState({ 'currentlyViewedEntry': p.h, 'selected': [] });
 	                            self.props.onSelected([]);
 	                        } },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "span",
 	                        { className: "right-arrow-bg" },
-	                        React.createElement(
+	                        React.makeElement(
 	                            "span",
 	                            null,
 	                            p.h === M.RootID ? __("Cloud Drive") : p.name
@@ -25533,7 +24401,7 @@
 	            })(p);
 	        } while (p = M.d[M.d[p.h].p]);
 
-	        return React.createElement(
+	        return React.makeElement(
 	            ModalDialog,
 	            {
 	                title: __("Add from your Cloud Drive"),
@@ -25562,28 +24430,28 @@
 	                        e.stopPropagation();
 	                    }
 	                }] },
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "fm-breadcrumbs-block" },
 	                breadcrumb,
-	                React.createElement("div", { className: "clear" })
+	                React.makeElement("div", { className: "clear" })
 	            ),
-	            React.createElement(
+	            React.makeElement(
 	                "table",
 	                { className: "grid-table-header fm-dialog-table" },
-	                React.createElement(
+	                React.makeElement(
 	                    "tbody",
 	                    null,
-	                    React.createElement(
+	                    React.makeElement(
 	                        "tr",
 	                        null,
-	                        React.createElement(BrowserCol, { id: "grid-header-star", sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
-	                        React.createElement(BrowserCol, { id: "name", label: __("Name"), sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
-	                        React.createElement(BrowserCol, { id: "size", label: __("Size"), sortBy: self.state.sortBy, onClick: self.toggleSortBy })
+	                        React.makeElement(BrowserCol, { id: "grid-header-star", sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
+	                        React.makeElement(BrowserCol, { id: "name", label: __("Name"), sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
+	                        React.makeElement(BrowserCol, { id: "size", label: __("Size"), sortBy: self.state.sortBy, onClick: self.toggleSortBy })
 	                    )
 	                )
 	            ),
-	            React.createElement(BrowserEntries, {
+	            React.makeElement(BrowserEntries, {
 	                entries: self.getEntries(),
 	                onExpand: function onExpand(node) {
 	                    self.setState({ 'currentlyViewedEntry': node.h });
@@ -25625,7 +24493,7 @@
 
 	        var classes = "send-contact " + self.props.className;
 
-	        return React.createElement(
+	        return React.makeElement(
 	            ModalDialog,
 	            {
 	                title: __("Send Contact"),
@@ -25654,7 +24522,7 @@
 	                        e.stopPropagation();
 	                    }
 	                }] },
-	            React.createElement(ContactsUI.ContactPickerWidget, {
+	            React.makeElement(ContactsUI.ContactPickerWidget, {
 	                megaChat: self.props.megaChat,
 	                contacts: self.props.contacts,
 	                onClick: function onClick(contact, e) {
@@ -25893,23 +24761,23 @@
 	        var typedMessage = htmlentities(self.state.typedMessage).replace(/\n/g, '<br/>');
 	        typedMessage = typedMessage + '<br/>';
 
-	        return React.createElement(
+	        return React.makeElement(
 	            "div",
 	            { className: "typingarea-component" + self.props.className },
-	            React.createElement(
+	            React.makeElement(
 	                "div",
 	                { className: "chat-textarea" },
-	                React.createElement("i", { className: self.props.iconClass ? self.props.iconClass : "small-icon conversations" }),
-	                React.createElement(
+	                React.makeElement("i", { className: self.props.iconClass ? self.props.iconClass : "small-icon conversations" }),
+	                React.makeElement(
 	                    "div",
 	                    { className: "chat-textarea-buttons" },
-	                    React.createElement(
+	                    React.makeElement(
 	                        ButtonsUI.Button,
 	                        {
 	                            className: "popup-button",
 	                            icon: "smiling-face"
 	                        },
-	                        React.createElement(DropdownsUI.DropdownEmojiSelector, {
+	                        React.makeElement(DropdownsUI.DropdownEmojiSelector, {
 	                            className: "popup emoji-one",
 	                            vertOffset: 12,
 	                            onClick: self.onEmojiClicked
@@ -25917,13 +24785,13 @@
 	                    ),
 	                    self.props.children
 	                ),
-	                React.createElement(
+	                React.makeElement(
 	                    "div",
 	                    { className: "chat-textarea-scroll" },
-	                    React.createElement(
+	                    React.makeElement(
 	                        "div",
 	                        { className: "textarea-wrapper" },
-	                        React.createElement("textarea", {
+	                        React.makeElement("textarea", {
 	                            className: messageTextAreaClasses,
 	                            placeholder: __(l[8009]),
 	                            onKeyDown: self.onTypeAreaKeyDown,
@@ -25934,7 +24802,7 @@
 	                            disabled: room.pubCu25519KeyIsMissing === true ? true : false,
 	                            readOnly: room.pubCu25519KeyIsMissing === true ? true : false
 	                        }),
-	                        React.createElement("div", { className: "message-preview", dangerouslySetInnerHTML: {
+	                        React.makeElement("div", { className: "message-preview", dangerouslySetInnerHTML: {
 	                                __html: typedMessage.replace(/\s/g, "&nbsp;")
 	                            } })
 	                    )

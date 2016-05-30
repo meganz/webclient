@@ -3352,6 +3352,8 @@
     "8832": "Minnesstatistik",
     "8833": "F\u00f6r att \u00f6ka denna gr\u00e4ns, kan du registrera ett konto. Detta kommer inte bara att ge dig gott om extra bandbredd, men \u00e4ven 50 GB s\u00e4kert lagringsutrymme i molnet - [B] gratis [\/B].",
     "8834": "H\u00e4mtningen kunde inte forts\u00e4tta eftersom det skulle ta dig \u00f6ver den nuvarande kapacitet f\u00f6r din fria \u00f6verf\u00f6ring p\u00e5 din IP-adress.",
+    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3445,6 +3447,8 @@
         "copyright-dispute-title": 8771,
         "copyright-dispute-subtitle": 8772,
         "user-register-for-bandwidth-and-storage": 8833,
-        "warning-message-for-bandwidth-overquota": 8834
+        "warning-message-for-bandwidth-overquota": 8834,
+        "new-version-megachat-message": 8840,
+        "new-version-megachat-extension-message": 8841
     }
 }

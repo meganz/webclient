@@ -13410,5 +13410,13 @@
     "8834": {
         "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
         "context": "A warning message which is displayed to warn the user about the reason why their download can not proceed because they would be over the bandwidth quota."
+    },
+    "8840": {
+        "text": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+        "context": "A dialog message when there is a new chat server version available that requires the user to reload."
+    },
+    "8841": {
+        "text": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+        "context": "A dialog message when there is a new chat server version available. This update will be incompatible with the current user's MEGA client so they will need to update their browser extension."
     }
 }

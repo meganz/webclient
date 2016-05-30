@@ -3352,6 +3352,8 @@
     "8832": "C\u00e1c th\u00f4ng s\u1ed1 b\u1ed9 nh\u1edb",
     "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
+    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3445,6 +3447,8 @@
         "copyright-dispute-title": 8771,
         "copyright-dispute-subtitle": 8772,
         "user-register-for-bandwidth-and-storage": 8833,
-        "warning-message-for-bandwidth-overquota": 8834
+        "warning-message-for-bandwidth-overquota": 8834,
+        "new-version-megachat-message": 8840,
+        "new-version-megachat-extension-message": 8841
     }
 }

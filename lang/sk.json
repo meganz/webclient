@@ -3344,14 +3344,16 @@
     "8818": "The link you provided is either invalid or is not the subject of a takedown notice.",
     "8819": "You have already made a counter-notification against this link.",
     "8820": "Zadan\u00fd MEGA \u00fa\u010det sa nezhoduje s majite\u013eom odkazu.",
-    "8822": "Copy failed",
-    "8826": "Debug mode",
-    "8828": "Item shared from MEGA",
-    "8830": "Items shared from MEGA",
-    "8831": "Copying...",
-    "8832": "Memory statistics",
+    "8822": "Kop\u00edrovanie zlyhalo",
+    "8826": "Debug m\u00f3d",
+    "8828": "Polo\u017eka zdie\u013ean\u00e1 z MEGA",
+    "8830": "Polo\u017eky zdie\u013ean\u00e9 z MEGA",
+    "8831": "Kop\u00edrovanie...",
+    "8832": "\u0160tatistiky pam\u00e4ti",
     "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
+    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3445,6 +3447,8 @@
         "copyright-dispute-title": 8771,
         "copyright-dispute-subtitle": 8772,
         "user-register-for-bandwidth-and-storage": 8833,
-        "warning-message-for-bandwidth-overquota": 8834
+        "warning-message-for-bandwidth-overquota": 8834,
+        "new-version-megachat-message": 8840,
+        "new-version-megachat-extension-message": 8841
     }
 }

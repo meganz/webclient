@@ -360,7 +360,7 @@ if (typeof mobileblog !== 'undefined') {
                         '<span>by:</span> ' + escapeHTML(blogposts[i].by || "Admin") +
                     '</div>' +
                     '<div class="clear"></div>' +
-                    '<div id="blogarticle_post">' + content + '</div>' +
+                    '<div id="blogarticle_post">' + content.replace(/(?:{|%7B)cmspath(?:%7D|})/g, 'https://cms2.mega.nz/') + '</div>' +
                     '<div class="clear"></div>' +
                 '</div>' +
                 '<div class="bottom-menu full-version">' +

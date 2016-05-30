@@ -35,7 +35,6 @@
         var hash  = asmCrypto.SHA256.bytes(content);
         signature = asmCrypto.string_to_bytes(ab_to_str(signature));
         var i;
-
     
         try {
             for (i = 0; i < signPubKey.__global.length; ++i) {
@@ -265,6 +264,10 @@
                 reRendered[nodeId] = true;
                 curCallback(nodeId);
             }
+        },
+
+        html: function(html) {
+            return html.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
         },
     
         isLoading: function() {

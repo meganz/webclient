@@ -8305,6 +8305,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     min-height: 254px;
     margin: -178px 0 0 -196px
 }
+.fm-dialog.reset-success {
+    margin-top: -166px;
+}
 .fm-dialog.registration-page-success {
     width: 360px;
     margin: -160px 0 0 -180px;
@@ -13047,7 +13050,8 @@ h5.main-italic-header {
     background-position: center -1021px;
 }
 .reset-success .reg-success-icon {
-    margin: 14px auto 0 auto;
+    margin: 14px auto 10px auto;
+    height: 140px;
 }
 .reg-success-header {
     font-size: 20px;

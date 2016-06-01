@@ -898,33 +898,23 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
     if (self.sendingbuf[msgnum]) {
         // if the pending item with the same message Id is an edit, overwrite it.
         var messagekey = self.getmessagekey(self.sendingbuf[msgnum][Chatd.MsgField.MSGID], Chatd.MsgType.EDIT);
-        if (self.sendingbuf[msgnum][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT) {
-            self.sendingbuf[msgnum][Chatd.MsgField.UPDATED] = mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
-            self.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
-            if (self.chatd.chatIdShard[self.chatId].isOnline()) {
-                // if no orginal message is still in the pending list, send out a msgup.
-                self.chatd.chatIdShard[self.chatId].msgupd(self.chatId, self.sendingbuf[msgnum][Chatd.MsgField.MSGID], self.sendingbuf[msgnum][Chatd.MsgField.UPDATED], message, self.sendingbuf[msgnum][Chatd.MsgField.KEYID]);
-            }
+        // if there is a pending edit after the pending new message, overwrite the pending edit to only keep 1 pending edit.
+        if (self.sending[messagekey]) {
+            self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.UPDATED] = mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
+            self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.MESSAGE] = message;
         }
-        // if the pending item with the same message Id is a new message, append an edit.
+        // if there is no any pending edit, overwrite the original messsage with the edited content and append a pending edit.
         else {
-            // if there is a pending edit after the pending new message, overwrite the pending edit to only keep 1 pending edit.
-            if (self.sending[messagekey]) {
-                self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.UPDATED] = mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
-                self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.MESSAGE] = message;
-            }
-            // if there is no any pending edit, overwrite the original messsage with the edited content and append a pending edit.
-            else {
-                self.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
-
-                self.sendingbuf[++self.sendingnum] = [self.sendingbuf[msgnum][Chatd.MsgField.MSGID], self.sendingbuf[msgnum][Chatd.MsgField.USERID], self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP], message, self.sendingbuf[msgnum][Chatd.MsgField.KEYID], mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1, Chatd.MsgType.EDIT];
-                self.sending[messagekey] = self.sendingnum;
-                self.sendingList.push(messagekey);
-            }
-            if (self.chatd.chatIdShard[self.chatId].isOnline()) {
-                // if the orginal message is still in the pending list, send out a msgupx.
-                self.chatd.chatIdShard[self.chatId].msgupdx(self.chatId, self.sendingbuf[msgnum][Chatd.MsgField.MSGID], self.sendingbuf[msgnum][Chatd.MsgField.UPDATED], message, self.sendingbuf[msgnum][Chatd.MsgField.KEYID]);
-            }
+            self.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
+            var pendingmsgkey = self.getmessagekey(self.sendingbuf[msgnum][Chatd.MsgField.MSGID], Chatd.MsgType.MESSAGE);
+            self.persist(pendingmsgkey);
+            self.sendingbuf[++self.sendingnum] = [self.sendingbuf[msgnum][Chatd.MsgField.MSGID], self.sendingbuf[msgnum][Chatd.MsgField.USERID], self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP], message, self.sendingbuf[msgnum][Chatd.MsgField.KEYID], mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1, Chatd.MsgType.EDIT];
+            self.sending[messagekey] = self.sendingnum;
+            self.sendingList.push(messagekey);
+        }
+        if (self.chatd.chatIdShard[self.chatId].isOnline()) {
+            // if the orginal message is still in the pending list, send out a msgupx.
+            self.chatd.chatIdShard[self.chatId].msgupdx(self.chatId, self.sendingbuf[msgnum][Chatd.MsgField.MSGID], self.sendingbuf[msgnum][Chatd.MsgField.UPDATED], message, self.sendingbuf[msgnum][Chatd.MsgField.KEYID]);
         }
         self.persist(messagekey);
     }

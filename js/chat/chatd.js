@@ -1050,9 +1050,12 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
     // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
     for (var chatId in this.chatIdMessages) {
         if (this.chatIdMessages[chatId]) {
-            this.chatIdMessages[chatId].confirm(chatId, msgxid, msgid);
+            var messagekey = this.chatIdMessages[chatId].getmessagekey(msgxid, Chatd.MsgType.MESSAGE);
+            if (this.chatIdMessages[chatId].sending[messagekey]) {
+                this.chatIdMessages[chatId].confirm(chatId, msgxid, msgid);
+                break;
+            }
         }
-        break;
     }
 };
 
@@ -1120,6 +1123,7 @@ Chatd.prototype.msgcheck = function(chatId, msgid) {
 // msgid can be false in case of rejections
 Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     var self = this;
+
     var messagekey = self.getmessagekey(msgxid, Chatd.MsgType.MESSAGE);
     var num = self.sending[messagekey];
     if (!num) {

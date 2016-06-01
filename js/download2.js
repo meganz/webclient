@@ -299,7 +299,7 @@ var dlmanager = {
             }
         }
 
-        dlmanager.dlReportStatus(dl, error);
+        dlmanager.dlReportStatus(dl, error === EFQUOTA ? EOVERQUOTA : error);
 
         ctx.next(error || new Error("failed"));
     },

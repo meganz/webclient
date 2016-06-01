@@ -3344,7 +3344,11 @@
     "8818": "L\u00e4nken du angav \u00e4r antingen ogiltig eller inte \u00e4r f\u00f6rem\u00e5l f\u00f6r en anm\u00e4lan om borttagning.",
     "8819": "Du har redan gjort ett bestridande mot denna l\u00e4nk.",
     "8820": "MEGA kontot som angavs matchar inte \u00e4garen av l\u00e4nken.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Kopiering misslyckad",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Debugl\u00e4ge",
     "8828": "objekt delade p\u00e5 MEGA",
     "8830": "objekt delade p\u00e5 MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "Minnesstatistik",
     "8833": "F\u00f6r att \u00f6ka denna gr\u00e4ns, kan du registrera ett konto. Detta kommer inte bara att ge dig gott om extra bandbredd, men \u00e4ven 50 GB s\u00e4kert lagringsutrymme i molnet - [B] gratis [\/B].",
     "8834": "H\u00e4mtningen kunde inte forts\u00e4tta eftersom det skulle ta dig \u00f6ver den nuvarande kapacitet f\u00f6r din fria \u00f6verf\u00f6ring p\u00e5 din IP-adress.",
-    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
-    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Exportera \u00e5terst\u00e4llningsnyckel",
+    "8839": "\u00c5terst\u00e4llningsnyckel",
+    "8840": "MEGAchat har uppgraderats och kr\u00e4ver en omladdning. Vill du ladda om sidan nu och uppdatera till den senaste versionen?",
+    "8841": "MEGAchat har uppgraderats och kommer nu endast att st\u00f6djas i v\u00e5r nyligen utgivna version av MEGA. Uppdatera ditt till\u00e4gg f\u00f6r att forts\u00e4tta anv\u00e4nda MEGAchat.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

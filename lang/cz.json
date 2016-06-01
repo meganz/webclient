@@ -3344,7 +3344,11 @@
     "8818": "Odkaz, kter\u00fd jste zadali, je bu\u010f neplatn\u00fd nebo nen\u00ed p\u0159edm\u011btem ozn\u00e1men\u00ed o zastaven\u00ed \u0161\u00ed\u0159en\u00ed.",
     "8819": "Ji\u017e jste u\u010dinili protiozn\u00e1men\u00ed proti tomuto odkazu.",
     "8820": "Zadan\u00fd \u00fa\u010det MEGA neodpov\u00edd\u00e1 vlastn\u00edkovi odkazu.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Kop\u00edrov\u00e1n\u00ed selhalo",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Re\u017eim lad\u011bn\u00ed",
     "8828": "Polo\u017eka sd\u00edlen\u00e1 z MEGA",
     "8830": "Polo\u017eky sd\u00edlen\u00e9 z MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "Statistika pam\u011bti",
     "8833": "Pro zv\u00fd\u0161en\u00ed tohoto omezen\u00ed si m\u016f\u017eete zaregistrovat \u00fa\u010det. Z\u00edsk\u00e1te t\u00edm nejen nav\u00edc \u0161\u00ed\u0159ku p\u00e1sma, ale tak\u00e9 50 GB zabezpe\u010den\u00e9ho prostoru \u00falo\u017ei\u0161t\u011b v cloudu - [B]zdarma[\/B].",
     "8834": "Va\u0161e stahov\u00e1n\u00ed nem\u016f\u017ee pokra\u010dovat, proto\u017ee byste p\u0159ekro\u010dili aktu\u00e1ln\u00ed povolen\u00ed bezplatn\u00e9ho p\u0159enosu pro va\u0161i IP adresu.",
-    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
-    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Exportovat Obnovovac\u00ed kl\u00ed\u010d",
+    "8839": "Obnovovac\u00ed kl\u00ed\u010d",
+    "8840": "MEGAchat byl upgradov\u00e1n a vy\u017eaduje nov\u00e9 na\u010dten\u00ed. Chcete nyn\u00ed na\u010d\u00edst znovu str\u00e1nku kv\u016fli aktualizaci na nejnov\u011bj\u0161\u00ed verzi?",
+    "8841": "MEGAchat byl upgradov\u00e1n a bude nyn\u00ed podporov\u00e1n pouze v na\u0161\u00ed nov\u011b vydan\u00e9 verzi MEGA. Aktualizujte sv\u00e9 roz\u0161\u00ed\u0159en\u00ed, abyste mohli nad\u00e1le pou\u017e\u00edvat MEGAchat.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

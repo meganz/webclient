@@ -3344,7 +3344,11 @@
     "8818": "El enlace proporcionado no es v\u00e1lido, o no est\u00e1 sujeto a un aviso de eliminaci\u00f3n.",
     "8819": "Ya ha realizado una notificaci\u00f3n contra este enlace.",
     "8820": "La cuenta MEGA indicada no coincide con la del due\u00f1o del enlace.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Copia fallida",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Modo depuraci\u00f3n",
     "8828": "\u00cdtem compartido desde MEGA",
     "8830": "\u00cdtems compartidos desde MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "Estad\u00edsticas de memoria",
     "8833": "Para aumentar este l\u00edmite, puedes registrar una cuenta. Esto no solo te dar\u00e1 ancho de banda mucho m\u00e1s amplio, sino tambi\u00e9n 50 GB de espacio de almacenamiento seguro en la nube [B]gratis[\/B].",
     "8834": "Tu descarga no ha podido empezar porque te llevar\u00eda por encima de la cuota de transferencia admitida como usuario gratuito para tu IP.",
-    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
-    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Exportar Clave de Recuperaci\u00f3n",
+    "8839": "Clave de Recuperaci\u00f3n",
+    "8840": "MEGAchat ha sido mejorado y necesita una recarga. \u00bfQuieres recargar la p\u00e1gina ahora para actualizar a la \u00faltima versi\u00f3n?",
+    "8841": "MEGAchat ha sido mejorado y ya solo ser\u00e1 soportado en la nueva versi\u00f3n de MEGA reci\u00e9n lanzada. Por favor, actualiza tu extensi\u00f3n para seguir usando MEGAchat,",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

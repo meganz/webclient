@@ -3344,7 +3344,11 @@
     "8818": "Povezava, ki ste jo vnesli, je bodisi neveljavna, ali pa ni predmet zahteve po odstranitvi.",
     "8819": "Ste \u017ee vpisali proti-zahtevo za to povezavo.",
     "8820": "Vpisani MEGA ra\u010dun se ne sklada z lastnikom povezave.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Kopiranje neuspe\u0161no",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Razhro\u0161\u010devalni na\u010din",
     "8828": "Predmet, deljen z MEGA",
     "8830": "Predmeti, deljeni z MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "Statistika porabe pomnilnika",
     "8833": "Za dvig te omejitve, lahko registrirate ra\u010dun. To vam ne bo le ponudilo dodatne pasovne \u0161irine, pa\u010d pa boste pridobili tudi 50 GB varnega shranjevalnega prostora v oblaku - [B]brezpla\u010dno[\/B].",
     "8834": "Va\u0161ega prevzema nismo mogli sprocesirati, ker bi vas ponesel preko trenutno dovoljene kvote brezpla\u010dnega prenosa za va\u0161 IP naslov.",
-    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
-    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Izvozi re\u0161ilni klju\u010d",
+    "8839": "Re\u0161ilni klju\u010d",
+    "8840": "MEGAchat je bil nadgrajen in zahteva ponovno nalaganje. Ali \u017eelite ponovno nalo\u017eiti stran, da se nadgradi na zadnjo verzijo?",
+    "8841": "MEGAchat je bil nadgrajen in bo sedaj podprt samo v novo izdani verziji MEGA. Prosim, nadgradite va\u0161 dodatek, da boste \u0161e naprej u\u017eivali pri uporabi MEGAchat.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

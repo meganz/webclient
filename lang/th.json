@@ -3344,7 +3344,11 @@
     "8818": "\u0e25\u0e34\u0e07\u0e01\u0e4c\u0e17\u0e35\u0e48\u0e04\u0e38\u0e13\u0e23\u0e30\u0e1a\u0e38\u0e14\u0e39\u0e40\u0e2b\u0e21\u0e37\u0e2d\u0e19\u0e08\u0e30\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e40\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e17\u0e35\u0e48\u0e08\u0e30\u0e41\u0e08\u0e49\u0e07\u0e43\u0e2b\u0e49\u0e25\u0e1a\u0e40\u0e19\u0e37\u0e49\u0e2d\u0e2b\u0e32",
     "8819": "\u0e04\u0e38\u0e13\u0e44\u0e14\u0e49\u0e22\u0e37\u0e48\u0e19\u0e40\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e42\u0e15\u0e49\u0e41\u0e22\u0e49\u0e07\u0e01\u0e31\u0e1a\u0e25\u0e34\u0e07\u0e01\u0e4c\u0e19\u0e35\u0e49\u0e41\u0e25\u0e49\u0e27",
     "8820": "\u0e1a\u0e31\u0e0d\u0e0a\u0e35 MEGA \u0e17\u0e35\u0e48\u0e43\u0e2b\u0e49\u0e44\u0e27\u0e49\u0e44\u0e21\u0e48\u0e15\u0e23\u0e07\u0e01\u0e31\u0e1a\u0e40\u0e08\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e25\u0e34\u0e07\u0e01\u0e4c",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "\u0e04\u0e31\u0e14\u0e25\u0e2d\u0e01\u0e44\u0e21\u0e48\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "\u0e42\u0e2b\u0e21\u0e14\u0e14\u0e35\u0e1a\u0e31\u0e01",
     "8828": "\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e17\u0e35\u0e48\u0e41\u0e0a\u0e23\u0e4c\u0e08\u0e32\u0e01 MEGA",
     "8830": "\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e17\u0e35\u0e48\u0e41\u0e0a\u0e23\u0e4c\u0e08\u0e32\u0e01 MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "\u0e2a\u0e16\u0e34\u0e15\u0e34\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e04\u0e27\u0e32\u0e21\u0e08\u0e33",
     "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Export Recovery Key",
+    "8839": "Recovery Key",
     "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
     "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

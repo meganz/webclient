@@ -1271,7 +1271,7 @@
     "5552": "Vista thumbnail",
     "5553": "Modalit\u00e0 lista",
     "5554": "Esporta chiave master",
-    "5555": "Borrar clave maestra",
+    "5555": "Cancella chiave master",
     "5556": "La chiave master \u00e8 stata esportata in:",
     "5557": "file",
     "5558": "file",
@@ -3344,7 +3344,11 @@
     "8818": "Il link che hai fornito \u00e8 invalido o non \u00e8 soggetto a un avviso di rimozione.",
     "8819": "Hai gi\u00e0 fatto una contro-notifica a questo link.",
     "8820": "L&#039;account MEGA fornito non combacia con il proprietario del link.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Copia fallita",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Modalit\u00e0 debug",
     "8828": "Oggetto condiviso da MEGA",
     "8830": "Oggetti condivisi da MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "Statistiche della memoria",
     "8833": "Per aumentare questo limite, puoi registrarti con un account. Questo non ti dar\u00e0 soltanto una larghezza di banda extra, ma anche 50GB di spazio cloud sicuro [B](gratuitamente)[\/B].",
     "8834": "Il tuo download non \u00e8 stato processato in quanto ti avrebbe portato oltre la soglia dei trasferimenti gratis permessi dal tuo indirizzo IP.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Export Recovery Key",
+    "8839": "Recovery Key",
     "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
     "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

@@ -3344,7 +3344,11 @@
     "8818": "Girdi\u011finiz link ge\u00e7ersiz ya da kald\u0131r\u0131lan i\u00e7eri\u011fin linki de\u011fil.",
     "8819": "Bu linki kar\u015f\u0131 bildirim i\u00e7in \u00f6nceden de g\u00f6nderdiniz.",
     "8820": "Sa\u011flanan MEGA hesab\u0131 ile ba\u011flant\u0131 sahibi e\u015fle\u015fmedi.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Kopyalama ba\u015far\u0131s\u0131z",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Hata ay\u0131klama modu",
     "8828": "MEGA&#039;dan payla\u015f\u0131lan \u00f6\u011feler",
     "8830": "MEGA&#039;dan payla\u015f\u0131lan \u00f6\u011feler",
@@ -3352,8 +3356,14 @@
     "8832": "Bellek istatistikleri",
     "8833": "Bu limiti y\u00fckseltmek i\u00e7in, hesap olu\u015fturabilirsiniz. Sadece limiti y\u00fckseltmekle kalmay\u0131p 50 GB g\u00fcvenli bulut deposuna da [B]\u00fccretsiz[\/B] sahip olursunuz.",
     "8834": "\u0130ndirmeniz devam edemez \u00e7\u00fcnk\u00fc \u015fuanki IP adresiniz i\u00e7in olan aktarma limiti dolmu\u015f.",
-    "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
-    "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Kurtarma Anahtar\u0131n\u0131 D\u0131\u015fa Aktar",
+    "8839": "Kurtarma Anahtar\u0131",
+    "8840": "MEGAchat g\u00fcncellendi ve yeniden y\u00fckleme gerektiriyor. Son versiyona g\u00fcncellemek i\u00e7in sayfay\u0131 yenilemek ister misiniz?",
+    "8841": "MEGAchat g\u00fcncellendi ve sadece yeni yay\u0131mlanan MEGA versiyonuyla uyumlu. MEGAchat kullanmaya devam etmek i\u00e7in l\u00fctfen eklentiyi g\u00fcncelleyin.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

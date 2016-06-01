@@ -3344,7 +3344,11 @@
     "8818": "\u0110\u01b0\u1eddng li\u00ean k\u1ebft qu\u00fd v\u1ecb v\u1eeba cung c\u1ea5p c\u00f3 th\u1ec3 kh\u00f4ng h\u1ee3p l\u1ec7 ho\u1eb7c kh\u00f4ng c\u00f3 ch\u1ee9a n\u1ed9i dung b\u1ecb th\u00e1o b\u1ecf.",
     "8819": "Qu\u00fd v\u1ecb \u0111\u00e3 c\u00f3 g\u1eedi y\u00eau c\u1ea7u ph\u1ea3n \u0111\u1ed1i v\u1edbi \u0111\u01b0\u1eddng li\u00ean k\u1ebft n\u00e0y r\u1ed3i.",
     "8820": "T\u00e0i kho\u1ea3n MEGA v\u1eeba nh\u1eadp kh\u00f4ng c\u00f3 tr\u00f9ng kh\u1edbp v\u1edbi ch\u1ee7 s\u1edf h\u1eefu \u0111\u01b0\u1eddng li\u00ean k\u1ebft URL.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Sao ch\u00e9p th\u1ea5t b\u1ea1i",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Ch\u1ebf \u0111\u1ed9 s\u1eeda l\u1ed7i (debug)",
     "8828": "Item shared from MEGA",
     "8830": "Items shared from MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "C\u00e1c th\u00f4ng s\u1ed1 b\u1ed9 nh\u1edb",
     "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Export Recovery Key",
+    "8839": "Recovery Key",
     "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
     "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

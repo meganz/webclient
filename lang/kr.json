@@ -3344,7 +3344,11 @@
     "8818": "\uc785\ub825\ud558\uc2e0 \ub9c1\ud06c\uac00 \uc798\ubabb\ub418\uc5c8\uac70\ub098 \uac8c\uc2dc \uc911\ub2e8\uc758 \ub300\uc0c1\uc774 \uc544\ub2d9\ub2c8\ub2e4.",
     "8819": "\uc774\ubbf8 \uc774 \ub9c1\ud06c\uc5d0 \ub300\ud55c \uac8c\uc2dc \uc911\ub2e8 \ud55c\uc758\ub97c \ubcf4\ub0c8\uc2b5\ub2c8\ub2e4.",
     "8820": "\uc785\ub825\ud558\uc2e0 MEGA \uacc4\uc815\uc774 \ub9c1\ud06c\uc758 \uc18c\uc720\uc790\uc640 \uc77c\uce58\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Copy failed",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Debug mode",
     "8828": "Item shared from MEGA",
     "8830": "Items shared from MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "Memory statistics",
     "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Export Recovery Key",
+    "8839": "Recovery Key",
     "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
     "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

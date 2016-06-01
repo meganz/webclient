@@ -3344,7 +3344,11 @@
     "8818": "Wprowadzony link nie jest poprawny lub nie zosta\u0142 zablokowany.",
     "8819": "Twoje zg\u0142oszenie do tego linku ju\u017c wcze\u015bniej zosta\u0142o zarejestrowane.",
     "8820": "Podane konto MEGA nie jest w\u0142a\u015bcicielem wskazanego linku.",
+    "8821": "Failed to copy item. Please try again.",
     "8822": "Kopiowanie nie powiod\u0142o si\u0119",
+    "8823": "The log ({0}) will be deleted from the Offline section.",
+    "8824": "A log will be created in the Offline section ({0}).",
+    "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Tryb Debug",
     "8828": "Elementy udost\u0119pnione z MEGA",
     "8830": "Elementy udost\u0119pnione z MEGA",
@@ -3352,8 +3356,14 @@
     "8832": "Szczeg\u00f3\u0142y pami\u0119ci",
     "8833": "Aby zwi\u0119kszy\u0107 limit, mo\u017cesz zarejestrowa\u0107 si\u0119. Dzi\u0119ki temu nie tylko otrzymasz ekstra limit, ale r\u00f3wnie\u017c 50 GB powierzchni na pliki - [B]za darmo[\/B].",
     "8834": "Pobieranie nie mo\u017ce by\u0107 kontynuowane, poniewa\u017c przekroczsz dost\u0119pny limit przypisany do Twojego adresu IP.",
+    "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+    "8836": "Recovery Key copied to clipboard",
+    "8837": "Recovery Key copied",
+    "8838": "Eksportuj klucz zapasowy",
+    "8839": "Klucz zapasowy",
     "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
     "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3449,6 +3459,7 @@
         "user-register-for-bandwidth-and-storage": 8833,
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
-        "new-version-megachat-extension-message": 8841
+        "new-version-megachat-extension-message": 8841,
+        "purchase-has-expired": 8845
     }
 }

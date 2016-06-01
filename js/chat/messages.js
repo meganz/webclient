@@ -708,6 +708,15 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
     });
 
+    self.chatd.rebind('onMessageIncludeKey.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+        chatRoom.protocolHandler.setIncludeKey(true);
+
+        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+            self.trackDataChange();
+        }
+    });
+
     self.chatd.rebind('onMessageKeyRestore.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
         var keyxid = eventData.keyid;

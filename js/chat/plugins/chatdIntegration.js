@@ -927,23 +927,8 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
     var self = this;
 
     var messageContents = messageObject.getContents() ? messageObject.getContents() : "";
-    var encryptedMessageContents = messageObject.encryptedMessageContents ? messageObject.encryptedMessageContents : undefined;
     var tmpPromise = new MegaPromise();
 
-    if (encryptedMessageContents) {
-        // XX: should this be a .error ? or a .warn call ? maybe it should be changed to .debug ?
-        self.logger.warn("Re-using previously encrypted payload and key for message: ", messageObject);
-
-        // was already encrypted, don't re-encrypt and just reuse the previous payload (arr[0]) and keyid (arr[1])
-        tmpPromise.resolve(
-            self.chatd.submit(
-                base64urldecode(chatRoom.chatId),
-                encryptedMessageContents[0],
-                encryptedMessageContents[1]
-            )
-        );
-        return tmpPromise;
-    }
     var promises = [];
     var participants = Object.keys(chatRoom.members);
     removeValue(participants, u_handle);
@@ -1046,14 +1031,7 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
     if (msgId.length === 0) {
         debugger;
     }
-    else {
-        var msg = chatMessages.sending[msgId];
-        if (!msg) {
-            console.error("Update message failed, because msgId  was not found in .sending", msgId);
-            return false;
-        }
-    }
-    return chatMessages.discard(msgId);
+    return self.chatd.discard(msgId, rawChatId);
 };
 
 // decorate ALL functions which require shard to be available before executing

@@ -489,6 +489,20 @@ var strongvelope = {};
     };
 
     /**
+     * Utility functions to check the key id is a temporary key id.
+     *
+     * @method
+     * @param x {Number}
+     *     Number to pack
+     * @returns {Boolen}
+     *     true if the keyid is a temporary key id, false if it is not.
+     */
+    strongvelope.isTempKeyid = function(keyid) {
+
+        return (((keyid & 0xffff0000) >>>0 ) === (0xffff0000 >>>0));
+    };
+
+    /**
      * Manages keys, encryption and message encoding.
      *
      * Note: A new ProtocolHandler instance needs to be initialised. This can
@@ -548,6 +562,7 @@ var strongvelope = {};
         this.includeParticipants = new Set();
         this.excludeParticipants = new Set();
         this.participantChange = false;
+        this.includeKey = false;
         this.counter = 0;
     };
 
@@ -1051,7 +1066,11 @@ var strongvelope = {};
             this.excludeParticipants.clear();
             this.participantChange = false;
         }
-
+        // if the key is still pending, it is possible that the key did not deliver to chatd yet, so include the key.
+        else if (this.includeKey && ns.isTempKeyid(this.getKeyId())) {
+            encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_KEYED, "message": this.getKeyBlob()});
+            this.includeKey = false;
+        }
         var assembledMessage = null;
         // Assemble main message body.
         assembledMessage = this._assembleBody(message, this.keyId);
@@ -1564,5 +1583,17 @@ var strongvelope = {};
         if (keyCount > this.counter) {
             this.counter = keyCount;
         }
+    };
+
+    /**
+     * Set the flag of include key
+     *
+     * @method
+     * @param include {Boolen}
+     *     flag to include the key.
+     */
+    strongvelope.ProtocolHandler.prototype.setIncludeKey = function(include) {
+
+        this.includeKey = include;
     };
 }());

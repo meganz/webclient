@@ -1163,7 +1163,7 @@ Chatd.Messages.prototype.reject = function(msgxid, msgid) {
         self.sendingList.push(neweditmessagekey);
         self.persist(neweditmessagekey);
 
-        self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID]);
+        self.chatd.chatIdShard[self.chatId].msgupd(self.chatId, msgid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID]);
         self.discard(editmessagekey);
     }
     self.discard(messagekey);

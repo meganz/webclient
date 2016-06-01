@@ -63,13 +63,12 @@
                                     $('.login-register-input.email .top-loginp-tooltip-txt', $dialog)
                                         .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
 
-                                    msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
-                                            if (e) {
-                                                $('.pro-register-dialog').addClass('hidden');
-                                                signupPromptDialog.hide();
-                                                showLoginDialog(rv.email);
-                                            }
-                                        });
+                                    if (options.onLoginAttemptFailed) {
+                                        options.onLoginAttemptFailed(rv);
+                                    }
+                                    else {
+                                        msgDialog('warninga', l[1578], l[218]);
+                                    }
                                 }
                                 else if (r === EBLOCKED) {
                                     alert(l[730]);

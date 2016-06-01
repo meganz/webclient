@@ -3888,7 +3888,7 @@ function MegaData()
     this.nodeAttr = function(attrs) {
 
         var node = M.d[attrs.h];
-        
+
         if (node) {
             for (var i in attrs) {
                 if (attrs.hasOwnProperty(i)) {
@@ -4080,6 +4080,26 @@ function MegaData()
         return nodes.every(this._everyTypeFolder);
     };
 
+    /**
+     * Retrieve node share.
+     * @param {String|Object} node cloud node or handle
+     * @param {String} user The user's handle
+     * @return {Object} the share object, or false if not found.
+     */
+    this.getNodeShare = function(node, user) {
+        user = user || 'EXP';
+
+        if (typeof node !== 'object') {
+            node = this.getNodeByHandle(node);
+        }
+
+        if (node && Object(node.shares).hasOwnProperty(user)) {
+            return node.shares[user];
+        }
+
+        return false;
+    };
+
     this.nodeShare = function(h, s, ignoreDB) {
         if (this.d[h]) {
             if (typeof this.d[h].shares === 'undefined') {
@@ -4098,7 +4118,9 @@ function MegaData()
             }
             if ((typeof mDB === 'object') && !pfkey) {
                 if (!u_sharekeys[h]) {
-                    console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
+                    if (d && !this.getNodeShare(h)) {
+                        console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
+                    }
                 }
                 else {
                     mDBadd('ok', {
@@ -4115,13 +4137,22 @@ function MegaData()
     };
 
     this.delNodeShare = function(h, u) {
-        var a = 0;
+
         if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
+            var a = 0;
+
             api_updfkey(h);
             delete this.d[h].shares[u];
+
+            if (u === 'EXP' && this.d[h].ph) {
+                delete this.d[h].ph;
+                this.nodeAttr({ h: h });
+            }
+
             for (var i in this.d[h].shares) {
                 if (this.d[h].shares[i]) {
                     a++;
+                    break;
                 }
             }
             if (a === 0) {
@@ -4165,29 +4196,6 @@ function MegaData()
             if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
                 M.delPS(pendingContactId, nodeHandle);
             }
-        }
-    };
-
-    /**
-     * Removes traces of export link share
-     * Remove M.fln, M.links, M.d[handle].ph
-     * @param {String} handle of selected node/item
-     */
-    this.deleteExportLinkShare = function(handle) {
-
-        removeValue(M.links || [], handle);
-
-        if (M.d[handle]) {
-            
-            // Remove from local state
-            delete M.d[handle].ph;
-            delete M.d[handle].ets;
-            
-            // Get the current state of the node
-            var node = M.d[handle];
-                    
-            // Update indexedDB with the current state
-            mDBadd('f', clone(node));
         }
     };
 
@@ -5814,6 +5822,11 @@ function execsc(actionPackets, callback) {
                 processPS([actionPacket]);
             }
 
+            // Export link (public handle)
+            else if (actionPacket.a === 'ph') {
+                processPH([actionPacket]);
+            }
+
             // Incomming request updated
             else if (actionPacket.a === 'upci') {
                 processUPCI([actionPacket]);
@@ -7078,47 +7091,45 @@ function processPH(publicHandles) {
 
     var nodeId;
     var publicHandleId;
+    var timeNow = unixtime();
     var UiExportLink = fminitialized && new mega.UI.Share.ExportLink();
 
     for (var value in publicHandles) {
-        /* jshint -W089 */
-        value = publicHandles[value];
-        nodeId = value.h;
-        publicHandleId = value.ph;
-        
-        // If the Expiry Timestamp (ets) key is set
-        if (typeof value.ets !== 'undefined') {
-            
-            // Update local state with the expiry timestamp
-            // Note: the nodeAttr function will update IndexedDB
-            M.d[nodeId].ets = value.ets;
-        }
-        else {
-            // Otherwise delete the expiry timestamp from local state
-            // Note: the nodeAttr function will update IndexedDB
-            delete M.d[nodeId].ets;
-        }
-        
-        // Remove export link, down: 1
-        if (value.d) {
-            M.delNodeShare(nodeId, 'EXP');
-            M.deleteExportLinkShare(nodeId);
+        if (publicHandles.hasOwnProperty(value)) {
+            value = publicHandles[value];
+            nodeId = value.h;
+            publicHandleId = value.ph;
 
-            if (UiExportLink) {
-                UiExportLink.removeExportLinkIcon(nodeId);
+            // Remove export link, down: 1
+            if (value.d) {
+                M.delNodeShare(nodeId, 'EXP');
+
+                if (UiExportLink) {
+                    UiExportLink.removeExportLinkIcon(nodeId);
+                }
             }
-        }
-        else {
-            M.nodeAttr({ h: nodeId, ph: publicHandleId });
-            M.nodeShare(value.h, { h: nodeId, r: 0, u: 'EXP', down: value.down, ts: unixtime() });
+            else {
+                var share = clone(value);
+                delete share.a;
+                delete share.i;
+                delete share.n;
+                share.ts = timeNow;
+                share.u = 'EXP';
+                share.r = 0;
 
-            if (UiExportLink) {
-                UiExportLink.addExportLinkIcon(nodeId);
+                if (Object(M.d[nodeId]).ph !== publicHandleId) {
+                    M.nodeAttr({ h: nodeId, ph: publicHandleId });
+                }
+                M.nodeShare(share.h, share);
+
+                if (UiExportLink) {
+                    UiExportLink.addExportLinkIcon(nodeId);
+                }
             }
-        }
 
-        if (UiExportLink && (value.down !== undefined)) {
-            UiExportLink.updateTakenDownItem(nodeId, value.down);
+            if (UiExportLink && (value.down !== undefined)) {
+                UiExportLink.updateTakenDownItem(nodeId, value.down);
+            }
         }
     }
 }

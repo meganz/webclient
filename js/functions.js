@@ -923,7 +923,7 @@ var time2lastSeparator = function(dateString, refDate) {
  * @returns {Number} Returns an integer with the current UNIX timestamp (in seconds)
  */
 function unixtime() {
-    return Math.round(new Date().getTime() / 1000);
+    return Math.round(Date.now() / 1000);
 }
 
 function uplpad(number, length) {

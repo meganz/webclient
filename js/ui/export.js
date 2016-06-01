@@ -187,17 +187,7 @@ var getLinkExpiry = {
 
                     // Add it to be sent in the request
                     request.ets = expiryTimestamp;
-
-                    // Update local state with the expiry timestamp
-                    node.ets = expiryTimestamp;
                 }
-                else {
-                    // Remove the expiry timestamp from the locally stored node
-                    delete node.ets;
-                }
-
-                // Update indexedDB with the current state
-                mDBadd('f', clone(node));
 
                 // Show the expiry time if applicable or remove it
                 getLinkExpiry.showExpiryTime(expiryTimestamp, nodeHandle);
@@ -226,7 +216,7 @@ var getLinkExpiry = {
                 // Get the node handle
                 var node = M.d[handles[i]];
                 var nodeHandle = node.h;
-                var expiryTimestamp = node.ets;
+                var expiryTimestamp = M.getNodeShare(node).ets;
 
                 // If it has an expiry time, increment the count
                 if (expiryTimestamp) {
@@ -270,7 +260,7 @@ var getLinkExpiry = {
             }
             else {
                 // Otherwise update to the date and time
-                expiryString = getLinkExpiry.formatTimestampToDateTime(expiryTimestamp);
+                expiryString = time2date(expiryTimestamp);
             }
 
             // Show it
@@ -283,26 +273,6 @@ var getLinkExpiry = {
 
         // Set or clear the text
         $linkExpiry.text(expiryString);
-    },
-
-    /**
-     * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
-     * @param {Number} timestamp The UNIX timestamp
-     * @returns {String} Returns the date in yyyy-mm-dd hh:mm format
-     */
-    formatTimestampToDateTime: function(timestamp) {
-
-        // Convert to Date object
-        var date = new Date(timestamp * 1000);
-
-        // Get the date and time parts
-        var year = date.getFullYear();
-        var month = uplpad(date.getMonth() + 1, 2);
-        var day = uplpad(date.getDate(), 2);
-        var hours = uplpad(date.getHours(), 2);
-        var mins = uplpad(date.getMinutes(), 2);
-
-        return year + '-' + month + '-' + day + ' ' + hours + ':' + mins;
     }
 };
 
@@ -343,7 +313,6 @@ var getLinkExpiry = {
         var links = $.trim(getClipboardLinks());
         var $span = $('.copy-to-clipboard span');
         var toastTxt;
-        var doLinks;
         var linksNum;
         var success;
 
@@ -414,8 +383,7 @@ var getLinkExpiry = {
 
             $('.copy-to-clipboard').rebind('click', function() {
                 success = true;
-                doLinks = ($(this).attr('id') === 'clipboardbtn1');
-                links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
+                links = $.trim(getClipboardLinks());
 
                 // If extension, use the native extension method
                 if (is_chrome_firefox) {
@@ -468,15 +436,14 @@ var getLinkExpiry = {
             else {
                 if (window.ClipboardEvent) {
                     $('.copy-to-clipboard').rebind('click', function() {
-                        var doLinks = ($(this).attr('id') === 'clipboardbtn1');
-                        links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
 
                         window.onCopyEventHandler = function onCopyEvent(ev) {
                             if (d) {
                                 console.log('onCopyEvent', arguments);
                             }
+                            links = $.trim(getClipboardLinks());
                             ev.clipboardData.setData('text/plain', links);
-                            if (doLinks) {
+                            if (1) {
                                 ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
                                     return '<a href="' + link + '"></a>';
                                 }).join("<br/>\n"));
@@ -538,7 +505,7 @@ var getLinkExpiry = {
             // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
             $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
             $span.text(l[1990]);
-            
+
             // If decryption key, grey out option to set expiry date because it doesn't make sense
             if (keyOption === 'decryption-key') {
                 $('.export-links-dialog .disabled-overlay').removeClass('hidden');
@@ -555,6 +522,148 @@ var getLinkExpiry = {
         // Initialise the Export Link expiry feature
         getLinkExpiry.init();
     };
+
+
+
+    // ------------------------------------
+    // ----- PRIVATE FUNCTIONS FOLLOW -----
+    // ------------------------------------
+
+
+    /**
+     * getClipboardLinks
+     *
+     * Gether all available public links for selected items (files/folders).
+     * @returns {String} links URLs or decryption keys for selected items separated with newline '\n'.
+     * @private
+     */
+    function getClipboardLinks() {
+        var key;
+        var type;
+        var links = [];
+        var handles = $.selected;
+        var $dialog = $('.export-links-dialog .export-content-block');
+        var modeFull = $dialog.hasClass('full-link');
+        var modePublic = $dialog.hasClass('public-handle');
+        var modeDecKey = $dialog.hasClass('decryption-key');
+
+        for (var i in handles) {
+            if (handles.hasOwnProperty(i)) {
+                var node = M.d[handles[i]];
+
+                // Only nodes with public handle
+                if (node && node.ph) {
+                    if (node.t) {
+                        // Folder
+                        type = 'F';
+                        key = u_sharekeys[node.h];
+                    }
+                    else {
+                        // File
+                        type = '';
+                        key = node.key;
+                    }
+
+                    var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
+                    var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
+
+                    // Check export/public link dialog drop down list selected option
+                    if (modeFull) {
+                        links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
+                    }
+                    else if (modePublic) {
+                        links.push(nodeUrlWithPublicHandle);
+                    }
+                    else if (modeDecKey) {
+                        links.push(nodeDecryptionKey);
+                    }
+                }
+            }
+        }
+
+        return links.join("\n");
+    }
+
+    /**
+     * itemExportLinkHtml
+     *
+     * @param {Object} item
+     * @returns {String}
+     * @private
+     */
+    function itemExportLinkHtml(item) {
+
+        var key;
+        var type;
+        var fileSize;
+        var folderClass = '';
+        var html = '';
+        var nodeHandle = item.h;
+
+        // Add a hover text for the icon
+        var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
+
+        // Shared item type is folder
+        if (item.t) {
+            type = 'F';
+            key = u_sharekeys[item.h];
+            fileSize = '';
+            folderClass = ' folder-item';
+        }
+
+        // Shared item type is file
+        else {
+            type = '';
+            key = item.key;
+            fileSize = htmlentities(bytesToSize(item.s));
+        }
+
+        var fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
+        var fileUrlKey = key ? '!' + a32_to_base64(key) : '';
+
+        html = '<div class="export-link-item' + folderClass + '" data-node-handle="' + nodeHandle + '">'
+             +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
+             +      '<div class="export-link-text-pad">'
+             +          '<div class="export-link-txt">'
+             +               '<span class="export-item-title">' + htmlentities(item.name) + '</span>'
+             +               '<span class="export-link-gray-txt">' + fileSize + '</span>'
+             +               '<span class="export-link-expiry-container hidden">'
+             +                    '<span class="export-link-expiry-icon" title="' + expiresTitleText + '"></span>'
+             +                    '<span class="export-link-expiry"></span>'
+             +               '</span>'
+             +          '</div>'
+             +          '<div id="file-link-block" class="file-link-block">'
+             +              '<span class="icon"></span>'
+             +              '<span class="file-link-info-wrapper">'
+             +                  '<span class="file-link-info url">' + fileUrlWithoutKey + '</span>'
+             +                  '<span class="file-link-info key">' + fileUrlKey + '</span>'
+             +              '</span>'
+             +          '</div>'
+             +      '</div>'
+             +  '</div>';
+
+        return html;
+    }
+
+    /**
+     * generates file url for shared item
+     *
+     * @returns {String} html
+     * @private
+     */
+    function itemExportLink() {
+
+        var html = '';
+
+        $.each($.itemExport, function(index, value) {
+            var node = M.d[value];
+            if (node && node.ph) {
+                html += itemExportLinkHtml(node);
+            }
+        });
+
+        return html;
+    }
 
     // export
     scope.mega = scope.mega || {};
@@ -668,44 +777,53 @@ var getLinkExpiry = {
     };
 
     /**
-     * A 'Private' function, send public link delete request.
+     * A 'Private' function, send public get-link request.
      * @param {String} nodeId The node ID.
      */
     ExportLink.prototype._getExportLinkRequest = function(nodeId) {
 
         var self = this;
+        var done = function(handle) {
+
+            if (handle && self.options.updateUI) {
+                var UiExportLink = new mega.UI.Share.ExportLink();
+                UiExportLink.addExportLinkIcon(handle);
+            }
+
+            if (!--self.nodesLeft) {
+                loadingDialog.hide();
+                if (self.options.showExportLinkDialog) {
+                    var exportLinkDialog = new mega.Dialog.ExportLink();
+                    exportLinkDialog.linksDialog();
+                }
+            }
+        };
+        var share = M.getNodeShare(nodeId);
         var request = { a: 'l', n: nodeId, i: requesti };
 
+        // No need to perform an API call if this file was already exported (Ie, we're updating)
+        if (share.h === nodeId) {
+            return done(nodeId);
+        }
+
         // If the Expiry Timestamp (ets) is already set locally, resend in the request or it gets removed
-        if (M.d[nodeId] && (typeof M.d[nodeId].ets !== 'undefined')) {
-            request.ets = M.d[nodeId].ets;
+        if (share.ets) {
+            request.ets = share.ets;
         }
 
         api_req(request, {
             nodeId: nodeId,
             callback: function(result) {
 
-                self.nodesLeft--;
                 if (typeof result !== 'number') {
                     M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
                     M.nodeAttr({ h: this.nodeId, ph: result });
-
-                    if (self.options.updateUI) {
-                        var UiExportLink = new mega.UI.Share.ExportLink();
-                        UiExportLink.addExportLinkIcon(this.nodeId);
-                    }
-                    if (!self.nodesLeft) {
-                        loadingDialog.hide();
-                        if (self.options.showExportLinkDialog) {
-                            var exportLinkDialog = new mega.Dialog.ExportLink();
-                            exportLinkDialog.linksDialog();
-                        }
-                    }
                 }
                 else { // Error
                     self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);
-                    loadingDialog.hide();
                 }
+
+                done(typeof result !== 'number' && this.nodeId);
             }
         });
     };
@@ -721,22 +839,20 @@ var getLinkExpiry = {
         api_req({ a: 's2', n:  nodeId, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti }, {
             nodeId: nodeId,
             callback: function(result) {
-                self.nodesLeft--;
                 if (result.r && (result.r[0] === 0)) {
                     M.delNodeShare(this.nodeId, 'EXP');
-                    M.deleteExportLinkShare(this.nodeId);
 
                     if (self.options.updateUI) {
                         var UiExportLink = new mega.UI.Share.ExportLink();
                         UiExportLink.removeExportLinkIcon(this.nodeId);
                     }
-                    if (!self.nodesLeft) {
-                        loadingDialog.hide();
-                    }
                 }
                 else {
                     // Error
                     self.logger.warn('_removeFolerExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
+                }
+
+                if (!--self.nodesLeft) {
                     loadingDialog.hide();
                 }
             }
@@ -754,22 +870,20 @@ var getLinkExpiry = {
         api_req({ a: 'l', n: nodeId, d: 1, i:requesti }, {
             nodeId: nodeId,
             callback: function(result) {
-                self.nodesLeft--;
                 if (result === 0) {
                     M.delNodeShare(this.nodeId, 'EXP');
-                    M.deleteExportLinkShare(this.nodeId);
 
                     if (self.options.updateUI) {
                         var UiExportLink = new mega.UI.Share.ExportLink();
                         UiExportLink.removeExportLinkIcon(this.nodeId);
                     }
-                    if (!self.nodesLeft) {
-                        loadingDialog.hide();
-                    }
                 }
                 else {
                     // Error
                     self.logger.warn('_removeFileExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
+                }
+
+                if (!--self.nodesLeft) {
                     loadingDialog.hide();
                 }
             }
@@ -784,7 +898,6 @@ var getLinkExpiry = {
     ExportLink.prototype.isTakenDown = function(nodesId) {
 
         var self = this;
-        var result = false;
         var nodes = nodesId;
 
         if (nodesId) {
@@ -796,14 +909,17 @@ var getLinkExpiry = {
             nodes = self.options.nodesToProcess;
         }
 
-        $.each(nodes, function(index, value) {
-            if (M.d[value] && M.d[value].shares && M.d[value].shares.EXP && (M.d[value].shares.EXP.down === 1)) {
-                result = true;
-                return false;// Break the loop
-            }
-        });
+        for (var handle in nodes) {
+            if (nodes.hasOwnProperty(handle)) {
+                handle = nodes[handle];
 
-        return result;
+                if (M.getNodeShare(handle).down === 1) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     };
 
     // export

@@ -706,7 +706,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.MSGID:
                 //self.keepAliveTimerRestart();
                 self.logger.log("MSG already exists: " + base64urlencode(cmd.substr(1,8)) + " - " + base64urlencode(cmd.substr(9,8)));
-                self.chatd.discard(cmd.substr(1,8));
+                self.chatd.msgreject(cmd.substr(1,8), cmd.substr(9,8));
                 len = 17;
                 break;
             default:
@@ -913,8 +913,10 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
                 self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.UPDATED] = mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
                 self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.MESSAGE] = message;
             }
-            // if there is no any pending edit, append a pending edit.
+            // if there is no any pending edit, overwrite the original messsage with the edited content and append a pending edit.
             else {
+                self.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
+
                 self.sendingbuf[++self.sendingnum] = [self.sendingbuf[msgnum][Chatd.MsgField.MSGID], self.sendingbuf[msgnum][Chatd.MsgField.USERID], self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP], message, self.sendingbuf[msgnum][Chatd.MsgField.KEYID], mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1, Chatd.MsgType.EDIT];
                 self.sending[messagekey] = self.sendingnum;
                 self.sendingList.push(messagekey);
@@ -966,6 +968,16 @@ Chatd.Messages.prototype.resend = function(restore) {
 
     this.sendingList.forEach(function(msgxid) {
         if (mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
+            if(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
+                lastexpiredpendingkey = null;
+            }
+            if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT) {
+                var messagekey = self.getmessagekey(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MSGID], Chatd.MsgType.MESSAGE);
+                // if the edit is pending on the original message, then wait.
+                if (self.sending[messagekey]) {
+                    return;
+                }
+            }
             var messageConstructs = [];
             messageConstructs.push({"msgxid":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MSGID], "timestamp":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP],"keyid":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID], "updated":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.UPDATED], "message":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MESSAGE], "type":self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE]});
 
@@ -973,21 +985,10 @@ Chatd.Messages.prototype.resend = function(restore) {
                 self.chatId,
                 messageConstructs
             );
-            if(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
-                lastexpiredpendingkey = null;
-            }
         }
         else {
             // if it is an expired message, require manul send.
             if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.MESSAGE) {
-                var editmessagekey = self.getmessagekey(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MSGID], Chatd.MsgType.EDIT);
-                var editmsgnum = self.sending[editmessagekey];
-                // if there is a pending edit, use the pending edit.
-                if (editmsgnum) {
-                    self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID] = self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID];
-                    self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.MESSAGE] = self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE];
-                    self.persist(msgxid);
-                }
 
                 self.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(self.chatId),
@@ -1059,6 +1060,20 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
     }
 };
 
+// msg is rejected as it have already been sent, and the msgid is the confirmed msg id.
+Chatd.prototype.msgreject = function(msgxid, msgid) {
+    // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
+    for (var chatId in this.chatIdMessages) {
+        if (this.chatIdMessages[chatId]) {
+            var messagekey = this.chatIdMessages[chatId].getmessagekey(msgxid, Chatd.MsgType.MESSAGE);
+            if (this.chatIdMessages[chatId].sending[messagekey]) {
+                this.chatIdMessages[chatId].reject(msgxid, msgid);
+                break;
+            }
+        }
+    }
+};
+
 // msgid can be false in case of rejections
 Chatd.prototype.editreject = function(chatId, msgid) {
     // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
@@ -1120,6 +1135,40 @@ Chatd.prototype.msgcheck = function(chatId, msgid) {
     }
 };
 
+// msg is rejected and the confirmed msg id is msgid
+Chatd.Messages.prototype.reject = function(msgxid, msgid) {
+    var self = this;
+
+    var messagekey = self.getmessagekey(msgxid, Chatd.MsgType.MESSAGE);
+    var num = self.sending[messagekey];
+    if (!num) {
+        return ;
+    }
+    self.chatd.trigger('onMessageUpdated', {
+        chatId: base64urlencode(self.chatId),
+        userId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.USERID]),
+        messageId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.MSGID]),
+        id: num >>> 0,
+        state: 'DISCARDED',
+        keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
+        message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
+    });
+    var editmessagekey = self.getmessagekey(msgxid, Chatd.MsgType.EDIT);
+    var editmsgnum = self.sending[editmessagekey];
+    // we now have a proper msgid, resend MSGUPDX in case the edit crossed the execution of the command
+    if (self.sendingbuf[editmsgnum]) {
+        var neweditmessagekey = self.getmessagekey(msgid, Chatd.MsgType.EDIT);
+        self.sendingbuf[++self.sendingnum] = [msgid, self.chatd.userId, self.sendingbuf[editmsgnum][Chatd.MsgField.TIMESTAMP], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID], self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.TYPE]];
+        self.sending[neweditmessagekey] = self.sendingnum;
+        self.sendingList.push(neweditmessagekey);
+        self.persist(neweditmessagekey);
+
+        self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID]);
+        self.discard(editmessagekey);
+    }
+    self.discard(messagekey);
+};
+
 // msgid can be false in case of rejections
 Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     var self = this;
@@ -1135,7 +1184,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
             chatId: base64urlencode(chatId),
             id: num,
             messageId: base64urlencode(msgid),
-            message: self.buf[num][Chatd.MsgField.MESSAGE]
+            message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
         });
     }
     else {
@@ -1163,14 +1212,21 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
             keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
             message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
         });
+        var editmessagekey = self.getmessagekey(msgxid, Chatd.MsgType.EDIT);
+        var editmsgnum = self.sending[editmessagekey];
+        // we now have a proper msgid, resend MSGUPDX in case the edit crossed the execution of the command
+        if (self.sendingbuf[editmsgnum]) {
+            var neweditmessagekey = self.getmessagekey(msgid, Chatd.MsgType.EDIT);
+            self.sendingbuf[++self.sendingnum] = [msgid, self.chatd.userId, self.sendingbuf[editmsgnum][Chatd.MsgField.TIMESTAMP], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID], self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.TYPE]];
+            self.sending[neweditmessagekey] = self.sendingnum;
+            self.sendingList.push(neweditmessagekey);
+            self.persist(neweditmessagekey);
+
+            self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID]);
+            self.discard(editmessagekey);
+        }
     }
-    var editmessagekey = self.getmessagekey(msgxid, Chatd.MsgType.EDIT);
-    var editmsgnum = self.sending[editmessagekey];
-    // we now have a proper msgid, resend MSGUPDX in case the edit crossed the execution of the command
-    if (self.sendingbuf[editmsgnum]) {
-        self.sendingbuf[editmsgnum][Chatd.MsgField.MSGID] = msgid;
-        self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID]);
-    }
+
     self.discard(messagekey);
 };
 

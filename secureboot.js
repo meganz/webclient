@@ -897,6 +897,7 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 if (m)
 {
     var app,mobileblog,android,intent, ios9;
+    var ios;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
@@ -954,6 +955,7 @@ if (m)
             // Check for iOS 9.0+
             ios9 = (ver > 8);
         }
+        ios = 1;
     }
     else document.body.className = 'another-os full-mode unsupported';
 

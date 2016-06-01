@@ -1158,12 +1158,14 @@ Chatd.Messages.prototype.reject = function(msgxid, msgid) {
     // we now have a proper msgid, resend MSGUPDX in case the edit crossed the execution of the command
     if (self.sendingbuf[editmsgnum]) {
         var neweditmessagekey = self.getmessagekey(msgid, Chatd.MsgType.EDIT);
-        self.sendingbuf[++self.sendingnum] = [msgid, self.chatd.userId, self.sendingbuf[editmsgnum][Chatd.MsgField.TIMESTAMP], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID], self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.TYPE]];
+        var msgnum = self.getmessagenum(msgid);
+        var neweditkeyid = msgnum ? self.buf[msgnum][Chatd.MsgField.KEYID] : self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID];
+        self.sendingbuf[++self.sendingnum] = [msgid, self.chatd.userId, self.sendingbuf[editmsgnum][Chatd.MsgField.TIMESTAMP], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], neweditkeyid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.TYPE]];
         self.sending[neweditmessagekey] = self.sendingnum;
         self.sendingList.push(neweditmessagekey);
         self.persist(neweditmessagekey);
 
-        self.chatd.chatIdShard[self.chatId].msgupd(self.chatId, msgid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID]);
+        self.chatd.chatIdShard[self.chatId].msgupd(self.chatId, msgid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], neweditkeyid);
         self.discard(editmessagekey);
     }
     self.discard(messagekey);
@@ -1414,6 +1416,18 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
     MegaPromise.allDone(promises).always(function() {
         _updatekeyid();
     });
+};
+
+// get msg number from msgid, wonder there should be a more efficient way to do this.
+Chatd.Messages.prototype.getmessagenum = function(msgid) {
+    var msgnum = null;
+     for (var i = this.highnum; i > this.lownum; i--) {
+        if (this.buf[i] && this.buf[i][Chatd.MsgField.MSGID] === msgid) {
+            msgnum = i;
+            break;
+        }
+    }
+    return msgnum;
 };
 
 // generate a key from message id and message type

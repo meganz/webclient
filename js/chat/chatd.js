@@ -896,18 +896,19 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
 
     // modify pending message so that a potential resend includes the change
     if (self.sendingbuf[msgnum]) {
-        // if the pending item with the same message Id is an edit, overwrite it.
+        //overwrite the original messsage with the edited content
+        self.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
+        var pendingmsgkey = self.getmessagekey(self.sendingbuf[msgnum][Chatd.MsgField.MSGID], Chatd.MsgType.MESSAGE);
+        self.persist(pendingmsgkey);
+
         var messagekey = self.getmessagekey(self.sendingbuf[msgnum][Chatd.MsgField.MSGID], Chatd.MsgType.EDIT);
         // if there is a pending edit after the pending new message, overwrite the pending edit to only keep 1 pending edit.
         if (self.sending[messagekey]) {
             self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.UPDATED] = mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1;
             self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.MESSAGE] = message;
         }
-        // if there is no any pending edit, overwrite the original messsage with the edited content and append a pending edit.
+        // if there is no any pending edit, append a pending edit.
         else {
-            self.sendingbuf[msgnum][Chatd.MsgField.MESSAGE] = message;
-            var pendingmsgkey = self.getmessagekey(self.sendingbuf[msgnum][Chatd.MsgField.MSGID], Chatd.MsgType.MESSAGE);
-            self.persist(pendingmsgkey);
             self.sendingbuf[++self.sendingnum] = [self.sendingbuf[msgnum][Chatd.MsgField.MSGID], self.sendingbuf[msgnum][Chatd.MsgField.USERID], self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP], message, self.sendingbuf[msgnum][Chatd.MsgField.KEYID], mintimestamp-self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP]+1, Chatd.MsgType.EDIT];
             self.sending[messagekey] = self.sendingnum;
             self.sendingList.push(messagekey);
@@ -1205,20 +1206,11 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
             message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
         });
         var editmessagekey = self.getmessagekey(msgxid, Chatd.MsgType.EDIT);
-        var editmsgnum = self.sending[editmessagekey];
-        // we now have a proper msgid, resend MSGUPDX in case the edit crossed the execution of the command
-        if (self.sendingbuf[editmsgnum]) {
-            var neweditmessagekey = self.getmessagekey(msgid, Chatd.MsgType.EDIT);
-            self.sendingbuf[++self.sendingnum] = [msgid, self.chatd.userId, self.sendingbuf[editmsgnum][Chatd.MsgField.TIMESTAMP], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID], self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.TYPE]];
-            self.sending[neweditmessagekey] = self.sendingnum;
-            self.sendingList.push(neweditmessagekey);
-            self.persist(neweditmessagekey);
-
-            self.chatd.chatIdShard[chatId].msgupd(chatId, msgid, self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED], self.sendingbuf[editmsgnum][Chatd.MsgField.MESSAGE], self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID]);
+        // if we have a pending edit, discard it as the NEWMSG should use the edited content.
+        if (self.sending[editmessagekey]) {
             self.discard(editmessagekey);
         }
     }
-
     self.discard(messagekey);
 };
 

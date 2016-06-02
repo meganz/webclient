@@ -766,11 +766,6 @@ var getLinkExpiry = {
         sharePromise.done(function _sharePromiseDone(result) {
             if (result.r && result.r[0] === 0) {
 
-                // do not overwrite, since we'll lose the `ets`
-                if (!share) {
-                    M.nodeShare(nodeId, { h: nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                }
-
                 self._getExportLinkRequest(nodeId);
 
                 if (!self.nodesLeft) {
@@ -784,6 +779,7 @@ var getLinkExpiry = {
         });
         sharePromise.fail(function _sharePromiseFailed(result) {
             self.logger.warn('Get folder link failed: ' + result);
+            // XXX: this seem to lack some handling code for this condition
         });
     };
 

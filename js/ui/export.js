@@ -750,8 +750,13 @@ var getLinkExpiry = {
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
-
         var childNodes = [];
+        var share = M.getNodeShare(nodeId);
+
+        // No need to perform an API call if this folder was already exported (Ie, we're updating)
+        if (share.h === nodeId) {
+            return self._getExportLinkRequest(nodeId);
+        }
 
         // Get all child nodes of root folder with nodeId
         childNodes = fm_getnodes(nodeId);
@@ -760,8 +765,14 @@ var getLinkExpiry = {
         var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
         sharePromise.done(function _sharePromiseDone(result) {
             if (result.r && result.r[0] === 0) {
-                M.nodeShare(nodeId, { h: nodeId, r: 0, u: 'EXP', ts: unixtime() });
+
+                // do not overwrite, since we'll lose the `ets`
+                if (!share) {
+                    M.nodeShare(nodeId, { h: nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                }
+
                 self._getExportLinkRequest(nodeId);
+
                 if (!self.nodesLeft) {
                     loadingDialog.hide();
                 }

@@ -950,13 +950,12 @@ Chatd.Messages.prototype.clearpending = function() {
 Chatd.Messages.prototype.resend = function(restore) {
     var self = this;
     restore = (typeof restore === 'undefined') ? false : restore;
-
     // resend all pending new messages and modifications
     // 1 hour is agreed by everyone.
     var MESSAGE_EXPIRY = 60*60; // 60*60
     var mintimestamp = Math.floor(new Date().getTime()/1000);
     var lastexpiredpendingkey = null;
-
+    var trivialmsgs = [];
     this.sendingList.forEach(function(msgxid) {
         if (mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
             if(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
@@ -994,7 +993,7 @@ Chatd.Messages.prototype.resend = function(restore) {
             }
             // if it is an expired edit, throw it away.
             else if(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT) {
-                self.discard(msgxid);
+                trivialmsgs.push(msgxid);
             }
             // if it is an expired key
             else if(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
@@ -1013,6 +1012,9 @@ Chatd.Messages.prototype.resend = function(restore) {
             userId: base64urlencode(self.sendingbuf[self.sending[lastexpiredpendingkey]][Chatd.MsgField.USERID]),
             messageId: base64urlencode(self.sendingbuf[self.sending[lastexpiredpendingkey]][Chatd.MsgField.MSGID])
         });
+    }
+    for (var msgkeyid in trivialmsgs) {
+        self.discard(trivialmsgs[msgkeyid]);
     }
 };
 

@@ -811,18 +811,18 @@ function countrydetails(isocode) {
  * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
  */
 function time2date(unixTime, ignoreTime) {
-    
+
     var myDate = new Date(unixTime * 1000 || 0);
     var myDateString =
         myDate.getFullYear() + '-'
         + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
         + ('0' + myDate.getDate()).slice(-2);
-    
+
     if (!ignoreTime) {
         myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
             + ('0' + myDate.getMinutes()).slice(-2);
     }
-    
+
     return myDateString;
 }
 
@@ -3432,6 +3432,7 @@ mega.utils.reload = function megaUtilsReload() {
             u_key = u_storage.k,
             privk = u_storage.privk,
             debug = !!u_storage.d;
+        var mcd = u_storage.testChatDisabled;
 
         localStorage.clear();
         sessionStorage.clear();
@@ -3448,6 +3449,9 @@ mega.utils.reload = function megaUtilsReload() {
                 u_storage.dd = true;
                 if (!is_extension) {
                     u_storage.jj = true;
+                }
+                if (mcd) {
+                    u_storage.testChatDisabled = 1;
                 }
             }
         }

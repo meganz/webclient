@@ -6274,7 +6274,7 @@ function setContextMenuGetLinkText() {
         var nodeHandle = $.selected[i];
 
         // If it has a public link, then increment the count
-        if (typeof M.d[nodeHandle].ph !== 'undefined') {
+        if (M.getNodeShare(nodeHandle)) {
             numOfExistingPublicLinks++;
         }
     }

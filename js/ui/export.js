@@ -809,7 +809,7 @@ var getLinkExpiry = {
         var request = { a: 'l', n: nodeId, i: requesti };
 
         // No need to perform an API call if this file was already exported (Ie, we're updating)
-        if (share.h === nodeId) {
+        if (share.h === nodeId && share.ph) {
             return done(nodeId);
         }
 

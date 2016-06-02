@@ -3350,7 +3350,9 @@
     "8824": "A log will be created in the Offline section ({0}).",
     "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "\u0e42\u0e2b\u0e21\u0e14\u0e14\u0e35\u0e1a\u0e31\u0e01",
+    "8827": "Item shared by the Windows Phone MEGA app.",
     "8828": "\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e17\u0e35\u0e48\u0e41\u0e0a\u0e23\u0e4c\u0e08\u0e32\u0e01 MEGA",
+    "8829": "Items shared by the Windows Phone MEGA app.",
     "8830": "\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e17\u0e35\u0e48\u0e41\u0e0a\u0e23\u0e4c\u0e08\u0e32\u0e01 MEGA",
     "8831": "\u0e01\u0e33\u0e25\u0e31\u0e07\u0e04\u0e31\u0e14\u0e25\u0e2d\u0e01...",
     "8832": "\u0e2a\u0e16\u0e34\u0e15\u0e34\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e04\u0e27\u0e32\u0e21\u0e08\u0e33",
@@ -3363,6 +3365,9 @@
     "8839": "Recovery Key",
     "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
     "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+    "8842": "Grant bandwidth to downloading users:",
+    "8843": "[S]50 %[\/S] bandwidth",
+    "8844": "This is the maximum percentage of your bandwidth which is available to third party users.",
     "8845": "This purchase has expired.",
     "alias": {
         "shared-with-me": 5589,
@@ -3460,6 +3465,7 @@
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
         "new-version-megachat-extension-message": 8841,
-        "purchase-has-expired": 8845
+        "purchase-has-expired": 8845,
+        "grant-bandwidth-title": 8842
     }
 }

@@ -13403,9 +13403,17 @@
         "text": "Debug mode",
         "context": "A message on the alert dialog which is displayed when the app starts and the debugging mode is enabled."
     },
+    "8827": {
+        "text": "Item shared by the Windows Phone MEGA app.",
+        "context": "Message or description for the shared resource or the dialog displayed when the user is sharing one item from MEGA with other app of his Windows Phone device - (String as short as possible).\r\n\r\nExample scenario: A user shares a photo from his mega account to the Outlook email app, to email it to a friend. This text \"Item shared by the Windows Phone Mega app\". would appear as the body of the email to describe what has happened.\r\nIf we shared it to whatsapp then this text could also be the description there - it lets others know where this item came from."
+    },
     "8828": {
         "text": "Item shared from MEGA",
         "context": "Title for the shared resource or the dialog displayed when the user is sharing a file\/folder from MEGA with another app - (String as short as possible)."
+    },
+    "8829": {
+        "text": "Items shared by the Windows Phone MEGA app.",
+        "context": "Message or description for the shared resource or the dialog displayed when the user is sharing multiple items from MEGA with other app of his Windows Phone device - (String as short as possible)."
     },
     "8830": {
         "text": "Items shared from MEGA",
@@ -13454,6 +13462,18 @@
     "8841": {
         "text": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
         "context": "A dialog message when there is a new chat server version available. This update will be incompatible with the current user's MEGA client so they will need to update their browser extension."
+    },
+    "8842": {
+        "text": "Grant bandwidth to downloading users:",
+        "context": "Maximum percentage of your bandwidth which is available to third party users."
+    },
+    "8843": {
+        "text": "[S]50 %[\/S] bandwidth",
+        "context": "Full string: 50% bandwidth. This is the maximum percentage of your bandwidth which is available to third party users. The 50% is a placeholder for whatever the percentage will actually be.\r\n\r\nPlease leave \"[S]50 %[\/S]\" as it is."
+    },
+    "8844": {
+        "text": "This is the maximum percentage of your bandwidth which is available to third party users.",
+        "context": "Full string: \r\n\"50% bandwith. This is the maximum percentage of your bandwidth which is available to third party users.\"\r\n\r\nUser can set bandwidth limit to users, who downloading his files.\r\n\r\n"
     },
     "8845": {
         "text": "This purchase has expired.",

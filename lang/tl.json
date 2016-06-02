@@ -3350,7 +3350,9 @@
     "8824": "A log will be created in the Offline section ({0}).",
     "8825": "Debug mode is enabled. Do you want to disable it?",
     "8826": "Debug mode",
+    "8827": "Item shared by the Windows Phone MEGA app.",
     "8828": "Bagay na binahagi galing sa MEGA",
+    "8829": "Items shared by the Windows Phone MEGA app.",
     "8830": "Mga bagay na binahagi galing sa MEGA",
     "8831": "Ginagaya...",
     "8832": "Memory statistics",
@@ -3358,12 +3360,15 @@
     "8834": "Ang inyong download ay hindi makakapagsimula dahil makukuha nito ang kasalukuyang libreng transfer allowance sa inyong IP address.",
     "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
     "8836": "Recovery Key copied to clipboard",
-    "8837": "Recovery Key copied",
-    "8838": "Export Recovery Key",
+    "8837": "Nakopya na ang Recovery Key",
+    "8838": "I-export ang Recovery Key",
     "8839": "Recovery Key",
     "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
     "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
-    "8845": "This purchase has expired.",
+    "8842": "Grant bandwidth to downloading users:",
+    "8843": "[S]50 %[\/S] na bandwidth",
+    "8844": "This is the maximum percentage of your bandwidth which is available to third party users.",
+    "8845": "Ang pagbiling ito ay lumipas na.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3460,6 +3465,7 @@
         "warning-message-for-bandwidth-overquota": 8834,
         "new-version-megachat-message": 8840,
         "new-version-megachat-extension-message": 8841,
-        "purchase-has-expired": 8845
+        "purchase-has-expired": 8845,
+        "grant-bandwidth-title": 8842
     }
 }

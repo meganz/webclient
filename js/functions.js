@@ -804,17 +804,26 @@ function countrydetails(isocode) {
     return cdetails;
 }
 
-function time2date(unixtime, ignoretime) {
-    var MyDate = new Date(unixtime * 1000 || 0);
-    var MyDateString =
-        MyDate.getFullYear() + '-'
-        + ('0' + (MyDate.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + MyDate.getDate()).slice(-2);
-    if (!ignoretime) {
-        MyDateString += ' ' + ('0' + MyDate.getHours()).slice(-2) + ':'
-            + ('0' + MyDate.getMinutes()).slice(-2);
+/**
+ * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
+ * @param {Number} unixTime The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
+ * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
+ */
+function time2date(unixTime, ignoreTime) {
+    
+    var myDate = new Date(unixTime * 1000 || 0);
+    var myDateString =
+        myDate.getFullYear() + '-'
+        + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
+        + ('0' + myDate.getDate()).slice(-2);
+    
+    if (!ignoreTime) {
+        myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
+            + ('0' + myDate.getMinutes()).slice(-2);
     }
-    return MyDateString;
+    
+    return myDateString;
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:

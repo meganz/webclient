@@ -4080,6 +4080,26 @@ function MegaData()
         return nodes.every(this._everyTypeFolder);
     };
 
+    /**
+     * Retrieve node share.
+     * @param {String|Object} node cloud node or handle
+     * @param {String} user The user's handle
+     * @return {Object} the share object, or false if not found.
+     */
+    this.getNodeShare = function(node, user) {
+        user = user || 'EXP';
+
+        if (typeof node !== 'object') {
+            node = this.getNodeByHandle(node);
+        }
+
+        if (node && Object(node.shares).hasOwnProperty(user)) {
+            return node.shares[user];
+        }
+
+        return false;
+    };
+
     this.nodeShare = function(h, s, ignoreDB) {
         if (this.d[h]) {
             if (typeof this.d[h].shares === 'undefined') {
@@ -4098,7 +4118,9 @@ function MegaData()
             }
             if ((typeof mDB === 'object') && !pfkey) {
                 if (!u_sharekeys[h]) {
-                    console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
+                    if (d && !this.getNodeShare(h)) {
+                        console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
+                    }
                 }
                 else {
                     mDBadd('ok', {
@@ -4115,13 +4137,22 @@ function MegaData()
     };
 
     this.delNodeShare = function(h, u) {
-        var a = 0;
+
         if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
+            var a = 0;
+
             api_updfkey(h);
             delete this.d[h].shares[u];
+
+            if (u === 'EXP' && this.d[h].ph) {
+                delete this.d[h].ph;
+                this.nodeAttr({ h: h });
+            }
+
             for (var i in this.d[h].shares) {
                 if (this.d[h].shares[i]) {
                     a++;
+                    break;
                 }
             }
             if (a === 0) {
@@ -4165,22 +4196,6 @@ function MegaData()
             if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
                 M.delPS(pendingContactId, nodeHandle);
             }
-        }
-    };
-
-    /**
-     * Removes traces of export link share
-     * Remove M.fln, M.links, M.d[handle].ph
-     *
-     * @param {string} handle of selected node/item
-     *
-     */
-    this.deleteExportLinkShare = function(handle) {
-
-        removeValue(M.links || [], handle);
-
-        if (M.d[handle] && M.d[handle].ph) {
-            delete M.d[handle].ph;
         }
     };
 
@@ -5807,6 +5822,11 @@ function execsc(actionPackets, callback) {
                 processPS([actionPacket]);
             }
 
+            // Export link (public handle)
+            else if (actionPacket.a === 'ph') {
+                processPH([actionPacket]);
+            }
+
             // Incomming request updated
             else if (actionPacket.a === 'upci') {
                 processUPCI([actionPacket]);
@@ -7064,41 +7084,52 @@ function processOPC(opc, ignoreDB) {
 /**
  * processPH
  *
- * Process export link (public handle) action packet.
- * @param {Object} actionPacket a: 'ph'.
+ * Process export link (public handle) action packet and 'f' tree response.
+ * @param {Object} publicHandles The Public Handles action packet i.e. a: 'ph'.
  */
 function processPH(publicHandles) {
 
     var nodeId;
     var publicHandleId;
+    var timeNow = unixtime();
     var UiExportLink = fminitialized && new mega.UI.Share.ExportLink();
 
     for (var value in publicHandles) {
-        /* jshint -W089 */
-        value = publicHandles[value];
-        nodeId = value.h;
-        publicHandleId = value.ph;
+        if (publicHandles.hasOwnProperty(value)) {
+            value = publicHandles[value];
+            nodeId = value.h;
+            publicHandleId = value.ph;
 
-        // Remove export link, down: 1
-        if (value.d) {
-            M.delNodeShare(nodeId, 'EXP');
-            M.deleteExportLinkShare(nodeId);
+            // Remove export link, down: 1
+            if (value.d) {
+                M.delNodeShare(nodeId, 'EXP');
 
-            if (UiExportLink) {
-                UiExportLink.removeExportLinkIcon(nodeId);
+                if (UiExportLink) {
+                    UiExportLink.removeExportLinkIcon(nodeId);
+                }
             }
-        }
-        else {
-            M.nodeAttr({ h: nodeId, ph: publicHandleId });
-            M.nodeShare(value.h, { h: nodeId, r: 0, u: 'EXP', down: value.down, ets: value.ets, ts: unixtime() });
+            else {
+                var share = clone(value);
+                delete share.a;
+                delete share.i;
+                delete share.n;
+                share.ts = timeNow;
+                share.u = 'EXP';
+                share.r = 0;
 
-            if (UiExportLink) {
-                UiExportLink.addExportLinkIcon(nodeId);
+                if (Object(M.d[nodeId]).ph !== publicHandleId) {
+                    M.nodeAttr({ h: nodeId, ph: publicHandleId });
+                }
+                M.nodeShare(share.h, share);
+
+                if (UiExportLink) {
+                    UiExportLink.addExportLinkIcon(nodeId);
+                }
             }
-        }
 
-        if (UiExportLink && (value.down !== undefined)) {
-            UiExportLink.updateTakenDownItem(nodeId, value.down);
+            if (UiExportLink && (value.down !== undefined)) {
+                UiExportLink.updateTakenDownItem(nodeId, value.down);
+            }
         }
     }
 }
@@ -7630,656 +7661,3 @@ function balance2pro(callback)
         }
     });
 }
-
-(function($, scope) {
-    /**
-     * Public Link Dialog
-     *
-     * @param opts {Object}
-     *
-     * @constructor
-     */
-    var ExportLinkDialog = function(opts) {
-
-        var self = this;
-
-        var defaultOptions = {
-        };
-
-        self.options = $.extend(true, {}, defaultOptions, opts);
-
-        self.logger = MegaLogger.getLogger('ExportLinkDialog');
-    };
-
-    /**
-     * linksDialog
-     *
-     * Render public link dialog and handle events
-     * @param {Boolean} close To close or to show public link dialog
-     */
-    ExportLinkDialog.prototype.linksDialog = function(close) {
-
-        var self = this;
-
-        var html = '',
-            scroll = '.export-link-body';
-
-        var links = $.trim(getClipboardLinks()),
-            $span = $('.copy-to-clipboard span'),
-            toastTxt, doLinks, linksNum, success;
-
-        deleteScrollPanel(scroll, 'jsp');
-
-        if (close) {
-            $.dialog = false;
-            fm_hideoverlay();
-            $('.fm-dialog.export-links-dialog').addClass('hidden');
-            $('.export-links-warning').addClass('hidden');
-            if (window.onCopyEventHandler) {
-                document.removeEventListener('copy', window.onCopyEventHandler, false);
-                delete window.onCopyEventHandler;
-            }
-            return true;
-        }
-
-        $.dialog = 'links';
-
-        $('.export-links-dialog').addClass('file-keys-view');
-
-        // Generate content
-        html = itemExportLink();
-
-        // Fill with content
-        $('.export-links-dialog .export-link-body').html(html);
-
-        // Default export option is
-        $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass('public-handle');
-        $('.export-link-select').html($('.export-link-dropdown div.public-handle').html());
-
-        fm_showoverlay();
-
-        $('.fm-dialog.export-links-dialog').removeClass('hidden');
-        $('.export-link-body').removeAttr('style');
-        $('.export-links-warning').removeClass('hidden');
-
-        if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
-            $('.export-link-body').jScrollPane({ showArrows: true, arrowSize: 5 });
-            jScrollFade('.export-link-body');
-        }
-        $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
-
-        setTimeout(function() {
-            $('.file-link-info').rebind('click', function() {
-                $('.file-link-info').select();
-            });
-        }, 300);
-
-        // Setup toast notification
-        toastTxt = l[7654];
-        linksNum = links.replace(/\s+/gi, ' ').split(' ').length;
-
-        if (linksNum > 1) {
-            toastTxt = l[7655].replace('%d', linksNum);
-        }
-
-        // Setup the copy to clipboard buttons
-        $span.text(l[1990]);
-
-        // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || mega.utils.execCommandUsable()) {
-            if (!is_chrome_firefox) {
-                $('.fm-dialog-chrome-clipboard').removeClass('hidden');
-            }
-
-            $('.copy-to-clipboard').rebind('click', function() {
-                success = true;
-                doLinks = ($(this).attr('id') === 'clipboardbtn1');
-                links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
-
-                // If extension, use the native extension method
-                if (is_chrome_firefox) {
-                    mozSetClipboard(links);
-                }
-                else {
-                    // Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
-                    $('#chromeclipboard').html(links);
-                    selectText('chromeclipboard');
-                    success = document.execCommand('copy');
-                }
-
-                if (success) {
-                    showToast('clipboard', toastTxt);
-                }
-            });
-        }
-        else if (flashIsEnabled()) {
-            $('.copy-to-clipboard').html('<span>' + htmlentities(l[1990]) + '</span><object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
-
-            $('.copy-to-clipboard').rebind('mouseover', function() {
-                var e = $('#clipboardswf1')[0];
-                if (e && e.setclipboardtext) {
-                    e.setclipboardtext(getClipboardLinks());
-                }
-            });
-            $('.copy-to-clipboard').rebind('mousedown', function() {
-                showToast('clipboard', toastTxt);
-            });
-        }
-        else {
-            var uad = browserdetails(ua);
-
-            if (uad.icon === 'ie.png' && window.clipboardData) {
-                $('.copy-to-clipboard').rebind('click', function() {
-                    links = $.trim(getClipboardLinks());
-                    var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
-                    window.clipboardData.setData(mode, links);
-                    showToast('clipboard', toastTxt);
-                });
-            }
-            else {
-                if (window.ClipboardEvent) {
-                    $('.copy-to-clipboard').rebind('click', function() {
-                        var doLinks = ($(this).attr('id') === 'clipboardbtn1');
-                        links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
-
-                        window.onCopyEventHandler = function onCopyEvent(ev) {
-                            if (d) console.log('onCopyEvent', arguments);
-                            ev.clipboardData.setData('text/plain', links);
-                            if (doLinks) {
-                                ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
-                                    return '<a href="' + link + '"></a>';
-                                }).join("<br/>\n"));
-                            }
-                            ev.preventDefault();
-                            showToast('clipboard', toastTxt); // Done
-                        };
-                        document.addEventListener('copy', window.onCopyEventHandler, false);
-                        Soon(function() {
-                            $span.text(l[7663] + ' ' + (uad.os === 'Apple' ? 'command' : 'ctrl') + ' + C');
-                        });
-                    });
-                }
-                else {
-                    // Hide the clipboard buttons if not using the extension and Flash is disabled
-                    $('.copy-to-clipboard').addClass('hidden');
-                }
-            }
-        }
-
-        // Click anywhere on export link dialog will hide export link dropdown
-        $('.export-links-dialog').rebind('click', function() {
-            $('.export-link-dropdown').fadeOut(200);
-        });
-
-        $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
-            self.linksDialog(1);
-        });
-
-        $('.export-links-warning-close').rebind('click', function() {
-            $('.export-links-warning').addClass('hidden');
-        });
-
-        $('.export-link-select').rebind('click', function() {
-            $('.export-link-dropdown').fadeIn(200);
-
-            // Stop propagation
-            return false;
-        });
-
-        // On Export File Links and Decryption Keys
-        var $linkButtons = $('.link-handle, .link-decryption-key, .link-handle-and-key');
-        var $linkHandle = $('.link-handle');
-
-        // Reset state from previous dialog opens and pre-select the 'Link without key' option by default
-        $linkButtons.removeClass('selected');
-        $linkHandle.addClass('selected');
-
-        // Add click handler
-        $linkButtons.rebind('click', function() {
-
-            var keyOption = $(this).attr('data-keyoptions');
-            var $this = $(this);
-
-            // Add selected state to button
-            $linkButtons.removeClass('selected');
-            $this.addClass('selected');
-
-            // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
-            $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
-            $span.text(l[1990]);
-
-            // Stop propagation
-            return false;
-        });
-    };
-
-    // export
-    scope.mega = scope.mega || {};
-    scope.mega.Dialog = scope.mega.Dialog || {};
-    scope.mega.Dialog.ExportLink = ExportLinkDialog;
-
-})(jQuery, window);
-
-(function($, scope) {
-    /**
-     * ExportLink related operations.
-     *
-     * @param opts {Object}
-     *
-     * @constructor
-     */
-    var ExportLink = function(opts) {
-
-        var self = this;
-
-        var defaultOptions = {
-            'updateUI': false,
-            'nodesToProcess': [],
-            'showExportLinkDialog': false
-        };
-
-        self.options = $.extend(true, {}, defaultOptions, opts);
-
-        // Number of nodes left to process
-        self.nodesLeft = self.options.nodesToProcess.length;
-        self.logger = MegaLogger.getLogger('ExportLink');
-    };
-
-    /**
-     * getExportLink
-     *
-     * Get public link for file or folder.
-     * @param {Array} nodeIds Array of nodes handle id.
-     */
-    ExportLink.prototype.getExportLink = function() {
-
-        var self = this;
-
-        // Prompt copyright dialog and if accepted get link, otherwise stall
-        if (self.options.nodesToProcess.length) {
-            loadingDialog.show();
-            self.logger.debug('getExportLink');
-
-            $.each(self.options.nodesToProcess, function(index, nodeId) {
-                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
-                    self._getFolderExportLinkRequest(nodeId);
-                }
-                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
-                    self._getExportLinkRequest(nodeId);
-                }
-            });
-        }
-    };
-
-    /**
-     * removeExportLink
-     *
-     * Removes public link for file or folder.
-     * @param {Array} nodeHandle Array of node handles id.
-     */
-    ExportLink.prototype.removeExportLink = function() {
-
-        var self = this;
-
-        if (self.options.nodesToProcess.length) {
-            loadingDialog.show();
-            self.logger.debug('removeExportLink');
-
-            $.each(self.options.nodesToProcess, function(index, nodeId) {
-                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
-                    self._removeFolderExportLinkRequest(nodeId);
-                }
-                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
-                    self._removeFileExportLinkRequest(nodeId);
-                }
-            });
-        }
-    };
-
-    /**
-     * _getFolderExportLinkRequest
-     *
-     * 'Private' function, send folder public link delete request.
-     * @param {String} nodeId.
-     */
-    ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
-
-        var self = this;
-
-        var childNodes = [];
-
-        // Get all child nodes of root folder with nodeId
-        childNodes = fm_getnodes(nodeId);
-        childNodes.push(nodeId);
-
-        var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
-        sharePromise.done(function _sharePromiseDone(result) {
-            if (result.r && result.r[0] === 0) {
-                M.nodeShare(nodeId, { h: nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                self._getExportLinkRequest(nodeId);
-                if (!self.nodesLeft) {
-                    loadingDialog.hide();
-                }
-            }
-            else {
-                self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
-                loadingDialog.hide();
-            }
-        });
-        sharePromise.fail(function _sharePromiseFailed(result) {
-            self.logger.warn('Get folder link failed: ' + result);
-        });
-    };
-
-    /**
-     * _getExportLinkRequest
-     *
-     * 'Private' function, send public link delete request.
-     * @param {String} nodeId.
-     */
-    ExportLink.prototype._getExportLinkRequest = function(nodeId) {
-
-        var self = this;
-
-        api_req({ a: 'l', n: nodeId, i:requesti }, {
-            nodeId: nodeId,
-            callback: function(result) {
-                self.nodesLeft--;
-                if (typeof result !== 'number') {
-                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                    M.nodeAttr({ h: this.nodeId, ph: result });
-
-                    if (self.options.updateUI) {
-                        var UiExportLink = new mega.UI.Share.ExportLink();
-                        UiExportLink.addExportLinkIcon(this.nodeId);
-                    }
-                    if (!self.nodesLeft) {
-                        loadingDialog.hide();
-                        if (self.options.showExportLinkDialog) {
-                            var exportLinkDialog = new mega.Dialog.ExportLink();
-                            exportLinkDialog.linksDialog();
-                        }
-                    }
-                }
-                else { // Error
-                    self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);
-                    loadingDialog.hide();
-                }
-
-            }
-        });
-    };
-
-    /**
-     * _removeFolderExportLinkRequest
-     *
-     * 'Private' function, send folder delete public link request.
-     * @param {String} nodeId..
-     */
-    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId) {
-
-        var self = this;
-
-        api_req({ a: 's2', n:  nodeId, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti }, {
-            nodeId: nodeId,
-            callback: function(result) {
-                self.nodesLeft--;
-                if (result.r && (result.r[0] === 0)) {
-                    M.delNodeShare(this.nodeId, 'EXP');
-                    M.deleteExportLinkShare(this.nodeId);
-
-                    if (self.options.updateUI) {
-                        var UiExportLink = new mega.UI.Share.ExportLink();
-                        UiExportLink.removeExportLinkIcon(this.nodeId);
-                    }
-                    if (!self.nodesLeft) {
-                        loadingDialog.hide();
-                    }
-                }
-                else {// Error
-                    self.logger.warn('_removeFolerExportLinkRequest failed for node:', this.nodeId, 'Error code: ', result);
-                    loadingDialog.hide();
-                }
-            }
-        });
-    };
-
-    /**
-     * _removeFileExportLinkRequest
-     *
-     * 'Private' function, send file delete public link request.
-     * @param {String} nodeId.
-     */
-    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId) {
-
-        var self = this;
-
-        api_req({ a: 'l', n: nodeId, d: 1, i:requesti }, {
-            nodeId: nodeId,
-            callback: function(result) {
-                self.nodesLeft--;
-                if (result === 0) {
-                    M.delNodeShare(this.nodeId, 'EXP');
-                    M.deleteExportLinkShare(this.nodeId);
-
-                    if (self.options.updateUI) {
-                        var UiExportLink = new mega.UI.Share.ExportLink();
-                        UiExportLink.removeExportLinkIcon(this.nodeId);
-                    }
-                    if (!self.nodesLeft) {
-                        loadingDialog.hide();
-                    }
-                }
-                else {// Error
-                    self.logger.warn('_removeFileExportLinkRequest failed for node:', this.nodeId, 'Error code: ', result);
-                    loadingDialog.hide();
-                }
-            }
-        });
-    };
-
-    /**
-     * isTakenDown
-     *
-     * Returns true in case that any of checked items is taken down, otherwise false
-     * @param {Array} nodesId Array of strings nodes ids
-     * @returns {Boolean}
-     */
-    ExportLink.prototype.isTakenDown = function(nodesId) {
-
-        var self = this,
-            result = false,
-            nodes = nodesId;
-
-        if (nodesId) {
-            if (!Array.isArray(nodesId)) {
-                nodes = [nodesId];
-            }
-        }
-        else {
-            nodes = self.options.nodesToProcess;
-        }
-
-        $.each(nodes, function(index, value) {
-            if (M.d[value] && M.d[value].shares && M.d[value].shares.EXP && (M.d[value].shares.EXP.down === 1)) {
-                result = true;
-                return false;// Break the loop
-            }
-        });
-
-        return result;
-    };
-
-    // export
-    scope.mega = scope.mega || {};
-    scope.mega.Share = scope.mega.Share || {};
-    scope.mega.Share.ExportLink = ExportLink;
-})(jQuery, window);
-
-(function($, scope) {
-    /**
-     * UI Public Link Icon related operations.
-     *
-     * @param opts {Object}
-     *
-     * @constructor
-     */
-    var UiExportLink = function(opts) {
-
-        this.logger = MegaLogger.getLogger('UiExportLink');
-    };
-
-    /**
-     * addExportLinkIcon
-     *
-     * Add public link icon to file or folder
-     * @param {String} nodeId
-     */
-    UiExportLink.prototype.addExportLinkIcon = function(nodeId) {
-
-        var self = this;
-        var $nodeId = $('#' + nodeId);
-        var $tree = $('#treea_' + nodeId);
-
-        if (!$nodeId.length && !$tree.length) {
-            self.logger.warn('No DOM Node matching "%s"', nodeId);
-
-            return false;
-        }
-
-        self.logger.debug('addExportLinkIcon', nodeId);
-
-        if ($nodeId.length) {
-
-            // Add link-icon to list view
-            $('.own-data', $nodeId).addClass('linked');
-
-            // Add link-icon to grid view
-            if ($nodeId.hasClass('file-block')) {
-                $nodeId.addClass('linked');
-            }
-        }
-
-        if ($tree.length) {
-
-            // Add link-icon to left panel
-            $tree.addClass('linked');
-        }
-    };
-
-    /**
-     * removeExportLinkIcon
-     *
-     * Remove public link icon to file or folder
-     * @param {String} nodeId
-     */
-    UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
-
-        // Remove link icon from list view
-        $('#' + nodeId + ' .own-data').removeClass('linked');
-
-        // Remove link icon from grid view
-        $('#' + nodeId + '.file-block').removeClass('linked');
-
-        // Remove link icon from left panel
-        $('#treeli_' + nodeId + ' span').removeClass('linked');
-    };
-
-    /**
-     * updateTakenDownItems
-     *
-     * Updates grid and block (file) view, removes favorite icon if exists and adds .taken-down class.
-     * @param {String} nodeId
-     * @param {Boolean} isTakenDown
-     */
-    UiExportLink.prototype.updateTakenDownItem = function(nodeId, isTakenDown) {
-
-        var self = this;
-
-        if (isTakenDown) {
-            if (M.d[nodeId].fav === 1) {
-
-                // Remove favourite (star)
-                M.favourite(nodeId, true);
-            }
-            self.addTakenDownIcon(nodeId);
-        }
-        else {
-            self.removeTakenDownIcon(nodeId);
-        }
-    };
-
-    /**
-     * addTakenDownIcon
-     *
-     * Add taken-down icon to file or folder
-     * @param {String} nodeId
-     */
-    UiExportLink.prototype.addTakenDownIcon = function(nodeId) {
-
-        var titleTooltip = '';
-
-        // Add taken-down to list view
-        $('.grid-table.fm #' + nodeId).addClass('taken-down');
-
-        // Add taken-down to block view
-        $('#' + nodeId + '.file-block').addClass('taken-down');
-
-        // Add taken-down to left panel
-        $('#treea_' + nodeId).addClass('taken-down');
-
-        // Add title, mouse popup
-        if (M.d[nodeId].t === 1) {// Item is folder
-
-            titleTooltip = l[7705];
-
-            // Undecryptable node indicators
-            if (missingkeys[nodeId]) {
-                titleTooltip += '\n' + l[8595];
-            }
-
-            $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
-            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
-        }
-        else {// Item is file
-
-            titleTooltip = l[7704];
-
-            // Undecryptable node indicators
-            if (missingkeys[nodeId]) {
-                titleTooltip += '\n' + l[8602];
-            }
-
-            $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
-            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
-        }
-    };
-
-    /**
-     * removeTakenDownIcon
-     *
-     * Remove taken-down icon from file or folder
-     * @param {String} nodeId
-     */
-    UiExportLink.prototype.removeTakenDownIcon = function(nodeId) {
-
-        // Add taken-down to list view
-        $('.grid-table.fm #' + nodeId).removeClass('taken-down');
-
-        // Add taken-down to block view
-        $('#' + nodeId + '.file-block').removeClass('taken-down');
-
-        // Add taken-down to left panel
-        $('#treea_' + nodeId).removeClass('taken-down');
-
-        // Remove title, mouse popup
-        $('.grid-table.fm #' + nodeId).attr('title', '');
-        $('#' + nodeId + '.file-block').attr('title', '');
-    };
-
-    // export
-    scope.mega = scope.mega || {};
-    scope.mega.UI = scope.mega.UI || {};
-    scope.mega.UI.Share = scope.mega.UI.Share || {};
-    scope.mega.UI.Share.ExportLink = UiExportLink;
-})(jQuery, window);

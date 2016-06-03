@@ -5036,6 +5036,45 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding: 10px;
     width: 276px;
 }
+
+/* Site update dialog */
+.site-update-available .warning-header {
+    color: #000;
+    font-family: "source_sans_prolight";
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.site-update-available .warning-popup-body {
+    display: table;
+}
+.site-update-available .left-block {
+    display: table-cell;
+    padding-top: 3px;
+    width: 48px;
+}
+.site-update-available .mega-icon {
+    background: rgba(0, 0, 0, 0) url("../images/mega/warning-popup-mega-icon.svg") no-repeat scroll 0 0;
+    height: 38px;
+    width: 38px;
+}
+.site-update-available .right-block {
+    display: table-cell;
+    padding-left: 20px;
+    vertical-align: top;
+    width: 100%;
+}
+.site-update-available .release-info {
+    color: #ccc;
+    font-family: "source_sans_prosemibold",Arial;
+    font-size: 13px;
+}
+.site-update-available .warning-button.update:hover {
+    background-color: rgba(39, 183, 0, 0.25);
+}
+.site-update-available .warning-button.update:hover span {
+    color: #27b700;
+}
+
 .top-search-bl {
     float: right;
     height: 24px;

@@ -3378,7 +3378,10 @@
     "8852": "Ned\u00e1vno jsme provedli n\u011bjak\u00e1 vylep\u0161en\u00ed na\u0161ich str\u00e1nek, chcete aktualizovat na nejnov\u011bj\u0161\u00ed verzi?",
     "8853": "Do\u0161lo k probl\u00e9mu s dek\u00f3dov\u00e1n\u00edm va\u0161eho osobn\u00edho kl\u00ed\u010de RSA, obra\u0165te se na support@mega.nz kv\u016fli dal\u0161\u00ed pomoci.",
     "8854": "Pokud jste si d\u0159\u00edve p\u0159edplatili pl\u00e1n PRO pomoc\u00ed Google Play nebo Apple iTunes, ru\u010dn\u011b zru\u0161te sv\u00e9 p\u0159edplatn\u00e9 pomoc\u00ed jich, proto\u017ee to nen\u00ed sou\u010dast\u00ed tohoto procesu zru\u0161en\u00ed \u00fa\u010dtu.",
-    "8855": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
+    "8855": "Pokusili jste se p\u0159ihl\u00e1sit p\u0159\u00edli\u0161 mnohokr\u00e1t.[BR]Po\u010dkejte do %1 a zkuste to znovu.",
+    "8856": "Added",
+    "8857": "Available Offline",
+    "8858": "Modified",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

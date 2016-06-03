@@ -698,8 +698,26 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageKeysDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
         var keys = eventData.keys;
+        if (!chatRoom.notDecryptedKeys) {
+            chatRoom.notDecryptedKeys = {};
+        }
+
+        for (var i=0;i < keys.length;i++) {
+            var cacheKey = keys[i].userId + "-" + keys[i].keyid;
+            chatRoom.notDecryptedKeys[cacheKey] = {
+                userId : keys[i].userId,
+                keyid  : keys[i].keyid,
+                keylen : keys[i].keylen,
+                key    : keys[i].key
+            };
+        }
         var seedKeys = function() {
-            chatRoom.protocolHandler.seedKeys(keys);
+            for (var i=0;i < keys.length;i++) {
+                if (chatRoom.protocolHandler.seedKeys([keys[i]])) {
+                    var cacheKey = keys[i].userId + "-" + keys[i].keyid;
+                    delete  chatRoom.notDecryptedKeys[cacheKey];
+                }
+            }
         };
         ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
 

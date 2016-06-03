@@ -1565,6 +1565,7 @@ var strongvelope = {};
             }
             this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
         }
+        return true;
     };
 
     /**

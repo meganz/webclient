@@ -403,6 +403,22 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         return masterPromise;
     };
 };
+
+ChatdIntegration._ensureKeysAreDecrypted= function(keys, handler) {
+    var pms = new MegaPromise();
+    ChatdIntegration._ensureKeysAreLoaded(keys).done(
+        function() {
+            if (handler.seedKeys(keys)) {
+                pms.resolve();
+            }
+            else {
+                pms.reject();
+            }
+        }
+    );
+    return pms;
+};
+
 ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
     var promises = [];
     if (Array.isArray(messages)) {
@@ -824,9 +840,23 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 promises.push(
                     ChatdIntegration._ensureKeysAreLoaded([msgObject])
                 );
-
-                MegaPromise.allDone(promises).always(function() {
-                    _runDecryption();
+                var pendingkeys = [];
+                var msgkeycacheid = msgObject.userId  + "-" + msgObject.keyid;
+                if (chatRoom.notDecryptedKeys[msgkeycacheid]) {
+                    pendingkeys.push(chatRoom.notDecryptedKeys[msgkeycacheid]);
+                }
+                MegaPromise.allDone(promises).done(
+                    function() {
+                        if (pendingkeys.length > 0) {
+                            ChatdIntegration._ensureKeysAreDecrypted(pendingkeys, chatRoom.protocolHandler).done(
+                                function () {
+                                    _runDecryption();
+                                }
+                            );
+                        }
+                        else {
+                            _runDecryption();
+                        }
                 });
             }
         });

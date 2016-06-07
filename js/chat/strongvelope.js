@@ -981,18 +981,15 @@ var strongvelope = {};
         var content = "";
         var senderKey = this.participantKeys[this.ownHandle][keyId];
 
-        if ((typeof message !== 'undefined') && (message !== null)  && (message.length > 0)) {
+        var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
-            var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
-
-            // Assemble message content.
-            content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
-                                               encryptedMessage.nonce);
-            // Only include ciphertext if it's not empty (non-blind message).
-            if ((encryptedMessage.ciphertext !== null) && (encryptedMessage.ciphertext.length > 0)) {
-                content += tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.PAYLOAD),
-                                                encryptedMessage.ciphertext);
-            }
+        // Assemble message content.
+        content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
+                                           encryptedMessage.nonce);
+        // Only include ciphertext if it's not empty (non-blind message).
+        if ((encryptedMessage.ciphertext !== null) && (encryptedMessage.ciphertext.length > 0)) {
+            content += tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.PAYLOAD),
+                                            encryptedMessage.ciphertext);
         }
         // Sign message.
         content = this._signContent(senderKey + content) + content;

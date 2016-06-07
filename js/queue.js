@@ -434,10 +434,10 @@ TransferQueue.prototype.pause = function(gid) {
         var $tr = $('.transfer-table #' + gid);
         if ($tr.hasClass('transfer-started')) {
             $tr.find('.speed').addClass('unknown').text(l[1651]);
-            $tr.find('.eta').addClass('unknown').text('');   
+            $tr.find('.eta').addClass('unknown').text('');
         } else {
             $tr.find('.speed').text('');
-            $tr.find('.eta').text('');   
+            $tr.find('.eta').text('');
         }
         GlobalProgress[gid].speed = 0; // reset speed
         if (($.transferprogress || {})[gid]) {

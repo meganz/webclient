@@ -622,7 +622,11 @@ var dlmanager = {
             $('.download.info-block').removeClass('overquota');
         }
         else {
-            $('#' + ids.join(',#')).not('.transfer-completed').find('.transfer-status').removeClass('overquota').text(l[7227]);
+            $('#' + ids.join(',#'))
+                .addClass('transfer-queued')
+                .find('.transfer-status')
+                .removeClass('overquota')
+                .text(l[7227]);
         }
 
         this.logger.debug('_onQuotaRetry', ids, this._dlQuotaListener.length, this._dlQuotaListener);
@@ -960,22 +964,23 @@ function fm_tfspause(gid, overquota) {
             }
         }
         else {
-            var $tr = $('.transfer-table tr#' + gid + ':not(.transfer-completed)');
-            $tr.addClass('transfer-paused');
+            var $tr = $('.transfer-table tr#' + gid);
+
             if ($tr.hasClass('transfer-started')) {
                 $tr.find('.eta').text('').addClass('unknown');
                 $tr.find('.speed').text(l[1651]).addClass('unknown');
             }
+            $tr.addClass('transfer-paused');
+            $tr.removeClass('transfer-started');
 
             if (overquota === true) {
                 $tr.addClass('transfer-error');
                 $tr.find('.transfer-status').addClass('overquota').text(l[1673]);
             }
             else {
+                $tr.addClass('transfer-queued');
                 $tr.removeClass('transfer-error');
-                if (!$tr.hasClass('transfer-started')) {
-                    $tr.find('.transfer-status').text(l[7227]);
-                }
+                $tr.find('.transfer-status').text(l[7227]);
             }
         }
         return true;
@@ -989,7 +994,7 @@ function fm_tfsresume(gid) {
             ulQueue.resume(gid);
         }
         else {
-            var $tr = $('.transfer-table tr#' + gid + ':not(.transfer-completed)');
+            var $tr = $('.transfer-table tr#' + gid);
 
             if (page === 'download'
                     && $('.download.info-block').hasClass('overquota')
@@ -1013,11 +1018,13 @@ function fm_tfsresume(gid) {
             else {
                 $tr.removeClass('transfer-paused');
 
-                if (!$('.transfer-table tr').hasClass('transfer-started') && !$('.transfer-table tr').hasClass('transfer-completed')) {
-                    $tr.find('.transfer-status').text(l[1042]);
+                if (!$('.transfer-table tr.transfer-started, .transfer-table tr.transfer-initiliazing').length) {
+
+                    $tr.addClass('transfer-initiliazing')
+                        .find('.transfer-status').text(l[1042]);
                 }
                 else {
-                    $tr.find('.speed, eta').removeClass('unknown').text('');
+                    $tr.find('.speed, .eta').removeClass('unknown').text('');
                 }
             }
         }

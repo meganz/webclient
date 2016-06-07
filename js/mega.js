@@ -4381,8 +4381,8 @@ function MegaData()
         }
 
         this.addToTransferTable(gid, ttl,
-            '<tr id="dl_' + htmlentities(handle) + '">'
-            + '<td><div class="transfer-type download ' + state + '">'
+            '<tr id="dl_' + htmlentities(handle) + '" class="transfer-queued transfer-download ' + state + '">'
+            + '<td><div class="transfer-type download">'
             + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
             + '</div>' + flashhtml + '</td>'
             + '<td><span class="transfer-filtype-icon ' + fileIcon(node) + '"></span>'
@@ -4619,8 +4619,8 @@ function MegaData()
 
         if (z && zipsize) {
             this.addToTransferTable('zip_' + z, ttl,
-                '<tr id="zip_' + z + '">'
-                + '<td><div class="transfer-type download' + p + '">'
+                '<tr id="zip_' + z + '" class="transfer-queued transfer-download ' + p + '">'
+                + '<td><div class="transfer-type download">'
                 + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
                 + '</div>' + flashhtml + '</td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span>'
@@ -4714,9 +4714,10 @@ function MegaData()
         }
 
         var $tr = $('.transfer-table #' + id);
-        if (!$tr.find('.transfer-type p').attr('style') || !$tr.hasClass('transfer-started') || ($tr.hasClass('transfer-started') && $tr.hasClass('transfer-paused'))) {
+        if (!$tr.hasClass('transfer-started')) {
             $tr.find('.transfer-status').text('');
             $tr.addClass('transfer-started');
+            $tr.removeClass('transfer-initiliazing transfer-queued');
             $('.transfer-table').prepend($tr);
             $.transferHeader();
         }
@@ -4931,7 +4932,11 @@ function MegaData()
     this.dlstart = function(dl)
     {
         var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
-        $('.transfer-table #' + id + ' .transfer-status').text(l[1042]);
+
+        $('.transfer-table #' + id)
+            .addClass('transfer-initiliazing')
+            .find('.transfer-status').text(l[1042]);
+
         Soon(fm_tfsupdate);
         dl.st = NOW();
         ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
@@ -4993,8 +4998,8 @@ function MegaData()
 
     this.getTransferTableLengths = function()
     {
-        var size = Math.ceil($('.transfer-scrolling-table').height() / 24),
-            used = $('.transfer-table tr[id]').length;
+        var used = $('.transfer-table tr').length;
+        var size = Math.ceil($('.transfer-scrolling-table').height() / 24);
 
         return {size: size, used: used, left: size - used};
     };
@@ -5002,22 +5007,29 @@ function MegaData()
     function addToTransferTable(gid, elem, q)
     {
         var target = gid[0] === 'u'
-            ? $('.transfer-table tr[id^="ul"]:not(.transfer-started):not(.transfer-paused):last-child')
-            : $('.transfer-table tr:not([id^="ul"]):not(.transfer-started):not(.transfer-paused):last-child');
+            ? $('.transfer-table tr.transfer-upload.transfer-queued:last')
+            : $('.transfer-table tr.transfer-download.transfer-queued:last');
 
         if (target.length) {
             target.after(elem);
         }
         else {
             if (gid[0] != 'u') {
-                target = $('.transfer-table tr[id^="ul"]:not(.transfer-started):not(.transfer-paused):first-child');
+                target = $('.transfer-table tr.transfer-upload.transfer-queued:first');
             }
 
             if (target.length) {
                 target.before(elem);
             }
             else {
-                $('.transfer-table').append($(elem));
+                target = $('.transfer-table tr.transfer-completed:first');
+
+                if (target.length) {
+                    target.before(elem);
+                }
+                else {
+                    $('.transfer-table').append(elem);
+                }
             }
         }
         if ($.mSortableT) {
@@ -5054,7 +5066,7 @@ function MegaData()
 
             if (gid[0] !== 'u')
             {
-                var dl = $('.transfer-table tr:not([id^="ul"]):not(.transfer-started):not(.transfer-paused):last');
+                var dl = $('.transfer-table tr.transfer-download.transfer-queued:last');
 
                 if (dl.length)
                 {
@@ -5163,8 +5175,8 @@ function MegaData()
 
             var gid = 'ul_' + ul_id;
             this.addToTransferTable(gid, ttl,
-                '<tr id="' + gid + '">'
-                + '<td><div class="transfer-type  upload ' + pause + '">'
+                '<tr id="' + gid + '" class="transfer-queued transfer-upload ' + pause + '">'
+                + '<td><div class="transfer-type upload">'
                 + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
                 + '</div></td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span>'
@@ -5220,9 +5232,10 @@ function MegaData()
     {
         var id = ul.id;
         var $tr = $('.transfer-table #ul_' + id);
-        if (!$tr.find('.transfer-type p').attr('style') || !$tr.hasClass('transfer-started') || ($tr.hasClass('transfer-started') && $tr.hasClass('transfer-paused'))) {
+        if (!$tr.hasClass('transfer-started')) {
             $tr.find('.transfer-status').text('');
-            $tr.removeClass('transfer-paused').addClass('transfer-started');
+            $tr.removeClass('transfer-initiliazing transfer-queued');
+            $tr.addClass('transfer-started');
             $('.transfer-table').prepend($tr);
             $.transferHeader();
         }
@@ -5360,7 +5373,11 @@ function MegaData()
         if (d) {
             ulmanager.logger.log('ulstart', id);
         }
-        $('.transfer-table #ul_' + id + ' .transfer-status').text(l[1042]);
+
+        $('.transfer-table #ul_' + id)
+            .addClass('transfer-initiliazing')
+            .find('.transfer-status').text(l[1042]);
+
         Soon(fm_tfsupdate);
         ul.starttime = new Date().getTime();
         M.ulprogress(ul, 0, 0, 0);
@@ -5552,7 +5569,7 @@ function onUploadError(ul, errorstr, reason, xhr)
     if (d) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
     }
-    
+
     $('.transfer-table #ul_' + ul.id).addClass('transfer-error');
     $('.transfer-table #ul_' + ul.id + ' .transfer-status').text(errorstr);
 }

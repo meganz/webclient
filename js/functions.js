@@ -1640,10 +1640,15 @@ function setTransferStatus(dl, status, ethrow, lock) {
         $('.download.icons-block').addClass('hidden');
     }
     else {
-        $('.transfer-table #' + id + ' td:eq(5)').text(text);
+        $('.transfer-table #' + id + ' td:eq(5)')
+            .attr('title', status)
+            .text(text);
     }
     if (lock) {
-        $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
+        $('.transfer-table #' + id)
+            .addClass('transfer-completed')
+            .removeClass('transfer-initiliazing')
+            .attr('id', 'LOCKed_' + id);
     }
     if (d) {
         console.error(status);

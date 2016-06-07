@@ -144,7 +144,7 @@ var ulmanager = {
                 else {
                     errorstr = reason.substr(0, 50) + '...';
                 }
-                $('.transfer-table #ul_' + file.id + ' .transfer-status').text(htmlentities(errorstr));
+                $('.transfer-table #ul_' + file.id + ' .transfer-status').text(errorstr);
                 msgDialog('warninga', l[1309], l[1498] + ': ' + fileName, reason);
                 ulmanager.abort(file);
             }
@@ -1110,7 +1110,7 @@ FileUpload.prototype.run = function(done) {
             errorstr = l[1677];
         }
 
-        $('.transfer-table #ul_' + file.id + ' .transfer-status').text(htmlentities(errorstr));
+        $('.transfer-table #ul_' + file.id + ' .transfer-status').text(errorstr);
 
         ulmanager.abort(file);
         this.destroy();

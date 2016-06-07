@@ -849,7 +849,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 );
                 var pendingkeys = [];
                 var msgkeycacheid = msgObject.userId  + "-" + msgObject.keyid;
-                if (chatRoom.notDecryptedKeys[msgkeycacheid]) {
+                if (chatRoom.notDecryptedKeys && chatRoom.notDecryptedKeys[msgkeycacheid]) {
                     pendingkeys.push(chatRoom.notDecryptedKeys[msgkeycacheid]);
                 }
                 MegaPromise.allDone(promises).done(

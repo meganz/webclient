@@ -508,7 +508,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
             var pendingkeys = [];
             var msgkeycacheid = eventData.userId  + "-" + eventData.keyid;
-            if (chatRoom.notDecryptedKeys[msgkeycacheid]) {
+            if (chatRoom.notDecryptedKeys && chatRoom.notDecryptedKeys[msgkeycacheid]) {
                 pendingkeys.push(chatRoom.notDecryptedKeys[msgkeycacheid]);
             }
             MegaPromise.allDone(promises).done(

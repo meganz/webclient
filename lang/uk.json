@@ -3369,6 +3369,13 @@
     "8843": "[S]50 %[\/S] \u043f\u0440\u043e\u043f\u0443\u0441\u043a\u043d\u043e\u0457 \u0437\u0434\u0430\u0442\u043d\u043e\u0441\u0442\u0456",
     "8844": "\u0426\u0435 \u043c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u0438\u0439 \u0432\u0456\u0434\u0441\u043e\u0442\u043e\u043a \u0432\u0430\u0448\u043e\u0457 \u043f\u0440\u043e\u043f\u0443\u0441\u043a\u043d\u043e\u0457 \u0437\u0434\u0430\u0442\u043d\u043e\u0441\u0442\u0456, \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u0438\u0439 \u0434\u043b\u044f \u0441\u0442\u043e\u0440\u043e\u043d\u043d\u0456\u0445 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0456\u0432.",
     "8845": "\u0421\u0442\u0440\u043e\u043a \u043f\u043e\u043a\u0443\u043f\u043a\u0438 \u043c\u0438\u043d\u0443\u0432.",
+    "8846": "Continue [S]anyway[\/S]",
+    "8847": "Download [S]MEGAsync[\/S]",
+    "8848": "Download [S]with MEGAsync[\/S]",
+    "8849": "Download [S]through your browser[\/S]",
+    "8850": "MEGA v%1 Update Available",
+    "8851": "Released %1.",
+    "8852": "We have recently made some improvements to our site, would you like to update to the latest version?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3466,6 +3473,9 @@
         "new-version-megachat-message": 8840,
         "new-version-megachat-extension-message": 8841,
         "purchase-has-expired": 8845,
-        "grant-bandwidth-title": 8842
+        "grant-bandwidth-title": 8842,
+        "mega-update-available": 8850,
+        "released-date-time": 8851,
+        "site-update-available-message": 8852
     }
 }

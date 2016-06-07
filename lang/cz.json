@@ -3369,6 +3369,13 @@
     "8843": "[S]50 %[\/S] \u0161\u00ed\u0159ka p\u00e1sma",
     "8844": "Toto je maxim\u00e1ln\u00ed procento va\u0161\u00ed \u0161\u00ed\u0159ky p\u00e1sma, kter\u00e1 je dostupn\u00e1 u\u017eivatel\u016fm t\u0159et\u00edch stran.",
     "8845": "Tato objedn\u00e1vka vypr\u0161ela.",
+    "8846": "Continue [S]anyway[\/S]",
+    "8847": "Download [S]MEGAsync[\/S]",
+    "8848": "Download [S]with MEGAsync[\/S]",
+    "8849": "Download [S]through your browser[\/S]",
+    "8850": "MEGA v%1 Update Available",
+    "8851": "Released %1.",
+    "8852": "We have recently made some improvements to our site, would you like to update to the latest version?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3466,6 +3473,9 @@
         "new-version-megachat-message": 8840,
         "new-version-megachat-extension-message": 8841,
         "purchase-has-expired": 8845,
-        "grant-bandwidth-title": 8842
+        "grant-bandwidth-title": 8842,
+        "mega-update-available": 8850,
+        "released-date-time": 8851,
+        "site-update-available-message": 8852
     }
 }

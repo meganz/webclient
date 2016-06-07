@@ -3350,9 +3350,9 @@
     "8824": "Plik rejestru b\u0119dzie tworzony w trybie Offline ({0}).",
     "8825": "Tryb Debug jest w\u0142\u0105czony. Czy chcesz wy\u0142\u0105czy\u0107?",
     "8826": "Tryb Debug",
-    "8827": "Item shared by the Windows Phone MEGA app.",
+    "8827": "Plik udost\u0119pniony przez aplikacj\u0119 MEGA na Windows Phone.",
     "8828": "Elementy udost\u0119pnione z MEGA",
-    "8829": "Items shared by the Windows Phone MEGA app.",
+    "8829": "Pliki udost\u0119pnione przez aplikacj\u0119 MEGA na Windows Phone.",
     "8830": "Elementy udost\u0119pnione z MEGA",
     "8831": "Kopiowanie...",
     "8832": "Szczeg\u00f3\u0142y pami\u0119ci",
@@ -3369,6 +3369,13 @@
     "8843": "[S]50 %[\/S] przesy\u0142u",
     "8844": "To jest maksymalny procent Twojego przesy\u0142u, kt\u00f3ry mo\u017ce by\u0107 udost\u0119pniony innym u\u017cytkownikom.",
     "8845": "Zamowienie wygas\u0142o.",
+    "8846": "Continue [S]anyway[\/S]",
+    "8847": "Download [S]MEGAsync[\/S]",
+    "8848": "Download [S]with MEGAsync[\/S]",
+    "8849": "Download [S]through your browser[\/S]",
+    "8850": "MEGA v%1 Update Available",
+    "8851": "Released %1.",
+    "8852": "We have recently made some improvements to our site, would you like to update to the latest version?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3466,6 +3473,9 @@
         "new-version-megachat-message": 8840,
         "new-version-megachat-extension-message": 8841,
         "purchase-has-expired": 8845,
-        "grant-bandwidth-title": 8842
+        "grant-bandwidth-title": 8842,
+        "mega-update-available": 8850,
+        "released-date-time": 8851,
+        "site-update-available-message": 8852
     }
 }

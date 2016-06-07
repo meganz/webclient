@@ -3350,9 +3350,9 @@
     "8824": "S\u1ebd c\u00f3 m\u1ed9t t\u1ec7p log ghi l\u1ea1i c\u00e1c ho\u1ea1t \u0111\u1ed9ng xu\u1ea5t hi\u1ec7n \u1edf m\u1ee5c Ngo\u1ea1i Tuy\u1ebfn ({0}).",
     "8825": "Ch\u1ebf \u0111\u1ed9 g\u1ee1 l\u1ed7i (debug) \u0111ang b\u1eadt. B\u1ea1n c\u00f3 mu\u1ed1n t\u1eaft kh\u00f4ng?",
     "8826": "Ch\u1ebf \u0111\u1ed9 s\u1eeda l\u1ed7i (debug)",
-    "8827": "Item shared by the Windows Phone MEGA app.",
+    "8827": "M\u1ee5c n\u00e0y \u0111\u01b0\u1ee3c chia s\u1ebb t\u1eeb app MEGA cho Windows Phone.",
     "8828": "M\u1ee5c chia s\u1ebb t\u1eeb MEGA",
-    "8829": "Items shared by the Windows Phone MEGA app.",
+    "8829": "C\u00e1c m\u1ee5c n\u00e0y \u0111\u01b0\u1ee3c chia s\u1ebb t\u1eeb app MEGA cho Windows Phone.",
     "8830": "C\u00e1c m\u1ee5c chia s\u1ebb t\u1eeb MEGA",
     "8831": "\u0110ang sao ch\u00e9p...",
     "8832": "C\u00e1c th\u00f4ng s\u1ed1 b\u1ed9 nh\u1edb",
@@ -3369,6 +3369,13 @@
     "8843": "[S]50 %[\/S] b\u0103ng th\u00f4ng",
     "8844": "\u0110\u00e2y l\u00e0 m\u1ee9c \u0111\u1ed9 ph\u1ea7n tr\u0103m b\u0103ng th\u00f4ng gi\u1edbi h\u1ea1n cho nh\u1eefng ng\u01b0\u1eddi t\u1ea3i n\u1ed9i dung t\u1eeb b\u1ea1n.",
     "8845": "M\u00f3n h\u00e0ng \u0111\u00e3 h\u1ebft h\u1ea1n.",
+    "8846": "[S]V\u1eabn c\u1ee9[\/S] ti\u1ebfp t\u1ee5c",
+    "8847": "T\u1ea3i v\u1ec1 [S]MEGAsync[\/S]",
+    "8848": "T\u1ea3i v\u1ec1 [S]b\u1eb1ng MEGAsync[\/S]",
+    "8849": "T\u1ea3i v\u1ec1 [S]b\u1eb1ng tr\u00ecnh duy\u1ec7t web[\/S]",
+    "8850": "C\u1eadp Nh\u1eadt MEGA phi\u00ean b\u1ea3n v%1 M\u1edbi",
+    "8851": "\u0110\u0103ng v\u00e0o ng\u00e0y %1.",
+    "8852": "Ch\u00fang t\u00f4i v\u1eeba m\u1edbi c\u1ea3i ti\u1ebfn m\u1ed9t s\u1ed1 t\u00ednh n\u0103ng tr\u00ean h\u1ec7 th\u1ed1ng, b\u1ea1n c\u00f3 mu\u1ed1n c\u1eadp nh\u1eadt phi\u00ean b\u1ea3n m\u1edbi kh\u00f4ng?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3466,6 +3473,9 @@
         "new-version-megachat-message": 8840,
         "new-version-megachat-extension-message": 8841,
         "purchase-has-expired": 8845,
-        "grant-bandwidth-title": 8842
+        "grant-bandwidth-title": 8842,
+        "mega-update-available": 8850,
+        "released-date-time": 8851,
+        "site-update-available-message": 8852
     }
 }

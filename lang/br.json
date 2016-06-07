@@ -3350,9 +3350,9 @@
     "8824": "Um log ser\u00e1 criado na se\u00e7\u00e3o off-line ({0}).",
     "8825": "modo de depura\u00e7\u00e3o est\u00e1 habilitado. Voc\u00ea quer desativ\u00e1-lo?",
     "8826": "Modo de depura\u00e7\u00e3o",
-    "8827": "Item shared by the Windows Phone MEGA app.",
+    "8827": "Item compartilhado pelo app MEGA para Windows Phone",
     "8828": "Item compartilhado do MEGA",
-    "8829": "Items shared by the Windows Phone MEGA app.",
+    "8829": "Itens compartilhados pelo app MEGA para Windows Phone",
     "8830": "Itens compartilhados a partir do MEGA",
     "8831": "Copiando...",
     "8832": "estat\u00edsticas de mem\u00f3ria",
@@ -3369,6 +3369,13 @@
     "8843": "[S]50 %[\/S] largura de banda",
     "8844": "Este \u00e9 o percentual m\u00e1ximo de sua largura de banda que est\u00e1 dispon\u00edvel para usu\u00e1rios de terceiros.",
     "8845": "Esta compra expirou.",
+    "8846": "Continue [S]anyway[\/S]",
+    "8847": "Download [S]MEGAsync[\/S]",
+    "8848": "Download [S]with MEGAsync[\/S]",
+    "8849": "Download [S]through your browser[\/S]",
+    "8850": "MEGA v%1 Update Available",
+    "8851": "Released %1.",
+    "8852": "We have recently made some improvements to our site, would you like to update to the latest version?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3466,6 +3473,9 @@
         "new-version-megachat-message": 8840,
         "new-version-megachat-extension-message": 8841,
         "purchase-has-expired": 8845,
-        "grant-bandwidth-title": 8842
+        "grant-bandwidth-title": 8842,
+        "mega-update-available": 8850,
+        "released-date-time": 8851,
+        "site-update-available-message": 8852
     }
 }

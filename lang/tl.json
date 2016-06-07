@@ -3344,7 +3344,7 @@
     "8818": "The link you provided is either invalid or is not the subject of a takedown notice.",
     "8819": "Ikaw ay gumawa na ng isang counter-notification sa link na ito.",
     "8820": "Hindi tugma ang binigay na MEGA account sa may-ari ng link.",
-    "8821": "Failed to copy item. Please try again.",
+    "8821": "Bigong kopyahin ang item. Subukang muli.",
     "8822": "Nabigo ang paggaya",
     "8823": "The log ({0}) will be deleted from the Offline section.",
     "8824": "A log will be created in the Offline section ({0}).",
@@ -3359,7 +3359,7 @@
     "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "Ang inyong download ay hindi makakapagsimula dahil makukuha nito ang kasalukuyang libreng transfer allowance sa inyong IP address.",
     "8835": "Failed to copy the Recovery Key to your clipboard. Please try again.",
-    "8836": "Recovery Key copied to clipboard",
+    "8836": "Kinopya na ang Recovery Key sa clipboard",
     "8837": "Nakopya na ang Recovery Key",
     "8838": "I-export ang Recovery Key",
     "8839": "Recovery Key",
@@ -3369,6 +3369,13 @@
     "8843": "[S]50 %[\/S] na bandwidth",
     "8844": "This is the maximum percentage of your bandwidth which is available to third party users.",
     "8845": "Ang pagbiling ito ay lumipas na.",
+    "8846": "Continue [S]anyway[\/S]",
+    "8847": "Download [S]MEGAsync[\/S]",
+    "8848": "Download [S]with MEGAsync[\/S]",
+    "8849": "Download [S]through your browser[\/S]",
+    "8850": "MEGA v%1 Update Available",
+    "8851": "Released %1.",
+    "8852": "We have recently made some improvements to our site, would you like to update to the latest version?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3466,6 +3473,9 @@
         "new-version-megachat-message": 8840,
         "new-version-megachat-extension-message": 8841,
         "purchase-has-expired": 8845,
-        "grant-bandwidth-title": 8842
+        "grant-bandwidth-title": 8842,
+        "mega-update-available": 8850,
+        "released-date-time": 8851,
+        "site-update-available-message": 8852
     }
 }

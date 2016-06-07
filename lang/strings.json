@@ -13478,5 +13478,33 @@
     "8845": {
         "text": "This purchase has expired.",
         "context": "The bitcoin price has expired. Usually when paying by Bitcoin the user has 15 minutes to make their payment. After that the invoice is invalid and they must close the dialog and try again."
+    },
+    "8846": {
+        "text": "Continue [S]anyway[\/S]",
+        "context": "The button label is short for \"Continue downloading anyway\"."
+    },
+    "8847": {
+        "text": "Download [S]MEGAsync[\/S]",
+        "context": "A button label which allows the user to download the MEGAsync application."
+    },
+    "8848": {
+        "text": "Download [S]with MEGAsync[\/S]",
+        "context": "A button label which allows the user to download a file with the MEGAsync application."
+    },
+    "8849": {
+        "text": "Download [S]through your browser[\/S]",
+        "context": "A button label which allows the user to download a file using their browser."
+    },
+    "8850": {
+        "text": "MEGA v%1 Update Available",
+        "context": "This is a title for the site update dialog which is shown to users if they are still using an old version of the site 24 hours after a new release has been made. Please leave the %1 placeholder which will be replaced with the version number e.g. 3.4.35. The lowercase 'v' is short for 'version'."
+    },
+    "8851": {
+        "text": "Released %1.",
+        "context": "This is a short sentence on the site update dialog. Please leave the %1 placeholder which will be replaced with the current localised date and time."
+    },
+    "8852": {
+        "text": "We have recently made some improvements to our site, would you like to update to the latest version?",
+        "context": "This is a short message on the site update dialog which is shown to users if they are still using an old version of the site 24 hours after a new release has been made."
     }
 }

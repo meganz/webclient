@@ -978,20 +978,22 @@ var strongvelope = {};
         if (!this.participantKeys[this.ownHandle][keyId]) {
             throw new Error('No cached chat key for user!');
         }
+        var content = "";
         var senderKey = this.participantKeys[this.ownHandle][keyId];
 
-        var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
+        if ((typeof message !== 'undefined') && (message !== null)  && (message.length > 0)) {
 
-        // Assemble message content.
-        var content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
-                                           encryptedMessage.nonce);
+            var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
-        // Only include ciphertext if it's not empty (non-blind message).
-        if (encryptedMessage.ciphertext !== null) {
-            content += tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.PAYLOAD),
-                                            encryptedMessage.ciphertext);
+            // Assemble message content.
+            content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
+                                               encryptedMessage.nonce);
+            // Only include ciphertext if it's not empty (non-blind message).
+            if ((encryptedMessage.ciphertext !== null) && (encryptedMessage.ciphertext.length > 0)) {
+                content += tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.PAYLOAD),
+                                                encryptedMessage.ciphertext);
+            }
         }
-
         // Sign message.
         content = this._signContent(senderKey + content) + content;
 

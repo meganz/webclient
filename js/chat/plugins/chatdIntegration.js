@@ -683,12 +683,12 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     try {
                         // .seed result is not used in here, since it returns false, even when some messages can be decrypted
                         // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
-                        var seedResult = chatRoom.protocolHandler.seed(hist);
+                        chatRoom.protocolHandler.seed(hist);
                         //console.error(chatRoom.roomJid, seedResult);
 
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
                         decryptedMsgs.forEach(function (v, k) {
-                            if (typeof v === 'undefined') {
+                            if ((typeof v === 'undefined') || (v === null)) {
                                 return; // skip already decrypted messages
                             }
 
@@ -698,11 +698,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 self._processedMessages[cacheKey] = true;
                             }
 
-                            if (v && typeof(v.payload) !== 'undefined' && v.payload !== null) {
+                            if (v.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+                                if (typeof(v.payload) === 'undefined' || v.payload === null) {
+                                    v.payload = "";
+                                }
                                 chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
                                 delete chatRoom.notDecryptedBuffer[messageId];
                             }
-                            else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+                            else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
                                 chatRoom.messagesBuff.messages[messageId].meta = {
                                     userId: v.sender,
                                     included: v.includeParticipants,
@@ -710,16 +713,16 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 };
                                 chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
                             }
-                            else if (v && !v.payload && v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                            else if (v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                                 chatRoom.messagesBuff.messages[messageId].dialogType = 'truncated';
                                 chatRoom.messagesBuff.messages[messageId].userId = v.sender;
                             }
-                            else if (v && (v.type === 0 || v.type === 2)) {
+                            else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
                                 // this is a system message
                                 chatRoom.messagesBuff.messages[messageId].protocol = true;
                                 delete chatRoom.notDecryptedBuffer[messageId];
                             }
-                            else if (v && !v.payload) {
+                            else if (v) {
                                 self.logger.error("Could not decrypt: ", v);
                             }
                             self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
@@ -810,11 +813,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             msgObject.keyid,
                             false
                         );
-
-                        if (decrypted && typeof(decrypted.payload) !== 'undefined' && decrypted.payload !== null) {
-                            chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
-                        } else if (decrypted && !decrypted.payload && typeof(decrypted.type) !== 'undefined') {
-                            if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+                        if (decrypted) {
+                            if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+                                if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
+                                    decrypted.payload = "";
+                                }
+                                chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
+                            } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
                                 chatRoom.messagesBuff.messages[msgObject.messageId].meta = {
                                     userId: decrypted.sender,
                                     included: decrypted.includeParticipants,
@@ -826,9 +831,11 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 msg.dialogType = 'truncated';
                                 msg.userId = decrypted.sender;
                             }
-                            else {
+                            else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                             }
+                        } else {
+                            throw new Error('Unknown message type!');
                         }
                         self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                     } catch(e) {

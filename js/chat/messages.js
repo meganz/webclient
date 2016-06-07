@@ -433,7 +433,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         // convert id to unsigned.
         eventData.id = (eventData.id>>>0);
 
-        if (eventData.state === "EDITED" || eventData.state === "TRUNCATED" /*|| eventData.state === "EXPIRED"*/) {
+        if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
             var timestamp = chatRoom.messagesBuff.messages[eventData.messageId].delay ?
                 chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime();
 
@@ -462,10 +462,14 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         false
                     );
                     if (decrypted) {
-
                         //if the edited payload is an empty string, it means the message has been deleted.
-                        editedMessage.textContents = decrypted.payload;
-                        if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                        if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+                            if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
+                                decrypted.payload = "";
+                            }
+                            editedMessage.textContents = decrypted.payload;
+                        }
+                        else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                             editedMessage.dialogType = 'truncated';
                             editedMessage.userId = decrypted.sender;
                         }
@@ -502,8 +506,23 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 ChatdIntegration._ensureKeysAreLoaded([editedMessage])
             );
 
-            MegaPromise.allDone(promises).always(function() {
-                _runDecryption();
+            var pendingkeys = [];
+            var msgkeycacheid = eventData.userId  + "-" + eventData.keyid;
+            if (chatRoom.notDecryptedKeys[msgkeycacheid]) {
+                pendingkeys.push(chatRoom.notDecryptedKeys[msgkeycacheid]);
+            }
+            MegaPromise.allDone(promises).done(
+                function() {
+                    if (pendingkeys.length > 0) {
+                        ChatdIntegration._ensureKeysAreDecrypted(pendingkeys, chatRoom.protocolHandler).done(
+                            function () {
+                                _runDecryption();
+                            }
+                        );
+                    }
+                    else {
+                        _runDecryption();
+                    }
             });
         }
         else if (eventData.state === "CONFIRMED") {
@@ -615,16 +634,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 debugger;
             }
 
-            // x = {
-            //     "chatId": "5oH6FNO5bLA",
-            //     "userId": "cypQ7i9inlY",
-            //     "id": 536870913,
-            //     "state": "RESTOREDEXPIRED",
-            //     "keyid": 80,
-            //     "message": "\u0002\u0001\u0001\u0000@×O³ªn\u0006\t\\¥WZ8}Þ³Ñ0!²KYf\u0006õ6ÜôÁ¬cÉ2båÑb¥\u0003v-¹¶ÙUCå°b·Ù-¡\u000f\u0003\u0000\f\u001e\u001a\u0010{\u000fÙ?V8U00\u0007\u0000\u0005Hô\b¸",
-            //     "ts": 1464103120
-            // };
-
             var foundMessage = self.getByInternalId(eventData.id);
 
             if (foundMessage) {
@@ -659,6 +668,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     );
                     if (decrypted) {
                         //if the edited payload is an empty string, it means the message has been deleted.
+                        if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
+                            decrypted.payload = "";
+                        }
                         outgoingMessage.contents = decrypted.payload;
                         chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
                         chatRoom.messagesBuff.messages.push(outgoingMessage);

@@ -4140,6 +4140,12 @@ var watchdog = Object.freeze({
                     location.reload();
                 }
                 break;
+            case 'chat_event':
+                if (strg.data.state === 'DISCARDED') {
+                    var chatRoom = megaChat.plugins.chatdIntegration._getChatRoomFromEventData(strg.data);
+                    megaChat.plugins.chatdIntegration.discardMessage(chatRoom, strg.data.messageId);
+                }
+                break;
         }
 
         delete localStorage[ev.key];

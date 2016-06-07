@@ -1312,7 +1312,13 @@ Chatd.Messages.prototype.discard = function(messagekey, notify) {
             keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
             message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
         });
+        watchdog.notify('chat_event', {
+            chatId: base64urlencode(self.chatId),
+            userId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.USERID]),
+            messageId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.MSGID]),
+            state: 'DISCARDED'});
     }
+
     self.removefrompersist(messagekey);
     removeValue(self.sendingList, messagekey);
     delete self.sending[messagekey];

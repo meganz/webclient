@@ -2314,7 +2314,7 @@ function api_getsid(ctx, user, passwordkey, hash) {
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
-    if (api_getsid.etoomany + (88 * 60000) > Date.now()) {
+    if (api_getsid.etoomany + 3600000 > Date.now()) {
         api_getsid.warning();
         return ctx.result(ctx, false);
     }
@@ -2327,10 +2327,9 @@ function api_getsid(ctx, user, passwordkey, hash) {
 }
 
 api_getsid.warning = function() {
-    var msg = '"You have attempted to login too many times,[br]please wait around %1 minutes to try again."';
-    var left = Math.floor(88 - (Date.now() - api_getsid.etoomany) / 60000) + 2;
+    var time = new Date(api_getsid.etoomany + 3780000).toLocaleTimeString();
 
-    msgDialog('warningb', l[882], msg.replace('%1', left).replace('[br]', '<br>'));
+    msgDialog('warningb', l[882], l[8855].replace('%1', time).replace('[br]', '<br>'));
 };
 
 function api_getsid2(res, ctx) {

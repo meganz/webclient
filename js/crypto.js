@@ -2353,6 +2353,10 @@ function api_getsid2(res, ctx) {
                     }
                     catch (ex) {
                         console.error('Error decoding private RSA key!', ex);
+
+                        Soon(function() {
+                            msgDialog('warninga', l[135], l[8853]);
+                        });
                     }
 
                     if (privk) {

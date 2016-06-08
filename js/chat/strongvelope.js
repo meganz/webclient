@@ -619,6 +619,10 @@ var strongvelope = {};
                 return false;
             }
         }
+        else {
+            logger.error('Can not parse the message content.');
+            return false;
+        }
 
         return result;
     };
@@ -651,20 +655,22 @@ var strongvelope = {};
             if (messages[i].userId !== COMMANDER) {
 
                 extracted = this._parseAndExtractKeys(messages[i]);
-                parsedMessage = extracted.parsedMessage;
+                if (extracted) {
+                    parsedMessage = extracted.parsedMessage;
 
-                parsedMessages.push(parsedMessage);
-                senderKeys = extracted.senderKeys;
-                for (var keyId in senderKeys) {
-                    if (senderKeys.hasOwnProperty(keyId)) {
-                        storedKey = this.participantKeys[messages[i].userId][keyId];
-                        if (storedKey && (storedKey !== senderKeys[keyId])) {
-                            // Bail out on inconsistent information.
-                            logger.critical("Mismatching statement on sender's previously sent key.");
+                    parsedMessages.push(parsedMessage);
+                    senderKeys = extracted.senderKeys;
+                    for (var keyId in senderKeys) {
+                        if (senderKeys.hasOwnProperty(keyId)) {
+                            storedKey = this.participantKeys[messages[i].userId][keyId];
+                            if (storedKey && (storedKey !== senderKeys[keyId])) {
+                                // Bail out on inconsistent information.
+                                logger.critical("Mismatching statement on sender's previously sent key.");
 
-                            return false;
+                                return false;
+                            }
+                            this.participantKeys[messages[i].userId][keyId] = senderKeys[keyId];
                         }
-                        this.participantKeys[messages[i].userId][keyId] = senderKeys[keyId];
                     }
                 }
             }

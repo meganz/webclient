@@ -493,8 +493,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 }
                             }
                         }
-
-
+                    }
+                    else {
+                        chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
+                        throw new Error('Message can not be decrypted!');
                     }
                 } catch(e) {
                     self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
@@ -678,7 +680,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
                             chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
                         );
-
+                    }
+                    else {
+                        throw new Error('Message can not be decrypted!');
                     }
                 } catch(e) {
                     self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);

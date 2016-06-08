@@ -688,44 +688,46 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
                         decryptedMsgs.forEach(function (v, k) {
-                            if ((typeof v === 'undefined') || (v === null)) {
-                                return; // skip already decrypted messages
-                            }
-
                             var messageId = hist[k]['k'];
-                            var cacheKey = chatRoom.chatId + "_" + messageId;
-                            if (messageId) {
-                                self._processedMessages[cacheKey] = true;
-                            }
-
-                            if (v.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
-                                if (typeof(v.payload) === 'undefined' || v.payload === null) {
-                                    v.payload = "";
+                            if (v) {
+                                var cacheKey = chatRoom.chatId + "_" + messageId;
+                                if (messageId) {
+                                    self._processedMessages[cacheKey] = true;
                                 }
-                                chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
+
+                                if (v.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+                                    if (typeof(v.payload) === 'undefined' || v.payload === null) {
+                                        v.payload = "";
+                                    }
+                                    chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
+                                    delete chatRoom.notDecryptedBuffer[messageId];
+                                }
+                                else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+                                    chatRoom.messagesBuff.messages[messageId].meta = {
+                                        userId: v.sender,
+                                        included: v.includeParticipants,
+                                        excluded: v.excludeParticipants
+                                    };
+                                    chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
+                                }
+                                else if (v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                                    chatRoom.messagesBuff.messages[messageId].dialogType = 'truncated';
+                                    chatRoom.messagesBuff.messages[messageId].userId = v.sender;
+                                }
+                                else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
+                                    // this is a system message
+                                    chatRoom.messagesBuff.messages[messageId].protocol = true;
+                                    delete chatRoom.notDecryptedBuffer[messageId];
+                                }
+                                else {
+                                    self.logger.error("Could not decrypt: ", v);
+                                }
+                                self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
+                            }
+                            else {
                                 delete chatRoom.notDecryptedBuffer[messageId];
+                                chatRoom.messagesBuff.messages.removeByKey(messageId);
                             }
-                            else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                                chatRoom.messagesBuff.messages[messageId].meta = {
-                                    userId: v.sender,
-                                    included: v.includeParticipants,
-                                    excluded: v.excludeParticipants
-                                };
-                                chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
-                            }
-                            else if (v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                                chatRoom.messagesBuff.messages[messageId].dialogType = 'truncated';
-                                chatRoom.messagesBuff.messages[messageId].userId = v.sender;
-                            }
-                            else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
-                                // this is a system message
-                                chatRoom.messagesBuff.messages[messageId].protocol = true;
-                                delete chatRoom.notDecryptedBuffer[messageId];
-                            }
-                            else if (v) {
-                                self.logger.error("Could not decrypt: ", v);
-                            }
-                            self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
                         });
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);

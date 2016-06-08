@@ -890,7 +890,9 @@
 	        name = M.getNameByHandle(contact.u);
 	    }
 
-	    assert(name, "Name not found for jid: " + jid);
+	    if (!name) {
+	        name = false;
+	    }
 
 	    return name;
 	};
@@ -1009,7 +1011,7 @@
 	Chat.prototype.getNodeIdFromJid = function (jid) {
 	    assert(jid, "Missing jid for getNodeIdFromJid");
 
-	    return megaUserIdEncodeForXmpp(nodeId) + "@" + this.options.xmppDomain;
+	    return megaJidToUserId(jid);
 	};
 
 	Chat.prototype.getMyXMPPPassword = function () {
@@ -25906,7 +25908,7 @@
 
 	                    return null;
 	                } else {
-	                    chatRoom.logger.error("Invalid 2nd byte for a management message: ", textContents);
+	                    chatRoom.logger.warn("Invalid 2nd byte for a management message: ", textContents);
 	                    return null;
 	                }
 	            } else {

@@ -544,6 +544,7 @@ function populate_l() {
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
     l[8535] = l[8535].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[8833] = l[8833].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[8843] = l[8843].replace('[S]', '<span>').replace('[/S]', '</span>');
 
     l['year'] = new Date().getFullYear();
     date_months = [

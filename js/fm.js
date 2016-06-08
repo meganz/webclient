@@ -3826,17 +3826,16 @@ function accountUI() {
         // LITE/PRO account
         if (u_attr.p) {
             // replace 50 (percents) by real value
-            api_req({"a": "uq"}, {callback: function(response) {
+            api_req({ 'a': 'uq' }, {callback: function(response) {
                 var bandwidthLimit = Math.round(response.srvratio || 0);
                 $('.bandwith-settings').removeClass('hidden');
                 $('#bandwidth-slider').slider({
-                    min: 0, max: 100, range: "min", value: bandwidthLimit, slide: function(e, ui) {
+                    min: 0, max: 100, range: 'min', value: bandwidthLimit, slide: function(e, ui) {
                         $('.slider-percentage span').text(ui.value + ' %');
                         $('.fm-account-save-block').removeClass('hidden');
                         u_attr.bandwidthLimit = ui.value;
                     }
                 });
-                $('.slider-percentage').safeHTML(l[8843].replace("[S]", "<span>").replace("[/S]", "</span>"));
                 $('.slider-percentage span').text(bandwidthLimit + ' %');
             }});
         }

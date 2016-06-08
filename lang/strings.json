@@ -13506,5 +13506,9 @@
     "8852": {
         "text": "We have recently made some improvements to our site, would you like to update to the latest version?",
         "context": "This is a short message on the site update dialog which is shown to users if they are still using an old version of the site 24 hours after a new release has been made."
+    },
+    "8853": {
+        "text": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
+        "context": "An error message shown to users while trying to log into the site and there was a problem decoding the private RSA key."
     }
 }

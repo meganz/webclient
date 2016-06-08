@@ -1678,7 +1678,7 @@
     "5988": "\ud734\uc9c0\ud1b5\uc73c\ub85c \uc62e\uae38\uae4c\uc694?",
     "5989": "\ud56d\ubaa9\uc774 \uc131\uacf5\uc801\uc73c\ub85c \ud734\uc9c0\ud1b5\uc73c\ub85c \uc774\ub3d9\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
     "5990": "\ud56d\ubaa9\uc774 \uc774\ub3d9\ub428",
-    "5991": "[0}\uac1c\uc758 \ud56d\ubaa9\uc744 \ud734\uc9c0\ud1b5\uc73c\ub85c \uc774\ub3d9\ud560\uae4c\uc694?",
+    "5991": "{0}\uac1c\uc758 \ud56d\ubaa9\uc744 \ud734\uc9c0\ud1b5\uc73c\ub85c \uc774\ub3d9\ud560\uae4c\uc694?",
     "5992": "\ud56d\ubaa9\uc744 \uc774\ub3d9\ud560\uae4c\uc694?",
     "5993": "{0}\uac1c\uc758 \ud56d\ubaa9\uc774 \ud734\uc9c0\ud1b5\uc73c\ub85c \uc774\ub3d9\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
     "5994": "\ud56d\ubaa9\uc774 \uc774\ub3d9\ub428",
@@ -3376,6 +3376,7 @@
     "8850": "MEGA v%1 Update Available",
     "8851": "Released %1.",
     "8852": "We have recently made some improvements to our site, would you like to update to the latest version?",
+    "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

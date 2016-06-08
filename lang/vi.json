@@ -3376,6 +3376,7 @@
     "8850": "C\u1eadp Nh\u1eadt MEGA phi\u00ean b\u1ea3n v%1 M\u1edbi",
     "8851": "\u0110\u0103ng v\u00e0o ng\u00e0y %1.",
     "8852": "Ch\u00fang t\u00f4i v\u1eeba m\u1edbi c\u1ea3i ti\u1ebfn m\u1ed9t s\u1ed1 t\u00ednh n\u0103ng tr\u00ean h\u1ec7 th\u1ed1ng, b\u1ea1n c\u00f3 mu\u1ed1n c\u1eadp nh\u1eadt phi\u00ean b\u1ea3n m\u1edbi kh\u00f4ng?",
+    "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

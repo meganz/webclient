@@ -3376,6 +3376,7 @@
     "8850": "MEGA v%1 Update Available",
     "8851": "Released %1.",
     "8852": "We have recently made some improvements to our site, would you like to update to the latest version?",
+    "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

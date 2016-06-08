@@ -4242,34 +4242,25 @@ function accountUI() {
     // Cancel account button on main Account page
     $('.cancel-account').rebind('click', function() {
 
-        // Check if they have an existing Pro plan
-        console.log('zzzz', account.purchases);
-        
-        var hadPastSubscription = false;
+        // Please confirm that all your data will be deleted
         var confirmMessage = l[1974];
-        
+
         // Search through their Pro plan purchase history
         $(account.purchases).each(function(index, purchaseTransaction) {
 
-            // Set payment method
+            // Get payment method name
             var paymentMethodId = purchaseTransaction[4];
             var paymentMethod = getGatewayName(paymentMethodId).name;
-            
-            // if they have paid with iTunes or Google Play in the past, then set the flag
+
+            // If they have paid with iTunes or Google Play in the past
             if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
-                hadPastSubscription = true;
                 
-                // Break early
+                // Update confirmation message to remind them to cancel iTunes or Google Play
+                confirmMessage += ' ' + l[8854];
                 return true;
             }
         });
         
-        if (hadPastSubscription) {
-            confirmMessage = 'Please confirm that you are aware that all your data will be deleted.' +
-                           + 'If you subscribed for a Pro plan you must cancel it in Google Play or iTunes yourself. '
-                           + 'It is not tied to the account cancellation.'
-        }
-
         // Ask for confirmation
         msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
             if (event) {

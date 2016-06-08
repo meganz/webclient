@@ -2980,6 +2980,18 @@ function showRegisterDialog() {
             megaAnalytics.log("pro", "doRegister");
         },
 
+        onLoginAttemptFailed: function(registerData) {
+            msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
+                if (e) {
+                    $('.pro-register-dialog').addClass('hidden');
+                    if (signupPromptDialog) {
+                        signupPromptDialog.hide();
+                    }
+                    showLoginDialog(registerData.email);
+                }
+            });
+        },
+
         onAccountCreated: function(gotLoggedIn, registerData) {
             // If true this means they do not need to confirm their email before continuing to step 2
             var skipConfirmationStep = true;

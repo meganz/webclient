@@ -1,5 +1,4 @@
-function voucherCentering(button)
-{
+function voucherCentering(button) {
     var popupBlock = $('.fm-voucher-popup');
     var rigthPosition = $('.fm-account-main').outerWidth() - $(popupBlock).outerWidth();
     var buttonMid = button.width() / 2;
@@ -3596,6 +3595,10 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
+            if (typeof u_attr.bandwidthLimit === "number") {
+                api_req({"a":"up", "srvratio": Math.round(u_attr.bandwidthLimit) });
+            }
+
             if (M.account.dl_maxSlots)
             {
                 mega.config.set('dl_maxSlots', M.account.dl_maxSlots);
@@ -3820,20 +3823,49 @@ function accountUI() {
             accountUI();
         });
 
-        $("#slider-range-max").slider({
+        // LITE/PRO account
+        if (u_attr.p) {
+            // replace 50 (percents) by real value
+            api_req({ 'a': 'uq' }, {callback: function(response) {
+                var bandwidthLimit = Math.round(response.srvratio || 0);
+                $('.bandwith-settings').removeClass('hidden');
+                $('#bandwidth-slider').slider({
+                    min: 0, max: 100, range: 'min', value: bandwidthLimit, slide: function(e, ui) {
+                        $('.slider-percentage span').text(ui.value + ' %');
+                        $('.fm-account-save-block').removeClass('hidden');
+                        u_attr.bandwidthLimit = ui.value;
+                    }
+                });
+                $('.slider-percentage span').text(bandwidthLimit + ' %');
+            }});
+        }
+
+        $('#slider-range-max').slider({
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4, slide: function(e, ui)
             {
-                M.account.dl_maxSlots = ui.value;
+                var uiValue = ui.value;
+                M.account.dl_maxSlots = uiValue;
+                $('.upload-settings .numbers.active').removeClass('active');
+                $('.upload-settings .numbers.val' + uiValue).addClass('active');
                 $('.fm-account-save-block').removeClass('hidden');
             }
         });
-        $("#slider-range-max2").slider({
+        $('.upload-settings .numbers.active').removeClass('active');
+        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
+
+        $('#slider-range-max2').slider({
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4, slide: function(e, ui)
             {
+                var uiValue = ui.value;
                 M.account.ul_maxSlots = ui.value;
+                $('.download-settings .numbers.active').removeClass('active');
+                $('.download-settings .numbers.val' + uiValue).addClass('active');
                 $('.fm-account-save-block').removeClass('hidden');
             }
         });
+        $('.download-settings .numbers.active').removeClass('active');
+        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
+
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;
         if ((fmconfig.ul_maxSpeed | 0) === 0) {

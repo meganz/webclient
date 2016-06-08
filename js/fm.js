@@ -4247,17 +4247,17 @@ function accountUI() {
 
         // Search through their Pro plan purchase history
         $(account.purchases).each(function(index, purchaseTransaction) {
-
+            
             // Get payment method name
             var paymentMethodId = purchaseTransaction[4];
             var paymentMethod = getGatewayName(paymentMethodId).name;
-
+            
             // If they have paid with iTunes or Google Play in the past
             if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
                 
                 // Update confirmation message to remind them to cancel iTunes or Google Play
                 confirmMessage += ' ' + l[8854];
-                return true;
+                return false;
             }
         });
         

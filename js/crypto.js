@@ -2346,8 +2346,18 @@ function api_getsid2(res, ctx) {
                 }
                 else if (typeof res.csid === 'string') {
                     var t = base64urldecode(res.csid);
+                    var privk = null;
 
-                    var privk = crypto_decodeprivkey(a32_to_str(decrypt_key(aes, base64_to_a32(res.privk))));
+                    try {
+                        privk = crypto_decodeprivkey(a32_to_str(decrypt_key(aes, base64_to_a32(res.privk))));
+                    }
+                    catch (ex) {
+                        console.error('Error decoding private RSA key!', ex);
+
+                        Soon(function() {
+                            msgDialog('warninga', l[135], l[8853]);
+                        });
+                    }
 
                     if (privk) {
                         // TODO: check remaining padding for added early wrong password detection likelihood

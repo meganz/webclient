@@ -20,6 +20,10 @@ function u_login(ctx, email, password, uh, permanent) {
     if (pwdman) {
         uh = pwdman.hash;
         keypw = pwdman.keypw;
+
+        if (d) {
+            console.log('Using pwdman credentials.');
+        }
     }
     else {
         keypw = prepare_key_pw(password);

@@ -48,6 +48,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var ctx;
         var ab;
         var imageType = 'image/jpeg';
+        var canStoreAttr = !n || (n.u === u_handle && n.f !== u_handle);
         // XXX: In Firefox loading a ~100MB image might throw `Image corrupt or truncated.`
         // and this .onload called back with a white image. Bug #941823 / #1045926
         // This is the MurmurHash3 for such image's dataURI.
@@ -115,9 +116,13 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 console.error('Error generating thumbnail, aborting...');
                 return;
             }
-            ab = dataURLToAB(dataURI);
-            // FIXME hack into cipher and extract key
-            api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer);
+
+            if (canStoreAttr) {
+                ab = dataURLToAB(dataURI);
+
+                // FIXME hack into cipher and extract key
+                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+            }
 
             if (node) {
                 delete th_requested[node];
@@ -149,12 +154,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
             // only store preview when the user is the file owner, and when it's not a retry (because then there is already a preview image, it's just unavailable:
 
-            if (!onPreviewRetry && (!n || n.u == u_handle) && fa.indexOf(':1*') < 0) {
+            if (!onPreviewRetry && canStoreAttr && fa.indexOf(':1*') < 0) {
                 if (d) {
                     console.log('Storing preview...', n);
                 }
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer);
+                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
             }
 
             if (node) {

@@ -761,6 +761,10 @@
 	Chat.prototype.destroy = function (isLogout) {
 	    var self = this;
 
+	    if (self.is_initialized === false) {
+	        return;
+	    }
+
 	    self.karere.destroying = true;
 	    self.trigger('onDestroy', [isLogout]);
 
@@ -5685,7 +5689,7 @@
 	  return element;
 	};
 
-	ReactElement.makeElement = function (type, config, children) {
+	ReactElement.createElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -5736,7 +5740,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.makeElement.bind(null, type);
+	  var factory = ReactElement.createElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -8673,7 +8677,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.makeElement(component);
+	    placeholderElement = ReactElement.createElement(component);
 	  }
 	};
 
@@ -18487,7 +18491,7 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.makeElement;
+	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
@@ -18937,7 +18941,7 @@
 	    // succeed and there will likely be errors in render.
 
 
-	    var element = ReactElement.makeElement.apply(this, arguments);
+	    var element = ReactElement.createElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -18962,7 +18966,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -21266,12 +21270,12 @@
 	        "globe_with_meridians": ["1F310", "&#x1F310;"],
 	        "earth_africa": ["1F30D", "&#x1F30D;"],
 	        "earth_americas": ["1F30E", "&#x1F30E;"],
-	        "earth_asia": ["1F642", "&#x1F30F;"],
+	        "earth_asia": ["1F30F", "&#x1F30F;"],
 	        "new_moon": ["1F311", "&#x1F311;"],
 	        "waxing_crescent_moon": ["1F312", "&#x1F312;"],
 	        "first_quarter_moon": ["1F313", "&#x1F313;"],
 	        "waxing_gibbous_moon": ["1F314", "&#x1F314;"],
-	        "full_moon": ["1F642", "&#x1F315;"],
+	        "full_moon": ["1F315", "&#x1F315;"],
 	        "waning_gibbous_moon": ["1F316", "&#x1F316;"],
 	        "last_quarter_moon": ["1F317", "&#x1F317;"],
 	        "waning_crescent_moon": ["1F318", "&#x1F318;"],
@@ -21562,8 +21566,8 @@
 	        "iphone": ["1F4F1", "&#x1F4F1;"],
 	        "calling": ["1F4F2", "&#x1F4F2;"],
 	        "computer": ["1F4BB", "&#x1F4BB;"],
-	        "printer": ["1F683", "&#x1F5A8;"],
-	        "alarm_clock": ["1F683", "&#x23F0;"],
+	        "printer": ["1F5A8", "&#x1F5A8;"],
+	        "alarm_clock": ["23F0", "&#x23F0;"],
 	        "hourglass_flowing_sand": ["23F3", "&#x23F3;"],
 	        "hourglass": ["231B", "&#x231B;"],
 	        "camera": ["1F4F7", "&#x1F4F7;"],
@@ -21665,7 +21669,7 @@
 	        "notebook": ["1F4D3", "&#x1F4D3;"],
 	        "notebook_with_decorative_cover": ["1F4D4", "&#x1F4D4;"],
 	        "ledger": ["1F4D2", "&#x1F4D2;"],
-	        "closed_book": ["1F683", "&#x1F4D5;"],
+	        "closed_book": ["1F4D5", "&#x1F4D5;"],
 	        "green_book": ["1F4D7", "&#x1F4D7;"],
 	        "blue_book": ["1F4D8", "&#x1F4D8;"],
 	        "orange_book": ["1F4D9", "&#x1F4D9;"],
@@ -21678,10 +21682,10 @@
 	        "triangular_ruler": ["1F4D0", "&#x1F4D0;"],
 	        "round_pushpin": ["1F4CD", "&#x1F4CD;"],
 	        "straight_ruler": ["1F4CF", "&#x1F4CF;"],
-	        "triangular_flag_on_post": ["1F683", "&#x1F6A9;"],
+	        "triangular_flag_on_post": ["1F6A9", "&#x1F6A9;"],
 	        "flag_white": ["1F3F3", "&#x1F3F3;"],
 	        "flag_black": ["1F3F4", "&#x1F3F4;"],
-	        "hole": ["1F683", "&#x1F573;"],
+	        "hole": ["1F573", "&#x1F573;"],
 	        "file_folder": ["1F4C1", "&#x1F4C1;"],
 	        "open_file_folder": ["1F4C2", "&#x1F4C2;"],
 	        "file_cabinet": ["1F5C4", "&#x1F5C4;"],
@@ -21711,7 +21715,7 @@
 	        "mag": ["1F50D", "&#x1F50D;"],
 	        "mag_right": ["1F50E", "&#x1F50E;"],
 	        "no_entry_sign": ["1F6AB", "&#x1F6AB;"],
-	        "no_entry": ["1F683", "&#x26D4;"],
+	        "no_entry": ["26D4", "&#x26D4;"],
 	        "name_badge": ["1F4DB", "&#x1F4DB;"],
 	        "no_pedestrians": ["1F6B7", "&#x1F6B7;"],
 	        "do_not_litter": ["1F6AF", "&#x1F6AF;"],
@@ -21735,7 +21739,7 @@
 	        "u5272": ["1F239", "&#x1F239;"],
 	        "u7a7a": ["1F233", "&#x1F233;"],
 	        "sa": ["1F202", "&#x1F202;"],
-	        "koko": ["1F683", "&#x1F201;"],
+	        "koko": ["1F201", "&#x1F201;"],
 	        "u6307": ["1F22F", "&#x1F22F;"],
 	        "chart": ["1F4B9", "&#x1F4B9;"],
 	        "sparkle": ["2747", "&#x2747;"],
@@ -21763,11 +21767,11 @@
 	        "atm": ["1F3E7", "&#x1F3E7;"],
 	        "aries": ["2648", "&#x2648;"],
 	        "taurus": ["2649", "&#x2649;"],
-	        "gemini": ["1F683", "&#x264A;"],
-	        "cancer": ["1F683", "&#x264B;"],
+	        "gemini": ["264A", "&#x264A;"],
+	        "cancer": ["264B", "&#x264B;"],
 	        "leo": ["264C", "&#x264C;"],
 	        "virgo": ["264D", "&#x264D;"],
-	        "libra": ["1F683", "&#x264E;"],
+	        "libra": ["264E", "&#x264E;"],
 	        "scorpius": ["264F", "&#x264F;"],
 	        "sagittarius": ["2650", "&#x2650;"],
 	        "capricorn": ["2651", "&#x2651;"],
@@ -21786,10 +21790,10 @@
 	        "arrow_up_small": ["1F53C", "&#x1F53C;"],
 	        "arrow_down_small": ["1F53D", "&#x1F53D;"],
 	        "fast_forward": ["23E9", "&#x23E9;"],
-	        "rewind": ["1F683", "&#x23EA;"],
+	        "rewind": ["23EA", "&#x23EA;"],
 	        "arrow_double_up": ["23EB", "&#x23EB;"],
 	        "arrow_double_down": ["23EC", "&#x23EC;"],
-	        "arrow_right": ["1F683", "&#x27A1;"],
+	        "arrow_right": ["27A1", "&#x27A1;"],
 	        "arrow_left": ["2B05", "&#x2B05;"],
 	        "arrow_up": ["2B06", "&#x2B06;"],
 	        "arrow_down": ["2B07", "&#x2B07;"],
@@ -21879,8 +21883,8 @@
 	        "large_blue_diamond": ["1F537", "&#x1F537;"],
 	        "black_small_square": ["25AA", "&#x25AA;"],
 	        "white_small_square": ["25AB", "&#x25AB;"],
-	        "black_large_square": ["1F683", "&#x2B1B;"],
-	        "white_large_square": ["1F683", "&#x2B1C;"],
+	        "black_large_square": ["2B1B", "&#x2B1B;"],
+	        "white_large_square": ["2B1C", "&#x2B1C;"],
 	        "black_medium_square": ["25FC", "&#x25FC;"],
 	        "white_medium_square": ["25FB", "&#x25FB;"],
 	        "black_medium_small_square": ["25FE", "&#x25FE;"],

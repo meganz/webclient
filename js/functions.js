@@ -454,7 +454,7 @@ function populate_l() {
         l[1] = 'Go Pro';
     }
     l[8634] = l[8634].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
-    l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");    
+    l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[438] = l[438].replace('[X]', '');
     l['439a'] = l[439];
     l[439] = l[439].replace('[X1]', '').replace('[X2]', '');
@@ -543,7 +543,9 @@ function populate_l() {
     l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
     l[8535] = l[8535].replace('[B]', '<b>').replace('[/B]', '</b>');
-    
+    l[8833] = l[8833].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[8843] = l[8843].replace('[S]', '<span>').replace('[/S]', '</span>');
+
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
@@ -803,17 +805,26 @@ function countrydetails(isocode) {
     return cdetails;
 }
 
-function time2date(unixtime, ignoretime) {
-    var MyDate = new Date(unixtime * 1000 || 0);
-    var MyDateString =
-        MyDate.getFullYear() + '-'
-        + ('0' + (MyDate.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + MyDate.getDate()).slice(-2);
-    if (!ignoretime) {
-        MyDateString += ' ' + ('0' + MyDate.getHours()).slice(-2) + ':'
-            + ('0' + MyDate.getMinutes()).slice(-2);
+/**
+ * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
+ * @param {Number} unixTime The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
+ * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
+ */
+function time2date(unixTime, ignoreTime) {
+
+    var myDate = new Date(unixTime * 1000 || 0);
+    var myDateString =
+        myDate.getFullYear() + '-'
+        + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
+        + ('0' + myDate.getDate()).slice(-2);
+
+    if (!ignoreTime) {
+        myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
+            + ('0' + myDate.getMinutes()).slice(-2);
     }
-    return MyDateString;
+
+    return myDateString;
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
@@ -917,8 +928,12 @@ var time2lastSeparator = function(dateString, refDate) {
     }
 };
 
+/**
+ * Gets the current UNIX timestamp
+ * @returns {Number} Returns an integer with the current UNIX timestamp (in seconds)
+ */
 function unixtime() {
-    return (new Date().getTime() / 1000);
+    return Math.round(Date.now() / 1000);
 }
 
 function uplpad(number, length) {
@@ -3418,6 +3433,7 @@ mega.utils.reload = function megaUtilsReload() {
             u_key = u_storage.k,
             privk = u_storage.privk,
             debug = !!u_storage.d;
+        var mcd = u_storage.testChatDisabled;
 
         localStorage.clear();
         sessionStorage.clear();
@@ -3434,6 +3450,9 @@ mega.utils.reload = function megaUtilsReload() {
                 u_storage.dd = true;
                 if (!is_extension) {
                     u_storage.jj = true;
+                }
+                if (mcd) {
+                    u_storage.testChatDisabled = 1;
                 }
             }
         }
@@ -4120,8 +4139,14 @@ var watchdog = Object.freeze({
                         // the other tab must have sent the new sid
                         assert(sid, 'sid not set');
                         api_setsid(sid);
-                        dlmanager.uqFastTrack = 1;
-                        dlmanager._overquotaInfo();
+
+                        if (dlmanager.isOverFreeQuota) {
+                            dlmanager._onQuotaRetry(true, sid);
+                        }
+                        else {
+                            dlmanager.uqFastTrack = 1;
+                            dlmanager._overquotaInfo();
+                        }
                     }, 2000);
                 }
                 break;
@@ -4174,6 +4199,32 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
+    if (navigator.mozGetUserMedia) {
+        var creds = passwordManager.pickFormFields(form);
+        if (creds) {
+            // prepare pwd to be stored encrypted
+            // format: "~:<keypw>:<userhash>"
+            var pwd = creds.pwd;
+
+            if (!passwordManager.getStoredCredentials(pwd)) {
+                var keypw = prepare_key_pw(pwd);
+                var pwaes = new sjcl.cipher.aes(keypw);
+                var hash = stringhash(creds.usr.toLowerCase(), pwaes);
+
+                pwd = '~:' + a32_to_base64(keypw) + ':' + hash;
+
+                $('#pmh_username').val(creds.usr);
+                $('#pmh_password').val(pwd);
+                $('#pwdmanhelper').submit();
+                Soon(function() {
+                    $('#pwdmanhelper input').val('');
+                    $(form).find('input').val('');
+                    $('iframe#dummyTestFrame').attr('src', 'about:blank');
+                });
+            }
+        }
+        return;
+    }
     if (is_chrome_firefox || typeof history !== "object") {
         return false;
     }
@@ -4189,6 +4240,78 @@ function passwordManager(form) {
     }).submit();
     return true;
 }
+passwordManager.knownForms = Object.freeze({
+    '#form_login_header': {
+        usr: '#login-name',
+        pwd: '#login-password'
+    },
+    '#login_form': {
+        usr: '#login-name2',
+        pwd: '#login-password2'
+    },
+    '#register_form': {
+        usr: '#register-email',
+        pwd: '#register-password'
+    }
+});
+passwordManager.getStoredCredentials = function(password) {
+    // Retrieve `keypw` and `userhash` from pwd string
+    var result = null;
+
+    if (String(password).substr(0, 2) === '~:') {
+        var parts = password.substr(2).split(':');
+
+        if (parts.length === 2) {
+            try {
+                var hash = parts[1];
+                var keypw = base64_to_a32(parts[0]);
+
+                if (base64_to_a32(hash).length === 2
+                        && keypw.length === 4) {
+
+                    result = {
+                        hash: hash,
+                        keypw: keypw
+                    };
+                }
+            }
+            catch (e) {}
+        }
+    }
+
+    return result;
+};
+passwordManager.pickFormFields = function(form) {
+    var result = null;
+    var $form = $(form);
+
+    if ($form.length) {
+        if ($form.length !== 1) {
+            console.error('Unexpected form selector', form);
+        }
+        else {
+            form = passwordManager.knownForms[form];
+            if (form) {
+                result = {
+                    usr: $form.find(form.usr).val(),
+                    pwd: $form.find(form.pwd).val(),
+
+                    selector: {
+                        usr: form.usr,
+                        pwd: form.pwd
+                    }
+                };
+
+                if (!(result.usr && result.pwd)) {
+                    result = false;
+                }
+            }
+        }
+    }
+
+    return result;
+};
+
 
 // http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
 function elementInViewport2Lightweight(el) {
@@ -4566,7 +4689,7 @@ function getProPlan(planNum) {
  *                   company names are not translated).
  */
 function getGatewayName(gatewayId) {
-    
+
     var gateways = {
         0: {
             name: 'voucher',
@@ -4637,12 +4760,12 @@ function getGatewayName(gatewayId) {
             displayName: l[6198]    // Wire transfer
         }
     };
-    
+
     // If the gateway exists, return it
     if (typeof gateways[gatewayId] !== 'undefined') {
         return gateways[gatewayId];
     }
-    
+
     // Otherwise return a placeholder for currently unknown ones
     return {
         name: 'unknown',

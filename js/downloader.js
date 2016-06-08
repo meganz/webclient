@@ -564,6 +564,11 @@ ClassFile.prototype.run = function(task_done) {
                     dlmanager.showOverQuotaDialog(onGetUrlError);
                     this.dlGetUrlErrors = 0;
                 }
+                else if (error === EFQUOTA) {
+                    dlmanager.logger.warn(this + ' Got EFQUOTA, holding...');
+                    dlmanager.showOverQuotaRegisterDialog(onGetUrlError);
+                    this.dlGetUrlErrors = 0;
+                }
                 else {
                     dlmanager.dlRetryInterval *= 1.2;
                     if (dlmanager.dlRetryInterval > 600000) {

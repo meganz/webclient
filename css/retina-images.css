@@ -436,10 +436,6 @@ body.pro:after {
     background-image: url(../images/mega/membership-spite@2x.png);
     background-size: 83px auto;
 }
-.account-set-bg1, .account-slider, a.account-slider, a.account-slider:link, a.account-slider:visited, a.account-slider:hover, a.account-slider:active, .ui-slider-handle.ui-state-default.ui-corner-all, .account-set-green-bg, .ui-slider-range.ui-widget-header.ui-slider-range-min {
-    background-image: url(../images/mega/account-sliders@2x.png);
-    background-size: 490px auto;
-}
 .blog-article li, .blog-new-full ul li, .sync li, .affiliate li, .pro li {
     background-image: url(../images/mega/dev-point-new.png);
     background-size: 39px auto;

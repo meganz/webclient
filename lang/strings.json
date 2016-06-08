@@ -13379,17 +13379,41 @@
         "text": "The MEGA account provided did not match the owner of the link.",
         "context": "A message inside an error dialog. This explains that the email the user provided during a takedown counter-notice (which disputes the takedown) was not the one who created the link."
     },
+    "8821": {
+        "text": "Failed to copy item. Please try again.",
+        "context": "Message of the dialog displayed when the process\/request to copy a node failed."
+    },
     "8822": {
         "text": "Copy failed",
         "context": "A title on a dialog which is displayed when the process\/request to copy a file\/folder failed."
+    },
+    "8823": {
+        "text": "The log ({0}) will be deleted from the Offline section.",
+        "context": "Alert message shown when the DEBUG mode is disabled.\nPreserve the ({0}) code because is for include the file name in runtime."
+    },
+    "8824": {
+        "text": "A log will be created in the Offline section ({0}).",
+        "context": "Alert message shown when the DEBUG mode is enabled.\nPreserve the ({0}) code because is for include the file name in runtime."
+    },
+    "8825": {
+        "text": "Debug mode is enabled. Do you want to disable it?",
+        "context": "Message of the alert dialog displayed when the app starts and the DEBUG mode is enable. This alert is to try to avoid that the user forget disable the DEBUG mode and the log file size grows a lot in the offline section."
     },
     "8826": {
         "text": "Debug mode",
         "context": "A message on the alert dialog which is displayed when the app starts and the debugging mode is enabled."
     },
+    "8827": {
+        "text": "Item shared by the Windows Phone MEGA app.",
+        "context": "Message or description for the shared resource or the dialog displayed when the user is sharing one item from MEGA with other app of his Windows Phone device - (String as short as possible).\r\n\r\nExample scenario: A user shares a photo from his mega account to the Outlook email app, to email it to a friend. This text \"Item shared by the Windows Phone Mega app\". would appear as the body of the email to describe what has happened.\r\nIf we shared it to whatsapp then this text could also be the description there - it lets others know where this item came from."
+    },
     "8828": {
         "text": "Item shared from MEGA",
         "context": "Title for the shared resource or the dialog displayed when the user is sharing a file\/folder from MEGA with another app - (String as short as possible)."
+    },
+    "8829": {
+        "text": "Items shared by the Windows Phone MEGA app.",
+        "context": "Message or description for the shared resource or the dialog displayed when the user is sharing multiple items from MEGA with other app of his Windows Phone device - (String as short as possible)."
     },
     "8830": {
         "text": "Items shared from MEGA",
@@ -13411,6 +13435,26 @@
         "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
         "context": "A warning message which is displayed to warn the user about the reason why their download can not proceed because they would be over the bandwidth quota."
     },
+    "8835": {
+        "text": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+        "context": "Message of the dialog displayed when fails to copy the user's Recovery Key to the clipboard to be saved or exported."
+    },
+    "8836": {
+        "text": "Recovery Key copied to clipboard",
+        "context": "Message of the dialog displayed when copy the user's Recovery Key to the clipboard to be saved or exported."
+    },
+    "8837": {
+        "text": "Recovery Key copied",
+        "context": "Title of the dialog displayed when copy the user's Recovery Key to the clipboard to be saved or exported - (String as short as possible)."
+    },
+    "8838": {
+        "text": "Export Recovery Key",
+        "context": "Text 'Export Recovery Key' placed just before two buttons into the 'settings' page to allow see (copy\/paste) and export the Recovery Key."
+    },
+    "8839": {
+        "text": "Recovery Key",
+        "context": "Label for any 'Recovery Key' button, link, text, title, etc. Preserve uppercase - (String as short as possible).\r\nThe Recovery Key is the new name for the account \"Master Key\", and can unlock (recover) the account if the user forgets their password."
+    },
     "8840": {
         "text": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
         "context": "A dialog message when there is a new chat server version available that requires the user to reload."
@@ -13418,5 +13462,53 @@
     "8841": {
         "text": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
         "context": "A dialog message when there is a new chat server version available. This update will be incompatible with the current user's MEGA client so they will need to update their browser extension."
+    },
+    "8842": {
+        "text": "Grant bandwidth to downloading users:",
+        "context": "Maximum percentage of your bandwidth which is available to third party users."
+    },
+    "8843": {
+        "text": "[S]50 %[\/S] bandwidth",
+        "context": "Full string: 50% bandwidth. This is the maximum percentage of your bandwidth which is available to third party users. The 50% is a placeholder for whatever the percentage will actually be.\r\n\r\nPlease leave \"[S]50 %[\/S]\" as it is."
+    },
+    "8844": {
+        "text": "This is the maximum percentage of your bandwidth which is available to third party users.",
+        "context": "Full string: \r\n\"50% bandwith. This is the maximum percentage of your bandwidth which is available to third party users.\"\r\n\r\nUser can set bandwidth limit to users, who downloading his files.\r\n\r\n"
+    },
+    "8845": {
+        "text": "This purchase has expired.",
+        "context": "The bitcoin price has expired. Usually when paying by Bitcoin the user has 15 minutes to make their payment. After that the invoice is invalid and they must close the dialog and try again."
+    },
+    "8846": {
+        "text": "Continue [S]anyway[\/S]",
+        "context": "The button label is short for \"Continue downloading anyway\"."
+    },
+    "8847": {
+        "text": "Download [S]MEGAsync[\/S]",
+        "context": "A button label which allows the user to download the MEGAsync application."
+    },
+    "8848": {
+        "text": "Download [S]with MEGAsync[\/S]",
+        "context": "A button label which allows the user to download a file with the MEGAsync application."
+    },
+    "8849": {
+        "text": "Download [S]through your browser[\/S]",
+        "context": "A button label which allows the user to download a file using their browser."
+    },
+    "8850": {
+        "text": "MEGA v%1 Update Available",
+        "context": "This is a title for the site update dialog which is shown to users if they are still using an old version of the site 24 hours after a new release has been made. Please leave the %1 placeholder which will be replaced with the version number e.g. 3.4.35. The lowercase 'v' is short for 'version'."
+    },
+    "8851": {
+        "text": "Released %1.",
+        "context": "This is a short sentence on the site update dialog. Please leave the %1 placeholder which will be replaced with the current localised date and time."
+    },
+    "8852": {
+        "text": "We have recently made some improvements to our site, would you like to update to the latest version?",
+        "context": "This is a short message on the site update dialog which is shown to users if they are still using an old version of the site 24 hours after a new release has been made."
+    },
+    "8853": {
+        "text": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
+        "context": "An error message shown to users while trying to log into the site and there was a problem decoding the private RSA key."
     }
 }

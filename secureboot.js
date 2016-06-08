@@ -1410,7 +1410,6 @@ else if (!b_u)
     jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
 
-
     // notifications
     jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
     jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
@@ -1435,6 +1434,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+    jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
 
     // MEGA CHAT
     if (location.host === 'mega.nz' || !megaChatIsDisabled) {
@@ -1534,7 +1534,7 @@ else if (!b_u)
     jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-
+    jsl.push({f:'css/jquery-ui.css', n: 'jquery_ui_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
@@ -1543,8 +1543,6 @@ else if (!b_u)
     jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-
-
 
     if (localStorage.enableDevtools) {
         jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});

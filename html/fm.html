@@ -37,8 +37,12 @@
             </span>
         </span>
         <a class="context-menu-item send-to-contact-item"><span class="context-menu-icon"></span>[$6860]</a>
-        <a class="context-menu-item getlink-item"><span class="context-menu-icon"></span>[$59]</a>
-        <a class="context-menu-item removelink-item"><span class="context-menu-icon"></span>[$6821]</a>
+        <a class="context-menu-item getlink-item">
+            <span class="context-menu-icon"></span><span class="getlink-menu-text">[$59]</span>
+        </a>
+        <a class="context-menu-item removelink-item">
+            <span class="context-menu-icon"></span><span class="removelink-menu-text">[$6821]</span>
+        </a>
         <a class="context-menu-item sh4r1ng-item"><span class="context-menu-icon"></span>[$60]</a>
         <a class="context-menu-item shared-folder-item"><span class="context-menu-icon"></span>[$6775]</a>
         <a class="context-menu-item permissions-item"><span class="context-menu-icon"></span>[$64]</a>
@@ -812,11 +816,6 @@
                 </a>
                 <div class="clear"></div>
             </div>
-            <div class="fm-account-save-block hidden">
-                <div class="default-button fm-account-save"><span>[$776]</span></div>
-                <div class="default-button fm-account-cancel red"><span>[$82]</span></div>
-                <div class="clear"></div>
-            </div>
 
             <div class="fm-account-main">
 
@@ -1167,50 +1166,45 @@
                     <div class="fm-account-blocks">
                         <div class="fm-account-header">[$569]:</div>
                         <div class="transfer-settings">
-                            <div class="upload-settings">
-                                <div class="account-bandwidth-txt">[$570]</div>
-                                <div class="account-set-bg1" >
-                                    <div id="slider-range-max">
+                            <div class="bandwith-settings hidden">
+                                <!-- [$8842] !-->
+                                <div class="account-bandwidth-txt">[$8842]</div>
+                                <div id="bandwidth-slider"></div>
+                                <div class="slider numbers val1">0 <span>%</span></div>
+                                <div class="slider numbers val2">100 <span>%</span></div>
+                                <div class="clear"></div>
+                                <div class="slider-percentage-bl">
+                                    <div class="slider-percentage">
+                                        [$8843]
+                                    </div>
+                                    <div class="slider-percentage-info">
+                                        <span>[$8844]</span>
                                     </div>
                                 </div>
-                                <div class="transfer-numbers">1</div>
-                                <div class="transfer-numbers">2</div>
-                                <div class="transfer-numbers">3</div>
-                                <div class="transfer-numbers">4</div>
-                                <div class="transfer-numbers">5</div>
-                                <div class="transfer-numbers last">6</div>
+                            </div>
+                            
+                            <div class="upload-settings">
+                                <div class="account-bandwidth-txt">[$570]</div>
+                                <div id="slider-range-max"></div>
+                                <div class="slider numbers val1">1</div>
+                                <div class="slider numbers val2">2</div>
+                                <div class="slider numbers val3">3</div>
+                                <div class="slider numbers val4">4</div>
+                                <div class="slider numbers val5">5</div>
+                                <div class="slider numbers val6">6</div>
                                 <div class="clear"></div>
-                                <select name="minsettings" id="minsettings">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                    <option>6</option>
-                                </select>
                             </div>
 
                             <div class="download-settings">
                                 <div class="account-bandwidth-txt">[$571]</div>
-                                <div class="account-set-bg1" >
-                                    <div id="slider-range-max2">
-                                    </div>
-                                </div>
-                                <div class="transfer-numbers">1</div>
-                                <div class="transfer-numbers">2</div>
-                                <div class="transfer-numbers">3</div>
-                                <div class="transfer-numbers">4</div>
-                                <div class="transfer-numbers">5</div>
-                                <div class="transfer-numbers last">6</div>
+                               <div id="slider-range-max2"></div>
+                                <div class="slider numbers val1">1</div>
+                                <div class="slider numbers val2">2</div>
+                                <div class="slider numbers val3">3</div>
+                                <div class="slider numbers val4">4</div>
+                                <div class="slider numbers val5">5</div>
+                                <div class="slider numbers val6">6</div>
                                 <div class="clear"></div>
-                                <select name="minnumber" id="minnumber">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                    <option>6</option>
-                                </select>
                             </div>
 
                             <div class="clear"></div>
@@ -1424,6 +1418,11 @@
                         </div>
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table vouchers"></table>
                     </div>
+                </div>
+                <div class="fm-account-save-block hidden">
+                    <div class="default-button fm-account-save"><span>[$776]</span></div>
+                    <div class="default-button fm-account-cancel red"><span>[$82]</span></div>
+                    <div class="clear"></div>
                 </div>
             </div>
         </div>

@@ -544,6 +544,7 @@ function populate_l() {
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
     l[8535] = l[8535].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[8833] = l[8833].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[8843] = l[8843].replace('[S]', '<span>').replace('[/S]', '</span>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -804,17 +805,26 @@ function countrydetails(isocode) {
     return cdetails;
 }
 
-function time2date(unixtime, ignoretime) {
-    var MyDate = new Date(unixtime * 1000 || 0);
-    var MyDateString =
-        MyDate.getFullYear() + '-'
-        + ('0' + (MyDate.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + MyDate.getDate()).slice(-2);
-    if (!ignoretime) {
-        MyDateString += ' ' + ('0' + MyDate.getHours()).slice(-2) + ':'
-            + ('0' + MyDate.getMinutes()).slice(-2);
+/**
+ * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
+ * @param {Number} unixTime The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
+ * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
+ */
+function time2date(unixTime, ignoreTime) {
+
+    var myDate = new Date(unixTime * 1000 || 0);
+    var myDateString =
+        myDate.getFullYear() + '-'
+        + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
+        + ('0' + myDate.getDate()).slice(-2);
+
+    if (!ignoreTime) {
+        myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
+            + ('0' + myDate.getMinutes()).slice(-2);
     }
-    return MyDateString;
+
+    return myDateString;
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
@@ -918,8 +928,12 @@ var time2lastSeparator = function(dateString, refDate) {
     }
 };
 
+/**
+ * Gets the current UNIX timestamp
+ * @returns {Number} Returns an integer with the current UNIX timestamp (in seconds)
+ */
 function unixtime() {
-    return (new Date().getTime() / 1000);
+    return Math.round(Date.now() / 1000);
 }
 
 function uplpad(number, length) {
@@ -3437,6 +3451,7 @@ mega.utils.reload = function megaUtilsReload() {
             u_key = u_storage.k,
             privk = u_storage.privk,
             debug = !!u_storage.d;
+        var mcd = u_storage.testChatDisabled;
 
         localStorage.clear();
         sessionStorage.clear();
@@ -3453,6 +3468,9 @@ mega.utils.reload = function megaUtilsReload() {
                 u_storage.dd = true;
                 if (!is_extension) {
                     u_storage.jj = true;
+                }
+                if (mcd) {
+                    u_storage.testChatDisabled = 1;
                 }
             }
         }

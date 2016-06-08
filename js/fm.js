@@ -1,5 +1,4 @@
-function voucherCentering(button)
-{
+function voucherCentering(button) {
     var popupBlock = $('.fm-voucher-popup');
     var rigthPosition = $('.fm-account-main').outerWidth() - $(popupBlock).outerWidth();
     var buttonMid = button.width() / 2;
@@ -3595,6 +3594,10 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
+            if (typeof u_attr.bandwidthLimit === "number") {
+                api_req({"a":"up", "srvratio": Math.round(u_attr.bandwidthLimit) });
+            }
+
             if (M.account.dl_maxSlots)
             {
                 mega.config.set('dl_maxSlots', M.account.dl_maxSlots);
@@ -3819,20 +3822,49 @@ function accountUI() {
             accountUI();
         });
 
-        $("#slider-range-max").slider({
+        // LITE/PRO account
+        if (u_attr.p) {
+            // replace 50 (percents) by real value
+            api_req({ 'a': 'uq' }, {callback: function(response) {
+                var bandwidthLimit = Math.round(response.srvratio || 0);
+                $('.bandwith-settings').removeClass('hidden');
+                $('#bandwidth-slider').slider({
+                    min: 0, max: 100, range: 'min', value: bandwidthLimit, slide: function(e, ui) {
+                        $('.slider-percentage span').text(ui.value + ' %');
+                        $('.fm-account-save-block').removeClass('hidden');
+                        u_attr.bandwidthLimit = ui.value;
+                    }
+                });
+                $('.slider-percentage span').text(bandwidthLimit + ' %');
+            }});
+        }
+
+        $('#slider-range-max').slider({
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4, slide: function(e, ui)
             {
-                M.account.dl_maxSlots = ui.value;
+                var uiValue = ui.value;
+                M.account.dl_maxSlots = uiValue;
+                $('.upload-settings .numbers.active').removeClass('active');
+                $('.upload-settings .numbers.val' + uiValue).addClass('active');
                 $('.fm-account-save-block').removeClass('hidden');
             }
         });
-        $("#slider-range-max2").slider({
+        $('.upload-settings .numbers.active').removeClass('active');
+        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
+
+        $('#slider-range-max2').slider({
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4, slide: function(e, ui)
             {
+                var uiValue = ui.value;
                 M.account.ul_maxSlots = ui.value;
+                $('.download-settings .numbers.active').removeClass('active');
+                $('.download-settings .numbers.val' + uiValue).addClass('active');
                 $('.fm-account-save-block').removeClass('hidden');
             }
         });
+        $('.download-settings .numbers.active').removeClass('active');
+        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
+
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;
         if ((fmconfig.ul_maxSpeed | 0) === 0) {
@@ -6251,12 +6283,54 @@ function contextMenuUI(e, ll) {
         }
     });
 
+    setContextMenuGetLinkText();
     adjustContextMenuPosition(e, m);
 
     disableCircularTargets('#fi_');
 
     m.removeClass('hidden');
     e.preventDefault();
+}
+
+/**
+ * Sets the text in the context menu for the Get link and Remove link items. If there are
+ * more than one nodes selected then the text will be pluralised. If all the selected nodes
+ * have public links already then the text will change to 'Update link/s'.
+ */
+function setContextMenuGetLinkText() {
+
+    var numOfExistingPublicLinks = 0;
+    var numOfSelectedNodes = $.selected.length;
+    var getLinkText = '';
+
+    // Loop through all selected nodes
+    for (var i = 0; i < numOfSelectedNodes; i++) {
+
+        // Get the node handle of the current node
+        var nodeHandle = $.selected[i];
+
+        // If it has a public link, then increment the count
+        if (M.getNodeShare(nodeHandle)) {
+            numOfExistingPublicLinks++;
+        }
+    }
+
+    // If all the selected nodes have existing public links, set text to 'Update links' or 'Update link'
+    if (numOfSelectedNodes === numOfExistingPublicLinks) {
+        getLinkText = (numOfSelectedNodes > 1) ? l[8733] : l[8732];
+    }
+    else {
+        // Otherwise change text to 'Get links' or 'Get link' if there are selected nodes without links
+        getLinkText = (numOfSelectedNodes > 1) ? l[8734] : l[59];
+    }
+
+    // If there are multiple nodes with existing links selected, set text to 'Remove links', otherwise 'Remove link'
+    var removeLinkText = (numOfExistingPublicLinks > 1) ? l[8735] : l[6821];
+
+    // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
+    var $contextMenu = $('.context-menu');
+    $contextMenu.find('.getlink-menu-text').text(getLinkText);
+    $contextMenu.find('.removelink-menu-text').text(removeLinkText);
 }
 
 /**
@@ -7494,7 +7568,7 @@ function shareDialogContentCheck() {
     }
 }
 
-function addShareDialogContactToContent(userEmail, type, id, av, userName, permClass, permText, exportLink) {
+function addShareDialogContactToContent(userEmail, type, id, av, userName, permClass, permText) {
 
     var html = '',
         htmlEnd = '',
@@ -7509,21 +7583,15 @@ function addShareDialogContactToContent(userEmail, type, id, av, userName, permC
             + '</div>';
     }
 
-    if (exportLink) {
-        item = itemExportLinkHtml(M.d[exportLink]);
-        exportClass = 'share-item-bl';
-    }
-    else {
-        item = av
-            + '<div class="fm-share-user-info">'
-            + '<div class="fm-share-centered">'
-            + '<div class="fm-chat-user">' + htmlentities(userName) + '</div>'
-            + contactEmailHtml
-            + '</div>'
-            + '</div>';
-    }
+    item = av
+        + '<div class="fm-share-user-info">'
+        + '<div class="fm-share-centered">'
+        + '<div class="fm-chat-user">' + htmlentities(userName) + '</div>'
+        + contactEmailHtml
+        + '</div>'
+        + '</div>';
 
-    html = '<div class="share-dialog-contact-bl ' + exportClass + ' ' + type + '" id="sdcbl_' + id + '">'
+    html = '<div class="share-dialog-contact-bl ' + type + '" id="sdcbl_' + id + '">'
            + item
            + '<div class="share-dialog-remove-button"></div>'
            + '<div class="share-dialog-permissions ' + permClass + '">'
@@ -9047,80 +9115,6 @@ function moveDialog() {
 }
 
 /**
- * getClipboardLinks
- *
- * Gether all available public links for selected items (files/folders).
- * @returns {String} links URLs or decryption keys for selected items separated with newline '\n'.
- */
-function getClipboardLinks() {
-    var key;
-    var type;
-    var links = [];
-    var handles = $.selected;
-    var $dialog = $('.export-links-dialog .export-content-block');
-    var modeFull = $dialog.hasClass('full-link');
-    var modePublic = $dialog.hasClass('public-handle');
-    var modeDecKey = $dialog.hasClass('decryption-key');
-
-    for (var i in handles) {
-        if (handles.hasOwnProperty(i)) {
-            var node = M.d[handles[i]];
-
-            // Only nodes with public handle
-            if (node && node.ph) {
-                if (node.t) {
-                    // Folder
-                    type = 'F';
-                    key = u_sharekeys[node.h];
-                }
-                else {
-                    // File
-                    type = '';
-                    key = node.key;
-                }
-
-                var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
-                var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
-
-                // Check export/public link dialog drop down list selected option
-                if (modeFull) {
-                    links.push(nodeUrlWithPublicHandle + nodeDecryptionKey);
-                }
-                else if (modePublic) {
-                    links.push(nodeUrlWithPublicHandle);
-                }
-                else if (modeDecKey) {
-                    links.push(nodeDecryptionKey);
-                }
-            }
-        }
-    }
-
-    return links.join("\n");
-}
-
-function getclipboardkeys() {
-
-    var n, key,
-        l = '';
-
-    for (var i in M.links) {
-        n = M.d[M.links[i]];
-
-        if (n.t) {
-            key = u_sharekeys[n.h];
-        }
-        else {
-            key = n.key;
-        }
-
-        l += a32_to_base64(key) + '\n';
-    }
-
-    return l;
-}
-
-/**
  * Show toast notification
  * @param {String} toastClass Custom style for the notification
  * @param {String} notification The text for the toast notification
@@ -9167,74 +9161,6 @@ function showToast(toastClass, notification, buttonLabel) {
 
 function hideToast () {
     $('.toast-notification.common-toast').removeClass('visible');
-}
-
-/**
- * itemExportLinkHtml
- *
- * @param {Object} item
- * @returns {String}
- */
-function itemExportLinkHtml(item) {
-
-    var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize, folderClass = '',
-        html = '';
-
-    // Shared item type is folder
-    if (item.t) {
-        type = 'F';
-        key = u_sharekeys[item.h];
-        fileSize = '';
-        folderClass = ' folder-item';
-    }
-
-    // Shared item type is file
-    else {
-        type = '';
-        key = item.key;
-        fileSize = htmlentities(bytesToSize(item.s));
-    }
-
-    fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
-    fileUrlKey = key ? '!' + a32_to_base64(key) : '';
-
-    html = '<div class="export-link-item' + folderClass + '">'
-         +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
-         +      '<div class="export-link-text-pad">'
-         +          '<div class="export-link-txt">'
-         +               '<span class="export-item-title">' + htmlentities(item.name) + '</span><span class="export-link-gray-txt">' + fileSize + '</span>'
-         +          '</div>'
-         +          '<div id="file-link-block" class="file-link-block">'
-         +              '<span class="icon"></span>'
-         +              '<span class="file-link-info-wrapper">'
-         +                  '<span class="file-link-info url">' + fileUrlWithoutKey + '</span>'
-         +                  '<span class="file-link-info key">' + fileUrlKey + '</span>'
-         +              '</span>'
-         +          '</div>'
-         +      '</div>'
-         +  '</div>';
-
-    return html;
-}
-
-/**
- * generates file url for shared item
- *
- * @returns {String} html
- */
-function itemExportLink() {
-
-    var node,
-        html = '';
-
-    $.each($.itemExport, function(index, value) {
-        node = M.d[value];
-        if (node && node.ph) {
-            html += itemExportLinkHtml(node);
-        }
-    });
-
-    return html;
 }
 
 function refreshDialogContent() {

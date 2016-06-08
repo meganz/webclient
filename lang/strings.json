@@ -13510,5 +13510,9 @@
     "8853": {
         "text": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
         "context": "An error message shown to users while trying to log into the site and there was a problem decoding the private RSA key."
+    },
+    "8854": {
+        "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them because it is not part of this account cancellation process.",
+        "context": "An additional message on the confirm dialog after a user chooses to cancel their account. This will appear if they have previously had a PRO plan that was paid with a Google or Apple subscription."
     }
 }

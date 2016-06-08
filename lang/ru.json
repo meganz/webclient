@@ -3377,6 +3377,7 @@
     "8851": "\u0412\u044b\u043f\u0443\u0449\u0435\u043d\u043e %1.",
     "8852": "\u041c\u044b \u0432\u043d\u0435\u0441\u043b\u0438 \u043d\u0435\u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0443\u043b\u0443\u0447\u0448\u0435\u043d\u0438\u044f \u0432 \u0441\u0430\u0439\u0442, \u0445\u043e\u0442\u0438\u0442\u0435 \u043e\u0431\u043d\u043e\u0432\u0438\u0442\u044c\u0441\u044f \u0434\u043e \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0439 \u0432\u0435\u0440\u0441\u0438\u0438?",
     "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
+    "8854": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them because it is not part of this account cancellation process.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3477,6 +3478,7 @@
         "grant-bandwidth-title": 8842,
         "mega-update-available": 8850,
         "released-date-time": 8851,
-        "site-update-available-message": 8852
+        "site-update-available-message": 8852,
+        "subscription-cancellation-message": 8854
     }
 }

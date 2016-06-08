@@ -3377,6 +3377,7 @@
     "8851": "Liberada el %1.",
     "8852": "Hemos hecho algunas mejoras recientemente a nuestro sitio, \u00bfquieres actualizar a la \u00faltima versi\u00f3n?",
     "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
+    "8854": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them because it is not part of this account cancellation process.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3477,6 +3478,7 @@
         "grant-bandwidth-title": 8842,
         "mega-update-available": 8850,
         "released-date-time": 8851,
-        "site-update-available-message": 8852
+        "site-update-available-message": 8852,
+        "subscription-cancellation-message": 8854
     }
 }

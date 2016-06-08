@@ -4763,13 +4763,18 @@ function MegaData()
                     $tr.find('.left-c p').css('transform', 'rotate(' + (transferDeg - 180) + 'deg)');
                 }
                 if (retime > 0) {
-                    $tr.find('.eta').safeHTML(secondsToTime(retime, 1)).removeClass('unknown');
-                } else {
+                    $tr.find('.eta')
+                        .text(secondsToTime(retime))
+                        .removeClass('unknown')
+                        .attr('title', new Date((unixtime() + retime) * 1000).toLocaleString());
+                }
+                else {
                     $tr.find('.eta').addClass('unknown').text('');
                 }
                 if (bps > 0) {
                     $tr.find('.speed').safeHTML(bytesToSize(bps, 1, 1) + '/s').removeClass('unknown');
-                } else {
+                }
+                else {
                     $tr.find('.speed').addClass('unknown').text('');
                 }
                 percent_megatitle();

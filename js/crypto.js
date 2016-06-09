@@ -2329,7 +2329,7 @@ function api_getsid(ctx, user, passwordkey, hash) {
 api_getsid.warning = function() {
     var time = new Date(api_getsid.etoomany + 3780000).toLocaleTimeString();
 
-    msgDialog('warningb', l[882], l[8855].replace('%1', time).replace('[br]', '<br>'));
+    msgDialog('warningb', l[882], l[8855].replace('%1', time));
 };
 
 function api_getsid2(res, ctx) {

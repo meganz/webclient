@@ -2314,6 +2314,11 @@ function api_getsid(ctx, user, passwordkey, hash) {
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
+    if (api_getsid.etoomany + 3600000 > Date.now()) {
+        api_getsid.warning();
+        return ctx.result(ctx, false);
+    }
+
     api_req({
         a: 'us',
         user: user,
@@ -2321,11 +2326,25 @@ function api_getsid(ctx, user, passwordkey, hash) {
     }, ctx);
 }
 
+api_getsid.warning = function() {
+    var time = new Date(api_getsid.etoomany + 3780000).toLocaleTimeString();
+
+    msgDialog('warningb', l[882], l[8855].replace('%1', time));
+};
+
 function api_getsid2(res, ctx) {
     var t, k;
     var r = false;
 
-    if (typeof res === 'object') {
+    if (typeof res === 'number') {
+
+        if (res === ETOOMANY) {
+
+            api_getsid.etoomany = Date.now();
+            api_getsid.warning();
+        }
+    }
+    else if (typeof res === 'object') {
         var aes = new sjcl.cipher.aes(ctx.passwordkey);
 
         // decrypt master key

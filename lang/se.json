@@ -3377,6 +3377,8 @@
     "8851": "Frigjort %1.",
     "8852": "Vi har nyligen gjort vissa f\u00f6rb\u00e4ttringar p\u00e5 v\u00e5r webbplats, vill du uppdatera till den senaste versionen?",
     "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
+    "8854": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them because it is not part of this account cancellation process.",
+    "8855": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3477,6 +3479,7 @@
         "grant-bandwidth-title": 8842,
         "mega-update-available": 8850,
         "released-date-time": 8851,
-        "site-update-available-message": 8852
+        "site-update-available-message": 8852,
+        "subscription-cancellation-message": 8854
     }
 }

@@ -2231,7 +2231,7 @@
     "7164": "Upgradov\u00e1n\u00ed \u00fa\u010dtu",
     "7165": "Zru\u0161it p\u0159edplatn\u00e9",
     "7166": "P\u0159edplatn\u00e9 bylo spr\u00e1vn\u011b  zru\u0161eno",
-    "7167": "P\u0159edplatn\u00e9 nebylo spr\u00e1vn\u011b  zru\u0161eno. Obra\u0165te se na support@mega.nz pro zru\u0161en\u00ed va\u0161eho p\u0159edplatn\u00e9ho",
+    "7167": "Nemohli jsme zru\u0161it va\u0161e p\u0159edplatn\u00e9. Obra\u0165te se na support@mega.nz kv\u016fli pomoci.",
     "7168": "Zav\u0159\u00edt v\u0161echny relace",
     "7169": "Zb\u00fdvaj\u00edc\u00ed relace byly \u00fasp\u011b\u0161n\u011b zav\u0159eny",
     "7170": "Chyba p\u0159i zav\u00edr\u00e1n\u00ed otev\u0159en\u00fdch relac\u00ed",
@@ -3376,7 +3376,9 @@
     "8850": "Dostupn\u00e1 aktualizace MEGA v%1",
     "8851": "Vyd\u00e1no %1.",
     "8852": "Ned\u00e1vno jsme provedli n\u011bjak\u00e1 vylep\u0161en\u00ed na\u0161ich str\u00e1nek, chcete aktualizovat na nejnov\u011bj\u0161\u00ed verzi?",
-    "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
+    "8853": "Do\u0161lo k probl\u00e9mu s dek\u00f3dov\u00e1n\u00edm va\u0161eho osobn\u00edho kl\u00ed\u010de RSA, obra\u0165te se na support@mega.nz kv\u016fli dal\u0161\u00ed pomoci.",
+    "8854": "Pokud jste si d\u0159\u00edve p\u0159edplatili pl\u00e1n PRO pomoc\u00ed Google Play nebo Apple iTunes, ru\u010dn\u011b zru\u0161te sv\u00e9 p\u0159edplatn\u00e9 pomoc\u00ed jich, proto\u017ee to nen\u00ed sou\u010dast\u00ed tohoto procesu zru\u0161en\u00ed \u00fa\u010dtu.",
+    "8855": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3477,6 +3479,7 @@
         "grant-bandwidth-title": 8842,
         "mega-update-available": 8850,
         "released-date-time": 8851,
-        "site-update-available-message": 8852
+        "site-update-available-message": 8852,
+        "subscription-cancellation-message": 8854
     }
 }

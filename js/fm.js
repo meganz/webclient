@@ -10476,11 +10476,9 @@ function fm_resize_handler() {
         megaChat.resized();
     }
 
-    $('.fm-right-files-block, .fm-right-account-block')
-        .filter(':visible')
-        .css({
-            'margin-left': ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel:visible').width()) + "px"
-        });
+    $('.fm-right-files-block, .fm-right-account-block').css({
+        'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+    });
 
     var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
 

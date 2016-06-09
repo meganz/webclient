@@ -20971,6 +20971,83 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 
 /* Style for datepicker dialog (override existing jQuery UI ones) */
+.ui-datepicker {
+    width: 17em;
+    padding: .2em .2em 0;
+    display: none;
+    border: 1px solid #dddddd;
+    background: #ffffff;
+    color: #333333;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.ui-helper-clearfix:before, .ui-helper-clearfix:after {
+    content: "";
+    display: table;
+    border-collapse: collapse;
+}
+.ui-datepicker .ui-datepicker-header {
+    position: relative;
+    padding: .2em 0;
+}
+.ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next {
+    position: absolute;
+}
+.ui-datepicker .ui-datepicker-prev span, .ui-datepicker .ui-datepicker-next span {
+    display: block;
+    position: absolute;
+    left: 50%;
+    margin-left: -8px;
+    top: 50%;
+    margin-top: -8px;
+}
+.ui-datepicker .ui-datepicker-header {
+    position: relative;
+    padding: .2em 0;
+}
+.ui-datepicker table {
+    width: 100%;
+    font-size: .9em;
+    border-collapse: collapse;
+    margin: 0 0 .4em;
+}
+.ui-datepicker .ui-datepicker-buttonpane button {
+    float: right;
+    margin: .5em .2em .4em;
+    cursor: pointer;
+    padding: .2em .6em .3em .6em;
+    width: auto;
+    overflow: visible;
+    z-index: 10;
+    outline: none;
+}
+.ui-datepicker .ui-datepicker-buttonpane {
+    background-image: none;
+    margin: .7em 0 0 0;
+    padding: 0 .2em;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+}
+#ui-datepicker-div {
+    margin-top: 10px;
+}
+.ui-datepicker td span, .ui-datepicker td a {
+    display: block;
+    text-decoration: none;
+}
+.ui-icon {
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+}
+.ui-state-disabled .ui-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=35);
+    -moz-opacity: 0.35;
+    -khtml-opacity: 0.35;
+    opacity: 0.35;
+}
 #ui-datepicker-div {
     width: auto;
 }
@@ -25083,9 +25160,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     display: none;
 }
 .export-links-dialog .dialog-feature-toggle {    
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1));
-    box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.05);
     border: solid 1px rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.25);
     border-radius: 40px;
     cursor: pointer;
     display: inline-block;
@@ -25094,7 +25170,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     width: 36px;
 }
 .export-links-dialog .dialog-feature-toggle.toggle-on {
-    background-image: linear-gradient(to bottom, rgba(18, 224, 60, 0.7), #13e03c);
+    background-color: #13e03c;
 }
 .export-links-dialog .dialog-feature-switch {
     background-color: #ffffff;

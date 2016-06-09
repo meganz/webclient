@@ -3378,6 +3378,7 @@
     "8852": "Nedavno smo pripravili nekaj izbolj\u0161av na\u0161e strani, ali \u017eelite uporabiti najnovej\u0161o verzijo?",
     "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
     "8854": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them because it is not part of this account cancellation process.",
+    "8855": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

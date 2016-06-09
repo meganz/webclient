@@ -13514,5 +13514,9 @@
     "8854": {
         "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them because it is not part of this account cancellation process.",
         "context": "An additional message on the confirm dialog after a user chooses to cancel their account. This will appear if they have previously had a PRO plan that was paid with a Google or Apple subscription."
+    },
+    "8855": {
+        "text": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
+        "context": "An error message which is shown when a user tries to log into the site too many times. Please leave the [BR] tag which will be replaced with a line break at run time. The %1 placeholder will be replaced with the time e.g. 14:37 which is when the user can try logging in again."
     }
 }

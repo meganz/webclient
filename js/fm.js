@@ -3337,43 +3337,8 @@ function accountUI() {
             }
 
             // Set payment method
-            //['Voucher', 'PayPal', 'Apple', 'Google', 'Bitcoin', 'Union Pay', 'Fortumo', 'Credit Card', 'Credit Card']
-            var paymentMethodIndex = purchaseTransaction[4];
-            var paymentMethod = l[428];             // Voucher
-
-            if (paymentMethodIndex === 1) {
-                paymentMethod = l[1233];            // PayPal
-            }
-            else if (paymentMethodIndex === 2) {
-                paymentMethod = l[6953];            // iTunes
-            }
-            else if (paymentMethodIndex === 3) {
-                paymentMethod = l[7188];            // Google
-            }
-            else if (paymentMethodIndex === 4) {
-                paymentMethod = l[6802];            // Bitcoin
-            }
-            else if (paymentMethodIndex === 5) {
-                paymentMethod = l[6952];            // Union Pay
-            }
-            else if (paymentMethodIndex === 6) {
-                paymentMethod = l[7161] + ' (Fortumo)';    // Mobile carrier billing (Fortumo)
-            }
-            else if (paymentMethodIndex === 7) {
-                paymentMethod = l[6952];            // Credit card
-            }
-            else if (paymentMethodIndex === 8) {
-                paymentMethod = l[6952];            // Credit card
-            }
-            else if (paymentMethodIndex === 9) {
-                paymentMethod = l[7161] + ' (Centili)';    // Mobile carrier billing (Centili)
-            }
-            else if (paymentMethodIndex === 10) {
-                paymentMethod = 'paysafecard';
-            }
-            else if (paymentMethodIndex === 11) {
-                paymentMethod = 'AstroPay';         // Various AstroPay methods
-            }
+            var paymentMethodId = purchaseTransaction[4];
+            var paymentMethod = getGatewayName(paymentMethodId).displayName;
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method
             var dateTime = time2date(purchaseTransaction[1]);
@@ -4157,8 +4122,9 @@ function accountUI() {
                 msgDialog('warninga', 'Error', 'Please enter a valid voucher amount.');
                 return false;
             }
-            if (vouchertype == '19.99')
+            if (vouchertype === '19.99') {
                 vouchertype = '19.991';
+            }
             loadingDialog.show();
             api_req({a: 'uavi', d: vouchertype, n: voucheramount, c: 'EUR'},
             {
@@ -4308,8 +4274,27 @@ function accountUI() {
     // Cancel account button on main Account page
     $('.cancel-account').rebind('click', function() {
 
+        // Please confirm that all your data will be deleted
+        var confirmMessage = l[1974];
+
+        // Search through their Pro plan purchase history
+        $(account.purchases).each(function(index, purchaseTransaction) {
+            
+            // Get payment method name
+            var paymentMethodId = purchaseTransaction[4];
+            var paymentMethod = getGatewayName(paymentMethodId).name;
+            
+            // If they have paid with iTunes or Google Play in the past
+            if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
+                
+                // Update confirmation message to remind them to cancel iTunes or Google Play
+                confirmMessage += ' ' + l[8854];
+                return false;
+            }
+        });
+        
         // Ask for confirmation
-        msgDialog('confirmation', l[6181], l[1974], false, function(event) {
+        msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
             if (event) {
                 loadingDialog.show();
                 api_req({ a: 'erm', m: Object(M.u[u_handle]).m, t: 21 }, {

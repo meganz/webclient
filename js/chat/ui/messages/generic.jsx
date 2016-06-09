@@ -6,7 +6,7 @@ var ContactsUI = require('./../contacts.jsx');
 var TypingAreaUI = require('./../typingArea.jsx');
 
 /* 1h as confirmed by Mathias */
-var MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
+var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
@@ -42,10 +42,18 @@ var GenericConversationMessage = React.createClass({
                 $textarea.focus();
                 moveCursortoToEnd($textarea[0]);
             }
-            if (oldState.editing === false) {
+            if (!oldState.editing) {
                 if (self.props.onEditStarted) {
                     self.props.onEditStarted($generic);
                 }
+            }
+
+            if (self.scrollToElementAfterUpdate === true) {
+                var $jsp = self.getParentJsp();
+                if ($jsp) {
+                    $jsp.scrollToElement($(self.findDOMNode()));
+                }
+                self.scrollToElementAfterUpdate = false;
             }
         }
         else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
@@ -53,10 +61,19 @@ var GenericConversationMessage = React.createClass({
                 self.props.onUpdate();
             }
         }
+        var $node = $(self.findDOMNode());
+        $node.rebind('onEditRequest.genericMessage', function(e) {
+            if (self.state.editing === false) {
+                self.scrollToElementAfterUpdate = true;
+                self.setState({'editing': true});
+            }
+        });
     },
     componentWillUnmount: function() {
         var self = this;
         $(document).unbind('keyup.megaChatEditTextareaClose' + self.props.chatRoom.roomJid);
+        var $node = $(self.findDOMNode());
+        $node.unbind('onEditRequest.genericMessage');
     },
     doDelete: function(e, msg) {
         e.preventDefault(e);

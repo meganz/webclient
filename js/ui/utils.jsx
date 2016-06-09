@@ -83,6 +83,7 @@ var JScrollPane = React.createClass({
 
         var currHeights = [$('.jspPane', $elem).outerHeight(), $elem.outerHeight()];
 
+
         if (forced || self._lastHeights != currHeights) {
             self._lastHeights = currHeights;
             var $jsp = $elem.data('jsp');
@@ -92,6 +93,11 @@ var JScrollPane = React.createClass({
                     if (scrollPositionYPerc === -1) {
                         $elem.one('jsp-initialised', function () {
                             $jsp.scrollToBottom();
+                        });
+                    }
+                    else {
+                        $elem.one('jsp-initialised', function () {
+                            $jsp.scrollToPercentY(scrollPositionYPerc, false);
                         });
                     }
                 }

@@ -70,6 +70,11 @@ var ConversationMessageMixin = {
 
         return timestampInt;
     },
+    getParentJsp: function() {
+        var $node = $(this.findDOMNode());
+        var $jsp = $node.parents('.jScrollPaneContainer').data('jsp');
+        return $jsp;
+    },
     componentDidUpdate: function() {
         var self = this;
         var chatRoom = self.props.chatRoom;

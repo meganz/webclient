@@ -1225,9 +1225,9 @@ var ConversationPanel = React.createClass({
                             }}
                             onEditStarted={($domElement) => {
                                 var $jsp = self.$messages.data('jsp');
-                                if (!verge.inViewport($domElement)) {
+                                setTimeout(function() {
                                     $jsp.scrollToElement($domElement);
-                                }
+                                }, 90);
                             }}
                             onEditDone={(messageContents) => {
                                 if (messageContents) {
@@ -1262,10 +1262,23 @@ var ConversationPanel = React.createClass({
                                             messageContents
                                         ]
                                     );
+
+                                    var $jsp = self.$messages.data('jsp');
+                                    $jsp.scrollToBottom();
+                                    self.lastScrollPositionPerc = 1;
                                 }
-                                var $jsp = self.$messages.data('jsp');
-                                $jsp.scrollToBottom();
-                                self.lastScrollPositionPerc = 1;
+                                else if(messageContents.length === 0) {
+
+                                    self.setState({
+                                        'confirmDeleteDialog': true,
+                                        'messageToBeDeleted': v
+                                    });
+                                }
+                                else if(messageContents === false) {
+                                    var $jsp = self.$messages.data('jsp');
+                                    $jsp.scrollToBottom();
+                                    self.lastScrollPositionPerc = 1;
+                                }
                             }}
                             onDeleteClicked={(e, msg) => {
                                 self.setState({
@@ -1380,6 +1393,9 @@ var ConversationPanel = React.createClass({
                 }}
                 onConfirmClicked={() => {
                     var msg = self.state.messageToBeDeleted;
+                    if (!msg) {
+                        return;
+                    }
                     if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
                         room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
                     }
@@ -1584,12 +1600,67 @@ var ConversationPanel = React.createClass({
                                 chatRoom={self.props.chatRoom}
                                 className="main-typing-area"
                                 disabled={room.isReadOnly()}
+                                onUpEditPressed={() => {
+                                    var foundMessage = false;
+                                    room.messagesBuff.messages.keys().reverse().forEach(function(k) {
+                                        if(!foundMessage) {
+                                            var message = room.messagesBuff.messages[k];
+
+                                            var contact;
+                                            if (message.authorContact) {
+                                                contact = message.authorContact;
+                                            }
+                                            else if (message.meta && message.meta.userId) {
+                                                contact = M.u[message.meta.userId];
+                                                if (!contact) {
+                                                    return false;
+                                                }
+                                            }
+                                            else if (message.userId) {
+                                                if (!M.u[message.userId]) {
+                                                    // data is still loading!
+                                                    return false;
+                                                }
+                                                contact = M.u[message.userId];
+                                            }
+                                            else if (message.getFromJid) {
+                                                contact = megaChat.getContactFromJid(message.getFromJid());
+                                            }
+                                            else {
+                                                // contact not found
+                                                return false;
+                                            }
+
+                                            if (
+                                                    contact && contact.u === u_handle &&
+                                                    (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
+                                                    !message.requiresManualRetry &&
+                                                    !message.deleted &&
+                                                    !message.type &&
+                                                    (!message.isManagement || !message.isManagement())
+                                                ) {
+                                                    foundMessage = message;
+                                            }
+                                        }
+                                    });
+
+                                    if (!foundMessage) {
+                                        return false;
+                                    }
+                                    else {
+                                        $('.message.body.' + foundMessage.messageId).trigger('onEditRequest');
+                                        self.lastScrolledToBottom = false;
+                                        return true;
+                                    }
+                                }}
                                 onUpdate={() => {
                                     self.handleWindowResize();
                                     $('.jScrollPaneContainer', self.findDOMNode()).trigger('forceResize');
                                 }}
                                 onConfirm={(messageContents) => {
-                                    self.props.chatRoom.sendMessage(messageContents);
+                                    if (messageContents && messageContents.length > 0) {
+                                        self.props.chatRoom.sendMessage(messageContents);
+                                    }
                                 }}
                             >
                                     <ButtonsUI.Button

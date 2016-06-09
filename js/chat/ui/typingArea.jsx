@@ -153,23 +153,37 @@ var TypingArea = React.createClass({
         var val = element.value;
 
         if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-            if ($.trim(val).length > 0) {
-                if (self.props.onConfirm(val) !== true) {
-                    self.setState({typedMessage: ""});
-                }
-                self.stoppedTyping();
-                e.preventDefault();
-                return;
+
+            if (self.props.onConfirm(val) !== true) {
+                self.setState({typedMessage: ""});
             }
-            else {
-                self.stoppedTyping();
-                e.preventDefault();
-            }
+            self.stoppedTyping();
+            e.preventDefault();
+            return;
         }
         else if (key === 13) {
             if ($.trim(val).length === 0) {
                 self.stoppedTyping();
                 e.preventDefault();
+            }
+        }
+        else if (key === 38) {
+            /* arrow up! */
+            if ($.trim(val).length === 0) {
+                if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
+                    self.stoppedTyping();
+                    e.preventDefault();
+                    return;
+                }
+            }
+        }
+        else if (key === 27) {
+            /* ESC */
+            if (self.props.showButtons === true) {
+                self.stoppedTyping();
+                e.preventDefault();
+                self.onCancelClicked(e);
+                return;
             }
         }
 

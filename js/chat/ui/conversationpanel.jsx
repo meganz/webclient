@@ -273,8 +273,8 @@ var ConversationRightArea = React.createClass({
                     </div>
 
                     <div className="buttons-block">
-                        {startAudioCallButton}
-                        {startVideoCallButton}
+                        {room.type !== "group" ? startAudioCallButton : null}
+                        {room.type !== "group" ? startVideoCallButton : null}
 
                         <ButtonsUI.Button
                             className="link-button dropdown-element"
@@ -339,6 +339,17 @@ var ConversationRightArea = React.createClass({
                             }}>
                                 <i className="small-icon rounded-stop"></i>
                                 {__("Truncate")}
+                            </div>
+                        ) : null
+                        }
+                        { room.type === "group" ? (
+                            <div className="link-button red" onClick={() => {
+                                if (self.props.onLeaveClicked) {
+                                    self.props.onLeaveClicked();
+                                }
+                            }}>
+                                <i className="small-icon rounded-stop"></i>
+                                {l[8633]}
                             </div>
                         ) : null
                         }
@@ -1230,7 +1241,13 @@ var ConversationPanel = React.createClass({
                                 }, 90);
                             }}
                             onEditDone={(messageContents) => {
-                                if (messageContents) {
+                                var currentContents = v.textContents ? v.textContents : v.contents;
+                                if (messageContents === false || messageContents === currentContents) {
+                                    var $jsp = self.$messages.data('jsp');
+                                    $jsp.scrollToBottom();
+                                    self.lastScrollPositionPerc = 1;
+                                }
+                                else if (messageContents) {
                                     room.megaChat.plugins.chatdIntegration.updateMessage(
                                         room,
                                         v.internalId ? v.internalId : v.orderValue,
@@ -1273,11 +1290,6 @@ var ConversationPanel = React.createClass({
                                         'confirmDeleteDialog': true,
                                         'messageToBeDeleted': v
                                     });
-                                }
-                                else if(messageContents === false) {
-                                    var $jsp = self.$messages.data('jsp');
-                                    $jsp.scrollToBottom();
-                                    self.lastScrollPositionPerc = 1;
                                 }
                             }}
                             onDeleteClicked={(e, msg) => {
@@ -1506,6 +1518,11 @@ var ConversationPanel = React.createClass({
                         }}
                         onTruncateClicked={function() {
                             self.setState({'truncateDialog': true});
+                        }}
+                        onLeaveClicked={function() {
+                            room.members[u_handle] = 0;
+                            room.trackDataChange();
+                            //TODO: Do a real leave chat here...
                         }}
                         onAttachFromCloudClicked={function() {
                             self.setState({'attachCloudDialog': true});

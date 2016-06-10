@@ -34,7 +34,7 @@ UrlFilter.prototype.processMessage = function(e, eventData) {
     }
 
     eventData.message.messageHtml = Autolinker.link(messageContents, {
-        truncate: 30,
+        truncate: 80,
         newWindow: true,
         stripPrefix: true,
         twitter: false,

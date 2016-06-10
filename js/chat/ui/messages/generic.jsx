@@ -766,9 +766,6 @@ var GenericConversationMessage = React.createClass({
                             }
                         }}
                         onConfirm={(messageContents) => {
-                            if (messageContents) {
-                                message.textContents = messageContents;
-                            }
                             self.setState({'editing': false});
 
                             if (self.props.onEditDone) {

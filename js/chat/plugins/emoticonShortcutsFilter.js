@@ -18,7 +18,13 @@ var EmoticonShortcutsFilter = function(megaChat) {
         ';p': ':stuck_out_tongue_winking_eye:',
         ';-p': ':stuck_out_tongue_winking_eye:',
         ':p': ':stuck_out_tongue:',
-        ':-p': ':stuck_out_tongue:'
+        ':-p': ':stuck_out_tongue:',
+
+        ':(': ':disappointed:',
+        ':\\': ':confused:',
+        ':/': ':confused:',
+        ':|': ':neutral_face:',
+        'd:': ':anguished:'
     };
 
 

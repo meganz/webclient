@@ -8316,7 +8316,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     top: 0;
     left: 0;
 }
-.fm-dialog-overlay.bitcoin-invoice-dialog, .fm-dialog-overlay.payment-dialog-overlay, .fm-dialog-overlay.voucher-dialog-overlay, .fm-dialog-overlay.dark-overlay {
+.fm-dialog-overlay.bitcoin-invoice-dialog-overlay, .fm-dialog-overlay.payment-dialog-overlay, .fm-dialog-overlay.voucher-dialog-overlay, .fm-dialog-overlay.dark-overlay {
     background: rgba(34,34,34,0.95);
 }
 .fm-dialog {
@@ -8621,13 +8621,19 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     float: right;
 }
 /* Failure to connect to provider */
+.fm-dialog.bitcoin-provider-failure-dialog {
+    margin-left: -179px;
+    margin-top: -157px;
+}
 .fm-dialog.bitcoin-provider-failure-dialog .container {
     position: relative;
     padding-top: 30px;
 }
-.bitcoin-provider-failure-dialog.pro-register-paypal-dialog .reg-success-icon {
-    background-position: center -200px;
+.fm-dialog.bitcoin-provider-failure-dialog .reg-success-icon {    
+    background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll 0 -200px;
+    height: 200px;
     margin-top: 0;
+    width: 200px;
 }
 .fm-dialog.bitcoin-provider-failure-dialog .txt, .bitcoin-invoice-dialog .payment-confirmation .txt {
     color: #333333;
@@ -15731,8 +15737,8 @@ span.browsers-update {
     color: white;
 }
 .pro-bottom-button:hover, .membership-bott-button:hover {
-    background-color: #d90007;
-    border-color: #d90007;
+    background-color: #ff3333;
+    border-color: #ff3333;
     color: white;
 }
 .pro-bottom-icon-block {

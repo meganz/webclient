@@ -583,40 +583,42 @@ var strongvelope = {};
         var parsedMessage = ns._parseMessageContent(message.message);
         var result = { parsedMessage: parsedMessage, senderKeys: {}};
 
-        if (parsedMessage && (parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) && (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
-            if (ns._verifyMessage(parsedMessage.signedContent,
-                                  parsedMessage.signature,
-                                  pubEd25519[message.userId])) {
-                var isOwnMessage = (message.userId === this.ownHandle);
-                var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
-                // If we sent the message, pick first recipient for getting the
-                // sender key (e. g. for history loading).
-                var keyIndex = isOwnMessage ? 0 : myIndex;
-                var otherHandle = (isOwnMessage && (parsedMessage.keys[keyIndex].length < _RSA_ENCRYPTION_THRESHOLD))
-                                 ? parsedMessage.recipients[0]
-                                 : message.userId;
-                if (keyIndex >= 0) {
-                    // Decrypt message key(s).
-                    var encryptedKey = (isOwnMessage && (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ? parsedMessage.ownKey : parsedMessage.keys[keyIndex];
-                    var decryptedKeys = this._legacyDecryptKeysFor( encryptedKey,
-                                                                    parsedMessage.nonce,
-                                                                    otherHandle,
-                                                                    isOwnMessage);
-                    // Update local sender key cache.
-                    if (!this.participantKeys[message.userId]) {
-                        this.participantKeys[message.userId] = {};
-                    }
-                    for (var i = 0; i < decryptedKeys.length; i++) {
-                        result.senderKeys[parsedMessage.keyIds[i]] = decryptedKeys[i];
+        if (parsedMessage) {
+            if((parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) && (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
+                if (ns._verifyMessage(parsedMessage.signedContent,
+                                      parsedMessage.signature,
+                                      pubEd25519[message.userId])) {
+                    var isOwnMessage = (message.userId === this.ownHandle);
+                    var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
+                    // If we sent the message, pick first recipient for getting the
+                    // sender key (e. g. for history loading).
+                    var keyIndex = isOwnMessage ? 0 : myIndex;
+                    var otherHandle = (isOwnMessage && (parsedMessage.keys[keyIndex].length < _RSA_ENCRYPTION_THRESHOLD))
+                                     ? parsedMessage.recipients[0]
+                                     : message.userId;
+                    if (keyIndex >= 0) {
+                        // Decrypt message key(s).
+                        var encryptedKey = (isOwnMessage && (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ? parsedMessage.ownKey : parsedMessage.keys[keyIndex];
+                        var decryptedKeys = this._legacyDecryptKeysFor( encryptedKey,
+                                                                        parsedMessage.nonce,
+                                                                        otherHandle,
+                                                                        isOwnMessage);
+                        // Update local sender key cache.
+                        if (!this.participantKeys[message.userId]) {
+                            this.participantKeys[message.userId] = {};
+                        }
+                        for (var i = 0; i < decryptedKeys.length; i++) {
+                            result.senderKeys[parsedMessage.keyIds[i]] = decryptedKeys[i];
+                        }
                     }
                 }
-            }
-            else {
-                logger.critical('Signature invalid for message from *** on ***');
-                logger.error('Signature invalid for message from '
-                             + message.userId + ' on ' + message.ts);
+                else {
+                    logger.critical('Signature invalid for message from *** on ***');
+                    logger.error('Signature invalid for message from '
+                                 + message.userId + ' on ' + message.ts);
 
-                return false;
+                    return false;
+                }
             }
         }
         else {

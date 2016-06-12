@@ -13518,5 +13518,17 @@
     "8855": {
         "text": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
         "context": "An error message which is shown when a user tries to log into the site too many times. Please leave the [BR] tag which will be replaced with a line break at run time. The %1 placeholder will be replaced with the time e.g. 14:37 which is when the user can try logging in again."
+    },
+    "8856": {
+        "text": "Added",
+        "context": "A label for any 'Added' text or title. For example to show the upload date of a file\/folder."
+    },
+    "8857": {
+        "text": "Available Offline",
+        "context": "A label for any 'Available Offline' text or title. For example this is used as the label of the button to get\/set if a node is saved for offline use or not."
+    },
+    "8858": {
+        "text": "Modified",
+        "context": "A label for any 'Modified' text or title. For example to show the modification date of a file\/folder."
     }
 }

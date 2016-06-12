@@ -962,6 +962,9 @@ function init_page() {
     // Initialise the Public Service Announcement system
     psa.init();
 
+    // Initialise the update check system
+    alarm.siteUpdate.init();
+
     topmenuUI();
     loggedout = false;
     flhashchange = false;

@@ -58,6 +58,11 @@ var ConversationRightArea = React.createClass({
             // something is really bad.
             return null;
         }
+        // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
+        if (!room.isCurrentlyActive) {
+            return null;
+        }
+        
         var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                             if (contact.presence && contact.presence !== "offline") {
                                 room.startAudioCall();

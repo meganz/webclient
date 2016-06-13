@@ -306,9 +306,22 @@ var useravatar = (function() {
     };
 
     ns.generateContactAvatarMeta = function(user) {
+        if (M.u[user]) {
+            user = M.u[user];
+        }
+        else if (user === u_handle) {
+            user = u_attr;
+        }
+        else if (M.u[user]) {
+            // It's an user ID
+            user = M.u[user];
+        }
+
         if (user && user.u && user.avatar) {
             return user.avatar;
         }
+
+
         if (typeof user === 'string' && user.length > 0 && user.indexOf("@") > -1) {
             // "@" is faster then isEmail's greping for non-contacts!
             if (isEmail(user)) {
@@ -336,13 +349,6 @@ var useravatar = (function() {
                     'avatar': _lettersSettings(email.substr(0, 2))
                 };
             }
-            else if (user === u_handle) {
-                user = u_attr;
-            }
-            else if (M.u[user]) {
-                // It's an user ID
-                user = M.u[user];
-            }
             else {
                 return {
                     'type': 'text',
@@ -366,7 +372,7 @@ var useravatar = (function() {
                 'avatar': avatars[user.u].url
             };
 
-            return avatar;
+            return user.avatar;
         }
 
         var letters = M.getNameByHandle(user.u);

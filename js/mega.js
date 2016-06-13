@@ -3310,6 +3310,10 @@ function MegaData()
                 self.u[userId].name = "";
             }
 
+            if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
+                self.u[userId].avatar = false;
+                useravatar.loaded(userId);
+            }
 
             if (userId === u_handle) {
                 u_attr.firstname = firstName;

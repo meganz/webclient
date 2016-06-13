@@ -520,50 +520,13 @@ function generateAvatarMeta(user_hash) {
 
     var fullName = M.getNameByHandle(user_hash);
 
-    var shortName = fullName.substr(0, 1).toUpperCase();
-    var avatar = avatars[contact.u];
-
-    var color = 1;
-
-    if (contact.shortName && contact.displayColor) { // really simple in-memory cache
-        shortName = contact.shortName;
-        color = contact.displayColor;
-    }
-    else {
-        M.u.forEach(function(k, v) {
-            var c = M.u[v];
-            var n = M.getNameByHandle(v);
-
-            if (!n || !c) {
-                return; // skip, contact not found
-            }
-
-            var dn;
-            if (shortName.length == 1) {
-                dn = _generateReadableContactNameFromStr(n, true);
-            }
-            else {
-                dn = _generateReadableContactNameFromStr(n, false);
-            }
-
-            if (c.u == contact.u) {
-                color = k % 10;
-            }
-            else if (dn == shortName) { // duplicate name, if name != my current name
-                shortName = _generateReadableContactNameFromStr(fullName, false);
-            }
-        });
-
-        contact.shortName = shortName;
-        contact.displayColor = color;
-    }
-
-    meta.color = color;
-    meta.shortName = shortName;
+    var ua_meta = useravatar.generateContactAvatarMeta(user_hash);
+    meta.color = ua_meta.avatar.colorIndex;
+    meta.shortName = ua_meta.avatar.letters;
     meta.fullName = fullName;
 
-    if (avatar) {
-        meta.avatarUrl = avatar.url;
+    if (ua_meta.type === 'image') {
+        meta.avatarUrl = ua_meta.avatar;
     }
     return meta;
 }

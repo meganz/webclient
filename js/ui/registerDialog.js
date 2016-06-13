@@ -211,7 +211,7 @@
             .removeClass('hidden')
             .addClass('active');
 
-        $('.pro-register-scroll').removeAttr('style');    
+        $('.pro-register-scroll').removeAttr('style');
         deleteScrollPanel('.pro-register-scroll', 'jsp');
 
         $('.fm-dialog-overlay').removeClass("hidden");
@@ -247,7 +247,7 @@
                 deleteScrollPanel('.pro-register-scroll', 'jsp');
                 $scrollBlock.removeAttr('style');
             }
-        }
+        };
 
         var reposition = function() {
             $dialog.css({
@@ -259,7 +259,7 @@
         var closeRegisterDialog = function() {
             closeDialog();
             $(window).unbind('resize.proregdialog');
-        }
+        };
 
         dialogBodyScroll();
         reposition();

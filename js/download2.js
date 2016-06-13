@@ -623,10 +623,10 @@ var dlmanager = {
         }
         else {
             $('#' + ids.join(',#'))
-                .find('span.transfer-status')
+                .addClass('transfer-queued')
+                .find('.transfer-status')
                 .removeClass('overquota')
-                .parents('td')
-                .safeHTML('<span class="transfer-status queued">@@</span>', l[7227]);
+                .text(l[7227]);
         }
 
         this.logger.debug('_onQuotaRetry', ids, this._dlQuotaListener.length, this._dlQuotaListener);
@@ -965,14 +965,22 @@ function fm_tfspause(gid, overquota) {
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
-            $tr.addClass('paused');
-            $tr.find('span.transfer-type').addClass('paused');
+
+            if ($tr.hasClass('transfer-started')) {
+                $tr.find('.eta').text('').addClass('unknown');
+                $tr.find('.speed').text(l[1651]).addClass('unknown');
+            }
+            $tr.addClass('transfer-paused');
+            $tr.removeClass('transfer-started');
 
             if (overquota === true) {
-                $tr.find('td:eq(5)').safeHTML('<span class="transfer-status error overquota">@@</span>', l[1673]);
+                $tr.addClass('transfer-error');
+                $tr.find('.transfer-status').addClass('overquota').text(l[1673]);
             }
             else {
-                $tr.find('td:eq(5)').safeHTML('<span class="transfer-status queued">@@</span>', l[7227]);
+                $tr.addClass('transfer-queued');
+                $tr.removeClass('transfer-error');
+                $tr.find('.transfer-status').text(l[7227]);
             }
         }
         return true;
@@ -990,7 +998,7 @@ function fm_tfsresume(gid) {
 
             if (page === 'download'
                     && $('.download.info-block').hasClass('overquota')
-                    || $tr.find('span.transfer-status').hasClass('overquota')) {
+                    || $tr.find('.transfer-status').hasClass('overquota')) {
 
                 if (page === 'download') {
                     $('.download.pause-button').addClass('active');
@@ -1008,11 +1016,15 @@ function fm_tfsresume(gid) {
                 $('.download.status-txt, .download-info .text').text('').removeClass('blue');
             }
             else {
-                $tr.removeClass('paused');
-                $tr.find('span.transfer-type').removeClass('paused');
+                $tr.removeClass('transfer-paused');
 
-                if (!$('.transfer-table .progress-block, .transfer-table .transfer-status.initiliazing').length) {
-                    $tr.find('td:eq(5)').safeHTML('<span class="transfer-status initiliazing">@@</span>', l[1042]);
+                if (!$('.transfer-table tr.transfer-started, .transfer-table tr.transfer-initiliazing').length) {
+
+                    $tr.addClass('transfer-initiliazing')
+                        .find('.transfer-status').text(l[1042]);
+                }
+                else {
+                    $tr.find('.speed, .eta').removeClass('unknown').text('');
                 }
             }
         }
@@ -1151,17 +1163,16 @@ function fm_tfsupdate() {
     var u = 0;
 
     // Move completed transfers to the bottom
-    var $completed = $('.transfer-table tr.completed');
+    var $completed = $('.transfer-table tr.transfer-completed');
     var completedLen = $completed.length;
-    $completed.remove()
-        .insertBefore($('.transfer-table tr.clone-of-header'));
+    $('.transfer-table').append($completed);
 
     // Remove completed transfers filling the whole table
-    if ($('.transfer-table tr:first').hasClass('completed')) {
+    if ($('.transfer-table tr:first').hasClass('transfer-completed')) {
         var trLen = M.getTransferTableLengths().size;
         if (completedLen >= trLen) {
             if (completedLen > 50) {
-                $('.transfer-table tr.completed')
+                $('.transfer-table tr.transfer-completed')
                     .slice(0, trLen)
                     .fadeOut(function() {
                         $(this).remove();
@@ -1181,9 +1192,9 @@ function fm_tfsupdate() {
             ++u;
         }
     });*/
-    var $trs = $('.transfer-table tr').not('.completed');
+    var $trs = $('.transfer-table tr').not('.transfer-completed');
     u = $trs.find('.transfer-type.upload').length;
-    i = $trs.length - u - (1 /* tr.clone-of-header */);
+    i = $trs.length - u;
     for (var k in M.tfsdomqueue) {
         if (k[0] === 'u') {
             ++u;

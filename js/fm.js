@@ -889,10 +889,10 @@ function transferPanelContextMenu(target)
             var prev = target.first().prev();
             var next = target.last().next();
 
-            if (prev.length === 0 || prev.find('.queued').length === 0) {
+            if (prev.length === 0 || !prev.hasClass('transfer-queued')) {
                 menuitems.filter('.move-up').hide();
             }
-            if (next.hasClass('clone-of-header')) {
+            if (next.length === 0) {
                 menuitems.filter('.move-down').hide();
             }
         }
@@ -914,10 +914,10 @@ function transferPanelContextMenu(target)
             menuitems.filter('.transfer-play').hide();
         }
 
-        if (target.prev().length == 0 || target.prev().find('.queued').length == 0) {
+        if (!target.prev().length || !target.prev().hasClass('transfer-queued')) {
             menuitems.filter('.move-up').hide();
         }
-        if (target.next().hasClass('clone-of-header')) {
+        if (target.next().length === 0) {
             menuitems.filter('.move-down').hide();
         }
     }
@@ -1070,14 +1070,13 @@ function openTransferpanel()
                         ulQueue._qpaused = mUL.pQueue;
 
                         // Check for transfers moved before any started one
-                        var $prev = $('.transfer-table tr .progress-block')
-                            .closest('tr')
+                        var $prev = $('.transfer-table tr.transfer-started')
                             .first()
                             .prevAll()
-                            .not('.paused');
+                            .not('.transfer-paused');
                         // XXX: we rely on the speed field being non-numeric
                         if ($prev.length && !$prev.find('.speed').text().replace(/\D/g, '')) {
-                            var ids = $('.transfer-table tr:not(.paused)').attrs('id');
+                            var ids = $('.transfer-table tr:not(.transfer-paused)').attrs('id');
                             ids.forEach(fm_tfspause);
                             if (dlQueue._queue.length || ulQueue._queue.length) {
                                 dlmanager.logger.error('The move operation should have cleared the queues.');
@@ -5027,7 +5026,7 @@ var SelectionManager = function($selectable) {
                 "tr.ui-draggable",
                 "tr.ui-selectee",
                 ".contact-block-view.ui-draggable",
-                ".transfer-table tr:not(.clone-of-header)"
+                ".transfer-table tr"
             ].join(","),
             $selectable_containers
             ).filter(":visible");
@@ -5125,7 +5124,7 @@ function UIkeyevents() {
         else {
             s = $('.grid-table tr.ui-selected');
         }
-        var selPanel = $('.fm-transfers-block tr.ui-selected').not('.clone-of-header');
+        var selPanel = $('.fm-transfers-block tr.ui-selected');
 
         if (M.chat) {
             return true;
@@ -5747,7 +5746,7 @@ function transferPanelUI()
               tth = $('.transfer-table-header');
 
         // Show/Hide header if there is no items in transfer list
-        if (!$('.transfer-table tr').not('.clone-of-header').length > 0)
+        if (!$('.transfer-table tr').length)
         {
             $('.transfer-panel-empty-txt').removeClass('hidden');
             tt.hide(0);
@@ -5767,11 +5766,12 @@ function transferPanelUI()
             }
         });
 
-        $('.tranfer-table .grid-url-arrow, .tranfer-table .clear-transfer-icon').rebind('click', function(e) {
+        var $ttw = $('.transfer-table-wrapper .grid-url-arrow, .transfer-table-wrapper .clear-transfer-icon');
+        $ttw.rebind('click', function(e) {
             var target = $(this).closest('tr');
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
-            $('.tranfer-table tr').removeClass('ui-selected');
+            $('.transfer-table-wrapper tr').removeClass('ui-selected');
 
             if ($(this).hasClass('grid-url-arrow')) {
                 target.addClass('ui-selected');
@@ -5780,7 +5780,7 @@ function transferPanelUI()
                 contextMenuUI(e);
             }
             else {
-                if (!target.find('.transfer-status.completed').length) {
+                if (!target.hasClass('.transfer-completed')) {
                     var toabort = target.attr('id');
                     dlmanager.abort(toabort);
                     ulmanager.abort(toabort);
@@ -5793,9 +5793,10 @@ function transferPanelUI()
                 });
             }
         });
+        $ttw = undefined;
 
         $('.transfer-table tr').rebind('dblclick', function(e) {
-            if ($(this).find('.transfer-status.completed').length) {
+            if ($(this).hasClass('transfer-completed')) {
                 var id = String($(this).attr('id'));
                 if (id[0] === 'd') {
                     id = id.split('_').pop();
@@ -5887,7 +5888,7 @@ function transferPanelUI()
     };
 
     $.clearTransferPanel = function() {
-        if ($('.transfer-table tr').length === 1) {
+        if ($('.transfer-table tr').length === 0) {
             $('.transfer-clear-all-icon').addClass('disabled');
             $('.transfer-pause-icon').addClass('disabled');
             $('.transfer-clear-completed').addClass('disabled');
@@ -5904,7 +5905,7 @@ function transferPanelUI()
 
     $.removeTransferItems = function($trs) {
         if (!$trs) {
-            $trs = $('.transfer-table tr.completed');
+            $trs = $('.transfer-table tr.transfer-completed');
         }
         var $len = $trs.length;
         if ($len && $len < 100) {
@@ -5931,7 +5932,7 @@ function transferPanelUI()
                 dlmanager.abort(null);
                 ulmanager.abort(null);
 
-                $.removeTransferItems($('.transfer-table tr').not('.clone-of-header'));
+                $.removeTransferItems($('.transfer-table tr'));
             });
         }
     });
@@ -5960,7 +5961,7 @@ function transferPanelUI()
                     dlQueue.resume();
 
                     $(this).removeClass('active').find('span').text(l[6993]);
-                    $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
+                    $('.transfer-table-wrapper tr').removeClass('transfer-paused');
                     $('.nw-fm-left-icon').removeClass('paused');
                 }
                 else {
@@ -5969,15 +5970,18 @@ function transferPanelUI()
                 }
             }
             else {
-                $('.transfer-table tr[id] .progress-block, .transfer-table tr[id] .transfer-status:not(.completed)')
-                    .closest('tr').attrs('id')
-                    .concat(Object.keys(M.tfsdomqueue)).map(fm_tfspause);
+                var $trs = $('.transfer-table tr:not(.transfer-completed)');
+
+                $trs.attrs('id')
+                    .concat(Object.keys(M.tfsdomqueue))
+                    .map(fm_tfspause);
+
                 dlQueue.pause();
                 ulQueue.pause();
                 uldl_hold = true;
 
                 $(this).addClass('active').find('span').text(l[7101]);
-                $('.transfer-table tr span.transfer-type').not('.done').addClass('paused');
+                $trs.addClass('transfer-paused');
                 $('.nw-fm-left-icon').addClass('paused');
             }
         }

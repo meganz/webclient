@@ -1008,7 +1008,7 @@ function numOfBytes(bytes, precision) {
     return { size: parts[0], unit: parts[1] || 'B' };
 }
 
-function bytesToSize(bytes, precision) {
+function bytesToSize(bytes, precision, html_format) {
     if (!bytes) {
         return '0';
     }
@@ -1031,6 +1031,8 @@ function bytesToSize(bytes, precision) {
     var megabyte = kilobyte * 1024;
     var gigabyte = megabyte * 1024;
     var terabyte = gigabyte * 1024;
+    var resultSize = 0;
+    var resultUnit = '';
     if (bytes > 1024 * 1024 * 1024) {
         precision = 2;
     }
@@ -1038,22 +1040,33 @@ function bytesToSize(bytes, precision) {
         precision = 1;
     }
     if ((bytes >= 0) && (bytes < kilobyte)) {
-        return parseInt(bytes) + ' ' + s_b;
+        resultSize = parseInt(bytes);
+        resultUnit = s_b;
     }
     else if ((bytes >= kilobyte) && (bytes < megabyte)) {
-        return (bytes / kilobyte).toFixed(precision) + ' ' + s_kb;
+        resultSize = (bytes / kilobyte).toFixed(precision);
+        resultUnit = s_kb;
     }
     else if ((bytes >= megabyte) && (bytes < gigabyte)) {
-        return (bytes / megabyte).toFixed(precision) + ' ' + s_mb;
+        resultSize = (bytes / megabyte).toFixed(precision);
+        resultUnit = s_mb;
     }
     else if ((bytes >= gigabyte) && (bytes < terabyte)) {
-        return (bytes / gigabyte).toFixed(precision) + ' ' + s_gb;
+        resultSize = (bytes / gigabyte).toFixed(precision);
+        resultUnit = s_gb;
     }
     else if (bytes >= terabyte) {
-        return (bytes / terabyte).toFixed(precision) + ' ' + s_tb;
+        resultSize = (bytes / terabyte).toFixed(precision);
+        resultUnit = s_tb;
     }
     else {
-        return parseInt(bytes) + ' ' + s_b;
+        resultSize = parseInt(bytes);
+        resultUnit = s_b;
+    }
+    if (html_format) {
+        return '<span>' + resultSize + '</span>' + resultUnit;
+    } else {
+        return resultSize + ' ' + resultUnit;
     }
 }
 
@@ -1644,10 +1657,15 @@ function setTransferStatus(dl, status, ethrow, lock) {
         $('.download.icons-block').addClass('hidden');
     }
     else {
-        $('.transfer-table #' + id + ' td:eq(5)').text(text);
+        $('.transfer-table #' + id + ' td:eq(5)')
+            .attr('title', status)
+            .text(text);
     }
     if (lock) {
-        $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
+        $('.transfer-table #' + id)
+            .addClass('transfer-completed')
+            .removeClass('transfer-initiliazing')
+            .attr('id', 'LOCKed_' + id);
     }
     if (d) {
         console.error(status);

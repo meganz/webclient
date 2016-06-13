@@ -7603,10 +7603,6 @@
         "text": "Settings\r\n",
         "context": ""
     },
-    "6690": {
-        "text": "Go to My Account\r\n",
-        "context": ""
-    },
     "6771": {
         "text": "Deleted folders",
         "context": "FM description of rubbish bin"
@@ -7978,10 +7974,6 @@
     "6884": {
         "text": "Previously verified credentials",
         "context": "Information for the fingerprint warning dialog"
-    },
-    "6885": {
-        "text": "Thank you for activating your complimentary MEGA Pro account! Upon completion, you will receive 500 GB of secure encrypted high-performance online storage space for one year. All transfers from and to MEGA are unmetered and therefore uncapped from all Slingshot broadband connections.",
-        "context": ""
     },
     "6888": {
         "text": "You can choose to import contacts from third party services. These will not be added to your MEGA contacts, but will remain accessible \u200bfor sharing and collaboration\u200b.",
@@ -11383,10 +11375,6 @@
         "text": "slower browser download",
         "context": "Part of download button label. Full text is: Continue slower browser download. Please make it as short as possible."
     },
-    "7975": {
-        "text": "anyway",
-        "context": "Part of download button label. Full text is: Continue anyway. Please make it as short as possible."
-    },
     "7976": {
         "text": "We strongly suggest using our sync client for vastly improved performance[BR] downloading large files. [A]Get MEGAsync now[\/A].",
         "context": "Message recommending users use the sync client to download large files.\r\nPlease keep linkebreak and link tags as it is:\r\n\r\n[BR], [A], [\/A]"
@@ -13518,5 +13506,17 @@
     "8855": {
         "text": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
         "context": "An error message which is shown when a user tries to log into the site too many times. Please leave the [BR] tag which will be replaced with a line break at run time. The %1 placeholder will be replaced with the time e.g. 14:37 which is when the user can try logging in again."
+    },
+    "8856": {
+        "text": "Added",
+        "context": "A label for any 'Added' text or title. For example to show the upload date of a file\/folder."
+    },
+    "8857": {
+        "text": "Available Offline",
+        "context": "A label for any 'Available Offline' text or title. For example this is used as the label of the button to get\/set if a node is saved for offline use or not."
+    },
+    "8858": {
+        "text": "Modified",
+        "context": "A label for any 'Modified' text or title. For example to show the modification date of a file\/folder."
     }
 }

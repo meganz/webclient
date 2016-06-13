@@ -7603,10 +7603,6 @@
         "text": "Settings\r\n",
         "context": ""
     },
-    "6690": {
-        "text": "Go to My Account\r\n",
-        "context": ""
-    },
     "6771": {
         "text": "Deleted folders",
         "context": "FM description of rubbish bin"
@@ -7978,10 +7974,6 @@
     "6884": {
         "text": "Previously verified credentials",
         "context": "Information for the fingerprint warning dialog"
-    },
-    "6885": {
-        "text": "Thank you for activating your complimentary MEGA Pro account! Upon completion, you will receive 500 GB of secure encrypted high-performance online storage space for one year. All transfers from and to MEGA are unmetered and therefore uncapped from all Slingshot broadband connections.",
-        "context": ""
     },
     "6888": {
         "text": "You can choose to import contacts from third party services. These will not be added to your MEGA contacts, but will remain accessible \u200bfor sharing and collaboration\u200b.",
@@ -11382,10 +11374,6 @@
     "7973": {
         "text": "slower browser download",
         "context": "Part of download button label. Full text is: Continue slower browser download. Please make it as short as possible."
-    },
-    "7975": {
-        "text": "anyway",
-        "context": "Part of download button label. Full text is: Continue anyway. Please make it as short as possible."
     },
     "7976": {
         "text": "We strongly suggest using our sync client for vastly improved performance[BR] downloading large files. [A]Get MEGAsync now[\/A].",

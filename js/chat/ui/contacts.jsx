@@ -101,7 +101,7 @@ var Avatar = React.createClass({
             contact.m = contact.email;
         }
 
-        var $avatar = $(useravatar.contact(contact));
+        var avatarMeta = useravatar.generateContactAvatarMeta(contact);
 
         var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
         
@@ -126,17 +126,15 @@ var Avatar = React.createClass({
                 });
         }
 
-        if($avatar.find("img").length > 0) {
+        if(avatarMeta.type === "image") {
             displayedAvatar = <div className={classes} style={this.props.style}>
                 {verifiedElement}
-                <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
+                <img src={avatarMeta.avatar} style={this.props.imgStyles}/>
             </div>;
         } else {
-            var tempClasses = $avatar.attr('class');
-            var colorNum = tempClasses.split("color")[1].split(" ")[0];
-            classes += " color" + colorNum;
+            classes += " color" + avatarMeta.avatar.colorIndex;
 
-            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={$(useravatar.contact(contact)).text()}></div></div>;
+            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={avatarMeta.avatar.letters}></div></div>;
 
         }
 

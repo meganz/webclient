@@ -172,7 +172,8 @@ var MEGA_USER_STRUCT = {
     "shortName": "",
     "firstName": "",
     "lastName": "",
-    "ts": undefined
+    "ts": undefined,
+    "avatar": undefined
 };
 
 function MegaData()
@@ -3395,6 +3396,7 @@ function MegaData()
                 delete cleanedUpUserData.presenceMtime;
                 delete cleanedUpUserData.shortName;
                 delete cleanedUpUserData.name;
+                delete cleanedUpUserData.avatar;
                 mDBadd('u', cleanedUpUserData);
             }
 

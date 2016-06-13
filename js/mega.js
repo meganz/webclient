@@ -5113,7 +5113,7 @@ function MegaData()
 
         if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
             $('.download-button.light-red.download').safeHTML(l[8849]);
-            $('.download-button.light-white.continue').safeHTML('11');
+            $('.download-button.light-white.continue').safeHTML(l[8848]);
             $('.megasync-upload-overlay').show();
             $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', function() {
                 $('.megasync-upload-overlay').hide();

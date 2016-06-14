@@ -11883,23 +11883,29 @@ table {
     font-family: 'source_sans_prolight';
     white-space: nowrap;
 }
-.download.info-txt.mid-txt {
-    font-size: 14px;
-    line-height: 17px;
-    color: #777777;
-}
-.download.info-txt.mid-txt.dark-grey {
-    color: #333333;
-}
 .download.info-txt.small-txt {
     font-size: 12px;
     line-height: 14px;
     color: #777777;
 }
-.download.info-txt.white {
+.button.download-button span {
+    font-size: 14px;
+    line-height: 17px;
+    display: block;
+    font-family: 'source_sans_proregular', Arial;
+}
+.button.download-button.dark-grey-txt {
+    color: #333333;
+}
+.button.download-button span.small-txt {
+    font-size: 12px;
+    line-height: 14px;
+    color: #777777;
+}
+.button.download-button.white-txt {
     color: white;
 }
-.download.info-txt.black {
+.button.download-button.black-txt {
     color: black;
 }
 .download.buttons-block {
@@ -11954,6 +11960,11 @@ table {
     -o-transition: background-color 200ms ease-in-out;
     -ms-transition: background-color 200ms ease-in-out;
     text-align: left;
+    font-size: 20px;
+    line-height: 25px;
+    color: #333333;
+    font-family: 'source_sans_prolight';
+    white-space: nowrap;
 }
 .button.download-button:hover {
     background-color: #777777;
@@ -11967,7 +11978,7 @@ table {
 .download-button.transparent, .download-button.transparent:hover {
     background-color: transparent;
 }
-.download-button.transparent:hover .download.info-txt {
+.download-button.transparent:hover {
     color: #D90007;
 }
 .button.download-button.light-white {
@@ -11989,7 +12000,7 @@ table {
     box-shadow: inset 0px 0px 0px 2px rgba(217,0,7,1);
     cursor: default;
 }
-.button.download-button.red.downloading .download.info-txt {
+.button.download-button.red.downloading {
     color: rgba(217,0,7,1);
 }
 .button.download-button:first-child {

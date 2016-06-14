@@ -548,6 +548,11 @@ function populate_l() {
     l[8851] = l[8851].replace('%1', '<span class="release-date-time"></span>');
     l[8843] = l[8843].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8855] = l[8855].replace('[BR]', '<br>');
+    l[8848] = l[8848].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
+    l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
 
     l['year'] = new Date().getFullYear();
     date_months = [

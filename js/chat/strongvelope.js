@@ -1000,7 +1000,7 @@ var strongvelope = {};
                                             encryptedMessage.ciphertext);
         }
         // Sign message.
-        content = this._signContent(senderKey + content) + content;
+        content = this._signContent(String.fromCharCode(PROTOCOL_VERSION) + String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP) + senderKey + content) + content;
 
         // Return assembled total message.
         content = String.fromCharCode(PROTOCOL_VERSION) + String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP) + content;
@@ -1344,7 +1344,7 @@ var strongvelope = {};
         }
 
         if (parsedMessage) {
-            if (ns._verifyMessage(senderKey + parsedMessage.signedContent,
+            if (ns._verifyMessage(String.fromCharCode(parsedMessage.protocolVersion) + String.fromCharCode(parsedMessage.type) + senderKey + parsedMessage.signedContent,
                                   parsedMessage.signature,
                                   pubEd25519[sender])) {
                     senderKey = this.participantKeys[sender][keyidStr];

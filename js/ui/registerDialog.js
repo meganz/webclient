@@ -242,12 +242,12 @@
 
             if (scrollBlockHeight + 140 > bodyHeight) {
                 $scrollBlock.jScrollPane({
-                    enableKeyboardNavigation: false, 
-                    showArrows: true, 
-                    arrowSize: 5, 
+                    enableKeyboardNavigation: false,
+                    showArrows: true,
+                    arrowSize: 5,
                     animateScroll: true
                 });
-            } 
+            }
             else {
                 deleteScrollPanel('.pro-register-scroll', 'jsp');
                 $scrollBlock.removeAttr('style');

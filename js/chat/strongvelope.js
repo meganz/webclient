@@ -1288,6 +1288,7 @@ var strongvelope = {};
         }
 
         var result = {
+            version: parsedMessage.protocolVersion,
             sender: sender,
             type: parsedMessage.type,
             payload: cleartext,
@@ -1368,6 +1369,7 @@ var strongvelope = {};
         }
 
         var result = {
+            version: parsedMessage.protocolVersion,
             sender: sender,
             type: parsedMessage.type,
             payload: cleartext,

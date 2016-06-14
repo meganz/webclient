@@ -211,6 +211,9 @@
             .removeClass('hidden')
             .addClass('active');
 
+        $('.pro-register-scroll').removeAttr('style');
+        deleteScrollPanel('.pro-register-scroll', 'jsp');
+
         $('.fm-dialog-overlay').removeClass("hidden");
 
         options = Object(opts);
@@ -228,6 +231,29 @@
                 .addClass('hidden');
         }
 
+        var dialogBodyScroll = function() {
+            var jsp;
+            var bodyHeight = $('body').height();
+            var $scrollBlock =  $('.pro-register-scroll');
+            var scrollBlockHeight = $scrollBlock.height();
+            $scrollBlock.css({
+                'max-height': bodyHeight - 100
+            });
+
+            if (scrollBlockHeight + 140 > bodyHeight) {
+                $scrollBlock.jScrollPane({
+                    enableKeyboardNavigation: false,
+                    showArrows: true,
+                    arrowSize: 5,
+                    animateScroll: true
+                });
+            }
+            else {
+                deleteScrollPanel('.pro-register-scroll', 'jsp');
+                $scrollBlock.removeAttr('style');
+            }
+        };
+
         var reposition = function() {
             $dialog.css({
                 'margin-left': -1 * ($dialog.outerWidth() / 2),
@@ -235,15 +261,32 @@
             });
         };
 
+        var closeRegisterDialog = function() {
+            closeDialog();
+            $(window).unbind('resize.proregdialog');
+        };
+
+        dialogBodyScroll();
         reposition();
 
-        $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
+        $(window).rebind('resize.proregdialog', function() {
+            Soon(function() {
+                dialogBodyScroll();
+                reposition();
+            });
+        });
 
+        $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
 
         // controls
         $('.fm-dialog-close', $dialog)
             .rebind('click.proDialog', function() {
-                closeDialog();
+                closeRegisterDialog();
+            });
+
+        $('.fm-dialog-overlay')
+            .rebind('click.proDialog', function() {
+                closeRegisterDialog();
             });
 
         $('#register-email', $dialog)
@@ -352,7 +395,6 @@
                 doProRegister($dialog);
             }
         });
-
 
         $('.register-st2-button', $dialog).rebind('click', function(e) {
             doProRegister($dialog);

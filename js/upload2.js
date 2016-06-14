@@ -137,7 +137,7 @@ var ulmanager = {
                 }
                 var fileName = htmlentities(file.name);
                 var errorstr = reason.match(/"([^"]+)"/);
-                
+
                 if (errorstr) {
                     errorstr = errorstr.pop();
                 }
@@ -452,6 +452,7 @@ var ulmanager = {
             }
             api_req({
                 a: 'u',
+                v: 2,
                 ssl: use_ssl,
                 ms: fmconfig.ul_maxSpeed | 0,
                 s: cfile.size,
@@ -820,20 +821,18 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
         return Soon(this.done.bind(this));
     }
     var xhr = xhrEvent.target;
+    var response = xhr.response;
+    var isValidType = (response instanceof ArrayBuffer);
     xhrEvent = undefined;
 
-    if (xhr.status === 200 && typeof xhr.response === 'string' && xhr.statusText === 'OK') {
-        var response = xhr.response;
-        if (response.length > 27) {
-            response = base64urldecode(response);
-        }
+    if (isValidType && xhr.status === 200 && xhr.statusText === 'OK') {
 
-        if (!response.length || response === 'OK' || response.length === 27) {
+        if (!response.byteLength || response.byteLength === 36) {
             this.file.sent += this.bytes.buffer.length || this.bytes.length;
             delete this.file.progress[this.start];
             this.updateprogress();
 
-            if (response.length === 27) {
+            if (response.byteLength === 36) {
                 var ul_key = this.file.ul_key;
                 var t = Object.keys(this.file.ul_macs);
                 t.sort(function(a, b) {
@@ -849,17 +848,13 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
                         ^ mac[3], ul_key[4], ul_key[5], mac[0] ^ mac[1], mac[2] ^ mac[3]];
 
                 if (u_k_aes && !this.file.ulCompletingPhase) {
-                    // var ctx = {
-                    // file: this.file,
-                    // size: this.file.size,
-                    // ul_queue_num : this.file.pos,
-                    // callback : ul_completepending2,
-                    // faid : this.file.faid
-                    // };
-                    // api_completeupload(response, ul_queue[file.id], filekey,ctx);
-                    this.file.ulCompletingPhase = true;
+                    var u8 = new Uint8Array(response);
+
                     this.file.filekey = filekey;
-                    this.file.response = base64urlencode(response);
+                    this.file.ulCompletingPhase = true;
+                    this.file.response = (u8[35] === 1)
+                        ? ab_to_base64(response)
+                        : ab_to_str(response);
                     ulmanager.ulFinalize(this.file);
                 }
                 else {
@@ -875,12 +870,13 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
             return this.done();
         }
         else {
-            var estr = ulmanager.ulStrError(response);
-            this.logger.error("Invalid upload response: ", response, estr);
+            var resp = ab_to_str(response);
+            var estr = ulmanager.ulStrError(resp);
+            this.logger.error("Invalid upload response: ", resp, estr);
             if (estr !== "EKEY") {
                 return this.onXHRerror("$FATAL", null,
                     (estr ? (estr + " error")
-                    : "IUR[" + String(response).trim().substr(0, 5) + "]"));
+                    : "IUR[" + String(resp).trim().substr(0, 5) + "]"));
             }
         }
     }
@@ -888,15 +884,15 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
     this.srverr = xhr.status + 1;
 
     var errstr = 'BRFS [l:Unk]';
-    if (typeof xhr.response === 'string') {
-        if (xhr.response.length && xhr.response.length < 5) {
-            errstr = 'BRFS [s:' + xhr.response + ']';
+    if (isValidType) {
+        if (response.byteLength && response.byteLength < 5) {
+            errstr = 'BRFS [s:' + ab_to_str(response) + ']';
         }
         else if (xhr.status >= 400) {
             errstr = 'BRFS [-]';
         }
         else {
-            errstr = 'BRFS [l:' + xhr.response.length + ']';
+            errstr = 'BRFS [l:' + response.byteLength + ']';
         }
     }
 
@@ -909,13 +905,15 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
     }, 1950 + Math.floor(Math.random() * 2e3));
 
     if (d) {
-        this.logger.warn("Bad response from server",
+        this.logger.warn("Bad response from server, status(%s:%s)",
             xhr.status,
-            this.file.name,
-            typeof xhr.response === 'string',
-            xhr.statusText
+            xhr.statusText,
+            isValidType,
+            this.file.name
         );
     }
+
+    response = undefined;
 }
 
 ChunkUpload.prototype.upload = function() {
@@ -954,7 +952,7 @@ ChunkUpload.prototype.upload = function() {
     }
 
     xhr.open('POST', url);
-    xhr.responseType = 'text';
+    xhr.responseType = 'arraybuffer';
     xhr.send(this.bytes.buffer);
 
     this.xhr = xhr;

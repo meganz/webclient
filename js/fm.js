@@ -4278,20 +4278,20 @@ function accountUI() {
 
         // Search through their Pro plan purchase history
         $(account.purchases).each(function(index, purchaseTransaction) {
-            
+
             // Get payment method name
             var paymentMethodId = purchaseTransaction[4];
             var paymentMethod = getGatewayName(paymentMethodId).name;
-            
+
             // If they have paid with iTunes or Google Play in the past
             if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
-                
+
                 // Update confirmation message to remind them to cancel iTunes or Google Play
                 confirmMessage += ' ' + l[8854];
                 return false;
             }
         });
-        
+
         // Ask for confirmation
         msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
             if (event) {
@@ -6245,6 +6245,9 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.copy-item').hide();
                 $(menuCMI).filter('.getlink-item').hide();
             }
+            else if (items['.getlink-item']) {
+                Soon(setContextMenuGetLinkText);
+            }
         }
         else {
             return false;
@@ -6268,7 +6271,6 @@ function contextMenuUI(e, ll) {
         }
     });
 
-    setContextMenuGetLinkText();
     adjustContextMenuPosition(e, m);
 
     disableCircularTargets('#fi_');
@@ -6285,7 +6287,7 @@ function contextMenuUI(e, ll) {
 function setContextMenuGetLinkText() {
 
     var numOfExistingPublicLinks = 0;
-    var numOfSelectedNodes = $.selected.length;
+    var numOfSelectedNodes = Object($.selected).length;
     var getLinkText = '';
 
     // Loop through all selected nodes

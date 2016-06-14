@@ -10,6 +10,9 @@ describe("authring unit test", function() {
 
     var ns = authring;
 
+    // for anyone reading this line... never mock global stuff in unit tests...
+    var origMegaPromise = MegaPromise;
+
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
 
@@ -57,6 +60,11 @@ describe("authring unit test", function() {
 
         sandbox.stub(attribCache, 'getItem', function() {
             return MegaPromise.reject();
+        });
+        sandbox.stub(backgroundNacl.sign.detached, 'verify', function() {
+            return MegaPromise.resolve(
+                nacl.sign.detached.verify.apply(this, arguments)
+            );
         });
     });
 
@@ -372,48 +380,91 @@ describe("authring unit test", function() {
         });
 
         describe('verifyKey()', function() {
-            it("good signature", function() {
-                assert.strictEqual(ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY), true);
+            it("good signature", function(done) {
+                ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY)
+                    .done(function(r) {
+                        assert.strictEqual(r, true);
+                    })
+                    .fail(function() {
+                        assert.strictEqual(false, true);
+                    })
+                    .always(function() {
+                        done();
+                    });
             });
 
-            it("bad signature", function() {
-                assert.strictEqual(ns.verifyKey(RSA_SIGNED_PUB_KEY.substring(0, 71) + String.fromCharCode(42),
-                                                RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY), false);
+            it("bad signature", function(done) {
+                ns.verifyKey(RSA_SIGNED_PUB_KEY.substring(0, 71) + String.fromCharCode(42),
+                    RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY)
+                    .done(function(r) {
+                        assert.strictEqual(r, false);
+                    })
+                    .fail(function() {
+                        assert.strictEqual(true, false);
+                    }).always(function() { done() });
             });
 
-            it("empty signature", function() {
+            it("empty signature", function(done) {
                 sandbox.stub(ns._logger, '_log');
-                var result = ns.verifyKey('', RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY);
-                assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][0],
-                                   'Cannot verify an empty signature.');
+                var result = ns.verifyKey('', RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY)
+                    .done(function(r) {
+                        assert.strictEqual(r, null);
+                        assert.strictEqual(ns._logger._log.args[0][0],
+                            'Cannot verify an empty signature.');
+                    })
+                    .fail(function() {
+                        assert.strictEqual(true, false);
+                    })
+                    .always(function() { done() });
+
             });
 
-            it("bad signature with bad timestamp", function() {
+            it("bad signature with bad timestamp", function(done) {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(Date, 'now', function() { return 1407891027650; });
-                var result = ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY);
-                assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][0],
-                                   'Bad timestamp: In the future!');
+                ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY)
+                    .done(function(result) {
+                        assert.strictEqual(result, null);
+                        assert.strictEqual(ns._logger._log.args[0][0],
+                            'Bad timestamp: In the future!');
+                    })
+                    .fail(function() {
+                        assert.strictEqual(true, false);
+                    })
+                    .always(function() { done() });
+
             });
 
-            it("bad signature with bad point", function() {
-                assert.strictEqual(ns.verifyKey(RSA_SIGNED_PUB_KEY.substring(0, 8) + String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(9),
-                                                RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY), false);
+            it("bad signature with bad point", function(done) {
+                ns.verifyKey(RSA_SIGNED_PUB_KEY.substring(0, 8) + String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(9),
+                                                RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY)
+                    .done(function(result) {
+                        assert.strictEqual(result, false);
+                    })
+                    .fail(function() {
+                        assert.strictEqual(true, false);
+                    })
+                    .always(function() { done() });
             });
 
-            it("unsupported key type", function() {
+            it("unsupported key type", function(done) {
                 sandbox.stub(ns._logger, '_log');
-                var result = ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'DSA', ED25519_PUB_KEY);
-                assert.strictEqual(result, undefined);
-                assert.strictEqual(ns._logger._log.args[0][0],
-                                   'Unsupported key type: DSA');
+                ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'DSA', ED25519_PUB_KEY)
+                    .done(function(result) {
+                        assert.strictEqual(result, null);
+                        assert.strictEqual(ns._logger._log.args[0][0],
+                            'Unsupported key type: DSA');
+                    })
+                    .fail(function() {
+                        assert.strictEqual(true, false);
+                    })
+                    .always(function() { done() });
+
             });
         });
 
         describe('signKey()/verifyKey() roundtripping', function() {
-            it("equality", function() {
+            it("equality", function(done) {
                 sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
                 var buffer = new Uint8Array(256);
@@ -428,7 +479,16 @@ describe("authring unit test", function() {
                     p2 = asmCrypto.bytes_to_string(buffer);
                     pubKey = [p1, p2];
                     signature = ns.signKey(pubKey, 'RSA');
-                    assert.strictEqual(ns.verifyKey(signature, pubKey, 'RSA', ED25519_PUB_KEY), true);
+                    ns.verifyKey(signature, pubKey, 'RSA', ED25519_PUB_KEY)
+                        .done(function(r) {
+                            assert.strictEqual(r, true);
+                        })
+                        .fail(function(r) {
+                            assert.strictEqual(false, true);
+                        })
+                        .always(function() {
+                            done();
+                        });
                 }
             });
         });
@@ -979,10 +1039,13 @@ describe("authring unit test", function() {
             });
 
             it('Curve25519 key', function() {
+                sandbox.stub(ns, 'verifyKey').returns(origMegaPromise.resolve(true));
+
                 var masterPromise = { resolve: sinon.stub(),
                                       linkFailTo: sinon.stub() };
                 var pubkeyPromise = { done: sinon.stub(),
                                       resolve: sinon.stub() };
+
                 sandbox.stub(window, 'MegaPromise');
                 MegaPromise.onCall(0).returns(masterPromise);
                 MegaPromise.onCall(1).returns(pubkeyPromise);
@@ -1009,7 +1072,6 @@ describe("authring unit test", function() {
                 sandbox.stub(crypt, 'getPubKeyFromPrivKey').returns('public key');
                 sandbox.stub(ns, '_checkPubKey');
                 sandbox.stub(crypt, 'setPubKey');
-                sandbox.stub(ns, 'verifyKey').returns(true);
 
                 var result = ns._initKeyPair('Cu25519');
                 assert.strictEqual(result, masterPromise);
@@ -1051,6 +1113,8 @@ describe("authring unit test", function() {
             });
 
             it('RSA key', function() {
+                sandbox.stub(ns, 'verifyKey').returns(origMegaPromise.resolve(true));
+
                 var masterPromise = { resolve: sinon.stub(),
                                       linkFailTo: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise');
@@ -1074,7 +1138,6 @@ describe("authring unit test", function() {
                 var pubkeyPromise = { done: sinon.stub(),
                                       resolve: sinon.stub() };
                 sandbox.stub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
-                sandbox.stub(ns, 'verifyKey').returns(true);
 
                 var result = ns._initKeyPair('RSA');
                 assert.strictEqual(result, masterPromise);
@@ -1214,6 +1277,8 @@ describe("authring unit test", function() {
             });
 
             it('RSA key, invalid signature', function() {
+                sandbox.stub(ns, 'verifyKey').returns(origMegaPromise.resolve(false));
+
                 var masterPromise = { linkDoneAndFailTo: sinon.stub(),
                                       linkFailTo: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise');
@@ -1237,7 +1302,6 @@ describe("authring unit test", function() {
                 var pubkeyPromise = { done: sinon.stub(),
                                       resolve: sinon.stub() };
                 sandbox.stub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
-                sandbox.stub(ns, 'verifyKey').returns(false);
                 sandbox.stub(mega.attr, 'set');
                 sandbox.stub(ns, 'signKey').returns('squiggle');
                 sandbox.stub(window, 'base64urlencode', _echo);

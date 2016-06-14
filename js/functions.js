@@ -1967,7 +1967,7 @@ function MurmurHash3(key, seed) {
  *  by the queue
  */
 function CreateWorkers(url, message, size) {
-    size = size || 4
+    size = size || 4;
     var worker = [],
         instances = [];
 

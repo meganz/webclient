@@ -421,6 +421,7 @@ ChatdIntegration._ensureKeysAreDecrypted= function(keys, handler) {
 
 ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
     var promises = [];
+
     if (Array.isArray(messages)) {
         messages.forEach(function (msgObject) {
             if (msgObject.userId === strongvelope.COMMANDER) {
@@ -969,8 +970,16 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
     var tmpPromise = new MegaPromise();
 
     var promises = [];
-    var participants = Object.keys(chatRoom.members);
-    removeValue(participants, u_handle);
+    var participants = chatRoom.getParticipantsExceptMe();
+    if (participants.length === 0 && chatRoom.type === "private") {
+        return;
+    }
+    else {
+        participants.forEach(function(v, k) {
+            participants[k] = megaChat.getNodeIdFromJid(v);
+        });
+    }
+
 
     promises.push(
         ChatdIntegration._ensureKeysAreLoaded(undefined, participants)

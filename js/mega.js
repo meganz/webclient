@@ -3256,8 +3256,14 @@ function MegaData()
     this.syncUsersFullname = function(userId) {
         var self = this;
 
+        if (M.u[userId].firstName || M.u[userId].lastName) {
+            // already loaded.
+            return;
+        }
+
         var lastName = {name: 'lastname', value: null};
         var firstName = {name: 'firstname', value: null};
+
         MegaPromise.allDone([
             mega.attr.get(userId, 'firstname', -1)
                 .done(function(r) {

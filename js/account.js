@@ -1493,6 +1493,7 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
         .always(function _uaPacketParser() {
             if (attrName === 'firstname'
                     || attrName === 'lastname') {
+                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
                 M.syncUsersFullname(userHandle);
             }
             else if (ownActionPacket) {

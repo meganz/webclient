@@ -262,11 +262,14 @@ var dlmanager = {
             error = res;
         }
         else if (typeof res === 'object') {
+            if (res.efq) {
+                dlmanager.efq = true;
+            }
+            else {
+                delete dlmanager.efq;
+            }
             if (res.d) {
                 error = (res.d ? 2 : 1); // XXX: ???
-            }
-            else if (res.efq) {
-                error = EFQUOTA;
             }
             else if (res.e) {
                 error = res.e;
@@ -299,7 +302,7 @@ var dlmanager = {
             }
         }
 
-        dlmanager.dlReportStatus(dl, error === EFQUOTA ? EOVERQUOTA : error);
+        dlmanager.dlReportStatus(dl, error);
 
         ctx.next(error || new Error("failed"));
     },
@@ -816,6 +819,10 @@ var dlmanager = {
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask) {
+
+        if (this.efq) {
+            return this.showOverQuotaRegisterDialog(dlTask);
+        }
 
         var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
         var $button = $dialog.find('.fm-dialog-close');

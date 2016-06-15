@@ -23,10 +23,10 @@ var Dropdown = React.createClass({
         if (this.props.active === true) {
             if (this.getOwnerElement()) {
                 var $element = $(this.popupElement);
-                var parentDomNode = $element.parents('.button');
+                var parentDomNode = $element.closest('.button');
                 var positionToElement = $('.button.active:visible');
                 var offsetLeft = 0;
-                var $container = $element.parents('.jspPane:first');
+                var $container = $element.closest('.jspPane:first');
 
                 if ($container.size() == 0) {
                     $container = $(document.body);

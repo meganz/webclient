@@ -320,7 +320,7 @@ var TypingArea = React.createClass({
 
                     {self.props.children}
                 </div>
-                <div className="chat-textarea-scroll">
+                <div className="chat-textarea-scroll textarea-scroll">
                         <textarea
                             className={messageTextAreaClasses}
                             placeholder={__(l[8009])}

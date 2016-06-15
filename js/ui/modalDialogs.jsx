@@ -33,7 +33,7 @@ var ModalDialog = React.createClass({
         var $element = $(ReactDOM.findDOMNode(this));
 
         if(
-            (!e || !$(e.target).parents(".fm-dialog").is($element))
+            (!e || !$(e.target).closest(".fm-dialog").is($element))
         ) {
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
             this.onCloseClicked();

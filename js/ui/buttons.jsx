@@ -68,10 +68,10 @@ var Button = React.createClass({
                     var $element = $(self.findDOMNode());
                     var $scrollables = $element.parents('.jScrollPaneContainer');
                     if (newVal === true) {
-                        $element.parents('.jspScrollable').attr('data-scroll-disabled', true);
+                        $scrollables.attr('data-scroll-disabled', true);
                     }
                     else {
-                        $element.parents('.jspScrollable').removeAttr('data-scroll-disabled');
+                        $scrollables.removeAttr('data-scroll-disabled');
                     }
                     if (child.props.onActiveChange) {
                         child.props.onActiveChange.call(this, newVal);
@@ -87,7 +87,7 @@ var Button = React.createClass({
         var $element = $(ReactDOM.findDOMNode(this));
 
         if(
-            (!e || !$(e.target).parents(".button").is($element))
+            (!e || !$(e.target).closest(".button").is($element))
         ) {
             this.setState({focused: false});
             $(document).unbind('keyup.button' + this.getUniqueId());
@@ -109,17 +109,15 @@ var Button = React.createClass({
         }
 
         if(
-            $(e.target).parents(".popup").parents('.button').is($element) && this.state.focused === true
+            $(e.target).closest(".popup").closest('.button').is($element) && this.state.focused === true
         ) {
-            console.error(1);
             e.preventDefault();
             e.stopPropagation();
             return;
         }
 
         if ($(e.target).is("input,textarea,select")) {
-            console.error(2);
-            return
+            return;
         }
 
 

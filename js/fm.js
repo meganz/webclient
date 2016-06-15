@@ -76,7 +76,7 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
     $textareaClone = $textarea.next('div');
 
     function textareaScrolling(keyEvents) {
-        var $textareaScrollBlock = $textarea.parents('.chat-textarea-scroll'),
+        var $textareaScrollBlock = $textarea.closest('.textarea-scroll'),
               $textareaCloneSpan,
               textareaContent = $textarea.val(),
               cursorPosition = $textarea.getCursorPosition(),
@@ -482,7 +482,7 @@ function initUI() {
                 dd = 'download';
             else if (
                 $(e.target).is('ul.conversations-pane > li') ||
-                $(e.target).parents('ul.conversations-pane > li').size() > 0 ||
+                $(e.target).closest('ul.conversations-pane > li').size() > 0 ||
                 $(e.target).is('.messages-block')
             ) {
                 if (M.isFile(ids)) {
@@ -6674,7 +6674,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if (!is_fm() || $(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if (!is_fm() || $(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).closest('.content-panel.conversations').length || $(e.target).closest('.messages.content-area').length || $(e.target).closest('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();

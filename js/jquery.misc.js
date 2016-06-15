@@ -4,7 +4,7 @@
  * @returns {*}
  */
 $.fn.getParentJScrollPane = function() {
-    var $scrollable_parent = $(this).parents('.jspScrollable:first');
+    var $scrollable_parent = $(this).closest('.jspScrollable:first');
     if ($scrollable_parent.size() > 0) {
         var $jsp = $scrollable_parent.data('jsp');
         if ($jsp) {

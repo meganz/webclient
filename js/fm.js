@@ -65,8 +65,6 @@ function initContactsGridScrolling() {
  */
 function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
     var textareaWrapperClass = $textarea.parent().attr('class'),
-          $parent = $textarea.parent(),
-          wrapperClassSelector = '.' + textareaWrapperClass.replace(/[_\s]/g, ' .'),
           $textareaClone,
           textareaLineHeight = parseInt($textarea.css('line-height'))
           textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
@@ -78,7 +76,7 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
     $textareaClone = $textarea.next('div');
 
     function textareaScrolling(keyEvents) {
-        var $textareaScrollBlock = $parent,
+        var $textareaScrollBlock = $textarea.parents('.chat-textarea-scroll'),
               $textareaCloneSpan,
               textareaContent = $textarea.val(),
               cursorPosition = $textarea.getCursorPosition(),
@@ -89,15 +87,26 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
 
         // Set textarea height according to  textarea clone height
         textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
-        textareaContent = textareaContent.replace(/\n/g,'<br />');
-        $textareaClone.html(textareaContent+'<br />');
-        $textarea.height($textareaClone.height());
+
+        // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
+        if (keyEvents && $textareaClone.data('lastContent') === textareaContent) {
+            return;
+        }
+        else {
+            $textareaClone.data('lastContent', textareaContent);
+            textareaContent = textareaContent.replace(/\n/g, '<br />');
+            $textareaClone.html(textareaContent + '<br />');
+        }
+
+        var textareaCloneHeight = $textareaClone.height();
+        $textarea.height(textareaCloneHeight);
         $textareaCloneSpan = $textareaClone.children('span');
+        var textareaCloneSpanHeight = $textareaCloneSpan.height();
         scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
-        viewRatio = Math.round($textareaCloneSpan.height() + scrPos);
+        viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
 
         // Textarea wrapper scrolling init
-        if ($textareaClone.height() > textareaMaxHeight) {
+        if (textareaCloneHeight > textareaMaxHeight) {
             $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
             if (!jsp && keyEvents) {
                 $textarea.focus();
@@ -112,8 +121,8 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
         // Scrolling according cursor position
         if (viewRatio > textareaLineHeight || viewRatio < viewLimitTop) {
             jsp = $textareaScrollBlock.data('jsp');
-            if ($textareaCloneSpan.height() > 0 && jsp) {
-                jsp.scrollToY($textareaCloneSpan.height() - textareaLineHeight);
+            if (textareaCloneSpanHeight > 0 && jsp) {
+                jsp.scrollToY(textareaCloneSpanHeight - textareaLineHeight);
             } else if (jsp) {
                 jsp.scrollToY(0);
             }

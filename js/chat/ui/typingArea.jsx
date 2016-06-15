@@ -186,8 +186,6 @@ var TypingArea = React.createClass({
                 return;
             }
         }
-
-        this.setState({typedMessage: e.target.value});
     },
     onTypeAreaBlur: function (e) {
         if (this.props.disabled) {
@@ -284,9 +282,6 @@ var TypingArea = React.createClass({
 
         var messageTextAreaClasses = "messages-textarea";
 
-        // typing area
-        var typedMessage = htmlentities(self.state.typedMessage).replace(/\n/g, '<br/>');
-        typedMessage = typedMessage + '<br/>';
 
         var buttons = null;
 
@@ -337,9 +332,7 @@ var TypingArea = React.createClass({
                             disabled={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
                             readOnly={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
                         ></textarea>
-                        <div className="message-preview" dangerouslySetInnerHTML={{
-                                                __html: typedMessage.replace(/\s/g, "&nbsp;")
-                                            }}></div>
+                        <div className="message-preview"></div>
                 </div>
             </div>
             {buttons}

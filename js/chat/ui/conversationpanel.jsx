@@ -164,7 +164,7 @@ var ConversationRightArea = React.createClass({
                         dropdowns.push(
                             <DropdownsUI.DropdownItem
                                 key="privOperator" icon="cogwheel-icon"
-                                label={__("Operator")}
+                                label={__("Moderator")}
                                 className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
                                 onClick={() => {
                                     if (room.members[contactHash] !== 3) {
@@ -343,7 +343,7 @@ var ConversationRightArea = React.createClass({
                                 }
                             }}>
                                 <i className="small-icon rounded-stop"></i>
-                                {__("Truncate")}
+                                {__("Clear chat history")}
                             </div>
                         ) : null
                         }
@@ -1452,7 +1452,7 @@ var ConversationPanel = React.createClass({
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
-                title={__("Truncate")}
+                title={__("Clear chat history")}
                 name="truncate-conversation"
                 onClose={() => {
                     self.setState({'truncateDialog': false});
@@ -1480,7 +1480,7 @@ var ConversationPanel = React.createClass({
                                         msgDialog(
                                             'warninga',
                                             l[135],
-                                            __("You don't have the permissions to truncate this conversation.")
+                                            __("You don't have the permission to clear the history of this conversation.")
                                         );
                                     }
                                 });
@@ -1495,7 +1495,7 @@ var ConversationPanel = React.createClass({
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__("Are you sure you want to truncate this conversation?")}
+                        {__("Are you sure you want to clear the history of this conversation?")}
                     </div>
                 </div>
             </ModalDialogsUI.ConfirmDialog>

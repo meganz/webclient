@@ -23668,7 +23668,7 @@
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog secondary-header" },
-	                        __("Are you sure you want to truncate this conversation?")
+	                        __("Are you sure you want to clear all messages in this conversation?")
 	                    )
 	                )
 	            );

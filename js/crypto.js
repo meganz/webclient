@@ -4509,16 +4509,7 @@ function api_strerror(errno) {
     var backgroundNacl = {};
     backgroundNacl.workers = null;
     backgroundNacl.requiresWorkersInit = function() {
-        // XX: Add real support for proper resizing of the worker pool
-        // because of the late M.u initialisation, this would always be the min val of 3
-        /**
-         * # of workers to initialise
-         * max: 6
-         * min: 3
-         * target: (number of contacts/4)
-         * @type {number}
-         */
-        var numberOfWorkers = Math.max(Math.min(6, M.u.length * 0.25), 3);
+        var numberOfWorkers = mega.maxWorkers;
 
         if (backgroundNacl.workers === null) {
             backgroundNacl.workers = CreateWorkers('naclworker.js', function(context, e, release) {

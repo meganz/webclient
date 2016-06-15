@@ -1,6 +1,6 @@
 window = this; // required, so that nacl-fast.js can be loaded as-is in a worker
 
-importScripts('js/vendor/nacl-fast.js');
+importScripts('nacl-fast.js');
 
 var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
 

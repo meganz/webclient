@@ -13208,11 +13208,8 @@ h5.main-italic-header {
     color: #3F3F3F;
     margin-bottom: 17px;
 }
-.reset-success-st3 .fm-dialog-header {
-    margin-bottom: 10px;
-}
-.cancel-subscription-st1 .fm-dialog-header, .cancel-subscription-st2 .fm-dialog-header {
-    margin: 19px 0 10px 0;
+.cancel-subscription-st1 .fm-dialog-header, .cancel-subscription-st2 .fm-dialog-header, .reset-success-st3 .fm-dialog-header {
+    margin: 0 0 10px 0;
 }
 .reset-success-st2 .fm-account-input {
     margin: 0 8px 20px 8px;

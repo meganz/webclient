@@ -258,7 +258,8 @@ function init_page() {
     if (localStorage.awaitingConfirmationAccount) {
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
-        if (confirmcode) {
+        // if visiting a #confirm link, or they confirmed it elsewhere.
+        if (confirmcode || u_type > 1) {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {

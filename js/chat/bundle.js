@@ -322,8 +322,6 @@
 
 	makeObservable(Chat);
 
-	Chat.prototype.renderConversationsApp = function () {};
-
 	Chat.prototype.init = function () {
 	    var self = this;
 
@@ -545,7 +543,6 @@
 
 	        self.$conversationsAppInstance = ReactDOM.render(self.$conversationsApp, document.querySelector('.section.conversations'));
 
-	        self.renderConversationsApp();
 	        if (d) {
 	            console.timeEnd('chatReactUiInit');
 	        }
@@ -562,12 +559,6 @@
 	    } else {
 	        initAppUI();
 	    }
-
-	    $(window).unbind('hashchange.chat').bind('hashchange.chat', function () {
-	        if (window.location.hash.indexOf("/chat") !== -1) {
-	            self.renderConversationsApp();
-	        }
-	    });
 
 	    if (self.is_initialized) {
 	        self.destroy().always(function () {
@@ -771,7 +762,7 @@
 	        if (type != "joined") {
 
 	            if (self.chats[eventObject.getRoomJid()]) {
-	                self.chats[eventObject.getRoomJid()].destroy(true);
+	                self.chats[eventObject.getRoomJid()].setState(ChatRoom.STATE.LEFT);
 	            }
 	        } else {
 	            room = self.chats[eventObject.getRoomJid()];
@@ -1234,8 +1225,6 @@
 	    if (self.$container.parent('.section.conversations .fm-right-files-block').size() == 0) {
 	        $('.section.conversations .fm-right-files-block').append(self.$container);
 	    }
-
-	    self.renderConversationsApp();
 	};
 
 	Chat.prototype.closeChatPopups = function () {
@@ -1315,8 +1304,6 @@
 	    $('.nw-conversations-item').removeClass('selected');
 
 	    sectionUIopen('conversations');
-
-	    self.renderConversationsApp();
 
 	    if (Object.keys(self.chats).length === 0) {
 	        $('.fm-empty-conversations').removeClass('hidden');
@@ -19238,6 +19225,10 @@
 
 	        var megaChat = this.props.chatRoom.megaChat;
 	        var chatRoom = this.props.chatRoom;
+	        if (!chatRoom || !chatRoom.roomJid) {
+	            return null;
+	        }
+
 	        var roomShortJid = chatRoom.roomJid.split("@")[0];
 
 	        if (chatRoom.isCurrentlyActive) {
@@ -19460,7 +19451,7 @@
 	        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
 	        sortedConversations.forEach(function (chatRoom) {
-	            if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
+	            if (!chatRoom || !chatRoom.roomJid) {
 	                return;
 	            }
 
@@ -22397,6 +22388,11 @@
 	    render: function render() {
 	        var self = this;
 	        var room = this.props.chatRoom;
+
+	        if (!room || !room.roomJid) {
+
+	            return null;
+	        }
 	        var contactJid = room.getParticipantsExceptMe()[0];
 	        var contact = room.megaChat.getContactFromJid(contactJid);
 
@@ -22659,6 +22655,16 @@
 	                                } },
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            l[8633]
+	                        ) : null,
+	                        room.type === "group" && room.stateIsLeftOrLeaving() ? React.makeElement(
+	                            "div",
+	                            { className: "link-button red", onClick: function onClick() {
+	                                    if (self.props.onCloseClicked) {
+	                                        self.props.onCloseClicked();
+	                                    }
+	                                } },
+	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
+	                            l[148]
 	                        ) : null
 	                    )
 	                )
@@ -23082,10 +23088,6 @@
 	        var self = this;
 	        var room = self.props.chatRoom;
 
-	        if (room._leaving) {
-	            return;
-	        }
-
 	        if (!self.props.chatRoom.isCurrentlyActive) {
 	            return;
 	        }
@@ -23304,6 +23306,9 @@
 	        var self = this;
 
 	        var room = this.props.chatRoom;
+	        if (!room || !room.roomJid) {
+	            return null;
+	        }
 	        var contactJid = room.getParticipantsExceptMe()[0];
 	        var contact = room.megaChat.getContactFromJid(contactJid);
 
@@ -23729,6 +23734,10 @@
 	                        room.members[u_handle] = 0;
 	                        room.trackDataChange();
 	                    },
+	                    },
+	                    onCloseClicked: function onCloseClicked() {
+	                        room.destroy();
+	                    },
 	                    onAttachFromCloudClicked: function onAttachFromCloudClicked() {
 	                        self.setState({ 'attachCloudDialog': true });
 	                    },
@@ -23947,10 +23956,6 @@
 	        }
 
 	        self.props.conversations.forEach(function (chatRoom) {
-	            if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
-	                return;
-	            }
-
 	            var otherParticipants = chatRoom.getParticipantsExceptMe();
 
 	            if (!otherParticipants || otherParticipants.length === 0) {
@@ -26445,6 +26450,8 @@
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
 	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
 
+	            var text = __("Joined the group chat by invitation from %s").replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+
 	            messages.push(React.makeElement(
 	                "div",
 	                { className: "message body", "data-id": "id" + message.messageId, key: h },
@@ -26458,16 +26465,7 @@
 	                        otherDisplayName
 	                    ),
 	                    datetime,
-	                    React.makeElement(
-	                        "div",
-	                        { className: "message text-block" },
-	                        "Joined the group chat by invitation from ",
-	                        React.makeElement(
-	                            "strong",
-	                            { className: "dark-grey-txt" },
-	                            displayName
-	                        )
-	                    )
+	                    React.makeElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: text } })
 	                )
 	            ));
 	        });
@@ -26482,6 +26480,13 @@
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
 	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
 
+	            var text;
+	            if (otherContact.u === contact.u) {
+	                text = __("Had left the group chat");
+	            } else {
+	                text = __("Was removed from the group chat by %s").replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+	            }
+
 	            messages.push(React.makeElement(
 	                "div",
 	                { className: "message body", "data-id": "id" + message.messageId, key: h },
@@ -26495,17 +26500,10 @@
 	                        otherDisplayName
 	                    ),
 	                    datetime,
-	                    React.makeElement(
-	                        "div",
-	                        { className: "message text-block" },
+	                    React.makeElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: text } })
 	                        "__(\"Was removed from the group chat by %s\").replace(\"%s\", '",
-	                        React.makeElement(
-	                            "strong",
-	                            { className: "dark-grey-txt" },
-	                            displayName
 	                        ),
 	                        "')"
-	                    )
 	                )
 	            ));
 	        });
@@ -26794,7 +26792,7 @@
 
 	    self.megaChat.rebind("onRoomDestroy." + self.roomJid, function (e, room) {
 	        if (room.roomJid == self.roomJid) {
-	            $(window).rebind("unbind." + self.roomJid);
+	            $(window).unbind("focus." + self.roomJid);
 	        }
 	    });
 
@@ -27077,8 +27075,6 @@
 	        });
 	    } else {
 	        self.setState(ChatRoom.STATE.LEFT);
-
-	        self.destroyStructure();
 	    }
 
 	    self.megaChat.refreshConversations();
@@ -27088,28 +27084,22 @@
 	    var self = this;
 
 	    self.megaChat.trigger('onRoomDestroy', [self]);
-
-	    self.leave(notifyOtherDevices);
-
-	    var $element = $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
-	    $element.remove();
-
 	    var mc = self.megaChat;
 	    var roomJid = self.roomJid;
 
-	    if (roomJid === mc.getCurrentRoomJid() || self.$messages && self.$messages.is(":visible")) {
-	        window.location = "#fm/chat";
-	        self.hide();
-	        setTimeout(function () {
-	            self.megaChat.renderListing();
-	        }, 300);
-	    } else {
-	        self.megaChat.refreshConversations();
+	    if (!self.stateIsLeftOrLeaving()) {
+	        self.leave(notifyOtherDevices);
 	    }
 
-	    setTimeout(function () {
+	    Soon(function () {
+	        if (self.isCurrentlyActive) {
+	            self.isCurrentlyActive = false;
+	        }
+
 	        mc.chats.remove(roomJid);
-	    }, 1);
+
+	        window.location = '#fm/chat';
+	    });
 	};
 
 	ChatRoom.prototype.show = function () {
@@ -27523,7 +27513,7 @@
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
-	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat;
+	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
 	};
 	ChatRoom.prototype.iAmOperator = function () {
 	    return this.type === "private" || this.members && this.members[u_handle] === 3;

@@ -50,14 +50,24 @@ var ConversationRightArea = React.createClass({
     render: function() {
         var self = this;
         var room = this.props.chatRoom;
-        var contactJid = room.getParticipantsExceptMe()[0];
-        var contact = room.megaChat.getContactFromJid(contactJid);
 
-
-        if (!contact) {
-            // something is really bad.
+        if (!room || !room.roomJid) {
+            // destroyed
             return null;
         }
+        var contactJid;
+        var contact;
+        var contacts = room.getParticipantsExceptMe();
+        if (contacts && contacts.length > 0) {
+            contactJid = contacts[0];
+            contact = room.megaChat.getContactFromJid(contactJid);
+        }
+        else {
+            contact = {};
+        }
+
+
+
         // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
         if (!room.isCurrentlyActive) {
             return null;
@@ -347,7 +357,7 @@ var ConversationRightArea = React.createClass({
                             </div>
                         ) : null
                         }
-                        { room.type === "group" ? (
+                        { room.type === "group" && !room.stateIsLeftOrLeaving() ? (
                             <div className="link-button red" onClick={() => {
                                 if (self.props.onLeaveClicked) {
                                     self.props.onLeaveClicked();
@@ -355,6 +365,17 @@ var ConversationRightArea = React.createClass({
                             }}>
                                 <i className="small-icon rounded-stop"></i>
                                 {l[8633]}
+                            </div>
+                        ) : null
+                        }
+                        { room.type === "group" && room.stateIsLeftOrLeaving() ? (
+                            <div className="link-button red" onClick={() => {
+                                if (self.props.onCloseClicked) {
+                                    self.props.onCloseClicked();
+                                }
+                            }}>
+                                <i className="small-icon rounded-stop"></i>
+                                {l[148]}
                             </div>
                         ) : null
                         }
@@ -788,10 +809,6 @@ var ConversationPanel = React.createClass({
         var self = this;
         var room = self.props.chatRoom;
 
-        if (room._leaving) {
-            return;
-        }
-
         if (!self.props.chatRoom.isCurrentlyActive) {
             return;
         }
@@ -1055,8 +1072,16 @@ var ConversationPanel = React.createClass({
         var self = this;
 
         var room = this.props.chatRoom;
-        var contactJid = room.getParticipantsExceptMe()[0];
-        var contact = room.megaChat.getContactFromJid(contactJid);
+        if (!room || !room.roomJid) {
+            return null;
+        }
+        var contacts = room.getParticipantsExceptMe();
+        var contactJid;
+        var contact;
+        if (contacts && contacts.length > 0) {
+            contactJid = contacts[0];
+            contact = room.megaChat.getContactFromJid(contactJid);
+        }
 
         var conversationPanelClasses = "conversation-panel";
 
@@ -1065,10 +1090,7 @@ var ConversationPanel = React.createClass({
         }
 
 
-        if (!contact) {
-            return null;
-        }
-        var avatarMeta = generateAvatarMeta(contact.u);
+        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
         var contactName = avatarMeta.fullName;
 
 
@@ -1527,7 +1549,10 @@ var ConversationPanel = React.createClass({
                         onLeaveClicked={function() {
                             room.members[u_handle] = 0;
                             room.trackDataChange();
-                            //TODO: Do a real leave chat here...
+                            $(room).trigger('onLeaveChatRequested');
+                        }}
+                        onCloseClicked={function() {
+                            room.destroy();
                         }}
                         onAttachFromCloudClicked={function() {
                             self.setState({'attachCloudDialog': true});
@@ -1746,17 +1771,12 @@ var ConversationPanels = React.createClass({
         }
 
         self.props.conversations.forEach(function(chatRoom) {
-            if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
-                return;
-            }
-
             var otherParticipants = chatRoom.getParticipantsExceptMe();
 
-            if (!otherParticipants || otherParticipants.length === 0) {
-                return;
+            var contact;
+            if (otherParticipants && otherParticipants.length > 0) {
+                contact = megaChat.getContactFromJid(otherParticipants[0]);
             }
-
-            var contact = megaChat.getContactFromJid(otherParticipants[0]);
 
             // XX: Performance trick. However, scroll positions are NOT retained properly when switching conversations,
             // so this should be done some day in the future, after we have more stable product.

@@ -80,6 +80,12 @@ var _createObjectDataMethods = function(kls) {
             return cb(self._data[k], k);
         });
     };
+    obj.some = function(cb) {
+        var self = this;
+        return self.keys().some(function(k) {
+            return cb(self._data[k], k);
+        });
+    };
 
     obj.map = function(cb) {
         var self = this;

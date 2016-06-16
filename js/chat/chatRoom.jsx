@@ -237,7 +237,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
     self.megaChat.rebind("onRoomDestroy." + self.roomJid, function(e, room) {
         if (room.roomJid == self.roomJid) {
-            $(window).rebind("unbind." + self.roomJid);
+            $(window).unbind("focus." + self.roomJid);
         }
     });
 
@@ -659,8 +659,6 @@ ChatRoom.prototype.leave = function(notifyOtherDevices) {
     }
     else {
         self.setState(ChatRoom.STATE.LEFT);
-
-        self.destroyStructure();
     }
 
     self.megaChat.refreshConversations();
@@ -674,33 +672,22 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
     var self = this;
 
     self.megaChat.trigger('onRoomDestroy', [self]);
-
-
-    self.leave(notifyOtherDevices);
-
-    //self.$messages.remove();
-
-    var $element = $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
-    $element.remove();
-
-    // dereference from self
     var mc = self.megaChat;
     var roomJid = self.roomJid;
 
-    if (roomJid === mc.getCurrentRoomJid() || (self.$messages && self.$messages.is(":visible"))) {
-        window.location = "#fm/chat";
-        self.hide();
-        setTimeout(function() {
-            self.megaChat.renderListing();
-        }, 300);
-    }
-    else {
-        self.megaChat.refreshConversations();
+    if (!self.stateIsLeftOrLeaving()) {
+        self.leave(notifyOtherDevices);
     }
 
-    setTimeout(function() {
+    Soon(function() {
+        if (self.isCurrentlyActive) {
+            self.isCurrentlyActive = false;
+        }
+
         mc.chats.remove(roomJid);
-    }, 1);
+
+        window.location = '#fm/chat';
+    });
 };
 
 
@@ -1296,7 +1283,12 @@ ChatRoom.prototype._clearChatMessagesFromChatd = function() {
 };
 
 ChatRoom.prototype.isReadOnly = function() {
-    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat;
+    return (
+        (this.members && this.members[u_handle] === 0) ||
+        this.privateReadOnlyChat ||
+        this.state === ChatRoom.STATE.LEAVING ||
+        this.state === ChatRoom.STATE.LEFT
+    );
 };
 ChatRoom.prototype.iAmOperator = function() {
     return this.type === "private" || this.members && this.members[u_handle] === 3;

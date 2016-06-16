@@ -163,6 +163,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
 
     loadingDialog.hide();
 
+    if (actionPacket.active === 0) {
+        // skip non active chats for now...
+        return false;
+    }
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
         self.logger.error("actionPacket returned no chat participants: ", chatParticipants, ", removing chat.");
@@ -217,6 +221,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                         if (v.p === -1) {
                             excluded.push(v.u);
                             delete chatRoom.members[v.u];
+                            if (v.u === u_handle) {
+                                chatRoom.leave();
+                            }
                         }
                         else {
                             included.push(v.u);
@@ -227,6 +234,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     if (included.length > 0 || excluded.length > 0) {
                         if (included.length > 0) {
                             ChatdIntegration._ensureKeysAreLoaded([], included);
+                            ChatdIntegration._ensureNamesAreLoaded(included);
                         }
 
                         chatRoom.trackDataChange();
@@ -473,6 +481,33 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
         });
     }
     return MegaPromise.allDone(promises);
+};
+
+
+ChatdIntegration._ensureNamesAreLoaded = function(users) {
+    if (Array.isArray(users)) {
+        users.forEach(function (userId) {
+            if (userId === strongvelope.COMMANDER) {
+                return;
+            }
+
+            if (!M.u[userId]) {
+                M.u.set(
+                    userId,
+                    new MegaDataObject(MEGA_USER_STRUCT, true, {
+                        'h': userId,
+                        'u': userId,
+                        'm': '',
+                        'c': 0
+                    })
+                );
+                M.syncUsersFullname(userId);
+            }
+            else {
+                M.syncUsersFullname(userId);
+            }
+        });
+    }
 };
 
 
@@ -755,8 +790,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         $(chatRoom).rebind('onLeaveChatRequested.chatdInt', function(e) {
             asyncApiReq({
                 "a":"mcr", // request identifier
-                "id": chatRoom.chatId, // chat id
-                "u": u_handle // optional, email or handle of other user to remove. If not provided the requester is removed.
+                "id": chatRoom.chatId // chat id
             });
         });
         $(chatRoom).rebind('onAddUserRequest.chatdInt', function(e, contactHashes) {

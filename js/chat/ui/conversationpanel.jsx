@@ -122,7 +122,7 @@ var ConversationRightArea = React.createClass({
 
                 if (room.type === "group" && room.members) {
                     var removeParticipantButton = <DropdownsUI.DropdownItem
-                        key="remove" icon="rounded-stop" label={__("Remove participant")} onClick={() => {
+                        key="remove" icon="rounded-stop" label={__(l[8867])} onClick={() => {
                                     $(room).trigger('onRemoveUserRequest', [contactHash]);
                                 }}/>;
 
@@ -133,7 +133,7 @@ var ConversationRightArea = React.createClass({
 
                         dropdowns.push(
                             <div key="setPermLabel" className="dropdown-items-info">
-                                {__("Set permission:")}
+                                {__(l[8868])}
                             </div>
                         );
 
@@ -143,7 +143,7 @@ var ConversationRightArea = React.createClass({
                             <DropdownsUI.DropdownItem
                                 key="privReadOnly" icon="eye-icon"
                                 className={"tick-item " + (room.members[contactHash] === 0 ? "active" : "")}
-                                label={__("Read-Only")} onClick={() => {
+                                label={__(l[8873])} onClick={() => {
                                     if (room.members[contactHash] !== 0) {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 0]);
                                     }
@@ -154,7 +154,7 @@ var ConversationRightArea = React.createClass({
                             <DropdownsUI.DropdownItem
                                 key="privFullAcc" icon="conversation-icon"
                                 className={"tick-item " + (room.members[contactHash] === 2 ? "active" : "")}
-                                label={__("Full Access")} onClick={() => {
+                                label={__(l[8874])} onClick={() => {
                                     if (room.members[contactHash] !== 2) {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 2]);
                                     }
@@ -164,7 +164,7 @@ var ConversationRightArea = React.createClass({
                         dropdowns.push(
                             <DropdownsUI.DropdownItem
                                 key="privOperator" icon="cogwheel-icon"
-                                label={__("Moderator")}
+                                label={__(l[8875])}
                                 className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
                                 onClick={() => {
                                     if (room.members[contactHash] !== 3) {
@@ -258,7 +258,7 @@ var ConversationRightArea = React.createClass({
                     {Object.keys(room.members).length}
                 </div>
                 <div className="chat-right-head-txt">
-                    {__("Group members")}
+                    {__(l[8876])}
                 </div>
             </div>
         }
@@ -304,9 +304,9 @@ var ConversationRightArea = React.createClass({
                                 }
                                 multiple={true}
                                 className="popup add-participant-selector"
-                                singleSelectedButtonLabel={__("Add to group conversation")}
-                                multipleSelectedButtonLabel={__("Add to group conversation")}
-                                nothingSelectedButtonLabel={__("Select one or more contacts to continue")}
+                                singleSelectedButtonLabel={__(l[8869])}
+                                multipleSelectedButtonLabel={__(l[8869])}
+                                nothingSelectedButtonLabel={__(l[8870])}
                                 onSelectDone={this.props.onAddParticipantSelected}
                                 positionMy="center top"
                                 positionAt="left bottom"
@@ -343,7 +343,7 @@ var ConversationRightArea = React.createClass({
                                 }
                             }}>
                                 <i className="small-icon rounded-stop"></i>
-                                {__("Clear chat history")}
+                                {__(l[8871])}
                             </div>
                         ) : null
                         }
@@ -1333,9 +1333,9 @@ var ConversationPanel = React.createClass({
 
             var msg;
             if (areMultipleUsersTyping === true) {
-                msg = __("%s and %s are typing")
-                    .replace("%s", namesDisplay[0])
-                    .replace("%s", namesDisplay[1]);
+                msg = __(l[8872])
+                    .replace("%1", namesDisplay[0])
+                    .replace("%2", namesDisplay[1]);
             }
             else {
                 msg = __(l[8629]).replace("%1", namesDisplay[0]);
@@ -1403,7 +1403,7 @@ var ConversationPanel = React.createClass({
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
-                title={__("Delete message")}
+                title={__(l[8004])}
                 name="delete-message"
                 onClose={() => {
                     self.setState({'confirmDeleteDialog': false});
@@ -1434,7 +1434,7 @@ var ConversationPanel = React.createClass({
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__("Are you sure you want to delete this message?")}
+                        {__(l[8879])}
                     </div>
 
                     <GenericConversationMessage
@@ -1452,7 +1452,7 @@ var ConversationPanel = React.createClass({
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
-                title={__("Clear chat history")}
+                title={__(l[8871])}
                 name="truncate-conversation"
                 onClose={() => {
                     self.setState({'truncateDialog': false});
@@ -1480,7 +1480,7 @@ var ConversationPanel = React.createClass({
                                         msgDialog(
                                             'warninga',
                                             l[135],
-                                            __("You don't have the permission to clear the history of this conversation.")
+                                            __(l[8880])
                                         );
                                     }
                                 });
@@ -1495,7 +1495,7 @@ var ConversationPanel = React.createClass({
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__("Are you sure you want to clear the history of this conversation?")}
+                        {__(l[8881])}
                     </div>
                 </div>
             </ModalDialogsUI.ConfirmDialog>
@@ -1573,7 +1573,7 @@ var ConversationPanel = React.createClass({
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
-                            {__("Message not sent. Will retry later.")}
+                            {__(l[8882])}
                         </div>
                     </div>
 
@@ -1581,7 +1581,7 @@ var ConversationPanel = React.createClass({
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
-                            {__("Message not sent. Click here if you want to re-send it.")}
+                            {__(l[8883])}
                         </div>
                     </div>
 
@@ -1589,7 +1589,7 @@ var ConversationPanel = React.createClass({
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
-                            {__("Message not sent. Click here if you want to cancel it.")}
+                            {__(l[8884])}
                         </div>
                     </div>
 

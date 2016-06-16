@@ -27,7 +27,7 @@ var AlterParticipantsConversationMessage = React.createClass({
 
         var displayName;
         if (contact) {
-            displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
         }
         else {
             displayName = contact;

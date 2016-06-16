@@ -1900,6 +1900,7 @@
     "6234": "PRO Lite",
     "6240": "\u1ee8ng d\u1ee5ng \u0110T Windows Phone",
     "6508": "Thi\u1ebft \u0111\u1eb7t",
+    "6690": "T\u1edbi m\u1ee5c T\u00e0i kho\u1ea3n",
     "6771": "C\u00e1c th\u01b0 m\u1ee5c b\u1ecb x\u00f3a",
     "6772": "Kh\u00f4ng c\u00f3 Cu\u1ed9c tr\u00f2 chuy\u1ec7n n\u00e0o",
     "6773": "T\u0103ng d\u1ea7n",
@@ -3379,6 +3380,12 @@
     "8856": "Ng\u00e0y T\u1ea1o",
     "8857": "L\u01b0u V\u1ec1 Ngo\u1ea1i Tuy\u1ebfn",
     "8858": "Ch\u1ec9nh S\u1eeda L\u1ea7n Cu\u1ed1i",
+    "8859": "Backup Recovery Key",
+    "8861": "Remove Recovery Key",
+    "8862": "The Recovery Key file has been removed.",
+    "8863": "The Recovery Key has been exported into: ",
+    "8864": "You are removing the exported Recovery Key file",
+    "8865": "You will have to enter your credentials (login and password) in the new app. If you don&#039;t remember your password, please Export your Recovery Key before uninstalling the v1 app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3480,6 +3487,13 @@
         "mega-update-available": 8850,
         "released-date-time": 8851,
         "site-update-available-message": 8852,
-        "subscription-cancellation-message": 8854
+        "subscription-cancellation-message": 8854,
+        "view_member_profile": 8866,
+        "remove_participant": 8867,
+        "set_permission": 8868,
+        "add_to_chat": 8869,
+        "select_contact_to_chat": 8870,
+        "clear_chat_history": 8871,
+        "typing_hint": 8872
     }
 }

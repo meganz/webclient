@@ -1900,6 +1900,7 @@
     "6234": "PRO Lite",
     "6240": "Windows Phone App",
     "6508": "Nastavitve",
+    "6690": "Pojdite na Moj ra\u010dun",
     "6771": "Izbrisane mape",
     "6772": "Ni pogovorov",
     "6773": "Nara\u0161\u010dajo\u010de",
@@ -3379,6 +3380,12 @@
     "8856": "Dodano",
     "8857": "Na voljo brez povezave",
     "8858": "Spremenjeno",
+    "8859": "Varnostna kopija re\u0161ilnega klju\u010da",
+    "8861": "Odstrani re\u0161ilni klju\u010d",
+    "8862": "The Recovery Key file has been removed.",
+    "8863": "The Recovery Key has been exported into: ",
+    "8864": "You are removing the exported Recovery Key file",
+    "8865": "You will have to enter your credentials (login and password) in the new app. If you don&#039;t remember your password, please Export your Recovery Key before uninstalling the v1 app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3480,6 +3487,13 @@
         "mega-update-available": 8850,
         "released-date-time": 8851,
         "site-update-available-message": 8852,
-        "subscription-cancellation-message": 8854
+        "subscription-cancellation-message": 8854,
+        "view_member_profile": 8866,
+        "remove_participant": 8867,
+        "set_permission": 8868,
+        "add_to_chat": 8869,
+        "select_contact_to_chat": 8870,
+        "clear_chat_history": 8871,
+        "typing_hint": 8872
     }
 }

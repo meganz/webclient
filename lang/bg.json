@@ -1900,6 +1900,7 @@
     "6234": "LITE",
     "6240": "\u041f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0437\u0430 Windows Phone",
     "6508": "\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438",
+    "6690": "\u041e\u0442\u0438\u0434\u0435\u0442\u0435 \u0432 \u041c\u043e\u044f \u0410\u043a\u0430\u0443\u043d\u0442",
     "6771": "\u0418\u0437\u0442\u0440\u0438\u0442\u0438 \u043f\u0430\u043f\u043a\u0438",
     "6772": "\u041d\u044f\u043c\u0430 \u0420\u0430\u0437\u0433\u043e\u0432\u043e\u0440\u0438",
     "6773": "\u0412\u044a\u0437\u0445\u043e\u0434\u044f\u0449",
@@ -3379,6 +3380,12 @@
     "8856": "Added",
     "8857": "Available Offline",
     "8858": "Modified",
+    "8859": "Backup Recovery Key",
+    "8861": "Remove Recovery Key",
+    "8862": "The Recovery Key file has been removed.",
+    "8863": "The Recovery Key has been exported into: ",
+    "8864": "You are removing the exported Recovery Key file",
+    "8865": "You will have to enter your credentials (login and password) in the new app. If you don&#039;t remember your password, please Export your Recovery Key before uninstalling the v1 app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3480,6 +3487,13 @@
         "mega-update-available": 8850,
         "released-date-time": 8851,
         "site-update-available-message": 8852,
-        "subscription-cancellation-message": 8854
+        "subscription-cancellation-message": 8854,
+        "view_member_profile": 8866,
+        "remove_participant": 8867,
+        "set_permission": 8868,
+        "add_to_chat": 8869,
+        "select_contact_to_chat": 8870,
+        "clear_chat_history": 8871,
+        "typing_hint": 8872
     }
 }

@@ -1900,6 +1900,7 @@
     "6234": "\u05e7\u05dc\u05d9\u05dc",
     "6240": "\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d5\u05d5\u05d9\u05e0\u05d3\u05d5\u05e1 \u05e4\u05d5\u05df",
     "6508": "\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea",
+    "6690": "\u05e2\u05d1\u05d5\u05e8 \u05d0\u05dc \u05d4\u05d7\u05e9\u05d1\u05d5\u05df \u05e9\u05dc\u05d9",
     "6771": "\u05ea\u05d9\u05e7\u05d9\u05d5\u05ea \u05e9\u05e0\u05de\u05d7\u05e7\u05d5",
     "6772": "\u05d0\u05d9\u05df \u05e9\u05d9\u05d7\u05d5\u05ea",
     "6773": "\u05e2\u05d5\u05dc\u05d4",
@@ -3379,6 +3380,12 @@
     "8856": "\u05d4\u05ea\u05d5\u05d5\u05e1\u05e3",
     "8857": "\u05d6\u05de\u05d9\u05df \u05d1\u05de\u05e6\u05d1 \u05dc\u05d0 \u05de\u05e7\u05d5\u05d5\u05df",
     "8858": "\u05d4\u05e9\u05ea\u05e0\u05d4",
+    "8859": "Backup Recovery Key",
+    "8861": "Remove Recovery Key",
+    "8862": "The Recovery Key file has been removed.",
+    "8863": "The Recovery Key has been exported into: ",
+    "8864": "You are removing the exported Recovery Key file",
+    "8865": "You will have to enter your credentials (login and password) in the new app. If you don&#039;t remember your password, please Export your Recovery Key before uninstalling the v1 app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3480,6 +3487,13 @@
         "mega-update-available": 8850,
         "released-date-time": 8851,
         "site-update-available-message": 8852,
-        "subscription-cancellation-message": 8854
+        "subscription-cancellation-message": 8854,
+        "view_member_profile": 8866,
+        "remove_participant": 8867,
+        "set_permission": 8868,
+        "add_to_chat": 8869,
+        "select_contact_to_chat": 8870,
+        "clear_chat_history": 8871,
+        "typing_hint": 8872
     }
 }

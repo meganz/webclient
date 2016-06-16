@@ -1900,6 +1900,7 @@
     "6234": "PRO Lite",
     "6240": "Windows Phone App",
     "6508": "Inst\u00e4llningar",
+    "6690": "G\u00e5 till mitt konto",
     "6771": "Borttagna mappar",
     "6772": "Inga konversationer",
     "6773": "Stigande",
@@ -3379,6 +3380,12 @@
     "8856": "Added",
     "8857": "Available Offline",
     "8858": "Modified",
+    "8859": "Backup Recovery Key",
+    "8861": "Remove Recovery Key",
+    "8862": "The Recovery Key file has been removed.",
+    "8863": "The Recovery Key has been exported into: ",
+    "8864": "You are removing the exported Recovery Key file",
+    "8865": "You will have to enter your credentials (login and password) in the new app. If you don&#039;t remember your password, please Export your Recovery Key before uninstalling the v1 app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3480,6 +3487,13 @@
         "mega-update-available": 8850,
         "released-date-time": 8851,
         "site-update-available-message": 8852,
-        "subscription-cancellation-message": 8854
+        "subscription-cancellation-message": 8854,
+        "view_member_profile": 8866,
+        "remove_participant": 8867,
+        "set_permission": 8868,
+        "add_to_chat": 8869,
+        "select_contact_to_chat": 8870,
+        "clear_chat_history": 8871,
+        "typing_hint": 8872
     }
 }

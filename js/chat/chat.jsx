@@ -321,10 +321,6 @@ makeObservable(Chat);
 
 
 
-Chat.prototype.renderConversationsApp = function () {
-    //this.$conversationsAppInstance.forceUpdate();
-};
-
 /**
  * Initialize the MegaChat (also will connect to the XMPP)
  */
@@ -588,7 +584,7 @@ Chat.prototype.init = function() {
             document.querySelector('.section.conversations')
         );
 
-        self.renderConversationsApp();
+
         if (d) {
             console.timeEnd('chatReactUiInit');
         }
@@ -607,13 +603,6 @@ Chat.prototype.init = function() {
         initAppUI();
     }
 
-    $(window)
-        .unbind('hashchange.chat')
-        .bind('hashchange.chat', function() {
-            if (window.location.hash.indexOf("/chat") !== -1) {
-                self.renderConversationsApp();
-            }
-        });
 
     if (self.is_initialized) {
         self.destroy()
@@ -874,7 +863,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
         if (type != "joined") { // i'd left
             // i'd left, remove the room and the UI stuff
             if (self.chats[eventObject.getRoomJid()]) {
-                self.chats[eventObject.getRoomJid()].destroy(true);
+                self.chats[eventObject.getRoomJid()].setState(ChatRoom.STATE.LEFT);
             }
         }
         else { // i'd joined
@@ -904,9 +893,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
         assert(anyOf(updatedJids, "null") === false, "updatedJids should not contain \"null\".");
 
         room.syncUsers(clone(updatedJids));
-        //room.refreshUI();
     }
-    //TODO: group chats?
 };
 
 
@@ -1591,8 +1578,6 @@ Chat.prototype.refreshConversations = function() {
     if (self.$container.parent('.section.conversations .fm-right-files-block').size() == 0) {
         $('.section.conversations .fm-right-files-block').append(self.$container);
     }
-
-    self.renderConversationsApp();
 };
 
 Chat.prototype.closeChatPopups = function() {
@@ -1700,8 +1685,6 @@ Chat.prototype.renderListing = function() {
 
 
     sectionUIopen('conversations');
-
-    self.renderConversationsApp();
 
 
     if (Object.keys(self.chats).length === 0) {

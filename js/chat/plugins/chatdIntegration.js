@@ -163,6 +163,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
 
     loadingDialog.hide();
 
+    if (actionPacket.active === 0) {
+        // skip non active chats for now...
+        return false;
+    }
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
         self.logger.error("actionPacket returned no chat participants: ", chatParticipants, ", removing chat.");
@@ -217,6 +221,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                         if (v.p === -1) {
                             excluded.push(v.u);
                             delete chatRoom.members[v.u];
+                            if (v.u === u_handle) {
+                                chatRoom.leave();
+                            }
                         }
                         else {
                             included.push(v.u);
@@ -755,8 +762,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         $(chatRoom).rebind('onLeaveChatRequested.chatdInt', function(e) {
             asyncApiReq({
                 "a":"mcr", // request identifier
-                "id": chatRoom.chatId, // chat id
-                "u": u_handle // optional, email or handle of other user to remove. If not provided the requester is removed.
+                "id": chatRoom.chatId // chat id
             });
         });
         $(chatRoom).rebind('onAddUserRequest.chatdInt', function(e, contactHashes) {

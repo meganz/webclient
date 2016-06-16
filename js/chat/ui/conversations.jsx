@@ -35,6 +35,10 @@ var ConversationsListItem = React.createClass({
 
         var megaChat = this.props.chatRoom.megaChat;
         var chatRoom = this.props.chatRoom;
+        if (!chatRoom || !chatRoom.roomJid) {
+            return null;
+        }
+
         var roomShortJid = chatRoom.roomJid.split("@")[0];
 
         // selected
@@ -268,7 +272,7 @@ var ConversationsList = React.createClass({
         sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
         sortedConversations.forEach((chatRoom) => {
-            if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
+            if (!chatRoom || !chatRoom.roomJid) {
                 return;
             }
 

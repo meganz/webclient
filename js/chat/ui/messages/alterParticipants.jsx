@@ -51,6 +51,11 @@ var AlterParticipantsConversationMessage = React.createClass({
             var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
             var otherDisplayName = otherContact.u === u_handle ? __("Me") : generateAvatarMeta(otherContact.u).fullName;
 
+            var text = __("Joined the group chat by invitation from %s").replace(
+                "%s",
+                '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
+            );
+
             messages.push(
                 <div className="message body" data-id={"id" + message.messageId} key={h}>
                     {avatar}
@@ -59,9 +64,7 @@ var AlterParticipantsConversationMessage = React.createClass({
                         <div className="message user-card-name">{otherDisplayName}</div>
                         {datetime}
 
-                        <div className="message text-block">
-                            Joined the group chat by invitation from <strong className="dark-grey-txt">{displayName}</strong>
-                        </div>
+                        <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
                     </div>
                 </div>
             )
@@ -77,6 +80,17 @@ var AlterParticipantsConversationMessage = React.createClass({
             var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
             var otherDisplayName = otherContact.u === u_handle ? __("Me") : generateAvatarMeta(otherContact.u).fullName;
 
+            var text;
+            if (otherContact.u === contact.u) {
+                text = __("Had left the group chat");
+            }
+            else {
+                text = __("Was removed from the group chat by %s").replace(
+                    "%s",
+                    '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
+                );
+            }
+
             messages.push(
                 <div className="message body" data-id={"id" + message.messageId} key={h}>
                     {avatar}
@@ -85,9 +99,7 @@ var AlterParticipantsConversationMessage = React.createClass({
                         <div className="message user-card-name">{otherDisplayName}</div>
                         {datetime}
 
-                        <div className="message text-block">
-                            Was removed from the group chat by <strong className="dark-grey-txt">{displayName}</strong>
-                        </div>
+                        <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
                     </div>
                 </div>
             )

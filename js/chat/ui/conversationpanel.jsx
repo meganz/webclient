@@ -55,14 +55,19 @@ var ConversationRightArea = React.createClass({
             // destroyed
             return null;
         }
-        var contactJid = room.getParticipantsExceptMe()[0];
-        var contact = room.megaChat.getContactFromJid(contactJid);
-
-
-        if (!contact) {
-            // something is really bad.
-            return null;
+        var contactJid;
+        var contact;
+        var contacts = room.getParticipantsExceptMe();
+        if (contacts && contacts.length > 0) {
+            contactJid = contacts[0];
+            contact = room.megaChat.getContactFromJid(contactJid);
         }
+        else {
+            contact = {};
+        }
+
+
+
         // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
         if (!room.isCurrentlyActive) {
             return null;
@@ -1070,8 +1075,13 @@ var ConversationPanel = React.createClass({
         if (!room || !room.roomJid) {
             return null;
         }
-        var contactJid = room.getParticipantsExceptMe()[0];
-        var contact = room.megaChat.getContactFromJid(contactJid);
+        var contacts = room.getParticipantsExceptMe();
+        var contactJid;
+        var contact;
+        if (contacts && contacts.length > 0) {
+            contactJid = contacts[0];
+            contact = room.megaChat.getContactFromJid(contactJid);
+        }
 
         var conversationPanelClasses = "conversation-panel";
 
@@ -1080,10 +1090,7 @@ var ConversationPanel = React.createClass({
         }
 
 
-        if (!contact) {
-            return null;
-        }
-        var avatarMeta = generateAvatarMeta(contact.u);
+        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
         var contactName = avatarMeta.fullName;
 
 
@@ -1766,11 +1773,10 @@ var ConversationPanels = React.createClass({
         self.props.conversations.forEach(function(chatRoom) {
             var otherParticipants = chatRoom.getParticipantsExceptMe();
 
-            if (!otherParticipants || otherParticipants.length === 0) {
-                return;
+            var contact;
+            if (otherParticipants && otherParticipants.length > 0) {
+                contact = megaChat.getContactFromJid(otherParticipants[0]);
             }
-
-            var contact = megaChat.getContactFromJid(otherParticipants[0]);
 
             // XX: Performance trick. However, scroll positions are NOT retained properly when switching conversations,
             // so this should be done some day in the future, after we have more stable product.

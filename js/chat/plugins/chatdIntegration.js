@@ -234,6 +234,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     if (included.length > 0 || excluded.length > 0) {
                         if (included.length > 0) {
                             ChatdIntegration._ensureKeysAreLoaded([], included);
+                            ChatdIntegration._ensureNamesAreLoaded(included);
                         }
 
                         chatRoom.trackDataChange();
@@ -480,6 +481,33 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
         });
     }
     return MegaPromise.allDone(promises);
+};
+
+
+ChatdIntegration._ensureNamesAreLoaded = function(users) {
+    if (Array.isArray(users)) {
+        users.forEach(function (userId) {
+            if (userId === strongvelope.COMMANDER) {
+                return;
+            }
+
+            if (!M.u[userId]) {
+                M.u.set(
+                    userId,
+                    new MegaDataObject(MEGA_USER_STRUCT, true, {
+                        'h': userId,
+                        'u': userId,
+                        'm': '',
+                        'c': 0
+                    })
+                );
+                M.syncUsersFullname(userId);
+            }
+            else {
+                M.syncUsersFullname(userId);
+            }
+        });
+    }
 };
 
 

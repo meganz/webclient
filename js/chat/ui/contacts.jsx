@@ -166,7 +166,7 @@ var ContactCard = React.createClass({
             var ButtonsUI = require('./../../ui/buttons.jsx');
             var DropdownsUI = require('./../../ui/dropdowns.jsx');
 
-            var moreDropdowns = this.props.dropdowns ? this.props.dropdowns : [];
+            var moreDropdowns = this.props.dropdowns ? $.extend([], this.props.dropdowns) : [];
 
             if (contact.c === 1) {
                 if (moreDropdowns.length > 0) {

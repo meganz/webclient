@@ -13518,5 +13518,29 @@
     "8858": {
         "text": "Modified",
         "context": "A label for any 'Modified' text or title. For example to show the modification date of a file\/folder."
+    },
+    "8859": {
+        "text": "Backup Recovery Key",
+        "context": "The is a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key."
+    },
+    "8861": {
+        "text": "Remove Recovery Key",
+        "context": "Menu item to let the user remove the recovery key (previously downloaded)"
+    },
+    "8862": {
+        "text": "The Recovery Key file has been removed.",
+        "context": "Success message when the Recovery Key file has been removed."
+    },
+    "8863": {
+        "text": "The Recovery Key has been exported into: ",
+        "context": "success message when the recovery key file has been downloaded"
+    },
+    "8864": {
+        "text": "You are removing the exported Recovery Key file",
+        "context": "confirmation message before removing the previously downloaded recovery key file"
+    },
+    "8865": {
+        "text": "You will have to enter your credentials (login and password) in the new app. If you don't remember your password, please Export your Recovery Key before uninstalling the v1 app.",
+        "context": "Message shown to tell the users that they should export the recovery key before uninstalling the old app"
     }
 }

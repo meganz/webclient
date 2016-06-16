@@ -3379,6 +3379,12 @@
     "8856": "Aggiunto",
     "8857": "Disponibile offline",
     "8858": "Modificato",
+    "8859": "Backuppa la Chiave di Recupero",
+    "8861": "Rimuovi la Chiave di Recupero",
+    "8862": "Il file della Chiave di Recupero \u00e8 stato rimosso.",
+    "8863": "La Chiave di Recupero \u00e8 stata esportata in:",
+    "8864": "Stai rimuovendo il file esportato della Chiave di Recupero",
+    "8865": "Dovrai inserire le tue credenziali (username e password) nella nuova app. Se non ricordi la tua password, per favore esporta la tua Chiave di Recupero prima di disinstallare la v1 dell&#039;app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

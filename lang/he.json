@@ -3379,6 +3379,12 @@
     "8856": "\u05d4\u05ea\u05d5\u05d5\u05e1\u05e3",
     "8857": "\u05d6\u05de\u05d9\u05df \u05d1\u05de\u05e6\u05d1 \u05dc\u05d0 \u05de\u05e7\u05d5\u05d5\u05df",
     "8858": "\u05d4\u05e9\u05ea\u05e0\u05d4",
+    "8859": "Backup Recovery Key",
+    "8861": "Remove Recovery Key",
+    "8862": "The Recovery Key file has been removed.",
+    "8863": "The Recovery Key has been exported into: ",
+    "8864": "You are removing the exported Recovery Key file",
+    "8865": "You will have to enter your credentials (login and password) in the new app. If you don&#039;t remember your password, please Export your Recovery Key before uninstalling the v1 app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

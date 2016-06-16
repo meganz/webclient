@@ -3379,6 +3379,12 @@
     "8856": "Adicionado",
     "8857": "Dispon\u00edvel offline",
     "8858": "Modificado",
+    "8859": "Salvar chave mestra",
+    "8861": "Remover chave mestra",
+    "8862": "The Recovery Key file has been removed.",
+    "8863": "The Recovery Key has been exported into: ",
+    "8864": "You are removing the exported Recovery Key file",
+    "8865": "You will have to enter your credentials (login and password) in the new app. If you don&#039;t remember your password, please Export your Recovery Key before uninstalling the v1 app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

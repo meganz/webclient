@@ -3379,6 +3379,12 @@
     "8856": "P\u0159id\u00e1no",
     "8857": "Dostupn\u00e9 offline",
     "8858": "Zm\u011bn\u011bno",
+    "8859": "Z\u00e1lohovat Obnovovac\u00ed kl\u00ed\u010d",
+    "8861": "Odebrat Obnovovac\u00ed kl\u00ed\u010d",
+    "8862": "Obnovovac\u00ed kl\u00ed\u010d byl odebr\u00e1n.",
+    "8863": "Obnovovac\u00ed kl\u00ed\u010d byl exportov\u00e1n do:",
+    "8864": "Odeb\u00edr\u00e1te exportovan\u00fd soubor Obnovovac\u00edho kl\u00ed\u010de",
+    "8865": "Budete muset zadat sv\u00e9 p\u0159ihla\u0161ovac\u00ed \u00fadaje (jm\u00e9no a heslo) v nov\u00e9 aplikaci. Pokud si nepamatujete sv\u00e9 heslo, exportujte si sv\u016fj Obnovovac\u00ed kl\u00ed\u010d p\u0159ed odinstalac\u00ed aplikace v1.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

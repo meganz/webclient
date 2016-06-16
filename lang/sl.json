@@ -3379,6 +3379,12 @@
     "8856": "Dodano",
     "8857": "Na voljo brez povezave",
     "8858": "Spremenjeno",
+    "8859": "Varnostna kopija re\u0161ilnega klju\u010da",
+    "8861": "Odstrani re\u0161ilni klju\u010d",
+    "8862": "The Recovery Key file has been removed.",
+    "8863": "The Recovery Key has been exported into: ",
+    "8864": "You are removing the exported Recovery Key file",
+    "8865": "You will have to enter your credentials (login and password) in the new app. If you don&#039;t remember your password, please Export your Recovery Key before uninstalling the v1 app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

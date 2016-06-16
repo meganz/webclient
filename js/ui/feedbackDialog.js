@@ -105,8 +105,12 @@
 
             self.$textarea = $('textarea', self.$dialog);
             self.$textarea
-                .val('');
-            
+                .val('')
+                .next()
+                .text('');
+ 
+            initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
+
             $('.collected-data', self.$dialog)
                 .html('');
 

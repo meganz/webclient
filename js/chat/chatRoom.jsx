@@ -1112,7 +1112,14 @@ ChatRoom.prototype.revokeAttachment = function(node) {
         );
     });
     MegaPromise.allDone(allPromises)
-        .done(function() {
+        .done(function(r) {
+            if (r && r[0] && r[0][0] && r[0][0] < 0) {
+                msgDialog(
+                    'warninga',
+                    __("Revoke attachment"),
+                    __("Could not revoke access to attachment, error code: %s.").replace("%s", r[0][0])
+                );
+            }
             // 1b, 1b, JSON
             self.sendMessage(
                 Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +

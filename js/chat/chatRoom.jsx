@@ -622,7 +622,7 @@ ChatRoom.prototype.getRoomTitle = function() {
                 );
             }
         });
-        return names.length > 0 ? names.join(", ") : __("(empty)");
+        return names.length > 0 ? names.join(", ") : __(l[8888]);
     }
 };
 
@@ -1133,8 +1133,8 @@ ChatRoom.prototype.revokeAttachment = function(node) {
         .fail(function(r) {
             msgDialog(
                 'warninga',
-                __("Revoke attachment"),
-                __("Could not revoke access to attachment, error code: %s.").replace("%s", r)
+                __(l[8891]),
+                __(l[8893]).replace("%s", r)
             );
         });
 

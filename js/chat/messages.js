@@ -139,23 +139,23 @@ Message.prototype.getManagementMessageSummaryText = function() {
     if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __("Attached: %s").replace("%s", nodes[0].name);
+            return __(l[8894]).replace("%s", nodes[0].name);
         }
         else {
-            return __("Attached %s files.").replace("%s", nodes.length);
+            return __(l[8895]).replace("%s", nodes.length);
         }
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __("Sent Contact: %s").replace("%s", nodes[0].name);
+            return __(l[8896]).replace("%s", nodes[0].name);
         }
         else {
-            return __("Sent %s Contacts.").replace("%s", nodes.length);
+            return __(l[8897]).replace("%s", nodes.length);
         }
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-        return __("Revoked access to attachment(s).");
+        return __(l[8892]);
     }
 };
 

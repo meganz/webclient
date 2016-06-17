@@ -255,7 +255,7 @@ var GenericConversationMessage = React.createClass({
 
             var displayName;
             if (contact) {
-                displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+                displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
             }
             else {
                 displayName = contact;
@@ -576,7 +576,7 @@ var GenericConversationMessage = React.createClass({
                                 >
                                     <DropdownsUI.DropdownItem
                                         icon="rounded-grey-plus"
-                                        label={__("Add contact")}
+                                        label={__(l[71])}
                                         onClick={() => {
                                             M.inviteContact(M.u[u_handle].m, contactEmail);
 
@@ -779,13 +779,13 @@ var GenericConversationMessage = React.createClass({
                 else if(message.deleted) {
                     messageDisplayBlock =  <div className="message text-block">
                         <em>
-                            {__("This message has been deleted.")}
+                            {__(l[8886])}
                         </em>
                     </div>;
                 }
                 else {
                     if (message.updated > 0) {
-                        textMessage = textMessage + " <em>" + __("(edited)") + "</em>";
+                        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
                     }
                     messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;
                 }

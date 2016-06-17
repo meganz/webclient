@@ -176,7 +176,7 @@ var ContactCard = React.createClass({
                 }
                 moreDropdowns.unshift(
                     <DropdownsUI.DropdownItem
-                            key="view" icon="human-profile" label={__("View Profile")} onClick={() => {
+                            key="view" icon="human-profile" label={__(l[8866])} onClick={() => {
                                 window.location = '#fm/' + contact.u;
                             }} />
                 );
@@ -273,7 +273,7 @@ var ContactPickerWidget = React.createClass({
                         self.props.nothingSelectedButtonLabel ?
                             self.props.nothingSelectedButtonLabel
                             :
-                            __("Select one or more contacts to start")
+                            __(l[8889])
                     }</em>
                 </div>;
             }
@@ -294,7 +294,7 @@ var ContactPickerWidget = React.createClass({
                                 self.props.multipleSelectedButtonLabel ?
                                     self.props.multipleSelectedButtonLabel
                                     :
-                                    __("Start Group Conversation")
+                                    __(l[8890])
                             }
                         </a>
                     </div>
@@ -409,10 +409,10 @@ var ContactPickerWidget = React.createClass({
         if (contacts.length === 0) {
             var noContactsMsg = "";
             if (M.u.length < 2) {
-                noContactsMsg = __("You have no contacts.");
+                noContactsMsg = __(l[8877]);
             }
             else {
-                noContactsMsg = __("No contacts found matching your query.");
+                noContactsMsg = __(l[8878]);
             }
 
             contacts = <em>{noContactsMsg}</em>;

@@ -21182,7 +21182,7 @@
 	                    moreDropdowns.unshift(React.makeElement("hr", { key: "separator" }));
 	                }
 	                moreDropdowns.unshift(React.makeElement(DropdownsUI.DropdownItem, {
-	                    key: "view", icon: "human-profile", label: __("View Profile"), onClick: function onClick() {
+	                    key: "view", icon: "human-profile", label: __(l[8866]), onClick: function onClick() {
 	                        window.location = '#fm/' + contact.u;
 	                    } }));
 	            }
@@ -21292,7 +21292,7 @@
 	                    React.makeElement(
 	                        "em",
 	                        null,
-	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __("Select one or more contacts to start")
+	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
 	            } else if (self.state.selected.length === 1) {
@@ -21319,7 +21319,7 @@
 	                        React.makeElement(
 	                            "a",
 	                            { href: "javascript:;", className: "default-white-button right", onClick: onSelectDoneCb },
-	                            self.props.multipleSelectedButtonLabel ? self.props.multipleSelectedButtonLabel : __("Start Group Conversation")
+	                            self.props.multipleSelectedButtonLabel ? self.props.multipleSelectedButtonLabel : __(l[8890])
 	                        )
 	                    )
 	                );
@@ -21420,9 +21420,9 @@
 	        if (contacts.length === 0) {
 	            var noContactsMsg = "";
 	            if (M.u.length < 2) {
-	                noContactsMsg = __("You have no contacts.");
+	                noContactsMsg = __(l[8877]);
 	            } else {
-	                noContactsMsg = __("No contacts found matching your query.");
+	                noContactsMsg = __(l[8878]);
 	            }
 
 	            contacts = React.makeElement(
@@ -22463,7 +22463,7 @@
 
 	                if (room.type === "group" && room.members) {
 	                    var removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
-	                        key: "remove", icon: "rounded-stop", label: __("Remove participant"), onClick: function onClick() {
+	                        key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
 	                            $(room).trigger('onRemoveUserRequest', [contactHash]);
 	                        } });
 
@@ -22472,13 +22472,13 @@
 	                        dropdowns.push(React.makeElement(
 	                            "div",
 	                            { key: "setPermLabel", className: "dropdown-items-info" },
-	                            __("Set permission:")
+	                            __(l[8868])
 	                        ));
 
 	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                            key: "privReadOnly", icon: "eye-icon",
 	                            className: "tick-item " + (room.members[contactHash] === 0 ? "active" : ""),
-	                            label: __("Read-Only"), onClick: function onClick() {
+	                            label: __(l[8873]), onClick: function onClick() {
 	                                if (room.members[contactHash] !== 0) {
 	                                    $(room).trigger('alterUserPrivilege', [contactHash, 0]);
 	                                }
@@ -22487,7 +22487,7 @@
 	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                            key: "privFullAcc", icon: "conversation-icon",
 	                            className: "tick-item " + (room.members[contactHash] === 2 ? "active" : ""),
-	                            label: __("Full Access"), onClick: function onClick() {
+	                            label: __(l[8874]), onClick: function onClick() {
 	                                if (room.members[contactHash] !== 2) {
 	                                    $(room).trigger('alterUserPrivilege', [contactHash, 2]);
 	                                }
@@ -22495,7 +22495,7 @@
 
 	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                            key: "privOperator", icon: "cogwheel-icon",
-	                            label: __("Moderator"),
+	                            label: __(l[8875]),
 	                            className: "tick-item " + (room.members[contactHash] === 3 ? "active" : ""),
 	                            onClick: function onClick() {
 	                                if (room.members[contactHash] !== 3) {
@@ -22553,7 +22553,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "chat-right-head-txt" },
-	                    __("Group members")
+	                    __(l[8876])
 	                )
 	            );
 	        }
@@ -22603,9 +22603,9 @@
 	                                exclude: excludedParticipants,
 	                                multiple: true,
 	                                className: "popup add-participant-selector",
-	                                singleSelectedButtonLabel: __("Add to group conversation"),
-	                                multipleSelectedButtonLabel: __("Add to group conversation"),
-	                                nothingSelectedButtonLabel: __("Select one or more contacts to continue"),
+	                                singleSelectedButtonLabel: __(l[8869]),
+	                                multipleSelectedButtonLabel: __(l[8869]),
+	                                nothingSelectedButtonLabel: __(l[8870]),
 	                                onSelectDone: this.props.onAddParticipantSelected,
 	                                positionMy: "center top",
 	                                positionAt: "left bottom"
@@ -22644,9 +22644,9 @@
 	                                    }
 	                                } },
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
-	                            __("Clear chat history")
+	                            __(l[8871])
 	                        ) : null,
-	                        room.type === "group" && !room.stateIsLeftOrLeaving() ? React.makeElement(
+	                        room.type === "group" ? React.makeElement(
 	                            "div",
 	                            { className: "link-button red", onClick: function onClick() {
 	                                    if (self.props.onLeaveClicked) {
@@ -23540,7 +23540,7 @@
 
 	            var msg;
 	            if (areMultipleUsersTyping === true) {
-	                msg = __("%s and %s are typing").replace("%s", namesDisplay[0]).replace("%s", namesDisplay[1]);
+	                msg = __(l[8872]).replace("%1", namesDisplay[0]).replace("%2", namesDisplay[1]);
 	            } else {
 	                msg = __(l[8629]).replace("%1", namesDisplay[0]);
 	            }
@@ -23612,7 +23612,7 @@
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
-	                    title: __("Delete message"),
+	                    title: __(l[8004]),
 	                    name: "delete-message",
 	                    onClose: function onClose() {
 	                        self.setState({ 'confirmDeleteDialog': false });
@@ -23643,7 +23643,7 @@
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog secondary-header" },
-	                        __("Are you sure you want to delete this message?")
+	                        __(l[8879])
 	                    ),
 	                    React.makeElement(GenericConversationMessage, {
 	                        className: "dialog-wrapper",
@@ -23662,7 +23662,7 @@
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
-	                    title: __("Clear chat history"),
+	                    title: __(l[8871]),
 	                    name: "truncate-conversation",
 	                    onClose: function onClose() {
 	                        self.setState({ 'truncateDialog': false });
@@ -23686,7 +23686,7 @@
 	                                    m: lastChatMessageId
 	                                }).fail(function (r) {
 	                                    if (r === -2) {
-	                                        msgDialog('warninga', l[135], __("You don't have the permission to clear the history of this conversation."));
+	                                        msgDialog('warninga', l[135], __(l[8880]));
 	                                    }
 	                                });
 	                            }
@@ -23703,7 +23703,7 @@
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog secondary-header" },
-	                        __("Are you sure you want to clear the history of this conversation?")
+	                        __(l[8881])
 	                    )
 	                )
 	            );
@@ -23733,7 +23733,7 @@
 	                    onLeaveClicked: function onLeaveClicked() {
 	                        room.members[u_handle] = 0;
 	                        room.trackDataChange();
-	                        $(room).trigger('onLeaveChatRequested');
+	                    },
 	                    },
 	                    onCloseClicked: function onCloseClicked() {
 	                        room.destroy();
@@ -23775,7 +23775,7 @@
 	                        "div",
 	                        { className: "dropdown notification-text" },
 	                        React.makeElement("i", { className: "small-icon conversations" }),
-	                        __("Message not sent. Will retry later.")
+	                        __(l[8882])
 	                    )
 	                ),
 	                React.makeElement(
@@ -23786,7 +23786,7 @@
 	                        "div",
 	                        { className: "dropdown notification-text" },
 	                        React.makeElement("i", { className: "small-icon conversations" }),
-	                        __("Message not sent. Click here if you want to re-send it.")
+	                        __(l[8883])
 	                    )
 	                ),
 	                React.makeElement(
@@ -23797,7 +23797,7 @@
 	                        "div",
 	                        { className: "dropdown notification-text" },
 	                        React.makeElement("i", { className: "small-icon conversations" }),
-	                        __("Message not sent. Click here if you want to cancel it.")
+	                        __(l[8884])
 	                    )
 	                ),
 	                React.makeElement(
@@ -25557,7 +25557,7 @@
 
 	            var displayName;
 	            if (contact) {
-	                displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+	                displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
 	            } else {
 	                displayName = contact;
 	            }
@@ -25886,7 +25886,7 @@
 	                                    },
 	                                    React.makeElement(DropdownsUI.DropdownItem, {
 	                                        icon: 'rounded-grey-plus',
-	                                        label: __("Add contact"),
+	                                        label: __(l[71]),
 	                                        onClick: function onClick() {
 	                                            M.inviteContact(M.u[u_handle].m, contactEmail);
 
@@ -26114,12 +26114,12 @@
 	                        React.makeElement(
 	                            'em',
 	                            null,
-	                            __("This message has been deleted.")
+	                            __(l[8886])
 	                        )
 	                    );
 	                } else {
 	                    if (message.updated > 0) {
-	                        textMessage = textMessage + " <em>" + __("(edited)") + "</em>";
+	                        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
 	                    }
 	                    messageDisplayBlock = React.makeElement('div', { className: 'message text-block', dangerouslySetInnerHTML: { __html: textMessage } });
 	                }
@@ -26433,7 +26433,7 @@
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -26448,7 +26448,7 @@
 	            };
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	            var otherDisplayName = otherContact.u === u_handle ? __("Me") : generateAvatarMeta(otherContact.u).fullName;
+	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
 
 	            var text = __("Joined the group chat by invitation from %s").replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
@@ -26478,7 +26478,7 @@
 	            };
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	            var otherDisplayName = otherContact.u === u_handle ? __("Me") : generateAvatarMeta(otherContact.u).fullName;
+	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
 
 	            var text;
 	            if (otherContact.u === contact.u) {
@@ -26501,6 +26501,9 @@
 	                    ),
 	                    datetime,
 	                    React.makeElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: text } })
+	                        "__(\"Was removed from the group chat by %s\").replace(\"%s\", '",
+	                        ),
+	                        "')"
 	                )
 	            ));
 	        });
@@ -26556,7 +26559,7 @@
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -27047,7 +27050,7 @@
 	                names.push(M.u[contactHash] ? M.getNameByHandle(contactHash) : "non contact");
 	            }
 	        });
-	        return names.length > 0 ? names.join(", ") : __("(empty)");
+	        return names.length > 0 ? names.join(", ") : __(l[8888]);
 	    }
 	};
 
@@ -27385,7 +27388,7 @@
 	    }).always(function () {
 	        loadingDialog.hide();
 	    }).fail(function (r) {
-	        msgDialog('warninga', __("Revoke attachment"), __("Could not revoke access to attachment, error code: %s.").replace("%s", r));
+	        msgDialog('warninga', __(l[8891]), __(l[8893]).replace("%s", r));
 	    });
 
 	    return allPromises;

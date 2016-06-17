@@ -21175,7 +21175,7 @@
 	            var ButtonsUI = __webpack_require__(158);
 	            var DropdownsUI = __webpack_require__(159);
 
-	            var moreDropdowns = this.props.dropdowns ? this.props.dropdowns : [];
+	            var moreDropdowns = this.props.dropdowns ? $.extend([], this.props.dropdowns) : [];
 
 	            if (contact.c === 1) {
 	                if (moreDropdowns.length > 0) {
@@ -22393,12 +22393,14 @@
 
 	            return null;
 	        }
-	        var contactJid = room.getParticipantsExceptMe()[0];
-	        var contact = room.megaChat.getContactFromJid(contactJid);
-
-	        if (!contact) {
-
-	            return null;
+	        var contactJid;
+	        var contact;
+	        var contacts = room.getParticipantsExceptMe();
+	        if (contacts && contacts.length > 0) {
+	            contactJid = contacts[0];
+	            contact = room.megaChat.getContactFromJid(contactJid);
+	        } else {
+	            contact = {};
 	        }
 
 	        if (!room.isCurrentlyActive) {
@@ -22646,7 +22648,7 @@
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            __(l[8871])
 	                        ) : null,
-	                        room.type === "group" ? React.makeElement(
+	                        room.type === "group" && !room.stateIsLeftOrLeaving() ? React.makeElement(
 	                            "div",
 	                            { className: "link-button red", onClick: function onClick() {
 	                                    if (self.props.onLeaveClicked) {
@@ -23309,8 +23311,13 @@
 	        if (!room || !room.roomJid) {
 	            return null;
 	        }
-	        var contactJid = room.getParticipantsExceptMe()[0];
-	        var contact = room.megaChat.getContactFromJid(contactJid);
+	        var contacts = room.getParticipantsExceptMe();
+	        var contactJid;
+	        var contact;
+	        if (contacts && contacts.length > 0) {
+	            contactJid = contacts[0];
+	            contact = room.megaChat.getContactFromJid(contactJid);
+	        }
 
 	        var conversationPanelClasses = "conversation-panel";
 
@@ -23318,10 +23325,7 @@
 	            conversationPanelClasses += " hidden";
 	        }
 
-	        if (!contact) {
-	            return null;
-	        }
-	        var avatarMeta = generateAvatarMeta(contact.u);
+	        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
 	        var contactName = avatarMeta.fullName;
 
 	        var messagesList = [];
@@ -23733,7 +23737,7 @@
 	                    onLeaveClicked: function onLeaveClicked() {
 	                        room.members[u_handle] = 0;
 	                        room.trackDataChange();
-	                    },
+	                        $(room).trigger('onLeaveChatRequested');
 	                    },
 	                    onCloseClicked: function onCloseClicked() {
 	                        room.destroy();
@@ -23958,11 +23962,10 @@
 	        self.props.conversations.forEach(function (chatRoom) {
 	            var otherParticipants = chatRoom.getParticipantsExceptMe();
 
-	            if (!otherParticipants || otherParticipants.length === 0) {
-	                return;
+	            var contact;
+	            if (otherParticipants && otherParticipants.length > 0) {
+	                contact = megaChat.getContactFromJid(otherParticipants[0]);
 	            }
-
-	            var contact = megaChat.getContactFromJid(otherParticipants[0]);
 
 	            conversations.push(React.makeElement(ConversationPanel, {
 	                chatRoom: chatRoom,
@@ -25652,7 +25655,7 @@
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[8005]),
 	                                            onClick: addToCloudDrive }),
 	                                        React.makeElement('hr', null),
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __("Revoke"), className: 'red',
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]), className: 'red',
 	                                            onClick: function onClick() {
 	                                                chatRoom.revokeAttachment(v);
 	                                            } })
@@ -26450,7 +26453,7 @@
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
 	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
 
-	            var text = __("Joined the group chat by invitation from %s").replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+	            var text = __(l[8907]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
 	            messages.push(React.makeElement(
 	                "div",
@@ -26482,9 +26485,9 @@
 
 	            var text;
 	            if (otherContact.u === contact.u) {
-	                text = __("Had left the group chat");
+	                text = __(l[8908]);
 	            } else {
-	                text = __("Was removed from the group chat by %s").replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+	                text = __(l[8906]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 	            }
 
 	            messages.push(React.makeElement(
@@ -26501,9 +26504,6 @@
 	                    ),
 	                    datetime,
 	                    React.makeElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: text } })
-	                        "__(\"Was removed from the group chat by %s\").replace(\"%s\", '",
-	                        ),
-	                        "')"
 	                )
 	            ));
 	        });
@@ -26598,7 +26598,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "message text-block" },
-	                    __("History has been cleared.")
+	                    __(l[8905])
 	                )
 	            )
 	        );

@@ -360,7 +360,7 @@ var GenericConversationMessage = React.createClass({
 
                                         <hr />
 
-                                        <DropdownsUI.DropdownItem icon="red-cross" label={__("Revoke")} className="red"
+                                        <DropdownsUI.DropdownItem icon="red-cross" label={__(l[8909])} className="red"
                                                                   onClick={() => {
                                                 chatRoom.revokeAttachment(v);
                                             }}/>

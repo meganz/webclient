@@ -49,9 +49,9 @@ var AlterParticipantsConversationMessage = React.createClass({
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
-            var otherDisplayName = otherContact.u === u_handle ? __("Me") : generateAvatarMeta(otherContact.u).fullName;
+            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
 
-            var text = __("Joined the group chat by invitation from %s").replace(
+            var text = __(l[8907]).replace(
                 "%s",
                 '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
             );
@@ -78,14 +78,14 @@ var AlterParticipantsConversationMessage = React.createClass({
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
-            var otherDisplayName = otherContact.u === u_handle ? __("Me") : generateAvatarMeta(otherContact.u).fullName;
+            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
 
             var text;
             if (otherContact.u === contact.u) {
-                text = __("Had left the group chat");
+                text = __(l[8908]);
             }
             else {
-                text = __("Was removed from the group chat by %s").replace(
+                text = __(l[8906]).replace(
                     "%s",
                     '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
                 );

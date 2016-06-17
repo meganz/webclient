@@ -54,7 +54,7 @@ var TruncatedMessage = React.createClass({
                     {datetime}
 
                     <div className="message text-block">
-                        {__("History has been cleared.")}
+                        {__(l[8905])}
                     </div>
                 </div>
             </div>

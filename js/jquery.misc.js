@@ -129,7 +129,7 @@ $.tresizer.last = 0;
  *	Less error prone, less code lines :-)
  *	@crodas
  */
-jQuery.fn.extend({
+/*jQuery.fn.extend({
 	rebind: function(actions, callback) {
 		return this.each(function() {
 			var $this = $(this);
@@ -137,4 +137,13 @@ jQuery.fn.extend({
 			$this.bind(actions, callback);
 		});
 	}
-});
+});*/
+// Rewritten to be less overkill, too ;)
+$.fn.rebind = function(actions, callback) {
+    var i = 0;
+    var l = this.length;
+    while (l > i) {
+        $(this[i++]).unbind(actions).bind(actions, callback);
+    }
+    return this;
+};

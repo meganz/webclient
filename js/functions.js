@@ -2697,7 +2697,7 @@ function disableDescendantFolders(id, pref) {
     return true;
 }
 
-function obj_values(obj) {
+var obj_values = function obj_values(obj) {
     var vals = [];
 
     Object.keys(obj).forEach(function(memb) {
@@ -2707,6 +2707,10 @@ function obj_values(obj) {
     });
 
     return vals;
+}
+
+if (typeof Object.values === 'function') {
+    obj_values = Object.values;
 }
 
 function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {

@@ -1898,6 +1898,7 @@ function MegaData()
                 target = '!' +  this.currentdirid;
             }
             newHashLocation = '#F!' + pfid + '!' + pfkey + target;
+            M.lastSeenFolderLink = newHashLocation;
         }
         else {
             // new hash location can be altered already by the chat logic in the previous lines in this func

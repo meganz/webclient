@@ -1767,9 +1767,9 @@ function topmenuUI() {
         }
     });
 
-    if (M && M.currentdirid && M.currentdirid.substr(0, 7) == 'search/') {
+    if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
         $('.top-search-bl').addClass('contains-value');
-        $('.top-search-bl input').val(M.currentdirid.replace('search/', ''));
+        $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
     if (u_type) {

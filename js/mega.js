@@ -505,10 +505,39 @@ function MegaData()
         return v;
     };
 
+    /* legacy method
     this.filterByParent = function(id) {
         this.filterBy(function(node) {
             return (node.p === id) || (node.p && (node.p.length === 11) && (id === 'shares'));
         });
+    };*/
+
+    this.filterByParent = function(id) {
+        if (id === 'shares') {
+            this.filterBy(function(node) {
+                return (node.p === 'shares') || (node.p && node.p.length === 11);
+            });
+        }
+        else if (id === 'contacts') {
+            this.filterBy(function(node) {
+                // Fill M.v with active contacts only
+                return (node.p === 'contacts') && (node.c === 1);
+            });
+        }
+        // We should have a parent's childs into M.c, no need to traverse the whole M.d
+        else if (M.c[id]) {
+            this.v = [];
+            for (var handle in this.c[id]) {
+                if (this.d[handle]) {
+                    this.v.push(this.d[handle]);
+                }
+            }
+        }
+        else {
+            this.filterBy(function(node) {
+                return (node.p === id);
+            });
+        }
     };
 
     this.filterBySearch = function(str) {
@@ -667,7 +696,7 @@ function MegaData()
         }
 
         $(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
-        $(lSel).parent().children('table').hide();
+        $(lSel).hide().parent().children('table').hide();
 
         $('.files-grid-view.fm.shared-folder-content').addClass('hidden');
 
@@ -846,701 +875,59 @@ function MegaData()
     };
 
     /**
-     * renderMain
-     *
-     * @param {type} u
-     * @returns {unresolved}
+     * Render cloud listing layout.
+     * @param {Boolean} aUpdate  Whether we're updating the list
      */
-    this.renderMain = function(u) {
+    this.renderMain = function(aUpdate) {
+        var numRenderedNodes = -1;
 
-        /**
-         * flush_cached_nodes
-         *
-         * @param {integer} n
-         *
-         */
-        function flush_cached_nodes(n) {
-            var canvas,
-                num = n,
-                e = cache.splice(0, num || cache.length);
+        if (d) {
+            console.time('renderMain');
+        }
 
-            if (e.length) {
-                canvas = M.viewmode == 0 ? $('.grid-table.fm') : $('.file-block-scrolling').data('jsp').getContentPane();
+        if (!aUpdate) {
+            this.megaRender = new MegaRender(this.viewmode);
+        }
 
-                for (var i in e) {
-                    if (M.v[e[i][0]] && M.v[e[i][0]].h === e[i][2]) {
-                        M.v[e[i][0]].seen = true;
-                    }
-                    else {
-                        if (d > 1) {
-                            console.log('desync cached node...', e[i][2]);
-                        }
+        // cleanupLayout will render an "empty grid" layout if there
+        // are no nodes in the current list (Ie, M.v), if so no need
+        // to call renderLayout therefore.
+        if (this.megaRender.cleanupLayout(aUpdate, this.v, this.fsViewSel)) {
 
-                        for (var k in M.v) {
-                            if (M.v[k].h === e[i][2]) {
-                                M.v[k].seen = true;
-                                break;
-                            }
-                        }
-                    }
-                    canvas.append(e[i][1]);
-                }
-                if (M.dynlistRt) {
-                    clearTimeout(M.dynlistRt);
-                }
-                M.dynlistRt = setTimeout(function() {
-                    delete M.dynlistRt;
-                    M.rmSetupUI();
-                }, 750);
-                $(window).trigger('resize');
+            if (this.currentdirid === 'opc') {
+                this.drawSentContactRequests(this.v, 'clearGrid');
+            }
+            else if (this.currentdirid === 'ipc') {
+                this.drawReceivedContactRequests(this.v, 'clearGrid');
             }
             else {
-                $(lSel).unbind('jsp-scroll-y.dynlist');
-            }
-        }// flush_cached_nodes END
-
-        /**
-         * mInsertNode
-         *
-         * @param {string} aNode
-         * @param {string} aPrevNode
-         * @param {string} aNextNode
-         * @param {string} aTag
-         * @param {} aElement
-         * @param {} aHTMLContent
-         * @param {} aUpdate
-         * @param {} aDynCache
-         *
-         */
-        function mInsertNode(aNode, aPrevNode, aNextNode, aTag, aElement, aHTMLContent, aUpdate, aDynCache) {
-            if (!aUpdate || $(aTag + ' ' + aElement).length === 0) {
-                // 1. if the current view does not have any nodes, just append it
-                if (aDynCache) {
-                    cache.push(aDynCache);
-                }
-                else {
-                    $(aTag).append(aHTMLContent);
-                }
-            }
-            else {
-                var j;
-                if ($(aTag + ' #' + aNode.h).length) {
-                    files--;
-                    aNode.seen = true;
-                    return;
-                }
-
-                if (aDynCache) {
-                    // console.log(i, aNode.name,cache.map(n=>n[2]));
-
-                    if (aNode.t) {
-                        for (var x = 0, m = cache.length; x < m && cache[x][3]; ++x);
-                        cache.splice(x, 0, aDynCache);
-                    }
-                    else {
-                        cache.push(aDynCache);
-                    }
-                    return;
-                }
-
-                if (aUpdate && aPrevNode && $(aTag + ' #' + aPrevNode.h).length) {
-                    // 2. if there is a node before the new node in the current view, add it after that node:
-                    $(aTag + ' #' + aPrevNode.h).after(aHTMLContent);
-                }
-                else if (aUpdate && aNextNode && $(aTag + ' #' + aNextNode.h).length) {
-                    // 3. if there is a node after the new node in the current view, add it before that node:
-                    $(aTag + ' #' + aNextNode.h).before(aHTMLContent);
-                }
-                else if (aNode.t) {
-                    // 4. new folder: insert new node before the first folder in the current view
-                    $($(aTag + ' ' + aElement)[0]).before(aHTMLContent);
-                }
-                else {// !aNode.t)
-                    // 5. new file: insert new node before the first file in the current view
-                    var a = $(aTag + ' ' + aElement).not('.folder');
-                    if (a.length > 0) {
-                        $(a[0]).before(aHTMLContent);
-                    }
-                    else {
-                        // 6. if this view does not have any files, insert after the last folder
-                        a = $(aTag + ' ' + aElement);
-                        $(a[a.length - 1]).after(aHTMLContent);
-                    }
-                }
-            }
-        }// mInsertNode END
-
-        /*
-         * renerContactsLayout
-         *
-         * @param {} u
-         *
-         */
-        var chatIsReady = megaChatIsReady;
-        function renderContactsLayout(u) {
-            var u_h, contact, node, avatar, el, t, html, onlinestatus,
-                cs = M.contactstatus(u_h),
-                time = time2last(cs.ts),
-                timems = cs.ts,
-                interactionclass = 'cloud-drive';
-
-            if (cs.files === 0 && cs.folders === 0) {
-                time = l[1051];
-                interactionclass = 'never';
-            }
-
-            // Render all items given in glob M.v
-            for (var i in M.v) {
-                u_h = M.v[i].h;
-                contact = M.u[u_h];
-
-                // do not render invalid..
-                if (!contact) {
-                    continue;
-                }
-
-                // chat is enabled?
-                if (chatIsReady) {
-                    if (contact && contact.lastChatActivity > timems) {
-                        interactionclass = 'conversations';
-                        time = time2last(contact.lastChatActivity);
-
-                        var room = megaChat.getPrivateRoom(u_h);
-                        if (room && megaChat.plugins.chatNotifications) {
-                            if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
-                                interactionclass = 'unread-conversations';
-                            }
-                        }
-
-                    }
-                }
-
-                node = M.d[u_h];
-                avatar = useravatar.contact(u_h, "nw-contact-avatar");
-
-                onlinestatus = M.onlineStatusClass(
-                    chatIsReady &&
-                    megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
-                );
-
-                if (M.viewmode === 1) {
-                    el = 'div';
-                    t = '.contacts-blocks-scrolling';
-                    html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(M.v[i].h) + '">\n\
-                                <span class="nw-contact-status"></span>\n\
-                                <span class="file-settings-icon"></span>\n\
-                                ' + avatar + ' \
-                                <span class="shared-folder-info-block">\n\
-                                    <span class="shared-folder-name">' + htmlentities(node.name) + '</span>\n\
-                                    <span class="shared-folder-info">' + htmlentities(node.m) + '</span>\n\
-                                </span>\n\
-                            </a>';
-                }
-                else {
-                    el = 'tr';
-                    t = '.grid-table.contacts';
-                    html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
-                                <td>\n\
-                                    ' + avatar + ' \
-                                    <div class="fm-chat-user-info todo-star">\n\
-                                        <div class="fm-chat-user">' + htmlentities(M.getNameByHandle(node.u)) + '</div>\n\
-                                        <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
-                                    </div>\n\
-                                </td>\n\
-                                <td width="240">\n\
-                                    <div class="ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '">\n\
-                                        <div class="nw-contact-status"></div>\n\
-                                        <div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div>\n\
-                                        <div class="clear"></div>\n\
-                                    </div>\n\
-                                </td>\n\
-                                <td width="270">\n\
-                                    <div class="contacts-interation li_' + u_h + '"></div>\n\
-                                </td>\n\
-                                <td class="grid-url-header-nw">\n\
-                                    <a class="grid-url-arrow"></a>\n\
-                                </td>\n\
-                            </tr>';
-                }
-                mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u);
-
-                getLastInteractionWith(u_h);
-            }
-        }// renderContactsLayout END
-
-        /*
-         * renderLayout
-         *
-         * render layouts different from contacts, opc and ipc
-         *
-         * @param {} u
-         * @param {int} n_cache
-         * @param {int} files
-         *
-         * @returns {int}
-         */
-        function renderLayout(u, n_cache) {
-            var html, cs, contains, u_h, t, el, time, bShare,
-                avatar, rights, rightsclass, onlinestatus, html,
-                sExportLink, additionClass, titleTooltip, fName, fIcon, takenDown, takenDownTitle,
-                undecryptableClass = '',
-                iShareNum = 0,
-                nodeType = '',
-                s, ftype, cc, star;
-
-            for (var i in M.v) {
-
-                var nodeData = M.v[i];
-                var nodeHandle = nodeData.h;
-
-                s  = '';
-                nodeType  = '';
-                cc = null;
-                undecryptableClass = '';
-                titleTooltip = '';
-                fName = '';
-                fIcon = '';
-                ftype = '';
-
-                if (nodeData.t) {
-                    ftype = l[1049];
-                    nodeType = 'folder';
-                    fIcon = 'folder';
-                }
-                else {
-                    ftype = filetype(M.v[i].name);
-                    s = htmlentities(bytesToSize(M.v[i].s));
-                    nodeType = 'file';
-                }
-                star = nodeData.fav ? ' star' : '';
-
-                fName = htmlentities(nodeData.name);
-
-                // Undecryptable node indicators
-                if (missingkeys[nodeHandle]) {
-                    undecryptableClass = 'undecryptable';
-                    fIcon = 'generic';
-                    ftype = l[7381];// i.e. 'unknown'
-
-                    // Taken down item
-                    if (nodeData && nodeData.shares && nodeData.shares.EXP && nodeData.shares.EXP.down) {
-                        titleTooltip = (nodeData.t === 1) ? (l[7705] + '\n') : (l[7704] + '\n');
-                    }
-
-                    if (nodeType === 'folder') {
-                        titleTooltip += l[8595];
-                        fName = l[8686];// i.e. 'undecrypted folder'
-                    }
-                    else if (nodeType === 'file') {
-                        titleTooltip += l[8602];
-                        fName = l[8687];// i.e. 'undecrypted file'
-                    }
-                }
-
-                if (M.currentdirid === 'shares') {// render shares tab
-
-                    // Handle of initial share owner
-                    var ownersHandle = M.v[i].su;
-                    var fullContactName = htmlentities(M.getNameByHandle(ownersHandle));
-
-                    cs = M.contactstatus(nodeHandle);
-                    contains = fm_contains(cs.files, cs.folders);
-                    u_h = ownersHandle || M.v[i].p;
-                    rights = l[55];
-                    rightsclass = ' read-only';
-                    onlinestatus = M.onlineStatusClass(
-                        chatIsReady &&
-                        megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
-                    );
-
-                    if (cs.files === 0 && cs.folders === 0) {
-                        contains = l[1050];
-                    }
-                    if (nodeData.r === 1) {
-                        rights = l[56];
-                        rightsclass = ' read-and-write';
-                    }
-                    else if (nodeData.r === 2) {
-                        rights = l[57];
-                        rightsclass = ' full-access';
-                    }
-
-                    if (M.viewmode === 1) {
-                        t = '.shared-blocks-scrolling';
-                        avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
-                        el = 'a';
-                        html = '<a class="file-block folder ' + undecryptableClass + '" id="'
-                            + htmlentities(nodeHandle) + '" title="'
-                            + titleTooltip + '"><span class="file-status-icon '
-                            + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass)
-                            + '"></span><span class="file-settings-icon">' +
-                            '</span><span class="file-icon-area">'
-                            + '<span class="block-view-file-type ' + fIcon + '"></span></span>'
-                            + avatar
-                            + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
-                            + fName + '</span><span class="shared-folder-info">by '
-                            + fullContactName + '</span></span></a>';
-                    }
-                    else {
-                        t = '.shared-grid-view .grid-table.shared-with-me';
-                        el = 'tr';
-                        avatar = useravatar.contact(u_h, 'nw-contact-avatar');
-
-                        html = '<tr id="' + htmlentities(nodeHandle)
-                            + '" class="' + undecryptableClass + '" title="'
-                            + titleTooltip + '">'
-                            + '<td width="30"><span class="grid-status-icon ' + htmlentities(star)
-                            + '"></span></td><td><div class="shared-folder-icon"></div>'
-                            + '<div class="shared-folder-info-block"><div class="shared-folder-name">'
-                            + fName + '</div><div class="shared-folder-info">'
-                            + htmlentities(contains)
-                            + '</div></div> </td><td width="240">'
-                            + avatar
-                            + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
-                            + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div>'
-                            + '<div class="fm-chat-user">'
-                            + fullContactName + '</div><div class="nw-contact-status"></div>'
-                            + '<div class="fm-chat-user-status ' + htmlentities(u_h)
-                            + '">' + htmlentities(onlinestatus[0])
-                            + '</div><div class="clear"></div></div></td><td width="270">'
-                            + '<div class="shared-folder-access'
-                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td>'
-                            + '<td class="grid-url-header-nw"><a class="grid-url-arrow"></a></td></tr>';
-                    }
-                }
-
-                // switching from contacts tab
-                else if (M.currentdirid.length === 11 && M.currentrootid === 'contacts') {
-                    cs = M.contactstatus(nodeHandle);
-                    contains = fm_contains(cs.files, cs.folders);
-                    if (cs.files === 0 && cs.folders === 0) {
-                        contains = l[1050];
-                    }
-                    var rights = l[55], rightsclass = ' read-only';
-                    if (nodeData.r === 1) {
-                        rights = l[56];
-                        rightsclass = ' read-and-write';
-                    }
-                    else if (nodeData.r === 2) {
-                        rights = l[57];
-                        rightsclass = ' full-access';
-                    }
-
-                    if (M.viewmode === 1) {
-                        t = '.fm-blocks-view.contact-details-view .file-block-scrolling';
-                        el = 'a';
-                        /* jshint -W043 */
-                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block folder">\n\
-                                    <span class="file-status-icon"></span>\n\
-                                    <span class="file-settings-icon"></span>\n\
-                                    <span class="shared-folder-access ' + rightsclass + '"></span>\n\
-                                    <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type folder-shared"><img alt=""></span>\n\
-                                    </span>\n\
-                                    <span class="file-block-title">' + fName + '</span>\n\
-                                </a>';
-                        /* jshint +W043 */
-                    }
-                    else {
-                        t = '.contacts-details-block .grid-table.shared-with-me';
-                        el = 'tr';
-                        /* jshint -W043 */
-                        html = '<tr id="' + htmlentities(nodeHandle) + '">\n\
-                                    <td width="30">\n\
-                                        <span class="grid-status-icon"></span>\n\
-                                    </td>\n\
-                                    <td>\n\
-                                        <div class="shared-folder-icon"></div>\n\
-                                        <div class="shared-folder-info-block">\n\
-                                            <div class="shared-folder-name">' + fName + '</div>\n\
-                                            <div class="shared-folder-info">' + contains + '</div>\n\
-                                        </div>\n\
-                                    </td>\n\
-                                    <td width="270">\n\
-                                        <div class="shared-folder-access ' + rightsclass + '">' + rights + '</div>\n\
-                                    </td>\n\
-                                    <td class="grid-url-header-nw">\n\
-                                        <a class="grid-url-arrow"></a>\n\
-                                    </td>\n\
-                                </tr>';
-                        /* jshint +W043 */
-                    }
-                }
-                else {
-
-                    if (nodeData.shares) {
-                        iShareNum = Object.keys(nodeData.shares).length;
-                    }
-                    else {
-                        iShareNum = 0;
-                    }
-                    bShare = (
-                        (nodeData.shares && nodeData.shares.EXP && iShareNum > 1)
-                        || (nodeData.shares && !nodeData.shares.EXP && iShareNum)
-                        || M.ps[nodeHandle])
-                        ? true : false;
-                    sExportLink = (nodeData.shares && nodeData.shares.EXP) ? 'linked' : '';
-                    additionClass = '';
-                    fIcon = fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name });
-
-                    if (nodeData && nodeData.shares && nodeData.shares.EXP && nodeData.shares.EXP.down) {
-                        additionClass = 'taken-down';
-
-                        if (nodeData.t === 1) {// folder
-                            titleTooltip = l[7705];
-
-                            // Undecryptable node indicators
-                            if (missingkeys[nodeHandle]) {
-                                titleTooltip += '\n' + l[8595];
-                            }
-                        }
-                        else {// file
-                            titleTooltip = l[7704];
-
-                            // Undecryptable node indicators
-                            if (missingkeys[nodeHandle]) {
-                                titleTooltip += '\n' + l[8602];
-                            }
-                        }
-
-                    }
-
-                    // Block view
-                    if (M.viewmode === 1) {
-                        t = '.fm-blocks-view.fm .file-block-scrolling';
-                        el = 'a';
-                        /* jshint -W043 */
-                        html = '<a id="' + htmlentities(nodeHandle) + '" class="file-block '
-                            + nodeType + ' ' + sExportLink + ' ' + additionClass + ' '
-                            + undecryptableClass + '" title="' + titleTooltip + '">\n\
-                                    <span class="file-status-icon' + star + '"></span>\n\
-                                    <span class="data-item-icon"></span>\n\
-                                    <span class="file-settings-icon"></span>\n\
-                                    <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type '
-                            + fileIcon({ t: nodeData.t, share: bShare, name: nodeData.name })
-                            + '"><img alt="" /></span>\n\
-                                    </span>\n\
-                                    <span class="file-block-title">' + fName + '</span>\n\
-                                </a>';
-                        /* jshint +W043 */
-                    }
-
-                    // List view
-                    else {
-                        if (M.lastColumn && nodeData.p !== "contacts") {
-                            time = time2date(nodeData[M.lastColumn] || nodeData.ts);
-                        }
-                        else {
-                            time = time2date(nodeData.ts
-                                || (nodeData.p === 'contacts' && M.contactstatus(nodeHandle).ts));
-                        }
-                        t = '.grid-table.fm';
-                        el = 'tr';
-                        /* jshint -W043 */
-                        html = '<tr id="' + htmlentities(nodeHandle) + '" class="'
-                            + nodeType + ' ' + additionClass + ' '
-                            + undecryptableClass + '" title="' + titleTooltip + '">\n\
-                                    <td width="50">\n\
-                                        <span class="grid-status-icon' + star + '"></span>\n\
-                                    </td>\n\
-                                    <td>\n\
-                                        <span class="transfer-filtype-icon '
-                            + fileIcon({t: nodeData.t, share: bShare, name: nodeData.name}) + '"> </span>\n\
-                                        <span class="tranfer-filetype-txt">' + fName + '</span>\n\
-                                    </td>\n\
-                                    <td width="100">' + s + '</td>\n\
-                                    <td width="130">' + ftype + '</td>\n\
-                                    <td width="120">' + time + '</td>\n\
-                                    <td width="62" class="grid-url-field own-data ' + sExportLink + '">\n\
-                                        <a class="grid-url-arrow"></a>\n\
-                                        <span class="data-item-icon"></span>\n\
-                                    </td>\n\
-                                </tr>';
-                        /* jshint +W043 */
-                    }
-
-                    if (!(nodeData.seen = n_cache > files++)) {
-                        cc = [i, html, nodeHandle, nodeData.t];
-                    }
-                }
-                mInsertNode(nodeData, M.v[i-1], M.v[i+1], t, el, html, u, cc);
-            }
-        }// renderLayout END
-
-        var n_cache, lSel,
-            cache = [],
-            files = 0;
-
-        if (d) console.log('renderMain', u);
-
-        lSel = this.fsViewSel;
-        $(lSel).unbind('jsp-scroll-y.dynlist');
-        $(window).unbind("resize.dynlist");
-        sharedFolderUI();
-        $.tresizer();
-
-        hideEmptyGrids();
-
-        if (!u) {
-            deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
-            deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
-            deleteScrollPanel('.file-block-scrolling', 'jsp');
-
-            initOpcGridScrolling();
-            initIpcGridScrolling();
-
-            $('.grid-table tr').remove();
-            $('.file-block-scrolling a').remove();
-            $('.contacts-blocks-scrolling a').remove();
-        }
-
-        var u_h = M.currentdirid;
-        var user = M.d[u_h];
-        $(lSel).parent().children('table').show();
-
-        if (user) {
-            $('.contact-share-notification').text(user.name + ' shared the following folders with you:').removeClass('hidden');
-        }
-
-        // Check elements number, if empty draw empty grid
-        if (this.v.length === 0) {
-            if (M.RubbishID && M.currentdirid === M.RubbishID) {
-                $('.fm-empty-trashbin').removeClass('hidden');
-            }
-            else if (M.currentdirid === 'contacts') {
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
-                $('.fm-empty-contacts').removeClass('hidden');
-            }
-            else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                $('.fm-empty-contacts').removeClass('hidden');
-            }
-            else if (String(M.currentdirid).substr(0, 7) === 'search/') {
-                $('.fm-empty-search').removeClass('hidden');
-            }
-            else if (M.currentdirid === M.RootID && folderlink) {
-                if (!isValidShareLink()) {
-                    $('.fm-invalid-folder').removeClass('hidden');
-                }
-                else {
-                    $('.fm-empty-folder-link').removeClass('hidden');
-                }
-            }
-            else if (M.currentdirid === M.RootID) {
-                $('.fm-empty-cloud').removeClass('hidden');
-            }
-            else if (M.currentdirid === M.InboxID) {
-                $('.fm-empty-messages').removeClass('hidden');
-            }
-            else if (M.currentdirid === 'shares') {
-                $('.fm-empty-incoming').removeClass('hidden');
-            }
-            else if (M.currentrootid === M.RootID) {
-                $('.fm-empty-folder').removeClass('hidden');
-            }
-            else if (M.currentrootid === 'shares') {
-                this.emptySharefolderUI(lSel);
-            }
-            else if (M.currentrootid === 'contacts') {
-                $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
-                $('.contact-share-notification').addClass('hidden');
-            }
-        }
-        else if (this.currentdirid.length !== 11 && !~['contacts', 'shares', 'ipc', 'opc'].indexOf(this.currentdirid)) {
-            if (this.viewmode === 1) {
-                var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
-                n_cache = r * Math.ceil($('.fm-blocks-view.fm').height() / 164) + r;
-            }
-            else {
-                n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
-            }
-            if (!n_cache) {
-                this.cRenderMainN = this.cRenderMainN || 1;
-                if (++this.cRenderMainN < 4)
-                    return Soon(function() {
-                        M.renderMain(u);
-                    });
-            }
-            else {
-                $.rmItemsInView = n_cache;
+                numRenderedNodes = this.megaRender.renderLayout(aUpdate, this.v);
             }
         }
 
-        delete this.cRenderMainN;
+        // No need to bind mouse events etc (gridUI/iconUI/selecddUI)
+        // if there weren't new rendered nodes (Ie, they were cached)
+        if (numRenderedNodes) {
 
+            if (!aUpdate) {
+                contactUI();
 
-        if (this.currentdirid === 'opc') {
-            DEBUG('RenderMain() opc');
-            this.drawSentContactRequests(this.v, 'clearGrid');
-        }
-        else if (this.currentdirid === 'ipc') {
-            DEBUG('RenderMain() ipc');
-            this.drawReceivedContactRequests(this.v, 'clearGrid');
-        }
-        else if (this.currentdirid === 'contacts') {
-            renderContactsLayout(u);
-        }
-        else {
-            M.setLastColumn(localStorage._lastColumn);
-            renderLayout(u, n_cache);
-        }
-
-        contactUI();// ToDo: Document this function,
-
-        $(window).unbind('dynlist.flush');
-        $(window).bind('dynlist.flush', function() {
-            if (cache.length)
-                flush_cached_nodes();
-        });
-
-        if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
-        if (cache.length) {
-            $(lSel).bind('jsp-scroll-y.dynlist', function(ev, pos, top, bot) {
-                if (bot) {
-                    flush_cached_nodes(n_cache);
+                if (this.viewmode) {
+                    fa_duplicates = {};
+                    fa_reqcnt = 0;
                 }
-            });
 
-            var cdid = M.currentdirid;
-            $(window).bind("resize.dynlist", SoonFc(function() {
-                if (cdid !== M.currentdirid) {
-                    return;
+                if ($.rmItemsInView) {
+                    $.rmInitJSP = this.fsViewSel;
                 }
-                if (cache.length) {
-                    if (!$(lSel).find('.jspDrag:visible').length) {
-                        var n;
+            }
 
-                        if (M.viewmode === 1) {
-                            var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
-                            n = r * Math.ceil($('.fm-blocks-view').height() / 164) - $('.fm-blocks-view.fm a').length;
-                        }
-                        else {
-                            n = 2 + Math.ceil($('.files-grid-view.fm').height() / 24 - $('.files-grid-view.fm tr').length);
-                        }
-
-                        if (n > 0) {
-                            flush_cached_nodes(n);
-                        }
-                    }
-                }
-                else
-                {
-                    $(window).unbind("resize.dynlist");
-                }
-            }));
+            this.rmSetupUI(aUpdate);
         }
 
-        if (this.viewmode == 1) {
-            fa_duplicates = {};
-            fa_reqcnt = 0;
+        if (d) {
+            console.timeEnd('renderMain');
         }
-
-        this.rmSetupUI(u);
-
-        if (!u && n_cache)
-            $.rmInitJSP = lSel;
     };
 
     this.rmSetupUI = function(u) {
@@ -1551,15 +938,16 @@ function MegaData()
                 o.append('<div class="clear"></div>');
             }
             iconUI(u);
-            fm_thumbnails();
+            if (!u) {
+                fm_thumbnails();
+            }
         }
         else {
             Soon(gridUI);
         }
         Soon(fmtopUI);
 
-        $('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
-        $('.grid-scrolling-table .grid-url-arrow').bind('click', function(e) {
+        $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(e) {
             var target = $(this).closest('tr');
             if (target.attr('class').indexOf('ui-selected') == -1) {
                 target.parent().find('tr').removeClass('ui-selected');
@@ -1573,7 +961,7 @@ function MegaData()
             contextMenuUI(e, 1);
         });
 
-        $('.file-block .file-settings-icon').bind('click', function(e) {
+        $('.file-block .file-settings-icon').rebind('click', function(e) {
             var target = $(this).parents('.file-block');
             if (target.attr('class').indexOf('ui-selected') == -1) {
                 target.parent().find('a').removeClass('ui-selected');
@@ -1599,14 +987,12 @@ function MegaData()
                     $.selected = [M.currentdirid];
                 }
 
-                $('.shared-details-info-block .grid-url-arrow').unbind('click');
-                $('.shared-details-info-block .grid-url-arrow').bind('click', function (e) {
+                $('.shared-details-info-block .grid-url-arrow').rebind('click', function (e) {
                     prepareShareMenuHandler(e);
                     contextMenuUI(e, 1);
                 });
 
-                $('.shared-details-info-block .fm-share-download').unbind('click');
-                $('.shared-details-info-block .fm-share-download').bind('click', function (e) {
+                $('.shared-details-info-block .fm-share-download').rebind('click', function (e) {
                     prepareShareMenuHandler(e);
                     var $this = $(this);
                     e.clientX = $this.offset().left;
@@ -1615,8 +1001,7 @@ function MegaData()
                     contextMenuUI(e, 3);
                 });
 
-                $('.shared-details-info-block .fm-share-copy').unbind('click');
-                $('.shared-details-info-block .fm-share-copy').bind('click', function (e) {
+                $('.shared-details-info-block .fm-share-copy').rebind('click', function (e) {
                     $.copyDialog = 'copy'; // this is used like identifier when key with key code 27 is pressed
                     $.mcselected = M.RootID;
                     $('.copy-dialog .dialog-copy-button').addClass('active');
@@ -1627,8 +1012,7 @@ function MegaData()
                 });
 
                 // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
-                $('.shared-details-info-block .fm-leave-share').unbind('click');
-                $('.shared-details-info-block .fm-leave-share').bind('click', function (e) {
+                $('.shared-details-info-block .fm-leave-share').rebind('click', function (e) {
 
                     // Get the share ID from the hash in the URL
                     var shareId = window.location.hash.replace('#fm/', '');
@@ -2793,14 +2177,6 @@ function MegaData()
         }
     };
 
-    this.getById = function(id)
-    {
-        if (this.d[id])
-            return this.d[id];
-        else
-            return false;
-    };
-
     this.rubNodes = {};
 
     this.addNode = function(n, ignoreDB) {
@@ -2925,7 +2301,7 @@ function MegaData()
         if (typeof newnodes !== 'undefined') {
             newnodes.push(n);
         }
-        $(window).trigger("megaNodeAdded", [n]);
+        // $(window).trigger("megaNodeAdded", [n]);
     };
 
     this.delNode = function(h) {
@@ -5718,16 +5094,16 @@ function renderNew() {
         if (newNode.h.length === 11) {
             newcontact = true;
         }
-        if (typeof newNode.su !== 'undefined') {
+        if (newNode.su) {
             newshare = true;
         }
-        if (newNode && newNode.p && newNode.t) {
+        if (newNode.p && newNode.t) {
             treebuild[newNode.p] = 1;
         }
         if (newNode.p === M.currentdirid || newNode.h === M.currentdirid) {
             UImain = true;
         }
-        if ($('#path_' + newNode.h).length > 0) {
+        if (!newpath && document.getElementById('path_' + newNode.h)) {
             newpath = true;
         }
     }
@@ -5744,7 +5120,7 @@ function renderNew() {
         M.filterByParent(M.currentdirid);
         M.sort();
         M.renderMain(true);
-        M.renderPath();
+        // M.renderPath();
         $.tresizer();
     }
 
@@ -5771,20 +5147,9 @@ function renderNew() {
     if (newshare) {
         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
     }
-    initContextUI();
+    // initContextUI();
     if (newpath) {
         M.renderPath();
-    }
-
-    // handle the Inbox section use cases
-    if (M.hasInboxItems() === true) {
-        $('.nw-fm-left-icon.inbox').removeClass('hidden');
-    }
-    else {
-        $('.nw-fm-left-icon.inbox').addClass('hidden');
-        if ($('.nw-fm-left-icon.inbox').is(".active") === true) {
-            M.openFolder(M.RootID);
-        }
     }
 
     if (u_type === 0) {
@@ -6339,7 +5704,7 @@ function execsc(actionPackets, callback) {
             M.avatars(loadavatars);
         }
         if (M.viewmode) {
-            fm_thumbnails();
+            delay('thumbnails', fm_thumbnails, 3200);
         }
         if ($.dialog === 'properties') {
             propertiesDialog();

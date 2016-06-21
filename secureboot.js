@@ -1424,6 +1424,7 @@ else if (!b_u)
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
     // UI Elements
+    jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
     jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
     jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});

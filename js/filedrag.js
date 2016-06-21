@@ -139,15 +139,25 @@
         else if (item.isDirectory) {
             dir_inflight++;
             var dirReader = item.createReader();
-            dirReader.readEntries(function(entries) {
-                for (var i = 0; i < entries.length; i++) {
-                    traverseFileTree(entries[i], path + item.name + "/");
-                }
-                if (--dir_inflight == 0) {
-                    addupload(filedrag_u);
-                    filedrag_u = [];
-                }
-            });
+            var dirReaderIterator = function() {
+                dirReader.readEntries(function(entries) {
+                    if (entries.length) {
+                        var i = entries.length;
+                        while (i--) {
+                            traverseFileTree(entries[i], path + item.name + "/");
+                        }
+
+                        dirReaderIterator();
+                    }
+                    else {
+                        if (!--dir_inflight) {
+                            addupload(filedrag_u);
+                            filedrag_u = [];
+                        }
+                    }
+                });
+            };
+            dirReaderIterator();
         }
         if (d && dir_inflight == 0) {
             console.log('end');

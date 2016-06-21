@@ -99,12 +99,17 @@ var crypt = (function () {
      *     Mega user handle.
      * @param keyType {string}
      *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
+     * @param userData {string}
+     *     Optional argument, any provided data will be passed to the fullfiled promise.
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      */
-    ns.getPubKeyAttribute = function(userhandle, keyType) {
-        assertUserHandle(userhandle);
-        if (typeof ns.PUBKEY_ATTRIBUTE_MAPPING[keyType] === 'unknown') {
+    ns.getPubKeyAttribute = function(userhandle, keyType, userData) {
+        // According to doShare() this can be an email for RSA keyType
+        if (keyType !== 'RSA' || String(userhandle).indexOf('@') < 1) {
+            assertUserHandle(userhandle);
+        }
+        if (typeof ns.PUBKEY_ATTRIBUTE_MAPPING[keyType] === 'undefined') {
             throw new Error('Unsupported key type to retrieve: ' + keyType);
         }
 
@@ -118,19 +123,38 @@ var crypt = (function () {
             /** Function to settle the promise for the RSA pub key attribute. */
             var __settleFunction = function(res, ctx, xhr, fromCache) {
                 if (typeof res === 'object') {
+
+                    var debugUserHandle = userhandle;
+                    if (userhandle !== res.u) {
+                        debugUserHandle += ' (' + res.u + ')';
+                    }
+
                     var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
+
+                    // cache it, the legacy way.
+                    u_pubkeys[userhandle] = u_pubkeys[res.u] = pubKey;
+
                     logger.debug('Got ' + keyType + ' pub key of user '
-                                 + userhandle + ': ' + JSON.stringify(pubKey));
+                                 + debugUserHandle + ': ' + JSON.stringify(pubKey));
 
                     if (!fromCache && attribCache) {
-                        attribCache.setItem(cacheKey, JSON.stringify(res));
+                        // if an email was provided, cache it using the user-handle
+                        if (String(userhandle).indexOf('@') > 0) {
+                            cacheKey = res.u + "_@uk";
+                        }
+                        attribCache.setItem(cacheKey, JSON.stringify(res))
+                            .always(function() {
+                                masterPromise.resolve(pubKey, [res, userData]);
+                            });
                     }
-                    masterPromise.resolve(pubKey);
+                    else {
+                        masterPromise.resolve(pubKey, [res, userData]);
+                    }
                 }
                 else {
                     logger.error(keyType + ' pub key for ' + userhandle
                                  + ' could not be retrieved: ' + res);
-                    masterPromise.reject(res);
+                    masterPromise.reject(res, [res, userData]);
                 }
             };
 
@@ -140,7 +164,7 @@ var crypt = (function () {
 
             var __retrieveRsaKeyFunc = function() {
                 // Fire it off.
-                api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+                api_req({ 'a': 'uk', 'u': userhandle, 'i': requesti }, myCtx);
             };
 
             if (attribCache) {
@@ -594,8 +618,8 @@ var crypt = (function () {
      */
     ns.setPubKey = function(pubKey, keyType) {
         var keyCache = ns.getPubKeyCacheMapping(keyType);
-        if (typeof keyCache === 'unknown') {
-            throw('Illegal key type to set: ' + keyType);
+        if (typeof keyCache === 'undefined') {
+            throw new Error('Illegal key type to set: ' + keyType);
         }
         logger.debug('Setting ' + keyType + ' public key', u_handle, pubKey);
         keyCache[u_handle] = pubKey;
@@ -2571,17 +2595,30 @@ function api_cachepubkeys(users) {
         keyPromises.push(crypt.getPubRSA(u[i]));
     }
 
-    // Make a promise for the bunch of them, and define settlement handlers.
-    var compoundPromise = MegaPromise.all(keyPromises);
-    compoundPromise.done(function __getKeysDone() {
-        logger.debug('Cached RSA pub keys for users ' + JSON.stringify(u));
-    });
-    compoundPromise.fail(function __getKeysFail(reason) {
-        logger.error('Failed to cache RSA pub keys for users' + JSON.stringify(u)
-                     + ': ' + reason);
-    });
+    var gotPubRSAForEveryone = function() {
+        for (i = u.length; i--;) {
+            if (!u_pubkeys[u[i]]) {
+                return false;
+            }
+        }
+        return true;
+    };
+    var promise = new MegaPromise();
 
-    return compoundPromise;
+    // Make a promise for the bunch of them, and define settlement handlers.
+    MegaPromise.allDone(keyPromises)
+        .always(function __getKeysDone() {
+            if (gotPubRSAForEveryone()) {
+                logger.debug('Cached RSA pub keys for users ' + JSON.stringify(u));
+                promise.resolve.apply(promise, arguments);
+            }
+            else {
+                logger.warn('Failed to cache RSA pub keys for users' + JSON.stringify(u), arguments);
+                promise.reject.apply(promise, arguments);
+            }
+        });
+
+    return promise;
 }
 
 /**

@@ -2844,10 +2844,21 @@ function fmtopUI() {
         }
 
     }
-    $('.fm-clearbin-button').unbind('click');
-    $('.fm-clearbin-button').bind('click', function() {
+    $('.fm-clearbin-button').rebind('click', function() {
         doClearbin(false);
     });
+
+    // handle the Inbox section use cases
+    if (M.hasInboxItems()) {
+        $('.nw-fm-left-icon.inbox').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.inbox').addClass('hidden');
+
+        if (M.currentrootid === M.InboxID) {
+            M.openFolder(M.RootID);
+        }
+    }
 }
 
 function doClearbin(selected)
@@ -4456,7 +4467,7 @@ function gridUI() {
 
     $.gridHeader = function() {
         var headerColumn = '';
-        $('.grid-table tbody tr:first-child td:visible').each(function(i, e) {
+        $('.grid-table tr:first-child td:visible').each(function(i, e) {
             headerColumn = $('.grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
@@ -4465,7 +4476,7 @@ function gridUI() {
 
     $.detailsGridHeader = function() {
         var headerColumn = '';
-        $('.contact-details-view .grid-table tbody tr:first-child td').each(function(i, e) {
+        $('.contact-details-view .grid-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.contact-details-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
@@ -5437,15 +5448,20 @@ function searchPath()
 }
 
 function selectddUI() {
-    if (M.currentdirid && M.currentdirid.substr(0, 7) == 'account')
+    if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         return false;
+    }
+
     if (d) {
         console.time('selectddUI');
     }
+
+    var mainSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
     var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
     if (M.currentrootid === 'contacts') {
-        dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
+        dropSel = mainSel;
     }
+
     $(dropSel).droppable(
         {
             tolerance: 'pointer',
@@ -5462,9 +5478,14 @@ function selectddUI() {
                 $.doDD(e, ui, 'out', 0);
             }
         });
-    if ($.gridDragging)
+
+    if ($.gridDragging) {
         $('body').addClass('dragging ' + ($.draggingClass || ''));
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).draggable(
+    }
+
+    var $ddUIitem = $(mainSel);
+    var $ddUIgrid = $($.selectddUIgrid);
+    $ddUIitem.draggable(
         {
             start: function(e, u)
             {
@@ -5538,7 +5559,7 @@ function selectddUI() {
 
     $('.ui-selectable-helper').remove();
 
-    $($.selectddUIgrid).selectable({
+    $ddUIgrid.selectable({
         filter: $.selectddUIitem,
         start: function(e, u) {
             $.hideContextMenu(e);
@@ -5559,10 +5580,9 @@ function selectddUI() {
     if (!window.fmShortcuts) {
         window.fmShortcuts = new FMShortcuts();
     }
-    selectionManager = new SelectionManager($($.selectddUIgrid));
+    selectionManager = new SelectionManager($ddUIgrid);
 
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).bind('contextmenu', function(e)
+    $ddUIitem.rebind('contextmenu', function(e)
     {
         if ($(this).attr('class').indexOf('ui-selected') == -1)
         {
@@ -5575,8 +5595,7 @@ function selectddUI() {
         return !!contextMenuUI(e, 1);
     });
 
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('click');
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).bind('click', function(e)
+    $ddUIitem.rebind('click', function(e)
     {
         if ($.gridDragging)
             return false;
@@ -5628,8 +5647,7 @@ function selectddUI() {
         return false;
     });
 
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('dblclick');
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).bind('dblclick', function(e)
+    $ddUIitem.rebind('dblclick', function(e)
     {
         var h = $(e.currentTarget).attr('id');
         var n = M.d[h] || {};
@@ -5657,6 +5675,8 @@ function selectddUI() {
     if (d) {
         console.timeEnd('selectddUI');
     }
+
+    $ddUIitem = $ddUIgrid = undefined;
 }
 
 function iconUI(aQuiet)
@@ -5708,8 +5728,7 @@ function iconUI(aQuiet)
         if (!aQuiet) initFileblocksScrolling();
     }
 
-    $('.fm-blocks-view,.shared-blocks-view').unbind('contextmenu');
-    $('.fm-blocks-view,.shared-blocks-view').bind('contextmenu', function(e)
+    $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e)
     {
         $('.file-block').removeClass('ui-selected');
         selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
@@ -10195,16 +10214,17 @@ function fm_thumbnails()
         fa_tnwait = y;
     if (d)
         console.time('fm_thumbnails');
-    if (myURL)
+    if (M.viewmode || M.chat)
     {
         for (var i in M.v)
         {
-            var n = Object(M.v[i]);
-            if (n.fa && String(n.fa).indexOf(':0') > 0)
+            var n = M.v[i];
+            if (n && n.fa && String(n.fa).indexOf(':0') > 0)
             {
                 if (fa_tnwait == n.h && n.seen)
                     fa_tnwait = 0;
-                if (!fa_tnwait && !thumbnails[n.h] && !th_requested[n.h])
+                // if (!fa_tnwait && !thumbnails[n.h] && !th_requested[n.h])
+                if (n.seen && !thumbnails[n.h] && !th_requested[n.h])
                 {
                     if (typeof fa_duplicates[n.fa] == 'undefined')
                         fa_duplicates[n.fa] = 0;
@@ -10294,14 +10314,12 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
+        var imgNode = document.getElementById(n.h);
 
-        var e = M.chat ? $('#' + n.h + '.img-block') : $('#' + n.h + '.file-block');
-
-        if (e.length > 0) {
-            e = e.find('img:first');
-            e.attr('src', thumbnails[n.h]);
-            e.parent().addClass('thumb');
+        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
             n.seen = 2;
+            imgNode.setAttribute('src', thumbnails[n.h]);
+            imgNode.parentNode.classList.add('thumb');
         }
     }
 }
@@ -10493,13 +10511,15 @@ function fm_resize_handler() {
         'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
     });
 
-    var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
+    if (M.currentrootid === 'shares') {
+        var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
 
-    if (!isNaN(shared_block_height)) {
-        $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
-            'height': shared_block_height + "px",
-            'min-height': shared_block_height + "px"
-        });
+        if (shared_block_height > 0) {
+            $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
+                'height': shared_block_height + "px",
+                'min-height': shared_block_height + "px"
+            });
+        }
     }
 
     if (d) {
@@ -10527,6 +10547,7 @@ function sharedFolderUI() {
     // Browsing shared content
     if ($('.shared-details-block').length > 0) {
 
+        $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').removeAttr('style');
         $('.shared-details-block .shared-folder-content').unwrap();
         $('.shared-folder-content').removeClass('shared-folder-content');
         $('.shared-top-details').remove();

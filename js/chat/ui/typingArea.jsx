@@ -125,9 +125,9 @@ var TypingArea = React.createClass({
         }
 
         var $container = $(ReactDOM.findDOMNode(self));
-        var val = $('.chat-textarea:visible textarea:visible', $container).val();
+        var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
 
-        if ($.trim(val).length > 0) {
+        if (val.length > 0) {
             if (self.props.onConfirm(val) !== true) {
                 self.setState({typedMessage: ""});
             }
@@ -150,7 +150,7 @@ var TypingArea = React.createClass({
         var self = this;
         var key = e.keyCode || e.which;
         var element = e.target;
-        var val = element.value;
+        var val = $.trim(element.value);
 
         if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
 

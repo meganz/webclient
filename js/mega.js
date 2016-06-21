@@ -3549,7 +3549,7 @@ function MegaData()
 
         if (t.length === 11 && !u_pubkeys[t]) {
             var keyCachePromise = api_cachepubkeys([t]);
-            keyCachePromise.done(function _cachepubkeyscomplete() {
+            keyCachePromise.always(function _cachepubkeyscomplete() {
                 if (u_pubkeys[t]) {
                     M.copyNodes(cn, t, del, callback, callbackError);
                 }
@@ -6875,12 +6875,17 @@ function doShare(nodeId, targets, dontShowShareDialog) {
         var accessRights = value.r;
 
         // Search by email only don't use handle cause user can re-register account
-        api_req({ 'a': 'uk', 'u': email, 'i': requesti }, {
+        crypt.getPubKeyAttribute(email, 'RSA', {
             targetEmail: email,
-            shareAccessRightsLevel: accessRights,
-            callback: function (result) {
+            shareAccessRightsLevel: accessRights
+        })
+            .always(function (pubKey, result) {
 
                 var sharePromise = new MegaPromise();
+
+                // parse [api-result, user-data-ctx]
+                var ctx = result[1];
+                result = result[0];
 
                 if (result.pubk) {
                     var userHandle = result.u;
@@ -6889,13 +6894,13 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                     usersWithHandle = [];
 
                     if (M.u[userHandle] && M.u[userHandle].c !== 0) {
-                        usersWithHandle.push({ 'r': this.shareAccessRightsLevel, 'u': userHandle });
+                        usersWithHandle.push({ 'r': ctx.shareAccessRightsLevel, 'u': userHandle });
                     }
                     else {
                         usersWithHandle.push({
-                            'r': this.shareAccessRightsLevel,
+                            'r': ctx.shareAccessRightsLevel,
                             'u': userHandle, 'k': result.pubk,
-                            'm': this.targetEmail
+                            'm': ctx.targetEmail
                         });
                     }
 
@@ -6908,19 +6913,18 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                 else {
                     // NOT ok, user doesn't have account yet
                     usersWithoutHandle = [];
-                    usersWithoutHandle.push({ 'r': this.shareAccessRightsLevel, 'u': this.targetEmail });
+                    usersWithoutHandle.push({ 'r': ctx.shareAccessRightsLevel, 'u': ctx.targetEmail });
                     sharePromise = api_setshare1({
                         node: nodeId,
                         targets: usersWithoutHandle,
                         sharenodes: childNodesId
                     });
                     sharePromise.done(function _sharePromiseWithoutHandleDone(result) {
-                        _shareDone(result, this.targetEmail);
+                        _shareDone(result, ctx.targetEmail);
                     });
                     masterPromise.linkFailTo(sharePromise);
                 }
-            }
-        });
+            });
     });
 
     return masterPromise;

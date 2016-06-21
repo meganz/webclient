@@ -228,10 +228,12 @@
             }
         }
 
-        var dataTransfer = e.dataTransfer;
-        var files = e.target.files || (dataTransfer && dataTransfer.files);
+        var dataTransfer = Object(e.dataTransfer);
+        var files = e.target.files || dataTransfer.files;
         if (!files || files.length == 0) {
-            return false;
+            if (!is_chrome_firefox || !dataTransfer.mozItemCount) {
+                return false;
+            }
         }
         if (e.dataTransfer
                 && e.dataTransfer.items

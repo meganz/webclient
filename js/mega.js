@@ -45,10 +45,12 @@ if (typeof loadingDialog === 'undefined') {
     loadingDialog.show = function() {
         $('.dark-overlay').show();
         $('.loading-spinner').removeClass('hidden').addClass('active');
+        this.active = true;
     };
     loadingDialog.hide = function() {
         $('.dark-overlay').hide();
         $('.loading-spinner').addClass('hidden').removeClass('active');
+        this.active = false;
    };
 }
 if (typeof loadingInitDialog === 'undefined') {
@@ -211,6 +213,10 @@ function MegaData()
         mBroadcaster.sendMessage("MegaDataReset");
     };
     this.reset();
+
+    this.getPropNames = function(memb) {
+        return Object.getOwnPropertyNames(Object(this[memb]));
+    };
 
     this.sortBy = function(fn, d)
     {
@@ -541,11 +547,106 @@ function MegaData()
     };
 
     this.filterBySearch = function(str) {
-        str = str.replace('search/', '');
-        this.filterBy(function(node) {
-            if (node.name && str && node.name.toLowerCase().indexOf(str.toLowerCase()) >= 0)
-                return true;
-        });
+        str = decodeURIComponent(String(str || '').replace('search/', '')).toLowerCase();
+
+        if (str[0] === '~') {
+            var command = str.substr(1);
+            str = null;
+
+            /*jshint -W089 */
+            if (command === 'findupes') {
+                var nodesByHash = {};
+
+                for (var node in M.d) {
+                    node = M.d[node];
+
+                    if (node && node.hash && node.h && RootbyId(node.h) === M.RootID) {
+                        if (!nodesByHash[node.hash]) {
+                            nodesByHash[node.hash] = [];
+                        }
+                        nodesByHash[node.hash].push(node);
+                    }
+                }
+
+                var dupes = Object.keys(nodesByHash).filter(function(hash) {
+                    return nodesByHash[hash].length > 1;
+                });
+
+                M.v = [];
+                for (var i in dupes) {
+                    M.v = M.v.concat(nodesByHash[dupes[i]]);
+                }
+
+                if (M.overrideModes) {
+                    M.overrideModes = 0;
+                    M.overrideViewMode = 1;
+                    M.overrideSortMode = ['size', -1];
+                }
+
+                // Wait for M.openFolder to finish and set colors to matching hashes
+                M.onRenderFinished = function() {
+                    var find = M.viewmode ? 'a' : 'tr';
+                    $(window).trigger('dynlist.flush');
+                    $(M.fsViewSel).find(find).each(function() {
+                        var $this = $(this);
+                        var node = M.d[$this.attr('id')];
+
+                        if (node) {
+                            var color = crc32(asmCrypto.SHA256.hex(node.hash)) >>> 8;
+
+                            if (M.viewmode) {
+                                var r = (color >> 16) & 0xff;
+                                var g = (color >> 8) & 0xff;
+                                var b = color & 0xff;
+
+                                $this.find('.file-block-title')
+                                    .css({
+                                        'border-radius': '0 0 8px 8px',
+                                        'background-color': 'rgba(' + r + ',' + g + ',' + b + ',0.3)'
+                                    });
+                            }
+                            else {
+                                color = ("00" + color.toString(16)).slice(-6);
+
+                                $this.find('.transfer-filtype-icon')
+                                    .css('background-color', '#' + color);
+                            }
+                        }
+                    });
+                    loadingDialog.hide();
+                };
+            }
+            else {
+                console.error('Unknown search command', command);
+                str = '~' + command;
+            }
+            /*jshint +W089 */
+        }
+
+        if (str) {
+            // Simple glob/wildcard support.
+            // spaces are replaced with *, and * moved to regexp's .* matching
+            var regex;
+            str = str.replace(/\s+/g, '*');
+
+            if (str.indexOf('*') !== -1) {
+                try {
+                    regex = RegExp(str.replace(/(\W)/g, '\\$1').replace(/\\\*/g, '.*'), 'i');
+                }
+                catch (ex) {}
+            }
+
+            if (regex) {
+                this.filterBy(function(node) {
+                    return regex.test(node.name);
+                });
+            }
+            else {
+                this.filterBy(function(node) {
+                    return (node.name && node.name.toLowerCase().indexOf(str) !== -1);
+                });
+            }
+        }
     };
 
     this.hasInboxItems = function() {
@@ -947,6 +1048,10 @@ function MegaData()
         }
         Soon(fmtopUI);
 
+        if (M.onRenderFinished) {
+            Soon(M.onRenderFinished);
+            delete M.onRenderFinished;
+        }
         $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(e) {
             var target = $(this).closest('tr');
             if (target.attr('class').indexOf('ui-selected') == -1) {
@@ -1200,10 +1305,16 @@ function MegaData()
             else {
                 M.filterByParent(M.currentdirid);
             }
+
             var viewmode = 0;// 0 is list view, 1 block view
-            if (typeof fmconfig.uiviewmode !== 'undefined' && fmconfig.uiviewmode) {
-                if (fmconfig.viewmode)
+            if (M.overrideViewMode !== undefined) {
+                viewmode = M.overrideViewMode;
+                delete M.overrideViewMode;
+            }
+            else if (typeof fmconfig.uiviewmode !== 'undefined' && fmconfig.uiviewmode) {
+                if (fmconfig.viewmode) {
                     viewmode = fmconfig.viewmode;
+                }
             }
             else if (typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined') {
                 viewmode = fmconfig.viewmodes[id];
@@ -1217,7 +1328,11 @@ function MegaData()
                 }
             }
             M.viewmode = viewmode;
-            if (fmconfig.uisorting && fmconfig.sorting) {
+            if (M.overrideSortMode) {
+                M.doSort(M.overrideSortMode[0], M.overrideSortMode[1]);
+                delete M.overrideSortMode;
+            }
+            else if (fmconfig.uisorting && fmconfig.sorting) {
                 M.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
             }
             else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {

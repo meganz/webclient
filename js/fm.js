@@ -2584,6 +2584,8 @@ function initContextUI() {
         propertiesDialog();
     });
 
+    $(c + '.findupes-item').rebind('click', mega.utils.findDupes);
+
     $(c + '.permissions-item').rebind('click', function() {
         if (d) {
             console.log('permissions');
@@ -4255,6 +4257,8 @@ function accountUI() {
             avatarDialog();
         });
         $('.fm-account-avatar').html(useravatar.contact(u_handle));
+
+        $('#find-duplicate').rebind('click', mega.utils.findDupes);
 
         $.tresizer();
 
@@ -6221,6 +6225,9 @@ function contextMenuUI(e, ll) {
             flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
+            }
+            else {
+                flt += ',.findupes-item';
             }
             if (M.v.length) {
                 flt += ',.zipdownload-item,.download-item';
@@ -10519,6 +10526,17 @@ function fm_resize_handler() {
         console.timeEnd('fm_resize_handler');
     }
 }
+
+/**
+ * Fire "find duplicates"
+ */
+mega.utils.findDupes = function() {
+    loadingDialog.show();
+    Soon(function() {
+        M.overrideModes = 1;
+        location.hash = '#fm/search/~findupes';
+    });
+};
 
 function sharedFolderUI() {
     /* jshint -W074 */

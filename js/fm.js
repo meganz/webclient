@@ -4280,9 +4280,12 @@ function accountUI() {
         $('.membership-big-txt.email').hide();
     }
 
-    $('.editprofile').unbind('click');
-    $('.editprofile').bind('click', function() {
+    $('.editprofile').rebind('click', function() {
         document.location.hash = 'fm/account/profile';
+    });
+
+    $('.rubbish-bin-link').rebind('click', function() {
+        document.location.hash = 'fm/rubbish';
     });
 
     // Cancel account button on main Account page

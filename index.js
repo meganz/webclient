@@ -1762,6 +1762,12 @@ function topmenuUI() {
         else if ($.dlhash) {
             document.location.hash = $.dlhash;
         }
+        else if (folderlink && M.lastSeenFolderLink) {
+            $(document).one('MegaOpenFolder', function() {
+                $('.nw-fm-left-icon.transfers').click();
+            });
+            location.hash = M.lastSeenFolderLink;
+        }
         else {
             document.location.hash = 'fm';
         }

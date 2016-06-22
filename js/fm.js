@@ -5978,7 +5978,7 @@ function transferPanelUI()
         if (!$(this).hasClass('disabled')) {
             if ($(this).hasClass('active')) {
                 // terms of service
-                if (u_type || u_attr.terms) {
+                if (u_type || folderlink || Object(u_attr).terms) {
                     [dlQueue, ulQueue].forEach(function(queue) {
                         Object.keys(queue._qpaused).map(fm_tfsresume);
                     });

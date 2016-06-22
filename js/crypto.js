@@ -183,7 +183,6 @@ var crypt = (function () {
             else {
                 __retrieveRsaKeyFunc();
             }
-
         }
         else {
             var pubKeyPromise = mega.attr.get(userhandle,
@@ -420,7 +419,11 @@ var crypt = (function () {
          * @private
          */
         var __resolveSignatureVerification = function(result) {
-            var pubKey = result[0][0];
+            var pubKey = result[0];
+            if (keyType === 'RSA') {
+                // getPubKeyAttribute returned more than a single argument
+                pubKey = pubKey[0];
+            }
             var signingKey = result[1];
             var signature = base64urldecode(result[2]);
             var signatureVerification = ns._checkSignature(signature, pubKey,

@@ -1397,6 +1397,7 @@ function MegaData()
                 target = '!' +  this.currentdirid;
             }
             newHashLocation = '#F!' + pfid + '!' + pfkey + target;
+            M.lastSeenFolderLink = newHashLocation;
         }
         else {
             // new hash location can be altered already by the chat logic in the previous lines in this func
@@ -4361,8 +4362,14 @@ function MegaData()
         if (d) {
             dlmanager.logger.error('dlerror', gid, error);
         }
-        else if (error !== EOVERQUOTA) {
-            srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
+        else {
+            if (error !== EOVERQUOTA) {
+                srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
+            }
+            else if (!dl.log509 && !dl.logOverQuota && Object(u_attr).p) {
+                dl.logOverQuota = 1;
+                api_req({ a: 'log', e: 99615, m: 'PRO user got EOVERQUOTA' });
+            }
         }
 
         switch (error) {

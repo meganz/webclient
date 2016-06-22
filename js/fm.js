@@ -4280,9 +4280,12 @@ function accountUI() {
         $('.membership-big-txt.email').hide();
     }
 
-    $('.editprofile').unbind('click');
-    $('.editprofile').bind('click', function() {
+    $('.editprofile').rebind('click', function() {
         document.location.hash = 'fm/account/profile';
+    });
+
+    $('.rubbish-bin-link').rebind('click', function() {
+        document.location.hash = 'fm/rubbish';
     });
 
     // Cancel account button on main Account page
@@ -5975,7 +5978,7 @@ function transferPanelUI()
         if (!$(this).hasClass('disabled')) {
             if ($(this).hasClass('active')) {
                 // terms of service
-                if (u_type || u_attr.terms) {
+                if (u_type || folderlink || Object(u_attr).terms) {
                     [dlQueue, ulQueue].forEach(function(queue) {
                         Object.keys(queue._qpaused).map(fm_tfsresume);
                     });

@@ -378,6 +378,10 @@ var dlmanager = {
         }
 
         if (code === 509) {
+            if (!dl.log509 && Object(u_attr).p) {
+                dl.log509 = 1;
+                api_req({ a: 'log', e: 99614, m: 'PRO user got 509' });
+            }
             this.showOverQuotaDialog(task);
             dlmanager.dlReportStatus(dl, EOVERQUOTA);
             return 1;
@@ -801,6 +805,8 @@ var dlmanager = {
             return delay('overfreequota:retry', this._onQuotaRetry.bind(this, true), 1200);
         }
         this.isOverFreeQuota = true;
+
+        api_req({ a: 'log', e: 99613, m: 'efq' });
 
         mega.ui.showRegisterDialog({
             title: l[17],

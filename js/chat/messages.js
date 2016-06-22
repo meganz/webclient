@@ -4,7 +4,6 @@ var Message = function(chatRoom, messagesBuff, vals) {
     self.chatRoom = chatRoom;
     self.messagesBuff = messagesBuff;
 
-
     MegaDataObject.attachToExistingJSObject(
         self,
         {
@@ -223,7 +222,24 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatdInt = chatdInt;
     self.chatd = chatdInt.chatd;
 
-    self.messages = new MegaDataSortedMap("messageId", "orderValue,delay", this);
+    self.messages = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc, this);
+
+    var origPush = self.messages.push;
+    self.messages.push = function(msg) {
+        if (msg.addChangeListener) {
+            msg.addChangeListener(function() {
+                self.messages.reorder();
+            });
+        }
+        else if (msg instanceof KarereEventObjects.OutgoingMessage) {
+            $(msg).bind("onChange", function(msg, property, oldVal, newVal) {
+                if (property === "orderValue" || property === "delay") {
+                    self.messages.reorder();
+                }
+            });
+        }
+        origPush.call(this, msg);
+    };
 
     self.lastSeen = null;
     self.lastSent = null;
@@ -785,6 +801,47 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.chatRoom.megaChat.updateSectionUnreadCount();
         }
     });
+};
+
+
+MessagesBuff.orderFunc = function(a, b) {
+    var sortFields = ["orderValue","delay"];
+
+    var notSentStates = [
+        Message.STATE.NOT_SENT,
+        Message.STATE.NOT_SENT_EXPIRED,
+        Message.STATE.NULL
+    ];
+
+    if (a.getState && b.getState && notSentStates.indexOf(a.getState()) !== -1 && notSentStates.indexOf(b.getState()) === -1) {
+        return 1;
+    }
+    if (a.getState && b.getState && notSentStates.indexOf(b.getState()) !== -1 && notSentStates.indexOf(a.getState()) === -1) {
+        return -1;
+    }
+    else {
+        for (var i = 0; i < sortFields.length; i++) {
+            var sortField = sortFields[i];
+            var ascOrDesc = 1;
+            if (sortField.substr(0, 1) === "-") {
+                ascOrDesc = -1;
+                sortField = sortField.substr(1);
+            }
+
+            if (a[sortField] && b[sortField]) {
+                if (a[sortField] < b[sortField]) {
+                    return -1 * ascOrDesc;
+                }
+                else if (a[sortField] > b[sortField]) {
+                    return 1 * ascOrDesc;
+                }
+                else {
+                    return 0;
+                }
+            }
+        }
+    }
+    return 0;
 };
 
 

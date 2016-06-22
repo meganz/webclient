@@ -6933,9 +6933,17 @@ function sectionUIopen(id) {
             $('.fm-main.default > .fm-left-panel').removeClass('hidden');
         }
 
+        // prevent unneeded flashing of the conversations section when switching between chats
         // new sections UI
-        $('.section').addClass('hidden');
-        $('.section.' + id).removeClass('hidden');
+        if (id == "conversations") {
+            $('.section:not(.conversations)').addClass('hidden');
+            $('.section.' + id).removeClass('hidden');
+        }
+        else {
+            $('.section').addClass('hidden');
+            $('.section.' + id).removeClass('hidden');
+        }
+
     }
 }
 

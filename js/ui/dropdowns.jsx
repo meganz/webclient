@@ -7,6 +7,11 @@ var EMOJILIST = require('./emojilist.jsx');
 
 var Dropdown = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            requiresUpdateOnResize: true
+        };
+    },
     componentWillUpdate: function(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             this.onActiveChange(nextProps.active)
@@ -127,6 +132,11 @@ var Dropdown = React.createClass({
 
 var DropdownContactsSelector = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            requiresUpdateOnResize: true
+        };
+    },
     render: function() {
         var self = this;
 
@@ -155,6 +165,11 @@ var DropdownContactsSelector = React.createClass({
 
 var DropdownItem = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            requiresUpdateOnResize: true
+        };
+    },
     getInitialState: function() {
         return {'isClicked': false}
     },
@@ -214,6 +229,11 @@ var DropdownItem = React.createClass({
 
 var DropdownEmojiSelector = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            requiresUpdateOnResize: true
+        };
+    },
     getInitialState: function() {
         return {
             'previewEmoji': null,

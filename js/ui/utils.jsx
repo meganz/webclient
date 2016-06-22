@@ -10,6 +10,11 @@ var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
  */
 var JScrollPane = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            requiresUpdateOnResize: true
+        };
+    },
     componentDidMount: function() {
         var self = this;
         var $elem = $(ReactDOM.findDOMNode(self));
@@ -64,18 +69,21 @@ var JScrollPane = React.createClass({
         $(window).unbind('resize.jsp' + this.getUniqueId());
     },
     setWidthHeightIfEmpty: function() {
-        var $elem = $(ReactDOM.findDOMNode(this));
+        // var $elem = $(ReactDOM.findDOMNode(this));
 
-        if(!$elem.width() && $elem.parent().outerWidth()) {
-            $elem.width(
-                $elem.parent().outerWidth()
-            );
-        }
+        // if(!$elem.width() && $elem.parent().outerWidth()) {
+        //     $elem.width(
+        //         $elem.parent().outerWidth()
+        //     );
+        // }
     },
     eventuallyReinitialise: function(forced, scrollPositionYPerc) {
         var self = this;
 
         if (!self.isMounted()) {
+            return;
+        }
+        if (!self.isComponentEventuallyVisible()) {
             return;
         }
 

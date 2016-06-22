@@ -519,35 +519,49 @@ MegaDataSortedMap.prototype.push = function(v) {
 MegaDataSortedMap.prototype.reorder = function() {
     var self = this;
 
-    if (self._sortField) {
-        var sortFields = self._sortField.split(",");
-
-        self._sortedVals.sort(function (a, b) {
-            for (var i = 0; i < sortFields.length; i++) {
-                var sortField = sortFields[i];
-                var ascOrDesc = 1;
-                if (sortField.substr(0, 1) === "-") {
-                    ascOrDesc = -1;
-                    sortField = sortField.substr(1);
-                }
-
-                if (self._data[a][sortField] && self._data[b][sortField]) {
-                    if (self._data[a][sortField] < self._data[b][sortField]) {
-                        return -1 * ascOrDesc;
-                    }
-                    else if (self._data[a][sortField] > self._data[b][sortField]) {
-                        return 1 * ascOrDesc;
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-            }
-            return 0;
-        });
+    if (self._reorderThrottlingTimer) {
+        clearTimeout(self._reorderThrottlingTimer);
+        delete self._reorderThrottlingTimer;
     }
 
-    self.trackDataChange([self._data]);
+    self._reorderThrottlingTimer = setTimeout(function() {
+        if (self._sortField) {
+            if (typeof(self._sortField) === "function") {
+                self._sortedVals.sort(function (a, b) {
+                    return self._sortField(self._data[a], self._data[b]);
+                });
+            }
+            else {
+                var sortFields = self._sortField.split(",");
+
+                self._sortedVals.sort(function (a, b) {
+                    for (var i = 0; i < sortFields.length; i++) {
+                        var sortField = sortFields[i];
+                        var ascOrDesc = 1;
+                        if (sortField.substr(0, 1) === "-") {
+                            ascOrDesc = -1;
+                            sortField = sortField.substr(1);
+                        }
+
+                        if (self._data[a][sortField] && self._data[b][sortField]) {
+                            if (self._data[a][sortField] < self._data[b][sortField]) {
+                                return -1 * ascOrDesc;
+                            }
+                            else if (self._data[a][sortField] > self._data[b][sortField]) {
+                                return 1 * ascOrDesc;
+                            }
+                            else {
+                                return 0;
+                            }
+                        }
+                    }
+                    return 0;
+                });
+            }
+        }
+
+        self.trackDataChange([self._data]);
+    }, 30);
 };
 
 

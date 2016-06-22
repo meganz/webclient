@@ -412,9 +412,15 @@ var crypt = (function () {
 
         // Get Ed25519 key and signature to verify for all non-Ed25519 pub keys.
 
-        /** Verify signature of signed pub keys. */
+        /**
+         * Verify signature of signed pub keys.
+         *
+         * @param {Array} result  This is an array of arrays (`arguments`) for each
+         *                        resolved promise as processed by MegaPromise.all()
+         * @private
+         */
         var __resolveSignatureVerification = function(result) {
-            var pubKey = result[0];
+            var pubKey = result[0][0];
             var signingKey = result[1];
             var signature = base64urldecode(result[2]);
             var signatureVerification = ns._checkSignature(signature, pubKey,
@@ -712,7 +718,16 @@ var crypt = (function () {
         // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         if (localStorage.hideCryptoWarningDialogs !== '1') {
-            mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+            var showDialog = function() {
+                mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+            };
+
+            if (fminitialized) {
+                showDialog();
+            }
+            else {
+                mBroadcaster.once('fm:initialized', showDialog);
+            }
         }
 
         // Remove the cached key, so the key will be fetched and checked against
@@ -748,7 +763,16 @@ var crypt = (function () {
         // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         if (localStorage.hideCryptoWarningDialogs !== '1') {
-            mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+            var showDialog = function() {
+                mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+            };
+
+            if (fminitialized) {
+                showDialog();
+            }
+            else {
+                mBroadcaster.once('fm:initialized', showDialog);
+            }
         }
 
         logger.error(keyType + ' signature does not verify for user '

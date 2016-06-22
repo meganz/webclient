@@ -869,7 +869,15 @@ var dlmanager = {
         return array_unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
     },
 
-    isMEGAsyncRunning: function(minVersion) {
+    /**
+     * Check whether MEGAsync is running.
+     *
+     * @param {String}  minVersion      The min MEGAsync version required.
+     * @param {Boolean} getVersionInfo  Do not reject the promise if the min version is not
+     *                                  meet, instead resolve it providing an ERANGE result.
+     * @return {MegaPromise}
+     */
+    isMEGAsyncRunning: function(minVersion, getVersionInfo) {
         var timeout = 200;
         var logger = this.logger;
         var promise = new MegaPromise();
@@ -877,7 +885,7 @@ var dlmanager = {
         var resolve = function() {
             if (promise) {
                 loadingDialog.hide();
-                logger.debug('isMEGAsyncRunning: YUP');
+                logger.debug('isMEGAsyncRunning: YUP', arguments);
 
                 promise.resolve.apply(promise, arguments);
                 promise = undefined;
@@ -901,6 +909,8 @@ var dlmanager = {
                     reject(err || ENOENT);
                 }
                 else {
+                    var verNotMeet = false;
+
                     // if a min version is required, check for it
                     if (minVersion) {
                         var runningVersion = mega.utils.vtol(is.v);
@@ -912,11 +922,18 @@ var dlmanager = {
                         }
 
                         if (runningVersion < minVersion) {
-                            return reject(ERANGE);
+                            if (!getVersionInfo) {
+                                return reject(ERANGE);
+                            }
+
+                            verNotMeet = ERANGE;
                         }
                     }
 
-                    resolve(megasync);
+                    var syncData = clone(is);
+                    syncData.verNotMeet = verNotMeet;
+
+                    resolve(megasync, syncData);
                 }
             });
         };

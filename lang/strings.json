@@ -12656,7 +12656,7 @@
         "context": "A button label. The button starts a new conversation."
     },
     "8633": {
-        "text": "Leave chat",
+        "text": "Leave Chat",
         "context": "A button label. The button allows the user to leave the conversation."
     },
     "8634": {
@@ -13546,5 +13546,181 @@
     "8865": {
         "text": "You will have to enter your credentials (login and password) in the new app. If you don't remember your password, please Export your Recovery Key before uninstalling the v1 app.",
         "context": "Message shown to tell the users that they should export the recovery key before uninstalling the old app"
+    },
+    "8866": {
+        "text": "View Profile",
+        "context": "A title of button to view a member\u2019s profile in chat."
+    },
+    "8867": {
+        "text": "Remove Participant",
+        "context": " A button title which removes a participant from a chat."
+    },
+    "8868": {
+        "text": "Set Permission:",
+        "context": "A title of a section where the user can set the chat participant\u2019s permissions."
+    },
+    "8869": {
+        "text": "Add to Group Conversation",
+        "context": "A button title. This button adds contacts to a group chat."
+    },
+    "8870": {
+        "text": "Select one or more contacts to continue",
+        "context": "A hint message in the Add Participant dialog to remind the user to add a participant into a chat."
+    },
+    "8871": {
+        "text": "Clear Chat History",
+        "context": "A button title to delete the history of a chat."
+    },
+    "8872": {
+        "text": "%1 and %2 are typing",
+        "context": "Two participants are typing at the same time and this hint in chat tells us that. Please keep %1 and %2 within your translation as they are replaced with the names of the participants."
+    },
+    "8873": {
+        "text": "Read-only",
+        "context": "The read only permission in chat."
+    },
+    "8874": {
+        "text": "Standard",
+        "context": "The Standard permission level in chat. With the standard permissions a participant can read and type messages in a chat."
+    },
+    "8875": {
+        "text": "Moderator",
+        "context": "The Moderator permission level in chat. With moderator permissions a participant can manage the chat."
+    },
+    "8876": {
+        "text": "Chat Members",
+        "context": "A title message above a list of chat members for a group chat."
+    },
+    "8877": {
+        "text": "You have no contacts.",
+        "context": "A warning message that there are no contacts to start a chat."
+    },
+    "8878": {
+        "text": "No contacts found matching your query.",
+        "context": "A result message when there was no contact found after making a search."
+    },
+    "8879": {
+        "text": "Are you sure you want to delete this message?",
+        "context": "A confirmation message for a user to confirm deletion of the message."
+    },
+    "8880": {
+        "text": "You don't have permission to clear the history of this conversation.",
+        "context": "A warning message to remind a user that they do not have permission to clear the history of a chat."
+    },
+    "8881": {
+        "text": "Are you sure you want to clear the full message history of this conversation?",
+        "context": "A confirmation message for a user to confirm that they want to clear the history of a chat."
+    },
+    "8882": {
+        "text": "Message not sent. Will keep retrying.",
+        "context": "A hint message which is displayed when the message failed to send. It tells the user that it will keep retrying to send it."
+    },
+    "8883": {
+        "text": "Message not sent. Click here if you want to resend it.",
+        "context": "A hint message displayed when the message failed to send. It reminds the user to click it to resend."
+    },
+    "8884": {
+        "text": "Message not sent. Click here if you want to cancel it.",
+        "context": "A hint message displayed when the message failed to send. It reminds the user to click it to cancel."
+    },
+    "8885": {
+        "text": "Me",
+        "context": "The title for my message in a chat. The message was sent from yourself."
+    },
+    "8886": {
+        "text": "This message has been deleted.",
+        "context": "A log message in a chat to indicate that the message has been deleted by the user."
+    },
+    "8887": {
+        "text": "(edited)",
+        "context": "A log message in a chat to indicate that the message has been edited by the user."
+    },
+    "8888": {
+        "text": "(empty)",
+        "context": "This is a message of a title used to show a name of a chat room, which does not contain any member."
+    },
+    "8889": {
+        "text": "Select one or more contacts to start",
+        "context": "A helper message on the contact list to start a group\/private chat."
+    },
+    "8890": {
+        "text": "Start Group Conversation",
+        "context": "A button title. The button starts a group chat."
+    },
+    "8891": {
+        "text": "Revoke Attachment",
+        "context": "A button title to revoke an attachment in a chat by revoking the access to the attachment so other participants in the chat can not access it. (It does not delete the attachment out of your cloud drive)"
+    },
+    "8892": {
+        "text": "Revoked access to attachment(s).",
+        "context": "A summary message displaying in the chat list when the last message of the chat is somebody revoking an attachment (i.e. removing access to the attachment, it does not delete it from the owners cloud drive)"
+    },
+    "8893": {
+        "text": "Could not revoke access to the attachment. Error code: %s.",
+        "context": "A warning message of not being able to revoke access to a shared attachment. Please keep %s as it will be replaced by the reason at runtime."
+    },
+    "8894": {
+        "text": "Attached: %s",
+        "context": "A message appearing in the chat summary window when the most recent action performed by a user was attaching a file. Please keep %s as it will be replaced at runtime with the name of the attached file."
+    },
+    "8895": {
+        "text": "Attached %s files.",
+        "context": "A summary message when a user has attached many files at once into the chat. Please keep %s as it will be replaced at runtime with the number of files."
+    },
+    "8896": {
+        "text": "Sent Contact: %s ",
+        "context": "A summary message when a user sent a contact's details through the chat. Please keep %s as it will be replaced at runtime with the name of the contact that was sent."
+    },
+    "8897": {
+        "text": "Sent %s Contacts.",
+        "context": "A summary message when a user sent the information of %s number of contacts at once. Please keep %s as it will be replaced at runtime with the number of contacts sent."
+    },
+    "8898": {
+        "text": "No thanks",
+        "context": "A button title to choose not to send feedback for the  video\/audio call to MEGA."
+    },
+    "8901": {
+        "text": "Image and video downloads",
+        "context": "A title header that refers to where you enable the options 'Save images in gallery' and 'Save videos in gallery' inside 'Settings' -> 'Advanced' section\"."
+    },
+    "8902": {
+        "text": "Save images in gallery",
+        "context": "A title of a section where you can enable the option 'Save images in gallery'."
+    },
+    "8903": {
+        "text": "Save videos in gallery",
+        "context": "A title of a section where you can enable the option 'Save videos in gallery'."
+    },
+    "8904": {
+        "text": "Save iOS compatible images and videos in your device's gallery (Note: images and videos won't be saved in Offline).",
+        "context": "This footer text explains what happens if the options 'Save videos in gallery\u2019 and 'Save images in gallery\u2019 are enabled."
+    },
+    "8905": {
+        "text": "cleared the chat history.",
+        "context": "A log message in the chat conversation underneath a user\/avatar (the subject) to tell the reader that a participant (the subject) cleared the history of the chat.\r\nFor example, [Alice] cleared the chat history"
+    },
+    "8906": {
+        "text": "was removed from the group chat by %s.",
+        "context": "A log message in a chat conversation underneath a user avatar\/name (the subject) to tell the reader that a participant (that subject) was removed from the group chat by the moderator. Please keep %s, it will be replaced by the moderator name at runtime.\r\nFor example: [Alice] was removed from the group chat by %s."
+    },
+    "8907": {
+        "text": "joined the group chat by invitation from %s.",
+        "context": "A log message in a chat conversation underneath a user avatar\/name (the subject) to tell the reader that a participant (the subject) was added to the chat by a moderator. Please keep the %s placeholder, it will be replaced by the moderator name at runtime.\r\nFor example: [Alice] joined the group chat by invitation from %s."
+    },
+    "8908": {
+        "text": "left the group chat.",
+        "context": "A log message in the chat conversation underneath a user\/avatar (the subject) to tell the reader that a participant (the subject) left the group chat.\r\nFor example, [Alice] left the group chat."
+    },
+    "8909": {
+        "text": "Revoke",
+        "context": "A button title to revoke the access to an attachment in a chat."
+    },
+    "8910": {
+        "text": "Removed item from shared folder",
+        "context": "Notification when on client side when owner of a shared folder removes folder\/file from it."
+    },
+    "8911": {
+        "text": "Keep names as in the mobile device",
+        "context": "Option to choose that the camera sync will maintain the local file names when uploading"
     }
 }

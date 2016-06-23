@@ -285,3 +285,6 @@
 .message.body.dialog-wrapper .not-sent-indicator {
     display: none;
 }
+.not-sent-indicator i {
+    cursor: pointer;
+}

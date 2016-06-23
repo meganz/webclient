@@ -81,8 +81,10 @@ var MegaRenderMixin = {
     },
     componentDidMount: function() {
 
-        $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
-        window.addEventListener('hashchange', this.onHashChangeDoUpdate);
+        if (this.props.requiresUpdateOnResize) {
+            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
+        }
+        // window.addEventListener('hashchange', this.onHashChangeDoUpdate);
 
         // init on data structure change events
         if (this.props) {
@@ -103,28 +105,59 @@ var MegaRenderMixin = {
         //);
         //
         //this.requiresLazyRendering();
+
+        this._isMounted = true;
     },
     findDOMNode: function() {
         return ReactDOM.findDOMNode(this);
     },
     componentWillUnmount: function() {
-        $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
-        window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
+        if (this.props.requiresUpdateOnResize) {
+            $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
+        }
+
+        // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
 
         //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.getUniqueId());
         //$(window).unbind('load.lazyRenderer' + this.getUniqueId());
         //$(window).unbind('resize.lazyRenderer' + this.getUniqueId());
         //$(window).unbind('hashchange.lazyRenderer' + this.getUniqueId());
         //$(window).unbind('scroll.lazyRenderer' + this.getUniqueId());
+        this._isMounted = false;
     },
     isComponentVisible: function() {
         var domNode = $(this.findDOMNode());
 
+        // ._isMounted is faster then .isMounted() or any other operation
+        if (!this._isMounted) {
+            return false;
+        }
+        // offsetParent should NOT trigger a reflow/repaint
+        if (domNode.offsetParent === null) {
+            return false
+        }
         if (!domNode.is(":visible")) {
             return false;
         }
         if (!verge.inX(domNode[0]) && !verge.inY(domNode[0])) {
             return false;
+        }
+        return true;
+    },
+    /**
+     * Lightweight version of .isComponentVisible
+     * @returns {boolean}
+     */
+    isComponentEventuallyVisible: function() {
+        var domNode = $(this.findDOMNode());
+
+        // ._isMounted is faster then .isMounted() or any other operation
+        if (!this._isMounted) {
+            return false;
+        }
+        // offsetParent should NOT trigger a reflow/repaint
+        if (domNode.offsetParent === null) {
+            return false
         }
         return true;
     },
@@ -137,7 +170,10 @@ var MegaRenderMixin = {
         if (!self._wasRendered || (self._wasRendered && !self.isMounted())) {
             return;
         }
-        if (!self.isComponentVisible()) {
+        if (!self._isMounted) {
+            return;
+        }
+        if (!self.isComponentEventuallyVisible()) {
             return;
         }
 
@@ -172,13 +208,13 @@ var MegaRenderMixin = {
 
         this.eventuallyUpdate();
     },
-    onHashChangeDoUpdate: function() {
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
-            return;
-        }
-
-        this.eventuallyUpdate();
-    },
+    // onHashChangeDoUpdate: function() {
+    //     if (!this.isMounted() || this._pendingForceUpdate === true) {
+    //         return;
+    //     }
+    //
+    //     this.eventuallyUpdate();
+    // },
     _recurseAddListenersIfNeeded: function(idx, map, depth) {
         var self = this;
         depth = depth ? depth : 0;
@@ -367,13 +403,25 @@ var MegaRenderMixin = {
         }
     },
     safeForceUpdate: function() {
-        var self = this;
-        
-        setTimeout(function() {
-            if (self.isMounted()) {
-                self.forceUpdate();
+        try {
+            if (this._isMounted && this.isMounted()) {
+                var benchmarkRender;
+                if (window.RENDER_DEBUG) {
+                    benchmarkRender =  unixtime();
+                }
+                this.forceUpdate();
+                if (window.RENDER_DEBUG) {
+                    console.error("safeForceUpdate", unixtime() - benchmarkRender,
+                        "rendered: ", this.getElementName(),
+                        "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
+                        "props:", this.props,
+                        "state:", this.state
+                    );
+                }
             }
-        }, 0);
+        } catch(e) {
+            console.error("safeForceUpdate: ", e);
+        }
     }
 };
 

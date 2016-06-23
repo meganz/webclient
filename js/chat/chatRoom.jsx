@@ -857,7 +857,7 @@ ChatRoom.prototype.appendMessage = function(message) {
 
     self.shownMessages[message.messageId] = true;
 
-    self.trackDataChange();
+    //self.trackDataChange();
 };
 
 

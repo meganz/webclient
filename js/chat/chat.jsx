@@ -535,7 +535,7 @@ Chat.prototype.init = function() {
         }
     });
 
-    $(window).unbind('hashchange.megaChat');
+    $(window).unbind('hashchange.megaChat' + this.instanceId);
     var lastOpenedRoom = null;
     $(window).bind('hashchange.megaChat' + this.instanceId, function() {
         var room = self.getCurrentRoom();

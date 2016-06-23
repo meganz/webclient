@@ -1550,7 +1550,6 @@ function topmenuUI() {
         }
     });
 
-    $('.top-menu-popup .top-menu-item').unbind('click');
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
 
         $('.top-menu-popup').removeClass('active');
@@ -1603,9 +1602,11 @@ function topmenuUI() {
         }
         else if (className.indexOf('help') > -1) {
             document.location.hash = 'help';
-        } else if (className.indexOf('contact') > -1) {
+        }
+        else if (className.indexOf('contact') > -1) {
             document.location.hash = 'contact';
-        } else if (className.indexOf('support') > -1) {
+        }
+        else if (className.indexOf('support') > -1) {
             document.location.hash = 'support';
         }
         else if (className.indexOf('sitemap') > -1) {
@@ -1645,7 +1646,12 @@ function topmenuUI() {
             langDialog.show();
         }
         else if (className.indexOf('clouddrive') > -1) {
-            document.location.hash = 'fm';
+            if (folderlink) {
+                location.hash = M.lastSeenFolderLink;
+            }
+            else {
+                location.hash = 'fm';
+            }
         }
         else if (className.indexOf('logout') > -1) {
             mLogout();

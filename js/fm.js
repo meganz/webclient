@@ -2859,13 +2859,6 @@ function fmtopUI() {
             M.openFolder(M.RootID);
         }
     }
-
-    if (folderlink) {
-        $('.top-menu-item.clouddrive').text(l[808]);
-    }
-    else {
-        $('.top-menu-item.clouddrive').text(l[164]);
-    }
 }
 
 function doClearbin(selected)

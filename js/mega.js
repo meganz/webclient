@@ -4609,35 +4609,61 @@ function MegaData()
         var flag = 'ulMegaSyncAD';
 
         if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
-            $('.download-button.light-red.download').safeHTML(l[8849]);
-            $('.download-button.light-white.continue').safeHTML(l[8848]);
-            $('.megasync-upload-overlay').show();
-            $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', function() {
-                $('.megasync-upload-overlay').hide();
-                M.addUpload(u, true);
-                $(document).unbind('keyup.megasync-upload');
-            });
-            $(document).rebind('keyup.megasync-upload', function(evt) {
-                $('.megasync-upload-overlay').hide();
-                M.addUpload(u, true);
-                $(document).unbind('keyup.megasync-upload');
-            });
-            $('.download-button.light-white.download').rebind('click', function() {
-                $('.megasync-upload-overlay').hide();
-                location.hash = '#sync';
-                $(document).unbind('keyup.megasync-upload');
-            });
-            var $chk = $('.megasync-upload-overlay .checkdiv');
-            $chk.rebind('click.dialog', function() {
-                if ($chk.hasClass('checkboxOff')) {
-                    $chk.removeClass('checkboxOff').addClass('checkboxOn');
-                    localStorage[flag] = 1;
-                }
-                else {
-                    $chk.removeClass('checkboxOn').addClass('checkboxOff');
-                    delete localStorage[flag];
-                }
-            });
+            var showMEGAsyncDialog = function(button, syncData) {
+                $('.download-button.light-red.download').safeHTML(button);
+                $('.download-button.light-white.continue').safeHTML(l[8846]);
+                $('.megasync-upload-overlay').show();
+                var $chk = $('.megasync-upload-overlay .checkdiv');
+                var hideMEGAsyncDialog = function() {
+                    $('.megasync-upload-overlay').hide();
+                    $(document).unbind('keyup.megasync-upload');
+                    $('.download-button.light-white.continue, .fm-dialog-close').unbind('click');
+                    $('.download-button.light-red.download').unbind('click');
+                    $chk.unbind('click.dialog');
+                    $chk = undefined;
+                };
+                $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', function() {
+                    hideMEGAsyncDialog();
+                    M.addUpload(u, true);
+                });
+                $(document).rebind('keyup.megasync-upload', function() {
+                    hideMEGAsyncDialog();
+                    M.addUpload(u, true);
+                });
+                $('.download-button.light-red.download').rebind('click', function() {
+                    hideMEGAsyncDialog();
+
+                    if (!syncData) {
+                        location.hash = '#sync';
+                    }
+                    // if the user is running MEGAsync 3.0+
+                    else if (!syncData.verNotMeet) {
+                        // Check whether the user logged in MEGAsync does match here
+                        if (syncData.u === u_handle) {
+                            // Let MEGAsync open the local file selector.
+                            megasync.megaSyncRequest({ a: 'u' });
+                        }
+                    }
+                });
+                $chk.rebind('click.dialog', function() {
+                    if ($chk.hasClass('checkboxOff')) {
+                        $chk.removeClass('checkboxOff').addClass('checkboxOn');
+                        localStorage[flag] = 1;
+                    }
+                    else {
+                        $chk.removeClass('checkboxOn').addClass('checkboxOff');
+                        delete localStorage[flag];
+                    }
+                });
+            };
+            dlmanager.isMEGAsyncRunning('3.0', 1)
+                .done(function(ms, syncData) {
+                    var button = l[8847].split('<span>');
+                    showMEGAsyncDialog("I'll use <span>" + button[1], syncData);
+                })
+                .fail(function() {
+                    showMEGAsyncDialog(l[8847]);
+                });
             return;
         }
         var target;

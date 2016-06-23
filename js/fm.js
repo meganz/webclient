@@ -2855,16 +2855,9 @@ function fmtopUI() {
     else {
         $('.nw-fm-left-icon.inbox').addClass('hidden');
 
-        if (M.InboxID && M.currentrootid === M.InboxID) {
+        if (M.currentrootid === M.InboxID) {
             M.openFolder(M.RootID);
         }
-    }
-
-    if (folderlink) {
-        $('.top-menu-item.clouddrive').text(l[808]);
-    }
-    else {
-        $('.top-menu-item.clouddrive').text(l[164]);
     }
 }
 
@@ -4629,7 +4622,8 @@ function gridUI() {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.fm tr td:first-child').rebind('click', function() {
+    $('.grid-table.fm tr td:first-child').unbind('click');
+    $('.grid-table.fm tr td:first-child').bind('click', function() {
         var id = [$(this).parent().attr('id')];
         M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));
     });

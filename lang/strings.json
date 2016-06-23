@@ -13722,5 +13722,9 @@
     "8911": {
         "text": "Keep names as in the mobile device",
         "context": "Option to choose that the camera sync will maintain the local file names when uploading"
+    },
+    "8912": {
+        "text": "I'll use [B]MEGAsync[\/B]",
+        "context": "Shown when user tries to upload more than 100 files and MEGAsync is found running.\r\nPlease leave the [B] and [\/B] tags as they are."
     }
 }

@@ -3429,7 +3429,8 @@
     "8908": "grup sohbetinden ayr\u0131ld\u0131.",
     "8909": "\u0130ptal et",
     "8910": "\u00d6\u011fe payla\u015f\u0131lan klas\u00f6rden kald\u0131r\u0131ld\u0131",
-    "8911": "Keep names as in the mobile device",
+    "8911": "Senkronize ederken isim de\u011fi\u015ftirme",
+    "8912": "I&#039;ll use [B]MEGAsync[\/B]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

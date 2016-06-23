@@ -1128,6 +1128,13 @@ Chatd.prototype.msgcheck = function(chatId, msgid) {
     }
 };
 
+// get a message reference list
+Chatd.prototype.msgreferencelist = function(chatId) {
+    if (this.chatIdMessages[chatId]) {
+        return this.chatIdMessages[chatId].getreferencelist();
+    }
+};
+
 // msg is rejected and the confirmed msg id is msgid
 Chatd.Messages.prototype.reject = function(msgxid, msgid) {
     var self = this;
@@ -1570,6 +1577,49 @@ Chatd.Messages.prototype.check = function(chatId, msgid) {
 
     // If this message does not exist in the history, a HIST should be called. However, this should be handled in the
     // implementing code (which tracks more info regarding the actual history, messages, last recv/delivered, etc
+};
+
+// get a list of reference messages
+Chatd.Messages.prototype.getreferencelist = function() {
+
+    var ranges = [0,1,2,3,4,5,6];
+    var refs =[];
+    var index = 0;
+    var min = 0;
+    var max = 0;
+    var pendinglen = this.sendingList.length;
+
+    for (var index = 0;index < ranges.length; index++) {
+        max = 1 << ranges[index];
+        // if there are not enough buffered messages, bail out.
+        if (max > (this.highnum - this.lownum) + pendinglen) {
+            break;
+        }
+        var num = Math.floor(Math.random() * (max - min)) + min;
+        if (num < pendinglen) {
+            var msgkey = this.sendingList[pendinglen - num - 1];
+            if(this.sending[msgkey]) {
+                refs.push((this.sending[msgkey] >>> 0));
+            }
+        }
+        else {
+            var i = this.highnum - (num - pendinglen);
+            if (this.buf[i]) {
+                refs.push(base64urlencode(this.buf[i][Chatd.MsgField.MSGID]));
+            }
+        }
+        min = max;
+    }
+    max = (this.highnum - this.lownum);
+    if (max > min) {
+        var num = Math.floor(Math.random() * (max - min)) + min;
+        var i = this.highnum - num;
+        if (this.buf[i]) {
+            refs.push(base64urlencode(this.buf[i][Chatd.MsgField.MSGID]));
+        }
+    }
+
+    return refs;
 };
 
 // utility functions

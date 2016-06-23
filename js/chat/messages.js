@@ -240,7 +240,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.haveMessages = false;
     self.joined = false;
-
+    self.messageOrders = {};
     self.logger = MegaLogger.getLogger("messagesBuff[" + chatRoom.roomJid.split("@")[0] + "]", {}, chatRoom.logger);
 
     manualTrackChangesOnStructure(self, true);
@@ -468,6 +468,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 decrypted.payload = "";
                             }
                             editedMessage.textContents = decrypted.payload;
+                            editedMessage.references = decrypted.references;
+                            editedMessage.msgIdentity = decrypted.identity;
+                            if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
+                                // potential message order tampering detected.
+                                self.logger.error("potential message order tampering detected: ", eventData.messageId);
+                            }
                         }
                         else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                             editedMessage.dialogType = 'truncated';
@@ -1045,4 +1051,15 @@ MessagesBuff.prototype.getLatestTextMessage = function() {
     else {
         return false;
     }
+};
+
+MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references) {
+    var msgOrder = this.messageOrders[messageIdentity];
+
+    for(var i = 0; i < references.length; i++) {
+        if (this.messageOrders[references[i]] && this.messageOrders[references[i]] > msgOrder) {
+            return false;
+        }
+    }
+    return true;
 };

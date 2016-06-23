@@ -49,6 +49,22 @@ var strongvelope = {};
     strongvelope.SECRET_KEY_SIZE = 16;
     var SECRET_KEY_SIZE = strongvelope.SECRET_KEY_SIZE;
 
+    /** Size (in bytes) of the message identity. */
+    strongvelope.MESSAGE_IDENTITY_SIZE = 8;
+    var MESSAGE_IDENTITY_SIZE = strongvelope.MESSAGE_IDENTITY_SIZE;
+
+    /** Size (in bytes) of the message identity timestamp part. */
+    strongvelope.MESSAGE_IDENTITY_TIMESTAMP_SIZE = 3;
+    var MESSAGE_IDENTITY_TIMESTAMP_SIZE = strongvelope.MESSAGE_IDENTITY_TIMESTAMP_SIZE;
+
+    /** Size (in bytes) of the message identity randomness part. */
+    strongvelope.MESSAGE_IDENTITY_RANDOMNESS_SIZE = 5;
+    var MESSAGE_IDENTITY_RANDOMNESS_SIZE = strongvelope.MESSAGE_IDENTITY_RANDOMNESS_SIZE;
+
+    /** Size (in bytes) of the message reference identity size. */
+    strongvelope.MESSAGE_REFERENCE_SIZE = 2;
+    var MESSAGE_REFERENCE_SIZE = strongvelope.MESSAGE_REFERENCE_SIZE;
+
     /** User handle of chat API. */
     strongvelope.COMMANDER = 'gTxFhlOd_LQ';
     var COMMANDER = strongvelope.COMMANDER;
@@ -107,7 +123,10 @@ var strongvelope = {};
         INC_PARTICIPANT:    0x08,
         EXC_PARTICIPANT:    0x09,
         OWN_KEY:            0x0a,
-        INVITOR:            0x0b
+        INVITOR:            0x0b,
+        PRIVILEGE:          0x0c,
+        MESSAGE_IDENTITY:   0x0d,
+        MESSAGE_REFERENCE:  0x0e
     };
     var TLV_TYPES = strongvelope.TLV_TYPES;
 
@@ -125,7 +144,10 @@ var strongvelope = {};
         0x08: 'includeParticipants',
         0x09: 'excludeParticipants',
         0x0a: 'ownKey',
-        0x0b: 'invitor'
+        0x0b: 'invitor',
+        0x0c: 'privilege',
+        0x0d: 'identity',
+        0x0e: 'reference'
     };
 
 
@@ -144,7 +166,8 @@ var strongvelope = {};
         GROUP_KEYED:        0x00,
         GROUP_FOLLOWUP:     0x01,
         ALTER_PARTICIPANTS: 0x02,
-        TRUNCATE:           0x03
+        TRUNCATE:           0x03,
+        PRIVILEGE_CHANGE:   0x04
     };
     var MESSAGE_TYPES = strongvelope.MESSAGE_TYPES;
     var _KEYED_MESSAGES = [MESSAGE_TYPES.GROUP_KEYED,
@@ -489,6 +512,25 @@ var strongvelope = {};
     };
 
     /**
+     * Utility functions to unpack a 16bit number in little endian.
+     *
+     * @method
+     * @param x {String}
+     *     Number to unpack
+     * @returns {Number}
+     *     16bit Number
+     */
+    strongvelope.unpack16le = function(x) {
+        var r = 0;
+
+        for (var i = 2; i--; ) {
+            r = ((r << 8) >>> 0 )+x.charCodeAt(i);
+        }
+
+        return r;
+    };
+
+    /**
      * Utility functions to check the key id is a temporary key id.
      *
      * @method
@@ -501,6 +543,57 @@ var strongvelope = {};
 
         return (((keyid & 0xffff0000) >>>0 ) === (0xffff0000 >>>0));
     };
+
+    /**
+     * Utility function to to generate a message id.
+     *
+     * @method
+     * @returns {String}
+     *     8 bytes of message id
+     */
+    strongvelope.generateMessageId = function() {
+
+        var timestamp = Math.floor(new Date().getTime()/1000);
+        var timestr = a32_to_str([(timestamp << 8)]).substr(0, MESSAGE_IDENTITY_TIMESTAMP_SIZE);
+
+        var randomnum = new Uint8Array(MESSAGE_IDENTITY_RANDOMNESS_SIZE);
+        asmCrypto.getRandomValues(randomnum);
+
+        return (timestr + asmCrypto.bytes_to_string(randomnum));
+    };
+
+    /**
+     * Parse the decrypted payload.
+     *
+     * @method
+     * @param {String} message
+     *     encrypted payload.
+     * @returns {(Payload|Boolean)}
+     *     The payload content on success, `false` in case of errors.
+     */
+    strongvelope._parsePayload = function(payload) {
+        if (payload.length < MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE) {
+            return false;
+        }
+
+        var identity = payload.substr(0, MESSAGE_IDENTITY_SIZE);
+        var refidlen = ns.unpack16le(payload.substr(MESSAGE_IDENTITY_SIZE, MESSAGE_REFERENCE_SIZE));
+        var refidstr = payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE, refidlen);
+        var refids = [];
+        var pos = 0;
+        while(pos < refidlen) {
+            refids.push(refidstr.substr(pos, MESSAGE_IDENTITY_SIZE));
+            pos += MESSAGE_IDENTITY_SIZE;
+        }
+        var plainmessage =  payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE + refidlen);
+        var result = {
+            identity: identity,
+            references: refids,
+            plaintext: plainmessage
+        };
+        return result;
+    };
+
 
     /**
      * Manages keys, encryption and message encoding.
@@ -981,15 +1074,20 @@ var strongvelope = {};
      *     Outgoing message content encoded in TLV records, and a flag
      *     indicating whether the message is keyed.
      */
-    strongvelope.ProtocolHandler.prototype._assembleBody = function(message, keyId) {
+    strongvelope.ProtocolHandler.prototype._assembleBody = function(message, keyId, refs, messageIdentity) {
 
         if (!this.participantKeys[this.ownHandle][keyId]) {
             throw new Error('No cached chat key for user!');
         }
-        var content = "";
-        var senderKey = this.participantKeys[this.ownHandle][keyId];
 
-        var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
+        var content = "";
+        var refids = "";
+        var senderKey = this.participantKeys[this.ownHandle][keyId];
+        for (var i=0;i<refs.length;i++) {
+            refids += refs[i];
+        }
+
+        var encryptedMessage = ns._symmetricEncryptMessage(messageIdentity + ns.pack16le(refids.length) + refids + message, senderKey);
 
         // Assemble message content.
         content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
@@ -1042,7 +1140,7 @@ var strongvelope = {};
      *     Encrypted outgoing message array or `false` if something fails.
      *     If we need to send out a keyed message, then two messages will be returned in the array.
      */
-    strongvelope.ProtocolHandler.prototype.encryptTo = function(message, destination) {
+    strongvelope.ProtocolHandler.prototype.encryptTo = function(message, refs, destination) {
         var encryptedMessages = new Array();
 
         // Check we're in a chat with this destination, or a new chat.
@@ -1079,10 +1177,11 @@ var strongvelope = {};
             this.includeKey = false;
         }
         var assembledMessage = null;
+        var messageIdentity = ns.generateMessageId();
         // Assemble main message body.
-        assembledMessage = this._assembleBody(message, this.keyId);
+        assembledMessage = this._assembleBody(message, this.keyId, refs, messageIdentity);
 
-        encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_FOLLOWUP, "message": assembledMessage});
+        encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_FOLLOWUP, "message": assembledMessage, "identity": messageIdentity});
 
         return encryptedMessages;
     };
@@ -1096,14 +1195,18 @@ var strongvelope = {};
      *     will be encoded (i. e. it's a "blind" management message).
      * @param {Number} keyId
      *     keyId of the encryption key
+     * @param {Array} references
+     *     list of reference message identities.
+     * @param {String} messageIdentity
+     *     the identity of the original message.
      * @returns {String}
      *     Encrypted outgoing message.
      */
-    strongvelope.ProtocolHandler.prototype.encryptWithKeyId = function(message, keyId) {
+    strongvelope.ProtocolHandler.prototype.encryptWithKeyId = function(message, keyId, references, messageIdentity) {
         var keyIdStr = a32_to_str([keyId]);
         var assembledMessage = null;
         // Assemble main message body.
-        assembledMessage = this._assembleBody(message, keyIdStr);
+        assembledMessage = this._assembleBody(message, keyIdStr, references, messageIdentity);
 
         return assembledMessage;
     };
@@ -1210,7 +1313,9 @@ var strongvelope = {};
 
         return false;
     };
-        /**
+
+
+    /**
      * Decrypts a message from a sender and (potentially) updates sender keys.
      *
      * @method
@@ -1298,6 +1403,8 @@ var strongvelope = {};
 
         return result;
     };
+
+
     /**
      * Decrypts a message from a sender and (potentially) updates sender keys.
      *
@@ -1367,12 +1474,18 @@ var strongvelope = {};
         if (cleartext === false) {
             return false;
         }
-
+        var payload = ns._parsePayload(cleartext);
+        // Bail out if payload can not be parsed.
+        if (payload === false) {
+            return false;
+        }
         var result = {
             version: parsedMessage.protocolVersion,
             sender: sender,
             type: parsedMessage.type,
-            payload: cleartext,
+            identity: payload.identity,
+            references: payload.references,
+            payload: payload.plaintext,
             includeParticipants: [],
             excludeParticipants: []
         };

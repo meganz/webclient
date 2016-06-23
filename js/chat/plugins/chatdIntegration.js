@@ -721,11 +721,11 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
                         chatRoom.protocolHandler.seed(hist);
                         //console.error(chatRoom.roomJid, seedResult);
-
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
-                        decryptedMsgs.forEach(function (v, k) {
-                            var messageId = hist[k]['k'];
-                            if (v) {
+                        for(var i = decryptedMsgs.length-1; i >= 0; i--) {
+                            var v = decryptedMsgs[i];
+                            var messageId = hist[i]['k'];
+                            if (messageId) {
                                 var cacheKey = chatRoom.chatId + "_" + messageId;
                                 if (messageId) {
                                     self._processedMessages[cacheKey] = true;
@@ -736,7 +736,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                         v.payload = "";
                                     }
                                     chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
+                                    chatRoom.messagesBuff.messages[messageId].references = v.references;
+                                    chatRoom.messagesBuff.messages[messageId].msgIdentity = v.identity;
+                                    chatRoom.messagesBuff.messageOrders[v.identity] = chatRoom.messagesBuff.messages[messageId].orderValue;
                                     delete chatRoom.notDecryptedBuffer[messageId];
+                                    if (chatRoom.messagesBuff.verifyMessageOrder(v.identity, v.references) === false) {
+                                        // potential message order tampering detected.
+                                        self.logger.error("potential message order tampering detected: ", messageId);
+                                    }
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
                                     chatRoom.messagesBuff.messages[messageId].meta = {
@@ -764,7 +771,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 delete chatRoom.notDecryptedBuffer[messageId];
                                 chatRoom.messagesBuff.messages.removeByKey(messageId);
                             }
-                        });
+                        };
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }
@@ -844,6 +851,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             if (msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
                 var _runDecryption = function() {
                     try {
+
                         var decrypted = chatRoom.protocolHandler.decryptFrom(
                             msgObject.message,
                             msgObject.userId,
@@ -856,6 +864,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     decrypted.payload = "";
                                 }
                                 chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
+                                chatRoom.messagesBuff.messages[msgObject.messageId].references = decrypted.references;
+                                chatRoom.messagesBuff.messages[msgObject.messageId].msgIdentity = decrypted.identity;
+                                chatRoom.messagesBuff.messageOrders[decrypted.identity] = msgObject.orderValue;
+                                if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
+                                    // potential message order tampering detected.
+                                    self.logger.error("potential message order tampering detected: ", msgObject.messageId);
+                                }
                             } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
                                 chatRoom.messagesBuff.messages[msgObject.messageId].meta = {
                                     userId: decrypted.sender,
@@ -1014,29 +1029,41 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
         });
     }
 
-
     promises.push(
         ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
     );
 
-
-
+    var refs = self.chatd.msgreferencelist(base64urldecode(chatRoom.chatId));
+    var refids = [];
+    for (var i=0;i<refs.length;i++) {
+        var foundMessage = chatRoom.messagesBuff.getByInternalId(refs[i]);
+        if (foundMessage) {
+            if(foundMessage.msgIdentity) {
+                refids.push(foundMessage.msgIdentity);
+            }
+        } else if (chatRoom.messagesBuff.messages[refs[i]]) {
+            if (chatRoom.messagesBuff.messages[refs[i]].msgIdentity) {
+                refids.push(chatRoom.messagesBuff.messages[refs[i]].msgIdentity);
+            }
+        }
+    }
 
     var _runEncryption = function() {
 
         try {
             var result;
             if (chatRoom.type === "private") {
-                result = chatRoom.protocolHandler.encryptTo(messageContents, participants[0]);
+                result = chatRoom.protocolHandler.encryptTo(messageContents, refids, participants[0]);
             }
             else {
-                result = chatRoom.protocolHandler.encryptTo(messageContents);
+                result = chatRoom.protocolHandler.encryptTo(messageContents, refids);
             }
 
             if (result !== false) {
                 var keyid = chatRoom.protocolHandler.getKeyId();
 
                 messageObject.encryptedMessageContents = [result, keyid];
+                messageObject.msgIdentity = result[result.length - 1].identity;
 
                 tmpPromise.resolve(
                     self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)
@@ -1081,7 +1108,13 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
         }
     }
     var keyId = msg[Chatd.MsgField.KEYID];
-    cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId);
+    var msgId = base64urlencode(msg[Chatd.MsgField.MSGID]);
+    var foundMsg =  chatRoom.messagesBuff.messages[msgId];
+    if (!foundMsg) {
+        console.error("Update message failed, because message  was not found", msgId);
+        return false;
+    }
+    cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId, foundMsg.references, foundMsg.msgIdentity);
 
     return self.chatd.modify(rawChatId, msgnum, cipher);
 };

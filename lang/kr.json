@@ -3411,6 +3411,8 @@
     "8888": "\ube44\uc5b4\uc788\uc74c",
     "8889": "Select one or more contacts to start",
     "8890": "\uadf8\ub8f9 \ub300\ud654 \uc2dc\uc791",
+    "8891": "Revoke Attachment",
+    "8892": "Revoked access to attachment(s).",
     "8893": "Could not revoke access to the attachment. Error code: %s.",
     "8894": "\ucca8\ubd80\ub428: %s",
     "8895": "%s\uac1c\uc758 \ud30c\uc77c \ucca8\ubd80\ud568.",
@@ -3425,6 +3427,8 @@
     "8906": "was removed from the group chat by %s.",
     "8907": "joined the group chat by invitation from %s.",
     "8908": "\uadf8\ub8f9 \ub300\ud654 \ub5a0\ub0a8.",
+    "8909": "Revoke",
+    "8910": "Removed item from shared folder",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

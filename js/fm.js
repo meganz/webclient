@@ -2855,7 +2855,7 @@ function fmtopUI() {
     else {
         $('.nw-fm-left-icon.inbox').addClass('hidden');
 
-        if (M.currentrootid === M.InboxID) {
+        if (M.InboxID && M.currentrootid === M.InboxID) {
             M.openFolder(M.RootID);
         }
     }

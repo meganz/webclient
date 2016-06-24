@@ -432,6 +432,11 @@
 
             this.container = document.querySelector(viewModeContainers[this.section][this.viewmode]);
 
+            if (!this.container) {
+                siteLoadError(l[1311], this);
+                return 0;
+            }
+
             if (this.container.nodeName === 'TABLE') {
                 var tbody = this.container.querySelector('tbody');
                 if (tbody) {
@@ -1108,7 +1113,7 @@
                                         }
 
                                         for (var k in nodeList) {
-                                            if (nodeList[k].h === entries[i].nodeHandle) {
+                                            if (nodeList[k].h === entries[idx].nodeHandle) {
                                                 nodeList[k].seen = true;
                                                 break;
                                             }

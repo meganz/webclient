@@ -736,13 +736,15 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                         v.payload = "";
                                     }
                                     chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
-                                    chatRoom.messagesBuff.messages[messageId].references = v.references;
-                                    chatRoom.messagesBuff.messages[messageId].msgIdentity = v.identity;
-                                    chatRoom.messagesBuff.messageOrders[v.identity] = chatRoom.messagesBuff.messages[messageId].orderValue;
                                     delete chatRoom.notDecryptedBuffer[messageId];
-                                    if (chatRoom.messagesBuff.verifyMessageOrder(v.identity, v.references) === false) {
-                                        // potential message order tampering detected.
-                                        self.logger.error("potential message order tampering detected: ", messageId);
+                                    if (v.identity && v.references) {
+                                        chatRoom.messagesBuff.messages[messageId].references = v.references;
+                                        chatRoom.messagesBuff.messages[messageId].msgIdentity = v.identity;
+                                        chatRoom.messagesBuff.messageOrders[v.identity] = chatRoom.messagesBuff.messages[messageId].orderValue;
+                                        if (chatRoom.messagesBuff.verifyMessageOrder(v.identity, v.references) === false) {
+                                            // potential message order tampering detected.
+                                            self.logger.error("potential message order tampering detected: ", messageId);
+                                        }
                                     }
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
@@ -867,12 +869,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     decrypted.payload = "";
                                 }
                                 chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
-                                chatRoom.messagesBuff.messages[msgObject.messageId].references = decrypted.references;
-                                chatRoom.messagesBuff.messages[msgObject.messageId].msgIdentity = decrypted.identity;
-                                chatRoom.messagesBuff.messageOrders[decrypted.identity] = msgObject.orderValue;
-                                if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
-                                    // potential message order tampering detected.
-                                    self.logger.error("potential message order tampering detected: ", msgObject.messageId);
+                                if (decrypted.identity && decrypted.references) {
+                                    chatRoom.messagesBuff.messages[msgObject.messageId].references = decrypted.references;
+                                    chatRoom.messagesBuff.messages[msgObject.messageId].msgIdentity = decrypted.identity;
+                                    chatRoom.messagesBuff.messageOrders[decrypted.identity] = msgObject.orderValue;
+                                    if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
+                                        // potential message order tampering detected.
+                                        self.logger.error("potential message order tampering detected: ", msgObject.messageId);
+                                    }
                                 }
                             } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
                                 chatRoom.messagesBuff.messages[msgObject.messageId].meta = {

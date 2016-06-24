@@ -484,11 +484,13 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 decrypted.payload = "";
                             }
                             editedMessage.textContents = decrypted.payload;
-                            editedMessage.references = decrypted.references;
-                            editedMessage.msgIdentity = decrypted.identity;
-                            if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
-                                // potential message order tampering detected.
-                                self.logger.error("potential message order tampering detected: ", eventData.messageId);
+                            if (decrypted.identity && decrypted.references) {
+                                editedMessage.references = decrypted.references;
+                                editedMessage.msgIdentity = decrypted.identity;
+                                if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
+                                    // potential message order tampering detected.
+                                    self.logger.error("potential message order tampering detected: ", eventData.messageId);
+                                }
                             }
                         }
                         else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {

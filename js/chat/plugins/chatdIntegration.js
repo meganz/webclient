@@ -758,7 +758,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     chatRoom.messagesBuff.messages[messageId].userId = v.sender;
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
-                                    chatRoom.messagesBuff.messages[messageId].textContents = v.target + ' was changed to ' + v.privilege.charCodeAt(0) + ' by ' + v.sender;
+                                    chatRoom.messagesBuff.messages[messageId].textContents = v.recipients + ' were changed to ' + v.privilege.charCodeAt(0) + ' by ' + v.sender;
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
                                     // this is a system message
@@ -888,7 +888,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             }
                             else if (decrypted.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
                                 var msg = chatRoom.messagesBuff.messages[msgObject.messageId];
-                                msg.textContents = decrypted.target + ' was changed to ' + decrypted.privilege.charCodeAt(0) + ' by ' + decrypted.sender;
+                                msg.textContents = decrypted.recipients + ' were changed to ' + decrypted.privilege.charCodeAt(0) + ' by ' + decrypted.sender;
                             }
                             else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;

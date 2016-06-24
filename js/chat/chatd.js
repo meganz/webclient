@@ -521,7 +521,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 self.connectionRetryManager.gotConnected();
                 if (userId === u_handle) {
-                    if (priv === 1 || priv === 2 || priv === 3) {
+                    if (priv === 0 || priv === 1 || priv === 2 || priv === 3) {
                         // ^^ explicit and easy to read...despite that i could have done >= 1 <= 3 or something like
                         // that..
                         if (!self.joinedChatIds[chatId]) {

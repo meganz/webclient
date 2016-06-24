@@ -1295,7 +1295,7 @@ var strongvelope = {};
             var result = {
                 sender: parsedMessage.invitor,
                 type: parsedMessage.type,
-                target: (parsedMessage.recipients.length > 0) ? parsedMessage.recipients[0] : null,
+                recipients: parsedMessage.recipients,
                 privilege: parsedMessage.privilege,
                 includeParticipants: parsedMessage.includeParticipants,
                 excludeParticipants: parsedMessage.excludeParticipants

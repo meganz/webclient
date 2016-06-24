@@ -1182,10 +1182,13 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     }
 
     if (msgid === false) {
-        self.chatd.trigger('onMessageReject', {
-            chatId: base64urlencode(chatId),
-            id: num,
+        self.chatd.trigger('onMessageUpdated', {
+            chatId: base64urlencode(self.chatId),
+            userId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.USERID]),
             messageId: base64urlencode(msgid),
+            id: num >>> 0,
+            state: 'DISCARDED',
+            keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
             message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
         });
     }

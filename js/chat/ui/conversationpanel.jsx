@@ -1190,8 +1190,8 @@ var ConversationPanel = React.createClass({
                     }
 
                     if (
-                        v instanceof KarereEventObjects.OutgoingMessage ||
-                        v instanceof Message
+                        (v instanceof KarereEventObjects.OutgoingMessage || v instanceof Message) &&
+                        (v.keyid !== 0)
                     ) {
 
                         // the grouping logic for messages.

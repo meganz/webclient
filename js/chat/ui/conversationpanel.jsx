@@ -147,15 +147,14 @@ var ConversationRightArea = React.createClass({
                             </div>
                         );
 
-
-
                         dropdowns.push(
                             <DropdownsUI.DropdownItem
-                                key="privReadOnly" icon="eye-icon"
-                                className={"tick-item " + (room.members[contactHash] === 0 ? "active" : "")}
-                                label={__(l[8873])} onClick={() => {
-                                    if (room.members[contactHash] !== 0) {
-                                        $(room).trigger('alterUserPrivilege', [contactHash, 0]);
+                                key="privOperator" icon="cogwheel-icon"
+                                label={__(l[8875])}
+                                className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
+                                onClick={() => {
+                                    if (room.members[contactHash] !== 3) {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 3]);
                                     }
                                 }}/>
                         );
@@ -173,12 +172,11 @@ var ConversationRightArea = React.createClass({
 
                         dropdowns.push(
                             <DropdownsUI.DropdownItem
-                                key="privOperator" icon="cogwheel-icon"
-                                label={__(l[8875])}
-                                className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
-                                onClick={() => {
-                                    if (room.members[contactHash] !== 3) {
-                                        $(room).trigger('alterUserPrivilege', [contactHash, 3]);
+                                key="privReadOnly" icon="eye-icon"
+                                className={"tick-item " + (room.members[contactHash] === 0 ? "active" : "")}
+                                label={__(l[8873])} onClick={() => {
+                                    if (room.members[contactHash] !== 0) {
+                                        $(room).trigger('alterUserPrivilege', [contactHash, 0]);
                                     }
                                 }}/>
                         );

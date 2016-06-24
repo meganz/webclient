@@ -1284,7 +1284,7 @@ var strongvelope = {};
 
         var self = this;
         if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS
-                || parsedMessage.type === MESSAGE_TYPES.TRUNCATE) {
+                || parsedMessage.type === MESSAGE_TYPES.TRUNCATE || parsedMessage.type === MESSAGE_TYPES.PRIVILEGE_CHANGE) {
             // Sanity checks.
             if (setutils.intersection(new Set(parsedMessage.includeParticipants),
                         new Set(parsedMessage.excludeParticipants)).size > 0) {
@@ -1295,6 +1295,8 @@ var strongvelope = {};
             var result = {
                 sender: parsedMessage.invitor,
                 type: parsedMessage.type,
+                target: (parsedMessage.recipients.length > 0) ? parsedMessage.recipients[0] : null,
+                privilege: parsedMessage.privilege,
                 includeParticipants: parsedMessage.includeParticipants,
                 excludeParticipants: parsedMessage.excludeParticipants
             };

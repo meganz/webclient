@@ -221,12 +221,6 @@ function init_page() {
     }
     else if (!flhashchange || page !== 'fm/transfers') {
         n_h = false;
-        if (u_sid) {
-            api_setsid(u_sid);
-            if (waitxhr) {
-                waitsc();
-            }
-        }
         u_n = false;
         pfkey = false;
         pfid = false;
@@ -273,6 +267,16 @@ function init_page() {
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
             if ((!pfid && folderlink) || (pfid && folderlink === 0)) {
+
+                // re-initialize waitd connection when switching.
+                if (!pfid && folderlink && u_sid) {
+                    api_setsid(u_sid);
+
+                    if (waitxhr) {
+                        waitsc();
+                    }
+                }
+
                 M.reset();
                 folderlink = 0;
                 fminitialized = false;

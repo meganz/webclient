@@ -1075,6 +1075,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
 
                 messageObject.encryptedMessageContents = [result, keyid];
                 messageObject.msgIdentity = result[result.length - 1].identity;
+                messageObject.references = refids;
 
                 tmpPromise.resolve(
                     self.chatd.submit(base64urldecode(chatRoom.chatId), result, keyid)
@@ -1108,6 +1109,7 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
     }
 
     var msg = chatMessages.buf[msgnum];
+    var foundMsg;
     if (!msg) {
         msg = chatMessages.sendingbuf[msgnum & 0xffffffff];
         if (!msg) {
@@ -1115,12 +1117,16 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
             return false;
         }
         else {
+            foundMsg = chatRoom.messagesBuff.getByInternalId(msgnum);
             msgnum = msgnum & 0xffffffff;
         }
     }
+    else {
+        var msgId = base64urlencode(msg[Chatd.MsgField.MSGID]);
+        foundMsg =  chatRoom.messagesBuff.messages[msgId];
+    }
     var keyId = msg[Chatd.MsgField.KEYID];
-    var msgId = base64urlencode(msg[Chatd.MsgField.MSGID]);
-    var foundMsg =  chatRoom.messagesBuff.messages[msgId];
+
     if (!foundMsg) {
         console.error("Update message failed, because message  was not found", msgId);
         return false;

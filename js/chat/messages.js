@@ -1104,6 +1104,7 @@ MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references
 
     for(var i = 0; i < references.length; i++) {
         if (this.messageOrders[references[i]] && this.messageOrders[references[i]] > msgOrder) {
+            // There might be a potential message order tampering.It should raise an event to UI.
             return false;
         }
     }

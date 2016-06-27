@@ -12656,7 +12656,7 @@
         "context": "A button label. The button starts a new conversation."
     },
     "8633": {
-        "text": "Leave chat",
+        "text": "Leave Chat",
         "context": "A button label. The button allows the user to leave the conversation."
     },
     "8634": {
@@ -13647,6 +13647,14 @@
         "text": "Start Group Conversation",
         "context": "A button title. The button starts a group chat."
     },
+    "8891": {
+        "text": "Revoke Attachment",
+        "context": "A button title to revoke an attachment in a chat by revoking the access to the attachment so other participants in the chat can not access it. (It does not delete the attachment out of your cloud drive)"
+    },
+    "8892": {
+        "text": "Revoked access to attachment(s).",
+        "context": "A summary message displaying in the chat list when the last message of the chat is somebody revoking an attachment (i.e. removing access to the attachment, it does not delete it from the owners cloud drive)"
+    },
     "8893": {
         "text": "Could not revoke access to the attachment. Error code: %s.",
         "context": "A warning message of not being able to revoke access to a shared attachment. Please keep %s as it will be replaced by the reason at runtime."
@@ -13702,5 +13710,13 @@
     "8908": {
         "text": "left the group chat.",
         "context": "A log message in the chat conversation underneath a user\/avatar (the subject) to tell the reader that a participant (the subject) left the group chat.\r\nFor example, [Alice] left the group chat."
+    },
+    "8909": {
+        "text": "Revoke",
+        "context": "A button title to revoke the access to an attachment in a chat."
+    },
+    "8910": {
+        "text": "Removed item from shared folder",
+        "context": "Notification when on client side when owner of a shared folder removes folder\/file from it."
     }
 }

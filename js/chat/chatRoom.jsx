@@ -931,6 +931,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
     self._sendMessageToTransport(eventObject)
         .done(function(internalId) {
             eventObject.internalId = internalId;
+            eventObject.orderValue = internalId;
         });
 };
 

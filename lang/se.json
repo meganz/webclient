@@ -3411,6 +3411,8 @@
     "8888": "(tom)",
     "8889": "V\u00e4lj en eller flera kontakter f\u00f6r att starta.",
     "8890": "Starta gruppkonversation",
+    "8891": "Revoke Attachment",
+    "8892": "Revoked access to attachment(s).",
     "8893": "Det gick inte att \u00e5terkalla tillg\u00e5ng till den bifogade filen. Felkod:% s.",
     "8894": "Bifogad: %s",
     "8895": "Bifogat %s filer.",
@@ -3425,6 +3427,8 @@
     "8906": "togs bort fr\u00e5n gruppchatten av %s",
     "8907": "anslutit sig till gruppchatten med inbjudan fr\u00e5n% s.",
     "8908": "L\u00e4mnade gruppen",
+    "8909": "Revoke",
+    "8910": "Removed item from shared folder",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

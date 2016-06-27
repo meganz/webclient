@@ -256,7 +256,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.haveMessages = false;
     self.joined = false;
-
+    self.messageOrders = {};
     self.logger = MegaLogger.getLogger("messagesBuff[" + chatRoom.roomJid.split("@")[0] + "]", {}, chatRoom.logger);
 
     manualTrackChangesOnStructure(self, true);
@@ -484,6 +484,14 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 decrypted.payload = "";
                             }
                             editedMessage.textContents = decrypted.payload;
+                            if (decrypted.identity && decrypted.references) {
+                                editedMessage.references = decrypted.references;
+                                editedMessage.msgIdentity = decrypted.identity;
+                                if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
+                                    // potential message order tampering detected.
+                                    self.logger.error("potential message order tampering detected: ", eventData.messageId);
+                                }
+                            }
                         }
                         else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                             editedMessage.dialogType = 'truncated';
@@ -807,40 +815,27 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 MessagesBuff.orderFunc = function(a, b) {
     var sortFields = ["orderValue","delay"];
 
-    var notSentStates = [
-        Message.STATE.NOT_SENT,
-        Message.STATE.NOT_SENT_EXPIRED,
-        Message.STATE.NULL
-    ];
+    for (var i = 0; i < sortFields.length; i++) {
+        var sortField = sortFields[i];
+        var ascOrDesc = 1;
+        if (sortField.substr(0, 1) === "-") {
+            ascOrDesc = -1;
+            sortField = sortField.substr(1);
+        }
 
-    if (a.getState && b.getState && notSentStates.indexOf(a.getState()) !== -1 && notSentStates.indexOf(b.getState()) === -1) {
-        return 1;
-    }
-    if (a.getState && b.getState && notSentStates.indexOf(b.getState()) !== -1 && notSentStates.indexOf(a.getState()) === -1) {
-        return -1;
-    }
-    else {
-        for (var i = 0; i < sortFields.length; i++) {
-            var sortField = sortFields[i];
-            var ascOrDesc = 1;
-            if (sortField.substr(0, 1) === "-") {
-                ascOrDesc = -1;
-                sortField = sortField.substr(1);
+        if (a[sortField] && b[sortField]) {
+            if (a[sortField] < b[sortField]) {
+                return -1 * ascOrDesc;
             }
-
-            if (a[sortField] && b[sortField]) {
-                if (a[sortField] < b[sortField]) {
-                    return -1 * ascOrDesc;
-                }
-                else if (a[sortField] > b[sortField]) {
-                    return 1 * ascOrDesc;
-                }
-                else {
-                    return 0;
-                }
+            else if (a[sortField] > b[sortField]) {
+                return 1 * ascOrDesc;
+            }
+            else {
+                return 0;
             }
         }
     }
+
     return 0;
 };
 
@@ -1102,4 +1097,16 @@ MessagesBuff.prototype.getLatestTextMessage = function() {
     else {
         return false;
     }
+};
+
+MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references) {
+    var msgOrder = this.messageOrders[messageIdentity];
+
+    for(var i = 0; i < references.length; i++) {
+        if (this.messageOrders[references[i]] && this.messageOrders[references[i]] > msgOrder) {
+            // There might be a potential message order tampering.It should raise an event to UI.
+            return false;
+        }
+    }
+    return true;
 };

@@ -133,6 +133,9 @@ Chatd.Const = {
 };
 
 Chatd.MAX_KEEPALIVE_DELAY = 60000;
+// 1 hour is agreed by everyone.
+Chatd.MESSAGE_EXPIRY = 60*60; // 60*60
+var MESSAGE_EXPIRY = Chatd.MESSAGE_EXPIRY;
 
 // add a new chatd shard
 Chatd.prototype.addshard = function(chatId, shard, url) {
@@ -521,7 +524,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 self.connectionRetryManager.gotConnected();
                 if (userId === u_handle) {
-                    if (priv === 1 || priv === 2 || priv === 3) {
+                    if (priv === 0 || priv === 1 || priv === 2 || priv === 3) {
                         // ^^ explicit and easy to read...despite that i could have done >= 1 <= 3 or something like
                         // that..
                         if (!self.joinedChatIds[chatId]) {
@@ -951,8 +954,6 @@ Chatd.Messages.prototype.resend = function(restore) {
     var self = this;
     restore = (typeof restore === 'undefined') ? false : restore;
     // resend all pending new messages and modifications
-    // 1 hour is agreed by everyone.
-    var MESSAGE_EXPIRY = 60*60; // 60*60
     var mintimestamp = Math.floor(new Date().getTime()/1000);
     var lastexpiredpendingkey = null;
     var trivialmsgs = [];
@@ -1128,6 +1129,13 @@ Chatd.prototype.msgcheck = function(chatId, msgid) {
     }
 };
 
+// get a message reference list
+Chatd.prototype.msgreferencelist = function(chatId) {
+    if (this.chatIdMessages[chatId]) {
+        return this.chatIdMessages[chatId].getreferencelist();
+    }
+};
+
 // msg is rejected and the confirmed msg id is msgid
 Chatd.Messages.prototype.reject = function(msgxid, msgid) {
     var self = this;
@@ -1175,10 +1183,13 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
     }
 
     if (msgid === false) {
-        self.chatd.trigger('onMessageReject', {
-            chatId: base64urlencode(chatId),
-            id: num,
+        self.chatd.trigger('onMessageUpdated', {
+            chatId: base64urlencode(self.chatId),
+            userId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.USERID]),
             messageId: base64urlencode(msgid),
+            id: num >>> 0,
+            state: 'DISCARDED',
+            keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
             message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
         });
     }
@@ -1570,6 +1581,49 @@ Chatd.Messages.prototype.check = function(chatId, msgid) {
 
     // If this message does not exist in the history, a HIST should be called. However, this should be handled in the
     // implementing code (which tracks more info regarding the actual history, messages, last recv/delivered, etc
+};
+
+// get a list of reference messages
+Chatd.Messages.prototype.getreferencelist = function() {
+
+    var ranges = [0,1,2,3,4,5,6];
+    var refs =[];
+    var index = 0;
+    var min = 0;
+    var max = 0;
+    var pendinglen = this.sendingList.length;
+
+    for (var index = 0;index < ranges.length; index++) {
+        max = 1 << ranges[index];
+        // if there are not enough buffered messages, bail out.
+        if (max > (this.highnum - this.lownum) + pendinglen) {
+            break;
+        }
+        var num = Math.floor(Math.random() * (max - min)) + min;
+        if (num < pendinglen) {
+            var msgkey = this.sendingList[pendinglen - num - 1];
+            if(this.sending[msgkey]) {
+                refs.push((this.sending[msgkey] >>> 0));
+            }
+        }
+        else {
+            var i = this.highnum - (num - pendinglen);
+            if (this.buf[i]) {
+                refs.push(base64urlencode(this.buf[i][Chatd.MsgField.MSGID]));
+            }
+        }
+        min = max;
+    }
+    max = (this.highnum - this.lownum);
+    if (max > min) {
+        var num = Math.floor(Math.random() * (max - min)) + min;
+        var i = this.highnum - num;
+        if (this.buf[i]) {
+            refs.push(base64urlencode(this.buf[i][Chatd.MsgField.MSGID]));
+        }
+    }
+
+    return refs;
 };
 
 // utility functions

@@ -326,6 +326,17 @@ var MegaRenderMixin = {
             return false;
         }
 
+        // component specific control of the React lifecycle
+        if (this.specificShouldComponentUpdate) {
+            var r = this.specificShouldComponentUpdate();
+            if (r === false) {
+                return false;
+            }
+            else if (r === true) {
+                return true;
+            }
+        }
+
         if (this.props !== null) {
             shouldRerender = this._recursiveSearchForDataChanges("p", nextProps, this.props);
         }
@@ -334,14 +345,20 @@ var MegaRenderMixin = {
         }
 
 
-        if (window.RENDER_DEBUG) console.error("shouldRerender?",
-            shouldRerender,
-            "rendered: ", this.getElementName(),
-            "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
-            "props:", this.props,
-            "nextProps:", this.props,
-            "state:", this.state
-        );
+
+        if (window.RENDER_DEBUG) {
+            if (shouldRerender) {
+                // debugger;
+            }
+            console.error("shouldRerender?",
+                shouldRerender,
+                "rendered: ", this.getElementName(),
+                "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
+                "props:", this.props,
+                "nextProps:", this.props,
+                "state:", this.state
+            );
+        }
 
 
         if (shouldRerender === true) { // (eventually) add listeners to newly added data structures

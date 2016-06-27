@@ -12,6 +12,7 @@ var JScrollPane = React.createClass({
     mixins: [MegaRenderMixin],
     getDefaultProps: function() {
         return {
+            className: "jScrollPaneContainer",
             requiresUpdateOnResize: true
         };
     },
@@ -21,8 +22,6 @@ var JScrollPane = React.createClass({
 
 
         $elem.height('100%');
-
-        self.setWidthHeightIfEmpty();
 
         $elem.find('.jspContainer').replaceWith(
             function() {
@@ -47,6 +46,11 @@ var JScrollPane = React.createClass({
         }, self.props.options);
 
         $elem.jScrollPane(options);
+
+
+        if (self.props.onFirstInit) {
+            self.props.onFirstInit($elem.data('jsp'), $elem);
+        }
         $elem.rebind('jsp-will-scroll-y.jsp' + self.getUniqueId(), function(e) {
             if ($elem.attr('data-scroll-disabled') === "true") {
                 e.preventDefault();
@@ -56,8 +60,55 @@ var JScrollPane = React.createClass({
             }
         });
 
-        $elem.rebind('forceResize.jsp' + self.getUniqueId(), function(e, forced, scrollPositionYPerc) {
-            self.onResize(forced, scrollPositionYPerc);
+        $elem.rebind('jsp-user-scroll-y.jsp' + self.getUniqueId(), function(e, scrollPositionY, isAtTop, isAtBottom) {
+            if (self.props.onUserScroll) {
+                if ($(e.target).is($elem)) {
+                    self.props.onUserScroll(
+                        $elem.data('jsp'),
+                        $elem,
+                        e,
+                        scrollPositionY,
+                        isAtTop,
+                        isAtBottom
+                    );
+                }
+            }
+
+            // if (e.target.className.indexOf("textarea-scroll") > -1) {
+            //     return;
+            // }
+            //
+            // if (self.lastScrollPosition === scrollPositionY || self.scrolledToBottom !== 1) {
+            //     return;
+            // }
+            //
+            // if (scrollPositionY < 350 && !isAtBottom && self.$messages.is(":visible")) {
+            //     if (
+            //         self.lastUpdatedScrollHeight !== $jsp.getContentHeight() &&
+            //         !self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() &&
+            //         self.props.chatRoom.messagesBuff.haveMoreHistory()
+            //     ) {
+            //         self.props.chatRoom.messagesBuff.retrieveChatHistory();
+            //         self.forceUpdate();
+            //         self.lastUpdatedScrollHeight = $jsp.getContentHeight();
+            //         self.shouldMaintainScroll = true;
+            //     }
+            // }
+            //
+            // if (isAtBottom) {
+            //     self.lastScrolledToBottom = true;
+            // }
+            // else {
+            //     self.lastScrolledToBottom = false;
+            // }
+            //
+            // self.lastScrollHeight = $jsp.getContentHeight();
+            // self.lastScrollPosition = scrollPositionY;
+            // self.lastScrollPositionPerc = $jsp.getPercentScrolledY();
+        });
+
+        $elem.rebind('forceResize.jsp' + self.getUniqueId(), function(e, forced, scrollPositionYPerc, scrollToElement) {
+            self.onResize(forced, scrollPositionYPerc, scrollToElement);
         });
         $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize);
         self.onResize();
@@ -68,22 +119,13 @@ var JScrollPane = React.createClass({
 
         $(window).unbind('resize.jsp' + this.getUniqueId());
     },
-    setWidthHeightIfEmpty: function() {
-        // var $elem = $(ReactDOM.findDOMNode(this));
-
-        // if(!$elem.width() && $elem.parent().outerWidth()) {
-        //     $elem.width(
-        //         $elem.parent().outerWidth()
-        //     );
-        // }
-    },
-    eventuallyReinitialise: function(forced, scrollPositionYPerc) {
+    eventuallyReinitialise: function(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
 
         if (!self.isMounted()) {
             return;
         }
-        if (!self.isComponentEventuallyVisible()) {
+        if (!self.isComponentVisible()) {
             return;
         }
 
@@ -91,43 +133,70 @@ var JScrollPane = React.createClass({
 
         var currHeights = [$('.jspPane', $elem).outerHeight(), $elem.outerHeight()];
 
-
         if (forced || self._lastHeights != currHeights) {
+
             self._lastHeights = currHeights;
-            var $jsp = $elem.data('jsp');
-            if ($jsp) {
+
+            self._doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem);
+        }
+    },
+    _doReinit: debounce(function(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
+        var self = this;
+
+        if (!self.isMounted()) {
+            return;
+        }
+        if (!self.isComponentVisible()) {
+            return;
+        }
+
+        self._lastHeights = currHeights;
+        var $jsp = $elem.data('jsp');
+        if ($jsp) {
+            $jsp.reinitialise();
+
+            var manualReinitialiseControl = false;
+            if (self.props.onReinitialise) {
+                manualReinitialiseControl = self.props.onReinitialise(
+                    $jsp,
+                    $elem,
+                    forced,
+                    scrollPositionYPerc,
+                    scrollToElement
+                );
+            }
+
+            if (manualReinitialiseControl === false) {
                 if (scrollPositionYPerc) {
 
                     if (scrollPositionYPerc === -1) {
-                        $elem.one('jsp-initialised', function () {
-                            $jsp.scrollToBottom();
-                        });
+                        $jsp.scrollToBottom();
                     }
                     else {
-                        $elem.one('jsp-initialised', function () {
-                            $jsp.scrollToPercentY(scrollPositionYPerc, false);
-                        });
+                        $jsp.scrollToPercentY(scrollPositionYPerc, false);
                     }
                 }
-                $jsp.reinitialise();
+                else if (scrollToElement) {
+                    $jsp.scrollToElement(scrollToElement);
+                }
             }
         }
-    },
-    onResize: function(forced, scrollPositionYPerc) {
-        if (!this.isMounted()) {
-            return;
+    }),
+    onResize: debounce(function(forced, scrollPositionYPerc, scrollToElement) {
+        if (forced && forced.originalEvent) {
+            forced = true;
+            scrollPositionYPerc = undefined;
         }
-        
-        this.setWidthHeightIfEmpty();
 
-        this.eventuallyReinitialise(forced, scrollPositionYPerc);
-    },
+
+        this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
+    }),
     componentDidUpdate: function() {
         this.onResize();
     },
     render: function () {
         return (
-            <div className={this.props.className + " jScrollPaneContainer"} {...this.props} onResize={this.onResize}>
+            <div {...this.props} onResize={this.onResize}>
                 <div className="jspContainer">
                     <div className="jspPane">
                         {this.props.children}

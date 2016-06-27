@@ -409,10 +409,11 @@ var ConversationsApp = React.createClass({
                 self.setState({
                     'leftPaneWidth': mega.config.get('leftPaneWidth')
                 });
-            }, 500);
+                $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
+                $('.jScrollPaneContainer:visible').trigger('forceResize');
+            }, 75);
             lPane.width(mega.config.get('leftPaneWidth'));
             $('.fm-tree-panel', lPane).width(mega.config.get('leftPaneWidth'));
-            $('.jScrollPaneContainer', lPane).trigger('forceResize');
         });
 
 
@@ -434,12 +435,20 @@ var ConversationsApp = React.createClass({
             } else {
                 $('.left-pane-drag-handle').css('cursor', 'we-resize')
             }
+
+            $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
         });
 
         $($.leftPaneResizableChat).on('resizestop', function() {
             $('.fm-left-panel').width(
                 lPane.width()
             );
+
+            $('.jScrollPaneContainer:visible').trigger('forceResize');
+
+            setTimeout(function() {
+                $('.hiden-when-dragging').removeClass('hiden-when-dragging');
+            }, 100);
         });
 
         this.handleWindowResize();

@@ -4686,3 +4686,24 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 };
 
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
+
+
+var debounce = function (func, execAsap) {
+    var timeout;
+
+    return function debounced () {
+        var obj = this, args = arguments;
+        function delayed () {
+            if (!execAsap)
+                func.apply(obj, args);
+            timeout = null;
+        };
+
+        if (timeout)
+            cancelAnimationFrame(timeout);
+        else if (execAsap)
+            func.apply(obj, args);
+
+        timeout = requestAnimationFrame(delayed);
+    };
+};

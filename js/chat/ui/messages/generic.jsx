@@ -50,6 +50,7 @@ var GenericConversationMessage = React.createClass({
 
             if (self.scrollToElementAfterUpdate === true) {
                 var $jsp = self.getParentJsp();
+
                 if ($jsp) {
                     $jsp.scrollToElement($(self.findDOMNode()));
                 }
@@ -759,8 +760,6 @@ var GenericConversationMessage = React.createClass({
                         showButtons={true}
                         className="edit-typing-area"
                         onUpdate={() => {
-                            self.safeForceUpdate();
-
                             if (self.props.onUpdate) {
                                 self.props.onUpdate();
                             }

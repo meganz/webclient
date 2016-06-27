@@ -69,9 +69,10 @@ var ConversationRightArea = React.createClass({
 
 
         // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
-        if (!room.isCurrentlyActive) {
+        if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
             return null;
         }
+        self._wasAppendedEvenOnce = true;
         
         var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                             if (contact.presence && contact.presence !== "offline") {
@@ -115,7 +116,7 @@ var ConversationRightArea = React.createClass({
         var contactsList = [];
 
 
-        var contacts = room.type === "group" ?
+        contacts = room.type === "group" ?
             (
                 room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
                     room.getContactParticipantsExceptMe()
@@ -805,28 +806,12 @@ var ConversationPanel = React.createClass({
     uploadFromComputer: function() {
         $('#fileselect3').trigger('click')
     },
-    refreshUI: function(scrollToBottom) {
+    refreshUI: function() {
         var self = this;
         var room = self.props.chatRoom;
 
         if (!self.props.chatRoom.isCurrentlyActive) {
             return;
-        }
-
-        var $jsp = self.$messages.data("jsp");
-        if ($jsp) {
-            var perc = $jsp.getPercentScrolledY();
-            self.$messages.trigger('forceResize', [
-                true,
-                scrollToBottom ? (
-                    self.lastScrollPositionPerc ? self.lastScrollPositionPerc : -1
-                )
-                :
-                perc
-            ]);
-            if (scrollToBottom) {
-                self.lastScrollPositionPerc = 1;
-            }
         }
 
         room.renderContactTree();
@@ -857,9 +842,23 @@ var ConversationPanel = React.createClass({
         window.addEventListener('keydown', self.handleKeyDown);
 
 
-        var $container = $(ReactDOM.findDOMNode(self));
+        self.eventuallyInit();
+    },
+    eventuallyInit: function(doResize) {
+        var self = this;
+
+        // because..JSP would hijack some DOM elements, we need to wait with this...
+        if (self.initialised) {
+            return;
+        }
+        var $container = $(self.findDOMNode());
+
+        if ($container.length > 0) {
+            self.initialised = true;
+        }
 
         self.$messages = $('.messages.scroll-area > .jScrollPaneContainer', $container);
+
 
         var droppableConfig = {
             tolerance: 'pointer',
@@ -892,55 +891,6 @@ var ConversationPanel = React.createClass({
         //    maintainPosition: false
         //});
 
-        self.$messages.rebind('jsp-user-scroll-y.conversationsPanel' + self.props.chatRoom.roomJid, function(e, scrollPositionY, isAtTop, isAtBottom) {
-            var $jsp = self.$messages.data("jsp");
-
-            if (self.lastScrollPosition === scrollPositionY || self.scrolledToBottom !== 1) {
-                return;
-            }
-
-            if (scrollPositionY < 350 && !isAtBottom && self.$messages.is(":visible")) {
-                if (
-                    self.lastUpdatedScrollHeight !== $jsp.getContentHeight() &&
-                    !self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() &&
-                    self.props.chatRoom.messagesBuff.haveMoreHistory()
-                ) {
-                    self.props.chatRoom.messagesBuff.retrieveChatHistory();
-                    self.forceUpdate();
-                    self.lastUpdatedScrollHeight = $jsp.getContentHeight();
-                }
-            }
-
-            if (isAtBottom) {
-                self.lastScrolledToBottom = true;
-            }
-            else {
-                self.lastScrolledToBottom = false;
-            }
-
-            self.lastScrollHeight = $jsp.getContentHeight();
-            self.lastScrollPosition = scrollPositionY;
-            self.lastScrollPositionPerc = $jsp.getPercentScrolledY();
-        });
-
-        self.$messages.rebind('jsp-initialised.conversationsPanel' + self.props.chatRoom.roomJid, function(e) {
-            var $jsp = self.$messages.data("jsp");
-
-            if (self.lastScrolledToBottom === true) {
-                $jsp.scrollToBottom();
-                self.lastScrollPositionPerc = 1;
-            }
-            else {
-                var prevPosY = (
-                        $jsp.getContentHeight() - self.lastScrollHeight
-                    ) + self.lastScrollPosition;
-
-                $jsp.scrollToY(
-                    prevPosY
-                );
-            }
-        });
-
         var room = self.props.chatRoom;
 
         // collapse on ESC pressed (exited fullscreen)
@@ -954,7 +904,10 @@ var ConversationPanel = React.createClass({
                     self.setState({isFullscreenModeEnabled: true});
                 }
             });
-        self.handleWindowResize();
+
+        if (doResize !== false) {
+            self.handleWindowResize();
+        }
     },
     componentWillMount: function() {
         var self = this;
@@ -1026,15 +979,28 @@ var ConversationPanel = React.createClass({
         var self = this;
         var room = this.props.chatRoom;
 
+        self.eventuallyInit(false);
+
         room.megaChat.updateSectionUnreadCount();
 
+        var $node = $(self.findDOMNode());
+        $('.jspPane :input,.jspPane a', $node).unbind('focus.jsp');
+
+        if (self.loadingShown) {
+            $('.js-messages-loading', $node).removeClass('hidden');
+        }
+        else {
+            $('.js-messages-loading', $node).addClass('hidden');
+        }
         self.handleWindowResize();
     },
     handleWindowResize: function(e, scrollToBottom) {
         var $container = $(ReactDOM.findDOMNode(this));
         var self = this;
 
-        if (!self.props.chatRoom.isCurrentlyActive || !self.isMounted() || !self.$messages) {
+        self.eventuallyInit(false);
+
+        if (!self.isMounted() || !self.$messages || !self.isComponentVisible()) {
             return;
         }
 
@@ -1045,6 +1011,7 @@ var ConversationPanel = React.createClass({
             $('.call-block', $container).outerHeight() -
             $('.chat-textarea-block', $container).outerHeight()
         );
+
         if (scrollBlockHeight != self.$messages.outerHeight()) {
             self.$messages.css('height', scrollBlockHeight);
             $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
@@ -1053,20 +1020,111 @@ var ConversationPanel = React.createClass({
         else {
             self.refreshUI(scrollToBottom);
         }
-
-        // try to do a .scrollToBottom only once, to trigger the stickToBottom func. of JSP
-        if (!self.scrolledToBottom) {
-            var $messagesPad = $('.messages.main-pad', self.$messages);
-            if (
-                $messagesPad.outerHeight() - 1 > $messagesPad.parent().parent().parent().outerHeight()
-            ) {
-                self.scrolledToBottom = 1;
-                self.$messages.data("jsp").scrollToBottom();
-            }
-        }
     },
     isActive: function() {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
+    },
+    onMessagesScrollReinitialise: function(
+                            $jsp,
+                            $elem,
+                            forced,
+                            scrollPositionYPerc,
+                            scrollToElement
+                ) {
+        var self = this;
+        var chatRoom = self.props.chatRoom;
+        var mb = chatRoom.messagesBuff;
+
+        // don't do anything if history is being retrieved at the moment.
+        if (self.isRetrievingHistoryViaScrollPull || mb.isRetrievingHistory) {
+            return;
+        }
+
+        if (self.justFinishedRetrievingHistory) {
+            self.justFinishedRetrievingHistory = false;
+            var prevPosY = (
+                    $jsp.getContentHeight() - self.lastContentHeightBeforeHist
+                ) + self.lastScrollPosition;
+
+            delete self.lastContentHeightBeforeHist;
+
+            $jsp.scrollToY(
+                prevPosY
+            );
+        }
+
+        $('.jspPane :input,.jspPane a', self.findDOMNode()).unbind('focus.jsp');
+
+        if (self.isComponentVisible()) {
+            if (self.scrolledToBottom && !self.editDomElement) {
+                $jsp.scrollToBottom();
+                return true;
+            }
+            if (self.lastScrollPosition !== $jsp.getContentPositionY() && !self.editDomElement) {
+                $jsp.scrollToY(self.lastScrollPosition);
+                return true;
+            }
+            if ($jsp.getContentPositionY() == -0 /* lol, JSP... */ && self.editDomElement) {
+                $jsp.scrollToY(self.lastScrollPosition);
+                return true;
+            }
+
+        }
+    },
+    onMessagesScrollUserScroll: function(
+                        $jsp,
+                        $elem,
+                        e,
+                        scrollPositionY,
+                        isAtTop,
+                        isAtBottom
+                ) {
+        var self = this;
+
+        // turn on/off auto scroll to bottom.
+        if (isAtBottom === true) {
+            self.scrolledToBottom = true;
+        }
+        else {
+            self.scrolledToBottom = false;
+        }
+        if (isAtTop) {
+            var chatRoom = self.props.chatRoom;
+            var mb = chatRoom.messagesBuff;
+            if (mb.haveMoreHistory()) {
+                mb.retrieveChatHistory();
+                self.isRetrievingHistoryViaScrollPull = true;
+                self.lastScrollPosition = $jsp.getContentPositionY();
+
+                self.lastContentHeightBeforeHist = $jsp.getContentHeight();
+                $(mb).unbind('onHistoryFinished.pull');
+                $(mb).one('onHistoryFinished.pull', function() {
+                    self.isRetrievingHistoryViaScrollPull = false;
+                    self.justFinishedRetrievingHistory = true;
+                })
+            }
+        }
+
+        if (self.lastScrollPosition !== $jsp.getContentPositionY()) {
+            self.lastScrollPosition = $jsp.getContentPositionY();
+        }
+        if ($jsp.getContentPositionY() == -0 /* lol, JSP... */ && self.editDomElement) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
+
+    },
+    specificShouldComponentUpdate: function() {
+        if (
+            (this.isRetrievingHistoryViaScrollPull && this.loadingShown) ||
+            (this.props.messagesBuff.messagesHistoryIsLoading() && this.loadingShown)
+        ) {
+            return false;
+        }
+        else {
+            return undefined;
+        }
     },
     render: function() {
         var self = this;
@@ -1075,6 +1133,12 @@ var ConversationPanel = React.createClass({
         if (!room || !room.roomJid) {
             return null;
         }
+        // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
+        if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
+            return null;
+        }
+        self._wasAppendedEvenOnce = true;
+
         var contacts = room.getParticipantsExceptMe();
         var contactJid;
         var contact;
@@ -1098,6 +1162,7 @@ var ConversationPanel = React.createClass({
         ];
 
         if (
+            (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
             self.props.messagesBuff.messagesHistoryIsLoading() === true ||
             self.props.messagesBuff.joined === false ||
             (
@@ -1106,18 +1171,15 @@ var ConversationPanel = React.createClass({
                 self.props.messagesBuff.messagesHistoryIsLoading() === true
             )
         ) {
-            var loadingStyles = {
-                top: self.$messages ? (self.$messages.outerHeight() / 2) : "50%"
-            };
-            messagesList.push(
-                <div className="loading-spinner light active manual-management" key="loadingSpinner" style={loadingStyles}><div className="main-loader"></div></div>
-            );
-        } else if (
+            self.loadingShown = true;
+        }
+        else if (
             self.props.messagesBuff.joined === true && (
                 self.props.messagesBuff.messages.length === 0 ||
                 !self.props.messagesBuff.haveMoreHistory()
             )
         ) {
+            delete self.loadingShown;
             var headerText = (
                 self.props.messagesBuff.messages.length === 0 ?
                     __(l[8002]) :
@@ -1151,6 +1213,9 @@ var ConversationPanel = React.createClass({
                     </div>
                 </div>
             );
+        }
+        else {
+            delete self.loadingShown;
         }
         var lastTimeMarker;
         var lastMessageFrom = null;
@@ -1262,12 +1327,11 @@ var ConversationPanel = React.createClass({
                                 self.onResizeDoUpdate();
                             }}
                             onEditStarted={($domElement) => {
-                                var $jsp = self.$messages.data('jsp');
-                                setTimeout(function() {
-                                    $jsp.scrollToElement($domElement);
-                                }, 90);
+                                self.editDomElement = $domElement;
                             }}
                             onEditDone={(messageContents) => {
+                                self.editDomElement = null;
+
                                 var currentContents = v.textContents ? v.textContents : v.contents;
                                 if (messageContents === false || messageContents === currentContents) {
                                     var $jsp = self.$messages.data('jsp');
@@ -1624,15 +1688,29 @@ var ConversationPanel = React.createClass({
                                                 enableKeyboardNavigation:false,
                                                 showArrows:true,
                                                 arrowSize:5,
-                                                animateDuration: 70,
+                                                animateDuration: 0,
                                                 animateScroll: false,
                                                 maintainPosition: false
                                             }}
+                                               onFirstInit={(jsp, node) => {
+                                                    jsp.scrollToBottom();
+                                                    self.scrolledToBottom = 1;
+                                                }}
+                                               onReinitialise={self.onMessagesScrollReinitialise}
+                                               onUserScroll={self.onMessagesScrollUserScroll}
+                                               className="js-messages-scroll-area jScrollPaneContainer"
                                                chatRoom={self.props.chatRoom}
                                                messagesToggledInCall={self.state.messagesToggledInCall}
                                 >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
+                                        <div className="loading-spinner js-messages-loading light manual-management" key="loadingSpinner" style={{top: "50%"}}>
+                                            <div className="main-loader" style={{
+                                                'position': 'fixed',
+                                                'top': '50%',
+                                                'left': '50%'
+                                            }}></div>
+                                        </div>
                                         {messagesList}
                                     </div>
                                 </div>
@@ -1700,9 +1778,9 @@ var ConversationPanel = React.createClass({
                                         return true;
                                     }
                                 }}
-                                onUpdate={() => {
+                                onResized={() => {
                                     self.handleWindowResize();
-                                    $('.jScrollPaneContainer', self.findDOMNode()).trigger('forceResize');
+                                    $('.js-messages-scroll-area.jScrollPaneContainer', self.findDOMNode()).trigger('forceResize');
                                 }}
                                 onConfirm={(messageContents) => {
                                     if (messageContents && messageContents.length > 0) {

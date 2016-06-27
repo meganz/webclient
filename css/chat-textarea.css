@@ -108,3 +108,16 @@
     right: 13px;
     top: 6px;
 }
+
+
+.textarea-scroll.noscroll .jspVerticalBar {
+    display: none;
+}
+
+.conversationsApp .fm-tree-panel.manual-tree-panel-scroll-management {
+    overflow-x: hidden; /* don't allow child elements to be visible out of this container (happens when left pane is
+    resized and the width is not yet updated, because of potential throttling */
+}
+.chat-textarea-scroll.textarea-scroll.jspScrollable .messages-textarea {
+    max-width: 100%; /* don't overlap other elements in case of left pane resize.. */
+}

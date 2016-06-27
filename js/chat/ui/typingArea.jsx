@@ -12,9 +12,15 @@ var ConversationsUI = require('./../ui/conversations.jsx');
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    getDefaultProps: function() {
+        return {
+            'textareaMaxHeight': 100
+        };
+    },
     getInitialState: function () {
         return {
-            typedMessage: this.props.initialText ? this.props.initialText : ""
+            typedMessage: this.props.initialText ? this.props.initialText : "",
+            textareaHeight: 20
         };
     },
     onEmojiClicked: function (e, slug, meta) {
@@ -66,27 +72,41 @@ var TypingArea = React.createClass({
             self.stoppedTyping();
         }, 2000);
     },
-    triggerOnUpdate: function() {
-        if (!this.props.onUpdate || !this.isMounted()) {
+    triggerOnUpdate: function(forced) {
+        var self = this;
+        if (!self.props.onUpdate || !self.isMounted()) {
             return;
         }
 
-        var shouldTriggerUpdate = false;
-        if (this.state.typedMessage != this.lastTypedMessage) {
-            this.lastTypedMessage = this.state.typedMessage;
+        var shouldTriggerUpdate = forced ? forced : false;
+
+        if (!shouldTriggerUpdate && self.state.typedMessage != self.lastTypedMessage) {
+            self.lastTypedMessage = self.state.typedMessage;
             shouldTriggerUpdate = true;
         }
+
         if (!shouldTriggerUpdate) {
             var $container = $(ReactDOM.findDOMNode(this));
             var $textarea = $('.chat-textarea:visible textarea:visible', $container);
-            if (!this._lastTextareaHeight || this._lastTextareaHeight !== $textarea.height()) {
-                this._lastTextareaHeight = $textarea.height();
+            if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
+                self._lastTextareaHeight = $textarea.height();
                 shouldTriggerUpdate = true;
+                if (self.props.onResized) {
+                    self.props.onResized();
+                }
             }
         }
 
+
+
         if (shouldTriggerUpdate) {
-            this.props.onUpdate();
+            if (self.onUpdateThrottling) {
+                clearTimeout(self.onUpdateThrottling);
+            }
+
+            self.onUpdateThrottling = setTimeout(function() {
+                self.props.onUpdate();
+            }, 70);
         }
     },
     stoppedTyping: function () {
@@ -114,7 +134,7 @@ var TypingArea = React.createClass({
     onCancelClicked: function(e) {
         var self = this;
         self.setState({typedMessage: ""});
-        self.props.onConfirm(false);
+        self.onConfirmTrigger(false);
         self.triggerOnUpdate();
     },
     onSaveClicked: function(e) {
@@ -128,7 +148,7 @@ var TypingArea = React.createClass({
         var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
 
         if (val.length > 0) {
-            if (self.props.onConfirm(val) !== true) {
+            if (self.onConfirmTrigger(val) !== true) {
                 self.setState({typedMessage: ""});
             }
             self.triggerOnUpdate();
@@ -140,7 +160,20 @@ var TypingArea = React.createClass({
         }
 
     },
-    onTypeAreaKeyDown: function (e) {
+    onConfirmTrigger: function(val) {
+        var result = this.props.onConfirm(val);
+
+        if (val !== false && result !== false) {
+            // scroll To 0 after sending a message.
+            var $node = $(this.findDOMNode());
+            var $textareaScrollBlock = $('.textarea-scroll', $node);
+            var jsp = $textareaScrollBlock.data('jsp');
+            jsp.scrollToY(0);
+            $('.jspPane', $textareaScrollBlock).css({'top': 0});
+        }
+        return result;
+    },
+    onTypeAreaKeyDown: function(e) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
@@ -154,11 +187,31 @@ var TypingArea = React.createClass({
 
         if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
 
-            if (self.props.onConfirm(val) !== true) {
+            if (self.onConfirmTrigger(val) !== true) {
                 self.setState({typedMessage: ""});
             }
             self.stoppedTyping();
             e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+    },
+    onTypeAreaKeyUp: function (e) {
+        if (this.props.disabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
+        var self = this;
+        var key = e.keyCode || e.which;
+        var element = e.target;
+        var val = $.trim(element.value);
+
+        if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+            // send already handled in onKeyDown
+            e.preventDefault();
+            e.stopPropagation();
             return;
         }
         else if (key === 13) {
@@ -186,6 +239,9 @@ var TypingArea = React.createClass({
                 return;
             }
         }
+
+
+        self.updateScroll(true);
     },
     onTypeAreaBlur: function (e) {
         if (this.props.disabled) {
@@ -207,11 +263,15 @@ var TypingArea = React.createClass({
 
         var self = this;
 
-        self.setState({typedMessage: e.target.value});
+        if (self.state.typedMessage !== e.target.value) {
+            self.setState({typedMessage: e.target.value});
+        }
 
         if ($.trim(e.target.value).length) {
             self.typing();
         }
+
+        self.updateScroll(true);
 
         // if (self.props.onUpdate) {
         //     self.props.onUpdate();
@@ -234,11 +294,17 @@ var TypingArea = React.createClass({
         window.addEventListener('resize', self.handleWindowResize);
 
         var $container = $(ReactDOM.findDOMNode(this));
-        initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
-        $('.chat-textarea-scroll textarea', $container).rebind('autoresized.typingArea', function() {
-            self.handleWindowResize();
+        // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
+        self._lastTextareaHeight = 20;
+        if (self.props.initialText) {
+            self.lastTypedMessage = this.props.initialText;
+        }
+
+        var $container = $(self.findDOMNode());
+        $('.jScrollPaneContainer', $container).rebind('forceResize.typingArea' + self.getUniqueId(), function() {
+            self.updateScroll(false);
         });
-        self.triggerOnUpdate();
+        self.triggerOnUpdate(true);
 
     },
     componentWillUnmount: function() {
@@ -259,6 +325,140 @@ var TypingArea = React.createClass({
 
             self.handleWindowResize();
         }
+        if (!this.scrollingInitialised) {
+            this.initScrolling();
+        }
+        else {
+            this.updateScroll();
+        }
+    },
+    initScrolling: function() {
+        var self = this;
+        self.scrollingInitialised = true;
+        var $node = $(self.findDOMNode());
+        var $textarea = $('textarea:first', $node);
+        var $textareaClone = $('message-preview', $node);
+        self.textareaLineHeight = parseInt($textarea.css('line-height'));
+        var $textareaScrollBlock = $('.textarea-scroll', $node);
+        $textareaScrollBlock.jScrollPane({
+            enableKeyboardNavigation: false,
+            showArrows: true,
+            arrowSize: 5,
+            animateScroll: false,
+            maintainPosition: false
+        });
+    },
+    updateScroll: function(keyEvents) {
+        var self = this;
+
+        // DONT update if not visible...
+        if (!self.isComponentVisible()) {
+            return;
+        }
+
+
+        var $node = $(self.findDOMNode());
+
+        var $textarea = $('textarea:first', $node);
+        var $textareaClone = $('.message-preview', $node);
+        var textareaMaxHeight = self.props.textareaMaxHeight;
+        var $textareaScrollBlock = $('.textarea-scroll', $node);
+        $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+
+        var textareaContent = $textarea.val();
+        var cursorPosition = self.getCursorPosition($textarea[0]);
+        var $textareaCloneSpan;
+        var jsp = $textareaScrollBlock.data('jsp');
+        var viewLimitTop = 0;
+        var scrPos = 0;
+        var viewRatio = 0;
+
+        // Set textarea height according to  textarea clone height
+        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
+
+
+        // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
+        if (
+            keyEvents &&
+            self.lastContent === textareaContent &&
+            self.lastPosition === cursorPosition
+        ) {
+                return;
+        }
+        else {
+            self.lastContent = textareaContent;
+            self.lastPosition = cursorPosition;
+            textareaContent = textareaContent.replace(/\n/g, '<br />');
+            $textareaClone.html(textareaContent + '<br />');
+        }
+
+        var textareaCloneHeight = $textareaClone.height();
+        $textarea.height(textareaCloneHeight);
+        $textareaCloneSpan = $textareaClone.children('span');
+        var textareaCloneSpanHeight = $textareaCloneSpan.height();
+        scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
+        viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
+
+        $textareaScrollBlock.height(
+            Math.min(
+                textareaCloneHeight,
+                textareaMaxHeight
+            )
+        );
+
+        jsp.reinitialise();
+
+        // Scrolling according cursor position
+        if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {
+            jsp.scrollToY(0);
+        }
+        else if (viewRatio > self.textareaLineHeight || viewRatio < viewLimitTop) {
+            if (
+                textareaCloneSpanHeight > 0 &&
+                jsp &&
+                textareaCloneSpanHeight > textareaMaxHeight
+            ) {
+                jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
+            } else if (jsp) {
+                jsp.scrollToY(0);
+            }
+        }
+
+
+        if (textareaCloneHeight < textareaMaxHeight) {
+            $textareaScrollBlock.addClass('noscroll');
+        }
+        else {
+            $textareaScrollBlock.removeClass('noscroll');
+        }
+        if (textareaCloneHeight !== self.state.textareaHeight) {
+            self.setState({
+                'textareaHeight': textareaCloneHeight
+            });
+            if (self.props.onResized) {
+                self.props.onResized();
+            }
+        }
+        else {
+            self.handleWindowResize();
+        }
+    },
+    getCursorPosition: function(el) {
+        var pos = 0;
+        if ('selectionStart' in el) {
+            pos=el.selectionStart;
+        } else if('selection' in document) {
+            el.focus();
+            var sel = document.selection.createRange(),
+                selLength = document.selection.createRange().text.length;
+
+            sel.moveStart('character', -el.value.length);
+            pos = sel.text.length - selLength;
+        }
+        return pos;
+    },
+    onTypeAreaSelect: function(e) {
+        this.updateScroll(true);
     },
     handleWindowResize: function (e, scrollToBottom) {
         var self = this;
@@ -269,6 +469,9 @@ var TypingArea = React.createClass({
             return;
         }
 
+        if (e) {
+            self.updateScroll(false);
+        }
         self.triggerOnUpdate();
 
     },
@@ -302,6 +505,18 @@ var TypingArea = React.createClass({
                     label={__(l[1718])} />
             ];
         }
+
+        var textareaStyles = {
+            height: self.state.textareaHeight
+        };
+
+        var textareaScrollBlockStyles = {
+            height: Math.min(
+                    self.state.textareaHeight,
+                    self.props.textareaMaxHeight
+                )
+        };
+
         return <div className={"typingarea-component" + self.props.className}>
             <div className="chat-textarea">
                 <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
@@ -320,19 +535,22 @@ var TypingArea = React.createClass({
 
                     {self.props.children}
                 </div>
-                <div className="chat-textarea-scroll textarea-scroll">
-                        <textarea
-                            className={messageTextAreaClasses}
-                            placeholder={__(l[8009])}
-                            onKeyDown={self.onTypeAreaKeyDown}
-                            onBlur={self.onTypeAreaBlur}
-                            onChange={self.onTypeAreaChange}
-                            value={self.state.typedMessage}
-                            ref="typearea"
-                            disabled={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
-                            readOnly={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
-                        ></textarea>
-                        <div className="message-preview"></div>
+                <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer" style={textareaScrollBlockStyles}>
+                    <textarea
+                        className={messageTextAreaClasses}
+                        placeholder={__(l[8009])}
+                        onKeyUp={self.onTypeAreaKeyUp}
+                        onKeyDown={self.onTypeAreaKeyDown}
+                        onBlur={self.onTypeAreaBlur}
+                        onChange={self.onTypeAreaChange}
+                        onSelect={self.onTypeAreaSelect}
+                        value={self.state.typedMessage}
+                        ref="typearea"
+                        style={textareaStyles}
+                        disabled={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
+                        readOnly={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
+                    ></textarea>
+                    <div className="message-preview"></div>
                 </div>
             </div>
             {buttons}

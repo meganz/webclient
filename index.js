@@ -63,6 +63,7 @@ function startMega() {
     }
 
     mBroadcaster.sendMessage('zoomLevelCheck');
+    $('#pwdmanhelper input').val('');
 }
 
 function mainScroll() {
@@ -220,12 +221,6 @@ function init_page() {
     }
     else if (!flhashchange || page !== 'fm/transfers') {
         n_h = false;
-        if (u_sid) {
-            api_setsid(u_sid);
-            if (waitxhr) {
-                waitsc();
-            }
-        }
         u_n = false;
         pfkey = false;
         pfid = false;
@@ -254,54 +249,16 @@ function init_page() {
         closeDialog();
     }
 
-    if (localStorage._proRegisterAccount) {
-        var acc = JSON.parse(localStorage._proRegisterAccount);
-        delete localStorage._proRegisterAccount;
+    if (localStorage.awaitingConfirmationAccount) {
+        var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
-        var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
-        var $button = $('.resend-email-button', $dialog);
-
-        $dialog.addClass('special').show();
-        $('input', $dialog).val(acc.email);
-
-        $button.rebind('click', function _click() {
-            var ctx = {
-                callback: function(res) {
-                    loadingDialog.hide();
-
-                    if (res !== 0) {
-                        console.error('sendsignuplink failed', res);
-
-                        $button.addClass('disabled');
-                        $button.unbind('click');
-
-                        var tick = 26;
-                        var timer = setInterval(function() {
-                            if (--tick === 0) {
-                                clearInterval(timer);
-                                $button.text(l[8744]);
-                                $button.removeClass('disabled');
-                                $button.rebind('click', _click);
-                            }
-                            else {
-                                $button.text('\u23F1 ' + tick + '...');
-                            }
-                        }, 1000);
-
-                        alert(l[200]);
-                    }
-                    else {
-                        closeDialog();
-                        fm_showoverlay();
-                        $dialog.removeClass('hidden');
-                    }
-                }
-            };
-            loadingDialog.show();
-            sendsignuplink(acc.name, acc.email, acc.password, ctx, true);
-        });
-        fm_showoverlay();
-        return;
+        // if visiting a #confirm link, or they confirmed it elsewhere.
+        if (confirmcode || u_type > 1) {
+            delete localStorage.awaitingConfirmationAccount;
+        }
+        else {
+            return mega.ui.sendSignupLinkDialog(acc);
+        }
     }
 
     var fmwasinitialized = !!fminitialized;
@@ -310,6 +267,16 @@ function init_page() {
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
             if ((!pfid && folderlink) || (pfid && folderlink === 0)) {
+
+                // re-initialize waitd connection when switching.
+                if (!pfid && folderlink && u_sid) {
+                    api_setsid(u_sid);
+
+                    if (waitxhr) {
+                        waitsc();
+                    }
+                }
+
                 M.reset();
                 folderlink = 0;
                 fminitialized = false;
@@ -752,6 +719,17 @@ function init_page() {
             mainScroll();
         }
     }
+    else if (page === 'disputenotice') {
+        parsepage(pages['disputenotice']);
+        copyright.init_cndispute();
+    }
+    else if (page === 'dispute') {
+        parsepage(pages['dispute']);
+        $('.reg-st5-complete-button').rebind('click', function (e) {
+            document.location.hash = 'disputenotice';
+        });
+        mainScroll();
+    }
     else if (page.substr(0, 3) == 'pro') {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
@@ -985,10 +963,13 @@ function init_page() {
         parsepage(pages['start'], 'start');
         init_start();
     }
-        
+
     // Initialise the Public Service Announcement system
     psa.init();
-    
+
+    // Initialise the update check system
+    alarm.siteUpdate.init();
+
     topmenuUI();
     loggedout = false;
     flhashchange = false;
@@ -1785,14 +1766,20 @@ function topmenuUI() {
         else if ($.dlhash) {
             document.location.hash = $.dlhash;
         }
+        else if (folderlink && M.lastSeenFolderLink) {
+            $(document).one('MegaOpenFolder', function() {
+                $('.nw-fm-left-icon.transfers').click();
+            });
+            location.hash = M.lastSeenFolderLink;
+        }
         else {
             document.location.hash = 'fm';
         }
     });
 
-    if (M && M.currentdirid && M.currentdirid.substr(0, 7) == 'search/') {
+    if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
         $('.top-search-bl').addClass('contains-value');
-        $('.top-search-bl input').val(M.currentdirid.replace('search/', ''));
+        $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
     if (u_type) {

@@ -666,7 +666,7 @@ function pro_pay() {
                 else if (pro_paymentmethod === 'directreseller') {
                     pro_m = directReseller.gatewayId; // 15
                 }
-                
+
                 // If AstroPay, send extra details
                 else if (pro_paymentmethod.indexOf('astropay') > -1) {
                     pro_m = astroPayDialog.gatewayId;
@@ -1983,7 +1983,7 @@ var directReseller = {
     redirectToSite: function(utcResult) {
         var provider = utcResult['EUR']['provider'];
         var params = utcResult['EUR']['params'];
-        
+
         if (provider === 1) {
             params = atob(params);
             window.location = 'http://mega.and1.tw/zh_tw/order_mega.php?' + params;
@@ -2593,11 +2593,10 @@ var cardDialog = {
  */
 var bitcoinDialog = {
 
-    // Web socket for chain.com connection to monitor bitcoin payment
-    chainWebSocketConn: null,
-
     // Timer for counting down the time till when the price expires
     countdownIntervalId: 0,
+
+    dialogOriginalHtml: '',
 
     /**
      * Step 3 in plan purchase with Bitcoin
@@ -2606,13 +2605,8 @@ var bitcoinDialog = {
     showInvoice: function(apiResponse) {
 
         /* Testing data to watch the invoice expire in 5 secs
-        apiResponse = {
-            "invoice_id": 'sIk',
-            "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
-            "amount": 1.35715354,
-            "created": Math.round(Date.now() / 1000),
-            "expiry": Math.round(Date.now() / 1000) + 5
-        };//*/
+        apiResponse['expiry'] = Math.round(Date.now() / 1000) + 5;
+        //*/
 
         // Set details
         var bitcoinAddress = apiResponse.address;
@@ -2621,56 +2615,56 @@ var bitcoinDialog = {
         var proPlanNum = selectedProPackage[1];
         var planName = getProPlan(proPlanNum);
         var planMonths = l[6806].replace('%1', selectedProPackage[4]);  // x month purchase
-        var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
+        var priceEuros = selectedProPackage[5];
         var priceBitcoins = apiResponse.amount;
         var expiryTime = new Date(apiResponse.expiry);
 
-        // Cache original HTML of dialog to reset after close
-        var dialogOverlay = $('.fm-dialog-overlay');
-        var dialog = $('.fm-dialog.pro-register-paypal-dialog');
-        var dialogOriginalHtml = dialog.html();
-
-        // Add styles for the dialog
-        dialogOverlay.addClass('bitcoin-invoice-dialog');
-        dialog.addClass('bitcoin-invoice-dialog');
-
-        // Clone template and show Bitcoin invoice
-        var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
-        dialog.html(bitcoinInvoiceHtml);
+        // Cache selectors
+        var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
+        var $bitcoinLoadingDialog = $('.pro-register-paypal-dialog');
+        var $bitcoinDialog = $('.bitcoin-invoice-dialog');
+                
+        // If this is the first open
+        if (bitcoinDialog.dialogOriginalHtml === '') {
+            
+            // Clone the HTML for the original dialog so it can be reset upon re-opening
+            bitcoinDialog.dialogOriginalHtml = $bitcoinDialog.html();
+        }
+        else {
+            // Replace the modified HTML with the original HTML
+            $bitcoinDialog.safeHTML(bitcoinDialog.dialogOriginalHtml);
+        }
 
         // Render QR code
-        bitcoinDialog.generateBitcoinQrCode(dialog, bitcoinAddress, priceBitcoins);
+        bitcoinDialog.generateBitcoinQrCode($bitcoinDialog, bitcoinAddress, priceBitcoins);
 
         // Update details inside dialog
-        dialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
-        dialog.find('.bitcoin-address').html(bitcoinAddress);
-        dialog.find('.invoice-date-time').html(invoiceDateTime);
-        dialog.find('.plan-icon').addClass('pro' + proPlanNum);
-        dialog.find('.plan-name').html(planName);
-        dialog.find('.plan-duration').html(planMonths);
-        dialog.find('.plan-price-euros').html(priceEuros);
-        dialog.find('.plan-price-bitcoins').html(priceBitcoins);
+        $bitcoinDialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
+        $bitcoinDialog.find('.bitcoin-address').text(bitcoinAddress);
+        $bitcoinDialog.find('.invoice-date-time').text(invoiceDateTime);
+        $bitcoinDialog.find('.plan-icon').addClass('pro' + proPlanNum);
+        $bitcoinDialog.find('.plan-name').text(planName);
+        $bitcoinDialog.find('.plan-duration').text(planMonths);
+        $bitcoinDialog.find('.plan-price-euros .value').text(priceEuros);
+        $bitcoinDialog.find('.plan-price-bitcoins').text(priceBitcoins);
 
         // Set countdown to price expiry
-        bitcoinDialog.setCoundownTimer(dialog, expiryTime);
+        bitcoinDialog.setCoundownTimer($bitcoinDialog, expiryTime);
 
         // Close dialog and reset to original dialog
-        dialog.find('.btn-close-dialog').rebind('click', function() {
+        $bitcoinDialog.find('.btn-close-dialog').rebind('click.bitcoin-dialog-close', function() {
 
-            dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
-            dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
-
-            // Close Web Socket if open
-            if (bitcoinDialog.chainWebSocketConn !== null) {
-                bitcoinDialog.chainWebSocketConn.close();
-            }
+            $dialogBackgroundOverlay.removeClass('bitcoin-invoice-dialog-overlay').addClass('hidden');
+            $bitcoinDialog.addClass('hidden');
 
             // End countdown timer
             clearInterval(bitcoinDialog.countdownIntervalId);
         });
-
-        // Update the dialog if a transaction is seen in the blockchain
-        bitcoinDialog.checkTransactionInBlockchain(dialog, bitcoinAddress, planName);
+        
+        // Make background overlay darker and show the dialog
+        $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay');
+        $bitcoinLoadingDialog.addClass('hidden');
+        $bitcoinDialog.removeClass('hidden');
     },
 
     /**
@@ -2692,79 +2686,7 @@ var bitcoinDialog = {
         };
 
         // Render the QR code
-        dialog.find('.bitcoin-qr-code').html('').qrcode(options);
-    },
-
-    /**
-     * Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
-     * This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
-     * @param {Object} dialog The jQuery object for the dialog
-     * @param {String} bitcoinAddress The bitcoin address
-     * @param {String} planName The Pro plan name
-     */
-    checkTransactionInBlockchain: function(dialog, bitcoinAddress, planName) {
-
-        // Open socket
-        bitcoinDialog.chainWebSocketConn = new WebSocket('wss://ws.chain.com/v2/notifications');
-
-        // Listen for events on this bitcoin address
-        bitcoinDialog.chainWebSocketConn.onopen = function (event) {
-            var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
-            bitcoinDialog.chainWebSocketConn.send(JSON.stringify(req));
-        };
-
-        // After receiving a response from the chain.com server
-        bitcoinDialog.chainWebSocketConn.onmessage = function (event) {
-
-            // Get data from WebSocket response
-            var notification = JSON.parse(event.data);
-            var type = notification.payload.type;
-            var address = notification.payload.address;
-
-            // Check only 'address' packets as the system also sends heartbeat packets
-            if ((type === 'address') && (address === bitcoinAddress)) {
-
-                // Update price left to pay
-                var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
-                var currentPriceSatoshis = btcmath.toSatoshi(currentPriceBitcoins);
-                var satoshisReceived = notification.payload.received;
-                var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
-                var priceRemainingBitcoins = btcmath.toBitcoinString(priceRemainingSatoshis);
-
-                // If correct amount was received
-                if (satoshisReceived === currentPriceSatoshis) {
-
-                    // Show success
-                    dialog.find('.left-side').css('visibility', 'hidden');
-                    dialog.find('.payment-confirmation').show();
-                    dialog.find('.payment-confirmation .reg-success-icon').addClass('success');
-                    dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
-                    dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
-                    dialog.find('.expiry-instruction').html('Paid!');
-
-                    // End countdown timer and close connection
-                    clearInterval(bitcoinDialog.countdownIntervalId);
-                    bitcoinDialog.chainWebSocketConn.close();
-
-                    // Inform API that we have full payment and await action packet confirmation.
-                    // a = action, vpay = verify payment, saleId = the id from the 'uts' call - this is
-                    // an array because one day we may support multiple sales e.g. buy Pro 1 and 2 at the
-                    // same time, add = the bitcoin address, t = payment gateway id for bitcoin provider (4)
-                    api_req({ a: 'vpay', saleid: [saleId], add: bitcoinAddress, t: 4 });
-                }
-
-                // If partial payment was made
-                else if (satoshisReceived < currentPriceSatoshis) {
-
-                    // Update price to pay
-                    dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
-                    dialog.find('.btn-open-wallet').attr('href', 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins);
-
-                    // Re-render QR code with updated price
-                    bitcoinDialog.generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
-                }
-            }
-        };
+        dialog.find('.bitcoin-qr-code').text('').qrcode(options);
     },
 
     /**
@@ -2774,8 +2696,11 @@ var bitcoinDialog = {
      * @param {Date} expiryTime The date/time the invoice will expire
      * @returns {Number} Returns the interval id
      */
-    setCoundownTimer: function(dialog, expiryTime)
-    {
+    setCoundownTimer: function(dialog, expiryTime) {
+        
+        // Clear old countdown timer if they have re-opened the page
+        clearInterval(bitcoinDialog.countdownIntervalId);
+        
         // Count down the time to price expiration
         bitcoinDialog.countdownIntervalId = setInterval(function() {
 
@@ -2798,7 +2723,7 @@ var bitcoinDialog = {
                 }
 
                 // Show time remaining
-                dialog.find('.time-to-expire').html(minutesPadded + ':' + secondsPadded);
+                dialog.find('.time-to-expire').text(minutesPadded + ':' + secondsPadded);
             }
             else {
                 // Grey out and hide details as the price has expired
@@ -2813,8 +2738,8 @@ var bitcoinDialog = {
                 dialog.find('.plan-price-euros').css('opacity', '0.25');
                 dialog.find('.plan-price-bitcoins').css('opacity', '0.25');
                 dialog.find('.plan-price-bitcoins-btc').css('opacity', '0.25');
-                dialog.find('.expiry-instruction').html('This purchase has expired.').css('opacity', '1');
-                dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
+                dialog.find('.expiry-instruction').text(l[8845]).css('opacity', '1');
+                dialog.find('.time-to-expire').text('00:00').css('opacity', '1');
                 dialog.find('.price-expired-instruction').show();
 
                 // End countdown timer
@@ -2828,26 +2753,20 @@ var bitcoinDialog = {
      */
     showBitcoinProviderFailureDialog: function() {
 
+        var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
+        var $bitcoinFailureDialog = $('.bitcoin-provider-failure-dialog');
+        
         // Add styles for the dialog
-        var dialogOverlay = $('.fm-dialog-overlay');
-        var dialog = $('.fm-dialog.pro-register-paypal-dialog');
-        var dialogOriginalHtml = dialog.html();
-
-        // Add styles for the dialog
-        dialogOverlay.addClass('bitcoin-provider-failure-dialog');
-        dialog.addClass('bitcoin-provider-failure-dialog');
+        $bitcoinFailureDialog.removeClass('hidden');
+        $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay').removeClass('hidden');
 
         // End countdown timer
         clearInterval(bitcoinDialog.countdownIntervalId);
 
-        // Clone template and show failure
-        var bitcoinProviderFailureHtml = $('.bitcoin-provider-failure').html();
-        dialog.html(bitcoinProviderFailureHtml);
-
         // Close dialog and reset to original dialog
-        dialog.find('.btn-close-dialog').rebind('click', function() {
-            dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');
-            dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
+        $bitcoinFailureDialog.find('.btn-close-dialog').rebind('click', function() {
+            $dialogBackgroundOverlay.removeClass('bitcoin-invoice-dialog-overlay').addClass('hidden');
+            $bitcoinFailureDialog.addClass('hidden');
         });
     }
 };
@@ -2972,191 +2891,35 @@ var doProLogin = function($dialog) {
 
 function showRegisterDialog() {
     megaAnalytics.log("pro", "regDialog");
-    $.dialog = 'pro-register-dialog';
 
-    var $dialog = $('.pro-register-dialog');
-    $dialog
-        .removeClass('hidden')
-        .addClass('active');
+    mega.ui.showRegisterDialog({
+        title: l[5840],
 
-    $('.fm-dialog-overlay').removeClass("hidden");
+        onCreatingAccount: function() {
+            megaAnalytics.log("pro", "doRegister");
+        },
 
-    var reposition = function() {
-        $dialog.css({
-            'margin-left': -1 * ($dialog.outerWidth() / 2),
-            'margin-top': -1 * ($dialog.outerHeight() / 2)
-        });
-    };
+        onLoginAttemptFailed: function(registerData) {
+            msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
+                if (e) {
+                    $('.pro-register-dialog').addClass('hidden');
+                    if (signupPromptDialog) {
+                        signupPromptDialog.hide();
+                    }
+                    showLoginDialog(registerData.email);
+                }
+            });
+        },
 
-    reposition();
-
-    $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
-
-
-    // controls
-    $('.fm-dialog-close', $dialog)
-        .unbind('click.proDialog')
-        .bind('click.proDialog', function() {
-            closeDialog();
-        });
-
-    $('#register-email', $dialog)
-        .data('placeholder', l[95])
-        .val(l[95]);
-
-    $('#register-firstname', $dialog)
-        .data('placeholder', l[1096])
-        .val(l[1096]);
-
-    $('#register-lastname', $dialog)
-        .data('placeholder', l[1097])
-        .val(l[1097]);
-
-    $('#register-password', $dialog)
-        .addClass('input-password')
-        .data('placeholder', l[909])
-        .val(l[909]);
-
-    $('#register-password2', $dialog)
-        .addClass('input-password')
-        .data('placeholder', l[1114])
-        .val(l[1114]);
-
-    uiPlaceholders($dialog);
-    uiCheckboxes($dialog);
-
-    var registerpwcheck = function()
-    {
-        $('.login-register-input.password', $dialog).removeClass('weak-password strong-password');
-        $('.new-registration', $dialog).removeClass('good1 good2 good3 good4 good5');
-        if (typeof zxcvbn == 'undefined' || $('#register-password', $dialog).attr('type') == 'text' || $('#register-password', $dialog).val() == '') return false;
-        var pw = zxcvbn($('#register-password', $dialog).val());
-        if (pw.score > 3 && pw.entropy > 75)
-        {
-            $('.login-register-input.password', $dialog).addClass('strong-password');
-            $('.new-registration', $dialog).addClass('good5');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong>' + l[1128]);
-            $('.new-reg-status-description', $dialog).text(l[1123]);
-        }
-        else if (pw.score > 2 && pw.entropy > 50)
-        {
-            $('.login-register-input.password', $dialog).addClass('strong-password');
-            $('.new-registration', $dialog).addClass('good4');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong>' + l[1127]);
-            $('.new-reg-status-description', $dialog).text(l[1122]);
-        }
-        else if (pw.score > 1 && pw.entropy > 40)
-        {
-            $('.login-register-input.password', $dialog).addClass('strong-password');
-            $('.new-registration', $dialog).addClass('good3');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong>' + l[1126]);
-            $('.new-reg-status-description', $dialog).text(l[1121]);
-        }
-        else if (pw.score > 0 && pw.entropy > 15)
-        {
-            $('.new-registration', $dialog).addClass('good2');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong>' + l[1125]);
-            $('.new-reg-status-description', $dialog).text(l[1120]);
-        }
-        else
-        {
-            $('.login-register-input.password', $dialog).addClass('weak-password');
-            $('.new-registration', $dialog).addClass('good1');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong> ' + l[1124]);
-            $('.new-reg-status-description', $dialog).text(l[1119]);
-        }
-        $('.password-status-warning', $dialog).html('<span class="password-warning-txt">' + l[34] + '</span> ' + l[1129] + '<div class="password-tooltip-arrow"></div>');
-        $('.password-status-warning', $dialog).css('margin-left',($('.password-status-warning', $dialog).width()/2*-1)-13);
-        reposition();
-    };
-
-    if (typeof zxcvbn == 'undefined' && !silent_loading)
-    {
-        $('.login-register-input.password', $dialog).addClass('loading');
-        silent_loading=function()
-        {
-            $('.login-register-input.password', $dialog).removeClass('loading');
-            registerpwcheck();
-        };
-        jsl.push(jsl2['zxcvbn_js']);
-        jsl_start();
-    }
-    $('#register-password', $dialog).unbind('keyup.proRegister');
-    $('#register-password', $dialog).bind('keyup.proRegister',function(e)
-    {
-        registerpwcheck();
-    });
-    $('.password-status-icon', $dialog).unbind('mouseover.proRegister');
-    $('.password-status-icon', $dialog).bind('mouseover.proRegister',function(e)
-    {
-        if ($(this).parents('.strong-password').length == 0)
-        {
-            $('.password-status-warning', $dialog).removeClass('hidden');
-        }
-
-    });
-    $('.password-status-icon', $dialog).unbind('mouseout.proRegister');
-    $('.password-status-icon', $dialog).bind('mouseout.proRegister',function(e)
-    {
-        if ($(this).parents('.strong-password').length == 0)
-        {
-            $('.password-status-warning', $dialog).addClass('hidden');
-        }
-    });
-
-    $('input', $dialog).unbind('keydown.proRegister');
-    $('input', $dialog).bind('keydown.proRegister',function(e)  {
-        if (e.keyCode == 13) {
-            doProRegister($dialog);
-        }
-    });
-
-
-    $('.register-st2-button', $dialog).unbind('click');
-    $('.register-st2-button', $dialog).bind('click',function(e) {
-        doProRegister($dialog);
-        return false;
-    });
-
-    $('.new-registration-checkbox a', $dialog)
-        .unbind('click.proRegisterDialog')
-        .bind('click.proRegisterDialog',function(e) {
-            $.termsAgree = function()
-            {
-                $('.register-check').removeClass('checkboxOff');
-                $('.register-check').addClass('checkboxOn');
-            };
-            termsDialog();
-            return false;
-        });
-};
-
-var doProRegister = function($dialog) {
-    megaAnalytics.log("pro", "doRegister");
-    loadingDialog.show();
-
-    if (u_type > 0)
-    {
-        msgDialog('warninga',l[135],l[5843]);
-        loadingDialog.show();
-        return false;
-    }
-
-    var registeraccount = function()
-    {
-        var done = function(login) {
-            loadingDialog.hide();
-            $('.pro-register-dialog').addClass('hidden');
-            $('.fm-dialog.registration-page-success').unbind('click');
-
+        onAccountCreated: function(gotLoggedIn, registerData) {
             // If true this means they do not need to confirm their email before continuing to step 2
             var skipConfirmationStep = true;
 
             if (skipConfirmationStep) {
                 closeDialog();
                 topmenuUI();
-                if (!login) {
-                    localStorage._proRegisterAccount = JSON.stringify(rv);
+                if (!gotLoggedIn) {
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
                 }
                 else {
                     showToast('megasync', l[8745]);
@@ -3168,176 +2931,8 @@ var doProRegister = function($dialog) {
                 $('.fm-dialog.registration-page-success').removeClass('hidden');
                 fm_showoverlay();
             }
-        };
-
-        var ctx =
-        {
-            callback : function(res)
-            {
-                if (res === 0) {
-                    var ops = {a:'up'};
-
-                    ops.terms = 'Mq';
-                    ops.firstname = base64urlencode(to8(rv.first));
-                    ops.lastname = base64urlencode(to8(rv.last));
-                    ops.name2 = base64urlencode(to8(rv.name));
-                    u_attr.terms = 1;
-
-                    api_req(ops);
-                    done();
-                }
-                else if (res === EACCESS || res === EEXIST) {
-
-                    var passwordaes = new sjcl.cipher.aes(prepare_key_pw(rv.password));
-                    var uh = stringhash(rv.email.toLowerCase(), passwordaes);
-                    var ctx = {
-                        checkloginresult: function(ctx, r) {
-                            loadingDialog.hide();
-
-                            if (!r) {
-                                $('.login-register-input.email', $dialog).addClass('incorrect');
-                                $('.login-register-input.email .top-loginp-tooltip-txt', $dialog)
-                                    .safeHTML('@@<div class="white-txt">@@</div>', l[1297], l[1298]);
-
-                                msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
-                                    if (e) {
-                                        $('.pro-register-dialog').addClass('hidden');
-                                        signupPromptDialog.hide();
-                                        showLoginDialog(rv.email);
-                                    }
-                                });
-                            }
-                            else if (r === EBLOCKED) {
-                                alert(l[730]);
-                            }
-                            else {
-                                u_type = r;
-                                u_checked = true;
-                                done(true);
-                            }
-                        }
-                    };
-                    u_login(ctx, rv.email, rv.password, uh, true);
-                }
-                else {
-                    loadingDialog.hide();
-                    msgDialog('warninga', 'Error', l[200], res);
-                }
-            }
-        };
-
-        var rv = {};
-
-        rv.password = $('#register-password', $dialog).val();
-        rv.first = $('#register-firstname', $dialog).val();
-        rv.last = $('#register-lastname', $dialog).val();
-        rv.email = $('#register-email', $dialog).val();
-        rv.name = rv.first + ' ' + rv.last;
-
-        sendsignuplink(rv.name, rv.email, rv.password, ctx, true);
-    };
-
-
-
-    var err=false;
-
-    if ($('#register-firstname', $dialog).val() == '' || $('#register-firstname', $dialog).val() == l[1096] || $('#register-lastname', $dialog).val() == '' || $('#register-lastname', $dialog).val() == l[1097])
-    {
-        $('.login-register-input.name', $dialog).addClass('incorrect');
-        err=1;
-    }
-    if ($('#register-email', $dialog).val() == '' || $('#register-email', $dialog).val() == l[1096] || checkMail($('#register-email', $dialog).val()))
-    {
-        $('.login-register-input.email', $dialog).addClass('incorrect');
-        err=1;
-    }
-
-    if ($('#register-email', $dialog).val() == '' || $('#register-email', $dialog).val() == l[1096] || checkMail($('#register-email', $dialog).val()))
-    {
-        $('.login-register-input.email', $dialog).addClass('incorrect');
-        err=1;
-    }
-
-    var pw = zxcvbn($('#register-password', $dialog).val());
-    if ($('#register-password', $dialog).attr('type') == 'text')
-    {
-        $('.login-register-input.password.first', $dialog).addClass('incorrect');
-        $('.white-txt.password', $dialog).text(l[213]);
-        err=1;
-    }
-    else if (pw.score == 0 || pw.entropy < 16)
-    {
-        $('.login-register-input.password.first', $dialog).addClass('incorrect');
-        $('.white-txt.password', $dialog).text(l[1104]);
-        err=1;
-    }
-
-    if ($('#register-password', $dialog).val() !== $('#register-password2', $dialog).val())
-    {
-        $('#register-password', $dialog)[0].type = 'password';
-        $('#register-password2', $dialog)[0].type = 'password';
-        $('#register-password', $dialog).val('');
-        $('#register-password2', $dialog).val('');
-        $('.login-register-input.password.confirm', $dialog).addClass('incorrect');
-        err=1;
-    }
-
-    if (!err && typeof zxcvbn == 'undefined')
-    {
-        msgDialog('warninga',l[135],l[1115] + '<br>' + l[1116]);
-        loadingDialog.hide();
-        return false;
-    }
-    else if (!err)
-    {
-        if ($('.register-check', $dialog).attr('class').indexOf('checkboxOff') > -1)
-        {
-            msgDialog('warninga',l[1117],l[1118]);
-            loadingDialog.hide();
         }
-        else
-        {
-            if (localStorage.signupcode)
-            {
-                loadingDialog.show();
-                u_storage = init_storage(localStorage);
-                var ctx =
-                {
-                    checkloginresult: function(u_ctx,r)
-                    {
-                        if (typeof r[0] == 'number' && r[0] < 0) msgDialog('warningb',l[135],l[200]);
-                        else
-                        {
-                            loadingDialog.hide();
-                            u_type = r;
-                            document.location.hash = 'fm'; //TODO: fixme
-                        }
-                    }
-                }
-                var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#register-password', $dialog).val()));
-                var uh = stringhash($('#register-email', $dialog).val().toLowerCase(),passwordaes);
-                u_checklogin(ctx,true,prepare_key_pw($('#register-password', $dialog).val()),localStorage.signupcode,$('#register-firstname', $dialog).val() + ' ' + $('#register-lastname', $dialog).val(),uh);
-                delete localStorage.signupcode;
-            }
-            else if (u_type === false)
-            {
-                loadingDialog.show();
-                u_storage = init_storage(localStorage);
-                u_checklogin(
-                    {
-                        checkloginresult: function(u_ctx,r)
-                        {
-                            u_type = r;
-                            registeraccount();
-                        }
-                    },true);
-            }
-            else if (u_type == 0) registeraccount();
-        }
-    }
-    if (err) {
-        loadingDialog.hide();
-    }
+    });
 };
 
 var paypalTimeout = null;

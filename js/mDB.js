@@ -52,12 +52,34 @@ function mStorageDB(aName, aOptions, aCallback) {
     }
 }
 mStorageDB.prototype = {
-    addSchemaHandler: function mStorageDB_addSchemaHandler(aTable, aKeyPath, aHandler) {
-        this.schema[aTable] = {
-            key: {
-                keyPath: aKeyPath
+    addSchema: function mStorageDB_addSchema(aTable, aKeyPath, aIndex) {
+        if (Array.isArray(aTable)) {
+            var self = this;
+            aTable.forEach(function(table) {
+                self.addSchema(table, aKeyPath, aIndex);
+            });
+        }
+        else {
+            if (!aKeyPath) {
+                aIndex = true;
+                aKeyPath = 'k';
             }
-        };
+            this.schema[aTable] = {
+                key: {
+                    keyPath: aKeyPath
+                }
+            };
+
+            if (aIndex) {
+                this.schema[aTable].indexes = {};
+                this.schema[aTable].indexes[aKeyPath] = { unique: true };
+            }
+        }
+        return this;
+    },
+
+    addSchemaHandler: function mStorageDB_addSchemaHandler(aTable, aKeyPath, aHandler) {
+        this.addSchema(aTable, aKeyPath);
         this.handlers[aTable] = aHandler;
         return this;
     },
@@ -100,6 +122,9 @@ mStorageDB.prototype = {
             db = new MegaDB(this.name, u_handle, this.schema, this.options);
 
             db.bind('onDbStateReady', function _onDbStateReady() {
+                if (self.options.noBulkRead) {
+                    return __dbNotifyCompletion();
+                }
                 self.fetch(Object.keys(self.schema))
                     .then(function() {
                         __dbNotifyCompletion();
@@ -137,6 +162,12 @@ mStorageDB.prototype = {
         this.db = db;
         this.add = this.query.bind(this, 'add');
         this.del = this.query.bind(this, 'del');
+
+        if (db) {
+            this.put = db.put.bind(db);
+            this.get = db.getv.bind(db);
+            this.cat = db.concat.bind(db);
+        }
 
         return promise;
     },
@@ -284,6 +315,18 @@ mBroadcaster.once('startMega', function __msdb_init() {
     db.addSchemaHandler( 'opc',  'p',  processOPC );
     db.addSchemaHandler( 'ipc',  'p',  processIPC );
     db.addSchemaHandler( 'ps',   'p',  processPS  );
+
+    /*mStorageDB('idbcache', { plugins: 0, ersistant: 1 },
+        function(aError) {
+            if (aError) {
+                if (d) {
+                    console.warn('Unable to initialize idbcache', aError);
+                }
+            }
+            else {
+                Object.defineProperty(mega, 'idbcache', { value: this });
+            }
+        }).addSchema('fa');*/
 
     mBroadcaster.once('mStorageDB:' + db.name,
         function __msdb_ready(aError) {

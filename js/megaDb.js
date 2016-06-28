@@ -30,6 +30,10 @@ function MegaDB(name, suffix, schema, options) {
     var dbName = 'mdb_' + name + '_' + suffix;
     var murSeed = options.murSeed || 0x4d444201;
 
+    if (options.persistant) {
+        dbName += '!persist';
+    }
+
     var murData =
         JSON.stringify(this.schema) +
         JSON.stringify(clone(this.options));
@@ -261,7 +265,10 @@ MegaDB.dropAllDatabases = function(aUserHandle) {
             while (len--) {
                 var dbn = dbNameList.item(len);
 
-                if (!aUserHandle || dbn.substr(-aUserHandle.length) === aUserHandle) {
+                if (dbn.indexOf('!persist') === -1
+                        && (!aUserHandle
+                            || dbn.substr(-aUserHandle.length) === aUserHandle)) {
+
                     promises.push(__drop(dbn));
                 }
             }
@@ -511,15 +518,6 @@ MegaDB.prototype.update = function(tableName, k, val) {
         val = k;
         k = val[this._getTablePk(tableName)];
     }
-    // ignore any __privateProperties and get back the .id after .add is done
-    var tempObj = clone(val);
-
-    Object.keys(tempObj).forEach(function(k) {
-        if (k.toString().indexOf("__") === 0) {
-            delete tempObj[k];
-        }
-    });
-
 
     val = clone(val);
     self.trigger("onModifyQuery", [tableName, val]);
@@ -533,6 +531,15 @@ MegaDB.prototype.update = _wrapFnWithBeforeAndAfterEvents(
     ),
     'Update'
 );
+
+// Wrapper around .update which prepares an object to store whatever data is passed
+MegaDB.prototype.put = function(tableName, key, value) {
+    var pk = this._getTablePk(tableName);
+
+    value = {v: value};
+    value[pk] = key;
+    return this.update(tableName, key, value);
+};
 
 
 /**
@@ -693,6 +700,73 @@ MegaDB.prototype.get = _wrapFnWithBeforeAndAfterEvents(
     'Get'
 );
 
+// Wrapper around .get that returns either the record found or undefined
+MegaDB.prototype.getv = function(tableName, val) {
+    var promise = new MegaPromise();
+
+    this.get(tableName, val)
+        .done(function(result) {
+            var value = result;
+
+            if ($.isArray(value)) {
+                value = value[0];
+            }
+
+            promise.resolve("v" in Object(value) ? value.v : value);
+        })
+        .fail(function() {
+            promise.reject.apply(promise, arguments);
+        });
+
+    return promise;
+};
+
+/**
+ * Check if a row/object is found, if it does append the data to it, otherwise insert normally.
+ *
+ * @param tableName {String}
+ * @param key {String} id of the object to be updated
+ * @param val {*} the value to append
+ * @param sep {String} Optional, character to concatenate if a string
+ * @returns {MegaPromise}
+ */
+MegaDB.prototype.concat = function(tableName, key, val, sep) {
+    var promise = new MegaPromise();
+    var self = this;
+
+    this.getv(tableName, key)
+        .done(function(result) {
+            var value = val;
+
+            if (result) {
+                if (typeof result === 'string') {
+                    sep = sep || '/';
+
+                    value = result + sep + val;
+                }
+                else if (Array.isArray(result)) {
+                    value = result;
+
+                    if (Array.isArray(val)) {
+                        value = value.concat(val);
+                    }
+                    else {
+                        value.push(val);
+                    }
+                }
+                else {
+                    return promise.reject(EARGS);
+                }
+            }
+
+            return promise.linkDoneAndFailTo(self.put(tableName, key, value));
+        })
+        .fail(function() {
+            promise.reject.apply(promise, arguments);
+        });
+
+    return promise;
+};
 
 /**
  * Get one object (by index) which pk equals to `val` from table `tableName`

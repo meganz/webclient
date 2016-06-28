@@ -7,7 +7,7 @@
 body.pro:after {
     content: url(../images/mega/payment-animation@2x.gif);
 }
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar, .nt-takedown-reinstated-notification .notification-avatar, .nt-payment-notification .notification-avatar, .nt-payment-reminder-notification .notification-avatar {
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar, .nt-takedown-reinstated-notification .notification-avatar, .nt-payment-notification .notification-avatar, .nt-payment-reminder-notification .notification-avatar, .fm-dialog.bitcoin-provider-failure-dialog .reg-success-icon {
     background-image: url(../images/mega/bitcoin-v7@2x.png);
     background-size: 200px auto;
 }
@@ -435,10 +435,6 @@ body.pro:after {
 .membership-icon-old {
     background-image: url(../images/mega/membership-spite@2x.png);
     background-size: 83px auto;
-}
-.account-set-bg1, .account-slider, a.account-slider, a.account-slider:link, a.account-slider:visited, a.account-slider:hover, a.account-slider:active, .ui-slider-handle.ui-state-default.ui-corner-all, .account-set-green-bg, .ui-slider-range.ui-widget-header.ui-slider-range-min {
-    background-image: url(../images/mega/account-sliders@2x.png);
-    background-size: 490px auto;
 }
 .blog-article li, .blog-new-full ul li, .sync li, .affiliate li, .pro li {
     background-image: url(../images/mega/dev-point-new.png);

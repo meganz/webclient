@@ -143,6 +143,8 @@ Chatd.MAX_KEEPALIVE_DELAY = 60000;
 Chatd.MESSAGE_EXPIRY = 60*60; // 60*60
 var MESSAGE_EXPIRY = Chatd.MESSAGE_EXPIRY;
 
+Chatd.VERSION = 0;
+
 // add a new chatd shard
 Chatd.prototype.addshard = function(chatId, shard, url) {
     // instantiate Chatd.Shard object for this shard if needed
@@ -205,8 +207,27 @@ Chatd.Shard = function(chatd, shard) {
         {
             functions: {
                 reconnect: function(connectionRetryManager) {
-                    //console.error("reconnect was called");
-                    return self.reconnect();
+                    // TODO: change this to use the new API method for retrieving a mcurl for a specific shard
+                    // (not chat)
+                    var firstChatId = Object.keys(self.chatIds)[0];
+                    asyncApiReq({
+                        a: 'mcurl',
+                        id: base64urlencode(firstChatId),
+                        v: Chatd.VERSION
+                    })
+                        .done(function(mcurl) {
+                            self.url = mcurl;
+                            return self.reconnect();
+                        })
+                        .fail(function(r) {
+                            if (r === EEXPIRED) {
+                                if (megaChat && megaChat.plugins && megaChat.plugins.chatdIntegration) {
+                                    megaChat.plugins.chatdIntegration.requiresUpdate();
+                                }
+                            }
+                        });
+
+
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -325,6 +346,13 @@ Chatd.Shard.prototype.reconnect = function() {
         // Resending of pending message should be done via the integration code, since it have more info and a direct
         // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
         self.resendpending();
+        
+        self.chatd.trigger('onOpen', {
+            shard: self
+        });
+        // Resending of pending message should be done via the integration code, since it have more info and a direct
+        // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
+        // self.resendpending();
         self.triggerEventOnAllChats('onRoomConnected');
     };
 
@@ -629,7 +657,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 len = 17;
                 break;
-            
+
             case Chatd.Opcode.RANGE:
                 self.keepAliveTimerRestart();
                 self.logger.log(

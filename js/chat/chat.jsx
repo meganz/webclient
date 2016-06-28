@@ -905,6 +905,10 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
 Chat.prototype.destroy = function(isLogout) {
     var self = this;
 
+    if (self.is_initialized === false) {
+        return;
+    }
+    
     self.karere.destroying = true;
     self.trigger('onDestroy', [isLogout]);
 

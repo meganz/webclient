@@ -901,6 +901,22 @@ function time2last(timestamp) {
 }
 
 /**
+ * Basic calendar math function (using moment.js) to return true or false if the date passed in is either
+ * the same day or the previous day.
+ *
+ * @param dateString {String|int}
+ * @param [refDate] {String|int}
+ * @returns {Boolean}
+ */
+var todayOrYesterday = function(dateString, refDate) {
+    var momentDate = moment(dateString);
+    var today = moment(refDate ? refDate : undefined).startOf('day');
+    var yesterday = today.clone().subtract(1, 'days');
+
+    return (momentDate.isSame(today, 'd') || momentDate.isSame(yesterday, 'd'));
+}
+
+/**
  * Basic calendar math function (using moment.js) that will return a string, depending on the exact calendar
  * dates/months ago when the passed `dateString` had happened.
  *

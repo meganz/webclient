@@ -1231,9 +1231,10 @@ var ConversationPanel = React.createClass({
 
                 var timestamp = v.delay;
                 var curTimeMarker;
-                if (timestamp + (2*24*60*60) >= unixtime()) {
+                var iso = (new Date(timestamp * 1000).toISOString());
+                if (todayOrYesterday(iso)) {
                     // if in last 2 days, use the time2lastSeparator
-                    curTimeMarker = time2lastSeparator((new Date(timestamp * 1000).toISOString()));
+                    curTimeMarker = time2lastSeparator(iso);
                 }
                 else {
                     // if not in the last 2 days, use 1st June [Year]

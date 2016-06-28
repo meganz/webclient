@@ -823,7 +823,7 @@ if (typeof l === 'undefined') {
 
 var date_months = []
 
-function acc_time2date(unixtime) {
+function acc_time2date(unixtime, yearIsOptional) {
     var MyDate = new Date(unixtime * 1000);
     var th = 'th';
     if ((parseInt(MyDate.getDate()) === 11) || (parseInt(MyDate.getDate()) === 12)) {}
@@ -839,7 +839,18 @@ function acc_time2date(unixtime) {
     if (lang !== 'en') {
         th = ',';
     }
-    return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
+    var result = date_months[MyDate.getMonth()] + ' ' + MyDate.getDate();
+
+    if (yearIsOptional === true) {
+        var currYear = (new Date()).getFullYear();
+        if (currYear !== MyDate.getFullYear()) {
+            result +=  th + ' ' + MyDate.getFullYear();
+        }
+    }
+    else {
+        result +=  th + ' ' + MyDate.getFullYear();
+    }
+    return result;
 }
 
 function time2last(timestamp) {
@@ -1292,7 +1303,7 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 
     $promise.verify = function() {
         if (validateFunction()) {
-            if (window.d) {
+            if (window.d && typeof(window.promisesDebug) !== 'undefined') {
                 console.debug("Resolving timeout promise",
                     timeout, "ms", "at", (new Date()),
                     validateFunction, resolveRejectArgs);
@@ -1308,7 +1319,7 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 
         var timeoutTimer = setTimeout(function() {
             if (validateFunction()) {
-                if (window.d) {
+                if (window.d && typeof(window.promisesDebug) !== 'undefined') {
                     console.debug("Resolving timeout promise",
                         timeout, "ms", "at", (new Date()),
                         validateFunction, resolveRejectArgs);

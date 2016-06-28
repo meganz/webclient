@@ -32,7 +32,13 @@ var Chatd = function(userId, options) {
         self.msgTransactionId += String.fromCharCode(Math.random()*256);
     }
 
-    self.logger = new MegaLogger("chatd");
+    var loggerIsEnabled = localStorage['chatdLogger'] === '1';
+
+    self.logger = new MegaLogger("chatd", {
+        minLogLevel: function() {
+            return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+        }
+    });
 
     self.options = $.extend({}, Chatd.DEFAULT_OPTIONS, options);
 
@@ -180,7 +186,16 @@ Chatd.Shard = function(chatd, shard) {
     // queued commands
     self.cmdq = '';
 
-    self.logger = new MegaLogger("shard-" + shard, {}, chatd.logger);
+    var loggerIsEnabled = localStorage['chatdLogger'] === '1';
+
+    self.logger = new MegaLogger(
+        "shard-" + shard, {
+            minLogLevel: function() {
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+            }
+        },
+        chatd.logger
+    );
 
     self.keepAliveTimer = null;
 
@@ -359,7 +374,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
 
-        console.error(unixtime(), "MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+        self.logger.debug("MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
         self.cmdq += String.fromCharCode(opCode)+cmd;
     });
@@ -368,7 +383,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
 };
 
 Chatd.Shard.prototype.cmd = function(opCode, cmd) {
-    console.error(unixtime(), "CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+    this.logger.debug("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
     this.cmdq += String.fromCharCode(opCode)+cmd;
 
@@ -491,14 +506,15 @@ Chatd.Shard.prototype.exec = function(a) {
     var cmd = String.fromCharCode.apply(null, a);
     var len;
     var newmsg;
-    console.log('Receive from chatd');
+
     var codestr = '';
     for (var i=0;i<cmd.length;i++)
     {
         codestr += cmd[i].charCodeAt(0).toString(16) + " ";
         
     }
-    console.log(codestr);
+    self.logger.debug("Received from chatd: ", codestr);
+
     while (cmd.length) {
         switch (cmd.charCodeAt(0)) {
             case Chatd.Opcode.KEEPALIVE:
@@ -893,7 +909,9 @@ Chatd.Messages.prototype.updatekeyid = function(keyid) {
 Chatd.Messages.prototype.modify = function(msgnum, message) {
     var self = this;
 
-    console.error("mod", msgnum, message);
+    var shard = self.chatd.chatIdShard[self.chatId];
+
+    shard.logger.debug("mod", msgnum, message);
 
     var mintimestamp = Math.floor(new Date().getTime()/1000);
 

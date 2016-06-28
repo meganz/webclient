@@ -9,7 +9,26 @@
 var ChatdIntegration = function(megaChat) {
     //return false;
     var self = this;
-    self.logger = MegaLogger.getLogger("chatdInt", {}, megaChat.logger);
+
+    var loggerIsEnabled = localStorage['chatdIntegrationLogger'] === '1';
+    self.logger = MegaLogger.getLogger(
+        "chatdInt",
+        {
+            onCritical: function(msg) {
+                if (msg.indexOf("order tampering") > -1) {
+                    api_req({
+                        a: 'log',
+                        e: 99616,
+                        m: 'order tampering'
+                    }, {});
+                }
+            },
+            minLogLevel: function() {
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+            }
+        },
+        megaChat.logger
+    );
 
     self.megaChat = megaChat;
     self.chatd = new Chatd(u_handle);
@@ -743,7 +762,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                         chatRoom.messagesBuff.messageOrders[v.identity] = chatRoom.messagesBuff.messages[messageId].orderValue;
                                         if (chatRoom.messagesBuff.verifyMessageOrder(v.identity, v.references) === false) {
                                             // potential message order tampering detected.
-                                            self.logger.error("potential message order tampering detected: ", messageId);
+                                            self.logger.critical("potential message order tampering detected: ", messageId);
                                         }
                                     }
                                 }
@@ -760,7 +779,12 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     chatRoom.messagesBuff.messages[messageId].userId = v.sender;
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
-                                    chatRoom.messagesBuff.messages[messageId].textContents = v.recipients + ' were changed to ' + v.privilege.charCodeAt(0) + ' by ' + v.sender;
+                                    chatRoom.messagesBuff.messages[messageId].meta = {
+                                        userId: v.sender,
+                                        privilege: v.privilege.charCodeAt(0),
+                                        targetUserId: v.recipients
+                                    };
+                                    chatRoom.messagesBuff.messages[messageId].dialogType = "privilegeChange";
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
                                     // this is a system message
@@ -875,7 +899,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     chatRoom.messagesBuff.messageOrders[decrypted.identity] = msgObject.orderValue;
                                     if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
                                         // potential message order tampering detected.
-                                        self.logger.error("potential message order tampering detected: ", msgObject.messageId);
+                                        self.logger.critical("potential message order tampering detected: ", msgObject.messageId);
                                     }
                                 }
                             } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
@@ -892,7 +916,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             }
                             else if (decrypted.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
                                 var msg = chatRoom.messagesBuff.messages[msgObject.messageId];
-                                msg.textContents = decrypted.recipients + ' were changed to ' + decrypted.privilege.charCodeAt(0) + ' by ' + decrypted.sender;
+                                msg.meta = {
+                                    userId: decrypted.sender,
+                                    privilege: decrypted.privilege.charCodeAt(0),
+                                    targetUserId: decrypted.recipients
+                                };
+                                msg.dialogType = "privilegeChange";
+
                             }
                             else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;

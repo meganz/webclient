@@ -377,7 +377,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'message': eventData.message,
                     'delay': eventData.ts,
                     'orderValue': eventData.id,
-                    'updated': eventData.updated
+                    'updated': eventData.updated,
+                    'sent': (eventData.userId === u_handle) ? Message.STATE.SENT : Message.STATE.NOT_SENT
                 }
             );
 
@@ -388,18 +389,19 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.lastDeliveredMessageRetrieved = true;
             }
 
-            // is my own message?
-            // mark as sent, since the msg was echoed from the server
-            if (eventData.userId === u_handle) {
-                msgObject.sent = Message.STATE.SENT;
-            }
             var cacheKey = chatRoom.chatId + "_" + eventData.messageId;
             // if the message has already been decrypted, then just bail.
             if (self.chatRoom.megaChat.plugins.chatdIntegration._processedMessages[cacheKey]) {
                 return;
             }
             self.messages.push(msgObject);
+            if (eventData.pendingid) {
+                var foundMessage = self.getByInternalId(eventData.pendingid);
 
+                if (foundMessage) {
+                    self.messages.removeByKey(foundMessage.messageId);
+                }
+            }
             if (!eventData.isNew) {
                 self.expectedMessagesCount--;
                 if (eventData.userId !== u_handle) {
@@ -609,13 +611,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             if (foundMessage) {
                 self.messages.removeByKey(foundMessage.messageId);
             }
-
-            foundMessage = self.getByInternalId(eventData.messageId);
-
-            if (foundMessage) {
-                self.messages.removeByKey(foundMessage.messageId);
-            }
-
         }
         else if (eventData.state === "EXPIRED") {
             self.haveMessages = true;

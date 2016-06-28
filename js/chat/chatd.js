@@ -1200,6 +1200,7 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
         self.chatd.trigger('onMessageStore', {
             chatId: base64urlencode(self.chatId),
             id: id,
+            pendingid: num >>> 0,
             messageId: base64urlencode(msgid),
             userId: base64urlencode(self.buf[id][Chatd.MsgField.USERID]),
             ts: self.buf[id][Chatd.MsgField.TIMESTAMP],
@@ -1209,15 +1210,6 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
             isNew: true
         });
 
-        self.chatd.trigger('onMessageUpdated', {
-            chatId: base64urlencode(self.chatId),
-            userId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.USERID]),
-            messageId: base64urlencode(msgid),
-            id: num >>> 0,
-            state: 'DISCARDED',
-            keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
-            message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
-        });
         var editmessagekey = self.getmessagekey(msgxid, Chatd.MsgType.EDIT);
         // if we have a pending edit, discard it as the NEWMSG should use the edited content.
         if (self.sending[editmessagekey]) {

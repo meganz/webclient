@@ -4447,13 +4447,10 @@ if (typeof sjcl !== 'undefined') {
                     }
                     else { // Exclude folder/file links,
                         if (shares) {
-                            length = Object.keys(shares).length;
+                            length = self.getFullSharesNumber(shares);
                             if (length) {
-                                if (!shares.EXP || (shares.EXP && length > 1)) {
-                                    return true;
-                                }
+                                return true;
                             }
-
                         }
                     }
                 }
@@ -4462,7 +4459,7 @@ if (typeof sjcl !== 'undefined') {
                 if (pendingShare) {
                     shares = M.ps[nodes[i]];
 
-                    if (M.ps && shares && Object.keys(shares).length) {
+                    if (shares && Object.keys(shares).length) {
                         return true;
                     }
                 }
@@ -4510,42 +4507,54 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        var result, shares, length;
+        var result = [];
+        var shares;
+        var length;
+        var tmp;
 
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
                 result = [];
 
-                // Look for full share
-                if (fullShare) {
-                    shares = M.d[nodes[i]].shares;
+                if (M.d[nodes[i]] && M.d[nodes[i]].shares) {
 
-                    // Look for link share
-                    if (linkShare) {
-                        if (shares && Object.keys(shares).length) {
-                            result.push(self.loopShares(shares), linkShare);
+                    // Look for full share
+                    if (fullShare) {
+                        shares = M.d[nodes[i]].shares;
+
+                        /* jshint -W073 */
+                        // Look for link share
+                        if (linkShare) {
+                            if (shares && Object.keys(shares).length) {
+                                tmp = self.loopShares(shares, linkShare);
+                                $.extend(result, tmp);
+                            }
                         }
-                    }
-                    else { // Exclude folder/file links,
-                        if (shares) {
-                            length = Object.keys(shares).length;
-                            if (length) {
-                                if (!shares.EXP || (shares.EXP && length > 1)) {
-                                    result.push(self.loopShares(shares), linkShare);
+                        else { // Exclude folder/file links,
+                            if (shares) {
+                                length = Object.keys(shares).length;
+                                if (length) {
+                                    if (!shares.EXP || (shares.EXP && length > 1)) {
+                                        tmp = self.loopShares(shares, linkShare);
+                                        $.extend(result, tmp);
+                                    }
                                 }
                             }
-
                         }
                     }
                 }
+                if (M.ps[nodes[i]]) {
 
-                // Look for pending share
-                if (pendingShare) {
-                    shares = M.ps[nodes[i]];
-                    if (M.ps && shares && Object.keys(shares).length) {
-                        result.push(self.loopShares(shares), linkShare);
+                    // Look for pending share
+                    if (pendingShare) {
+                        shares = M.ps[nodes[i]];
+                        if (M.ps && shares && Object.keys(shares).length) {
+                            tmp = self.loopShares(shares, linkShare);
+                            $.extend(result, tmp);
+                        }
                     }
                 }
+                /* jshint +W073 */
             }
         }
 
@@ -4568,9 +4577,7 @@ if (typeof sjcl !== 'undefined') {
             exclude = 'EXP',
             index;
 
-        $.each(shares, function(index, value) {
-           result.push(index);
-        });
+        result = Object.keys(shares);
 
         // Remove 'EXP'
         if (!linkShare) {
@@ -4582,6 +4589,157 @@ if (typeof sjcl !== 'undefined') {
         }
 
         return result;
+    };
+
+    /**
+     * getFullSharesNumber
+     *
+     * Loops through all shares and return number of full shares excluding
+     * ex. full contacts. Why ex. full contact, in the past when client removes
+     * full contact from the list, share related to client remains active on
+     * owners side. That behaviour is changed/updated on API side, so now after
+     * full contact relationship is removed, related shares are also removed.
+     *
+     * @param {Object} shares
+     * @returns {Integer} result Number of shares
+     */
+    Share.prototype.getFullSharesNumber = function(shares) {
+
+        var result = 0;
+        var contactKeys = [];
+
+        if (shares) {
+            contactKeys = Object.keys(shares);
+            $.each(contactKeys, function(ind, key) {
+
+                // Count only full contacts
+                if (M.u[key] && M.u[key].c) {
+                    result++;
+                }
+            });
+        }
+
+        return result;
+    };
+
+    /**
+     * nodesWithExContactShare
+     *
+     * Find all nodes with full shares belonging to ex. full contacts
+     *
+     * @param {Object} contacts
+     * @returns {Array} result Array of nodes handles
+     */
+    Share.prototype.nodesWithExContactShares = function(contacts) {
+
+        var self = this;
+        var result = [];
+        var contactKeys = [];
+        var exContactShares = [];
+        var fullSharesHandles = [];
+        var nodesHandle = [];
+
+        $.each(contacts, function(ind, contact) {
+
+            // Is contact relationship disconnected/removed
+            if (contact.c === 0) {
+                contactKeys.push(contact.u);// Contact handle
+            }
+        });
+
+        // If there's a full share where contact relationship is removed
+
+        // Find nodes with shares related to removed contact
+        $.each(M.d, function(nodeHandle, data) {
+
+            // Get full shares handles === contacts handles for a node
+            fullSharesHandles = self.getShares([nodeHandle], true);
+
+            if (fullSharesHandles.length) {
+
+                // Is there any ex full contacts handles in node shares
+
+                exContactShares = contactKeys.filter(function(id) {
+                    return fullSharesHandles.indexOf(id) !== -1;
+                });
+
+                // If ex full contacts hava a share in node add to result
+                if (exContactShares.length) {
+                    nodesHandle.push(nodeHandle);
+                }
+            }
+        });
+
+        result = nodesHandle;
+
+        return result;
+    };
+
+    Share.prototype.updateNodeShares = function() {
+
+        var self = this;
+
+        if ($.removedContactsFromShare.length > 0) {
+            self.removeContactFromShare();
+        }
+        if ($.changedPermissions.length > 0) {
+            doShare($.selected[0], $.changedPermissions, true);
+        }
+        addContactToFolderShare();
+    };
+
+
+    Share.prototype.removeFromPermissionQueue = function(handleOrEmail) {
+
+        $.changedPermissions.forEach(function(value, index) {
+            if (value.u === handleOrEmail) {
+                $.changedPermissions.splice(index, 1);
+            }
+        });
+    };
+
+    Share.prototype.removeContactFromShare = function() {
+
+        var self = this;
+        var userEmail = '';
+        var selectedNodeHandle = '';
+        var handleOrEmail = '';
+        var pendingContactId;
+
+        if ($.removedContactsFromShare.length > 0) {
+
+            $.removedContactsFromShare.forEach(function(elem) {
+                userEmail = elem.userEmail;
+                selectedNodeHandle = elem.selectedNodeHandle;
+                handleOrEmail = elem.handleOrEmail;
+
+                // The s2 api call can remove both shares and pending shares
+                api_req({
+                    a: 's2',
+                    n:  selectedNodeHandle,
+                    s: [{ u: userEmail, r: ''}],
+                    ha: '',
+                    i: requesti
+                });
+
+                // If it was a user handle, the share is a full share
+                if (M.u[handleOrEmail]) {
+                    userEmail = M.u[handleOrEmail].m;
+                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
+                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
+
+                    self.removeFromPermissionQueue(handleOrEmail);
+                }
+
+                // Pending share
+                else {
+                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
+                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
+
+                    self.removeFromPermissionQueue(userEmail);
+                }
+            });
+        }
     };
 
     // export
@@ -4852,5 +5010,4 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     }
 };
-
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);

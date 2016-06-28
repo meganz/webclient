@@ -524,7 +524,10 @@
 
                         // If users press enter/return on empty input field behave like done/share button is clicked
                         else {
-                            addContactToFolderShare();
+                            
+                            var share = new mega.Share();
+                            share.updateNodeShares();
+
                             addNewContact($('.add-user-popup-button.add'));
                         }
 

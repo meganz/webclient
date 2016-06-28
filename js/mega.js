@@ -885,11 +885,13 @@ function MegaData()
     };
 
     this.handleEmptyContactGrid = function() {
+
+        var haveActiveContact = false;
+
         // If focus is on contacts tab
         if (M.currentdirid === 'contacts') {
-            var haveActiveContact = false;
             M.u.forEach(function(v, k) {
-                if (v.c !== 0 && v.c !== 2) {
+                if (v.c === 1) {
                     haveActiveContact = true;
                     return false; // break
                 }
@@ -902,6 +904,8 @@ function MegaData()
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
+
+        return haveActiveContact;
     };
 
     /**
@@ -1471,8 +1475,8 @@ function MegaData()
         for (i in contacts) {
             if (contacts.hasOwnProperty(i)) {
 
-                // don't show my own contact in the contact & conv. lists
-                if (contacts[i].u === u_handle) {
+                // only full contacts
+                if (contacts[i].c !== 1) {
                     continue;
                 }
 
@@ -3651,7 +3655,9 @@ function MegaData()
                 delete this.d[h].shares;
                 M.nodeAttr({ h: h, shares: undefined });
                 delete u_sharekeys[h];
-                sharedUInode(h);
+                if (fminitialized) {
+                    sharedUInode(h);
+                }
                 if (typeof mDB === 'object') {
                     mDBdel('ok', h);
                 }
@@ -5323,6 +5329,8 @@ function execsc(actionPackets, callback) {
         async_procnodes = [],
         async_treestate = [],
         loadavatars = false;
+    var share = new mega.Share();
+    var exSharedNodes = [];
 
     newnodes = [];
 
@@ -5358,6 +5366,16 @@ function execsc(actionPackets, callback) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
+
+                if (fminitialized) {
+                    exSharedNodes = share.nodesWithExContactShares(actionPacket.u);
+
+                    /* jshint -W083 */
+                    $.each(exSharedNodes, function(ind, node) {
+                        sharedUInode(node);
+                    });
+                    /* jshint +W083 */
+                }
             }
 
             // Full share
@@ -5375,6 +5393,9 @@ function execsc(actionPackets, callback) {
                         addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: email}]);
                     }
                 }
+
+                // Full share contains .h param
+                sharedUInode(actionPacket.h);
             }
 
             // Outgoing pending contact
@@ -5453,6 +5474,7 @@ function execsc(actionPackets, callback) {
             });
         }
         else if ((actionPacket.a === 's' || actionPacket.a === 's2') && !folderlink) {
+
             var tsharekey = '';
             var prockey = false;
 
@@ -5462,25 +5484,28 @@ function execsc(actionPackets, callback) {
                 if (typeof actionPacket.r === "undefined") {
                     M.delNodeShare(actionPacket.n, actionPacket.u);
                 }
-                else if (M.d[actionPacket.n]
-                    && typeof M.d[actionPacket.n].shares !== 'undefined'
-                    && M.d[actionPacket.n].shares[actionPacket.u]
-                    || actionPacket.ha == crypto_handleauth(actionPacket.n)) {
+                else {
+                    var handle = actionPacket.n;
+                    var shares = Object(M.d[handle]).shares || {};
 
-                    // I updated or created my share
-                    u_sharekeys[actionPacket.n] = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
-                    M.nodeShare(actionPacket.n, {
-                        h: actionPacket.n,
-                        r: actionPacket.r,
-                        u: actionPacket.u,
-                        ts: actionPacket.ts
-                    });
+                    if (shares.hasOwnProperty(actionPacket.u)
+                            || (actionPacket.ha === crypto_handleauth(actionPacket.n))) {
+
+                        // I updated or created my share
+                        u_sharekeys[handle] = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
+                        M.nodeShare(handle, {
+                            h: actionPacket.n,
+                            r: actionPacket.r,
+                            u: actionPacket.u,
+                            ts: actionPacket.ts
+                        });
+                    }
                 }
             }
             else {
-                if (typeof actionPacket.n !== 'undefined'
-                        && typeof actionPacket.k !== 'undefined'
-                        && typeof u_sharekeys[actionPacket.n] === 'undefined') {
+                if ((typeof actionPacket.n !== 'undefined')
+                        && (typeof actionPacket.k !== 'undefined')
+                        && (typeof u_sharekeys[actionPacket.n] === 'undefined')) {
 
                     if (!actionPacket.k) {
                         // XXX: We need to find out which API call is causing it
@@ -5603,6 +5628,7 @@ function execsc(actionPackets, callback) {
 
             if (fminitialized) {
                 M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                sharedUInode(actionPacket.n);
             }
         }
         else if (actionPacket.a === 'k' && !folderlink) {
@@ -5681,20 +5707,36 @@ function execsc(actionPackets, callback) {
                 $('#contact_' + actionPacket.ou).remove();
 
                 $.each(actionPacket.u, function(k, v) {
+
+                    var userHandle = v.u;
+
                     // hide the context menu if it is currently visible and this contact was removed.
-                    if ($.selected && $.selected[0] === v.u) {
+                    if ($.selected && ($.selected[0] === userHandle)) {
+
                         // was selected
                         $.selected = [];
                         if ($('.context-menu.files-menu').is(":visible")) {
                             $.hideContextMenu();
                         }
                     }
-                    if (M.c[v.u]) {
-                        for (var sharenode in M.c[v.u]) {
-                            removeShare(sharenode, 1);
+                    if (M.c[userHandle]) {
+                        for (var sharenode in M.c[userHandle]) {
+                            if (M.c[userHandle].hasOwnProperty(sharenode)) {
+                                removeShare(sharenode, 1);
+                            }
                         }
                     }
                 });
+
+                if (fminitialized) {
+                    exSharedNodes = share.nodesWithExContactShares(actionPacket.u);
+
+                    /* jshint -W083 */
+                    $.each(exSharedNodes, function(ind, node) {
+                        sharedUInode(node);
+                    });
+                    /* jshint +W083 */
+                }
 
                 M.handleEmptyContactGrid();
             }
@@ -6314,11 +6356,8 @@ function getUserHandleFromEmail(emailAddress) {
  */
 function doShare(nodeId, targets, dontShowShareDialog) {
 
-    var masterPromise = new MegaPromise(),
-        logger = MegaLogger.getLogger('doShare'),
-        childNodesId = [],// Holds complete directory tree starting from nodeId
-        usersWithHandle = [],
-        usersWithoutHandle = [];
+    var masterPromise = new MegaPromise();
+    var logger = MegaLogger.getLogger('doShare');
 
     /** Settle function for API set share command. */
     var _shareDone = function(result, users) {
@@ -6378,7 +6417,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
     };
 
     // Get complete children directory structure for root node with id === nodeId
-    childNodesId = fm_getnodes(nodeId);
+    var childNodesId = fm_getnodes(nodeId);
     childNodesId.push(nodeId);
 
     // Create new lists of users, active (with user handle) and non existing (pending)
@@ -6404,7 +6443,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                     var userHandle = result.u;
 
                     // 'u' is returned user handle, 'r' is access right
-                    usersWithHandle = [];
+                    var usersWithHandle = [];
 
                     if (M.u[userHandle] && M.u[userHandle].c !== 0) {
                         usersWithHandle.push({ 'r': ctx.shareAccessRightsLevel, 'u': userHandle });
@@ -6412,7 +6451,8 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                     else {
                         usersWithHandle.push({
                             'r': ctx.shareAccessRightsLevel,
-                            'u': userHandle, 'k': result.pubk,
+                            'u': userHandle,
+                            'k': result.pubk,
                             'm': ctx.targetEmail
                         });
                     }
@@ -6425,7 +6465,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                 }
                 else {
                     // NOT ok, user doesn't have account yet
-                    usersWithoutHandle = [];
+                    var usersWithoutHandle = [];
                     usersWithoutHandle.push({ 'r': ctx.shareAccessRightsLevel, 'u': ctx.targetEmail });
                     sharePromise = api_setshare1({
                         node: nodeId,
@@ -6724,6 +6764,10 @@ function processPS(pendingShares, ignoreDB) {
 
     DEBUG('processPS');
     var ps;
+    var nodeHandle;
+    var pendingContactId;
+    var shareRights;
+    var timeStamp;
 
     for (var i in pendingShares) {
         if (pendingShares.hasOwnProperty(i)) {
@@ -6736,15 +6780,15 @@ function processPS(pendingShares, ignoreDB) {
 
             // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
             else {
-                var nodeHandle = ps.n,
-                    pendingContactId = ps.p,
-                    shareRights = ps.r,
-                    timeStamp = ps.ts;
+                nodeHandle = ps.n;
+                pendingContactId = ps.p;
+                shareRights = ps.r;
+                timeStamp = ps.ts;
 
                 // shareRights is undefined when user denies pending contact request
                 // .op is available when user accepts pending contact request and
                 // remaining pending share should be updated to full share
-                if (typeof shareRights === 'undefined' || ps.op) {
+                if ((typeof shareRights === 'undefined') || ps.op) {
 
                     M.delPS(pendingContactId, nodeHandle);
 
@@ -6753,6 +6797,7 @@ function processPS(pendingShares, ignoreDB) {
                     }
 
                     if (M.opc && M.opc[ps.p]) {
+
                         // Update tokenInput plugin
                         addToMultiInputDropDownList('.share-multiple-input', [{id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m}]);
                         addToMultiInputDropDownList('.add-contact-multiple-input', {id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m});
@@ -6761,11 +6806,16 @@ function processPS(pendingShares, ignoreDB) {
                 else {
 
                     // Add the pending share to state
-                    M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
+                    M.addPS({
+                        'h':nodeHandle,
+                        'p':pendingContactId,
+                        'r':shareRights,
+                        'ts':timeStamp
+                    }, ignoreDB);
+                }
 
-                    if (fminitialized) {
-                        sharedUInode(nodeHandle);
-                    }
+                if (fminitialized) {
+                    sharedUInode(nodeHandle);
                 }
             }
         }

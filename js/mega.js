@@ -5752,13 +5752,6 @@ function execsc(actionPackets, callback) {
                             $.hideContextMenu();
                         }
                     }
-                    if (M.c[userHandle]) {
-                        for (var sharenode in M.c[userHandle]) {
-                            if (M.c[userHandle].hasOwnProperty(sharenode)) {
-                                removeShare(sharenode, 1);
-                            }
-                        }
-                    }
                 });
 
                 M.handleEmptyContactGrid();

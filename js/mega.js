@@ -200,6 +200,7 @@ function MegaData()
         this.opc = {};
         this.ipc = {};
         this.ps = {};
+        this.su = {};
         this.sn = false;
         this.filter = false;
         this.sortfn = false;
@@ -2960,6 +2961,12 @@ function MegaData()
         if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
             mSDB.add('ps', clone(ps));
         }
+
+        // maintain special outgoing shares index by user:
+        if (!this.su[ps.p]) {
+            this.su[ps.p] = [];
+        }
+        this.su[ps.p][ps.h] = 2;
     };
 
     /**
@@ -3596,6 +3603,38 @@ function MegaData()
         return false;
     };
 
+    /**
+     * Retrieve all users a node is being shared with
+     * @param {Object} node    The ufs-node
+     * @param {String} exclude A list of users to exclude
+     * @return {Array} users list
+     */
+    this.getNodeShareUsers = function(node, exclude) {
+        var result = [];
+
+        if (typeof node !== 'object') {
+            node = this.getNodeByHandle(node);
+        }
+
+        if (node && node.shares) {
+            var users = Object.keys(node.shares);
+
+            if (exclude) {
+                if (!Array.isArray(exclude)) {
+                    exclude = [exclude];
+                }
+
+                users = users.filter(function(user) {
+                    return exclude.indexOf(user) === -1;
+                });
+            }
+
+            result = users;
+        }
+
+        return result;
+    };
+
     this.nodeShare = function(h, s, ignoreDB) {
         if (this.d[h]) {
             if (typeof this.d[h].shares === 'undefined') {
@@ -3626,6 +3665,12 @@ function MegaData()
                     });
                 }
             }
+
+            // maintain special outgoing shares index by user:
+            if (!this.su[s.u]) {
+                this.su[s.u] = [];
+            }
+            this.su[s.u][h] = 1;
         }
         else if (d) {
             console.log('nodeShare failed for node:', h, s, ignoreDB);
@@ -5329,8 +5374,6 @@ function execsc(actionPackets, callback) {
         async_procnodes = [],
         async_treestate = [],
         loadavatars = false;
-    var share = new mega.Share();
-    var exSharedNodes = [];
 
     newnodes = [];
 
@@ -5365,16 +5408,6 @@ function execsc(actionPackets, callback) {
                         }
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
-                }
-
-                if (fminitialized) {
-                    exSharedNodes = share.nodesWithExContactShares(actionPacket.u);
-
-                    /* jshint -W083 */
-                    $.each(exSharedNodes, function(ind, node) {
-                        sharedUInode(node);
-                    });
-                    /* jshint +W083 */
                 }
             }
 
@@ -5727,16 +5760,6 @@ function execsc(actionPackets, callback) {
                         }
                     }
                 });
-
-                if (fminitialized) {
-                    exSharedNodes = share.nodesWithExContactShares(actionPacket.u);
-
-                    /* jshint -W083 */
-                    $.each(exSharedNodes, function(ind, node) {
-                        sharedUInode(node);
-                    });
-                    /* jshint +W083 */
-                }
 
                 M.handleEmptyContactGrid();
             }
@@ -6925,6 +6948,17 @@ function process_u(u) {
 
             // Update user attributes M.u
             M.addUser(u[i]);
+
+
+            // FIXME: I don't see the point of calling sharedUInode() here on contact removal.
+            //        I.e. if we're removing the shares associated with an user on their removal, then
+            //        that function should be called already doing that, otherwise that likely indicates
+            //        a bug elsewhere and we're just hiding it doing this here...
+            if (fminitialized) {
+                if (u[i].c === 0 && M.su[u[i].u]) {
+                    Object.keys(M.su[u[i].u]).forEach(sharedUInode);
+                }
+            }
         }
     }
 

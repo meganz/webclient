@@ -238,19 +238,20 @@ function filetype(n) {
     }
 }
 
-function fileIcon(nodeInfo) {
+function fileIcon(node) {
 
     var icon;
 
-    // (Is folder && have share) || (if r attribute?) || (is pending share)
-    if ((nodeInfo.t && nodeInfo.share) || (typeof nodeInfo.r === "number") || (nodeInfo.h && M.ps[nodeInfo.h])) {
-        icon = 'folder-shared';
+    if (node.t) {
+        if (M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
+            icon = 'folder-shared';
+        }
+        else {
+            icon = 'folder';
+        }
     }
-    else if (nodeInfo.t) {
-        icon = 'folder';
-    }
-    else if (ext[fileext(nodeInfo.name)]) {
-        icon = ext[fileext(nodeInfo.name)][0];
+    else if (ext[fileext(node.name)]) {
+        icon = ext[fileext(node.name)][0];
     }
     else {
         icon = 'generic';

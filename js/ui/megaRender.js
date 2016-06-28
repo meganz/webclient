@@ -682,15 +682,13 @@
                 }
 
                 if (aExtendedInfo !== false) {
-                    var isShared = M.ps[aHandle]
-                        || (aNode.shares && Object.keys(aNode.shares).length);
 
                     if (share) {
                         props.linked = true;
                         props.classNames.push('linked');
                     }
 
-                    props.icon = fileIcon({ t: aNode.t, share: isShared, name: aNode.name });
+                    props.icon = fileIcon(aNode);
 
                     if (!this.viewmode) {
                         if (M.lastColumn && aNode.p !== "contacts") {

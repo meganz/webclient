@@ -1466,12 +1466,13 @@ function sharedUInode(nodeHandle) {
 
     // t === 1, folder
     if (M.d[nodeHandle] && M.d[nodeHandle].t) {
+        var icon = fileIcon(M.d[nodeHandle]);
 
         // Update right panel selected node with appropriate icon for list view
-        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
+        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(icon);
 
         // Update right panel selected node with appropriate icon for block view
-        $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(fileIcon({t: 1, share: bAvailShares}));
+        $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(icon);
     }
 
     // If no shares are available, remove share icon from left panel, right panel (list and block view)

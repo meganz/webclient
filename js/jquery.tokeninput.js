@@ -41,20 +41,26 @@
          * resultsFormatter
          *
          * Creates contact row for share dialog drop down list.
-         * It contains user avatar and two fields one below other
-         * We can have 2 different layouts depending if contact have name or not
-         * 1. Contact does NOT have name. Top field is contact email address
+         * Row is consisted of user avatar and two fields one below other
+         * -------------------------
+         * |        | upper string |
+         * | avatar |--------------|
+         * |        | lower string |
+         * -------------------------
+         * We can have 2 different situations depending on contact name
+         * 1. Contact does NOT have a name. Top field is contact email address
          * bottom field is 'Email' string
-         * 2. Contact does have name. Top field is a contact name, bottom field
-         * is a contact email address.
+         * 2. Contact does have a name. Top field is a contact name, bottom
+         * field is a contact email address.
          *
+         * @@param {Object} item
          * @returns {String} Html
          */
         resultsFormatter: function (item) {
 
             var id;
             var avatar;
-            var email = item[this.propertyToSearch];
+            var email = item[this.tokenValue];
             var contactName = '';
             var upperValue = '';
             var lowerValue = '';
@@ -67,14 +73,16 @@
                 }
             });
 
-            contactName = M.getNameByHandle(id);
+            if (id) {
+                contactName = M.getNameByHandle(id);
+            }
 
             // Check existance of contact name and arrange upper/lower strings
-            if ((contactName === email) || (contactName === '')) {
+            if ((contactName === email) || (contactName === '')) {// no contact name
                 upperValue = email;
-                lowerValue = l[7434];
+                lowerValue = l[7434];// Email
             }
-            else {
+            else {// with contact name
                 upperValue = contactName;
                 lowerValue = email;
             }

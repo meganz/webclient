@@ -4011,6 +4011,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
 /** prevent tabnabbing attacks */
 mBroadcaster.once('startMega', function() {
+    return;
 
     if (!(window.chrome || window.safari || window.opr)) {
         return;
@@ -4065,7 +4066,7 @@ mBroadcaster.once('startMega', function() {
         }
     });
 
-    // Catch clicks on links and forward them to window.opemn
+    // Catch clicks on links and forward them to window.open
     document.documentElement.addEventListener('click', function(ev) {
         var node = Object(ev.target);
 

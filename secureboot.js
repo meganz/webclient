@@ -834,6 +834,10 @@ else {
 function siteLoadError(error, filename) {
     var message = ['An error occurred while loading MEGA.'];
 
+    if (location.host !== 'mega.nz') {
+        message[0] += '..';
+    }
+
     if (error === 1) {
         message.push('The file "' + filename + '" is corrupt.');
     }
@@ -847,6 +851,9 @@ function siteLoadError(error, filename) {
     if (!is_extension) {
         message.push('Please try again later. We apologize for the inconvenience.');
     }
+    message.push("If the problem persist, please try disabling all third-party browser "
+                + "extensions and reload your browser. If that doesn't help, contact support@mega.nz");
+
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
 
     contenterror = 1;
@@ -2173,7 +2180,7 @@ else if (!b_u)
     }
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
-    
+
     if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
@@ -2205,7 +2212,7 @@ else if (!b_u)
         lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
-    
+
     function boot_auth(u_ctx,r)
     {
         u_type = r;

@@ -6380,12 +6380,12 @@
         "context": ""
     },
     "5896": {
-        "text": "Start audio call",
-        "context": ""
+        "text": "Start Audio Call",
+        "context": "Button title to start audio call"
     },
     "5897": {
-        "text": "Start video call",
-        "context": ""
+        "text": "Start Video Call",
+        "context": "Button label to start video call"
     },
     "5898": {
         "text": "The user [X] has been invited and will appear in your contact list once accepted.",
@@ -7792,8 +7792,8 @@
         "context": ""
     },
     "6834": {
-        "text": "Send files",
-        "context": ""
+        "text": "Send Files",
+        "context": "Button label for sending file attachments through the chat to another user."
     },
     "6835": {
         "text": "Add contact to Conversation",
@@ -11492,7 +11492,7 @@
         "context": "Information that shared file has beed saved to your Cloud drive."
     },
     "8007": {
-        "text": "Add participant...",
+        "text": "Add Participant...",
         "context": "Button label. Allows to add contacts in current chat conversation."
     },
     "8008": {
@@ -13718,5 +13718,25 @@
     "8910": {
         "text": "Removed item from shared folder",
         "context": "Notification when on client side when owner of a shared folder removes folder\/file from it."
+    },
+    "8911": {
+        "text": "Keep names as in the mobile device",
+        "context": "Option to choose that the camera sync will maintain the local file names when uploading"
+    },
+    "8912": {
+        "text": "I'll use [B]MEGAsync[\/B]",
+        "context": "Shown when user tries to upload more than 100 files and MEGAsync is found running.\r\nPlease leave the [B] and [\/B] tags as they are."
+    },
+    "8913": {
+        "text": "Removed [X] items from a share",
+        "context": "Notification popup.\r\nNotification for multiple removed items from a share.\r\nPlease keep [X] as it will be replaced at runtime with the number of removed items."
+    },
+    "8914": {
+        "text": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+        "context": "A warning message that appears if a series of messages in the chat appear to be in the wrong order. This is unlikely but could mean that a man-in-the-middle attacker has tried to move messages around."
+    },
+    "8915": {
+        "text": "was changed to %s1 by %s2",
+        "context": "A log message in a chat to display a participant's permission was changed and by whom. This message sits directly under a user's name and avatar (the subject of the sentence). s1% will be replaced with the permission name (such as Moderator or Read-only) and %s2 will be replaced with the person who did it.\r\nFor example:\r\n[Alice Jones]\r\nwas changed to Moderator by John Smith"
     }
 }

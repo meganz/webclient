@@ -3411,8 +3411,8 @@
     "8888": "(\u7a7a)",
     "8889": "\u9078\u64c7\u4e00\u6216\u591a\u500b\u806f\u7d61\u4eba\u4e26\u958b\u59cb\u5c0d\u8a71",
     "8890": "\u767c\u8d77\u5c0d\u8a71\u7fa4\u7d44",
-    "8891": "Revoke Attachment",
-    "8892": "Revoked access to attachment(s).",
+    "8891": "\u64a4\u9664\u9644\u4ef6",
+    "8892": "\u64a4\u9664\u5b58\u53d6\u9644\u4ef6",
     "8893": "\u7121\u6cd5\u64a4\u92b7\u5b58\u53d6\u9644\u4ef6\u3002\u932f\u8aa4\u4ee3\u78bc\uff1a%s",
     "8894": "\u9644\u52a0\u6a94\u6848\uff1a%s",
     "8895": "\u5df2\u9644\u52a0 %s \u500b\u6a94\u6848\u3002",
@@ -3428,7 +3428,12 @@
     "8907": "\u5df2\u88ab %s \u9080\u8acb\u52a0\u5165\u6b64\u5c0d\u8a71\u7fa4\u7d44\u3002",
     "8908": "\u5df2\u96e2\u958b\u6b64\u5c0d\u8a71\u7fa4\u7d44\u3002",
     "8909": "\u64a4\u9664",
-    "8910": "Removed item from shared folder",
+    "8910": "\u5df2\u5f9e\u5206\u4eab\u8cc7\u6599\u593e\u4e2d\u79fb\u9664\u6a94\u6848",
+    "8911": "Keep names as in the mobile device",
+    "8912": "I&#039;ll use [B]MEGAsync[\/B]",
+    "8913": "Removed [X] items from a share",
+    "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3571,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

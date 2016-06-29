@@ -3411,8 +3411,8 @@
     "8888": "(bo\u015f)",
     "8889": "Ba\u015flamak i\u00e7in en az bir ki\u015fi se\u00e7in",
     "8890": "Grup G\u00f6r\u00fc\u015fmesi Ba\u015flat",
-    "8891": "Revoke Attachment",
-    "8892": "Revoked access to attachment(s).",
+    "8891": "Eki \u0130ptal Et",
+    "8892": "Ek(ler)e eri\u015fim iptal edildi.",
     "8893": "Eke eri\u015fim iptal edilemedi. Hata kodu: %2.",
     "8894": "Ekli: %s",
     "8895": "Ekli %s dosya.",
@@ -3428,7 +3428,12 @@
     "8907": "%s daveti ile grup sohbetine kat\u0131ld\u0131.",
     "8908": "grup sohbetinden ayr\u0131ld\u0131.",
     "8909": "\u0130ptal et",
-    "8910": "Removed item from shared folder",
+    "8910": "\u00d6\u011fe payla\u015f\u0131lan klas\u00f6rden kald\u0131r\u0131ld\u0131",
+    "8911": "Senkronize ederken isim de\u011fi\u015ftirme",
+    "8912": "[B]MEGAsync[\/B] kullanaca\u011f\u0131m",
+    "8913": "Removed [X] items from a share",
+    "8914": "Dikkat: Bu konu\u015fmadaki mesaj s\u0131ralama b\u00fct\u00fcnl\u00fc\u011f\u00fcn\u00fc do\u011frulayamad\u0131k.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3571,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

@@ -163,7 +163,7 @@ describe("chat messages unit test", function () {
         return messagesBuff;
     };
 
-    describe('MessagesBuff', function () {
+    /*describe('MessagesBuff', function () {
         it(
             "MessagesBuff is populated from chatd events, history is stored in the proper order and seen and " +
             "received are marked properly",
@@ -220,5 +220,5 @@ describe("chat messages unit test", function () {
             assert.strictEqual(messagesBuff.lastDelivered, "messageId22");
         });
 
-    });
+    });*/
 });

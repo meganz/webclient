@@ -71,7 +71,9 @@ var ChatdIntegration = function(megaChat) {
             if (chatRoomJid) {
                 var chatRoom = self.megaChat.chats[chatRoomJid];
                 if (chatRoom) {
-                    chatRoom.setState(ChatRoom.STATE.JOINING, true);
+                    if (chatRoom.state !== ChatRoom.STATE.LEFT) {
+                        chatRoom.setState(ChatRoom.STATE.JOINING, true);
+                    }
                 }
             }
         });
@@ -269,6 +271,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             );
             chatRoom = r[1];
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
+                if (chatRoom.lastActivity === 0) {
+                    chatRoom.lastActivity = unixtime();
+                }
                 window.location = chatRoom.getRoomUrl();
             }
         }
@@ -288,7 +293,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                             excluded.push(v.u);
                             delete chatRoom.members[v.u];
                             if (v.u === u_handle) {
-                                chatRoom.leave();
+                                chatRoom.leave(false);
                             }
                         }
                         else {
@@ -883,7 +888,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         $(chatRoom).rebind('onLeaveChatRequested.chatdInt', function(e) {
             asyncApiReq({
                 "a":"mcr", // request identifier
-                "id": chatRoom.chatId // chat id
+                "id": chatRoom.chatId, // chat id
+                "v": Chatd.VERSION
             });
         });
         $(chatRoom).rebind('onAddUserRequest.chatdInt', function(e, contactHashes) {
@@ -892,7 +898,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     "a":"mci",
                     "id": chatRoom.chatId,
                     "u": h,
-                    "p": 2
+                    "p": 2,
+                    "v": Chatd.VERSION
                 });
             });
         });
@@ -901,7 +908,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             asyncApiReq({
                 "a":"mcr",
                 "id": chatRoom.chatId,
-                "u": contactHash
+                "u": contactHash,
+                "v": Chatd.VERSION
             });
         });
         $(chatRoom).rebind('alterUserPrivilege.chatdInt', function(e, contactHash, newPriv) {
@@ -909,7 +917,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "a":"mcup",
                 "id": chatRoom.chatId,
                 "u": contactHash,
-                "p": newPriv
+                "p": newPriv,
+                "v": Chatd.VERSION
             });
         });
         chatRoom.megaChat.rebind('onNewGroupChatRequest.chatdInt', function(e, contactHashes) {
@@ -924,7 +933,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             asyncApiReq({
                 'a': 'mcc',
                 'g': 1,
-                'u': users
+                'u': users,
+                'v': Chatd.VERSION
             })
                 .done(function(r) {
                     // no need to do anything, the triggered action packet would trigger the code for joining the room.

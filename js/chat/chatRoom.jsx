@@ -90,7 +90,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
     // Events
     this.bind('onStateChange', function(e, oldState, newState) {
-        self.logger.log("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
+        self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 
         var resetStateToReady = function() {
             if (self.state != ChatRoom.STATE.LEFT && self.state != ChatRoom.STATE.READY) {
@@ -172,7 +172,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
 
     // activity on a specific room (show, hidden, got new message, etc)
-    self.bind('onAfterRenderMessage', function(e, msg) {
+    self.bind('onMessagesBuffAppend', function(e, msg) {
         var ts = msg.delay ? msg.delay : msg.ts;
         if (!ts) {
             return;
@@ -634,13 +634,16 @@ ChatRoom.prototype.getRoomTitle = function() {
  * @param [notifyOtherDevices] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
  * @returns {undefined|Deferred}
  */
-ChatRoom.prototype.leave = function(notifyOtherDevices) {
+ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     var self = this;
 
     self._leaving = true;
 
 
-    if (notifyOtherDevices === true) {
+    self.members[u_handle] = 0;
+
+
+    if (triggerLeaveRequest) {
         if (self.type == "group") {
             $(self).trigger('onLeaveChatRequested');
         }
@@ -652,16 +655,24 @@ ChatRoom.prototype.leave = function(notifyOtherDevices) {
 
 
     if (self.roomJid.indexOf("@") != -1) {
-        self.setState(ChatRoom.STATE.LEAVING);
-        return self.megaChat.karere.leaveChat(self.roomJid).done(function() {
-            self.setState(ChatRoom.STATE.LEFT);
-        });
+        if (self.state !== ChatRoom.STATE.LEFT) {
+            self.setState(ChatRoom.STATE.LEAVING);
+
+            return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
+                self.setState(ChatRoom.STATE.LEFT);
+            });
+        }
+        else {
+            return;
+        }
     }
     else {
         self.setState(ChatRoom.STATE.LEFT);
     }
 
     self.megaChat.refreshConversations();
+
+    self.trackDataChange();
 };
 
 /**
@@ -986,7 +997,7 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
     users.forEach(function(uh) {
         nodeids.forEach(function(nodeId) {
             promises.push(
-                asyncApiReq({'a': 'mcga', 'n': nodeId, 'u': uh, 'id': self.chatId})
+                asyncApiReq({'a': 'mcga', 'n': nodeId, 'u': uh, 'id': self.chatId, 'v': Chatd.VERSION})
             )
         })
     });
@@ -1108,7 +1119,8 @@ ChatRoom.prototype.revokeAttachment = function(node) {
     users.forEach(function(uh) {
         allPromises.push(
             asyncApiReq({
-                'a': 'mcra', 'n': node.h, 'u': uh, 'id': self.chatId
+                'a': 'mcra', 'n': node.h, 'u': uh, 'id': self.chatId,
+                'v': Chatd.VERSION
             })
         );
     });
@@ -1206,10 +1218,16 @@ ChatRoom.prototype.recover = function() {
     var self = this;
 
     self.callRequest = null;
-    self.setState(ChatRoom.STATE.JOINING, true);
-    var $startChatPromise = self.megaChat.karere.startChat([], self.type, self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));
+    var $startChatPromise;
+    if (self.state !== ChatRoom.STATE.LEFT) {
+        self.setState(ChatRoom.STATE.JOINING, true);
+        $startChatPromise = self.megaChat.karere.startChat([], self.type, self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));
 
-    self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins
+        self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins
+    }
+    else {
+        $startChatPromise = MegaPromise.reject();
+    }
 
     return $startChatPromise;
 };

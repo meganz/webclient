@@ -140,7 +140,7 @@ var JScrollPane = React.createClass({
             self._doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem);
         }
     },
-    _doReinit: debounce(function(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
+    _doReinit: function(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
         var self = this;
 
         if (!self.isMounted()) {
@@ -181,8 +181,8 @@ var JScrollPane = React.createClass({
                 }
             }
         }
-    }),
-    onResize: debounce(function(forced, scrollPositionYPerc, scrollToElement) {
+    },
+    onResize: function(forced, scrollPositionYPerc, scrollToElement) {
         if (forced && forced.originalEvent) {
             forced = true;
             scrollPositionYPerc = undefined;
@@ -190,7 +190,7 @@ var JScrollPane = React.createClass({
 
 
         this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
-    }),
+    },
     componentDidUpdate: function() {
         this.onResize();
     },

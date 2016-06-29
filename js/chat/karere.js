@@ -376,9 +376,9 @@ Karere.DEFAULTS = {
     actionMessageTriggerRegistryExpiration: 2000,
 
     loggerOptions: {
-        isEnabled: function() {
+        minLogLevel: function() {
             // jscs:disable disallowImplicitTypeConversion
-            return !!localStorage.dxmpp;
+            return !!localStorage.dxmpp == true ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
             // jscs:enable disallowImplicitTypeConversion
         }
     },
@@ -1406,6 +1406,10 @@ makeMetaAware(Karere);
                 eventData['sent-stamp'] = $('delay', message).attr('sent-stamp') ?
                                             Date.parse($('delay', message).attr('sent-stamp')) / 1000 :
                                             undefined;
+            }
+
+            if (eventData['show'] === 'error') {
+                stanzaType = 'PresenceError';
             }
         }
         else {

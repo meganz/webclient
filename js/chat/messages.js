@@ -238,7 +238,15 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             });
         }
-        origPush.call(this, msg);
+        var res = origPush.call(this, msg);
+        if (
+            !(
+                msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false
+            )
+        ) {
+            chatRoom.trigger('onMessagesBuffAppend', msg);
+        }
+        return res;
     };
 
     self.lastSeen = null;

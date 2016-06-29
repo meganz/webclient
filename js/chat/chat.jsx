@@ -460,7 +460,9 @@ Chat.prototype.init = function() {
         updateMyConnectionStatus();
 
         self.chats.forEach(function(v, k) {
-            v.setState(ChatRoom.STATE.INITIALIZED, true);
+            if (v.state !== ChatRoom.STATE.LEFT) {
+                v.setState(ChatRoom.STATE.INITIALIZED, true);
+            }
         })
     });
 
@@ -519,6 +521,11 @@ Chat.prototype.init = function() {
             self.karere._myPresence = presence;
             self.connect().done(function() {
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
+                
+                Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
+                    var shard = self.plugins.chatdIntegration.chatd.shards[k];
+                    shard.reconnect();
+                });
             });
             return true;
         }
@@ -527,6 +534,10 @@ Chat.prototype.init = function() {
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
                 self.karere.connectionRetryManager.resetConnectionRetries();
                 self.karere.disconnect();
+                Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
+                    var shard = self.plugins.chatdIntegration.chatd.shards[k];
+                    shard.disconnect();
+                });
             }
             else {
                 self.karere.connectionRetryManager.resetConnectionRetries();
@@ -1768,7 +1779,7 @@ Chat.prototype.createAndShowGroupRoomFor = function(contactHashes) {
 Chat.prototype._destroyAllChatsFromChatd = function() {
     var self = this;
 
-    asyncApiReq({'a': 'mcf'}).done(function(r) {
+    asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).done(function(r) {
         r.c.forEach(function(chatRoomMeta) {
             if (chatRoomMeta.g === 1) {
                 console.error("Destroying: ", chatRoomMeta.id, chatRoomMeta.g, chatRoomMeta.u);
@@ -1777,14 +1788,16 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
                         api_req({
                             a: 'mcr',
                             id: chatRoomMeta.id,
-                            u: u.u
+                            u: u.u,
+                            v: Chatd.VERSION
                         });
                     }
                 });
                 api_req({
                     a: 'mcr',
                     id: chatRoomMeta.id,
-                    u: u_handle
+                    u: u_handle,
+                    v: Chatd.VERSION
                 });
             }
         })

@@ -74,7 +74,9 @@ var ConversationRightArea = React.createClass({
             return null;
         }
         self._wasAppendedEvenOnce = true;
-        
+
+        var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
+
         var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                             if (contact.presence && contact.presence !== "offline") {
                                 room.startAudioCall();
@@ -124,15 +126,23 @@ var ConversationRightArea = React.createClass({
             )   :
             room.getContactParticipantsExceptMe();
 
+        removeValue(contacts, u_handle, true);
+
+        if (room.type === "group" && !room.stateIsLeftOrLeaving()) {
+            contacts.unshift(
+                u_handle
+            );
+        }
+
         contacts.forEach(function(contactHash) {
             var contact = M.u[contactHash];
-            if (contact && contactHash != u_handle) {
+            if (contact) {
                 var dropdowns = [];
                 var privilege = null;
 
                 var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
 
-                if (room.type === "group" && room.members) {
+                if (room.type === "group" && room.members && myPresence !== 'offline') {
                     var removeParticipantButton = <DropdownsUI.DropdownItem
                         key="remove" icon="rounded-stop" label={__(l[8867])} onClick={() => {
                                     $(room).trigger('onRemoveUserRequest', [contactHash]);
@@ -154,6 +164,7 @@ var ConversationRightArea = React.createClass({
                                 key="privOperator" icon="cogwheel-icon"
                                 label={__(l[8875])}
                                 className={"tick-item " + (room.members[contactHash] === 3 ? "active" : "")}
+                                disabled={myPresence === 'offline' || contactHash === u_handle}
                                 onClick={() => {
                                     if (room.members[contactHash] !== 3) {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 3]);
@@ -165,6 +176,7 @@ var ConversationRightArea = React.createClass({
                             <DropdownsUI.DropdownItem
                                 key="privFullAcc" icon="conversation-icon"
                                 className={"tick-item " + (room.members[contactHash] === 2 ? "active" : "")}
+                                disabled={myPresence === 'offline' || contactHash === u_handle}
                                 label={__(l[8874])} onClick={() => {
                                     if (room.members[contactHash] !== 2) {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 2]);
@@ -176,6 +188,7 @@ var ConversationRightArea = React.createClass({
                             <DropdownsUI.DropdownItem
                                 key="privReadOnly" icon="eye-icon"
                                 className={"tick-item " + (room.members[contactHash] === 0 ? "active" : "")}
+                                disabled={myPresence === 'offline' || contactHash === u_handle}
                                 label={__(l[8873])} onClick={() => {
                                     if (room.members[contactHash] !== 0) {
                                         $(room).trigger('alterUserPrivilege', [contactHash, 0]);
@@ -214,9 +227,12 @@ var ConversationRightArea = React.createClass({
                     else {
                         // should not happen.
                     }
-                    dropdowns.push(
-                        removeParticipantButton
-                    );
+
+                    if (contactHash !== u_handle) {
+                        dropdowns.push(
+                            removeParticipantButton
+                        );
+                    }
                 }
 
                 contactsList.push(
@@ -228,8 +244,10 @@ var ConversationRightArea = React.createClass({
                         dropdownPositionMy="right top"
                         dropdownPositionAt="right bottom"
                         dropdowns={dropdowns}
-                        dropdownDisabled={!room.iAmOperator()}
-                        dropdownButtonClasses={room.type == "group" ? "button icon-dropdown" : "default-white-button tiny-button"}
+                        dropdownDisabled={!room.iAmOperator() || contactHash === u_handle}
+                        dropdownButtonClasses={
+                            room.type == "group" && myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button"
+                        }
                         dropdownIconClasses={dropdownIconClasses}
                     />
                 );
@@ -250,6 +268,7 @@ var ConversationRightArea = React.createClass({
 
         var dontShowTruncateButton = false;
         if (
+            myPresence === 'offline' ||
             !room.iAmOperator() ||
             room.messagesBuff.messages.length === 0 ||
             (
@@ -302,7 +321,8 @@ var ConversationRightArea = React.createClass({
                                     excludedParticipants.length !== this.props.contacts.length &&
                                     !room.isReadOnly() &&
                                     room.iAmOperator()
-                                )
+                                ) ||
+                                myPresence === 'offline'
                             }
                             >
                             <DropdownsUI.DropdownContactsSelector
@@ -318,6 +338,7 @@ var ConversationRightArea = React.createClass({
                                 multipleSelectedButtonLabel={__(l[8869])}
                                 nothingSelectedButtonLabel={__(l[8870])}
                                 onSelectDone={this.props.onAddParticipantSelected}
+                                disabled={myPresence === 'offline'}
                                 positionMy="center top"
                                 positionAt="left bottom"
                                 />
@@ -327,7 +348,7 @@ var ConversationRightArea = React.createClass({
                             className="link-button dropdown-element"
                             icon="rounded-grey-up-arrow"
                             label={__(l[6834] + "...")}
-                            disabled={room.isReadOnly()}
+                            disabled={room.isReadOnly() || myPresence === 'offline'}
                             >
                             <DropdownsUI.Dropdown
                                 contacts={this.props.contacts}
@@ -357,7 +378,7 @@ var ConversationRightArea = React.createClass({
                             </div>
                         ) : null
                         }
-                        { room.type === "group" && !room.stateIsLeftOrLeaving() ? (
+                        { myPresence !== 'offline' && room.type === "group" && !room.stateIsLeftOrLeaving() ? (
                             <div className="link-button red" onClick={() => {
                                 if (self.props.onLeaveClicked) {
                                     self.props.onLeaveClicked();
@@ -1170,7 +1191,9 @@ var ConversationPanel = React.createClass({
                 self.props.messagesBuff.messagesHistoryIsLoading() === true
             )
         ) {
-            self.loadingShown = true;
+            if (localStorage.megaChatPresence !== 'unavailable') {
+                self.loadingShown = true;
+            }
         }
         else if (
             self.props.messagesBuff.joined === true && (
@@ -1526,6 +1549,8 @@ var ConversationPanel = React.createClass({
                     }
 
                     msg.message = "";
+                    msg.contents = "";
+                    msg.messageHtml = "";
                     msg.deleted = true;
 
                     self.setState({
@@ -1576,7 +1601,8 @@ var ConversationPanel = React.createClass({
                             asyncApiReq({
                                 a: 'mct',
                                 id: room.chatId,
-                                m: lastChatMessageId
+                                m: lastChatMessageId,
+                                v: Chatd.VERSION
                             })
                                 .fail(function(r) {
                                     if(r === -2) {
@@ -1614,6 +1640,8 @@ var ConversationPanel = React.createClass({
             additionalClass = " small-block";
         }
 
+        var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
+
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove} data-room-jid={self.props.chatRoom.roomJid.split("@")[0]}>
                 <div className="chat-content-block">
@@ -1628,9 +1656,7 @@ var ConversationPanel = React.createClass({
                             self.setState({'truncateDialog': true});
                         }}
                         onLeaveClicked={function() {
-                            room.members[u_handle] = 0;
-                            room.trackDataChange();
-                            $(room).trigger('onLeaveChatRequested');
+                            room.leave(true);
                         }}
                         onCloseClicked={function() {
                             room.destroy();
@@ -1778,7 +1804,7 @@ var ConversationPanel = React.createClass({
                                                     (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
                                                     !message.requiresManualRetry &&
                                                     !message.deleted &&
-                                                    !message.type &&
+                                                    (!message.type || message instanceof KarereEventObjects.OutgoingMessage) &&
                                                     (!message.isManagement || !message.isManagement())
                                                 ) {
                                                     foundMessage = message;
@@ -1808,7 +1834,7 @@ var ConversationPanel = React.createClass({
                                     <ButtonsUI.Button
                                         className="popup-button"
                                         icon="small-icon grey-medium-plus"
-                                        disabled={room.isReadOnly()}
+                                        disabled={room.isReadOnly() || myPresence === 'offline'}
                                         >
                                         <DropdownsUI.Dropdown
                                             className="wide-dropdown attach-to-chat-popup"

@@ -112,7 +112,21 @@ var ConversationsListItem = React.createClass({
             lastMessageDiv = <div className={lastMsgDivClasses}>
                         {renderableSummary}
                     </div>;
-            lastMessageDatetimeDiv = <div className="date-time">{unixtimeToTimeString(lastMessage.delay)}</div>;
+
+            var timestamp = lastMessage.delay;
+            var curTimeMarker;
+            var msgDate = new Date(timestamp * 1000);
+            var iso = (msgDate.toISOString());
+            if (todayOrYesterday(iso)) {
+                // if in last 2 days, use the time2lastSeparator
+                curTimeMarker = time2lastSeparator(iso) + ", " + msgDate.getHours() + ":" + msgDate.getMinutes();
+            }
+            else {
+                // if not in the last 2 days, use 1st June [Year]
+                curTimeMarker = acc_time2date(timestamp, true);
+            }
+
+            lastMessageDatetimeDiv = <div className="date-time">{curTimeMarker}</div>;
         }
         else {
             var lastMsgDivClasses = "conversation-message";
@@ -129,7 +143,10 @@ var ConversationsListItem = React.createClass({
                     megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' ||
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                     chatRoom.messagesBuff.joined === false
-                ) ? l[7006] : l[8000]
+                    ) ? (
+                        localStorage.megaChatPresence !== 'unavailable' ? l[7006] : ""
+                    ) :
+                    l[8000]
             );
 
 

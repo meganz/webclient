@@ -90,6 +90,15 @@ EmoticonShortcutsFilter.prototype.processMessage = function(e, eventData) {
         return; // ignore, maybe its a system message (or composing/paused composing notification)
     }
 
+    // Escape :*: emoticons -> tempEmoticons
+    var tmpReplacements = [];
+    messageContents = messageContents.replace(
+        /(\:[a-zA-Z\_]{1,}\:)/g,
+        function($0) {
+            var x = tmpReplacements.push($0) - 1;
+            return "$ee:" + x + "$";
+        });
+
     messageContents = messageContents.replace(self.emoticonsRegExp, function(match) {
         var foundSlug = $.trim(match.toLowerCase());
         var startingSpaces = EmoticonShortcutsFilter._strStartsWithNSpaces(match);
@@ -111,6 +120,13 @@ EmoticonShortcutsFilter.prototype.processMessage = function(e, eventData) {
             prefix + self.shortcuts[foundSlug] + suffix :
             match;
     });
+
+    // revert back the :*: emoticons
+    messageContents = messageContents.replace(
+        /(\$ee\:(\d{1,})\$)/g,
+        function($0, $1, $2) {
+            return tmpReplacements[$2] ? tmpReplacements[$2] : $0;
+        });
 
     eventData.message.messageHtml = messageContents;
     eventData.message.emoticonShortcutsProcessed = true;

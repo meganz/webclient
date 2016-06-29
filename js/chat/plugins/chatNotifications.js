@@ -55,7 +55,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
             };
 
             megaRoom
-                .rebind('onAfterRenderMessage.chatNotifications', function(e, message) {
+                .rebind('onMessagesBuffAppend.chatNotifications', function(e, message) {
                     var fromContact = null;
                     if (message.userId) {
                         // contact not found.

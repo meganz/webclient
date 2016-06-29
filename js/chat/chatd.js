@@ -143,7 +143,7 @@ Chatd.MAX_KEEPALIVE_DELAY = 60000;
 Chatd.MESSAGE_EXPIRY = 60*60; // 60*60
 var MESSAGE_EXPIRY = Chatd.MESSAGE_EXPIRY;
 
-Chatd.VERSION = 0;
+Chatd.VERSION = 1;
 
 // add a new chatd shard
 Chatd.prototype.addshard = function(chatId, shard, url) {

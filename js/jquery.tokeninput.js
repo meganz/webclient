@@ -7,11 +7,6 @@
         queryParam: "q",
         searchDelay: 200,
         minChars: 1,
-
-        // ToDo: We can search by id OR name fields,
-        // currently both are the same and they represents a contact email
-        // In the future we should allow search by email and contact name
-        // but first we must be sure that user name is available in M.u.name
         propertyToSearch: "id",
         jsonContainer: null,
         contentType: "json",
@@ -61,7 +56,7 @@
             var id;
             var avatar;
             var email = item[this.tokenValue];
-            var contactName = '';
+            var contactName = item[this.propertyToSearch];
             var upperValue = '';
             var lowerValue = '';
 
@@ -99,7 +94,7 @@
 
             var id;
             var avatar;
-            var email = item[this.propertyToSearch];
+            var email = item[this.tokenValue];
 
             M.u.forEach(function (contact, contactHandle) {
                 if (contact.m === email) {
@@ -294,14 +289,16 @@
         // Add contacts to drop down list, doesn't interfere with UI elements
         addToDDL: function(items) {
 
-            var localData = [],
-                tokenValue,
-                found = false;
+            var localData = [];
+            var tokenValue;
+            var propertyToSearch;
+            var found = false;
 
             if ($(this).data("settings")) {
 
                 localData = $(this).data("settings").local_data;
                 tokenValue = $(this).data("settings").tokenValue;
+                propertyToSearch = $(this).data("settings").propertyToSearch;
 
                 // Loop through list of available items
                 for (var i in items) {
@@ -322,7 +319,7 @@
 
                         // Add missing item to drop down list
                         if (!found) {
-                            $(this).data("settings").local_data.push({ id: items[i][tokenValue], name: items[i][tokenValue]});
+                            $(this).data("settings").local_data.push({ id: items[i][tokenValue], name: items[i][propertyToSearch]});
                         }
                     }
                 }
@@ -951,7 +948,7 @@
 
             $(input).data("settings").local_data.push({
                 id: item[$(input).data("settings").tokenValue],
-                name: item[$(input).data("settings").tokenValue]
+                name: item[$(input).data("settings").propertyToSearch]
             });
         }// END of function add_token
 
@@ -1178,7 +1175,7 @@
             return template.replace(new RegExp("(?![^&;]+;)(?!<[^<>]*)(" + regexp_escape(value) + ")(?![^<>]*>)(?![^&;]+;)", "g"), highlight_term(value, term));
         }
 
-        // exclude existing tokens from dropdown, so the list is clearer
+        // exclude existing tokens from dropdown
         function excludeCurrent(results) {
             if ($(input).data("settings").excludeCurrent) {
                 var currentTokens = $(input).data("tokenInputObject").getTokens(),
@@ -1187,7 +1184,7 @@
                     $.each(results, function(index, value) {
                         var notFound = true;
                         $.each(currentTokens, function(cIndex, cValue) {
-                            if (value[$(input).data("settings").propertyToSearch] == cValue[$(input).data("settings").propertyToSearch]) {
+                            if (value[$(input).data("settings").tokenValue] == cValue[$(input).data("settings").tokenValue]) {
                                 notFound = false;
                                 return false;
                             }
@@ -1383,8 +1380,12 @@
                 // Do the search through local data
                 else if ($(input).data("settings").local_data) {
 
+                    var tokenValue = $(input).data("settings").tokenValue;
+                    var property = $(input).data("settings").propertyToSearch;
+
                     var results = $.grep($(input).data("settings").local_data, function(row) {
-                        return row[$(input).data("settings").propertyToSearch].toLowerCase().indexOf(query.toLowerCase()) > -1;
+                        var emailAndName = row[tokenValue].toLowerCase() + row[property].toLowerCase();
+                        return emailAndName.indexOf(query.toLowerCase()) > -1;
                     });
 
 //                    cache.add(cache_key, results);

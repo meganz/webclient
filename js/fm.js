@@ -7881,7 +7881,7 @@ function initShareDialogMultiInputPlugin() {
             emailCheck: true,
             preventDoublet: false,
             tokenValue: "id",
-            propertyToSearch: "id",
+            propertyToSearch: "name",
             resultsLimit: 5,
             minChars: 1,
             accountHolder: (M.u[u_handle] || {}).m || '',

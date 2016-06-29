@@ -62,13 +62,13 @@ var PrivilegeChange = React.createClass({
             newPrivilegeText = l[8873];
         }
 
-        var text = __("were changed to %s by %s")
+        var text = __(l[8915])
             .replace(
-                "%s",
+                "%s1",
                 '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>'
             )
             .replace(
-                "%s",
+                "%s2",
                 '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
             );
 

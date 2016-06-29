@@ -856,7 +856,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             }
                             else {
                                 delete chatRoom.notDecryptedBuffer[messageId];
-                                chatRoom.messagesBuff.messages.removeByKey(messageId);
                             }
                         };
                     } catch (e) {
@@ -987,7 +986,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             }
                             self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                         } else {
-                            chatRoom.messagesBuff.messages.removeByKey(msgObject.messageId);
                             self.logger.error('Unknown message type!');
                         }
                     } catch(e) {

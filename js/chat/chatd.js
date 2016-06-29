@@ -140,7 +140,7 @@ Chatd.Const = {
 
 Chatd.MAX_KEEPALIVE_DELAY = 60000;
 // 1 hour is agreed by everyone.
-Chatd.MESSAGE_EXPIRY = 0.2*60; // 60*60
+Chatd.MESSAGE_EXPIRY = 60*60; // 60*60
 var MESSAGE_EXPIRY = Chatd.MESSAGE_EXPIRY;
 
 Chatd.VERSION = 1;

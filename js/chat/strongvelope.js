@@ -1447,9 +1447,13 @@ var strongvelope = {};
         }
 
         var keyidStr = a32_to_str([keyid]);
+        if (!this.participantKeys[sender]) {
+            logger.critical('Message does not have a sender key for :' + sender);
+            return false;
+        }
         var senderKey = this.participantKeys[sender][keyidStr];
         if (!senderKey) {
-            logger.critical('Message does not have a sender key for :' + sender);
+            logger.critical('Message does not have a sender key for :' + sender + ' with key ID:' + keyid);
             return false;
         }
 

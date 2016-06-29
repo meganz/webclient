@@ -698,8 +698,12 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 // this is a text message.
-
-                if (message.textContents === "") {
+                if (message instanceof KarereEventObjects.OutgoingMessage) {
+                    if (message.contents === "") {
+                        message.deleted = true;
+                    }
+                }
+                else if (message.textContents === "") {
                     message.deleted = true;
                 }
                 var messageActionButtons = null;

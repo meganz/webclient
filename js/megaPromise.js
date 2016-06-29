@@ -93,16 +93,9 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
 
     p.then(
         function megaPromiseResProxy() {
-        $promise.resolve.apply($promise, arguments)
+            $promise.resolve.apply($promise, arguments);
         },
-        (
-            d && typeof promisesDebug !== 'undefined' && promisesDebug ?
-                MegaPromise.getTraceableReject($promise, p) :
-                function megaPromiseRejProxy() {
-                    $promise.reject.apply($promise, arguments);
-                }
-        )
-    );
+        MegaPromise.getTraceableReject($promise, p));
 
     return $promise;
 };
@@ -117,10 +110,10 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
 MegaPromise.getTraceableReject = function($promise, origPromise) {
     // Save the current stack pointer in case of an async call behind
     // the promise.reject (Ie, onAPIProcXHRLoad shown as initial call)
-    var preStack = mega.utils.getStack();
+    var preStack = d && mega.utils.getStack();
 
     return function __mpTraceableReject(aResult) {
-        if (window.d) {
+        if (window.d > 1) {
             var postStack = mega.utils.getStack();
             if (typeof console.group === 'function') {
                 console.group('PROMISE REJECTED');
@@ -366,14 +359,8 @@ MegaPromise.all = function(promisesList) {
     $.when.apply($, _jQueryPromisesList)
         .then(function megaPromiseResProxy() {
             promise.resolve(toArray.apply(null, arguments));
-        }, (
-            d && typeof promisesDebug !== 'undefined' && promisesDebug ?
-                MegaPromise.getTraceableReject(promise) :
-                function megaPromiseRejProxy() {
-                    promise.reject.apply(promise, arguments);
-                }
-            )
-        );
+        },
+        MegaPromise.getTraceableReject(promise));
 
     return promise;
 };

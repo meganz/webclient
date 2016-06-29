@@ -71,7 +71,7 @@ Message.prototype.getState = function() {
             return Message.STATE.DELIVERED;
         }
         else {
-            console.error("Was not able to determinate state from pointers [1].");
+            mb.logger.error("Was not able to determinate state from pointers [1].");
             return -1;
         }
     }
@@ -88,7 +88,7 @@ Message.prototype.getState = function() {
         }
 
         else {
-            console.error("Was not able to determinate state from pointers [2].");
+            mb.logger.error("Was not able to determinate state from pointers [2].");
             return -2;
         }
     }
@@ -257,7 +257,18 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.haveMessages = false;
     self.joined = false;
     self.messageOrders = {};
-    self.logger = MegaLogger.getLogger("messagesBuff[" + chatRoom.roomJid.split("@")[0] + "]", {}, chatRoom.logger);
+
+    var loggerIsEnabled = localStorage['messagesBuffLogger'] === '1';
+
+    self.logger = MegaLogger.getLogger(
+        "messagesBuff[" + chatRoom.roomJid.split("@")[0] + "]",
+        {
+            minLogLevel: function() {
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+            }
+        },
+        chatRoom.logger
+    );
 
     manualTrackChangesOnStructure(self, true);
 
@@ -447,7 +458,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (self.chatRoom.chatId !== chatRoom.chatId) {
             return; // ignore event
         }
-        console.error(eventData.id, eventData.state, eventData);
+        self.logger.debug(eventData.id, eventData.state, eventData);
         // convert id to unsigned.
         eventData.id = (eventData.id>>>0);
 
@@ -634,7 +645,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
                 else {
                     // its ok, this happens when a system/protocol message was sent
-                    console.error("Not found: ", eventData.id);
+                    self.logger.error("Not found: ", eventData.id);
                     return;
                 }
             }
@@ -954,7 +965,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
             });
 
         self.$msgsHistoryLoading.fail(function() {
-            console.error("HIST FAILED: ", arguments);
+            self.logger.error("HIST FAILED: ", arguments);
             if (!isInitialRetrivalCall) {
                 self._currentHistoryPointer += 32;
             }

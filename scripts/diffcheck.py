@@ -225,14 +225,18 @@ def reduce_jscs(file_line_mapping, **extra):
 
     # Go through output and collect only relevant lines to the result.
     result = ['\nJSCS output:\n============']
-    lines_expression = re.compile(r'^ +(\d+) |.*(?:\n|\r\n?)-', re.MULTILINE)
+    # lines_expression = re.compile(r'^ +(\d+) |.*(?:\n|\r\n?)-', re.MULTILINE)
+    lines_expression = re.compile(r'^ +(\d+) |-', re.MULTILINE)
     file_expression = re.compile(r'^[^\b].* (?:\./)?(.+) :$', re.MULTILINE)
     for item in output:
         # Do the processing for every block here.
         line_no_candidates = lines_expression.findall(item, re.MULTILINE)
+        idx = 0
+        while line_no_candidates and line_no_candidates.index('', idx) == idx:
+            idx = idx + 1;
         # Check if we've got a relevant block.
         if line_no_candidates and '' in line_no_candidates:
-            line_no = int(line_no_candidates[line_no_candidates.index('') - 1])
+            line_no = int(line_no_candidates[line_no_candidates.index('', idx) - 1])
             file_name = file_expression.findall(item)[0]
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list.
@@ -359,7 +363,7 @@ def reduce_validator(file_line_mapping, **extra):
             continue
 
         # Ignore this specific file types
-        if file_extension in ['.json','.py','.sh', '.svg', '.css']:
+        if file_extension in ['.json','.py','.sh', '.svg', '.css', '.html']:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file

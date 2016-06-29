@@ -32,7 +32,13 @@ var Chatd = function(userId, options) {
         self.msgTransactionId += String.fromCharCode(Math.random()*256);
     }
 
-    self.logger = new MegaLogger("chatd");
+    var loggerIsEnabled = localStorage['chatdLogger'] === '1';
+
+    self.logger = new MegaLogger("chatd", {
+        minLogLevel: function() {
+            return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+        }
+    });
 
     self.options = $.extend({}, Chatd.DEFAULT_OPTIONS, options);
 
@@ -137,6 +143,8 @@ Chatd.MAX_KEEPALIVE_DELAY = 60000;
 Chatd.MESSAGE_EXPIRY = 60*60; // 60*60
 var MESSAGE_EXPIRY = Chatd.MESSAGE_EXPIRY;
 
+Chatd.VERSION = 0;
+
 // add a new chatd shard
 Chatd.prototype.addshard = function(chatId, shard, url) {
     // instantiate Chatd.Shard object for this shard if needed
@@ -180,7 +188,16 @@ Chatd.Shard = function(chatd, shard) {
     // queued commands
     self.cmdq = '';
 
-    self.logger = new MegaLogger("shard-" + shard, {}, chatd.logger);
+    var loggerIsEnabled = localStorage['chatdLogger'] === '1';
+
+    self.logger = new MegaLogger(
+        "shard-" + shard, {
+            minLogLevel: function() {
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+            }
+        },
+        chatd.logger
+    );
 
     self.keepAliveTimer = null;
 
@@ -190,8 +207,27 @@ Chatd.Shard = function(chatd, shard) {
         {
             functions: {
                 reconnect: function(connectionRetryManager) {
-                    //console.error("reconnect was called");
-                    return self.reconnect();
+                    // TODO: change this to use the new API method for retrieving a mcurl for a specific shard
+                    // (not chat)
+                    var firstChatId = Object.keys(self.chatIds)[0];
+                    asyncApiReq({
+                        a: 'mcurl',
+                        id: base64urlencode(firstChatId),
+                        v: Chatd.VERSION
+                    })
+                        .done(function(mcurl) {
+                            self.url = mcurl;
+                            return self.reconnect();
+                        })
+                        .fail(function(r) {
+                            if (r === EEXPIRED) {
+                                if (megaChat && megaChat.plugins && megaChat.plugins.chatdIntegration) {
+                                    megaChat.plugins.chatdIntegration.requiresUpdate();
+                                }
+                            }
+                        });
+
+
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -310,6 +346,13 @@ Chatd.Shard.prototype.reconnect = function() {
         // Resending of pending message should be done via the integration code, since it have more info and a direct
         // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
         self.resendpending();
+        
+        self.chatd.trigger('onOpen', {
+            shard: self
+        });
+        // Resending of pending message should be done via the integration code, since it have more info and a direct
+        // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
+        // self.resendpending();
         self.triggerEventOnAllChats('onRoomConnected');
     };
 
@@ -359,7 +402,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
         var opCode = cmdObj[0];
         var cmd = cmdObj[1];
 
-        console.error(unixtime(), "MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+        self.logger.debug("MULTICMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
         self.cmdq += String.fromCharCode(opCode)+cmd;
     });
@@ -368,7 +411,7 @@ Chatd.Shard.prototype.multicmd = function(cmds) {
 };
 
 Chatd.Shard.prototype.cmd = function(opCode, cmd) {
-    console.error(unixtime(), "CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
+    this.logger.debug("CMD SENT: ", constStateToText(Chatd.Opcode, opCode), cmd);
 
     this.cmdq += String.fromCharCode(opCode)+cmd;
 
@@ -491,14 +534,15 @@ Chatd.Shard.prototype.exec = function(a) {
     var cmd = String.fromCharCode.apply(null, a);
     var len;
     var newmsg;
-    console.log('Receive from chatd');
+
     var codestr = '';
     for (var i=0;i<cmd.length;i++)
     {
         codestr += cmd[i].charCodeAt(0).toString(16) + " ";
         
     }
-    console.log(codestr);
+    self.logger.debug("Received from chatd: ", codestr);
+
     while (cmd.length) {
         switch (cmd.charCodeAt(0)) {
             case Chatd.Opcode.KEEPALIVE:
@@ -613,7 +657,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 len = 17;
                 break;
-            
+
             case Chatd.Opcode.RANGE:
                 self.keepAliveTimerRestart();
                 self.logger.log(
@@ -893,7 +937,9 @@ Chatd.Messages.prototype.updatekeyid = function(keyid) {
 Chatd.Messages.prototype.modify = function(msgnum, message) {
     var self = this;
 
-    console.error("mod", msgnum, message);
+    var shard = self.chatd.chatIdShard[self.chatId];
+
+    shard.logger.debug("mod", msgnum, message);
 
     var mintimestamp = Math.floor(new Date().getTime()/1000);
 

@@ -84,11 +84,11 @@ describe("crypto unit test", function() {
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(attribCache.getItem.callCount, 1);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw' });
+                assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw', i: requesti });
                 assert.strictEqual(api_req.args[0][1].u, 'you456789xw');
 
                 var settleFunction = api_req.args[0][1].callback;
-                settleFunction({ pubk: pubKey });
+                settleFunction({ pubk: pubKey, u: 'you456789xw'}, 0,0,1);
                 assert.strictEqual(rootPromise.resolve.callCount, 1);
                 assert.strictEqual(rootPromise.resolve.args[0][0], pubKey);
                 assert.strictEqual(ns._logger._log.args[0][0],
@@ -109,7 +109,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(attribCache.getItem.callCount, 1);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw' });
+                assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw', i: requesti });
                 assert.strictEqual(api_req.args[0][1].u, 'you456789xw');
 
                 var settleFunction = api_req.args[0][1].callback;

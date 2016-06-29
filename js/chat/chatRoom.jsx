@@ -1205,8 +1205,6 @@ ChatRoom.prototype.getUnreadCount = function() {
 ChatRoom.prototype.recover = function() {
     var self = this;
 
-    self.logger.warn('recovering room: ', self.roomJid, self);
-
     self.callRequest = null;
     self.setState(ChatRoom.STATE.JOINING, true);
     var $startChatPromise = self.megaChat.karere.startChat([], self.type, self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));

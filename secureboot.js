@@ -899,6 +899,7 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 if (m)
 {
     var app,mobileblog,android,intent, ios9;
+    var ios;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
@@ -956,6 +957,7 @@ if (m)
             // Check for iOS 9.0+
             ios9 = (ver > 8);
         }
+        ios = 1;
     }
     else document.body.className = 'another-os full-mode unsupported';
 
@@ -1008,6 +1010,7 @@ if (m)
     }
     else if (window.location.hash.substr(1, 7) === 'confirm'
             || window.location.hash.substr(1, 6) === 'backup'
+            || window.location.hash.substr(1, 6) === 'fm/ipc'
             || window.location.hash.substr(1, 9) === 'newsignup'
             || window.location.hash.substr(1, 7) === 'account')
     {
@@ -1064,7 +1067,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 26, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 27, writable : false });
 
     // Do not report exceptions if this build is older than 20 days
     var exTimeLeft = ((buildVersion.timestamp + (20 * 86400)) * 1000) > Date.now();
@@ -1410,7 +1413,6 @@ else if (!b_u)
     jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
 
-
     // notifications
     jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
     jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
@@ -1425,15 +1427,18 @@ else if (!b_u)
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
     // UI Elements
+    jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
     jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
     jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
+    jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
     jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+    jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
 
     // MEGA CHAT
     if (location.host === 'mega.nz' || !megaChatIsDisabled) {
@@ -1533,7 +1538,6 @@ else if (!b_u)
     jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
@@ -1542,8 +1546,6 @@ else if (!b_u)
     jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-
-
 
     if (localStorage.enableDevtools) {
         jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
@@ -1587,6 +1589,9 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+        'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
+        'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
+        'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
         'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
@@ -1644,6 +1649,8 @@ else if (!b_u)
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],
+        'dispute': ['dispute'],
+        'disputenotice': ['disputenotice', 'disputenotice_js'],
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],

@@ -12,6 +12,7 @@
     /** }}} */
 
     var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
+    var isReady = false;
 
     mBroadcaster.once('startMega', function() {
         for (var sub in signPubKey) {
@@ -22,6 +23,7 @@
                 signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
             }
         }
+        isReady = true;
     });
     
     var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
@@ -33,7 +35,6 @@
         var hash  = asmCrypto.SHA256.bytes(content);
         signature = asmCrypto.string_to_bytes(ab_to_str(signature));
         var i;
-
     
         try {
             for (i = 0; i < signPubKey.__global.length; ++i) {
@@ -64,6 +65,12 @@
     
     function process_cms_response(bytes, next, as, id) {
         var viewer = new Uint8Array(bytes);
+
+        if (!isReady) {
+            return setTimeout(function() {
+                process_cms_response(bytes, next, as, id);
+            }, 100);
+        }
     
         var signature = bytes.slice(3, 67); // 64 bytes, signature
         var version = viewer[0];
@@ -257,6 +264,10 @@
                 reRendered[nodeId] = true;
                 curCallback(nodeId);
             }
+        },
+
+        html: function(html) {
+            return html.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
         },
     
         isLoading: function() {

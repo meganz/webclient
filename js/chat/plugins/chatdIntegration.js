@@ -9,7 +9,26 @@
 var ChatdIntegration = function(megaChat) {
     //return false;
     var self = this;
-    self.logger = MegaLogger.getLogger("chatdInt", {}, megaChat.logger);
+
+    var loggerIsEnabled = localStorage['chatdIntegrationLogger'] === '1';
+    self.logger = MegaLogger.getLogger(
+        "chatdInt",
+        {
+            onCritical: function(msg) {
+                if (msg.indexOf("order tampering") > -1) {
+                    api_req({
+                        a: 'log',
+                        e: 99616,
+                        m: 'order tampering'
+                    }, {});
+                }
+            },
+            minLogLevel: function() {
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+            }
+        },
+        megaChat.logger
+    );
 
     self.megaChat = megaChat;
     self.chatd = new Chatd(u_handle);
@@ -32,29 +51,13 @@ var ChatdIntegration = function(megaChat) {
             //self._detachFromChatRoom(chatRoom);
         });
 
-        asyncApiReq({a: "mcf", d: 1})
-            .done(function(r) {
-                // reopen chats from the MCF response.
-                self.logger.debug("MCF returned: ", r);
-
-                if (r.c) {
-                    r.c.forEach(function (actionPacket) {
-                        self.openChatFromApi(actionPacket, true);
-                    });
-                    self.deviceId = r.d;
-
-                    self.mcfHasFinishedPromise.resolve();
-                }
-                else {
-                    self.mcfHasFinishedPromise.reject(r);
-                }
-            })
+        self.retrieveChatsFromApi();
     });
 
     megaChat.rebind("onDestroy.chatdInt", function(e) {
         self.chatd.destroyed = true;
     });
-
+    
     $(window).rebind('onChatdChatUpdatedActionPacket.chatdInt', function(e, actionPacket) {
         self.openChatFromApi(actionPacket, false);
     });
@@ -76,6 +79,69 @@ var ChatdIntegration = function(megaChat) {
     return self;
 };
 
+ChatdIntegration.prototype.retrieveChatsFromApi = function() {
+    var self = this;
+    asyncApiReq({a: "mcf", d: 1, v: Chatd.VERSION})
+        .done(function(r) {
+            self.logger.debug("MCF returned: ", r);
+            
+            // reopen chats from the MCF response.
+            if (r.c) {
+                r.c.forEach(function (actionPacket) {
+                    self.openChatFromApi(actionPacket, true);
+                });
+                self.deviceId = r.d;
+
+                self.mcfHasFinishedPromise.resolve();
+            }
+            else {
+                self.mcfHasFinishedPromise.reject(r);
+            }
+        })
+        .fail(function(r) {
+            if (r === EEXPIRED) {
+                self.requiresUpdate();
+            }
+        });
+};
+
+ChatdIntegration.prototype.requiresUpdate = function() {
+    var self = this;
+
+    if (window.location.toString().indexOf("/chat")) {
+        $('.nw-fm-left-icon.cloud-drive').triggerHandler('click');
+    }
+
+    megaChat.destroy();
+    megaChatIsDisabled = true;
+    $('.nw-fm-left-icon.conversations').hide();
+
+    // because msgDialog would be closed on location.hash change... we need to do this a bit later....
+    Soon(function() {
+
+        if (localStorage.chatUpdateIgnored === String(Chatd.VERSION)) {
+            return;
+        }
+        if (!is_extension) {
+            msgDialog('confirmation', l[1900], l[8840], '', function (e) {
+                if (e) {
+                    window.location.reload();
+                }
+                else {
+                    localStorage.chatUpdateIgnored = Chatd.VERSION;
+                }
+            });
+        }
+        else {
+            msgDialog(
+                'warningb',
+                l[1900],
+                l[8841]
+            );
+            localStorage.chatUpdateIgnored = Chatd.VERSION;
+        }
+    });
+};
 ChatdIntegration.prototype._getChatRoomFromEventData = function(eventData) {
     var self = this;
     var chatRoomJid = self.chatIdToRoomJid[eventData.chatId];
@@ -247,12 +313,18 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     if (!actionPacket.url && (!chatRoom || !chatRoom.chatdUrl)) {
         asyncApiReq({
             a: 'mcurl',
-            id: actionPacket.id
+            id: actionPacket.id,
+            v: Chatd.VERSION
         })
         .done(function(mcurl) {
                 actionPacket.url = mcurl;
                 finishProcess();
-            });
+        })
+        .fail(function(r) {
+            if (r === EEXPIRED) {
+                self.requiresUpdate();
+            }
+        });
     }
     else {
         finishProcess();
@@ -358,7 +430,8 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             self.waitingChatIdPromises[chatRoom.roomJid] = asyncApiReq({
                 'a': 'mcc',
                 'g': chatRoom.type === "group" ? 1 : 0,
-                'u': userHashes
+                'u': userHashes,
+                'v': Chatd.VERSION
             })
                 .always(function() {
                     delete self.waitingChatIdPromises[chatRoom.roomJid];
@@ -596,6 +669,10 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
 
         if (foundChatRoom.roomJid === chatRoom.roomJid) {
+            delete chatRoom.chatId;
+            delete chatRoom.chatShard;
+            delete chatRoom.chatdUrl;
+            
             if(chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
                 chatRoom.setState(
                     ChatRoom.STATE.JOINING,
@@ -604,7 +681,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             }
         }
     });
-            // chatd events
+    // chatd events
     self.chatd.rebind('onMembersUpdated.chatdInt' + chatRoomId, function(e, eventData) {
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
 
@@ -642,7 +719,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             }
         }
     });
-
+    
     if (!chatRoom.messagesBuff) {
         chatRoom.pubCu25519KeyIsMissing = false;
 
@@ -743,7 +820,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                         chatRoom.messagesBuff.messageOrders[v.identity] = chatRoom.messagesBuff.messages[messageId].orderValue;
                                         if (chatRoom.messagesBuff.verifyMessageOrder(v.identity, v.references) === false) {
                                             // potential message order tampering detected.
-                                            self.logger.error("potential message order tampering detected: ", messageId);
+                                            self.logger.critical("potential message order tampering detected: ", messageId);
                                         }
                                     }
                                 }
@@ -760,7 +837,12 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     chatRoom.messagesBuff.messages[messageId].userId = v.sender;
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
-                                    chatRoom.messagesBuff.messages[messageId].textContents = v.recipients + ' were changed to ' + v.privilege.charCodeAt(0) + ' by ' + v.sender;
+                                    chatRoom.messagesBuff.messages[messageId].meta = {
+                                        userId: v.sender,
+                                        privilege: v.privilege.charCodeAt(0),
+                                        targetUserId: v.recipients
+                                    };
+                                    chatRoom.messagesBuff.messages[messageId].dialogType = "privilegeChange";
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
                                     // this is a system message
@@ -875,7 +957,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     chatRoom.messagesBuff.messageOrders[decrypted.identity] = msgObject.orderValue;
                                     if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
                                         // potential message order tampering detected.
-                                        self.logger.error("potential message order tampering detected: ", msgObject.messageId);
+                                        self.logger.critical("potential message order tampering detected: ", msgObject.messageId);
                                     }
                                 }
                             } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
@@ -892,7 +974,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             }
                             else if (decrypted.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
                                 var msg = chatRoom.messagesBuff.messages[msgObject.messageId];
-                                msg.textContents = decrypted.recipients + ' were changed to ' + decrypted.privilege.charCodeAt(0) + ' by ' + decrypted.sender;
+                                msg.meta = {
+                                    userId: decrypted.sender,
+                                    privilege: decrypted.privilege.charCodeAt(0),
+                                    targetUserId: decrypted.recipients
+                                };
+                                msg.dialogType = "privilegeChange";
+
                             }
                             else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;

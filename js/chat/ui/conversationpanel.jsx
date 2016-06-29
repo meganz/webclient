@@ -15,6 +15,7 @@ var getMessageString = require('./messages/utils.jsx').getMessageString;
 var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
 var AlterParticipantsConversationMessage = require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
 var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
+var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
 
 
 
@@ -1229,7 +1230,16 @@ var ConversationPanel = React.createClass({
                 }
 
                 var timestamp = v.delay;
-                var curTimeMarker = time2lastSeparator((new Date(timestamp * 1000).toISOString()));
+                var curTimeMarker;
+                var iso = (new Date(timestamp * 1000).toISOString());
+                if (todayOrYesterday(iso)) {
+                    // if in last 2 days, use the time2lastSeparator
+                    curTimeMarker = time2lastSeparator(iso);
+                }
+                else {
+                    // if not in the last 2 days, use 1st June [Year]
+                    curTimeMarker = acc_time2date(timestamp, true);
+                }
                 var currentState = v.getState ? v.getState() : null;
 
                 if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
@@ -1303,6 +1313,15 @@ var ConversationPanel = React.createClass({
                     }
                     else if (v.dialogType === 'truncated') {
                         messageInstance = <TruncatedMessage
+                            message={v}
+                            chatRoom={room}
+                            key={v.messageId}
+                            contact={M.u[v.userId]}
+                            grouped={grouped}
+                        />
+                    }
+                    else if (v.dialogType === 'privilegeChange') {
+                        messageInstance = <PrivilegeChange
                             message={v}
                             chatRoom={room}
                             key={v.messageId}

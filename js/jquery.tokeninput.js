@@ -37,12 +37,27 @@
         accountHolder: '',
         url: '',
         scrollLocation: 'add',
+        /**
+         * resultsFormatter
+         *
+         * Creates contact row for share dialog drop down list.
+         * It contains user avatar and two fields one below other
+         * We can have 2 different layouts depending if contact have name or not
+         * 1. Contact does NOT have name. Top field is contact email address
+         * bottom field is 'Email' string
+         * 2. Contact does have name. Top field is a contact name, bottom field
+         * is a contact email address.
+         *
+         * @returns {String} Html
+         */
         resultsFormatter: function (item) {
 
             var id;
-            var av;
             var avatar;
             var email = item[this.propertyToSearch];
+            var contactName = '';
+            var upperValue = '';
+            var lowerValue = '';
 
             M.u.forEach(function (contact, contactHandle) {
                 if (contact.m === email) {
@@ -52,21 +67,29 @@
                 }
             });
 
-            if (!id) {
-                av = '';
+            contactName = M.getNameByHandle(id);
+
+            // Check existance of contact name and arrange upper/lower strings
+            if ((contactName === email) || (contactName === '')) {
+                upperValue = email;
+                lowerValue = l[7434];
+            }
+            else {
+                upperValue = contactName;
+                lowerValue = email;
             }
 
             avatar = useravatar.contact(id || email, 'nw-contact-avatar', 'span');
 
             return '<li class="share-search-result">' + (this.addAvatar ? avatar : '')
-                    + '<span class="fm-chat-user-info"><span class="fm-chat-user">'
-                    + (this.enableHTML ? email : _escapeHTML(email))
-                    + '</span><span class="fm-chat-user-email">email</span></span><span class="clear"></span></li>';
+                    + '<span class="fm-chat-user-info">'
+                    + '<span class="fm-chat-user">' + htmlentities(upperValue) + '</span>'
+                    + '<span class="fm-chat-user-email">' + htmlentities(lowerValue) + '</span>'
+                    + '</span><span class="clear"></span></li>';
         },
         tokenFormatter: function (item) {
 
             var id;
-            var av;
             var avatar;
             var email = item[this.propertyToSearch];
 
@@ -77,10 +100,6 @@
                     return false;
                 }
             });
-
-            if (!id) {
-                av = '';
-            }
 
             avatar = useravatar.contact(id || email, 'search-avatar', 'span');
 

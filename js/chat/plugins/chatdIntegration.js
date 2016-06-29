@@ -802,7 +802,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         for(var i = decryptedMsgs.length-1; i >= 0; i--) {
                             var v = decryptedMsgs[i];
                             var messageId = hist[i]['k'];
-                            if (messageId) {
+                            if (v) {
                                 var cacheKey = chatRoom.chatId + "_" + messageId;
                                 if (messageId) {
                                     self._processedMessages[cacheKey] = true;
@@ -985,10 +985,11 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                             }
+                            self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                         } else {
-                            throw new Error('Unknown message type!');
+                            chatRoom.messagesBuff.messages.removeByKey(msgObject.messageId);
+                            self.logger.error('Unknown message type!');
                         }
-                        self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                     } catch(e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                     }

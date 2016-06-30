@@ -21,6 +21,34 @@
 
 <body>
 
+<!-- Group chat dropdown. Remove style attr (its just an example !-->
+<div class="dropdown body contact-card-dropdown" style="right: 4px; top: 195px;">
+    <div class="dropdown-item">
+        <i class="small-icon human-profile"></i>
+        <span>View Profile</span>
+    </div>
+    
+    <hr />
+    
+    <div class="dropdown-items-info">
+        Set permission:
+    </div>
+    <!-- New tick items !-->
+    <div class="dropdown-item tick-item">
+        <i class="small-icon eye-icon"></i>
+        <span>Observer</span>
+    </div>
+    <div class="dropdown-item tick-item active">
+        <i class="small-icon conversation-icon"></i>
+        <span>Member</span>
+    </div>
+    <div class="dropdown-item tick-item">
+        <i class="small-icon cogwheel-icon"></i>
+        <span>Administrator</span>
+    </div>
+</div>
+<!-- End of Group chat dropdown !-->
+
 <div class="fmholder" id="fmholder">
   <div class="top-head"></div>
   <div class="fm-main default">
@@ -53,19 +81,6 @@
                         <div class="conversation-message">My place! Bring wine and cheese!</div>
                         <div class="date-time">12:35 AM</div>
                     </li>
-                    <li>
-                    	<div class="user-card-name conversation-name">
-                            Bruce Schneier
-                            <span class="user-card-presence away"></span>
-                        </div>
-                        <!-- Unread messages counter !-->
-                        <div class="unread-messages">
-                        	2
-                        </div>
-                        <!-- Please add 'unread" classname !-->
-                        <div class="conversation-message unread">Hey man, where are you?</div>
-                        <div class="date-time">12:35 AM</div>
-                    </li>
                 </ul>
                 <!-- Left Conversations List !--> 
                  
@@ -83,69 +98,93 @@
                 <!-- jScrollPane block !-->
                 <div class="chat-right-area conversation-details-scroll">
                     <div class="chat-right-pad">
-            
-                        <div class="contacts-info body">
-                            <!-- Please add "online/away/busy/offline" classname !-->
-                            <div class="user-card-presence online"></div>
-                            <div class="small-rounded-avatar color6">B</div>
-                            
-                            <div class="default-white-button tiny-button">
-                                <i class="tiny-icon grey-down-arrow"></i>
+                        
+                        <!-- Group chat header !-->
+                        <div class="chat-right-head">
+                            <div class="chat-grey-counter">
+                                3
                             </div>
-                            
-                            <div class="user-card-data">
-                                <div class="user-card-name">Bruce Schneider</div>
-                                <div class="user-card-email">bs@mega.co.nz</div>
+                            <div class="chat-right-head-txt">
+                                Group members
                             </div>
                         </div>
+                        <!-- End of Group chat header !-->
                         
-                        <div class="contacts-info body">
-                            <!-- Please add "online/away/busy/offline" classname !-->
-                            <div class="user-card-presence online"></div>
-                            <div class="small-rounded-avatar color4">C</div>
+                        <!-- Contacts list new wrappers according to project !-->
+                        <div  class="chat-contacts-list">
+                            <div  class="chat-contacts-list-inner">
                             
-                            <div class="default-white-button tiny-button">
-                                <i class="tiny-icon grey-down-arrow"></i>
-                            </div>
-                            
-                            <div class="user-card-data">
-                                <div class="user-card-name">Clifford Cocks</div>
-                                <div class="user-card-email">cc@mega.co.nz</div>
-                            </div>
-                        </div>
-                        
-                        <div class="contacts-info body">
-                            <!-- Please add "online/away/busy/offline" classname !-->
-                            <div class="user-card-presence online"></div>
-                            <div class="small-rounded-avatar color6">D</div>
-                            
-                            <div class="default-white-button tiny-button">
-                                <i class="tiny-icon grey-down-arrow"></i>
-                            </div>
-                            
-                            <div class="user-card-data">
-                                <div class="user-card-name">David Chaum</div>
-                                <div class="user-card-email">dc@mega.co.nz</div>
+                                <div class="contacts-info body">
+                                    <!-- Please add "online/away/busy/offline" classname !-->
+                                    <div class="user-card-presence online"></div>
+                                    <div class="small-rounded-avatar"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
+                                    
+                                    <div class="button icon-dropdown">
+                                        <i class="small-icon cogwheel-icon"></i>
+                                    </div>
+                                    
+                                    <div class="user-card-data">
+                                        <div class="user-card-name">Bruce Schneider</div>
+                                        <div class="user-card-email">bs@mega.co.nz</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="contacts-info body">
+                                    <!-- Please add "online/away/busy/offline" classname !-->
+                                    <div class="user-card-presence online"></div>
+                                    <div class="small-rounded-avatar"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
+                                    
+                                    <div class="button icon-dropdown active">
+                                        <i class="small-icon conversation-icon"></i>
+                                    </div>
+                                    
+                                    <div class="user-card-data">
+                                        <div class="user-card-name">Clifford Cocks</div>
+                                        <div class="user-card-email">cc@mega.co.nz</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="contacts-info body">
+                                    <!-- Please add "online/away/busy/offline" classname !-->
+                                    <div class="user-card-presence online"></div>
+                                    <div class="small-rounded-avatar"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
+                                    
+                                    <div class="button icon-dropdown">
+                                        <i class="small-icon eye-icon"></i>
+                                    </div>
+                                    
+                                    <div class="user-card-data">
+                                        <div class="user-card-name">David Chaum</div>
+                                        <div class="user-card-email">dc@mega.co.nz</div>
+                                    </div>
+                                </div>
+                                
                             </div>
                         </div>
                         
                         <div class="buttons-block">
+             
                             <div class="link-button">
+                                <i class="small-icon audio-call"></i>
+                                <span>Start audio call</span>
+                            </div>
+                            <div class="link-button">
+                                <i class="small-icon video-call"></i>
+                                <span>Start video call</span>
+                            </div>
+                            <div class="button link-button dropdown-element">
                                 <i class="small-icon rounded-grey-plus"></i>
-                                Add participant…
+                                <span>Add participant...</span>
                             </div>
-                            <div class="link-button">
+                            <div class="button link-button dropdown-element">
                                 <i class="small-icon rounded-grey-up-arrow"></i>
-                                Send Files…
-                            </div>
-                            <div class="link-button">
-                                <i class="small-icon shared-grey-folder"></i>
-                                Share Folders
+                                <span>Send files...</span>
                             </div>
                             <div class="link-button red">
                                 <i class="small-icon rounded-stop"></i>
-                                Leave Chat
+                                <span>Truncate</span>
                             </div>
+                            
                         </div>
                     
                     </div>
@@ -167,28 +206,18 @@
                 	<div class="messages main-pad">
                     	<div class="messages content-area">
                         
-                        	<!-- Joined information !-->
-                            <div class="messages notification">
-                                <div class="header">
-                                    New group chat with <span>Bruce Schneier, Clifford Cocks and David Chaum</span>
-                                </div>
-                                <div class="info">
-                                    Text explaining MEGA’s group chat, it’s advantages and limitations, something specific enough, ideally between 160-200 characters in English.
-                                </div>
-                            </div>
-                            <!-- end of Joined information !-->
                         
                             <!-- Joined Message block !-->
                             <div class="message body">
-                                <div class="message small-rounded-avatar color2">C</div>
+                                <div class="message small-rounded-avatar"><img alt="" src="../../images/temp/avatar-img.jpg" /></div>
                                 
                                 <!-- Please add "small-info-txt" for joined information !-->
                                 <div class="message content-area small-info-txt">
-                                	<div class="message user-card-name">Clifford</div>
+                                	<div class="message user-card-name">Bruce Schneier</div>
                                     <div class="message date-time">12:35 AM</div>
                                     
                                     <div class="message text-block">
-                                    	Joined the group chat by invitation from <strong class="dark-grey-txt">Bruce Schneier</strong>
+                                    	Joined the group chat by invitation from <strong class="dark-grey-txt">you</strong>
                                     </div>
                                 </div>
                             </div>
@@ -196,15 +225,31 @@
                             
                             <!-- Joined Message block !-->
                             <div class="message body">
-                                <div class="message small-rounded-avatar color2">B</div>
+                                <div class="message small-rounded-avatar"><img alt="" src="../../images/temp/img01.jpg" /></div>
                                 
                                 <!-- Please add "small-info-txt" for joined information !-->
                                 <div class="message content-area small-info-txt">
-                                	<div class="message user-card-name">Bruce Schneier</div>
+                                	<div class="message user-card-name">Clifford</div>
                                     <div class="message date-time">02:35 AM</div>
                                     
                                     <div class="message text-block">
-                                    	Joined the group chat invited by <strong class="dark-grey-txt">you</strong>
+                                    	Joined the group chat invited by <strong class="dark-grey-txt">Bruce Schneier</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End of Joined Message block !-->
+                            
+                            <!-- Joined Message block !-->
+                            <div class="message body">
+                                <div class="message small-rounded-avatar"><img alt="" src="../../images/temp/img01.jpg" /></div>
+                                
+                                <!-- Please add "small-info-txt" for joined information !-->
+                                <div class="message content-area small-info-txt">
+                                	<div class="message user-card-name">Clifford</div>
+                                    <div class="message date-time">02:35 AM</div>
+                                    
+                                    <div class="message text-block">
+                                    	Have <span class="dark-grey-txt">read-only</span> permissions, set by <strong class="dark-grey-txt">Bruce Schneier</strong>
                                     </div>
                                 </div>
                             </div>

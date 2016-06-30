@@ -294,7 +294,11 @@ var psa = {
      * Hides the announcement
      */
     hideAnnouncement: function() {
-        
+        // if already hidden, don't do anything (specially a window.trigger('resize')).
+        if (!this.visible) {
+            return false;
+        }
+
         // Move the progress bar back to the 0 position
         $('.loader-progressbar').css('bottom', 0);
         

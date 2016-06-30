@@ -245,13 +245,13 @@ var crypt = (function () {
      *     Key type of pub key. Can be one of 'Cu25519' or 'RSA'.
      * @param signingKey {string}
      *     Ed25519 key needed to verify the signature.
-     * @return
+     * @return {MegaPromise}
      *     The signature verification result. true for success, false for
      *     failure and null for a missing signature.
      */
     ns._checkSignature = function(signature, pubKey, keyType, signingKey) {
         if (signature === '') {
-            return null;
+            return MegaPromise.resolve(null);
         }
 
         return authring.verifyKey(signature, pubKey, keyType, signingKey);
@@ -426,56 +426,57 @@ var crypt = (function () {
             }
             var signingKey = result[1];
             var signature = base64urldecode(result[2]);
-            var signatureVerification = ns._checkSignature(signature, pubKey,
-                                                           keyType, signingKey);
-            if (authMethod === false) {
-                // Authring check fails, but could be a new key.
-                if (signatureVerification === true) {
-                    // Record good (new) signature.
-                    newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
-                    pubKeyCache[userhandle] = pubKey;
-                    masterPromise.resolve(pubKey);
-                }
-                else {
-                    // Mismatch on authring, but no new signature,
-                    // or failed signature verification: Choke!
-                    newAuthMethod = undefined;
-                    ns._showKeySignatureFailureException(userhandle, keyType);
-                    masterPromise.reject(EINTERNAL);
-                }
-            }
-            else {
-                // Not seen previously or not verified, yet.
-                if (signatureVerification === null) {
-                    var authRecord = authring.getContactAuthenticated(userhandle, keyType);
-                    if ((authRecord === false) || (fingerprint === authRecord.fingerprint)) {
-                        // Can only record it seen.
-                        newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
-                        pubKeyCache[userhandle] = pubKey;
-                        masterPromise.resolve(pubKey);
+            ns._checkSignature(signature, pubKey, keyType, signingKey)
+                .done(function(signatureVerification) {
+                    if (authMethod === false) {
+                        // Authring check fails, but could be a new key.
+                        if (signatureVerification === true) {
+                            // Record good (new) signature.
+                            newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                            pubKeyCache[userhandle] = pubKey;
+                            masterPromise.resolve(pubKey);
+                        }
+                        else {
+                            // Mismatch on authring, but no new signature,
+                            // or failed signature verification: Choke!
+                            newAuthMethod = undefined;
+                            ns._showKeySignatureFailureException(userhandle, keyType);
+                            masterPromise.reject(EINTERNAL);
+                        }
                     }
                     else {
-                        newAuthMethod = undefined;
-                        ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
-                                                             authRecord.fingerprint,
-                                                             fingerprint);
-                        masterPromise.reject(EINTERNAL);
+                        // Not seen previously or not verified, yet.
+                        if (signatureVerification === null) {
+                            var authRecord = authring.getContactAuthenticated(userhandle, keyType);
+                            if ((authRecord === false) || (fingerprint === authRecord.fingerprint)) {
+                                // Can only record it seen.
+                                newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
+                                pubKeyCache[userhandle] = pubKey;
+                                masterPromise.resolve(pubKey);
+                            }
+                            else {
+                                newAuthMethod = undefined;
+                                ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
+                                    authRecord.fingerprint,
+                                    fingerprint);
+                                masterPromise.reject(EINTERNAL);
+                            }
+                        }
+                        else if (signatureVerification === true) {
+                            // Record good signature.
+                            newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                            pubKeyCache[userhandle] = pubKey;
+                            masterPromise.resolve(pubKey);
+                        }
+                        else {
+                            // Failed signature verification: Choke!
+                            ns._showKeySignatureFailureException(userhandle, keyType);
+                        }
                     }
-                }
-                else if (signatureVerification === true) {
-                    // Record good signature.
-                    newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
-                    pubKeyCache[userhandle] = pubKey;
-                    masterPromise.resolve(pubKey);
-                }
-                else {
-                    // Failed signature verification: Choke!
-                    ns._showKeySignatureFailureException(userhandle, keyType);
-                }
-            }
 
-            // Finish off.
-            __finish(pubKey, authMethod, newAuthMethod);
+                    // Finish off.
+                    __finish(pubKey, authMethod, newAuthMethod);
+                });
         };
 
         if (keyType === 'Ed25519') {
@@ -4701,3 +4702,64 @@ function api_strerror(errno) {
         }
     };
 })(this);
+
+
+(function() {
+    var backgroundNacl = {};
+    backgroundNacl.workers = null;
+    backgroundNacl.requiresWorkersInit = function() {
+        var numberOfWorkers = mega.maxWorkers;
+
+        if (backgroundNacl.workers === null) {
+            backgroundNacl.workers = CreateWorkers('naclworker.js', function(context, e, release) {
+                release(e.data);
+            }, numberOfWorkers);
+        }
+    };
+
+    var x = 0;
+
+    Object.defineProperty(window, 'backgroundNacl', { value: backgroundNacl });
+
+    // create aliases for all (used by us) nacl funcs, that return promises
+    backgroundNacl.sign = {
+        'detached' : {
+            /**
+             * Alias of nacl.sign.detached.verify.
+             *
+             * Note: msg, sig and publicKey should be strings, NOT ArrayBuffers as when using nacl directly.
+             *
+             * @param msg
+             * @param sig
+             * @param publicKey
+             * @returns {MegaPromise}
+             */
+            'verify': function(msg, sig, publicKey) {
+                backgroundNacl.requiresWorkersInit();
+
+                var masterPromise = new MegaPromise();
+
+                backgroundNacl.workers.push(
+                    [
+                        "req" + (x++),
+                        [
+                            "verify", msg, sig, publicKey
+                        ]
+                    ],
+                    function() {
+                        masterPromise.resolve(
+                            arguments[1][0]
+                        );
+                    }
+                );
+
+                return masterPromise;
+            }
+        }
+    };
+
+    mBroadcaster.once('startMega', function _setupBackgroundNacl() {
+        backgroundNacl.requiresWorkersInit();
+    });
+
+})();

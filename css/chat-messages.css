@@ -107,7 +107,7 @@
     margin: 2px 0 0 0;
 }
 .message.text-block {
-    margin: 3px 30px 0 0;
+    margin: 2px 30px 0 0;
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
@@ -135,13 +135,7 @@
     text-decoration: none;
 }
 .small-info-txt .message.text-block {
-    font-size: 13px;
-    line-height: 14px;
     color: #999999;
-    margin: 0 30px 0 0;
-}
-.small-info-txt.message.content-area {
-    padding: 2px 0 6px 0;
 }
 .message .dark-grey-txt {
     color: #666666;
@@ -260,6 +254,16 @@
     right: 24px;
     float: none;
     margin: 2px 0 0 0;
+    z-index: 100;
+}
+.not-sent .message.content-area > .default-white-button.tiny-button,
+.sending .message.content-area > .default-white-button.tiny-button {
+    right: 48px;
+    margin-top: 5px;
+}
+.not-sent.requires-manual-retry .message.content-area > .default-white-button.tiny-button {
+    right: 64px;
+    margin-top: 5px;
 }
 .message.content-area .small-blue-spinner {
     position: absolute;
@@ -276,4 +280,11 @@
 }
 .message.warning-text i {
     margin: 0 5px 0 0;
+}
+
+.message.body.dialog-wrapper .not-sent-indicator {
+    display: none;
+}
+.not-sent-indicator i {
+    cursor: pointer;
 }

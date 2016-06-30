@@ -158,8 +158,6 @@ IndexedDBKVStorage.prototype._prefillMemCache = function() {
 };
 
 /**
-
-/**
  * Set item
  *
  * @param k {String} A unique key for this value to be stored by. In case that it already exists in the DB it will be
@@ -307,4 +305,38 @@ IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(functi
         });
 
     return promise;
+});
+
+
+/**
+ * Loops across all items in db
+ *
+ * @param cb {Function}
+ */
+IndexedDBKVStorage.prototype.eachItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVEachItem(cb) {
+    var self = this;
+
+    Object.keys(this._memCache).forEach(function(k) {
+        cb(self._memCache[k], k);
+    });
+
+    return MegaPromise.resolve();
+});
+
+/**
+ * Loops across all items that their key starts with `prefix` in db
+ *
+ * @param prefix {String}
+ * @param cb {Function}
+ */
+IndexedDBKVStorage.prototype.eachPrefixItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVEachItem(prefix, cb) {
+    var self = this;
+
+    Object.keys(this._memCache).forEach(function(k) {
+        if (k.indexOf(prefix) === 0) {
+            cb(self._memCache[k], k);
+        }
+    });
+
+    return MegaPromise.resolve();
 });

@@ -298,6 +298,8 @@ var mega = {
         0, 'Torch', 'Epic'
     ],
 
+    maxWorkers: (navigator.hardwareConcurrency || 4),
+
     /** Get browser brancd internal ID */
     getBrowserBrandID: function() {
         if (Object(window.chrome).torch) {

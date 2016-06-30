@@ -158,7 +158,7 @@ function init_page() {
     if (!page.match(/^(blog|help|corporate|page_)/)) {
         $('.top-head').remove();
     }
-    $('#loading').hide();
+    $('#loading:visible').hide();
     if (loadingDialog) {
         loadingDialog.hide();
     }

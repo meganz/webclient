@@ -9,6 +9,9 @@ describe("crypto unit test", function() {
     var ns = crypt;
     var assert = chai.assert;
 
+    // for anyone reading this line... never mock global stuff in unit tests...
+    var origMegaPromise = MegaPromise;
+
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
 
@@ -50,6 +53,12 @@ describe("crypto unit test", function() {
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
         //sandbox.stub(attribCache, 'isDisabled', true);
+
+        sandbox.stub(backgroundNacl.sign.detached, 'verify', function() {
+            return MegaPromise.resolve(
+                nacl.sign.detached.verify.apply(this, arguments)
+            );
+        });
     });
 
     afterEach(function() {
@@ -205,29 +214,41 @@ describe("crypto unit test", function() {
         });
 
         describe('_checkSignature()', function() {
-            it("good signature", function() {
-                sandbox.stub(authring, 'verifyKey').returns(true);
-                var result = ns._checkSignature('squiggle', 'RSA key', 'RSA', 'Ed key');
-                assert.strictEqual(result, true);
-                assert.strictEqual(authring.verifyKey.callCount, 1);
-                assert.deepEqual(authring.verifyKey.args[0],
-                                 ['squiggle', 'RSA key', 'RSA', 'Ed key']);
+            it("good signature", function(done) {
+                sandbox.stub(authring, 'verifyKey').returns(origMegaPromise.resolve(true));
+                ns._checkSignature('squiggle', 'RSA key', 'RSA', 'Ed key')
+                    .done(function(result) {
+                        assert.strictEqual(result, true);
+                        assert.strictEqual(authring.verifyKey.callCount, 1);
+                        assert.deepEqual(authring.verifyKey.args[0],
+                            ['squiggle', 'RSA key', 'RSA', 'Ed key']);
+
+                        done();
+                    });
+
             });
 
-            it("bad signature", function() {
-                sandbox.stub(authring, 'verifyKey').returns(false);
-                var result = ns._checkSignature('squiggle', 'RSA key', 'RSA', 'Ed key');
-                assert.strictEqual(result, false);
-                assert.strictEqual(authring.verifyKey.callCount, 1);
-                assert.deepEqual(authring.verifyKey.args[0],
-                                 ['squiggle', 'RSA key', 'RSA', 'Ed key']);
+            it("bad signature", function(done) {
+                sandbox.stub(authring, 'verifyKey').returns(origMegaPromise.resolve(false));
+                ns._checkSignature('squiggle', 'RSA key', 'RSA', 'Ed key')
+                    .done(function(result) {
+                        assert.strictEqual(result, false);
+                        assert.strictEqual(authring.verifyKey.callCount, 1);
+                        assert.deepEqual(authring.verifyKey.args[0],
+                            ['squiggle', 'RSA key', 'RSA', 'Ed key']);
+
+                        done();
+                    });
             });
 
-            it("empty signature", function() {
-                sandbox.stub(authring, 'verifyKey');
-                var result = ns._checkSignature('', 'RSA key', 'RSA', 'Ed key');
-                assert.strictEqual(result, null);
-                assert.strictEqual(authring.verifyKey.callCount, 0);
+            it("empty signature", function(done) {
+                sandbox.stub(authring, 'verifyKey').returns(origMegaPromise.resolve(null));
+                ns._checkSignature('', 'RSA key', 'RSA', 'Ed key')
+                    .done(function(result) {
+                        assert.strictEqual(result, null);
+                        assert.strictEqual(authring.verifyKey.callCount, 0);
+                        done();
+                    });
             });
         });
 
@@ -421,7 +442,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
                 sandbox.stub(mega.attr, 'get').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
-                sandbox.stub(ns, '_checkSignature').returns(true);
+                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
@@ -473,7 +494,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(true);
+                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
@@ -529,7 +550,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(true);
+                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
                 sandbox.stub(authring, 'setContactAuthenticated');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
@@ -687,7 +708,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(null);
+                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(null));
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
@@ -735,7 +756,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(null);
+                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(null));
                 sandbox.stub(authring, 'setContactAuthenticated');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
@@ -787,7 +808,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(ns, '_checkSignature').returns(true);
+                sandbox.stub(ns, '_checkSignature').returns(origMegaPromise.resolve(true));
                 sandbox.stub(authring, 'setContactAuthenticated');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.

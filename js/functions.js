@@ -842,7 +842,7 @@ if (typeof l === 'undefined') {
 
 var date_months = []
 
-function acc_time2date(unixtime) {
+function acc_time2date(unixtime, yearIsOptional) {
     var MyDate = new Date(unixtime * 1000);
     var th = 'th';
     if ((parseInt(MyDate.getDate()) === 11) || (parseInt(MyDate.getDate()) === 12)) {}
@@ -858,7 +858,18 @@ function acc_time2date(unixtime) {
     if (lang !== 'en') {
         th = ',';
     }
-    return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
+    var result = date_months[MyDate.getMonth()] + ' ' + MyDate.getDate();
+
+    if (yearIsOptional === true) {
+        var currYear = (new Date()).getFullYear();
+        if (currYear !== MyDate.getFullYear()) {
+            result +=  th + ' ' + MyDate.getFullYear();
+        }
+    }
+    else {
+        result +=  th + ' ' + MyDate.getFullYear();
+    }
+    return result;
 }
 
 function time2last(timestamp) {
@@ -887,6 +898,22 @@ function time2last(timestamp) {
     else {
         return l[879].replace('[X]', Math.ceil(sec / 86400));
     }
+}
+
+/**
+ * Basic calendar math function (using moment.js) to return true or false if the date passed in is either
+ * the same day or the previous day.
+ *
+ * @param dateString {String|int}
+ * @param [refDate] {String|int}
+ * @returns {Boolean}
+ */
+var todayOrYesterday = function(dateString, refDate) {
+    var momentDate = moment(dateString);
+    var today = moment(refDate ? refDate : undefined).startOf('day');
+    var yesterday = today.clone().subtract(1, 'days');
+
+    return (momentDate.isSame(today, 'd') || momentDate.isSame(yesterday, 'd'));
 }
 
 /**
@@ -1328,7 +1355,7 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 
     $promise.verify = function() {
         if (validateFunction()) {
-            if (window.d) {
+            if (window.d && typeof(window.promisesDebug) !== 'undefined') {
                 console.debug("Resolving timeout promise",
                     timeout, "ms", "at", (new Date()),
                     validateFunction, resolveRejectArgs);
@@ -1344,7 +1371,7 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 
         var timeoutTimer = setTimeout(function() {
             if (validateFunction()) {
-                if (window.d) {
+                if (window.d && typeof(window.promisesDebug) !== 'undefined') {
                     console.debug("Resolving timeout promise",
                         timeout, "ms", "at", (new Date()),
                         validateFunction, resolveRejectArgs);
@@ -2008,7 +2035,7 @@ function MurmurHash3(key, seed) {
  *  by the queue
  */
 function CreateWorkers(url, message, size) {
-    size = size || 4
+    size = size || 4;
     var worker = [],
         instances = [];
 
@@ -2625,7 +2652,7 @@ function asyncApiReq(data) {
     var $promise = new MegaPromise();
     api_req(data, {
         callback: function(r) {
-            if (typeof r === 'number') {
+            if (typeof r === 'number' && r !== 0) {
                 $promise.reject.apply($promise, arguments);
             }
             else {
@@ -3055,7 +3082,7 @@ function generateAnonymousReport() {
     return $promise;
 }
 
-function __(s) { //TODO: waiting for @crodas to commit the real __ code.
+function __(s) { // TODO: waiting for @crodas to commit the real __ code.
     return s;
 }
 
@@ -4195,6 +4222,12 @@ var watchdog = Object.freeze({
                     location.reload();
                 }
                 break;
+            case 'chat_event':
+                if (strg.data.state === 'DISCARDED') {
+                    var chatRoom = megaChat.plugins.chatdIntegration._getChatRoomFromEventData(strg.data);
+                    megaChat.plugins.chatdIntegration.discardMessage(chatRoom, strg.data.messageId);
+                }
+                break;
         }
 
         delete localStorage[ev.key];
@@ -4342,27 +4375,6 @@ passwordManager.pickFormFields = function(form) {
     return result;
 };
 
-
-// http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport
-function elementInViewport2Lightweight(el) {
-    var top = el.offsetTop;
-    var left = el.offsetLeft;
-    var width = el.offsetWidth;
-    var height = el.offsetHeight;
-
-    while(el.offsetParent) {
-        el = el.offsetParent;
-        top += el.offsetTop;
-        left += el.offsetLeft;
-    }
-
-    return (
-        top < (window.pageYOffset + window.innerHeight) &&
-        left < (window.pageXOffset + window.innerWidth) &&
-        (top + height) > window.pageYOffset &&
-        (left + width) > window.pageXOffset
-    );
-}
 
 function elementInViewport2(el) {
     return verge.inY(el) || verge.inX(el);
@@ -4854,3 +4866,29 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 };
 
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
+
+
+var debounce = function(func, execAsap) {
+    var timeout;
+
+    return function debounced() {
+        var obj = this;
+        var args = arguments;
+        
+        function delayed() {
+            if (!execAsap) {
+                func.apply(obj, args);
+            }
+            timeout = null;
+        };
+
+        if (timeout) {
+            cancelAnimationFrame(timeout);
+        }
+        else if (execAsap) {
+            func.apply(obj, args);
+        }
+
+        timeout = requestAnimationFrame(delayed);
+    };
+};

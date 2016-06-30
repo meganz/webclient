@@ -476,4 +476,8 @@ body.pro:after {
     background-image: url(../images/mega/zoom-sprite@2x.png);
     background-size: 160px auto;
 }
+.dropdown-white-arrow, .huge-white-icon, .shared-link.small-icon {
+    background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
+    background-size: 68px auto;
+}
 }

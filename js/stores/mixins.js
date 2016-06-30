@@ -26,6 +26,7 @@ function shallowEqual(objA, objB) {
 
 var MAX_ALLOWED_DEBOUNCED_UPDATES = 1;
 var DEBOUNCED_UPDATE_TIMEOUT = 40;
+var REENABLE_UPDATES_AFTER_TIMEOUT = 300;
 
 var MAX_TRACK_CHANGES_RECURSIVE_DEPTH = 1;
 var _propertyTrackChangesVars = {
@@ -43,7 +44,6 @@ else {
 window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
 
 var MegaRenderMixin = {
-    //inViewport: false,
     getReactId: function() {
         return this._reactInternalInstance._rootNodeID;
     },
@@ -63,7 +63,7 @@ var MegaRenderMixin = {
 
         if (self.debounceTimer) {
            clearTimeout(self.debounceTimer);
-            console.error(self.getUniqueId(), self.skippedUpdates + 1);
+            // console.error(self.getUniqueId(), self.skippedUpdates + 1);
            self.skippedUpdates++;
         }
         var TIMEOUT_VAL = DEBOUNCED_UPDATE_TIMEOUT;
@@ -73,15 +73,17 @@ var MegaRenderMixin = {
         }
 
         self.debounceTimer = setTimeout(function() {
-            self.forceUpdate();
+            self.eventuallyUpdate();
             self.debounceTimer = null;
             self.skippedUpdates = 0;
         }, TIMEOUT_VAL);
     },
     componentDidMount: function() {
 
-        $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
-        window.addEventListener('hashchange', this.onHashChangeDoUpdate);
+        if (this.props.requiresUpdateOnResize) {
+            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
+        }
+        // window.addEventListener('hashchange', this.onHashChangeDoUpdate);
 
         // init on data structure change events
         if (this.props) {
@@ -102,23 +104,32 @@ var MegaRenderMixin = {
         //);
         //
         //this.requiresLazyRendering();
+
+        this._isMounted = true;
     },
     findDOMNode: function() {
         return ReactDOM.findDOMNode(this);
     },
     componentWillUnmount: function() {
-        $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
-        window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
+        if (this.props.requiresUpdateOnResize) {
+            $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
+        }
 
-        //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.getUniqueId());
-        //$(window).unbind('load.lazyRenderer' + this.getUniqueId());
-        //$(window).unbind('resize.lazyRenderer' + this.getUniqueId());
-        //$(window).unbind('hashchange.lazyRenderer' + this.getUniqueId());
-        //$(window).unbind('scroll.lazyRenderer' + this.getUniqueId());
+        // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
+
+        this._isMounted = false;
     },
     isComponentVisible: function() {
         var domNode = $(this.findDOMNode());
 
+        // ._isMounted is faster then .isMounted() or any other operation
+        if (!this._isMounted) {
+            return false;
+        }
+        // offsetParent should NOT trigger a reflow/repaint
+        if (domNode.offsetParent === null) {
+            return false;
+        }
         if (!domNode.is(":visible")) {
             return false;
         }
@@ -127,15 +138,62 @@ var MegaRenderMixin = {
         }
         return true;
     },
+    /**
+     * Lightweight version of .isComponentVisible
+     * @returns {bool}
+     */
+    isComponentEventuallyVisible: function() {
+        var domNode = $(this.findDOMNode());
+
+        // ._isMounted is faster then .isMounted() or any other operation
+        if (!this._isMounted) {
+            return false;
+        }
+        // offsetParent should NOT trigger a reflow/repaint
+        if (domNode.offsetParent === null) {
+            return false
+        }
+        return true;
+    },
     eventuallyUpdate: function() {
-        if (!this._wasRendered) {
+        var self = this;
+
+        if (self._updatesDisabled === true) {
             return;
         }
-        if (!this.isComponentVisible()) {
+        if (!self._wasRendered || (self._wasRendered && !self.isMounted())) {
+            return;
+        }
+        if (!self._isMounted) {
+            return;
+        }
+        if (!self.isComponentEventuallyVisible()) {
             return;
         }
 
-        this.forceUpdate();
+        self.safeForceUpdate();
+    },
+    tempDisableUpdates: function(forHowLong) {
+        var self = this;
+        self._updatesDisabled = true;
+        if (self._updatesReenableTimer) {
+            clearTimeout(self._updatesRenableTimer);
+        }
+
+        var timeout = forHowLong ?
+            forHowLong : (
+                self.REENABLE_UPDATES_AFTER_TIMEOUT ?
+                    self.REENABLE_UPDATES_AFTER_TIMEOUT : REENABLE_UPDATES_AFTER_TIMEOUT
+            );
+
+        self._updatesReenableTimer = setTimeout(function() {
+            self.tempEnableUpdates();
+        }, timeout);
+    },
+    tempEnableUpdates: function() {
+        clearTimeout(this._updatesReenableTimer);
+        this._updatesDisabled = false;
+        this.eventuallyUpdate();
     },
     onResizeDoUpdate: function() {
         if (!this.isMounted() || this._pendingForceUpdate === true) {
@@ -144,13 +202,13 @@ var MegaRenderMixin = {
 
         this.eventuallyUpdate();
     },
-    onHashChangeDoUpdate: function() {
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
-            return;
-        }
-
-        this.eventuallyUpdate();
-    },
+    // onHashChangeDoUpdate: function() {
+    //     if (!this.isMounted() || this._pendingForceUpdate === true) {
+    //         return;
+    //     }
+    //
+    //     this.eventuallyUpdate();
+    // },
     _recurseAddListenersIfNeeded: function(idx, map, depth) {
         var self = this;
         depth = depth ? depth : 0;
@@ -186,7 +244,7 @@ var MegaRenderMixin = {
         var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
 
         if (!v && v === rv) { // null, undefined, false is ok
-            //console.error('r === rv, !v', k, referenceMap, map);
+            // console.error('r === rv, !v', k, referenceMap, map);
             return false; // continue/skip
         }
 
@@ -198,13 +256,13 @@ var MegaRenderMixin = {
                 foundChanges = true;
                 dataChangeHistory[cacheKey] = v._dataChangeIndex;
             } else {
-                //console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
+                // console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
             }
         } else if (typeof v === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
             if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
                 foundChanges = true;
             } else {
-                //console.error("NOT (recursive) changed: ", k, v);
+                // console.error("NOT (recursive) changed: ", k, v);
             }
         } else if (v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
             v.forEach(function(v, k) {
@@ -214,7 +272,7 @@ var MegaRenderMixin = {
                 }
             });
         } else {
-            //console.error("NOT tracked/changed: ", k, v);
+            // console.error("NOT tracked/changed: ", k, v);
         }
         return foundChanges;
     },
@@ -222,7 +280,7 @@ var MegaRenderMixin = {
         var self = this;
         depth = depth || 0;
 
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
             return;
         }
 
@@ -258,8 +316,19 @@ var MegaRenderMixin = {
     },
     shouldComponentUpdate: function(nextProps, nextState) {
         var shouldRerender = false;
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
             return false;
+        }
+
+        // component specific control of the React lifecycle
+        if (this.specificShouldComponentUpdate) {
+            var r = this.specificShouldComponentUpdate();
+            if (r === false) {
+                return false;
+            }
+            else if (r === true) {
+                return true;
+            }
         }
 
         if (this.props !== null) {
@@ -270,14 +339,20 @@ var MegaRenderMixin = {
         }
 
 
-        if (window.RENDER_DEBUG) console.error("shouldRerender?",
-            shouldRerender,
-            "rendered: ", this.getElementName(),
-            "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
-            "props:", this.props,
-            "nextProps:", this.props,
-            "state:", this.state
-        );
+
+        if (window.RENDER_DEBUG) {
+            if (shouldRerender) {
+                // debugger;
+            }
+            console.error("shouldRerender?",
+                shouldRerender,
+                "rendered: ", this.getElementName(),
+                "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
+                "props:", this.props,
+                "nextProps:", this.props,
+                "state:", this.state
+            );
+        }
 
 
         if (shouldRerender === true) { // (eventually) add listeners to newly added data structures
@@ -294,7 +369,7 @@ var MegaRenderMixin = {
     onPropOrStateUpdated: function() {
         if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this, this.getElementName(), arguments);
 
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
+        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
             return;
         }
 
@@ -310,26 +385,6 @@ var MegaRenderMixin = {
         }
         return rootElement === this ? null : rootElement;
     },
-    //requiresLazyRendering: function() {
-    //    var domNode = this.findDOMNode();
-    //    var wasInViewPort = this.inViewport;
-    //
-    //    if (domNode) {
-    //        this.inViewport = elementInViewport2(domNode);
-    //    }
-    //    else {
-    //        this.inViewport = false;
-    //    }
-    //
-    //    if (wasInViewPort !== this.inViewport) {
-    //        if (!this.inViewport) {
-    //            $(domNode).css({'visibility': 'hidden'});
-    //        }
-    //        else {
-    //            $(domNode).css({'visibility': 'visible'});
-    //        }
-    //    }
-    //},
     getOwnerElement: function() {
         var owner = this._reactInternalInstance._currentElement._owner;
         if (owner) {
@@ -339,13 +394,25 @@ var MegaRenderMixin = {
         }
     },
     safeForceUpdate: function() {
-        var self = this;
         try {
-            setTimeout(function() {
-                self.forceUpdate();
-            }, 75);
-        } catch(e) {
-            console.warn(e);
+            if (this._isMounted && this.isMounted()) {
+                var benchmarkRender;
+                if (window.RENDER_DEBUG) {
+                    benchmarkRender =  unixtime();
+                }
+                this.forceUpdate();
+                if (window.RENDER_DEBUG) {
+                    var o = this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none";
+                    console.error("safeForceUpdate", unixtime() - benchmarkRender,
+                        "rendered: ", this.getElementName(),
+                        "owner: ", o,
+                        "props:", this.props,
+                        "state:", this.state
+                    );
+                }
+            }
+        } catch (e) {
+            console.error("safeForceUpdate: ", e);
         }
     }
 };

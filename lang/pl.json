@@ -3429,7 +3429,11 @@
     "8908": "opu\u015bci\u0142 grupowy czat.",
     "8909": "Odrzu\u0107",
     "8910": "Usu\u0144 element z udost\u0119pnionego katalogu",
-    "8911": "Keep names as in the mobile device",
+    "8911": "Zachowaj nazwy na urz\u0105dzeniu mobilnym",
+    "8912": "U\u017cyj\u0119 [B]MEGAsync[\/B]",
+    "8913": "Removed [X] items from a share",
+    "8914": "Usage: Nie mogli\u015bmy zweryfikowa\u0107 kolejno\u015bci wiadomo\u015bci w czacie.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3572,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

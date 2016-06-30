@@ -2872,7 +2872,7 @@
     "8004": "\u5220\u9664\u6d88\u606f",
     "8005": "\u6dfb\u52a0\u81f3\u4e91\u7aef\u786c\u76d8",
     "8006": "Attachment added to your Cloud Drive.",
-    "8007": "Add participant...",
+    "8007": "Add Participant...",
     "8008": "\u5f53\u524d\u6ca1\u6709[P]\u5bf9\u8bdd[\/P]",
     "8009": "\u8f93\u5165\u6d88\u606f...",
     "8010": "\u641c\u7d22\u8054\u7cfb\u4eba",
@@ -3430,6 +3430,10 @@
     "8909": "Revoke",
     "8910": "Removed item from shared folder",
     "8911": "Keep names as in the mobile device",
+    "8912": "I&#039;ll use [B]MEGAsync[\/B]",
+    "8913": "Removed [X] items from a share",
+    "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3572,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

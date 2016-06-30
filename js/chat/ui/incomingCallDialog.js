@@ -93,8 +93,6 @@
         //        self.hide();
         //    }
         //});
-
-        //todo: close on esc (for all dialogs?)
     };
 
     /**

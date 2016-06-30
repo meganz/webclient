@@ -284,7 +284,12 @@ var useravatar = (function() {
             M.u[user].trackDataChange();
         }
 
+        var $avatar = null;
         function updateAvatar() {
+            if ($avatar === null) {
+                // only do a $(....) call IF .updateAvatar is called.
+                $avatar = $(ns.contact(user));
+            }
 
             var $this = $(this);
             $this.removeClass($this.data('color'))
@@ -293,7 +298,6 @@ var useravatar = (function() {
                 .safeHTML($avatar.html());
         }
 
-        var $avatar = $(ns.contact(user));
         $('.avatar-wrapper.' + user).each(updateAvatar);
 
         if ((M.u[user] || {}).m) {
@@ -301,6 +305,97 @@ var useravatar = (function() {
         }
     };
 
+    ns.generateContactAvatarMeta = function(user) {
+        if (M.u[user]) {
+            user = M.u[user];
+        }
+        else if (user === u_handle) {
+            user = u_attr;
+        }
+        else if (M.u[user]) {
+            // It's an user ID
+            user = M.u[user];
+        }
+
+        if (user && user.u && user.avatar) {
+            return user.avatar;
+        }
+
+
+        if (typeof user === 'string' && user.length > 0 && user.indexOf("@") > -1) {
+            // "@" is faster then isEmail's greping for non-contacts!
+            if (isEmail(user)) {
+                var email = user;
+                var found = false;
+                // User is an email, we should look if the user
+                // exists, if it does exists we use the user Object.
+                M.u.every(function(contact, u) {
+                    if (M.u[u].m === email) {
+                        // Found the user object
+                        found = ns.generateContactAvatarMeta(M.u[u]);
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                });
+
+                if (found) {
+                    return found;
+                }
+
+                return {
+                    'type': 'text',
+                    'avatar': _lettersSettings(email.substr(0, 2))
+                };
+            }
+            else {
+                return {
+                    'type': 'text',
+                    'avatar': _lettersSettings(user.substr(0, 2))
+                };
+            }
+        }
+
+        if (!user || typeof user !== 'object' || !user.u) {
+            return {
+                'type': 'text',
+                'avatar': ''
+            };
+        }
+
+        isUserVerified(user.u);
+
+        if (avatars[user.u]) {
+            user.avatar = {
+                'type': 'image',
+                'avatar': avatars[user.u].url
+            };
+
+            return user.avatar;
+        }
+
+        var letters = M.getNameByHandle(user.u);
+
+        if (!letters) {
+            // XXX: not a known user?
+            letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
+        }
+
+        if (user && user.u) {
+            user.avatar = {
+                'type': 'text',
+                'avatar': _lettersSettings(letters.substr(0, 2))
+            };
+            return user.avatar;
+        }
+        else {
+            return {
+                'type': 'text',
+                'avatar': _lettersSettings(letters.substr(0, 2))
+            }
+        }
+    };
     /**
      * Returns a contact avatar
      * @param {String|Object} user
@@ -453,6 +548,9 @@ var useravatar = (function() {
                     data: blob,
                     url: myURL.createObjectURL(blob)
                 };
+                if (M.u[handle]) {
+                    M.u[handle].avatar = false;
+                }
             }
             else {
                 logger.warn('setUserAvatar: Provided data is not an ArrayBuffer.', ab);
@@ -472,6 +570,10 @@ var useravatar = (function() {
             }
 
             avatars[handle] = missingAvatars[handle] = undefined;
+
+            if (M.u[handle]) {
+                M.u[handle].avatar = false;
+            }
         };
 
         if (d) {

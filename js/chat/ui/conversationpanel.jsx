@@ -153,7 +153,7 @@ var ConversationRightArea = React.createClass({
                                 }}/>;
 
 
-                    if (room.iAmOperator()) {
+                    if (room.iAmOperator() || contactHash === u_handle) {
                         // operator
 
 

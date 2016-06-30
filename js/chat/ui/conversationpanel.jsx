@@ -13,7 +13,8 @@ var TypingAreaUI = require('./../ui/typingArea.jsx');
 var getMessageString = require('./messages/utils.jsx').getMessageString;
 
 var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
-var AlterParticipantsConversationMessage = require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
+var AlterParticipantsConversationMessage = 
+    require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
 var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
 var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
 
@@ -77,7 +78,8 @@ var ConversationRightArea = React.createClass({
 
         var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
 
-        var startAudioCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+        var startAudioCallButton = 
+                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                             if (contact.presence && contact.presence !== "offline") {
                                 room.startAudioCall();
                             }
@@ -86,7 +88,8 @@ var ConversationRightArea = React.createClass({
             {__(l[5896])}
         </div>;
 
-        var startVideoCallButton = <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+        var startVideoCallButton = 
+                    <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
                         if (contact.presence && contact.presence !== "offline") {
                             room.startVideoCall();
                         }
@@ -98,7 +101,8 @@ var ConversationRightArea = React.createClass({
         if (room.isReadOnly()) {
            startAudioCallButton = startVideoCallButton = null;
         }
-        var endCallButton = <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
+        var endCallButton =     
+                    <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
                         if (contact.presence && contact.presence !== "offline") {
                             if (room.callSession) {
                                 room.callSession.endCall();
@@ -246,7 +250,8 @@ var ConversationRightArea = React.createClass({
                         dropdowns={dropdowns}
                         dropdownDisabled={!room.iAmOperator() || contactHash === u_handle}
                         dropdownButtonClasses={
-                            room.type == "group" && myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button"
+                            room.type == "group" && 
+                                myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button"
                         }
                         dropdownIconClasses={dropdownIconClasses}
                     />
@@ -1539,13 +1544,16 @@ var ConversationPanel = React.createClass({
                     if (!msg) {
                         return;
                     }
-                    if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
-                        room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+                    var chatdint = room.megaChat.plugins.chatdIntegration;
+                    if (msg.getState() === Message.STATE.SENT || 
+                        msg.getState() === Message.STATE.DELIVERED ||
+                        msg.getState() === Message.STATE.NOT_SENT) {
+                        chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
                     }
                     else if (
                         msg.getState() === Message.STATE.NOT_SENT_EXPIRED
                     ) {
-                        room.megaChat.plugins.chatdIntegration.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);                    
+                        chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
                     }
 
                     msg.message = "";
@@ -1709,7 +1717,8 @@ var ConversationPanel = React.createClass({
                         </div>
                     </div>
 
-                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden">
+                    <div className=
+                            "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden">
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
@@ -1717,7 +1726,8 @@ var ConversationPanel = React.createClass({
                         </div>
                     </div>
 
-                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden">
+                    <div className=
+                            "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden">
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
@@ -1747,7 +1757,8 @@ var ConversationPanel = React.createClass({
                                 >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
-                                        <div className="loading-spinner js-messages-loading light manual-management" key="loadingSpinner" style={{top: "50%"}}>
+                                        <div className="loading-spinner js-messages-loading light manual-management"
+                                         key="loadingSpinner" style={{top: "50%"}}>
                                             <div className="main-loader" style={{
                                                 'position': 'fixed',
                                                 'top': '50%',
@@ -1804,7 +1815,8 @@ var ConversationPanel = React.createClass({
                                                     (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
                                                     !message.requiresManualRetry &&
                                                     !message.deleted &&
-                                                    (!message.type || message instanceof KarereEventObjects.OutgoingMessage) &&
+                                                    (!message.type ||
+                                                         message instanceof KarereEventObjects.OutgoingMessage) &&
                                                     (!message.isManagement || !message.isManagement())
                                                 ) {
                                                     foundMessage = message;
@@ -1823,7 +1835,8 @@ var ConversationPanel = React.createClass({
                                 }}
                                 onResized={() => {
                                     self.handleWindowResize();
-                                    $('.js-messages-scroll-area.jScrollPaneContainer', self.findDOMNode()).trigger('forceResize');
+                                    $('.js-messages-scroll-area.jScrollPaneContainer',
+                                         self.findDOMNode()).trigger('forceResize');
                                 }}
                                 onConfirm={(messageContents) => {
                                     if (messageContents && messageContents.length > 0) {

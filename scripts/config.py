@@ -39,7 +39,7 @@ NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 JSHINT_RULES = '--verbose'
 JSCS_RULES = '--verbose'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
-VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js', 'js/chat/bundle.js']
+VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js', 'js/chat/bundle.js', 'js/vendor/nacl-fast.js']
 VALIDATOR_LINELEN_THRESHOLD = 120 # Max chars per line to trigger.
 
 # Vera++ rules like this should be superseded by a "profile", but it

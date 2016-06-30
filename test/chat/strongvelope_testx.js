@@ -1524,8 +1524,10 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler._sentKeyId, null);
 
                 var result = handler.encryptTo('Hello!', 'you456789xw');
-                var expectedResult0 =  PROTOCOL_VERSION_STRING + '|squiggle|\u0000|gooniegoogoo|you456789xw|encrypted key|key ID';
-                var expectedResult1 =  PROTOCOL_VERSION_STRING + '|squiggle|\u0001|gooniegoogoo|key ID|ciphertext';
+                var expectedResult0 =  
+                    PROTOCOL_VERSION_STRING + '|squiggle|\u0000|gooniegoogoo|you456789xw|encrypted key|key ID';
+                var expectedResult1 = 
+                    PROTOCOL_VERSION_STRING + '|squiggle|\u0001|gooniegoogoo|key ID|ciphertext';
                 assert.strictEqual(result[0], expectedResult0);
                 assert.strictEqual(result[1], expectedResult1);
                 assert.strictEqual(ns._symmetricEncryptMessage.callCount, 1*2);
@@ -1582,8 +1584,10 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler._sentKeyId, null);
 
                 var result = handler.encryptTo('Hello!', 'you456789xw');
-                var expectedResult0 =  PROTOCOL_VERSION_STRING + '|squiggle|\u0000|gooniegoogoo|you456789xw|encrypted key|key ID';
-                var expectedResult1 =  PROTOCOL_VERSION_STRING + '|squiggle|\u0001|gooniegoogoo|key ID|ciphertext';
+                var expectedResult0 = 
+                    PROTOCOL_VERSION_STRING + '|squiggle|\u0000|gooniegoogoo|you456789xw|encrypted key|key ID';
+                var expectedResult1 = 
+                    PROTOCOL_VERSION_STRING + '|squiggle|\u0001|gooniegoogoo|key ID|ciphertext';
                 assert.strictEqual(result[0], expectedResult0);
                 assert.strictEqual(result[1], expectedResult1);
                 assert.strictEqual(ns._symmetricEncryptMessage.callCount, 1*2);
@@ -1615,8 +1619,10 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler._sentKeyId, null);
 
                 var result = handler.encryptTo('Hello!');
-                var expectedResult0 =  PROTOCOL_VERSION_STRING + '|squiggle|\u0000|gooniegoogoo|you456789xw|encrypted key|key ID';
-                var expectedResult1 =  PROTOCOL_VERSION_STRING + '|squiggle|\u0001|gooniegoogoo|key ID|ciphertext';
+                var expectedResult0 = 
+                    PROTOCOL_VERSION_STRING + '|squiggle|\u0000|gooniegoogoo|you456789xw|encrypted key|key ID';
+                var expectedResult1 = 
+                    PROTOCOL_VERSION_STRING + '|squiggle|\u0001|gooniegoogoo|key ID|ciphertext';
 
                 assert.strictEqual(result[0], expectedResult0);
                 assert.strictEqual(result[1], expectedResult1);

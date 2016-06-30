@@ -428,9 +428,10 @@ var MegaRenderMixin = {
                 }
                 this.forceUpdate();
                 if (window.RENDER_DEBUG) {
+                    var o = this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none";
                     console.error("safeForceUpdate", unixtime() - benchmarkRender,
                         "rendered: ", this.getElementName(),
-                        "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
+                        "owner: ", o,
                         "props:", this.props,
                         "state:", this.state
                     );

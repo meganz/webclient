@@ -85,7 +85,8 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
               viewRatio = 0;
 
         // Set textarea height according to  textarea clone height
-        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
+        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) +
+                          '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
 
         // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
         if (keyEvents && $textareaClone.data('lastContent') === textareaContent) {
@@ -106,7 +107,8 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
 
         // Textarea wrapper scrolling init
         if (textareaCloneHeight > textareaMaxHeight) {
-            $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+            $textareaScrollBlock.jScrollPane(
+                {enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
             if (!jsp && keyEvents) {
                 $textarea.focus();
             }
@@ -6767,7 +6769,22 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if (!is_fm() || $(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).closest('.content-panel.conversations').length || $(e.target).closest('.messages.content-area').length || $(e.target).closest('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if (!is_fm() ||
+            $(e.target).parents('#startholder').length ||
+            $(e.target).is('input') ||
+            $(e.target).is('textarea') ||
+            $(e.target).is('.download.info-txt') ||
+            $(e.target).closest('.content-panel.conversations').length ||
+            $(e.target).closest('.messages.content-area').length ||
+            $(e.target).closest('.chat-right-pad .user-card-data').length ||
+            $(e.target).parents('.fm-account-main').length ||
+            $(e.target).parents('.export-link-item').length ||
+            $(e.target).parents('.contact-fingerprint-txt').length ||
+            $(e.target).parents('.fm-breadcrumbs').length ||
+            $(e.target).hasClass('contact-details-user-name') ||
+            $(e.target).hasClass('contact-details-email') ||
+            $(e.target).hasClass('nw-conversations-name') ||
+            ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();

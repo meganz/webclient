@@ -363,7 +363,8 @@ var TypingArea = React.createClass({
         var $textareaClone = $('.message-preview', $node);
         var textareaMaxHeight = self.props.textareaMaxHeight;
         var $textareaScrollBlock = $('.textarea-scroll', $node);
-        $textareaScrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+        $textareaScrollBlock.jScrollPane(
+            {enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
 
         var textareaContent = $textarea.val();
         var cursorPosition = self.getCursorPosition($textarea[0]);
@@ -374,7 +375,8 @@ var TypingArea = React.createClass({
         var viewRatio = 0;
 
         // Set textarea height according to  textarea clone height
-        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
+        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) +
+                          '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
 
 
         // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
@@ -535,7 +537,8 @@ var TypingArea = React.createClass({
 
                     {self.props.children}
                 </div>
-                <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer" style={textareaScrollBlockStyles}>
+                <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
+                     style={textareaScrollBlockStyles}>
                     <textarea
                         className={messageTextAreaClasses}
                         placeholder={__(l[8009])}

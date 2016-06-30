@@ -90,7 +90,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
     // Events
     this.bind('onStateChange', function(e, oldState, newState) {
-        self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
+        self.logger.debug("Will change state from: ",
+         ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 
         var resetStateToReady = function() {
             if (self.state != ChatRoom.STATE.LEFT && self.state != ChatRoom.STATE.READY) {
@@ -1221,7 +1222,8 @@ ChatRoom.prototype.recover = function() {
     var $startChatPromise;
     if (self.state !== ChatRoom.STATE.LEFT) {
         self.setState(ChatRoom.STATE.JOINING, true);
-        $startChatPromise = self.megaChat.karere.startChat([], self.type, self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));
+        $startChatPromise = self.megaChat.karere.startChat([], self.type, 
+            self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));
 
         self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins
     }

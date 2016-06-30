@@ -436,7 +436,8 @@ describe("authring unit test", function() {
             });
 
             it("bad signature with bad point", function(done) {
-                ns.verifyKey(RSA_SIGNED_PUB_KEY.substring(0, 8) + String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(9),
+                ns.verifyKey(
+                    RSA_SIGNED_PUB_KEY.substring(0, 8) + String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(9),
                                                 RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY)
                     .done(function(result) {
                         assert.strictEqual(result, false);

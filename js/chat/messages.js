@@ -508,9 +508,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                             if (decrypted.identity && decrypted.references) {
                                 editedMessage.references = decrypted.references;
                                 editedMessage.msgIdentity = decrypted.identity;
-                                if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
+                                if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references)
+                                    === false) {
                                     // potential message order tampering detected.
-                                    self.logger.error("potential message order tampering detected: ", eventData.messageId);
+                                    self.logger.error("message order tampering detected: ", eventData.messageId);
                                 }
                             }
                         }
@@ -737,7 +738,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             });
         }
 
-        // pending would be handled automatically, because all NEW messages are set with state === NOT_SENT (== PENDING)
+        // pending would be handled automatically, because all NEW messages are set with state === NOT_SENT(== PENDING)
     });
 
     self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {

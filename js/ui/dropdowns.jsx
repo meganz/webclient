@@ -140,8 +140,12 @@ var DropdownContactsSelector = React.createClass({
     render: function() {
         var self = this;
 
-        return <Dropdown className={"popup contacts-search " + this.props.className} active={this.props.active} closeDropdown={this.props.closeDropdown} ref="dropdown"
-                         positionMy={this.props.positionMy} positionAt={this.props.positionAt}
+        return <Dropdown className={"popup contacts-search " + this.props.className} 
+                         active={this.props.active} 
+                         closeDropdown={this.props.closeDropdown} 
+                         ref="dropdown"
+                         positionMy={this.props.positionMy} 
+                         positionAt={this.props.positionAt}
                 >
             <div className="popup contacts-search">
                 <ContactsUI.ContactPickerWidget

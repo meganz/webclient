@@ -519,8 +519,8 @@ var GenericConversationMessage = React.createClass({
                             }));
                         }
                         else if (M.u[contact.u] && !M.u[contact.u].m) {
-                            // if already added from group chat...add the email, since that contact got shared in a chat
-                            // room
+                            // if already added from group chat...add the email, 
+                            // since that contact got shared in a chat room
                             M.u[contact.u].m = contact.email ? contact.email : contactEmail;
                         }
 
@@ -657,7 +657,8 @@ var GenericConversationMessage = React.createClass({
                         </div>
                     </div>;
                 }
-                else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+                else if (textContents.substr &&
+                 textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
                     var foundRevokedNode = null;
 
                     var revokedNode = textContents.substr(2, textContents.length);
@@ -673,7 +674,8 @@ var GenericConversationMessage = React.createClass({
 
                             if (attachedMsg.orderValue < message.orderValue) {
                                 try {
-                                    var attachments = JSON.parse(attachedMsg.textContents.substr(2, attachedMsg.textContents.length));
+                                    var attc = attachedMsg.textContents;
+                                    var attachments = JSON.parse(attc.substr(2, attc.length));
                                     attachments.forEach(function(node) {
                                         if (node.h === revokedNode) {
                                             foundRevokedNode = node;
@@ -790,7 +792,8 @@ var GenericConversationMessage = React.createClass({
                     if (message.updated > 0) {
                         textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
                     }
-                    messageDisplayBlock = <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;
+                    messageDisplayBlock = 
+                        <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;
                 }
                 if (!message.deleted) {
                     if (
@@ -858,7 +861,7 @@ var GenericConversationMessage = React.createClass({
         ) {
             textMessage = getMessageString(message.type);
             if (!textMessage) {
-                console.error("Message with type: ", message.type, "does not have a text string defined. Message: ", message);
+                console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
                 debugger;
                 throw new Error("boom");
             }
@@ -867,7 +870,8 @@ var GenericConversationMessage = React.createClass({
                 var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
                 if (message.currentCallCounter) {
-                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
+                    tmpMsg += " " + 
+                        textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
                 }
                 textMessage = tmpMsg;
                 textMessage = textMessage
@@ -954,7 +958,8 @@ var GenericConversationMessage = React.createClass({
             }
 
             return (
-                <div className={message.messageId + " message body" + additionalClasses} data-id={"id" + message.messageId}>
+                <div className={message.messageId + " message body" + additionalClasses} 
+                     data-id={"id" + message.messageId}>
                     <div className="feedback round-icon-block">
                         <i className={"round-icon " + message.cssClass}></i>
                     </div>

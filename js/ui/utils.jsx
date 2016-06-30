@@ -107,7 +107,7 @@ var JScrollPane = React.createClass({
             // self.lastScrollPositionPerc = $jsp.getPercentScrolledY();
         });
 
-        $elem.rebind('forceResize.jsp' + self.getUniqueId(), function(e, forced, scrollPositionYPerc, scrollToElement) {
+        $elem.rebind('forceResize.jsp'+self.getUniqueId(), function(e, forced, scrollPositionYPerc, scrollToElement) {
             self.onResize(forced, scrollPositionYPerc, scrollToElement);
         });
         $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize);

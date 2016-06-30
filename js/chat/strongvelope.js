@@ -438,7 +438,8 @@ var strongvelope = {};
             parsedContent[_TLV_MAPPING[TLV_TYPES.MESSAGE_TYPE]] = binaryMessage.charCodeAt(1);
         }
         while (rest.length > 0) {
-            part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ? tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
+            part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ?
+                tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
             tlvType = part.record[0].charCodeAt(0);
             tlvVariable = _TLV_MAPPING[tlvType];
             value = part.record[1];
@@ -677,7 +678,8 @@ var strongvelope = {};
         var result = { parsedMessage: parsedMessage, senderKeys: {}};
 
         if (parsedMessage) {
-            if((parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) && (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
+            if((parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) &&
+                    (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
                 if (ns._verifyMessage(parsedMessage.signedContent,
                                       parsedMessage.signature,
                                       pubEd25519[message.userId])) {
@@ -686,12 +688,17 @@ var strongvelope = {};
                     // If we sent the message, pick first recipient for getting the
                     // sender key (e. g. for history loading).
                     var keyIndex = isOwnMessage ? 0 : myIndex;
-                    var otherHandle = (isOwnMessage && (parsedMessage.keys[keyIndex].length < _RSA_ENCRYPTION_THRESHOLD))
+                    var otherHandle =
+                        (isOwnMessage && (parsedMessage.keys[keyIndex].length < _RSA_ENCRYPTION_THRESHOLD))
                                      ? parsedMessage.recipients[0]
                                      : message.userId;
                     if (keyIndex >= 0) {
                         // Decrypt message key(s).
-                        var encryptedKey = (isOwnMessage && (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ? parsedMessage.ownKey : parsedMessage.keys[keyIndex];
+                        var encryptedKey =
+                            (isOwnMessage &&
+                            (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ? 
+                                parsedMessage.ownKey : parsedMessage.keys[keyIndex];
+
                         var decryptedKeys = this._legacyDecryptKeysFor( encryptedKey,
                                                                         parsedMessage.nonce,
                                                                         otherHandle,
@@ -1087,7 +1094,8 @@ var strongvelope = {};
             refids += refs[i];
         }
 
-        var encryptedMessage = ns._symmetricEncryptMessage(messageIdentity + ns.pack16le(refids.length) + refids + message, senderKey);
+        var encryptedMessage =
+            ns._symmetricEncryptMessage(messageIdentity +ns.pack16le(refids.length) + refids + message, senderKey);
 
         // Assemble message content.
         content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
@@ -1098,7 +1106,11 @@ var strongvelope = {};
                                             encryptedMessage.ciphertext);
         }
         // Sign message.
-        content = this._signContent(String.fromCharCode(PROTOCOL_VERSION) + String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP) + senderKey + content) + content;
+        content = this._signContent(
+            String.fromCharCode(PROTOCOL_VERSION) +
+            String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP) +
+            senderKey +
+            content) + content;
 
         // Return assembled total message.
         content = String.fromCharCode(PROTOCOL_VERSION) + String.fromCharCode(MESSAGE_TYPES.GROUP_FOLLOWUP) + content;
@@ -1181,7 +1193,8 @@ var strongvelope = {};
         // Assemble main message body.
         assembledMessage = this._assembleBody(message, this.keyId, refs, messageIdentity);
 
-        encryptedMessages.push({"type": MESSAGE_TYPES.GROUP_FOLLOWUP, "message": assembledMessage, "identity": messageIdentity});
+        encryptedMessages.push(
+            {"type": MESSAGE_TYPES.GROUP_FOLLOWUP, "message": assembledMessage, "identity": messageIdentity});
 
         return encryptedMessages;
     };
@@ -1284,7 +1297,8 @@ var strongvelope = {};
 
         var self = this;
         if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS
-                || parsedMessage.type === MESSAGE_TYPES.TRUNCATE || parsedMessage.type === MESSAGE_TYPES.PRIVILEGE_CHANGE) {
+                || parsedMessage.type === MESSAGE_TYPES.TRUNCATE
+                || parsedMessage.type === MESSAGE_TYPES.PRIVILEGE_CHANGE) {
             // Sanity checks.
             if (setutils.intersection(new Set(parsedMessage.includeParticipants),
                         new Set(parsedMessage.excludeParticipants)).size > 0) {
@@ -1368,7 +1382,8 @@ var strongvelope = {};
                                                          senderKeys);
 
         // Am I part of this chat?
-        // TODO: In future it should update participants based on chatd server's requests rather than incoming messages.
+        // TODO: In future it should update participants based on chatd server's 
+        // requests rather than incoming messages.
         if (parsedMessage.excludeParticipants.indexOf(this.ownHandle) >= 0) {
             logger.info('I have been excluded from this chat, cannot read message.');
             this.keyId = null;
@@ -1458,7 +1473,8 @@ var strongvelope = {};
         }
 
         if (parsedMessage) {
-            if (ns._verifyMessage(String.fromCharCode(parsedMessage.protocolVersion) + String.fromCharCode(parsedMessage.type) + senderKey + parsedMessage.signedContent,
+            if (ns._verifyMessage(String.fromCharCode(parsedMessage.protocolVersion) +
+                                  String.fromCharCode(parsedMessage.type) + senderKey + parsedMessage.signedContent,
                                   parsedMessage.signature,
                                   pubEd25519[sender])) {
                     senderKey = this.participantKeys[sender][keyidStr];

@@ -1,4 +1,7 @@
-if (false /* window.location.hostname == "beta.mega.nz" *//* || window.location.hostname == "mega.dev" || location.hostname.indexOf("developers.") > -1*/) {
+if (false) {
+/* window.location.hostname == "beta.mega.nz" *//* ||
+     window.location.hostname == "mega.dev" ||
+     location.hostname.indexOf("developers.") > -1*/
     if (d)
     {
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)

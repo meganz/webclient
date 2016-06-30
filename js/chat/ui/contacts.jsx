@@ -134,7 +134,8 @@ var Avatar = React.createClass({
         } else {
             classes += " color" + avatarMeta.avatar.colorIndex;
 
-            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={avatarMeta.avatar.letters}></div></div>;
+            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}
+                <div className={letterClass} data-user-letter={avatarMeta.avatar.letters}></div></div>;
 
         }
 
@@ -158,7 +159,8 @@ var ContactCard = React.createClass({
             return null;
         }
 
-        var pres = (this.props.megaChat ? this.props.megaChat : window.megaChat).xmppPresenceToCssClass(contact.presence);
+        var pres = 
+            (this.props.megaChat ? this.props.megaChat : window.megaChat).xmppPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
 
         var contextMenu;
@@ -222,7 +224,9 @@ var ContactCard = React.createClass({
                 {contextMenu}
 
                 <div className="user-card-data">
-                    <div className="user-card-name small">{this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}</div>
+                    <div className="user-card-name small">
+                        {this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}
+                    </div>
                     <div className="user-card-email small">{contact.m}</div>
                 </div>
             </div>;

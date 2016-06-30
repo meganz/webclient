@@ -77,7 +77,8 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             var $promise;
 
             chatJids.push(megaChat.karere.getBareJid());
-            var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group", undefined, undefined, undefined, true);
+            var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group", 
+                undefined, undefined, undefined, true);
 
             if (resp instanceof MegaPromise) {
                 if (resp.state() === 'rejected') {
@@ -480,7 +481,8 @@ Chat.prototype.init = function() {
                 var room = self.chats[eventData.roomJid];
 
                 if (room) {
-                    //self.sendBroadcastAction("conv-start", {roomJid: room.roomJid, type: room.type, participants: room.getParticipants()});
+                    //self.sendBroadcastAction("conv-start",
+                    // {roomJid: room.roomJid, type: room.type, participants: room.getParticipants()});
                 }
             }
         }

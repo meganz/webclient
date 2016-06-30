@@ -820,12 +820,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
                                     delete chatRoom.notDecryptedBuffer[messageId];
                                     if (v.identity && v.references) {
-                                        chatRoom.messagesBuff.messages[messageId].references = v.references;
-                                        chatRoom.messagesBuff.messages[messageId].msgIdentity = v.identity;
-                                        chatRoom.messagesBuff.messageOrders[v.identity] = chatRoom.messagesBuff.messages[messageId].orderValue;
-                                        if (chatRoom.messagesBuff.verifyMessageOrder(v.identity, v.references) === false) {
+                                        var mb = chatRoom.messagesBuff;
+                                        mb.messages[messageId].references = v.references;
+                                        mb.messages[messageId].msgIdentity = v.identity;
+                                        mb.messageOrders[v.identity] = mb.messages[messageId].orderValue;
+                                        if (mb.verifyMessageOrder(v.identity, v.references) === false) {
                                             // potential message order tampering detected.
-                                            self.logger.critical("potential message order tampering detected: ", messageId);
+                                            self.logger.critical("message order tampering detected: ", messageId);
                                         }
                                     }
                                 }
@@ -864,7 +865,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             }
                         };
                     } catch (e) {
-                        self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
+                        self.logger.error("Failed to decrypt stuff via strongvelope, uncaught exception: ", e);
                     }
                 };
 
@@ -961,12 +962,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 }
                                 chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
                                 if (decrypted.identity && decrypted.references) {
-                                    chatRoom.messagesBuff.messages[msgObject.messageId].references = decrypted.references;
-                                    chatRoom.messagesBuff.messages[msgObject.messageId].msgIdentity = decrypted.identity;
-                                    chatRoom.messagesBuff.messageOrders[decrypted.identity] = msgObject.orderValue;
-                                    if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
+                                    var mb = chatRoom.messagesBuff;
+                                    mb.messages[msgObject.messageId].references = decrypted.references;
+                                    mb.messages[msgObject.messageId].msgIdentity = decrypted.identity;
+                                    mb.messageOrders[decrypted.identity] = msgObject.orderValue;
+                                    if (mb.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
                                         // potential message order tampering detected.
-                                        self.logger.critical("potential message order tampering detected: ", msgObject.messageId);
+                                        var l = self.logger;
+                                        l.critical("message order tampering detected: ", msgObject.messageId);
                                     }
                                 }
                             } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
@@ -999,7 +1002,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             self.logger.error('Unknown message type!');
                         }
                     } catch(e) {
-                        self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
+                        self.logger.error("Failed to decrypt stuff via strongvelope, uncaught exception: ", e);
                     }
                 };
 
@@ -1210,7 +1213,7 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
     if (!msg) {
         msg = chatMessages.sendingbuf[msgnum & 0xffffffff];
         if (!msg) {
-            console.error("Update message failed, because msgNum  was not found in either .buf or .sendingbuf", msgnum);
+            console.error("Update message failed, msgNum  was not found in either .buf or .sendingbuf", msgnum);
             return false;
         }
         else {

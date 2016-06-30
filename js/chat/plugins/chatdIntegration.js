@@ -1219,7 +1219,7 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
     var keyId = msg[Chatd.MsgField.KEYID];
 
     if (!foundMsg) {
-        console.error("Update message failed, because message  was not found", msgId);
+        console.error("Update message failed, because message  was not found", msgnum);
         return false;
     }
     cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId, foundMsg.references, foundMsg.msgIdentity);

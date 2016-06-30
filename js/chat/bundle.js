@@ -440,21 +440,6 @@
 	    });
 
 	    this.karere.bind("onUsersJoined", function (e, eventData) {
-	        if (eventData.newUsers[self.karere.getJid()]) {
-
-	            var iAmFirstToJoin = true;
-	            Object.keys(eventData.currentUsers).forEach(function (k) {
-	                if (k.indexOf(self.karere.getBareJid()) !== -1) {
-	                    iAmFirstToJoin = false;
-	                    return false;
-	                }
-	            });
-	            if (iAmFirstToJoin) {
-	                var room = self.chats[eventData.roomJid];
-
-	                if (room) {}
-	            }
-	        }
 	        return self._onUsersUpdate("joined", e, eventData);
 	    });
 
@@ -8755,6 +8740,10 @@
 	  }
 	};
 
+	function registerNullComponentID() {
+	  ReactEmptyComponentRegistry.registerNullComponentID(this._rootNodeID);
+	}
+
 	var ReactEmptyComponent = function (instantiate) {
 	  this._currentElement = null;
 	  this._rootNodeID = null;
@@ -8763,7 +8752,7 @@
 	assign(ReactEmptyComponent.prototype, {
 	  construct: function (element) {},
 	  mountComponent: function (rootID, transaction, context) {
-	    ReactEmptyComponentRegistry.registerNullComponentID(rootID);
+	    transaction.getReactMountReady().enqueue(registerNullComponentID, this);
 	    this._rootNodeID = rootID;
 	    return ReactReconciler.mountComponent(this._renderedComponent, rootID, transaction, context);
 	  },
@@ -9757,6 +9746,7 @@
 	 */
 	var EventInterface = {
 	  type: null,
+	  target: null,
 	  // currentTarget is set when dispatching; no use in copying it here
 	  currentTarget: emptyFunction.thatReturnsNull,
 	  eventPhase: null,
@@ -9790,8 +9780,6 @@
 	  this.dispatchConfig = dispatchConfig;
 	  this.dispatchMarker = dispatchMarker;
 	  this.nativeEvent = nativeEvent;
-	  this.target = nativeEventTarget;
-	  this.currentTarget = nativeEventTarget;
 
 	  var Interface = this.constructor.Interface;
 	  for (var propName in Interface) {
@@ -9802,7 +9790,11 @@
 	    if (normalize) {
 	      this[propName] = normalize(nativeEvent);
 	    } else {
-	      this[propName] = nativeEvent[propName];
+	      if (propName === 'target') {
+	        this.target = nativeEventTarget;
+	      } else {
+	        this[propName] = nativeEvent[propName];
+	      }
 	    }
 	  }
 
@@ -13485,7 +13477,10 @@
 	      }
 	    });
 
-	    nativeProps.children = content;
+	    if (content) {
+	      nativeProps.children = content;
+	    }
+
 	    return nativeProps;
 	  }
 
@@ -18268,7 +18263,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.6';
+	module.exports = '0.14.8';
 
 /***/ },
 /* 143 */
@@ -19231,7 +19226,6 @@
 	        self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
 	    },
 	    render: function render() {
-
 	        var classString = "";
 
 	        var megaChat = this.props.chatRoom.megaChat;
@@ -20002,7 +19996,6 @@
 	window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
 
 	var MegaRenderMixin = {
-	    //inViewport: false,
 	    getReactId: function() {
 	        return this._reactInternalInstance._rootNodeID;
 	    },
@@ -20076,11 +20069,6 @@
 
 	        // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
 
-	        //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.getUniqueId());
-	        //$(window).unbind('load.lazyRenderer' + this.getUniqueId());
-	        //$(window).unbind('resize.lazyRenderer' + this.getUniqueId());
-	        //$(window).unbind('hashchange.lazyRenderer' + this.getUniqueId());
-	        //$(window).unbind('scroll.lazyRenderer' + this.getUniqueId());
 	        this._isMounted = false;
 	    },
 	    isComponentVisible: function() {
@@ -20092,7 +20080,7 @@
 	        }
 	        // offsetParent should NOT trigger a reflow/repaint
 	        if (domNode.offsetParent === null) {
-	            return false
+	            return false;
 	        }
 	        if (!domNode.is(":visible")) {
 	            return false;
@@ -20104,7 +20092,7 @@
 	    },
 	    /**
 	     * Lightweight version of .isComponentVisible
-	     * @returns {boolean}
+	     * @returns {bool}
 	     */
 	    isComponentEventuallyVisible: function() {
 	        var domNode = $(this.findDOMNode());
@@ -20208,7 +20196,7 @@
 	        var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
 
 	        if (!v && v === rv) { // null, undefined, false is ok
-	            //console.error('r === rv, !v', k, referenceMap, map);
+	            // console.error('r === rv, !v', k, referenceMap, map);
 	            return false; // continue/skip
 	        }
 
@@ -20220,13 +20208,13 @@
 	                foundChanges = true;
 	                dataChangeHistory[cacheKey] = v._dataChangeIndex;
 	            } else {
-	                //console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
+	                // console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
 	            }
 	        } else if (typeof v === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
 	            if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
 	                foundChanges = true;
 	            } else {
-	                //console.error("NOT (recursive) changed: ", k, v);
+	                // console.error("NOT (recursive) changed: ", k, v);
 	            }
 	        } else if (v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
 	            v.forEach(function(v, k) {
@@ -20236,7 +20224,7 @@
 	                }
 	            });
 	        } else {
-	            //console.error("NOT tracked/changed: ", k, v);
+	            // console.error("NOT tracked/changed: ", k, v);
 	        }
 	        return foundChanges;
 	    },
@@ -20349,26 +20337,6 @@
 	        }
 	        return rootElement === this ? null : rootElement;
 	    },
-	    //requiresLazyRendering: function() {
-	    //    var domNode = this.findDOMNode();
-	    //    var wasInViewPort = this.inViewport;
-	    //
-	    //    if (domNode) {
-	    //        this.inViewport = elementInViewport2(domNode);
-	    //    }
-	    //    else {
-	    //        this.inViewport = false;
-	    //    }
-	    //
-	    //    if (wasInViewPort !== this.inViewport) {
-	    //        if (!this.inViewport) {
-	    //            $(domNode).css({'visibility': 'hidden'});
-	    //        }
-	    //        else {
-	    //            $(domNode).css({'visibility': 'visible'});
-	    //        }
-	    //    }
-	    //},
 	    getOwnerElement: function() {
 	        var owner = this._reactInternalInstance._currentElement._owner;
 	        if (owner) {
@@ -20386,15 +20354,16 @@
 	                }
 	                this.forceUpdate();
 	                if (window.RENDER_DEBUG) {
+	                    var o = this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none";
 	                    console.error("safeForceUpdate", unixtime() - benchmarkRender,
 	                        "rendered: ", this.getElementName(),
-	                        "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
+	                        "owner: ", o,
 	                        "props:", this.props,
 	                        "state:", this.state
 	                    );
 	                }
 	            }
-	        } catch(e) {
+	        } catch (e) {
 	            console.error("safeForceUpdate: ", e);
 	        }
 	    }
@@ -20743,8 +20712,12 @@
 
 	        return React.makeElement(
 	            Dropdown,
-	            { className: "popup contacts-search " + this.props.className, active: this.props.active, closeDropdown: this.props.closeDropdown, ref: "dropdown",
-	                positionMy: this.props.positionMy, positionAt: this.props.positionAt
+	            { className: "popup contacts-search " + this.props.className,
+	                active: this.props.active,
+	                closeDropdown: this.props.closeDropdown,
+	                ref: "dropdown",
+	                positionMy: this.props.positionMy,
+	                positionAt: this.props.positionAt
 	            },
 	            React.makeElement(
 	                "div",
@@ -23859,10 +23832,11 @@
 	                        if (!msg) {
 	                            return;
 	                        }
+	                        var chatdint = room.megaChat.plugins.chatdIntegration;
 	                        if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
-	                            room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+	                            chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        } else if (msg.getState() === Message.STATE.NOT_SENT_EXPIRED) {
-	                            room.megaChat.plugins.chatdIntegration.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+	                            chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        }
 
 	                        msg.message = "";
@@ -24074,7 +24048,8 @@
 	                                    { className: "messages content-area" },
 	                                    React.makeElement(
 	                                        "div",
-	                                        { className: "loading-spinner js-messages-loading light manual-management", key: "loadingSpinner", style: { top: "50%" } },
+	                                        { className: "loading-spinner js-messages-loading light manual-management",
+	                                            key: "loadingSpinner", style: { top: "50%" } },
 	                                        React.makeElement("div", { className: "main-loader", style: {
 	                                                'position': 'fixed',
 	                                                'top': '50%',
@@ -25739,7 +25714,8 @@
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "chat-textarea-scroll textarea-scroll jScrollPaneContainer", style: textareaScrollBlockStyles },
+	                    { className: "chat-textarea-scroll textarea-scroll jScrollPaneContainer",
+	                        style: textareaScrollBlockStyles },
 	                    React.makeElement("textarea", {
 	                        className: messageTextAreaClasses,
 	                        placeholder: __(l[8009]),
@@ -26438,7 +26414,8 @@
 
 	                            if (attachedMsg.orderValue < message.orderValue) {
 	                                try {
-	                                    var attachments = JSON.parse(attachedMsg.textContents.substr(2, attachedMsg.textContents.length));
+	                                    var attc = attachedMsg.textContents;
+	                                    var attachments = JSON.parse(attc.substr(2, attc.length));
 	                                    attachments.forEach(function (node) {
 	                                        if (node.h === revokedNode) {
 	                                            foundRevokedNode = node;
@@ -26629,7 +26606,7 @@
 	        } else if (message.type) {
 	            textMessage = getMessageString(message.type);
 	            if (!textMessage) {
-	                console.error("Message with type: ", message.type, "does not have a text string defined. Message: ", message);
+	                console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
 	                debugger;
 	                throw new Error("boom");
 	            }
@@ -26712,7 +26689,8 @@
 
 	            return React.makeElement(
 	                'div',
-	                { className: message.messageId + " message body" + additionalClasses, 'data-id': "id" + message.messageId },
+	                { className: message.messageId + " message body" + additionalClasses,
+	                    'data-id': "id" + message.messageId },
 	                React.makeElement(
 	                    'div',
 	                    { className: 'feedback round-icon-block' },
@@ -27249,23 +27227,6 @@
 	                    var contact = participants[0];
 
 	                    var pres = self.megaChat.karere.getPresence(contact);
-
-	                    if (pres && pres != "offline" && self.encryptionHandler && self.encryptionHandler.state !== 3) {
-
-	                        var othersJid = self.getParticipantsExceptMe()[0];
-	                        var data = {
-	                            currentMpencState: self.encryptionHandler.state,
-	                            currentKarereState: self.megaChat.karere.getConnectionState(),
-	                            myPresence: self.megaChat.karere.getPresence(self.megaChat.karere.getJid()),
-	                            otherUsersPresence: self.megaChat.karere.getPresence(othersJid),
-	                            callIsActive: self.callSession ? constStateToText(CallSession.STATE, self.callSession.state) : null,
-	                            queuedMessagesCount: self._messagesQueue.length,
-	                            opQueueErrorRetriesCount: self.encryptionOpQueue._error_retries
-	                        };
-
-	                        srvlog("Timed out initialising mpenc.", data, true);
-	                        self.logger.error("Timed out initialising mpenc.", data);
-	                    }
 
 	                    self.setState(ChatRoom.STATE.PLUGINS_READY);
 	                }
@@ -27949,6 +27910,7 @@
 	    $.each(self.messagesBuff.messages, function (k, v) {
 	        if (v.messageId === messageId) {
 	            found = v;
+
 	            return false;
 	        }
 	    });

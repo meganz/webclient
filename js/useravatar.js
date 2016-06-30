@@ -187,14 +187,15 @@ var useravatar = (function() {
 
         if (authring.hadInitialised() === false) {
             var authSystemPromise = authring.initAuthenticationSystem();
-            authSystemPromise.always(isUserVerified_Callback);
+            authSystemPromise.done(isUserVerified_Callback);
         }
         else {
             Soon(isUserVerified_Callback);
         }
 
         function isUserVerified_Callback() {
-            var verifyState = u_authring.Ed25519[userHandle] || {};
+            var ed25519 = u_authring.Ed25519;
+            var verifyState = ed25519 && ed25519[userHandle] || {};
             var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
 
             if (isVerified) {

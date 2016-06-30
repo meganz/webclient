@@ -1747,6 +1747,18 @@ function api_reset() {
 function api_setsid(sid) {
     if (sid !== false) {
         watchdog.notify('setsid', sid);
+
+        if (typeof dlmanager === 'object'
+                && dlmanager.isOverQuota) {
+
+            if (dlmanager.isOverFreeQuota) {
+                dlmanager._onQuotaRetry(true, sid);
+            }
+            else {
+                dlmanager.uqFastTrack = 1;
+                dlmanager._overquotaInfo();
+            }
+        }
         sid = 'sid=' + sid;
     }
     else {

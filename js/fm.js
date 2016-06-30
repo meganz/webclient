@@ -59,10 +59,10 @@ function initContactsGridScrolling() {
  * initTextareaScrolling
  *
  * @param {Object} $textarea. DOM textarea element.
- * @param {Number} Textarea max height. Default is 100
- * @param {Boolean} If we need to bind window resize event
+ * @param {Number} textareaMaxHeight Textarea max height. Default is 100
+ * @param {Boolean} resizeEvent If we need to bind window resize event
  */
-function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
+function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
     var textareaWrapperClass = $textarea.parent().attr('class'),
           $textareaClone,
           textareaLineHeight = parseInt($textarea.css('line-height'))
@@ -70,7 +70,7 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
 
     // Textarea Clone block to define height of autoresizeable textarea   
     if (!$textarea.next('div').length) {
-        $('<div></div>').insertAfter('textarea');
+        $('<div></div>').insertAfter($textarea);
     }
     $textareaClone = $textarea.next('div');
 
@@ -95,7 +95,7 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
         else {
             $textareaClone.data('lastContent', textareaContent);
             textareaContent = textareaContent.replace(/\n/g, '<br />');
-            $textareaClone.html(textareaContent + '<br />');
+            $textareaClone.safeHTML(textareaContent + '<br />');
         }
 
         var textareaCloneHeight = $textareaClone.height();
@@ -112,7 +112,8 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
             if (!jsp && keyEvents) {
                 $textarea.focus();
             }
-        } else if (jsp) {
+        }
+        else if (jsp) {
             jsp.destroy();
             if (keyEvents) {
                 $textarea.focus();
@@ -124,28 +125,12 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
             jsp = $textareaScrollBlock.data('jsp');
             if (textareaCloneSpanHeight > 0 && jsp) {
                 jsp.scrollToY(textareaCloneSpanHeight - textareaLineHeight);
-            } else if (jsp) {
+            }
+            else if (jsp) {
                 jsp.scrollToY(0);
             }
         }
         $textarea.trigger('autoresized');
-    }
-
-    // Get textarea cursor position
-    $.fn.getCursorPosition = function() {
-        var el = $(this).get(0),
-              pos = 0;
-        if ('selectionStart' in el) {
-            pos=el.selectionStart;
-        } else if ('selection' in document) {
-            el.focus();
-            var sel = document.selection.createRange(),
-                  selLength = document.selection.createRange().text.length;
-
-            sel.moveStart('character', -el.value.length);
-            pos = sel.text.length - selLength;
-        }
-        return pos;
     }
 
     // Init textarea scrolling

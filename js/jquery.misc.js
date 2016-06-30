@@ -147,3 +147,21 @@ $.fn.rebind = function(actions, callback) {
     }
     return this;
 };
+
+// Get textarea cursor position
+$.fn.getCursorPosition = function() {
+    var el = $(this).get(0),
+        pos = 0;
+    if ('selectionStart' in el) {
+        pos=el.selectionStart;
+    }
+    else if ('selection' in document) {
+        el.focus();
+        var sel = document.selection.createRange(),
+            selLength = document.selection.createRange().text.length;
+
+        sel.moveStart('character', -el.value.length);
+        pos = sel.text.length - selLength;
+    }
+    return pos;
+};

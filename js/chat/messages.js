@@ -577,7 +577,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.haveMessages = true;
 
             if (!eventData.id) {
-                debugger;
+                // debugger;
             }
 
             var foundMessage = self.getByInternalId(eventData.id);
@@ -617,7 +617,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.haveMessages = true;
 
             if (!eventData.id) {
-                debugger;
+                // debugger;
             }
 
             var foundMessage = self.getByInternalId(eventData.id);
@@ -636,7 +636,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.haveMessages = true;
 
             if (!eventData.id) {
-                debugger;
+                // debugger;
             }
 
             var foundMessage = self.getByInternalId(eventData.id);
@@ -672,7 +672,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.haveMessages = true;
 
             if (!eventData.id) {
-                debugger;
+                // debugger;
             }
 
             var foundMessage = self.getByInternalId(eventData.id);

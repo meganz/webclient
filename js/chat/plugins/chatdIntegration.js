@@ -214,7 +214,7 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
             }, 300, 5000).done(function() {
                 cb();
             }).fail(function() {
-                debugger;
+                // debugger;
             });
         }
     }
@@ -590,7 +590,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
             try {
                 var attachmentMeta = JSON.parse(textContents.substr(2));
             } catch(e) {
-                debugger;
+                // debugger;
                 return null;
             }
 
@@ -1252,7 +1252,7 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
     msgId = base64urldecode(msgId);
 
     if (msgId.length === 0) {
-        debugger;
+        // debugger;
     }
     return self.chatd.discard(msgId, rawChatId);
 };

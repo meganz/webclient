@@ -117,7 +117,7 @@ var _createObjectDataMethods = function(kls) {
 
     obj.destroyStructure = function() {
         this.trackDataChange();
-        for(var k in this.keys()) {
+        for (var k in this.keys()) {
             delete this[k];
         }
         delete this._data;
@@ -145,7 +145,7 @@ var _properJSCmp = function(a, b) {
     if (Number.isNaN(a) && Number.isNaN(b)) {
         return true;
     }
-    else if(typeof(a) == 'boolean' || typeof(b) == 'boolean') {
+    else if (typeof(a) == 'boolean' || typeof(b) == 'boolean') {
         return a === b;
     }
     else {
@@ -271,7 +271,7 @@ var trackPropertyChanges = function(obj, properties, implementChangeListener) {
     });
 
     obj.set = function(k, v, ignoreDataChange, defaultVal) {
-        if(typeof(this._data[k]) === 'undefined' || _properJSCmp(this._data[k], v) !== true) {
+        if (typeof(this._data[k]) === 'undefined' || _properJSCmp(this._data[k], v) !== true) {
             if (
                 typeof(this._data[k]) === 'undefined' &&
                 typeof(defaultVal) !== 'undefined' &&

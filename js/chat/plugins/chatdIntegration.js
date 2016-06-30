@@ -7,7 +7,6 @@
  * @constructor
  */
 var ChatdIntegration = function(megaChat) {
-    //return false;
     var self = this;
 
     var loggerIsEnabled = localStorage['chatdIntegrationLogger'] === '1';
@@ -44,11 +43,6 @@ var ChatdIntegration = function(megaChat) {
         megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
             self._attachToChatRoom(chatRoom);
-        });
-        megaChat.rebind("onRoomDestroy.chatdInt", function(e, chatRoom) {
-            assert(chatRoom.type, 'missing room type');
-
-            //self._detachFromChatRoom(chatRoom);
         });
 
         self.retrieveChatsFromApi();
@@ -216,7 +210,7 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
         }
         else {
             createTimeoutPromise(function() {
-                return !!chatRoom.protocolHandler;
+                return chatRoom.protocolHandler ? true : false;
             }, 300, 5000).done(function() {
                 cb();
             }).fail(function() {
@@ -238,7 +232,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
         self.logger.error("actionPacket returned no chat participants: ", chatParticipants, ", removing chat.");
-        //TODO: remove/destroy chat?
         return false;
     }
     var chatJids = [];
@@ -284,7 +277,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 chatRoom.chatdUrl = actionPacket.url;
             }
             else {
-                //this is a member update!
+                // this is a member update!
                 if (actionPacket.n) {
                     var included = [];
                     var excluded = [];
@@ -490,7 +483,7 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
     };
 };
 
-ChatdIntegration._ensureKeysAreDecrypted= function(keys, handler) {
+ChatdIntegration._ensureKeysAreDecrypted = function(keys, handler) {
     var pms = new MegaPromise();
     ChatdIntegration._ensureKeysAreLoaded(keys).done(
         function() {
@@ -657,7 +650,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
 
         if (foundChatRoom.roomJid === chatRoom.roomJid) {
-            if(chatRoom.state === ChatRoom.STATE.JOINING) {
+            if (chatRoom.state === ChatRoom.STATE.JOINING) {
                 chatRoom.setState(
                     ChatRoom.STATE.READY
                 );
@@ -678,7 +671,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             delete chatRoom.chatShard;
             delete chatRoom.chatdUrl;
             
-            if(chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
+            if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
                 chatRoom.setState(
                     ChatRoom.STATE.JOINING,
                     true
@@ -710,7 +703,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                 if (eventData.userId === u_handle) {
                     chatRoom.membersLoaded = true;
-                    //self.setProtocolHandlerParticipants(chatRoom);
                 }
             }
             else if (eventData.priv === 255) {
@@ -802,9 +794,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         // .seed result is not used in here, since it returns false, even when some messages can be decrypted
                         // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
                         chatRoom.protocolHandler.seed(hist);
-                        //console.error(chatRoom.roomJid, seedResult);
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
-                        for(var i = decryptedMsgs.length-1; i >= 0; i--) {
+                        for (var i = decryptedMsgs.length-1; i >= 0; i--) {
                             var v = decryptedMsgs[i];
                             var messageId = hist[i]['k'];
                             if (v) {
@@ -1146,10 +1137,10 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
 
     var refs = self.chatd.msgreferencelist(base64urldecode(chatRoom.chatId));
     var refids = [];
-    for (var i=0;i<refs.length;i++) {
+    for (var i = 0; i < refs.length; i++) {
         var foundMessage = chatRoom.messagesBuff.getByInternalId(refs[i]);
         if (foundMessage) {
-            if(foundMessage.msgIdentity) {
+            if (foundMessage.msgIdentity) {
                 refids.push(foundMessage.msgIdentity);
             }
         } else if (chatRoom.messagesBuff.messages[refs[i]]) {
@@ -1248,7 +1239,7 @@ ChatdIntegration.prototype.deleteMessage = function(chatRoom, msgnum) {
  * Discard a message from the sending queue
  *
  * @param chatRoom
- * @param msgnum
+ * @param msgId
  */
 ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
     var self = this;

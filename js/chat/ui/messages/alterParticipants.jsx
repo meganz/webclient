@@ -35,12 +35,6 @@ var AlterParticipantsConversationMessage = React.createClass({
 
         var messages = [];
 
-
-        //if (message.meta.excluded.length === 0) {
-        //    debugger;
-        //}
-        //console.error(message.meta);
-
         message.meta.included.forEach(function(h) {
             var otherContact = M.u[h] ? M.u[h] : {
                 'u': h,

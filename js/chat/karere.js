@@ -217,7 +217,6 @@ var Karere = function(user_options) {
         {
             functions: {
                 reconnect: function(connectionRetryManager) {
-                    //console.error("reconnect was called");
                     return self.forceReconnect();
                 },
                 /**
@@ -225,7 +224,6 @@ var Karere = function(user_options) {
                  * @param connectionRetryManager {ConnectionRetryManager}
                  */
                 forceDisconnect: function(connectionRetryManager) {
-                    //console.error("forceDisconnect was called");
                     return self.forceDisconnect();
                 },
                 /**
@@ -1151,7 +1149,7 @@ makeMetaAware(Karere);
         eventData['from'] = from;
         eventData['id'] = eventId;
 
-        //TODO: remove $
+        // TODO: remove $
         var jsonData = $('json', message);
         if (jsonData.size() > 0) {
             eventData['meta'] = JSON.parse(jsonData[0].childNodes[0].data);
@@ -1271,15 +1269,15 @@ makeMetaAware(Karere);
                  */
 
                 // if not...set the message property
-                //TODO: remove $
+                // TODO: remove $
                 eventData['message'] = $('messageContents', elems[0]).text();
 
                 // is this a forwarded message? if yes, trigger event only for that
-                //TODO: remove $
+                // TODO: remove $
                 if ($('forwarded', message).size() > 0) {
-                    //TODO: remove $
+                    // TODO: remove $
                     $('forwarded', message).each(function(k, v) {
-                        //TODO: remove $
+                        // TODO: remove $
                         self._onIncomingStanza($('message', v)[0], {
                             'isForwarded': true,
                             'delay': $('delay', v).attr('stamp') ?
@@ -1402,7 +1400,7 @@ makeMetaAware(Karere);
                 var d = Date.parse(stamp);
                 eventData.delay = d / 1000;
 
-                //TODO: remove $
+                // TODO: remove $
                 eventData['sent-stamp'] = $('delay', message).attr('sent-stamp') ?
                                             Date.parse($('delay', message).attr('sent-stamp')) / 1000 :
                                             undefined;
@@ -1463,7 +1461,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype._onIncomingIq = function(message) {
         var self = this;
-        //TODO: remove $
+        // TODO: remove $
         var $message = $(message);
 
         if ($message.attr("type") === "result") {
@@ -2544,7 +2542,7 @@ makeMetaAware(Karere);
         var meta = $.extend({}, self.options.defaultCapabilities);
 
         self.connection.disco.info(fullJid, function(response) {
-            //TODO: remove $
+            // TODO: remove $
             meta['audio'] = $('feature[var="urn:xmpp:jingle:apps:rtp:audio"]', response).size() > 0;
             meta['video'] = $('feature[var="urn:xmpp:jingle:apps:rtp:video"]', response).size() > 0;
             meta['karere'] = $('feature[var="karere"]', response).size() > 0;

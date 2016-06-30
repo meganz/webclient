@@ -129,38 +129,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
                         var pres = self.megaChat.karere.getPresence(contact);
 
-                        if (pres && pres != "offline" && self.encryptionHandler && self.encryptionHandler.state !== 3) {
-                            //var $dialog = self.generateInlineDialog(
-                            //    "error-" + unixtime(),
-                            //    self.megaChat.karere.getBareJid(),
-                            //    "mpenc-setup-failed",
-                            //    "Could not initialise the encryption in a timely manner. To try again, you can close and start the chat again.",
-                            //    [],
-                            //    undefined,
-                            //    false
-                            //);
-                            //
-                            //self._mpencFailedDialog = $dialog;
-                            //
-                            //self.appendDomMessage(
-                            //    $dialog
-                            //);
-
-                            var othersJid = self.getParticipantsExceptMe()[0];
-                            var data = {
-                                currentMpencState: self.encryptionHandler.state,
-                                currentKarereState: self.megaChat.karere.getConnectionState(),
-                                myPresence: self.megaChat.karere.getPresence(self.megaChat.karere.getJid()),
-                                otherUsersPresence: self.megaChat.karere.getPresence(othersJid),
-                                callIsActive: self.callSession ? constStateToText(CallSession.STATE, self.callSession.state) : null,
-                                queuedMessagesCount: self._messagesQueue.length,
-                                opQueueErrorRetriesCount: self.encryptionOpQueue._error_retries
-                            };
-
-                            srvlog("Timed out initialising mpenc.", data, true);
-                            self.logger.error("Timed out initialising mpenc.", data);
-                        }
-
                         self.setState(ChatRoom.STATE.PLUGINS_READY);
                     }
                 });
@@ -845,7 +813,6 @@ ChatRoom.prototype.appendMessage = function(message) {
     }
     if (self.shownMessages[message.messageId]) {
 
-        //self.logger.debug(self.roomJid.split("@")[0], message.messageId, "This message is already added to the message list (and displayed).");
         return false;
     }
     if (!message.orderValue) {
@@ -1166,7 +1133,8 @@ ChatRoom.prototype.getMessageById = function(messageId) {
     $.each(self.messagesBuff.messages, function(k, v) {
         if (v.messageId === messageId) {
             found = v;
-            return false; //break;
+            // break;
+            return false;
         }
     });
 

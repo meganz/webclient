@@ -37,28 +37,6 @@ UrlFilter.prototype.processMessage = function(e, eventData) {
         truncate: 80,
         newWindow: true,
         stripPrefix: true,
-        twitter: false,
-        replaceFn : function( autolinker, match ) {
-            switch( match.getType() ) {
-                case 'email' :
-
-                    //var contactFound = M.getContactByEmail(match.getEmail());
-                    //
-                    //if (contactFound) {
-                    //    var tag = autolinker.getTagBuilder().build( match );  // returns an `Autolinker.HtmlTag` instance, which provides mutator methods for easy changes
-                    //    tag.setAttr('href', "#fm/" + contactFound.h);
-                    //    tag.setAttr('onclick', "window.location = '#fm/" + contactFound.h + "';");
-                    //    tag.setAttr('target', "");
-                    //    tag.addClass("inline-profile-link");
-                    //    tag.innerHtml = '<div class="nw-contact-avatar ' + htmlentities(contactFound.h) + '">'
-                    //        +  useravatar.contact(contactFound, 'av', 'span')
-                    //    + '</div>' + tag.innerHtml;
-                    //    return tag;
-                    //
-                    //} else {
-                        return true;  // let Autolinker perform its normal anchor tag replacement
-                    //}
-            }
-        }
+        twitter: false
     });
 };

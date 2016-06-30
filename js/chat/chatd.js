@@ -236,7 +236,6 @@ Chatd.Shard = function(chatd, shard) {
                  * @param connectionRetryManager {ConnectionRetryManager}
                  */
                 forceDisconnect: function(connectionRetryManager) {
-                    //console.error("forceDisconnect was called");
                     return self.disconnect();
                 },
                 /**
@@ -773,7 +772,6 @@ Chatd.Shard.prototype.exec = function(a) {
                 len += 17;
                 break;
             case Chatd.Opcode.KEYID:
-                //self.keepAliveTimerRestart();
                 self.logger.log("GET new key: " + base64urlencode(cmd.substr(1,8)));
 
                 self.chatd.trigger('onMessagesKeyIdDone',
@@ -822,7 +820,6 @@ Chatd.Shard.prototype.exec = function(a) {
 // generate and return next msgTransactionId in sequence
 Chatd.prototype.nexttransactionid = function() {
     for (var i = 0; i < this.msgTransactionId.length; i++) {
-        //TODO: LP: @Mathias: what is `c`?
         var c = (this.msgTransactionId.charCodeAt(i)+1) & 0xff;
 
         this.msgTransactionId = this.msgTransactionId.substr(0,i) +
@@ -1079,7 +1076,7 @@ Chatd.Messages.prototype.resend = function(restore) {
     var trivialmsgs = [];
     this.sendingList.forEach(function(msgxid) {
         if (mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
-            if(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
+            if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
                 lastexpiredpendingkey = null;
             }
             if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT) {
@@ -1121,13 +1118,13 @@ Chatd.Messages.prototype.resend = function(restore) {
                 });
             }
             // if it is an expired edit, throw it away.
-            else if(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT) {
+            else if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.EDIT) {
                 trivialmsgs.push(msgxid);
             }
             // if it is an expired key
-            else if(self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
+            else if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
                 // if it an expired pending key
-                if(((self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID] & 0xffff0000) >>>0)
+                if (((self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID] & 0xffff0000) >>>0)
                     === (0xffff0000 >>>0)) {
                     lastexpiredpendingkey = msgxid;
                 }
@@ -1742,7 +1739,7 @@ Chatd.Messages.prototype.getreferencelist = function() {
         var num = Math.floor(Math.random() * (max - min)) + min;
         if (num < pendinglen) {
             var msgkey = this.sendingList[pendinglen - num - 1];
-            if(this.sending[msgkey]) {
+            if (this.sending[msgkey]) {
                 refs.push((this.sending[msgkey] >>> 0));
             }
         }

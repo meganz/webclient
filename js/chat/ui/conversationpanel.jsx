@@ -450,7 +450,7 @@ var ConversationAudioVideoPanel = React.createClass({
         });
 
 
-        //Hidding Control panel if cursor is idle
+        // Hidding Control panel if cursor is idle
         var idleMouseTimer;
         var forceMouseHide = false;
         $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomJid,function(ev) {
@@ -907,14 +907,6 @@ var ConversationPanel = React.createClass({
         self.lastScrolledToBottom = true;
         self.lastScrollHeight = 0;
         self.lastUpdatedScrollHeight = 0;
-
-        //self.$messages.jScrollPane({
-        //    enableKeyboardNavigation:false,
-        //    showArrows:true,
-        //    arrowSize:5,
-        //    animateDuration: 70,
-        //    maintainPosition: false
-        //});
 
         var room = self.props.chatRoom;
 

@@ -1506,8 +1506,6 @@ function MegaData()
         $('.content-panel.contacts').html(html);
 
         if (megaChatIsReady) {
-            //megaChat.renderContactTree();
-
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
                 var m = $('.fm-start-chat-dropdown'),
@@ -5233,7 +5231,6 @@ function renderfm()
 
     M.openFolder(M.currentdirid);
     if (megaChatIsReady) {
-        //megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
 
@@ -6102,7 +6099,7 @@ function fm_getcopynodes(cn, t)
         for (var j in s) r.push(s[j]);
         r.push(cn[i]);
     }
-    for(var i in r)
+    for (var i in r)
     {
         var n = M.d[r[i]];
         if (n)
@@ -6896,10 +6893,6 @@ function process_u(u) {
             M.addUser(u[i]);
         }
     }
-
-    //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
-    //    megaChat.karere.forceReconnect();
-    //}
 }
 
 function process_ok(ok, ignoreDB)

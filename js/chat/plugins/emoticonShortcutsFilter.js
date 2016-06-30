@@ -28,7 +28,6 @@ var EmoticonShortcutsFilter = function(megaChat) {
     };
 
 
-    //RegExpEscape
     var escapedRegExps = [];
     $.each(self.shortcuts, function(shortcut, expanded) {
 

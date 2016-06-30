@@ -499,7 +499,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         false
                     );
                     if (decrypted) {
-                        //if the edited payload is an empty string, it means the message has been deleted.
+                        // if the edited payload is an empty string, it means the message has been deleted.
                         if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
                             if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
                                 decrypted.payload = "";
@@ -708,7 +708,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         false
                     );
                     if (decrypted) {
-                        //if the edited payload is an empty string, it means the message has been deleted.
+                        // if the edited payload is an empty string, it means the message has been deleted.
                         if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
                             decrypted.payload = "";
                         }
@@ -1048,7 +1048,8 @@ MessagesBuff.prototype.getMessageById = function(messageId) {
     $.each(self.messages, function(k, v) {
         if (v.messageId === messageId) {
             found = v;
-            return false; //break;
+            // break;
+            return false;
         }
     });
 
@@ -1097,7 +1098,7 @@ MessagesBuff.prototype.removeMessageByType = function(type) {
 MessagesBuff.prototype.getLatestTextMessage = function() {
     if (this.messages.length > 0) {
         var msgs = this.messages;
-        for(var i = msgs.length - 1; i >= 0; i--) {
+        for (var i = msgs.length - 1; i >= 0; i--) {
             if (msgs.getItem(i) && msgs.getItem(i).textContents && msgs.getItem(i).textContents.length > 0) {
                 var msg = msgs.getItem(i);
                 if (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) {
@@ -1117,7 +1118,7 @@ MessagesBuff.prototype.getLatestTextMessage = function() {
 MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references) {
     var msgOrder = this.messageOrders[messageIdentity];
 
-    for(var i = 0; i < references.length; i++) {
+    for (var i = 0; i < references.length; i++) {
         if (this.messageOrders[references[i]] && this.messageOrders[references[i]] > msgOrder) {
             // There might be a potential message order tampering.It should raise an event to UI.
             return false;

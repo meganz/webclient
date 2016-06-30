@@ -40,8 +40,8 @@ function check_for_typeof($dir) {
 	foreach(glob($dir."/*.js") as $f) {
 		$file_contents = file_get_contents($f);
 
-		$pattern = '#(.*)if\((.*)#U';
-		$replacement = '$1if ($2';
+		$pattern = '#(.*)for\((.*)#U';
+		$replacement = '$1for ($2';
 
 		$foundMatches = preg_match_all($pattern, $file_contents, $matches);
 

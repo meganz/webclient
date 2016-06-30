@@ -37,7 +37,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
                 roomType = "private";
             }
         }
-        //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
+        // XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
         hideEmptyGrids();
 
         $('.fm-files-view-icon').addClass('hidden');
@@ -175,7 +175,7 @@ var Chat = function() {
                         rawkey = base64urldecode(key);
                     } catch (e) {
                     }
-                    //use the SDK's base64 alphabet, it is also safer for using in URLs
+                    // use the SDK's base64 alphabet, it is also safer for using in URLs
                     return base64urlencode(asmCrypto.bytes_to_string(
                         asmCrypto.HMAC_SHA256.bytes(msg, rawkey)));
                 },
@@ -358,7 +358,7 @@ Chat.prototype.init = function() {
                 if (room.participantExistsInRoom(bareJid)) {
                     // if this user is part of the currently visible room, then refresh the UI
                     if (self.getCurrentRoomJid() === room.roomJid) {
-                        //room.refreshUI();
+                        // room.refreshUI();
                     }
                 }
             });
@@ -414,7 +414,7 @@ Chat.prototype.init = function() {
 
         var room = self.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
         if (room) { // refresh UI if new capabilities were received.
-            //room.refreshUI();
+            // room.refreshUI();
         }
 
     });
@@ -468,24 +468,6 @@ Chat.prototype.init = function() {
     });
 
     this.karere.bind("onUsersJoined", function(e, eventData) {
-        if (eventData.newUsers[self.karere.getJid()]) {
-            // i'm the first of my devices to join the room..notify all my other devices please
-            var iAmFirstToJoin = true;
-            Object.keys(eventData.currentUsers).forEach(function(k) {
-                if (k.indexOf(self.karere.getBareJid()) !== -1) {
-                    iAmFirstToJoin = false;
-                    return false;
-                }
-            });
-            if (iAmFirstToJoin) {
-                var room = self.chats[eventData.roomJid];
-
-                if (room) {
-                    //self.sendBroadcastAction("conv-start",
-                    // {roomJid: room.roomJid, type: room.type, participants: room.getParticipants()});
-                }
-            }
-        }
         return self._onUsersUpdate("joined", e, eventData);
     });
 
@@ -1203,8 +1185,7 @@ Chat.prototype.reorderContactTree = function() {
     });
 
     folders = M.sortContacts(folders);
-
-    //TODO: this should use the new HTML code, not #treesub_contacts
+    
     var $container = $('#treesub_contacts');
 
     var $prevNode = null;

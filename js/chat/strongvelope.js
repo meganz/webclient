@@ -678,7 +678,7 @@ var strongvelope = {};
         var result = { parsedMessage: parsedMessage, senderKeys: {}};
 
         if (parsedMessage) {
-            if((parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) &&
+            if ((parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) &&
                     (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
                 if (ns._verifyMessage(parsedMessage.signedContent,
                                       parsedMessage.signature,

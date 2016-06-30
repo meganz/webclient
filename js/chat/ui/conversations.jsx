@@ -24,13 +24,6 @@ var ConversationsListItem = React.createClass({
         self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
     },
     render: function() {
-        //console.error(
-        //    'rendering: ',
-        //    this.props.chatRoom.roomJid.split("@")[0],
-        //    this.props.chatRoom.unreadCount,
-        //    this.props.chatRoom.isCurrentlyActive
-        //);
-
         var classString = "";
 
         var megaChat = this.props.chatRoom.megaChat;

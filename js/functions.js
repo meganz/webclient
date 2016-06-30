@@ -3082,7 +3082,7 @@ function generateAnonymousReport() {
     return $promise;
 }
 
-function __(s) { //TODO: waiting for @crodas to commit the real __ code.
+function __(s) { // TODO: waiting for @crodas to commit the real __ code.
     return s;
 }
 

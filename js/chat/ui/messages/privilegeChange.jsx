@@ -36,16 +36,11 @@ var PrivilegeChange = React.createClass({
         var messages = [];
 
 
-        //if (message.meta.excluded.length === 0) {
-        //    debugger;
-        //}
-        //console.error(message.meta);
 
-    
         var otherContact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
             'u': message.meta.targetUserId,
             'h': message.meta.targetUserId,
-            'c': 0,
+            'c': 0
         };
 
         var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;

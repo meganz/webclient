@@ -116,7 +116,7 @@ MegaKVStorage.prototype.hasItem = function(k) {
  * Clear storage
  */
 MegaKVStorage.prototype.clear = function() {
-    for(var i = 0; i < this.adapter.length; i++) {
+    for (var i = 0; i < this.adapter.length; i++) {
         var k = this.adapter.key(i);
         if (k.indexOf(this._genBucketName("")) === 0) {
             this.adapter.removeItem(k);

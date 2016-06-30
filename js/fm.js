@@ -137,7 +137,7 @@ function initTextareaScrolling ($textarea, textareaMaxHeight, resizeEvent) {
               pos = 0;
         if ('selectionStart' in el) {
             pos=el.selectionStart;
-        } else if('selection' in document) {
+        } else if ('selection' in document) {
             el.focus();
             var sel = document.selection.createRange(),
                   selLength = document.selection.createRange().text.length;

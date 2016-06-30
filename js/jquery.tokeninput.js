@@ -319,7 +319,10 @@
 
                         // Add missing item to drop down list
                         if (!found) {
-                            $(this).data("settings").local_data.push({ id: items[i][tokenValue], name: items[i][propertyToSearch]});
+                            $(this).data("settings").local_data.push({
+                                id: items[i][tokenValue],
+                                name: items[i][propertyToSearch]
+                            });
                         }
                     }
                 }
@@ -1184,7 +1187,8 @@
                     $.each(results, function(index, value) {
                         var notFound = true;
                         $.each(currentTokens, function(cIndex, cValue) {
-                            if (value[$(input).data("settings").tokenValue] == cValue[$(input).data("settings").tokenValue]) {
+                            if (value[$(input).data("settings").tokenValue]
+                                    === cValue[$(input).data("settings").tokenValue]) {
                                 notFound = false;
                                 return false;
                             }

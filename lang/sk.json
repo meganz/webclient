@@ -3430,10 +3430,10 @@
     "8909": "Odobra\u0165",
     "8910": "Polo\u017eka odstr\u00e1nen\u00e1 zo zdie\u013ean\u00e9ho prie\u010dinku",
     "8911": "Zachova\u0165 men\u00e1 ako v zariaden\u00ed.",
-    "8912": "I&#039;ll use [B]MEGAsync[\/B]",
-    "8913": "Removed [X] items from a share",
+    "8912": "Pou\u017eijem [B]MEGAsync[\/B]",
+    "8913": "Odstr\u00e1nil [X] polo\u017eiek zo zdie\u013eania",
     "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
-    "8915": "was changed to %s1 by %s2",
+    "8915": "bol zmenen\u00fd na %s1 u\u017e\u00edvate\u013eom %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

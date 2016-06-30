@@ -197,7 +197,7 @@ def reduce_jscs(file_line_mapping, **extra):
     rules = config.JSCS_RULES if not norules else ''
     files_to_test = [os.path.join(*x)
                      for x in file_line_mapping.keys()
-                     if x[-1].split('.')[-1] in ['js', 'jsx']]
+                     if x[-1].split('.')[-1] in ['js']]
 
     if len(files_to_test) == 0:
         logging.info('JSCS: No modified JavaScript files found.')

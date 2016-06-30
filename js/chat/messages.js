@@ -232,7 +232,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             });
         }
         else if (msg instanceof KarereEventObjects.OutgoingMessage) {
-            $(msg).bind("onChange", function(msg, property, oldVal, newVal) {
+            $(msg).bind("onChange.mbOnPush", function(msg, property, oldVal, newVal) {
                 if (property === "orderValue" || property === "delay") {
                     self.messages.reorder();
                 }

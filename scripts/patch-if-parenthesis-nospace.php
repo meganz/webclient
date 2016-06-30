@@ -6,8 +6,8 @@
  *
  * This script can be used in jenkins, to verify the code for typeof(x) and will return -1 if such are found.
  *
- * If argument "fixit" is passed as 1st argument, the script would replace ALL usages found (Except for several folders,
- * as vendor/).
+ * If argument "fixit" is passed as 1st argument, the script would replace ALL usages found (Except for several
+ * folders, as vendor/).
  */
 define("BASEDIR", realpath(dirname(__FILE__)."/../"));
 

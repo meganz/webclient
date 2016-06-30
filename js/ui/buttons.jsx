@@ -31,6 +31,16 @@ var Button = React.createClass({
                 }
             });
 
+            $(window).rebind('hashchange.button' + self.getUniqueId(), function(e) {
+                if (self.state.focused === true) {
+                    self.onBlur();
+                }
+            });
+
+            $(document).rebind('closeDropdowns.' + self.getUniqueId(), function(e) {
+                self.onBlur();
+            });
+
             // change the focused state to any other buttons in this group
             if (this.props.group) {
                 if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
@@ -53,23 +63,38 @@ var Button = React.createClass({
                 active: this.state.focused,
                 closeDropdown: function() {
                     self.setState({'focused': false});
+                },
+                onActiveChange: function(newVal) {
+                    var $element = $(self.findDOMNode());
+                    var $scrollables = $element.parents('.jScrollPaneContainer');
+                    if (newVal === true) {
+                        $scrollables.attr('data-scroll-disabled', true);
+                    }
+                    else {
+                        $scrollables.removeAttr('data-scroll-disabled');
+                    }
+                    if (child.props.onActiveChange) {
+                        child.props.onActiveChange.call(this, newVal);
+                    }
                 }
             });
         }.bind(this))
     },
     onBlur: function(e) {
-        var $element = $(ReactDOM.findDOMNode(this));
-
-        if (e && e.target && $(e.target).is($element)) {
+        if (!this.isMounted()) {
             return;
         }
+        var $element = $(ReactDOM.findDOMNode(this));
 
         if(
-            (!e || !$(e.target).parents(".button").is($element))
+            (!e || !$(e.target).closest(".button").is($element))
         ) {
             this.setState({focused: false});
             $(document).unbind('keyup.button' + this.getUniqueId());
+            $(document).unbind('closeDropdowns.' + this.getUniqueId());
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+
+            $(window).unbind('hashchange.button' + this.getUniqueId());
         }
 
 
@@ -84,7 +109,7 @@ var Button = React.createClass({
         }
 
         if(
-            $(e.target).parents(".popup").parents('.button').is($element) && this.state.focused === true
+            $(e.target).closest(".popup").closest('.button').is($element) && this.state.focused === true
         ) {
             e.preventDefault();
             e.stopPropagation();
@@ -92,7 +117,7 @@ var Button = React.createClass({
         }
 
         if ($(e.target).is("input,textarea,select")) {
-            return
+            return;
         }
 
 

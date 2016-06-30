@@ -94,3 +94,6 @@
 .buttons-block {
 	padding:11px 0 0 0;
 }
+.hiden-when-dragging {
+	visibility: hidden;
+}

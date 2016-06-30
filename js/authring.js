@@ -477,7 +477,7 @@ var authring = (function () {
      *     'Cu25519' or 'RSA'.
      * @param signPubKey {string}
      *     Contact's Ed25519 public key to verify the signature.
-     * @return {bool}
+     * @return {MegaPromise}
      *     True on a good signature verification, false otherwise.
      */
     ns.verifyKey = function(signature, pubKey, keyType, signPubKey) {
@@ -485,12 +485,12 @@ var authring = (function () {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported key type: ' + keyType);
 
-            return;
+            return MegaPromise.resolve(null);
         }
         if (!signature) {
             logger.warn('Cannot verify an empty signature.');
 
-            return;
+            return MegaPromise.resolve(null);
         }
 
         var signatureValue = signature.substring(8);
@@ -499,14 +499,14 @@ var authring = (function () {
         if (timestampValue > Math.round(Date.now() / 1000)) {
             logger.error('Bad timestamp: In the future!');
 
-            return;
+            return MegaPromise.resolve(null);
         }
         var value = pubKey;
         if (keyType === 'RSA') {
             value = pubKey[0] + pubKey[1];
         }
         var keyString = 'keyauth' + timestamp + value;
-        return nacl.sign.detached.verify(asmCrypto.string_to_bytes(keyString),
+        return backgroundNacl.sign.detached.verify(asmCrypto.string_to_bytes(keyString),
                                          asmCrypto.string_to_bytes(signatureValue),
                                          asmCrypto.string_to_bytes(signPubKey));
     };
@@ -922,21 +922,22 @@ var authring = (function () {
                 var signature = result[0];
                 if (signature) {
                     // Now check the key's signature.
-                    var isVerified = ns.verifyKey(signature, pubKey, keyType,
-                                                  u_pubEd25519);
-                    if (isVerified) {
-                        masterPromise.resolve();
-                    }
-                    else {
-                        // Signature fails, make a good one and save it.
-                        var pubKeySignature = authring.signKey(pubKey, keyType);
-                        var setSignaturePromise = mega.attr.set(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
-                                                                   base64urlencode(pubKeySignature),
-                                                                   true, false);
-                        var comboPromise = MegaPromise.all([authringPromise,
-                                                            setSignaturePromise]);
-                        masterPromise.linkDoneAndFailTo(comboPromise);
-                    }
+                    ns.verifyKey(signature, pubKey, keyType, u_pubEd25519)
+                        .done(function(isVerified) {
+                            if (isVerified) {
+                                masterPromise.resolve();
+                            }
+                            else {
+                                // Signature fails, make a good one and save it.
+                                var pubKeySignature = authring.signKey(pubKey, keyType);
+                                var setSignaturePromise = mega.attr.set(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
+                                    base64urlencode(pubKeySignature),
+                                    true, false);
+                                var comboPromise = MegaPromise.all([authringPromise,
+                                    setSignaturePromise]);
+                                masterPromise.linkDoneAndFailTo(comboPromise);
+                            }
+                        });
                 }
                 else {
                     // Signature undefined.

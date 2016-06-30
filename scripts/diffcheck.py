@@ -112,6 +112,20 @@ def get_commits_in_branch(current_branch=None):
 
     return commits, authors
 
+def pick_files_to_test(file_line_mapping, extensions=None, exclude=None):
+    if extensions is None:
+        extensions = ['js']
+
+    files_to_test = [os.path.join(*x)
+                     for x in file_line_mapping.keys()
+                     if x[-1].split('.')[-1] in extensions]
+
+    if exclude is not None:
+        files_to_test = [x for x in files_to_test if not exclude.match(x)]
+
+    # logging.info(files_to_test)
+    return files_to_test
+
 def reduce_jshint(file_line_mapping, **extra):
     """
     Runs JSHint on the project with the default configured rules. The output
@@ -129,9 +143,7 @@ def reduce_jshint(file_line_mapping, **extra):
     # Get the JSHint output.
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
-    files_to_test = [os.path.join(*x)
-                     for x in file_line_mapping.keys()
-                     if x[-1].split('.')[-1] in ['js', 'jsx']]
+    files_to_test = pick_files_to_test(file_line_mapping)
 
     if len(files_to_test) == 0:
         logging.info('JSHint: No modified JavaScript files found.')
@@ -195,9 +207,7 @@ def reduce_jscs(file_line_mapping, **extra):
     # Get the JSCS output.
     os.chdir(PROJECT_PATH)
     rules = config.JSCS_RULES if not norules else ''
-    files_to_test = [os.path.join(*x)
-                     for x in file_line_mapping.keys()
-                     if x[-1].split('.')[-1] in ['js', 'jsx']]
+    files_to_test = pick_files_to_test(file_line_mapping)
 
     if len(files_to_test) == 0:
         logging.info('JSCS: No modified JavaScript files found.')
@@ -270,9 +280,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
     # Get the HTMLHint output.
     os.chdir(PROJECT_PATH)
     rules = config.HTMLHINT_RULES if not norules else ''
-    files_to_test = [os.path.join(*x)
-                     for x in file_line_mapping.keys()
-                     if x[-1].split('.')[-1] in ['htm', 'html']]
+    files_to_test = pick_files_to_test(file_line_mapping, ['htm', 'html'], re.compile('dont-deploy'))
 
     if len(files_to_test) == 0:
         logging.info('HTMLHint: No modified HTML files found.')

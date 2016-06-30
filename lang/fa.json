@@ -2872,7 +2872,7 @@
     "8004": "Delete message",
     "8005": "Add to Cloud Drive",
     "8006": "Attachment added to your Cloud Drive.",
-    "8007": "Add participant...",
+    "8007": "Add Participant...",
     "8008": "You have no [P]Conversations[\/P]",
     "8009": "Write a message...",
     "8010": "Search contacts",
@@ -3430,6 +3430,10 @@
     "8909": "Revoke",
     "8910": "Removed item from shared folder",
     "8911": "Keep names as in the mobile device",
+    "8912": "I&#039;ll use [B]MEGAsync[\/B]",
+    "8913": "Removed [X] items from a share",
+    "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3572,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

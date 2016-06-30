@@ -742,6 +742,13 @@ function mDBadd(t, n) {
     if (a.ar && a.p !== 'contacts') {
         delete a.ar;
     }
+    if (a.presence) {
+        a.presence = undefined;
+    }
+    if (a.presenceMtime) {
+        a.presenceMtime = undefined;
+    }
+
     delete a.key;
     delete a.seen;
     // mFileManagerDB.query('add', t, a);

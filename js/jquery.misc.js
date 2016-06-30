@@ -4,7 +4,7 @@
  * @returns {*}
  */
 $.fn.getParentJScrollPane = function() {
-    var $scrollable_parent = $(this).parents('.jspScrollable:first');
+    var $scrollable_parent = $(this).closest('.jspScrollable:first');
     if ($scrollable_parent.size() > 0) {
         var $jsp = $scrollable_parent.data('jsp');
         if ($jsp) {
@@ -146,4 +146,22 @@ $.fn.rebind = function(actions, callback) {
         $(this[i++]).unbind(actions).bind(actions, callback);
     }
     return this;
+};
+
+// Get textarea cursor position
+$.fn.getCursorPosition = function() {
+    var el = $(this).get(0),
+        pos = 0;
+    if ('selectionStart' in el) {
+        pos=el.selectionStart;
+    }
+    else if ('selection' in document) {
+        el.focus();
+        var sel = document.selection.createRange(),
+            selLength = document.selection.createRange().text.length;
+
+        sel.moveStart('character', -el.value.length);
+        pos = sel.text.length - selLength;
+    }
+    return pos;
 };

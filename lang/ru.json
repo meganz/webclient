@@ -3429,7 +3429,11 @@
     "8908": "\u041f\u043e\u043a\u0438\u043d\u0443\u043b \u0433\u0440\u0443\u043f\u043f\u043e\u0432\u043e\u0439 \u0447\u0430\u0442.",
     "8909": "\u041e\u0442\u043e\u0437\u0432\u0430\u0442\u044c",
     "8910": "\u041e\u0442\u043e\u0437\u0432\u0430\u043d \u044d\u043b\u0435\u043c\u0435\u043d\u0442 \u0438\u0437 \u043e\u0431\u0449\u0435\u0439 \u043f\u0430\u043f\u043a\u0438",
-    "8911": "Keep names as in the mobile device",
+    "8911": "\u041e\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u044f \u043a\u0430\u043a \u043d\u0430 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0435",
+    "8912": "\u042f \u0432\u043e\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u044e\u0441\u044c [B]MEGAsync[\/B]",
+    "8913": "Removed [X] items from a share",
+    "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3572,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

@@ -2245,6 +2245,8 @@ a.nt-settings-button:hover span {
 }
 .jspPane {
     position: absolute;
+    min-width: 100%;
+    max-width: 100%;
 }
 .jspVerticalBar {
     position: absolute;
@@ -2272,9 +2274,6 @@ a.nt-settings-button:hover span {
 }
 .jspTrack {
     position: relative;
-}
-.jspPane {
-    width: 100% !important;
 }
 .jspDrag {
     background-color: rgb(102, 102, 102);
@@ -6175,7 +6174,7 @@ table {
 }
 .transfer-filtype-icon {
     padding: 0;
-    width: 24px;
+    width: 22px;
     height: 24px;
     margin: 0 0 0 -2px;
     background-position: 0 0px;
@@ -8151,7 +8150,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin-top: 12px;
 }
 .feedback-textarea-bl, .cancel-textarea-bl {
-    height: 96px;
+    height: 86px;
     background-image: none;
     padding: 0;
     margin: -4px 0 0 0;
@@ -8165,13 +8164,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 140px;
 }
 .feedback-textarea-scroll {
-    height: 96px;
+    height: 86px;
+    padding: 7px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .cancel-textarea-scroll {
     height: 140px;
+    padding: 7px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .add-user-nt-scrolling, .share-message-scroll {
     height: 50px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 6px 0 5px 0;
 }
 .add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .feedback-textarea-scroll .jspDrag, .cancel-textarea-scroll .jspDrag {
     width: 4px;
@@ -8185,8 +8196,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #999999;
     width: 100%;
     margin: 0;
-    height: 50px;
-    padding: 0;
+    height: 39px;
+    padding: 0 10px 0 3px;
     -webkit-appearance: caret;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -8194,27 +8205,49 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     resize: none;
     font-family: 'source_sans_proregular', Arial;
     overflow: hidden;
-    min-height: 36px;
+    min-height: 39px;
+}
+.feedback-textarea {
+    height: 72px;
+    line-height: 0;
+    font-size: 0;
 }
 .feedback-textarea-scroll textarea, .feedback-hidden {
-    height: 96px;
+    height: 72px;
+    min-height: 72px;
+    padding: 0 10px;
     font-size: 13px;
+}
+.cancel-textarea {
+    height: 126px;
+    line-height: 0;
+    font-size: 0;
 }
 .cancel-textarea-scroll textarea, .cancel-hidden {
     color: black;
     font-size: 13px;
-    height: 125px;
+    height: 126px;
+    padding: 0 10px;
+    min-height: 126px;
 }
 .add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden, .feedback-dialog .feedback-dialog-hidden {
-    display: none;
+    position: absolute;
     height: auto;
-    overflow: visible;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.share-message-scrolling {
+    padding: 6px 0 5px 0;
+    line-height:0;
+    font-size:0;
 }
 .add-user-textarea, .share-message-textarea {
-    padding: 7px 10px 7px 3px;
-}
-.feedback-textarea, .cancel-textarea {
-    padding: 7px 10px;
+    height: 39px;
+    position: relative;
+    line-height: 0;
+    font-size: 0;
 }
 .add-user-nt-scrolling textarea::selection, .share-message-scrolling textarea::selection {
     background-color: #333333;
@@ -8809,7 +8842,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     position: relative;
     padding-top: 30px;
 }
-.fm-dialog.bitcoin-provider-failure-dialog .reg-success-icon {    
+.fm-dialog.bitcoin-provider-failure-dialog .reg-success-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll 0 -200px;
     height: 200px;
     margin-top: 0;
@@ -9713,7 +9746,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     border-left: 2px solid rgba(0,0,0,0.05);
     display: table-cell;
     padding-left: 10px;
-    position: relative;    
+    position: relative;
 }
 .export-link-expiry-icon {
     background-image: url("../images/mega/dialogs-sprite_v10.svg");
@@ -13506,11 +13539,8 @@ h5.main-italic-header {
     color: #3F3F3F;
     margin-bottom: 17px;
 }
-.reset-success-st3 .fm-dialog-header {
-    margin-bottom: 10px;
-}
-.cancel-subscription-st1 .fm-dialog-header, .cancel-subscription-st2 .fm-dialog-header {
-    margin: 19px 0 10px 0;
+.cancel-subscription-st1 .fm-dialog-header, .cancel-subscription-st2 .fm-dialog-header, .reset-success-st3 .fm-dialog-header {
+    margin: 0 0 10px 0;
 }
 .reset-success-st2 .fm-account-input {
     margin: 0 8px 20px 8px;
@@ -22130,7 +22160,7 @@ a.top-login-forgot-pass {
 .pro-register-scroll {
     overflow: hidden;
 }
-    
+
 .pro-register-dialog p {
     font-size: 15px;
     line-height: 24px;
@@ -22213,9 +22243,19 @@ a.top-login-forgot-pass {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
+    font-size: 0;
+    line-height: 0;
 }
 .feedback-dialog-textarea {
     height: 96px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 8px 0;
+    position: relative;
+}
+.feedback-dialog-textarea .jspPane {
+    min-width: 0;
 }
 .feedback-dialog-textarea textarea, .feedback-dialog-hidden {
     background-color: transparent;
@@ -22223,15 +22263,17 @@ a.top-login-forgot-pass {
     border: 0;
     resize: none;
     font-size: 14px;
-    line-height: 24px;
     color: #999999;
     width: 100%;
-    padding: 0 17px;
-    height: 30px;
+    padding: 0 12px;
+    margin: 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     overflow: hidden;
+    height: 80px;
+    line-height: 20px;
+    min-height: 80px;
 }
 .feedback-dialog-textarea textarea::selection {
     background: rgba(255,255,255,0.15);
@@ -22239,13 +22281,9 @@ a.top-login-forgot-pass {
 .feedback-dialog-textarea textarea::-moz-selection {
  background: rgba(255,255,255,0.15);
 }
-.feedback-dialog-textarea textarea, .feedback-dialog-hidden {
-    padding: 0;
-    height: 78px;
-    line-height: 18px;
-}
 .feedback-dialog-scr {
-    padding: 9px 17px;
+    position: relative;
+    height: 80px;
 }
 .feedback-dialog-textarea .jspDrag {
     background-color: rgba(255, 255, 255, 1);
@@ -25373,7 +25411,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
 .export-links-dialog .dialog-feature-toggle.hidden {
     display: none;
 }
-.export-links-dialog .dialog-feature-toggle {    
+.export-links-dialog .dialog-feature-toggle {
     border: solid 1px rgba(0, 0, 0, 0.05);
     background-color: rgba(0, 0, 0, 0.25);
     border-radius: 40px;

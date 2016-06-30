@@ -80,6 +80,12 @@ var _createObjectDataMethods = function(kls) {
             return cb(self._data[k], k);
         });
     };
+    obj.some = function(cb) {
+        var self = this;
+        return self.keys().some(function(k) {
+            return cb(self._data[k], k);
+        });
+    };
 
     obj.map = function(cb) {
         var self = this;
@@ -111,7 +117,7 @@ var _createObjectDataMethods = function(kls) {
 
     obj.destroyStructure = function() {
         this.trackDataChange();
-        for(var k in this.keys()) {
+        for (var k in this.keys()) {
             delete this[k];
         }
         delete this._data;
@@ -139,7 +145,7 @@ var _properJSCmp = function(a, b) {
     if (Number.isNaN(a) && Number.isNaN(b)) {
         return true;
     }
-    else if(typeof(a) == 'boolean' || typeof(b) == 'boolean') {
+    else if (typeof(a) == 'boolean' || typeof(b) == 'boolean') {
         return a === b;
     }
     else {
@@ -265,7 +271,7 @@ var trackPropertyChanges = function(obj, properties, implementChangeListener) {
     });
 
     obj.set = function(k, v, ignoreDataChange, defaultVal) {
-        if(typeof(this._data[k]) === 'undefined' || _properJSCmp(this._data[k], v) !== true) {
+        if (typeof(this._data[k]) === 'undefined' || _properJSCmp(this._data[k], v) !== true) {
             if (
                 typeof(this._data[k]) === 'undefined' &&
                 typeof(defaultVal) !== 'undefined' &&
@@ -513,35 +519,49 @@ MegaDataSortedMap.prototype.push = function(v) {
 MegaDataSortedMap.prototype.reorder = function() {
     var self = this;
 
-    if (self._sortField) {
-        var sortFields = self._sortField.split(",");
-
-        self._sortedVals.sort(function (a, b) {
-            for (var i = 0; i < sortFields.length; i++) {
-                var sortField = sortFields[i];
-                var ascOrDesc = 1;
-                if (sortField.substr(0, 1) === "-") {
-                    ascOrDesc = -1;
-                    sortField = sortField.substr(1);
-                }
-
-                if (self._data[a][sortField] && self._data[b][sortField]) {
-                    if (self._data[a][sortField] < self._data[b][sortField]) {
-                        return -1 * ascOrDesc;
-                    }
-                    else if (self._data[a][sortField] > self._data[b][sortField]) {
-                        return 1 * ascOrDesc;
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-            }
-            return 0;
-        });
+    if (self._reorderThrottlingTimer) {
+        clearTimeout(self._reorderThrottlingTimer);
+        delete self._reorderThrottlingTimer;
     }
 
-    self.trackDataChange([self._data]);
+    self._reorderThrottlingTimer = setTimeout(function() {
+        if (self._sortField) {
+            if (typeof(self._sortField) === "function") {
+                self._sortedVals.sort(function (a, b) {
+                    return self._sortField(self._data[a], self._data[b]);
+                });
+            }
+            else {
+                var sortFields = self._sortField.split(",");
+
+                self._sortedVals.sort(function (a, b) {
+                    for (var i = 0; i < sortFields.length; i++) {
+                        var sortField = sortFields[i];
+                        var ascOrDesc = 1;
+                        if (sortField.substr(0, 1) === "-") {
+                            ascOrDesc = -1;
+                            sortField = sortField.substr(1);
+                        }
+
+                        if (self._data[a][sortField] && self._data[b][sortField]) {
+                            if (self._data[a][sortField] < self._data[b][sortField]) {
+                                return -1 * ascOrDesc;
+                            }
+                            else if (self._data[a][sortField] > self._data[b][sortField]) {
+                                return 1 * ascOrDesc;
+                            }
+                            else {
+                                return 0;
+                            }
+                        }
+                    }
+                    return 0;
+                });
+            }
+        }
+
+        self.trackDataChange([self._data]);
+    }, 30);
 };
 
 
@@ -571,7 +591,7 @@ MegaDataSortedMap.prototype.exists = function(keyValue) {
 
 MegaDataSortedMap.prototype.keys = function() {
     var self = this;
-    return self._sortedVals;
+    return clone(self._sortedVals);
 };
 
 MegaDataSortedMap.prototype.values = function() {

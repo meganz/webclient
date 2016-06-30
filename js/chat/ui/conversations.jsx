@@ -24,51 +24,67 @@ var ConversationsListItem = React.createClass({
         self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
     },
     render: function() {
-        //console.error(
-        //    'rendering: ',
-        //    this.props.chatRoom.roomJid.split("@")[0],
-        //    this.props.chatRoom.unreadCount,
-        //    this.props.chatRoom.isCurrentlyActive
-        //);
-
         var classString = "";
 
         var megaChat = this.props.chatRoom.megaChat;
         var chatRoom = this.props.chatRoom;
-        var contactJid = chatRoom.getParticipantsExceptMe()[0];
-        var contact = chatRoom.megaChat.getContactFromJid(contactJid);
-
-
-        if (!contact) {
+        if (!chatRoom || !chatRoom.roomJid) {
             return null;
         }
-        var id = 'conversation_' + htmlentities(contact.u);
-        var roomShortJid = chatRoom.roomJid.split("@")[0];
 
-        var caps = megaChat.karere.getCapabilities(contactJid);
-        if (caps) {
-            Object.keys(caps).forEach(function (k) {
-                var v = caps[k];
-                if (v) {
-                    classString += " chat-capability-" + k;
-                }
-            });
-        }
+        var roomShortJid = chatRoom.roomJid.split("@")[0];
 
         // selected
         if (chatRoom.isCurrentlyActive) {
             classString += " active";
         }
 
-        var presenceClass = chatRoom.megaChat.xmppPresenceToCssClass(
-            contact.presence
-        );
+
+        var contactJid;
+        var presenceClass;
+        var id;
+
+        if (chatRoom.type === "private") {
+            contactJid = chatRoom.getParticipantsExceptMe()[0];
+            var contact = chatRoom.megaChat.getContactFromJid(contactJid);
+
+
+            if (!contact) {
+                return null;
+            }
+            id = 'conversation_' + htmlentities(contact.u);
+
+
+            var caps = megaChat.karere.getCapabilities(contactJid);
+            if (caps) {
+                Object.keys(caps).forEach(function (k) {
+                    var v = caps[k];
+                    if (v) {
+                        classString += " chat-capability-" + k;
+                    }
+                });
+            }
+
+
+            presenceClass = chatRoom.megaChat.xmppPresenceToCssClass(
+                contact.presence
+            );
+        }
+        else if (chatRoom.type === "group") {
+            contactJid = roomShortJid;
+            id = 'conversation_' + contactJid;
+            presenceClass = 'group';
+            classString += ' groupchat';
+        }
+        else {
+            return "unknown room type: " + chatRoom.roomJid.split("@")[0];
+        }
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
         var unreadDiv = null;
         var isUnread = false;
         if (unreadCount > 0) {
-            unreadDiv = <div className="unread-messages">{unreadCount}</div>;
+            unreadDiv = <div className="unread-messages">{unreadCount > 9 ? "9+" : unreadCount}</div>;
             isUnread = true;
         }
 
@@ -89,7 +105,21 @@ var ConversationsListItem = React.createClass({
             lastMessageDiv = <div className={lastMsgDivClasses}>
                         {renderableSummary}
                     </div>;
-            lastMessageDatetimeDiv = <div className="date-time">{unixtimeToTimeString(lastMessage.delay)}</div>;
+
+            var timestamp = lastMessage.delay;
+            var curTimeMarker;
+            var msgDate = new Date(timestamp * 1000);
+            var iso = (msgDate.toISOString());
+            if (todayOrYesterday(iso)) {
+                // if in last 2 days, use the time2lastSeparator
+                curTimeMarker = time2lastSeparator(iso) + ", " + msgDate.getHours() + ":" + msgDate.getMinutes();
+            }
+            else {
+                // if not in the last 2 days, use 1st June [Year]
+                curTimeMarker = acc_time2date(timestamp, true);
+            }
+
+            lastMessageDatetimeDiv = <div className="date-time">{curTimeMarker}</div>;
         }
         else {
             var lastMsgDivClasses = "conversation-message";
@@ -106,7 +136,10 @@ var ConversationsListItem = React.createClass({
                     megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' ||
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                     chatRoom.messagesBuff.joined === false
-                ) ? l[7006] : l[8000]
+                    ) ? (
+                        localStorage.megaChatPresence !== 'unavailable' ? l[7006] : ""
+                    ) :
+                    l[8000]
             );
 
 
@@ -139,12 +172,11 @@ var ConversationsListItem = React.createClass({
             classString += " call-active";
         }
 
-        var avatarMeta = generateAvatarMeta(contact.u);
 
         return (
             <li className={classString} id={id} data-room-jid={roomShortJid} data-jid={contactJid} onClick={this.props.onConversationClicked}>
                 <div className="user-card-name conversation-name">
-                    {avatarMeta.fullName}
+                    {chatRoom.getRoomTitle()}
                     <span className={"user-card-presence " + presenceClass}></span>
                 </div>
                 {unreadDiv}
@@ -159,11 +191,8 @@ var ConversationsListItem = React.createClass({
 var ConversationsList = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     conversationClicked: function(room, e) {
-        var contact = room.megaChat.getContactFromJid(
-            room.getParticipantsExceptMe()[0]
-        );
 
-        window.location = "#fm/chat/" + contact.u;
+        window.location = room.getRoomUrl();
         e.stopPropagation();
     },
     currentCallClicked: function(e) {
@@ -184,6 +213,7 @@ var ConversationsList = React.createClass({
         }
     },
     handleWindowResize: function() {
+
         var contentPanelConversations = document.querySelector('.content-panel.conversations');
         if (
             !contentPanelConversations ||
@@ -252,22 +282,23 @@ var ConversationsList = React.createClass({
         sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
         sortedConversations.forEach((chatRoom) => {
-            if (chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
+            if (!chatRoom || !chatRoom.roomJid) {
                 return;
             }
 
-            var contact = chatRoom.getParticipantsExceptMe()[0];
-            if (!contact) {
-                return;
-            }
-            contact = chatRoom.megaChat.getContactFromJid(contact);
+            if (chatRoom.type === "private") {
+                var contact = chatRoom.getParticipantsExceptMe()[0];
+                if (!contact) {
+                    return;
+                }
+                contact = chatRoom.megaChat.getContactFromJid(contact);
 
-            if (contact && contact.c === 0) {
-                // skip & leave, a non-contact conversation, e.g. contact removed.
-                Soon(function() {
-                    chatRoom.destroy();
-                });
-                return;
+                if (contact && contact.c === 0) {
+                    // a non-contact conversation, e.g. contact removed - mark as read only
+                    Soon(function () {
+                        chatRoom.privateReadOnlyChat = true;
+                    });
+                }
             }
 
             currConvsList.push(
@@ -296,10 +327,19 @@ var ConversationsList = React.createClass({
 
 var ConversationsApp = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
-    startChatClicked: function(contact, e) {
-        e.preventDefault();
-        window.location = "#fm/chat/" + contact.u;
-        var room = this.props.megaChat.createAndShowPrivateRoomFor(contact.u);
+    getInitialState: function() {
+        return {
+            'leftPaneWidth': mega.config.get('leftPaneWidth')
+        };
+    },
+    startChatClicked: function(selected) {
+        if (selected.length === 1) {
+            window.location = "#fm/chat/" + selected[0];
+            this.props.megaChat.createAndShowPrivateRoomFor(selected[0]);
+        }
+        else {
+            this.props.megaChat.createAndShowGroupRoomFor(selected);
+        }
     },
     componentDidMount: function() {
         var self = this;
@@ -353,7 +393,7 @@ var ConversationsApp = React.createClass({
                 // is visible/active at the moment
                 if (
                     $target.is(".messages-textarea,a,input,textarea,select,button") ||
-                    $target.parents('.messages.scroll-area').length > 0 ||
+                    $target.closest('.messages.scroll-area').length > 0 ||
                     ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
                     $('.fm-dialog:visible,.dropdown:visible').length > 0 ||
                     $('input:focus,textarea:focus,select:focus').length > 0
@@ -368,13 +408,66 @@ var ConversationsApp = React.createClass({
                 return false;
 
             }
-        }); 
+        });
+
+        var lPane = $('.conversationsApp .fm-left-panel');
+
+        self.fmConfigThrottling = null;
+        self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function() {
+            clearTimeout(self.fmConfigThrottling);
+            self.fmConfigThrottling = setTimeout(function fmConfigThrottlingLeftPaneResize() {
+                self.setState({
+                    'leftPaneWidth': mega.config.get('leftPaneWidth')
+                });
+                $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
+                $('.jScrollPaneContainer:visible').trigger('forceResize');
+            }, 75);
+            lPane.width(mega.config.get('leftPaneWidth'));
+            $('.fm-tree-panel', lPane).width(mega.config.get('leftPaneWidth'));
+        });
+
+
+        $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
+
+        if (fmconfig.leftPaneWidth) {
+            lPane.width(Math.min(
+                $.leftPaneResizableChat.options.maxWidth,
+                Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)
+            ));
+        }
+
+        $($.leftPaneResizableChat).on('resize', function() {
+            var w = lPane.width();
+            if (w >= $.leftPaneResizableChat.options.maxWidth) {
+                $('.left-pane-drag-handle').css('cursor', 'w-resize')
+            } else if (w <= $.leftPaneResizableChat.options.minWidth) {
+                $('.left-pane-drag-handle').css('cursor', 'e-resize')
+            } else {
+                $('.left-pane-drag-handle').css('cursor', 'we-resize')
+            }
+
+            $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
+        });
+
+        $($.leftPaneResizableChat).on('resizestop', function() {
+            $('.fm-left-panel').width(
+                lPane.width()
+            );
+
+            $('.jScrollPaneContainer:visible').trigger('forceResize');
+
+            setTimeout(function() {
+                $('.hiden-when-dragging').removeClass('hiden-when-dragging');
+            }, 100);
+        });
+
         this.handleWindowResize();
 
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
         $(document).unbind('keydown.megaChatTextAreaFocus');
+        mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
     },
     componentDidUpdate: function() {
         this.handleWindowResize();
@@ -399,9 +492,10 @@ var ConversationsApp = React.createClass({
 
         var leftPanelStyles = {};
 
-        if (fmconfig && fmconfig.leftPaneWidth) {
-            leftPanelStyles.width = fmconfig.leftPaneWidth;
+        if (self.state.leftPaneWidth) {
+            leftPanelStyles.width = self.state.leftPaneWidth;
         }
+
 
         return (
             <div className="conversationsApp" key="conversationsApp">
@@ -421,7 +515,8 @@ var ConversationsApp = React.createClass({
                                 <DropdownsUI.DropdownContactsSelector
                                     contacts={this.props.contacts}
                                     megaChat={this.props.megaChat}
-                                    onClick={this.startChatClicked}
+                                    onSelectDone={this.startChatClicked}
+                                    multiple={true}
                                     />
                             </ButtonsUI.Button>
                         </div>

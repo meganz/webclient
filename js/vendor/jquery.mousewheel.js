@@ -1,8 +1,8 @@
 /*!
- * jQuery Mousewheel 3.1.13
+ * jQuery Mousewheel 3.1.12
  *
- * Copyright jQuery Foundation and other contributors
- * Released under the MIT license
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
  * http://jquery.org/license
  */
 
@@ -198,11 +198,13 @@
         // a different lowestDelta
         // Ex: trackpad = 3 and mouse wheel = 120
         if (nullLowestDeltaTimeout) { clearTimeout(nullLowestDeltaTimeout); }
-        nullLowestDeltaTimeout = setTimeout(function() {
-            lowestDelta = null;
-        }, 200);
+        nullLowestDeltaTimeout = setTimeout(nullLowestDelta, 200);
 
         return ($.event.dispatch || $.event.handle).apply(this, args);
+    }
+
+    function nullLowestDelta() {
+        lowestDelta = null;
     }
 
     function shouldAdjustOldDeltas(orgEvent, absDelta) {

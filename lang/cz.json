@@ -3430,7 +3430,10 @@
     "8909": "Odvolat",
     "8910": "Odebran\u00e1 polo\u017eka ze sd\u00edlen\u00e9 slo\u017eky",
     "8911": "Ponechat n\u00e1zvy jako v mobiln\u00edm za\u0159\u00edzen\u00ed",
-    "8912": "I&#039;ll use [B]MEGAsync[\/B]",
+    "8912": "Pou\u017eiji [B]MEGAsync[\/B]",
+    "8913": "Odebr\u00e1no [X] polo\u017eek ze sd\u00edlen\u00ed",
+    "8914": "Upozorn\u011bn\u00ed: Nebyli jsme schopni ov\u011b\u0159it integritu \u0159azen\u00ed zpr\u00e1v v tomto chatu.",
+    "8915": "byl\/a zm\u011bn\u011bn\/a na %s1 u\u017eivatelem %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3573,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

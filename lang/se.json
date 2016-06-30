@@ -3431,6 +3431,9 @@
     "8910": "Borttagna objekt fr\u00e5n delad mapp",
     "8911": "Keep names as in the mobile device",
     "8912": "I&#039;ll use [B]MEGAsync[\/B]",
+    "8913": "Removed [X] items from a share",
+    "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3573,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

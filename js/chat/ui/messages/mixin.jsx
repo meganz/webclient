@@ -65,6 +65,7 @@ var ConversationMessageMixin = {
             timestampInt = message.delay;
         }
         else {
+            console.error("missing timestamp: ", message);
             timestampInt = unixtime();
         }
 

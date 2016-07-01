@@ -975,7 +975,6 @@ var ConversationPanel = React.createClass({
                     self.setState({
                         currentlyTyping: currentlyTyping
                     });
-                    self.forceUpdate();
                 }
             }
         });

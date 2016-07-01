@@ -491,7 +491,7 @@ Object.keys(MegaDataMap.prototype).forEach(function(k) {
     MegaDataSortedMap.prototype[k] = MegaDataMap.prototype[k];
 });
 
-MegaDataSortedMap.prototype.push = function(v) {
+MegaDataSortedMap.prototype.push = function(v, immediateReorder) {
     var self = this;
 
     var keyVal = v[self._keyField];
@@ -511,12 +511,12 @@ MegaDataSortedMap.prototype.push = function(v) {
         keyVal
     );
 
-    self.reorder();
+    self.reorder(immediateReorder);
 
     return self._sortedVals.length;
 };
 
-MegaDataSortedMap.prototype.reorder = function() {
+MegaDataSortedMap.prototype.reorder = function(forced) {
     var self = this;
 
     if (self._reorderThrottlingTimer) {
@@ -561,7 +561,7 @@ MegaDataSortedMap.prototype.reorder = function() {
         }
 
         self.trackDataChange([self._data]);
-    }, 30);
+    }, forced ? 0 : 30);
 };
 
 
@@ -579,6 +579,29 @@ MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     }
 };
 
+MegaDataSortedMap.prototype.replace = function(k, newValue) {
+    var self = this;
+    if (self._data[k]) {
+        // cleanup
+        var old = self._data[k];
+        self._data[k] = newValue;
+        if (typeof(self._sortField) === "function") {
+            // if order had changed...do call .reorder()
+            if (self._sortField(old, newValue) !== 0) {
+                self.reorder();
+            }
+        }
+        else {
+            // maybe we should do parsing of the ._sortField if its a string and manually compare the old and new
+            // value's order property if it had changed
+            self.reorder();
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+};
 MegaDataSortedMap.prototype.exists = function(keyValue) {
     var self = this;
     if (self._data[keyValue]) {

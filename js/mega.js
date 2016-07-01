@@ -2364,6 +2364,7 @@ function MegaData()
         if (n.t === 4) {
             this.RubbishID = n.h;
         }
+
         if (!n.c) {
             if (n.sk && !u_sharekeys[n.h]) {
                 u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
@@ -2376,7 +2377,15 @@ function MegaData()
                 else {
                     crypto_processkey(u_handle, u_k_aes, n);
                 }
-                u_nodekeys[n.h] = n.key;
+                if (n.key) {
+                    u_nodekeys[n.h] = n.key;
+
+                    // Update global variable which holds data about missing keys
+                    // so DOM can be updated accordingly
+                    if (missingkeys[n.h]) {
+                        delete missingkeys[n.h];
+                    }
+                }
             }
             else if (!n.k) {
                 if (n.a) {
@@ -3710,12 +3719,16 @@ function MegaData()
             if (a === 0) {
                 delete this.d[h].shares;
                 M.nodeAttr({ h: h, shares: undefined });
-                delete u_sharekeys[h];
                 if (fminitialized) {
                     sharedUInode(h);
                 }
-                if (typeof mDB === 'object') {
-                    mDBdel('ok', h);
+                // XXX: Do not delete sharekeys for now...due some issue we've noticed
+                //     with missing keys...and let's see, what can go wrong doing this?
+                if (0) {
+                    delete u_sharekeys[h];
+                    if (typeof mDB === 'object') {
+                        mDBdel('ok', h);
+                    }
                 }
             }
             if (typeof mDB === 'object') {
@@ -6538,7 +6551,7 @@ var kdWorker;
 
 function process_f(f, cb, retry)
 {
-    var onMainThread = window.dk ? 9e11 : 200;
+    var onMainThread = localStorage.dk ? 9e11 : 200;
     var doNewNodes = (typeof newnodes !== 'undefined');
 
     // if (d) console.error('process_f', doNewNodes);

@@ -2177,7 +2177,7 @@ function mSpawnWorker(url, nw) {
 
     this.jid = 1;
     this.jobs = {};
-    this.nworkers = nw = nw || 4;
+    this.nworkers = nw = nw || mega.maxWorkers;
     this.wrk = new Array(nw);
     this.token = mRandomToken('mSpawnWorker.' + url.split(".")[0]);
 
@@ -2357,14 +2357,6 @@ mSpawnWorker.prototype = {
         if (reply.rsasharekeys) {
             $.extend(rsasharekeys, reply.rsasharekeys);
         }
-        if (reply.lostandfound) {
-            if (!job.lostandfound) {
-                job.lostandfound = reply.lostandfound;
-            }
-            else {
-                $.extend(job.lostandfound, reply.lostandfound);
-            }
-        }
 
         Soon(this.postNext.bind(this));
         if (++job.done === this.nworkers) {
@@ -2375,11 +2367,12 @@ mSpawnWorker.prototype = {
             // Don't report `newmissingkeys` unless there are *new* missing keys
             if (job.newmissingkeys) {
                 try {
-                    var keys = Object.keys(missingkeys).sort();
+                    var keys = Object.keys(u_nodekeys).sort();
                     var hash = MurmurHash3(JSON.stringify(keys));
                     var prop = u_handle + '_lastMissingKeysHash';
+                    var oldh = parseInt(localStorage[prop]);
 
-                    if (localStorage[prop] !== hash) {
+                    if (oldh !== hash) {
                         localStorage[prop] = hash;
                     }
                     else {
@@ -2388,15 +2381,6 @@ mSpawnWorker.prototype = {
                 }
                 catch (ex) {
                     console.error(ex);
-                }
-            }
-
-            // Update global variable which holds data about missing keys
-            // so DOM can be updated accordingly
-            if (job.lostandfound) {
-                for (var handle in job.lostandfound) {
-                    // no hasOwnProperty here
-                    delete missingkeys[handle];
                 }
             }
 
@@ -4872,6 +4856,7 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     }
 };
+
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
 
 

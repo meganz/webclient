@@ -1128,7 +1128,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             session.setState(CallSession.STATE.MISSED);
             self.trigger('CallMissed', [session, eventData]);
         } else if (reason === 'user') {
-            //do nothing, we canceled it so we have that handled already, this is just a feedback event
+            // do nothing, we canceled it so we have that handled already, this is just a feedback event
         } else if (CallManager._isAFailedReason(reason)) {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text])
@@ -1287,11 +1287,15 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
     var sid;
     var callSession;
 
-    if (eventData.sid) { //no jingle session yet
+    // no jingle session yet
+    if (eventData.sid) { 
         sid = eventData.sid;
-    } else if (eventData.sess) { //there is a jingle session created for this sid
+    }
+    // there is a jingle session created for this sid
+    else if (eventData.sess) {
         sid = eventData.sess.sid();
-    } else {
+    }
+    else {
         // handle the eventData{player: .., id: ...} use case for local-stream-* and remove stream etc
         if (chatRoom.callSession) {
             sid = chatRoom.callSession.sid;

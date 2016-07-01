@@ -6,8 +6,8 @@
  *
  * This script can be used in jenkins, to verify the code for typeof(x) and will return -1 if such are found.
  *
- * If argument "fixit" is passed as 1st argument, the script would replace ALL usages found (Except for several folders,
- * as vendor/).
+ * If argument "fixit" is passed as 1st argument, the script would replace ALL usages found (Except for several
+ * folders, as vendor/).
  */
 define("BASEDIR", realpath(dirname(__FILE__)."/../"));
 
@@ -48,7 +48,7 @@ function check_for_typeof($dir) {
 		if ($foundMatches) {
 			fail("Bad usage found in: " . $f);
 
-			if($foundMatches){
+			if ($foundMatches){
 				echo "Found matches:\n";
 				foreach($matches[0] as $line) {
 					$replaced_with = preg_replace($pattern, $replacement, $line);
@@ -58,7 +58,7 @@ function check_for_typeof($dir) {
 
 			global $argv;
 
-			if(isset($argv[1]) && $argv[1] === "fixit") {
+			if (isset($argv[1]) && $argv[1] === "fixit") {
 				$file_contents = preg_replace( $pattern, $replacement, $file_contents );
 				changed_file( $f );
 				file_put_contents($f, $file_contents);
@@ -82,28 +82,28 @@ function recurse_dirs($root, $cb) {
 
 	foreach ($iter as $path => $dir) {
 		if ($dir->isDir()) {
-			if(strpos($dir, "/.") !== false) {
+			if (strpos($dir, "/.") !== false) {
 				continue;
 			}
-			if(strpos($dir, "/__") !== false) {
+			if (strpos($dir, "/__") !== false) {
 				continue;
 			}
-			if(strpos($dir, "/test") !== false) {
+			if (strpos($dir, "/test") !== false) {
 				continue;
 			}
-			if(strpos($dir, "/docs") !== false) {
+			if (strpos($dir, "/docs") !== false) {
 				continue;
 			}
-			if(strpos($dir, "/dont-deploy") !== false) {
+			if (strpos($dir, "/dont-deploy") !== false) {
 				continue;
 			}
-			if(strpos($dir, "/node_modules") !== false) {
+			if (strpos($dir, "/node_modules") !== false) {
 				continue;
 			}
-			if(strpos($dir, "/vendor") !== false) {
+			if (strpos($dir, "/vendor") !== false) {
 				continue;
 			}
-			if(strpos($dir, "/coverage") !== false) {
+			if (strpos($dir, "/coverage") !== false) {
 				continue;
 			}
 			$cb($path);
@@ -121,7 +121,7 @@ show_git_revert_command();
 
 echo "\n";
 
-if($FAILED > 0) {
+if ($FAILED > 0) {
 	echo "Failed with: ".$FAILED." errors.\n";
 	exit -1;
 }

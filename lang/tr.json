@@ -3429,7 +3429,11 @@
     "8908": "grup sohbetinden ayr\u0131ld\u0131.",
     "8909": "\u0130ptal et",
     "8910": "\u00d6\u011fe payla\u015f\u0131lan klas\u00f6rden kald\u0131r\u0131ld\u0131",
-    "8911": "Keep names as in the mobile device",
+    "8911": "Senkronize ederken isim de\u011fi\u015ftirme",
+    "8912": "[B]MEGAsync[\/B] kullanaca\u011f\u0131m",
+    "8913": "Payla\u015f\u0131lanlardan [X] nesne silindi",
+    "8914": "Dikkat: Bu konu\u015fmadaki mesaj s\u0131ralama b\u00fct\u00fcnl\u00fc\u011f\u00fcn\u00fc do\u011frulayamad\u0131k.",
+    "8915": "%s2 taraf\u0131ndan %s1 yap\u0131ld\u0131",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3572,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

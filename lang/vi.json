@@ -3382,7 +3382,7 @@
     "8858": "Ch\u1ec9nh S\u1eeda L\u1ea7n Cu\u1ed1i",
     "8859": "Sao L\u01b0u M\u00e3 Kh\u00f3a Ph\u1ee5c H\u1ed3i",
     "8861": "X\u00f3a M\u00e3 Kh\u00f3a Ph\u1ee5c H\u1ed3i",
-    "8862": "The Recovery Key file has been removed.",
+    "8862": "T\u1ec7p tin ch\u1ee9a M\u00e3 Kh\u00f3a Ph\u1ee5c H\u1ed3i \u0111\u00e3 b\u1ecb x\u00f3a.",
     "8863": "M\u00e3 Kh\u00f3a Ph\u1ee5c H\u1ed3i \u0111\u00e3 \u0111\u01b0\u1ee3c xu\u1ea5t v\u00e0o v\u1ecb tr\u00ed sau:",
     "8864": "You are removing the exported Recovery Key file",
     "8865": "B\u1ea1n s\u1ebd c\u1ea7n ph\u1ea3i nh\u1eadp th\u00f4ng thin \u0111\u0103ng nh\u1eadp v\u00e0 m\u1eadt kh\u1ea9u khi s\u1eed d\u1ee5ng \u1ee9ng d\u1ee5ng m\u1edbi. N\u1ebfu b\u1ea1n kh\u00f4ng nh\u1edb m\u1eadt kh\u1ea9u c\u1ee7a m\u00ecnh, vui l\u00f2ng Xu\u1ea5t M\u00e3 Kh\u00f3a Ph\u1ee5c H\u1ed3i tr\u01b0\u1edbc khi g\u1ee1 \u1ee9ng d\u1ee5ng v1 kh\u1ecfi m\u00e1y.",
@@ -3422,7 +3422,7 @@
     "8901": "Image and video downloads",
     "8902": "L\u01b0u h\u00ecnh \u1ea3nh nh\u1eadn \u0111\u01b0\u1ee3c v\u00e0o m\u00e1y",
     "8903": "L\u01b0u video nh\u1eadn \u0111\u01b0\u1ee3c v\u00e0o m\u00e1y",
-    "8904": "Save iOS compatible images and videos in your device&#039;s gallery (Note: images and videos won&#039;t be saved in Offline).",
+    "8904": "L\u01b0u l\u1ea1i nh\u1eefng h\u00ecnh \u1ea3nh v\u00e0 video ph\u00f9 h\u1ee3p v\u1edbi iOS v\u00e0o \u0111i\u1ec7n tho\u1ea1i (Ghi ch\u00fa: h\u00ecnh \u1ea3nh v\u00e0 video s\u1ebd \u0111\u01b0\u1ee3c l\u01b0u th\u1eb3ng v\u00e0o \u0111i\u1ec7n tho\u1ea1i, kh\u00f4ng ph\u1ea3i m\u1ee5c Ngo\u1ea1i Tuy\u1ebfn).",
     "8905": "\u0111\u00e3 d\u1ecdn l\u1ecbch s\u1eed tin nh\u1eafn.",
     "8906": "\u0111\u00e3 b\u1ecb x\u00f3a kh\u1ecfi nh\u00f3m chat b\u1edfi %s.",
     "8907": "v\u1eeba gia nh\u1eadp nh\u00f3m chat t\u1eeb l\u1eddi m\u1eddi c\u1ee7a %s.",
@@ -3430,6 +3430,10 @@
     "8909": "X\u00f3a b\u1ecf",
     "8910": "Removed item from shared folder",
     "8911": "Keep names as in the mobile device",
+    "8912": "I&#039;ll use [B]MEGAsync[\/B]",
+    "8913": "Removed [X] items from a share",
+    "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3572,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

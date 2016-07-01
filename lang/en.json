@@ -1594,8 +1594,8 @@
     "5893": "You have an incoming call from [X].",
     "5894": "Call with [X] was canceled.",
     "5895": "Call with [X] was handled on some other device.",
-    "5896": "Start audio call",
-    "5897": "Start video call",
+    "5896": "Start Audio Call",
+    "5897": "Start Video Call",
     "5898": "The user [X] has been invited and will appear in your contact list once accepted.",
     "5899": "The users have been invited and will appear in your contact list once accepted.",
     "5900": "View received requests",
@@ -1947,7 +1947,7 @@
     "6831": "Caution! You have elected to close your MEGA account. The account under this email address will be permanently closed and this can not be undone.",
     "6832": "By completing this action you will lose access to all your data, including contacts & incoming shares.",
     "6833": "End chat",
-    "6834": "Send files",
+    "6834": "Send Files",
     "6835": "Add contact to Conversation",
     "6836": "Send contact details",
     "6837": "From your Cloud Drive",
@@ -2872,7 +2872,7 @@
     "8004": "Delete message",
     "8005": "Add to Cloud Drive",
     "8006": "Attachment added to your Cloud Drive.",
-    "8007": "Add participant...",
+    "8007": "Add Participant...",
     "8008": "You have no [P]Conversations[\/P]",
     "8009": "Write a message...",
     "8010": "Search contacts",
@@ -3430,6 +3430,10 @@
     "8909": "Revoke",
     "8910": "Removed item from shared folder",
     "8911": "Keep names as in the mobile device",
+    "8912": "I&#039;ll use [B]MEGAsync[\/B]",
+    "8913": "Removed [X] items from a share",
+    "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+    "8915": "was changed to %s1 by %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3572,6 +3576,7 @@
         "participant_removed": 8906,
         "participant_joined": 8907,
         "participant_left": 8908,
-        "revoke": 8909
+        "revoke": 8909,
+        "chat_permission_change": 8915
     }
 }

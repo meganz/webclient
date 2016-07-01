@@ -56,6 +56,102 @@ function initContactsGridScrolling() {
 }
 
 /**
+ * initTextareaScrolling
+ *
+ * @param {Object} $textarea. DOM textarea element.
+ * @param {Number} textareaMaxHeight Textarea max height. Default is 100
+ * @param {Boolean} resizeEvent If we need to bind window resize event
+ */
+function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
+    var textareaWrapperClass = $textarea.parent().attr('class'),
+          $textareaClone,
+          textareaLineHeight = parseInt($textarea.css('line-height'))
+          textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
+
+    // Textarea Clone block to define height of autoresizeable textarea   
+    if (!$textarea.next('div').length) {
+        $('<div></div>').insertAfter($textarea);
+    }
+    $textareaClone = $textarea.next('div');
+
+    function textareaScrolling(keyEvents) {
+        var $textareaScrollBlock = $textarea.closest('.textarea-scroll'),
+              $textareaCloneSpan,
+              textareaContent = $textarea.val(),
+              cursorPosition = $textarea.getCursorPosition(),
+              jsp = $textareaScrollBlock.data('jsp'),
+              viewLimitTop = 0,
+              scrPos = 0,
+              viewRatio = 0;
+
+        // Set textarea height according to  textarea clone height
+        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) +
+                          '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
+
+        // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
+        if (keyEvents && $textareaClone.data('lastContent') === textareaContent) {
+            return;
+        }
+        else {
+            $textareaClone.data('lastContent', textareaContent);
+            textareaContent = textareaContent.replace(/\n/g, '<br />');
+            $textareaClone.safeHTML(textareaContent + '<br />');
+        }
+
+        var textareaCloneHeight = $textareaClone.height();
+        $textarea.height(textareaCloneHeight);
+        $textareaCloneSpan = $textareaClone.children('span');
+        var textareaCloneSpanHeight = $textareaCloneSpan.height();
+        scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
+        viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
+
+        // Textarea wrapper scrolling init
+        if (textareaCloneHeight > textareaMaxHeight) {
+            $textareaScrollBlock.jScrollPane(
+                {enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
+            if (!jsp && keyEvents) {
+                $textarea.focus();
+            }
+        }
+        else if (jsp) {
+            jsp.destroy();
+            if (keyEvents) {
+                $textarea.focus();
+            }
+        }
+
+        // Scrolling according cursor position
+        if (viewRatio > textareaLineHeight || viewRatio < viewLimitTop) {
+            jsp = $textareaScrollBlock.data('jsp');
+            if (textareaCloneSpanHeight > 0 && jsp) {
+                jsp.scrollToY(textareaCloneSpanHeight - textareaLineHeight);
+            }
+            else if (jsp) {
+                jsp.scrollToY(0);
+            }
+        }
+        $textarea.trigger('autoresized');
+    }
+
+    // Init textarea scrolling
+    textareaScrolling();
+
+    // Reinit scrolling after keyup/keydown/paste events
+    $textarea.off('keyup keydown paste');
+    $textarea.on('keyup keydown paste', function() {
+        textareaScrolling(1);
+    });
+
+    // Bind window resize if textarea is resizeable
+    if (resizeEvent) {
+        var eventName = textareaWrapperClass.replace(/[_\s]/g, '');
+        $(window).bind('resize.' + eventName, function () {
+            textareaScrolling();
+        });
+    }
+}
+
+/**
  * Sent Contact Requests
  *
  *
@@ -372,7 +468,7 @@ function initUI() {
                 dd = 'download';
             else if (
                 $(e.target).is('ul.conversations-pane > li') ||
-                $(e.target).parents('ul.conversations-pane > li').size() > 0 ||
+                $(e.target).closest('ul.conversations-pane > li').size() > 0 ||
                 $(e.target).is('.messages-block')
             ) {
                 if (M.isFile(ids)) {
@@ -803,7 +899,7 @@ function initUI() {
         setTimeout(browserDialog, 2000);
     }
 
-    var lPane = $('.fm-left-panel')
+    var lPane = $('.fm-left-panel');
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
         'minWidth': 200,
@@ -1737,47 +1833,9 @@ function addContactUI() {
         $('.add-user-notification').removeClass('active');
     });
 
-    function addContactAreaResizing() {
-
-        var txt = $('.add-user-notification textarea'),
-            txtHeight = txt.outerHeight(),
-            hiddenDiv = $('.add-contact-hidden'),
-            pane = $('.add-user-nt-scrolling'),
-            content = txt.val(),
-            api;
-
-        content = content.replace(/\n/g, '<br />');
-        hiddenDiv.html(encodeURI(content) + '<br/>');
-
-        if (txtHeight !== hiddenDiv.outerHeight()) {
-            txt.height(hiddenDiv.outerHeight());
-
-            if ($('.add-user-textarea').outerHeight() >= 50) {
-                pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-                api = pane.data('jsp');
-                txt.blur();
-                txt.focus();
-                api.scrollByY(0);
-            }
-            else {
-                api = pane.data('jsp');
-
-                if (api) {
-                    api.destroy();
-                    txt.blur();
-                    txt.focus();
-                }
-            }
-        }
-    }
-
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
         initAddDialogMultiInputPlugin();
     }
-
-    $('.add-user-notification textarea').on('keyup', function() {
-        addContactAreaResizing();
-    });
 
     $('.fm-empty-contacts .fm-empty-button').rebind('mouseover', function() {
         $('.fm-empty-contacts').addClass('hovered');
@@ -1855,7 +1913,7 @@ function addContactUI() {
                 $d.css('right', 8 + 'px');
             }
 
-            addContactAreaResizing();
+            initTextareaScrolling($('.add-user-textarea textarea'), 39);
             focusOnInput();
         }
 
@@ -2826,7 +2884,11 @@ function fmtopUI() {
                     && M.currentdirid.substr(0, 6) !== 'search')) {
 
             $('.fm-add-user').removeClass('hidden');
-            $('.fm-left-panel').addClass('contacts-panel');
+
+
+            // don't add .contacts-panel to ALL .fm-left-panel's
+            $('.fm-left-panel:visible').addClass('contacts-panel');
+            
             if (M.currentdirid === 'ipc') {
                 $('.fm-received-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
@@ -6696,7 +6758,22 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if (!is_fm() || $(e.target).parents('#startholder').length || $(e.target).is('input') || $(e.target).is('textarea') || $(e.target).is('.download.info-txt') || $(e.target).parents('.content-panel.conversations').length || $(e.target).parents('.messages.content-area').length || $(e.target).parents('.chat-right-pad .user-card-data').length || $(e.target).parents('.fm-account-main').length || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+        if (!is_fm() ||
+            $(e.target).parents('#startholder').length ||
+            $(e.target).is('input') ||
+            $(e.target).is('textarea') ||
+            $(e.target).is('.download.info-txt') ||
+            $(e.target).closest('.content-panel.conversations').length ||
+            $(e.target).closest('.messages.content-area').length ||
+            $(e.target).closest('.chat-right-pad .user-card-data').length ||
+            $(e.target).parents('.fm-account-main').length ||
+            $(e.target).parents('.export-link-item').length ||
+            $(e.target).parents('.contact-fingerprint-txt').length ||
+            $(e.target).parents('.fm-breadcrumbs').length ||
+            $(e.target).hasClass('contact-details-user-name') ||
+            $(e.target).hasClass('contact-details-email') ||
+            $(e.target).hasClass('nw-conversations-name') ||
+            ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6955,9 +7032,17 @@ function sectionUIopen(id) {
             $('.fm-main.default > .fm-left-panel').removeClass('hidden');
         }
 
+        // prevent unneeded flashing of the conversations section when switching between chats
         // new sections UI
-        $('.section').addClass('hidden');
-        $('.section.' + id).removeClass('hidden');
+        if (id == "conversations") {
+            $('.section:not(.conversations)').addClass('hidden');
+            $('.section.' + id).removeClass('hidden');
+        }
+        else {
+            $('.section').addClass('hidden');
+            $('.section.' + id).removeClass('hidden');
+        }
+
     }
 }
 
@@ -7931,6 +8016,7 @@ function initShareDialogMultiInputPlugin() {
                 // where they can add a custom message to the pending share request
                 if (checkIfContactExists(item.id) === false) {
                     $('.share-message').show();
+                    initTextareaScrolling($('.share-message-textarea textarea'), 39);
                 }
 
                 $('.dialog-share-button').removeClass('disabled');
@@ -8370,44 +8456,6 @@ function initShareDialog() {
     $('.share-message textarea').rebind('blur', function() {
         var $this = $(this);
         $('.share-message').removeClass('active');
-    });
-
-    function shareMessageResizing() {
-
-      var txt = $('.share-message textarea'),
-          txtHeight =  txt.outerHeight(),
-          hiddenDiv = $('.share-message-hidden'),
-          pane = $('.share-message-scrolling'),
-          content = txt.val(),
-          api;
-
-      content = content.replace(/\n/g, '<br />');
-      hiddenDiv.html(encodeURI(content) + '<br/>');
-
-      if (txtHeight !== hiddenDiv.outerHeight() ) {
-        txt.height(hiddenDiv.outerHeight());
-
-        if ( $('.share-message-textarea').outerHeight()>=50) {
-            pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
-            api = pane.data('jsp');
-            txt.blur();
-            txt.focus();
-            api.scrollByY(0);
-        }
-        else {
-            api = pane.data('jsp');
-
-            if (api) {
-              api.destroy();
-              txt.blur();
-              txt.focus();
-            }
-        }
-      }
-    }
-
-    $('.share-message textarea').rebind('keyup', function() {
-        shareMessageResizing();
     });
 }
 
@@ -11165,6 +11213,9 @@ var cancelSubscriptionDialog = {
         // Show the dialog
         this.$dialog.removeClass('hidden');
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // Init textarea scrolling
+        initTextareaScrolling($('.cancel-textarea textarea'), 126);
 
         // Init functionality
         this.enableButtonWhenReasonEntered();

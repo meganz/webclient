@@ -152,19 +152,25 @@ describe("chat.strongvelope workflow test", function() {
             var messagesProcessedAlice = 0;
 
             while (messagesProcessedAlice < 50) {
-                for (var i = 0; i < TEST_MESSAGES.length; i++) {
-                    message = TEST_MESSAGES[i];
+                for (var mi = 0; mi < TEST_MESSAGES.length; mi++) {
+                    message = TEST_MESSAGES[mi];
 
                     // Alice encrypts a message to send to Bob.
                     sent = alice.encryptTo(message, 'bob45678900');
                     messagesProcessedAlice++;
 
                     // Alice receives her own message.
-                    received = alice.decryptFrom(sent, 'alice678900');
+                    for (var i=0;i<sent.length;i++)
+                    {
+                        received = alice.decryptFrom(sent[i], 'alice678900');
+                    }
                     assert.strictEqual(received.payload, message);
 
                     // Bob receives it.
-                    received = bob.decryptFrom(sent, 'alice678900');
+                    for (var i=0;i<sent.length;i++)
+                    {
+                        received = bob.decryptFrom(sent[i], 'alice678900');
+                    }
                     assert.strictEqual(received.payload, message);
                     if (typeof received.toSend !== 'undefined') {
                         // See if Alice can handle the key re-send.
@@ -179,21 +185,19 @@ describe("chat.strongvelope workflow test", function() {
                     sent = bob.encryptTo(received.payload, 'alice678900');
 
                     // Bob receives his own message.
-                    received = bob.decryptFrom(sent, 'bob45678900');
+                    for (var i=0;i<sent.length;i++)
+                    {
+                        received = bob.decryptFrom(sent[i], 'bob45678900');
+                    }
                     assert.strictEqual(received.payload, message);
 
                     // Alice gets it back.
-                    received = alice.decryptFrom(sent, 'bob45678900');
+                    for (var i=0;i<sent.length;i++)
+                    {
+                        received = alice.decryptFrom(sent[i], 'bob45678900');
+                    }
                     assert.strictEqual(received.payload, message);
                     messagesProcessedAlice++;
-                    if (typeof received.toSend !== 'undefined') {
-                        // See if Bob can handle the key re-send.
-                        toSendReceived = bob.decryptFrom(received.toSend, 'alice678900');
-                        assert.strictEqual(toSendReceived.payload, null);
-                        // See if Alice can handle her own key re-send.
-                        toSendReceived = alice.decryptFrom(received.toSend, 'alice678900');
-                        assert.strictEqual(toSendReceived.payload, null);
-                    }
                 }
             }
 
@@ -218,27 +222,25 @@ describe("chat.strongvelope workflow test", function() {
                 if (participants.hasOwnProperty(handle)) {
                     var person = participants[handle];
                     received = person.decryptFrom(sent, sender);
-                    if (activeParticipants.has(person.ownHandle)) {
-                        assert.strictEqual(received.payload, message);
-                        if (sender !== person.ownHandle) {
-                            assert.ok(person.otherParticipants.has(sender));
+                    if (sender !== ns.COMMANDER) {
+                        if (activeParticipants.has(person.ownHandle)) {
+                            if (message) {
+                                assert.strictEqual(received.payload, message);
+                            }
+                            if (sender !== person.ownHandle) {
+                                assert.ok(person.otherParticipants.has(sender));
+                            }
                         }
-                    }
-                    else {
-                        assert.strictEqual(received, false);
-                        assert.strictEqual(person.otherParticipants.size, 0);
-                    }
-                    if (received.toSend) {
-                        toSend.push([received.toSend, person.ownHandle]);
+                        else {
+                            assert.strictEqual(received, false);
+                        }
+                        if (received.toSend) {
+                            toSend.push([received.toSend, person.ownHandle]);
+                        }
                     }
                 }
             }
 
-            // Process potential reminder message.
-            for (var i = 0; i < toSend.length; i++) {
-                _checkReceivers(toSend[i][0], toSend[i][1], null,
-                                participants, activeParticipants);
-            }
         };
 
         it("normal operation", function() {
@@ -252,65 +254,121 @@ describe("chat.strongvelope workflow test", function() {
             var sent = '';
             var sender = '';
             var result;
+            var alterMessage = '';
             var activeParticipants = new Set(['alice678900']);
             participants['alice678900'] = _makeParticipant('alice678900');
             participants['alice678900'].updateSenderKey();
 
+
             // Alice starts a chat with Bob.
             participants['bob45678900'] = _makeParticipant('bob45678900');
             participants['bob45678900'].updateSenderKey();
+            participants['bob45678900'].addParticipant('alice678900');
             sender = 'alice678900';
             message = 'Tēnā koe';
             sent = participants[sender].encryptTo(message, 'bob45678900');
+
             activeParticipants.add('bob45678900');
-            _checkReceivers(sent, sender, message,
-                            participants, activeParticipants);
+            if (sent.length > 1)
+            {
+                _checkReceivers(sent[0], sender, null,
+                            participants, activeParticipants);//keyed message
+                _checkReceivers(sent[1], sender, message,
+                            participants, activeParticipants);//payload message
+            }
+            else
+            {
+                _checkReceivers(sent[0], sender, message,
+                            participants, activeParticipants);//payload message
+            }
 
             // Bob replies.
             sender = 'bob45678900';
             message = 'Kia ora';
             sent = participants[sender].encryptTo(message);
-            _checkReceivers(sent, sender, message,
-                            participants, activeParticipants);
+            if (sent.length > 1)
+            {
+                _checkReceivers(sent[0], sender, null,
+                            participants, activeParticipants);//keyed message
+                _checkReceivers(sent[1], sender, message,
+                            participants, activeParticipants);//payload message
+            }
+            else
+            {
+                _checkReceivers(sent[0], sender, message,
+                            participants, activeParticipants);//payload message
+            }
 
             // Alice adds Charlie to the chat.
             participants['charlie8900'] = _makeParticipant('charlie8900');
             participants['charlie8900'].updateSenderKey();
+            alterMessage = participants['alice678900'].alterParticipants(['charlie8900'], []);
             sender = 'alice678900';
 
-            sent = participants[sender].alterParticipants(['charlie8900'], []);
-            activeParticipants.add('charlie8900');
-            _checkReceivers(sent, sender, null,
-                            participants, activeParticipants);
+            _checkReceivers(alterMessage, ns.COMMANDER, null,
+                            participants, activeParticipants);//API message
 
+            activeParticipants.forEach(function(item) {
+                participants['charlie8900'].addParticipant(item);
+            });
+            activeParticipants.add('charlie8900');
             // Bob sends to the group.
             sender = 'bob45678900';
             message = 'Good to see you, bro.';
             sent = participants[sender].encryptTo(message);
-            _checkReceivers(sent, sender, message,
-                            participants, activeParticipants);
+            if (sent.length > 1)
+            {
+                _checkReceivers(sent[0], sender, null,
+                            participants, activeParticipants);//keyed message
+                _checkReceivers(sent[1], sender, message,
+                            participants, activeParticipants);//payload message
+            }
+            else
+            {
+                _checkReceivers(sent[0], sender, message,
+                            participants, activeParticipants);//payload message
+            }
 
-            // Alice removes Bob from the chat.
-            sender = 'alice678900';
-            sent = participants[sender].alterParticipants([], ['bob45678900']);
+            alterMessage = participants['alice678900'].alterParticipants([], ['bob45678900']);
+            // Removes Bob from the chat.
+            _checkReceivers(alterMessage, ns.COMMANDER, null,
+                            participants, activeParticipants);//API message
             activeParticipants.delete('bob45678900');
-            _checkReceivers(sent, sender, null,
-                            participants, activeParticipants);
 
             // Charlie sends to the group.
             sender = 'charlie8900';
             message = 'Howdy partners!';
             sent = participants[sender].encryptTo(message);
-            _checkReceivers(sent, sender, message,
-                            participants, activeParticipants);
+            if (sent.length > 1)
+            {
+                _checkReceivers(sent[0], sender, null,
+                            participants, activeParticipants);//keyed message
+                _checkReceivers(sent[1], sender, message,
+                            participants, activeParticipants);//payload message
+            }
+            else
+            {
+                _checkReceivers(sent[0], sender, message,
+                            participants, activeParticipants);//payload message
+            }
 
             // Let's remove Bob's handler, and send another message.
             delete participants['bob45678900'];
             sender = 'alice678900';
             message = "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn";
             sent = participants[sender].encryptTo(message);
-            _checkReceivers(sent, sender, message,
-                            participants, activeParticipants);
+            if (sent.length > 1)
+            {
+                _checkReceivers(sent[0], sender, null,
+                            participants, activeParticipants);//keyed message
+                _checkReceivers(sent[1], sender, message,
+                            participants, activeParticipants);//payload message
+            }
+            else
+            {
+                _checkReceivers(sent[0], sender, message,
+                            participants, activeParticipants);//payload message
+            }
 
             // Bob re-joins (Bob is now a nervous key rotator).
             participants['bob45678900'] = _makeParticipant('bob45678900');
@@ -319,20 +377,37 @@ describe("chat.strongvelope workflow test", function() {
             result = participants['bob45678900'].seed(_messageBuffer);
             // Bob will fail to seed, because his device id has changed
             assert.strictEqual(result, false);
+            // Bob updates his sender key as he just failed to seed from history messages.
+            participants['bob45678900'].updateSenderKey();
             sender = 'alice678900';
             message = 'Welcome back, mate.';
-            sent = participants[sender].alterParticipants(['bob45678900'], [], message);
-            activeParticipants.add('bob45678900');
-            _checkReceivers(sent, sender, message,
-                            participants, activeParticipants);
+            alterMessage = participants['alice678900'].alterParticipants(['bob45678900'], []);
+            // Adds Bob into the chat.
+            _checkReceivers(alterMessage, ns.COMMANDER, null,
+                            participants, activeParticipants);//API message
 
+            // Bob adds all participants of the current room.
+            activeParticipants.forEach(function(item) {
+               participants['bob45678900'].addParticipant(item);
+            });
+            activeParticipants.add('bob45678900');
             // Chatty Charlie sends to the group.
             sender = 'charlie8900';
-            for (var i = 0; i < TEST_MESSAGES.length; i++) {
-                message = TEST_MESSAGES[i];
+            for (var mi = 0; mi < TEST_MESSAGES.length; mi++) {
+                message = TEST_MESSAGES[mi];
                 sent = participants[sender].encryptTo(message);
-                _checkReceivers(sent, sender, message,
-                                participants, activeParticipants);
+                if (sent.length > 1)
+                {
+                    _checkReceivers(sent[0], sender, null,
+                                participants, activeParticipants);//keyed message
+                    _checkReceivers(sent[1], sender, message,
+                                participants, activeParticipants);//payload message
+                }
+                else
+                {
+                    _checkReceivers(sent[0], sender, message,
+                                participants, activeParticipants);//payload message
+                }
             }
 
             // Delayed Dave (who doesn't have chat keys, yet) is added.
@@ -342,18 +417,33 @@ describe("chat.strongvelope workflow test", function() {
             sandbox.stub(window, 'u_privk', RSA_PRIV_KEY);
             sender = 'alice678900';
             message = 'Long time no see, Dave.';
-            sent = participants[sender].alterParticipants(['dave5678900'], [], message);
+            alterMessage = participants['alice678900'].alterParticipants(['dave5678900'], []);
+            // Removes Bob from the chat.
+            _checkReceivers(alterMessage, ns.COMMANDER, null,
+                            participants, activeParticipants);//API message
+            // Dave adds all participants of the current room.
+            activeParticipants.forEach(function(item) {
+                participants['dave5678900'].addParticipant(item);
+            });
             activeParticipants.add('dave5678900');
-            _checkReceivers(sent, sender, message,
-                            participants, activeParticipants);
+
 
             // Bob sends to the group.
             sender = 'bob45678900';
             message = 'Welcome back, mate.';
             sent = participants[sender].encryptTo(message);
-            _checkReceivers(sent, sender, message,
-                            participants, activeParticipants);
-
+            if (sent.length > 1)
+            {
+                _checkReceivers(sent[0], sender, null,
+                            participants, activeParticipants);//keyed message
+                _checkReceivers(sent[1], sender, message,
+                            participants, activeParticipants);//payload message
+            }
+            else
+            {
+                _checkReceivers(sent[0], sender, message,
+                            participants, activeParticipants);//payload message
+            }
             // Dave drops out, and re-initialises (seeds) from history.
             delete participants['dave5678900'];
             participants['dave5678900'] = _makeParticipant('dave5678900', true);

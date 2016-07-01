@@ -11,13 +11,18 @@ var ContactsListItem = React.createClass({
 
         var contact = this.props.contact;
 
+        if (!contact) {
+            return null;
+        }
+
         classString += " " + this.props.megaChat.xmppPresenceToCssClass(
             contact.presence
         );
 
         return (
             <div>
-                <div className={classString} onClick={this.props.onContactClicked}>
+                <div className={classString}
+                     onClick={this.props.onContactClicked}>
                     <div className="nw-contact-status"></div>
                     <div className="nw-conversations-unread">0</div>
                     <div className="nw-conversations-name">
@@ -36,6 +41,10 @@ var ContactVerified = React.createClass({
         var self = this;
 
         var contact = this.props.contact;
+
+        if (!contact) {
+            return null;
+        }
 
         var verifiedElement = null;
 
@@ -66,6 +75,10 @@ var ContactPresence = React.createClass({
     render: function() {
         var self = this;
         var contact = this.props.contact;
+        if (!contact) {
+            return null;
+        }
+
         var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
 
         return <div className={"user-card-presence " + pres + " " + this.props.className}></div>;
@@ -80,11 +93,15 @@ var Avatar = React.createClass({
         var self = this;
         var contact = this.props.contact;
 
+        if (!contact) {
+            return null;
+        }
+        
         if (!contact.m && contact.email) {
             contact.m = contact.email;
         }
 
-        var $avatar = $(useravatar.contact(contact));
+        var avatarMeta = useravatar.generateContactAvatarMeta(contact);
 
         var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
         
@@ -109,17 +126,16 @@ var Avatar = React.createClass({
                 });
         }
 
-        if($avatar.find("img").length > 0) {
+        if(avatarMeta.type === "image") {
             displayedAvatar = <div className={classes} style={this.props.style}>
                 {verifiedElement}
-                <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
+                <img src={avatarMeta.avatar} style={this.props.imgStyles}/>
             </div>;
         } else {
-            var tempClasses = $avatar.attr('class');
-            var colorNum = tempClasses.split("color")[1].split(" ")[0];
-            classes += " color" + colorNum;
+            classes += " color" + avatarMeta.avatar.colorIndex;
 
-            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}<div className={letterClass} data-user-letter={$(useravatar.contact(contact)).text()}></div></div>;
+            displayedAvatar = <div className={classes} style={this.props.style}>{verifiedElement}
+                <div className={letterClass} data-user-letter={avatarMeta.avatar.letters}></div></div>;
 
         }
 
@@ -129,12 +145,22 @@ var Avatar = React.createClass({
 
 var ContactCard = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    getDefaultProps: function() {
+        return {
+            'dropdownButtonClasses': "default-white-button tiny-button",
+            'dropdownIconClasses': "tiny-icon grey-down-arrow"
+        }
+    },
     render: function() {
         var self = this;
 
         var contact = this.props.contact;
-        var megaChat = (this.props.megaChat ? this.props.megaChat : window.megaChat);
-        var pres = megaChat.xmppPresenceToCssClass(contact.presence);
+        if (!contact) {
+            return null;
+        }
+
+        var pres = 
+            (this.props.megaChat ? this.props.megaChat : window.megaChat).xmppPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
 
         var contextMenu;
@@ -142,32 +168,37 @@ var ContactCard = React.createClass({
             var ButtonsUI = require('./../../ui/buttons.jsx');
             var DropdownsUI = require('./../../ui/dropdowns.jsx');
 
-            var moreDropdowns = [];
+            var moreDropdowns = this.props.dropdowns ? $.extend([], this.props.dropdowns) : [];
 
-            if(window.location.hash != '#fm/chat/' + contact.u) {
-                moreDropdowns.push(
+            if (contact.c === 1) {
+                if (moreDropdowns.length > 0) {
+                    moreDropdowns.unshift(
+                        <hr key="separator" />
+                    );
+                }
+                moreDropdowns.unshift(
                     <DropdownsUI.DropdownItem
-                        key={"start_conv_" + contact.u}
-                        icon="conversations" label={__("Open/start Chat")} onClick={() => {
-                                    window.location = '#fm/chat/' + contact.u;
-                                }} />
+                            key="view" icon="human-profile" label={__(l[8866])} onClick={() => {
+                                window.location = '#fm/' + contact.u;
+                            }} />
                 );
             }
-            contextMenu = <ButtonsUI.Button
-                className="default-white-button tiny-button"
-                icon="tiny-icon grey-down-arrow">
-                <DropdownsUI.Dropdown className="contact-card-dropdown"
-                    positionMy="right top"
-                    positionAt="right bottom"
-                    vertOffset={4}
-                    noArrow={true}
-                >
-                    <DropdownsUI.DropdownItem icon="human-profile" label={__("View Profile")} onClick={() => {
-                                    window.location = '#fm/' + contact.u;
-                                }} />
-                    {moreDropdowns}
-                </DropdownsUI.Dropdown>
-            </ButtonsUI.Button>;
+
+            if (moreDropdowns.length > 0) {
+                contextMenu = <ButtonsUI.Button
+                    className={self.props.dropdownButtonClasses}
+                    icon={self.props.dropdownIconClasses}
+                    disabled={self.props.dropdownDisabled}>
+                    <DropdownsUI.Dropdown className="contact-card-dropdown"
+                                          positionMy="right top"
+                                          positionAt="right bottom"
+                                          vertOffset={4}
+                                          noArrow={true}
+                    >
+                        {moreDropdowns}
+                    </DropdownsUI.Dropdown>
+                </ButtonsUI.Button>;
+            }
         }
 
         return <div
@@ -181,6 +212,11 @@ var ContactCard = React.createClass({
                             self.props.onClick(contact, e);
                         }
                     }}
+                    onDoubleClick={(e) => {
+                        if (self.props.onDoubleClick) {
+                            self.props.onDoubleClick(contact, e);
+                        }
+                    }}
                     >
                 <ContactPresence contact={contact} className={this.props.presenceClassName}/>
                 <Avatar contact={contact} className="small-rounded-avatar" />
@@ -188,8 +224,10 @@ var ContactCard = React.createClass({
                 {contextMenu}
 
                 <div className="user-card-data">
-                    <div className="user-card-name">{M.getNameByHandle(contact.u)}</div>
-                    <div className="user-card-email">{contact.m}</div>
+                    <div className="user-card-name small">
+                        {this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}
+                    </div>
+                    <div className="user-card-email small">{contact.m}</div>
                 </div>
             </div>;
     }
@@ -199,7 +237,15 @@ var ContactPickerWidget = React.createClass({
     mixins: [MegaRenderMixin],
     getInitialState: function() {
         return {
-            'searchValue': ''
+            'searchValue': '',
+            'selected': this.props.selected ? this.props.selected : []
+        }
+    },
+    getDefaultProps: function() {
+        return {
+            multipleSelectedButtonLabel: false,
+            singleSelectedButtonLabel: false,
+            nothingSelectedButtonLabel: false,
         }
     },
     onSearchChange: function(e) {
@@ -211,7 +257,62 @@ var ContactPickerWidget = React.createClass({
 
         var contacts = [];
 
+        var footer = null;
+
+        if (self.props.multiple) {
+            var onSelectDoneCb = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                $(document).trigger('closeDropdowns');
+
+                if (self.props.onSelectDone) {
+                    self.props.onSelectDone(self.state.selected);
+                }
+            };
+
+            if (!self.state.selected || self.state.selected.length === 0) {
+                footer = <div className="contacts-search-footer">
+                    <em>{
+                        self.props.nothingSelectedButtonLabel ?
+                            self.props.nothingSelectedButtonLabel
+                            :
+                            __(l[8889])
+                    }</em>
+                </div>;
+            }
+            else if (self.state.selected.length === 1) {
+                footer = <div className="contacts-search-footer">
+                    <div className="fm-dialog-footer">
+                        <a href="javascript:;" className="default-white-button right" onClick={onSelectDoneCb}>
+                            {self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]}
+                        </a>
+                    </div>
+                </div>
+            }
+            else if (self.state.selected.length > 1) {
+                footer = <div className="contacts-search-footer">
+                    <div className="fm-dialog-footer">
+                        <a href="javascript:;" className="default-white-button right" onClick={onSelectDoneCb}>
+                            {
+                                self.props.multipleSelectedButtonLabel ?
+                                    self.props.multipleSelectedButtonLabel
+                                    :
+                                    __(l[8890])
+                            }
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+
+
         self.props.contacts.forEach(function(v, k) {
+            if (self.props.exclude && self.props.exclude.indexOf(v.u) > -1) {
+                // continue;
+                return;
+            }
+
             var pres = self.props.megaChat.karere.getPresence(
                 self.props.megaChat.getJidFromNodeId(v.u)
             );
@@ -238,23 +339,89 @@ var ContactPickerWidget = React.createClass({
             }
 
             var selectedClass = "";
-            if (self.props.selected && self.props.selected.indexOf(v.h) !== -1) {
+            if (self.state.selected && self.state.selected.indexOf(v.h) !== -1) {
                 selectedClass = "selected";
             }
             contacts.push(
                 <ContactCard
                     contact={v}
                     className={"contacts-search " + selectedClass}
+                    onDoubleClick={(contact, e) => {
+                        if (!self.props.multiple) {
+                            if (self.props.onClick) {
+                                self.props.onClick(contact, e);
+                            }
+                        }
+                        else {
+                            if (self.props.onSelect) {
+                                self.props.onSelect(contact, e);
+                            }
+
+                            $(document).trigger('closeDropdowns');
+
+                            var sel = self.state.selected;
+                            if (sel.indexOf(contact.h) === -1) {
+                                sel.push(contact.h);
+                            }
+
+                            if (self.props.onSelectDone) {
+                                self.props.onSelectDone(sel);
+                            }
+                        }
+                    }}
                     onClick={(contact, e) => {
-                        if (self.props.onClick) {
-                            self.props.onClick(contact, e);
+                        if (!self.props.multiple) {
+                            if (self.props.onClick) {
+                                self.props.onClick(contact, e);
+                            }
+                        }
+                        else {
+                            var sel = self.state.selected;
+                            if (!sel) {
+                                sel = [];
+                            }
+                            if (self.state.selected.indexOf(contact.h) > -1) {
+                                removeValue(sel, contact.h, false);
+                            }
+                            else {
+                                sel.push(contact.h);
+                            }
+
+
+                            self.setState({'selected': sel});
+
+                            self.forceUpdate();
+
+                            if (self.props.onSelect) {
+                                self.props.onSelect(contact, e);
+                            }
                         }
                     }}
                     noContextMenu={true}
-                    key={v.u + "_" + selectedClass}
+                    key={v.u}
                 />
             );
         });
+
+        var innerDivStyles = {};
+
+        if (contacts.length < 6) {
+            innerDivStyles['height'] = Math.max(48, contacts.length * 48);
+            innerDivStyles['overflow'] = "visible";
+        }
+
+        if (contacts.length === 0) {
+            var noContactsMsg = "";
+            if (M.u.length < 2) {
+                noContactsMsg = __(l[8877]);
+            }
+            else {
+                noContactsMsg = __(l[8878]);
+            }
+
+            contacts = <em>{noContactsMsg}</em>;
+        }
+
 
         return <div>
             <div className={"contacts-search-header " + this.props.headerClasses}>
@@ -269,10 +436,12 @@ var ContactPickerWidget = React.createClass({
             </div>
 
             <utils.JScrollPane className="contacts-search-scroll">
-                <div>
+                <div style={innerDivStyles}>
                     {contacts}
                 </div>
             </utils.JScrollPane>
+
+            {footer}
         </div>;
     }
 });

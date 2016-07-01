@@ -44,12 +44,12 @@ if (typeof loadingDialog === 'undefined') {
     var loadingDialog = {};
     loadingDialog.show = function() {
         $('.dark-overlay').show();
-        $('.loading-spinner').removeClass('hidden').addClass('active');
+        $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
         this.active = true;
     };
     loadingDialog.hide = function() {
         $('.dark-overlay').hide();
-        $('.loading-spinner').addClass('hidden').removeClass('active');
+        $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
         this.active = false;
    };
 }
@@ -70,7 +70,7 @@ if (typeof loadingInitDialog === 'undefined') {
         }
         this.hide();
         $('.light-overlay').show();
-        $('.loading-spinner').removeClass('hidden').addClass('init active');
+        $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('init active');
         this.active = true;
     };
     loadingInitDialog.step1 = function() {
@@ -105,7 +105,7 @@ if (typeof loadingInitDialog === 'undefined') {
         this.active = false;
         this.progress = false;
         $('.light-overlay').hide();
-        $('.loading-spinner').addClass('hidden').removeClass('init active');
+        $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
         $('.loader-percents').width('0%');
@@ -174,7 +174,8 @@ var MEGA_USER_STRUCT = {
     "shortName": "",
     "firstName": "",
     "lastName": "",
-    "ts": undefined
+    "ts": undefined,
+    "avatar": undefined
 };
 
 function MegaData()
@@ -1510,8 +1511,6 @@ function MegaData()
         $('.content-panel.contacts').html(html);
 
         if (megaChatIsReady) {
-            //megaChat.renderContactTree();
-
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
                 var m = $('.fm-start-chat-dropdown'),
@@ -2752,8 +2751,14 @@ function MegaData()
     this.syncUsersFullname = function(userId) {
         var self = this;
 
+        if (M.u[userId].firstName || M.u[userId].lastName) {
+            // already loaded.
+            return;
+        }
+
         var lastName = {name: 'lastname', value: null};
         var firstName = {name: 'firstname', value: null};
+
         MegaPromise.allDone([
             mega.attr.get(userId, 'firstname', -1)
                 .done(function(r) {
@@ -2806,6 +2811,10 @@ function MegaData()
                 self.u[userId].name = "";
             }
 
+            if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
+                self.u[userId].avatar = false;
+                useravatar.loaded(userId);
+            }
 
             if (userId === u_handle) {
                 u_attr.firstname = firstName;
@@ -2882,6 +2891,7 @@ function MegaData()
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
             }
 
+
             this.u[userId].addChangeListener(this.onContactChanged);
 
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
@@ -2891,6 +2901,7 @@ function MegaData()
                 delete cleanedUpUserData.presenceMtime;
                 delete cleanedUpUserData.shortName;
                 delete cleanedUpUserData.name;
+                delete cleanedUpUserData.avatar;
                 mDBadd('u', cleanedUpUserData);
             }
 
@@ -5265,7 +5276,6 @@ function renderfm()
 
     M.openFolder(M.currentdirid);
     if (megaChatIsReady) {
-        //megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
 
@@ -5822,7 +5832,7 @@ function execsc(actionPackets, callback) {
         }
         // Action packet for the mcc
         else if (actionPacket.a === 'mcc') {
-            $(window).trigger('onChatCreatedActionPacket', actionPacket);
+            $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
         }
         // Action packet for 'Set Email'
         else if (actionPacket.a === 'se') {
@@ -6141,7 +6151,7 @@ function fm_getcopynodes(cn, t)
         for (var j in s) r.push(s[j]);
         r.push(cn[i]);
     }
-    for(var i in r)
+    for (var i in r)
     {
         var n = M.d[r[i]];
         if (n)
@@ -6954,10 +6964,6 @@ function process_u(u) {
             }
         }
     }
-
-    //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
-    //    megaChat.karere.forceReconnect();
-    //}
 }
 
 function process_ok(ok, ignoreDB)

@@ -15,6 +15,8 @@
     padding: 2px;
 }
 .conversation-panels, .conversation-panel {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 100%;
     position: relative;
@@ -32,33 +34,71 @@
     float: none;
 }
 .chat-right-pad {
-    padding: 20px 22px 22px 22px;
+    padding: 16px 0 22px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 100%;
+}
+.chat-right-head {
+    clear: both;
+    padding: 4px 18px 16px 22px;
+}
+.chat-right-head-txt {
+    font-size: 18px;
+    line-height: 22px;
+    color: #666666;
+    padding: 0 0 0 0;
+}
+.chat-grey-counter {
+    float: right;
+    background-color: #777777;
+    height: 16px;
+    padding: 0 6px;
+    margin: 2px 0 0 0;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    color: white;
+    font-size: 11px;
+    line-height: 16px;
+}
+.chat-contacts-list {
+    max-height: -webkit-calc(100% - 306px);
+    max-height: -moz-calc(100% - 306px);
+    max-height: calc(100% - 306px);
+    min-height: 50px;
+}
+.chat-contacts-list .buttons-block {
+    min-height: 192px;
+}
+.chat-contacts-list-inner {
+    padding: 0 0 0 22px;
 }
 .chat-right-pad .contacts-info.body {
-    padding: 8px 0 6px 0;
-}
-.chat-right-area.conversation-details-scroll {
-    height: 100%;
-    height: -webkit-calc(100% - 98px);
-    height: -moz-calc(100% - 98px);
-    height: calc(100% - 98px);
+    padding: 8px 0;
 }
 .contacts-info.body {
     padding: 6px 0;
-    position: relative;
+    /*position: relative;*/
     clear: both;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 .contacts-info .tiny-button {
-    margin-top: 10px;
+    margin: 10px 22px 0 0;
+}
+.contacts-info .tiny-button + .user-card-data {
+    padding-right: 40px;
 }
 .chat-right-area .buttons-block {
-    padding: 13px 0;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding: 12px 22px;
+    margin: 16px 0 0 0;
 }
 .chat-right-area .buttons-block .link-button {
-    margin: 7px 0;
+    margin: 6px 0;
     padding: 5px 0;
 }
 .chat-right-area .big-button {
@@ -94,7 +134,12 @@
 .buttons-block {
     padding: 11px 0 0 0;
 }
-
+.contacts-info .icon-dropdown {
+    margin: 5px 4px 0 0;
+}
+.contacts-info .icon-dropdown + .user-card-data {
+    padding-right: 46px;
+}
 /* Old chat stuff */
 .fm-start-chat-dropdown {
     -webkit-box-sizing: border-box;

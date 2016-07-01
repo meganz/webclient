@@ -346,7 +346,7 @@
                             $item.addClass('ui-selected');
                         }
                         if (k > lastSelectedNodeIdx) {
-                            return false; //break; if out of range, will save some loops
+                            return false; // break; if out of range, will save some loops
                         }
                     });
                     self.trigger('selectionUpdate', [self.selection]);
@@ -384,7 +384,7 @@
 
         var nodes = M.getFilterBy(filterFunc);
 
-        //XX: can we make this work better by removing this step (separation of all nodes to 2 diff arrays and then
+        // XX: can we make this work better by removing this step (separation of all nodes to 2 diff arrays and then
         // merging them back)
 
         var dirNodes = [];

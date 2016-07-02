@@ -6482,7 +6482,7 @@ var kdWorker;
 
 function process_f(f, cb, retry)
 {
-    var onMainThread = window.dk ? 9e11 : 200;
+    var onMainThread = localStorage.dk ? 9e11 : 200;
     var doNewNodes = (typeof newnodes !== 'undefined');
 
     // if (d) console.error('process_f', doNewNodes);

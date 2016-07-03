@@ -2436,7 +2436,6 @@ function MegaData()
     this.delNode = function(h) {
 
         function ds(h) {
-            $(window).trigger("megaNodeRemoved", [h]);
             removeUInode(h);
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
@@ -3420,6 +3419,9 @@ function MegaData()
             }
             if ((typeof mDB === 'object') && !pfkey) {
                 mDBadd('f', clone(node));
+            }
+            if (node.key && missingkeys[node.h]) {
+                delete missingkeys[node.h];
             }
         }
     };
@@ -5394,11 +5396,10 @@ function execsc(actionPackets, callback) {
         trights = false,
         tmoveid = false,
         rootsharenodes = [],
-        async_procnodes = [],
-        async_treestate = [],
         loadavatars = false;
 
     newnodes = [];
+    mega.flags |= window.MEGAFLAG_EXECSC;
 
     // Process action packets
     for (var i in actionPackets) {
@@ -5536,8 +5537,14 @@ function execsc(actionPackets, callback) {
 
             if (actionPacket.o === u_handle) {
 
+                if (!actionPacket.u) {
+                    // this must be a pending share
+                    if (actionPacket.a !== 's2') {
+                        console.error('INVALID SHARE ACTION PACKET, Missing user-handle', actionPacket);
+                    }
+                }
                 // If access right are undefined then share is deleted
-                if (typeof actionPacket.r === "undefined") {
+                else if (typeof actionPacket.r === "undefined") {
                     M.delNodeShare(actionPacket.n, actionPacket.u);
                 }
                 else {
@@ -5750,10 +5757,42 @@ function execsc(actionPackets, callback) {
             tparentid = false;
             trights = false;
             __process_f1(actionPacket.t.f);
-            // async_procnodes = async_procnodes.concat(actionPacket.t.f);
         }
         else if (actionPacket.a === 'u') {
-            async_treestate.push(actionPacket);
+            var n = M.d[actionPacket.n];
+            if (n) {
+                var f = {
+                    h : actionPacket.n,
+                    k : actionPacket.k,
+                    a : actionPacket.at
+                };
+                crypto_processkey(u_handle, u_k_aes, f);
+                if (f.key) {
+                    if (f.name !== n.name) {
+                        M.onRenameUIUpdate(n.h, f.name);
+                    }
+                    if (fminitialized && f.fav !== n.fav) {
+                        if (f.fav) {
+                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
+                            $('#' + n.h + '.file-block .file-status-icon').addClass('star');
+                        }
+                        else {
+                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
+                            $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
+                        }
+                    }
+                    M.nodeAttr({
+                        h : actionPacket.n,
+                        fav : f.fav,
+                        name : f.name,
+                        key : f.key,
+                        a : actionPacket.at
+                    });
+                }
+                if (actionPacket.cr) {
+                    crypto_proccr(actionPacket.cr);
+                }
+            }
         }
         else if (actionPacket.a === 'c') {
             process_u(actionPacket.u);
@@ -5813,11 +5852,17 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'opc') {
             processOPC([actionPacket]);
-            M.drawSentContactRequests([actionPacket]);
+
+            if (fminitialized) {
+                M.drawSentContactRequests([actionPacket]);
+            }
         }
         else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
-            M.drawReceivedContactRequests([actionPacket]);
+
+            if (fminitialized) {
+                M.drawReceivedContactRequests([actionPacket]);
+            }
             notify.notifyFromActionPacket(actionPacket);
         }
         else if (actionPacket.a === 'ph') {// Export link (public handle)
@@ -5876,73 +5921,25 @@ function execsc(actionPackets, callback) {
             }
         }
     }
-    if (async_procnodes.length) {
-        process_f(async_procnodes, onExecSCDone);
+
+    if (newnodes.length > 0 && fminitialized) {
+        renderNew();
     }
-    else {
-        onExecSCDone();
+    if (loadavatars) {
+        M.avatars(loadavatars);
+    }
+    if (M.viewmode) {
+        delay('thumbnails', fm_thumbnails, 3200);
+    }
+    if ($.dialog === 'properties') {
+        propertiesDialog();
+    }
+    getsc();
+    if (callback) {
+        Soon(callback);
     }
 
-    function onExecSCDone() {
-        if (async_treestate.length) {
-            async_treestate.forEach(function(actionPacket) {
-                var n = M.d[actionPacket.n];
-                // if (d) console.log('updateTreeState', n, actionPacket);
-                if (n) {
-                    var f = {
-                        h : actionPacket.n,
-                        k : actionPacket.k,
-                        a : actionPacket.at
-                    };
-                    crypto_processkey(u_handle, u_k_aes, f);
-                    if (f.key) {
-                        if (f.name !== n.name) {
-                            M.onRenameUIUpdate(n.h, f.name);
-                        }
-                        if (fminitialized && f.fav !== n.fav) {
-                            if (f.fav) {
-                                $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                                $('#' + n.h + '.file-block .file-status-icon').addClass('star');
-                            }
-                            else {
-                                $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                                $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
-                            }
-                        }
-                        M.nodeAttr({
-                            h : actionPacket.n,
-                            fav : f.fav,
-                            name : f.name,
-                            key : f.key,
-                            a : actionPacket.at
-                        });
-                    }
-                    if (actionPacket.cr) {
-                        crypto_proccr(actionPacket.cr);
-                    }
-                }
-            });
-
-            // Remove processed item from the queue
-            async_treestate = [];
-        }
-        if (newnodes.length > 0 && fminitialized) {
-            renderNew();
-        }
-        if (loadavatars) {
-            M.avatars(loadavatars);
-        }
-        if (M.viewmode) {
-            delay('thumbnails', fm_thumbnails, 3200);
-        }
-        if ($.dialog === 'properties') {
-            propertiesDialog();
-        }
-        getsc();
-        if (callback) {
-            Soon(callback);
-        }
-    }
+    mega.flags &= ~window.MEGAFLAG_EXECSC;
 }
 
 var M = new MegaData();
@@ -6964,17 +6961,6 @@ function process_u(u) {
 
             // Update user attributes M.u
             M.addUser(u[i]);
-
-
-            // FIXME: I don't see the point of calling sharedUInode() here on contact removal.
-            //        I.e. if we're removing the shares associated with an user on their removal, then
-            //        that function should be called already doing that, otherwise that likely indicates
-            //        a bug elsewhere and we're just hiding it doing this here...
-            if (fminitialized) {
-                if (u[i].c === 0 && M.su[u[i].u]) {
-                    Object.keys(M.su[u[i].u]).forEach(sharedUInode);
-                }
-            }
         }
     }
 }

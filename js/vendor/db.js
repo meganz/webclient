@@ -165,9 +165,17 @@
                 throw 'Database has been closed';
             }
 
-            var records = Array.isArray(arguments[1])
-                ? arguments[1]
-                : [].slice.call(arguments, 1);
+            var records;
+            if (Array.isArray(arguments[1])) {
+                records = arguments[1];
+            }
+            else {
+                var len = arguments.length;
+                records = Array(len - 1);
+                for (var i = 1 ; i < len ; i++ ) {
+                    records[i - 1] = arguments[i];
+                }
+            }
 
             var transaction = db.transaction( table , transactionModes.readwrite ),
                 store = transaction.objectStore( table ),
@@ -203,7 +211,51 @@
 
         };
 
-        this.remove = function ( table , key ) {
+        this.remove = function( table ) {
+            if ( closed ) {
+                throw 'Database has been closed';
+            }
+
+            var records;
+            if (Array.isArray(arguments[1])) {
+                records = arguments[1];
+            }
+            else {
+                var len = arguments.length;
+                records = Array(len - 1);
+                for (var i = 1 ; i < len ; i++ ) {
+                    records[i - 1] = arguments[i];
+                }
+            }
+
+            var transaction = db.transaction( table , transactionModes.readwrite ),
+                store = transaction.objectStore( table ),
+                keyPath = store.keyPath;
+
+            return new Promise(function(resolve, reject){
+              records.forEach( function ( key ) {
+                  store['delete']( key );
+              });
+
+              // Let this be backward compatible with old method
+              if (records.length === 1) {
+                  records = records[0];
+              }
+
+              transaction.oncomplete = function () {
+                  resolve( records , that );
+              };
+              transaction.onerror = function ( e ) {
+                  reject({ 'records': records , 'reason': e });
+              };
+              transaction.onabort = function ( e ) {
+                  reject({ 'records': records , 'reason': e });
+              };
+            });
+
+        };
+
+        this.remove1 = function ( table , key ) {
             if ( closed ) {
                 throw 'Database has been closed';
             }

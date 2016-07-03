@@ -12,7 +12,7 @@ var inherits = (function() {
     };
 })();
 
-makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
+makeEnum(['MDBOPEN', 'EXECSC'], 'MEGAFLAG_', window);
 
 /**
  * Safely parse an HTML fragment, removing any executable
@@ -271,14 +271,14 @@ function delay(aProcID, aFunction, aTimeout) {
         aProcID = mRandomToken();
     }
 
-    if (d) {
+    if (d > 1) {
         console.debug("delay'ing", aProcID, delay.queue[aProcID]);
     }
     delay.cancel(aProcID);
 
     delay.queue[aProcID] =
         setTimeout(function() {
-            if (d) {
+            if (d > 1) {
                 console.debug('dispatching delayed function...', aProcID);
             }
             delete delay.queue[aProcID];
@@ -4181,14 +4181,6 @@ var watchdog = Object.freeze({
                         // the other tab must have sent the new sid
                         assert(sid, 'sid not set');
                         api_setsid(sid);
-
-                        if (dlmanager.isOverFreeQuota) {
-                            dlmanager._onQuotaRetry(true, sid);
-                        }
-                        else {
-                            dlmanager.uqFastTrack = 1;
-                            dlmanager._overquotaInfo();
-                        }
                     }, 2000);
                 }
                 break;
@@ -4866,7 +4858,7 @@ var debounce = function(func, execAsap) {
     return function debounced() {
         var obj = this;
         var args = arguments;
-        
+
         function delayed() {
             if (!execAsap) {
                 func.apply(obj, args);

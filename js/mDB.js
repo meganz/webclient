@@ -400,7 +400,7 @@ var mFileManagerDB = {
     },
 
     init: function mFileManagerDB_init() {
-        var db = new MegaDB("fm", u_handle, this.schema, { murSeed: 0x800F0001 });
+        var db = new MegaDB("fm", u_handle, this.schema, { murSeed: 0x800F0002 });
 
         if (mBroadcaster.crossTab.master) {
             var ieAccessError;

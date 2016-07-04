@@ -866,6 +866,9 @@ var ConversationPanel = React.createClass({
         window.addEventListener('resize', self.handleWindowResize);
         window.addEventListener('keydown', self.handleKeyDown);
 
+        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
+            self.callJustEnded = true;
+        });
 
         self.eventuallyInit();
     },
@@ -992,7 +995,7 @@ var ConversationPanel = React.createClass({
         megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
         megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
     },
-    componentDidUpdate: function() {
+    componentDidUpdate: function(prevProps, prevState) {
         var self = this;
         var room = this.props.chatRoom;
 
@@ -1010,6 +1013,19 @@ var ConversationPanel = React.createClass({
             $('.js-messages-loading', $node).addClass('hidden');
         }
         self.handleWindowResize();
+
+        if (prevState.messagesToggledInCall !== self.state.messagesToggledInCall || self.callJustEnded) {
+            if (self.callJustEnded) {
+                self.callJustEnded = false;
+            }
+            self.$messages.trigger('forceResize', [
+                true,
+                1
+            ]);
+            Soon(function() {
+                self.$messages.data('jsp').scrollToPercentY(1);
+            });
+        }
     },
     handleWindowResize: function(e, scrollToBottom) {
         var $container = $(ReactDOM.findDOMNode(this));

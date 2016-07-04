@@ -648,7 +648,7 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
  * Destroy a room (leave + UI destroy + js cleanup)
  * @param [notifyOtherDevices] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
  */
-ChatRoom.prototype.destroy = function(notifyOtherDevices) {
+ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
     var self = this;
 
     self.megaChat.trigger('onRoomDestroy', [self]);
@@ -666,7 +666,9 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 
         mc.chats.remove(roomJid);
 
-        window.location = '#fm/chat';
+        if (!noRedirect) {
+            window.location = '#fm/chat';
+        }
     });
 };
 

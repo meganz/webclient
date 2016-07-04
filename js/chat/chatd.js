@@ -205,6 +205,8 @@ Chatd.Shard = function(chatd, shard) {
 
     self.needRestore = true;
 
+    self.destroyed = false;
+
     self.connectionRetryManager = new ConnectionRetryManager(
         {
             functions: {
@@ -280,7 +282,8 @@ Chatd.Shard = function(chatd, shard) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        self.chatd.destroyed === true || localStorage.megaChatPresence === "unavailable"
+                        self.chatd.destroyed === true || localStorage.megaChatPresence === "unavailable" ||
+                            self.destroyed === true
                     );
                 }
             }
@@ -843,6 +846,31 @@ Chatd.prototype.join = function(chatId, shard, url) {
                 this.shards[shard].joinedChatIds[chatId] = true;
             }
         }
+    }
+};
+
+Chatd.prototype.leave = function(chatId) {
+    if (this.chatIdShard[chatId]) {
+        var shard = this.chatIdShard[chatId];
+
+        shard.destroyed = true;
+        shard.disconnect();
+        // do some cleanup now...
+        delete shard.joinedChatIds[chatId];
+        if (Object.keys(shard.joinedChatIds).length === 0) {
+            // close shard if no more joined chatIds are left...
+            var self = this;
+            Object.keys(this.shards).forEach(function(k) {
+                if (self.shards[k] === shard) {
+                    delete self.shards[k];
+                    return false;
+                }
+            });
+            delete shard;
+        }
+
+        delete this.chatIdMessages[chatId];
+        delete this.chatIdShard[chatId];
     }
 };
 

@@ -753,8 +753,9 @@ function initUI() {
         }
         var $target = $(e.target);
 
-        if ($target.attr('data-reactid')) {
-            return; // never return false, if this is an event triggered by a React element....
+        if ($target.attr('data-reactid') || $target.is('.chatlink')) {
+            // chat can handle its own links..no need to return false on every "click" and "element" :O
+            return;
         }
         if ($target.attr('type') !== 'file'
                 && !$target.is('.upgradelink, .campaign-logo, .resellerbuy, .linkified')) {

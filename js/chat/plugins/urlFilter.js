@@ -35,6 +35,7 @@ UrlFilter.prototype.processMessage = function(e, eventData) {
 
     eventData.message.messageHtml = Autolinker.link(messageContents, {
         truncate: 80,
+        className: 'chatlink',
         newWindow: true,
         stripPrefix: true,
         twitter: false

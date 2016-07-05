@@ -2,8 +2,16 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
+var Tooltips = require("./tooltips.jsx");
+var Forms = require("./forms.jsx");
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
+
+var ExtraFooterElement = React.createClass({
+    render() {
+        return this.props.children;
+    }
+});
 
 var ModalDialog = React.createClass({
     mixins: [MegaRenderMixin],
@@ -25,7 +33,7 @@ var ModalDialog = React.createClass({
         var $element = $(ReactDOM.findDOMNode(this));
 
         if(
-            (!e || !$(e.target).parents(".fm-dialog").is($element))
+            (!e || !$(e.target).closest(".fm-dialog").is($element))
         ) {
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
             this.onCloseClicked();
@@ -47,17 +55,39 @@ var ModalDialog = React.createClass({
             self.props.onClose(self);
         }
     },
-    renderChildren: function () {
-        return React.Children.map(this.props.children, function (child) {
-            return React.cloneElement(child, {});
-        }.bind(this))
-    },
     render: function() {
         var self = this;
 
         var classes = "fm-dialog " + self.props.className;
 
         var footer = null;
+
+        var extraFooterElements = [];
+        var otherElements = [];
+
+        var x = 0;
+        React.Children.forEach(self.props.children, function (child) {
+            if (!child) {
+                // skip if undefined
+                return;
+            }
+
+            if (
+                child.type.displayName === 'ExtraFooterElement'
+            ) {
+                extraFooterElements.push(React.cloneElement(child, {
+                    key: x++
+                }));
+            }
+            else {
+                otherElements.push(
+                    React.cloneElement(child, {
+                        key: x++
+                    })
+                );
+            }
+        }.bind(this));
+
 
         if(self.props.buttons) {
             var buttons = [];
@@ -74,6 +104,7 @@ var ModalDialog = React.createClass({
             });
 
             footer = <div className="fm-dialog-footer">
+                {extraFooterElements}
                 {buttons}
                 <div className="clear"></div>
             </div>;
@@ -88,7 +119,7 @@ var ModalDialog = React.createClass({
                     }
 
                     <div className="fm-dialog-content">
-                        {self.renderChildren()}
+                        {otherElements}
                     </div>
 
                     {footer}
@@ -175,6 +206,38 @@ var BrowserEntries = React.createClass({
             var isFolder = node.t === 1;
             var isSelected = self.state.selected.indexOf(node.h) !== -1;
 
+            var tooltipElement = null;
+
+            var icon = <span className={"transfer-filtype-icon " + fileIcon(node)}> </span>;
+
+            if (fileIcon(node) === "graphic" && node.fa) {
+                var src = thumbnails[node.h];
+                if (!src) {
+                    src = M.getNodeByHandle(node.h);
+
+
+                    M.v.push(node);
+                    if (!node.seen) {
+                        node.seen = 1; // HACK
+                    }
+                    delay('thumbnails', fm_thumbnails, 90);
+                    src = window.noThumbURI || '';
+                }
+                icon = <Tooltips.Tooltip withArrow={true}>
+                    <Tooltips.Handler className={"transfer-filtype-icon " + fileIcon(node)}> </Tooltips.Handler>
+                    <Tooltips.Contents className={"img-preview"}>
+                        <div className="dropdown img-wrapper img-block" id={node.h}>
+                            <img alt=""
+                                 className={"thumbnail-placeholder " + node.h}
+                                 src={src}
+                                 width="120"
+                                 height="120"
+                            />
+                        </div>
+                    </Tooltips.Contents>
+                </Tooltips.Tooltip>;
+            }
+
             items.push(
                 <tr
                     className={(isFolder ? " folder" :"") + (isSelected ? " ui-selected" : "")}
@@ -190,7 +253,7 @@ var BrowserEntries = React.createClass({
                         <span className={"grid-status-icon" + (node.fav ? " star" : "")}></span>
                     </td>
                     <td>
-                        <span className={"transfer-filtype-icon " + fileIcon(node)}> </span>
+                        {icon}
                         <span className={"tranfer-filetype-txt"}>{node.name}</span>
                     </td>
                     <td>{!isFolder ? bytesToSize(node.s) : ""}</td>
@@ -490,9 +553,96 @@ var SelectContactDialog = React.createClass({
     }
 });
 
+var ConfirmDialog = React.createClass({
+    mixins: [MegaRenderMixin],
+    getDefaultProps: function() {
+        return {
+            'confirmLabel': __("Continue"),
+            'cancelLabel': __("Cancel")
+        }
+    },
+    getInitialState: function() {
+        return {
+        }
+    },
+    onConfirmClicked: function() {
+        if (this.props.onConfirmClicked) {
+            this.props.onConfirmClicked();
+        }
+    },
+    render: function() {
+        var self = this;
+
+        if (mega.config.get('confirmModal_' + self.props.name) === true)  {
+            if (this.props.onConfirmClicked) {
+                // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
+                setTimeout(function() {
+                    self.props.onConfirmClicked();
+                }, 75);
+            }
+            return null;
+        }
+
+        var classes = "delete-message " + self.props.name + " " + self.props.className;
+
+        return (
+            <ModalDialog
+                title={this.props.title}
+                className={classes}
+                onClose={() => {
+                    self.props.onClose(self);
+                }}
+                buttons={[
+                        {
+                            "label": self.props.confirmLabel,
+                            "key": "select",
+                            "className": null,
+                            "onClick": function(e) {
+                                self.onConfirmClicked();
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        },
+                        {
+                            "label": self.props.cancelLabel,
+                            "key": "cancel",
+                            "onClick": function(e) {
+                                self.props.onClose(self);
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        },
+            ]}>
+                <div className="fm-dialog-content">
+                    {self.props.children}
+                </div>
+                <ExtraFooterElement>
+                    <div className="footer-checkbox">
+                        <Forms.Checkbox
+                            name="delete-confirm"
+                            id="delete-confirm"
+                            onLabelClick={(e, state) => {
+                                if (state === true) {
+                                    mega.config.set('confirmModal_' + self.props.name, true);
+                                }
+                                else {
+                                    mega.config.set('confirmModal_' + self.props.name, false);
+                                }
+                            }}
+                            >
+                            {l['7039']}
+                            </Forms.Checkbox>
+                    </div>
+                </ExtraFooterElement>
+            </ModalDialog>
+        );
+    }
+});
 
 module.exports = window.ModalDialogUI = {
     ModalDialog,
     CloudBrowserDialog,
-    SelectContactDialog
+    SelectContactDialog,
+    ConfirmDialog,
+    ExtraFooterElement
 };

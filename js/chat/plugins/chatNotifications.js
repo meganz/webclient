@@ -55,7 +55,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
             };
 
             megaRoom
-                .rebind('onAfterRenderMessage.chatNotifications', function(e, message) {
+                .rebind('onMessagesBuffAppend.chatNotifications', function(e, message) {
                     var fromContact = null;
                     if (message.userId) {
                         // contact not found.
@@ -279,12 +279,4 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
         .rebind('onCallAnswered.chatNotifications', function(e, room) {
             self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call")
         });
-
-        //// link counters
-        //self.notifications.rebind("onCounterUpdated.chatNotifications", function(e, notif, group, type) {
-        //    var room = megaChat.chats[group];
-        //    if (room) {
-        //        room.unreadCount = notif.getCounterGroup(group);
-        //    }
-        //});
 };

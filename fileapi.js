@@ -215,14 +215,23 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		}
 	};
 
+	this.directoryEntries = aFile.isDirectory() && aFile.directoryEntries;
+
 	this.readEntries = function(aCallback)
 	{
-		var entries = [], de = aFile.directoryEntries;
+		var entries = [];
 
-		while (de.hasMoreElements())
-		{
-			var file = de.getNext().QueryInterface(Ci.nsIFile);
-			entries.push(new mozDirtyGetAsEntry(file,aDataTransfer));
+		if (this.directoryEntries) {
+			var de = this.directoryEntries;
+
+			while (de.hasMoreElements()) {
+				var file = de.getNext().QueryInterface(Ci.nsIFile);
+				entries.push(new mozDirtyGetAsEntry(file,aDataTransfer));
+
+				if (entries.length > 999) {
+					break;
+				}
+			}
 		}
 
 		mozRunAsync(aCallback.bind(this, entries));

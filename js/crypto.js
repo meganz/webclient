@@ -99,12 +99,17 @@ var crypt = (function () {
      *     Mega user handle.
      * @param keyType {string}
      *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
+     * @param userData {string}
+     *     Optional argument, any provided data will be passed to the fullfiled promise.
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      */
-    ns.getPubKeyAttribute = function(userhandle, keyType) {
-        assertUserHandle(userhandle);
-        if (typeof ns.PUBKEY_ATTRIBUTE_MAPPING[keyType] === 'unknown') {
+    ns.getPubKeyAttribute = function(userhandle, keyType, userData) {
+        // According to doShare() this can be an email for RSA keyType
+        if (keyType !== 'RSA' || String(userhandle).indexOf('@') < 1) {
+            assertUserHandle(userhandle);
+        }
+        if (typeof ns.PUBKEY_ATTRIBUTE_MAPPING[keyType] === 'undefined') {
             throw new Error('Unsupported key type to retrieve: ' + keyType);
         }
 
@@ -118,19 +123,38 @@ var crypt = (function () {
             /** Function to settle the promise for the RSA pub key attribute. */
             var __settleFunction = function(res, ctx, xhr, fromCache) {
                 if (typeof res === 'object') {
+
+                    var debugUserHandle = userhandle;
+                    if (userhandle !== res.u) {
+                        debugUserHandle += ' (' + res.u + ')';
+                    }
+
                     var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
+
+                    // cache it, the legacy way.
+                    u_pubkeys[userhandle] = u_pubkeys[res.u] = pubKey;
+
                     logger.debug('Got ' + keyType + ' pub key of user '
-                                 + userhandle + ': ' + JSON.stringify(pubKey));
+                                 + debugUserHandle + ': ' + JSON.stringify(pubKey));
 
                     if (!fromCache && attribCache) {
-                        attribCache.setItem(cacheKey, JSON.stringify(res));
+                        // if an email was provided, cache it using the user-handle
+                        if (String(userhandle).indexOf('@') > 0) {
+                            cacheKey = res.u + "_@uk";
+                        }
+                        attribCache.setItem(cacheKey, JSON.stringify(res))
+                            .always(function() {
+                                masterPromise.resolve(pubKey, [res, userData]);
+                            });
                     }
-                    masterPromise.resolve(pubKey);
+                    else {
+                        masterPromise.resolve(pubKey, [res, userData]);
+                    }
                 }
                 else {
                     logger.error(keyType + ' pub key for ' + userhandle
                                  + ' could not be retrieved: ' + res);
-                    masterPromise.reject(res);
+                    masterPromise.reject(res, [res, userData]);
                 }
             };
 
@@ -140,7 +164,7 @@ var crypt = (function () {
 
             var __retrieveRsaKeyFunc = function() {
                 // Fire it off.
-                api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+                api_req({ 'a': 'uk', 'u': userhandle, 'i': requesti }, myCtx);
             };
 
             if (attribCache) {
@@ -159,7 +183,6 @@ var crypt = (function () {
             else {
                 __retrieveRsaKeyFunc();
             }
-
         }
         else {
             var pubKeyPromise = mega.attr.get(userhandle,
@@ -222,13 +245,13 @@ var crypt = (function () {
      *     Key type of pub key. Can be one of 'Cu25519' or 'RSA'.
      * @param signingKey {string}
      *     Ed25519 key needed to verify the signature.
-     * @return
+     * @return {MegaPromise}
      *     The signature verification result. true for success, false for
      *     failure and null for a missing signature.
      */
     ns._checkSignature = function(signature, pubKey, keyType, signingKey) {
         if (signature === '') {
-            return null;
+            return MegaPromise.resolve(null);
         }
 
         return authring.verifyKey(signature, pubKey, keyType, signingKey);
@@ -388,61 +411,72 @@ var crypt = (function () {
 
         // Get Ed25519 key and signature to verify for all non-Ed25519 pub keys.
 
-        /** Verify signature of signed pub keys. */
+        /**
+         * Verify signature of signed pub keys.
+         *
+         * @param {Array} result  This is an array of arrays (`arguments`) for each
+         *                        resolved promise as processed by MegaPromise.all()
+         * @private
+         */
         var __resolveSignatureVerification = function(result) {
             var pubKey = result[0];
+            if (keyType === 'RSA') {
+                // getPubKeyAttribute returned more than a single argument
+                pubKey = pubKey[0];
+            }
             var signingKey = result[1];
             var signature = base64urldecode(result[2]);
-            var signatureVerification = ns._checkSignature(signature, pubKey,
-                                                           keyType, signingKey);
-            if (authMethod === false) {
-                // Authring check fails, but could be a new key.
-                if (signatureVerification === true) {
-                    // Record good (new) signature.
-                    newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
-                    pubKeyCache[userhandle] = pubKey;
-                    masterPromise.resolve(pubKey);
-                }
-                else {
-                    // Mismatch on authring, but no new signature,
-                    // or failed signature verification: Choke!
-                    newAuthMethod = undefined;
-                    ns._showKeySignatureFailureException(userhandle, keyType);
-                    masterPromise.reject(EINTERNAL);
-                }
-            }
-            else {
-                // Not seen previously or not verified, yet.
-                if (signatureVerification === null) {
-                    var authRecord = authring.getContactAuthenticated(userhandle, keyType);
-                    if ((authRecord === false) || (fingerprint === authRecord.fingerprint)) {
-                        // Can only record it seen.
-                        newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
-                        pubKeyCache[userhandle] = pubKey;
-                        masterPromise.resolve(pubKey);
+            ns._checkSignature(signature, pubKey, keyType, signingKey)
+                .done(function(signatureVerification) {
+                    if (authMethod === false) {
+                        // Authring check fails, but could be a new key.
+                        if (signatureVerification === true) {
+                            // Record good (new) signature.
+                            newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                            pubKeyCache[userhandle] = pubKey;
+                            masterPromise.resolve(pubKey);
+                        }
+                        else {
+                            // Mismatch on authring, but no new signature,
+                            // or failed signature verification: Choke!
+                            newAuthMethod = undefined;
+                            ns._showKeySignatureFailureException(userhandle, keyType);
+                            masterPromise.reject(EINTERNAL);
+                        }
                     }
                     else {
-                        newAuthMethod = undefined;
-                        ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
-                                                             authRecord.fingerprint,
-                                                             fingerprint);
-                        masterPromise.reject(EINTERNAL);
+                        // Not seen previously or not verified, yet.
+                        if (signatureVerification === null) {
+                            var authRecord = authring.getContactAuthenticated(userhandle, keyType);
+                            if ((authRecord === false) || (fingerprint === authRecord.fingerprint)) {
+                                // Can only record it seen.
+                                newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
+                                pubKeyCache[userhandle] = pubKey;
+                                masterPromise.resolve(pubKey);
+                            }
+                            else {
+                                newAuthMethod = undefined;
+                                ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
+                                    authRecord.fingerprint,
+                                    fingerprint);
+                                masterPromise.reject(EINTERNAL);
+                            }
+                        }
+                        else if (signatureVerification === true) {
+                            // Record good signature.
+                            newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                            pubKeyCache[userhandle] = pubKey;
+                            masterPromise.resolve(pubKey);
+                        }
+                        else {
+                            // Failed signature verification: Choke!
+                            ns._showKeySignatureFailureException(userhandle, keyType);
+                        }
                     }
-                }
-                else if (signatureVerification === true) {
-                    // Record good signature.
-                    newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
-                    pubKeyCache[userhandle] = pubKey;
-                    masterPromise.resolve(pubKey);
-                }
-                else {
-                    // Failed signature verification: Choke!
-                    ns._showKeySignatureFailureException(userhandle, keyType);
-                }
-            }
 
-            // Finish off.
-            __finish(pubKey, authMethod, newAuthMethod);
+                    // Finish off.
+                    __finish(pubKey, authMethod, newAuthMethod);
+                });
         };
 
         if (keyType === 'Ed25519') {
@@ -594,8 +628,8 @@ var crypt = (function () {
      */
     ns.setPubKey = function(pubKey, keyType) {
         var keyCache = ns.getPubKeyCacheMapping(keyType);
-        if (typeof keyCache === 'unknown') {
-            throw('Illegal key type to set: ' + keyType);
+        if (typeof keyCache === 'undefined') {
+            throw new Error('Illegal key type to set: ' + keyType);
         }
         logger.debug('Setting ' + keyType + ' public key', u_handle, pubKey);
         keyCache[u_handle] = pubKey;
@@ -688,7 +722,16 @@ var crypt = (function () {
         // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         if (localStorage.hideCryptoWarningDialogs !== '1') {
-            mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+            var showDialog = function() {
+                mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+            };
+
+            if (fminitialized) {
+                showDialog();
+            }
+            else {
+                mBroadcaster.once('fm:initialized', showDialog);
+            }
         }
 
         // Remove the cached key, so the key will be fetched and checked against
@@ -724,7 +767,16 @@ var crypt = (function () {
         // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         if (localStorage.hideCryptoWarningDialogs !== '1') {
-            mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+            var showDialog = function() {
+                mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
+            };
+
+            if (fminitialized) {
+                showDialog();
+            }
+            else {
+                mBroadcaster.once('fm:initialized', showDialog);
+            }
         }
 
         logger.error(keyType + ' signature does not verify for user '
@@ -1695,6 +1747,18 @@ function api_reset() {
 function api_setsid(sid) {
     if (sid !== false) {
         watchdog.notify('setsid', sid);
+
+        if (typeof dlmanager === 'object'
+                && dlmanager.isOverQuota) {
+
+            if (dlmanager.isOverFreeQuota) {
+                dlmanager._onQuotaRetry(true, sid);
+            }
+            else {
+                dlmanager.uqFastTrack = 1;
+                dlmanager._overquotaInfo();
+            }
+        }
         sid = 'sid=' + sid;
     }
     else {
@@ -2313,6 +2377,11 @@ function api_getsid(ctx, user, passwordkey, hash) {
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
+    if (api_getsid.etoomany + 3600000 > Date.now()) {
+        api_getsid.warning();
+        return ctx.result(ctx, false);
+    }
+
     api_req({
         a: 'us',
         user: user,
@@ -2320,11 +2389,25 @@ function api_getsid(ctx, user, passwordkey, hash) {
     }, ctx);
 }
 
+api_getsid.warning = function() {
+    var time = new Date(api_getsid.etoomany + 3780000).toLocaleTimeString();
+
+    msgDialog('warningb', l[882], l[8855].replace('%1', time));
+};
+
 function api_getsid2(res, ctx) {
     var t, k;
     var r = false;
 
-    if (typeof res === 'object') {
+    if (typeof res === 'number') {
+
+        if (res === ETOOMANY) {
+
+            api_getsid.etoomany = Date.now();
+            api_getsid.warning();
+        }
+    }
+    else if (typeof res === 'object') {
         var aes = new sjcl.cipher.aes(ctx.passwordkey);
 
         // decrypt master key
@@ -2345,8 +2428,18 @@ function api_getsid2(res, ctx) {
                 }
                 else if (typeof res.csid === 'string') {
                     var t = base64urldecode(res.csid);
+                    var privk = null;
 
-                    var privk = crypto_decodeprivkey(a32_to_str(decrypt_key(aes, base64_to_a32(res.privk))));
+                    try {
+                        privk = crypto_decodeprivkey(a32_to_str(decrypt_key(aes, base64_to_a32(res.privk))));
+                    }
+                    catch (ex) {
+                        console.error('Error decoding private RSA key!', ex);
+
+                        Soon(function() {
+                            msgDialog('warninga', l[135], l[8853]);
+                        });
+                    }
 
                     if (privk) {
                         // TODO: check remaining padding for added early wrong password detection likelihood
@@ -2425,6 +2518,75 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
     api_req(req, ctx);
 }
 
+/**
+ * Set node attribute.
+ * @param {String}  handle The node's handle.
+ * @param {Object}  attrs  Attributes.
+ * @param {Boolean} shrink Use one-letter attrs.
+ * @return {MegaPromise}
+ */
+function api_setattr(handle, attrs, shrink) {
+    var promise = new MegaPromise();
+    var logger = MegaLogger.getLogger('crypt');
+
+    if (!Object(M.d).hasOwnProperty(handle)) {
+        promise.reject(ENOENT);
+    }
+    else if (typeof attrs !== 'object'
+            || !Object.keys(attrs).length) {
+
+        promise.reject(EARGS);
+    }
+    else {
+        var node = M.d[handle];
+        var ar = Object(node.ar);
+        var cache = {h: handle};
+        var callback = {
+            callback: function(res) {
+                if (res !== 0) {
+                    logger.error('api_setattr', ar, res);
+                    promise.reject(res);
+                }
+                else {
+                    promise.resolve(res);
+                }
+            }
+        };
+
+        for (var i in attrs) {
+            if (attrs.hasOwnProperty(i)) {
+                var name = (shrink ? i[0] : i);
+
+                if (d && ar.hasOwnProperty(name) && ar[name] === attrs[i]) {
+                    logger.warn('api_setattr: attribute "%s" already exists.', name);
+                }
+
+                cache[i] = attrs[i];
+                ar[name] = attrs[i];
+            }
+        }
+
+        try {
+            var mkat = enc_attr(ar, node.key);
+            var attr = ab_to_base64(mkat[0]);
+            var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
+
+            logger.debug('Setting node attributes for "%s"...', handle, cache, ar);
+
+            cache.a = attr;
+            M.nodeAttr(cache);
+
+            api_req({ a: 'a', n: handle, attr: attr, key: key, i: requesti }, callback);
+        }
+        catch (ex) {
+            logger.error(ex);
+            promise.reject(ex);
+        }
+    }
+
+    return promise;
+}
+
 function stringhash(s, aes) {
     var s32 = str_to_a32(s);
     var h32 = [0, 0, 0, 0];
@@ -2473,17 +2635,30 @@ function api_cachepubkeys(users) {
         keyPromises.push(crypt.getPubRSA(u[i]));
     }
 
-    // Make a promise for the bunch of them, and define settlement handlers.
-    var compoundPromise = MegaPromise.all(keyPromises);
-    compoundPromise.done(function __getKeysDone() {
-        logger.debug('Cached RSA pub keys for users ' + JSON.stringify(u));
-    });
-    compoundPromise.fail(function __getKeysFail(reason) {
-        logger.error('Failed to cache RSA pub keys for users' + JSON.stringify(u)
-                     + ': ' + reason);
-    });
+    var gotPubRSAForEveryone = function() {
+        for (i = u.length; i--;) {
+            if (!u_pubkeys[u[i]]) {
+                return false;
+            }
+        }
+        return true;
+    };
+    var promise = new MegaPromise();
 
-    return compoundPromise;
+    // Make a promise for the bunch of them, and define settlement handlers.
+    MegaPromise.allDone(keyPromises)
+        .always(function __getKeysDone() {
+            if (gotPubRSAForEveryone()) {
+                logger.debug('Cached RSA pub keys for users ' + JSON.stringify(u));
+                promise.resolve.apply(promise, arguments);
+            }
+            else {
+                logger.warn('Failed to cache RSA pub keys for users' + JSON.stringify(u), arguments);
+                promise.reject.apply(promise, arguments);
+            }
+        });
+
+    return promise;
 }
 
 /**
@@ -3080,7 +3255,9 @@ var faxhrlastgood = {};
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id, type, key, data, ctx) {
-    if (!ctx) {
+    var handle = typeof ctx === 'string' && ctx;
+
+    if (typeof ctx !== 'object') {
         if (!storedattr[id]) {
             storedattr[id] = {};
         }
@@ -3094,15 +3271,22 @@ function api_storefileattr(id, type, key, data, ctx) {
             id: id,
             type: type,
             data: data,
+            handle: handle,
             startTime: Date.now()
         };
     }
 
-    api_req({
+    var req = {
         a: 'ufa',
         s: ctx.data.byteLength,
         ssl: use_ssl
-    }, ctx, n_h ? 1 : 0);
+    };
+
+    if (M.d[ctx.handle] && RightsbyID(ctx.handle) > 1) {
+        req.h = handle;
+    }
+
+    api_req(req, ctx, n_h ? 1 : 0);
 }
 
 function api_getfileattr(fa, type, procfa, errfa) {
@@ -3514,6 +3698,10 @@ function api_faretry(ctx, error, host) {
         ctx.faRetryI = 250;
     }
 
+    if (!ctx.p && error === EACCESS) {
+        api_pfaerror(ctx.handle);
+    }
+
     if (ctx.errfa && ctx.errfa.timeout && ctx.faRetryI > ctx.errfa.timeout) {
         api_faerrlauncher(ctx, host);
     }
@@ -3783,12 +3971,32 @@ function api_attachfileattr(node, id) {
     storedattr[id].target = node;
 
     if (fa) {
-        api_req({
-            a: 'pfa',
-            n: node,
-            fa: fa
+        var logger = MegaLogger.getLogger('crypt');
+
+        api_req({ a: 'pfa', n: node, fa: fa }, {
+            callback: function(res) {
+                if (res === EACCESS) {
+                    api_pfaerror(node);
+                }
+            }
         });
     }
+}
+
+/** handle ufa/pfa EACCESS error */
+function api_pfaerror(handle) {
+    var node = M.getNodeByHandle(handle);
+
+    if (d) {
+        console.warn('api_pfaerror for %s', handle, node);
+    }
+
+    // Got access denied, store 'f' attr to prevent subsequent attemps
+    if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
+        return api_setattr(node.h, {f: u_handle});
+    }
+
+    return false;
 }
 
 // generate crypto request response for the given nodes/shares matrix
@@ -4047,8 +4255,12 @@ function crypto_processkey(me, master_aes, file) {
                 file.key = k;
                 file.ar = o;
                 file.name = file.ar.n;
-                if (file.ar.fav) {
-                    file.fav = 1;
+
+                var exclude = {t:1, c:1, n:1};
+                for (var j in o) {
+                    if (o.hasOwnProperty(j) && !exclude[j]) {
+                        file[j] = o[j];
+                    }
                 }
 
                 success = true;
@@ -4502,3 +4714,64 @@ function api_strerror(errno) {
         }
     };
 })(this);
+
+
+(function() {
+    var backgroundNacl = {};
+    backgroundNacl.workers = null;
+    backgroundNacl.requiresWorkersInit = function() {
+        var numberOfWorkers = mega.maxWorkers;
+
+        if (backgroundNacl.workers === null) {
+            backgroundNacl.workers = CreateWorkers('naclworker.js', function(context, e, release) {
+                release(e.data);
+            }, numberOfWorkers);
+        }
+    };
+
+    var x = 0;
+
+    Object.defineProperty(window, 'backgroundNacl', { value: backgroundNacl });
+
+    // create aliases for all (used by us) nacl funcs, that return promises
+    backgroundNacl.sign = {
+        'detached' : {
+            /**
+             * Alias of nacl.sign.detached.verify.
+             *
+             * Note: msg, sig and publicKey should be strings, NOT ArrayBuffers as when using nacl directly.
+             *
+             * @param msg
+             * @param sig
+             * @param publicKey
+             * @returns {MegaPromise}
+             */
+            'verify': function(msg, sig, publicKey) {
+                backgroundNacl.requiresWorkersInit();
+
+                var masterPromise = new MegaPromise();
+
+                backgroundNacl.workers.push(
+                    [
+                        "req" + (x++),
+                        [
+                            "verify", msg, sig, publicKey
+                        ]
+                    ],
+                    function() {
+                        masterPromise.resolve(
+                            arguments[1][0]
+                        );
+                    }
+                );
+
+                return masterPromise;
+            }
+        }
+    };
+
+    mBroadcaster.once('startMega', function _setupBackgroundNacl() {
+        backgroundNacl.requiresWorkersInit();
+    });
+
+})();

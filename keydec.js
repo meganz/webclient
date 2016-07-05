@@ -195,11 +195,18 @@ function crypto_processkey(me, master_aes, file, OUT) {
                 OUT.key = k;
                 OUT.ar = o;
                 OUT.name = o.n;
-                if (o.fav) {
-                    OUT.fav = 1;
-                }
+
                 if (file.hash) {
                     OUT.hash = file.hash;
+                }
+
+                var exclude = {t:1, c:1, n:1};
+                for (var j in o) {
+                    if (o.hasOwnProperty(j)) {
+                        if (!exclude[j]) {
+                            OUT[j] = o[j];
+                        }
+                    }
                 }
 
                 success = true;

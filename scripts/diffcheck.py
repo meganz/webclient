@@ -34,6 +34,7 @@ import tempfile
 import subprocess
 import collections
 import config
+from subprocess import CalledProcessError
 
 PLATFORMS = {'posix': 'posix',
              'nt': 'win32'}
@@ -86,6 +87,44 @@ def get_git_line_sets(base, target):
 
     return file_line_mapping
 
+def get_commits_in_branch(current_branch=None):
+    protected_branches = ['master', 'develop', 'old-design']
+
+    if current_branch is None:
+        try:
+            command = 'git symbolic-ref --short -q HEAD'
+            current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
+        except CalledProcessError as e:
+            logging.warn('Unable to query current branch.')
+            return -1, 0
+
+    if current_branch in protected_branches:
+        logging.warn('In protected branch ({})'.format(current_branch))
+        return -1, 0
+
+    command = 'git rev-list --no-merges --count develop..{}'.format(current_branch)
+    commits = int(subprocess.check_output(command.split()).decode('utf8'))
+    # logging.info('{} commits in branch {}'.format(commits, current_branch))
+
+    command = 'git shortlog -s --no-merges develop..{}'.format(current_branch)
+    authors = len(subprocess.check_output(command.split()).decode('utf8').rstrip().split('\n'))
+    # logging.info('{} authors worked in branch {}'.format(authors, current_branch))
+
+    return commits, authors
+
+def pick_files_to_test(file_line_mapping, extensions=None, exclude=None):
+    if extensions is None:
+        extensions = ['js']
+
+    files_to_test = [os.path.join(*x)
+                     for x in file_line_mapping.keys()
+                     if x[-1].split('.')[-1] in extensions]
+
+    if exclude is not None:
+        files_to_test = [x for x in files_to_test if not exclude.match(x)]
+
+    # logging.info(files_to_test)
+    return files_to_test
 
 def reduce_jshint(file_line_mapping, **extra):
     """
@@ -104,9 +143,7 @@ def reduce_jshint(file_line_mapping, **extra):
     # Get the JSHint output.
     os.chdir(PROJECT_PATH)
     rules = config.JSHINT_RULES if not norules else ''
-    files_to_test = [os.path.join(*x)
-                     for x in file_line_mapping.keys()
-                     if x[-1].split('.')[-1] in ['js', 'jsx']]
+    files_to_test = pick_files_to_test(file_line_mapping)
 
     if len(files_to_test) == 0:
         logging.info('JSHint: No modified JavaScript files found.')
@@ -170,9 +207,7 @@ def reduce_jscs(file_line_mapping, **extra):
     # Get the JSCS output.
     os.chdir(PROJECT_PATH)
     rules = config.JSCS_RULES if not norules else ''
-    files_to_test = [os.path.join(*x)
-                     for x in file_line_mapping.keys()
-                     if x[-1].split('.')[-1] in ['js', 'jsx']]
+    files_to_test = pick_files_to_test(file_line_mapping)
 
     if len(files_to_test) == 0:
         logging.info('JSCS: No modified JavaScript files found.')
@@ -200,14 +235,18 @@ def reduce_jscs(file_line_mapping, **extra):
 
     # Go through output and collect only relevant lines to the result.
     result = ['\nJSCS output:\n============']
-    lines_expression = re.compile(r'^ +(\d+) |.*(?:\n|\r\n?)-', re.MULTILINE)
+    # lines_expression = re.compile(r'^ +(\d+) |.*(?:\n|\r\n?)-', re.MULTILINE)
+    lines_expression = re.compile(r'^ +(\d+) |-', re.MULTILINE)
     file_expression = re.compile(r'^[^\b].* (?:\./)?(.+) :$', re.MULTILINE)
     for item in output:
         # Do the processing for every block here.
         line_no_candidates = lines_expression.findall(item, re.MULTILINE)
+        idx = 0
+        while line_no_candidates and line_no_candidates.index('', idx) == idx:
+            idx = idx + 1;
         # Check if we've got a relevant block.
         if line_no_candidates and '' in line_no_candidates:
-            line_no = int(line_no_candidates[line_no_candidates.index('') - 1])
+            line_no = int(line_no_candidates[line_no_candidates.index('', idx) - 1])
             file_name = file_expression.findall(item)[0]
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list.
@@ -241,9 +280,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
     # Get the HTMLHint output.
     os.chdir(PROJECT_PATH)
     rules = config.HTMLHINT_RULES if not norules else ''
-    files_to_test = [os.path.join(*x)
-                     for x in file_line_mapping.keys()
-                     if x[-1].split('.')[-1] in ['htm', 'html']]
+    files_to_test = pick_files_to_test(file_line_mapping, ['htm', 'html'], re.compile('dont-deploy'))
 
     if len(files_to_test) == 0:
         logging.info('HTMLHint: No modified HTML files found.')
@@ -334,7 +371,7 @@ def reduce_validator(file_line_mapping, **extra):
             continue
 
         # Ignore this specific file types
-        if file_extension in ['.json','.py','.sh', '.svg', '.css']:
+        if file_extension in ['.json','.py','.sh', '.svg', '.css', '.html']:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file
@@ -555,7 +592,7 @@ def reduce_verapp(file_line_mapping, **extra):
     return '\n'.join(result), error_count
 
 
-def main(base, target, norules):
+def main(base, target, norules, branch):
     """
     Run the JSHint and JSCS tests and present output ont eh console via print.
     """
@@ -592,6 +629,15 @@ def main(base, target, norules):
         print('\n\n'.join(results).rstrip())
         sys.exit(1)
 
+    branch_commits, authors = get_commits_in_branch(branch)
+    if branch_commits > 10:
+        print('\nToo many commits in this branch, please squash them using scripts/squash.sh')
+        if authors > 1:
+            print('WARNING: {} authors have contributed in this branch, '
+                  'consider squashing your commits only\n         by manually running '
+                  '"git rebase -i --autosquash develop", unless they do not care.'.format(authors))
+        sys.exit(1)
+
     print('\nEverything seems Ok.')
 
 
@@ -609,6 +655,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
     parser.add_argument('--norules', default=False, action='store_true',
                         help="Don't show rule names with description (default: show rules names)")
+    parser.add_argument('--branch', type=str, help='Source branch name.', required=False, default=None)
     parser.add_argument('base',
                         help='base revision or name of base branch')
     parser.add_argument('target', nargs='?', default='',
@@ -617,4 +664,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.base, args.target, args.norules)
+    main(args.base, args.target, args.norules, args.branch)

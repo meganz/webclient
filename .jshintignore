@@ -21,6 +21,7 @@ aesasm.js
 keygen.js
 keydec.js
 karma.conf.js
+nacl-fast.js
 js/chat/mpenc.js
 js/cmsSnapshot.js
 js/chat/bundle.js

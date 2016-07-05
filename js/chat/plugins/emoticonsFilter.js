@@ -8,8 +8,6 @@
 var EmoticonsFilter = function(megaChat) {
     var self = this;
 
-    //RegExpEscape
-
     var escapedRegExps = [];
     $.each(EMOJILIST.EMOJIS, function(slug, meta) {
         var txt = ":" + slug + ":";

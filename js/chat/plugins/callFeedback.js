@@ -48,7 +48,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                     'type': 'primary',
                                     'classes': 'default-white-button small-text left',
                                     'icon': 'refresh-circle',
-                                    'text': __("Send Feedback"),
+                                    'text': __(l[1403]),
                                     'callback': function() {
                                         var feedbackDialog = mega.ui.FeedbackDialog.singleton(
                                             $(this),
@@ -68,7 +68,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                 'noThanks': {
                                     'type': 'secondary',
                                     'classes': 'default-white-button small-text left red',
-                                    'text': __("No thanks"),
+                                    'text': __(l[8898]),
                                     'callback': function() {
                                         megaRoom.messagesBuff.removeMessageById(msgId);
                                         megaRoom.trigger('resize');

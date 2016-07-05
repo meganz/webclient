@@ -10,10 +10,26 @@ var u_privk; // private key
 // returns user type if successful, false if not
 // valid user types are: 0 - anonymous, 1 - email set, 2 - confirmed, but no RSA, 3 - complete
 function u_login(ctx, email, password, uh, permanent) {
+    var keypw;
+
     ctx.result = u_login2;
     ctx.permanent = permanent;
 
-    api_getsid(ctx, email, prepare_key_pw(password), uh);
+    // check whether the pwd came from the browser manager
+    var pwdman = passwordManager.getStoredCredentials(password);
+    if (pwdman) {
+        uh = pwdman.hash;
+        keypw = pwdman.keypw;
+
+        if (d) {
+            console.log('Using pwdman credentials.');
+        }
+    }
+    else {
+        keypw = prepare_key_pw(password);
+    }
+
+    api_getsid(ctx, email, keypw, uh);
 }
 
 function u_login2(ctx, ks) {
@@ -376,8 +392,17 @@ function changepw(currentpw, newpw, ctx) {
     }, ctx);
 }
 
-// an anonymous account must be present - check / create before calling
-function sendsignuplink(name, email, password, ctx) {
+/**
+ * Send account signup/confirmation link.
+ *  an anonymous account must be present - check / create before calling
+ *
+ * @param {String}  name     The user's full name
+ * @param {String}  email    His email
+ * @param {String}  password The password chosen
+ * @param {Object}  ctx      The usual object with a callback to receive the result
+ * @param {Boolean} pro      Whether the signup is part of a pro purchase
+ */
+function sendsignuplink(name, email, password, ctx, pro) {
     var pw_aes = new sjcl.cipher.aes(prepare_key_pw(password));
     var req = {
         a: 'uc',
@@ -386,6 +411,10 @@ function sendsignuplink(name, email, password, ctx) {
         n: base64urlencode(to8(name)),
         m: base64urlencode(email)
     };
+
+    if (pro === true) {
+        req.p = 1;
+    }
 
     api_req(req, ctx);
 }
@@ -506,56 +535,19 @@ function generateAvatarMeta(user_hash) {
 
     var contact = M.u[user_hash];
     if (!contact) {
-        console.error('contact not found');
+        // console.error('contact not found');
         contact = {}; // dummy obj.
     }
 
     var fullName = M.getNameByHandle(user_hash);
 
-    var shortName = fullName.substr(0, 1).toUpperCase();
-    var avatar = avatars[contact.u];
-
-    var color = 1;
-
-    if (contact.shortName && contact.displayColor) { // really simple in-memory cache
-        shortName = contact.shortName;
-        color = contact.displayColor;
-    }
-    else {
-        M.u.forEach(function(k, v) {
-            var c = M.u[v];
-            var n = M.getNameByHandle(v);
-
-            if (!n || !c) {
-                return; // skip, contact not found
-            }
-
-            var dn;
-            if (shortName.length == 1) {
-                dn = _generateReadableContactNameFromStr(n, true);
-            }
-            else {
-                dn = _generateReadableContactNameFromStr(n, false);
-            }
-
-            if (c.u == contact.u) {
-                color = k % 10;
-            }
-            else if (dn == shortName) { // duplicate name, if name != my current name
-                shortName = _generateReadableContactNameFromStr(fullName, false);
-            }
-        });
-
-        contact.shortName = shortName;
-        contact.displayColor = color;
-    }
-
-    meta.color = color;
-    meta.shortName = shortName;
+    var ua_meta = useravatar.generateContactAvatarMeta(user_hash);
+    meta.color = ua_meta.avatar.colorIndex;
+    meta.shortName = ua_meta.avatar.letters;
     meta.fullName = fullName;
 
-    if (avatar) {
-        meta.avatarUrl = avatar.url;
+    if (ua_meta.type === 'image') {
+        meta.avatarUrl = ua_meta.avatar;
     }
     return meta;
 }
@@ -1095,11 +1087,8 @@ function checkUserLogin() {
 
         var push = function() {
             if (u_type === 3 && !pfid && !folderlink) {
-                if (timer) {
-                    clearTimeout(timer);
-                }
                 // through a timer to prevent floods
-                timer = setTimeout(store, 9701);
+                timer = delay('fmconfig:store', store, 9701);
             }
             else {
                 localStorage.fmconfig = JSON.stringify(fmconfig);
@@ -1519,6 +1508,7 @@ function uaPacketParser(attrName, userHandle, ownActionPacket) {
         .always(function _uaPacketParser() {
             if (attrName === 'firstname'
                     || attrName === 'lastname') {
+                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
                 M.syncUsersFullname(userHandle);
             }
             else if (ownActionPacket) {

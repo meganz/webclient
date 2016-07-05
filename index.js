@@ -66,6 +66,7 @@ function startMega() {
     }
 
     mBroadcaster.sendMessage('zoomLevelCheck');
+    $('#pwdmanhelper input').val('');
 }
 
 function mainScroll() {
@@ -78,15 +79,15 @@ function mainScroll() {
     });
     $('.main-scroll-block').unbind('jsp-scroll-y');
     jScrollFade('.main-scroll-block');
-    if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
+    if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
         scrollMenu();
     }
 }
 
 function scrollMenu() {
     $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
-        if (page == 'doc' || page.substr(0, 4) == 'help' || page == 'cpage') {
-            var sc = scrollPositionY - 30;
+        if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
+            var sc = scrollPositionY + 30;
             if (isAtTop) {
                 sc = 30;
             }
@@ -120,11 +121,6 @@ function init_page() {
     }
     else {
         $('body').attr('class', '');
-    }
-
-    // Initialise the Public Service Announcement system
-    if (typeof psa !== 'undefined') {
-        psa.init();
     }
 
     // Add language class to body for CSS fixes for specific language strings
@@ -165,7 +161,7 @@ function init_page() {
     if (!page.match(/^(blog|help|corporate|page_)/)) {
         $('.top-head').remove();
     }
-    $('#loading').hide();
+    $('#loading:visible').hide();
     if (window.loadingDialog) {
         loadingDialog.hide();
     }
@@ -228,12 +224,6 @@ function init_page() {
     }
     else if (!flhashchange || page !== 'fm/transfers') {
         n_h = false;
-        if (u_sid) {
-            api_setsid(u_sid);
-            if (waitxhr) {
-                waitsc();
-            }
-        }
         u_n = false;
         pfkey = false;
         pfid = false;
@@ -262,12 +252,34 @@ function init_page() {
         closeDialog();
     }
 
+    if (localStorage.awaitingConfirmationAccount) {
+        var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
+
+        // if visiting a #confirm link, or they confirmed it elsewhere.
+        if (confirmcode || u_type > 1) {
+            delete localStorage.awaitingConfirmationAccount;
+        }
+        else {
+            return mega.ui.sendSignupLinkDialog(acc);
+        }
+    }
+
     var fmwasinitialized = !!fminitialized;
     if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid)) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
             if ((!pfid && folderlink) || (pfid && folderlink === 0)) {
+
+                // re-initialize waitd connection when switching.
+                if (!pfid && folderlink && u_sid) {
+                    api_setsid(u_sid);
+
+                    if (waitxhr) {
+                        waitsc();
+                    }
+                }
+
                 M.reset();
                 folderlink = 0;
                 fminitialized = false;
@@ -570,11 +582,11 @@ function init_page() {
                 return;
             }
             loadingDialog.show();
-            CMS.watch('help2:' + lang, function () {
+            CMS.watch('help.' + lang, function () {
                 window.helpTemplate = null;
                 doRenderHelp();
             });
-            CMS.get(['help2:' + lang, 'help:' + lang + '.json'], function (err, content, json) {
+            CMS.get(['help.' + lang, 'help.' + lang + '.json'], function (err, content, json) {
                 helpdata = json.object
                 parsepage(window.helpTemplate = content.html);
                 init_help();
@@ -655,15 +667,17 @@ function init_page() {
         }
     }
     else if (page == 'about') {
-        parsepage(pages['about']);
-        $('.team-person-block').removeClass('first');
-        var html = '';
-        var a = 4;
+        loadingDialog.show();
+        CMS.get("team", function(err, content) {
+            parsepage(pages['about']);
 
-        $('.team-person-block').sort(function () {
+            var html = '';
+            var a = 4;
+
+            $('.about').safeHTML(content.html);
+            $('.team-person-block').sort(function () {
                 return (Math.round(Math.random()) - 0.5);
-            })
-            .each(function (i, element) {
+            }).each(function (i, element) {
                 if (a == 4) {
                     html += element.outerHTML.replace('team-person-block', 'team-person-block first');
                     a = 0;
@@ -674,10 +688,15 @@ function init_page() {
                 a++;
             });
 
-        $('#emailp').html($('#emailp').text().replace('jobs@mega.nz',
-            '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
-        $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
-        mainScroll();
+            $('#emailp').safeHTML($('#emailp').text().replace('jobs@mega.nz',
+                '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
+            $('.new-bottom-pages.about').safeHTML(html + '<div class="clear"></div>');
+            topmenuUI();
+            loadingDialog.hide();
+            mainScroll();
+
+        });
+        return;
     }
     else if (page == 'sourcecode') {
         parsepage(pages['sourcecode']);
@@ -702,6 +721,17 @@ function init_page() {
             $('#copyright_en').removeClass('hidden');
             mainScroll();
         }
+    }
+    else if (page === 'disputenotice') {
+        parsepage(pages['disputenotice']);
+        copyright.init_cndispute();
+    }
+    else if (page === 'dispute') {
+        parsepage(pages['dispute']);
+        $('.reg-st5-complete-button').rebind('click', function (e) {
+            document.location.hash = 'disputenotice';
+        });
+        mainScroll();
     }
     else if (page.substr(0, 3) == 'pro') {
         var tmp = page.split('/uao=');
@@ -939,6 +969,16 @@ function init_page() {
     else {
         location.assign('/');
     }
+    
+    // Initialise the Public Service Announcement system
+    if (typeof psa !== 'undefined') {
+        psa.init();
+    }
+    
+    // Initialise the update check system
+    if (typeof alarm !== 'undefined') {
+        alarm.siteUpdate.init();
+    }
     topmenuUI();
     loggedout = false;
     flhashchange = false;
@@ -1123,6 +1163,11 @@ function topmenuUI() {
         $('.top-menu-item.logout,.context-menu-divider.logout').show();
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
         $('.fm-avatar').show();
+        $('.top-login-button').hide();
+        $('.membership-status').show();
+        $('.top-change-language').hide();
+        $('.create-account-button').hide();
+        $('.membership-status-block').show();
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1152,8 +1197,6 @@ function topmenuUI() {
             $('.membership-status').text(l[435]);
             $('body').addClass('free');
         }
-
-        $('.membership-status').show();
 
         if (is_fm()) {
             $('.top-menu-item.refresh-item').removeClass('hidden');
@@ -1373,11 +1416,16 @@ function topmenuUI() {
                     $parent = $('.membership-popup.pro-popup');
 
                     $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
-                    var p = '';
+                    var $elm = $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt');
                     if (account.stype !== 'S') {
-                        p = escapeHTML(l[987]) + ' <span class="red">' + time2date(account.expiry) + '</span>';
+                        $elm.safeHTML('@@ <span class="red">@@</span>', l[987], time2date(account.expiry));
                     }
-                    $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').safeHTML(p);
+                    else if (Array.isArray(account.sgw)) {
+                        $elm.safeHTML('<span class="red">(@@)</span>', account.sgw.join(', '));
+                    }
+                    else {
+                        $elm.text('');
+                    }
 
                     // Update current plan to PRO I, PRO II, PRO III or LITE in popup
                     $('.membership-icon-pad .membership-big-txt.red').text(planName);
@@ -1728,14 +1776,20 @@ function topmenuUI() {
         else if ($.dlhash) {
             document.location.hash = $.dlhash;
         }
+        else if (folderlink && M.lastSeenFolderLink) {
+            $(document).one('MegaOpenFolder', function() {
+                $('.nw-fm-left-icon.transfers').click();
+            });
+            location.hash = M.lastSeenFolderLink;
+        }
         else {
             document.location.hash = 'fm';
         }
     });
 
-    if (M && M.currentdirid && M.currentdirid.substr(0, 7) == 'search/') {
+    if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
         $('.top-search-bl').addClass('contains-value');
-        $('.top-search-bl input').val(M.currentdirid.replace('search/', ''));
+        $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
     if (u_type) {

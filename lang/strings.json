@@ -4901,7 +4901,7 @@
     },
     "2440": {
         "text": "Synchronization will stop.\nDeletions that occur while it is not running will not be propagated.\n\nExit anyway?",
-        "context": ""
+        "context": "Do not translate. This string is not being used since a long time ago."
     },
     "2443": {
         "text": "The destination folder is synced and you already have a file \ninside it with the same name (%1).\nIf you continue the upload, the previous file will be overwritten.\nAre you sure?",
@@ -6380,12 +6380,12 @@
         "context": ""
     },
     "5896": {
-        "text": "Start audio call",
-        "context": ""
+        "text": "Start Audio Call",
+        "context": "Button title to start audio call"
     },
     "5897": {
-        "text": "Start video call",
-        "context": ""
+        "text": "Start Video Call",
+        "context": "Button label to start video call"
     },
     "5898": {
         "text": "The user [X] has been invited and will appear in your contact list once accepted.",
@@ -7655,6 +7655,10 @@
         "text": "Approve credentials",
         "context": "\"Verify user\" dialog title"
     },
+    "6786": {
+        "text": "Worry not! You can easily add new contacts by email or import existing contacts from other services.",
+        "context": ""
+    },
     "6787": {
         "text": "No shared folders with you",
         "context": ""
@@ -7788,8 +7792,8 @@
         "context": ""
     },
     "6834": {
-        "text": "Send files",
-        "context": ""
+        "text": "Send Files",
+        "context": "Button label for sending file attachments through the chat to another user."
     },
     "6835": {
         "text": "Add contact to Conversation",
@@ -7974,10 +7978,6 @@
     "6884": {
         "text": "Previously verified credentials",
         "context": "Information for the fingerprint warning dialog"
-    },
-    "6885": {
-        "text": "Thank you for activating your complimentary MEGA Pro account! Upon completion, you will receive 500 GB of secure encrypted high-performance online storage space for one year. All transfers from and to MEGA are unmetered and therefore uncapped from all Slingshot broadband connections.",
-        "context": ""
     },
     "6888": {
         "text": "You can choose to import contacts from third party services. These will not be added to your MEGA contacts, but will remain accessible \u200bfor sharing and collaboration\u200b.",
@@ -11379,10 +11379,6 @@
         "text": "slower browser download",
         "context": "Part of download button label. Full text is: Continue slower browser download. Please make it as short as possible."
     },
-    "7975": {
-        "text": "anyway",
-        "context": "Part of download button label. Full text is: Continue anyway. Please make it as short as possible."
-    },
     "7976": {
         "text": "We strongly suggest using our sync client for vastly improved performance[BR] downloading large files. [A]Get MEGAsync now[\/A].",
         "context": "Message recommending users use the sync client to download large files.\r\nPlease keep linkebreak and link tags as it is:\r\n\r\n[BR], [A], [\/A]"
@@ -11496,7 +11492,7 @@
         "context": "Information that shared file has beed saved to your Cloud drive."
     },
     "8007": {
-        "text": "Add participant...",
+        "text": "Add Participant...",
         "context": "Button label. Allows to add contacts in current chat conversation."
     },
     "8008": {
@@ -12660,7 +12656,7 @@
         "context": "A button label. The button starts a new conversation."
     },
     "8633": {
-        "text": "Leave chat",
+        "text": "Leave Chat",
         "context": "A button label. The button allows the user to leave the conversation."
     },
     "8634": {
@@ -12886,5 +12882,861 @@
     "8693": {
         "text": "Due to a rendering bug in Chrome\/Chromium browsers, MEGA cannot be used at this zoom level. Please either zoom in, zoom out, press Ctrl\/command + 0 to reset the zoom level or switch to Firefox.",
         "context": "In Chrome\/Chromium browsers, the MEGA web layout is broken on different zoom levels, 110%, 67% and 33%."
+    },
+    "8694": {
+        "text": "Set expiry date",
+        "context": "A label in the Get Link dialog which allows the user to set an expiry date on their public link."
+    },
+    "8695": {
+        "text": "PRO Only",
+        "context": "A label to indicate that this is a PRO only feature. For example, the user needs a PRO account to set an expiry date on their public link."
+    },
+    "8696": {
+        "text": "Upgrade to PRO",
+        "context": "A button label which when clicked will take the user to the PRO page to purchase a PRO plan."
+    },
+    "8697": {
+        "text": "Select date",
+        "context": "A text label inside the date picker to tell the user to select the date."
+    },
+    "8698": {
+        "text": "Expires %1",
+        "context": "A label on any row in the Get Link dialog with a public link that has an expiry date. The %1 will be replaced at runtime with the expiry date and time."
+    },
+    "8699": {
+        "text": "Clear completed transfers",
+        "context": "A button on the download screen to clear (remove) the completed file transfers from the list which shows which files are currently being uploaded or downloaded."
+    },
+    "8700": {
+        "text": "Thunderbird Extension",
+        "context": "This is our MEGAbird extension for the Thunderbird email client. It allows uploading large files to MEGA then linking them in the email. See also: https:\/\/addons.mozilla.org\/en-US\/thunderbird\/addon\/megabird\/"
+    },
+    "8703": {
+        "text": "Write the user's e-mail",
+        "context": "In the \"add contact\" screen you have two options: \"write the user's e-mail\" or \"import from phone\" a contact"
+    },
+    "8704": {
+        "text": "Import from phone",
+        "context": "import from phone option"
+    },
+    "8705": {
+        "text": "Add contact and share",
+        "context": "Menu option to add a contact to your contact list."
+    },
+    "8706": {
+        "text": "Export",
+        "context": "button label"
+    },
+    "8707": {
+        "text": "%s will be downloaded. Are you sure?",
+        "context": "Alert text before download asking if the user wants to go ahead with the download"
+    },
+    "8708": {
+        "text": "You do not have an application capable of opening the file %s. Do you want to continue with the download?",
+        "context": "Alert text before download where the file the user is going to download won't be able to be opened"
+    },
+    "8709": {
+        "text": "Error. Please, try again.",
+        "context": "An error when attempting to perform an action, asking the user to try again. (This will be used when there is a problem getting the root node)"
+    },
+    "8710": {
+        "text": "View source code",
+        "context": "Link to the public code of the app"
+    },
+    "8711": {
+        "text": "Add a new contact to begin sharing",
+        "context": "Add new contacts before starting to share with them."
+    },
+    "8712": {
+        "text": "Internal SD card",
+        "context": "internal SD card option"
+    },
+    "8713": {
+        "text": "External SD card",
+        "context": "external SD card option"
+    },
+    "8714": {
+        "text": "Error. Folder not created",
+        "context": "error message when creating a folder"
+    },
+    "8715": {
+        "text": "Rubbish Bin emptied successfully",
+        "context": "success message when emptying the RB"
+    },
+    "8716": {
+        "text": "Error. The Rubbish Bin was not emptied",
+        "context": "error message when emptying the RB"
+    },
+    "8717": {
+        "text": "Owner's E-mail",
+        "context": "category in sort by action"
+    },
+    "8718": {
+        "text": "PIN Code Type",
+        "context": "A title for an option to let the user choose the type of Personal Identification Number they want to use e.g. 4 digit PIN or 6 digit PIN."
+    },
+    "8719": {
+        "text": "4 digit PIN",
+        "context": "A Personal Identification Number with 4 digits."
+    },
+    "8720": {
+        "text": "6 digit PIN",
+        "context": "A Personal Identification Number with 6 digits."
+    },
+    "8721": {
+        "text": "Alphanumeric PIN",
+        "context": "PIN alphanumeric"
+    },
+    "8722": {
+        "text": "Sent to Inbox",
+        "context": "A success message after sending a file to the Inbox."
+    },
+    "8723": {
+        "text": "Error. Not sent to Inbox",
+        "context": "error message when sending a node to Inbox"
+    },
+    "8724": {
+        "text": "Creation Date",
+        "context": "Let's the user sort by the date when the files\/folders were created. It could also could be used as a column title on a list of files\/folders."
+    },
+    "8725": {
+        "text": "Modification Date",
+        "context": "category in sort by action, where the user can sort files by the date they were last modified."
+    },
+    "8726": {
+        "text": "Invite",
+        "context": "A button on a dialog which invites a contact to join MEGA."
+    },
+    "8727": {
+        "text": "Do you want to send an invitation to %s?",
+        "context": "confirmation message before sending an invitation to a contact"
+    },
+    "8728": {
+        "text": "Contact request successfully sent to %s. You can check the status in the Sent Requests tab.",
+        "context": "success message when sending a contact request, also informing the user where they can find information on the contact request they just made"
+    },
+    "8729": {
+        "text": "Please log out before creating the account",
+        "context": "alert when clicking a newsignup link while already being logged in"
+    },
+    "8730": {
+        "text": "Logs are now enabled",
+        "context": "Confirmation message when enabling logs in the app"
+    },
+    "8731": {
+        "text": "Logs are now disabled",
+        "context": "Confirmation message when disabling logs in the app"
+    },
+    "8732": {
+        "text": "Update link",
+        "context": "A right click context menu item. This will let the user update a public link with additional information. For example the public link can now be updated with an expiry time."
+    },
+    "8733": {
+        "text": "Update links",
+        "context": "A right click context menu item. This will let the user update multiple public links with additional information. For example the public links can now be updated with an expiry time."
+    },
+    "8734": {
+        "text": "Get links",
+        "context": "A right click context menu item. This will let the user create multiple public links for the selected folders and files."
+    },
+    "8735": {
+        "text": "Remove links",
+        "context": "A right click context menu item. This will let the user remove multiple public links for the selected folders and files."
+    },
+    "8736": {
+        "text": "Set new expiry date",
+        "context": "A label for a dropdown box on the Get Link dialog. This lets the user set an expiry date on a public link. After this time the link will no longer work."
+    },
+    "8737": {
+        "text": "25 May - International Missing Children's Day",
+        "context": "A title for a public banner that will be displayed to all users."
+    },
+    "8738": {
+        "text": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
+        "context": "The main text for a public banner that will be displayed to all users, explaining our strong position on the issue of child abuse."
+    },
+    "8742": {
+        "text": "Learn more",
+        "context": "A button label on the Public Service Announcement banner. This button will take them to a page where they can learn more information."
+    },
+    "8743": {
+        "text": "You have previously logged in using this browser. Are you sure you want to create a new account?",
+        "context": "This dialog message is shown as part of the PRO purchase flow. If it is detected that a user has previously had an account in this web browser, then we want to make sure the payment is attributed to that account, rather than the user mistakenly registering a new account."
+    },
+    "8744": {
+        "text": "Resend",
+        "context": "A button to resend the email confirmation as part of a PRO plan purchase."
+    },
+    "8745": {
+        "text": "You have been successfully logged in.",
+        "context": "A toast notification to tell the user that they have been logged in successfully."
+    },
+    "8746": {
+        "text": "Open link failed [{0}]",
+        "context": "A dialog message which is displayed when the process to open a link failed. Preserve the [{0}] code because it is for including the error code or the error message at runtime."
+    },
+    "8747": {
+        "text": "Open link failed",
+        "context": "The title of a dialog which is displayed when the process to open a link failed."
+    },
+    "8748": {
+        "text": "Opening file link...",
+        "context": "A progress indicator message which is shown when opening a file link to import\/download."
+    },
+    "8749": {
+        "text": "Opening folder link...",
+        "context": "A progress indicator message which is shown when opening a folder link to import\/download."
+    },
+    "8750": {
+        "text": "Open MEGA link",
+        "context": "A label for any 'Open MEGA link' button, link, text, title, etc. Try to preserve the MEGA brand name as uppercase."
+    },
+    "8751": {
+        "text": "Paste MEGA link:",
+        "context": "A label for a dialog message to import\/download a MEGA link."
+    },
+    "8752": {
+        "text": "Import to {0}",
+        "context": "A Label for a dialog which is shown when a user is trying to import a MEGA link. Preserve the {0} code because it is for including the name of the destination folder at runtime."
+    },
+    "8753": {
+        "text": "File link",
+        "context": "A label for any 'File link' button, link, text, title, etc."
+    },
+    "8754": {
+        "text": "Folder link",
+        "context": "A label for any 'Folder link' button, link, text, title, etc."
+    },
+    "8755": {
+        "text": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
+        "context": "A message displayed on the payment success screen letting users know the expected timeframes for their account to be unlocked."
+    },
+    "8756": {
+        "text": "Save Image",
+        "context": "A title which is shown under the action that allows you to save an image to your camera roll."
+    },
+    "8757": {
+        "text": "Generating links...",
+        "context": "A message which is shown when some links to files and\/or folders are being generated."
+    },
+    "8758": {
+        "text": "Links copied",
+        "context": "A message which is shown when some links have been copied to the pasteboard (clipboard)."
+    },
+    "8759": {
+        "text": "Link removed",
+        "context": "A message which is shown when the link to a file or folder has been removed."
+    },
+    "8760": {
+        "text": "Links removed",
+        "context": "A message which is shown when the links to files and\/or folders have been removed."
+    },
+    "8761": {
+        "text": "Save Images",
+        "context": "A title which is shown under the action that allows you to save several images to your camera roll."
+    },
+    "8762": {
+        "text": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+        "context": "A message on the cloud drive screen when they are on an ephemeral session and they have no files or folders in their account. This prompts them to register an account for extra features. Please keep the [S] and [\/S] tags which will be used to style that text red at runtime."
+    },
+    "8763": {
+        "text": "Sun",
+        "context": "A three letter abbreviation for the word Sunday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8764": {
+        "text": "Mon",
+        "context": "A three letter abbreviation for the word Monday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8765": {
+        "text": "Tue",
+        "context": "A three letter abbreviation for the word Tuesday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8766": {
+        "text": "Wed",
+        "context": "A three letter abbreviation for the word Wednesday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8767": {
+        "text": "Thu",
+        "context": "A three letter abbreviation for the word Thursday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8768": {
+        "text": "Fri",
+        "context": "A three letter abbreviation for the word Friday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8769": {
+        "text": "Sat",
+        "context": "A three letter abbreviation for the word Saturday. This abbreviation will be used inside a datepicker on the Get Link dialog."
+    },
+    "8770": {
+        "text": "Camera Uploads will be disabled",
+        "context": "Alert title displayed when Camera Uploads will be disabled because of unexpected errors."
+    },
+    "8771": {
+        "text": "Copyright Dispute",
+        "context": "Title for the copyright counter-notice page that gives information on how to dispute a takedown"
+    },
+    "8772": {
+        "text": "Counter-notification Process",
+        "context": "Sub title for the copyright counter-notice page that gives information on the step by step process to dispute a takedown by sending a counter-notification"
+    },
+    "8773": {
+        "text": "MEGA processes all takedown notices submitted to us based on good faith acceptance of the representations from the party submitting the takedown notice. Due to our end-to-end encryption model we have to do so without being able to review the files. Even if we could decrypt them, we could not determine the copyright status without complex analysis and review, which is impractical for the number of files processed each day. We are aware that some agencies submit incorrect takedown notices from time to time, but we are unable to find such errors in advance.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph explains why we have to allow takedowns through without human review."
+    },
+    "8774": {
+        "text": "You may file a counter-notice if you believe that access to a file you have uploaded has been wrongly disabled because it was the subject of an incorrect takedown notice. You should only do so if you are confident that no other party owns copyright in the material, or you have rights to store the material and, if you are sharing it, that you have the right to do so.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph lets the user know that they can file a dispute, but only under certain conditions."
+    },
+    "8775": {
+        "text": "We can only accept a counter-notification directly from the user from whose MEGA account the URL or file has been disabled. For verification, counter-notifications must be submitted from the email address associated with the MEGA account.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph informs the user that they have to be logged into the account that suffered the takedown."
+    },
+    "8776": {
+        "text": "Upon receipt of a counter-notification, MEGA will promptly provide the person who provided the takedown notification with a copy of the counter-notification, and inform that person that MEGA will replace the removed material or cease disabling access to it in 10 business days. If MEGA does not receive any further communication from or on behalf of the person who originally submitted the takedown notice, or such communication that it does receive does not in MEGA's sole opinion adequately justify the original takedown notice, MEGA may, but shall not be obliged to, reinstate the material in approximately 10-14 business days provided it has no reason to believe that the material infringes copyright.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph informs the user of the steps Mega will take after receiving the counter notice."
+    },
+    "8777": {
+        "text": "Nothing in this policy prejudices MEGA's right, agreed to by each user in MEGA's Terms of Service, to remove or disable access to any material at any time, for any reason or no reason.",
+        "context": "Information regarding the copyright takedown dispute process. This paragraph informs the user that our Terms of Service still apply and that we can take things down for reasons other than copyright takedowns"
+    },
+    "8778": {
+        "text": "To file a counter-notification with us, you may click the button below to proceed to our dispute form.",
+        "context": "Information regarding the copyright takedown dispute process. This tells the user where to click."
+    },
+    "8779": {
+        "text": "Please understand that:",
+        "context": "Information regarding the copyright takedown dispute process. This is the start of a series of bullet points explaining in fine detail the points that the user must consider before doing a dispute"
+    },
+    "8780": {
+        "text": "When we receive your counter-notice, we pass it, including your address and other contact information, to the party who issued the original takedown notice. By submitting your counter-notice you authorise us to do so;",
+        "context": "Information regarding the copyright takedown dispute process. This informs the user that the details they type will be passed on to the complainant who make the original takedown"
+    },
+    "8781": {
+        "text": "Filing a counter-notification may lead to legal proceedings between you and the complaining party;",
+        "context": "Information regarding the copyright takedown dispute process. This informs the user that this could lead to court"
+    },
+    "8782": {
+        "text": "There may be adverse legal consequences in New Zealand and\/or your jurisdiction if you make a false or bad faith allegation by using this process;",
+        "context": "Information regarding the copyright takedown dispute process. You can get in trouble with the law for providing bad information"
+    },
+    "8783": {
+        "text": "If, when using this counter-notice process, you make a false or bad faith allegation or otherwise breach MEGA\u2019s Terms of Service or this policy and that causes MEGA any loss, costs (including legal costs), damages or other liability, MEGA reserves the right to claim for and recover from you that loss, those costs (including full legal costs on a solicitor client basis), damages and other liability, by deduction from any balance in our account and\/or by proceedings in New Zealand and\/or the jurisdiction of the address in your counter-notice;",
+        "context": "Information regarding the copyright takedown dispute process. Mega can claim costs and other things in court if you provide bad information during a dispute"
+    },
+    "8784": {
+        "text": "This counter-notice process is provided voluntarily by MEGA for the purposes of all applicable copyright takedown and counter-notice regimes in other jurisdictions, but, in doing so, MEGA does not submit itself to any jurisdiction or law other than New Zealand as set out in its Terms of Service. MEGA may amend, suspend or withdraw this counter-notice process at any time, provided that any counter-notices in train at that time shall continue to be processed.",
+        "context": "Information regarding the copyright takedown dispute process. Mega makes this available for all jurisdictions that will accept it, but Mega does not agree to be governed by those laws, and is only 'submitting itself' to New Zealand law"
+    },
+    "8785": {
+        "text": "By filing a counter-notice, you are deemed to have accepted the above terms. If you do not accept the above terms, do not file a counter-notice.",
+        "context": "Information regarding the copyright takedown dispute process. The user should not fill out the form if they did not agree with the things they just read about"
+    },
+    "8786": {
+        "text": "If there is any inconsistency or ambiguity between the English and other language versions of the above terms, the English version shall prevail. ",
+        "context": "Information regarding the copyright takedown dispute process. This states that the english version of this legal wording is the one that counts, if there is any disagreement between language versions"
+    },
+    "8787": {
+        "text": "You may submit a counter-notification here",
+        "context": "The button label for submitting a copyright counter-notification"
+    },
+    "8788": {
+        "text": "Mega Limited Copyright Agent",
+        "context": "Do not translate 'Mega Limited' as that is the company's name. This is a title for the copyright agent for Mega Limited"
+    },
+    "8789": {
+        "text": "Copyright Counter-Notification",
+        "context": "Title for the copyright dispute counter-notification form"
+    },
+    "8790": {
+        "text": "This notification is a serious legal document - please be careful to be accurate in your copyright infringement counter-notification. You may first wish to consult with an attorney to determine whether you have ownership of the content, or are protected by fair use, license, or other legal basis.",
+        "context": "Subheading for the copyright counter-notification form explaining that it is serious business."
+    },
+    "8791": {
+        "text": "Content Details",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8792": {
+        "text": "URL of the content that has been removed or disabled:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8793": {
+        "text": "Description of the content:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8794": {
+        "text": "Commentary sufficient to explain the mistake or misidentification to the person who filed the original takedown notice:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8795": {
+        "text": "Personal Details",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8796": {
+        "text": "Full Name:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8797": {
+        "text": "Phone Number:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8798": {
+        "text": "MEGA Account Email Address:",
+        "context": "A label on the copyright counter-notification form "
+    },
+    "8799": {
+        "text": "Address Line 1:",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8800": {
+        "text": "Address Line 2:",
+        "context": "A label on the copyright counter-notification form "
+    },
+    "8801": {
+        "text": "Other comments (not sent to complainant):",
+        "context": "A label on the copyright counter-notification form"
+    },
+    "8802": {
+        "text": "Declarations",
+        "context": "section title on the copyright counter-notification form"
+    },
+    "8803": {
+        "text": "I will accept service of proceedings in New Zealand or in the jurisdiction where my address in this counter-notice is located, from the person who provided MEGA with the original copyright takedown notice or an agent of such person.",
+        "context": "A declaration on the copyright counter-notification form"
+    },
+    "8804": {
+        "text": "I have a good faith belief that the material was removed or disabled as a result of a mistake or misidentification of the material to be removed or disabled.",
+        "context": "A declaration on the copyright counter-notification form "
+    },
+    "8805": {
+        "text": "Test Network Connection:",
+        "context": "A title for the Network Diagnostic dialog. This will test the speed of the user's network connection to a storage server."
+    },
+    "8806": {
+        "text": "Network Diagnostics",
+        "context": "A title for the Network Diagnostic dialog. This lets the user test the transfer speed and for various storage servers."
+    },
+    "8807": {
+        "text": "There was an error message while talking to the API server. Please check that this is a valid link.",
+        "context": "An error message when an invalid link is used on the \"Network Diagnostic\" dialog."
+    },
+    "8808": {
+        "text": "Test the speed of your connection to our servers. This will help us to debug your connectivity issues.",
+        "context": "A description of the \"Network diagnostic\" section."
+    },
+    "8809": {
+        "text": "Please provide commentary sufficient to explain the mistake or misidentification.",
+        "context": "A message inside a warning dialog asking the user to fill out the section of the copyright-takedown form. This requires them to give comments on why they think their link was mistakenly taken down."
+    },
+    "8810": {
+        "text": "Please provide a description of the content that has been taken down.",
+        "context": "A message inside an error dialog that asks the user to fill out the section of the copyright takedown dispute form with the description of the link that they are disputing."
+    },
+    "8811": {
+        "text": "Please supply the URL of the content that has been taken down.",
+        "context": "A message inside an error dialog asking the user to fill out the URL section of the copyright takedown dispute form to tell us which link was taken down."
+    },
+    "8812": {
+        "text": "Please enter a valid MEGA link to the content that has been taken down.",
+        "context": "A message inside an error dialog asking the user to provide a valid link, as they must have already given a badly formatted link."
+    },
+    "8813": {
+        "text": "Please supply your phone number.",
+        "context": "A message inside an error dialog asking the user to supply their phone number, as they must have left that field blank."
+    },
+    "8814": {
+        "text": "Please supply a valid phone number.",
+        "context": "A message inside an error dialog asking the user to supply a valid phone number, as they must have added something badly formatted into the input field."
+    },
+    "8815": {
+        "text": "Please supply your address.",
+        "context": "A message inside an error dialog asking the user to supply their address as they must have left the address field of the form blank and it is a required field."
+    },
+    "8816": {
+        "text": "Please acknowledge that you will accept service of proceedings in New Zealand or in the jurisdiction where my address in this counter-notice is located, from the person who provided MEGA with the original copyright takedown notice or an agent of such person.",
+        "context": "A message inside an error dialog when the user has not checked an important disclosure on the copyright takedown dispute form. The disclosure text is repeated in this text and roughly means \"I accept that I can be summoned to a court of law in New Zealand or where I live by the person who did the takedown, or an agent of that person\"."
+    },
+    "8817": {
+        "text": "Please acknowledge that you have a good faith belief that the material was removed or disabled as a result of a mistake or misidentification of the material to be removed or disabled.",
+        "context": "A message inside an error dialog when the user has not checked an important disclosure on the copyright takedown dispute form. The disclosure is repeated in the error text and is asking the user to state that they \"have a good faith belief\" or have good reasons to believe that the takedown (and the material the takedown relates to) they are disputing was a mistake or otherwise wrong."
+    },
+    "8818": {
+        "text": "The link you provided is either invalid or is not the subject of a takedown notice.",
+        "context": "A message inside an error dialog when the user has submitted a link for a copyright takedown dispute, but the link was either not formatted correctly, or has not actually had a takedown happen to it (so cannot be disputed)."
+    },
+    "8819": {
+        "text": "You have already made a counter-notification against this link.",
+        "context": "A message inside an error dialog.\r\nThe user has just tried to dispute a takedown by sending MEGA a takedown counter-notification.\r\nHowever they have already done this before, so they will see this error.\r\n\r\nA counter-notification means \"Sending a notice back to the complainant (who sent MEGA a takedown notice for the link), that counters (or is against) the notice you received\"."
+    },
+    "8820": {
+        "text": "The MEGA account provided did not match the owner of the link.",
+        "context": "A message inside an error dialog. This explains that the email the user provided during a takedown counter-notice (which disputes the takedown) was not the one who created the link."
+    },
+    "8821": {
+        "text": "Failed to copy item. Please try again.",
+        "context": "Message of the dialog displayed when the process\/request to copy a node failed."
+    },
+    "8822": {
+        "text": "Copy failed",
+        "context": "A title on a dialog which is displayed when the process\/request to copy a file\/folder failed."
+    },
+    "8823": {
+        "text": "The log ({0}) will be deleted from the Offline section.",
+        "context": "Alert message shown when the DEBUG mode is disabled.\nPreserve the ({0}) code because is for include the file name in runtime."
+    },
+    "8824": {
+        "text": "A log will be created in the Offline section ({0}).",
+        "context": "Alert message shown when the DEBUG mode is enabled.\nPreserve the ({0}) code because is for include the file name in runtime."
+    },
+    "8825": {
+        "text": "Debug mode is enabled. Do you want to disable it?",
+        "context": "Message of the alert dialog displayed when the app starts and the DEBUG mode is enable. This alert is to try to avoid that the user forget disable the DEBUG mode and the log file size grows a lot in the offline section."
+    },
+    "8826": {
+        "text": "Debug mode",
+        "context": "A message on the alert dialog which is displayed when the app starts and the debugging mode is enabled."
+    },
+    "8827": {
+        "text": "Item shared by the Windows Phone MEGA app.",
+        "context": "Message or description for the shared resource or the dialog displayed when the user is sharing one item from MEGA with other app of his Windows Phone device - (String as short as possible).\r\n\r\nExample scenario: A user shares a photo from his mega account to the Outlook email app, to email it to a friend. This text \"Item shared by the Windows Phone Mega app\". would appear as the body of the email to describe what has happened.\r\nIf we shared it to whatsapp then this text could also be the description there - it lets others know where this item came from."
+    },
+    "8828": {
+        "text": "Item shared from MEGA",
+        "context": "Title for the shared resource or the dialog displayed when the user is sharing a file\/folder from MEGA with another app - (String as short as possible)."
+    },
+    "8829": {
+        "text": "Items shared by the Windows Phone MEGA app.",
+        "context": "Message or description for the shared resource or the dialog displayed when the user is sharing multiple items from MEGA with other app of his Windows Phone device - (String as short as possible)."
+    },
+    "8830": {
+        "text": "Items shared from MEGA",
+        "context": "Title for the shared resource or the dialog displayed when the user is sharing multiple files\/folders from MEGA with another app - (String as short as possible)."
+    },
+    "8831": {
+        "text": "Copying...",
+        "context": "A progress indicator message when copying a file\/folder to a different parent."
+    },
+    "8832": {
+        "text": "Memory statistics",
+        "context": "A label for any memory (RAM) statistics button, link, text, title, etc."
+    },
+    "8833": {
+        "text": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+        "context": "A message displayed to encourage the user to register an account for extra bandwidth and free storage. Please keep the [B] and [\/B] tags as they will be used to stylise the text at runtime."
+    },
+    "8834": {
+        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
+        "context": "A warning message which is displayed to warn the user about the reason why their download can not proceed because they would be over the bandwidth quota."
+    },
+    "8835": {
+        "text": "Failed to copy the Recovery Key to your clipboard. Please try again.",
+        "context": "Message of the dialog displayed when fails to copy the user's Recovery Key to the clipboard to be saved or exported."
+    },
+    "8836": {
+        "text": "Recovery Key copied to clipboard",
+        "context": "Message of the dialog displayed when copy the user's Recovery Key to the clipboard to be saved or exported."
+    },
+    "8837": {
+        "text": "Recovery Key copied",
+        "context": "Title of the dialog displayed when copy the user's Recovery Key to the clipboard to be saved or exported - (String as short as possible)."
+    },
+    "8838": {
+        "text": "Export Recovery Key",
+        "context": "Text 'Export Recovery Key' placed just before two buttons into the 'settings' page to allow see (copy\/paste) and export the Recovery Key."
+    },
+    "8839": {
+        "text": "Recovery Key",
+        "context": "Label for any 'Recovery Key' button, link, text, title, etc. Preserve uppercase - (String as short as possible).\r\nThe Recovery Key is the new name for the account \"Master Key\", and can unlock (recover) the account if the user forgets their password."
+    },
+    "8840": {
+        "text": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
+        "context": "A dialog message when there is a new chat server version available that requires the user to reload."
+    },
+    "8841": {
+        "text": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
+        "context": "A dialog message when there is a new chat server version available. This update will be incompatible with the current user's MEGA client so they will need to update their browser extension."
+    },
+    "8842": {
+        "text": "Grant bandwidth to downloading users:",
+        "context": "Maximum percentage of your bandwidth which is available to third party users."
+    },
+    "8843": {
+        "text": "[S]50 %[\/S] bandwidth",
+        "context": "Full string: 50% bandwidth. This is the maximum percentage of your bandwidth which is available to third party users. The 50% is a placeholder for whatever the percentage will actually be.\r\n\r\nPlease leave \"[S]50 %[\/S]\" as it is."
+    },
+    "8844": {
+        "text": "This is the maximum percentage of your bandwidth which is available to third party users.",
+        "context": "Full string: \r\n\"50% bandwith. This is the maximum percentage of your bandwidth which is available to third party users.\"\r\n\r\nUser can set bandwidth limit to users, who downloading his files.\r\n\r\n"
+    },
+    "8845": {
+        "text": "This purchase has expired.",
+        "context": "The bitcoin price has expired. Usually when paying by Bitcoin the user has 15 minutes to make their payment. After that the invoice is invalid and they must close the dialog and try again."
+    },
+    "8846": {
+        "text": "Continue [S]anyway[\/S]",
+        "context": "The button label is short for \"Continue downloading anyway\"."
+    },
+    "8847": {
+        "text": "Download [S]MEGAsync[\/S]",
+        "context": "A button label which allows the user to download the MEGAsync application."
+    },
+    "8848": {
+        "text": "Download [S]with MEGAsync[\/S]",
+        "context": "A button label which allows the user to download a file with the MEGAsync application."
+    },
+    "8849": {
+        "text": "Download [S]through your browser[\/S]",
+        "context": "A button label which allows the user to download a file using their browser."
+    },
+    "8850": {
+        "text": "MEGA v%1 Update Available",
+        "context": "This is a title for the site update dialog which is shown to users if they are still using an old version of the site 24 hours after a new release has been made. Please leave the %1 placeholder which will be replaced with the version number e.g. 3.4.35. The lowercase 'v' is short for 'version'."
+    },
+    "8851": {
+        "text": "Released %1.",
+        "context": "This is a short sentence on the site update dialog. Please leave the %1 placeholder which will be replaced with the current localised date and time."
+    },
+    "8852": {
+        "text": "We have recently made some improvements to our site, would you like to update to the latest version?",
+        "context": "This is a short message on the site update dialog which is shown to users if they are still using an old version of the site 24 hours after a new release has been made."
+    },
+    "8853": {
+        "text": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
+        "context": "An error message shown to users while trying to log into the site and there was a problem decoding the private RSA key."
+    },
+    "8854": {
+        "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them because it is not part of this account cancellation process.",
+        "context": "An additional message on the confirm dialog after a user chooses to cancel their account. This will appear if they have previously had a PRO plan that was paid with a Google or Apple subscription."
+    },
+    "8855": {
+        "text": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
+        "context": "An error message which is shown when a user tries to log into the site too many times. Please leave the [BR] tag which will be replaced with a line break at run time. The %1 placeholder will be replaced with the time e.g. 14:37 which is when the user can try logging in again."
+    },
+    "8856": {
+        "text": "Added",
+        "context": "A label for any 'Added' text or title. For example to show the upload date of a file\/folder."
+    },
+    "8857": {
+        "text": "Available Offline",
+        "context": "A label for any 'Available Offline' text or title. For example this is used as the label of the button to get\/set if a node is saved for offline use or not."
+    },
+    "8858": {
+        "text": "Modified",
+        "context": "A label for any 'Modified' text or title. For example to show the modification date of a file\/folder."
+    },
+    "8859": {
+        "text": "Backup Recovery Key",
+        "context": "The is a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key."
+    },
+    "8861": {
+        "text": "Remove Recovery Key",
+        "context": "Menu item to let the user remove the recovery key (previously downloaded)"
+    },
+    "8862": {
+        "text": "The Recovery Key file has been removed.",
+        "context": "Success message when the Recovery Key file has been removed."
+    },
+    "8863": {
+        "text": "The Recovery Key has been exported into: ",
+        "context": "success message when the recovery key file has been downloaded"
+    },
+    "8864": {
+        "text": "You are removing the exported Recovery Key file",
+        "context": "confirmation message before removing the previously downloaded recovery key file"
+    },
+    "8865": {
+        "text": "You will have to enter your credentials (login and password) in the new app. If you don't remember your password, please Export your Recovery Key before uninstalling the v1 app.",
+        "context": "Message shown to tell the users that they should export the recovery key before uninstalling the old app"
+    },
+    "8866": {
+        "text": "View Profile",
+        "context": "A title of button to view a member\u2019s profile in chat."
+    },
+    "8867": {
+        "text": "Remove Participant",
+        "context": " A button title which removes a participant from a chat."
+    },
+    "8868": {
+        "text": "Set Permission:",
+        "context": "A title of a section where the user can set the chat participant\u2019s permissions."
+    },
+    "8869": {
+        "text": "Add to Group Conversation",
+        "context": "A button title. This button adds contacts to a group chat."
+    },
+    "8870": {
+        "text": "Select one or more contacts to continue",
+        "context": "A hint message in the Add Participant dialog to remind the user to add a participant into a chat."
+    },
+    "8871": {
+        "text": "Clear Chat History",
+        "context": "A button title to delete the history of a chat."
+    },
+    "8872": {
+        "text": "%1 and %2 are typing",
+        "context": "Two participants are typing at the same time and this hint in chat tells us that. Please keep %1 and %2 within your translation as they are replaced with the names of the participants."
+    },
+    "8873": {
+        "text": "Read-only",
+        "context": "The read only permission in chat."
+    },
+    "8874": {
+        "text": "Standard",
+        "context": "The Standard permission level in chat. With the standard permissions a participant can read and type messages in a chat."
+    },
+    "8875": {
+        "text": "Moderator",
+        "context": "The Moderator permission level in chat. With moderator permissions a participant can manage the chat."
+    },
+    "8876": {
+        "text": "Chat Members",
+        "context": "A title message above a list of chat members for a group chat."
+    },
+    "8877": {
+        "text": "You have no contacts.",
+        "context": "A warning message that there are no contacts to start a chat."
+    },
+    "8878": {
+        "text": "No contacts found matching your query.",
+        "context": "A result message when there was no contact found after making a search."
+    },
+    "8879": {
+        "text": "Are you sure you want to delete this message?",
+        "context": "A confirmation message for a user to confirm deletion of the message."
+    },
+    "8880": {
+        "text": "You don't have permission to clear the history of this conversation.",
+        "context": "A warning message to remind a user that they do not have permission to clear the history of a chat."
+    },
+    "8881": {
+        "text": "Are you sure you want to clear the full message history of this conversation?",
+        "context": "A confirmation message for a user to confirm that they want to clear the history of a chat."
+    },
+    "8882": {
+        "text": "Message not sent. Will keep retrying.",
+        "context": "A hint message which is displayed when the message failed to send. It tells the user that it will keep retrying to send it."
+    },
+    "8883": {
+        "text": "Message not sent. Click here if you want to resend it.",
+        "context": "A hint message displayed when the message failed to send. It reminds the user to click it to resend."
+    },
+    "8884": {
+        "text": "Message not sent. Click here if you want to cancel it.",
+        "context": "A hint message displayed when the message failed to send. It reminds the user to click it to cancel."
+    },
+    "8885": {
+        "text": "Me",
+        "context": "The title for my message in a chat. The message was sent from yourself."
+    },
+    "8886": {
+        "text": "This message has been deleted.",
+        "context": "A log message in a chat to indicate that the message has been deleted by the user."
+    },
+    "8887": {
+        "text": "(edited)",
+        "context": "A log message in a chat to indicate that the message has been edited by the user."
+    },
+    "8888": {
+        "text": "(empty)",
+        "context": "This is a message of a title used to show a name of a chat room, which does not contain any member."
+    },
+    "8889": {
+        "text": "Select one or more contacts to start",
+        "context": "A helper message on the contact list to start a group\/private chat."
+    },
+    "8890": {
+        "text": "Start Group Conversation",
+        "context": "A button title. The button starts a group chat."
+    },
+    "8891": {
+        "text": "Revoke Attachment",
+        "context": "A button title to revoke an attachment in a chat by revoking the access to the attachment so other participants in the chat can not access it. (It does not delete the attachment out of your cloud drive)"
+    },
+    "8892": {
+        "text": "Revoked access to attachment(s).",
+        "context": "A summary message displaying in the chat list when the last message of the chat is somebody revoking an attachment (i.e. removing access to the attachment, it does not delete it from the owners cloud drive)"
+    },
+    "8893": {
+        "text": "Could not revoke access to the attachment. Error code: %s.",
+        "context": "A warning message of not being able to revoke access to a shared attachment. Please keep %s as it will be replaced by the reason at runtime."
+    },
+    "8894": {
+        "text": "Attached: %s",
+        "context": "A message appearing in the chat summary window when the most recent action performed by a user was attaching a file. Please keep %s as it will be replaced at runtime with the name of the attached file."
+    },
+    "8895": {
+        "text": "Attached %s files.",
+        "context": "A summary message when a user has attached many files at once into the chat. Please keep %s as it will be replaced at runtime with the number of files."
+    },
+    "8896": {
+        "text": "Sent Contact: %s ",
+        "context": "A summary message when a user sent a contact's details through the chat. Please keep %s as it will be replaced at runtime with the name of the contact that was sent."
+    },
+    "8897": {
+        "text": "Sent %s Contacts.",
+        "context": "A summary message when a user sent the information of %s number of contacts at once. Please keep %s as it will be replaced at runtime with the number of contacts sent."
+    },
+    "8898": {
+        "text": "No thanks",
+        "context": "A button title to choose not to send feedback for the  video\/audio call to MEGA."
+    },
+    "8901": {
+        "text": "Image and video downloads",
+        "context": "A title header that refers to where you enable the options 'Save images in gallery' and 'Save videos in gallery' inside 'Settings' -> 'Advanced' section\"."
+    },
+    "8902": {
+        "text": "Save images in gallery",
+        "context": "A title of a section where you can enable the option 'Save images in gallery'."
+    },
+    "8903": {
+        "text": "Save videos in gallery",
+        "context": "A title of a section where you can enable the option 'Save videos in gallery'."
+    },
+    "8904": {
+        "text": "Save iOS compatible images and videos in your device's gallery (Note: images and videos won't be saved in Offline).",
+        "context": "This footer text explains what happens if the options 'Save videos in gallery\u2019 and 'Save images in gallery\u2019 are enabled."
+    },
+    "8905": {
+        "text": "cleared the chat history.",
+        "context": "A log message in the chat conversation underneath a user\/avatar (the subject) to tell the reader that a participant (the subject) cleared the history of the chat.\r\nFor example, [Alice] cleared the chat history"
+    },
+    "8906": {
+        "text": "was removed from the group chat by %s.",
+        "context": "A log message in a chat conversation underneath a user avatar\/name (the subject) to tell the reader that a participant (that subject) was removed from the group chat by the moderator. Please keep %s, it will be replaced by the moderator name at runtime.\r\nFor example: [Alice] was removed from the group chat by %s."
+    },
+    "8907": {
+        "text": "joined the group chat by invitation from %s.",
+        "context": "A log message in a chat conversation underneath a user avatar\/name (the subject) to tell the reader that a participant (the subject) was added to the chat by a moderator. Please keep the %s placeholder, it will be replaced by the moderator name at runtime.\r\nFor example: [Alice] joined the group chat by invitation from %s."
+    },
+    "8908": {
+        "text": "left the group chat.",
+        "context": "A log message in the chat conversation underneath a user\/avatar (the subject) to tell the reader that a participant (the subject) left the group chat.\r\nFor example, [Alice] left the group chat."
+    },
+    "8909": {
+        "text": "Revoke",
+        "context": "A button title to revoke the access to an attachment in a chat."
+    },
+    "8910": {
+        "text": "Removed item from shared folder",
+        "context": "Notification when on client side when owner of a shared folder removes folder\/file from it."
+    },
+    "8911": {
+        "text": "Keep names as in the mobile device",
+        "context": "Option to choose that the camera sync will maintain the local file names when uploading"
+    },
+    "8912": {
+        "text": "I'll use [B]MEGAsync[\/B]",
+        "context": "Shown when user tries to upload more than 100 files and MEGAsync is found running.\r\nPlease leave the [B] and [\/B] tags as they are."
+    },
+    "8913": {
+        "text": "Removed [X] items from a share",
+        "context": "Notification popup.\r\nNotification for multiple removed items from a share.\r\nPlease keep [X] as it will be replaced at runtime with the number of removed items."
+    },
+    "8914": {
+        "text": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
+        "context": "A warning message that appears if a series of messages in the chat appear to be in the wrong order. This is unlikely but could mean that a man-in-the-middle attacker has tried to move messages around."
+    },
+    "8915": {
+        "text": "was changed to %s1 by %s2",
+        "context": "A log message in a chat to display a participant's permission was changed and by whom. This message sits directly under a user's name and avatar (the subject of the sentence). s1% will be replaced with the permission name (such as Moderator or Read-only) and %s2 will be replaced with the person who did it.\r\nFor example:\r\n[Alice Jones]\r\nwas changed to Moderator by John Smith"
     }
 }

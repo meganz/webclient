@@ -73,9 +73,10 @@ function dl_g(res) {
 
     $('.widget-block').addClass('hidden');
     $('.download.content-block').removeClass('hidden');
-    $('.download-button.to-clouddrive').hide();
-    $('.download-button.throught-browser').hide();
-    $('.download-button.with-megasync').hide();
+    $('.download-button.to-clouddrive').safeHTML(l[1389]).hide();
+    $('.download-button.throught-browser').safeHTML(l[8849]).hide();
+    $('.download-button.with-megasync').safeHTML(l[8848]).hide();
+    
 
     if (res === ETOOMANY) {
         $('.download.content-block').addClass('not-available-user');

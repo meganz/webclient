@@ -299,6 +299,8 @@ var mega = {
         0, 'Torch', 'Epic'
     ],
 
+    maxWorkers: (navigator.hardwareConcurrency || 4),
+
     /** Get browser brancd internal ID */
     getBrowserBrandID: function() {
         if (Object(window.chrome).torch) {
@@ -835,6 +837,10 @@ else {
 function siteLoadError(error, filename) {
     var message = ['An error occurred while loading MEGA.'];
 
+    if (location.host !== 'mega.nz') {
+        message[0] += '..';
+    }
+
     if (error === 1) {
         message.push('The file "' + filename + '" is corrupt.');
     }
@@ -848,6 +854,9 @@ function siteLoadError(error, filename) {
     if (!is_extension) {
         message.push('Please try again later. We apologize for the inconvenience.');
     }
+    message.push("If the problem persist, please try disabling all third-party browser "
+                + "extensions and reload your browser. If that doesn't help, contact support@mega.nz");
+
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
 
     contenterror = 1;
@@ -906,6 +915,7 @@ else if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 if (m)
 {
     var app,mobileblog,android,intent, ios9;
+    var ios;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
@@ -963,6 +973,7 @@ if (m)
             // Check for iOS 9.0+
             ios9 = (ver > 8);
         }
+        ios = 1;
     }
     else document.body.className = 'another-os full-mode unsupported';
 
@@ -1015,6 +1026,7 @@ if (m)
     }
     else if (window.location.hash.substr(1, 7) === 'confirm'
             || window.location.hash.substr(1, 6) === 'backup'
+            || window.location.hash.substr(1, 6) === 'fm/ipc'
             || window.location.hash.substr(1, 9) === 'newsignup'
             || window.location.hash.substr(1, 7) === 'account')
     {
@@ -1071,7 +1083,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 26, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 27, writable : false });
 
     // Do not report exceptions if this build is older than 20 days
     var exTimeLeft = ((buildVersion.timestamp + (20 * 86400)) * 1000) > Date.now();
@@ -1436,10 +1448,12 @@ else if (!b_u)
         jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
         // UI Elements
+        jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
         jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
         jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
+        jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
@@ -1604,6 +1618,9 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+        'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
+        'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
+        'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
         'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
@@ -1661,6 +1678,8 @@ else if (!b_u)
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],
+        'dispute': ['dispute'],
+        'disputenotice': ['disputenotice', 'disputenotice_js'],
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
@@ -2185,6 +2204,7 @@ else if (!b_u)
     }
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
+
     if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
@@ -2216,6 +2236,7 @@ else if (!b_u)
         lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
+
     function boot_auth(u_ctx,r)
     {
         u_type = r;

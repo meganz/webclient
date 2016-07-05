@@ -13,7 +13,7 @@ import os
 
 # Checkers to run. Available options for checkers are:
 # "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++", 'htmlhint'
-checkers = ['validator', 'htmlhint', 'jshint', 'jscs']
+checkers = ['validator', 'htmlhint', 'jscs', 'jshint']
 
 # Extra options for designated checkers.
 # This configuration needs an entry for every encountered checker if the
@@ -39,7 +39,7 @@ NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 JSHINT_RULES = '--verbose'
 JSCS_RULES = '--verbose'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
-VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/vendor/dcraw.js']
+VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/chat/bundle.js', 'nacl-fast.js']
 VALIDATOR_LINELEN_THRESHOLD = 120 # Max chars per line to trigger.
 
 # Vera++ rules like this should be superseded by a "profile", but it

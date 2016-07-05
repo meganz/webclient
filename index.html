@@ -28,5 +28,12 @@
 <div style="position:absolute; left:0px; width:100%; top:0px; height:60px; z-index:99; display:none;" id="topmenufm">
 </div>
 <div id="popnotifications"></div>
+<form id="pwdmanhelper" action="login-to-devnull.html" method="post"
+        target="dummyTestFrame" autocomplete="on" style="display:none">
+    <input type="text" name="username" id="pmh_username" />
+    <input type="password" name="password" id="pmh_password"/>
+</form>
+<iframe id="dummyTestFrame" name="dummyTestFrame" type="content"
+    src="login-to-devnull.html" style="display:none"></iframe>
 </body>
 </html>

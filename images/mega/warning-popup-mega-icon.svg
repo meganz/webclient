@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="38px" height="38px" viewBox="0 0 38 38" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.8.3 (29802) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard 1</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="9.5960829%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#FF4444" offset="0%"></stop>
+            <stop stop-color="#FF3333" offset="100%"></stop>
+        </linearGradient>
+        <path d="M26.7962264,24.5849057 L24.4867924,24.5849057 C24.1879245,24.5849057 23.9433962,24.3403774 23.9433962,24.0415095 L23.9433962,16.9366038 C23.9433962,16.8754717 23.8686792,16.8415095 23.8279245,16.8890566 L18.9373584,21.7796227 C18.5162264,22.2007548 17.8301886,22.2007548 17.4022641,21.7796227 L12.5116981,16.8890566 C12.4709434,16.8415095 12.3962264,16.8754717 12.3962264,16.9366038 L12.3962264,24.0415095 C12.3962264,24.3403774 12.1516981,24.5849057 11.8528301,24.5849057 L9.54339622,24.5849057 C9.2445283,24.5849057 9,24.3403774 9,24.0415095 L9,11.5433963 C9,11.2445283 9.2445283,11 9.54339622,11 L11.1328301,11 C11.4181132,11 11.6966037,11.1154717 11.9003773,11.3192453 L17.9796226,17.3910189 C18.0815094,17.4996981 18.2581132,17.4996981 18.3667924,17.3910189 L24.4392452,11.3192453 C24.6430188,11.1154717 24.9215094,11 25.2135849,11 L26.7962264,11 C27.0950943,11 27.3396226,11.2445283 27.3396226,11.5433963 L27.3396226,24.0415095 C27.3396226,24.3403774 27.0950943,24.5849057 26.7962264,24.5849057 L26.7962264,24.5849057 Z" id="path-2"></path>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.860889668   0 0 0 0 0.14397415   0 0 0 0 0.14397415  0 0 0 1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-1">
+            <g id="warning-popup-mega-icon" transform="translate(1.000000, 1.000000)">
+                <g id="Page-1">
+                    <g id="Artboard-1">
+                        <g id="Group">
+                            <path d="M18.5142857,36 C27.9411256,36 36,27.9411256 36,18.5142857 C36,8.05887451 27.9411256,0 18.5142857,0 C8.05887452,0 0,8.05887451 0,18.5142857 C0,27.9411256 8.05887452,36 18.5142857,36 L18.5142857,36 Z" id="Oval" fill="url(#linearGradient-1)"></path>
+                            <g id="Shape_2_">
+                                <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-2"></use>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

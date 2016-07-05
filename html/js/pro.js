@@ -77,7 +77,7 @@ var astroPayDialog = {
             // Get the extra data from the gateway details
             var firstLastName = alarm.planExpired.lastPayment.gwd.name;
             var taxNum = alarm.planExpired.lastPayment.gwd.cpf;
-            
+
             // Prefill the user's name and tax details
             this.$dialog.find('.astropay-name-field').val(firstLastName);
             this.$dialog.find('.astropay-tax-field').val(taxNum);
@@ -586,7 +586,7 @@ function pro_pay() {
     }
 
     // Otherwise if Union Pay, show bouncing coin while loading
-    else if ((pro_paymentmethod === 'dynamicpay') || (pro_paymentmethod === 'paysafecard')) {
+    else if ((pro_paymentmethod === 'dynamicpay') || (pro_paymentmethod === 'paysafecard') || (pro_paymentmethod === 'directreseller')) {
         proPage.showLoadingOverlay('transferring');
     }
 
@@ -663,7 +663,10 @@ function pro_pay() {
                 else if (pro_paymentmethod === 'tpay') {
                     pro_m = tpay.gatewayId; // 14
                 }
-                
+                else if (pro_paymentmethod === 'directreseller') {
+                    pro_m = directReseller.gatewayId; // 15
+                }
+
                 // If AstroPay, send extra details
                 else if (pro_paymentmethod.indexOf('astropay') > -1) {
                     pro_m = astroPayDialog.gatewayId;
@@ -756,6 +759,11 @@ function pro_pay() {
                             else if (pro_m === tpay.gatewayId) {
                                 tpay.redirectToSite(utcResult);
                             }
+
+                            // If 6media, redirect to the site
+                            else if (pro_m === directReseller.gatewayId) {
+                                directReseller.redirectToSite(utcResult);
+                            }
                         }
                     }
                 });
@@ -802,7 +810,7 @@ var proPage = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            
+
             // Don't show the plan expiry dialog anymore for this session
             alarm.planExpired.lastPayment = null;
 
@@ -1043,11 +1051,11 @@ var proPage = {
 
             // On clicking 'Click here to show more payment options'
             $showMoreButton.click(function() {
-                
+
                 // Show the other payment options and then hide the button
                 $('.payment-options-list.secondary').removeClass('hidden');
                 $showMoreButton.hide();
-                
+
                 // Trigger resize or you can't scroll to the bottom of the page anymore
                 $(window).trigger('resize');
             });
@@ -1085,17 +1093,17 @@ var proPage = {
             var $gateway = $template.clone();
             var gatewayOpt = gatewayOptions[i];
             var gatewayId = gatewayOpt.gatewayId;
-            
+
             // Get the gateway name and display name
             var gatewayInfo = getGatewayName(gatewayId);
             var gatewayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gatewayInfo.name;
             var displayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gatewayInfo.displayName;
-            
+
             // If it couldn't find the name (e.g. new provider, use the name from the API)
             if (gatewayInfo.name === 'unknown') {
                 continue;
             }
-            
+
             // Add disabled class if this payment method is not supported for this plan
             if ((gatewayOpt.supportsExpensivePlans === 0) && (selectedPlanNum !== 4)) {
                 $gateway.addClass('disabled');
@@ -1104,7 +1112,7 @@ var proPage = {
 
             // If the voucher/balance option
             if ((gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
-                
+
                 // Show "Balance (x.xx)" if they have enough to purchase this plan
                 displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
             }
@@ -1129,10 +1137,10 @@ var proPage = {
      * Change payment method radio button states when clicked
      */
     initPaymentMethodRadioButtons: function() {
-        
+
         // Cache selector
         var $paymentOptionsList = $('.payment-options-list');
-        
+
         // Add click handler to all payment methods
         $paymentOptionsList.find('.payment-method').rebind('click', function() {
 
@@ -1158,19 +1166,19 @@ var proPage = {
             proPage.updateDurationOptionsOnProviderChange();
         });
     },
-    
+
     /**
      * Preselect an option they previously paid with if applicable
      */
     preselectPreviousPaymentOption: function() {
-        
+
         // If they have paid before and their plan has expired, then re-select their last payment method
         if (alarm.planExpired.lastPayment) {
 
             // Get the last gateway they paid with
             var lastPayment = alarm.planExpired.lastPayment;
             var gatewayId = lastPayment.gw;
-            
+
             // Get the gateway name, if it's an Astropay subgateway, then it will have it's own name
             var gatewayInfo = getGatewayName(gatewayId);
             var extraData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
@@ -1178,10 +1186,10 @@ var proPage = {
 
             // Find the gateway
             var $gatewayInput = $('#' + gatewayName);
-            
+
             // If it is still in the list (e.g. valid provider still)
             if ($gatewayInput.length) {
-                
+
                 // Get the elements which need to be set
                 var $membershipRadio = $gatewayInput.parent();
                 var $providerDetails = $membershipRadio.next();
@@ -1209,12 +1217,12 @@ var proPage = {
             proPage.preselectFirstPaymentOption();
         }
     },
-    
+
     /**
      * Preselects the first payment option in the list of payment providers
      */
     preselectFirstPaymentOption: function() {
-        
+
         // Find and select the first payment option
         var $paymentOption = $('.payment-options-list.primary .payment-method:not(.template)').first();
         $paymentOption.find('input').attr('checked', 'checked');
@@ -1335,7 +1343,7 @@ var proPage = {
 
             // Get the number of months for the plan they last paid for
             var lastPaymentMonths = alarm.planExpired.lastPayment.m;
-            
+
             // Find the radio option with the same number of months
             var $monthOption = $(".payment-duration[data-plan-months='" + lastPaymentMonths + "']");
 
@@ -1348,7 +1356,7 @@ var proPage = {
                 return true;
             }
         }
-        
+
         // Otherwise pre-select the first option available
         var $firstOption = $('.duration-options-list .payment-duration:not(.template').first();
         $firstOption.find('input').prop('checked', true);
@@ -1889,12 +1897,11 @@ var wireTransferDialog = {
         });
 
         // If logged in, pre-populate email address into wire transfer details
-        if (typeof u_attr !== 'undefined') {
-            
+        if (typeof u_attr !== 'undefined' && u_attr.email) {
+
             // Replace the @ with -at- so the bank will accept it on the form
-            var email = u_attr.email;
-                email = email.replace('@', '-at-');
-            
+            var email = String(u_attr.email).replace('@', '-at-');
+
             wireTransferDialog.$dialog.find('.email-address').text(email);
         }
 
@@ -1961,6 +1968,28 @@ var tpay = {
     }
 };
 
+/**
+ * Code for directReseller payments such as Gary's 6media
+ */
+/* jshint -W003 */
+var directReseller = {
+
+    gatewayId: 15,
+
+    /**
+     * Redirect to the site
+     * @param {String} utcResult A sale ID
+     */
+    redirectToSite: function(utcResult) {
+        var provider = utcResult['EUR']['provider'];
+        var params = utcResult['EUR']['params'];
+
+        if (provider === 1) {
+            params = atob(params);
+            window.location = 'http://mega.and1.tw/zh_tw/order_mega.php?' + params;
+        }
+    }
+};
 
 /**
  * Code for paysafecard
@@ -2564,11 +2593,10 @@ var cardDialog = {
  */
 var bitcoinDialog = {
 
-    // Web socket for chain.com connection to monitor bitcoin payment
-    chainWebSocketConn: null,
-
     // Timer for counting down the time till when the price expires
     countdownIntervalId: 0,
+
+    dialogOriginalHtml: '',
 
     /**
      * Step 3 in plan purchase with Bitcoin
@@ -2577,13 +2605,8 @@ var bitcoinDialog = {
     showInvoice: function(apiResponse) {
 
         /* Testing data to watch the invoice expire in 5 secs
-        apiResponse = {
-            "invoice_id": 'sIk',
-            "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
-            "amount": 1.35715354,
-            "created": Math.round(Date.now() / 1000),
-            "expiry": Math.round(Date.now() / 1000) + 5
-        };//*/
+        apiResponse['expiry'] = Math.round(Date.now() / 1000) + 5;
+        //*/
 
         // Set details
         var bitcoinAddress = apiResponse.address;
@@ -2592,56 +2615,56 @@ var bitcoinDialog = {
         var proPlanNum = selectedProPackage[1];
         var planName = getProPlan(proPlanNum);
         var planMonths = l[6806].replace('%1', selectedProPackage[4]);  // x month purchase
-        var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
+        var priceEuros = selectedProPackage[5];
         var priceBitcoins = apiResponse.amount;
         var expiryTime = new Date(apiResponse.expiry);
 
-        // Cache original HTML of dialog to reset after close
-        var dialogOverlay = $('.fm-dialog-overlay');
-        var dialog = $('.fm-dialog.pro-register-paypal-dialog');
-        var dialogOriginalHtml = dialog.html();
-
-        // Add styles for the dialog
-        dialogOverlay.addClass('bitcoin-invoice-dialog');
-        dialog.addClass('bitcoin-invoice-dialog');
-
-        // Clone template and show Bitcoin invoice
-        var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
-        dialog.html(bitcoinInvoiceHtml);
+        // Cache selectors
+        var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
+        var $bitcoinLoadingDialog = $('.pro-register-paypal-dialog');
+        var $bitcoinDialog = $('.bitcoin-invoice-dialog');
+                
+        // If this is the first open
+        if (bitcoinDialog.dialogOriginalHtml === '') {
+            
+            // Clone the HTML for the original dialog so it can be reset upon re-opening
+            bitcoinDialog.dialogOriginalHtml = $bitcoinDialog.html();
+        }
+        else {
+            // Replace the modified HTML with the original HTML
+            $bitcoinDialog.safeHTML(bitcoinDialog.dialogOriginalHtml);
+        }
 
         // Render QR code
-        bitcoinDialog.generateBitcoinQrCode(dialog, bitcoinAddress, priceBitcoins);
+        bitcoinDialog.generateBitcoinQrCode($bitcoinDialog, bitcoinAddress, priceBitcoins);
 
         // Update details inside dialog
-        dialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
-        dialog.find('.bitcoin-address').html(bitcoinAddress);
-        dialog.find('.invoice-date-time').html(invoiceDateTime);
-        dialog.find('.plan-icon').addClass('pro' + proPlanNum);
-        dialog.find('.plan-name').html(planName);
-        dialog.find('.plan-duration').html(planMonths);
-        dialog.find('.plan-price-euros').html(priceEuros);
-        dialog.find('.plan-price-bitcoins').html(priceBitcoins);
+        $bitcoinDialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
+        $bitcoinDialog.find('.bitcoin-address').text(bitcoinAddress);
+        $bitcoinDialog.find('.invoice-date-time').text(invoiceDateTime);
+        $bitcoinDialog.find('.plan-icon').addClass('pro' + proPlanNum);
+        $bitcoinDialog.find('.plan-name').text(planName);
+        $bitcoinDialog.find('.plan-duration').text(planMonths);
+        $bitcoinDialog.find('.plan-price-euros .value').text(priceEuros);
+        $bitcoinDialog.find('.plan-price-bitcoins').text(priceBitcoins);
 
         // Set countdown to price expiry
-        bitcoinDialog.setCoundownTimer(dialog, expiryTime);
+        bitcoinDialog.setCoundownTimer($bitcoinDialog, expiryTime);
 
         // Close dialog and reset to original dialog
-        dialog.find('.btn-close-dialog').rebind('click', function() {
+        $bitcoinDialog.find('.btn-close-dialog').rebind('click.bitcoin-dialog-close', function() {
 
-            dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
-            dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
-
-            // Close Web Socket if open
-            if (bitcoinDialog.chainWebSocketConn !== null) {
-                bitcoinDialog.chainWebSocketConn.close();
-            }
+            $dialogBackgroundOverlay.removeClass('bitcoin-invoice-dialog-overlay').addClass('hidden');
+            $bitcoinDialog.addClass('hidden');
 
             // End countdown timer
             clearInterval(bitcoinDialog.countdownIntervalId);
         });
-
-        // Update the dialog if a transaction is seen in the blockchain
-        bitcoinDialog.checkTransactionInBlockchain(dialog, bitcoinAddress, planName);
+        
+        // Make background overlay darker and show the dialog
+        $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay');
+        $bitcoinLoadingDialog.addClass('hidden');
+        $bitcoinDialog.removeClass('hidden');
     },
 
     /**
@@ -2663,79 +2686,7 @@ var bitcoinDialog = {
         };
 
         // Render the QR code
-        dialog.find('.bitcoin-qr-code').html('').qrcode(options);
-    },
-
-    /**
-     * Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
-     * This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
-     * @param {Object} dialog The jQuery object for the dialog
-     * @param {String} bitcoinAddress The bitcoin address
-     * @param {String} planName The Pro plan name
-     */
-    checkTransactionInBlockchain: function(dialog, bitcoinAddress, planName) {
-
-        // Open socket
-        bitcoinDialog.chainWebSocketConn = new WebSocket('wss://ws.chain.com/v2/notifications');
-
-        // Listen for events on this bitcoin address
-        bitcoinDialog.chainWebSocketConn.onopen = function (event) {
-            var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
-            bitcoinDialog.chainWebSocketConn.send(JSON.stringify(req));
-        };
-
-        // After receiving a response from the chain.com server
-        bitcoinDialog.chainWebSocketConn.onmessage = function (event) {
-
-            // Get data from WebSocket response
-            var notification = JSON.parse(event.data);
-            var type = notification.payload.type;
-            var address = notification.payload.address;
-
-            // Check only 'address' packets as the system also sends heartbeat packets
-            if ((type === 'address') && (address === bitcoinAddress)) {
-
-                // Update price left to pay
-                var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
-                var currentPriceSatoshis = btcmath.toSatoshi(currentPriceBitcoins);
-                var satoshisReceived = notification.payload.received;
-                var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
-                var priceRemainingBitcoins = btcmath.toBitcoinString(priceRemainingSatoshis);
-
-                // If correct amount was received
-                if (satoshisReceived === currentPriceSatoshis) {
-
-                    // Show success
-                    dialog.find('.left-side').css('visibility', 'hidden');
-                    dialog.find('.payment-confirmation').show();
-                    dialog.find('.payment-confirmation .reg-success-icon').addClass('success');
-                    dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
-                    dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
-                    dialog.find('.expiry-instruction').html('Paid!');
-
-                    // End countdown timer and close connection
-                    clearInterval(bitcoinDialog.countdownIntervalId);
-                    bitcoinDialog.chainWebSocketConn.close();
-
-                    // Inform API that we have full payment and await action packet confirmation.
-                    // a = action, vpay = verify payment, saleId = the id from the 'uts' call - this is
-                    // an array because one day we may support multiple sales e.g. buy Pro 1 and 2 at the
-                    // same time, add = the bitcoin address, t = payment gateway id for bitcoin provider (4)
-                    api_req({ a: 'vpay', saleid: [saleId], add: bitcoinAddress, t: 4 });
-                }
-
-                // If partial payment was made
-                else if (satoshisReceived < currentPriceSatoshis) {
-
-                    // Update price to pay
-                    dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
-                    dialog.find('.btn-open-wallet').attr('href', 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins);
-
-                    // Re-render QR code with updated price
-                    bitcoinDialog.generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
-                }
-            }
-        };
+        dialog.find('.bitcoin-qr-code').text('').qrcode(options);
     },
 
     /**
@@ -2745,8 +2696,11 @@ var bitcoinDialog = {
      * @param {Date} expiryTime The date/time the invoice will expire
      * @returns {Number} Returns the interval id
      */
-    setCoundownTimer: function(dialog, expiryTime)
-    {
+    setCoundownTimer: function(dialog, expiryTime) {
+        
+        // Clear old countdown timer if they have re-opened the page
+        clearInterval(bitcoinDialog.countdownIntervalId);
+        
         // Count down the time to price expiration
         bitcoinDialog.countdownIntervalId = setInterval(function() {
 
@@ -2769,7 +2723,7 @@ var bitcoinDialog = {
                 }
 
                 // Show time remaining
-                dialog.find('.time-to-expire').html(minutesPadded + ':' + secondsPadded);
+                dialog.find('.time-to-expire').text(minutesPadded + ':' + secondsPadded);
             }
             else {
                 // Grey out and hide details as the price has expired
@@ -2784,8 +2738,8 @@ var bitcoinDialog = {
                 dialog.find('.plan-price-euros').css('opacity', '0.25');
                 dialog.find('.plan-price-bitcoins').css('opacity', '0.25');
                 dialog.find('.plan-price-bitcoins-btc').css('opacity', '0.25');
-                dialog.find('.expiry-instruction').html('This purchase has expired.').css('opacity', '1');
-                dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
+                dialog.find('.expiry-instruction').text(l[8845]).css('opacity', '1');
+                dialog.find('.time-to-expire').text('00:00').css('opacity', '1');
                 dialog.find('.price-expired-instruction').show();
 
                 // End countdown timer
@@ -2799,32 +2753,26 @@ var bitcoinDialog = {
      */
     showBitcoinProviderFailureDialog: function() {
 
+        var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
+        var $bitcoinFailureDialog = $('.bitcoin-provider-failure-dialog');
+        
         // Add styles for the dialog
-        var dialogOverlay = $('.fm-dialog-overlay');
-        var dialog = $('.fm-dialog.pro-register-paypal-dialog');
-        var dialogOriginalHtml = dialog.html();
-
-        // Add styles for the dialog
-        dialogOverlay.addClass('bitcoin-provider-failure-dialog');
-        dialog.addClass('bitcoin-provider-failure-dialog');
+        $bitcoinFailureDialog.removeClass('hidden');
+        $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay').removeClass('hidden');
 
         // End countdown timer
         clearInterval(bitcoinDialog.countdownIntervalId);
 
-        // Clone template and show failure
-        var bitcoinProviderFailureHtml = $('.bitcoin-provider-failure').html();
-        dialog.html(bitcoinProviderFailureHtml);
-
         // Close dialog and reset to original dialog
-        dialog.find('.btn-close-dialog').rebind('click', function() {
-            dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');
-            dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
+        $bitcoinFailureDialog.find('.btn-close-dialog').rebind('click', function() {
+            $dialogBackgroundOverlay.removeClass('bitcoin-invoice-dialog-overlay').addClass('hidden');
+            $bitcoinFailureDialog.addClass('hidden');
         });
     }
 };
 
 
-function showLoginDialog() {
+function showLoginDialog(email) {
     megaAnalytics.log("pro", "loginDialog");
     $.dialog = 'pro-login-dialog';
 
@@ -2852,7 +2800,7 @@ function showLoginDialog() {
 
     $('.input-email', $dialog)
         .data('placeholder', l[195])
-        .val(l[195]);
+        .val(email || l[195]);
 
     $('.input-password', $dialog)
         .data('placeholder', l[909])
@@ -2943,348 +2891,48 @@ var doProLogin = function($dialog) {
 
 function showRegisterDialog() {
     megaAnalytics.log("pro", "regDialog");
-    $.dialog = 'pro-register-dialog';
 
-    var $dialog = $('.pro-register-dialog');
-    $dialog
-        .removeClass('hidden')
-        .addClass('active');
+    mega.ui.showRegisterDialog({
+        title: l[5840],
 
-    $('.fm-dialog-overlay').removeClass("hidden");
+        onCreatingAccount: function() {
+            megaAnalytics.log("pro", "doRegister");
+        },
 
-    var reposition = function() {
-        $dialog.css({
-            'margin-left': -1 * ($dialog.outerWidth() / 2),
-            'margin-top': -1 * ($dialog.outerHeight() / 2)
-        });
-    };
-
-    reposition();
-
-    $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
-
-
-    // controls
-    $('.fm-dialog-close', $dialog)
-        .unbind('click.proDialog')
-        .bind('click.proDialog', function() {
-            closeDialog();
-        });
-
-    $('#register-email', $dialog)
-        .data('placeholder', l[95])
-        .val(l[95]);
-
-    $('#register-firstname', $dialog)
-        .data('placeholder', l[1096])
-        .val(l[1096]);
-
-    $('#register-lastname', $dialog)
-        .data('placeholder', l[1097])
-        .val(l[1097]);
-
-    $('#register-password', $dialog)
-        .addClass('input-password')
-        .data('placeholder', l[909])
-        .val(l[909]);
-
-    $('#register-password2', $dialog)
-        .addClass('input-password')
-        .data('placeholder', l[1114])
-        .val(l[1114]);
-
-    uiPlaceholders($dialog);
-    uiCheckboxes($dialog);
-
-    var registerpwcheck = function()
-    {
-        $('.login-register-input.password', $dialog).removeClass('weak-password strong-password');
-        $('.new-registration', $dialog).removeClass('good1 good2 good3 good4 good5');
-        if (typeof zxcvbn == 'undefined' || $('#register-password', $dialog).attr('type') == 'text' || $('#register-password', $dialog).val() == '') return false;
-        var pw = zxcvbn($('#register-password', $dialog).val());
-        if (pw.score > 3 && pw.entropy > 75)
-        {
-            $('.login-register-input.password', $dialog).addClass('strong-password');
-            $('.new-registration', $dialog).addClass('good5');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong>' + l[1128]);
-            $('.new-reg-status-description', $dialog).text(l[1123]);
-        }
-        else if (pw.score > 2 && pw.entropy > 50)
-        {
-            $('.login-register-input.password', $dialog).addClass('strong-password');
-            $('.new-registration', $dialog).addClass('good4');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong>' + l[1127]);
-            $('.new-reg-status-description', $dialog).text(l[1122]);
-        }
-        else if (pw.score > 1 && pw.entropy > 40)
-        {
-            $('.login-register-input.password', $dialog).addClass('strong-password');
-            $('.new-registration', $dialog).addClass('good3');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong>' + l[1126]);
-            $('.new-reg-status-description', $dialog).text(l[1121]);
-        }
-        else if (pw.score > 0 && pw.entropy > 15)
-        {
-            $('.new-registration', $dialog).addClass('good2');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong>' + l[1125]);
-            $('.new-reg-status-description', $dialog).text(l[1120]);
-        }
-        else
-        {
-            $('.login-register-input.password', $dialog).addClass('weak-password');
-            $('.new-registration', $dialog).addClass('good1');
-            $('.new-reg-status-pad', $dialog).html('<strong>' + l[1105] + '</strong> ' + l[1124]);
-            $('.new-reg-status-description', $dialog).text(l[1119]);
-        }
-        $('.password-status-warning', $dialog).html('<span class="password-warning-txt">' + l[34] + '</span> ' + l[1129] + '<div class="password-tooltip-arrow"></div>');
-        $('.password-status-warning', $dialog).css('margin-left',($('.password-status-warning', $dialog).width()/2*-1)-13);
-        reposition();
-    };
-
-    if (typeof zxcvbn == 'undefined' && !silent_loading)
-    {
-        $('.login-register-input.password', $dialog).addClass('loading');
-        silent_loading=function()
-        {
-            $('.login-register-input.password', $dialog).removeClass('loading');
-            registerpwcheck();
-        };
-        jsl.push(jsl2['zxcvbn_js']);
-        jsl_start();
-    }
-    $('#register-password', $dialog).unbind('keyup.proRegister');
-    $('#register-password', $dialog).bind('keyup.proRegister',function(e)
-    {
-        registerpwcheck();
-    });
-    $('.password-status-icon', $dialog).unbind('mouseover.proRegister');
-    $('.password-status-icon', $dialog).bind('mouseover.proRegister',function(e)
-    {
-        if ($(this).parents('.strong-password').length == 0)
-        {
-            $('.password-status-warning', $dialog).removeClass('hidden');
-        }
-
-    });
-    $('.password-status-icon', $dialog).unbind('mouseout.proRegister');
-    $('.password-status-icon', $dialog).bind('mouseout.proRegister',function(e)
-    {
-        if ($(this).parents('.strong-password').length == 0)
-        {
-            $('.password-status-warning', $dialog).addClass('hidden');
-        }
-    });
-
-    $('input', $dialog).unbind('keydown.proRegister');
-    $('input', $dialog).bind('keydown.proRegister',function(e)  {
-        if (e.keyCode == 13) {
-            doProRegister($dialog);
-        }
-    });
-
-
-    $('.register-st2-button', $dialog).unbind('click');
-    $('.register-st2-button', $dialog).bind('click',function(e) {
-        doProRegister($dialog);
-        return false;
-    });
-
-    $('.new-registration-checkbox a', $dialog)
-        .unbind('click.proRegisterDialog')
-        .bind('click.proRegisterDialog',function(e) {
-            $.termsAgree = function()
-            {
-                $('.register-check').removeClass('checkboxOff');
-                $('.register-check').addClass('checkboxOn');
-            };
-            termsDialog();
-            return false;
-        });
-};
-
-var doProRegister = function($dialog) {
-    megaAnalytics.log("pro", "doRegister");
-    loadingDialog.show();
-
-    if (u_type > 0)
-    {
-        msgDialog('warninga',l[135],l[5843]);
-        loadingDialog.show();
-        return false;
-    }
-
-
-    var registeraccount = function()
-    {
-        var ctx =
-        {
-            callback : function(res)
-            {
-                loadingDialog.hide();
-                if (res == 0)
-                {
-                    var ops = {a:'up'};
-
-                    ops.terms = 'Mq';
-                    ops.firstname = base64urlencode(to8($('#register-firstname', $dialog).val()));
-                    ops.lastname = base64urlencode(to8($('#register-lastname', $dialog).val()));
-                    ops.name2 = base64urlencode(to8($('#register-firstname', $dialog) + ' ' + $('#register-lastname', $dialog).val()));
-                    u_attr.terms=1;
-
-                    api_req(ops);
+        onLoginAttemptFailed: function(registerData) {
+            msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
+                if (e) {
                     $('.pro-register-dialog').addClass('hidden');
-                    $('.fm-dialog.registration-page-success').unbind('click');
-
-                    // If true this means they do not need to confirm their email before continuing to step 2
-                    var skipConfirmationStep = true;
-
-                    if (skipConfirmationStep) {
-                        closeDialog();
-                        pro_next_step();
+                    if (signupPromptDialog) {
+                        signupPromptDialog.hide();
                     }
-                    else {
-                        $('.fm-dialog.registration-page-success').removeClass('hidden');
-                        $('.fm-dialog-overlay').removeClass('hidden');
-                        $('body').addClass('overlayed');
-                    }
+                    showLoginDialog(registerData.email);
                 }
-                else
-                {
-                    if (res == EACCESS) alert(l[218]);
-                    else if (res == EEXIST)
-                    {
-                        if (m) alert(l[219]);
-                        else
-                        {
-                            $('.login-register-input.email .top-loginp-tooltip-txt', $dialog).html(l[1297] + '<div class="white-txt">' + l[1298] + '</div>');
-                            $('.login-register-input.email', $dialog).addClass('incorrect');
-                            msgDialog('warninga','Error',l[219]);
+            });
+        },
 
-                            loadingDialog.hide();
-                        }
-                    }
+        onAccountCreated: function(gotLoggedIn, registerData) {
+            // If true this means they do not need to confirm their email before continuing to step 2
+            var skipConfirmationStep = true;
+
+            if (skipConfirmationStep) {
+                closeDialog();
+                topmenuUI();
+                if (!gotLoggedIn) {
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
                 }
+                else {
+                    showToast('megasync', l[8745]);
+                    $('.fm-avatar img').attr('src', useravatar.top());
+                }
+                pro_next_step();
             }
-        };
-
-        var rv={};
-
-        rv.name = $('#register-firstname', $dialog).val() + ' ' + $('#register-lastname', $dialog).val();
-        rv.email = $('#register-email', $dialog).val();
-        rv.password = $('#register-password', $dialog).val();
-
-        var sendsignuplink = function(name,email,password,ctx)
-        {
-            var pw_aes = new sjcl.cipher.aes(prepare_key_pw(password));
-            var req = { a : 'uc', c : base64urlencode(a32_to_str(encrypt_key(pw_aes,u_k))+a32_to_str(encrypt_key(pw_aes,[rand(0x100000000),0,0,rand(0x100000000)]))), n : base64urlencode(to8(name)), m : base64urlencode(email) };
-
-            api_req(req,ctx);
-        };
-
-        sendsignuplink(rv.name,rv.email,rv.password,ctx);
-    };
-
-
-
-    var err=false;
-
-    if ($('#register-firstname', $dialog).val() == '' || $('#register-firstname', $dialog).val() == l[1096] || $('#register-lastname', $dialog).val() == '' || $('#register-lastname', $dialog).val() == l[1097])
-    {
-        $('.login-register-input.name', $dialog).addClass('incorrect');
-        err=1;
-    }
-    if ($('#register-email', $dialog).val() == '' || $('#register-email', $dialog).val() == l[1096] || checkMail($('#register-email', $dialog).val()))
-    {
-        $('.login-register-input.email', $dialog).addClass('incorrect');
-        err=1;
-    }
-
-    if ($('#register-email', $dialog).val() == '' || $('#register-email', $dialog).val() == l[1096] || checkMail($('#register-email', $dialog).val()))
-    {
-        $('.login-register-input.email', $dialog).addClass('incorrect');
-        err=1;
-    }
-
-    var pw = zxcvbn($('#register-password', $dialog).val());
-    if ($('#register-password', $dialog).attr('type') == 'text')
-    {
-        $('.login-register-input.password.first', $dialog).addClass('incorrect');
-        $('.white-txt.password', $dialog).text(l[213]);
-        err=1;
-    }
-    else if (pw.score == 0 || pw.entropy < 16)
-    {
-        $('.login-register-input.password.first', $dialog).addClass('incorrect');
-        $('.white-txt.password', $dialog).text(l[1104]);
-        err=1;
-    }
-
-    if ($('#register-password', $dialog).val() !== $('#register-password2', $dialog).val())
-    {
-        $('#register-password', $dialog)[0].type = 'password';
-        $('#register-password2', $dialog)[0].type = 'password';
-        $('#register-password', $dialog).val('');
-        $('#register-password2', $dialog).val('');
-        $('.login-register-input.password.confirm', $dialog).addClass('incorrect');
-        err=1;
-    }
-
-    if (!err && typeof zxcvbn == 'undefined')
-    {
-        msgDialog('warninga',l[135],l[1115] + '<br>' + l[1116]);
-        loadingDialog.hide();
-        return false;
-    }
-    else if (!err)
-    {
-        if ($('.register-check', $dialog).attr('class').indexOf('checkboxOff') > -1)
-        {
-            msgDialog('warninga',l[1117],l[1118]);
-            loadingDialog.hide();
+            else {
+                $('.fm-dialog.registration-page-success').removeClass('hidden');
+                fm_showoverlay();
+            }
         }
-        else
-        {
-            if (localStorage.signupcode)
-            {
-                loadingDialog.show();
-                u_storage = init_storage(localStorage);
-                var ctx =
-                {
-                    checkloginresult: function(u_ctx,r)
-                    {
-                        if (typeof r[0] == 'number' && r[0] < 0) msgDialog('warningb',l[135],l[200]);
-                        else
-                        {
-                            loadingDialog.hide();
-                            u_type = r;
-                            document.location.hash = 'fm'; //TODO: fixme
-                        }
-                    }
-                }
-                var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#register-password', $dialog).val()));
-                var uh = stringhash($('#register-email', $dialog).val().toLowerCase(),passwordaes);
-                u_checklogin(ctx,true,prepare_key_pw($('#register-password', $dialog).val()),localStorage.signupcode,$('#register-firstname', $dialog).val() + ' ' + $('#register-lastname', $dialog).val(),uh);
-                delete localStorage.signupcode;
-            }
-            else if (u_type === false)
-            {
-                loadingDialog.show();
-                u_storage = init_storage(localStorage);
-                u_checklogin(
-                    {
-                        checkloginresult: function(u_ctx,r)
-                        {
-                            u_type = r;
-                            registeraccount();
-                        }
-                    },true);
-            }
-            else if (u_type == 0) registeraccount();
-        }
-    }
-    if (err) {
-        loadingDialog.hide();
-    }
+    });
 };
 
 var paypalTimeout = null;
@@ -3382,18 +3030,30 @@ var showSignupPromptDialog = function() {
                 .html('<p>' + l[5842] + '</p>');
 
             $('.fm-dialog-button.pro-login', this.$dialog)
-                .unbind('click.loginrequired')
-                .bind('click.loginrequired', function() {
+                .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
                     showLoginDialog();
                     return false;
                 });
 
             $('.fm-dialog-button.pro-register', this.$dialog)
-                .unbind('click.loginrequired')
-                .bind('click.loginrequired', function() {
+                .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
-                    showRegisterDialog();
+
+                    if (!u_wasloggedin()) {
+                        showRegisterDialog();
+                    }
+                    else {
+                        var msg = l[8743];
+                        msgDialog('confirmation', l[1193], msg, null, function(res) {
+                            if (res) {
+                                showRegisterDialog();
+                            }
+                            else {
+                                showLoginDialog();
+                            }
+                        });
+                    }
                     return false;
                 }).find('span').text(l[1076]);
         });

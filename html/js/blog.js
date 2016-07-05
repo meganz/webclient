@@ -19,7 +19,7 @@ var blogposts = null;
 
 function unsigned_blogposts(ready) {
     var xhr = getxhr();
-    xhr.open("GET", "https://cms.mega.nz/unsigned/blog.json");
+    xhr.open("GET", "https://cms2.mega.nz/unsigned/blog");
     xhr.onreadystatechange = function() {
         if (this.readyState === 4) {
             blogposts = JSON.parse(xhr.responseText);
@@ -113,7 +113,7 @@ function blog_load() {
                     blogcontent += '<div class="blog-new-small"><span>By:</span> ' + escapeHTML(by) + '</div>';
                     blogcontent += '<div class="clear"></div><img alt="" data-img="loading_'
                         + escapeHTML(blogposts[i].attaches.simg) + '" src="'
-                        + escapeHTML(CMS.img(blogposts[i].attaches.simg)) + '" />';
+                        + escapeHTML(CMS.img2(blogposts[i].attaches.simg)) + '" />';
                     blogcontent += '<p><span class="blog-new-description">' + introtxt + '</span>';
                     blogcontent += '<a class="blog-new-read-more">' + l[8512] + '</a>';
                     blogcontent += '<span class="clear"></span></p> </div>';
@@ -340,7 +340,7 @@ if (typeof mobileblog !== 'undefined') {
         var content = '';
         if (blogposts[i].attaches.bimg) {
             content += '<img alt="" data-img="loading_' + escapeHTML(blogposts[i].attaches.bimg)
-                + '" src="https://cms.mega.nz/unsigned/' + escapeHTML(blogposts[i].attaches.bimg)
+                + '" src="https://cms2.mega.nz/unsigned/' + escapeHTML(blogposts[i].attaches.bimg)
                 + '" class="blog-new-full-img" />';
         }
         content += blogposts[i].c;
@@ -360,7 +360,7 @@ if (typeof mobileblog !== 'undefined') {
                         '<span>by:</span> ' + escapeHTML(blogposts[i].by || "Admin") +
                     '</div>' +
                     '<div class="clear"></div>' +
-                    '<div id="blogarticle_post">' + content + '</div>' +
+                    '<div id="blogarticle_post">' + content.replace(/(?:{|%7B)cmspath(?:%7D|})/g, 'https://cms2.mega.nz/') + '</div>' +
                     '<div class="clear"></div>' +
                 '</div>' +
                 '<div class="bottom-menu full-version">' +

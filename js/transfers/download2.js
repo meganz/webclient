@@ -300,6 +300,12 @@ var dlmanager = {
             error = res;
         }
         else if (typeof res === 'object') {
+            if (res.efq) {
+                dlmanager.efq = true;
+            }
+            else {
+                delete dlmanager.efq;
+            }
             if (res.d) {
                 error = (res.d ? 2 : 1); // XXX: ???
             }
@@ -327,6 +333,8 @@ var dlmanager = {
                     }
 
                     dlmanager.isOverQuota = false;
+                    dlmanager.isOverFreeQuota = false;
+                    delete localStorage.awaitingConfirmationAccount;
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -408,6 +416,10 @@ var dlmanager = {
         }
 
         if (code === 509) {
+            if (!dl.log509 && Object(u_attr).p) {
+                dl.log509 = 1;
+                api_req({ a: 'log', e: 99614, m: 'PRO user got 509' });
+            }
             this.showOverQuotaDialog(task);
             dlmanager.dlReportStatus(dl, EOVERQUOTA);
             return 1;
@@ -636,21 +648,30 @@ var dlmanager = {
     _quotaPushBack: {},
     _dlQuotaListener: [],
 
-    _onQuotaRetry: function DM_onQuotaRetry(getNewUrl) {
+    _onQuotaRetry: function DM_onQuotaRetry(getNewUrl, sid) {
         delay.cancel('overquota:retry');
 
         var ids = dlmanager.getCurrentDownloads();
         $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+
+        if (this.isOverFreeQuota) {
+            closeDialog();
+            topmenuUI();
+
+            if (sid) {
+                this.isOverFreeQuota = sid;
+            }
+        }
 
         if (page === 'download') {
             $('.download.info-block').removeClass('overquota');
         }
         else {
             $('#' + ids.join(',#'))
-                .find('span.transfer-status')
+                .addClass('transfer-queued')
+                .find('.transfer-status')
                 .removeClass('overquota')
-                .parents('td')
-                .safeHTML('<span class="transfer-status queued">@@</span>', l[7227]);
+                .text(l[7227]);
         }
 
         this.logger.debug('_onQuotaRetry', ids, this._dlQuotaListener.length, this._dlQuotaListener);
@@ -755,11 +776,11 @@ var dlmanager = {
 
                 if ($dialog.is(':visible')) {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
-                    $countdown.text(secondsToTimeShort(timeLeft));
+                    $countdown.safeHTML(secondsToTime(timeLeft, 1));
 
                     this._overQuotaTimeLeftTick =
                         setInterval(function() {
-                            $countdown.text(secondsToTimeShort(timeLeft--));
+                            $countdown.safeHTML(secondsToTime(timeLeft--, 1));
                         }, 1000);
                 }
             }.bind(this)
@@ -794,15 +815,10 @@ var dlmanager = {
             );
     },
 
-    showOverQuotaDialog: function DM_quotaDialog(dlTask) {
-
-        var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
-        var $button = $dialog.find('.fm-dialog-close');
-        var $overlay = $('.fm-dialog-overlay');
-
+    _setOverQuotaState: function DM_setOverQuotaState(dlTask) {
         this.isOverQuota = true;
         localStorage.seenOverQuotaDialog = Date.now();
-        this.logger.debug('showOverQuotaDialog', dlTask);
+        this.logger.debug('_setOverQuotaState', dlTask);
 
         if (typeof dlTask === "function") {
             this._dlQuotaListener.push(dlTask);
@@ -811,10 +827,52 @@ var dlmanager = {
             this._quotaPushBack[dlTask.gid] = dlTask;
         }
 
-        dlmanager.getCurrentDownloads()
+        this.getCurrentDownloads()
             .forEach(function(gid) {
                 fm_tfspause(gid, true);
             });
+    },
+
+    showOverQuotaRegisterDialog: function DM_quotaDialog(dlTask) {
+
+        this._setOverQuotaState(dlTask);
+
+        // did we get a sid from another tab? (watchdog:setsid)
+        if (typeof this.isOverFreeQuota === 'string') {
+            // Yup, delay a retry...
+            return delay('overfreequota:retry', this._onQuotaRetry.bind(this, true), 1200);
+        }
+        this.isOverFreeQuota = true;
+
+        api_req({ a: 'log', e: 99613, m: 'efq' });
+
+        mega.ui.showRegisterDialog({
+            title: l[17],
+            body: '<p>' + l[8834] + '</p><p>' + l[8833] + '</p><h2>' + l[1095] + '</h2>',
+
+            onAccountCreated: function(gotLoggedIn, accountData) {
+                if (gotLoggedIn) {
+                    dlmanager._onQuotaRetry(true);
+                }
+                else {
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                    mega.ui.sendSignupLinkDialog(accountData);
+                }
+            }
+        });
+    },
+
+    showOverQuotaDialog: function DM_quotaDialog(dlTask) {
+
+        if (this.efq) {
+            return this.showOverQuotaRegisterDialog(dlTask);
+        }
+
+        var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+        var $button = $dialog.find('.fm-dialog-close');
+        var $overlay = $('.fm-dialog-overlay');
+
+        this._setOverQuotaState(dlTask);
 
         if ($dialog.is(':visible')) {
             this.logger.info('showOverQuotaDialog', 'visible already.');
@@ -849,7 +907,15 @@ var dlmanager = {
         return array_unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
     },
 
-    isMEGAsyncRunning: function(minVersion) {
+    /**
+     * Check whether MEGAsync is running.
+     *
+     * @param {String}  minVersion      The min MEGAsync version required.
+     * @param {Boolean} getVersionInfo  Do not reject the promise if the min version is not
+     *                                  meet, instead resolve it providing an ERANGE result.
+     * @return {MegaPromise}
+     */
+    isMEGAsyncRunning: function(minVersion, getVersionInfo) {
         var timeout = 200;
         var logger = this.logger;
         var promise = new MegaPromise();
@@ -857,7 +923,7 @@ var dlmanager = {
         var resolve = function() {
             if (promise) {
                 loadingDialog.hide();
-                logger.debug('isMEGAsyncRunning: YUP');
+                logger.debug('isMEGAsyncRunning: YUP', arguments);
 
                 promise.resolve.apply(promise, arguments);
                 promise = undefined;
@@ -881,6 +947,8 @@ var dlmanager = {
                     reject(err || ENOENT);
                 }
                 else {
+                    var verNotMeet = false;
+
                     // if a min version is required, check for it
                     if (minVersion) {
                         var runningVersion = mega.utils.vtol(is.v);
@@ -892,11 +960,18 @@ var dlmanager = {
                         }
 
                         if (runningVersion < minVersion) {
-                            return reject(ERANGE);
+                            if (!getVersionInfo) {
+                                return reject(ERANGE);
+                            }
+
+                            verNotMeet = ERANGE;
                         }
                     }
 
-                    resolve(megasync);
+                    var syncData = clone(is);
+                    syncData.verNotMeet = verNotMeet;
+
+                    resolve(megasync, syncData);
                 }
             });
         };
@@ -958,14 +1033,22 @@ function fm_tfspause(gid, overquota) {
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
-            $tr.addClass('paused');
-            $tr.find('span.transfer-type').addClass('paused');
+
+            if ($tr.hasClass('transfer-started')) {
+                $tr.find('.eta').text('').addClass('unknown');
+                $tr.find('.speed').text(l[1651]).addClass('unknown');
+            }
+            $tr.addClass('transfer-paused');
+            $tr.removeClass('transfer-started');
 
             if (overquota === true) {
-                $tr.find('td:eq(5)').safeHTML('<span class="transfer-status error overquota">@@</span>', l[1673]);
+                $tr.addClass('transfer-error');
+                $tr.find('.transfer-status').addClass('overquota').text(l[1673]);
             }
             else {
-                $tr.find('td:eq(5)').safeHTML('<span class="transfer-status queued">@@</span>', l[7227]);
+                $tr.addClass('transfer-queued');
+                $tr.removeClass('transfer-error');
+                $tr.find('.transfer-status').text(l[7227]);
             }
         }
         return true;
@@ -983,10 +1066,14 @@ function fm_tfsresume(gid) {
 
             if (page === 'download'
                     && $('.download.info-block').hasClass('overquota')
-                    || $tr.find('span.transfer-status').hasClass('overquota')) {
+                    || $tr.find('.transfer-status').hasClass('overquota')) {
 
                 if (page === 'download') {
                     $('.download.pause-button').addClass('active');
+                }
+
+                if (dlmanager.isOverFreeQuota) {
+                    return dlmanager.showOverQuotaRegisterDialog();
                 }
 
                 return dlmanager.showOverQuotaDialog();
@@ -997,11 +1084,15 @@ function fm_tfsresume(gid) {
                 $('.download.status-txt, .download-info .text').text('').removeClass('blue');
             }
             else {
-                $tr.removeClass('paused');
-                $tr.find('span.transfer-type').removeClass('paused');
+                $tr.removeClass('transfer-paused');
 
-                if (!$('.transfer-table .progress-block, .transfer-table .transfer-status.initiliazing').length) {
-                    $tr.find('td:eq(5)').safeHTML('<span class="transfer-status initiliazing">@@</span>', l[1042]);
+                if (!$('.transfer-table tr.transfer-started, .transfer-table tr.transfer-initiliazing').length) {
+
+                    $tr.addClass('transfer-initiliazing')
+                        .find('.transfer-status').text(l[1042]);
+                }
+                else {
+                    $tr.find('.speed, .eta').removeClass('unknown').text('');
                 }
             }
         }
@@ -1140,17 +1231,16 @@ function fm_tfsupdate() {
     var u = 0;
 
     // Move completed transfers to the bottom
-    var $completed = $('.transfer-table tr.completed');
+    var $completed = $('.transfer-table tr.transfer-completed');
     var completedLen = $completed.length;
-    $completed.remove()
-        .insertBefore($('.transfer-table tr.clone-of-header'));
+    $('.transfer-table').append($completed);
 
     // Remove completed transfers filling the whole table
-    if ($('.transfer-table tr:first').hasClass('completed')) {
+    if ($('.transfer-table tr:first').hasClass('transfer-completed')) {
         var trLen = M.getTransferTableLengths().size;
         if (completedLen >= trLen) {
             if (completedLen > 50) {
-                $('.transfer-table tr.completed')
+                $('.transfer-table tr.transfer-completed')
                     .slice(0, trLen)
                     .fadeOut(function() {
                         $(this).remove();
@@ -1170,9 +1260,9 @@ function fm_tfsupdate() {
             ++u;
         }
     });*/
-    var $trs = $('.transfer-table tr').not('.completed');
+    var $trs = $('.transfer-table tr').not('.transfer-completed');
     u = $trs.find('.transfer-type.upload').length;
-    i = $trs.length - u - (1 /* tr.clone-of-header */);
+    i = $trs.length - u;
     for (var k in M.tfsdomqueue) {
         if (k[0] === 'u') {
             ++u;

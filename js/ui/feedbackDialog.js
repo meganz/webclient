@@ -105,8 +105,12 @@
 
             self.$textarea = $('textarea', self.$dialog);
             self.$textarea
-                .val('');
-            
+                .val('')
+                .next()
+                .text('');
+ 
+            initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
+
             $('.collected-data', self.$dialog)
                 .html('');
 
@@ -164,36 +168,8 @@
 
             $('.feedback-button-send, .feedback-button-cancel', self.$dialog).removeClass('disabled');
         });
-
-        $('.feedback-dialog-textarea textarea').on('keyup', function() {
-            var $txt = $('.feedback-dialog-textarea textarea'),
-                $hiddenDiv = $('.feedback-dialog-hidden'),
-                $pane = $('.feedback-dialog-textarea'),
-                txtHeight = $txt.outerHeight(),
-                content = $txt.val(),
-                api;
-
-            content = content.replace(/\n/g, '<br />');
-            $hiddenDiv.html(content + '<br/>');
-
-            if ($hiddenDiv.height() > 78) {
-                $txt.height($hiddenDiv.outerHeight());
-                $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-                api = $pane.data('jsp');
-                $txt.blur();
-                $txt.focus();
-                api.scrollByY(0);
-            }
-            else {
-                $txt.removeAttr('style');
-                api = $pane.data('jsp');
-                if (api) {
-                    api.destroy();
-                    $txt.blur();
-                    $txt.focus();
-                }
-            }
-        });
+        
+        initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
 
         $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
             var dialog = self.$dataReportDialog;

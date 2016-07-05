@@ -8740,10 +8740,6 @@
 	  }
 	};
 
-	function registerNullComponentID() {
-	  ReactEmptyComponentRegistry.registerNullComponentID(this._rootNodeID);
-	}
-
 	var ReactEmptyComponent = function (instantiate) {
 	  this._currentElement = null;
 	  this._rootNodeID = null;
@@ -8752,7 +8748,7 @@
 	assign(ReactEmptyComponent.prototype, {
 	  construct: function (element) {},
 	  mountComponent: function (rootID, transaction, context) {
-	    transaction.getReactMountReady().enqueue(registerNullComponentID, this);
+	    ReactEmptyComponentRegistry.registerNullComponentID(rootID);
 	    this._rootNodeID = rootID;
 	    return ReactReconciler.mountComponent(this._renderedComponent, rootID, transaction, context);
 	  },
@@ -18263,7 +18259,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.8';
+	module.exports = '0.14.7';
 
 /***/ },
 /* 143 */
@@ -21632,15 +21628,17 @@
 	        "scream": ["1F631", "&#x1F631;"],
 	        "relieved": ["1F60C", "&#x1F60C;"],
 	        "dizzy_face": ["1F635", "&#x1F635;"],
+	        "confused": ["1f621", "&#x1f621;"],
 	        "slight_frown": ["1F641", "&#x1F641;"],
 	        "confounded": ["1F616", "&#x1F616;"],
-	        "angry": ["1F61E", "&#x1F61E;"],
+	        "angry": ["1f620", "&#x1f620;"],
 	        "kissing_smiling_eyes": ["1F619", "&#x1F619;"],
 	        "triumph": ["1F624", "&#x1F624;"],
 	        "neutral_face": ["1F610", "&#x1F610;"],
 	        "laughing": ["1F606", "&#x1F606;"],
 	        "hushed": ["1F62F", "&#x1F62F;"],
 	        "disappointed_relieved": ["1F625", "&#x1F625;"],
+	        "anguished": ["1F627", "&#x1F627;"],
 	        "weary": ["1F629", "&#x1F629;"],
 	        "flushed": ["1F633", "&#x1F633;"],
 	        "unamused": ["1F612", "&#x1F612;"],

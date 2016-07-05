@@ -1495,4 +1495,5 @@ var dl_queue = new DownloadQueue();
 if (is_mobile) {
     dlmanager.ioThrottleLimit = 2;
     dlmanager.dlMaxChunkSize = 4 * 1048576;
+    dlMethod = MemoryIO;
 }

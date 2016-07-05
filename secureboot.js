@@ -863,9 +863,10 @@ function siteLoadError(error, filename) {
     alert(message.join("\n\n"));
 }
 
-// is_mobile=1
+is_mobile=1
 if (location.hash === '#test') {
-    window.location.hash = '#!84Vl0ADI!Fj9EOhlQu4mN_ZwlUNIHCD6xc2xMKCEjSFvEEvypx9o';
+    // window.location.hash = '#!84Vl0ADI!Fj9EOhlQu4mN_ZwlUNIHCD6xc2xMKCEjSFvEEvypx9o';
+    window.location.hash = '#!eBURTBaL!qt9qLMPlRx5wSCAB9AdUV2LDZgVDdAfmqWXKFlI32-0';
 }
 
 if (location.hash.substr(1, 1) === '!') {
@@ -1526,9 +1527,9 @@ else if (!b_u)
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-    jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
 
     if (!is_mobile) {
+        jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
@@ -1619,8 +1620,8 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'download_mobile': { f: 'html/download-mobile.html', n: 'mobile_html', j: 0},
-        'mobile_css': { f: 'css/mobile-app-new.css', n: 'mobile_css', j: 2},
+        'download_mobile': { f: 'html/download-mobile.html', n: 'download', j: 0},
+        'mobile_css': { f: 'css/mobile-app-new.css', n: 'mobile_css', j:2,w:30,c:1,d:1,m:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
         'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
@@ -1702,6 +1703,10 @@ else if (!b_u)
         'chrome': ['chrome', 'chrome_js'],
         'firefox': ['firefox', 'firefox_js']
     };
+
+    if (is_mobile) {
+        subpages['!'] = ['download_mobile', 'download_js', 'mobile_css'];
+    }
 
     if (page)
     {
@@ -2208,7 +2213,7 @@ else if (!b_u)
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
 
-    if ((u_sid = u_storage.sid))
+    if (!is_mobile && (u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();
@@ -2261,7 +2266,9 @@ else if (!b_u)
         }
         catch (e) {}
 
-        if (u_checked) startMega();
+        if (u_checked || is_mobile) {
+            startMega();
+        }
         else if (loginresponse === -15) {
             u_logout(true);
             boot_auth(null, false);

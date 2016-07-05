@@ -88,6 +88,20 @@
             else if (msie) {
                 navigator.msSaveOrOpenBlob(blob, name);
             }
+            else if (is_mobile) {
+                if (page === 'download') {
+                    blob = myURL.createObjectURL(blob);
+                    $('body')
+                        .find('.download-progress')
+                        .rebind('click', function() {
+                            window.open(blob, '_blank');
+                            return false;
+                        });
+                }
+                else {
+                    throw new Error('MemoryIO -- huh??');
+                }
+            }
             else if (hasDownloadAttr) {
                 var blob_url = myURL.createObjectURL(blob);
                 var dlLinkNode = document.getElementById('dllink');
@@ -98,17 +112,6 @@
                     myURL.revokeObjectURL(blob_url);
                     blob_url = undefined;
                 });
-            }
-            else if (is_mobile) {
-                if (page === 'download') {
-                    blob = myURL.createObjectURL(blob);
-                    // location.href = blob;
-                    $('.download.progress-bar')
-                        .after('<br><p><a href="' + blob + '" target="_blank">OPEN FILE</a></p>');
-                }
-                else {
-                    throw new Error('MemoryIO -- huh??');
-                }
             }
             else {
                 throw new Error('MemoryIO -- huh?');

@@ -969,12 +969,12 @@ function init_page() {
     else {
         location.assign('/');
     }
-    
+
     // Initialise the Public Service Announcement system
     if (typeof psa !== 'undefined') {
         psa.init();
     }
-    
+
     // Initialise the update check system
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
@@ -1834,17 +1834,20 @@ function parsepage(pagehtml, pp) {
     $('#pageholder').hide();
     $('#startholder').hide();
     megatitle();
+
     pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     $('body').removeClass('notification-body bottom-pages new-startpage');
+
     if (page == 'start') {
         $('body').addClass('new-startpage');
     }
     else {
         $('body').addClass('bottom-pages');
     }
+
     var top = parsetopmenu();
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
@@ -1854,8 +1857,12 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace("((MEGAINFO))", translate(pages['megainfo']).replace(/{staticpath}/g, staticpath));
     pagehtml = pagehtml.replace("((TOP))", top);
     pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
-    $('#startholder').safeHTML(translate(pages['transferwidget']) + pagehtml);
-    $('#startholder').show();
+
+    var $container = is_mobile ? $('body') : $('#startholder');
+    $container
+        .safeHTML(translate(pages['transferwidget']) + pagehtml)
+        .show();
+
     Soon(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
         if (page !== 'start' && page !== 'download') {
@@ -1863,6 +1870,7 @@ function parsepage(pagehtml, pp) {
         }
         mega.utils.chrome110ZoomLevelNotification();
     });
+
     $('.nw-bottom-block').addClass(lang);
     if (typeof UIkeyevents === 'function') {
         UIkeyevents();
@@ -1914,7 +1922,8 @@ window.onhashchange = function() {
         return false;
     }
 
-    if (document.getElementById('overlay').style.display == '' && !is_fm()) {
+    var overlay = document.getElementById('overlay');
+    if (overlay && overlay.style.display == '' && !is_fm()) {
         document.location.hash = hash;
         return false;
     }

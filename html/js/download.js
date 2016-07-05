@@ -4,6 +4,18 @@ var dl_import=false;
 var dl_attr;
 var fdl_queue_var=false;
 
+var MOBILE_MAXFILESIZE = 400 * (1024 * 1024);
+var MOBILE_FILETYPES = {
+    "docx" : 'word',
+    "jpeg" : 'image',
+    "jpg"  : 'image',
+    "mp3"  : 'audio',
+    "mp4"  : 'video',
+    "pdf"  : 'pdf',
+    "png"  : 'image',
+    "xlsx" : 'word'
+};
+
 function dlinfo(ph,key,next)
 {
     dl_next = next;
@@ -76,7 +88,7 @@ function dl_g(res) {
     $('.download-button.to-clouddrive').safeHTML(l[1389]).hide();
     $('.download-button.throught-browser').safeHTML(l[8849]).hide();
     $('.download-button.with-megasync').safeHTML(l[8848]).hide();
-    
+
 
     if (res === ETOOMANY) {
         $('.download.content-block').addClass('not-available-user');
@@ -137,10 +149,13 @@ function dl_g(res) {
                     });
                 }
             });
-            $('.download-button.throught-browser').show().rebind('click', function() {
-                $(this).unbind('click');
-                browserDownload();
-            });
+            $('.download-button.throught-browser, .mobile.dl-browser')
+                .show()
+                .rebind('click', function() {
+                    $(this).unbind('click');
+                    browserDownload();
+                    return false;
+                });
 
             $('.download-button.to-clouddrive').rebind('click', start_import);
 
@@ -186,6 +201,54 @@ function dl_g(res) {
                 $('.download.status-txt, .download-info .text').text(l[1651]).addClass('blue');
                 $('.download.pause-button').addClass('active');
             }
+
+            if (is_mobile) {
+                $('.mobile.filename').text(str_mtrunc(filename, 30));
+                $('.mobile.filesize').text(bytesToSize(res.s));
+                $('.mobile.dl-megaapp').rebind('click', function() {
+                    switch (ua.details.os) {
+                        case 'iPad':
+                        case 'iPhone':
+                            setTimeout(function() {
+                                window.location = "https://itunes.apple.com/us/app/mega/id706857885?mt=8";
+                            }, 25);
+                            window.location = "mega://" + location.hash;
+                            break;
+
+                        case 'Android':
+                            var intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                            document.location = intent;
+                            break;
+
+                        default:
+                            alert('Unknown device.');
+                    }
+                    return false;
+                });
+
+                var ext = fileext(filename);
+                var supported = MOBILE_FILETYPES[ext];
+                var icon = supported || 'generic';
+
+                $('img.filetype-img').attr({
+                    src: 'images/mobile/extensions/' + icon + '.png'
+                });
+
+                if (res.s > MOBILE_MAXFILESIZE || !supported) {
+                    $('body').addClass('wrong-file');
+                    $('.mobile.dl-browser').addClass('disabled');
+                    $('.mobile.dl-browser').unbind('click');
+
+                    // TODO: translation
+                    var errmsg = 'This file is too large to open in your mobile browser. Please install our mobile app for <span>unlimited file size support, and free 50GB cloud storage!</span>';
+
+                    if (!supported) {
+                        errmsg = 'This file could not be opened in your mobile browser. Please install our mobile app for <span>unlimited file size and type support, and free 50GB cloud storage!</span>';
+                    }
+
+                    $('.mobile.error-txt').safeHTML(errmsg);
+                }
+            }
         }
         else {
             mKeyDialog(dlpage_ph)
@@ -197,6 +260,11 @@ function dl_g(res) {
         }
     }
     else $('.download.content-block').addClass('na-some-reason');
+
+    if (is_mobile && !fdl_queue_var) {
+        $('#mobile-ui-main').addClass('hidden');
+        $('#mobile-ui-notFound').removeClass('hidden');
+    }
 
     var pf = navigator.platform.toUpperCase();
     if (page.substr(-5) == 'linux') sync_switchOS('linux');
@@ -223,6 +291,11 @@ function browserDownload() {
         $('.download.content-block').addClass('downloading');
         $('.download.percents-txt').text('0 %');
         $('.download.status-txt').text(l[819]).removeClass('green');
+
+        if (is_mobile) {
+            $('body').addClass('downloading')
+                .find('.bar').width('0%');
+        }
 
         if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
             dlmanager.isDownloading = true;
@@ -336,9 +409,24 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.download.percents-txt').text(perc + ' %');
         megatitle(' ' + perc + '%');
     }
+
+    // XXX: ^
+    if (is_mobile) {
+        var $body = $('body');
+
+        $body
+            .addClass('downloading')
+            .find('.bar').width(perc + '%');
+
+        if (perc === 100) {
+            $body.addClass('download-complete');
+        }
+    }
+
     if (bytesloaded === bytestotal) {
         $('.download.status-txt').text(l[8579]);
     }
+
     if (fdl_starttime) var eltime = (new Date().getTime()-fdl_starttime)/1000;
     else var eltime = (new Date().getTime()-dl_queue[dl_queue_num].starttime)/1000;
     if (eltime && bytesloaded)

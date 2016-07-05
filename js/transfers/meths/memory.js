@@ -92,11 +92,13 @@
                 if (page === 'download') {
                     blob = myURL.createObjectURL(blob);
                     $('body')
+                        .addClass('download-complete')
                         .find('.download-progress')
                         .rebind('click', function() {
                             window.open(blob, '_blank');
                             return false;
                         });
+                    $('.mobile.download-speed, .mobile.download-percents').text('');
                 }
                 else {
                     throw new Error('MemoryIO -- huh??');

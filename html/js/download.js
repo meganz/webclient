@@ -216,6 +216,10 @@ function dl_g(res) {
                             window.location = "mega://" + location.hash;
                             break;
 
+                        case 'Windows Phone':
+                            window.location = 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+                            break;
+
                         case 'Android':
                             var intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
                             document.location = intent;
@@ -295,7 +299,7 @@ function browserDownload() {
 
         if (is_mobile) {
             $('body').addClass('downloading')
-                .find('.bar').width('0%');
+                .find('.bar').width('1%');
         }
 
         if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
@@ -439,9 +443,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
             .addClass('downloading')
             .find('.bar').width(perc + '%');
 
-        if (perc === 100) {
-            $body.addClass('download-complete');
-        }
+        $('.mobile.download-percents').text(perc + '%');
     }
 
     if (bytesloaded === bytestotal) {
@@ -459,6 +461,10 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
             speed.size + '<span>' + speed.unit + '/s</span>'
         );
         $('.download-info.time-txt .text').safeHTML(secondsToTime(retime, 1));
+
+        if (is_mobile) {
+            $('.mobile.download-speed').text(speed.size + speed.unit + '/s');
+        }
     }
     if (page !== 'download' || $.infoscroll)
     {

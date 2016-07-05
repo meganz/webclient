@@ -2292,21 +2292,7 @@ function MegaData()
         }
     };
 
-    this.rubNodes = {};
-
     this.addNode = function(n, ignoreDB) {
-        if (n.p === this.RubbishID) {
-            this.rubNodes[n.h] = true;
-            this.rubbishIco();
-        }
-        if (n.t === 4) {
-            for (var i in this.d) {
-                if (this.d[i].p == n.h) {
-                    this.rubNodes[this.d[i].h] = true;
-                }
-            }
-            this.rubbishIco();
-        }
 
         if (!this.c['shares']) {
             this.c['shares'] = [];
@@ -2416,6 +2402,12 @@ function MegaData()
         if (typeof newnodes !== 'undefined') {
             newnodes.push(n);
         }
+
+        if (fminitialized) {
+            // Handle Inbox/RubbishBin UI changes
+            delay('fmtopUI', fmtopUI);
+        }
+
         // $(window).trigger("megaNodeAdded", [n]);
     };
 
@@ -2450,11 +2442,13 @@ function MegaData()
                 M.u[h].c = 0;
             }
         }
-        if (this.rubNodes[h]) {
-            delete this.rubNodes[h];
-        }
         ds(h);
-        this.rubbishIco();
+
+        if (fminitialized) {
+            // Handle Inbox/RubbishBin UI changes
+            delay('fmtopUI', fmtopUI);
+        }
+
         if (M.currentdirid === 'shares' && !M.viewmode)
             M.openFolder('shares', 1);
     };
@@ -2694,53 +2688,99 @@ function MegaData()
 
     this.clearRubbish = function(sel)
     {
-        if (d) console.log('clearRubbish', sel);
+        if (d) {
+            console.log('clearRubbish', sel);
+            console.time('clearRubbish');
+        }
         var selids = {};
         var c = this.c[sel === false ? M.RubbishID : M.currentdirid];
-        if (sel && $.selected)
-            for (var i in $.selected)
-                selids[$.selected[i]] = 1;
+        var reqs = 0;
 
-        for (var h in c)
-        {
-            if (!sel || selids[h])
-            {
-                this.delNode(h);
-                api_req({a: 'd', n: h, i: requesti});
-                if (sel)
-                {
-                    $('.grid-table.fm#' + h).remove();
-                    $('#' + h + '.file-block').remove();
+        if (sel && $.selected) {
+            for (var i in $.selected) {
+                if ($.selected.hasOwnProperty(i)) {
+                    selids[$.selected[i]] = 1;
                 }
             }
         }
-        var hasItems = false;
-        if (sel)
-            for (var h in c) {
-                hasItems = true;
-                break;
+
+        loadingDialog.show();
+
+        var done = function() {
+            if (d) {
+                console.timeEnd('clearRubbish');
             }
-        if (!hasItems)
-        {
-            $('#treesub_' + M.RubbishID).remove();
-            $('.fm-tree-header.recycle-item').removeClass('contains-subfolders expanded recycle-notification');
-            if (this.RubbishID == this.currentdirid)
-            {
-                $('.grid-table.fm tr').remove();
-                $('.file-block').remove();
-                $('.fm-empty-trashbin').removeClass('hidden');
+            loadingDialog.hide();
+
+            var hasItems = false;
+            if (sel) {
+                for (var h in c) {
+                    if (c.hasOwnProperty(h)) {
+                        hasItems = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasItems) {
+                $('#treesub_' + M.RubbishID).remove();
+                $('.fm-tree-header.recycle-item').removeClass('contains-subfolders expanded recycle-notification');
+
+                if (M.RubbishID === M.currentdirid) {
+                    $('.grid-table.fm tr').remove();
+                    $('.file-block').remove();
+                    $('.fm-empty-trashbin').removeClass('hidden');
+                }
+            }
+
+            if (M.RubbishID === M.currentrootid) {
+                if (M.viewmode) {
+                    iconUI();
+                }
+                else {
+                    gridUI();
+                }
+            }
+            treeUI();
+            delay('fmtopUI', fmtopUI);
+        };
+
+        var apiReq = function(handle) {
+            api_req({a: 'd', n: handle, i: requesti}, {
+                callback: function(res, ctx) {
+                    if (res !== 0) {
+                        console.error('Failed to remove Rubbish node.', handle, res);
+                    }
+                    else {
+                        var h = handle;
+
+                        M.delNode(h);
+
+                        if (sel) {
+                            $('.grid-table.fm#' + h).remove();
+                            $('#' + h + '.file-block').remove();
+                        }
+                    }
+
+                    if (!--reqs) {
+                        done();
+                    }
+                }
+            });
+        };
+
+        for (var h in c) {
+            if (c.hasOwnProperty(h)) {
+                if (!sel || selids[h]) {
+                    reqs++;
+                    apiReq(h);
+                }
             }
         }
-        if (this.RubbishID == this.currentrootid)
-        {
-            if (M.viewmode)
-                iconUI();
-            else
-                gridUI();
+
+        if (!reqs) {
+            done();
         }
-        this.rubNodes = {}
-        this.rubbishIco();
-        treeUI();
     },
 
     this.syncUsersFullname = function(userId) {
@@ -3141,22 +3181,11 @@ function MegaData()
 
     this.moveNodes = function(n, t)
     {
-        if (t == this.RubbishID)
-        {
-            for (var i in n)
-            {
-                this.rubNodes[n[i]] = true;
-            }
-        }
-
         newnodes = [];
         var j = [];
         for (var i in n) {
             var h = n[i];
             var node = M.d[h];
-            if (t !== this.RubbishID && node && this.rubNodes[node.h]) {
-                delete this.rubNodes[node.h];
-            }
             j.push({
                 a: 'm',
                 n: h,
@@ -3186,7 +3215,7 @@ function MegaData()
             }
         }
         renderNew();
-        this.rubbishIco();
+        Soon(fmtopUI);
         processmove(j);
         $.tresizer();
     };
@@ -3354,38 +3383,6 @@ function MegaData()
             delete M.c[p];
             $('#treea_' + p).removeClass('contains-folders');
         }
-    };
-
-    this.rubbishIco = function()
-    {
-        var i = 0;
-        var $icon = $('.nw-fm-left-icon.rubbish-bin');
-
-        if (typeof M.c[M.RubbishID] !== 'undefined')
-            for (var a in M.c[M.RubbishID])
-                i++;
-        if (i > 0)
-            $('.fm-tree-header.recycle-item').addClass('recycle-notification contains-subfolders');
-        else
-        {
-            $('.fm-tree-header.recycle-item').removeClass('recycle-notification expanded contains-subfolders');
-            $('.fm-tree-header.recycle-item').prev('.fm-connector-first').removeClass('active');
-        }
-        if (Object.keys(this.rubNodes).length == 0) {
-            $icon.removeClass('filled glow')
-        }
-        else {
-            if (!$icon.hasClass('filled')) {
-                $icon.addClass('filled');
-            }
-            else if (!$icon.hasClass('glow')) {
-                $icon.addClass('glow');
-            }
-            else {
-                $icon.removeClass('glow');
-            }
-        }
-
     };
 
     this.nodeAttr = function(attrs) {

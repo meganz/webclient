@@ -68,7 +68,7 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
           textareaLineHeight = parseInt($textarea.css('line-height'))
           textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
 
-    // Textarea Clone block to define height of autoresizeable textarea   
+    // Textarea Clone block to define height of autoresizeable textarea
     if (!$textarea.next('div').length) {
         $('<div></div>').insertAfter($textarea);
     }
@@ -753,8 +753,9 @@ function initUI() {
         }
         var $target = $(e.target);
 
-        if ($target.attr('data-reactid')) {
-            return; // never return false, if this is an event triggered by a React element....
+        if ($target.attr('data-reactid') || $target.is('.chatlink')) {
+            // chat can handle its own links..no need to return false on every "click" and "element" :O
+            return;
         }
         if ($target.attr('type') !== 'file'
                 && !$target.is('.upgradelink, .campaign-logo, .resellerbuy, .linkified')) {
@@ -2886,7 +2887,7 @@ function fmtopUI() {
 
             // don't add .contacts-panel to ALL .fm-left-panel's
             $('.fm-left-panel:visible').addClass('contacts-panel');
-            
+
             if (M.currentdirid === 'ipc') {
                 $('.fm-received-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
@@ -2920,6 +2921,30 @@ function fmtopUI() {
         if (M.InboxID && M.currentrootid === M.InboxID) {
             M.openFolder(M.RootID);
         }
+    }
+
+    // handle the RubbishBin icon changes
+    var $icon = $('.nw-fm-left-icon.rubbish-bin');
+    var rubNodes = Object.keys(M.c[M.RubbishID] || {});
+    if (rubNodes.length) {
+        $('.fm-tree-header.recycle-item').addClass('recycle-notification contains-subfolders');
+
+        if (!$icon.hasClass('filled')) {
+            $icon.addClass('filled');
+        }
+        else if (!$icon.hasClass('glow')) {
+            $icon.addClass('glow');
+        }
+        else {
+            $icon.removeClass('glow');
+        }
+    }
+    else {
+        $('.fm-tree-header.recycle-item')
+            .removeClass('recycle-notification expanded contains-subfolders')
+            .prev('.fm-connector-first').removeClass('active');
+
+        $icon.removeClass('filled glow');
     }
 }
 

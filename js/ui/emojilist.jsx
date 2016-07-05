@@ -124,6 +124,10 @@ var EMOJI_CATEGORIES = {
             "1F635",
             "&#x1F635;"
         ],
+        "confused": [
+            "1f621",
+            "&#x1f621;"
+        ],
         "slight_frown": [
             "1F641",
             "&#x1F641;"
@@ -133,8 +137,8 @@ var EMOJI_CATEGORIES = {
             "&#x1F616;"
         ],
         "angry": [
-            "1F61E",
-            "&#x1F61E;"
+            "1f620",
+            "&#x1f620;"
         ],
         "kissing_smiling_eyes": [
             "1F619",
@@ -159,6 +163,10 @@ var EMOJI_CATEGORIES = {
         "disappointed_relieved": [
             "1F625",
             "&#x1F625;"
+        ],
+        "anguished": [
+            "1F627",
+            "&#x1F627;"
         ],
         "weary": [
             "1F629",

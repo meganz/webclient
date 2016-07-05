@@ -4,7 +4,7 @@ var dl_import=false;
 var dl_attr;
 var fdl_queue_var=false;
 
-var MOBILE_MAXFILESIZE = 400 * (1024 * 1024);
+var MOBILE_MAXFILESIZE = 100 * (1024 * 1024);
 var MOBILE_FILETYPES = {
     "docx" : 'word',
     "jpeg" : 'image',

@@ -203,6 +203,7 @@ function dl_g(res) {
             }
 
             if (is_mobile) {
+                setMobileAppInfo();
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
@@ -302,6 +303,26 @@ function browserDownload() {
             dl_queue.push(fdl_queue_var);
         }
         $.dlhash = window.location.hash;
+    }
+}
+
+function setMobileAppInfo() {
+    switch (ua.details.os) {
+        case 'iPhone':
+        case 'iPad':
+            $('.app-info-block').addClass('ios')
+                .attr('href', 'https://itunes.apple.com/app/mega/id706857885');
+            break;
+
+        case 'Windows Phone':
+            $('.app-info-block').addClass('wp')
+                .attr('href', 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a');
+            break;
+
+        case 'Android':
+            $('.app-info-block').addClass('android').attr('href',
+                'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid');
+            break;
     }
 }
 

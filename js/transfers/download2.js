@@ -470,6 +470,10 @@ var dlmanager = {
                 writer.logger.info("IO_THROTTLE: pause XHR");
                 dlQueue.pause();
                 dlmanager.ioThrottlePaused = true;
+
+                if (page === 'download') {
+                    $('.download.status-txt').text(l[8579]);
+                }
             }
         });
 
@@ -478,23 +482,16 @@ var dlmanager = {
                 writer.logger.info("IO_THROTTLE: resume XHR");
                 dlQueue.resume();
                 dlmanager.ioThrottlePaused = false;
+
+                if (page === 'download') {
+                    $('.download.status-txt').text(l[258]);
+                }
             }
         });
     },
 
     checkLostChunks: function DM_checkLostChunks(file) {
         var dl_key = file.key;
-
-        // var t = []
-        // $.each(file.macs, function(i, mac) {
-        // t.push(i);
-        // });
-        // t.sort(function(a, b) {
-        // return parseInt(a) - parseInt(b);
-        // });
-        // $.each(t, function(i, v) {
-        // t[i] = file.macs[v];
-        // });
 
         var t = Object.keys(file.macs).map(Number)
             .sort(function(a, b) {
@@ -535,6 +532,7 @@ var dlmanager = {
     dlWriter: function DM_dl_writer(dl, is_ready) {
 
         function finish_write(task, done) {
+            task.data = undefined;
             done();
 
             if (typeof task.callback === "function") {
@@ -544,7 +542,6 @@ var dlmanager = {
                 // tell the download scheduler we're done.
                 dl.ready();
             }
-            delete task.data;
         }
 
         dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
@@ -1494,3 +1491,8 @@ if (typeof dlMethod.init === 'function') {
 }
 
 var dl_queue = new DownloadQueue();
+
+if (is_mobile) {
+    dlmanager.ioThrottleLimit = 2;
+    dlmanager.dlMaxChunkSize = 4 * 1048576;
+}

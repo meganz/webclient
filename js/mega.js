@@ -4409,7 +4409,7 @@ function MegaData()
                 break;
         }
 
-        if (slideshowid == dl.id && !previews[slideshowid])
+        if (window.slideshowid == dl.id && !previews[slideshowid])
         {
             $('.slideshow-image-bl').addClass('hidden');
             $('.slideshow-pending').addClass('hidden');

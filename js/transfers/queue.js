@@ -104,7 +104,7 @@ MegaQueue.prototype.resume = function() {
 };
 
 MegaQueue.prototype.canExpand = function() {
-    return this._limit <= this._running && this._limit * 1.5 >= this._running;
+    return !is_mobile && this._limit <= this._running && this._limit * 1.5 >= this._running;
 };
 
 /**
@@ -387,6 +387,7 @@ MegaQueue.prototype._process = function(ms, sp) {
 
 MegaQueue.prototype.push = function(arg, next, self) {
     this._queue.push([arg, next, self]);
+    // this.logger.debug('Queueing new task, total: %d', this._queue.length, arg);
     this.trigger('queue');
     this._process();
 };

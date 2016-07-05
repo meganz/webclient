@@ -46,9 +46,86 @@
     var xhrStack = [];
 
     /**
+     * Simulate high speed network.
+     * @private
+     */
+    function HSBHttpRequest() {
+        this.status = 0;
+        this.upload = this;
+        this.statusText = '';
+        this.responseType = 'text';
+        this.readyState = XMLHttpRequest.UNSENT;
+        this.logger = new MegaLogger('HSBHttpRequest', {}, logger);
+    };
+    HSBHttpRequest.prototype = Object.freeze({
+        constructor: HSBHttpRequest,
+
+        open: function(meth, url) {
+            this.logger.info(meth, url);
+            this.readyState = XMLHttpRequest.OPENED;
+
+            var size = url.split('/').pop().split('-');
+            this.dataSize = size[1] - size[0] + 1;
+        },
+        send: function() {
+            this.logger.info('send', arguments);
+
+            var self = this;
+            setTimeout(function() {
+                (function tick(state) {
+                    if (self.readyState === XMLHttpRequest.UNSENT) {
+                        self.logger.error('aborted...');
+                        return;
+                    }
+                    var done = (++state === XMLHttpRequest.DONE);
+
+                    if (!done) {
+                        setTimeout(function() {
+                            tick(state);
+                        }, 90 * Math.random());
+                    }
+                    else {
+                        var ev = new $.Event('progress');
+                        ev.target = self;
+                        ev.loaded = ev.total = self.dataSize;
+                        self.onprogress(ev);
+
+                        self.response = new Uint8Array(self.dataSize).buffer;
+                    }
+
+                    self.readyStateChange('readystatechange', state, done ? 200 : undefined);
+
+                })(1);
+            }, 90 * Math.random());
+        },
+        abort: function() {
+            this.readyStateChange('abort', XMLHttpRequest.DONE);
+            this.readyState = XMLHttpRequest.UNSENT;
+        },
+        readyStateChange: function(name, state, status) {
+            var ev = new $.Event(name);
+            ev.target = this;
+
+            this.readyState = state;
+
+            if (status !== undefined) {
+                this.status = parseInt(status);
+            }
+            if (this.onreadystatechange) {
+                this.onreadystatechange(ev);
+            }
+        }
+    });
+
+    /**
      * Get a new reusable XMLHttpRequest
+     * @private
      */
     var getXMLHttpRequest = function _xhr2() {
+        if (debug > 6) {
+            return new HSBHttpRequest();
+        }
+
         var idx = xhrStack.length;
         while (idx--) {
             var state = xhrStack[idx].readyState;
@@ -167,15 +244,18 @@
         get response() {
             return Object(this.xhr).response;
         },
+        get constructor() {
+            return Object(this.xhr).constructor;
+        },
 
         // Mimic XMLHttpRequest methods
         open: function _open() {
             this.openTime = Date.now();
-            XMLHttpRequest.prototype.open.apply(this.xhr, arguments);
+            this.xhr.constructor.prototype.open.apply(this.xhr, arguments);
         },
         send: function _send() {
             this.sendTime = Date.now();
-            XMLHttpRequest.prototype.send.apply(this.xhr, arguments);
+            this.xhr.constructor.prototype.send.apply(this.xhr, arguments);
         },
 
         /**
@@ -216,7 +296,7 @@
                 xhr.onreadystatechange = null;
 
                 this.xhr = null;
-                XMLHttpRequest.prototype.abort.call(xhr);
+                xhr.constructor.prototype.abort.call(xhr);
             }
 
             this.abortTime = Date.now();

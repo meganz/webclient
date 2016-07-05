@@ -8,7 +8,7 @@ var maintenance = false;
 var androidsplash = false;
 var silent_loading = false;
 var cookiesDisabled = false;
-var lastactive = Date.now();
+var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
@@ -1505,6 +1505,7 @@ else if (!b_u)
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
     jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
     {
         is_chrome_firefox |= 4;

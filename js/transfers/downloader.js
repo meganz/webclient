@@ -324,6 +324,10 @@ ClassChunk.prototype.run = function(task_done) {
     this.xhr.open('POST', this.url, true);
     this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
     this.xhr.send();
+
+    if (Object(this.xhr.constructor).name === 'HSBHttpRequest') {
+        skipcheck = true;
+    }
 };
 
 // ClassFile

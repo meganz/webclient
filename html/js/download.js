@@ -336,6 +336,9 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.download.percents-txt').text(perc + ' %');
         megatitle(' ' + perc + '%');
     }
+    if (bytesloaded === bytestotal) {
+        $('.download.status-txt').text(l[8579]);
+    }
     if (fdl_starttime) var eltime = (new Date().getTime()-fdl_starttime)/1000;
     else var eltime = (new Date().getTime()-dl_queue[dl_queue_num].starttime)/1000;
     if (eltime && bytesloaded)

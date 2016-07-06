@@ -3431,9 +3431,9 @@
     "8910": "Oggetto rimosso dalla cartella condivisa",
     "8911": "Mantieni gli stessi nomi dei file",
     "8912": "User\u00f2 [B]MEGAsync[\/B]",
-    "8913": "Removed [X] items from a share",
+    "8913": "Rimossi [X] oggetti dalla condivisione",
     "8914": "Attenzione: Non possiamo verificare l&#039;ordine dei messaggi in questa chat.",
-    "8915": "was changed to %s1 by %s2",
+    "8915": "\u00e8 stato cambiato in %1 da %2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

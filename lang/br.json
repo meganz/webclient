@@ -3431,9 +3431,9 @@
     "8910": "Item removido da pasta compartilhada",
     "8911": "Manter nomes originais",
     "8912": "Vou usar [B]MEGAsync[\/B]",
-    "8913": "Removed [X] items from a share",
-    "8914": "Caution: We have not been able to verify the integrity of the message ordering in this chat.",
-    "8915": "was changed to %s1 by %s2",
+    "8913": "Removeu [X] itens do compartilhamento",
+    "8914": "Aten\u00e7\u00e3o: n\u00e3o foi poss\u00edvel verificar a integridade da ordem de mensagens neste chat.",
+    "8915": "foi alterado para %s1 por %s2",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

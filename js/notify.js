@@ -118,7 +118,7 @@ var notify = {
         var type = notification.a;                      // Type of notification e.g. share
         var currentTime = unixtime();                   // Get the current timestamps in seconds
         var seen = false;                               // New notification, so mark as unread
-        var userHandle = notification.u;                // User handle e.g. new share from this user
+        var userHandle = notification.u || notification.ou;// User handle e.g. new share from this user
 
         // Add notifications to start of the list
         notify.notifications.unshift({
@@ -591,6 +591,8 @@ var notify = {
                 return notify.renderUpdatedPendingContactOutgoing($notificationHtml, notification);
             case 'share':
                 return notify.renderNewShare($notificationHtml, notification, userEmail);
+            case 'd':
+                return notify.renderRemovedSharedNode($notificationHtml, notification);
             case 'dshare':
                 return notify.renderDeletedShare($notificationHtml, userEmail);
             case 'put':
@@ -798,6 +800,37 @@ var notify = {
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.attr('data-folder-id', folderId);
+
+        return $notificationHtml;
+    },
+
+    /**
+     * Render removed share node notification
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderRemovedSharedNode: function($notificationHtml, notification) {
+
+        var itemsNumber = 0;
+        var title = '';
+
+        if (Array.isArray(notification.data.n)) {
+            itemsNumber = notification.data.n.length;
+        }
+        else {
+            itemsNumber = 1;
+        }
+
+        if (itemsNumber > 1) {
+            title = l[8913].replace('[X]', itemsNumber);// Removed [X] items from a share
+        }
+        else {
+            title = l[8910];// Removed item from shared folder
+        }
+
+        // Populate other template information
+        $notificationHtml.addClass('nt-revocation-of-incoming');
+        $notificationHtml.find('.notification-info').text(title);
 
         return $notificationHtml;
     },

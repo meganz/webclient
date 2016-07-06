@@ -72,6 +72,29 @@ var ChatdIntegration = function(megaChat) {
             }
         });
     });
+
+    megaChat.rebind('onNewGroupChatRequest.chatdInt', function(e, contactHashes) {
+        var users = [];
+        contactHashes.forEach(function(k) {
+            users.push({
+                'u': k,
+                'p': 2
+            });
+        });
+
+        asyncApiReq({
+            'a': 'mcc',
+            'g': 1,
+            'u': users,
+            'v': Chatd.VERSION
+        })
+            .done(function(r) {
+                // no need to do anything, the triggered action packet would trigger the code for joining the room.
+            })
+            .fail(function() {
+                self.logger.error("Failed to retrieve chatd ID from API, while trying to create a new room");
+            });
+    });
     return self;
 };
 
@@ -955,28 +978,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "v": Chatd.VERSION
             });
         });
-        chatRoom.megaChat.rebind('onNewGroupChatRequest.chatdInt', function(e, contactHashes) {
-            var users = [];
-            contactHashes.forEach(function(k) {
-                users.push({
-                    'u': k,
-                    'p': 2
-                });
-            });
 
-            asyncApiReq({
-                'a': 'mcc',
-                'g': 1,
-                'u': users,
-                'v': Chatd.VERSION
-            })
-                .done(function(r) {
-                    // no need to do anything, the triggered action packet would trigger the code for joining the room.
-                })
-                .fail(function() {
-                    self.logger.error("Failed to retrieve chatd ID from API, while trying to create a new room");
-                });
-        });
         $(chatRoom.messagesBuff).rebind('onNewMessageReceived.chatdStrongvelope', function(e, msgObject) {
             if (msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
                 var _runDecryption = function() {
@@ -1138,7 +1140,9 @@ ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
 
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
     var self = this;
-    self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
+     if (!chatRoom.stateIsLeftOrLeaving()) {
+         self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
+     }
 };
 
 ChatdIntegration.prototype.setRetention = function(chatRoom, time) {

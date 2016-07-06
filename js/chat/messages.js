@@ -886,7 +886,7 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
     if (!self.lastSeen || lastMsg.orderValue < targetMsg.orderValue) {
         self.lastSeen = msgId;
 
-        if (!self.isRetrievingHistory) {
+        if (!self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
             self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
         }
 

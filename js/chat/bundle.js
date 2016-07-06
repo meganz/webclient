@@ -446,12 +446,6 @@
 	    this.karere.bind("onUsersLeft", function (e, eventData) {
 	        return self._onUsersUpdate("left", e, eventData);
 	    });
-	    this.karere.bind("onUsersUpdatedDone", function (e, eventObject) {
-	        var room = self.chats[eventObject.getRoomJid()];
-	        if (room && room.state == ChatRoom.STATE.JOINING) {
-	            room.setState(ChatRoom.STATE.PLUGINS_PAUSED);
-	        }
-	    });
 
 	    this.karere.bind("onChatMessage", function () {
 	        self._onChatMessage.apply(self, arguments);
@@ -23261,6 +23255,10 @@
 	        window.addEventListener('resize', self.handleWindowResize);
 	        window.addEventListener('keydown', self.handleKeyDown);
 
+	        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
+	            self.callJustEnded = true;
+	        });
+
 	        self.eventuallyInit();
 	    },
 	    eventuallyInit: function eventuallyInit(doResize) {
@@ -23375,7 +23373,7 @@
 	        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
 	        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
 	    },
-	    componentDidUpdate: function componentDidUpdate() {
+	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	        var self = this;
 	        var room = this.props.chatRoom;
 
@@ -23392,6 +23390,16 @@
 	            $('.js-messages-loading', $node).addClass('hidden');
 	        }
 	        self.handleWindowResize();
+
+	        if (prevState.messagesToggledInCall !== self.state.messagesToggledInCall || self.callJustEnded) {
+	            if (self.callJustEnded) {
+	                self.callJustEnded = false;
+	            }
+	            self.$messages.trigger('forceResize', [true, 1]);
+	            Soon(function () {
+	                self.$messages.data('jsp').scrollToPercentY(1);
+	            });
+	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
 	        var $container = $(ReactDOM.findDOMNode(this));
@@ -27587,7 +27595,7 @@
 	    self.trackDataChange();
 	};
 
-	ChatRoom.prototype.destroy = function (notifyOtherDevices) {
+	ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
 	    var self = this;
 
 	    self.megaChat.trigger('onRoomDestroy', [self]);
@@ -27605,7 +27613,9 @@
 
 	        mc.chats.remove(roomJid);
 
-	        window.location = '#fm/chat';
+	        if (!noRedirect) {
+	            window.location = '#fm/chat';
+	        }
 	    });
 	};
 

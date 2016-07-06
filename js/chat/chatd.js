@@ -575,12 +575,12 @@ Chatd.Shard.prototype.exec = function(a) {
                     if (priv === 0 || priv === 1 || priv === 2 || priv === 3) {
                         // ^^ explicit and easy to read...despite that i could have done >= 1 <= 3 or something like
                         // that..
-                        if (!self.joinedChatIds[chatId]) {
-                            self.joinedChatIds[chatId] = true;
+                        if (!self.joinedChatIds[base64urldecode(chatId)]) {
+                            self.joinedChatIds[base64urldecode(chatId)] = true;
                         }
                     }
                     else if (priv === -1) {
-                        delete self.joinedChatIds[chatId];
+                        delete self.joinedChatIds[base64urldecode(chatId)];
                     }
                     else {
                         self.logger.error("Not sure how to handle priv: " + priv +".");
@@ -854,11 +854,12 @@ Chatd.prototype.leave = function(chatId) {
         var shard = this.chatIdShard[chatId];
 
         shard.destroyed = true;
-        shard.disconnect();
+
         // do some cleanup now...
         delete shard.joinedChatIds[chatId];
         if (Object.keys(shard.joinedChatIds).length === 0) {
             // close shard if no more joined chatIds are left...
+            shard.disconnect();
             var self = this;
             Object.keys(this.shards).forEach(function(k) {
                 if (self.shards[k] === shard) {

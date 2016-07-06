@@ -758,7 +758,7 @@ function initUI() {
             return;
         }
         if ($target.attr('type') !== 'file'
-                && !$target.is('.upgradelink, .campaign-logo, .resellerbuy, .linkified')) {
+                && !$target.is('.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red')) {
             return false;
         }
     });

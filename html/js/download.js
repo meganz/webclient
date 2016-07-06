@@ -205,7 +205,7 @@ function dl_g(res) {
                 setMobileAppInfo();
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
-                $('.mobile.dl-megaapp').rebind('click', function() {
+                $('.mobile.dl-megaapp, .mobile.download-app').rebind('click', function() {
                     switch (ua.details.os) {
                         case 'iPad':
                         case 'iPhone':

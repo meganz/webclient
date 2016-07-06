@@ -20188,7 +20188,7 @@ span.incoming-call-name {
 .fm-share-user-info {
     display: table;
     vertical-align: middle;
-    width: 185px;
+    width: 180px;
     table-layout: fixed;
     float: left;
     height: 34px;
@@ -21032,9 +21032,15 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .token-input-dropdown-mega .fm-chat-user {
     color: #666666;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 .token-input-dropdown-mega .fm-chat-user-email {
     color: #999999;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 .email .fm-chat-user {
     padding-top: 7px;
@@ -21166,6 +21172,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+.token-input-dropdown-mega .fm-chat-user-info {
+    float: none;
+    margin: 7px 0 0 51px;
 }
 .share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select {
     float: left;

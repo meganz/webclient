@@ -823,6 +823,8 @@ function MegaData()
             type = '',
             drawn = false,
             t = '.grid-table.contact-requests';
+        var contactName = '';
+        
         if (M.currentdirid === 'ipc') {
 
             if (clearGrid) {
@@ -842,29 +844,31 @@ function MegaData()
                     }
                     trClass = (type !== '') ? ' class="' + type + '"' : '';
                     email = ipc[i].m;
+                    contactName = M.getNameByHandle(ipc[i].p);
+
                     if (ipc[i].ps && ipc[i].ps !== 0) {
                         ps = '<span class="contact-request-content">' + ipc[i].ps + ' ' + l[105] + ' ' + l[813] + '</span>';
                     }
                     else {
                         ps = '<span class="contact-request-content">' + l[5851] + '</span>';
                     }
-                    html = '<tr id="ipc_' + id + '"' + trClass + '>\n\
-                        <td>\n\
-                            ' + useravatar.contact(email, 'nw-contact-avatar') + ' \n\
-                            <div class="fm-chat-user-info">\n\
-                                <div class="fm-chat-user">' + htmlentities(email) + '</div>\n\
-                                <div class="contact-email">' + htmlentities(email) + '</div>\n\
-                            </div>\n\
-                        </td>\n\
-                        <td>' + ps + '</td>\n\
-                        <td>\n\
-                            <div class="contact-request-button delete"><span>' + l[5858] + '</span></div>\n\
-                            <div class="contact-request-button accept"><span>' + l[5856] + '</span></div>\n\
-                            <div class="contact-request-button ignore"><span>' + l[5860] + '</span></div>\n\
-                            <div class="contact-request-ignored"><span>' + l[5864] + '</span></div>\n\
-                            <div class="clear"></div>\n\
-                        </td>\n\
-                    </tr>';
+                    html = '<tr id="ipc_' + id + '"' + trClass + '>' +
+                        '<td>' +
+                            useravatar.contact(email, 'nw-contact-avatar')  +
+                            '<div class="fm-chat-user-info">' +
+                                '<div class="fm-chat-user">' + htmlentities(contactName) + '</div>' +
+                                '<div class="contact-email">' + htmlentities(email) + '</div>' +
+                            '</div>' +
+                        '</td>' +
+                        '<td>' + ps + '</td>' +
+                        '<td>' +
+                            '<div class="contact-request-button delete"><span>' + l[5858] + '</span></div>' +
+                            '<div class="contact-request-button accept"><span>' + l[5856] + '</span></div>' +
+                            '<div class="contact-request-button ignore"><span>' + l[5860] + '</span></div>' +
+                            '<div class="contact-request-ignored"><span>' + l[5864] + '</span></div>' +
+                            '<div class="clear"></div>' +
+                        '</td>' +
+                    '</tr>';
 
                     $(t).append(html);
 
@@ -5442,9 +5446,10 @@ function execsc(actionPackets, callback) {
                     // Fill DDL with removed contact
                     if (actionPacket.u && M.u[actionPacket.u] && M.u[actionPacket.u].m) {
                         var email = M.u[actionPacket.u].m;
+                        var contactName = M.getNameByHandle(actionPacket.u);
 
-                        addToMultiInputDropDownList('.share-multiple-input', [{ id: email, name: email }]);
-                        addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: email}]);
+                        addToMultiInputDropDownList('.share-multiple-input', [{ id: email, name: contactName }]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: contactName }]);
                     }
                 }
 
@@ -5832,6 +5837,11 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'd') {
             M.delNode(actionPacket.n);
+            
+            // Only show a notification if we did not trigger the action ourselves
+            if (actionPacket.ou !== u_attr.u) {
+                notify.notifyFromActionPacket(actionPacket);
+            }
         }
         else if (actionPacket.a === 'ua' && fminitialized) {
             var attrs = actionPacket.ua;
@@ -6684,8 +6694,10 @@ function processIPC(ipc, ignoreDB) {
             }
             else {
 
+                var contactName = M.getNameByHandle(ipc[i].p);
+
                 // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{ id: ipc[i].m, name: ipc[i].m }]);
+                addToMultiInputDropDownList('.share-multiple-input', [{ id: ipc[i].m, name: contactName }]);
                 // Don't prevent contact creation when there's already IPC available
                 // When user add contact who already sent IPC, server will automatically create full contact
             }
@@ -6728,9 +6740,11 @@ function processOPC(opc, ignoreDB) {
                 }
             }
 
+            var contactName = M.getNameByHandle(opc[i].p);
+
             // Update tokenInput plugin
-            addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
-            addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
+            addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: contactName }]);
+            addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: contactName }]);
         }
     }
 }
@@ -6797,10 +6811,12 @@ function processPS(pendingShares, ignoreDB) {
 
     DEBUG('processPS');
     var ps;
-    var nodeHandle;
-    var pendingContactId;
-    var shareRights;
-    var timeStamp;
+    var nodeHandle = '';
+    var pendingContactId = '';
+    var shareRights = 0;
+    var timeStamp = 0;
+    var contactName = '';
+
 
     for (var i in pendingShares) {
         if (pendingShares.hasOwnProperty(i)) {
@@ -6817,6 +6833,7 @@ function processPS(pendingShares, ignoreDB) {
                 pendingContactId = ps.p;
                 shareRights = ps.r;
                 timeStamp = ps.ts;
+                contactName = M.getNameByHandle(pendingContactId);
 
                 // shareRights is undefined when user denies pending contact request
                 // .op is available when user accepts pending contact request and
@@ -6832,8 +6849,14 @@ function processPS(pendingShares, ignoreDB) {
                     if (M.opc && M.opc[ps.p]) {
 
                         // Update tokenInput plugin
-                        addToMultiInputDropDownList('.share-multiple-input', [{id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m}]);
-                        addToMultiInputDropDownList('.add-contact-multiple-input', {id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m});
+                        addToMultiInputDropDownList('.share-multiple-input', [{
+                                id: M.opc[pendingContactId].m,
+                                name: contactName
+                            }]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', {
+                            id: M.opc[pendingContactId].m,
+                            name: contactName
+                        });
                     }
                 }
                 else {
@@ -6944,9 +6967,11 @@ function process_u(u) {
                 u[i].p = 'contacts';
                 M.addNode(u[i]);
 
+                var contactName = M.getNameByHandle(u[i].h);
+                
                 // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: u[i].m }]);
-                addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: u[i].m }]);
+                addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: contactName }]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);
             }
             else if (M.d[u[i].u]) {
                 M.delNode(u[i].u);

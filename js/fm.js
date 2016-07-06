@@ -1596,6 +1596,7 @@ function getContactsEMails() {
 
     var contact,
         contacts = [];
+    var contactName = '';
 
     // Loop through full contacts
     M.u.forEach(function(contact) {
@@ -1612,10 +1613,11 @@ function getContactsEMails() {
     for (var k in M.opc) {
         if (M.opc.hasOwnProperty(k)) {
             contact = M.opc[k];
+            contactName = M.getNameByHandle(M.opc[k].p);
 
             // Is contact deleted
             if (!contact.dts) {
-                contacts.push({ id: contact.m, name: contact.m });
+                contacts.push({ id: contact.m, name: contactName });
             }
         }
     }
@@ -1624,10 +1626,11 @@ function getContactsEMails() {
     for (var m in M.ipc) {
         if (M.ipc.hasOwnProperty(m)) {
             contact = M.ipc[m];
+            contactName = M.getNameByHandle(M.ipc[m].p);
 
             // Is there a email available
             if (contact.m) {
-                contacts.push({ id: contact.m, name: contact.m });
+                contacts.push({ id: contact.m, name: contactName });
             }
         }
     }
@@ -8003,7 +8006,7 @@ function initShareDialogMultiInputPlugin() {
             emailCheck: true,
             preventDoublet: false,
             tokenValue: "id",
-            propertyToSearch: "id",
+            propertyToSearch: "name",
             resultsLimit: 5,
             minChars: 1,
             accountHolder: (M.u[u_handle] || {}).m || '',

@@ -5727,6 +5727,11 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'd') {
             M.delNode(actionPacket.n);
+            
+            // Only show a notification if we did not trigger the action ourselves
+            if (actionPacket.ou !== u_attr.u) {
+                notify.notifyFromActionPacket(actionPacket);
+            }
         }
         else if (actionPacket.a === 'ua' && fminitialized) {
             var attrs = actionPacket.ua;

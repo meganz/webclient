@@ -89,7 +89,6 @@ function dl_g(res) {
     $('.download-button.throught-browser').safeHTML(l[8849]).hide();
     $('.download-button.with-megasync').safeHTML(l[8848]).hide();
 
-
     if (res === ETOOMANY) {
         $('.download.content-block').addClass('not-available-user');
     }
@@ -269,6 +268,19 @@ function dl_g(res) {
     if (is_mobile && !fdl_queue_var) {
         $('#mobile-ui-main').addClass('hidden');
         $('#mobile-ui-notFound').removeClass('hidden');
+
+        var msg;
+        if (res === ETOOMANY) {
+            msg = l[243] + '<p>' + l[731];
+        }
+        else if (res.e === ETEMPUNAVAIL) {
+            msg = l[1191] + '<p>' + l[253];
+        }
+        else {
+            msg = '<p>' + l[243];
+        }
+
+        $('.mobile.na-file-txt').safeHTML(msg);
     }
 
     var pf = navigator.platform.toUpperCase();

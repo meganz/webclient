@@ -1460,6 +1460,7 @@ else if (!b_u)
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+        jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
     } // !is_mobile
 
     // MEGA CHAT

@@ -1,19 +1,33 @@
 .typing-block {
 	position: absolute;
-	padding: 0 0 0 71px;
+    padding: 0 0 0 71px;
     bottom: 6px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .typing-text {
-	font-size: 12px;
-	line-height: 15px;
-	color: #999999;
-	float: left;
+	ont-size: 12px;
+    line-height: 15px;
+    color: #999999;
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: -webkit-calc(100% - 66px);
+    max-width: -moz-calc(100% - 66px);
+    max-width: calc(100% - 66px);
+    vertical-align: top;
 }
 .typing-bounce {
 	width: 34px;
-	text-align: center;
-	float: left;
-	margin: 0 2px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 4px;
 }
 .typing-bounce div {
 	width: 4px;
@@ -24,6 +38,7 @@
 	-webkit-animation: typing-bounce 1.4s ease-in-out 0s infinite both;
 	animation: typing-bounce 1.4s ease-in-out 0s infinite both;
 	vertical-align: middle;
+    margin: 0 1px;
 }
 .typing-bounce div.typing-bounce1 {
 	-webkit-animation-delay: -0.32s;

@@ -798,6 +798,7 @@
              * @param {Object} aTemplate   The DOM Node template
              */
             'cloud-drive': function(aNode, aProperties, aTemplate) {
+                var tmp;
 
                 if (aNode.fav) {
                     var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
@@ -805,9 +806,10 @@
                 }
 
                 if (this.viewmode) {
+                    tmp = aTemplate.querySelector('.block-view-file-type');
 
                     if (aProperties.icon) {
-                        aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
+                        tmp.classList.add(aProperties.icon);
                     }
 
                     aTemplate.querySelector('.file-block-title').textContent = aProperties.name;
@@ -821,8 +823,11 @@
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
                     aTemplate.querySelector('.tranfer-filetype-txt').textContent = aProperties.name;
-                    aTemplate.querySelector('.transfer-filtype-icon').classList.add(aProperties.icon);
+
+                    tmp = aTemplate.querySelector('.transfer-filtype-icon');
+                    tmp.classList.add(aProperties.icon);
                 }
+                this.addClasses(tmp, aProperties.classNames);
 
                 return aTemplate;
             },

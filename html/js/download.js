@@ -205,13 +205,10 @@ function dl_g(res) {
                 setMobileAppInfo();
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
-                $('.mobile.dl-megaapp, .mobile.download-app').rebind('click', function() {
+                $('.mobile.dl-megaapp').rebind('click', function() {
                     switch (ua.details.os) {
                         case 'iPad':
                         case 'iPhone':
-                            setTimeout(function() {
-                                window.location = "https://itunes.apple.com/us/app/mega/id706857885?mt=8";
-                            }, 25);
                             window.location = "mega://" + location.hash;
                             break;
 
@@ -326,17 +323,18 @@ function setMobileAppInfo() {
     switch (ua.details.os) {
         case 'iPhone':
         case 'iPad':
-            $('.app-info-block').addClass('ios')
-                .attr('href', 'https://itunes.apple.com/app/mega/id706857885');
+            $('.app-info-block').addClass('ios');
+            $('.mobile.download-app').attr('href', 'https://itunes.apple.com/app/mega/id706857885');
             break;
 
         case 'Windows Phone':
-            $('.app-info-block').addClass('wp')
-                .attr('href', 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a');
+            $('.app-info-block').addClass('wp');
+            $('.mobile.download-app').attr('href', 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a');
             break;
 
         case 'Android':
-            $('.app-info-block').addClass('android').attr('href',
+            $('.app-info-block').addClass('android');
+            $('.mobile.download-app').attr('href',
                 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid');
             break;
     }

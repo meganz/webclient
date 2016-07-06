@@ -867,7 +867,7 @@ Chatd.prototype.leave = function(chatId) {
                     return false;
                 }
             });
-            delete shard;
+            shard = null;
         }
 
         delete this.chatIdMessages[chatId];

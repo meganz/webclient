@@ -284,13 +284,13 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
 
             chatRoom.destroy(undefined, true);
-            delete chatRoom;
             chatRoom = false;
+            
             if (actionPacket.url) {
                 Soon(finishProcess);
             }
             else {
-                //retrieve mcurl!
+                // retrieve mcurl!
 
                 asyncApiReq({
                     a: 'mcurl',
@@ -1140,9 +1140,9 @@ ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
 
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
     var self = this;
-     if (!chatRoom.stateIsLeftOrLeaving()) {
-         self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
-     }
+    if (!chatRoom.stateIsLeftOrLeaving()) {
+        self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
+    }
 };
 
 ChatdIntegration.prototype.setRetention = function(chatRoom, time) {

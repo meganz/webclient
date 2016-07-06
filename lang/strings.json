@@ -13738,5 +13738,129 @@
     "8915": {
         "text": "was changed to %s1 by %s2",
         "context": "A log message in a chat to display a participant's permission was changed and by whom. This message sits directly under a user's name and avatar (the subject of the sentence). s1% will be replaced with the permission name (such as Moderator or Read-only) and %s2 will be replaced with the person who did it.\r\nFor example:\r\n[Alice Jones]\r\nwas changed to Moderator by John Smith"
+    },
+    "8916": {
+        "text": "No files Saved for Offline",
+        "context": "Title shown when the Offline section is empty, when you don't have download any files."
+    },
+    "8917": {
+        "text": "Paused Transfers",
+        "context": "Title shown when the transfers are paused"
+    },
+    "8918": {
+        "text": "No incoming Shared Folders",
+        "context": "Title shown when there's no incoming Shared Items"
+    },
+    "8919": {
+        "text": "No outgoing Shared Folders",
+        "context": "Title shown when there's no outgoing Shared Items"
+    },
+    "8921": {
+        "text": "Export Recovery Key",
+        "context": "Title shown when you try to export your MEGA Recovery Key"
+    },
+    "8922": {
+        "text": "Recovery Key exported",
+        "context": "Alert title shown when you have exported your MEGA Recovery Key"
+    },
+    "8923": {
+        "text": "Exporting the Recovery Key and keeping it in a secure location enables you to recover your account in the case of a lost password without data loss.",
+        "context": "Footer shown on the Settings \/ Security Options section that explains what means to export the Recovery Key"
+    },
+    "8924": {
+        "text": "Recovery Key removed",
+        "context": "Alert title shown when you have removed your MEGA Recovery Key"
+    },
+    "8925": {
+        "text": "The Recovery Key has been exported into the Offline section as RecoveryKey.txt. Note: It will be deleted if you log out, please store it in a safe place.",
+        "context": "Alert message shown to explain that the master key was saved on your device. Also that you can access it through iTunes. And ends with and security advise."
+    },
+    "8926": {
+        "text": "RecoveryKey.txt was removed from the Documents folder.",
+        "context": "Alert message shown to explain that the Recovery Key was removed of your device."
+    },
+    "8927": {
+        "text": "Logout and erase local data after 10 failed passcode attempts",
+        "context": "Footer text that explain what will happen if \"Erase local data\" is enabled"
+    },
+    "8928": {
+        "text": "Backup Key",
+        "context": "Button label to export recovery key of the current user. String as short as possible."
+    },
+    "8929": {
+        "text": "Backup Recovery Key",
+        "context": "Title of dialog to backup the recovery key for the current user."
+    },
+    "8930": {
+        "text": "Always keep physical control of your Recovery Key (e.g. on a client device, external storage, or print).",
+        "context": "Label to inform the user to keep physical control of the recovery key."
+    },
+    "8931": {
+        "text": "Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.",
+        "context": "Advising the user to keep the user's recovery key safe."
+    },
+    "8937": {
+        "text": "Failed to import folder. Please try again.",
+        "context": "Message of the dialog displayed when fails the process\/request to import a folder."
+    },
+    "8938": {
+        "text": "Folder import failed",
+        "context": "Title of the dialog displayed when fails the process\/request to import a folder - (String as short as possible)."
+    },
+    "8939": {
+        "text": "Link import failed",
+        "context": "Title of the dialog displayed when fails the process\/request to import a link - (String as short as possible)."
+    },
+    "8940": {
+        "text": "Failed to share item(s) from MEGA. Please try again.",
+        "context": "Message of the dialog displayed when the process to share item(s) from MEGA with other app fails."
+    },
+    "8941": {
+        "text": "Error sharing item(s)",
+        "context": "Title of the dialog displayed when the process to share item(s) from MEGA with other app fails - (String as short as possible)."
+    },
+    "8942": {
+        "text": "Importing folder...",
+        "context": "Progress indicator message when importing a folder - (String as short as possible)."
+    },
+    "8943": {
+        "text": "Limited available bandwidth",
+        "context": "Warning header. Informs user that bandwidth is limited for current membership plan."
+    },
+    "8944": {
+        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a pro account[\/S] for increased bandwidth quota.",
+        "context": "Informs user that bandwidth is limited for current membership plan. User can buy PRO plan to increase bandwidth quota.\r\n\r\nPlease leave [BR], [S], [\/S] as it is."
+    },
+    "8945": {
+        "text": "Continue without account",
+        "context": "Button label. User can continue using MEGA without account registration."
+    },
+    "8946": {
+        "text": "Continue with your free account",
+        "context": "Button label. User can continue using MEGA without PRO plan purchase."
+    },
+    "8947": {
+        "text": "OPEN IN BROWSER",
+        "context": "Mobile-webclient, downloads page.\r\n\r\nThis is a button which will perform the download through the mobile browser."
+    },
+    "8948": {
+        "text": "OPEN IN MEGA APP",
+        "context": "Mobile-webclient, downloads page.\r\n\r\nThis is a button which will perform the download by forwarding the URL to our mobile APPs"
+    },
+    "8949": {
+        "text": "OPEN FILE",
+        "context": "Mobile-webclient, downloads page.\r\n\r\nOnce a download has finished downloading through the mobile browser, clicking this button will open the downloaded file in the mobile browser itself."
+    },
+    "8950": {
+        "text": "Install our mobile app to get [S]free 50GB encrypted cloud storage![\/S]",
+        "context": "Mobile-webclient, downloads page.\r\n\r\nWhile downloading through the mobile browser, this message is shown to users to encourage installing our app.\r\n\r\n[S] is replaced with <span> and the text within turns red."
+    },
+    "8951": {
+        "text": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50GB cloud storage![\/S]",
+        "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the filesize exceeds an stated limit. \r\n\r\n[S] is replaced with <span> and the text within turns red."
+    },
+    "8952": {
+        "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50GB cloud storage![\/S]",
+        "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the file-type cannot be handled through the mobile browser itself. (The message is shown BEFORE trying to download the file)\r\n\r\n[S] is replaced with <span> and the text within turns red."
     }
 }

@@ -444,7 +444,9 @@ function megatitle(nperc) {
 }
 
 function populate_l() {
-    // for (var i = 7000 ; i-- ; l[i] = l[i] || '(null)');
+    if (d) {
+        for (var i = 10000 ; i-- ; l[i] = l[i] || '(translation-missing)');
+    }
     l[0] = 'Mega Limited ' + new Date().getFullYear();
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
         l[0] = 'Mega Ltd.';
@@ -553,6 +555,9 @@ function populate_l() {
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -4875,7 +4880,7 @@ var debounce = function(func, execAsap) {
     return function debounced() {
         var obj = this;
         var args = arguments;
-        
+
         function delayed() {
             if (!execAsap) {
                 func.apply(obj, args);

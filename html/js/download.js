@@ -217,7 +217,8 @@ function dl_g(res) {
                             break;
 
                         case 'Android':
-                            var intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                            var intent = 'intent://' + location.hash
+                                + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
                             document.location = intent;
                             break;
 
@@ -232,7 +233,7 @@ function dl_g(res) {
                 var icon = supported || 'generic';
 
                 $('img.filetype-img').attr({
-                    src: 'images/mobile/extensions/' + icon + '.png'
+                    src: staticpath + 'images/mobile/extensions/' + icon + '.png'
                 });
 
                 if (res.s > MOBILE_MAXFILESIZE || !supported) {
@@ -240,11 +241,10 @@ function dl_g(res) {
                     $('.mobile.dl-browser').addClass('disabled');
                     $('.mobile.dl-browser').unbind('click');
 
-                    // TODO: translation
-                    var errmsg = 'This file is too large to open in your mobile browser. Please install our mobile app for <span>unlimited file size support, and free 50GB cloud storage!</span>';
+                    var errmsg = l[8951];
 
                     if (!supported) {
-                        errmsg = 'This file could not be opened in your mobile browser. Please install our mobile app for <span>unlimited file size and type support, and free 50GB cloud storage!</span>';
+                        errmsg = l[8952];
                     }
 
                     $('.mobile.error-txt').safeHTML(errmsg);
@@ -262,22 +262,26 @@ function dl_g(res) {
     }
     else $('.download.content-block').addClass('na-some-reason');
 
-    if (is_mobile && !fdl_queue_var) {
-        $('#mobile-ui-main').addClass('hidden');
-        $('#mobile-ui-notFound').removeClass('hidden');
+    if (is_mobile) {
+        $('.mobile.application-txt').safeHTML(l[8950]);
 
-        var msg;
-        if (res === ETOOMANY) {
-            msg = l[243] + '<p>' + l[731];
-        }
-        else if (res.e === ETEMPUNAVAIL) {
-            msg = l[1191] + '<p>' + l[253];
-        }
-        else {
-            msg = '<p>' + l[243];
-        }
+        if (!fdl_queue_var) {
+            $('#mobile-ui-main').addClass('hidden');
+            $('#mobile-ui-notFound').removeClass('hidden');
 
-        $('.mobile.na-file-txt').safeHTML(msg);
+            var msg;
+            if (res === ETOOMANY) {
+                msg = l[243] + '<p>' + l[731];
+            }
+            else if (res.e === ETEMPUNAVAIL) {
+                msg = l[1191] + '<p>' + l[253];
+            }
+            else {
+                msg = '<p>' + l[243];
+            }
+
+            $('.mobile.na-file-txt').safeHTML(msg);
+        }
     }
 
     var pf = navigator.platform.toUpperCase();

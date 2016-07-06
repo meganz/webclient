@@ -863,11 +863,6 @@ function siteLoadError(error, filename) {
     alert(message.join("\n\n"));
 }
 
-is_mobile=1
-if (location.hash === '#test') {
-    // window.location.hash = '#!84Vl0ADI!Fj9EOhlQu4mN_ZwlUNIHCD6xc2xMKCEjSFvEEvypx9o';
-    window.location.hash = '#!eBURTBaL!qt9qLMPlRx5wSCAB9AdUV2LDZgVDdAfmqWXKFlI32-0';
-}
 
 if (location.hash.substr(1, 1) === '!') {
     m = false;

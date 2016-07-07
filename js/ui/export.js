@@ -113,6 +113,9 @@ var getLinkExpiry = {
 
             // Clear the date of any old entries
             $dialog.find('.expiry-date-select').datepicker('setDate', null);
+            
+            // Reset text to 'Set an expiry date'
+            $dialog.find('.set-expiry-text').text(l[8953]);
         });
     },
 
@@ -121,8 +124,10 @@ var getLinkExpiry = {
      */
     initExpiryDatePicker: function() {
 
+        var $dialog = $('.export-links-dialog');
+        
         // Initialise expiry date picker
-        $('#link-expiry-datepicker').datepicker({
+        $dialog.find('.expiry-date-select').datepicker({
             dateFormat: 'yy-mm-dd',     // 2016-05-25
             dayNamesMin: [
                 l[8763], l[8764], l[8765], l[8766], l[8767], l[8768], l[8769]   // Sun - Sat
@@ -154,6 +159,9 @@ var getLinkExpiry = {
 
                 // Update the link with the new expiry timestamp
                 getLinkExpiry.updateLinks(expiryTimestamp);
+                
+                // Set the text to 'Set new expiry date'
+                $dialog.find('.set-expiry-text').text(l[8736]);
             }
         });
     },

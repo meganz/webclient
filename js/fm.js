@@ -6367,6 +6367,9 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.copy-item').hide();
                 $(menuCMI).filter('.getlink-item').hide();
             }
+            else if (M.getNodeShare(id).down === 1) {
+                $(menuCMI).filter('.copy-item').hide();
+            }
             else if (items['.getlink-item']) {
                 Soon(setContextMenuGetLinkText);
             }

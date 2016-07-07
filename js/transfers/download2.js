@@ -1,3 +1,41 @@
+/* ***************** BEGIN MEGA LIMITED CODE REVIEW LICENCE *****************
+ *
+ * Copyright (c) 2016 by Mega Limited, Auckland, New Zealand
+ * All rights reserved.
+ *
+ * This licence grants you the rights, and only the rights, set out below,
+ * to access and review Mega's code. If you take advantage of these rights,
+ * you accept this licence. If you do not accept the licence,
+ * do not access the code.
+ *
+ * Words used in the Mega Limited Terms of Service [https://mega.nz/#terms]
+ * have the same meaning in this licence. Where there is any inconsistency
+ * between this licence and those Terms of Service, these terms prevail.
+ *
+ * 1. This licence does not grant you any rights to use Mega's name, logo,
+ *    or trademarks and you must not in any way indicate you are authorised
+ *    to speak on behalf of Mega.
+ *
+ * 2. If you issue proceedings in any jurisdiction against Mega because you
+ *    consider Mega has infringed copyright or any patent right in respect
+ *    of the code (including any joinder or counterclaim), your licence to
+ *    the code is automatically terminated.
+ *
+ * 3. THE CODE IS MADE AVAILABLE "AS-IS" AND WITHOUT ANY EXPRESS OF IMPLIED
+ *    GUARANTEES AS TO FITNESS, MERCHANTABILITY, NON-INFRINGEMENT OR OTHERWISE.
+ *    IT IS NOT BEING PROVIDED IN TRADE BUT ON A VOLUNTARY BASIS ON OUR PART
+ *    AND YOURS AND IS NOT MADE AVAILABE FOR CONSUMER USE OR ANY OTHER USE
+ *    OUTSIDE THE TERMS OF THIS LICENCE. ANYONE ACCESSING THE CODE SHOULD HAVE
+ *    THE REQUISITE EXPERTISE TO SECURE THEIR OWN SYSTEM AND DEVICES AND TO
+ *    ACCESS AND USE THE CODE FOR REVIEW PURPOSES. YOU BEAR THE RISK OF
+ *    ACCESSING AND USING IT. IN PARTICULAR, MEGA BEARS NO LIABILITY FOR ANY
+ *    INTERFERENCE WITH OR ADVERSE EFFECT ON YOUR SYSTEM OR DEVICES AS A
+ *    RESULT OF YOUR ACCESSING AND USING THE CODE.
+ *
+ * Read the full and most up-to-date version at:
+ *    https://github.com/meganz/webclient/blob/master/LICENCE.md
+ *
+ * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 var dlMethod;
 
 /* jshint -W003 */
@@ -432,6 +470,10 @@ var dlmanager = {
                 writer.logger.info("IO_THROTTLE: pause XHR");
                 dlQueue.pause();
                 dlmanager.ioThrottlePaused = true;
+
+                if (page === 'download') {
+                    $('.download.status-txt').text(l[8579]);
+                }
             }
         });
 
@@ -440,23 +482,16 @@ var dlmanager = {
                 writer.logger.info("IO_THROTTLE: resume XHR");
                 dlQueue.resume();
                 dlmanager.ioThrottlePaused = false;
+
+                if (page === 'download') {
+                    $('.download.status-txt').text(l[258]);
+                }
             }
         });
     },
 
     checkLostChunks: function DM_checkLostChunks(file) {
         var dl_key = file.key;
-
-        // var t = []
-        // $.each(file.macs, function(i, mac) {
-        // t.push(i);
-        // });
-        // t.sort(function(a, b) {
-        // return parseInt(a) - parseInt(b);
-        // });
-        // $.each(t, function(i, v) {
-        // t[i] = file.macs[v];
-        // });
 
         var t = Object.keys(file.macs).map(Number)
             .sort(function(a, b) {
@@ -497,6 +532,7 @@ var dlmanager = {
     dlWriter: function DM_dl_writer(dl, is_ready) {
 
         function finish_write(task, done) {
+            task.data = undefined;
             done();
 
             if (typeof task.callback === "function") {
@@ -506,7 +542,6 @@ var dlmanager = {
                 // tell the download scheduler we're done.
                 dl.ready();
             }
-            delete task.data;
         }
 
         dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
@@ -1456,3 +1491,9 @@ if (typeof dlMethod.init === 'function') {
 }
 
 var dl_queue = new DownloadQueue();
+
+if (is_mobile) {
+    dlmanager.ioThrottleLimit = 2;
+    dlmanager.dlMaxChunkSize = 4 * 1048576;
+    dlMethod = MemoryIO;
+}

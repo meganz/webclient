@@ -35,6 +35,9 @@ var flhashchange = false;
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
 function startMega() {
+    if (!window.M) {
+        window.M = new MegaData();
+    }
     mBroadcaster.sendMessage('startMega');
 
     if (silent_loading) {
@@ -159,7 +162,7 @@ function init_page() {
         $('.top-head').remove();
     }
     $('#loading:visible').hide();
-    if (loadingDialog) {
+    if (window.loadingDialog) {
         loadingDialog.hide();
     }
 
@@ -245,7 +248,7 @@ function init_page() {
     blogmonth = false;
     blogsearch = false;
 
-    if (!$.mcImport) {
+    if (!$.mcImport && typeof closeDialog === 'function') {
         closeDialog();
     }
 
@@ -958,18 +961,24 @@ function init_page() {
         login_txt = l[1298];
         document.location.hash = 'login';
     }
-    else {
+    else if (typeof init_start === 'function') {
         page = 'start';
         parsepage(pages['start'], 'start');
         init_start();
     }
+    else {
+        location.assign('/');
+    }
 
     // Initialise the Public Service Announcement system
-    psa.init();
+    if (typeof psa !== 'undefined') {
+        psa.init();
+    }
 
     // Initialise the update check system
-    alarm.siteUpdate.init();
-
+    if (typeof alarm !== 'undefined') {
+        alarm.siteUpdate.init();
+    }
     topmenuUI();
     loggedout = false;
     flhashchange = false;
@@ -1308,7 +1317,10 @@ function topmenuUI() {
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
                 && ((c && c.indexOf('cloud-popup-icon') == -1) || !c))) {
-            notify.closePopup();
+
+            if (typeof notify === 'object') {
+                notify.closePopup();
+            }
         }
         if (!e || ($(e.target).parents('.top-login-popup').length == 0
                 && ((c && c.indexOf('top-login-button') == -1) || !c))) {
@@ -1554,7 +1566,6 @@ function topmenuUI() {
         }
     });
 
-    $('.top-menu-popup .top-menu-item').unbind('click');
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
 
         $('.top-menu-popup').removeClass('active');
@@ -1745,8 +1756,7 @@ function topmenuUI() {
         }
     });
 
-    var c = $('.fm-dialog.registration-page-success').attr('class');
-    if (c.indexOf('hidden') == -1) {
+    if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         $('.fm-dialog.registration-page-success').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
@@ -1788,7 +1798,9 @@ function topmenuUI() {
     }
 
     // Initialise notification popup and tooltip
-    notify.init();
+    if (typeof notify === 'object') {
+        notify.init();
+    }
 }
 
 function is_fm() {
@@ -1822,17 +1834,20 @@ function parsepage(pagehtml, pp) {
     $('#pageholder').hide();
     $('#startholder').hide();
     megatitle();
+
     pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     $('body').removeClass('notification-body bottom-pages new-startpage');
+
     if (page == 'start') {
         $('body').addClass('new-startpage');
     }
     else {
         $('body').addClass('bottom-pages');
     }
+
     var top = parsetopmenu();
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
@@ -1842,8 +1857,12 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace("((MEGAINFO))", translate(pages['megainfo']).replace(/{staticpath}/g, staticpath));
     pagehtml = pagehtml.replace("((TOP))", top);
     pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
-    $('#startholder').safeHTML(translate(pages['transferwidget']) + pagehtml);
-    $('#startholder').show();
+
+    var $container = is_mobile ? $('body') : $('#startholder');
+    $container
+        .safeHTML(translate(pages['transferwidget']) + pagehtml)
+        .show();
+
     Soon(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
         if (page !== 'start' && page !== 'download') {
@@ -1851,8 +1870,11 @@ function parsepage(pagehtml, pp) {
         }
         mega.utils.chrome110ZoomLevelNotification();
     });
+
     $('.nw-bottom-block').addClass(lang);
-    UIkeyevents();
+    if (typeof UIkeyevents === 'function') {
+        UIkeyevents();
+    }
 }
 
 function parsetopmenu() {
@@ -1860,7 +1882,7 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    top = top.replace("{avatar-top}", useravatar.top());
+    top = top.replace("{avatar-top}", window.useravatar && useravatar.top() || '');
     top = translate(top);
     return top;
 }
@@ -1900,7 +1922,8 @@ window.onhashchange = function() {
         return false;
     }
 
-    if (document.getElementById('overlay').style.display == '' && !is_fm()) {
+    var overlay = document.getElementById('overlay');
+    if (overlay && overlay.style.display == '' && !is_fm()) {
         document.location.hash = hash;
         return false;
     }

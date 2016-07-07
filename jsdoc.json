@@ -12,7 +12,7 @@
                     "fileapi.js",
                     "karma.conf.js.js",
                     "js/chat/mpenc.js",
-                    "js/downloadFirefox.js",
+                    "js/transfers/meths/firefox-extension.js",
                     "js/jquery.checkboxes.js",
                     "js/jquery.misc.js",
                     "js/jquery.qrcode.js",

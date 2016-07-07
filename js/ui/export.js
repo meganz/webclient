@@ -228,13 +228,21 @@ var getLinkExpiry = {
             }
         }
 
-        // If there is at least 1 expiry time, enable the toggle switch
+        // If there is at least one expiry time on the selected link/s
         if (numOfNodesWithExpiryTime > 0) {
+
+            // Enable the toggle switch
             getLinkExpiry.enableToggle();
+
+            // Set the text to 'Set new expiry date'
+            $('.export-links-dialog .set-expiry-text').text(l[8736]);
         }
         else {
-            // Otherwise disable it
+            // Otherwise disable the toggle switch
             getLinkExpiry.disableToggle();
+
+            // Set the text to 'Set an expiry date'
+            $('.export-links-dialog .set-expiry-text').text(l[8953]);
         }
     },
 

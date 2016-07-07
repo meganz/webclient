@@ -1984,3 +1984,10 @@ window.onbeforeunload = function () {
 window.onunload = function() {
     mBroadcaster.crossTab.leave();
 };
+
+if (!is_karma && !is_mobile) {
+    window.M = new MegaData();
+    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
+    attribCache.syncNameTimer = {};
+    attribCache.uaPacketParser = uaPacketParser;
+}

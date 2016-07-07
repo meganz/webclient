@@ -193,11 +193,6 @@ function u_checklogin3a(res, ctx) {
 
         if (r == 3) {
             // Load/initialise the authentication system.
-            if (!attribCache) {
-                attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
-                attribCache.syncNameTimer = {};
-                attribCache.uaPacketParser = uaPacketParser;
-            }
             authring.initAuthenticationSystem();
             return mBroadcaster.crossTab.initialize(function() {
                 ctx.checkloginresult(ctx, r);

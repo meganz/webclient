@@ -17,7 +17,6 @@ self.onmessage = function(e) {
     rsa2aes        = {};
     missingkeys    = {};
     rsasharekeys   = {};
-    lostandfound   = {};
     newmissingkeys = false;
 
     for (var i in nodes) {
@@ -43,7 +42,6 @@ self.onmessage = function(e) {
         jid            : evd.jid,
         rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
         rsasharekeys   : Object.keys(rsasharekeys).length && rsasharekeys,
-        lostandfound   : Object.keys(lostandfound).length && lostandfound,
         u_sharekeys    : Object.keys(new_sharekeys).length && new_sharekeys,
         missingkeys    : missingkeys,
         newmissingkeys : newmissingkeys,
@@ -60,7 +58,6 @@ var d, u_privk, u_k_aes, u_sharekeys;
 
 var rsa2aes = {};
 var missingkeys = {};
-var lostandfound = {};
 var newmissingkeys = false;
 var rsasharekeys = {};
 
@@ -214,16 +211,9 @@ function crypto_processkey(me, master_aes, file, OUT) {
         }
     }
 
-    if (success) {
-        // Update global variable which holds data about missing keys
-        // so DOM can be updated accordingly
-        if (missingkeys[file.h]) {
-            lostandfound[file.h] = true;
-        }
-    }
-    else {
+    if (!success) {
         if (d) {
-            console.log('Received no suitable key for "%s"', file.h, file);
+            console.log('Received no suitable key for ' + file.h, file);
         }
 
         if (!missingkeys[file.h]) {

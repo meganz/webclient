@@ -633,6 +633,53 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                 }
             });
         }
+        else if (textContents.substr &&
+            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+            var foundRevokedNode = null;
+
+            var revokedNode = textContents.substr(2, textContents.length);
+
+            if (chatRoom.attachments.exists(revokedNode)) {
+                chatRoom.attachments[revokedNode].forEach(function(obj) {
+                    var messageId = obj.messageId;
+                    var attachedMsg = chatRoom.messagesBuff.messages[messageId];
+
+                    if (!attachedMsg) {
+                        return;
+                    }
+
+                    if (attachedMsg.orderValue < message.orderValue) {
+                        try {
+                            var attc = attachedMsg.textContents;
+                            var attachments = JSON.parse(attc.substr(2, attc.length));
+                            attachments.forEach(function(node) {
+                                if (node.h === revokedNode) {
+                                    foundRevokedNode = node;
+                                }
+                            })
+                        } catch(e) {
+                        }
+                        attachedMsg.revoked = true;
+                        obj.revoked = true;
+                        
+                        if (!attachedMsg.seen) {
+                            attachedMsg.seen = true;
+                            if (chatRoom.messagesBuff._unreadCountCache > 0) {
+                                chatRoom.messagesBuff._unreadCountCache--;
+                                chatRoom.messagesBuff.trackDataChange();
+                                chatRoom.megaChat.updateSectionUnreadCount();
+                            }
+                        }
+                    }
+                });
+            }
+
+            // don't show anything if this is a 'revoke' message
+            return null;
+        }
+        else {
+            return null;
+        }
     }
 };
 

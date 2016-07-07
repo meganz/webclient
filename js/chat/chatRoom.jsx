@@ -141,7 +141,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
 
     // activity on a specific room (show, hidden, got new message, etc)
-    self.bind('onMessagesBuffAppend', function(e, msg) {
+    self.rebind('onMessagesBuffAppend.lastActivity', function(e, msg) {
         var ts = msg.delay ? msg.delay : msg.ts;
         if (!ts) {
             return;
@@ -187,7 +187,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             throw new Error("Not implemented");
         }
     });
-
 
 
     self.getParticipantsExceptMe().forEach(function(jid) {

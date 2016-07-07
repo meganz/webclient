@@ -824,7 +824,7 @@ function MegaData()
             drawn = false,
             t = '.grid-table.contact-requests';
         var contactName = '';
-        
+
         if (M.currentdirid === 'ipc') {
 
             if (clearGrid) {
@@ -4176,7 +4176,7 @@ function MegaData()
         $.transferHeader();
 
         if (!isZIP || zipSize) {
-            showTransferToast('d', isZIP ? 1 : added, isPaused);
+            M.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
         }
         openTransferpanel();
         initGridScrolling();
@@ -5728,7 +5728,7 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'd') {
             M.delNode(actionPacket.n);
-            
+
             // Only show a notification if we did not trigger the action ourselves
             if (actionPacket.ou !== u_attr.u) {
                 notify.notifyFromActionPacket(actionPacket);
@@ -6896,7 +6896,7 @@ function process_u(u) {
                 M.addNode(u[i]);
 
                 var contactName = M.getNameByHandle(u[i].h);
-                
+
                 // Update token.input plugin
                 addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: contactName }]);
                 addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);

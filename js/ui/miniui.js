@@ -9,8 +9,7 @@
 
 var uiPlaceholders = function($scope) {
     $('.have-placeholder', $scope)
-        .unbind('focus.uiPlaceholder')
-        .bind('focus.uiPlaceholder', function (e) {
+        .rebind('focus.uiPlaceholder', function (e) {
             $(this).parent().removeClass('focused');
 
             if ($(this).val() == $(this).data('placeholder')) {
@@ -21,12 +20,10 @@ var uiPlaceholders = function($scope) {
                 $(this)[0].type = "password";
             }
         })
-        .unbind('keyup.uiPlaceholder')
-        .bind('keyup.uiPlaceholder', function (e) {
+        .rebind('keyup.uiPlaceholder', function (e) {
             $(this).parents('.incorrect').removeClass('incorrect');
         })
-        .unbind('blur.uiPlaceholder')
-        .bind('blur.uiPlaceholder', function (e) {
+        .rebind('blur.uiPlaceholder', function (e) {
             $(this).parent().removeClass('focused');
             if ($(this).val() == '') {
                 $(this).val($(this).data('placeholder'));
@@ -42,50 +39,55 @@ var uiPlaceholders = function($scope) {
         });
 };
 
-var uiCheckboxes = function($scope) {
+var uiCheckboxes = function($scope, saveState) {
     $('.radio-txt', $scope).each(function() {
         var $label = $(this);
         var $cbxElement = $label.prev('.checkboxOn, .checkboxOff');
         var $input = $('input[type="checkbox"]', $cbxElement);
 
-        var _onToggle = function() {
-            if ($cbxElement.attr('class').indexOf('checkboxOn') > -1)
-            {
-                $cbxElement.addClass('checkboxOff');
-                $cbxElement.removeClass('checkboxOn');
-                $('input[type="checkbox"]', $cbxElement).removeAttr('checked');
-                $cbxElement.trigger('onFakeCheckboxChange', [false]);
+        var doToggle = function(state) {
+            if (state) {
+                $cbxElement
+                    .removeClass('checkboxOff')
+                    .addClass('checkboxOn')
+                    .trigger('onFakeCheckboxChange', [true]);
             }
-            else
-            {
-                $cbxElement.addClass('checkboxOn');
-                $cbxElement.removeClass('checkboxOff');
-                $('input[type="checkbox"]', $cbxElement).attr('checked', true);
-                $cbxElement.trigger('onFakeCheckboxChange', [true]);
+            else {
+                $cbxElement
+                    .removeClass('checkboxOn')
+                    .addClass('checkboxOff')
+                    .trigger('onFakeCheckboxChange', [false]);
+            }
+
+            if (saveState) {
+                if (state) {
+                    localStorage[saveState] = 1;
+                }
+                else {
+                    delete localStorage[saveState];
+                }
+            }
+        };
+
+        var _onToggle = function() {
+            if ($cbxElement.hasClass('checkboxOn')) {
+                doToggle();
+                $input.removeAttr('checked');
+            }
+            else {
+                doToggle(true);
+                $input.attr('checked', true);
             }
             return false;
         };
 
-        $label
-            .unbind('click.uiCheckboxes')
-            .bind('click.uiCheckboxes', _onToggle);
+        $label.rebind('click.uiCheckboxes', _onToggle);
+        $cbxElement.rebind('click.uiCheckboxes', _onToggle);
 
-        $cbxElement
-            .unbind('click.uiCheckboxes')
-            .bind('click.uiCheckboxes', _onToggle);
-
-        $input
-            .rebind('change.uiCheckboxes', function() {
-                if ($(this).attr('checked')) {
-                    $cbxElement.removeClass('checkboxOff');
-                    $cbxElement.addClass('checkboxOn');
-                    $cbxElement.trigger('onFakeCheckboxChange', [true]);
-                } else {
-                    $cbxElement.removeClass('checkboxOn');
-                    $cbxElement.addClass('checkboxOff');
-                    $cbxElement.trigger('onFakeCheckboxChange', [false]);
-                }
-            });
-
+        $input.rebind('change.uiCheckboxes', function() {
+            doToggle($(this).attr('checked'));
+        });
     });
+
+    return $scope;
 };

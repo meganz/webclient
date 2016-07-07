@@ -214,7 +214,7 @@
         $('.pro-register-scroll').removeAttr('style');
         deleteScrollPanel('.pro-register-scroll', 'jsp');
 
-        $('.fm-dialog-overlay').removeClass("hidden");
+        fm_showoverlay();
 
         options = Object(opts);
 

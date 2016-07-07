@@ -4142,6 +4142,8 @@ var watchdog = Object.freeze({
     eTag: '$WDE$!_',
     // ID to identify tab's origin
     wdID: (Math.random() * Date.now()),
+    // Hols promises waiting for a query reply
+    queryQueue: {},
 
     /** setup watchdog/webstorage listeners */
     setup: function() {
@@ -4166,6 +4168,43 @@ var watchdog = Object.freeze({
         }
     },
 
+    /**
+     * Perform a query to other tabs and wait for reply through a Promise
+     * @param {String} what Parameter
+     * @return {MegaPromise}
+     */
+    query: function(what) {
+        var self = this;
+        var token = mRandomToken();
+        var promise = new MegaPromise();
+
+        if (!mBroadcaster.crossTab.master
+                || Object(mBroadcaster.crossTab.slaves).length) {
+
+            this.queryQueue[token] = [];
+
+            Soon(function() {
+                self.notify('Q!' + what, { reply: token });
+            });
+
+            // wait for reply and fullfil/reject the promise
+            setTimeout(function() {
+                if (self.queryQueue[token].length) {
+                    promise.resolve(self.queryQueue[token]);
+                }
+                else {
+                    promise.reject(EACCESS);
+                }
+                delete self.queryQueue[token];
+            }, 1200);
+        }
+        else {
+            promise = MegaPromise.reject(EEXIST);
+        }
+
+        return promise;
+    },
+
     /** Handle watchdog/webstorage event */
     handleEvent: function(ev) {
         if (String(ev.key).indexOf(this.eTag) !== 0) {
@@ -4186,6 +4225,19 @@ var watchdog = Object.freeze({
         }
 
         switch (msg) {
+            case 'Q!Rep!y':
+                if (this.queryQueue[strg.data.token]) {
+                    this.queryQueue[strg.data.token].push(strg.data.value);
+                }
+                break;
+
+            case 'Q!dlsize':
+                this.notify('Q!Rep!y', {
+                    token: strg.data.reply,
+                    value: dlmanager.getCurrentDownloadsSize()
+                });
+                break;
+
             case 'loadfm_done':
                 if (this.Strg.login === strg.origin) {
                     location.assign(location.pathname);
@@ -4228,6 +4280,7 @@ var watchdog = Object.freeze({
                     location.reload();
                 }
                 break;
+
             case 'chat_event':
                 if (strg.data.state === 'DISCARDED') {
                     var chatRoom = megaChat.plugins.chatdIntegration._getChatRoomFromEventData(strg.data);

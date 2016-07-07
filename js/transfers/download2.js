@@ -859,6 +859,56 @@ var dlmanager = {
         });
     },
 
+    showLimitedBandwidthDialog: function(res, callback) {
+        var $dialog = $('.limited-bandwidth-dialog');
+
+        loadingDialog.hide();
+        this.onLimitedBandwidth = function() {
+            if (callback) {
+                $('a.red', $dialog).unbind('click');
+                $('.continue', $dialog).unbind('click');
+                $('.upgrade', $dialog).unbind('click');
+                Soon(callback);
+                callback = $dialog = undefined;
+            }
+        };
+
+        fm_showoverlay();
+        uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
+
+        $('a.red', $dialog).rebind('click', function() {
+            open(getAppBaseUrl() + '#pro');
+        });
+
+        $('.continue', $dialog).rebind('click', callback)
+            .find('span')
+            .text(res === 2 ? l[8946] : l[8945]);
+
+        $('.upgrade', $dialog).rebind('click', function() {
+
+            closeDialog();
+
+            if (res === 2) {
+                loadingDialog.show();
+                open(getAppBaseUrl() + '#pro');
+                return false;
+            }
+
+            mega.ui.showRegisterDialog({
+                onAccountCreated: function(gotLoggedIn, accountData) {
+                    if (gotLoggedIn) {
+                        dlmanager.onLimitedBandwidth();
+                    }
+                    else {
+                        localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                        mega.ui.sendSignupLinkDialog(accountData);
+                    }
+                }
+            });
+        })
+        .find('span').text(res === 2 ? 'Get a PRO account' : l[1108]);
+    },
+
     showOverQuotaDialog: function DM_quotaDialog(dlTask) {
 
         if (this.efq) {
@@ -902,6 +952,18 @@ var dlmanager = {
 
     getCurrentDownloads: function() {
         return array_unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
+    },
+
+    getCurrentDownloadsSize: function() {
+        var size = 0;
+
+        dl_queue
+            .filter(isQueueActive)
+            .map(function(dl) {
+                size += dl.size;
+            });
+
+        return size;
     },
 
     /**

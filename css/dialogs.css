@@ -164,7 +164,7 @@
 /* End of confirm truncate dialog */
 
 /* Limited available bandwidth dialog */
-.fm-dialog.litimed-bandwidth-dialog {
+.fm-dialog.limited-bandwidth-dialog {
     min-width: 484px;
     margin: -196px 0 0 -242px;
 }

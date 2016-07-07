@@ -394,6 +394,8 @@ MegaQueue.prototype.push = function(arg, next, self) {
 
 function TransferQueue() {
     MegaQueue.prototype.constructor.apply(this, arguments);
+
+    this.qbqq = [];
 }
 
 inherits(TransferQueue, MegaQueue);
@@ -513,4 +515,71 @@ TransferQueue.prototype.resume = function(gid) {
         }
 
     }
+};
+
+TransferQueue.prototype.push = function(cl) {
+
+    if (!(cl instanceof ClassFile)) {
+        return MegaQueue.prototype.push.apply(this, arguments);
+    }
+
+    var self = this;
+    var showToast = function() {
+        if (M.addDownloadToast) {
+            showTransferToast.apply(window, M.addDownloadToast);
+            M.addDownloadToast = null;
+        }
+    };
+
+    if (localStorage.ignoreLimitedBandwidth) {
+        showToast();
+        return MegaQueue.prototype.push.apply(this, arguments);
+    }
+
+    this.pause();
+    this.qbqq.push(toArray.apply(null, arguments));
+
+    delay('TransferQueue:push', function() {
+        var qbqq = self.qbqq;
+        var dispatcher = function() {
+            closeDialog();
+            self.resume();
+            qbqq.forEach(function(args) {
+                MegaQueue.prototype.push.apply(self, args);
+            });
+            loadingDialog.hide();
+            showToast();
+        };
+        self.qbqq = [];
+
+        loadingDialog.show();
+
+        // Query the size being downloaded in other tabs
+        watchdog.query('dlsize').always(function(res) {
+            var size = 0;
+
+            // if no error (Ie, no other tabs)
+            if (typeof res !== 'number') {
+                size = res.reduce(function(a, b) { return a + b; }, 0);
+            }
+
+            // this will include currently-downloading and the ClassFiles in hold atm.
+            size += dlmanager.getCurrentDownloadsSize();
+
+            // Fire "Query bandwidth quota"
+            api_req({a: 'qbq', s: size}, {
+                callback: function(res) {
+                    switch (res) {
+                        case 1:
+                        case 2:
+                            dlmanager.showLimitedBandwidthDialog(res, dispatcher);
+                            break;
+
+                        default:
+                            Soon(dispatcher);
+                    }
+                }
+            });
+        });
+    }, 950);
 };

@@ -1545,3 +1545,10 @@ function uaPacketParser(attrName, userHandle, ownActionPacket) {
 };
 
 var attribCache = false;
+
+if (is_karma) {
+    window.M = new MegaData();
+    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
+    attribCache.syncNameTimer = {};
+    attribCache.uaPacketParser = uaPacketParser;
+}

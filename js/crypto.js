@@ -4274,14 +4274,7 @@ function crypto_processkey(me, master_aes, file) {
         }
     }
 
-    if (success) {
-        // Update global variable which holds data about missing keys
-        // so DOM can be updated accordingly
-        if (missingkeys[file.h]) {
-            delete missingkeys[file.h];
-        }
-    }
-    else {
+    if (!success) {
         logger.warn('Received no suitable key for "%s"', file.h, file);
 
         if (!missingkeys[file.h]) {
@@ -4293,8 +4286,6 @@ function crypto_processkey(me, master_aes, file) {
             keycache[file.h] = file.k;
         }
     }
-
-    return success;
 }
 
 function api_updfkey(h) {

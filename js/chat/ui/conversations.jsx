@@ -214,6 +214,13 @@ var ConversationsList = React.createClass({
     },
     handleWindowResize: function() {
 
+        if (!M.chat) {
+            // don't resize if the UI is not visible...the onresize fake event, triggered by the webclient, would
+            // always call/trigger this when the hash changes (e.g. the chat is opened), so it would do the JSP reinit
+            // when shown..no need to do it when Conversations is in background/not active.
+            return;
+        }
+
         var contentPanelConversations = document.querySelector('.content-panel.conversations');
         if (
             !contentPanelConversations ||

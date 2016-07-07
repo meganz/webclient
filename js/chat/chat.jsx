@@ -580,6 +580,11 @@ Chat.prototype.init = function() {
 
     if (!appContainer) {
        $(window).rebind('hashchange.delayedChatUiInit', function() {
+           if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
+               // delay the chat init a bit more! specially for the case of a user getting from #pro -> #fm, which
+               // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
+               return;
+           }
            appContainer = document.querySelector('.section.conversations');
            if (appContainer) {
                initAppUI();

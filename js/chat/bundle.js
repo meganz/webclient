@@ -8740,6 +8740,10 @@
 	  }
 	};
 
+	function registerNullComponentID() {
+	  ReactEmptyComponentRegistry.registerNullComponentID(this._rootNodeID);
+	}
+
 	var ReactEmptyComponent = function (instantiate) {
 	  this._currentElement = null;
 	  this._rootNodeID = null;
@@ -8748,7 +8752,7 @@
 	assign(ReactEmptyComponent.prototype, {
 	  construct: function (element) {},
 	  mountComponent: function (rootID, transaction, context) {
-	    ReactEmptyComponentRegistry.registerNullComponentID(rootID);
+	    transaction.getReactMountReady().enqueue(registerNullComponentID, this);
 	    this._rootNodeID = rootID;
 	    return ReactReconciler.mountComponent(this._renderedComponent, rootID, transaction, context);
 	  },
@@ -18259,7 +18263,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.7';
+	module.exports = '0.14.8';
 
 /***/ },
 /* 143 */
@@ -23259,6 +23263,10 @@
 	        window.addEventListener('resize', self.handleWindowResize);
 	        window.addEventListener('keydown', self.handleKeyDown);
 
+	        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
+	            self.callJustEnded = true;
+	        });
+
 	        self.eventuallyInit();
 	    },
 	    eventuallyInit: function eventuallyInit(doResize) {
@@ -23373,7 +23381,7 @@
 	        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
 	        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
 	    },
-	    componentDidUpdate: function componentDidUpdate() {
+	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	        var self = this;
 	        var room = this.props.chatRoom;
 
@@ -23390,6 +23398,16 @@
 	            $('.js-messages-loading', $node).addClass('hidden');
 	        }
 	        self.handleWindowResize();
+
+	        if (prevState.messagesToggledInCall !== self.state.messagesToggledInCall || self.callJustEnded) {
+	            if (self.callJustEnded) {
+	                self.callJustEnded = false;
+	            }
+	            self.$messages.trigger('forceResize', [true, 1]);
+	            Soon(function () {
+	                self.$messages.data('jsp').scrollToPercentY(1);
+	            });
+	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
 	        var $container = $(ReactDOM.findDOMNode(this));

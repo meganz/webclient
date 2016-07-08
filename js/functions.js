@@ -639,12 +639,11 @@ function browserdetails(useragent) {
         brand = brand && brand.pop() | 0;
     }
 
-    if (useragent.indexOf('android') > 0) {
-        os = 'Android';
-    }
-    else if (useragent.indexOf('windows phone') > 0) {
+    if (useragent.indexOf('windows phone') > 0) {
         icon = 'wp.png';
         os = 'Windows Phone';
+    } else if (useragent.indexOf('android') > 0) {
+        os = 'Android';
     }
     else if (useragent.indexOf('windows') > 0) {
         os = 'Windows';
@@ -4819,7 +4818,7 @@ mega.utils.chrome110ZoomLevelNotification = function() {
         0.3330000042915344// 33% non-retina
     ];
 
-    if ($.browser.chrome) {
+    if (window.chrome) {
 
         $('.nw-dark-overlay').removeClass('mac');
         $('.nw-dark-overlay.zoom-overlay').removeClass('zoom-67 zoom-33');

@@ -810,7 +810,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         self.messages.forEach(function(v, k) {
             if (v.getState && v.getState() === Message.STATE.NOT_SEEN) {
                 var shouldRender = true;
-                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
+                if (
+                    (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) ||
+                    v.revoked === true
+                ) {
                     shouldRender = false;
                 }
 
@@ -886,7 +889,7 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
     if (!self.lastSeen || lastMsg.orderValue < targetMsg.orderValue) {
         self.lastSeen = msgId;
 
-        if (!self.isRetrievingHistory) {
+        if (!self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
             self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
         }
 
@@ -1101,7 +1104,10 @@ MessagesBuff.prototype.getLatestTextMessage = function() {
         for (var i = msgs.length - 1; i >= 0; i--) {
             if (msgs.getItem(i) && msgs.getItem(i).textContents && msgs.getItem(i).textContents.length > 0) {
                 var msg = msgs.getItem(i);
-                if (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) {
+                if (
+                    (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) ||
+                    msg.revoked === true
+                ) {
                     continue;
                 }
                 return msg;

@@ -83,6 +83,10 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     }
 
                     if (message.userId !== u_handle) {
+                        if (message.isManagement && message.isManagement() && !message.isRenderableManagement()) {
+                            // skip non renderable management messages, as "Attachment Revoked" and others...
+                            return;
+                        }
                         var unreadFlag = message.getState() === Message.STATE.NOT_SEEN && !document.hasFocus();
                         n = self.notifications.notify(
                             'incoming-chat-message',

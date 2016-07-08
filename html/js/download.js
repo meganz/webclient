@@ -36,7 +36,9 @@ function dlinfo(ph,key,next)
     dlpage_ph   = ph;
     dlpage_key  = key;
 
-    watchdog.query('dlsize', 2100, true);
+    if (!is_mobile) {
+        watchdog.query('dlsize', 2100, true);
+    }
 
     if (dl_res)
     {
@@ -217,8 +219,7 @@ function dl_g(res) {
                             break;
 
                         case 'Windows Phone':
-                            window.location = 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
-                            break;
+                            window.location = "mega://" + location.hash.substr(1);
 
                         case 'Android':
                             var intent = 'intent://' + location.hash
@@ -229,6 +230,9 @@ function dl_g(res) {
                         default:
                             alert('Unknown device.');
                     }
+                    setTimeout(function() {
+                        document.location = $('.mobile.download-app').attr('href');
+                    }, 500);
                     return false;
                 });
 
@@ -338,6 +342,7 @@ function setMobileAppInfo() {
         case 'Windows Phone':
             $('.app-info-block').addClass('wp');
             $('.mobile.download-app').attr('href', 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a');
+            $('.mobile.dl-browser').hide();
             break;
 
         case 'Android':

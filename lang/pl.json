@@ -3438,7 +3438,7 @@
     "8917": "Zatrzymaj przesy\u0142anie",
     "8918": "Brak udost\u0119pnionych katalog\u00f3w",
     "8919": "Brak udost\u0119pnionych katalog\u00f3w",
-    "8920": "No pending requests",
+    "8920": "Brak zg\u0142osze\u0144",
     "8921": "Wyeksportuj klucz zapasowy",
     "8922": "Klucz zapasowy zosta\u0142 wyeksportowany",
     "8923": "Posiadanie Klucza Zapasowego i przechowywanie go w bezpiecznym miejscu, umo\u017cliwia p\u00f3\u017aniej odzyskanie dost\u0119pu do konto bez ryzyka utraty danych.",
@@ -3466,7 +3466,7 @@
     "8950": "Zainstaluj nasz\u0105 aplikacje i odbierz [S]darmowe 50GB bezpiecznej przestrzeni na pliki w chmurze![\/S]",
     "8951": "Ten plik jest za du\u017cy aby otworzy\u0107 go w przegl\u0105darce. Zainstaluj nasz\u0105 aplikacj\u0119 mobiln\u0105 [S]aby przechowywa\u0107 pliki bez ogranicze\u0144 i otrzyma\u0107 50GB za darmo w chmurze![\/S]",
     "8952": "Ten plik jest za du\u017cy aby otworzy\u0107 go w przegl\u0105darce. Zainstaluj nasz\u0105 aplikacj\u0119 mobiln\u0105 [S]aby przechowywa\u0107 dowolne pliki bez ogranicze\u0144 i otrzyma\u0107 50GB za darmo w chmurze![\/S]",
-    "8953": "Set an expiry date",
+    "8953": "Ustaw dat\u0119 wa\u017cno\u015bci",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

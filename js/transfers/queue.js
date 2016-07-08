@@ -519,7 +519,7 @@ TransferQueue.prototype.resume = function(gid) {
 
 TransferQueue.prototype.push = function(cl) {
 
-    if (!(cl instanceof ClassFile)) {
+    if (!(cl instanceof ClassFile) || is_mobile) {
         return MegaQueue.prototype.push.apply(this, arguments);
     }
 

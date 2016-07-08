@@ -36,7 +36,9 @@ function dlinfo(ph,key,next)
     dlpage_ph   = ph;
     dlpage_key  = key;
 
-    watchdog.query('dlsize', 2100, true);
+    if (!is_mobile) {
+        watchdog.query('dlsize', 2100, true);
+    }
 
     if (dl_res)
     {

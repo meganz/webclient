@@ -72,6 +72,29 @@ var ChatdIntegration = function(megaChat) {
             }
         });
     });
+
+    megaChat.rebind('onNewGroupChatRequest.chatdInt', function(e, contactHashes) {
+        var users = [];
+        contactHashes.forEach(function(k) {
+            users.push({
+                'u': k,
+                'p': 2
+            });
+        });
+
+        asyncApiReq({
+            'a': 'mcc',
+            'g': 1,
+            'u': users,
+            'v': Chatd.VERSION
+        })
+            .done(function(r) {
+                // no need to do anything, the triggered action packet would trigger the code for joining the room.
+            })
+            .fail(function() {
+                self.logger.error("Failed to retrieve chatd ID from API, while trying to create a new room");
+            });
+    });
     return self;
 };
 
@@ -251,8 +274,42 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     }
     roomJid += "@conference." + megaChat.options.xmppDomain;
 
+
     var chatRoom = self.megaChat.chats[roomJid];
+    var wasActive = chatRoom ? chatRoom.isCurrentlyActive : false;
+
     var finishProcess = function() {
+        // if the found chatRoom is in LEAVING mode...then try to reinitialise it!
+
+        if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
+
+            chatRoom.destroy(undefined, true);
+            chatRoom = false;
+            
+            if (actionPacket.url) {
+                Soon(finishProcess);
+            }
+            else {
+                // retrieve mcurl!
+
+                asyncApiReq({
+                    a: 'mcurl',
+                    id: actionPacket.id,
+                    v: Chatd.VERSION
+                })
+                    .done(function(mcurl) {
+                        actionPacket.url = mcurl;
+                        finishProcess();
+                    })
+                    .fail(function(r) {
+                        if (r === EEXPIRED) {
+                            self.requiresUpdate();
+                        }
+                    });
+            }
+            return;
+        }
+
         if (!chatRoom) {
             var r = self.megaChat.openChat(
                 chatJids,
@@ -267,6 +324,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
+                window.location = chatRoom.getRoomUrl();
+            }
+
+            if (wasActive) {
                 window.location = chatRoom.getRoomUrl();
             }
         }
@@ -287,6 +348,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                             delete chatRoom.members[v.u];
                             if (v.u === u_handle) {
                                 chatRoom.leave(false);
+                                // i had left, also do a chatd.leave!
+                                self.chatd.leave(
+                                    base64urldecode(actionPacket.id)
+                                );
                             }
                         }
                         else {
@@ -960,28 +1025,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "v": Chatd.VERSION
             });
         });
-        chatRoom.megaChat.rebind('onNewGroupChatRequest.chatdInt', function(e, contactHashes) {
-            var users = [];
-            contactHashes.forEach(function(k) {
-                users.push({
-                    'u': k,
-                    'p': 2
-                });
-            });
 
-            asyncApiReq({
-                'a': 'mcc',
-                'g': 1,
-                'u': users,
-                'v': Chatd.VERSION
-            })
-                .done(function(r) {
-                    // no need to do anything, the triggered action packet would trigger the code for joining the room.
-                })
-                .fail(function() {
-                    self.logger.error("Failed to retrieve chatd ID from API, while trying to create a new room");
-                });
-        });
         $(chatRoom.messagesBuff).rebind('onNewMessageReceived.chatdStrongvelope', function(e, msgObject) {
             if (msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
                 var _runDecryption = function() {
@@ -1143,7 +1187,9 @@ ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
 
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
     var self = this;
-    self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
+    if (!chatRoom.stateIsLeftOrLeaving()) {
+        self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
+    }
 };
 
 ChatdIntegration.prototype.setRetention = function(chatRoom, time) {

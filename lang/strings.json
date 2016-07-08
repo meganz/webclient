@@ -13755,6 +13755,10 @@
         "text": "No outgoing Shared Folders",
         "context": "Title shown when there's no outgoing Shared Items"
     },
+    "8920": {
+        "text": "No pending requests",
+        "context": "Title shown when there's no pending contact requests"
+    },
     "8921": {
         "text": "Export Recovery Key",
         "context": "Title shown when you try to export your MEGA Recovery Key"
@@ -13862,5 +13866,9 @@
     "8952": {
         "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50GB cloud storage![\/S]",
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the file-type cannot be handled through the mobile browser itself. (The message is shown BEFORE trying to download the file)\r\n\r\n[S] is replaced with <span> and the text within turns red."
+    },
+    "8953": {
+        "text": "Set an expiry date",
+        "context": "A label for the Get Link dialog when there is no expiry time currently set for the link. This lets them set an expiry date for the link so it will no longer be available after this date."
     }
 }

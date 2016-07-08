@@ -436,3 +436,14 @@
 .big-icon.nwse-inset-resize, .button.active .big-icon.nwse-resize {
     background-position: -14px -3537px;
 }
+.big-90px-icon {
+    width: 90px;
+    height: 90px;
+    display: inline-block;
+    vertical-align: top;
+}
+.big-90px-icon.speedometer {
+    background-image: url(../images/mega/dialogs-sprite_v11.svg);
+    background-repeat: no-repeat;
+    background-position: center -5633px;
+}

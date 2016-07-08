@@ -32,8 +32,12 @@ function dlinfo(ph,key,next)
     }
     loadingDialog.show();
     $('.download.content-block').addClass('hidden');
+
     dlpage_ph   = ph;
     dlpage_key  = key;
+
+    watchdog.query('dlsize', 2100, true);
+
     if (dl_res)
     {
         dl_g(dl_res);

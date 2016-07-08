@@ -2917,13 +2917,8 @@ function showRegisterDialog() {
 
             if (skipConfirmationStep) {
                 closeDialog();
-                topmenuUI();
                 if (!gotLoggedIn) {
                     localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
-                }
-                else {
-                    showToast('megasync', l[8745]);
-                    $('.fm-avatar img').attr('src', useravatar.top());
                 }
                 pro_next_step();
             }

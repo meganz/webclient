@@ -552,7 +552,7 @@ TransferQueue.prototype.push = function(cl) {
         };
         self.qbqq = [];
 
-        loadingDialog.show();
+        // loadingDialog.show();
 
         // Query the size being downloaded in other tabs
         watchdog.query('dlsize').always(function(res) {
@@ -581,5 +581,5 @@ TransferQueue.prototype.push = function(cl) {
                 }
             });
         });
-    }, 950);
+    }, 50);
 };

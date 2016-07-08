@@ -727,6 +727,11 @@ var dlmanager = {
                     return;
                 }
 
+                if (res.rtt) {
+                    // retry inmediately
+                    return this._onQuotaRetry(true);
+                }
+
                 if (this.uqFastTrack || (this.onOverQuotaProClicked && u_type)) {
                     // The user loged/registered in another tab, poll the uq command every
                     // 30 seconds until we find a pro status and then retry with fresh download
@@ -875,6 +880,8 @@ var dlmanager = {
 
         fm_showoverlay();
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
+
+        api_req({ a: 'log', e: 99617, m: 'qbq' });
 
         $('a.red', $dialog).rebind('click', function() {
             open(getAppBaseUrl() + '#pro');

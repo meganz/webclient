@@ -4128,6 +4128,8 @@ var watchdog = Object.freeze({
     wdID: (Math.random() * Date.now()),
     // Hols promises waiting for a query reply
     queryQueue: {},
+    // Holds query replies if cached
+    replyCache: {},
 
     /** setup watchdog/webstorage listeners */
     setup: function() {
@@ -4155,16 +4157,28 @@ var watchdog = Object.freeze({
     /**
      * Perform a query to other tabs and wait for reply through a Promise
      * @param {String} what Parameter
+     * @param {String} timeout ms
+     * @param {String} cache   preserve result
      * @return {MegaPromise}
      */
-    query: function(what) {
+    query: function(what, timeout, cache) {
         var self = this;
         var token = mRandomToken();
         var promise = new MegaPromise();
 
+        if (this.replyCache[what]) {
+            // a prior query was launched with the cache flag
+            cache = this.replyCache[what];
+            delete this.replyCache[what];
+            return MegaPromise.resolve(cache);
+        }
+
         if (!mBroadcaster.crossTab.master
                 || Object(mBroadcaster.crossTab.slaves).length) {
 
+            if (cache) {
+                this.replyCache[what] = [];
+            }
             this.queryQueue[token] = [];
 
             Soon(function() {
@@ -4180,7 +4194,7 @@ var watchdog = Object.freeze({
                     promise.reject(EACCESS);
                 }
                 delete self.queryQueue[token];
-            }, 1200);
+            }, timeout || 200);
         }
         else {
             promise = MegaPromise.reject(EEXIST);
@@ -4213,10 +4227,14 @@ var watchdog = Object.freeze({
                 if (this.queryQueue[strg.data.token]) {
                     this.queryQueue[strg.data.token].push(strg.data.value);
                 }
+                if (this.replyCache[strg.data.query]) {
+                    this.replyCache[strg.data.query].push(strg.data.value);
+                }
                 break;
 
             case 'Q!dlsize':
                 this.notify('Q!Rep!y', {
+                    query: 'dlsize',
                     token: strg.data.reply,
                     value: dlmanager.getCurrentDownloadsSize()
                 });

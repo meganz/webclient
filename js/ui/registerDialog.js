@@ -23,6 +23,14 @@
                 $('.pro-register-dialog').addClass('hidden');
                 $('.fm-dialog.registration-page-success').unbind('click');
 
+                if (login) {
+                    Soon(function() {
+                        showToast('megasync', l[8745]);
+                        $('.fm-avatar img').attr('src', useravatar.top());
+                    });
+                }
+                Soon(topmenuUI);
+
                 if (options.onAccountCreated) {
                     options.onAccountCreated(login, rv);
                 }

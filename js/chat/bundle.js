@@ -22598,7 +22598,7 @@
 	                            $(room).trigger('onRemoveUserRequest', [contactHash]);
 	                        } });
 
-	                    if (room.iAmOperator()) {
+	                    if (room.iAmOperator() || contactHash === u_handle) {
 
 	                        dropdowns.push(React.makeElement(
 	                            "div",
@@ -26409,35 +26409,6 @@
 	                        )
 	                    );
 	                } else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-	                    var foundRevokedNode = null;
-
-	                    var revokedNode = textContents.substr(2, textContents.length);
-
-	                    if (chatRoom.attachments.exists(revokedNode)) {
-	                        chatRoom.attachments[revokedNode].forEach(function (obj) {
-	                            var messageId = obj.messageId;
-	                            var attachedMsg = chatRoom.messagesBuff.messages[messageId];
-
-	                            if (!attachedMsg) {
-	                                return;
-	                            }
-
-	                            if (attachedMsg.orderValue < message.orderValue) {
-	                                try {
-	                                    var attc = attachedMsg.textContents;
-	                                    var attachments = JSON.parse(attc.substr(2, attc.length));
-	                                    attachments.forEach(function (node) {
-	                                        if (node.h === revokedNode) {
-	                                            foundRevokedNode = node;
-	                                        }
-	                                    });
-	                                } catch (e) {}
-	                                attachedMsg.seen = true;
-	                                attachedMsg.revoked = true;
-	                                obj.revoked = true;
-	                            }
-	                        });
-	                    }
 
 	                    return null;
 	                } else {
@@ -27244,7 +27215,7 @@
 	        } else if (newState === ChatRoom.STATE.JOINING) {} else if (newState === ChatRoom.STATE.READY) {}
 	    });
 
-	    self.bind('onMessagesBuffAppend', function (e, msg) {
+	    self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {
 	        var ts = msg.delay ? msg.delay : msg.ts;
 	        if (!ts) {
 	            return;

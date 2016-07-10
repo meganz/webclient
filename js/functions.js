@@ -444,8 +444,10 @@ function megatitle(nperc) {
 }
 
 function populate_l() {
-    if (d) {
-        for (var i = 10000 ; i-- ; l[i] = l[i] || '(translation-missing)');
+    if (d || 1) { // XXX: Disable me once pro->PRO is made Babel-side
+        for (var i = 10000 ; i-- ;) {
+            l[i] = (l[i] || '(translation-missing)').replace(/\b[Pp]ro\b/g, 'PRO');
+        }
     }
     l[0] = 'Mega Limited ' + new Date().getFullYear();
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
@@ -453,7 +455,7 @@ function populate_l() {
     }
     l[1] = l[398];
     if (lang === 'en') {
-        l[1] = 'Go Pro';
+        l[1] = 'Go PRO';
     }
     l[8634] = l[8634].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
@@ -555,6 +557,8 @@ function populate_l() {
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
+    l[8944] = l[8944].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');

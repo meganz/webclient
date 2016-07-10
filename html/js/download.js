@@ -259,6 +259,16 @@ function dl_g(res) {
                 }
             }
         }
+        else if (is_mobile) {
+            var mkey = prompt(l[1026]);
+
+            if (mkey) {
+                location.hash = '#!' + dlpage_ph + '!' + mkey;
+            }
+            else {
+                dlpage_key = null;
+            }
+        }
         else {
             mKeyDialog(dlpage_ph)
                 .fail(function() {
@@ -278,7 +288,10 @@ function dl_g(res) {
             $('#mobile-ui-notFound').removeClass('hidden');
 
             var msg;
-            if (res === ETOOMANY) {
+            if (!dlpage_key) {
+                msg = l[7945] + '<p>' + l[7946];
+            }
+            else if (res === ETOOMANY) {
                 msg = l[243] + '<p>' + l[731];
             }
             else if (res.e === ETEMPUNAVAIL) {

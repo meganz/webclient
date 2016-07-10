@@ -4737,8 +4737,7 @@ function MegaData()
             };
             dlmanager.isMEGAsyncRunning('3.0', 1)
                 .done(function(ms, syncData) {
-                    var button = l[8847].split('<span>');
-                    showMEGAsyncDialog("I'll use <span>" + button[1], syncData);
+                    showMEGAsyncDialog(l[8912], syncData);
                 })
                 .fail(function() {
                     showMEGAsyncDialog(l[8847]);

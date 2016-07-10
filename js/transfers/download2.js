@@ -881,6 +881,9 @@ var dlmanager = {
         fm_showoverlay();
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
 
+        $('.header-after-icon', $dialog).text(l[8943]);
+        $('.p-after-icon', $dialog).safeHTML(l[8944]);
+
         api_req({ a: 'log', e: 99617, m: 'qbq' });
 
         $('a.red', $dialog).rebind('click', function() {
@@ -913,7 +916,7 @@ var dlmanager = {
                 }
             });
         })
-        .find('span').text(res === 2 ? 'Get a PRO account' : l[1108]);
+        .find('span').text(res === 2 ? l[8954] : l[1108]);
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask) {

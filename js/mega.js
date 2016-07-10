@@ -3129,9 +3129,8 @@ function MegaData()
             return false;
         }
 
-        var importNodes = Object($.onImportCopyNodes).length;
-
         var a = this.isNodeObject(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
+        var importNodes = Object(a).length;
         var ops = {a: 'p', t: t, n: a, i: requesti};
         var s = fm_getsharenodes(t);
 

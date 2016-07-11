@@ -212,14 +212,18 @@ function dl_g(res) {
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
+                    var loadedAt = new Date().getTime()
+                    var isSafari = false;
                     switch (ua.details.os) {
                         case 'iPad':
                         case 'iPhone':
                             window.location = "mega://" + location.hash;
+                            isSafari = !window.chrome;
                             break;
 
                         case 'Windows Phone':
                             window.location = "mega://" + location.hash.substr(1);
+                            break;
 
                         case 'Android':
                             var intent = 'intent://' + location.hash
@@ -231,7 +235,9 @@ function dl_g(res) {
                             alert('Unknown device.');
                     }
                     setTimeout(function() {
-                        document.location = $('.mobile.download-app').attr('href');
+                        if (!isSafari || (new Date).getTime() - loadedAt < 2000) {
+                            document.location = $('.mobile.download-app').attr('href');
+                        }
                     }, 500);
                     return false;
                 });

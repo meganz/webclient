@@ -33,6 +33,10 @@ var is_chrome_firefox = document.location.protocol === 'chrome:'
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
 var is_mobile = m = isMobile();
 
+if (location.hash === '#test') {
+    window.location.hash = '#!eBURTBaL!qt9qLMPlRx5wSCAB9AdUV2LDZgVDdAfmqWXKFlI32-0';
+}
+
 function isMobile()
 {
     if (is_chrome_firefox) return false;

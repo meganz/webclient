@@ -230,9 +230,6 @@ function dl_g(res) {
                         default:
                             alert('Unknown device.');
                     }
-                    setTimeout(function() {
-                        document.location = $('.mobile.download-app').attr('href');
-                    }, 500);
                     return false;
                 });
 
@@ -333,8 +330,13 @@ function browserDownload() {
 
 function setMobileAppInfo() {
     switch (ua.details.os) {
-        case 'iPhone':
         case 'iPad':
+        case 'iPhone':
+            var app = document.querySelector('meta[name="apple-itunes-app"]');
+            if (app) {
+                app.setAttribute('content',
+                    'app-id=706857885, app-argument=mega://' + window.location.hash);
+            }
             $('.app-info-block').addClass('ios');
             $('.mobile.download-app').attr('href', 'https://itunes.apple.com/app/mega/id706857885');
             break;

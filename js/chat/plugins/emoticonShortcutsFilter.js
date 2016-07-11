@@ -20,7 +20,7 @@ var EmoticonShortcutsFilter = function(megaChat) {
         ':p': ':stuck_out_tongue:',
         ':-p': ':stuck_out_tongue:',
 
-        ':(': ':disappointed:',
+        ':(': ':slight_frown:',
         ':\\': ':confused:',
         ':/': ':confused:',
         ':|': ':neutral_face:',

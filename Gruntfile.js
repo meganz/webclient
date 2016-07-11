@@ -39,6 +39,7 @@ var Secureboot = function() {
             }
         }
         var is_chrome_firefox = 0;
+        var is_mobile = 0;
         eval(lines.join("\n"));
         return jsl;
     };

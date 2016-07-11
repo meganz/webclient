@@ -474,14 +474,7 @@ Chat.prototype.init = function() {
     this.karere.bind("onUsersLeft", function(e, eventData) {
         return self._onUsersUpdate("left", e, eventData);
     });
-    this.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
-        var room = self.chats[eventObject.getRoomJid()];
-        if (room && (room.state == ChatRoom.STATE.JOINING)) {
-            room.setState(
-                ChatRoom.STATE.PLUGINS_PAUSED
-            );
-        }
-    });
+
 
 
     this.karere.bind("onChatMessage", function() {

@@ -446,12 +446,6 @@
 	    this.karere.bind("onUsersLeft", function (e, eventData) {
 	        return self._onUsersUpdate("left", e, eventData);
 	    });
-	    this.karere.bind("onUsersUpdatedDone", function (e, eventObject) {
-	        var room = self.chats[eventObject.getRoomJid()];
-	        if (room && room.state == ChatRoom.STATE.JOINING) {
-	            room.setState(ChatRoom.STATE.PLUGINS_PAUSED);
-	        }
-	    });
 
 	    this.karere.bind("onChatMessage", function () {
 	        self._onChatMessage.apply(self, arguments);
@@ -21632,15 +21626,17 @@
 	        "scream": ["1F631", "&#x1F631;"],
 	        "relieved": ["1F60C", "&#x1F60C;"],
 	        "dizzy_face": ["1F635", "&#x1F635;"],
+	        "confused": ["1f621", "&#x1f621;"],
 	        "slight_frown": ["1F641", "&#x1F641;"],
 	        "confounded": ["1F616", "&#x1F616;"],
-	        "angry": ["1F61E", "&#x1F61E;"],
+	        "angry": ["1f620", "&#x1f620;"],
 	        "kissing_smiling_eyes": ["1F619", "&#x1F619;"],
 	        "triumph": ["1F624", "&#x1F624;"],
 	        "neutral_face": ["1F610", "&#x1F610;"],
 	        "laughing": ["1F606", "&#x1F606;"],
 	        "hushed": ["1F62F", "&#x1F62F;"],
 	        "disappointed_relieved": ["1F625", "&#x1F625;"],
+	        "anguished": ["1F627", "&#x1F627;"],
 	        "weary": ["1F629", "&#x1F629;"],
 	        "flushed": ["1F633", "&#x1F633;"],
 	        "unamused": ["1F612", "&#x1F612;"],
@@ -22602,7 +22598,7 @@
 	                            $(room).trigger('onRemoveUserRequest', [contactHash]);
 	                        } });
 
-	                    if (room.iAmOperator()) {
+	                    if (room.iAmOperator() || contactHash === u_handle) {
 
 	                        dropdowns.push(React.makeElement(
 	                            "div",
@@ -23261,6 +23257,10 @@
 	        window.addEventListener('resize', self.handleWindowResize);
 	        window.addEventListener('keydown', self.handleKeyDown);
 
+	        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
+	            self.callJustEnded = true;
+	        });
+
 	        self.eventuallyInit();
 	    },
 	    eventuallyInit: function eventuallyInit(doResize) {
@@ -23375,7 +23375,7 @@
 	        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
 	        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
 	    },
-	    componentDidUpdate: function componentDidUpdate() {
+	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	        var self = this;
 	        var room = this.props.chatRoom;
 
@@ -23392,6 +23392,16 @@
 	            $('.js-messages-loading', $node).addClass('hidden');
 	        }
 	        self.handleWindowResize();
+
+	        if (prevState.messagesToggledInCall !== self.state.messagesToggledInCall || self.callJustEnded) {
+	            if (self.callJustEnded) {
+	                self.callJustEnded = false;
+	            }
+	            self.$messages.trigger('forceResize', [true, 1]);
+	            Soon(function () {
+	                self.$messages.data('jsp').scrollToPercentY(1);
+	            });
+	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
 	        var $container = $(ReactDOM.findDOMNode(this));
@@ -26399,35 +26409,6 @@
 	                        )
 	                    );
 	                } else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-	                    var foundRevokedNode = null;
-
-	                    var revokedNode = textContents.substr(2, textContents.length);
-
-	                    if (chatRoom.attachments.exists(revokedNode)) {
-	                        chatRoom.attachments[revokedNode].forEach(function (obj) {
-	                            var messageId = obj.messageId;
-	                            var attachedMsg = chatRoom.messagesBuff.messages[messageId];
-
-	                            if (!attachedMsg) {
-	                                return;
-	                            }
-
-	                            if (attachedMsg.orderValue < message.orderValue) {
-	                                try {
-	                                    var attc = attachedMsg.textContents;
-	                                    var attachments = JSON.parse(attc.substr(2, attc.length));
-	                                    attachments.forEach(function (node) {
-	                                        if (node.h === revokedNode) {
-	                                            foundRevokedNode = node;
-	                                        }
-	                                    });
-	                                } catch (e) {}
-	                                attachedMsg.seen = true;
-	                                attachedMsg.revoked = true;
-	                                obj.revoked = true;
-	                            }
-	                        });
-	                    }
 
 	                    return null;
 	                } else {
@@ -27234,7 +27215,7 @@
 	        } else if (newState === ChatRoom.STATE.JOINING) {} else if (newState === ChatRoom.STATE.READY) {}
 	    });
 
-	    self.bind('onMessagesBuffAppend', function (e, msg) {
+	    self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {
 	        var ts = msg.delay ? msg.delay : msg.ts;
 	        if (!ts) {
 	            return;
@@ -27587,7 +27568,7 @@
 	    self.trackDataChange();
 	};
 
-	ChatRoom.prototype.destroy = function (notifyOtherDevices) {
+	ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
 	    var self = this;
 
 	    self.megaChat.trigger('onRoomDestroy', [self]);
@@ -27605,7 +27586,9 @@
 
 	        mc.chats.remove(roomJid);
 
-	        window.location = '#fm/chat';
+	        if (!noRedirect) {
+	            window.location = '#fm/chat';
+	        }
 	    });
 	};
 

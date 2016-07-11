@@ -101,19 +101,19 @@ module.exports = function(config) {
         'js/countries.js',
         'js/megaKvStorage.js',
         'js/vendor/int64.js',
-        'js/zip64.js',
         'js/cms.js',
         // Google Import Contacts
         'js/gContacts.js',
 
         // Transfers
-        'js/downloadChrome.js',
-        'js/downloadMemory.js',
-        'js/queue.js',
-        'js/downloader.js',
-        'js/download2.js',
-        'js/upload2.js',
-        'js/zip64.js',
+        'js/transfers/meths/filesystem.js',
+        'js/transfers/meths/memory.js',
+        'js/transfers/meths/cache.js',
+        'js/transfers/queue.js',
+        'js/transfers/downloader.js',
+        'js/transfers/download2.js',
+        'js/transfers/upload2.js',
+        'js/transfers/zip64.js',
         {pattern: 'aesasm.js', included: false},
         {pattern: 'encrypter.js', included: false},
 

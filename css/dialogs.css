@@ -39,8 +39,7 @@
 .contacts-info.body.contacts-search.selected:nth-child(odd) {
     background-color: #2ba6de;
 }
-.contacts-info.body.contacts-search.selected span,
-.contacts-info.body.contacts-search.selected .user-card-email {
+.contacts-info.body.contacts-search.selected span, .contacts-info.body.contacts-search.selected .user-card-email {
     color: white;
 }
 .contacts-info.body.contacts-search.selected .user-card-presence {
@@ -49,7 +48,6 @@
 .fm-dialog .contacts-search-header {
     padding-top: 10px;
 }
-
 .contacts-search .user-card-name span {
     margin-top: -4px;
     color: #666666;
@@ -66,7 +64,6 @@
     line-height: 46px;
     vertical-align: middle;
 }
-
 /* End of Send Contact Dialog */
 
 /* Add From Cloud Dialog */
@@ -165,3 +162,42 @@
     margin-bottom: 24px;
 }
 /* End of confirm truncate dialog */
+
+/* Limited available bandwidth dialog */
+.fm-dialog.limited-bandwidth-dialog {
+    min-width: 484px;
+    margin: -196px 0 0 -242px;
+}
+.dialog-top-icon {
+    margin: 34px 0 17px 0;
+}
+.dialog.header-after-icon {
+    font-size: 20px;
+    line-height: 25px;
+    color: #666666;
+    font-family: 'source_sans_prolight';
+    padding: 15px 0 8px 0;
+}
+.dialog.p-after-icon {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 15px 0 0 0;
+    margin: 0 0 0 0;
+}
+.dialog.p-after-icon span {
+    color: #FF333A;
+}
+.dialog.big-buttons-block {
+    font-size: 0;
+    padding: 24px 0 4px 0;
+    white-space: nowrap;
+}
+.dialog.big-buttons-block .default-big-button {
+    display: inline-block;
+    margin: 0 6px;
+}
+.fm-dialog-body .centered-checkbox {
+    padding: 0 0 10px 0;
+}
+/* End of Limited available bandwidth dialog */

@@ -12,7 +12,7 @@ var inherits = (function() {
     };
 })();
 
-makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
+makeEnum(['MDBOPEN', 'EXECSC'], 'MEGAFLAG_', window);
 
 /**
  * Safely parse an HTML fragment, removing any executable
@@ -271,14 +271,14 @@ function delay(aProcID, aFunction, aTimeout) {
         aProcID = mRandomToken();
     }
 
-    if (d) {
+    if (d > 1) {
         console.debug("delay'ing", aProcID, delay.queue[aProcID]);
     }
     delay.cancel(aProcID);
 
     delay.queue[aProcID] =
         setTimeout(function() {
-            if (d) {
+            if (d > 1) {
                 console.debug('dispatching delayed function...', aProcID);
             }
             delete delay.queue[aProcID];
@@ -444,7 +444,9 @@ function megatitle(nperc) {
 }
 
 function populate_l() {
-    // for (var i = 7000 ; i-- ; l[i] = l[i] || '(null)');
+    if (d) {
+        for (var i = 10000 ; i-- ; l[i] = l[i] || '(translation-missing)');
+    }
     l[0] = 'Mega Limited ' + new Date().getFullYear();
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
         l[0] = 'Mega Ltd.';
@@ -553,6 +555,9 @@ function populate_l() {
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -634,12 +639,11 @@ function browserdetails(useragent) {
         brand = brand && brand.pop() | 0;
     }
 
-    if (useragent.indexOf('android') > 0) {
-        os = 'Android';
-    }
-    else if (useragent.indexOf('windows phone') > 0) {
+    if (useragent.indexOf('windows phone') > 0) {
         icon = 'wp.png';
         os = 'Windows Phone';
+    } else if (useragent.indexOf('android') > 0) {
+        os = 'Android';
     }
     else if (useragent.indexOf('windows') > 0) {
         os = 'Windows';
@@ -2177,7 +2181,7 @@ function mSpawnWorker(url, nw) {
 
     this.jid = 1;
     this.jobs = {};
-    this.nworkers = nw = nw || 4;
+    this.nworkers = nw = nw || mega.maxWorkers;
     this.wrk = new Array(nw);
     this.token = mRandomToken('mSpawnWorker.' + url.split(".")[0]);
 
@@ -2357,14 +2361,6 @@ mSpawnWorker.prototype = {
         if (reply.rsasharekeys) {
             $.extend(rsasharekeys, reply.rsasharekeys);
         }
-        if (reply.lostandfound) {
-            if (!job.lostandfound) {
-                job.lostandfound = reply.lostandfound;
-            }
-            else {
-                $.extend(job.lostandfound, reply.lostandfound);
-            }
-        }
 
         Soon(this.postNext.bind(this));
         if (++job.done === this.nworkers) {
@@ -2375,11 +2371,12 @@ mSpawnWorker.prototype = {
             // Don't report `newmissingkeys` unless there are *new* missing keys
             if (job.newmissingkeys) {
                 try {
-                    var keys = Object.keys(missingkeys).sort();
+                    var keys = Object.keys(u_nodekeys).sort();
                     var hash = MurmurHash3(JSON.stringify(keys));
                     var prop = u_handle + '_lastMissingKeysHash';
+                    var oldh = parseInt(localStorage[prop]);
 
-                    if (localStorage[prop] !== hash) {
+                    if (oldh !== hash) {
                         localStorage[prop] = hash;
                     }
                     else {
@@ -2388,15 +2385,6 @@ mSpawnWorker.prototype = {
                 }
                 catch (ex) {
                     console.error(ex);
-                }
-            }
-
-            // Update global variable which holds data about missing keys
-            // so DOM can be updated accordingly
-            if (job.lostandfound) {
-                for (var handle in job.lostandfound) {
-                    // no hasOwnProperty here
-                    delete missingkeys[handle];
                 }
             }
 
@@ -4137,6 +4125,10 @@ var watchdog = Object.freeze({
     eTag: '$WDE$!_',
     // ID to identify tab's origin
     wdID: (Math.random() * Date.now()),
+    // Hols promises waiting for a query reply
+    queryQueue: {},
+    // Holds query replies if cached
+    replyCache: {},
 
     /** setup watchdog/webstorage listeners */
     setup: function() {
@@ -4161,6 +4153,55 @@ var watchdog = Object.freeze({
         }
     },
 
+    /**
+     * Perform a query to other tabs and wait for reply through a Promise
+     * @param {String} what Parameter
+     * @param {String} timeout ms
+     * @param {String} cache   preserve result
+     * @return {MegaPromise}
+     */
+    query: function(what, timeout, cache) {
+        var self = this;
+        var token = mRandomToken();
+        var promise = new MegaPromise();
+
+        if (this.replyCache[what]) {
+            // a prior query was launched with the cache flag
+            cache = this.replyCache[what];
+            delete this.replyCache[what];
+            return MegaPromise.resolve(cache);
+        }
+
+        if (!mBroadcaster.crossTab.master
+                || Object(mBroadcaster.crossTab.slaves).length) {
+
+            if (cache) {
+                this.replyCache[what] = [];
+            }
+            this.queryQueue[token] = [];
+
+            Soon(function() {
+                self.notify('Q!' + what, { reply: token });
+            });
+
+            // wait for reply and fullfil/reject the promise
+            setTimeout(function() {
+                if (self.queryQueue[token].length) {
+                    promise.resolve(self.queryQueue[token]);
+                }
+                else {
+                    promise.reject(EACCESS);
+                }
+                delete self.queryQueue[token];
+            }, timeout || 200);
+        }
+        else {
+            promise = MegaPromise.reject(EEXIST);
+        }
+
+        return promise;
+    },
+
     /** Handle watchdog/webstorage event */
     handleEvent: function(ev) {
         if (String(ev.key).indexOf(this.eTag) !== 0) {
@@ -4181,6 +4222,23 @@ var watchdog = Object.freeze({
         }
 
         switch (msg) {
+            case 'Q!Rep!y':
+                if (this.queryQueue[strg.data.token]) {
+                    this.queryQueue[strg.data.token].push(strg.data.value);
+                }
+                if (this.replyCache[strg.data.query]) {
+                    this.replyCache[strg.data.query].push(strg.data.value);
+                }
+                break;
+
+            case 'Q!dlsize':
+                this.notify('Q!Rep!y', {
+                    query: 'dlsize',
+                    token: strg.data.reply,
+                    value: dlmanager.getCurrentDownloadsSize()
+                });
+                break;
+
             case 'loadfm_done':
                 if (this.Strg.login === strg.origin) {
                     location.assign(location.pathname);
@@ -4197,14 +4255,6 @@ var watchdog = Object.freeze({
                         // the other tab must have sent the new sid
                         assert(sid, 'sid not set');
                         api_setsid(sid);
-
-                        if (dlmanager.isOverFreeQuota) {
-                            dlmanager._onQuotaRetry(true, sid);
-                        }
-                        else {
-                            dlmanager.uqFastTrack = 1;
-                            dlmanager._overquotaInfo();
-                        }
                     }, 2000);
                 }
                 break;
@@ -4223,6 +4273,7 @@ var watchdog = Object.freeze({
                     location.reload();
                 }
                 break;
+
             case 'chat_event':
                 if (strg.data.state === 'DISCARDED') {
                     var chatRoom = megaChat.plugins.chatdIntegration._getChatRoomFromEventData(strg.data);
@@ -4460,13 +4511,10 @@ if (typeof sjcl !== 'undefined') {
                     }
                     else { // Exclude folder/file links,
                         if (shares) {
-                            length = Object.keys(shares).length;
+                            length = self.getFullSharesNumber(shares);
                             if (length) {
-                                if (!shares.EXP || (shares.EXP && length > 1)) {
-                                    return true;
-                                }
+                                return true;
                             }
-
                         }
                     }
                 }
@@ -4475,7 +4523,7 @@ if (typeof sjcl !== 'undefined') {
                 if (pendingShare) {
                     shares = M.ps[nodes[i]];
 
-                    if (M.ps && shares && Object.keys(shares).length) {
+                    if (shares && Object.keys(shares).length) {
                         return true;
                     }
                 }
@@ -4510,91 +4558,101 @@ if (typeof sjcl !== 'undefined') {
     };
 
     /**
-     * getShares
+     * getFullSharesNumber
      *
-     * Is there available share for nodes.
-     * @param {String} node Node id.
-     * @param {Boolean} fullShare Inclde results for full shares.
-     * @param {Boolean} pendingShare Include results for pending shares.
-     * @param {Boolean} linkShare Include results for foder/file links.
-     * @returns {Array} result Array of user ids.
+     * Loops through all shares and return number of full shares excluding
+     * ex. full contacts. Why ex. full contact, in the past when client removes
+     * full contact from the list, share related to client remains active on
+     * owners side. That behaviour is changed/updated on API side, so now after
+     * full contact relationship is removed, related shares are also removed.
+     *
+     * @param {Object} shares
+     * @returns {Integer} result Number of shares
      */
-    Share.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
+    Share.prototype.getFullSharesNumber = function(shares) {
 
-        var self = this;
+        var result = 0;
+        var contactKeys = [];
 
-        var result, shares, length;
+        if (shares) {
+            contactKeys = Object.keys(shares);
+            $.each(contactKeys, function(ind, key) {
 
-        for (var i in nodes) {
-            if (nodes.hasOwnProperty(i)) {
-                result = [];
-
-                // Look for full share
-                if (fullShare) {
-                    shares = M.d[nodes[i]].shares;
-
-                    // Look for link share
-                    if (linkShare) {
-                        if (shares && Object.keys(shares).length) {
-                            result.push(self.loopShares(shares), linkShare);
-                        }
-                    }
-                    else { // Exclude folder/file links,
-                        if (shares) {
-                            length = Object.keys(shares).length;
-                            if (length) {
-                                if (!shares.EXP || (shares.EXP && length > 1)) {
-                                    result.push(self.loopShares(shares), linkShare);
-                                }
-                            }
-
-                        }
-                    }
+                // Count only full contacts
+                if (M.u[key] && M.u[key].c) {
+                    result++;
                 }
-
-                // Look for pending share
-                if (pendingShare) {
-                    shares = M.ps[nodes[i]];
-                    if (M.ps && shares && Object.keys(shares).length) {
-                        result.push(self.loopShares(shares), linkShare);
-                    }
-                }
-            }
+            });
         }
 
         return result;
     };
 
-    /**
-     * loopShares
-     *
-     * Loops through all shares and returns users id.
-     * @param {Object} shares.
-     * @param {Boolean} linkShare Do we need info about link share.
-     * @returns {Array} user id.
-     */
-    Share.prototype.loopShares = function(shares, linkShare) {
+    Share.prototype.updateNodeShares = function() {
 
         var self = this;
 
-        var result = [],
-            exclude = 'EXP',
-            index;
-
-        $.each(shares, function(index, value) {
-           result.push(index);
-        });
-
-        // Remove 'EXP'
-        if (!linkShare) {
-            index = result.indexOf(exclude);
-
-            if (index !== -1) {
-                result = result.splice(index, 1);
-            }
+        if ($.removedContactsFromShare.length > 0) {
+            self.removeContactFromShare();
         }
+        if ($.changedPermissions.length > 0) {
+            doShare($.selected[0], $.changedPermissions, true);
+        }
+        addContactToFolderShare();
+    };
 
-        return result;
+
+    Share.prototype.removeFromPermissionQueue = function(handleOrEmail) {
+
+        $.changedPermissions.forEach(function(value, index) {
+            if (value.u === handleOrEmail) {
+                $.changedPermissions.splice(index, 1);
+            }
+        });
+    };
+
+    Share.prototype.removeContactFromShare = function() {
+
+        var self = this;
+        var userEmail = '';
+        var selectedNodeHandle = '';
+        var handleOrEmail = '';
+        var pendingContactId;
+
+        if ($.removedContactsFromShare.length > 0) {
+
+            $.removedContactsFromShare.forEach(function(elem) {
+                userEmail = elem.userEmail;
+                selectedNodeHandle = elem.selectedNodeHandle;
+                handleOrEmail = elem.handleOrEmail;
+
+                // The s2 api call can remove both shares and pending shares
+                api_req({
+                    a: 's2',
+                    n:  selectedNodeHandle,
+                    s: [{ u: userEmail, r: ''}],
+                    ha: '',
+                    i: requesti
+                });
+
+                // If it was a user handle, the share is a full share
+                if (M.u[handleOrEmail]) {
+                    userEmail = M.u[handleOrEmail].m;
+                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
+                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
+
+                    self.removeFromPermissionQueue(handleOrEmail);
+                }
+
+                // Pending share
+                else {
+                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
+                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
+
+                    self.removeFromPermissionQueue(userEmail);
+                }
+            });
+        }
     };
 
     // export
@@ -4831,7 +4889,7 @@ mega.utils.chrome110ZoomLevelNotification = function() {
         0.3330000042915344// 33% non-retina
     ];
 
-    if ($.browser.chrome) {
+    if (window.chrome) {
 
         $('.nw-dark-overlay').removeClass('mac');
         $('.nw-dark-overlay.zoom-overlay').removeClass('zoom-67 zoom-33');
@@ -4875,7 +4933,7 @@ var debounce = function(func, execAsap) {
     return function debounced() {
         var obj = this;
         var args = arguments;
-        
+
         function delayed() {
             if (!execAsap) {
                 func.apply(obj, args);

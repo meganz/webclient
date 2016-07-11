@@ -1748,15 +1748,21 @@ function api_setsid(sid) {
     if (sid !== false) {
         watchdog.notify('setsid', sid);
 
-        if (typeof dlmanager === 'object'
-                && dlmanager.isOverQuota) {
+        if (typeof dlmanager === 'object') {
 
-            if (dlmanager.isOverFreeQuota) {
-                dlmanager._onQuotaRetry(true, sid);
+            if (dlmanager.isOverQuota) {
+
+                if (dlmanager.isOverFreeQuota) {
+                    dlmanager._onQuotaRetry(true, sid);
+                }
+                else {
+                    dlmanager.uqFastTrack = 1;
+                    dlmanager._overquotaInfo();
+                }
             }
-            else {
-                dlmanager.uqFastTrack = 1;
-                dlmanager._overquotaInfo();
+
+            if (typeof dlmanager.onLimitedBandwidth === 'function') {
+                dlmanager.onLimitedBandwidth();
             }
         }
         sid = 'sid=' + sid;
@@ -4268,14 +4274,7 @@ function crypto_processkey(me, master_aes, file) {
         }
     }
 
-    if (success) {
-        // Update global variable which holds data about missing keys
-        // so DOM can be updated accordingly
-        if (missingkeys[file.h]) {
-            delete missingkeys[file.h];
-        }
-    }
-    else {
+    if (!success) {
         logger.warn('Received no suitable key for "%s"', file.h, file);
 
         if (!missingkeys[file.h]) {
@@ -4287,8 +4286,6 @@ function crypto_processkey(me, master_aes, file) {
             keycache[file.h] = file.k;
         }
     }
-
-    return success;
 }
 
 function api_updfkey(h) {

@@ -1484,12 +1484,6 @@ function checkUserLogin() {
 
 })(this);
 
-var attribCache = new IndexedDBKVStorage('attrib', {
-    murSeed: 0x800F0002
-});
-
-attribCache.syncNameTimer = {};
-
 /**
  * Process action-packet for attribute updates.
  *
@@ -1497,7 +1491,7 @@ attribCache.syncNameTimer = {};
  * @param {String}  userHandle      User handle
  * @param {Boolean} ownActionPacket Whether the action-packet was issued by myself
  */
-attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
+function uaPacketParser(attrName, userHandle, ownActionPacket) {
     var logger = MegaLogger.getLogger('account');
     var cacheKey = userHandle + "_" + attrName;
 
@@ -1544,3 +1538,12 @@ attribCache.uaPacketParser = function(attrName, userHandle, ownActionPacket) {
 
     return removeItemPromise;
 };
+
+var attribCache = false;
+
+if (is_karma) {
+    window.M = new MegaData();
+    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
+    attribCache.syncNameTimer = {};
+    attribCache.uaPacketParser = uaPacketParser;
+}

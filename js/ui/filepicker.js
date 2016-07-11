@@ -377,7 +377,7 @@
         var filterFunc = function(n) {
             return n.name && n.p == parentNodeId;
         };
-
+        var share = new mega.Share();
 
         $nodeContainer = $('tbody', self.$picker);
         $nodeContainer.empty();
@@ -422,25 +422,20 @@
                 n.name
             );
 
-
-            if (n.t == 0) {
-                // is file
+            if (n.t === 0) {// is file
                 $('.transfer-filtype-icon', $newNode).addClass(
                     fileIcon(n)
                 );
-            } else {
+            }
+            else {
                 $newNode.addClass("folder");
 
-                if (n.shares) {
-                    var iShareNum = Object.keys(n.shares).length;
-                }
-                if ((n.shares && n.shares.EXP && iShareNum > 1)
-                    || (n.shares && !n.shares.EXP && iShareNum)
-                    || M.ps[n.h]) {
+                if (share.isShareExist([n.h], true, true, false)) {
                     $('.transfer-filtype-icon', $newNode).addClass(
                         "folder-shared"
                     );
-                } else {
+                }
+                else {
                     $('.transfer-filtype-icon', $newNode).addClass(
                         "folder"
                     );

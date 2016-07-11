@@ -491,7 +491,7 @@
         <div class="clear"></div>
         <div class="fm-expiry-dropdown">
             <div class="fm-link-select-label">
-                [$8736]<span class="pro-only-feature"> ([$8695])</span>:
+                <span class="set-expiry-text">[$8953]</span><span class="pro-only-feature"> ([$8695])</span>:
                 <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
                 <div class="get-pro hidden">[$8696]</div>
             </div>
@@ -965,7 +965,7 @@
             <span>[$726]</span>
         </div>
         <div class="fm-dialog-button dialog-cancel-button">
-            <span>[$148]</span>
+            <span>[$82]</span>
         </div>
         <div class="clear"></div>
     </div>
@@ -1156,12 +1156,12 @@
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>
-    
+
     <div class="pro-register-scroll">
         <div class="fm-dialog-body hidden"></div>
-    
+
         <div class="top-login-pad">
-    
+
             <div class="login-register-input name">
                 <div class="top-login-input-tooltip">
                     <div class="top-login-tooltip-arrow">
@@ -2306,7 +2306,7 @@
         <div class="bitcoin-address selectable"></div>
         <div class="price-expired-instruction">
             [$6812]
-        </div>                    
+        </div>
     </div>
     <div class="invoice-right-bg"></div>
     <div class="right-side">
@@ -2338,5 +2338,36 @@
         <div class="reg-success-icon"></div>
         <div class="txt description">[$6815]</div>
         <div class="txt instruction">[$6812]</div>
+    </div>
+</div>
+
+<div class="fm-dialog limited-bandwidth-dialog hidden">
+    <div class="fm-dialog-body centered-content">
+        <i class="big-90px-icon speedometer dialog-top-icon"></i>
+        <!-- [$8943] !-->
+        <div class="dialog header-after-icon">Limited available bandwidth</div>
+        <!-- [$8944]. We need to replace: [BR] by <br />, [S] by <span>, [/S] by </span  !-->
+        <p class="dialog p-after-icon">
+            Your transfer may be interrupted.
+            <br /><a class="red">Get a pro account</a> for increased bandwidth quota.</p>
+
+        <div class="dialog big-buttons-block">
+            <!-- [$8945] - Continue without account !-->
+            <!-- [$8946] - Continue with your free account !-->
+            <div class="default-big-button button-without-outline continue">
+                <span>Continue without account</span>
+            </div>
+            <!-- [$1108] !-->
+            <div class="default-big-button button-without-outline grey-gradient upgrade">
+                <span>Create account</span>
+            </div>
+        </div>
+
+        <div class="centered-checkbox dialog-bottom">
+            <div class="checkdiv checkboxOff">
+                <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
+            </div>
+            <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label>
+        </div>
     </div>
 </div>

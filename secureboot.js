@@ -8,6 +8,7 @@ var maintenance = false;
 var androidsplash = false;
 var silent_loading = false;
 var cookiesDisabled = false;
+var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
@@ -862,7 +863,11 @@ function siteLoadError(error, filename) {
     alert(message.join("\n\n"));
 }
 
-if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
+
+if (location.hash.substr(1, 1) === '!') {
+    m = false;
+}
+else if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
     tag.name = "viewport";
@@ -1381,74 +1386,80 @@ else if (!b_u)
     var langFilepath = getLanguageFilePath(lang);
 
     jsl.push({f:langFilepath, n: 'lang', j:3});
-    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
-    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-    jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
-    jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
-    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
-    jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
-
-    jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-    jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-    jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
-    jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
-    jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-    jsl.push({f:'js/account.js', n: 'user_js', j:1});
-    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
-    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/vendor/jquery-ui-1.11.4.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
-    jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
-    jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
-    jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
-    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
-    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-    jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
-    jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
-    jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
-    jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
-    jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-    jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
-    jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
+    jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
+    jsl.push({f:'js/account.js', n: 'user_js', j:1});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 
-    // notifications
-    jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
-    jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
-    jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
-    jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+    if (!is_mobile) {
 
-    // Other
-    jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
-    jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
+        jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
+        jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+        jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
+        jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+        jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
+        jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
+        jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
 
-    // Google Import Contacts
-    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
+        jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
+        jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
+        jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
+        jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
+        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
-    // UI Elements
-    jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
-    jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
-    jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
-    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
-    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
-    jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
-    jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
-    jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
-    jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
-    jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
+        jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
+        jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
+        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+        jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
+        jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
+        jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
+        jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+        jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
+        jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
+        jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
+        jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+        jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
+        jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
+        jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
+
+
+        // notifications
+        jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
+        jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
+        jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
+        jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+
+        // Other
+        jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
+        jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
+
+        // Google Import Contacts
+        jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
+
+        // UI Elements
+        jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
+        jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
+        jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
+        jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
+        jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+        jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+        jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
+    } // !is_mobile
 
     // MEGA CHAT
-    if (location.host === 'mega.nz' || !megaChatIsDisabled) {
+    if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
@@ -1485,74 +1496,84 @@ else if (!b_u)
     }
     // END OF MEGA CHAT
 
-    jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-    jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
     // Transfers
-    jsl.push({f:'js/xhr2.js', n: 'xhr_js', j:1});
-    jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
-    jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+    jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
+    jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
+    jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
     {
         is_chrome_firefox |= 4;
-        jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
+        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j:1,w:3});
     }
     else
     {
-        jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-        jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+        jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
+        jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     }
-    jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
-    jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
-    jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
+    jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
+    jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
+    jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
+
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
-    jsl.push({f:'html/start.html', n: 'start', j:0});
-    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-    jsl.push({f:'html/key.html', n: 'key', j:0});
-    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
-    jsl.push({f:'html/pro.html', n: 'pro', j:0});
-    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
-    jsl.push({f:'html/login.html', n: 'login', j:0});
-    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
-    jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
-    jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
-    jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
-    jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
-    jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-    jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-messages.css', n: 'chat_messages_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-share-links.css', n: 'chat_share_links_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-textarea.css', n: 'chat_textarea_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-typing.css', n: 'chat_typing_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-calls.css', n: 'chat_calls_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
-    jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-    jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
-    jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
-    jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+
+    if (!is_mobile) {
+        jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+        jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+        jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
+
+        jsl.push({f:'html/start.html', n: 'start', j:0});
+        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+        jsl.push({f:'html/key.html', n: 'key', j:0});
+        jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+        jsl.push({f:'html/pro.html', n: 'pro', j:0});
+        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+        jsl.push({f:'html/login.html', n: 'login', j:0});
+        jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+        jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
+        jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
+        jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
+        jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
+        jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-messages.css', n: 'chat_messages_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-share-links.css', n: 'chat_share_links_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-textarea.css', n: 'chat_textarea_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-typing.css', n: 'chat_typing_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-calls.css', n: 'chat_calls_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
+
+        jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
+        jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
+        jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+        jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
+        jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
+        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    } // !is_mobile
+
+
 
     if (localStorage.enableDevtools) {
         jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
@@ -1569,10 +1590,9 @@ else if (!b_u)
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
-    if (
-        typeof Number.isNaN !== 'function' ||
-        typeof Set === 'undefined'
-    ) {
+    if (!is_mobile
+            && (typeof Number.isNaN !== 'function'
+                || typeof Set === 'undefined')) {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
@@ -1596,6 +1616,8 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+        'download_mobile': {f:'html/download-mobile.html', n: 'download', j: 0},
+        'mobile_css': {f:'css/mobile-app-new.css', n: 'mobile_css', j:2,w:30,c:1,d:1,m:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
         'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
@@ -1677,6 +1699,10 @@ else if (!b_u)
         'chrome': ['chrome', 'chrome_js'],
         'firefox': ['firefox', 'firefox_js']
     };
+
+    if (is_mobile) {
+        subpages['!'] = ['download_mobile', 'download_js', 'mobile_css'];
+    }
 
     if (page)
     {
@@ -2131,59 +2157,35 @@ else if (!b_u)
         jj = 0; //prevent further 'silent_loading' loads from failing..
     }
 
-    if (ua.indexOf('android') > 0 && !sessionStorage.androidsplash && document.location.hash.indexOf('#confirm') == -1)
-    {
-        if (document.location.hash == '#android')
-        {
-            document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
-        }
-        else
-        {
-            // AMO Warning: Use of `document.write` strongly discouraged -- This isnt reached for the extension, anyway
-            document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
-            document.getElementById('android_yes').addEventListener("click", function ()
-            {
-                document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzandroid';
-            }, false);
-            document.getElementById('android_no').addEventListener("click", function ()
-            {
-                sessionStorage.androidsplash=1;
-                document.location.reload();
-            }, false);
-            androidsplash=true;
-        }
-    }
-    else
-    {
-        var istaticpath = staticpath;
-        if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
-        else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
+    var istaticpath = staticpath;
+    if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
+    else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -94px -468px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -94px -408px;}.st-bottom-button.st-facebook-button {background-position: -49px -468px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -408px;}.st-bottom-button.st-twitter-button {background-position: left -468px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {    background-position: left -408px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2@2x.png);    background-size: 222px auto;}}';
+    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -94px -468px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -94px -408px;}.st-bottom-button.st-facebook-button {background-position: -49px -468px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -408px;}.st-bottom-button.st-twitter-button {background-position: left -468px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {    background-position: left -408px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2@2x.png);    background-size: 222px auto;}}';
 
-        mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
-            .innerHTML =
-                '<div class="loading-mid-white-block">'+
-                '    <div class="loading-cloud">'+
-                '        <div class="loading-percentage">'+
-                '            <ul>'+
-                '                <li class="right-c"><p id="loadinganimright"><span></span></p></li>'+
-                '                <li class="left-c"><p  id="loadinganimleft"><span></span></p></li>'+
-                '            </ul>'+
-                '        </div>'+
-                '        <div class="loading-m-block"></div>'+
-                '    </div>'+
-                '    <div class="st-social-block-load" id="bootbottom">'+
-                '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
-                '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
-                '    <a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a>'+
-                '    </div>'+
-                '</div>';
-    }
+    mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
+        .innerHTML =
+            '<div class="loading-mid-white-block">'+
+            '    <div class="loading-cloud">'+
+            '        <div class="loading-percentage">'+
+            '            <ul>'+
+            '                <li class="right-c"><p id="loadinganimright"><span></span></p></li>'+
+            '                <li class="left-c"><p  id="loadinganimleft"><span></span></p></li>'+
+            '            </ul>'+
+            '        </div>'+
+            '        <div class="loading-m-block"></div>'+
+            '    </div>'+
+            '    <div class="st-social-block-load" id="bootbottom">'+
+            '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
+            '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
+            '    <a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a>'+
+            '    </div>'+
+            '</div>';
+
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
 
-    if ((u_sid = u_storage.sid))
+    if (!is_mobile && (u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();
@@ -2236,7 +2238,9 @@ else if (!b_u)
         }
         catch (e) {}
 
-        if (u_checked) startMega();
+        if (u_checked || is_mobile) {
+            startMega();
+        }
         else if (loginresponse === -15) {
             u_logout(true);
             boot_auth(null, false);

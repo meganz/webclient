@@ -141,7 +141,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
 
     // activity on a specific room (show, hidden, got new message, etc)
-    self.bind('onMessagesBuffAppend', function(e, msg) {
+    self.rebind('onMessagesBuffAppend.lastActivity', function(e, msg) {
         var ts = msg.delay ? msg.delay : msg.ts;
         if (!ts) {
             return;
@@ -187,7 +187,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             throw new Error("Not implemented");
         }
     });
-
 
 
     self.getParticipantsExceptMe().forEach(function(jid) {
@@ -648,7 +647,7 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
  * Destroy a room (leave + UI destroy + js cleanup)
  * @param [notifyOtherDevices] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
  */
-ChatRoom.prototype.destroy = function(notifyOtherDevices) {
+ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
     var self = this;
 
     self.megaChat.trigger('onRoomDestroy', [self]);
@@ -666,7 +665,9 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 
         mc.chats.remove(roomJid);
 
-        window.location = '#fm/chat';
+        if (!noRedirect) {
+            window.location = '#fm/chat';
+        }
     });
 };
 

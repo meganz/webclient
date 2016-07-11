@@ -107,7 +107,7 @@
     margin: 2px 0 0 0;
 }
 .message.text-block {
-    margin: 2px 30px 0 0;
+    margin: 1px 30px 0 0;
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
@@ -143,13 +143,24 @@
 .message.date-time {
     font-size: 13px;
     line-height: 18px;
-    display: table-cell;
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 1px;
     color: rgba(153,153,153,0.84);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 20px;
 }
 .message.user-card-name {
-    display: table-cell;
+    display: inline-block;
     padding: 0 10px 0 0;
     color: rgba(51,51,51,0.84);
+    vertical-align: top;
+    height: 20px;
+    max-width: -webkit-calc(100% - 60px);
+    max-width: -moz-calc(100% - 60px);
+    max-width: calc(100% - 60px);
 }
 .message.date-divider {
     font-size: 16px;

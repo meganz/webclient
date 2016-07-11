@@ -225,20 +225,20 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.messages = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc, this);
 
     var origPush = self.messages.push;
-    self.messages.push = function(msg, immediateReorder) {
+    self.messages.push = function(msg) {
         if (msg.addChangeListener) {
             msg.addChangeListener(function() {
-                self.messages.reorder(immediateReorder);
+                self.messages.reorder();
             });
         }
         else if (msg instanceof KarereEventObjects.OutgoingMessage) {
             $(msg).rebind("onChange.mbOnPush", function(msg, property, oldVal, newVal) {
                 if (property === "orderValue" || property === "delay") {
-                    self.messages.reorder(immediateReorder);
+                    self.messages.reorder();
                 }
             });
         }
-        var res = origPush.call(this, msg, immediateReorder);
+        var res = origPush.call(this, msg);
         if (
             !(
                 msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false

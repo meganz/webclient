@@ -491,7 +491,7 @@ Object.keys(MegaDataMap.prototype).forEach(function(k) {
     MegaDataSortedMap.prototype[k] = MegaDataMap.prototype[k];
 });
 
-MegaDataSortedMap.prototype.push = function(v, immediateReorder) {
+MegaDataSortedMap.prototype.push = function(v) {
     var self = this;
 
     var keyVal = v[self._keyField];
@@ -511,7 +511,7 @@ MegaDataSortedMap.prototype.push = function(v, immediateReorder) {
         keyVal
     );
 
-    self.reorder(immediateReorder);
+    self.reorder();
 
     return self._sortedVals.length;
 };

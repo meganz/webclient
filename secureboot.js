@@ -868,10 +868,7 @@ function siteLoadError(error, filename) {
 }
 
 
-if (location.hash.substr(1, 1) === '!') {
-    m = false;
-}
-else if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
+if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
     tag.name = "viewport";
@@ -910,6 +907,10 @@ else if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     tag.href = "https://mega.nz/favicon.ico";
     document.getElementsByTagName('head')[0].appendChild(tag);
     m=true;
+}
+
+if (location.hash.substr(1, 1) === '!') {
+    m = false;
 }
 
 if (m)

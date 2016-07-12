@@ -940,7 +940,7 @@ if (m)
                 intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             }
         }
-        if (intent) {
+        if (intent && !mobileblog) {
             document.location = intent;
         }
     }
@@ -1052,7 +1052,8 @@ if (m)
     if (mobileblog)
     {
         document.body.innerHTML = '';
-        mCreateElement('script', {type: 'text/javascript'}, 'head').src = '/blog.js';
+        mCreateElement('script', {type: 'text/javascript'}, 'head')
+            .src = ((location.host === 'mega.nz') ? '/blog.js' : 'html/js/blog.js');
     }
 }
 else if (page == '#android')

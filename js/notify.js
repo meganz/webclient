@@ -371,7 +371,7 @@ var notify = {
 
     /**
      * Sets the height of the notification dialog so it shows all the notifications
-     * that it can. If there are only a few notifications the height will only be 
+     * that it can. If there are only a few notifications the height will only be
      * as high as those few notifications.
      */
     setHeightForNotifications: function () {
@@ -677,8 +677,9 @@ var notify = {
      */
     renderContactChange: function($notificationHtml, notification) {
 
-        // The action 'c' will only be available if initial fetch of notifications, 'u[0].c' is used if action packet
+        // Get data from initial c=50 notification fetch or action packet
         var action = (typeof notification.data.c !== 'undefined') ? notification.data.c : notification.data.u[0].c;
+        var userHandle = (Array.isArray(notification.userHandle)) ? notification.data.ou : notification.userHandle;
         var className = '';
         var title = '';
 
@@ -692,7 +693,7 @@ var notify = {
             title = l[7145];        // Contact relationship established
 
             // Add a data attribute for the click handler
-            $notificationHtml.attr('data-contact-handle', notification.userHandle);
+            $notificationHtml.attr('data-contact-handle', userHandle);
             $notificationHtml.addClass('clickable');
         }
         else if (action === 2) {

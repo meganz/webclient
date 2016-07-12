@@ -36,7 +36,10 @@ function dlinfo(ph,key,next)
     dlpage_ph   = ph;
     dlpage_key  = key;
 
-    if (!is_mobile) {
+    if (is_mobile) {
+        $('.mobile.dl-browser, .mobile.dl-megaapp').addClass('disabled');
+    }
+    else {
         watchdog.query('dlsize', 2100, true);
     }
 
@@ -135,7 +138,10 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
-            if (!is_mobile) {
+            if (is_mobile) {
+                $('.mobile.dl-browser, .mobile.dl-megaapp').removeClass('disabled');
+            }
+            else {
                 $('.download-button.to-clouddrive').show();
                 $('.download-button.with-megasync').show();
             }

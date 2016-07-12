@@ -35,10 +35,6 @@ var is_extension = is_chrome_firefox || is_electron || document.location.href.su
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 
-if (location.hash === '#test') {
-    window.location.hash = '#!eBURTBaL!qt9qLMPlRx5wSCAB9AdUV2LDZgVDdAfmqWXKFlI32-0';
-}
-
 function isMobile()
 {
     if (is_chrome_firefox) return false;

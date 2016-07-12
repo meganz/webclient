@@ -8,6 +8,7 @@ var maintenance = false;
 var androidsplash = false;
 var silent_loading = false;
 var cookiesDisabled = false;
+var storageQuotaError = false;
 var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
@@ -203,10 +204,17 @@ if (!b_u) try
             throw new Error('SecurityError: DOM Exception 18');
         }
         d = !!localStorage.d;
+        jj = localStorage.jj;
+        dd = localStorage.dd;
+        // Write test
+        localStorage['$!--foo'] = Array(100).join(",");
+        delete localStorage['$!--foo'];
     }
     catch (ex) {
+        storageQuotaError = (ex.code === 22);
         cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
-            || ex.message === 'SecurityError: DOM Exception 18';
+            || ex.message === 'SecurityError: DOM Exception 18'
+            || storageQuotaError;
 
         if (!cookiesDisabled) {
             throw ex;
@@ -216,9 +224,7 @@ if (!b_u) try
         // We could either show the user a message about the issue and let him
         // enable cookies, or rather setup a tiny polyfill so that they can use
         // the site even in such case, even though this solution has side effects.
-        delete window.localStorage;
-        Object.defineProperty(window, 'localStorage', {
-            value: Object.create({}, {
+        tmp = Object.create({}, {
                 length:     { get: function() { return Object.keys(this).length; }},
                 key:        { value: function(pos) { return Object.keys(this)[pos]; }},
                 removeItem: { value: function(key) { delete this[key]; }},
@@ -239,13 +245,25 @@ if (!b_u) try
                         });
                     }
                 }
-            })
-        });
-        Object.defineProperty(window, 'sessionStorage', {
-            value: localStorage
-        });
+            });
+
+        try {
+            delete window.localStorage;
+            Object.defineProperty(window, 'localStorage', { value: tmp });
+            Object.defineProperty(window, 'sessionStorage', { value: tmp });
+        }
+        catch (e) {
+            if (!is_mobile) {
+                throw ex;
+            }
+        }
+        tmp = undefined;
+
         if (location.host !== 'mega.nz' && !is_karma) {
-            localStorage.jj = localStorage.dd = localStorage.d = 1;
+            dd = d = 1;
+            if (!is_mobile) {
+                jj = 1;
+            }
         }
         setTimeout(function() {
             console.warn('Apparently you have Cookies disabled, ' +
@@ -256,26 +274,32 @@ if (!b_u) try
 
     var contenterror = 0;
     var nocontentcheck = false;
-    if (localStorage.dd || is_karma) {
+    if (window.dd || location.host !== 'mega.nz') {
         nocontentcheck = true;
         var devhost = window.location.host;
         // handle subdirs
         var pathSuffix = window.location.pathname;
         pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
         // set the staticpath for debug mode
-        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-        // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
-        if (localStorage.d) {
-            console.debug('StaticPath set to "' + localStorage.staticpath + '"');
+        staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        if (window.d) {
+            console.debug('StaticPath set to "' + staticpath + '"');
         }
     }
-    staticpath = localStorage.staticpath || geoStaticpath();
+    else {
+        staticpath = localStorage.staticpath;
+    }
+    staticpath = staticpath || geoStaticpath();
     apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
         var extraInfo = '';
-        if (cookiesDisabled) {
+        if (storageQuotaError) {
+            extraInfo = "\n\nTip: We've detected this issue is likely caused by " +
+                "browsing in private mode, please try turning it off.";
+        }
+        else if (cookiesDisabled) {
             extraInfo = "\n\nTip: We've detected this issue is likely related to " +
                 "having Cookies disabled, please check your browser settings.";
         }
@@ -1067,8 +1091,8 @@ else if (page == '#android')
 }
 else if (!b_u)
 {
-    d = localStorage.d || 0;
-    var jj = localStorage.jj || 0;
+    d = window.d || 0;
+    jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
     var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cs','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'bg':['bg'],'tl':['en-ph'],'vi':['vn', 'vi']};
 
@@ -2189,9 +2213,9 @@ else if (!b_u)
             '</div>';
 
     var u_storage, loginresponse, u_sid, dl_res;
-    u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
+    u_storage = is_mobile ? {} : init_storage(localStorage.sid ? localStorage : sessionStorage);
 
-    if (!is_mobile && (u_sid = u_storage.sid))
+    if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();

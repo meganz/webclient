@@ -33,6 +33,7 @@ var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
 var is_mobile = m = isMobile();
+var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 
 if (location.hash === '#test') {
     window.location.hash = '#!eBURTBaL!qt9qLMPlRx5wSCAB9AdUV2LDZgVDdAfmqWXKFlI32-0';
@@ -937,10 +938,34 @@ if (location.hash.substr(1, 1) === '!') {
     m = false;
 }
 
+if (is_ios) {
+    tmp = document.querySelector('meta[name="apple-itunes-app"]');
+    if (tmp) {
+        tmp.setAttribute('content',
+            'app-id=706857885, app-argument=mega://' + window.location.hash);
+    }
+
+    // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
+    // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
+    tmp = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
+    if (tmp) {
+        var rev = tmp.pop();
+        tmp = tmp.pop();
+
+        console.log('Found iOS ' + tmp + '.' + rev);
+
+        is_ios = parseInt(tmp);
+        if (!is_ios) {
+            // Huh?
+            is_ios = true;
+        }
+    }
+    tmp = undefined;
+}
+
 if (m)
 {
     var app,mobileblog,android,intent, ios9;
-    var ios;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
@@ -978,27 +1003,10 @@ if (m)
         app='http://appworld.blackberry.com/webstore/content/46810890/';
         document.body.className = 'blackberry full-mode supported';
     }
-    else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
+    else if (is_ios)
     {
-        app = document.querySelector('meta[name="apple-itunes-app"]');
-        if (app) {
-            app.setAttribute('content',
-                'app-id=706857885, app-argument=mega://' + window.location.hash);
-        }
-
-        // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
-        // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
         app='https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
-
-        var ver = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
-        if (ver) {
-            var rev = ver.pop();
-            ver = ver.pop();
-            // Check for iOS 9.0+
-            ios9 = (ver > 8);
-        }
-        ios = 1;
     }
     else document.body.className = 'another-os full-mode unsupported';
 
@@ -1038,7 +1046,7 @@ if (m)
                 }, 2500);
             }
         }
-        else if (ios9) {
+        else if (is_ios > 8) {
             setTimeout(function() {
                 if (confirm('Do you already have the MEGA app installed?')) {
                     document.location = 'mega://' + window.location.hash;
@@ -1062,7 +1070,7 @@ if (m)
         if (ua.indexOf('chrome') > -1) {
             window.location = 'mega://' + window.location.hash.substr(i);
         }
-        else if (ios9) {
+        else if (is_ios > 8) {
             setTimeout(function() {
                 if (confirm('Do you already have the MEGA app installed?')) {
                     document.location = 'mega://' + window.location.hash;

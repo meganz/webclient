@@ -408,11 +408,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.lastDeliveredMessageRetrieved = true;
             }
 
-            var cacheKey = chatRoom.chatId + "_" + eventData.messageId;
-            // if the message has already been decrypted, then just bail.
-            if (self.chatRoom.megaChat.plugins.chatdIntegration._processedMessages[cacheKey]) {
-                return;
-            }
             self.messages.push(msgObject);
             if (eventData.pendingid) {
                 var foundMessage = self.getByInternalId(eventData.pendingid);

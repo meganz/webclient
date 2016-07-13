@@ -3256,7 +3256,7 @@
     "8729": "Fa\u00e7a logout antes de criar a conta",
     "8730": "Logs agora est\u00e3o habilitados",
     "8731": "Logs agora est\u00e3o desabilitados",
-    "8732": "Link de atualiza\u00e7\u00e3o",
+    "8732": "Atualizar link",
     "8733": "Atualizar links",
     "8734": "Obter links",
     "8735": "remover links",
@@ -3467,6 +3467,7 @@
     "8951": "Este arquivo \u00e9 muito grande para abrir no seu browser m\u00f3vel. Por favor, instale seu aplicativo m\u00f3vel para [S] suporte tamanho de arquivo ilimitado e armazenamento 50GB nuvem gr\u00e1tis! [\/S]",
     "8952": "Este arquivo n\u00e3o p\u00f4de ser aberto no seu browser m\u00f3vel. Por favor, instale nosso aplicativo m\u00f3vel para [S] tamanho de arquivo ilimitado e tipo de suporte e armazenamento de 50GB nuvem gr\u00e1tis! [\/S]",
     "8953": "Set an expiry date",
+    "8954": "Get a PRO account",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

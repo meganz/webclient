@@ -35,8 +35,7 @@ var ChatdIntegration = function(megaChat) {
     self.chatIdToRoomJid = {};
     self.mcfHasFinishedPromise = new MegaPromise();
     self.deviceId = null;
-    self._processedMessages = {};
-
+    self._cachedHandlers = {};
 
     // chat events
     megaChat.rebind("onInit.chatdInt", function(e) {
@@ -282,7 +281,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         // if the found chatRoom is in LEAVING mode...then try to reinitialise it!
 
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
-
+            self._cachedHandlers[roomJid] = chatRoom.protocolHandler;
             chatRoom.destroy(undefined, true);
             chatRoom = false;
             
@@ -320,6 +319,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 false
             );
             chatRoom = r[1];
+            // handler of the same room was cached before, then restore the keys.
+            if (self._cachedHandlers[roomJid]) {
+                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[roomJid].participantKeys;
+            }
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
@@ -873,10 +876,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
-                var cacheKey = chatRoom.chatId + "_" + v.messageId;
-                if (v.messageId && self._processedMessages[cacheKey]) {
-                    return;
-                }
 
                 if (v.userId && !v.requiresManualRetry) {
                     var msg = v.getContents ? v.getContents() : v.message;
@@ -911,10 +910,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                             var v = decryptedMsgs[i];
                             var messageId = hist[i]['k'];
                             if (v) {
-                                var cacheKey = chatRoom.chatId + "_" + messageId;
-                                if (messageId) {
-                                    self._processedMessages[cacheKey] = true;
-                                }
 
                                 if (v.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
                                     if (typeof(v.payload) === 'undefined' || v.payload === null) {

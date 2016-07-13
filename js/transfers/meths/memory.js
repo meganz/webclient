@@ -95,7 +95,7 @@
                         .addClass('download-complete')
                         .find('.download-progress')
                         .rebind('click', function() {
-                            if(navigator.userAgent.match(/CriOS/i)) {
+                            if (navigator.userAgent.match(/CriOS/i)) {
                                 var reader = new FileReader();
                                 reader.onload = function(e) {
                                     window.open(reader.result, '_blank');

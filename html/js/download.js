@@ -16,7 +16,8 @@ var MOBILE_FILETYPES = {
     "xlsx" : 'word'
 };
 
-if(navigator.userAgent.match(/CriOS/i)) {
+if (navigator.userAgent.match(/CriOS/i)) {
+    // chrome on iOS :-(
     MOBILE_MAXFILESIZE = 3 * (1024 * 1024);
 }
 

@@ -13870,5 +13870,9 @@
     "8953": {
         "text": "Set an expiry date",
         "context": "A label for the Get Link dialog when there is no expiry time currently set for the link. This lets them set an expiry date for the link so it will no longer be available after this date."
+    },
+    "8954": {
+        "text": "Get a PRO account",
+        "context": "a button to ask user to upgrade their account to PRO."
     }
 }

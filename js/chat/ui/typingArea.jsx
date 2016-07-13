@@ -520,7 +520,7 @@ var TypingArea = React.createClass({
         };
 
         return <div className={"typingarea-component" + self.props.className}>
-            <div className="chat-textarea">
+            <div className={"chat-textarea " + self.props.className}>
                 <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
                 <div className="chat-textarea-buttons">
                     <ButtonsUI.Button

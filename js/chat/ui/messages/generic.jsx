@@ -764,7 +764,8 @@ var GenericConversationMessage = React.createClass({
                     if (self.props.initTextScrolling) {
                         messageDisplayBlock = 
                             <utils.JScrollPane className="message text-block scroll">
-                                <div className="message text-scroll" dangerouslySetInnerHTML={{__html:textMessage}}></div>
+                                <div className="message text-scroll" dangerouslySetInnerHTML={{__html:textMessage}}>
+                                </div>
                             </utils.JScrollPane>;
                     } else {
                         messageDisplayBlock = 

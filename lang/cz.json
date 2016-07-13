@@ -3438,7 +3438,7 @@
     "8917": "Pozastaven\u00e9 p\u0159enosy",
     "8918": "\u017d\u00e1dn\u00e9 p\u0159\u00edchoz\u00ed sd\u00edlen\u00e9 slo\u017eky",
     "8919": "\u017d\u00e1dn\u00e9 odchoz\u00ed sd\u00edlen\u00e9 slo\u017eky",
-    "8920": "No pending requests",
+    "8920": "\u017d\u00e1dn\u00e9 \u017e\u00e1dosti \u010dekaj\u00edc\u00ed na vy\u0159\u00edzen\u00ed",
     "8921": "Exportovat obnovovac\u00ed kl\u00ed\u010d",
     "8922": "Obnovovac\u00ed kl\u00ed\u010d exportov\u00e1n",
     "8923": "Export obnovovac\u00edho kl\u00ed\u010de a jeho ponech\u00e1n\u00ed na bezpe\u010dn\u00e9m m\u00edst\u011b v\u00e1m umo\u017en\u00ed obnoven\u00ed va\u0161eho \u00fa\u010dtu v p\u0159\u00edpad\u011b ztracen\u00e9ho hesla bez ztr\u00e1ty dat.",
@@ -3466,7 +3466,8 @@
     "8950": "Nainstalujte na\u0161i mobiln\u00ed aplikaci, abyste z\u00edskali [S]50 GB \u0161ifrovan\u00e9ho cloudov\u00e9ho \u00falo\u017ei\u0161t\u011b zdarma![\/S]",
     "8951": "Tento soubor je p\u0159\u00edli\u0161 velk\u00fd pro otev\u0159en\u00ed ve va\u0161em mobiln\u00edm prohl\u00ed\u017ee\u010di. Nainstalujte si na\u0161i mobiln\u00ed aplikaci kv\u016fli [S]podpo\u0159e neomezen\u00e9 velikosti souboru a bezplatn\u00e9mu 50GB cloudov\u00e9mu \u00falo\u017ei\u0161ti![\/S]",
     "8952": "Tento soubor nemohl b\u00fdt otev\u0159en ve va\u0161em mobiln\u00edm prohl\u00ed\u017ee\u010di. Nainstalujte si na\u0161i mobiln\u00ed aplikaci kv\u016fli [S]podpo\u0159e neomezen\u00e9 velikosti a typu souboru a bezplatn\u00e9mu 50GB cloudov\u00e9mu \u00falo\u017ei\u0161ti![\/S]",
-    "8953": "Set an expiry date",
+    "8953": "Nastavit datum konce platnosti",
+    "8954": "Z\u00edskat \u00fa\u010det PRO",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

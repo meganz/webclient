@@ -3438,7 +3438,7 @@
     "8917": "Trasferimenti in pausa",
     "8918": "Nessuna cartella condivisa in arrivo",
     "8919": "Nessuna cartella condivisa in uscita",
-    "8920": "No pending requests",
+    "8920": "Nessuna richiesta in attesa",
     "8921": "Esporta la Chiave di recupero",
     "8922": "Chiave di recupero esportata",
     "8923": "Esportare la Chiave di recupero e mantenerla in uno spazio sicuro ti permette di recuperare il tuo account in caso di perdita della password senza perdite di dati.",
@@ -3466,7 +3466,8 @@
     "8950": "Installa la nostra app per ottenere [S]50GB gratis di spazio cloud criptato![\/S]",
     "8951": "Questo file \u00e8 troppo grande per essere aperto nel tuo browser mobile. Per favore, installa la nostra app per [S]aprire file di dimensione illimitata e 50GB di spazio cloud gratuito![\/S]",
     "8952": "Questo file non pu\u00f2 essere aperto nel tuo browser mobile. Per favore, installa la nostra app per [S]aprire file di dimensione illimitata e 50GB di spazio cloud gratuito![\/S]",
-    "8953": "Set an expiry date",
+    "8953": "Imposta una data di scadenza",
+    "8954": "Ottieni un account PRO",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

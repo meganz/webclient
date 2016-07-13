@@ -3438,7 +3438,7 @@
     "8917": "Transferuri puse pe pauz\u0103",
     "8918": "Niciun folder partajat primit",
     "8919": "Niciun folder partajat trimis",
-    "8920": "No pending requests",
+    "8920": "Nicio cerere \u00een a\u015fteptare",
     "8921": "Export\u0103 cheia de recuperare",
     "8922": "Cheie de recuperare exportat\u0103",
     "8923": "Exportarea cheii de recuperare \u015fi p\u0103strarea ei \u00eentr-o loca\u0163ie sigur\u0103 \u00ee\u0163i permite s\u0103 setezi o parol\u0103 nou\u0103 f\u0103r\u0103 pierderea datelor.",
@@ -3466,7 +3466,8 @@
     "8950": "Instaleaz\u0103 aplica\u0163ia noastr\u0103 mobil\u0103 pentru a ob\u0163ine [S]50GB spa\u0163iu de stocare criptat \u00een cloud![\/S]",
     "8951": "Acest fi\u015fier este prea mare pentru a-l deschide \u00een browserul mobil. Te rug\u0103m s\u0103 instalezi aplica\u0163ia noastr\u0103 mobil\u0103 pentru [S]suport nelimitat pentru m\u0103rimile fi\u015fierelor \u015fi 50GB spa\u0163iu de stocare \u00een cloud![\/S]",
     "8952": "Acest fi\u015fier nu a putut fi deschis \u00een browserul mobil. Te rug\u0103m s\u0103 instalezi aplica\u0163ia noastr\u0103 mobil\u0103 pentru [S]suport nelimitat pentru m\u0103rimile \u015fi tipurile  fi\u015fierelor \u015fi pentru 50GB spa\u0163iu de stocare \u00een cloud![\/S]",
-    "8953": "Set an expiry date",
+    "8953": "Seteaz\u0103 o dat\u0103 de expirare",
+    "8954": "Ob\u0163ine un cont PRO",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

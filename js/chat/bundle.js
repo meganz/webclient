@@ -540,6 +540,10 @@
 
 	    if (!appContainer) {
 	        $(window).rebind('hashchange.delayedChatUiInit', function () {
+	            if (typeof $.leftPaneResizable === 'undefined' || !fminitialized) {
+
+	                return;
+	            }
 	            appContainer = document.querySelector('.section.conversations');
 	            if (appContainer) {
 	                initAppUI();
@@ -5742,7 +5746,7 @@
 	  return element;
 	};
 
-	ReactElement.createElement = function (type, config, children) {
+	ReactElement.makeElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -5793,7 +5797,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.createElement.bind(null, type);
+	  var factory = ReactElement.makeElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -8730,7 +8734,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.createElement(component);
+	    placeholderElement = ReactElement.makeElement(component);
 	  }
 	};
 
@@ -18548,7 +18552,7 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.createElement;
+	var createElement = ReactElement.makeElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
@@ -18998,7 +19002,7 @@
 	    // succeed and there will likely be errors in render.
 
 
-	    var element = ReactElement.createElement.apply(this, arguments);
+	    var element = ReactElement.makeElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -19023,7 +19027,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -19403,6 +19407,11 @@
 	        }
 	    },
 	    handleWindowResize: function handleWindowResize() {
+
+	        if (!M.chat) {
+
+	            return;
+	        }
 
 	        var contentPanelConversations = document.querySelector('.content-panel.conversations');
 	        if (!contentPanelConversations || !contentPanelConversations.parentNode || !contentPanelConversations.parentNode.parentNode || !contentPanelConversations.parentNode.parentNode.parentNode) {
@@ -23237,21 +23246,21 @@
 	        room.trigger('RefreshUI');
 	    },
 
-	    onMouseMove: function onMouseMove(e) {
+	    onMouseMove: SoonFc(function (e) {
 	        var self = this;
 	        var chatRoom = self.props.chatRoom;
 	        if (self.isMounted()) {
 	            chatRoom.trigger("onChatIsFocused");
 	        }
-	    },
+	    }, 150),
 
-	    handleKeyDown: function handleKeyDown(e) {
+	    handleKeyDown: SoonFc(function (e) {
 	        var self = this;
 	        var chatRoom = self.props.chatRoom;
 	        if (self.isMounted() && chatRoom.isActive()) {
 	            chatRoom.trigger("onChatIsFocused");
 	        }
-	    },
+	    }, 150),
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        window.addEventListener('resize', self.handleWindowResize);
@@ -23495,7 +23504,7 @@
 	        }
 	    },
 	    specificShouldComponentUpdate: function specificShouldComponentUpdate() {
-	        if (this.isRetrievingHistoryViaScrollPull && this.loadingShown || this.props.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) {
+	        if (this.isRetrievingHistoryViaScrollPull && this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) {
 	            return false;
 	        } else {
 	            return undefined;
@@ -23533,13 +23542,13 @@
 
 	        var messagesList = [];
 
-	        if (self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.messagesBuff.messagesHistoryIsLoading() === true || self.props.messagesBuff.joined === false || self.props.messagesBuff.joined === true && self.props.messagesBuff.haveMessages === true && self.props.messagesBuff.messagesHistoryIsLoading() === true) {
+	        if (self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true || self.props.chatRoom.messagesBuff.joined === false || self.props.chatRoom.messagesBuff.joined === true && self.props.chatRoom.messagesBuff.haveMessages === true && self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true) {
 	            if (localStorage.megaChatPresence !== 'unavailable') {
 	                self.loadingShown = true;
 	            }
-	        } else if (self.props.messagesBuff.joined === true && (self.props.messagesBuff.messages.length === 0 || !self.props.messagesBuff.haveMoreHistory())) {
+	        } else if (self.props.chatRoom.messagesBuff.joined === true && (self.props.chatRoom.messagesBuff.messages.length === 0 || !self.props.chatRoom.messagesBuff.haveMoreHistory())) {
 	            delete self.loadingShown;
-	            var headerText = self.props.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
+	            var headerText = self.props.chatRoom.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
 
 	            headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 
@@ -23578,7 +23587,7 @@
 	        var lastMessageState = null;
 	        var grouped = false;
 
-	        self.props.messagesBuff.messages.forEach(function (v, k) {
+	        self.props.chatRoom.messagesBuff.messages.forEach(function (v, k) {
 	            if (!v.protocol && v.revoked !== true) {
 	                var shouldRender = true;
 	                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
@@ -24208,9 +24217,7 @@
 	                chatRoom: chatRoom,
 	                contacts: M.u,
 	                contact: contact,
-	                messagesBuff: chatRoom.messagesBuff,
-	                key: chatRoom.roomJid,
-	                chat: self.props.megaChat
+	                key: chatRoom.roomJid
 	            }));
 	        });
 
@@ -24227,9 +24234,10 @@
 	                    }
 
 	                    if (contact.c === 1) {
-	                        var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+	                        var pres = self.props.chatRoom.megaChat.xmppPresenceToCssClass(contact.presence);
 
-	                        (pres === "offline" ? contactsListOffline : contactsList).push(React.makeElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.megaChat, key: contact.u }));
+	                        (pres === "offline" ? contactsListOffline : contactsList).push(React.makeElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.chatRoom.megaChat,
+	                            key: contact.u }));
 	                    }
 	                });
 	            }

@@ -16,6 +16,11 @@ var MOBILE_FILETYPES = {
     "xlsx" : 'word'
 };
 
+if(navigator.userAgent.match(/CriOS/i)) {
+    MOBILE_MAXFILESIZE = 3 * (1024 * 1024);
+}
+
+
 function dlinfo(ph,key,next)
 {
     dl_next = next;

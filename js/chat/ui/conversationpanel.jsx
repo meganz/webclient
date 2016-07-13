@@ -846,21 +846,21 @@ var ConversationPanel = React.createClass({
         room.trigger('RefreshUI');
     },
 
-    onMouseMove: function(e) {
+    onMouseMove: SoonFc(function(e) {
         var self = this;
         var chatRoom = self.props.chatRoom;
         if (self.isMounted()) {
             chatRoom.trigger("onChatIsFocused");
         }
-    },
+    }, 150),
 
-    handleKeyDown: function(e) {
+    handleKeyDown: SoonFc(function(e) {
         var self = this;
         var chatRoom = self.props.chatRoom;
         if (self.isMounted() && chatRoom.isActive()) {
             chatRoom.trigger("onChatIsFocused");
         }
-    },
+    }, 150),
     componentDidMount: function() {
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
@@ -1151,7 +1151,7 @@ var ConversationPanel = React.createClass({
     specificShouldComponentUpdate: function() {
         if (
             (this.isRetrievingHistoryViaScrollPull && this.loadingShown) ||
-            (this.props.messagesBuff.messagesHistoryIsLoading() && this.loadingShown)
+            (this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown)
         ) {
             return false;
         }
@@ -1196,12 +1196,12 @@ var ConversationPanel = React.createClass({
 
         if (
             (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
-            self.props.messagesBuff.messagesHistoryIsLoading() === true ||
-            self.props.messagesBuff.joined === false ||
+            self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true ||
+            self.props.chatRoom.messagesBuff.joined === false ||
             (
-                self.props.messagesBuff.joined === true &&
-                self.props.messagesBuff.haveMessages === true &&
-                self.props.messagesBuff.messagesHistoryIsLoading() === true
+                self.props.chatRoom.messagesBuff.joined === true &&
+                self.props.chatRoom.messagesBuff.haveMessages === true &&
+                self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true
             )
         ) {
             if (localStorage.megaChatPresence !== 'unavailable') {
@@ -1209,14 +1209,14 @@ var ConversationPanel = React.createClass({
             }
         }
         else if (
-            self.props.messagesBuff.joined === true && (
-                self.props.messagesBuff.messages.length === 0 ||
-                !self.props.messagesBuff.haveMoreHistory()
+            self.props.chatRoom.messagesBuff.joined === true && (
+                self.props.chatRoom.messagesBuff.messages.length === 0 ||
+                !self.props.chatRoom.messagesBuff.haveMoreHistory()
             )
         ) {
             delete self.loadingShown;
             var headerText = (
-                self.props.messagesBuff.messages.length === 0 ?
+                self.props.chatRoom.messagesBuff.messages.length === 0 ?
                     __(l[8002]) :
                     __(l[8002])
             );
@@ -1258,7 +1258,7 @@ var ConversationPanel = React.createClass({
         var lastMessageState = null;
         var grouped = false;
 
-        self.props.messagesBuff.messages.forEach(function(v, k) {
+        self.props.chatRoom.messagesBuff.messages.forEach(function(v, k) {
             if (/*v.deleted !== 1 && */!v.protocol && v.revoked !== true) {
                 var shouldRender = true;
                 if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
@@ -1928,9 +1928,7 @@ var ConversationPanels = React.createClass({
                         chatRoom={chatRoom}
                         contacts={M.u}
                         contact={contact}
-                        messagesBuff={chatRoom.messagesBuff}
                         key={chatRoom.roomJid}
-                        chat={self.props.megaChat}
                         />
                 );
             // }
@@ -1949,10 +1947,11 @@ var ConversationPanels = React.createClass({
                     }
                     
                     if(contact.c === 1) {
-                        var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
+                        var pres = self.props.chatRoom.megaChat.xmppPresenceToCssClass(contact.presence);
 
                         (pres === "offline" ? contactsListOffline : contactsList).push(
-                            <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat} key={contact.u}/>
+                            <ContactsUI.ContactCard contact={contact} megaChat={self.props.chatRoom.megaChat}
+                                                    key={contact.u}/>
                         );
                     }
                 });

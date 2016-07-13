@@ -3438,7 +3438,7 @@
     "8917": "Transferencias Pausadas",
     "8918": "No hay Carpetas Compartidas entrantes",
     "8919": "No hay Carpetas Compartidas salientes",
-    "8920": "No pending requests",
+    "8920": "No hay solicitudes pendientes",
     "8921": "Exportar la Clave de Recuperaci\u00f3n",
     "8922": "Clave de Recuperaci\u00f3n exportada",
     "8923": "Exportar la Clave de Recuperaci\u00f3n y guardarla a buen recaudo te permitir\u00e1 recuperar tu cuenta en caso de perder tu contrase\u00f1a, sin p\u00e9rdida de datos.",
@@ -3466,7 +3466,8 @@
     "8950": "Instala nuestra aplicaci\u00f3n m\u00f3vil para obtener [S]\u00a150GB de almacenamiento en la nube gratis![\/S]",
     "8951": "El archivo es demasiado grande para abrirlo en tu navegador m\u00f3vil. Por favor, instala nuestra aplicaci\u00f3n m\u00f3vil para [S]soporte para ficheros de cualquier tama\u00f1o, \u00a1y 50 GB de almacenamiento en la nube gratis![\/S]",
     "8952": "El archivo no puede abrirse en tu navegador m\u00f3vil. Por favor, instala nuestra aplicaci\u00f3n m\u00f3vil para [S]soporte para ficheros de cualquier tama\u00f1o y tipo, \u00a1y 50 GB de almacenamiento en la nube gratis![\/S]",
-    "8953": "Set an expiry date",
+    "8953": "Fija una fecha de caducidad",
+    "8954": "Obt\u00e9n una cuenta PRO",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

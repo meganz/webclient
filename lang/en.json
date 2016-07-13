@@ -1113,7 +1113,7 @@
     "1929": "Install MEGA into your browser for improved performance and added security.",
     "1930": "The cloud in your pocket. Access and stream your files from your smartphone or tablet.",
     "1932": "To download files larger than 1 GB, please install MEGAsync or our browser extension.",
-    "1933": "To download files larger than  1GB, please install MEGAsync, Google Chrome or Opera.",
+    "1933": "To download files larger than 1GB, please install MEGAsync, Google Chrome or Opera.",
     "1934": "Forgot your password?",
     "1935": "If you have a backup of your master crypto key, you can reset your password by selecting YES. No data will be lost.",
     "1936": "You can still [A]export[\/A] your master key now if you have an active MEGA session in any other browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
@@ -3467,6 +3467,7 @@
     "8951": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50GB cloud storage![\/S]",
     "8952": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50GB cloud storage![\/S]",
     "8953": "Set an expiry date",
+    "8954": "Get a PRO account",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

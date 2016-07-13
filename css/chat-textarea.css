@@ -122,7 +122,7 @@
     max-width: 100%; /* don't overlap other elements in case of left pane resize.. */
 }
 
-.edit-typing-area {
+.message.content-area .chat-textarea {
     border: 1px solid #CCCCCC;
     min-height: 34px;
     position: relative;
@@ -137,6 +137,6 @@
     position: absolute;
     left: 7px;
 }
-.edit-typing-area .chat-textarea-buttons {
+.message.content-area .chat-textarea-buttons {
     top: 6px;
 }

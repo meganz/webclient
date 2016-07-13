@@ -218,7 +218,7 @@ function dl_g(res) {
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
-                    var loadedAt = new Date().getTime()
+                    var loadedAt = new Date().getTime();
                     var isSafari = false;
                     switch (ua.details.os) {
                         case 'iPad':
@@ -241,7 +241,7 @@ function dl_g(res) {
                             alert('Unknown device.');
                     }
                     setTimeout(function() {
-                        if (!isSafari || (new Date).getTime() - loadedAt < 2000) {
+                        if (!isSafari || (new Date()).getTime() - loadedAt < 2000) {
                             document.location = $('.mobile.download-app').attr('href');
                         }
                     }, 500);

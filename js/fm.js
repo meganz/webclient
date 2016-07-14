@@ -2896,12 +2896,15 @@ function fmtopUI() {
             if (M.currentdirid === 'ipc') {
                 $('.fm-received-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
-            } else if (M.currentdirid === 'opc') {
+            }
+            else if (M.currentdirid === 'opc') {
                 $('.fm-contact-requests').addClass('active');
                 $('.fm-right-header').addClass('requests-panel');
             }
         }
-        else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
+        else if (String(M.currentdirid).length === 8
+                && RightsbyID(M.currentdirid) > 0) {
+
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {

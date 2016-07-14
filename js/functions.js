@@ -444,9 +444,9 @@ function megatitle(nperc) {
 }
 
 function populate_l() {
-    if (d || 1) { // XXX: Disable me once pro->PRO is made Babel-side
+    if (d) {
         for (var i = 10000 ; i-- ;) {
-            l[i] = (l[i] || '(translation-missing)').replace(/\b[Pp]ro\b/g, 'PRO');
+            l[i] = (l[i] || '(translation-missing)');
         }
     }
     l[0] = 'Mega Limited ' + new Date().getFullYear();

@@ -221,6 +221,10 @@ function init_page() {
         else {
             page = 'fm';
         }
+
+        if (fminitialized) {
+            M.currentdirid = undefined;
+        }
     }
     else if (!flhashchange || page !== 'fm/transfers') {
         n_h = false;

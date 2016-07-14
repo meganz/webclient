@@ -4456,7 +4456,7 @@
         "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
     },
     "1933": {
-        "text": "To download files larger than  1GB, please install MEGAsync, Google Chrome or Opera.",
+        "text": "To download files larger than 1GB, please install MEGAsync, Google Chrome or Opera.",
         "context": ""
     },
     "1934": {

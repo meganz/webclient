@@ -760,7 +760,7 @@ var dlmanager = {
                             timeLeft += 3600;
                         }
                     }
-                    if (!res.rtt) {
+                    if (!res.rtt && size > 0) {
                         var limit = bytesToSize(size);
                         var hours = res.tah.length;
                         this._overquotaShowVariables(limit, hours);

@@ -121,3 +121,22 @@
 .chat-textarea-scroll.textarea-scroll.jspScrollable .messages-textarea {
     max-width: 100%; /* don't overlap other elements in case of left pane resize.. */
 }
+
+.edit-typing-area {
+    border: 1px solid #CCCCCC;
+    min-height: 34px;
+    position: relative;
+    top: 4px;
+    margin: 0 0 20px 0;
+    padding: 6px 46px 6px 33px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.textarea-icon.small-icon {
+    position: absolute;
+    left: 7px;
+}
+.edit-typing-area .chat-textarea-buttons {
+    top: 6px;
+}

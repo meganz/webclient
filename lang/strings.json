@@ -244,7 +244,7 @@
         "context": ""
     },
     "129": {
-        "text": "Upgrade to Pro",
+        "text": "Upgrade to PRO",
         "context": "Pro refers to the name of the storage & bandwidth packeges we sell to our users. This can be translated to something localized, however it should always be the same throughout all other texts"
     },
     "135": {
@@ -476,7 +476,7 @@
         "context": "message with checkbox for dialog not to be shown again."
     },
     "230": {
-        "text": "Upgrade to Pro",
+        "text": "Upgrade to PRO",
         "context": ""
     },
     "231": {
@@ -620,7 +620,7 @@
         "context": ""
     },
     "398": {
-        "text": "Pro Membership",
+        "text": "PRO Membership",
         "context": ""
     },
     "399": {
@@ -1560,7 +1560,7 @@
         "context": "Please make sure you apply the correct tags [B],[\/B], [A], & [\/A] - including backslash in the closing tag (\/)."
     },
     "872": {
-        "text": "Pro",
+        "text": "PRO",
         "context": "Description of the premium service which gives you more storage space & bandwidth quota"
     },
     "873": {
@@ -1712,7 +1712,7 @@
         "context": ""
     },
     "924": {
-        "text": "Do you have any question about [A]Pro accounts?[\/A]",
+        "text": "Do you have any question about [A]PRO accounts?[\/A]",
         "context": ""
     },
     "925": {
@@ -1964,7 +1964,7 @@
         "context": "Warning message in a dialog that asks for confirmation before deleting something."
     },
     "1008": {
-        "text": "Pro bandwidth quota exceeded.",
+        "text": "PRO bandwidth quota exceeded.",
         "context": "Pro refers to the paid membership, which is often \"Pro\" in the same language. "
     },
     "1009": {
@@ -2076,11 +2076,11 @@
         "context": "PayPal is the name of a popular payment processor"
     },
     "1040": {
-        "text": "Please log in to activate your Pro membership.",
+        "text": "Please log in to activate your PRO membership.",
         "context": ""
     },
     "1041": {
-        "text": "Please create an account to activate your Pro membership.",
+        "text": "Please create an account to activate your PRO membership.",
         "context": ""
     },
     "1042": {
@@ -2104,11 +2104,11 @@
         "context": ""
     },
     "1047": {
-        "text": "Welcome to MEGA Pro",
+        "text": "Welcome to MEGA PRO",
         "context": ""
     },
     "1048": {
-        "text": "Your Pro membership has been activated. Enjoy!",
+        "text": "Your PRO membership has been activated. Enjoy!",
         "context": ""
     },
     "1049": {
@@ -2412,7 +2412,7 @@
         "context": ""
     },
     "1148": {
-        "text": "[A]Get 2 months free[\/A] if you purchase a one-year Pro plan.",
+        "text": "[A]Get 2 months free[\/A] if you purchase a one-year PRO plan.",
         "context": ""
     },
     "1149": {
@@ -2424,7 +2424,7 @@
         "context": ""
     },
     "1151": {
-        "text": "Take full advantage of MEGA with a [A]Pro account[\/A]",
+        "text": "Take full advantage of MEGA with a [A]PRO account[\/A]",
         "context": ""
     },
     "1153": {
@@ -2548,7 +2548,7 @@
         "context": ""
     },
     "1186": {
-        "text": "You can conveniently purchase your MEGA Pro membership from one of our authorized resellers below:",
+        "text": "You can conveniently purchase your MEGA PRO membership from one of our authorized resellers below:",
         "context": ""
     },
     "1187": {
@@ -2852,7 +2852,7 @@
         "context": "Button to retry a certain action"
     },
     "1367": {
-        "text": "Get 50 GB for free, or sign up for one of our Pro packages and get up to 4 TB of encrypted storage starting at \u20ac8.33 per month.",
+        "text": "Get 50 GB for free, or sign up for one of our PRO packages and get up to 4 TB of encrypted storage starting at \u20ac8.33 per month.",
         "context": ""
     },
     "1368": {
@@ -4456,7 +4456,7 @@
         "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
     },
     "1933": {
-        "text": "To download files larger than  1GB, please install MEGAsync, Google Chrome or Opera.",
+        "text": "To download files larger than 1GB, please install MEGAsync, Google Chrome or Opera.",
         "context": ""
     },
     "1934": {
@@ -6176,7 +6176,7 @@
         "context": "Message shown on the app's start animation to explain what MEGA ACCESS means"
     },
     "5834": {
-        "text": "MEGA is a secure cloud storage service with 50 GB free storage space.\r\n\r\nInside the app you can upgrade your storage space & bandwidth quota by subscribing to MEGA Pro with a monthly or yearly subscription.\r\nSubscriptions are \u20ac9.99 (US$10.99) per month or \u20ac99.99 (US$119.99) per year.\r\nThis subscription gives you 500 GB of storage space and 1000 GB of bandwidth per month.\r\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View\r\nID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From here, you can select your\r\nMEGA Pro subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to\r\noff to disable the auto-renewal of your subscription.\r\n\r\nTerms of Service:\r\nhttps:\/\/mega.nz\/ios_terms.html\r\nPrivacy policy:\r\nhttps:\/\/mega.nz\/ios_privacy.html",
+        "text": "MEGA is a secure cloud storage service with 50 GB free storage space.\r\n\r\nInside the app you can upgrade your storage space & bandwidth quota by subscribing to MEGA PRO with a monthly or yearly subscription.\r\nSubscriptions are \u20ac9.99 (US$10.99) per month or \u20ac99.99 (US$119.99) per year.\r\nThis subscription gives you 500 GB of storage space and 1000 GB of bandwidth per month.\r\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View\r\nID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From here, you can select your\r\nMEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to\r\noff to disable the auto-renewal of your subscription.\r\n\r\nTerms of Service:\r\nhttps:\/\/mega.nz\/ios_terms.html\r\nPrivacy policy:\r\nhttps:\/\/mega.nz\/ios_privacy.html",
         "context": "MEGA description. Please adjust the new line position accordingly"
     },
     "5835": {
@@ -6476,7 +6476,7 @@
         "context": ""
     },
     "5929": {
-        "text": "You are significantly over your allowed storage allocation, and your uploads have been disabled. Please ensure you are on the correct MEGA Pro plan, or contact support@mega.nz.",
+        "text": "You are significantly over your allowed storage allocation, and your uploads have been disabled. Please ensure you are on the correct MEGA PRO plan, or contact support@mega.nz.",
         "context": ""
     },
     "5931": {
@@ -8316,7 +8316,7 @@
         "context": "Asks the user to choose their plan renewal period e.g. 1 month or 1 year."
     },
     "6978": {
-        "text": "[A]Get 2 months free[\/A] if you subscribe to a one-year Pro plan.",
+        "text": "[A]Get 2 months free[\/A] if you subscribe to a one-year PRO plan.",
         "context": "Tells the user they can get a discount if they pay for a whole year in advance."
     },
     "6979": {
@@ -8684,11 +8684,11 @@
         "context": "Information on the over bandwidth quota dialog."
     },
     "7099": {
-        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
+        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to PRO[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the amount of bandwidth they have used e.g. 532 MB."
     },
     "7100": {
-        "text": "Please upgrade to Pro to continue immediately, or wait %1 to continue for free. ",
+        "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the number of minutes they need to wait."
     },
     "7101": {
@@ -8988,7 +8988,7 @@
         "context": "upload to. Then choose a file which is not an Image, an Audio or a Video"
     },
     "7183": {
-        "text": "You can be a Pro user!\r\nDo you want to upgrade your account?",
+        "text": "You can be a PRO user!\r\nDo you want to upgrade your account?",
         "context": "Message to promote Pro accounts"
     },
     "7184": {
@@ -9604,7 +9604,7 @@
         "context": "Label for any 'From' button, link, text, title, etc. For example \"From 9,99 \u20ac\/month\"- (String as short as possible)."
     },
     "7344": {
-        "text": "Get 2 months free if you subscribe to a one-year Pro plan",
+        "text": "Get 2 months free if you subscribe to a one-year PRO plan",
         "context": "Label to indicate the user that he obtains 2 free months with a one-year Pro plan subscription."
     },
     "7345": {
@@ -9680,7 +9680,7 @@
         "context": "Label for 'Recurring' payments - (String as short as possible)."
     },
     "7363": {
-        "text": "You can be a Pro user!",
+        "text": "You can be a PRO user!",
         "context": "Label for the dialog shown randomly when a user logs into a free account, notifying the user the possibility of upgrade the account - (String as short as possible)."
     },
     "7364": {
@@ -13832,7 +13832,7 @@
         "context": "Warning header. Informs user that bandwidth is limited for current membership plan."
     },
     "8944": {
-        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a pro account[\/S] for increased bandwidth quota.",
+        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for increased bandwidth quota.",
         "context": "Informs user that bandwidth is limited for current membership plan. User can buy PRO plan to increase bandwidth quota.\r\n\r\nPlease leave [BR], [S], [\/S] as it is."
     },
     "8945": {

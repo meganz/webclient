@@ -727,11 +727,6 @@ var dlmanager = {
                     return;
                 }
 
-                if (res.rtt) {
-                    // retry inmediately
-                    return this._onQuotaRetry(true);
-                }
-
                 if (this.uqFastTrack || (this.onOverQuotaProClicked && u_type)) {
                     // The user loged/registered in another tab, poll the uq command every
                     // 30 seconds until we find a pro status and then retry with fresh download
@@ -765,9 +760,11 @@ var dlmanager = {
                             timeLeft += 3600;
                         }
                     }
-                    var limit = bytesToSize(size);
-                    var hours = res.tah.length;
-                    this._overquotaShowVariables(limit, hours);
+                    if (!res.rtt) {
+                        var limit = bytesToSize(size);
+                        var hours = res.tah.length;
+                        this._overquotaShowVariables(limit, hours);
+                    }
                 }
 
                 clearInterval(this._overQuotaTimeLeftTick);

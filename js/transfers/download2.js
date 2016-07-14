@@ -376,6 +376,9 @@ var dlmanager = {
     },
 
     dlClearActiveTransfer: function DM_dlClearActiveTransfer(dl_id) {
+        if (is_mobile) {
+            return;
+        }
         var data = JSON.parse(localStorage.aTransfers || '{}');
         if (data[dl_id]) {
             delete data[dl_id];
@@ -389,6 +392,9 @@ var dlmanager = {
     },
 
     dlSetActiveTransfer: function DM_dlSetActiveTransfer(dl_id) {
+        if (is_mobile) {
+            return;
+        }
         var data = JSON.parse(localStorage.aTransfers || '{}');
         data[dl_id] = Date.now();
         localStorage.aTransfers = JSON.stringify(data);

@@ -2284,9 +2284,9 @@ mSpawnWorker.prototype = {
             if (!(self && self.wrk)) {
                 return;
             }
-            Soon(function() {
+            /*Soon(function() {
                 throw err.message || err;
-            });
+            });*/
             self.unreliably = true;
             var nw = self.nworkers;
             while (nw--) {
@@ -2300,13 +2300,13 @@ mSpawnWorker.prototype = {
                     job.onerror(err);
                 }
             }
-            if (!window[self.token]) {
+            /*if (!window[self.token]) {
                 window[self.token] = true;
                 if (err.filename) {
                     msgDialog('warninga',
                         "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
                 }
-            }
+            }*/
             delete self.wrk;
             delete self.jobs;
             self = undefined;

@@ -36,7 +36,10 @@ function dlinfo(ph,key,next)
     dlpage_ph   = ph;
     dlpage_key  = key;
 
-    if (!is_mobile) {
+    if (is_mobile) {
+        $('.mobile.dl-browser, .mobile.dl-megaapp').addClass('disabled');
+    }
+    else {
         watchdog.query('dlsize', 2100, true);
     }
 
@@ -135,7 +138,10 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
-            if (!is_mobile) {
+            if (is_mobile) {
+                $('.mobile.dl-browser, .mobile.dl-megaapp').removeClass('disabled');
+            }
+            else {
                 $('.download-button.to-clouddrive').show();
                 $('.download-button.with-megasync').show();
             }
@@ -230,9 +236,6 @@ function dl_g(res) {
                         default:
                             alert('Unknown device.');
                     }
-                    setTimeout(function() {
-                        document.location = $('.mobile.download-app').attr('href');
-                    }, 500);
                     return false;
                 });
 
@@ -259,6 +262,16 @@ function dl_g(res) {
                 }
             }
         }
+        else if (is_mobile) {
+            var mkey = prompt(l[1026]);
+
+            if (mkey) {
+                location.hash = '#!' + dlpage_ph + '!' + mkey;
+            }
+            else {
+                dlpage_key = null;
+            }
+        }
         else {
             mKeyDialog(dlpage_ph)
                 .fail(function() {
@@ -278,7 +291,10 @@ function dl_g(res) {
             $('#mobile-ui-notFound').removeClass('hidden');
 
             var msg;
-            if (res === ETOOMANY) {
+            if (!dlpage_key) {
+                msg = l[7945] + '<p>' + l[7946];
+            }
+            else if (res === ETOOMANY) {
                 msg = l[243] + '<p>' + l[731];
             }
             else if (res.e === ETEMPUNAVAIL) {
@@ -333,8 +349,8 @@ function browserDownload() {
 
 function setMobileAppInfo() {
     switch (ua.details.os) {
-        case 'iPhone':
         case 'iPad':
+        case 'iPhone':
             $('.app-info-block').addClass('ios');
             $('.mobile.download-app').attr('href', 'https://itunes.apple.com/app/mega/id706857885');
             break;

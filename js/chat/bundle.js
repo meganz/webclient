@@ -25710,7 +25710,7 @@
 	            { className: "typingarea-component" + self.props.className },
 	            React.makeElement(
 	                "div",
-	                { className: "chat-textarea" },
+	                { className: "chat-textarea " + self.props.className },
 	                React.makeElement("i", { className: self.props.iconClass ? self.props.iconClass : "small-icon conversations" }),
 	                React.makeElement(
 	                    "div",

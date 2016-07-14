@@ -1712,7 +1712,7 @@
         "context": ""
     },
     "924": {
-        "text": "Do you have any question about [A]Pro accounts?[\/A]",
+        "text": "Do you have any question about [A]PRO accounts?[\/A]",
         "context": ""
     },
     "925": {
@@ -2424,7 +2424,7 @@
         "context": ""
     },
     "1151": {
-        "text": "Take full advantage of MEGA with a [A]Pro account[\/A]",
+        "text": "Take full advantage of MEGA with a [A]PRO account[\/A]",
         "context": ""
     },
     "1153": {
@@ -8684,7 +8684,7 @@
         "context": "Information on the over bandwidth quota dialog."
     },
     "7099": {
-        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
+        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to PRO[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the amount of bandwidth they have used e.g. 532 MB."
     },
     "7100": {

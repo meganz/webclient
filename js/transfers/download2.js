@@ -717,9 +717,7 @@ var dlmanager = {
         }
     },
 
-    _overquotaInfo: function(action) {
-
-        this.uqPendingRequest = true;
+    _overquotaInfo: function() {
 
         api_req({a: 'uq', xfer: 1}, {
             callback: function(res) {
@@ -728,11 +726,10 @@ var dlmanager = {
                     Soon(this._overquotaInfo.bind(this));
                     return;
                 }
-                this.uqPendingRequest = false;
 
                 if (res.rtt) {
                     // retry inmediately
-                    return Soon(this._onQuotaRetry.bind(this, true));
+                    return this._onQuotaRetry(true);
                 }
 
                 if (this.uqFastTrack || (this.onOverQuotaProClicked && u_type)) {
@@ -778,11 +775,6 @@ var dlmanager = {
 
                 var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
                 this._overquotaClickListeners($dialog);
-
-                if (action === -0xFEED) {
-                    fm_showoverlay();
-                    $dialog.removeClass('hidden');
-                }
 
                 if ($dialog.is(':visible')) {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
@@ -939,18 +931,19 @@ var dlmanager = {
 
         this._setOverQuotaState(dlTask);
 
-        if ($dialog.is(':visible') || this.uqPendingRequest) {
+        if ($dialog.is(':visible')) {
             this.logger.info('showOverQuotaDialog', 'visible already.');
             return;
         }
 
-        $dialog
+        fm_showoverlay();
+        $dialog.removeClass('hidden')
             .find('.bandwidth-header')
             .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
             .end();
 
         $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
-        this._overquotaInfo(-0xFEED);
+        this._overquotaInfo();
 
         var doCloseModal = function closeModal() {
             clearInterval(dlmanager._overQuotaTimeLeftTick);

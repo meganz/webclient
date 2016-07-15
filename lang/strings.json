@@ -13874,5 +13874,21 @@
     "8954": {
         "text": "Get a PRO account",
         "context": "a button to ask user to upgrade their account to PRO."
+    },
+    "9026": {
+        "text": "Are you sure you want to leave this share?",
+        "context": "An alert message which is shown when the user taps on the leave share action for a single inshare."
+    },
+    "9027": {
+        "text": "Are you sure you want to leave these shares?",
+        "context": "An alert message which is shown when the user taps on the leave share action after selecting multiple inshares."
+    },
+    "9028": {
+        "text": "Saved in Photos",
+        "context": "A success message which is shown when you save a photo in the Photos app."
+    },
+    "9029": {
+        "text": "If you have misspelled your email address, correct it and click 'Resend'.",
+        "context": "A hint shown at the bottom of the Send Signup Link dialog to tell users they can edit the provided email."
     }
 }

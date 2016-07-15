@@ -3468,6 +3468,10 @@
     "8952": "\uc774 \ud30c\uc77c\uc740 \ub2f9\uc2e0\uc758 \ubaa8\ubc14\uc77c \ube0c\ub77c\uc6b0\uc800\uc5d0\uc11c \uc5f4\uae30\uc5d0 \ub108\ubb34 \ud07d\ub2c8\ub2e4. [S]\ubb34\uc81c\ud55c \ud30c\uc77c \ud06c\uae30 \uc9c0\uc6d0\uacfc 50GB\uc758 \ubb34\ub8cc \ud074\ub77c\uc6b0\ub4dc \uc800\uc7a5\uc18c[\/S]\ub97c \uc704\ud574 \uc6b0\ub9ac\uc758 \ubaa8\ubc14\uc77c \uc571\uc744 \uc124\uce58\ud558\uc138\uc694!",
     "8953": "\ub9cc\uae30\uc77c \uc124\uc815",
     "8954": "PRO \uacc4\uc815 \uc5bb\uae30",
+    "9026": "Are you sure you want to leave this share?",
+    "9027": "Are you sure you want to leave these shares?",
+    "9028": "Saved in Photos",
+    "9029": "If you have misspelled your email address, correct it and click &#039;Resend&#039;.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

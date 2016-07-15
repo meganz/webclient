@@ -3468,6 +3468,10 @@
     "8952": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50GB cloud storage![\/S]",
     "8953": "\u0412\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0438 \u0434\u0430\u0442\u0443 \u0437\u0430\u043a\u0456\u043d\u0447\u0435\u043d\u043d\u044f \u0442\u0435\u0440\u043c\u0456\u043d\u0443",
     "8954": "\u041e\u0442\u0440\u0438\u043c\u0430\u0442\u0438 PRO \u0430\u043a\u0430\u0443\u043d\u0442",
+    "9026": "Are you sure you want to leave this share?",
+    "9027": "Are you sure you want to leave these shares?",
+    "9028": "Saved in Photos",
+    "9029": "If you have misspelled your email address, correct it and click &#039;Resend&#039;.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

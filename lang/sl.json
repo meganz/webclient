@@ -3468,6 +3468,10 @@
     "8952": "Te datoteke ne moremo odpreti v va\u0161em mobilnem brskljalniku. Prosim, namestite na\u0161 mobilni app za [S]podporo neomejeni velikosti datotek in tipom datotek; ter 50GB brezpla\u010dnega shranjevalnega mesta v oblaku![\/S]",
     "8953": "Nastavi datum poteka",
     "8954": "Pridobi PRO ra\u010dun",
+    "9026": "Are you sure you want to leave this share?",
+    "9027": "Are you sure you want to leave these shares?",
+    "9028": "Saved in Photos",
+    "9029": "If you have misspelled your email address, correct it and click &#039;Resend&#039;.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

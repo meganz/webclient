@@ -38,7 +38,7 @@
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
 (function(scope) {
-    var msie = typeof MSBlobBuilder === 'function';
+    var msie = !is_mobile && typeof MSBlobBuilder === 'function';
     var hasDownloadAttr = "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a");
 
     function MemoryIO(dl_id, dl) {

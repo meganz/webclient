@@ -13463,6 +13463,14 @@ h5.main-italic-header {
     padding: 18px 30px 45px 30px;
     line-height: 18px;
 }
+.reg-success-txtb {
+    font-size: 13px;
+    color: #666666;
+    text-align: center;
+    padding: 12px 12px 0px 12px;
+    line-height: 16px;
+    font-style: italic;
+}
 .reset-success .reg-success-txt {
     padding: 10px 30px 20px 30px;
 }

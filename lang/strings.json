@@ -14129,7 +14129,7 @@
     },
     "9018": {
         "text": "%1$d requests successfully deleted but %2$d requests were not deleted.",
-        "context": "error message when reinviting multiple contacts"
+        "context": "error message when removing multiple contacts requests. If there are multiple contact request removed, and some of them returned an error (but others went OK). %1$d (the format is important) is the number of contact requests successfully removed. And %2$d (the format is important) is the number of contact requests removed ending with error."
     },
     "9019": {
         "text": "Do you want to delete the invitation request to %s?",
@@ -14145,7 +14145,7 @@
     },
     "9022": {
         "text": "%1$d replies successfully sent but %2$d were not sent.",
-        "context": "error message when replying to multiple received request"
+        "context": "error message when replying to multiple received request. If there are multiple contact request replied, and some of them returned an error (but others went OK). %1$d (the format is important) is the number of successful contact requests replied. And %2$d (the format is important) is the number of contact requests replies ending with error."
     },
     "9023": {
         "text": "request",

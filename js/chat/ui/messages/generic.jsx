@@ -761,8 +761,16 @@ var GenericConversationMessage = React.createClass({
                     if (message.updated > 0) {
                         textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
                     }
-                    messageDisplayBlock = 
-                        <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;
+                    if (self.props.initTextScrolling) {
+                        messageDisplayBlock = 
+                            <utils.JScrollPane className="message text-block scroll">
+                                <div className="message text-scroll" dangerouslySetInnerHTML={{__html:textMessage}}>
+                                </div>
+                            </utils.JScrollPane>;
+                    } else {
+                        messageDisplayBlock = 
+                            <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;
+                    }
                 }
                 if (!message.deleted) {
                     if (

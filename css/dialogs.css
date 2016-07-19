@@ -146,8 +146,6 @@
 }
 .dialog-wrapper .message.text-block {
     margin-right: 0;
-}
-.dialog-wrapper .message.text-block {
     font-size: 14px;
     color: #666666;
 }

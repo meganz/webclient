@@ -1586,6 +1586,7 @@ var ConversationPanel = React.createClass({
                         message={self.state.messageToBeDeleted}
                         chatRoom={room}
                         hideActionButtons={true}
+                        initTextScrolling={true}
                     />
                 </div>
             </ModalDialogsUI.ConfirmDialog>

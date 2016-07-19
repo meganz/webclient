@@ -1358,7 +1358,7 @@ var proPage = {
         }
 
         // Otherwise pre-select the first option available
-        var $firstOption = $('.duration-options-list .payment-duration:not(.template').first();
+        var $firstOption = $('.duration-options-list .payment-duration:not(.template)').first();
         $firstOption.find('input').prop('checked', true);
         $firstOption.find('.membership-radio').addClass('checked');
         $firstOption.find('.membership-radio-label').addClass('checked');

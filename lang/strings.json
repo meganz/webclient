@@ -1712,7 +1712,7 @@
         "context": ""
     },
     "924": {
-        "text": "Do you have any question about [A]Pro accounts?[\/A]",
+        "text": "Do you have any question about [A]PRO accounts?[\/A]",
         "context": ""
     },
     "925": {
@@ -2424,7 +2424,7 @@
         "context": ""
     },
     "1151": {
-        "text": "Take full advantage of MEGA with a [A]Pro account[\/A]",
+        "text": "Take full advantage of MEGA with a [A]PRO account[\/A]",
         "context": ""
     },
     "1153": {
@@ -8684,7 +8684,7 @@
         "context": "Information on the over bandwidth quota dialog."
     },
     "7099": {
-        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
+        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to PRO[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the amount of bandwidth they have used e.g. 532 MB."
     },
     "7100": {
@@ -13874,5 +13874,341 @@
     "8954": {
         "text": "Get a PRO account",
         "context": "a button to ask user to upgrade their account to PRO."
+    },
+    "8955": {
+        "text": "Delete account",
+        "context": "A button in the My Account section where the user can permanently delete his account."
+    },
+    "8956": {
+        "text": "Open location",
+        "context": "An option in the sliding panel to open the folder which contains the file selected after performing a search."
+    },
+    "8957": {
+        "text": "Servers are too busy. Please wait.",
+        "context": "message when a request cannot be performed because the servers are busy"
+    },
+    "8958": {
+        "text": "Free Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8959": {
+        "text": "PRO Lite Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8960": {
+        "text": "Pro I Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8961": {
+        "text": "Pro II Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8962": {
+        "text": "Pro III Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8963": {
+        "text": "Backup your Recovery Key",
+        "context": "Title of the screen to backup the master key"
+    },
+    "8964": {
+        "text": "Your password unlocks your Recovery Key",
+        "context": "Subtitle of the screen to backup the master key"
+    },
+    "8965": {
+        "text": "Copy the Recovery Key to clipboard or save it as text file",
+        "context": "Sentence to inform the user the available actions in the screen to backup the master key"
+    },
+    "8966": {
+        "text": "The Recovery Key has been successfully copied",
+        "context": "Alert message when the master key (now named Recovery Key) has been successfully copied to the ClipBoard"
+    },
+    "8967": {
+        "text": "YES",
+        "context": "A positive button to perform a general action."
+    },
+    "8968": {
+        "text": "NO",
+        "context": "A negative button to perform a general action."
+    },
+    "8969": {
+        "text": "Forgot password?",
+        "context": "An option to reset the password."
+    },
+    "8970": {
+        "text": "If you have a backup of your Recovery Key, you can reset your password by selecting YES. No data will be lost.",
+        "context": "First paragraph of the screen when the password has been forgotten"
+    },
+    "8971": {
+        "text": "You can still export your Recovery Key now if you have an active MEGA session in any other browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
+        "context": "Second paragraph of the screen when the password has been forgotten"
+    },
+    "8972": {
+        "text": "If you don't, you can still export your Recovery Key now in this MEGA session. Please, go back and backup your recovery key.",
+        "context": "Second paragraph of the screen when the password has been forgotten and the user is still logged in"
+    },
+    "8973": {
+        "text": "Do you have a backup of your Recovery Key?",
+        "context": "Sentence to ask to the user if he has the master key in the screen when the password has been forgotten"
+    },
+    "8974": {
+        "text": "email goes here",
+        "context": "A hint message where the user can write his e-mail."
+    },
+    "8975": {
+        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to submit your Recovery Key and reset your password.",
+        "context": "Text of the alert message to ask for the link to reset the pass with the MK"
+    },
+    "8976": {
+        "text": "Recovery Key goes here",
+        "context": "Hint of the text when the user can write his master key"
+    },
+    "8977": {
+        "text": "If you delete your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.",
+        "context": "Text shown in the alert dialog to confirm the cancellation of an account"
+    },
+    "8978": {
+        "text": "password goes here",
+        "context": "A hint message where the user can write his password."
+    },
+    "8979": {
+        "text": "This is the last step to cancel your account. You will permanently lose all the data stored in the cloud. Please enter your password below.",
+        "context": "Text shown in the last alert dialog to confirm the cancellation of an account"
+    },
+    "8980": {
+        "text": "Email verification",
+        "context": "An alert dialog title to inform the user that they have to check their email."
+    },
+    "8981": {
+        "text": "Please check your email to proceed.",
+        "context": "Text of the alert dialog to inform the user that have to check the email"
+    },
+    "8982": {
+        "text": "An error occurred, please try again.",
+        "context": "Text of the alert dialog to inform the user when an error occurs when cancelling the account"
+    },
+    "8983": {
+        "text": "You must be logged in to perform this action.",
+        "context": "Alert to inform the user that have to be logged in to perform the action"
+    },
+    "8984": {
+        "text": "Incorrect",
+        "context": "An error when the user leaves the password field empty."
+    },
+    "8985": {
+        "text": "You must be logged out to perform this action.",
+        "context": "Alert to inform the user that have to be logged out to perform the action"
+    },
+    "8986": {
+        "text": "Please enter your Recovery Key below.",
+        "context": "Text of the dialog to write MK after opening the recovery link"
+    },
+    "8987": {
+        "text": "Password changed!",
+        "context": "An alert message when the password has been correctly changed."
+    },
+    "8988": {
+        "text": "Park",
+        "context": "A button to park an account."
+    },
+    "8989": {
+        "text": "Oops!",
+        "context": "The title of the screen to park an account."
+    },
+    "8990": {
+        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a backup of your Recovery Key.",
+        "context": "First paragraph of the screen to park an account"
+    },
+    "8991": {
+        "text": "You can park your existing account and start a fresh one under the same e-mail address. Your data will be retained for at least 60 days. In case that you recall your parked account's password, please contact support@mega.nz",
+        "context": "Second paragraph of the screen to park an account"
+    },
+    "8992": {
+        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to park your account.",
+        "context": "Text of the dialog message to ask for the link to park the account"
+    },
+    "8993": {
+        "text": "This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you do recall your parked account's password, please contact support@mega.nz",
+        "context": "Text shown in the last alert dialog to park an account"
+    },
+    "8994": {
+        "text": "Enter new password",
+        "context": "A screen title in the screen where the user will write their new password after opening the recovery link."
+    },
+    "8995": {
+        "text": "Your Recovery Key is going to be used to reset your password. Please, enter your new password.",
+        "context": "Text of the alert after opening the recovery link to reset pass being logged."
+    },
+    "8996": {
+        "text": "You will receive a recovery link that will allow you to reset your password. Please check your email to proceed.",
+        "context": "Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass"
+    },
+    "8997": {
+        "text": "Upgrade now",
+        "context": "A button to upgrade the user's account to a PRO account."
+    },
+    "8998": {
+        "text": "Error when changing the account data.",
+        "context": "Message when an error ocurred when changing an user attribute"
+    },
+    "8999": {
+        "text": "Your account data has been correctly updated.",
+        "context": "Message when an user attribute has been changed successfully"
+    },
+    "9000": {
+        "text": "Error. This email address is already in use.",
+        "context": "Error shown when the user tries to change his mail to one that is already used"
+    },
+    "9001": {
+        "text": "This is the last step to change your email. Please enter your password below.",
+        "context": "Text shown in the last alert dialog to change the email associated to an account"
+    },
+    "9002": {
+        "text": "Change email",
+        "context": "The title of the alert dialog to change the email associated to an account."
+    },
+    "9003": {
+        "text": "Your email has been correctly updated.",
+        "context": "Message when the user email has been changed successfully"
+    },
+    "9004": {
+        "text": "Take full advantage of your MEGA account by upgrading to PRO.",
+        "context": "Text of the warning when the user is running out of space"
+    },
+    "9005": {
+        "text": "Edit profile picture",
+        "context": "A title of a sliding panel where the user can choose the option to edit their profile picture."
+    },
+    "9006": {
+        "text": "Choose picture",
+        "context": "An option to change the avatar by choosing an existing picture."
+    },
+    "9007": {
+        "text": "Delete picture",
+        "context": "An option to delete the existing avatar."
+    },
+    "9008": {
+        "text": "The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
+        "context": "Alert when the user introduces his master key to reset pass incorrectly"
+    },
+    "9009": {
+        "text": "Invalid Recovery Key",
+        "context": "An alert title where the user provided the incorrect Recovery Key."
+    },
+    "9010": {
+        "text": "No pictures uploaded",
+        "context": "A message that indicates that no pictures have been uploaded to the Camera Uploads section."
+    },
+    "9011": {
+        "text": "Recovering info\u2026",
+        "context": "A message shown while the app is waiting for a request."
+    },
+    "9012": {
+        "text": "Your new email address needs to be validated. Please check your email to proceed.",
+        "context": "Text of the alert dialog to inform the user that have to check the email to validate his new email"
+    },
+    "9013": {
+        "text": "Your picture profile will be deleted. Do you want to proceed?",
+        "context": "Confirmation before deleting the avatar of the user's profile"
+    },
+    "9014": {
+        "text": "(PRO ONLY)",
+        "context": "An alert dialog for the Get Link feature."
+    },
+    "9015": {
+        "text": "Edit link",
+        "context": "An option of the sliding panel to edit the link of a node."
+    },
+    "9016": {
+        "text": "%d reinvite requests sent successfully.",
+        "context": "success message when reinviting multiple contacts. Please leave %d as it is."
+    },
+    "9017": {
+        "text": "%d requests deleted successfully.",
+        "context": "success message when reinviting multiple contacts. Please leave %d as it is."
+    },
+    "9018": {
+        "text": "%1$d requests successfully deleted but %2$d requests were not deleted.",
+        "context": "error message when removing multiple contacts requests. If there are multiple contact request removed, and some of them returned an error (but others went OK). %1$d (the format is important) is the number of contact requests successfully removed. And %2$d (the format is important) is the number of contact requests removed ending with error."
+    },
+    "9019": {
+        "text": "Do you want to delete the invitation request to %s?",
+        "context": "confirmation message before removing a contact request. Leave %s as it is please."
+    },
+    "9020": {
+        "text": "Do you want to delete these %d invitation requests?",
+        "context": "confirmation message before removing multiple contact request. Leave %d as it is please."
+    },
+    "9021": {
+        "text": "%d replies sent.",
+        "context": "success message when replying to multiple received request. Please leave %d as it is"
+    },
+    "9022": {
+        "text": "%1$d replies successfully sent but %2$d were not sent.",
+        "context": "error message when replying to multiple received request. If there are multiple contact request replied, and some of them returned an error (but others went OK). %1$d (the format is important) is the number of successful contact requests replied. And %2$d (the format is important) is the number of contact requests replies ending with error."
+    },
+    "9023": {
+        "text": "request",
+        "context": "An invitation request in the Contacts section."
+    },
+    "9024": {
+        "text": "requests",
+        "context": "Invitation requests in the Contacts section."
+    },
+    "9025": {
+        "text": "Remove shares?",
+        "context": "A confirmation message before removing the outgoing shares of a folder."
+    },
+    "9026": {
+        "text": "Are you sure you want to leave this share?",
+        "context": "An alert message which is shown when the user taps on the leave share action for a single inshare."
+    },
+    "9027": {
+        "text": "Are you sure you want to leave these shares?",
+        "context": "An alert message which is shown when the user taps on the leave share action after selecting multiple inshares."
+    },
+    "9028": {
+        "text": "Saved in Photos",
+        "context": "A success message which is shown when you save a photo in the Photos app."
+    },
+    "9029": {
+        "text": "If you have misspelled your email address, correct it and click 'Resend'.",
+        "context": "A hint shown at the bottom of the Send Signup Link dialog to tell users they can edit the provided email."
+    },
+    "9030": {
+        "text": "Upon completion, click  [S]Send[\/S] to send your Network Connection report to our Support team.",
+        "context": "Help message in our Network Connection helper. The word Send (its translation) must be capitalised  and within \"[S]\" and \"[\/S]\"."
+    },
+    "9031": {
+        "text": "Server",
+        "context": "Header of a table, representing the server (machine) that the network test went to"
+    },
+    "9032": {
+        "text": "Ping",
+        "context": "Header of a table, indicating the network Ping time."
+    },
+    "9033": {
+        "text": "Avg. Speed",
+        "context": "Header of table (Avg is a short word for Average. Try to keep the word short if possible)"
+    },
+    "9034": {
+        "text": "Progress",
+        "context": "Header of table indicating how the network test is progressing."
+    },
+    "9035": {
+        "text": "This dialog will show you the speed of your connection to our servers.",
+        "context": "Help text in our Network Diagnostics tool"
+    },
+    "9036": {
+        "text": " Please paste a file link below and click on [S]\"Test\"[\/S].",
+        "context": "Help text in our Network Diagnostics tool. Please leave the [S] and [\/S] around the translation for Test (which is the name of the button they need to click)"
+    },
+    "9037": {
+        "text": "Test",
+        "context": "Text for a button that initiates a network speed test"
+    },
+    "9038": {
+        "text": "Paste File URL",
+        "context": "Placeholder text for input"
     }
 }

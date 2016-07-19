@@ -23881,7 +23881,8 @@
 	                        className: "dialog-wrapper",
 	                        message: self.state.messageToBeDeleted,
 	                        chatRoom: room,
-	                        hideActionButtons: true
+	                        hideActionButtons: true,
+	                        initTextScrolling: true
 	                    })
 	                )
 	            );
@@ -26532,7 +26533,15 @@
 	                    if (message.updated > 0) {
 	                        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
 	                    }
-	                    messageDisplayBlock = React.makeElement('div', { className: 'message text-block', dangerouslySetInnerHTML: { __html: textMessage } });
+	                    if (self.props.initTextScrolling) {
+	                        messageDisplayBlock = React.makeElement(
+	                            utils.JScrollPane,
+	                            { className: 'message text-block scroll' },
+	                            React.makeElement('div', { className: 'message text-scroll', dangerouslySetInnerHTML: { __html: textMessage } })
+	                        );
+	                    } else {
+	                        messageDisplayBlock = React.makeElement('div', { className: 'message text-block', dangerouslySetInnerHTML: { __html: textMessage } });
+	                    }
 	                }
 	                if (!message.deleted) {
 	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && !message.requiresManualRetry) {

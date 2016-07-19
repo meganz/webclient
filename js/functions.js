@@ -622,6 +622,7 @@ function browserdetails(useragent) {
     var browser = false;
     var icon = '';
     var name = '';
+    var brand = '';
     var nameTrans = '';
     var current = false;
     var brand = false;
@@ -646,7 +647,8 @@ function browserdetails(useragent) {
     if (useragent.indexOf('windows phone') > 0) {
         icon = 'wp.png';
         os = 'Windows Phone';
-    } else if (useragent.indexOf('android') > 0) {
+    }
+    else if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
     else if (useragent.indexOf('windows') > 0) {
@@ -675,8 +677,13 @@ function browserdetails(useragent) {
     if (mega.browserBrand[brand]) {
         browser = mega.browserBrand[brand];
     }
-    else if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
+    else if (useragent.indexOf(' edge/') > 0) {
         browser = 'Edge';
+    }
+    else if (useragent.indexOf('iemobile/') > 0) {
+        icon = 'ie.png';
+        brand = 'IEMobile';
+        browser = 'Internet Explorer';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
@@ -753,8 +760,8 @@ function browserdetails(useragent) {
 
     // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
-        name = browser + ' on ' + os;
-        nameTrans = String(l[7684]).replace('%1', browser).replace('%2', os);
+        name = (brand || browser) + ' on ' + os;
+        nameTrans = String(l[7684]).replace('%1', brand || browser).replace('%2', os);
     }
     else if (os) {
         name = os;
@@ -782,7 +789,7 @@ function browserdetails(useragent) {
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
-    details.version = (useragent.match(RegExp("\\s+" + browser + "/([\\d.]+)", 'i')) || [])[1] || 0;
+    details.version = (useragent.match(RegExp("\\s+" + (brand || browser) + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
@@ -794,6 +801,10 @@ function browserdetails(useragent) {
         var ver = useragent.match(/ MEGAext\/([\d.]+)/);
 
         details.isExtension = ver && ver[1] || true;
+    }
+
+    if (brand) {
+        details.brand = brand;
     }
 
     // Determine core engine.

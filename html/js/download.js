@@ -226,6 +226,7 @@ function dl_g(res) {
 
                         case 'Windows Phone':
                             window.location = "mega://" + location.hash.substr(1);
+                            break;
 
                         case 'Android':
                             var intent = 'intent://' + location.hash
@@ -358,7 +359,7 @@ function setMobileAppInfo() {
         case 'Windows Phone':
             $('.app-info-block').addClass('wp');
             $('.mobile.download-app').attr('href', 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a');
-            $('.mobile.dl-browser').hide();
+            $('.mobile.dl-browser').addClass('disabled').unbind('click');
             break;
 
         case 'Android':

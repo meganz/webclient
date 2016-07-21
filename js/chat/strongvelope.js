@@ -577,7 +577,7 @@ var strongvelope = {};
             var refidstr = payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE, refidlen);
             var refids = [];
             var pos = 0;
-            while(pos < refidlen) {
+            while (pos < refidlen) {
                 refids.push(refidstr.substr(pos, MESSAGE_IDENTITY_SIZE));
                 pos += MESSAGE_IDENTITY_SIZE;
             }
@@ -1104,7 +1104,7 @@ var strongvelope = {};
         }
 
         var encryptedMessage = ns._symmetricEncryptMessage(
-                               messageIdentity +ns.pack16le(refids.length) + refids + to8(message),
+                               messageIdentity + ns.pack16le(refids.length) + refids + to8(message),
                                senderKey);
 
         // Assemble message content.

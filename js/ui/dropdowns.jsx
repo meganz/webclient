@@ -4,6 +4,7 @@ var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 var ContactsUI = require('./../chat/ui/contacts.jsx');
 var EMOJILIST = require('./emojilist.jsx');
+var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
 var Dropdown = React.createClass({
     mixins: [MegaRenderMixin],
@@ -15,6 +16,21 @@ var Dropdown = React.createClass({
     componentWillUpdate: function(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             this.onActiveChange(nextProps.active)
+        }
+    },
+    specificShouldComponentUpdate: function(nextProps, nextState) {
+        if (this.props.active != nextProps.active) {
+            return true;
+        }
+        else if (this.props.focused != nextProps.focused) {
+            return true;
+        }
+        else if (this.state && this.state.active != nextState.active) {
+            return true;
+        }
+        else {
+            // not sure, leave to the render mixing to decide.
+            return undefined;
         }
     },
     onActiveChange: function(newVal) {
@@ -88,6 +104,20 @@ var Dropdown = React.createClass({
             this.onActiveChange(false);
         }
     },
+    renderChildren: function () {
+        var self = this;
+
+        return React.Children.map(this.props.children, function (child) {
+            if (child) {
+                return React.cloneElement(child, {
+                    active: self.props.active || self.state.active
+                });
+            }
+            else {
+                return null;
+            }
+        }.bind(this))
+    },
     render: function() {
         var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
 
@@ -121,7 +151,7 @@ var Dropdown = React.createClass({
                     }}>
                     <div>
                         {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
-                        {this.props.children}
+                        {this.renderChildren()}
                     </div>
                 </utils.RenderTo>
             );
@@ -137,6 +167,21 @@ var DropdownContactsSelector = React.createClass({
             requiresUpdateOnResize: true
         };
     },
+    specificShouldComponentUpdate: function(nextProps, nextState) {
+        if (this.props.active != nextProps.active) {
+            return true;
+        }
+        else if (this.props.focused != nextProps.focused) {
+            return true;
+        }
+        else if (this.state && this.state.active != nextState.active) {
+            return true;
+        }
+        else {
+            // not sure, leave to the render mixing to decide.
+            return undefined;
+        }
+    },
     render: function() {
         var self = this;
 
@@ -147,8 +192,9 @@ var DropdownContactsSelector = React.createClass({
                          positionMy={this.props.positionMy} 
                          positionAt={this.props.positionAt}
                 >
-            <div className="popup contacts-search">
                 <ContactsUI.ContactPickerWidget
+                    active={this.props.active}
+                    className="popup contacts-search"
                     contacts={this.props.contacts}
                     megaChat={this.props.megaChat}
                     exclude={this.props.exclude}
@@ -162,7 +208,6 @@ var DropdownContactsSelector = React.createClass({
                             this.props.closeDropdown();
                         }
                     } />
-            </div>
         </Dropdown>;
     }
 });
@@ -235,7 +280,8 @@ var DropdownEmojiSelector = React.createClass({
     mixins: [MegaRenderMixin],
     getDefaultProps: function() {
         return {
-            requiresUpdateOnResize: true
+            'requiresUpdateOnResize': true,
+            'hideable': true
         };
     },
     getInitialState: function() {
@@ -243,11 +289,7 @@ var DropdownEmojiSelector = React.createClass({
             'previewEmoji': null,
             'searchValue': '',
             'browsingCategory': false,
-            'isActive': false,
-            'visibleEmojis': [].concat(
-                /*Object.keys(EMOJILIST.EMOJI_CATEGORIES["FREQUENTLY USED"]),*/
-                Object.keys(EMOJILIST.EMOJI_CATEGORIES["PEOPLE"])
-            )
+            'isActive': false
         }
     },
     onSearchChange: function(e) {
@@ -256,73 +298,18 @@ var DropdownEmojiSelector = React.createClass({
             searchValue: e.target.value,
             browsingCategory: false
         });
-        $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollTo(0);
+        self.refs.scrollableArea.scrollToY(0);
     },
-    componentDidUpdate: function() {
-        var self = this;
-        var $element = $('.popup.emoji-one:visible');
-
-        $('.popup-scroll-area.emoji-one', $element).rebind('jsp-user-scroll-y.emojis', function(e, pos) {
-            self.rerender();
-        });
-    },
-    _getVisibleEmojis: function() {
-        var self = this;
-
-        var $element = $('.popup-header.emoji-one:visible').parent();
-
-        if (!$element.is(":visible")) {
-            return false;
-        }
-
-        var $jsp = $('.popup-scroll-area.emoji-one', $element).data("jsp");
-        var pos = 0;
-
-        if ($jsp) {
-            pos = $jsp.getContentPositionY();
-        }
-
-        // caching those here, so that we won't trigger w/h calcs from the browser (to slow down this ...)
-        // (w/h + margin)
-        var emojiHeight = 42;
-        var emojiWidth = 42;
-        var emojiContainerWidth = 336;
-        var jspHeight = 420;
-        var bufferRows = 6;
-        var emojisPerRow = Math.floor(emojiContainerWidth / (emojiWidth - 5));
-        var visibleEmojiRows = Math.floor(jspHeight / emojiHeight);
-
-        var emojiList = EMOJILIST.ORDERED_EMOJIS;
-        if (self.state.searchValue && self.state.searchValue.length > 0) {
-            emojiList = [];
-            EMOJILIST.ORDERED_EMOJIS.forEach(function(v) {
-                if (v.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) > -1) {
-                    emojiList.push(v);
-                }
-            })
-        }
-
-
-        var firstEmojiNumber = Math.max(
-            0,
-            Math.ceil((pos/emojiHeight) * emojisPerRow) - Math.floor(bufferRows * emojisPerRow)
-        );
-        var lastEmojiNumber = firstEmojiNumber + Math.ceil(emojisPerRow * (visibleEmojiRows + bufferRows));
-
-        var inViewport = emojiList.slice(
-            Math.max(0, firstEmojiNumber - 1),
-            lastEmojiNumber + 1
-        );
-
-        return inViewport;
-    },
-    rerender: function() {
-        var self = this;
-
-        var inViewport = self._getVisibleEmojis();
-
-        if (self.state.visibleEmojis.join(",") != inViewport.join(",")) {
-            self.setState({'visibleEmojis': inViewport});
+    onUserScroll: function(
+        $ps,
+        elem,
+        e
+    ) {
+        if (this.state.browsingCategory) {
+            var $cat = $('.emoji-category-container[data-category-name="' + this.state.browsingCategory + '"]');
+            if (!elementInViewport($cat)) {
+                this.setState({'browsingCategory': false});
+            }
         }
     },
     render: function() {
@@ -359,11 +346,6 @@ var DropdownEmojiSelector = React.createClass({
 
 
             var emojis = [];
-            var visibleEmojis = this._getVisibleEmojis();
-            if (visibleEmojis === false) {
-                visibleEmojis = self.state.visibleEmojis;
-            }
-
             var searchValue = self.state.searchValue;
 
             Object.keys(EMOJILIST.EMOJI_CATEGORIES).forEach(function (categoryName) {
@@ -376,55 +358,44 @@ var DropdownEmojiSelector = React.createClass({
                     }
                     var meta = EMOJILIST.EMOJIS[slug];
 
-                    if (visibleEmojis.indexOf(slug) > -1) {
-                        curCategoryEmojis.push(
-                            <div
-                                data-emoji={slug}
-                                className="button square-button emoji-one" key={categoryName + "_" + slug}
-                                onMouseEnter={(e) => {
-                                    if (self.mouseEnterTimer) {
-                                        clearTimeout(self.mouseEnterTimer);
-                                    }
+                    curCategoryEmojis.push(
+                        <div
+                            data-emoji={slug}
+                            className="button square-button emoji-one" key={categoryName + "_" + slug}
+                            onMouseEnter={(e) => {
+                                if (self.mouseEnterTimer) {
+                                    clearTimeout(self.mouseEnterTimer);
+                                }
 
-                                    e.stopPropagation();
-                                    e.preventDefault();
+                                e.stopPropagation();
+                                e.preventDefault();
 
-                                    // delay the .setState change, because of the tons of icons we've, which are re-rendered
-                                    // in case of .setState
-                                    self.mouseEnterTimer = setTimeout(function() {
-                                        self.setState({'previewEmoji': slug});
-                                    }, 250);
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (self.mouseEnterTimer) {
-                                        clearTimeout(self.mouseEnterTimer);
-                                    }
-                                    e.stopPropagation();
-                                    e.preventDefault();
+                                // delay the .setState change, because of the tons of icons we've, which are
+                                // re-rendered in case of .setState
+                                self.mouseEnterTimer = setTimeout(function() {
+                                    self.setState({'previewEmoji': slug});
+                                }, 250);
+                            }}
+                            onMouseLeave={(e) => {
+                                if (self.mouseEnterTimer) {
+                                    clearTimeout(self.mouseEnterTimer);
+                                }
+                                e.stopPropagation();
+                                e.preventDefault();
 
-                                    self.setState({'previewEmoji': null});
-                                }}
-                                onClick={(e) => {
-                                    if (self.props.onClick) {
-                                        self.props.onClick(e, slug, meta);
-                                    }
-                                }}
-                            >
-                            <span
-                                className={"emojione-" + meta[0]}
-                                title={":" + slug + ":"}>{meta[1]}</span>
-                            </div>
-                        );
-                    }
-                    else {
-                        curCategoryEmojis.push(
-                            <div
-                                data-emoji={slug}
-                                className="button square-button emoji-one placeholder"
-                                key={categoryName + "_" + slug + "_pl"}
-                            />
-                        );
-                    }
+                                self.setState({'previewEmoji': null});
+                            }}
+                            onClick={(e) => {
+                                if (self.props.onClick) {
+                                    self.props.onClick(e, slug, meta);
+                                }
+                            }}
+                        >
+                        <span
+                            className={"emojione-" + meta[0]}
+                            title={":" + slug + ":"}>{meta[1]}</span>
+                        </div>
+                    );
                 });
 
                 if (curCategoryEmojis.length > 0) {
@@ -479,10 +450,9 @@ var DropdownEmojiSelector = React.createClass({
                             e.preventDefault();
 
                             self.setState({browsingCategory: categoryName, searchValue: ''});
-                            $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollToElement(
-                                $('.emoji-category-container[data-category-name="' + categoryName + '"]:visible'),
-                                true,
-                                true
+
+                            self.refs.scrollableArea.scrollToElement(
+                                $('.emoji-category-container[data-category-name="' + categoryName + '"]:visible')[0]
                             );
                         }}
                     >
@@ -510,15 +480,16 @@ var DropdownEmojiSelector = React.createClass({
 
 
 
-                <utils.JScrollPane
-                    className="popup-scroll-area emoji-one"
+                <PerfectScrollbar
+                    className="popup-scroll-area emoji-one perfectScrollbarContainer"
                     searchValue={this.state.searchValue}
-                    browsingCategory={this.state.browsingCategory}
+                    onUserScroll={this.onUserScroll}
+                    ref="scrollableArea"
                 >
                     <div className="popup-scroll-content emoji-one">
                         {emojis}
                     </div>
-                </utils.JScrollPane>
+                </PerfectScrollbar>
 
                 <div className="popup-footer emoji-one">{categoryButtons}</div>
             </div>;
@@ -527,15 +498,21 @@ var DropdownEmojiSelector = React.createClass({
             popupContents = null;
         }
 
-        return <Dropdown className="popup emoji-one" {...self.props} ref="dropdown" onActiveChange={(newValue) => {
-            // reset state if the dropdown is hidden
-            if (newValue === false) {
-                self.setState(self.getInitialState());
-            }
-            else {
-                self.setState({'isActive': true});
-            }
-        }}>
+        return <Dropdown
+            className="popup emoji-one" {...self.props} ref="dropdown"
+            onActiveChange={(newValue) => {
+                // reset state if the dropdown is hidden
+                if (newValue === false) {
+                    self.setState(self.getInitialState());
+                }
+                else {
+                    self.setState({'isActive': true});
+                }
+            }}
+            searchValue={self.state.searchValue}
+            browsingCategory={self.state.browsingCategory}
+            previewEmoji={self.state.previewEmoji}
+        >
             {popupContents}
         </Dropdown>;
     }

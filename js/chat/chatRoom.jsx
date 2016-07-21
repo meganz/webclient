@@ -902,6 +902,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
         KarereEventObjects.OutgoingMessage.STATE.NOT_SENT,
         self.roomJid
     );
+    eventObject.chatRoom = self;
 
     eventObject.textContents = message;
 

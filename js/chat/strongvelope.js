@@ -1103,8 +1103,9 @@ var strongvelope = {};
             refids += refs[i];
         }
 
-        var encryptedMessage =
-            ns._symmetricEncryptMessage(messageIdentity +ns.pack16le(refids.length) + refids + to8(message), senderKey);
+        var encryptedMessage = ns._symmetricEncryptMessage(
+                               messageIdentity +ns.pack16le(refids.length) + refids + to8(message),
+                               senderKey);
 
         // Assemble message content.
         content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),

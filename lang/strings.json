@@ -14176,7 +14176,7 @@
         "context": "A hint shown at the bottom of the Send Signup Link dialog to tell users they can edit the provided email."
     },
     "9030": {
-        "text": "Upon completion, click  [S]Send[\/S] to send your Network Connection report to our Support team.",
+        "text": "Upon completion, click [S]Send[\/S] to send your Network Connection report to our Support team.",
         "context": "Help message in our Network Connection helper. The word Send (its translation) must be capitalised  and within \"[S]\" and \"[\/S]\"."
     },
     "9031": {

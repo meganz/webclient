@@ -3549,9 +3549,10 @@
     "9033": "Avg. Speed",
     "9034": "Progress",
     "9035": "This dialog will show you the speed of your connection to our servers.",
-    "9036": " Please paste a file link below and click on [S]&quot;Test&quot;[\/S].",
+    "9036": " Please paste a file link below and click on [S]Test[\/S].",
     "9037": "Test",
     "9038": "Paste File URL",
+    "9039": "Folder links are not yet supported",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

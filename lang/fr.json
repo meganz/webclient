@@ -3552,6 +3552,7 @@
     "9036": "Veuillez coller un lien de fichier ci-dessous et cliquer sur [S]&quot;Test&quot;[\/S].",
     "9037": "Test",
     "9038": "Coller l&#039;URL du fichier",
+    "9039": "Folder links are not yet supported",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

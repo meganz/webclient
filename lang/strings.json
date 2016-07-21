@@ -14176,7 +14176,7 @@
         "context": "A hint shown at the bottom of the Send Signup Link dialog to tell users they can edit the provided email."
     },
     "9030": {
-        "text": "Upon completion, click  [S]Send[\/S] to send your Network Connection report to our Support team.",
+        "text": "Upon completion, click [S]Send[\/S] to send your network connection report to our support team.",
         "context": "Help message in our Network Connection helper. The word Send (its translation) must be capitalised  and within \"[S]\" and \"[\/S]\"."
     },
     "9031": {
@@ -14200,7 +14200,7 @@
         "context": "Help text in our Network Diagnostics tool"
     },
     "9036": {
-        "text": " Please paste a file link below and click on [S]\"Test\"[\/S].",
+        "text": " Please paste a file link below and click on [S]Test[\/S].",
         "context": "Help text in our Network Diagnostics tool. Please leave the [S] and [\/S] around the translation for Test (which is the name of the button they need to click)"
     },
     "9037": {
@@ -14210,5 +14210,9 @@
     "9038": {
         "text": "Paste File URL",
         "context": "Placeholder text for input"
+    },
+    "9039": {
+        "text": "Folder links are not yet supported",
+        "context": "Small text to make clear the Network Diagnostic tools do not support folder links at the moment."
     }
 }

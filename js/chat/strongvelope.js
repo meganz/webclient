@@ -581,8 +581,9 @@ var strongvelope = {};
                 refids.push(refidstr.substr(pos, MESSAGE_IDENTITY_SIZE));
                 pos += MESSAGE_IDENTITY_SIZE;
             }
-            var plainmessage =  (version <= PROTOCOL_VERSION_V2) ? payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE + refidlen)
-                                                                 : from8(payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE + refidlen));
+            var plainmessage =  (version <= PROTOCOL_VERSION_V2)
+                                ? payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE + refidlen)
+                                : from8(payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE + refidlen));
 
             var result = {
                 identity: identity,

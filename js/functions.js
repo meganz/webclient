@@ -4870,14 +4870,16 @@ function getGatewayName(gatewayId, gatewayOpt) {
     if (typeof gatewayOpt !== 'undefined') {
         if (typeof gateways[gatewayId] !== 'undefined') {
             // Subgateways should always take their subgateway name from the API if provided
-            gateways[gatewayId].name = (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gateways[gatewayId].name;
+            gateways[gatewayId].name =
+                (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gateways[gatewayId].name;
 
             // Direct reseller still requires the translation from above to be in its name
             if (gatewayId === 15) {
                 gateways[gatewayId].displayName = gateways[gatewayId].displayName + " " + gatewayOpt.displayName;
             }
             else {
-                gateways[gatewayId].displayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gateways[gatewayId].displayName;
+                gateways[gatewayId].displayName =
+                    (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gateways[gatewayId].displayName;
             }
         }
     }

@@ -271,7 +271,9 @@ if (!b_u) try
 
     var contenterror = 0;
     var nocontentcheck = false;
-    if (window.dd || location.host !== 'mega.nz') {
+    
+    if (!is_extension && (window.dd || location.host !== 'mega.nz')) {
+        
         nocontentcheck = true;
         var devhost = window.location.host;
         // handle subdirs

@@ -1095,9 +1095,9 @@ var proPage = {
             var gatewayId = gatewayOpt.gatewayId;
 
             // Get the gateway name and display name
-            var gatewayInfo = getGatewayName(gatewayId);
-            var gatewayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gatewayInfo.name;
-            var displayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gatewayInfo.displayName;
+            var gatewayInfo = getGatewayName(gatewayId, gatewayOpt);
+            var gatewayName = gatewayInfo.name;
+            var displayName = gatewayInfo.displayName;
 
             // If it couldn't find the name (e.g. new provider, use the name from the API)
             if (gatewayInfo.name === 'unknown') {
@@ -1983,10 +1983,15 @@ var directReseller = {
     redirectToSite: function(utcResult) {
         var provider = utcResult['EUR']['provider'];
         var params = utcResult['EUR']['params'];
+        params = atob(params);
 
+        // Gary at 6media
         if (provider === 1) {
-            params = atob(params);
             window.location = 'http://mega.and1.tw/zh_tw/order_mega.php?' + params;
+        }
+        // BWM Mediasoft
+        else if (provider === 2) {
+            window.location = 'http://mega.bwm-mediasoft.com/mega.php5?' + params;
         }
     }
 };

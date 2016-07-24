@@ -320,8 +320,6 @@ var Chat = function() {
 
 makeObservable(Chat);
 
-
-
 /**
  * Initialize the MegaChat (also will connect to the XMPP)
  */
@@ -578,24 +576,6 @@ Chat.prototype.init = function() {
         }
     };
 
-    if (!appContainer) {
-       $(window).rebind('hashchange.delayedChatUiInit', function() {
-           if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
-               // delay the chat init a bit more! specially for the case of a user getting from #pro -> #fm, which
-               // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
-               return;
-           }
-           appContainer = document.querySelector('.section.conversations');
-           if (appContainer) {
-               initAppUI();
-               $(window).unbind('hashchange.delayedChatUiInit');
-           }
-       });
-    }
-    else {
-        initAppUI();
-    }
-
 
     if (self.is_initialized) {
         self.destroy()
@@ -604,6 +584,25 @@ Chat.prototype.init = function() {
             });
 
         return;
+    }
+    else {
+        if (!appContainer) {
+            $(window).rebind('hashchange.delayedChatUiInit', function() {
+                if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
+                    // delay the chat init a bit more! specially for the case of a user getting from #pro -> #fm, which
+                    // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
+                    return;
+                }
+                appContainer = document.querySelector('.section.conversations');
+                if (appContainer) {
+                    initAppUI();
+                    $(window).unbind('hashchange.delayedChatUiInit');
+                }
+            });
+        }
+        else {
+            initAppUI();
+        }
     }
     self.is_initialized = true;
 

@@ -5897,7 +5897,12 @@ function execsc(actionPackets, callback) {
         }
         // Action packet for the mcc
         else if (actionPacket.a === 'mcc') {
-            $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
+            if (typeof megaChat === 'object' && megaChat.is_initialized === true) {
+                $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
+            }
+            else {
+                ChatdIntegration._queuedChats[actionPacket.id] = actionPacket;
+            }
         }
         // Action packet for 'Set Email'
         else if (actionPacket.a === 'se') {
@@ -5985,7 +5990,7 @@ function loadfm(force)
             fminitialized = false;
             loadfm.loading = true;
             setTimeout(function __lazyLoadFM() {
-                api_req({a:'f',c:1,r:1,ca:1},{
+                api_req({a:'f',c:1,r:1,ca:1, v: Chatd.VERSION},{
                     callback: loadfm_callback,
                     progress: function(perc) {
                         loadingInitDialog.step2(parseInt(perc));
@@ -6996,6 +7001,37 @@ function process_ok(ok, ignoreDB)
     }
 }
 
+function processMCF(mcfResponse, ignoreDB) {
+    if (mcfResponse === EEXPIRED) {
+        ChatdIntegration.requiresUpdate = true;
+        return;
+    }
+    else {
+        ChatdIntegration.requiresUpdate = true;
+    }
+
+    // reopen chats from the MCF response.
+    if (mcfResponse.length && mcfResponse.forEach) {
+        mcfResponse.forEach(function (chatRoomInfo) {
+            if (chatRoomInfo.active === 0) {
+                // skip non active chats for now...
+                return;
+            }
+            if (typeof mDB === 'object' && typeof mSDB === 'object' && !pfkey && !ignoreDB) {
+                mSDB.add('mcf', clone(chatRoomInfo));
+            }
+
+            ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+        });
+        ChatdIntegration.deviceId = mcfResponse.d;
+
+        ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
+    }
+    else {
+        ChatdIntegration.mcfHasFinishedPromise.reject(mcfResponse);
+    }
+}
+
 function folderreqerr(c, e)
 {
     loadingDialog.hide();
@@ -7098,6 +7134,9 @@ function loadfm_callback(res, ctx) {
     }
     if (res.ps) {
         processPS(res.ps);
+    }
+    if (res.mcf) {
+        processMCF(res.mcf.c ? res.mcf.c : res.mcf);
     }
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {

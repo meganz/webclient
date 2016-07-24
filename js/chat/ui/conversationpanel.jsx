@@ -1939,7 +1939,7 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-            var hadLoaded = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
+            var hadLoaded = ChatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
 
             if (hadLoaded) {
                 self.props.contacts.forEach(function (contact) {
@@ -1948,10 +1948,10 @@ var ConversationPanels = React.createClass({
                     }
                     
                     if(contact.c === 1) {
-                        var pres = self.props.chatRoom.megaChat.xmppPresenceToCssClass(contact.presence);
+                        var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
 
                         (pres === "offline" ? contactsListOffline : contactsList).push(
-                            <ContactsUI.ContactCard contact={contact} megaChat={self.props.chatRoom.megaChat}
+                            <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat}
                                                     key={contact.u}/>
                         );
                     }

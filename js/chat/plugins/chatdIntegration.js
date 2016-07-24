@@ -33,8 +33,6 @@ var ChatdIntegration = function(megaChat) {
     self.chatd = new Chatd(u_handle);
     self.waitingChatIdPromises = {};
     self.chatIdToRoomJid = {};
-    self.mcfHasFinishedPromise = new MegaPromise();
-    self.deviceId = null;
     self._cachedHandlers = {};
 
     // chat events
@@ -43,8 +41,19 @@ var ChatdIntegration = function(megaChat) {
             assert(chatRoom.type, 'missing room type');
             self._attachToChatRoom(chatRoom);
         });
-
-        self.retrieveChatsFromApi();
+        if (fminitialized === true && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+            // old db, which means that the 'mcf' is empty and the 'f' was not called.
+            // do a separate mcf call!
+            self.retrieveChatsFromApi();
+        }
+        else {
+            ChatdIntegration.mcfHasFinishedPromise.done(function () {
+                Object.keys(ChatdIntegration._queuedChats).forEach(function (id) {
+                    self.openChatFromApi(ChatdIntegration._queuedChats[id], true);
+                });
+                ChatdIntegration._queuedChats = {};
+            });
+        }
     });
 
     megaChat.rebind("onDestroy.chatdInt", function(e) {
@@ -97,6 +106,12 @@ var ChatdIntegration = function(megaChat) {
     return self;
 };
 
+ChatdIntegration.mcfHasFinishedPromise = new MegaPromise();
+ChatdIntegration.deviceId = null;
+ChatdIntegration._queuedChats = {};
+
+ChatdIntegration.mcfHasFinishedPromise.dumpToConsole();
+
 ChatdIntegration.prototype.retrieveChatsFromApi = function() {
     var self = this;
     asyncApiReq({a: "mcf", d: 1, v: Chatd.VERSION})
@@ -106,14 +121,27 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
             // reopen chats from the MCF response.
             if (r.c) {
                 r.c.forEach(function (actionPacket) {
+                    if (actionPacket.active === 0) {
+                        // skip non active chats for now...
+                        return;
+                    }
                     self.openChatFromApi(actionPacket, true);
+                    if (typeof mDB === 'object' && typeof mSDB === 'object' && !pfkey) {
+                        var roomInfo = {
+                            'id': actionPacket.id,
+                            'cs': actionPacket.cs,
+                            'g': actionPacket.g,
+                            'u': clone(actionPacket.u)
+                        };
+                        mSDB.add('mcf', roomInfo);
+                    }
                 });
-                self.deviceId = r.d;
+                ChatdIntegration.deviceId = r.d;
 
-                self.mcfHasFinishedPromise.resolve();
+                ChatdIntegration.mcfHasFinishedPromise.resolve();
             }
             else {
-                self.mcfHasFinishedPromise.reject(r);
+                ChatdIntegration.mcfHasFinishedPromise.reject(r);
             }
         })
         .fail(function(r) {
@@ -245,6 +273,22 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var self = this;
 
+    if (isMcf === false && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+        // 'mcf'/'f' is still loading..ANY incoming action packets, should be rejected (and never happen...)
+        return;
+    }
+    var roomInfo = {
+        'id': actionPacket.id,
+        'cs': actionPacket.cs,
+        'g': actionPacket.g,
+        'u': clone(actionPacket.u)
+    };
+
+    if (isMcf === false) {
+        if (typeof mSDB === 'object') {
+            mSDB.add('mcf', roomInfo);
+        }
+    }
     loadingDialog.hide();
 
     if (actionPacket.active === 0) {
@@ -310,6 +354,20 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         }
 
         if (!chatRoom) {
+            // don't try to open a chat, if its not yet opened and the actionPacket consist of me leaving...
+            if (actionPacket.n) {
+                var foundMeLeaving = false;
+                actionPacket.n.forEach(function(userPrivChangeEntry) {
+                    if (!foundMeLeaving && userPrivChangeEntry.p === -1 && userPrivChangeEntry.u === u_handle) {
+                        foundMeLeaving = true;
+                    }
+                });
+                if (foundMeLeaving) {
+                    mSDB.del('mcf', actionPacket.id);
+                    return;
+                }
+            }
+
             var r = self.megaChat.openChat(
                 chatJids,
                 actionPacket.g === 1 ? "group" : "private",
@@ -355,6 +413,12 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                                 self.chatd.leave(
                                     base64urldecode(actionPacket.id)
                                 );
+
+                                if (isMcf === false) {
+                                    if (typeof mSDB === 'object') {
+                                        mSDB.del('mcf', roomInfo.id);
+                                    }
+                                }
                             }
                         }
                         else {
@@ -406,7 +470,7 @@ ChatdIntegration._waitUntilChatIdIsAvailable = function(fn) {
         var masterPromise = new MegaPromise();
         var args = arguments;
 
-        self.mcfHasFinishedPromise.done(function() {
+        ChatdIntegration.mcfHasFinishedPromise.done(function() {
             self._retrieveChatdIdIfRequired(chatRoom)
                 .done(function() {
                     if (chatRoom.chatId) {
@@ -447,7 +511,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
     var self = this;
     var masterPromise = new MegaPromise();
 
-    self.mcfHasFinishedPromise.done(function() {
+    ChatdIntegration.mcfHasFinishedPromise.done(function() {
         if (!chatRoom.chatId) {
             // already sent an API request?
             if (
@@ -1122,7 +1186,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
-                assert(self.deviceId !== null, 'deviceId not loaded.');
+                assert(ChatdIntegration.deviceId !== null, 'deviceId not loaded.');
 
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,
@@ -1165,6 +1229,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
         chatRoom.chatShard,
         chatRoom.chatdUrl
             .replace("ws:", "wss:")
+            .replace("https:", "wss:")
             .replace("31.216.147.155", "chattest.userstorage.mega.co.nz")
     );
 

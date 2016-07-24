@@ -41,7 +41,7 @@ var ConversationRightArea = React.createClass({
         var foundNonMembers = 0;
         currentContacts.forEach(function(u, k) {
             if (u.c === 1) {
-                if (participants.indexOf(k) !== -1) {
+                if (participants.indexOf(k) === -1) {
                     foundNonMembers++;
                 }
             }
@@ -182,7 +182,8 @@ var ConversationRightArea = React.createClass({
 
                     {isReadOnlyElement}
                     {membersHeader}
-                    <ParticipantsList chatRoom={room} members={room.members} />
+                    <ParticipantsList chatRoom={room} members={room.members}
+                                      isCurrentlyActive={room.isCurrentlyActive} />
 
                     <div className="buttons-block">
                         {room.type !== "group" ? startAudioCallButton : null}

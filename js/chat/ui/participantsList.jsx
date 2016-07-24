@@ -23,12 +23,8 @@ var ParticipantsList = React.createClass({
             'scrollHeight': 49*4
         };
     },
-    onUserScroll: function(
-                    ps,
-                    $elem,
-                    e
-                ) {
-        var scrollPosY = ps.getScrollPositionY();
+    onUserScroll: function() {
+        var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
         if (this.state.scrollPositionY !== scrollPosY) {
             this.setState({
                 'scrollPositionY': scrollPosY
@@ -56,8 +52,8 @@ var ParticipantsList = React.createClass({
                 $('.chat-right-head', $parentContainer).outerHeight(true)
         );
 
-        if (maxHeight < $('.buttons-block', $parentContainer).outerHeight(true)) {
-            fitHeight = Math.max(maxHeight /* margin! */, 48);
+        if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
+            fitHeight = Math.max(fitHeight /* margin! */, 48);
         }
         else if (maxHeight < fitHeight) {
             fitHeight = Math.max(maxHeight, 48);
@@ -76,6 +72,7 @@ var ParticipantsList = React.createClass({
         if (self.state.scrollHeight !== fitHeight) {
             self.setState({'scrollHeight': fitHeight});
         }
+        self.onUserScroll();
     },
     render: function() {
         var self = this;

@@ -10,7 +10,7 @@ var Dropdown = React.createClass({
     mixins: [MegaRenderMixin],
     getDefaultProps: function() {
         return {
-            requiresUpdateOnResize: true
+            requiresUpdateOnResize: true,
         };
     },
     componentWillUpdate: function(nextProps, nextState) {
@@ -44,7 +44,6 @@ var Dropdown = React.createClass({
         if (this.props.active === true) {
             if (this.getOwnerElement()) {
                 var $element = $(this.popupElement);
-                var parentDomNode = $element.closest('.button');
                 var positionToElement = $('.button.active:visible');
                 var offsetLeft = 0;
                 var $container = $element.closest('.jspPane:first');
@@ -54,6 +53,7 @@ var Dropdown = React.createClass({
                 }
 
                 $element.css('margin-left','');
+
                 $element.position({
                     of: positionToElement,
                     my: self.props.positionMy ? self.props.positionMy : "center top",

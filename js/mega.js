@@ -5990,7 +5990,13 @@ function loadfm(force)
             fminitialized = false;
             loadfm.loading = true;
             setTimeout(function __lazyLoadFM() {
-                api_req({a:'f',c:1,r:1,ca:1, v: Chatd.VERSION},{
+                api_req({
+                    a:'f',
+                    c:1,
+                    r:1,
+                    ca:1,
+                    v: Chatd.VERSION
+                }, {
                     callback: loadfm_callback,
                     progress: function(perc) {
                         loadingInitDialog.step2(parseInt(perc));

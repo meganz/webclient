@@ -538,28 +538,28 @@
 	        }
 	    };
 
-	    if (!appContainer) {
-	        $(window).rebind('hashchange.delayedChatUiInit', function () {
-	            if (typeof $.leftPaneResizable === 'undefined' || !fminitialized) {
-
-	                return;
-	            }
-	            appContainer = document.querySelector('.section.conversations');
-	            if (appContainer) {
-	                initAppUI();
-	                $(window).unbind('hashchange.delayedChatUiInit');
-	            }
-	        });
-	    } else {
-	        initAppUI();
-	    }
-
 	    if (self.is_initialized) {
 	        self.destroy().always(function () {
 	            self.init();
 	        });
 
 	        return;
+	    } else {
+	        if (!appContainer) {
+	            $(window).rebind('hashchange.delayedChatUiInit', function () {
+	                if (typeof $.leftPaneResizable === 'undefined' || !fminitialized) {
+
+	                    return;
+	                }
+	                appContainer = document.querySelector('.section.conversations');
+	                if (appContainer) {
+	                    initAppUI();
+	                    $(window).unbind('hashchange.delayedChatUiInit');
+	                }
+	            });
+	        } else {
+	            initAppUI();
+	        }
 	    }
 	    self.is_initialized = true;
 
@@ -5746,7 +5746,7 @@
 	  return element;
 	};
 
-	ReactElement.makeElement = function (type, config, children) {
+	ReactElement.createElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -5797,7 +5797,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.makeElement.bind(null, type);
+	  var factory = ReactElement.createElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -8734,7 +8734,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.makeElement(component);
+	    placeholderElement = ReactElement.createElement(component);
 	  }
 	};
 
@@ -18552,7 +18552,7 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.makeElement;
+	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
@@ -19002,7 +19002,7 @@
 	    // succeed and there will likely be errors in render.
 
 
-	    var element = ReactElement.makeElement.apply(this, arguments);
+	    var element = ReactElement.createElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -19027,7 +19027,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -19323,7 +19323,7 @@
 	        } else {
 	            var lastMsgDivClasses = "conversation-message";
 
-	            var emptyMessage = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? localStorage.megaChatPresence !== 'unavailable' ? l[7006] : "" : l[8000];
+	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? localStorage.megaChatPresence !== 'unavailable' ? l[7006] : "" : l[8000];
 
 	            lastMessageDiv = React.makeElement(
 	                "div",
@@ -19697,7 +19697,8 @@
 	                        { style: leftPanelStyles },
 	                        React.makeElement(
 	                            "div",
-	                            { className: "content-panel conversations" },
+	                            {
+	                                className: "content-panel conversations" + (window.location.hash.indexOf("/chat") !== -1 ? " active" : "") },
 	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats, megaChat: this.props.megaChat, contacts: this.props.contacts })
 	                        )
 	                    )
@@ -24226,7 +24227,7 @@
 	            var contactsList = [];
 	            var contactsListOffline = [];
 
-	            var hadLoaded = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
+	            var hadLoaded = ChatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
 
 	            if (hadLoaded) {
 	                self.props.contacts.forEach(function (contact) {
@@ -24235,9 +24236,9 @@
 	                    }
 
 	                    if (contact.c === 1) {
-	                        var pres = self.props.chatRoom.megaChat.xmppPresenceToCssClass(contact.presence);
+	                        var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
 
-	                        (pres === "offline" ? contactsListOffline : contactsList).push(React.makeElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.chatRoom.megaChat,
+	                        (pres === "offline" ? contactsListOffline : contactsList).push(React.makeElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.megaChat,
 	                            key: contact.u }));
 	                    }
 	                });

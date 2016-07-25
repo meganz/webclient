@@ -3552,7 +3552,8 @@
     "9036": "Prosim, prilepite spodaj povezavo do datoteke in kliknite na [S]&quot;Test&quot;[\/S].",
     "9037": "Test",
     "9038": "Prilepi URL datoteke",
-    "9039": "Folder links are not yet supported",
+    "9039": "Povezave na mape \u0161e niso podprte",
+    "9040": "offline",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

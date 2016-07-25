@@ -3552,7 +3552,8 @@
     "9036": "Por favor pega un enlace de archivo abajo y pulsa en [S]&quot;Probar&quot;[\/S].",
     "9037": "Probar",
     "9038": "Pegar URL de Archivo",
-    "9039": "Folder links are not yet supported",
+    "9039": "A\u00fan no hay soporte para enlaces a Carpetas",
+    "9040": "desconectado",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

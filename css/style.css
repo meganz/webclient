@@ -5561,7 +5561,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background: -o-radial-gradient(center, ellipse cover, #4c4c4c 0%, #000000 100%);
     background: -ms-radial-gradient(center, ellipse cover, #4c4c4c 0%, #000000 100%);
     background: radial-gradient(ellipse at center, #4c4c4c 0%, #000000 100%);
-    z-index: 1300;
+    z-index: 1110;
     position: absolute;
     top: 0;
     left: 0;

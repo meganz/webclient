@@ -5572,7 +5572,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .light-overlay {
     background-color: rgba(255,255,255,1);
-    z-index: 1300;
+    z-index: 1100;
     position: absolute;
     top: 48px;
     left: 0;
@@ -10201,7 +10201,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    z-index: 500;
+    z-index: 1110;
     padding: 4px 0;
     min-height: 40px;
     top: 48px;

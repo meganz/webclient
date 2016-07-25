@@ -252,25 +252,43 @@ function MegaData()
         this.sortBy(this.sortfn, d);
     };
 
-    this.sortByName = function(d)
-    {
+    this.getSortByNameFn = function() {
+        var sortfn;
+
         if (typeof Intl !== 'undefined' && Intl.Collator) {
             var intl = new Intl.Collator('co', { numeric: true });
 
-            this.sortfn = function(a, b, d) {
-                return intl.compare(a.name, b.name) * d;
+            sortfn = function(a, b, d) {
+                
+                // a.m part is related to contacts only. In case that user doesn't
+                // have defined first or last name then email address will be used
+                // for comparasion. Files and folders doesn't have .m field but
+                // it's not possible to rename them to null i.e. '', => no side effects.
+                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m;
+                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m;
+
+                return intl.compare(itemA, itemB) * d;
             };
         }
-        else
-        {
-            this.sortfn = function(a,b,d)
-            {
-                if (typeof a.name == 'string' && typeof b.name == 'string')
-                    return a.name.localeCompare(b.name) * d;
-                else
-                    return -1;
+        else {
+            sortfn = function(a, b, d) {
+
+                // a.m part is related to contacts only. In case that user doesn't
+                // have defined first or last name then email address will be used
+                // for comparasion. Files and folders doesn't have .m field but
+                // it's not possible to rename them to null i.e. '' => no side effects.
+                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m;
+                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m;
+
+                return itemA.localeCompare(itemB) * d;
             };
         }
+
+        return sortfn;
+    };
+
+    this.sortByName = function(d) {
+        this.sortfn = this.getSortByNameFn();
         this.sortd = d;
         this.sort();
     };
@@ -283,23 +301,39 @@ function MegaData()
         this.sort();
     };
 
-    this.sortByDateTime = function(d)
-    {
-        this.sortfn = function(a, b, d)
-        {
-            if (a.ts < b.ts)
-                return -1 * d;
-            else
-                return 1 * d;
-        }
+    this.sortByDateTime = function(d) {
+        this.sortfn = this.getSortByDateTimeFn();
         this.sortd = d;
         this.sort();
     };
 
-    this.sortByFav = function(d)
-    {
-        this.sortfn = function(a, b, d)
-        {
+    this.getSortByDateTimeFn = function() {
+
+        var sortfn;
+
+        sortfn = function(a, b, d) {
+            if (a.ts < b.ts) {
+                return -1 * d;
+            }
+            else {
+                return 1 * d;
+            }
+        };
+
+        return sortfn;
+    };
+
+    this.sortByFav = function(d) {
+        this.sortfn = this.getSortByFavFn();
+        this.sortd = d;
+        this.sort();
+    };
+
+    this.getSortByFavFn = function() {
+
+        var sortfn;
+
+        sortfn = function(a, b, d) {
             if (a.fav) {
                 return -1 * d;
             }
@@ -309,9 +343,9 @@ function MegaData()
             }
 
             return 0;
-        }
-        this.sortd = d;
-        this.sort();
+        };
+
+        return sortfn;
     };
 
     this.sortBySize = function(d)
@@ -384,32 +418,53 @@ function MegaData()
             return 4;
     };
 
-    this.sortByStatus = function(d)
-    {
-        this.sortfn = function(a, b, d)
-        {
+    this.getSortByStatusFn = function(d) {
+
+        var sortfn;
+        
+        sortfn = function(a, b, d) {
             var statusa = M.getSortStatus(a.u), statusb = M.getSortStatus(b.u);
-            if (statusa < statusb)
+            if (statusa < statusb) {
                 return -1 * d;
-            else if (statusa > statusb)
+            }
+            else if (statusa > statusb) {
                 return 1 * d;
-            else if (typeof a.name == 'string' && typeof b.name == 'string')
+            }
+            else if ((typeof a.name === 'string') && (typeof b.name === 'string')) {
                 return a.name.localeCompare(b.name) * d;
-            else
+            }
+            else {
                 return 0;
-        }
+            }
+        };
+
+        return sortfn;
+    };
+
+    this.sortByStatus = function(d) {
+        this.sortfn = this.getSortByStatusFn(d);
         this.sortd = d;
         this.sort();
     };
 
-    this.sortByInteraction = function(d)
-    {
-        this.sortfn = mega.utils.sortObjFn(
+    this.getSortByInteractionFn = function() {
+
+        var sortfn;
+        
+        sortfn = mega.utils.sortObjFn(
             function(r) {
-                // Since the M.sort is using a COPY of the data, we need an up-to-date .ts value directly from M.u[...]
+
+                // Since the M.sort is using a COPY of the data,
+                // we need an up-to-date .ts value directly from M.u[...]
                 return M.u[r.h].ts;
             }, d
         );
+
+        return sortfn;
+    };
+
+    this.sortByInteraction = function(d) {
+        this.sortfn = this.getSortByInteractionFn();
         this.sortd = d;
         this.sort();
     };
@@ -426,7 +481,7 @@ function MegaData()
         'interaction': this.sortByInteraction.bind(this),
         'access': this.sortByAccess.bind(this),
         'status': this.sortByStatus.bind(this),
-        'fav': this.sortByFav.bind(this),
+        'fav': this.sortByFav.bind(this)
     };
 
     this.setLastColumn = function(col) {
@@ -470,7 +525,6 @@ function MegaData()
         else {
             $('.arrow.' + n).addClass('asc');
         }
-
 
         if (!M.sortRules[n]) {
             throw new Error("Cannot sort by " + n);
@@ -1430,18 +1484,17 @@ function MegaData()
         $(document).trigger('MegaOpenFolder');
     };
 
-    function sortContactByName(a, b) {
-        return parseInt(a.m.localeCompare(b.m));
-    }
-
+    // Contacts left panel handling
     this.contacts = function() {
 
-        var contacts = [];
         var i;
+        var activeContacts = [];
 
         for (i in M.c['contacts']) {
-            if (M.d.hasOwnProperty(i)) {
-                contacts.push(M.d[i]);
+
+            // Filter out contacts without full relationship
+            if (M.d.hasOwnProperty(i) && (M.d[i].c === 1)) {
+                activeContacts.push(M.d[i]);
             }
         }
 
@@ -1449,62 +1502,52 @@ function MegaData()
             this.i_cache = {};
         }
 
-        treePanelSortElements('contacts', contacts, {
-            'last-interaction': function(a, b) {
+        var sortBy = $.sortTreePanel['contacts'].by;
+        var sortFn;
 
-                var cs = M.contactstatus(a.u, true);
+        if (sortBy === 'last-interaction') {
+            sortFn = this.getSortByInteractionFn();
+        }
+        else if (sortBy === 'name') {
+            sortFn = this.getSortByNameFn();
+        }
+        else if (sortBy === 'status') {
+            sortFn = this.getSortByStatusFn();
+        }
+        else if (sortBy === 'created') {
+            sortFn = this.getSortByDateTimeFn();
+        }
+        else if (sortBy === 'fav') {
+            sortFn = this.getSortByFavFn();
+        }
 
-                if (cs.ts === 0) {
-                    cs.ts = -1;
-                }
-
-                M.i_cache[a.u] = cs.ts;
-                cs = M.contactstatus(b.u, true);
-
-                if (cs.ts === 0) {
-                    cs.ts = -1;
-                }
-
-                M.i_cache[b.u] = cs.ts;
-
-                return M.i_cache[a.u] - M.i_cache[b.u]
-            },
-            name: sortContactByName,
-            status: function(a, b) {
-                return M.getSortStatus(a.u) - M.getSortStatus(b.u);
+        var sortDirection = $.sortTreePanel['contacts'].dir;
+        activeContacts.sort(
+            function(a, b) {
+                return sortFn(a, b, sortDirection);
             }
-        }, sortContactByName);
+        );
 
         var html = '';
         var onlinestatus;
 
         // status can be: "online"/"away"/"busy"/"offline"
-        for (i in contacts) {
-            if (contacts.hasOwnProperty(i)) {
-
-                // only full contacts
-                if (contacts[i].c !== 1) {
-                    continue;
-                }
-
+        for (i in activeContacts) {
+            if (activeContacts.hasOwnProperty(i)) {
                 if (megaChatIsReady) {
-                    var jId = megaChat.getJidFromNodeId(contacts[i].u);
+                    var jId = megaChat.getJidFromNodeId(activeContacts[i].u);
                     onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(jId));
                 }
                 else {
                     onlinestatus = [l[5926], 'offline'];
                 }
 
-                if (!treesearch || (
-                        treesearch
-                        && contacts[i].name
-                        && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1
-                        )
-                    ) {
-                    var name = contacts[i].name && $.trim(contacts[i].name) || contacts[i].m;
+                var name = M.getNameByHandle(activeContacts[i].u).toLowerCase() || activeContacts[i].m;
+
+                if (!treesearch || (treesearch && name.indexOftreesearch.toLowerCase()) > -1) {
 
                     html += '<div class="nw-contact-item ui-droppable '
-                    + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
+                    + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
                     + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
@@ -1552,16 +1595,16 @@ function MegaData()
                         .removeData("triggeredBy");
                 }
 
+                $.selected = [$this.parent().parent().attr('id').replace('contact_', '')];
+
                 return false; // stop propagation!
             });
 
             $('.fm-start-chat-dropdown .context-menu-item.startchat-item').rebind('click.treePanel', function() {
                 var $this = $(this);
-                var $triggeredBy = $this.parent().data("triggeredBy");
-                var $userDiv = $triggeredBy.parent().parent();
 
                 if (!$this.is(".disabled")) {
-                    var user_handle = $userDiv.attr('id').replace("contact_", "");
+                    var user_handle = $.selected && $.selected[0];
                     window.location = "#fm/chat/" + user_handle;
                 }
             });
@@ -1677,11 +1720,6 @@ function MegaData()
 
         var share = new mega.Share({});
 
-        if (!n) {
-            console.error('Invalid node passed to M.buildtree');
-            return;
-        }
-
         /*
          * XXX: Initially this function was designed to render new nodes only,
          * but due to a bug the entire tree was being rendered/created from
@@ -1758,23 +1796,13 @@ function MegaData()
                 }
             }
 
-            // localCompare >=IE10, FF and Chrome OK
-            // sort by name is default in the tree
-            var treePanelSortOptions = {
-                name: function(a, b) {
-                    if (a.name) {
-                        return a.name.localeCompare(b.name);
-                    }
+            var sortFn = this.getSortByNameFn();
+            var sortDirection = $.sortTreePanel[prefix].dir;
+            folders.sort(
+                function(a, b) {
+                    return sortFn(a, b, sortDirection);
                 }
-            };
-            if (typeof Intl !== 'undefined' && Intl.Collator) {
-                var intl = new Intl.Collator('co', { numeric: true });
-
-                treePanelSortOptions.name = function(a, b) {
-                    return intl.compare(a.name, b.name);
-                };
-            }
-            treePanelSortElements(prefix, folders, treePanelSortOptions);
+            );
 
             // In case of copy and move dialogs
             if (typeof dialog !== 'undefined') {
@@ -5271,8 +5299,7 @@ function fm_matchname(p, name)
 
 var t;
 
-function renderfm()
-{
+function renderfm() {
     if (d) {
         console.time('renderfm');
     }
@@ -5283,8 +5310,7 @@ function renderfm()
     M.renderTree();
     M.renderPath();
     var c = $('#treesub_' + M.RootID).attr('class');
-    if (c && c.indexOf('opened') < 0)
-    {
+    if (c && c.indexOf('opened') < 0) {
         $('.fm-tree-header.cloud-drive-item').addClass('opened');
         $('#treesub_' + M.RootID).addClass('opened');
     }
@@ -5294,8 +5320,9 @@ function renderfm()
         megaChat.renderMyStatus();
     }
 
-    if (d)
+    if (d) {
         console.timeEnd('renderfm');
+    }
 }
 
 function renderNew() {

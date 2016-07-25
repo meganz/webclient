@@ -5581,6 +5581,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     height: -webkit-calc(100% -48px);
     height: -moz-calc(100% - 48px);
     height: calc(100% - 48px);
+    display: none;
 }
 .light-overlay.transparent {
     height: 100%;

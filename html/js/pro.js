@@ -1991,7 +1991,7 @@ var directReseller = {
         }
         // BWM Mediasoft
         else if (provider === 2) {
-            window.location = 'http://mega.bwm-mediasoft.com/mega.php5?' + params;
+            window.location = 'https://mega.bwm-mediasoft.com/mega.php5?' + params;
         }
     }
 };

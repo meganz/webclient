@@ -14214,5 +14214,9 @@
     "9039": {
         "text": "Folder links are not yet supported",
         "context": "Small text to make clear the Network Diagnostic tools do not support folder links at the moment."
+    },
+    "9040": {
+        "text": "offline",
+        "context": "This is used on the Contacts page to indicate the user's status is currently offline."
     }
 }

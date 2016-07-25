@@ -572,7 +572,7 @@ var strongvelope = {};
                 return false;
             }
 
-            var identity = payload.substr(0, MESSAGE_IDENTITY_SIZE);
+            var identity = asmCrypto.bytes_to_string(payload.substr(0, MESSAGE_IDENTITY_SIZE));
             var refidlen = ns.unpack16le(payload.substr(MESSAGE_IDENTITY_SIZE, MESSAGE_REFERENCE_SIZE));
             var refidstr = payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE, refidlen);
             var refids = [];

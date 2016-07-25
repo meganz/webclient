@@ -3492,9 +3492,7 @@ mega.utils.reload = function megaUtilsReload() {
         var u_sid = u_storage.sid,
             u_key = u_storage.k,
             privk = u_storage.privk,
-            // jscs:disable disallowImplicitTypeConversion
-            debug = !!u_storage.d,
-            // jscs:enable
+            debug = u_storage.d,
             apipath = debug ? localStorage.apipath : undefined;
         var mcd = u_storage.testChatDisabled;
 

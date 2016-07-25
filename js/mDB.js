@@ -397,7 +397,7 @@ var mFileManagerDB = {
         ok: { key: { keyPath: "h"   }},
         u:  { key: { keyPath: "u"   }},
         f:  { key: { keyPath: "h"   }},
-        s:  { key: { keyPath: "h_u" }},
+        s:  { key: { keyPath: "h_u" }}
     },
 
     init: function mFileManagerDB_init() {

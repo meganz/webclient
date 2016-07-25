@@ -110,8 +110,6 @@ ChatdIntegration.mcfHasFinishedPromise = new MegaPromise();
 ChatdIntegration.deviceId = null;
 ChatdIntegration._queuedChats = {};
 
-ChatdIntegration.mcfHasFinishedPromise.dumpToConsole();
-
 ChatdIntegration.prototype.retrieveChatsFromApi = function() {
     var self = this;
     asyncApiReq({a: "mcf", d: 1, v: Chatd.VERSION})
@@ -126,7 +124,7 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                         return;
                     }
                     self.openChatFromApi(actionPacket, true);
-                    if (typeof mDB === 'object' && typeof mSDB === 'object' && !pfkey) {
+                    if (!pfkey) {
                         var roomInfo = {
                             'id': actionPacket.id,
                             'cs': actionPacket.cs,
@@ -356,13 +354,13 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         if (!chatRoom) {
             // don't try to open a chat, if its not yet opened and the actionPacket consist of me leaving...
             if (actionPacket.n) {
-                var foundMeLeaving = false;
-                actionPacket.n.forEach(function(userPrivChangeEntry) {
-                    if (!foundMeLeaving && userPrivChangeEntry.p === -1 && userPrivChangeEntry.u === u_handle) {
-                        foundMeLeaving = true;
+                var foundMeLeaving = actionPacket.n.some(function(userPrivChangeEntry) {
+                    if (userPrivChangeEntry.p === -1 && userPrivChangeEntry.u === u_handle) {
+                        return true;
                     }
                 });
-                if (foundMeLeaving) {
+
+                if (typeof mSDB === 'object' && foundMeLeaving) {
                     mSDB.del('mcf', actionPacket.id);
                     return;
                 }

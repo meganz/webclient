@@ -5897,11 +5897,13 @@ function execsc(actionPackets, callback) {
         }
         // Action packet for the mcc
         else if (actionPacket.a === 'mcc') {
-            if (typeof megaChat === 'object' && megaChat.is_initialized === true) {
-                $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
-            }
-            else {
-                ChatdIntegration._queuedChats[actionPacket.id] = actionPacket;
+            if (!megaChatIsDisabled) {
+                if (megaChatIsReady) {
+                    $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
+                }
+                else {
+                    ChatdIntegration._queuedChats[actionPacket.id] = actionPacket;
+                }
             }
         }
         // Action packet for 'Set Email'
@@ -5995,7 +5997,7 @@ function loadfm(force)
                     c:1,
                     r:1,
                     ca:1,
-                    v: Chatd.VERSION
+                    cv: Chatd.VERSION
                 }, {
                     callback: loadfm_callback,
                     progress: function(perc) {
@@ -7023,7 +7025,7 @@ function processMCF(mcfResponse, ignoreDB) {
                 // skip non active chats for now...
                 return;
             }
-            if (typeof mDB === 'object' && typeof mSDB === 'object' && !pfkey && !ignoreDB) {
+            if (typeof mSDB === 'object' && !pfkey && !ignoreDB) {
                 mSDB.add('mcf', clone(chatRoomInfo));
             }
 
@@ -7141,7 +7143,7 @@ function loadfm_callback(res, ctx) {
     if (res.ps) {
         processPS(res.ps);
     }
-    if (res.mcf) {
+    if (res.mcf && !megaChatIsDisabled) {
         processMCF(res.mcf.c ? res.mcf.c : res.mcf);
     }
 

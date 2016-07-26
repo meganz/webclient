@@ -124,7 +124,7 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                         return;
                     }
                     self.openChatFromApi(actionPacket, true);
-                    if (!pfkey) {
+                    if (typeof mSDB === 'object' && !pfkey) {
                         var roomInfo = {
                             'id': actionPacket.id,
                             'cs': actionPacket.cs,

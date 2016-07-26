@@ -96,9 +96,15 @@ var support = (function() {
         }
         
         $subject.find('.default-select-scroll').safeHTML(html);
-        bindDropdownEvents($subject, 1);
+        bindDropdownEvents($subject);
         $window.rebind('resize.support-textarea', resizeHandler);
         $button = $('.support a').rebind('click', submit);
+
+        if (typeof window.onsupport === "function") {
+            window.onsupport($textarea.parents('.support'));
+            window.onsupport = null;
+        }
+
         resizeHandler();
     };
 

@@ -1654,6 +1654,7 @@ else if (!b_u)
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
         'download_mobile': {f:'html/download-mobile.html', n: 'download', j: 0},
         'mobile_css': {f:'css/mobile-app-new.css', n: 'mobile_css', j:2,w:30,c:1,d:1,m:1},
+        'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
         'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},

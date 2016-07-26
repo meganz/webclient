@@ -1022,6 +1022,11 @@ function transferPanelContextMenu(target)
     // XXX: Hide context-menu's menu-up/down items for now to check if that's the
     // origin of some problems, users can still use the new d&d logic to move transfers
     menuitems.filter('.move-up,.move-down').hide();
+    
+    if (target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
+        menuitems.filter('.network-diagnostic').show();
+    }
+
 
     var parent = menuitems.parent();
     parent
@@ -2722,6 +2727,14 @@ function initContextUI() {
         selectionManager.select_all();
     });
 
+    $(c + '.network-diagnostic').rebind('click', function() {
+        var $trs = $('.transfer-table tr.ui-selected');
+        mega.utils.require('network_js')
+            .then(function() {
+                NetworkTesting.dialog($trs.attrs('id')[0].replace(/^dl_/, '#!'));
+            });
+    });
+
     $(c + '.canceltransfer-item,' + c + '.transfer-clear').rebind('click', function() {
         var $trs = $('.transfer-table tr.ui-selected');
         var toabort = $trs.attrs('id');
@@ -3021,6 +3034,13 @@ function accountUI() {
             $('.fm-account-settings').removeClass('hidden');
             sectionTitle = l[823];
             sectionClass = 'settings';
+
+            $('#network-testing-button').rebind('click', function() {
+                mega.utils.require('network_js')
+                    .then(function() {
+                        NetworkTesting.dialog();
+                    });
+            });
 
             if (is_chrome_firefox) {
                 if (!$('#acc_dls_folder').length) {

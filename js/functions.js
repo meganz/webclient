@@ -2640,6 +2640,7 @@ function bucketspeedometer(initialp) {
 
 function moveCursortoToEnd(el) {
     if (typeof el.selectionStart === "number") {
+        el.focus();
         el.selectionStart = el.selectionEnd = el.value.length;
     }
     else if (typeof el.createTextRange !== "undefined") {
@@ -4972,7 +4973,7 @@ var debounce = function(func, execAsap) {
                 func.apply(obj, args);
             }
             timeout = null;
-        };
+        }
 
         if (timeout) {
             cancelAnimationFrame(timeout);

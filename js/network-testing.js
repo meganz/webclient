@@ -166,8 +166,12 @@ var NetworkTesting = (function() {
 
                 var length = bytesToSize(this.response.byteLength);
                 window.onsupport = function onsupport($root) {
-                    $root.find('.default-dropdown-item').eq(4).trigger('click')
-                        .trigger('click');
+                    var select = $root.find('#support-subject');
+                    select.find('.active').removeClass('active')
+                        .end().find('span').text(
+                            select.find('.default-dropdown-item').eq(4).addClass('active').text()
+                        );
+
                     $root.find('textarea').val(
                         "Host: " +  hostname + "\n" +
                         "Ping time: " + ping +  "\n" +

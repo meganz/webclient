@@ -1100,7 +1100,7 @@ var strongvelope = {};
         var refids = "";
         var senderKey = this.participantKeys[this.ownHandle][keyId];
         for (var i=0;i<refs.length;i++) {
-            refids += asmCrypto.bytes_to_string(refs[i]);
+            refids += refs[i];
         }
 
         var encryptedMessage = ns._symmetricEncryptMessage(
@@ -1200,6 +1200,7 @@ var strongvelope = {};
         }
         var assembledMessage = null;
         var messageIdentity = ns.generateMessageId();
+
         // Assemble main message body.
         assembledMessage = this._assembleBody(message, this.keyId, refs, messageIdentity);
 

@@ -380,7 +380,7 @@ var ContactPickerWidget = React.createClass({
             }
 
             var selectedClass = "";
-            if (self.state.selected && self.state.selected.indexOf(v.h) !== -1) {
+            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
                 selectedClass = "selected";
             }
             contacts.push(
@@ -401,8 +401,8 @@ var ContactPickerWidget = React.createClass({
                             $(document).trigger('closeDropdowns');
 
                             var sel = self.state.selected;
-                            if (sel.indexOf(contact.h) === -1) {
-                                sel.push(contact.h);
+                            if (sel.indexOf(contact.u) === -1) {
+                                sel.push(contact.u);
                             }
 
                             if (self.props.onSelectDone) {
@@ -421,11 +421,11 @@ var ContactPickerWidget = React.createClass({
                             if (!sel) {
                                 sel = [];
                             }
-                            if (self.state.selected.indexOf(contact.h) > -1) {
-                                removeValue(sel, contact.h, false);
+                            if (self.state.selected.indexOf(contact.u) > -1) {
+                                removeValue(sel, contact.u, false);
                             }
                             else {
-                                sel.push(contact.h);
+                                sel.push(contact.u);
                             }
 
 

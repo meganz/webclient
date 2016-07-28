@@ -253,7 +253,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     }
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
-        self.logger.error("actionPacket returned no chat participants: ", chatParticipants, ", removing chat.");
+        // its ok, no participants mean inactive chat, that we woudl skip...for now...
         return false;
     }
     var chatJids = [];

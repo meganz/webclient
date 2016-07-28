@@ -19668,8 +19668,7 @@
 	                        { style: leftPanelStyles },
 	                        React.makeElement(
 	                            "div",
-	                            {
-	                                className: "content-panel conversations" + (window.location.hash.indexOf("/chat") !== -1 ? " active" : "") },
+	                            { className: "content-panel conversations" + (window.location.hash.indexOf("/chat") !== -1 ? " active" : "") },
 	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats, megaChat: this.props.megaChat, contacts: this.props.contacts })
 	                        )
 	                    )
@@ -20937,7 +20936,6 @@
 	        if (this.props.active === true) {
 	            if (this.getOwnerElement()) {
 	                var $element = $(this.popupElement);
-	                var parentDomNode = $element.closest('.button');
 	                var positionToElement = $('.button.active:visible');
 	                var offsetLeft = 0;
 	                var $container = $element.closest('.jspPane:first');
@@ -20947,6 +20945,7 @@
 	                }
 
 	                $element.css('margin-left', '');
+
 	                $element.position({
 	                    of: positionToElement,
 	                    my: self.props.positionMy ? self.props.positionMy : "center top",
@@ -21821,7 +21820,7 @@
 	            }
 
 	            var selectedClass = "";
-	            if (self.state.selected && self.state.selected.indexOf(v.h) !== -1) {
+	            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
 	                selectedClass = "selected";
 	            }
 	            contacts.push(React.makeElement(ContactCard, {
@@ -21840,8 +21839,8 @@
 	                        $(document).trigger('closeDropdowns');
 
 	                        var sel = self.state.selected;
-	                        if (sel.indexOf(contact.h) === -1) {
-	                            sel.push(contact.h);
+	                        if (sel.indexOf(contact.u) === -1) {
+	                            sel.push(contact.u);
 	                        }
 
 	                        if (self.props.onSelectDone) {
@@ -21859,10 +21858,10 @@
 	                        if (!sel) {
 	                            sel = [];
 	                        }
-	                        if (self.state.selected.indexOf(contact.h) > -1) {
-	                            removeValue(sel, contact.h, false);
+	                        if (self.state.selected.indexOf(contact.u) > -1) {
+	                            removeValue(sel, contact.u, false);
 	                        } else {
-	                            sel.push(contact.h);
+	                            sel.push(contact.u);
 	                        }
 
 	                        self.setState({ 'selected': sel });
@@ -22853,7 +22852,7 @@
 	        var foundNonMembers = 0;
 	        currentContacts.forEach(function (u, k) {
 	            if (u.c === 1) {
-	                if (participants.indexOf(k) !== -1) {
+	                if (participants.indexOf(k) === -1) {
 	                    foundNonMembers++;
 	                }
 	            }
@@ -22976,7 +22975,8 @@
 	                    { className: "chat-right-pad" },
 	                    isReadOnlyElement,
 	                    membersHeader,
-	                    React.makeElement(ParticipantsList, { chatRoom: room, members: room.members }),
+	                    React.makeElement(ParticipantsList, { chatRoom: room, members: room.members,
+	                        isCurrentlyActive: room.isCurrentlyActive }),
 	                    React.makeElement(
 	                        "div",
 	                        { className: "buttons-block" },
@@ -26226,8 +26226,8 @@
 	            'scrollHeight': 49 * 4
 	        };
 	    },
-	    onUserScroll: function onUserScroll(ps, $elem, e) {
-	        var scrollPosY = ps.getScrollPositionY();
+	    onUserScroll: function onUserScroll() {
+	        var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
 	        if (this.state.scrollPositionY !== scrollPosY) {
 	            this.setState({
 	                'scrollPositionY': scrollPosY
@@ -26252,8 +26252,8 @@
 	        var $parentContainer = $node.closest('.chat-right-pad');
 	        var maxHeight = $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) - $('.chat-right-head', $parentContainer).outerHeight(true);
 
-	        if (maxHeight < $('.buttons-block', $parentContainer).outerHeight(true)) {
-	            fitHeight = Math.max(maxHeight, 48);
+	        if (fitHeight < $('.buttons-block', $parentContainer).outerHeight(true)) {
+	            fitHeight = Math.max(fitHeight, 48);
 	        } else if (maxHeight < fitHeight) {
 	            fitHeight = Math.max(maxHeight, 48);
 	        }
@@ -26268,6 +26268,7 @@
 	        if (self.state.scrollHeight !== fitHeight) {
 	            self.setState({ 'scrollHeight': fitHeight });
 	        }
+	        self.onUserScroll();
 	    },
 	    render: function render() {
 	        var self = this;

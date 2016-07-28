@@ -3552,6 +3552,8 @@
     "9036": "Por favor, cole um link de arquivo abaixo e clique em [S]&quot;Teste&quot;[\/S].",
     "9037": "Teste",
     "9038": "URL da pasta",
+    "9039": "links de pastas ainda n\u00e3o s\u00e3o suportados",
+    "9040": "offline",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

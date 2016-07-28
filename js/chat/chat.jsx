@@ -776,8 +776,6 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
 
     // ignore empty messages (except attachments)
     if (eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
-        self.logger.debug("Empty message, MegaChat will not process it: ", eventObject);
-
         return;
     }
     else {

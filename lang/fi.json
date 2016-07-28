@@ -3552,6 +3552,8 @@
     "9036": "Ole hyv\u00e4 ja liit\u00e4 tiedostolinkki alle ja klikkaa [S]&quot;Testaa&quot;[\/S].",
     "9037": "Testaa",
     "9038": "Liit\u00e4 tiedoston URL",
+    "9039": "Kansiolinkkej\u00e4 ei viel\u00e4 tueta",
+    "9040": "offline",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

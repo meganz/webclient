@@ -966,8 +966,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             if (hist.length > 0) {
                 var decryptMessages = function() {
                     try {
-                        // .seed result is not used in here, since it returns false, even when some messages can be decrypted
-                        // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
+                        // .seed result is not used in here, since it returns false, even when some messages can be
+                        // decrypted which in the current case (of tons of cached non encrypted txt msgs in chatd) is
+                        // bad
                         chatRoom.protocolHandler.seed(hist);
                         var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
                         for (var i = decryptedMsgs.length-1; i >= 0; i--) {
@@ -993,12 +994,14 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     }
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                                    chatRoom.messagesBuff.messages[messageId].meta = {
-                                        userId: v.sender,
-                                        included: v.includeParticipants,
-                                        excluded: v.excludeParticipants
-                                    };
-                                    chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
+                                    if (chatRoom.messagesBuff.messages[messageId]) {
+                                        chatRoom.messagesBuff.messages[messageId].meta = {
+                                            userId: v.sender,
+                                            included: v.includeParticipants,
+                                            excluded: v.excludeParticipants
+                                        };
+                                        chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
+                                    }
                                 }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                                     chatRoom.messagesBuff.messages[messageId].dialogType = 'truncated';

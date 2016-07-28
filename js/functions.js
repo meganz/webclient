@@ -2640,6 +2640,7 @@ function bucketspeedometer(initialp) {
 
 function moveCursortoToEnd(el) {
     if (typeof el.selectionStart === "number") {
+        el.focus();
         el.selectionStart = el.selectionEnd = el.value.length;
     }
     else if (typeof el.createTextRange !== "undefined") {
@@ -4809,7 +4810,7 @@ function getProPlan(planNum) {
  *                   'displayName' which is the translated name for that provider (however
  *                   company names are not translated).
  */
-function getGatewayName(gatewayId) {
+function getGatewayName(gatewayId, gatewayOpt) {
 
     var gateways = {
         0: {
@@ -4874,13 +4875,31 @@ function getGatewayName(gatewayId) {
         },
         15: {
             name: 'directreseller',
-            displayName: l[6952] + ' (6media)'
+            displayName: l[6952]
         },
         999: {
             name: 'wiretransfer',
             displayName: l[6198]    // Wire transfer
         }
     };
+
+    // If the gateway option information was provided we can improve the default naming in some cases
+    if (typeof gatewayOpt !== 'undefined') {
+        if (typeof gateways[gatewayId] !== 'undefined') {
+            // Subgateways should always take their subgateway name from the API if provided
+            gateways[gatewayId].name =
+                (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gateways[gatewayId].name;
+
+            // Direct reseller still requires the translation from above to be in its name
+            if (gatewayId === 15) {
+                gateways[gatewayId].displayName = gateways[gatewayId].displayName + " " + gatewayOpt.displayName;
+            }
+            else {
+                gateways[gatewayId].displayName =
+                    (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gateways[gatewayId].displayName;
+            }
+        }
+    }
 
     // If the gateway exists, return it
     if (typeof gateways[gatewayId] !== 'undefined') {
@@ -4959,7 +4978,7 @@ var debounce = function(func, execAsap) {
                 func.apply(obj, args);
             }
             timeout = null;
-        };
+        }
 
         if (timeout) {
             cancelAnimationFrame(timeout);

@@ -2,6 +2,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../ui/utils.jsx');
+var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
 var ButtonsUI = require('./../../ui/buttons.jsx');
@@ -212,43 +213,6 @@ var ConversationsList = React.createClass({
             this.conversationClicked(activeCallSession.room, e);
         }
     },
-    handleWindowResize: function() {
-
-        if (!M.chat) {
-            // don't resize if the UI is not visible...the onresize fake event, triggered by the webclient, would
-            // always call/trigger this when the hash changes (e.g. the chat is opened), so it would do the JSP reinit
-            // when shown..no need to do it when Conversations is in background/not active.
-            return;
-        }
-
-        var contentPanelConversations = document.querySelector('.content-panel.conversations');
-        if (
-            !contentPanelConversations ||
-            !contentPanelConversations.parentNode ||
-            !contentPanelConversations.parentNode.parentNode ||
-            !contentPanelConversations.parentNode.parentNode.parentNode
-        ) {
-            // UI element is being destroyed, e.g. on log out.
-            return;
-        }
-        var $container = $(contentPanelConversations.parentNode.parentNode.parentNode);
-        var $jsp = $container.data('jsp');
-
-
-        if ($jsp) {
-            $jsp.reinitialise();
-        }
-    },
-    componentDidMount: function() {
-        window.addEventListener('resize', this.handleWindowResize);
-        this.handleWindowResize();
-    },
-    componentWillUnmount: function() {
-        window.removeEventListener('resize', this.handleWindowResize);
-    },
-    componentDidUpdate: function() {
-        this.handleWindowResize();
-    },
     render: function() {
         var self = this;
 
@@ -375,7 +339,7 @@ var ConversationsApp = React.createClass({
                     return;
                 }
 
-                var $typeArea = $('.messages-textarea:visible');
+                var $typeArea = $('.messages-textarea:visible:first');
                 moveCursortoToEnd($typeArea);
                 e.megaChatHandled = true;
                 $typeArea.triggerHandler(e);
@@ -386,7 +350,7 @@ var ConversationsApp = React.createClass({
             }
         });
 
-        $(document).rebind('click.megaChatTextAreaFocus', function(e) {
+        $(document).rebind('mouseup.megaChatTextAreaFocus', function(e) {
             // prevent recursion!
             if (e.megaChatHandled) {
                 return;
@@ -408,11 +372,12 @@ var ConversationsApp = React.createClass({
                     return;
                 }
 
-                var $typeArea = $('.messages-textarea:visible');
-                $typeArea.focus();
-                e.megaChatHandled = true;
-                moveCursortoToEnd($typeArea);
-                return false;
+                var $typeArea = $('.messages-textarea:visible:first');
+                if ($typeArea.size() === 1 && !$typeArea.is(":focus")) {
+                    $typeArea.focus();
+                    e.megaChatHandled = true;
+                    moveCursortoToEnd($typeArea[0]);
+                }
 
             }
         });
@@ -531,16 +496,15 @@ var ConversationsApp = React.createClass({
 
 
                     <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
-                        <utils.JScrollPane  style={leftPanelStyles}>
-                            <div
-                                className={
-                                    "content-panel conversations" + (
-                                        window.location.hash.indexOf("/chat") !== -1 ? " active" : ""
-                                    )
-                                }>
+                        <PerfectScrollbar style={leftPanelStyles}>
+                            <div className={
+                                "content-panel conversations" + (
+                                    window.location.hash.indexOf("/chat") !== -1 ? " active" : ""
+                                )
+                            }>
                                 <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
                             </div>
-                        </utils.JScrollPane>
+                        </PerfectScrollbar>
                     </div>
                 </div>
                 <div className="fm-right-files-block">

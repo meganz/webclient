@@ -3552,6 +3552,8 @@
     "9036": "Klistra in en fil l\u00e4nk nedan och klicka p\u00e5 [S] &quot;Test&quot; [\/S].",
     "9037": "Test",
     "9038": "Klistra in filens URL",
+    "9039": "Mapp l\u00e4nkning st\u00f6ds ej \u00e4nnu",
+    "9040": "offline",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

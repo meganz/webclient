@@ -60,25 +60,35 @@ var Button = React.createClass({
 
         return React.Children.map(this.props.children, function (child) {
             return React.cloneElement(child, {
-                active: this.state.focused,
+                active: self.state.focused,
                 closeDropdown: function() {
                     self.setState({'focused': false});
                 },
                 onActiveChange: function(newVal) {
                     var $element = $(self.findDOMNode());
-                    var $scrollables = $element.parents('.jScrollPaneContainer');
-                    if (newVal === true) {
-                        $scrollables.attr('data-scroll-disabled', true);
-                    }
-                    else {
-                        $scrollables.removeAttr('data-scroll-disabled');
+                    var $scrollables = $element.parents('.jScrollPaneContainer, .perfectScrollbarContainer');
+                    if ($scrollables.size() > 0) {
+                        if (newVal === true) {
+                            // disable scrolling
+                            $scrollables.attr('data-scroll-disabled', true);
+                            $scrollables.filter('.perfectScrollbarContainer').each(function(k, element) {
+                                Ps.disable(element);
+                            });
+                        }
+                        else {
+                            // enable back scrolling
+                            $scrollables.removeAttr('data-scroll-disabled');
+                            $scrollables.filter('.perfectScrollbarContainer').each(function(k, element) {
+                                Ps.enable(element);
+                            });
+                        }
                     }
                     if (child.props.onActiveChange) {
                         child.props.onActiveChange.call(this, newVal);
                     }
                 }
             });
-        }.bind(this))
+        }.bind(this));
     },
     onBlur: function(e) {
         if (!this.isMounted()) {
@@ -95,6 +105,7 @@ var Button = React.createClass({
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 
             $(window).unbind('hashchange.button' + this.getUniqueId());
+            this.forceUpdate();
         }
 
 

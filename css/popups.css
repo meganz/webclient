@@ -162,5 +162,6 @@ color: #cccccc;
 }
 .popup-scroll-content.emoji-one {
     padding: 12px;
+    min-height: 312px;
 }
 /* End of Emoji one popup */

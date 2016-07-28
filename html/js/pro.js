@@ -1123,7 +1123,7 @@ var proPage = {
             $gateway.find('input').attr('id', gatewayName);
             $gateway.find('input').val(gatewayName);
             $gateway.find('.provider-icon').addClass(gatewayName);
-            $gateway.find('.provider-name').safeHTML(displayName);
+            $gateway.find('.provider-name').text(displayName).attr('title', htmlentities(displayName));
 
             // Build the html
             gatewayHtml += $gateway.prop('outerHTML');
@@ -1991,7 +1991,7 @@ var directReseller = {
         }
         // BWM Mediasoft
         else if (provider === 2) {
-            window.location = 'http://mega.bwm-mediasoft.com/mega.php5?' + params;
+            window.location = 'https://mega.bwm-mediasoft.com/mega.php5?' + params;
         }
     }
 };

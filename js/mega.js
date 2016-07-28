@@ -2125,11 +2125,11 @@ function MegaData()
         var name, hasnext = '', typeclass,
             html = '<div class="clear"></div>',
             a2 = this.getPath(this.currentdirid),
-            contactBreadcrumb = '<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">\n\
-                                    <span class="right-arrow-bg">\n\
-                                        <span>' + l[950] + ' </span>\n\
-                                    </span>\n\
-                                </a>';
+            contactBreadcrumb = '<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
+                                    + '<span class="right-arrow-bg">'
+                                        + '<span>' + l[950] + ' </span>'
+                                    + '</span>'
+                                + '</a>';
 
         if (a2.length > 2 && a2[a2.length - 2].length === 11) {
             delete a2[a2.length - 2];
@@ -2182,36 +2182,37 @@ function MegaData()
                     typeclass = 'folder';
                 }
             }
-            html = '<a class="fm-breadcrumbs ' + typeclass + ' ' + hasnext + ' ui-droppable" id="path_' + htmlentities(a2[i]) + '">\n\
-                        <span class="right-arrow-bg ui-draggable">\n\
-                            <span>' + name + '</span>\n\
-                        </span>\n\
-                    </a>' + html;
+            html = '<a class="fm-breadcrumbs ' + typeclass + ' ' + hasnext
+                    + ' ui-droppable" id="path_' + htmlentities(a2[i]) + '">'
+                        + '<span class="right-arrow-bg ui-draggable">'
+                            + '<span>' + name + '</span>'
+                        + '</span>'
+                    + '</a>' + html;
             hasnext = 'has-next-button';
         }
 
         if (this.currentdirid && this.currentdirid.substr(0, 5) === 'chat/') {
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
-            $('.fm-breadcrumbs-block').html('\
-                                            <a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">\n\
-                                                <span class="right-arrow-bg">\n\
-                                                    <span>Contacts</span>\n\
-                                                </span>\n\
-                                            </a>\n\
-                                            <a class="fm-breadcrumbs chat" id="path_' + htmlentities(M.currentdirid.replace("chat/", "")) + '">\n\
-                                                <span class="right-arrow-bg">\n\
-                                                    <span>' + htmlentities(contactName) + '</span>\n\
-                                                </span>\n\
-                                            </a>');
+            $('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
+                                                + '<span class="right-arrow-bg">'
+                                                    + '<span>Contacts</span>'
+                                                + '</span></a>'
+                                            + '<a class="fm-breadcrumbs chat" id="path_'
+                                            + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
+                                                + '<span class="right-arrow-bg">'
+                                                    + '<span>' + htmlentities(contactName) + '</span>'
+                                                + '</span>'
+                                            + '</a>');
             $('.search-files-result').addClass('hidden');
         }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            $('.fm-breadcrumbs-block').html('\
-                                            <a class="fm-breadcrumbs search ui-droppable" id="' + htmlentities(a[i]) + '">\n\
-                                                <span class="right-arrow-bg ui-draggable">\n\
-                                                    <span>' + htmlentities(this.currentdirid.replace('search/', '')) + '</span>\n\
-                                                </span>\n\
-                                            </a>');
+            $('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs search ui-droppable" id="'
+                                            + htmlentities(a[i]) + '">'
+                                                + '<span class="right-arrow-bg ui-draggable">'
+                                                    + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
+                                                    + '</span>'
+                                                + '</span>'
+                                            + '</a>');
             $('.search-files-result .search-number').text(M.v.length);
             $('.search-files-result').removeClass('hidden');
             $('.search-files-result').addClass('last-button');
@@ -2244,8 +2245,9 @@ function MegaData()
         }
 
         var el = $('.fm-breadcrumbs-block:visible .right-arrow-bg');
-        var i = 0, j = 0;
-        var headerWidth = $('.fm-right-header:visible').outerWidth();
+        var i = 0;
+        var j = 0;
+        headerWidth = $('.fm-right-header:visible').outerWidth();
 
         while (M.pathLength() > headerWidth) {
             if (i < el.length - 1) {

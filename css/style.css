@@ -25477,3 +25477,27 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     right: 0;
     top: 0;
 }
+.perfectScrollbarContainer {
+    position: relative;
+}
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail,
+    .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail {
+    background-color: transparent !important;
+    opacity: 1;
+}
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+    background-color: rgb(102, 102, 102) !important;
+    width: 6px;
+    opacity: 0.2;
+    -webkit-transition: opacity 100ms ease-in-out;
+    -moz-transition: opacity 100ms ease-in-out;
+    -o-transition: opacity 100ms ease-in-out;
+    -ms-transition: opacity 100ms ease-in-out;
+    transition: opacity 100ms ease-in-out;
+    cursor: pointer;
+
+}
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+    opacity: 0.5 !important;
+    background-color: rgb(102, 102, 102) !important;
+}

@@ -6,6 +6,11 @@ var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 
 var Handler = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps() {
+        return {
+            'hideable': true
+        }
+    },
     render () {
         var classes = "tooltip-handler" + (this.props.className ? " " + this.props.className : "");
         return <span className={classes} onMouseOver={this.props.onMouseOver} onMouseOut={this.props.onMouseOut}>
@@ -16,6 +21,11 @@ var Handler = React.createClass({
 
 var Contents = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps() {
+        return {
+            'hideable': true
+        }
+    },
     render() {
         var className = 'tooltip-contents dropdown body tooltip ' + (this.props.className ? this.props.className : "");
 
@@ -42,6 +52,11 @@ var Tooltip = React.createClass({
         return {
             'active': false
         };
+    },
+    getDefaultProps() {
+        return {
+            'hideable': true
+        }
     },
     componentDidUpdate(oldProps, oldState) {
         var self = this;

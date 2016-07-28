@@ -1475,6 +1475,7 @@ else if (!b_u)
         // Other
         jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
         jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
+        jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
 
         // Google Import Contacts
         jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
@@ -1598,6 +1599,7 @@ else if (!b_u)
         jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});

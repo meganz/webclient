@@ -8,17 +8,12 @@ var ConversationMessageMixin = {
     onAfterRenderWasTriggered: false,
     componentWillMount: function() {
         var self = this;
-        var chatRoom = self.props.chatRoom;
+        var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
-        megaChat.chats.addChangeListener(function() {
-            if (self.isMounted()) {
-                self.forceUpdate();
-            }
-        });
     },
     getContact: function() {
         var message = this.props.message;
-        var megaChat = this.props.chatRoom.megaChat;
+        var megaChat = this.props.message.chatRoom.megaChat;
 
         var contact;
         if (message.authorContact) {
@@ -77,7 +72,7 @@ var ConversationMessageMixin = {
     },
     componentDidUpdate: function() {
         var self = this;
-        var chatRoom = self.props.chatRoom;
+        var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
 
         if (!self.onAfterRenderWasTriggered) {

@@ -360,8 +360,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     }
                 });
 
-                if (typeof mSDB === 'object' && foundMeLeaving) {
-                    mSDB.del('mcf', actionPacket.id);
+                if (foundMeLeaving) {
+                    if (typeof mSDB === 'object') {
+                        mSDB.del('mcf', actionPacket.id);
+                    }
                     return;
                 }
             }

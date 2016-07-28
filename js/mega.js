@@ -5992,13 +5992,16 @@ function loadfm(force)
             fminitialized = false;
             loadfm.loading = true;
             setTimeout(function __lazyLoadFM() {
-                api_req({
+                var req_params = {
                     a:'f',
                     c:1,
                     r:1,
-                    ca:1,
-                    cv: Chatd.VERSION
-                }, {
+                    ca:1
+                };
+                if (!megaChatIsDisabled && typeof Chatd !== 'undefined') {
+                    req_params['cv'] = Chatd.VERSION;
+                }
+                api_req(req_params, {
                     callback: loadfm_callback,
                     progress: function(perc) {
                         loadingInitDialog.step2(parseInt(perc));
@@ -7010,6 +7013,11 @@ function process_ok(ok, ignoreDB)
 }
 
 function processMCF(mcfResponse, ignoreDB) {
+    if (megaChatIsDisabled) {
+        console.error('chat is disabled!');
+        return;
+    }
+
     if (mcfResponse === EEXPIRED) {
         ChatdIntegration.requiresUpdate = true;
         return;

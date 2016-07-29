@@ -532,7 +532,7 @@ var strongvelope = {};
     strongvelope.pack32le = function(x) {
         var r = '';
 
-        for (var i = 4; i--; ) {
+        for (var i = 4; i--;) {
             r += String.fromCharCode(x & 255);
             x >>>= 8;
         }

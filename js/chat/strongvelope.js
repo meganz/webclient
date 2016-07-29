@@ -521,6 +521,26 @@ var strongvelope = {};
     };
 
     /**
+     * Utility functions to pack a 32bit number in little endian.
+     *
+     * @method
+     * @param x {Number}
+     *     Number to pack
+     * @returns {String}
+     *     Byte array of the number packed in little endian.
+     */
+    strongvelope.pack32le = function(x) {
+        var r = '';
+
+        for (var i = 4; i--; ) {
+            r += String.fromCharCode(x & 255);
+            x >>>= 8;
+        }
+
+        return r;
+    };
+
+    /**
      * Utility functions to check the key id is a temporary key id.
      *
      * @method
@@ -544,7 +564,7 @@ var strongvelope = {};
     strongvelope.generateMessageId = function() {
 
         var timestamp = Math.floor(new Date().getTime()/1000);
-        var timestr = a32_to_str([(timestamp << 8)]).substr(0, MESSAGE_IDENTITY_TIMESTAMP_SIZE);
+        var timestr = ns.pack32le(timestamp).substr(0, MESSAGE_IDENTITY_TIMESTAMP_SIZE);
 
         var randomnum = new Uint8Array(MESSAGE_IDENTITY_RANDOMNESS_SIZE);
         asmCrypto.getRandomValues(randomnum);

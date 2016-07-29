@@ -3493,7 +3493,8 @@ mega.utils.reload = function megaUtilsReload() {
         var u_sid = u_storage.sid,
             u_key = u_storage.k,
             privk = u_storage.privk,
-            debug = !!u_storage.d;
+            debug = u_storage.d,
+            apipath = debug ? localStorage.apipath : undefined;
         var mcd = u_storage.testChatDisabled;
 
         localStorage.clear();
@@ -3515,6 +3516,10 @@ mega.utils.reload = function megaUtilsReload() {
                 if (mcd) {
                     u_storage.testChatDisabled = 1;
                 }
+            }
+            if (apipath) {
+                // restore api path across reloads, only for debugging purposes...
+                localStorage.apipath = apipath;
             }
         }
 

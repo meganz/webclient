@@ -123,7 +123,7 @@ function crypto_processkey(me, master_aes, file, OUT) {
                 if (d) {
                     console.log("Received invalid key length (" + k.length + "): " + file.h);
                 }
-                return;
+                k = null;
             }
         }
         else {
@@ -138,21 +138,18 @@ function crypto_processkey(me, master_aes, file, OUT) {
                         if (d) {
                             console.log("Corrupt key for node " + file.h);
                         }
-                        return;
                     }
                 }
                 catch (e) {
                     if (d) {
                         console.log('u_privk error: ' + e);
                     }
-                    return;
                 }
             }
             else {
                 if (d) {
                     console.log("Received RSA key, but have no public key published: " + file.h);
                 }
-                return;
             }
         }
 
@@ -160,12 +157,12 @@ function crypto_processkey(me, master_aes, file, OUT) {
             console.log('Missing attribute for node "%s"', file.h, file);
         }
 
-        var ab = file.a && base64_to_ab(file.a);
+        var ab = k && file.a && base64_to_ab(file.a);
         var o = ab && dec_attr(ab, k);
 
         // if (d) console.log('dec_attr', file.h, key,ab,k, o && o.n, o);
 
-        if (typeof o === 'object') {
+        if (o && typeof o === 'object') {
             if (typeof o.n === 'string') {
                 if (file.h) {
                     // u_nodekeys[file.h] = k;

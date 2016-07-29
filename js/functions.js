@@ -562,6 +562,8 @@ function populate_l() {
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
 
     l['year'] = new Date().getFullYear();
     date_months = [

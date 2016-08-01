@@ -274,7 +274,7 @@ function dl_g(res) {
             }
         }
         else {
-            mKeyDialog(dlpage_ph)
+            mKeyDialog(dlpage_ph, false, key)
                 .fail(function() {
                     $('.download.error-text.message').text(l[7427]).removeClass('hidden');
                     $('.info-block .block-view-file-type').addClass(fileIcon({name:'unknown'}));

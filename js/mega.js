@@ -7165,7 +7165,7 @@ function loadfm_callback(res, ctx) {
             loadfm.loaded = false;
             loadfm.loading = false;
 
-            return mKeyDialog(pfid, true)
+            return mKeyDialog(pfid, true, true)
                 .fail(function() {
                     location.hash = 'start';
                 });

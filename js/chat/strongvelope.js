@@ -42,7 +42,11 @@ var strongvelope = {};
     var PROTOCOL_VERSION_V1 = strongvelope.PROTOCOL_VERSION_V1;
 
     /** Version of the protocol implemented. */
-    strongvelope.PROTOCOL_VERSION = 0x02;
+    strongvelope.PROTOCOL_VERSION_V2 = 0x02;
+    var PROTOCOL_VERSION_V2 = strongvelope.PROTOCOL_VERSION_V2;
+
+    /** Version of the protocol implemented. */
+    strongvelope.PROTOCOL_VERSION = 0x03;
     var PROTOCOL_VERSION = strongvelope.PROTOCOL_VERSION;
 
     /** Size (in bytes) of the secret/symmetric encryption key. */
@@ -237,8 +241,7 @@ var strongvelope = {};
             strongvelope.deriveNonceSecret(nonce).substring(0, NONCE_SIZE));
 
         if ((message !== null) && (typeof message !== 'undefined')) {
-            var clearBytes = asmCrypto.string_to_bytes(to8(message));
-            var cipherBytes = asmCrypto.AES_CTR.encrypt(clearBytes, keyBytes, nonceBytes);
+            var cipherBytes = asmCrypto.AES_CTR.encrypt(message, keyBytes, nonceBytes);
             result.ciphertext = asmCrypto.bytes_to_string(cipherBytes);
         }
 
@@ -276,20 +279,6 @@ var strongvelope = {};
         var cipherBytes = asmCrypto.string_to_bytes(cipher);
         var clearBytes = asmCrypto.AES_CTR.decrypt(cipherBytes, keyBytes, nonceBytes);
         var clearText = asmCrypto.bytes_to_string(clearBytes);
-
-        try {
-            clearText = from8(clearText);
-        }
-        catch (e) {
-            if (e instanceof URIError) {
-                logger.critical('Could not decrypt message, probably a wrong key/nonce.');
-
-                return false;
-            }
-            else {
-                throw e;
-            }
-        }
 
         return clearText;
     };
@@ -532,6 +521,26 @@ var strongvelope = {};
     };
 
     /**
+     * Utility functions to pack a 32bit number in little endian.
+     *
+     * @method
+     * @param x {Number}
+     *     Number to pack
+     * @returns {String}
+     *     Byte array of the number packed in little endian.
+     */
+    strongvelope.pack32le = function(x) {
+        var r = '';
+
+        for (var i = 4; i--;) {
+            r += String.fromCharCode(x & 255);
+            x >>>= 8;
+        }
+
+        return r;
+    };
+
+    /**
      * Utility functions to check the key id is a temporary key id.
      *
      * @method
@@ -555,7 +564,7 @@ var strongvelope = {};
     strongvelope.generateMessageId = function() {
 
         var timestamp = Math.floor(new Date().getTime()/1000);
-        var timestr = a32_to_str([(timestamp << 8)]).substr(0, MESSAGE_IDENTITY_TIMESTAMP_SIZE);
+        var timestr = ns.pack32le(timestamp).substr(0, MESSAGE_IDENTITY_TIMESTAMP_SIZE);
 
         var randomnum = new Uint8Array(MESSAGE_IDENTITY_RANDOMNESS_SIZE);
         asmCrypto.getRandomValues(randomnum);
@@ -567,32 +576,52 @@ var strongvelope = {};
      * Parse the decrypted payload.
      *
      * @method
-     * @param {String} message
-     *     encrypted payload.
+     * @param {String} payload
+     *     decrypted payload.
+     * @param {String} version
+     *     version number of the payload.
      * @returns {(Payload|Boolean)}
      *     The payload content on success, `false` in case of errors.
      */
-    strongvelope._parsePayload = function(payload) {
-        if (payload.length < MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE) {
-            return false;
-        }
+    strongvelope._parsePayload = function(payload, version) {
 
-        var identity = payload.substr(0, MESSAGE_IDENTITY_SIZE);
-        var refidlen = ns.unpack16le(payload.substr(MESSAGE_IDENTITY_SIZE, MESSAGE_REFERENCE_SIZE));
-        var refidstr = payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE, refidlen);
-        var refids = [];
-        var pos = 0;
-        while(pos < refidlen) {
-            refids.push(refidstr.substr(pos, MESSAGE_IDENTITY_SIZE));
-            pos += MESSAGE_IDENTITY_SIZE;
+        try {
+            // Hopefully it will not need to change again.
+            payload = (version <= PROTOCOL_VERSION_V2) ? from8(payload) : payload;
+            if (payload.length < MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE) {
+                return false;
+            }
+
+            var identity = payload.substr(0, MESSAGE_IDENTITY_SIZE);
+            var refidlen = ns.unpack16le(payload.substr(MESSAGE_IDENTITY_SIZE, MESSAGE_REFERENCE_SIZE));
+            var refidstr = payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE, refidlen);
+            var refids = [];
+            var pos = 0;
+            while (pos < refidlen) {
+                refids.push(refidstr.substr(pos, MESSAGE_IDENTITY_SIZE));
+                pos += MESSAGE_IDENTITY_SIZE;
+            }
+            var plainmessage =  (version <= PROTOCOL_VERSION_V2)
+                                ? payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE + refidlen)
+                                : from8(payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE + refidlen));
+
+            var result = {
+                identity: identity,
+                references: refids,
+                plaintext: plainmessage
+            };
+            return result;
         }
-        var plainmessage =  payload.substr(MESSAGE_IDENTITY_SIZE + MESSAGE_REFERENCE_SIZE + refidlen);
-        var result = {
-            identity: identity,
-            references: refids,
-            plaintext: plainmessage
-        };
-        return result;
+        catch (e) {
+            if (e instanceof URIError) {
+                logger.critical('Could not decrypt message, probably a wrong key/nonce.');
+
+                return false;
+            }
+            else {
+                throw e;
+            }
+        }
     };
 
 
@@ -1094,8 +1123,9 @@ var strongvelope = {};
             refids += refs[i];
         }
 
-        var encryptedMessage =
-            ns._symmetricEncryptMessage(messageIdentity +ns.pack16le(refids.length) + refids + message, senderKey);
+        var encryptedMessage = ns._symmetricEncryptMessage(
+                               messageIdentity + ns.pack16le(refids.length) + refids + to8(message),
+                               senderKey);
 
         // Assemble message content.
         content = tlvstore.toTlvElement(String.fromCharCode(TLV_TYPES.NONCE),
@@ -1190,6 +1220,7 @@ var strongvelope = {};
         }
         var assembledMessage = null;
         var messageIdentity = ns.generateMessageId();
+
         // Assemble main message body.
         assembledMessage = this._assembleBody(message, this.keyId, refs, messageIdentity);
 
@@ -1404,21 +1435,34 @@ var strongvelope = {};
         var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
                                                     senderKey,
                                                     parsedMessage.nonce);
-        // Bail out if decryption failed.
-        if (cleartext === false) {
-            return false;
+        try {
+            cleartext = from8(cleartext);
+            // Bail out if decryption failed.
+            if (cleartext === false) {
+                return false;
+            }
+
+            var result = {
+                version: parsedMessage.protocolVersion,
+                sender: sender,
+                type: parsedMessage.type,
+                payload: cleartext,
+                includeParticipants: [],
+                excludeParticipants: []
+            };
+
+            return result;
         }
+        catch (e) {
+            if (e instanceof URIError) {
+                logger.critical('Could not decrypt message, probably a wrong key/nonce.');
 
-        var result = {
-            version: parsedMessage.protocolVersion,
-            sender: sender,
-            type: parsedMessage.type,
-            payload: cleartext,
-            includeParticipants: [],
-            excludeParticipants: []
-        };
-
-        return result;
+                return false;
+            }
+            else {
+                throw e;
+            }
+        }
     };
 
 
@@ -1496,7 +1540,8 @@ var strongvelope = {};
         if (cleartext === false) {
             return false;
         }
-        var payload = ns._parsePayload(cleartext);
+
+        var payload = ns._parsePayload(cleartext, parsedMessage.protocolVersion);
         // Bail out if payload can not be parsed.
         if (payload === false) {
             return false;

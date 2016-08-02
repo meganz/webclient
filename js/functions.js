@@ -3750,7 +3750,7 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             attribCache.destroy().always(finishLogout);
         }
-        if (u_privk) {
+        if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
             api_req({ 'a': 'sml' }, { callback: finishLogout });
         }

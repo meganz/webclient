@@ -1,4 +1,4 @@
-/*! asmCrypto v0.0.11, (c) 2013 Artem S Vybornov, opensource.org/licenses/MIT */
+/*! asmCrypto, (c) 2013 Artem S Vybornov, opensource.org/licenses/MIT */
 (function ( exports, global ) {
 
 function IllegalStateError () { var err = Error.apply( this, arguments ); this.message = err.message, this.stack = err.stack; }
@@ -9744,22 +9744,24 @@ function BigNumber ( num ) {
         sign = num < 0 ? -1 : 1;
     }
     else if ( is_bytes(num) ) {
-        bitlen = num.length * 8;
+        for ( var i = 0; !num[i]; i++ );
+
+        bitlen = ( num.length - i ) * 8;
         if ( !bitlen )
             return BigNumber_ZERO;
 
         limbs = new Uint32Array( (bitlen + 31) >> 5 );
-        for ( var i = num.length-4; i >= 0 ; i -= 4 ) {
-            limbs[(num.length-4-i)>>2] = (num[i] << 24) | (num[i+1] << 16) | (num[i+2] << 8) | num[i+3];
+        for ( var j = num.length-4; j >= i ; j -= 4 ) {
+            limbs[(num.length-4-j)>>2] = (num[j] << 24) | (num[j+1] << 16) | (num[j+2] << 8) | num[j+3];
         }
-        if ( i === -3 ) {
-            limbs[limbs.length-1] = num[0];
+        if ( i-j === 3 ) {
+            limbs[limbs.length-1] = num[i];
         }
-        else if ( i === -2 ) {
-            limbs[limbs.length-1] = (num[0] << 8) | num[1];
+        else if ( i-j === 2 ) {
+            limbs[limbs.length-1] = (num[i] << 8) | num[i+1];
         }
-        else if ( i === -1 ) {
-            limbs[limbs.length-1] = (num[0] << 16) | (num[1] << 8) | num[2];
+        else if ( i-j === 1 ) {
+            limbs[limbs.length-1] = (num[i] << 16) | (num[i+1] << 8) | num[i+2];
         }
 
         sign = 1;

@@ -1577,7 +1577,9 @@ function topmenuUI() {
     });
 
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
-
+        if ($('.light-overlay').is(':visible')) {
+            loadingInitDialog.hide();
+        }
         $('.top-menu-popup').removeClass('active');
         $('.top-menu-icon').removeClass('active');
 

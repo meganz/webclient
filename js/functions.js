@@ -2116,8 +2116,24 @@ function CreateWorkers(url, message, size) {
     }, size, url.split('/').pop().split('.').shift() + '-worker');
 }
 
-function mKeyDialog(ph, fl) {
+/**
+ * Ask the user for a decryption key
+ * @param {String} ph   The node's handle
+ * @param {String} fl   Whether is a folderlink
+ * @param {String} keyr If a wrong key was used
+ * @return {MegaPromise}
+ */
+function mKeyDialog(ph, fl, keyr) {
     var promise = new MegaPromise();
+
+    if (keyr) {
+        $('.fm-dialog.dlkey-dialog .instruction-message')
+            .text(l[9048]);
+    }
+    else {
+        $('.fm-dialog.dlkey-dialog .instruction-message')
+            .safeHTML(l[7945] + '<br/>' + l[7972]);
+    }
 
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);

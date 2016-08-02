@@ -1022,7 +1022,7 @@ function transferPanelContextMenu(target)
     // XXX: Hide context-menu's menu-up/down items for now to check if that's the
     // origin of some problems, users can still use the new d&d logic to move transfers
     menuitems.filter('.move-up,.move-down').hide();
-    
+
     if (target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
         menuitems.filter('.network-diagnostic').show();
     }
@@ -7558,7 +7558,7 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
 
     $(prefix + '-dialog-tree-panel' + tabClass + ' .dialog-content-block')
         .empty()
-        .html(html);
+        .safeHTML(html);
 
     // Empty message, no items available
     if (!$(prefix + '-dialog-tree-panel' + tabClass + ' .dialog-content-block ' + parentTag).length){
@@ -7678,6 +7678,38 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     }
     else {
         $('.dialog-newfolder-button').addClass('hidden');
+    }
+
+    // If copying from contacts tab (Ie, sharing)
+    if (buttonLabel === l[1344]) {
+        $('.fm-dialog.copy-dialog .share-dialog-permissions').removeClass('hidden');
+        $('.dialog-newfolder-button').addClass('hidden');
+        $('.copy-dialog-button').addClass('hidden');
+        $('.copy-operation-txt').text(l[1344]);
+
+        $('.fm-dialog.copy-dialog .share-dialog-permissions')
+            .rebind('click', function() {
+                var $btn = $(this);
+                var $menu = $('.permissions-menu', this.parentNode);
+                var $items = $('.permissions-menu-item', $menu);
+
+                $items
+                    .rebind('click', function() {
+                        $items.unbind('click');
+
+                        $items.removeClass('active');
+                        $(this).addClass('active');
+                        $btn.attr('class', 'share-dialog-permissions ' + this.classList[1])
+                            .safeHTML('<span></span>' + $(this).text());
+                        $menu.fadeOut(200);
+                    });
+                $menu.fadeIn(200);
+            });
+    }
+    else {
+        $('.fm-dialog.copy-dialog .share-dialog-permissions').addClass('hidden');
+        $('.copy-dialog-button').removeClass('hidden');
+        $('.copy-operation-txt').text(l[63]);
     }
 
     $('.' + dialogPrefix + '-dialog .nw-fm-tree-item').removeClass('expanded active opened selected');
@@ -8941,7 +8973,27 @@ function copyDialog() {
                         }
                     }
                     closeDialog();
-                    M.copyNodes(n, $.mcselected);
+
+                    // If copying from contacts tab (Ie, sharing)
+                    if ($(this).text().trim() === l[1344]) {
+                        var user = {
+                            u: M.currentdirid,
+                        };
+                        var $sp = $('.fm-dialog.copy-dialog .share-dialog-permissions');
+                        if ($sp.hasClass('read-and-write')) {
+                            user.r = 1;
+                        }
+                        else if ($sp.hasClass('full-access')) {
+                            user.r = 2;
+                        }
+                        else {
+                            user.r = 0;
+                        }
+                        doShare($.mcselected, [user], true);
+                    }
+                    else {
+                        M.copyNodes(n, $.mcselected);
+                    }
                     delete $.onImportCopyNodes;
                     break;
                 case 'shared-with-me':
@@ -10992,11 +11044,20 @@ function contactUI() {
             showAuthenticityCredentials(user);
         });
 
+        $('.fm-share-folders').rebind('click', function() {
+            $('.copy-dialog').removeClass('hidden');
+
+            $.copyDialog = 'copy';
+            $.mcselected = undefined;
+
+            handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
+            fm_showoverlay();
+        });
+
         if (!megaChatIsDisabled) {
 
             // Bind the "Start conversation" button
-            $('.fm-start-conversation').unbind('click.megaChat');
-            $('.fm-start-conversation').bind('click.megaChat', function() {
+            $('.fm-start-conversation').rebind('click.megaChat', function() {
 
                 window.location = '#fm/chat/' + u_h;
                 return false;

@@ -8434,7 +8434,7 @@ color: white;
     min-height: 20px;
     left: 200px;
     top: 200px;
-    
+
 }
 .dragger-content {
     min-height: 20px;
@@ -25523,6 +25523,12 @@ table.speed-table {
     right: 0;
     top: 0;
 }
+
+.fm-dialog.copy-dialog .share-dialog-permissions {
+    margin-top: 12px;
+    float: left;
+}
+
 .perfectScrollbarContainer {
     position: relative;
 }

@@ -10,7 +10,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > 
 > ```bash
 > git clone https://github.com/vibornoff/asmcrypto.js.git
-> git checkout v0.0.11
+> git checkout a0ac7b98ad5401d595a78516c7591a4980799b08  (using fixes in master since last v0.0.10 release)
 > npm install
 > grunt --with="common,utils,exports,globals,aes,aes-ecb,aes-cbc,aes-ctr,aes-ccm,aes-gcm,aes-exports,aes-ecb-exports,aes-cbc-exports,aes-ctr-exports,aes-ccm-exports,aes-gcm-exports,hash,sha256,sha256-exports,sha512,sha512-exports,hmac,hmac-sha256,hmac-sha512,hmac-sha256-exports,hmac-sha512-exports,rng,rng-exports,rng-globals,bn,bn-exports,rsa,rsa-raw,rsa-keygen-exports,rsa-raw-exports" devel
 > In our code special UTF-8 characters are removed for better SHA-256 hashing performance so a few comments were changed:
@@ -159,7 +159,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>
-[asmcrypto.js]: <https://github.com/vibornoff/asmcrypto.js/tree/v0.0.10>
+[asmcrypto.js]: <https://github.com/vibornoff/asmcrypto.js/tree/a0ac7b98ad5401d595a78516c7591a4980799b08>
 [autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>

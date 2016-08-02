@@ -14230,6 +14230,16 @@ div.membership-bott-button {
     line-height: 32px;
     text-transform: uppercase;
 }
+.reg-st3-big-txt span.bandwidth-amount {
+    font-size: 24px;
+    line-height: 28px;
+    text-transform: none;
+}
+.reg-st3-big-txt span.bandwidth-unit {
+    font-size: 16px;
+    line-height: 32px;
+    text-transform: uppercase;
+}
 .reg-st3-mid-txt {
     color: #666666;
     float: right;

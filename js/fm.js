@@ -1022,7 +1022,7 @@ function transferPanelContextMenu(target)
     // XXX: Hide context-menu's menu-up/down items for now to check if that's the
     // origin of some problems, users can still use the new d&d logic to move transfers
     menuitems.filter('.move-up,.move-down').hide();
-    
+
     if (target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
         menuitems.filter('.network-diagnostic').show();
     }
@@ -1605,12 +1605,9 @@ function getContactsEMails() {
 
     // Loop through full contacts
     M.u.forEach(function(contact) {
-        if (
-            contact.c// active contact?
-            && (contact.c !== 2)// Not an account owner?
-            && (contact.m) // email filed exists?
-            ) {
-            contacts.push({ id: contact.m, name: contact.name });
+        // Active contacts with email set
+        if (contact.c === 1 && contact.m) {
+            contacts.push({ id: contact.m, name: M.getNameByHandle(contact.u) });
         }
     });
 

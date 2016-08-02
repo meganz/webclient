@@ -1022,7 +1022,7 @@ function transferPanelContextMenu(target)
     // XXX: Hide context-menu's menu-up/down items for now to check if that's the
     // origin of some problems, users can still use the new d&d logic to move transfers
     menuitems.filter('.move-up,.move-down').hide();
-    
+
     if (target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
         menuitems.filter('.network-diagnostic').show();
     }
@@ -10710,8 +10710,12 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var fullOwnersName = htmlentities(M.getNameByHandle(ownersHandle));
+        var displayName = htmlentities(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
+
+        if (Object(M.u[ownersHandle]).m) {
+            displayName += ' &nbsp;&lt;' + htmlentities(M.u[ownersHandle].m) + '&gt;';
+        }
 
         // Access rights
         if (nodeData.r === 1) {
@@ -10740,7 +10744,7 @@ function sharedFolderUI() {
                         + '<div class="clear"></div>'
                         + avatar
                         + '<div class="fm-chat-user-info">'
-                            + '<div class="fm-chat-user">' + fullOwnersName + '</div>'
+                            + '<div class="fm-chat-user">' + displayName + '</div>'
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'

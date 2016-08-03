@@ -291,7 +291,7 @@
                             if (grantedBytes == 0) {
                                 // user canceled the quota request?
                                 retry(0, {
-                                    code: FileError.SECURITY_ERR
+                                    name: 'SecurityError'
                                 });
                             }
                             else {
@@ -315,25 +315,25 @@
     }
 
     function errorHandler(type, e) {
-        // TODO: FileError is deprecated. Please use the 'name' or 'message' attributes of DOMError rather than 'code'.
-        switch (e.code) {
-            case FileError.QUOTA_EXCEEDED_ERR:
+        switch (e.name) {
+            case 'QuotaExceededError':
                 alert('Error writing file, is your harddrive almost full? (' + type + ')');
                 break;
-            case FileError.NOT_FOUND_ERR:
+            case 'NotFoundError':
                 alert('NOT_FOUND_ERR in ' + type);
                 break;
-            case FileError.SECURITY_ERR:
+            case 'SecurityError':
                 alert('File transfers do not work with Chrome Incognito. (Security Error in ' + type + ')');
                 break;
-            case FileError.INVALID_MODIFICATION_ERR:
+            case 'InvalidModificationError':
                 alert('INVALID_MODIFICATION_ERR in ' + type);
                 break;
-            case FileError.INVALID_STATE_ERR:
+            case 'InvalidStateError':
                 console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
                 Later(this.fsInitOp.bind(this));
                 break;
             default:
+                console.error('Unexpected error...', e.code, e.name, e);
                 alert('requestFileSystem failed in ' + type);
         }
     }
@@ -675,7 +675,7 @@
                             free_space();
                         },
                         function(e) {
-                            if (e && e.code === FileError.SECURITY_ERR) {
+                            if (e && e.name === 'SecurityError') {
                                 window.Incognito = 0xC120E;
 
                             /* Apparently indexedDBs are handled in memory on

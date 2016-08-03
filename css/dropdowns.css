@@ -266,3 +266,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .img-preview .dropdown.img-wrapper {
     width: 176px;
 }
+
+.dropdown.body.dropdown-arrow.wide-dropdown {
+    margin-bottom: 16px;
+}

@@ -63,14 +63,11 @@
     font-size: 11px;
     line-height: 16px;
 }
-.chat-contacts-list {
-    max-height: -webkit-calc(100% - 306px);
-    max-height: -moz-calc(100% - 306px);
-    max-height: calc(100% - 306px);
-    min-height: 50px;
-}
 .chat-contacts-list .buttons-block {
     min-height: 192px;
+}
+.chat-contacts-list-inner .contacts-info.body.right-chat-contact-card {
+    min-height: 49px;
 }
 .chat-contacts-list-inner {
     padding: 0 0 0 22px;
@@ -95,7 +92,7 @@
 .chat-right-area .buttons-block {
     border-top: 1px solid rgba(0,0,0,0.05);
     padding: 12px 22px;
-    margin: 16px 0 0 0;
+    margin: 16px 0 16px 0;
 }
 .chat-right-area .buttons-block .link-button {
     margin: 6px 0;

@@ -151,6 +151,46 @@ var ContactCard = React.createClass({
             'dropdownIconClasses': "tiny-icon grey-down-arrow"
         }
     },
+    specificShouldComponentUpdate: function(nextProps, nextState) {
+        var self = this;
+
+        var foundKeys = Object.keys(self.props);
+        removeValue(foundKeys, 'dropdowns', true);
+
+        var shouldUpdate = undefined;
+        foundKeys.forEach(function(k) {
+            if (typeof(shouldUpdate) === 'undefined') {
+                if (!shallowEqual(nextProps[k], self.props[k])) {
+                    shouldUpdate = false;
+                }
+                else {
+                    shouldUpdate = true;
+                }
+            }
+        });
+
+        if (!shouldUpdate) {
+            // ^^ if false or undefined.
+            if (!shallowEqual(nextState, self.state)) {
+                shouldUpdate = false;
+            }
+            else {
+                shouldUpdate = true;
+            }
+        }
+        if (!shouldUpdate && self.state.props.dropdowns && nextProps.state.dropdowns) {
+            // ^^ if still false or undefined.
+            if (self.state.props.dropdowns.map && nextProps.state.dropdowns.map) {
+                var oldKeys = self.state.props.dropdowns.map(child => child.key);
+                var newKeys = nextProps.state.dropdowns.map(child => child.key);
+                if (!shallowEqual(oldKeys, newKeys)) {
+                    shouldUpdate = true;
+                }
+            }
+        }
+
+        return shouldUpdate;
+    },
     render: function() {
         var self = this;
 
@@ -217,6 +257,7 @@ var ContactCard = React.createClass({
                             self.props.onDoubleClick(contact, e);
                         }
                     }}
+                    style={self.props.style}
                     >
                 <ContactPresence contact={contact} className={this.props.presenceClassName}/>
                 <Avatar contact={contact} className="small-rounded-avatar" />
@@ -245,7 +286,7 @@ var ContactPickerWidget = React.createClass({
         return {
             multipleSelectedButtonLabel: false,
             singleSelectedButtonLabel: false,
-            nothingSelectedButtonLabel: false,
+            nothingSelectedButtonLabel: false
         }
     },
     onSearchChange: function(e) {
@@ -339,7 +380,7 @@ var ContactPickerWidget = React.createClass({
             }
 
             var selectedClass = "";
-            if (self.state.selected && self.state.selected.indexOf(v.h) !== -1) {
+            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
                 selectedClass = "selected";
             }
             contacts.push(
@@ -360,8 +401,8 @@ var ContactPickerWidget = React.createClass({
                             $(document).trigger('closeDropdowns');
 
                             var sel = self.state.selected;
-                            if (sel.indexOf(contact.h) === -1) {
-                                sel.push(contact.h);
+                            if (sel.indexOf(contact.u) === -1) {
+                                sel.push(contact.u);
                             }
 
                             if (self.props.onSelectDone) {
@@ -380,11 +421,11 @@ var ContactPickerWidget = React.createClass({
                             if (!sel) {
                                 sel = [];
                             }
-                            if (self.state.selected.indexOf(contact.h) > -1) {
-                                removeValue(sel, contact.h, false);
+                            if (self.state.selected.indexOf(contact.u) > -1) {
+                                removeValue(sel, contact.u, false);
                             }
                             else {
-                                sel.push(contact.h);
+                                sel.push(contact.u);
                             }
 
 
@@ -423,7 +464,7 @@ var ContactPickerWidget = React.createClass({
         }
 
 
-        return <div>
+        return <div className={this.props.className}>
             <div className={"contacts-search-header " + this.props.headerClasses}>
                 <i className="small-icon search-icon"></i>
                 <input

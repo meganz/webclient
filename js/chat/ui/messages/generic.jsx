@@ -16,22 +16,6 @@ var GenericConversationMessage = React.createClass({
         };
     },
     componentWillUpdate: function(nextProps, nextState) {
-        // $(document).rebind('keyup.megaChatEditTextareaClose' + chatRoom.roomJid, function(e) {
-        //     if (!self.state.editingMessageId) {
-        //         return;
-        //     }
-        //
-        //     var megaChat = self.props.chatRoom.megaChat;
-        //     if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === self.props.chatRoom.roomJid) {
-        //         if (e.keyCode === 27) {
-        //             self.setState({'editingMessageId': false});
-        //             e.preventDefault();
-        //             e.stopPropagation();
-        //             return false;
-        //         }
-        //
-        //     }
-        // });
     },
     componentDidUpdate: function(oldProps, oldState) {
         var self = this;
@@ -47,15 +31,6 @@ var GenericConversationMessage = React.createClass({
                     self.props.onEditStarted($generic);
                 }
             }
-
-            if (self.scrollToElementAfterUpdate === true) {
-                var $jsp = self.getParentJsp();
-
-                if ($jsp) {
-                    $jsp.scrollToElement($(self.findDOMNode()));
-                }
-                self.scrollToElementAfterUpdate = false;
-            }
         }
         else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
             if (self.props.onUpdate) {
@@ -65,14 +40,21 @@ var GenericConversationMessage = React.createClass({
         var $node = $(self.findDOMNode());
         $node.rebind('onEditRequest.genericMessage', function(e) {
             if (self.state.editing === false) {
-                self.scrollToElementAfterUpdate = true;
                 self.setState({'editing': true});
+
+                Soon(function() {
+                    var $generic = $(self.findDOMNode());
+                    var $textarea = $('textarea', $generic);
+                    if ($textarea.size() > 0 && !$textarea.is(":focus")) {
+                        $textarea.focus();
+                        moveCursortoToEnd($textarea[0]);
+                    }
+                });
             }
         });
     },
     componentWillUnmount: function() {
         var self = this;
-        $(document).unbind('keyup.megaChatEditTextareaClose' + self.props.chatRoom.roomJid);
         var $node = $(self.findDOMNode());
         $node.unbind('onEditRequest.genericMessage');
     },
@@ -92,7 +74,7 @@ var GenericConversationMessage = React.createClass({
     doCancelRetry: function(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
-        var chatRoom = this.props.chatRoom;
+        var chatRoom = this.props.message.chatRoom;
 
         chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
 
@@ -105,7 +87,7 @@ var GenericConversationMessage = React.createClass({
         var self = this;
         e.preventDefault(e);
         e.stopPropagation(e);
-        var chatRoom = this.props.chatRoom;
+        var chatRoom = this.props.message.chatRoom;
         this.doCancelRetry(e, msg);
         chatRoom._sendMessageToTransport(msg)
             .done(function(internalId) {
@@ -121,8 +103,8 @@ var GenericConversationMessage = React.createClass({
         var self = this;
 
         var message = this.props.message;
-        var megaChat = this.props.chatRoom.megaChat;
-        var chatRoom = this.props.chatRoom;
+        var megaChat = this.props.message.chatRoom.megaChat;
+        var chatRoom = this.props.message.chatRoom;
         var contact = self.getContact();
         var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();
@@ -731,7 +713,7 @@ var GenericConversationMessage = React.createClass({
                     messageDisplayBlock = <TypingAreaUI.TypingArea
                         iconClass="small-icon writing-pen textarea-icon"
                         initialText={message.textContents ? message.textContents : message.contents}
-                        chatRoom={self.props.chatRoom}
+                        chatRoom={self.props.message.chatRoom}
                         showButtons={true}
                         className="edit-typing-area"
                         onUpdate={() => {
@@ -743,7 +725,9 @@ var GenericConversationMessage = React.createClass({
                             self.setState({'editing': false});
 
                             if (self.props.onEditDone) {
-                                self.props.onEditDone(messageContents);
+                                Soon(function() {
+                                    self.props.onEditDone(messageContents);
+                                    });
                             }
 
                             return true;

@@ -7026,7 +7026,7 @@ function processMCF(mcfResponse, ignoreDB) {
     }
 
     // reopen chats from the MCF response.
-    if (mcfResponse.length && mcfResponse.forEach) {
+    if (typeof mcfResponse !== 'undefined' && typeof mcfResponse.length !== 'undefined' && mcfResponse.forEach) {
         mcfResponse.forEach(function (chatRoomInfo) {
             if (chatRoomInfo.active === 0) {
                 // skip non active chats for now...

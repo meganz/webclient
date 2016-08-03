@@ -3559,9 +3559,9 @@
     "9043": "Importaci\u00f3n fallida",
     "9044": "No se pudo importar el enlace de carpeta. Por favor, int\u00e9ntalo de nuevo.",
     "9045": "La cuenta de usuario asociada ha sido dada de baja debido a m\u00faltiples violaciones de nuestros T\u00e9rminos de Empleo.",
-    "9046": "The confirmation account link that you are using is incomplete. Please check the link length and be sure that you have copied the entire link then try again.",
+    "9046": "El enlace de confirmaci\u00f3n de cuenta que est\u00e1s utilizando est\u00e1 incompleto. Por favor, comprueba la longitud del enlace y aseg\u00farate que lo has copiado entero antes de probar de nuevo.",
     "9047": "El enlace de alta nueva que est\u00e1s usando no es v\u00e1lido.",
-    "9048": "The provided key is invalid. Please check that the key is correct or ask the creator of the link again.",
+    "9048": "La clave facilitada no es v\u00e1lida. Por favor aseg\u00farate que la clave sea correcta o solic\u00edtasela al creador del enlace de nuevo.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

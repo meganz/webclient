@@ -169,11 +169,28 @@ function init_page() {
     page = page.replace('%21', '!').replace('%21', '!');
 
     if (page.substr(0, 1) == '!' && page.length > 1) {
-        dlkey = false;
+        if (mega.utils.hasPendingTransfers()) {
+            if ($.lastSeenFilelink === location.hash) {
+                return;
+            }
+
+            mega.utils.abortTransfers()
+                .done(function() {
+                    location.reload();
+                })
+                .fail(function() {
+                    location.hash = $.lastSeenFilelink;
+                });
+
+            return;
+        }
+        $.lastSeenFilelink = location.hash;
+
         var ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
         }
+        dlkey = false;
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }

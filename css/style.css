@@ -8438,7 +8438,7 @@ color: white;
     min-height: 20px;
     left: 200px;
     top: 200px;
-    
+
 }
 .dragger-content {
     min-height: 20px;
@@ -14229,6 +14229,16 @@ div.membership-bott-button {
     color: #31B500;
 }
 .reg-st3-big-txt span {
+    font-size: 16px;
+    line-height: 32px;
+    text-transform: uppercase;
+}
+.reg-st3-big-txt span.bandwidth-amount {
+    font-size: 24px;
+    line-height: 28px;
+    text-transform: none;
+}
+.reg-st3-big-txt span.bandwidth-unit {
     font-size: 16px;
     line-height: 32px;
     text-transform: uppercase;
@@ -25527,6 +25537,12 @@ table.speed-table {
     right: 0;
     top: 0;
 }
+
+.fm-dialog.copy-dialog .share-dialog-permissions {
+    margin-top: 12px;
+    float: left;
+}
+
 .perfectScrollbarContainer {
     position: relative;
 }

@@ -7156,6 +7156,20 @@ function loadfm_callback(res, ctx) {
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
+        // Check if the key for a folderlink was correct
+        if (folderlink && missingkeys[M.RootID]) {
+            loadingDialog.hide();
+            loadingInitDialog.hide();
+
+            loadfm.loaded = false;
+            loadfm.loading = false;
+
+            return mKeyDialog(pfid, true, true)
+                .fail(function() {
+                    location.hash = 'start';
+                });
+        }
+
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
             for (var i in res.s) {

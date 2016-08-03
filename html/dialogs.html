@@ -246,9 +246,10 @@
     <!--Header-->
     <div class="fm-dialog-header">
         <!-- Please add "active" classname to necessary "copy-dialog-txt" block !-->
-        <div class="fm-dialog-title">[$63]
+        <div class="fm-dialog-title">
+            <span class="copy-operation-txt">[$63]</span>
             <span class="copy-dialog-txt cloud-drive">([$1687])</span>
-            <span class="copy-dialog-txt shared-with-me">(Shared with me)</span>
+            <span class="copy-dialog-txt shared-with-me">([$5589])</span>
             <span class="copy-dialog-txt conversations">(Send to Conversations)</span>
         </div>
         <div class="fm-dialog-close"></div>
@@ -262,7 +263,7 @@
         </div>
         <div class="copy-dialog-button cloud-drive"></div>
         <div class="copy-dialog-button shared-with-me"></div>
-        <div class="copy-dialog-button conversations hidden"></div>
+        <!--div class="copy-dialog-button conversations hidden"></div-->
         <div class="clear"></div>
         <div class="dialog-sorting-menu hidden">
             <div class="context-menu-section">
@@ -351,6 +352,16 @@
         </div>
         <div class="fm-dialog-button dialog-cancel-button">
             <span>[$82]</span>
+        </div>
+
+        <div class="permissions-menu hidden">
+            <div class="permissions-menu-arrow"></div>
+            <div class="permissions-menu-item read-only active"><span></span>[$7534]</div>
+            <div class="permissions-menu-item read-and-write"><span></span>[$56]</div>
+            <div class="permissions-menu-item full-access"><span></span>[$57]</div>
+        </div>
+        <div class="share-dialog-permissions read-only hidden">
+            <span></span>[$7534]
         </div>
         <div class="clear"></div>
     </div>

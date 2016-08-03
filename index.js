@@ -161,7 +161,7 @@ function init_page() {
     if (!page.match(/^(blog|help|corporate|page_)/)) {
         $('.top-head').remove();
     }
-    $('#loading:visible').hide();
+    $('#loading').hide();
     if (window.loadingDialog) {
         loadingDialog.hide();
     }
@@ -169,11 +169,28 @@ function init_page() {
     page = page.replace('%21', '!').replace('%21', '!');
 
     if (page.substr(0, 1) == '!' && page.length > 1) {
-        dlkey = false;
+        if (mega.utils.hasPendingTransfers()) {
+            if ($.lastSeenFilelink === location.hash) {
+                return;
+            }
+
+            mega.utils.abortTransfers()
+                .done(function() {
+                    location.reload();
+                })
+                .fail(function() {
+                    location.hash = $.lastSeenFilelink;
+                });
+
+            return;
+        }
+        $.lastSeenFilelink = location.hash;
+
         var ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
         }
+        dlkey = false;
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
@@ -186,21 +203,27 @@ function init_page() {
     }
 
     var wasFolderlink = pfid;
+    var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
+
+        pfid = false;
         if (ar[0]) {
             pfid = ar[0].replace(/[^\w-]+/g, "");
         }
+
+        pfkey = false;
         if (ar[1]) {
             pfkey = ar[1].replace(/[^\w-]+/g, "");
         }
-        // TODO: Rename pfid, pfkey, and pfhandle around our codebase
+
         pfhandle = false;
         if (ar[2]) {
             pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
+
         n_h = pfid;
-        if (!flhashchange) {
+        if (!flhashchange || pfkey !== oldPFKey) {
             if (pfkey) {
                 api_setfolder(n_h);
                 if (waitxhr) {
@@ -269,11 +292,11 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid)) {
+    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid || pfkey !== oldPFKey)) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
-            if ((!pfid && folderlink) || (pfid && folderlink === 0)) {
+            if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
 
                 // re-initialize waitd connection when switching.
                 if (!pfid && folderlink && u_sid) {

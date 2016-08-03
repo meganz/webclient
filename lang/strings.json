@@ -4400,7 +4400,7 @@
         "context": "caption of the download button to download the Chrome extension for MEGA"
     },
     "1915": {
-        "text": "Warning: only click the above button if you trust the [A]Chrome web store[\/A]. Alternatively, you can manually download & install the extension below.",
+        "text": "Warning: only click the above button if you trust the [A]Chrome Web Store[\/A]. Alternatively, you can manually download & install the extension below.",
         "context": ""
     },
     "1916": {
@@ -4468,20 +4468,20 @@
         "context": ""
     },
     "1936": {
-        "text": "You can still [A]export[\/A] your master key now if you have an active MEGA session in any other browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
-        "context": ""
+        "text": "You can still [A]export[\/A] your Recovery Key now if you have an active MEGA session in any other browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
+        "context": "Explanation of how the user can still get a copy of their master encryption key (now renamed \"Recovery Key\") if they are still logged in anywhere. Otherwise they can't unlock their account."
     },
     "1937": {
-        "text": "Do you have a backup of your master key?",
-        "context": ""
+        "text": "Do you have a backup of your Recovery Key?",
+        "context": "A question asking if the user has made a copy of their master encryption key (now renamed \"Recovery Key\")"
     },
     "1938": {
         "text": "Great!",
         "context": "Headline when the user chose YES"
     },
     "1939": {
-        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to submit your master key and reset your password.",
-        "context": ""
+        "text": "Please enter your e-mail address below. You will receive a recovery link that will allow you to submit your Recovery Key and reset your password.",
+        "context": "Instructions for the user to tell them what to do next so that they can use their master encryption key (now renamed \"Recovery Key\") to reset their password."
     },
     "1940": {
         "text": "Send",
@@ -4492,8 +4492,8 @@
         "context": "Headline if the user chose NO"
     },
     "1942": {
-        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a [A]backup[\/A] of your master key.",
-        "context": ""
+        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a [A]backup[\/A] of your Recovery Key.",
+        "context": "Instructions explaining that we have encrypted a user's data, and so we can't help them unless they remember their password or have a backup\/copy of their master encryption key (now renamed \"Recovery Key\")"
     },
     "1943": {
         "text": "You can park your existing account and start a fresh one under the same e-mail address. In the event that you recall your parked account's password, please contact [A]support@mega.nz[\/A] for recovery assistance. Your data will be retained for at least 60 days.",
@@ -4504,8 +4504,8 @@
         "context": "Error message when the user attempts to start the recovery procedure while he has an active ephemeral session open."
     },
     "1945": {
-        "text": "You are currently logged in with the account [X]. If you can't remember your current password and you would like to change your password, please export its master key, then log out and try again.",
-        "context": "the [X] variable will be replaced by the system with the user's e-mail address."
+        "text": "You are currently logged in with the account [X]. If you can't remember your current password and you would like to change your password, please export its Recovery Key, then log out and try again.",
+        "context": "the [X] variable will be replaced by the system with the user's e-mail address. This string asks the user to export their master encryption key (now renamed \"Recovery Key\")"
     },
     "1946": {
         "text": "Please check the e-mail address and try again.",
@@ -4516,16 +4516,16 @@
         "context": "Headline for parking an account (basically restarting from scratch)"
     },
     "1948": {
-        "text": "You have lost your password and cannot provide a previously exported master key? Unfortunately, due to MEGA's use of strong cryptography, the loss of your master key renders all of your data unreadable. If you proceed, you will start a fresh account under your existing e-mail address. Your old account will remain parked for at least 60 days and can be recovered by contacting [A]support@mega.nz[\/A] in the event that you still recall your password.",
-        "context": ""
+        "text": "You have lost your password and cannot provide a previously exported Recovery Key? Unfortunately, due to MEGA's use of strong cryptography, the loss of your Recovery Key renders all of your data unreadable. If you proceed, you will start a fresh account under your existing e-mail address. Your old account will remain parked for at least 60 days and can be recovered by contacting [A]support@mega.nz[\/A] in the event that you still recall your password.",
+        "context": "Explanation explaining that without their password or their master encryption key (now renamed \"Recovery Key\"), the user can't unlock their account."
     },
     "1949": {
         "text": "Choose new password",
         "context": ""
     },
     "1950": {
-        "text": "I acknowledge that I am starting a fresh, empty account and that I will lose all data in my present account unless I recall my password or locate an exported master key.",
-        "context": "Label text of a checkbox to ensure that the user is aware that the data of his current account will be lost when proceeding."
+        "text": "I acknowledge that I am starting a fresh, empty account and that I will lose all data in my present account unless I recall my password or locate an exported Recovery Key.",
+        "context": "Label text of a checkbox to ensure that the user is aware that the data of his current account will be lost when proceeding unless they remember their password or have their master encryption key (now renamed \"Recovery Key\")"
     },
     "1951": {
         "text": "Start new account",
@@ -4548,16 +4548,16 @@
         "context": "Headline of the password reset recovery procedure"
     },
     "1956": {
-        "text": "Please provide your previously exported master key. You can still export it from any MEGA session that you may have open in another browser or on another computer.",
-        "context": ""
+        "text": "Please provide your previously exported Recovery Key. You can still export it from any MEGA session that you may have open in another browser or on another computer.",
+        "context": "Asking the user to provide their master encryption key (now renamed \"Recovery Key\") to unlock their account. It also informs them that its possible to get a copy of their key if they are still logged in anywhere."
     },
     "1957": {
-        "text": "If you don't have your master key, you can [A]park[\/A] your existing account and start over.",
-        "context": ""
+        "text": "If you don't have your Recovery Key, you can [A]park[\/A] your existing account and start over.",
+        "context": "Text to explain that if the user is missing their master encryption key (now renamed \"Recovery Key\") then they can attempt a 'park account' option, which will throw away their old account and make a new one"
     },
     "1958": {
-        "text": "Use master key text file",
-        "context": "Header above the file selector where the user can select the backup of his master key file"
+        "text": "Use Recovery Key text file",
+        "context": "Header for a file selector where the user can select the backup of his master encryption key file (Now renamed to 'Recovery Key')"
     },
     "1959": {
         "text": "Select key file",
@@ -4576,8 +4576,8 @@
         "context": "Caption of the button to validate the new password that the user has chosen"
     },
     "1963": {
-        "text": "It seems that the master key that you provided is incorrect.",
-        "context": ""
+        "text": "It seems that the Recovery Key that you provided is incorrect.",
+        "context": "An error text informing the user that their master encryption key (now renamed \"Recovery Key\") that they provided was not correct"
     },
     "1964": {
         "text": "Are you sure you provided the correct key?",
@@ -4604,8 +4604,8 @@
         "context": ""
     },
     "1970": {
-        "text": "Or enter your master key here",
-        "context": "caption of the text field that the user can paste his master key into instead of selecting the key file"
+        "text": "Or enter your Recovery Key here",
+        "context": "caption of the text field that the user can paste his master encryption key (now renamed \"Recovery Key\") into instead of selecting the key file"
     },
     "1971": {
         "text": "You cannot use the account recovery procedure while being logged in. Please log out and try again.",
@@ -4616,8 +4616,8 @@
         "context": "Error message when the user selected a file that is not a valid key file."
     },
     "1973": {
-        "text": "The file you selected is too large. Please make sure you select the file containing your 22-character master key.",
-        "context": ""
+        "text": "The file you selected is too large. Please make sure you select the file containing your 22-character Recovery Key.",
+        "context": "Warning the user to pick the file they exported from Mega earlier, containing their master encryption key (now renamed \"Recovery Key\")"
     },
     "1974": {
         "text": "Please confirm that you are aware that all your data will be deleted.",
@@ -4632,12 +4632,12 @@
         "context": ""
     },
     "1977": {
-        "text": "Invalid master key",
-        "context": "Headline of an error message when the user supplied an invalid key for the account he's trying to recover."
+        "text": "Invalid Recovery Key",
+        "context": "Headline of an error message when the user supplied an invalid master encryption key (now renamed \"Recovery Key\") for the account he's trying to recover."
     },
     "1978": {
-        "text": "The key you supplied does not match this account. Please make sure you use the correct master key and try again.",
-        "context": ""
+        "text": "The Recovery Key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
+        "context": "The master encryption key (now renamed \"Recovery Key\") that the user tried to use to unlock their account was not correct. They need to find and use the correct one."
     },
     "1979": {
         "text": "Account blocked",
@@ -4656,32 +4656,32 @@
         "context": ""
     },
     "1983": {
-        "text": "Your password unlocks your master key",
-        "context": "Short text that explains that your master key is encrypted with your password (so the encryption hinges of your password)"
+        "text": "Your password unlocks your Recovery Key",
+        "context": "Short text that explains that your master encryption key (now renamed \"Recovery Key\") is encrypted with your password (so the encryption hinges of your password)"
     },
     "1984": {
-        "text": "Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your master key can no longer be decrypted, and you can no longer decrypt your data.",
-        "context": "More detailed explanation."
+        "text": "Your data is only readable through a chain of decryption operations that begins with your master encryption key (Recovery Key), which we store encrypted with your password. This means that if you lose your password, your Recovery Key can no longer be decrypted, and you can no longer decrypt your data.",
+        "context": "Detailed explanation of how the master encryption key (now renamed \"Recovery Key\") works, and why it is important to remember your password."
     },
     "1985": {
-        "text": "Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.",
-        "context": ""
+        "text": "Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.",
+        "context": "Explanation of why it is good to keep a backup of your master encryption key (now renamed \"Recovery Key\")"
     },
     "1986": {
         "text": "An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your e-mail.",
         "context": ""
     },
     "1987": {
-        "text": "Save master key as text file",
-        "context": "Headline above the export button"
+        "text": "Save Recovery Key as text file",
+        "context": "Headline above the export button for the master encryption key (Now renamed to \"Recovery Key\")"
     },
     "1988": {
         "text": "Save file",
         "context": "Caption of the export button"
     },
     "1989": {
-        "text": "Copy master key to clipboard",
-        "context": "Or the user can copy paste his 22 character master key from a text field to his clipboard"
+        "text": "Copy Recovery Key to clipboard",
+        "context": "A title of an action that lets the user copy his 22 character master encryption key (now renamed to \"Recovery Key\") from a text field to his clipboard"
     },
     "1990": {
         "text": "Copy",
@@ -4704,8 +4704,8 @@
         "context": "Help section answer. Please put the [A] & [\/A] tag appropriately in the translation."
     },
     "1998": {
-        "text": "If you are positively sure that you will never lose your password, there is no need to back up your master key. If you do decide to make a [A]backup[\/A], however, please ensure that you keep it in a safe location: Anyone with access to your backed up key and your e-mail account will be able to reset your password and gain access to your data.",
-        "context": "Help section answer. Please make sure you put the [A] & [\/A] tags appropriately in the translation."
+        "text": "If you are positively sure that you will never lose your password, there is no need to back up your Recovery Key. If you do decide to make a [A]backup[\/A], however, please ensure that you keep it in a safe location: Anyone with access to your backed up Recovery Key and your e-mail account will be able to reset your password and gain access to your data.",
+        "context": "Help section answer. Please make sure you put the [A] & [\/A] tags appropriately in the translation. This item explains why your master encryption key (now renamed \"Recovery Key\") is important, and that a backup needs to be kept safe."
     },
     "2001": {
         "text": "Do you want to upload your files to a new session?",
@@ -9832,8 +9832,8 @@
         "context": "A title for the main menu and footer which will link to the open source page containing Mega's source code."
     },
     "7412": {
-        "text": "Backup master key",
-        "context": "The is a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key."
+        "text": "Backup Recovery Key",
+        "context": "This a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key (Now renamed to \"Recovery Key\")."
     },
     "7413": {
         "text": "You already have a contact with that email address",
@@ -12212,8 +12212,8 @@
         "context": "Open the whole blog post"
     },
     "8513": {
-        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\r\n\r\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\n\r\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\r\n\r\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\r\n\r\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\r\n\r\nFor more info, please check our website:\r\nMobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/\r\n\r\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
-        "context": "General description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\n\" AND \"\t\"."
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\r\n\r\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\n\r\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\r\n\r\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\r\n\r\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\r\n\r\nFor more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/\r\n\r\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+        "context": "IMPORTANT: Master Key has been renamed to Recovery Key.\r\n\r\nGeneral description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\r\n\" AND \"\t\"."
     },
     "8514": {
         "text": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
@@ -12680,8 +12680,8 @@
         "context": "A subject in our help system about how to recover their account if they forget their password."
     },
     "8639": {
-        "text": "Transfer Speed Issue",
-        "context": "Message subject in our help system"
+        "text": "Transfer Issue",
+        "context": "Message subject in our help system (We have removed the word Speed)"
     },
     "8640": {
         "text": "Contact\/Sharing Issue",
@@ -14218,5 +14218,37 @@
     "9040": {
         "text": "offline",
         "context": "This is used on the Contacts page to indicate the user's status is currently offline."
+    },
+    "9041": {
+        "text": "You have not selected a default download location for your files.\r\n\r\nTo proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
+        "context": "Message of the dialog displayed when a user want to download some nodes and the app doesn't have configured a default download location. Asks the user to select a location for this download or configure a default location."
+    },
+    "9042": {
+        "text": "Could not download the folder link. Please try again.",
+        "context": "A dialog message which is displayed when the process\/request to download a folder link fails."
+    },
+    "9043": {
+        "text": "Import failed",
+        "context": "The title of a dialog which is displayed when process\/request to import a node fails."
+    },
+    "9044": {
+        "text": "Could not import the folder link. Please try again.",
+        "context": "A dialog message which is displayed when the process\/request to import a folder link fails."
+    },
+    "9045": {
+        "text": "The associated user account has been terminated due to multiple violations of our Terms of Service.",
+        "context": "An error message which is shown when you open a file\/folder link (or other shared resource) and it's no longer available because the the associated user account has been terminated due to multiple violations of our Terms of Service."
+    },
+    "9046": {
+        "text": "The account confirmation link that you are using is incomplete. Please check the link length and be sure that you have copied the entire link then try again.",
+        "context": "A dialog message which is displayed when a user tries to confirm a MEGA account but the confirm link is incomplete because it has less characters than it should. This is probably because the user hasn't copied and pasted the entire link."
+    },
+    "9047": {
+        "text": "The link you are using for a new signup is not valid.",
+        "context": "A warning dialog message which is shown when the user tries to make a new account registration using an invalid (#newsignup) link."
+    },
+    "9048": {
+        "text": "The provided key is invalid. Please check that the key is correct or ask the creator of the link again.",
+        "context": "A dialog message which is shown after a user provided a decryption key for a public link and the key was invalid."
     }
 }

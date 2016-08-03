@@ -3559,7 +3559,7 @@
     "9043": "Import failed",
     "9044": "Could not import the folder link. Please try again.",
     "9045": "The associated user account has been terminated due to multiple violations of our Terms of Service.",
-    "9046": "The confirmation account link that you are using is incomplete. Please check the link length and be sure that you have copied the entire link then try again.",
+    "9046": "The account confirmation link that you are using is incomplete. Please check the link length and be sure that you have copied the entire link then try again.",
     "9047": "The link you are using for a new signup is not valid.",
     "9048": "The provided key is invalid. Please check that the key is correct or ask the creator of the link again.",
     "alias": {

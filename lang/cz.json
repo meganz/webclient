@@ -3561,7 +3561,7 @@
     "9045": "P\u0159idru\u017een\u00fd u\u017eivatelsk\u00fd \u00fa\u010det byl ukon\u010den kv\u016fli opakovan\u00e9mu poru\u0161en\u00ed na\u0161ich Podm\u00ednek u\u017e\u00edv\u00e1n\u00ed.",
     "9046": "Odkaz na potvrzen\u00ed \u00fa\u010dtu, kter\u00fd pou\u017e\u00edv\u00e1te, je ne\u00fapln\u00fd. Zkontrolujte d\u00e9lku odkazu a ujist\u011bte se, \u017ee jste zkop\u00edrovali cel\u00fd odkaz, pak to zkuste znovu.",
     "9047": "Odkaz, kter\u00fd pou\u017e\u00edv\u00e1te pro novou registraci, nen\u00ed platn\u00fd.",
-    "9048": "The provided key is invalid. Please check that the key is correct or ask the creator of the link again.",
+    "9048": "Zadan\u00fd kl\u00ed\u010d je neplatn\u00fd. Zkontrolujte, zda je kl\u00ed\u010d spr\u00e1vn\u00fd, nebo znovu po\u017e\u00e1dejte autora odkazu.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

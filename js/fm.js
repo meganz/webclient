@@ -10759,8 +10759,12 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var fullOwnersName = htmlentities(M.getNameByHandle(ownersHandle));
+        var displayName = htmlentities(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
+
+        if (Object(M.u[ownersHandle]).m) {
+            displayName += ' &nbsp;&lt;' + htmlentities(M.u[ownersHandle].m) + '&gt;';
+        }
 
         // Access rights
         if (nodeData.r === 1) {
@@ -10789,7 +10793,7 @@ function sharedFolderUI() {
                         + '<div class="clear"></div>'
                         + avatar
                         + '<div class="fm-chat-user-info">'
-                            + '<div class="fm-chat-user">' + fullOwnersName + '</div>'
+                            + '<div class="fm-chat-user">' + displayName + '</div>'
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'

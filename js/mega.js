@@ -69,7 +69,7 @@ if (typeof loadingInitDialog === 'undefined') {
             $('.loading-spinner .step3').text(l[8579]);
         }
         this.hide();
-        $('.light-overlay').show();
+        $('.light-overlay').removeClass('hidden');
         $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('init active');
         this.active = true;
     };
@@ -104,7 +104,7 @@ if (typeof loadingInitDialog === 'undefined') {
     loadingInitDialog.hide = function() {
         this.active = false;
         this.progress = false;
-        $('.light-overlay').hide();
+        $('.light-overlay').addClass('hidden');
         $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
@@ -3127,9 +3127,8 @@ function MegaData()
             return false;
         }
 
-        var importNodes = Object($.onImportCopyNodes).length;
-
         var a = this.isNodeObject(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
+        var importNodes = Object(a).length;
         var ops = {a: 'p', t: t, n: a, i: requesti};
         var s = fm_getsharenodes(t);
 
@@ -5895,7 +5894,14 @@ function execsc(actionPackets, callback) {
         }
         // Action packet for the mcc
         else if (actionPacket.a === 'mcc') {
-            $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
+            if (!megaChatIsDisabled) {
+                if (megaChatIsReady) {
+                    $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
+                }
+                else {
+                    ChatdIntegration._queuedChats[actionPacket.id] = actionPacket;
+                }
+            }
         }
         // Action packet for 'Set Email'
         else if (actionPacket.a === 'se') {
@@ -5983,7 +5989,16 @@ function loadfm(force)
             fminitialized = false;
             loadfm.loading = true;
             setTimeout(function __lazyLoadFM() {
-                api_req({a:'f',c:1,r:1,ca:1},{
+                var req_params = {
+                    a:'f',
+                    c:1,
+                    r:1,
+                    ca:1
+                };
+                if (!megaChatIsDisabled && typeof Chatd !== 'undefined') {
+                    req_params['cv'] = Chatd.VERSION;
+                }
+                api_req(req_params, {
                     callback: loadfm_callback,
                     progress: function(perc) {
                         loadingInitDialog.step2(parseInt(perc));
@@ -6994,6 +7009,42 @@ function process_ok(ok, ignoreDB)
     }
 }
 
+function processMCF(mcfResponse, ignoreDB) {
+    if (megaChatIsDisabled) {
+        console.error('chat is disabled!');
+        return;
+    }
+
+    if (mcfResponse === EEXPIRED) {
+        ChatdIntegration.requiresUpdate = true;
+        return;
+    }
+    else {
+        ChatdIntegration.requiresUpdate = true;
+    }
+
+    // reopen chats from the MCF response.
+    if (mcfResponse.length && mcfResponse.forEach) {
+        mcfResponse.forEach(function (chatRoomInfo) {
+            if (chatRoomInfo.active === 0) {
+                // skip non active chats for now...
+                return;
+            }
+            if (typeof mSDB === 'object' && !pfkey && !ignoreDB) {
+                mSDB.add('mcf', clone(chatRoomInfo));
+            }
+
+            ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+        });
+        ChatdIntegration.deviceId = mcfResponse.d;
+
+        ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
+    }
+    else {
+        ChatdIntegration.mcfHasFinishedPromise.reject(mcfResponse);
+    }
+}
+
 function folderreqerr(c, e)
 {
     loadingDialog.hide();
@@ -7097,8 +7148,25 @@ function loadfm_callback(res, ctx) {
     if (res.ps) {
         processPS(res.ps);
     }
+    if (res.mcf && !megaChatIsDisabled) {
+        processMCF(res.mcf.c ? res.mcf.c : res.mcf);
+    }
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
+
+        // Check if the key for a folderlink was correct
+        if (folderlink && missingkeys[M.RootID]) {
+            loadingDialog.hide();
+            loadingInitDialog.hide();
+
+            loadfm.loaded = false;
+            loadfm.loading = false;
+
+            return mKeyDialog(pfid, true, true)
+                .fail(function() {
+                    location.hash = 'start';
+                });
+        }
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {

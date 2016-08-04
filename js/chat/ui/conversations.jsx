@@ -134,7 +134,7 @@ var ConversationsListItem = React.createClass({
 
             var emptyMessage = (
                 (
-                    megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' ||
+                    ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' ||
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                     chatRoom.messagesBuff.joined === false
                     ) ? (
@@ -212,7 +212,7 @@ var ConversationsList = React.createClass({
             activeCallSession.endCall('hangup');
             this.conversationClicked(activeCallSession.room, e);
         }
-    }, 
+    },
     render: function() {
         var self = this;
 
@@ -497,7 +497,11 @@ var ConversationsApp = React.createClass({
 
                     <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
                         <PerfectScrollbar style={leftPanelStyles}>
-                            <div className="content-panel conversations">
+                            <div className={
+                                "content-panel conversations" + (
+                                    window.location.hash.indexOf("/chat") !== -1 ? " active" : ""
+                                )
+                            }>
                                 <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
                             </div>
                         </PerfectScrollbar>

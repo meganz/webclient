@@ -5561,7 +5561,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background: -o-radial-gradient(center, ellipse cover, #4c4c4c 0%, #000000 100%);
     background: -ms-radial-gradient(center, ellipse cover, #4c4c4c 0%, #000000 100%);
     background: radial-gradient(ellipse at center, #4c4c4c 0%, #000000 100%);
-    z-index: 1300;
+    z-index: 1110;
     position: absolute;
     top: 0;
     left: 0;
@@ -5572,7 +5572,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .light-overlay {
     background-color: rgba(255,255,255,1);
-    z-index: 499;
+    z-index: 1100;
     position: absolute;
     top: 48px;
     left: 0;
@@ -5584,6 +5584,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .light-overlay.transparent {
     height: 100%;
+    z-index: 499;
     background-color: rgba(255,255,255, 0.5);
 }
 .nw-fm-left-icon.rubbish-bin, .nw-fm-left-icon.account {
@@ -8445,7 +8446,7 @@ color: white;
     min-height: 20px;
     left: 200px;
     top: 200px;
-    
+
 }
 .dragger-content {
     min-height: 20px;
@@ -8597,17 +8598,21 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog {
+.fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog, .fm-dialog.network-testing {
     min-width: 440px;
     margin: -77px 0 0 -220px;
 }
-.dlkey-dialog .wrapper {
+.dlkey-dialog .wrapper, .fm-dialog.network-testing .wrapper {
     padding: 10px;
 }
-.dlkey-dialog .instruction-message {
+.dlkey-dialog .instruction-message, .fm-dialog.network-testing .instruction-message {
     color: #777;
-    line-height: 20px;
-    padding: 0 0 20px;
+    line-height: 24px;
+    padding: 0 0 10px;
+}
+
+.fm-dialog.network-testing {
+    width: 512px;
 }
 .dlkey-dialog .decryption-key {
     position: relative;
@@ -8625,6 +8630,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .dlkey-dialog .decryption-key input {
     text-indent: 36px;
+}
+.fm-dialog.network-testing  {
+    margin: -115px 0 0 -256px;
 }
 .fm-dialog.rename-dialog {
     min-width: 360px;
@@ -10211,7 +10219,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    z-index: 500;
+    z-index: 1120;
     padding: 4px 0;
     min-height: 40px;
     top: 48px;
@@ -14229,6 +14237,16 @@ div.membership-bott-button {
     color: #31B500;
 }
 .reg-st3-big-txt span {
+    font-size: 16px;
+    line-height: 32px;
+    text-transform: uppercase;
+}
+.reg-st3-big-txt span.bandwidth-amount {
+    font-size: 24px;
+    line-height: 28px;
+    text-transform: none;
+}
+.reg-st3-big-txt span.bandwidth-unit {
     font-size: 16px;
     line-height: 32px;
     text-transform: uppercase;
@@ -25370,6 +25388,56 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
 .help2 img[alt="small"] {
     max-width: 50%;
 }
+
+table.speed-table {
+     -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #fafafa;
+    border-bottom-color: #f2f2f2;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-image-outset: 0 0 0 0;
+    border-image-repeat: stretch stretch;
+    border-image-slice: 100% 100% 100% 100%;
+    border-image-source: none;
+    border-image-width: 1 1 1 1;
+    border-left-color: #f2f2f2;
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-right-color: #f2f2f2;
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-top-color: #f2f2f2;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-top-style: solid;
+    border-top-width: 1px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 6px;
+    width: 100%;
+}
+
+/* Network Test Dialog Region */
+
+.speed-table th, .speed-table td{
+    text-align: right;
+}
+.speed-table th:first-child, .speed-table td:first-child{
+    text-align: left;
+}
+.speed-table td{
+    color: #666;
+    padding-top: 4px;
+}
+
 .copyrights-dispute-bottom {
     background-color: #FAFAFA;
     margin-top: 24px;
@@ -25477,6 +25545,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
     right: 0;
     top: 0;
 }
+
+.fm-dialog.copy-dialog .share-dialog-permissions {
+    margin-top: 12px;
+    float: left;
+}
+
 .perfectScrollbarContainer {
     position: relative;
 }

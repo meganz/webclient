@@ -149,7 +149,7 @@ var NetworkTesting = (function() {
             failed = true;
             speedtest(url, size);
             xhr.abort();
-        }
+        };
 
         xhr.onprogress = function(ev) {
             if (!$table.is(':visible')) {

@@ -2185,7 +2185,7 @@ function MegaData()
             html = '<a class="fm-breadcrumbs ' + typeclass + ' ' + hasnext
                     + ' ui-droppable" id="path_' + htmlentities(a2[i]) + '">'
                         + '<span class="right-arrow-bg ui-draggable">'
-                            + '<span>' + name + '</span>'
+                            + '<span>' + htmlentities(name)  + '</span>'
                         + '</span>'
                     + '</a>' + html;
             hasnext = 'has-next-button';
@@ -2207,7 +2207,7 @@ function MegaData()
         }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
             $('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs search ui-droppable" id="'
-                                            + htmlentities(a[i]) + '">'
+                                            + htmlentities(a2[i]) + '">'
                                                 + '<span class="right-arrow-bg ui-draggable">'
                                                     + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
                                                     + '</span>'

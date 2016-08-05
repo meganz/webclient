@@ -447,3 +447,74 @@
     background-repeat: no-repeat;
     background-position: center -5633px;
 }
+.small-icon.membership {
+    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-repeat: no-repeat;
+    background-position: center -2094px;
+    position: relative;
+}
+.small-icon.membership.pro4 {
+    background-position: center -2124px;
+}
+.small-icon.membership.pro1 {
+    background-position: center -2154px;
+}
+.small-icon.membership.pro2 {
+    background-position: center -2184px;
+}
+.small-icon.membership.pro3 {
+    background-position: center -2214px;
+}
+.tiny-icon.cog {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -17px -10463px;
+}
+.medium-icon.rocket {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -10px -10781px;
+}
+.huge-white-icon.achivement {
+    background-image: url(../images/mega/account-sprite.png);
+    width: 72px;
+    height: 72px;
+}
+.huge-white-icon.achivement.rocket {
+    background-position: 0 -86px;
+}
+.huge-white-icon.achivement.syncing-pc {
+    background-position: -104px -86px;
+}
+.huge-white-icon.achivement.mobile-device {
+    background-position: 0 -175px;
+}
+.huge-white-icon.achivement.mega-app {
+    background-position: -104px -175px;
+}
+.huge-white-icon.achivement.phone {
+    background-position: 0 -264px;
+}
+.huge-white-icon.achivement.profile {
+    background-position: -104px -264px;
+}
+.huge-white-icon.achivement.conversations {
+    background-position: 0 -353px;
+}
+.huge-white-icon.achivement.shared-folder {
+    background-position: -104px -353px;
+}
+.big-icon.cloud {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: 0px -10734px;
+}
+.big-icon.speedometer {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: 0px -10684px;
+}
+.semi-big-icon.cloud-up {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -7px -10390px;
+}
+.semi-big-icon.cloud-down {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -7px -10420px;
+}

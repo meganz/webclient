@@ -5915,7 +5915,7 @@ function execsc(actionPackets, callback) {
                     if (actionPacket.u === u_handle) {
                         u_attr.email = user.m;
 
-                        if (M.currentdirid === 'account/profile') {
+                        if (M.currentdirid === 'account') {
                             $('.nw-fm-left-icon.account').trigger('click');
                         }
                     }

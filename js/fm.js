@@ -1,8 +1,11 @@
-function voucherCentering(button) {
-    var popupBlock = $('.fm-voucher-popup');
-    var rigthPosition = $('.fm-account-main').outerWidth() - $(popupBlock).outerWidth();
-    var buttonMid = button.width() / 2;
-    popupBlock.css('top', button.position().top - 141);
+function voucherCentering($button) {
+    var $popupBlock = $('.fm-voucher-popup'), 
+        popupHeight = $popupBlock.outerHeight();
+    if ($button.position().top + 10 > popupHeight) {
+        $popupBlock.css('top', $button.position().top - popupHeight - 35);
+    } else {
+        $popupBlock.css('top', $button.position().top + $button.outerHeight() + 35);
+    }
 }
 
 function deleteScrollPanel(from, data) {
@@ -14,10 +17,10 @@ function deleteScrollPanel(from, data) {
 
 function initAccountScroll(scroll)
 {
-    $('.fm-account-main').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
-    jScrollFade('.fm-account-main');
+    $('.account.tab-content:visible').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
+    jScrollFade('.account.tab-content:visible');
     if (scroll) {
-        var jsp = $('.fm-account-main').data('jsp');
+        var jsp = $('.account.tab-content:visible').data('jsp');
         if (jsp) {
             jsp.scrollToBottom();
         }
@@ -2985,7 +2988,7 @@ function accountUI() {
     var sectionTitle;
     var sectionClass;
 
-    $('.fm-account-overview').removeClass('hidden');
+    $('.fm-account-notifications').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
@@ -2993,7 +2996,6 @@ function accountUI() {
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
-    $('.fm-account-main').removeClass('white-bg');
 
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
@@ -3017,10 +3019,10 @@ function accountUI() {
         var perc, warning, perc_c;
         var id = document.location.hash;
 
-        if (id == '#fm/account/settings') {
+        if (id == '#fm/account/advanced') {
             $('.fm-account-settings').removeClass('hidden');
-            sectionTitle = l[823];
-            sectionClass = 'settings';
+            sectionTitle = l[1716];
+            sectionClass = 'advanced';
 
             if (is_chrome_firefox) {
                 if (!$('#acc_dls_folder').length) {
@@ -3042,14 +3044,12 @@ function accountUI() {
                 }
             }
         }
-        else if (id == '#fm/account/profile') {
-            $('.fm-account-main').addClass('white-bg');
+        else if (id == '#fm/account') {
             $('.fm-account-profile').removeClass('hidden');
-            sectionTitle = l[984];
-            sectionClass = 'profile';
+            sectionTitle = l[403];
+            sectionClass = 'account-s';
         }
         else if (id == '#fm/account/history') {
-            $('.fm-account-main').addClass('white-bg');
             $('.fm-account-history').removeClass('hidden');
             sectionTitle = l[985];
             sectionClass = 'history';
@@ -3065,16 +3065,14 @@ function accountUI() {
                 alarm.nonActivatedAccount.render(true);
             }
 
-            $('.fm-account-overview').removeClass('hidden');
-            sectionTitle = l[983];
-            sectionClass = 'overview';
+            $('.fm-account-notifications').removeClass('hidden');
+            sectionTitle = l[862];
+            sectionClass = 'notifications';
         }
 
         $('.fm-account-button.' + sectionClass).addClass('active');
         $('.fm-breadcrumbs.account').addClass('has-next-button');
         $('.fm-breadcrumbs.next').attr('class', 'fm-breadcrumbs next ' + sectionClass).find('span').text(sectionTitle);
-
-        $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
 
         if (u_attr.p) {
 
@@ -3082,21 +3080,11 @@ function accountUI() {
             var planNum = u_attr.p;
             var planText = getProPlan(planNum);
 
-            $('.membership-big-txt.accounttype').text(planText);
-            $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
+            $('.account.plan-info.accounttype').text(planText);
+            $('.small-icon.membership').addClass('pro' + planNum);
 
             // Subscription
             if (account.stype == 'S') {
-                $('.fm-account-header.typetitle').text(l[434]);
-                if (account.scycle == '1 M') {
-                    $('.membership-big-txt.type').text(l[748]);
-                }
-                else if (account.scycle == '1 Y') {
-                    $('.membership-big-txt.type').text(l[749]);
-                }
-                else {
-                    $('.membership-big-txt.type').text('');
-                }
 
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
@@ -3105,12 +3093,13 @@ function accountUI() {
                 // Display the date their subscription will renew in format '14 March 2015 (credit card)'
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
-                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.membership-medium-txt.expiry').html(dateString + ' ' + paymentType);
+                    var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+                    $('.account.plan-info.expiry').html(dateString);
+                    $('.account.plan-info.expiry-txt').html(l[7354]);
                 }
                 else {
                     // Otherwise just show payment type
-                    $('.membership-medium-txt.expiry').html(paymentType);
+                    $('.account.plan-info.expiry, .account.plan-info.expiry-txt').html('');
                 }
 
                 // Check if there are any active subscriptions
@@ -3134,32 +3123,47 @@ function accountUI() {
             else if (account.stype == 'O') {
 
                 // one-time or cancelled subscription
-                $('.fm-account-header.typetitle').text(l[746]+':');
-                $('.membership-big-txt.type').text(l[751]);
-                $('.membership-medium-txt.expiry a').rebind('click', function() {
+                $('.account.plan-info.expiry a').rebind('click', function() {
                     document.location = $(this).attr('href');
                 });
-                $('.membership-medium-txt.expiry a').html(l[987] + ' ' + time2date(account.expiry));
-                $('.fm-account-blocks .btn-cancel').hide();
+                $('.account.plan-info.expiry-txt').html(l[987]);
+                $('.account.plan-info.expiry a').html(time2date(account.expiry));
+                $('.account.data-block .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }
         }
         else {
 
-            // free account:
-            $('.fm-account-blocks .membership-icon.type').addClass('free');
-            $('.membership-big-txt.type').text(l[435]);
-            $('.membership-big-txt.accounttype').text(l[435]);
-            $('.membership-medium-txt.expiry').text(l[436]);
+            // free account:  
+            $('.account.plan-info.accounttype').text(l[435]);
+            $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').hide();
             $('.subscription-bl').removeClass('active-subscription');
         }
 
+        // Maximum bandwidth
+        var b1 = bytesToSize(account.servbw_used + account.downbw_used);
+        b1 = b1.split(' ');
+        b1[0] = Math.round(b1[0]) + ' ';
+        var b2 = bytesToSize(account.bw);
+        b2 = b2.split(' ');
+        b2[0] = Math.round(b2[0]) + ' ';
+
+        $('.account.plan-info.bandwidth').html(htmlentities(b2[0]) + ' ' + htmlentities(b2[1]));
+
+        // Maximum disk space
+        var b2 = bytesToSize(account.space);
+        b2 = b2.split(' ');
+        b2[0] = Math.round(b2[0]) + ' ';
+
+        $('.account.plan-info.storage').html(htmlentities(b2[0]) + ' ' + htmlentities(b2[1]));
+
+
         perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
         perc_c=perc;
 
-        /* New Used Bandwidth bar */
 
+        /* New Used Bandwidth chart */
         var b1 = bytesToSize(account.servbw_used + account.downbw_used);
         b1 = b1.split(' ');
         b1[0] = Math.round(b1[0]) + ' ';
@@ -3168,38 +3172,25 @@ function accountUI() {
         b2[0] = Math.round(b2[0]) + ' ';
         var b3 = bytesToSize(account.bw - (account.servbw_used + account.downbw_used));
 
-        var bandwidthDeg = 360 * perc_c / 100;
-        if (bandwidthDeg <= 180) {
-                $('.bandwidth .nw-fm-chart0.right-c p').css('transform', 'rotate(' + bandwidthDeg + 'deg)');
-        }
-        else {
-                $('.bandwidth .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
-                $('.bandwidth .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (bandwidthDeg - 180) + 'deg)');
-        }
+        var deg =  234 * perc_c / 100;
 
-        if (bandwidthDeg > 0) {
-            $('.bandwidth .nw-fm-percentage').removeClass('empty');
+        /* Used Bandwidth chart */
+        if (deg <= 180) {
+            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+        } else {
+            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
+            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
-        $('.bandwidth .nw-fm-bar0').css('width', perc_c + '%');
 
         // Maximum bandwidth
-        $('.bandwidth .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
-        $('.bandwidth .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
-        $('.bandwidth .nw-fm-percents span.perc-txt').html(perc_c + '%');
-
-        // Used bandwidth
-        $('.bandwidth .fm-bar-size.used').html(b1);
-
-        // Available bandwidth
-        $('.bandwidth .fm-bar-size.available').html(b3);
-
-        if (perc > 99) {
-            $('.fm-account-blocks.storage').addClass('exceeded');
-        }
-
-        /* End of Used Bandwidth bar */
+        $('.bandwidth .chart.data .size-txt').html(htmlentities(b1));
+        $('.bandwidth .chart.data .pecents-txt').html(htmlentities(b2[0]));
+        $('.bandwidth .chart.data .gb-txt').html(htmlentities(b2[1]));
+        $('.bandwidth .chart.data .perc-txt').html(perc_c + '%');
+        /* End of New Used Bandwidth chart */
 
 
+        /* New Used space */
         perc = Math.round(account.space_used / account.space * 100);
         perc_c = perc;
         if (perc_c > 100)
@@ -3207,60 +3198,36 @@ function accountUI() {
         if (perc > 99)
             $('.fm-account-blocks.storage').addClass('exceeded');
 
-        /* New Used space bar */
-
         var c = account.cstrgn, k = Object.keys(c), deg = 0, iSharesBytes = 0;
-        // Array contains Cloud drive , Rubbish bin, Incoming shares, Inbox (percents)
-        var percents = [
-            100 * c[k[0]][0] / account.space,
-            100 * c[k[2]][0] / account.space,
-            0,
-            100 * c[k[1]][0] / account.space
-        ];
-        for (var i = 3 ; i < k.length ; ++i ) {
-            iSharesBytes += c[k[i]][0];
-            percents[2] += (100 * c[k[i]][0] / account.space);
+        var deg =  234 * perc_c / 100;
+
+        /* Used space chart */
+        if (deg <= 180) {
+            $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+        } else {
+            $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
+            $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
-        for (i = 0; i < 4; i++) {
-            deg = deg + (360 * percents[i] / 100);
-            if (deg <= 180) {
-                $('.storage .nw-fm-chart' + i + '.right-c p').css('transform', 'rotate(' + deg + 'deg)');
-            } else {
-                $('.storage .nw-fm-chart' + i + '.right-c p').css('transform', 'rotate(180deg)');
-                $('.storage .nw-fm-chart' + i + '.left-c p').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-            }
-            if (deg > 0) $('.storage .nw-fm-percentage').removeClass('empty');
-            $('.storage .nw-fm-bar' + i).css('width', percents[i] + '%');
+
+        /* Demo of achivement chart */
+        deg = (deg <= 20) ? deg : 20;
+        if (deg <= 180) {
+            $('.storage .achivement.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+        } else {
+            $('.storage .achivement.left-chart span').css('transform', 'rotate(180deg)');
+            $('.storage .achivement.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum disk space
         var b2 = bytesToSize(account.space);
         b2 = b2.split(' ');
         b2[0] = Math.round(b2[0]) + ' ';
-        $('.storage .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
-        $('.storage .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
-        $('.storage .nw-fm-percents span.perc-txt').html(perc_c + '%');
+        $('.storage .chart.data .pecents-txt').html(htmlentities(b2[0]));
+        $('.storage .chart.data .gb-txt').html(htmlentities(b2[1]));
+        $('.storage .chart.data .perc-txt').html(perc_c + '%');
 
         // Used space
-        $('.storage .fm-bar-size.used').html(bytesToSize(account.space_used));
-        // Available space
-        b2 = account.space - account.space_used;
-        if (b2 < 0) {
-            b2 = bytesToSize(-b2) + ' over quota';
-        } else {
-            b2 = bytesToSize(b2);
-        }
-
-        $('.storage .fm-bar-size.available').html(b2);
-        // Cloud drive
-        $('.storage .fm-bar-size.cloud-drive').html(bytesToSize(c[k[0]][0]));
-        // Rubbish bin
-        $('.storage .fm-bar-size.rubbish-bin').html(bytesToSize(c[k[2]][0]));
-        // Incoming shares
-        $('.storage .fm-bar-size.incoming-shares').html(bytesToSize(iSharesBytes));
-        // Inbox
-        $('.storage .fm-bar-size.inbox').html(bytesToSize(c[k[1]][0]));
-
+        $('.storage .chart.data .size-txt').html(bytesToSize(account.space_used));
         /* End of New Used space */
 
 
@@ -3269,7 +3236,7 @@ function accountUI() {
         {
             window.location.hash = 'pro';
         });
-        $('.membership-big-txt.balance').html('&euro; ' + htmlentities(account.balance[0][0]));
+        $('.account.plan-info.balance').html('&euro; ' + htmlentities(account.balance[0][0]));
         var a = 0;
         if (M.c['contacts']) {
             for (var i in M.c['contacts'])
@@ -3646,7 +3613,7 @@ function accountUI() {
             u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
             u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
 
-            $('.fm-account-avatar').html(useravatar.contact(u_handle));
+            $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
             $('.fm-avatar img').attr('src', useravatar.mine());
 
             api_req({
@@ -3825,7 +3792,7 @@ function accountUI() {
             showToast('settings', l[7698]);
             accountUI();
         });
-        $('.current-email').html(htmlentities(u_attr.email));
+        $('#current-email').val(u_attr.email);
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
 
@@ -4304,8 +4271,8 @@ function accountUI() {
             bindDropdownEvents($('.default-select.vouchertype'));
         }
 
-        $('.fm-purchase-voucher,.default-big-button.topup').unbind('click');
-        $('.fm-purchase-voucher,.default-big-button.topup').bind('click', function(e)
+        $('.fm-purchase-voucher,.default-white-button.topup').unbind('click');
+        $('.fm-purchase-voucher,.default-white-button.topup').bind('click', function(e)
         {
             document.location.hash = 'resellers';
         });
@@ -4339,7 +4306,7 @@ function accountUI() {
                     mega.attr.set('a', 'none', true, false);
 
                     useravatar.invalidateAvatar(u_handle);
-                    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle));
+                    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
                     $('.fm-avatar img').attr('src', useravatar.mine());
                     $('.fm-account-remove-avatar').hide();
                 }
@@ -4351,7 +4318,7 @@ function accountUI() {
         {
             avatarDialog();
         });
-        $('.fm-account-avatar').html(useravatar.contact(u_handle));
+        $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
 
         $('#find-duplicate').rebind('click', mega.utils.findDupes);
 
@@ -4367,6 +4334,20 @@ function accountUI() {
         $('.membership-big-txt.name').text(u_attr.name);
     }
 
+    // Show Membership plan
+    $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
+    if (u_attr.p) {
+            // LITE/PRO account
+            var planNum = u_attr.p;
+            var planText = getProPlan(planNum);
+
+            $('.account.membership-plan').text(planText);
+            $('.small-icon.membership').addClass('pro' + planNum);
+    }
+    else {
+        $('.account.membership-plan').text(l[435]);
+    }
+
     // Show email address
     if (u_attr.email) {
         $('.membership-big-txt.email').text(u_attr.email);
@@ -4375,8 +4356,8 @@ function accountUI() {
         $('.membership-big-txt.email').hide();
     }
 
-    $('.editprofile').rebind('click', function() {
-        document.location.hash = 'fm/account/profile';
+    $('.editprofile, .account.settings-button').rebind('click', function() {
+        document.location.hash = 'fm/account';
     });
 
     $('.rubbish-bin-link').rebind('click', function() {
@@ -4436,22 +4417,36 @@ function accountUI() {
     $('.fm-account-button').bind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
             switch (true) {
-                case ($(this).attr('class').indexOf('overview') >= 0):
+                case ($(this).hasClass('account-s')):
                     document.location.hash = 'fm/account';
                     break;
-                case ($(this).attr('class').indexOf('profile') >= 0):
-                    document.location.hash = 'fm/account/profile';
+                case ($(this).hasClass('advanced')):
+                    document.location.hash = 'fm/account/advanced';
                     break;
-                case ($(this).attr('class').indexOf('settings') >= 0):
-                    document.location.hash = 'fm/account/settings';
+                case ($(this).hasClass('notifications')):
+                    document.location.hash = 'fm/account/notifications';
                     break;
-                case ($(this).attr('class').indexOf('history') >= 0):
+                case ($(this).hasClass('history')):
                     document.location.hash = 'fm/account/history';
                     break;
-                case ($(this).attr('class').indexOf('reseller') >= 0):
+                case ($(this).hasClass('reseller')):
                     document.location.hash = 'fm/account/reseller';
                     break;
             }
+        }
+    });
+
+    $('.account.tab-lnk').unbind('click');
+    $('.account.tab-lnk').bind('click', function() {
+        if ($(this).attr('class').indexOf('active') == -1) {
+            var $this = $(this),
+                $sectionBlock = $this.closest('.fm-account-sections'),
+                currentTab = $this.attr('data-tab');
+            $sectionBlock.find('.account.tab-content:not(.hidden)').addClass('hidden');
+            $sectionBlock.find('.account.tab-content.' + currentTab).removeClass('hidden');
+            $sectionBlock.find('.account.tab-lnk.active').removeClass('active');
+            $this.addClass('active');
+            $(window).trigger('resize');
         }
     });
 
@@ -4531,7 +4526,7 @@ function avatarDialog(close)
                 mega.attr.set('a', ab_to_base64(data), true, false);
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
-                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle));
+                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },
@@ -10588,7 +10583,7 @@ function fm_resize_handler() {
         if ($mainBlock.width() > 1675) {
             $mainBlock.addClass('hi-width');
         }
-        else if ($mainBlock.width() < 920) {
+        else if ($mainBlock.width() < 880) {
             $mainBlock.addClass('low-width');
         } else {
             $mainBlock.removeClass('low-width hi-width');

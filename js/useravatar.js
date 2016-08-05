@@ -104,7 +104,8 @@ var useravatar = (function() {
      * @param {String} element The HTML tag
      * @return {String} Returns the HTML
      */
-    function _letters(letters, id, className, element) {
+    function _letters(letters, id, className, element, bg) {
+        var bgBlock = '';
 
         if (element === 'ximg') {
             return _lettersImg(letters);
@@ -116,9 +117,15 @@ var useravatar = (function() {
             _watching[id] = {};
         }
 
+        if (bg) {
+            bgBlock = '<div class="avatar-bg colorized"><span class="colorized color' + s.colorIndex + '"></span></div>';
+        }
+
         _watching[id][className] = true;
-        return '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
-                    + '<div class="verified_icon"></div>'
+        return bgBlock +
+                    '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '">'
+                    + '<span>'
+                    + '<i class="verified_icon"></i>'
                     + s.letters
                 + '</span></' + element + '>';
     };
@@ -132,10 +139,16 @@ var useravatar = (function() {
      * @param {String} type The HTML tag type
      * @returns {String} The image HTML
      */
-    function _image(url, id, className, type) {
+    function _image(url, id, className, type, bg) {
+        var bgBlock = '';
 
-        return '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">'
-                + '<div class="verified_icon"></div>'
+        if (bg) {
+            bgBlock = '<div class="avatar-bg"><span style="background-image: url(' + url + ');"></span></div>';
+        }
+
+        return bgBlock 
+                + '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">'
+                + '<i class="verified_icon"></i>'
                 + '<img src="' + url + '">'
          + '</' + type + '>';
     };
@@ -150,7 +163,7 @@ var useravatar = (function() {
      * @param {String} element Wrap the output with `element` tag
      * @returns HTML
      */
-    function emailAvatar(email, className, element) {
+    function emailAvatar(email, className, element, bg) {
 
         var found = false;
         // User is an email, we should look if the user
@@ -158,7 +171,7 @@ var useravatar = (function() {
         M.u.every(function(contact, u) {
             if (M.u[u].m === email) {
                 // Found the user object
-                found = ns.contact(M.u[u], className, element);
+                found = ns.contact(M.u[u], className, element, bg);
                 return false;
             }
             else {
@@ -170,7 +183,7 @@ var useravatar = (function() {
             return found;
         }
 
-        return _letters(email.substr(0, 2), email, className, element);
+        return _letters(email.substr(0, 2), email, className, element, bg);
     }
 
 
@@ -278,6 +291,7 @@ var useravatar = (function() {
         if (user === u_handle) {
             // my avatar!
             $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
+            $('.fm-account-avatar .avatar-bg span').css('background-image', 'url(' + ns.imgUrl(user) + ')');
         }
 
         if (M.u[user]) {
@@ -404,7 +418,7 @@ var useravatar = (function() {
      * @param {String} element
      * @returns {String}
      */
-    ns.contact = function(user, className, element) {
+    ns.contact = function(user, className, element, bg) {
         if (!className) {
             className = 'avatar';
         }
@@ -423,7 +437,7 @@ var useravatar = (function() {
                 user = M.u[user];
             }
             else {
-                return _letters(user, user, className, element);
+                return _letters(user, user, className, element, bg);
             }
         }
 
@@ -434,7 +448,7 @@ var useravatar = (function() {
         isUserVerified(user.u);
 
         if (avatars[user.u]) {
-            return _image(avatars[user.u].url, user.u, className, element);
+            return _image(avatars[user.u].url, user.u, className, element, bg);
         }
 
         var letters = M.getNameByHandle(user.u);
@@ -444,7 +458,7 @@ var useravatar = (function() {
             letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
         }
 
-        return _letters(letters, user.u, className, element);
+        return _letters(letters, user.u, className, element, bg);
     };
 
     // Generic logic to retrieve and process user-avatars

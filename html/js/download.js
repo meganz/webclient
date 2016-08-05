@@ -247,6 +247,16 @@ function dl_g(res) {
                             alert('Unknown device.');
                     }
 
+                    // If the intent is not being thrown we assume the user doesn't
+                    // have our APP so we redirect to their phone's store
+                    // This works everywhere but in Safari
+                    setTimeout(function() {
+                        document.location = $('.mobile.download-app').attr('href');
+                        if (!isSafari || (new Date).getTime() - loadedAt < 2000) {
+                            document.location = $('.mobile.download-app').attr('href');
+                        }
+                    }, 500);
+
                     return false;
                 });
 

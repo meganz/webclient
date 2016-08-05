@@ -392,6 +392,13 @@ MegaQueue.prototype.push = function(arg, next, self) {
     this._process();
 };
 
+MegaQueue.prototype.unshift = function(arg, next, self) {
+    this._queue.unshift([arg, next, self]);
+    // this.logger.debug('Queueing new task, total: %d', this._queue.length, arg);
+    this.trigger('queue');
+    this._process();
+};
+
 function TransferQueue() {
     MegaQueue.prototype.constructor.apply(this, arguments);
 

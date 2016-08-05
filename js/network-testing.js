@@ -134,6 +134,7 @@ var NetworkTesting = (function() {
         var started = new Date();
         var hostname =  url.match(/https?:\/\/([^\/]+)/)[1];
         var ping = null;
+        var failed = false;
 
         $table.removeClass('hidden');
         $table.find('.server').text(hostname);
@@ -144,6 +145,12 @@ var NetworkTesting = (function() {
             $table.find('.progress').text(progress);
         }
 
+        xhr.onerror = function(ev) {
+            failed = true;
+            speedtest(url, size);
+            xhr.abort();
+        };
+
         xhr.onprogress = function(ev) {
             if (!$table.is(':visible')) {
                 return xhr.abort();
@@ -152,6 +159,9 @@ var NetworkTesting = (function() {
         };
 
         xhr.onreadystatechange = function() {
+            if (failed) {
+                return;
+            }
             switch (this.readyState) {
             case this.HEADERS_RECEIVED:
                 speed = new SpeedMeter(updateSpeedData, size);

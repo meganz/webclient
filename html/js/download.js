@@ -18,7 +18,7 @@ var MOBILE_FILETYPES = {
 
 if (navigator.userAgent.match(/CriOS/i)) {
     // chrome on iOS :-(
-    MOBILE_MAXFILESIZE = 3 * (1024 * 1024);
+    MOBILE_MAXFILESIZE = 1.5 * (1024 * 1024);
 }
 
 

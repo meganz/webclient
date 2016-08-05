@@ -15,6 +15,11 @@ var ExtraFooterElement = React.createClass({
 
 var ModalDialog = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps() {
+        return {
+            'hideable': true
+        }
+    },
     componentDidMount: function() {
         var self = this;
         $(document.body).addClass('overlayed');
@@ -53,6 +58,13 @@ var ModalDialog = React.createClass({
 
         if (self.props.onClose) {
             self.props.onClose(self);
+        }
+    },
+    onPopupDidMount: function(elem) {
+        this.domNode = elem;
+        if (this.props.popupDidMount) {
+            // bubble up...
+            this.props.popupDidMount(elem);
         }
     },
     render: function() {
@@ -111,7 +123,7 @@ var ModalDialog = React.createClass({
         }
 
         return (
-            <utils.RenderTo element={document.body} className={classes}>
+            <utils.RenderTo element={document.body} className={classes} popupDidMount={this.onPopupDidMount}>
                 <div>
                     <div className="fm-dialog-close" onClick={self.onCloseClicked}></div>
                     {
@@ -131,6 +143,11 @@ var ModalDialog = React.createClass({
 
 var BrowserCol = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps() {
+        return {
+            'hideable': true
+        }
+    },
     render: function() {
         var self = this;
 
@@ -152,6 +169,11 @@ var BrowserCol = React.createClass({
 });
 var BrowserEntries = React.createClass({
     mixins: [MegaRenderMixin],
+    getDefaultProps() {
+        return {
+            'hideable': true
+        }
+    },
     getInitialState: function() {
         return {
             'selected': []
@@ -260,7 +282,7 @@ var BrowserEntries = React.createClass({
                 </tr>
             )
         });
-        return <utils.JScrollPane className="fm-dialog-grid-scroll">
+        return <utils.JScrollPane className="fm-dialog-grid-scroll" selected={this.state.selected}>
             <table className="grid-table fm-dialog-table">
                 <tbody>
                 {items}
@@ -275,6 +297,7 @@ var CloudBrowserDialog = React.createClass({
         return {
             'selectLabel': __("Attach"),
             'cancelLabel': __("Cancel"),
+            'hideable': true
         }
     },
     getInitialState: function() {
@@ -359,6 +382,9 @@ var CloudBrowserDialog = React.createClass({
     onAttachClicked: function() {
         this.props.onAttachClicked();
     },
+    onPopupDidMount: function(elem) {
+        this.domNode = elem;
+    },
     render: function() {
         var self = this;
 
@@ -406,6 +432,7 @@ var CloudBrowserDialog = React.createClass({
                 onClose={() => {
                     self.props.onClose(self);
                 }}
+                popupDidMount={self.onPopupDidMount}
                 buttons={[
                         {
                             "label": self.props.selectLabel,
@@ -467,6 +494,7 @@ var SelectContactDialog = React.createClass({
         return {
             'selectLabel': __("Send"),
             'cancelLabel': __("Cancel"),
+            'hideable': true
         }
     },
     getInitialState: function() {
@@ -558,7 +586,8 @@ var ConfirmDialog = React.createClass({
     getDefaultProps: function() {
         return {
             'confirmLabel': __("Continue"),
-            'cancelLabel': __("Cancel")
+            'cancelLabel': __("Cancel"),
+            'hideable': true
         }
     },
     getInitialState: function() {

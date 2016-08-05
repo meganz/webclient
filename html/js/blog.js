@@ -373,10 +373,10 @@ if (typeof mobileblog !== 'undefined') {
         document.body.innerHTML = markup.replace(/<\/?(?:html\:)?script[^>]*?>/gi, '')
             .replace(RegExp(' (' + eventHandlers.join("|") + ')', 'g'), ' data-dummy');
 
-        if (android) {
+        if (window.android) {
             document.body.className = 'android blog';
         }
-        else if (ios) {
+        else if (window.is_ios) {
             document.body.className = 'ios blog';
         }
         else {

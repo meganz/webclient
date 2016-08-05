@@ -1,6 +1,7 @@
 var ReactDOM = require("react-dom");
 
-// copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module
+// copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module and
+// adapted to be a bit more optimal for functions...
 function shallowEqual(objA, objB) {
     if (objA === objB) {
         return true;
@@ -8,9 +9,25 @@ function shallowEqual(objA, objB) {
     var key;
     // Test for A's keys different from B.
     for (key in objA) {
-        if (objA.hasOwnProperty(key) &&
-            (!objB.hasOwnProperty(key) || objA[key] !== objB[key])) {
-            return false;
+        if (key === "children") {
+            // skip!
+            continue;
+        }
+        if (objA.hasOwnProperty(key)) {
+            if (!objB.hasOwnProperty(key)) {
+                return false;
+            }
+            else if (objA[key] !== objB[key]) {
+                // handle/match functions code
+                if (typeof(objA[key]) === 'function' && typeof(objB[key]) === 'function') {
+                    if (objA[key].toString() !== objB[key].toString()) {
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
         }
     }
     // Test for B's keys missing from A.
@@ -22,7 +39,7 @@ function shallowEqual(objA, objB) {
     return true;
 }
 
-
+window.shallowEqual = shallowEqual;
 
 var MAX_ALLOWED_DEBOUNCED_UPDATES = 1;
 var DEBOUNCED_UPDATE_TIMEOUT = 40;
@@ -108,6 +125,11 @@ var MegaRenderMixin = {
         this._isMounted = true;
     },
     findDOMNode: function() {
+        if (this.domNode) {
+            // injected by RenderTo and ModalDialogs
+            return this.domNode;
+        }
+
         return ReactDOM.findDOMNode(this);
     },
     componentWillUnmount: function() {
@@ -127,7 +149,7 @@ var MegaRenderMixin = {
             return false;
         }
         // offsetParent should NOT trigger a reflow/repaint
-        if (domNode.offsetParent === null) {
+        if (!this.props.hideable && (!domNode || domNode[0].offsetParent === null)) {
             return false;
         }
         if (!domNode.is(":visible")) {
@@ -143,14 +165,14 @@ var MegaRenderMixin = {
      * @returns {bool}
      */
     isComponentEventuallyVisible: function() {
-        var domNode = $(this.findDOMNode());
+        var domNode = this.findDOMNode();
 
         // ._isMounted is faster then .isMounted() or any other operation
         if (!this._isMounted) {
             return false;
         }
         // offsetParent should NOT trigger a reflow/repaint
-        if (domNode.offsetParent === null) {
+        if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
             return false
         }
         return true;
@@ -215,7 +237,8 @@ var MegaRenderMixin = {
 
 
         if (typeof map._dataChangeIndex !== "undefined") {
-            var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
+            var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() +
+                            "_" + idx;
             if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
                 _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
                     self.onPropOrStateUpdated(map, idx);
@@ -247,12 +270,27 @@ var MegaRenderMixin = {
             // console.error('r === rv, !v', k, referenceMap, map);
             return false; // continue/skip
         }
+        if (!rv && v) { // null, undefined, false is ok
+            return true;
+        }
 
+        if (v === null && rv !== null) {
+            return true;
+        }
+        else if (v === null && rv === null) {
+            return false;
+        }
+        
         if (typeof v._dataChangeIndex !== "undefined") {
-            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
+            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
+                                "_" + idx;
 
             if (dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
-                if (window.RENDER_DEBUG) console.error("changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
+                if (window.RENDER_DEBUG) {
+                    console.error(
+                        "changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v
+                    );
+                }
                 foundChanges = true;
                 dataChangeHistory[cacheKey] = v._dataChangeIndex;
             } else {
@@ -290,15 +328,41 @@ var MegaRenderMixin = {
             this._wasRendered = true;
             return true; // first time render, always render the first time
         }
-        // quick lookup
+        // quick lookup for children
         if (
+            idx === "p_children"
+        ) {
+            // found a list of children nodes
+            if (map.map && referenceMap.map) {
+                var oldKeys = map.map(function(child) { return child.key; });
+                var newKeys = referenceMap.map(function(child) { return child.key; });
+                if (!shallowEqual(oldKeys, newKeys)) {
+                    return true;
+                }
+            }
+            else if (
+                (!map && referenceMap) ||
+                (map && !referenceMap)
+            ) {
+                return true;
+            }
+            else if (
+                map.$$typeof && referenceMap.$$typeof
+            ) {
+                if (
+                    !shallowEqual(map.props, referenceMap.props) ||
+                    !shallowEqual(map.state, referenceMap.state)
+                ) {
+                    return true;
+                }
+
+            }
+            // found a single node
+        }
+        else if (
             (map && !referenceMap) ||
             (!map && referenceMap) ||
             (map && referenceMap && !shallowEqual(map, referenceMap))
-        ) {
-            return true;
-        }  else if (
-            map.children && referenceMap.children && !shallowEqual(map.children.length, referenceMap.children.length)
         ) {
             return true;
         }
@@ -316,14 +380,29 @@ var MegaRenderMixin = {
     },
     shouldComponentUpdate: function(nextProps, nextState) {
         var shouldRerender = false;
-        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
+
+        if (
+            !this.isMounted() ||
+            this._pendingForceUpdate === true ||
+            this._updatesDisabled === true
+        ) {
+            if (window.RENDER_DEBUG) {
+                console.error(
+                    "shouldUpdate? No.", "F1", this.getElementName(), this.props, nextProps, this.state, nextState
+                );
+            }
             return false;
         }
 
         // component specific control of the React lifecycle
         if (this.specificShouldComponentUpdate) {
-            var r = this.specificShouldComponentUpdate();
+            var r = this.specificShouldComponentUpdate(nextProps, nextState);
             if (r === false) {
+                if (window.RENDER_DEBUG) {
+                    console.error(
+                        "shouldUpdate? No.", "F2", this.getElementName(), this.props, nextProps, this.state, nextState
+                    );
+                }
                 return false;
             }
             else if (r === true) {
@@ -331,12 +410,29 @@ var MegaRenderMixin = {
             }
         }
 
+        if (!this.isComponentEventuallyVisible()) {
+            if (window.RENDER_DEBUG) {
+                console.error(
+                    "shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState
+                );
+            }
+            return false;
+        }
+
         if (this.props !== null) {
             shouldRerender = this._recursiveSearchForDataChanges("p", nextProps, this.props);
+        }
+        if (shouldRerender === false) {
+            if (window.RENDER_DEBUG) {
+                console.error(
+                    "shouldUpdate? No.", "F3", this.getElementName(), this.props, nextProps, this.state, nextState
+                );
+            }
         }
         if (shouldRerender === false && this.state !== null) {
             shouldRerender = this._recursiveSearchForDataChanges("s", nextState, this.state);
         }
+
 
 
 
@@ -361,6 +457,12 @@ var MegaRenderMixin = {
             }
             if (this.state) {
                 this._recurseAddListenersIfNeeded("s", this.state);
+            }
+        } else {
+            if (window.RENDER_DEBUG) {
+                console.error(
+                    "shouldUpdate? No.", "F4", this.getElementName(), this.props, nextProps, this.state, nextState
+                );
             }
         }
 

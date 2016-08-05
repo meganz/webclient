@@ -312,9 +312,10 @@ mBroadcaster.once('startMega', function __idb_setup() {
 mBroadcaster.once('startMega', function __msdb_init() {
     var db = new mStorageDB('msmain');
 
-    db.addSchemaHandler( 'opc',  'p',  processOPC );
-    db.addSchemaHandler( 'ipc',  'p',  processIPC );
-    db.addSchemaHandler( 'ps',   'p',  processPS  );
+    db.addSchemaHandler('opc',  'p',  processOPC);
+    db.addSchemaHandler('ipc',  'p',  processIPC);
+    db.addSchemaHandler('ps',   'p',  processPS);
+    db.addSchemaHandler('mcf',   'id',  processMCF);
 
     /*mStorageDB('idbcache', { plugins: 0, ersistant: 1 },
         function(aError) {

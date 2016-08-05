@@ -445,7 +445,9 @@ function megatitle(nperc) {
 
 function populate_l() {
     if (d) {
-        for (var i = 10000 ; i-- ; l[i] = l[i] || '(translation-missing)');
+        for (var i = 10000 ; i-- ;) {
+            l[i] = (l[i] || '(translation-missing)');
+        }
     }
     l[0] = 'Mega Limited ' + new Date().getFullYear();
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
@@ -453,7 +455,7 @@ function populate_l() {
     }
     l[1] = l[398];
     if (lang === 'en') {
-        l[1] = 'Go Pro';
+        l[1] = 'Go PRO';
     }
     l[8634] = l[8634].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
@@ -555,9 +557,13 @@ function populate_l() {
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
+    l[8944] = l[8944].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -618,6 +624,7 @@ function browserdetails(useragent) {
     var browser = false;
     var icon = '';
     var name = '';
+    var brand = '';
     var nameTrans = '';
     var current = false;
     var brand = false;
@@ -642,7 +649,8 @@ function browserdetails(useragent) {
     if (useragent.indexOf('windows phone') > 0) {
         icon = 'wp.png';
         os = 'Windows Phone';
-    } else if (useragent.indexOf('android') > 0) {
+    }
+    else if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
     else if (useragent.indexOf('windows') > 0) {
@@ -671,8 +679,13 @@ function browserdetails(useragent) {
     if (mega.browserBrand[brand]) {
         browser = mega.browserBrand[brand];
     }
-    else if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
+    else if (useragent.indexOf(' edge/') > 0) {
         browser = 'Edge';
+    }
+    else if (useragent.indexOf('iemobile/') > 0) {
+        icon = 'ie.png';
+        brand = 'IEMobile';
+        browser = 'Internet Explorer';
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
@@ -749,8 +762,8 @@ function browserdetails(useragent) {
 
     // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
-        name = browser + ' on ' + os;
-        nameTrans = String(l[7684]).replace('%1', browser).replace('%2', os);
+        name = (brand || browser) + ' on ' + os;
+        nameTrans = String(l[7684]).replace('%1', brand || browser).replace('%2', os);
     }
     else if (os) {
         name = os;
@@ -778,7 +791,7 @@ function browserdetails(useragent) {
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
-    details.version = (useragent.match(RegExp("\\s+" + browser + "/([\\d.]+)", 'i')) || [])[1] || 0;
+    details.version = (useragent.match(RegExp("\\s+" + (brand || browser) + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
@@ -790,6 +803,10 @@ function browserdetails(useragent) {
         var ver = useragent.match(/ MEGAext\/([\d.]+)/);
 
         details.isExtension = ver && ver[1] || true;
+    }
+
+    if (brand) {
+        details.brand = brand;
     }
 
     // Determine core engine.
@@ -2099,8 +2116,24 @@ function CreateWorkers(url, message, size) {
     }, size, url.split('/').pop().split('.').shift() + '-worker');
 }
 
-function mKeyDialog(ph, fl) {
+/**
+ * Ask the user for a decryption key
+ * @param {String} ph   The node's handle
+ * @param {String} fl   Whether is a folderlink
+ * @param {String} keyr If a wrong key was used
+ * @return {MegaPromise}
+ */
+function mKeyDialog(ph, fl, keyr) {
     var promise = new MegaPromise();
+
+    if (keyr) {
+        $('.fm-dialog.dlkey-dialog .instruction-message')
+            .text(l[9048]);
+    }
+    else {
+        $('.fm-dialog.dlkey-dialog .instruction-message')
+            .safeHTML(l[7945] + '<br/>' + l[7972]);
+    }
 
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
@@ -2280,9 +2313,9 @@ mSpawnWorker.prototype = {
             if (!(self && self.wrk)) {
                 return;
             }
-            Soon(function() {
+            /*Soon(function() {
                 throw err.message || err;
-            });
+            });*/
             self.unreliably = true;
             var nw = self.nworkers;
             while (nw--) {
@@ -2296,13 +2329,13 @@ mSpawnWorker.prototype = {
                     job.onerror(err);
                 }
             }
-            if (!window[self.token]) {
+            /*if (!window[self.token]) {
                 window[self.token] = true;
                 if (err.filename) {
                     msgDialog('warninga',
                         "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
                 }
-            }
+            }*/
             delete self.wrk;
             delete self.jobs;
             self = undefined;
@@ -2625,6 +2658,7 @@ function bucketspeedometer(initialp) {
 
 function moveCursortoToEnd(el) {
     if (typeof el.selectionStart === "number") {
+        el.focus();
         el.selectionStart = el.selectionEnd = el.value.length;
     }
     else if (typeof el.createTextRange !== "undefined") {
@@ -3477,7 +3511,8 @@ mega.utils.reload = function megaUtilsReload() {
         var u_sid = u_storage.sid,
             u_key = u_storage.k,
             privk = u_storage.privk,
-            debug = !!u_storage.d;
+            debug = u_storage.d,
+            apipath = debug ? localStorage.apipath : undefined;
         var mcd = u_storage.testChatDisabled;
 
         localStorage.clear();
@@ -3499,6 +3534,10 @@ mega.utils.reload = function megaUtilsReload() {
                 if (mcd) {
                     u_storage.testChatDisabled = 1;
                 }
+            }
+            if (apipath) {
+                // restore api path across reloads, only for debugging purposes...
+                localStorage.apipath = apipath;
             }
         }
 
@@ -3711,7 +3750,7 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             attribCache.destroy().always(finishLogout);
         }
-        if (u_privk) {
+        if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
             api_req({ 'a': 'sml' }, { callback: finishLogout });
         }
@@ -4789,7 +4828,7 @@ function getProPlan(planNum) {
  *                   'displayName' which is the translated name for that provider (however
  *                   company names are not translated).
  */
-function getGatewayName(gatewayId) {
+function getGatewayName(gatewayId, gatewayOpt) {
 
     var gateways = {
         0: {
@@ -4854,13 +4893,31 @@ function getGatewayName(gatewayId) {
         },
         15: {
             name: 'directreseller',
-            displayName: l[6952] + ' (6media)'
+            displayName: l[6952]
         },
         999: {
             name: 'wiretransfer',
             displayName: l[6198]    // Wire transfer
         }
     };
+
+    // If the gateway option information was provided we can improve the default naming in some cases
+    if (typeof gatewayOpt !== 'undefined') {
+        if (typeof gateways[gatewayId] !== 'undefined') {
+            // Subgateways should always take their subgateway name from the API if provided
+            gateways[gatewayId].name =
+                (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gateways[gatewayId].name;
+
+            // Direct reseller still requires the translation from above to be in its name
+            if (gatewayId === 15) {
+                gateways[gatewayId].displayName = gateways[gatewayId].displayName + " " + gatewayOpt.displayName;
+            }
+            else {
+                gateways[gatewayId].displayName =
+                    (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gateways[gatewayId].displayName;
+            }
+        }
+    }
 
     // If the gateway exists, return it
     if (typeof gateways[gatewayId] !== 'undefined') {
@@ -4939,7 +4996,7 @@ var debounce = function(func, execAsap) {
                 func.apply(obj, args);
             }
             timeout = null;
-        };
+        }
 
         if (timeout) {
             cancelAnimationFrame(timeout);

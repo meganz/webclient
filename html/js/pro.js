@@ -1095,9 +1095,9 @@ var proPage = {
             var gatewayId = gatewayOpt.gatewayId;
 
             // Get the gateway name and display name
-            var gatewayInfo = getGatewayName(gatewayId);
-            var gatewayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gatewayInfo.name;
-            var displayName = (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gatewayInfo.displayName;
+            var gatewayInfo = getGatewayName(gatewayId, gatewayOpt);
+            var gatewayName = gatewayInfo.name;
+            var displayName = gatewayInfo.displayName;
 
             // If it couldn't find the name (e.g. new provider, use the name from the API)
             if (gatewayInfo.name === 'unknown') {
@@ -1123,7 +1123,7 @@ var proPage = {
             $gateway.find('input').attr('id', gatewayName);
             $gateway.find('input').val(gatewayName);
             $gateway.find('.provider-icon').addClass(gatewayName);
-            $gateway.find('.provider-name').safeHTML(displayName);
+            $gateway.find('.provider-name').text(displayName).attr('title', htmlentities(displayName));
 
             // Build the html
             gatewayHtml += $gateway.prop('outerHTML');
@@ -1358,7 +1358,7 @@ var proPage = {
         }
 
         // Otherwise pre-select the first option available
-        var $firstOption = $('.duration-options-list .payment-duration:not(.template').first();
+        var $firstOption = $('.duration-options-list .payment-duration:not(.template)').first();
         $firstOption.find('input').prop('checked', true);
         $firstOption.find('.membership-radio').addClass('checked');
         $firstOption.find('.membership-radio-label').addClass('checked');
@@ -1404,28 +1404,41 @@ var proPage = {
             planIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
         }
 
-        var currentPlan = membershipPlans[planIndex];
-
         // Change the wording to month or year
+        var currentPlan = membershipPlans[planIndex];
         var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
         var monthOrYearWording = (numOfMonths !== 12) ? l[931] : l[932];
 
         // Get the current plan price
         var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE].split('.');
+        
+        // If less than 12 months is selected, use the monthly base price instead
         if (numOfMonths !== 12) {
-            // Use the monthly base price instead
             price = currentPlan[UTQA_RESPONSE_INDEX_MONTHLYBASEPRICE].split('.');
         }
         var dollars = price[0];
         var cents = price[1];
-
-        // Update the price of the plan
-        $('.membership-step2 .reg-st3-bott-title.price .num').safeHTML(
-            dollars + '<span class="small">.' + cents + ' &euro;</span>'
-        );
-
-        // Update to /month or /year next to the price box
-        $('.membership-step2 .reg-st3-bott-title.price .period').text('/' + monthOrYearWording);
+        
+        // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
+        var bandwidthGigabytes = currentPlan[UTQA_RESPONSE_INDEX_TRANSFER];
+        var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
+        var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
+        var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
+        
+        // Set selectors
+        var $pricingBox = $('.membership-step2 .membership-pad-bl');
+        var $priceNum = $pricingBox.find('.reg-st3-bott-title.price .num');
+        var $pricePeriod = $pricingBox.find('.reg-st3-bott-title.price .period');
+        var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
+        var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
+        
+        // Update the price of the plan and the /month or /year next to the price box
+        $priceNum.safeHTML(dollars + '<span class="small">.' + cents + ' &euro;</span>');
+        $pricePeriod.text('/' + monthOrYearWording);
+        
+        // Update bandwidth
+        $bandwidthAmount.text(bandwidthSizeRounded);
+        $bandwidthUnit.text(bandwidthFormatted.unit);
     },
 
     /**
@@ -1983,10 +1996,15 @@ var directReseller = {
     redirectToSite: function(utcResult) {
         var provider = utcResult['EUR']['provider'];
         var params = utcResult['EUR']['params'];
+        params = atob(params);
 
+        // Gary at 6media
         if (provider === 1) {
-            params = atob(params);
             window.location = 'http://mega.and1.tw/zh_tw/order_mega.php?' + params;
+        }
+        // BWM Mediasoft
+        else if (provider === 2) {
+            window.location = 'https://mega.bwm-mediasoft.com/mega.php5?' + params;
         }
     }
 };

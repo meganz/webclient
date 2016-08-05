@@ -42,7 +42,10 @@ function dlinfo(ph,key,next)
     dlpage_ph   = ph;
     dlpage_key  = key;
 
-    if (!is_mobile) {
+    if (is_mobile) {
+        $('.mobile.dl-browser, .mobile.dl-megaapp').addClass('disabled');
+    }
+    else {
         watchdog.query('dlsize', 2100, true);
     }
 
@@ -141,7 +144,10 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
-            if (!is_mobile) {
+            if (is_mobile) {
+                $('.mobile.dl-browser, .mobile.dl-megaapp').removeClass('disabled');
+            }
+            else {
                 $('.download-button.to-clouddrive').show();
                 $('.download-button.with-megasync').show();
             }
@@ -240,11 +246,7 @@ function dl_g(res) {
                         default:
                             alert('Unknown device.');
                     }
-                    setTimeout(function() {
-                        if (!isSafari || (new Date()).getTime() - loadedAt < 2000) {
-                            document.location = $('.mobile.download-app').attr('href');
-                        }
-                    }, 500);
+
                     return false;
                 });
 
@@ -271,8 +273,18 @@ function dl_g(res) {
                 }
             }
         }
+        else if (is_mobile) {
+            var mkey = prompt(l[1026]);
+
+            if (mkey) {
+                location.hash = '#!' + dlpage_ph + '!' + mkey;
+            }
+            else {
+                dlpage_key = null;
+            }
+        }
         else {
-            mKeyDialog(dlpage_ph)
+            mKeyDialog(dlpage_ph, false, key)
                 .fail(function() {
                     $('.download.error-text.message').text(l[7427]).removeClass('hidden');
                     $('.info-block .block-view-file-type').addClass(fileIcon({name:'unknown'}));
@@ -290,7 +302,10 @@ function dl_g(res) {
             $('#mobile-ui-notFound').removeClass('hidden');
 
             var msg;
-            if (res === ETOOMANY) {
+            if (!dlpage_key) {
+                msg = l[7945] + '<p>' + l[7946];
+            }
+            else if (res === ETOOMANY) {
                 msg = l[243] + '<p>' + l[731];
             }
             else if (res.e === ETEMPUNAVAIL) {
@@ -345,8 +360,8 @@ function browserDownload() {
 
 function setMobileAppInfo() {
     switch (ua.details.os) {
-        case 'iPhone':
         case 'iPad':
+        case 'iPhone':
             $('.app-info-block').addClass('ios');
             $('.mobile.download-app').attr('href', 'https://itunes.apple.com/app/mega/id706857885');
             break;
@@ -354,7 +369,7 @@ function setMobileAppInfo() {
         case 'Windows Phone':
             $('.app-info-block').addClass('wp');
             $('.mobile.download-app').attr('href', 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a');
-            $('.mobile.dl-browser').hide();
+            $('.mobile.dl-browser').addClass('disabled').unbind('click');
             break;
 
         case 'Android':

@@ -252,7 +252,7 @@ function dl_g(res) {
                     // This works everywhere but in Safari
                     setTimeout(function() {
                         document.location = $('.mobile.download-app').attr('href');
-                        if (!isSafari || (new Date).getTime() - loadedAt < 2000) {
+                        if (!isSafari || (new Date()).getTime() - loadedAt < 2000) {
                             document.location = $('.mobile.download-app').attr('href');
                         }
                     }, 500);

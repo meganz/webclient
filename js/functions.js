@@ -562,6 +562,8 @@ function populate_l() {
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -2114,8 +2116,24 @@ function CreateWorkers(url, message, size) {
     }, size, url.split('/').pop().split('.').shift() + '-worker');
 }
 
-function mKeyDialog(ph, fl) {
+/**
+ * Ask the user for a decryption key
+ * @param {String} ph   The node's handle
+ * @param {String} fl   Whether is a folderlink
+ * @param {String} keyr If a wrong key was used
+ * @return {MegaPromise}
+ */
+function mKeyDialog(ph, fl, keyr) {
     var promise = new MegaPromise();
+
+    if (keyr) {
+        $('.fm-dialog.dlkey-dialog .instruction-message')
+            .text(l[9048]);
+    }
+    else {
+        $('.fm-dialog.dlkey-dialog .instruction-message')
+            .safeHTML(l[7945] + '<br/>' + l[7972]);
+    }
 
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
@@ -3493,7 +3511,8 @@ mega.utils.reload = function megaUtilsReload() {
         var u_sid = u_storage.sid,
             u_key = u_storage.k,
             privk = u_storage.privk,
-            debug = !!u_storage.d;
+            debug = u_storage.d,
+            apipath = debug ? localStorage.apipath : undefined;
         var mcd = u_storage.testChatDisabled;
 
         localStorage.clear();
@@ -3515,6 +3534,10 @@ mega.utils.reload = function megaUtilsReload() {
                 if (mcd) {
                     u_storage.testChatDisabled = 1;
                 }
+            }
+            if (apipath) {
+                // restore api path across reloads, only for debugging purposes...
+                localStorage.apipath = apipath;
             }
         }
 
@@ -3727,7 +3750,7 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             attribCache.destroy().always(finishLogout);
         }
-        if (u_privk) {
+        if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
             api_req({ 'a': 'sml' }, { callback: finishLogout });
         }

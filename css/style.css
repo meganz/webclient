@@ -11362,7 +11362,7 @@ table {
 }
 .account.radio-buttons {
     padding: 9px 0 22px 0;
-    width: 530px;
+    /*width: 530px;*/
 }
 .account.radio-buttons.bottom-pad {
     padding-bottom: 41px;

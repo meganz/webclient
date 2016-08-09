@@ -3250,7 +3250,7 @@ function accountUI() {
         /* No achivements */
         if (!localStorage.achivements) {
             $('.fm-right-account-block').removeClass('active-achivements');
-            $('.account.quota-txt.used-space').html( '<span>' + bytesToSize(account.space_used) + '</span>' + l[5528] + bytesToSize(account.space));
+            $('.account.quota-txt.used-space').html( '<span>' + bytesToSize(account.space_used) + '</span> ' + l[5528] + ' ' + bytesToSize(account.space));
 
             var percents = [
                 100 * c[k[0]][0] / account.space,

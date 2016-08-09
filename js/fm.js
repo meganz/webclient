@@ -3245,6 +3245,40 @@ function accountUI() {
 
         // Used space
         $('.storage .chart.data .size-txt').html(bytesToSize(account.space_used));
+
+
+        /* No achivements */
+        if (!localStorage.achivements) {
+            $('.fm-right-account-block').removeClass('active-achivements');
+            $('.account.quota-txt.used-space').html( '<span>' + bytesToSize(account.space_used) + '</span>' + l[5528] + bytesToSize(account.space));
+
+            var percents = [
+                100 * c[k[0]][0] / account.space,
+                100 * c[k[2]][0] / account.space,
+                0,
+                100 * c[k[1]][0] / account.space
+            ];
+            for (var i = 3 ; i < k.length ; ++i ) {
+                iSharesBytes += c[k[i]][0];
+                percents[2] += (100 * c[k[i]][0] / account.space);
+            }
+            for (i = 0; i < 4; i++) {
+                $('.account.progress-bar.pr' + i).css('width', percents[i] + '%');
+            }
+
+            // Cloud drive
+            $('.account.progress-txt.cloud-drive').html(bytesToSize(c[k[0]][0]));
+            // Rubbish bin
+            $('.account.progress-txt.rubbish-bin').html(bytesToSize(c[k[2]][0]));
+            // Incoming shares
+            $('.account.progress-txt.incoming-shares').html(bytesToSize(iSharesBytes));
+            // Inbox
+            $('.account.progress-txt.inbox').html(bytesToSize(c[k[1]][0]));
+        } else {
+            $('.fm-right-account-block').addClass('active-achivements');
+        }
+        /* End of No achivements */
+
         /* End of New Used space */
 
 

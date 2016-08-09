@@ -11346,7 +11346,7 @@ table {
     border-color: #FF333A;
     color: #333333;
 }
-.account.storage-quota {
+.account.quota-txt {
     font-size: 18px;
     line-height: 24px;
     color: #777777;
@@ -11385,7 +11385,7 @@ table {
     right: 2px;
     top: 2px;
 }
-.account.storage-quota span {
+.account.quota-txt span {
     color: #333333;
 }
 .account.checkbox-buttons {
@@ -24332,68 +24332,106 @@ div.camera-bottom-txt {
     width: 100%;
     float: none;
 }
-.achivements-list {
+.account.progress-list {
     padding: 15px 0 15px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
-.achivements-list.half-sized + .achivements-list.half-sized {
-    padding: 15px 0 15px 35px;
-}
-.achivement-item {
     font-size: 0;
     line-height: 24px;
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    padding: 3px 0 4px 0;
 }
-.achivement-indicator {
+.account.progress-list.half-sized + .account.progress-list.half-sized {
+    padding: 15px 0 15px 35px;
+}
+.account.progress-indicator {
     width: 12px;
     height: 12px;
     border: 2px solid #CCCCCC;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    margin: 6px 11px 0 0;
-    display: inline-block;
-    vertical-align: top;
+    margin: 9px 11px 9px 0;
+    float: left;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
 }
-.achivement-indicator.active {
+.account.progress-indicator.active {
     background-color: #CCCCCC;
 }
-.achivement-indicator.red, .achivement-bar.red {
-    background-color: #FF333A;
+.account.progress-indicator.red {
     border-color: #FF333A;
 }
-.achivement-indicator.dark-violet, .achivement-bar.dark-violet {
-    background-color: #514152;
+.account.progress-indicator.red.active, .account.progress-bar.red {
+    background-color: #FF333A;
+}
+.account.progress-indicator.dark-violet {
     border-color: #514152;
 }
-.achivement-reward {
+.account.progress-indicator.dark-violet.active, .account.progress-bar.dark-violet {
+    background-color: #514152;
+}
+.account.progress-indicator.blue {
+    border-color: #1FA5E0;
+}
+.account.progress-indicator.blue.active, .account.progress-bar.blue {
+    background-color: #1FA5E0;
+}
+.account.progress-indicator.orange {
+    border-color: #F27800;
+}
+.account.progress-indicator.orange.active, .account.progress-bar.orange {
+    background-color: #F27800;
+}
+.account.progress-indicator.yellow {
+    border-color: #FFD500;
+}
+.account.progress-indicator.yellow.active, .account.progress-bar.yellow {
+    background-color: #FFD500;
+}
+.account.progress-indicator.green {
+    border-color: #00E22C;
+}
+.account.progress-indicator.green.active, .account.progress-bar.green {
+    background-color: #00E22C;
+}
+.account.progress-txt {
     font-size: 18px;
     color: #777777;
-    display: inline-block;
-    vertical-align: top;
-    margin: 0 0 0 0;
-    min-width: 53px;
+    float: left;
+    min-width: 56px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 2px 12px 0 0;
+    height: 30px;
 }
-.achivement-title {
+.account.progress-title {
     font-size: 14px;
     color: #333333;
-    display: inline-block;
-    vertical-align: top;
-    margin: 1px 0 0 0;
+    padding: 3px 0 0 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 30px;
+}
+.account.used-space-block {
+    padding-bottom: 20px;
+}
+.account.achivements-block, .active-achivements .account.used-space-block {
+    display: none;
+}
+.active-achivements .account.achivements-block {
+    display: block;
 }
 .red-txt {
     color: #D90007;
 }
-.achivements-progress {
+.account.progress-block {
     height: 24px;
     background-color: #EEEEEE;
     font-size: 0;
@@ -24402,10 +24440,14 @@ div.camera-bottom-txt {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
+    margin: 0;
 }
-.achivement-bar {
+.account.progress-bar {
     height: 24px;
     display: inline-block;
+}
+.account.progress-block.used-space, .used-space .account.progress-bar {
+    height: 32px;
 }
 .achivements-table {
     display: table;

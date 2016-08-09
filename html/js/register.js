@@ -90,16 +90,23 @@ function doregister() {
 }
 
 function registeraccount() {
+    var rv = {};
     var ctx = {
         callback: function(res) {
             if (res === 0) {
+                var ops = {
+                    a: 'up'
+                };
                 loadingDialog.hide();
                 passwordManager($('#register_form'));
+
                 if (m) {
                     done_text1 = l[216];
                     done_text2 = l[217];
                     page = 'done';
                     mobileui();
+
+                    ops.name2 = $('#register_name').val();
                 }
                 else {
                     $('.fm-dialog.registration-page-success').unbind('click');
@@ -107,20 +114,14 @@ function registeraccount() {
                     // fm_showoverlay();
                     // ^ legacy confirmation dialog, with no email change option
                     mega.ui.sendSignupLinkDialog(rv);
-                }
-                var ops = {
-                    a: 'up'
-                };
-                if (m) {
-                    ops.name2 = $('#register_name').val();
-                }
-                else {
-                    var uname = $('#register-firstname').val() + ' ' + $('#register-lastname').val();
+
                     ops.terms = 'Mq';
-                    ops.firstname = base64urlencode(to8($('#register-firstname').val()));
-                    ops.lastname = base64urlencode(to8($('#register-lastname').val()));
-                    ops.name2 = base64urlencode(to8(uname));
+                    ops.firstname = base64urlencode(to8(rv.first));
+                    ops.lastname = base64urlencode(to8(rv.last));
+                    ops.name2 = base64urlencode(to8(rv.name));
                     u_attr.terms = 1;
+
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(rv);
                 }
                 api_req(ops);
             }
@@ -161,16 +162,17 @@ function registeraccount() {
             }
         }
     };
-    var rv = {};
     if (m) {
         rv.name = $('#register_name').val();
         rv.email = $('#register_email').val();
         rv.password = $('#register_password').val();
     }
     else {
-        rv.name = $('#register-firstname').val() + ' ' + $('#register-lastname').val();
-        rv.email = $('#register-email').val();
         rv.password = $('#register-password').val();
+        rv.first = $('#register-firstname').val();
+        rv.last = $('#register-lastname').val();
+        rv.email = $('#register-email').val();
+        rv.name = rv.first + ' ' + rv.last;
     }
     sendsignuplink(rv.name, rv.email, rv.password, ctx);
 }

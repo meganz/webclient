@@ -3249,7 +3249,6 @@ function accountUI() {
 
         /* No achivements */
         if (!localStorage.achivements) {
-            var b3 = 
             $('.fm-right-account-block').removeClass('active-achivements');
             $('.account.quota-txt.used-space').html('<span>' 
                 + bytesToSize(account.space_used) 

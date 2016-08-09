@@ -89,9 +89,6 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.1);
-    -moz-box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.1);
-    box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.1);
     white-space: nowrap;
 }
 .default-grey-button {
@@ -104,34 +101,8 @@
     background: -moz-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
     background: -webkit-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
     background: linear-gradient(to bottom, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
-    -webkit-box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.2);
-    -moz-box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.2);
-    box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.2);
 }
-.default-grey-button:before {
-    -webkit-box-shadow: 0px 0px 0px 1px #777777);
-    -moz-box-shadow: 0px 0px 0px 1px #777777;
-    box-shadow: 0px 0px 0px 1px #777777;
-    content: '';
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-}
-.default-grey-button:hover {
-    -webkit-box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.2), 0px 0px 0px 4px rgba(0,0,0,0.15);
-    -moz-box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.2), 0px 0px 0px 4px rgba(0,0,0,0.15);
-    box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.2), 0px 0px 0px 4px rgba(0,0,0,0.15);
-}
-.default-white-button.small-text {
-    font-size: 13px;
-}
-.default-white-button::before, .default-white-button::after {
+.default-grey-button:before, .default-grey-button:after, .default-white-button::before, .default-white-button::after {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -146,15 +117,28 @@
     -webkit-border-radius: 4px;
     border-radius: 4px;
 }
+.default-grey-button:after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+}
+.default-grey-button:hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+}
+.default-white-button.small-text {
+    font-size: 13px;
+}
 .default-white-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
 }
 .default-white-button:not(.tiny-button):hover {
-    -webkit-box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.1), 0px 0px 0px 4px rgba(0,0,0,0.15);
-    -moz-box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.1), 0px 0px 0px 4px rgba(0,0,0,0.15);
-    box-shadow: inset 0px -2px 0px 0px rgba(0,0,0,0.1), 0px 0px 0px 4px rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
 }
 .default-white-button:not(.tiny-button) i {
     margin: 6px 6px 1px -5px;

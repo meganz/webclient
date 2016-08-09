@@ -950,8 +950,7 @@ a.account-manage-button:hover {
     float: left;
 }
 .account-counter-block .radio-txt {
-    padding-right:0;
-    
+    padding-right: 0;
 }
 .account.rubbish-inputs {
     min-width: 250px;
@@ -8472,7 +8471,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     line-height: 24px;
     padding: 0 0 10px;
 }
-
 .fm-dialog.network-testing {
     width: 512px;
 }
@@ -8493,7 +8491,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .dlkey-dialog .decryption-key input {
     text-indent: 36px;
 }
-.fm-dialog.network-testing  {
+.fm-dialog.network-testing {
     margin: -115px 0 0 -256px;
 }
 .fm-dialog.rename-dialog {
@@ -11361,8 +11359,7 @@ table {
     padding: 6px 0 0 0;
 }
 .account.radio-buttons {
-    padding: 9px 0 22px 0;
-    /*width: 530px;*/
+    padding: 9px 0 22px 0;/*width: 530px;*/
 }
 .account.radio-buttons.bottom-pad {
     padding-bottom: 41px;
@@ -24336,12 +24333,12 @@ div.camera-bottom-txt {
     float: none;
 }
 .achivements-list {
-    padding: 14px 0 14px 0;
+    padding: 15px 0 15px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.achivements-list.half-sized +.achivements-list.half-sized {
+.achivements-list.half-sized + .achivements-list.half-sized {
     padding: 15px 0 15px 35px;
 }
 .achivement-item {
@@ -24351,7 +24348,7 @@ div.camera-bottom-txt {
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    padding: 2px 0;
+    padding: 3px 0 4px 0;
 }
 .achivement-indicator {
     width: 12px;
@@ -24397,7 +24394,7 @@ div.camera-bottom-txt {
     color: #D90007;
 }
 .achivements-progress {
-    height: 32px;
+    height: 24px;
     background-color: #EEEEEE;
     font-size: 0;
     white-space: nowrap;
@@ -24407,7 +24404,7 @@ div.camera-bottom-txt {
     border-radius: 3px;
 }
 .achivement-bar {
-    height: 32px;
+    height: 24px;
     display: inline-block;
 }
 .achivements-table {
@@ -24463,9 +24460,9 @@ div.camera-bottom-txt {
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
 }
-.achivement-icon {
+.achivement-left-side {
     position: absolute;
-    width: 113px;
+    width: 114px;
     height: -webkit-calc(100% - 50px);
     height: -moz-calc(100% - 50px);
     height: calc(100% - 50px);
@@ -24476,28 +24473,29 @@ div.camera-bottom-txt {
     box-sizing: border-box;
     z-index: 1;
 }
-.achivements-cell i {
+.achivements-cell .huge-white-icon {
     position: absolute;
     left: 50%;
-    top: 50%;
-    margin: -36px 0 0 -36px;
+    top: -5px;
+    margin: 0 0 0 -37px;
 }
 .achivement-full.info {
-    padding: 0 24px 48px 0;
-    margin-left: 137px;
+    padding: 0 24px 49px 0;
+    margin-left: 138px;
     position: relative;
     z-index: 1;
 }
 .achivement-full.title {
     font-size: 18px;
-    line-height: 24px;
+    line-height: 22px;
     color: #333333;
+    padding: 1px 0 0 0;
 }
 .achivement-full.description {
     font-size: 14px;
     line-height: 18px;
     color: #999999;
-    padding-top: 18px;
+    padding-top: 19px;
 }
 .achivement-full.status {
     position: absolute;
@@ -24505,23 +24503,42 @@ div.camera-bottom-txt {
     width: -moz-calc(100% - 160px);
     width: calc(100% - 160px);
     bottom: 18px;
-    left: 137px;
+    left: 138px;
     z-index: 1;
 }
+.achivement-full.rewards {
+    width: 100%;
+    position: absolute;
+    bottom: -2px;
+    font-size: 0;
+    white-space: nowrap;
+}
 .achivement-full.reward {
-    font-size: 30px;
-    line-height: 38px;
+    font-size: 20px;
+    line-height: 20px;
     color: #666666;
-    float: left;
+    padding: 10px 15px 0 15px;
+}
+.achivement-full.reward i {
+    width: 34px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0 0 0 0;
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+.achivement-full.reward-txt {
+    display: inline-block;
+    padding: 1px 0 0 4px;
 }
 .achivement-full.reward span {
-    font-size: 16px;
-    padding-left: 2px;
+    font-size: 14px;
+    text-transform: uppercase;
+    padding-left: 3px;
 }
 .achivement-full .default-grey-button {
-    float: right;
     min-width: 111px;
-    margin-top: 5px
+    margin-bottom: 6px;
 }
 .achivement-complete {
     font-size: 16px;
@@ -24532,7 +24549,7 @@ div.camera-bottom-txt {
     font-size: 14px;
     line-height: 18px;
     color: #999999;
-    padding: 2px 0 7px 0;
+    padding: 2px 0 6px 0;
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
@@ -25636,9 +25653,8 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 .help2 img[alt="small"] {
     max-width: 50%;
 }
-
 table.speed-table {
-     -moz-border-bottom-colors: none;
+    -moz-border-bottom-colors: none;
     -moz-border-left-colors: none;
     -moz-border-right-colors: none;
     -moz-border-top-colors: none;
@@ -25672,20 +25688,18 @@ table.speed-table {
     padding-top: 6px;
     width: 100%;
 }
-
 /* Network Test Dialog Region */
 
-.speed-table th, .speed-table td{
+.speed-table th, .speed-table td {
     text-align: right;
 }
-.speed-table th:first-child, .speed-table td:first-child{
+.speed-table th:first-child, .speed-table td:first-child {
     text-align: left;
 }
-.speed-table td{
+.speed-table td {
     color: #666;
     padding-top: 4px;
 }
-
 .copyrights-dispute-bottom {
     background-color: #FAFAFA;
     margin-top: 24px;
@@ -25790,16 +25804,14 @@ table.speed-table {
     right: 0;
     top: 0;
 }
-
 .fm-dialog.copy-dialog .share-dialog-permissions {
     margin-top: 12px;
     float: left;
 }
-
 .perfectScrollbarContainer {
     position: relative;
 }
-.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail,  .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail {
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail, .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail {
     background-color: transparent !important;
     opacity: 1;
 }

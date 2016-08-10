@@ -251,7 +251,6 @@ function dl_g(res) {
                     // have our APP so we redirect to their phone's store
                     // This works everywhere but in Safari
                     setTimeout(function() {
-                        document.location = $('.mobile.download-app').attr('href');
                         if (!isSafari || (new Date()).getTime() - loadedAt < 2000) {
                             document.location = $('.mobile.download-app').attr('href');
                         }
@@ -368,24 +367,35 @@ function browserDownload() {
     }
 }
 
+function getStoreLink() {
+    switch (ua.details.os) {
+    case 'iPad':
+    case 'iPhone':
+        return 'https://itunes.apple.com/app/mega/id706857885';
+
+    case 'Windows Phone':
+        return'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+
+    case 'Android':
+        return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
+    }
+}
+
 function setMobileAppInfo() {
+    $('.mobile.download-app').attr('href', getStoreLink());
     switch (ua.details.os) {
         case 'iPad':
         case 'iPhone':
             $('.app-info-block').addClass('ios');
-            $('.mobile.download-app').attr('href', 'https://itunes.apple.com/app/mega/id706857885');
             break;
 
         case 'Windows Phone':
             $('.app-info-block').addClass('wp');
-            $('.mobile.download-app').attr('href', 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a');
             $('.mobile.dl-browser').addClass('disabled').unbind('click');
             break;
 
         case 'Android':
             $('.app-info-block').addClass('android');
-            $('.mobile.download-app').attr('href',
-                'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid');
             break;
     }
 }

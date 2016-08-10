@@ -253,12 +253,13 @@ var ConversationsList = React.createClass({
         sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
         sortedConversations.forEach((chatRoom) => {
+            var contact;
             if (!chatRoom || !chatRoom.roomJid) {
                 return;
             }
 
             if (chatRoom.type === "private") {
-                var contact = chatRoom.getParticipantsExceptMe()[0];
+                contact = chatRoom.getParticipantsExceptMe()[0];
                 if (!contact) {
                     return;
                 }
@@ -276,6 +277,7 @@ var ConversationsList = React.createClass({
                 <ConversationsListItem
                     key={chatRoom.roomJid.split("@")[0]}
                     chatRoom={chatRoom}
+                    contact={contact}
                     messages={chatRoom.messagesBuff}
                     megaChat={megaChat}
                     onConversationClicked={(e) => {

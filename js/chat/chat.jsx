@@ -1699,7 +1699,7 @@ Chat.prototype.renderListing = function() {
 
             sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
-            if (sortedConversations.length > 1) {
+            if (sortedConversations.length > 0) {
                 var room = sortedConversations[0];
                 room.setActive();
                 room.show();

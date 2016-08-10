@@ -16,6 +16,12 @@ var MOBILE_FILETYPES = {
     "xlsx" : 'word'
 };
 
+if (navigator.userAgent.match(/CriOS/i)) {
+    // chrome on iOS :-(
+    MOBILE_MAXFILESIZE = 1.5 * (1024 * 1024);
+}
+
+
 function dlinfo(ph,key,next)
 {
     dl_next = next;
@@ -218,10 +224,13 @@ function dl_g(res) {
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
+                    var loadedAt = new Date().getTime();
+                    var isSafari = false;
                     switch (ua.details.os) {
                         case 'iPad':
                         case 'iPhone':
                             window.location = "mega://" + location.hash;
+                            isSafari = !window.chrome;
                             break;
 
                         case 'Windows Phone':
@@ -237,6 +246,17 @@ function dl_g(res) {
                         default:
                             alert('Unknown device.');
                     }
+
+                    // If the intent is not being thrown we assume the user doesn't
+                    // have our APP so we redirect to their phone's store
+                    // This works everywhere but in Safari
+                    setTimeout(function() {
+                        document.location = $('.mobile.download-app').attr('href');
+                        if (!isSafari || (new Date()).getTime() - loadedAt < 2000) {
+                            document.location = $('.mobile.download-app').attr('href');
+                        }
+                    }, 500);
+
                     return false;
                 });
 

@@ -12212,7 +12212,7 @@
         "context": "Open the whole blog post"
     },
     "8513": {
-        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\r\n\r\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\n\r\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\r\n\r\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\r\n\r\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\r\n\r\nFor more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/\r\n\r\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\r\n\r\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\n\r\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\r\n\r\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\r\n\r\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\r\n\r\nFor more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/\r\n\r\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the MEGA cloud storage system.",
         "context": "IMPORTANT: Master Key has been renamed to Recovery Key.\r\n\r\nGeneral description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\r\n\" AND \"\t\"."
     },
     "8514": {
@@ -14250,5 +14250,37 @@
     "9048": {
         "text": "The provided key is invalid. Please check that the key is correct or ask the creator of the link again.",
         "context": "A dialog message which is shown after a user provided a decryption key for a public link and the key was invalid."
+    },
+    "9049": {
+        "text": "You have attempted to log in too many times. Please wait until %@ and try again.",
+        "context": "An error message which is shown when there have been too many attempts to log in."
+    },
+    "9050": {
+        "text": "Please check your email and click the link to confirm your account.",
+        "context": "An error message which is shown when trying to login to an account that is not validated."
+    },
+    "9051": {
+        "text": "Your account has not been confirmed yet.",
+        "context": "A dialog message which is shown when the user is trying to login and the account has not been confirmed yet."
+    },
+    "9052": {
+        "text": "You have attempted to log in too many times. Please wait until {0} and try again.",
+        "context": "A dialog message which is shown when the user is trying to login and has made several failed attempts.\r\nPreserve the {0} code because is for including the exact time the user has to wait until."
+    },
+    "9053": {
+        "text": "MEGA accesses your microphone when you capture a video inside the app.",
+        "context": "The microphone usage description. To protect user privacy, Apple requires a string explaining why the microphone will be accessed."
+    },
+    "9054": {
+        "text": "MEGA accesses your camera when you capture a video or photo inside the app.",
+        "context": "The camera usage description. To protect user privacy, Apple requires a string explaining why the camera will be accessed."
+    },
+    "9055": {
+        "text": "MEGA accesses your photos or\/and videos when you select some of them to upload or when you have enabled the Camera Uploads.",
+        "context": "The photo library usage description. To protect user privacy Apple requires a string explaining why this will be accessed."
+    },
+    "9056": {
+        "text": "Please do not enter any URL into the Copyrighted work field, if you need to add more URLs please click on \"Add another URL\".",
+        "context": "An error message which is shown when submitting a copyright notice and a URL is mistakenly inserted into the \"Copyrighted work claimed to have been infringed\" field."
     }
 }

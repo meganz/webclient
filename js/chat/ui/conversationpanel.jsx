@@ -145,6 +145,7 @@ var ConversationRightArea = React.createClass({
         if (
             myPresence === 'offline' ||
             !room.iAmOperator() ||
+            room.isReadOnly() ||
             room.messagesBuff.messages.length === 0 ||
             (
                 room.messagesBuff.messages.length === 1 &&

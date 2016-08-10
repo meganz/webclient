@@ -11055,6 +11055,12 @@ function contactUI() {
             fm_showoverlay();
         });
 
+        // Remove contact button on contacts page
+        $('.fm-remove-contact').rebind('click', function() {
+            $.selected = [M.currentdirid];
+            fmremove();
+        });
+
         if (!megaChatIsDisabled) {
 
             // Bind the "Start conversation" button

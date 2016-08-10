@@ -761,6 +761,7 @@ var GenericConversationMessage = React.createClass({
                         contact && contact.u === u_handle &&
                         (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
                         self.state.editing !== true &&
+                        chatRoom.isReadOnly() === false &&
                         !message.requiresManualRetry
                     ) {
                         messageActionButtons = <ButtonsUI.Button

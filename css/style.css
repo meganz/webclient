@@ -7575,11 +7575,15 @@ table {
 .fm-send-files span, .fm-send-files.disabled span {
     background-position: -9px -1700px;
 }
-.fm-remove-contact span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-reset-stored-fingerprint span, .fm-question span {
+.fm-remove-contact span {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHRpdGxlPnJlbW92ZTwvdGl0bGU+PGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+PGcgZmlsbD0ibm9uZSI+PGcgZmlsbD0iIzc3NyI+PHBhdGggZD0iTTExLjk1IDEwLjU0TDYuNzcgNS4zNmMtLjItLjItLjUyLS4yLS43IDBsLS43LjdjLS4yMi4yLS4yLjUyIDAgLjdsNS4xNyA1LjItNS4xOCA1LjE3Yy0uMi4yLS4yLjUyIDAgLjdsLjcuN2MuMi4yMi41Mi4yLjcgMGw1LjItNS4xNyA1LjE3IDUuMThjLjIuMi41Mi4yLjcgMGwuNy0uN2MuMjItLjIuMi0uNTIgMC0uN2wtNS4xNy01LjIgNS4xOC01LjE3Yy4yLS4yLjItLjUyIDAtLjdsLS43LS43Yy0uMi0uMjItLjUyLS4yLS43IDBsLTUuMiA1LjE3eiIvPjwvZz48L2c+PC9zdmc+);
+}
+.fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-reset-stored-fingerprint span, .fm-question span {
     background-image: url(../images/mega/shared-sprite_v3.svg);
 }
 .fm-remove-contact span, .fm-remove-contact.disabled span {
-    background-position: -31px -458px;
+    padding-left: 26px;
+    background-position: 0px 0px !important;
 }
 .fm-start-conversation span, .fm-start-conversation.disabled span {
     background-position: -4px -713px;

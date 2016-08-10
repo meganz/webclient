@@ -42,7 +42,7 @@ SpeedMeter.prototype.avg = function(speeds) {
 
     var total = 0;
     for (var i = 0; i < speeds.length; ++i) {
-        total += speeds[i][0] / (speeds[i][1] - this._started);
+        total += speeds[i][0] / Math.max(1, speeds[i][1] - this._started);
     }
 
     return total / speeds.length;
@@ -76,7 +76,7 @@ SpeedMeter.prototype.update = function() {
  */
 SpeedMeter.prototype.getData = function() {
 
-    var time = new Date() - this._started;
+    var time = Math.max(new Date() - this._started, 1);
     var simpleSpeed = this._progress / time;
     var avgSpeed = this.avg(this._samples.slice(-5));
     return {
@@ -134,6 +134,7 @@ var NetworkTesting = (function() {
         var started = new Date();
         var hostname =  url.match(/https?:\/\/([^\/]+)/)[1];
         var ping = null;
+        var failed = false;
 
         $table.removeClass('hidden');
         $table.find('.server').text(hostname);
@@ -144,6 +145,12 @@ var NetworkTesting = (function() {
             $table.find('.progress').text(progress);
         }
 
+        xhr.onerror = function(ev) {
+            failed = true;
+            speedtest(url, size);
+            xhr.abort();
+        };
+
         xhr.onprogress = function(ev) {
             if (!$table.is(':visible')) {
                 return xhr.abort();
@@ -152,6 +159,9 @@ var NetworkTesting = (function() {
         };
 
         xhr.onreadystatechange = function() {
+            if (failed) {
+                return;
+            }
             switch (this.readyState) {
             case this.HEADERS_RECEIVED:
                 speed = new SpeedMeter(updateSpeedData, size);

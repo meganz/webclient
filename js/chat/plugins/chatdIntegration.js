@@ -351,6 +351,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             return;
         }
 
+        // try to find the chat room again, it may had been opened while waiting for the mcurl api call...
+        chatRoom = self.megaChat.chats[roomJid];
         if (!chatRoom) {
             // don't try to open a chat, if its not yet opened and the actionPacket consist of me leaving...
             if (actionPacket.n) {

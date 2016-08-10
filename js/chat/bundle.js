@@ -1313,7 +1313,7 @@
 
 	            sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
-	            if (sortedConversations.length > 1) {
+	            if (sortedConversations.length > 0) {
 	                var room = sortedConversations[0];
 	                room.setActive();
 	                room.show();
@@ -19438,12 +19438,13 @@
 	        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
 	        sortedConversations.forEach(function (chatRoom) {
+	            var contact;
 	            if (!chatRoom || !chatRoom.roomJid) {
 	                return;
 	            }
 
 	            if (chatRoom.type === "private") {
-	                var contact = chatRoom.getParticipantsExceptMe()[0];
+	                contact = chatRoom.getParticipantsExceptMe()[0];
 	                if (!contact) {
 	                    return;
 	                }
@@ -19460,6 +19461,7 @@
 	            currConvsList.push(React.makeElement(ConversationsListItem, {
 	                key: chatRoom.roomJid.split("@")[0],
 	                chatRoom: chatRoom,
+	                contact: contact,
 	                messages: chatRoom.messagesBuff,
 	                megaChat: megaChat,
 	                onConversationClicked: function onConversationClicked(e) {

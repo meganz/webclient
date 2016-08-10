@@ -1023,7 +1023,7 @@ function transferPanelContextMenu(target)
     // origin of some problems, users can still use the new d&d logic to move transfers
     menuitems.filter('.move-up,.move-down').hide();
 
-    if (target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
+    if (target.length === 1 && target.eq(0).attr('id').match(/^dl_/) && !!localStorage.d) {
         menuitems.filter('.network-diagnostic').show();
     }
 

@@ -3789,6 +3789,142 @@ mega.utils.vtol = function megaUtilsVTOL(version, hex) {
 };
 
 /**
+ * Retrieve data from storage servers.
+ * @param {String|Object} aData        ufs-node's handle or public link
+ * @param {Number}        aStartOffset offset to start retrieveing data from
+ * @param {Number}        aEndOffset   retrieve data until this offset
+ * @returns {MegaPromise}
+ */
+mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
+    var promise = new MegaPromise();
+
+    var fetcher = function(data) {
+
+        if (aEndOffset === -1) {
+            aEndOffset = data.s;
+        }
+
+        aEndOffset = parseInt(aEndOffset);
+        aStartOffset = parseInt(aStartOffset);
+
+        if ((!aStartOffset && aStartOffset !== 0)
+                || aStartOffset > data.s || !aEndOffset
+                || aEndOffset < aStartOffset) {
+
+            return promise.reject(ERANGE, data);
+        }
+        var byteOffset = aStartOffset % 16;
+
+        if (byteOffset) {
+            aStartOffset -= byteOffset;
+        }
+
+        mega.utils.xhr({
+            method: 'POST',
+            type: 'arraybuffer',
+            url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
+        }).done(function(ev, response) {
+
+            data.macs = [];
+            data.writer = [];
+
+            if (!data.nonce) {
+                var key = data.key;
+
+                data.nonce = JSON.stringify([
+                    key[0] ^ key[4],
+                    key[1] ^ key[5],
+                    key[2] ^ key[6],
+                    key[3] ^ key[7],
+                    key[4],  key[5]]);
+            }
+
+            Decrypter.unshift([
+                [data, aStartOffset],
+                data.nonce,
+                aStartOffset / 16,
+                new Uint8Array(response)
+            ], function resolver() {
+                try {
+                    var buffer = data.writer.shift().data.buffer;
+
+                    if (byteOffset) {
+                        buffer = buffer.slice(byteOffset);
+                    }
+
+                    data.buffer = buffer;
+                    promise.resolve(data);
+                }
+                catch (ex) {
+                    promise.reject(ex);
+                }
+            });
+
+        }).fail(function() {
+            promise.reject.apply(promise, arguments);
+        });
+    };
+
+    if (typeof aData !== 'object') {
+        var key;
+        var handle;
+
+        // If a ufs-node's handle provided
+        if (String(aData).length === 8) {
+            handle = aData;
+        }
+        else {
+            // if a public-link provided, eg #!<handle>!<key>
+            aData = String(aData).replace(/^.*?#!/, '').split('!');
+
+            if (aData.length === 2 && aData[0].length === 8) {
+                handle = aData[0];
+                key = base64_to_a32(aData[1]).slice(0, 8);
+            }
+        }
+
+        if (!handle) {
+            promise.reject(EARGS);
+        }
+        else {
+            var callback = function(res) {
+                if (typeof res === 'object' && res.g) {
+                    res.key = key;
+                    res.handle = handle;
+                    fetcher(res);
+                }
+                else {
+                    promise.reject(res);
+                }
+            };
+            var req = { a: 'g', g: 1, ssl: use_ssl };
+
+            if (!key) {
+                req.n = handle;
+                key = M.getNodeByHandle(handle).key;
+            }
+            else {
+                req.p = handle;
+            }
+
+            if (!Array.isArray(key) || key.length !== 8) {
+                promise.reject(EKEY);
+            }
+            else {
+                api_req(req, { callback: callback });
+            }
+        }
+    }
+    else {
+        fetcher(aData);
+    }
+
+    aData = undefined;
+
+    return promise;
+};
+
+/**
  * Perform a normal logout
  *
  * @param {Function} aCallback optional

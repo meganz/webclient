@@ -132,6 +132,9 @@ module.exports = function(config) {
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
 
+        // Speedmeter
+        'js/network-testing.js',
+
         {pattern: 'test/chat/transcripts/*.json', included: false},
 
         // == Tests ==

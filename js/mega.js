@@ -2193,7 +2193,7 @@ function MegaData()
 
         if (this.currentdirid && this.currentdirid.substr(0, 5) === 'chat/') {
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
-            $('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
+            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
                                                 + '<span class="right-arrow-bg">'
                                                     + '<span>Contacts</span>'
                                                 + '</span></a>'
@@ -2206,7 +2206,7 @@ function MegaData()
             $('.search-files-result').addClass('hidden');
         }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            $('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs search ui-droppable" id="'
+            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs search ui-droppable" id="'
                                             + htmlentities(a2[i]) + '">'
                                                 + '<span class="right-arrow-bg ui-draggable">'
                                                     + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))

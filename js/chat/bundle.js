@@ -1201,10 +1201,6 @@
 
 	    self.logger.debug("removed: ", u);
 
-	    var room = self.getPrivateRoom(u);
-	    if (room) {
-	        room.destroy(true);
-	    }
 	    this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
 	    self.renderMyStatus();
@@ -22943,7 +22939,7 @@
 	        removeValue(excludedParticipants, u_handle, false);
 
 	        var dontShowTruncateButton = false;
-	        if (myPresence === 'offline' || !room.iAmOperator() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
+	        if (myPresence === 'offline' || !room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
 	            dontShowTruncateButton = true;
 	        }
 
@@ -27223,7 +27219,7 @@
 	                    }
 	                }
 	                if (!message.deleted) {
-	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && !message.requiresManualRetry) {
+	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
 	                        messageActionButtons = React.makeElement(
 	                            ButtonsUI.Button,
 	                            {

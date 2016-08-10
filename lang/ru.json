@@ -3569,7 +3569,7 @@
     "9053": "MEGA \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442 \u043c\u0438\u043a\u0440\u043e\u0444\u043e\u043d \u043f\u0440\u0438 \u0437\u0430\u0445\u0432\u0430\u0442\u0435 \u0432\u0438\u0434\u0435\u043e \u0432 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0438.",
     "9054": "MEGA accesses your camera when you capture a video or photo inside the app.",
     "9055": "MEGA accesses your photos or\/and videos when you select some of them to upload or when you have enabled the Camera Uploads.",
-    "9056": "Please do not enter any URL into the Copyrighted work field, if you need to add more URLs please click on &quot;Add another URL&quot;.",
+    "9056": "Please do not enter any URL into the Copyrighted work field, if you need to add more URLs please click on Add another URL.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

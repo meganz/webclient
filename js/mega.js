@@ -259,7 +259,7 @@ function MegaData()
             var intl = new Intl.Collator('co', { numeric: true });
 
             sortfn = function(a, b, d) {
-                
+
                 // a.m part is related to contacts only. In case that user doesn't
                 // have defined first or last name then email address will be used
                 // for comparasion. Files and folders doesn't have .m field but
@@ -288,7 +288,23 @@ function MegaData()
     };
 
     this.sortByName = function(d) {
-        this.sortfn = this.getSortByNameFn();
+        if (typeof Intl !== 'undefined' && Intl.Collator) {
+            var intl = new Intl.Collator('co', { numeric: true });
+
+            this.sortfn = function(a, b, d) {
+                return intl.compare(a.name, b.name) * d;
+            };
+        }
+        else
+        {
+            this.sortfn = function(a,b,d)
+            {
+                if (typeof a.name == 'string' && typeof b.name == 'string')
+                    return a.name.localeCompare(b.name) * d;
+                else
+                    return -1;
+            };
+        }
         this.sortd = d;
         this.sort();
     };
@@ -421,7 +437,7 @@ function MegaData()
     this.getSortByStatusFn = function(d) {
 
         var sortfn;
-        
+
         sortfn = function(a, b, d) {
             var statusa = M.getSortStatus(a.u), statusb = M.getSortStatus(b.u);
             if (statusa < statusb) {
@@ -450,7 +466,7 @@ function MegaData()
     this.getSortByInteractionFn = function() {
 
         var sortfn;
-        
+
         sortfn = mega.utils.sortObjFn(
             function(r) {
 
@@ -1542,9 +1558,9 @@ function MegaData()
                     onlinestatus = [l[5926], 'offline'];
                 }
 
-                var name = M.getNameByHandle(activeContacts[i].u).toLowerCase() || activeContacts[i].m;
+                var name = M.getNameByHandle(activeContacts[i].u).toLowerCase();
 
-                if (!treesearch || (treesearch && name.indexOftreesearch.toLowerCase()) > -1) {
+                if (!treesearch || name.indexOf(treesearch.toLowerCase()) > -1) {
 
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
@@ -1565,6 +1581,7 @@ function MegaData()
                     scrollPos = 0;
 
                 var $this = $(this);
+                var $userDiv = $this.parent().parent();
 
                 $.hideContextMenu();
 
@@ -1573,7 +1590,6 @@ function MegaData()
 
                     $('.context-menu-item', m).removeClass("disabled");
 
-                    var $userDiv = $this.parent().parent();
                     if ($userDiv.is(".offline")) {
                         $('.context-menu-item.startaudio-item, .context-menu-item.startvideo-item', m)
                             .addClass("disabled");
@@ -1595,7 +1611,7 @@ function MegaData()
                         .removeData("triggeredBy");
                 }
 
-                $.selected = [$this.parent().parent().attr('id').replace('contact_', '')];
+                $.selected = [$userDiv.attr('id').replace('contact_', '')];
 
                 return false; // stop propagation!
             });
@@ -1702,6 +1718,11 @@ function MegaData()
      * @param {type} stype, what to sort.
      */
     this.buildtree = function(n, dialog, stype) {
+
+        if (!n) {
+             console.error('Invalid node passed to M.buildtree');
+             return;
+        }
 
         var folders = [],
             _ts_l = treesearch && treesearch.toLowerCase(),

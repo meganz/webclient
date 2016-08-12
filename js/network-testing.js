@@ -42,7 +42,7 @@ SpeedMeter.prototype.avg = function(speeds) {
 
     var total = 0;
     for (var i = 0; i < speeds.length; ++i) {
-        total += speeds[i][0] / (speeds[i][1] - this._started);
+        total += speeds[i][0] / Math.max(1, speeds[i][1] - this._started);
     }
 
     return total / speeds.length;
@@ -76,7 +76,7 @@ SpeedMeter.prototype.update = function() {
  */
 SpeedMeter.prototype.getData = function() {
 
-    var time = new Date() - this._started;
+    var time = Math.max(new Date() - this._started, 1);
     var simpleSpeed = this._progress / time;
     var avgSpeed = this.avg(this._samples.slice(-5));
     return {

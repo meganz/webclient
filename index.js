@@ -116,6 +116,37 @@ function init_page() {
         }
     }
 
+    if (page.substr(0, 1) === '!' && page.length > 1) {
+        var ar = page.substr(1, page.length - 1).split('!');
+        if (ar[0]) {
+            dlid = ar[0].replace(/[^\w-]+/g, "");
+        }
+
+        dlkey = false;
+        if (ar[1]) {
+            dlkey = ar[1].replace(/[^\w-]+/g, "");
+        }
+
+        if (mega.utils.hasPendingTransfers()) {
+            page = 'download';
+
+            if ($.lastSeenFilelink === location.hash) {
+                return;
+            }
+
+            mega.utils.abortTransfers()
+                .done(function() {
+                    location.reload();
+                })
+                .fail(function() {
+                    location.hash = $.lastSeenFilelink;
+                });
+
+            return;
+        }
+        $.lastSeenFilelink = location.hash;
+    }
+
     if (!u_type) {
         $('body').attr('class', 'not-logged');
     }
@@ -164,36 +195,6 @@ function init_page() {
     $('#loading').hide();
     if (window.loadingDialog) {
         loadingDialog.hide();
-    }
-
-    page = page.replace('%21', '!').replace('%21', '!');
-
-    if (page.substr(0, 1) == '!' && page.length > 1) {
-        if (mega.utils.hasPendingTransfers()) {
-            if ($.lastSeenFilelink === location.hash) {
-                return;
-            }
-
-            mega.utils.abortTransfers()
-                .done(function() {
-                    location.reload();
-                })
-                .fail(function() {
-                    location.hash = $.lastSeenFilelink;
-                });
-
-            return;
-        }
-        $.lastSeenFilelink = location.hash;
-
-        var ar = page.substr(1, page.length - 1).split('!');
-        if (ar[0]) {
-            dlid = ar[0].replace(/[^\w-]+/g, "");
-        }
-        dlkey = false;
-        if (ar[1]) {
-            dlkey = ar[1].replace(/[^\w-]+/g, "");
-        }
     }
 
     // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
@@ -1919,7 +1920,7 @@ function parsetopmenu() {
 window.onhashchange = function() {
     var tpage = document.location.hash;
 
-    if (typeof gifSlider !== 'undefined') {
+    if (typeof gifSlider !== 'undefined' && tpage.substr(0, 2) !== '#!') {
         gifSlider.clear();
     }
 

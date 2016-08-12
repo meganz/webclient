@@ -224,37 +224,53 @@ function dl_g(res) {
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
-                    var loadedAt = new Date().getTime();
-                    var isSafari = false;
-                    switch (ua.details.os) {
-                        case 'iPad':
-                        case 'iPhone':
-                            window.location = "mega://" + location.hash;
-                            isSafari = !window.chrome;
-                            break;
+                    if (is_ios) {
+                        // Based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
+                        var ns = '.ios ';
+                        var appLink = "mega://" + location.hash;
+                        var events = ["pagehide", "blur", "beforeunload"];
+                        var timeout = null;
+                        var preventDialog = function () {
+                            clearTimeout(timeout);
+                            timeout = null;
+                            $(window).unbind(events.join(ns) + ns);
+                        };
 
-                        case 'Windows Phone':
-                            window.location = "mega://" + location.hash.substr(1);
-                            break;
+                        var redirect = function () {
+                            window.location = appLink;
+                            $(window).bind(events.join(ns) + ns, preventDialog);
 
-                        case 'Android':
-                            var intent = 'intent://' + location.hash
-                                + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
-                            document.location = intent;
-                            break;
+                            timeout = setTimeout(function() {
+                                window.top.location = getStoreLink();
+                            }, 1500);
+                        };
 
-                        default:
-                            alert('Unknown device.');
+                        Soon(function() {
+                            redirect();
+                            // If user navigates back to browser and clicks the button,
+                            // try redirecting again.
+                            $('.mobile.dl-megaapp').rebind('click', function(e) {
+                                e.preventDefault();
+                                redirect();
+                            });
+                        });
                     }
+                    else {
+                        switch (ua.details.os) {
+                            case 'Windows Phone':
+                                window.location = "mega://" + location.hash.substr(1);
+                                break;
 
-                    // If the intent is not being thrown we assume the user doesn't
-                    // have our APP so we redirect to their phone's store
-                    // This works everywhere but in Safari
-                    setTimeout(function() {
-                        if (!isSafari || (new Date()).getTime() - loadedAt < 2000) {
-                            document.location = $('.mobile.download-app').attr('href');
+                            case 'Android':
+                                var intent = 'intent://' + location.hash
+                                    + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                                document.location = intent;
+                                break;
+
+                            default:
+                                alert('Unknown device.');
                         }
-                    }, 500);
+                    }
 
                     return false;
                 });
@@ -374,7 +390,7 @@ function getStoreLink() {
         return 'https://itunes.apple.com/app/mega/id706857885';
 
     case 'Windows Phone':
-        return'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+        return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
 
     case 'Android':
         return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';

@@ -230,30 +230,51 @@ function dl_g(res) {
                         var appLink = "mega://" + location.hash;
                         var events = ["pagehide", "blur", "beforeunload"];
                         var timeout = null;
-                        var preventDialog = function () {
+
+                        var preventDialog = function(e) {
                             clearTimeout(timeout);
                             timeout = null;
                             $(window).unbind(events.join(ns) + ns);
                         };
 
-                        var redirect = function () {
-                            window.location = appLink;
+                        var redirectToStore = function() {
+                            window.top.location = getStoreLink();
+                        };
+
+                        var redirect = function() {
+                            var ms = 500;
+
+                            preventDialog();
                             $(window).bind(events.join(ns) + ns, preventDialog);
 
-                            timeout = setTimeout(function() {
-                                window.top.location = getStoreLink();
-                            }, 1500);
+                            window.location = appLink;
+
+                            // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
+                            // open the app, which turns the setTimeout trick useless because no page unloading is
+                            // notified and users redirected to the app-store regardless if the app is installed.
+                            // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
+                            // that users with the app installed will have a higher chance of confirming the dialog.
+                            // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
+                            // otherwise users will the app NOT installed might don't know where the app is,
+                            // at least if they disabled the smart-app-banner...
+                            // NB: Chrome (CriOS) is not affected.
+                            if (is_ios > 8 && ua.details.brand !== 'CriOS') {
+                                ms = 4100;
+                            }
+
+                            timeout = setTimeout(redirectToStore, ms);
                         };
 
                         Soon(function() {
-                            redirect();
                             // If user navigates back to browser and clicks the button,
                             // try redirecting again.
                             $('.mobile.dl-megaapp').rebind('click', function(e) {
                                 e.preventDefault();
                                 redirect();
+                                return false;
                             });
                         });
+                        redirect();
                     }
                     else {
                         switch (ua.details.os) {

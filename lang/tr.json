@@ -3569,7 +3569,10 @@
     "9053": "MEGA mikrofonunuza uygulama i\u00e7ersinden video \u00e7ekerken eri\u015fim sa\u011flar.",
     "9054": "MEGA kameran\u0131za uygulama i\u00e7erisinden resim veya video \u00e7ekerken eri\u015fim sa\u011flar.",
     "9055": "MEGA Kamera Y\u00fcklemeleri&#039;ni a\u00e7t\u0131\u011f\u0131n\u0131zda veya y\u00fcklemek i\u00e7in baz\u0131lar\u0131n\u0131 se\u00e7ti\u011finizde foto\u011fraf ve\/ya videolar\u0131n\u0131za eri\u015fir.",
-    "9056": "L\u00fctfen Telif Hakk\u0131na sahip oldu\u011funuz \u00e7al\u0131\u015fma k\u0131sm\u0131na URL girmeyin. E\u011fer ba\u015fka URL eklemeniz gerekiyorsa l\u00fctfen &quot;Ba\u015fka URL ekle&quot; tu\u015funu kullan\u0131n.",
+    "9056": "Telif hakk\u0131 olan \u00e7al\u0131\u015fma alan\u0131na herhangi bir URL girmeyin l\u00fctfen. Daha fazla URL eklemek gerekirse l\u00fctfen ba\u015fka bir URL Ekle&#039;ye t\u0131klay\u0131n.",
+    "9057": "The file you are about to add is older than the copy already on record, do you want to replace the file?",
+    "9058": "Replace file",
+    "9059": "No, rename it as %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

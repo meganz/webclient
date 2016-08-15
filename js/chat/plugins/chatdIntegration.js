@@ -426,6 +426,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                         else {
                             included.push(v.u);
                             chatRoom.members[v.u] = v.p;
+                            if (v.u === u_handle && v.p !== 0) {
+                                chatRoom.privateReadOnlyChat = false;
+                            }
                         }
                     });
 

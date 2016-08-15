@@ -548,7 +548,7 @@ Object.defineProperty(this, 'mBroadcaster', {
     },
 
     removeListener: function mBroadcaster_removeListenr(token) {
-        // if (d) console.log('Removing broadcast listener', token);
+        if (d) console.log('Removing broadcast listener', token);
         for (var topic in this._topics) {
             if (this._topics[topic][token]) {
                 delete this._topics[topic][token];

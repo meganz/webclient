@@ -1201,10 +1201,6 @@
 
 	    self.logger.debug("removed: ", u);
 
-	    var room = self.getPrivateRoom(u);
-	    if (room) {
-	        room.destroy(true);
-	    }
 	    this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
 	    self.renderMyStatus();
@@ -1317,7 +1313,7 @@
 
 	            sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
-	            if (sortedConversations.length > 1) {
+	            if (sortedConversations.length > 0) {
 	                var room = sortedConversations[0];
 	                room.setActive();
 	                room.show();
@@ -5744,7 +5740,7 @@
 	  return element;
 	};
 
-	ReactElement.makeElement = function (type, config, children) {
+	ReactElement.createElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -5795,7 +5791,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.makeElement.bind(null, type);
+	  var factory = ReactElement.createElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -8732,7 +8728,7 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.makeElement(component);
+	    placeholderElement = ReactElement.createElement(component);
 	  }
 	};
 
@@ -18550,7 +18546,7 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.makeElement;
+	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
@@ -19000,7 +18996,7 @@
 	    // succeed and there will likely be errors in render.
 
 
-	    var element = ReactElement.makeElement.apply(this, arguments);
+	    var element = ReactElement.createElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -19025,7 +19021,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -19442,12 +19438,13 @@
 	        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
 	        sortedConversations.forEach(function (chatRoom) {
+	            var contact;
 	            if (!chatRoom || !chatRoom.roomJid) {
 	                return;
 	            }
 
 	            if (chatRoom.type === "private") {
-	                var contact = chatRoom.getParticipantsExceptMe()[0];
+	                contact = chatRoom.getParticipantsExceptMe()[0];
 	                if (!contact) {
 	                    return;
 	                }
@@ -19464,6 +19461,7 @@
 	            currConvsList.push(React.makeElement(ConversationsListItem, {
 	                key: chatRoom.roomJid.split("@")[0],
 	                chatRoom: chatRoom,
+	                contact: contact,
 	                messages: chatRoom.messagesBuff,
 	                megaChat: megaChat,
 	                onConversationClicked: function onConversationClicked(e) {
@@ -22941,7 +22939,7 @@
 	        removeValue(excludedParticipants, u_handle, false);
 
 	        var dontShowTruncateButton = false;
-	        if (myPresence === 'offline' || !room.iAmOperator() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
+	        if (myPresence === 'offline' || !room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
 	            dontShowTruncateButton = true;
 	        }
 
@@ -27221,7 +27219,7 @@
 	                    }
 	                }
 	                if (!message.deleted) {
-	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && !message.requiresManualRetry) {
+	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
 	                        messageActionButtons = React.makeElement(
 	                            ButtonsUI.Button,
 	                            {

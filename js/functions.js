@@ -625,9 +625,11 @@ function browserdetails(useragent) {
     var icon = '';
     var name = '';
     var brand = '';
+    var verTag = '';
     var nameTrans = '';
     var current = false;
     var brand = false;
+    var details = {};
 
     if (useragent === undefined || useragent === ua) {
         current = true;
@@ -733,10 +735,15 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('k-meleon') > 0) {
         browser = 'K-Meleon';
     }
+    else if (useragent.indexOf(' crios') > 0) {
+        browser = 'Chrome';
+        details.brand = verTag = 'CriOS';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
     else if (useragent.indexOf('safari') > 0) {
+        verTag = 'Version';
         browser = 'Safari';
     }
     else if (useragent.indexOf('firefox') > 0) {
@@ -785,13 +792,13 @@ function browserdetails(useragent) {
         }
     }
 
-    var details = {};
     details.name = name;
     details.nameTrans = nameTrans || name;
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
-    details.version = (useragent.match(RegExp("\\s+" + (brand || browser) + "/([\\d.]+)", 'i')) || [])[1] || 0;
+    details.version =
+        (useragent.match(RegExp("\\s+" + (verTag || brand || browser) + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);

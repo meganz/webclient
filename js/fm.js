@@ -15,6 +15,18 @@ function deleteScrollPanel(from, data) {
     }
 }
 
+function initDashboardScroll(scroll)
+{
+    $('.fm-right-block.dashboard').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
+    jScrollFade('.fm-right-block.dashboard');
+    if (scroll) {
+        var jsp = $('.fm-right-block.dashboard').data('jsp');
+        if (jsp) {
+            jsp.scrollToBottom();
+        }
+    }
+}
+
 function initAccountScroll(scroll)
 {
     $('.account.tab-content:visible').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
@@ -790,6 +802,7 @@ function initUI() {
                 'contacts':       { root: 'contacts',  prev: null },
                 'transfers':      { root: 'transfers', prev: null },
                 'account':        { root: 'account',  prev: null },
+                'dashboard':    { root: 'dashboard',  prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
@@ -811,9 +824,12 @@ function initUI() {
             }
         }
 
-        if ($(this).hasClass('account')) {
+        if ($(this).hasClass('account') || $(this).hasClass('dashboard')) {
             if (u_type === 0) {
                 ephemeralDialog(l[7687]);
+            }
+            else if ($(this).hasClass('dashboard')) {
+                document.location.hash = 'fm/dashboard';
             }
             else {
                 document.location.hash = 'fm/account';
@@ -2957,6 +2973,253 @@ function notificationsUI(close)
     $.tresizer();
 }
 
+function dashboardUI() {
+    $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
+    $('.fm-right-block.dashboard').removeClass('hidden');
+    sectionUIopen('dashboard');
+    
+    // Show Membership plan
+    $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
+    if (u_attr.p) {
+            // LITE/PRO account
+            var planNum = u_attr.p;
+            var planText = getProPlan(planNum);
+
+            $('.account.membership-plan').text(planText);
+            $('.small-icon.membership').addClass('pro' + planNum);
+    }
+    else {
+        $('.account.membership-plan').text(l[435]);
+    }
+
+    // Show first name or last name
+    if (u_attr.firstname) {
+        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
+    }
+    else {
+        $('.membership-big-txt.name').text(u_attr.name);
+    }
+
+    // Show email address
+    if (u_attr.email) {
+        $('.membership-big-txt.email').text(u_attr.email);
+    }
+    else {
+        $('.membership-big-txt.email').hide();
+    }
+
+
+    // Account data
+    M.accountData(function(account) {
+
+        var perc, perc_c, b_exceeded, s_exceeded;
+
+        // Show ballance
+        $('.account.left-pane.balance-info').html(l[7108]);
+        $('.account.left-pane.balance-txt').html(htmlentities(account.balance[0][0]) + ' &euro; ');
+
+        // Elements for free/pro accounts. Expites date / Registration date
+        if (u_attr.p) {
+            $('.dashboard .button.upgrade-account').addClass('hidden');
+
+            // Subscription
+            if (account.stype == 'S') {
+
+                // Get the date their subscription will renew
+                var timestamp = account.srenew[0];
+
+                // Display the date their subscription will renew
+                if (timestamp > 0) {
+                    var date = new Date(timestamp * 1000);
+                    var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+                    $('.account.left-pane.date-val').html(dateString);
+                    $('.account.left-pane.date-info').html(l[7354]);
+                }
+                else {
+                    // Otherwise hide info blocks
+                    $('.account.left-pane.date-val, .account.left-pane.date-info').addClass('hidden');
+                }
+            }
+            else if (account.stype == 'O') {
+                // one-time or cancelled subscription
+                $('.account.left-pane.date-info').html(l[987]);
+                var date = new Date(time2date(account.expiry));
+                var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+                $('.account.left-pane.date-val').html(dateString);
+            }
+        }
+        else {
+            // Free account. Replace membership expiry date by registration date  
+            $('.dashboard .button.upgrade-account').removeClass('hidden');
+            $('.dashboard .button.upgrade-account').rebind('click', function() {
+                window.location.hash = 'pro';
+            })
+            $('.account.left-pane.date-info').html('MEMBER SINCE');
+
+
+            // TODO: Get registration date
+            $('.account.left-pane.date-val').html('??');
+        }
+
+
+        /* New Used Bandwidth chart */
+        perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
+        perc_c = perc;
+        if (perc_c > 100) {
+            perc_c = 100;
+        }
+        if (perc > 99) {
+            $('.fm-account-blocks.bandwidth').addClass('exceeded');
+            b_exceeded = 1;
+        }
+
+        var deg =  234 * perc_c / 100;
+
+        // Used Bandwidth chart
+        if (deg <= 180) {
+            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+        } else {
+            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
+            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+        }
+
+        // Maximum bandwidth
+        var b1 = bytesToSize(account.servbw_used + account.downbw_used);
+        b1 = b1.split(' ');
+        b1[0] = Math.round(b1[0]) + ' ';
+        var b2 = bytesToSize(account.bw);
+        b2 = b2.split(' ');
+        b2[0] = Math.round(b2[0]) + ' ';
+        $('.bandwidth .chart.data .size-txt').html(htmlentities(b1));
+        $('.bandwidth .chart.data .pecents-txt').html(htmlentities(b2[0]));
+        $('.bandwidth .chart.data .gb-txt').html(htmlentities(b2[1]));
+        $('.bandwidth .chart.data .perc-txt').html(perc_c + '%');
+        /* End of New Used Bandwidth chart */
+
+
+        /* New Used Storage chart */
+        perc = Math.round(account.space_used / account.space * 100);
+        perc_c = perc;
+        if (perc_c > 100) {
+            perc_c = 100;
+        }
+        if (perc > 99) {
+            $('.fm-account-blocks.storage').addClass('exceeded');
+            s_exceeded = 1;
+        }
+
+        var deg =  234 * perc_c / 100;
+
+        // Used space chart
+        if (deg <= 180) {
+            $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+        } else {
+            $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
+            $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+        }
+
+        // Maximum disk space
+        var b2 = bytesToSize(account.space);
+        b2 = b2.split(' ');
+        b2[0] = Math.round(b2[0]) + ' ';
+        $('.storage .chart.data .pecents-txt').html(htmlentities(b2[0]));
+        $('.storage .chart.data .gb-txt').html(htmlentities(b2[1]));
+        $('.storage .chart.data .perc-txt').html(perc_c + '%');
+        $('.storage .chart.data .size-txt').html(bytesToSize(account.space_used));
+        /* End of New Used Storage chart */
+
+
+        /* Charts warning notifications */
+        $('.chart-warning:not(.hidden)').addClass('hidden');
+        if (b_exceeded && s_exceeded) {
+            // Bandwidth and Storage quota exceeded
+            $('.chart-warning.storage-and-bandwidth').removeClass('hidden');
+        } else if (s_exceeded) {
+            // Storage quota exceeded
+            $('.chart-warning.storage').removeClass('hidden');
+        } else if (b_exceeded) {
+            // Bandwidth quota exceeded
+            $('.chart-warning.bandwidth').removeClass('hidden');
+        }
+        else if (perc > 97) {
+            // Running out of cloud space
+            $('.chart-warning.out-of-space').removeClass('hidden');
+        }
+        /* End of Charts warning notifications */
+
+
+        /* Used Storage progressbar */
+        var c = account.cstrgn, k = Object.keys(c), iSharesBytes = 0;
+        var percents = [
+            100 * c[k[0]][0] / account.space,
+            100 * c[k[2]][0] / account.space,
+            0,
+            100 * c[k[1]][0] / account.space
+        ];
+        for (var i = 3 ; i < k.length ; ++i ) {
+            iSharesBytes += c[k[i]][0];
+            percents[2] += (100 * c[k[i]][0] / account.space);
+        }
+        for (i = 0; i < 4; i++) {
+            $('.storage .account.progress-bar.blue' + i).css('width', percents[i] + '%');
+        }
+        // Cloud drive
+        $('.account.progress-size.cloud-drive').html(bytesToSize(c[k[0]][0]));
+        // Rubbish bin
+        $('.account.progress-size.rubbish-bin').html(bytesToSize(c[k[2]][0]));
+        // Incoming shares
+        $('.account.progress-size.incoming-shares').html(bytesToSize(iSharesBytes));
+        // Inbox
+        $('.account.progress-size.inbox').html(bytesToSize(c[k[1]][0]));
+        /* End of Used Storage progressbar */
+
+
+        /* TODO: Used Bandwidth progressbar */
+        $('.storage .account.progress-bar.green0').css('width',  '0%');
+        $('.storage .account.progress-bar.green1').css('width', '0%');
+        // Downloads
+        $('.account.progress-size.downloads').html('0 MB');
+        // Uploads
+        $('.account.progress-size.uploads').html('0 MB');
+        /* End of Used Bandwidth progressbar */
+
+
+        /* TODO: Contacts block */
+        var contacts = true;
+        if (!contacts) {
+            $('.account.widget.text.contacts').removeClass('hidden');
+            $('.account.data-table.contacts').addClass('hidden');
+        } else {
+            $('.account.widget.text.contacts').addClass('hidden');
+            $('.account.data-table.contacts').removeClass('hidden');
+            $('.data-right-td.all-contacts span').text('0');
+            $('.data-right-td.new-contacts span').text('0');
+            $('.data-right-td.waiting-approval span').text('0');
+            $('.data-right-td.sent-requests span').text('0');
+        }
+        /* End of Contacts block */
+
+
+        /* TODO: Chat block */
+        var chat = false;
+        if (!chat) {
+            $('.account.widget.text.chat').removeClass('hidden');
+            $('.account.data-table.chat').addClass('hidden');
+        } else {
+            $('.account.widget.text.chat').addClass('hidden');
+            $('.account.data-table.chat').removeClass('hidden');
+            $('.data-right-td.new-chat span').text('0');
+            $('.data-right-td.new-messages span').text('0');
+        }
+        /* End of Contacts block */
+
+    });
+
+
+    initTreeScroll();
+    initDashboardScroll();
+}
+
 function accountUI() {
 
     var sectionTitle;
@@ -2965,8 +3228,7 @@ function accountUI() {
     $('.fm-account-notifications').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
-    $('.fm-right-files-block').addClass('hidden');
-    $('.section.conversations').addClass('hidden');
+    $('.fm-right-files-block, .section.conversations, .fm-right-block.dashboard').addClass('hidden');
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
@@ -3069,9 +3331,8 @@ function accountUI() {
 
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
-                var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
 
-                // Display the date their subscription will renew in format '14 March 2015 (credit card)'
+                // Display the date their subscription
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
                     var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
@@ -3108,7 +3369,9 @@ function accountUI() {
                     document.location = $(this).attr('href');
                 });
                 $('.account.plan-info.expiry-txt').html(l[987]);
-                $('.account.plan-info.expiry a').html(time2date(account.expiry));
+                var date = new Date(time2date(account.expiry));
+                var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+                $('.account.plan-info.expiry a').html(dateString);
                 $('.account.data-block .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }
@@ -3139,19 +3402,13 @@ function accountUI() {
 
         $('.account.plan-info.storage').html(htmlentities(b2[0]) + ' ' + htmlentities(b2[1]));
 
-
-        perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
-        perc_c=perc;
-
-
         /* New Used Bandwidth chart */
-        var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-        b1 = b1.split(' ');
-        b1[0] = Math.round(b1[0]) + ' ';
-        var b2 = bytesToSize(account.bw);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
-        var b3 = bytesToSize(account.bw - (account.servbw_used + account.downbw_used));
+        perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
+        perc_c = perc;
+        if (perc_c > 100)
+            perc_c = 100;
+        if (perc > 99)
+            $('.fm-account-blocks.bandwidth').addClass('exceeded');
 
         var deg =  234 * perc_c / 100;
 
@@ -3164,6 +3421,12 @@ function accountUI() {
         }
 
         // Maximum bandwidth
+        var b1 = bytesToSize(account.servbw_used + account.downbw_used);
+        b1 = b1.split(' ');
+        b1[0] = Math.round(b1[0]) + ' ';
+        var b2 = bytesToSize(account.bw);
+        b2 = b2.split(' ');
+        b2[0] = Math.round(b2[0]) + ' ';
         $('.bandwidth .chart.data .size-txt').html(htmlentities(b1));
         $('.bandwidth .chart.data .pecents-txt').html(htmlentities(b2[0]));
         $('.bandwidth .chart.data .gb-txt').html(htmlentities(b2[1]));
@@ -3179,7 +3442,6 @@ function accountUI() {
         if (perc > 99)
             $('.fm-account-blocks.storage').addClass('exceeded');
 
-        var c = account.cstrgn, k = Object.keys(c), deg = 0, iSharesBytes = 0;
         var deg =  234 * perc_c / 100;
 
         /* Used space chart */
@@ -3206,8 +3468,6 @@ function accountUI() {
         $('.storage .chart.data .pecents-txt').html(htmlentities(b2[0]));
         $('.storage .chart.data .gb-txt').html(htmlentities(b2[1]));
         $('.storage .chart.data .perc-txt').html(perc_c + '%');
-
-        // Used space
         $('.storage .chart.data .size-txt').html(bytesToSize(account.space_used));
 
 
@@ -3220,6 +3480,7 @@ function accountUI() {
                 + l[5528] + ' '
                 + htmlentities(b2[0] + b2[1]));
 
+            var c = account.cstrgn, k = Object.keys(c), iSharesBytes = 0;
             var percents = [
                 100 * c[k[0]][0] / account.space,
                 100 * c[k[2]][0] / account.space,
@@ -5493,7 +5754,7 @@ function searchPath()
             path.reverse();
             for (var i in path)
             {
-                var c,name,id=false,iconimg='';;
+                var c,name,id=false,iconimg='';
                 var n = M.d[path[i]];
                 if (path[i].length == 11 && M.u[path[i]])
                 {
@@ -6967,12 +7228,14 @@ function sectionUIopen(id) {
         tmpId = 'contacts';
     } else if (id === 'account') {
         tmpId = 'account';
+    } else if (id === 'dashboard') {
+        tmpId = 'dashboard';
     } else {
         tmpId = id;
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
-    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account').addClass(tmpId);
+    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account dashboard').addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
@@ -7147,6 +7410,8 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         sectionUIopen('opc');
     } else if (id_r === 'account') {
         sectionUIopen('account');
+    } else if (id_r === 'dashboard') {
+        sectionUIopen('dashboard');
     } else if (M.RubbishID && id_r === M.RubbishID) {
         sectionUIopen('rubbish-bin');
     } else if (id_s === 'transfers') {
@@ -10691,6 +10956,34 @@ function fm_resize_handler() {
 
         initAccountScroll();
     }
+    else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
+        var $mainBlock = $('.fm-account-main');
+
+        if ($mainBlock.width() > 1675) {
+            $mainBlock.addClass('hi-width');
+        }
+        else if ($mainBlock.width() < 880) {
+            $mainBlock.addClass('low-width');
+        } else {
+            $mainBlock.removeClass('low-width hi-width');
+        }
+
+        initAccountScroll();
+    }
+    else if (M.currentdirid && M.currentdirid.substr(0, 9) === 'dashboard') {
+        var $mainBlock = $('.fm-right-block.dashboard');
+
+        if ($mainBlock.width() > 1675) {
+            $mainBlock.addClass('hi-width');
+        }
+        else if ($mainBlock.width() < 880) {
+            $mainBlock.addClass('low-width');
+        } else {
+            $mainBlock.removeClass('low-width hi-width');
+        }
+
+        initDashboardScroll();
+    }
     else {
         if (M.viewmode) {
             initFileblocksScrolling();
@@ -10712,7 +11005,7 @@ function fm_resize_handler() {
         megaChat.resized();
     }
 
-    $('.fm-right-files-block, .fm-right-account-block').css({
+    $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
         'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
     });
 

@@ -3792,7 +3792,7 @@ label.iPhoneCheckLabelOff span {
     background-color: white;
 }
 /* New FM */
-.fm-tree-panel, .fm-left-menu.account + .nw-tree-panel-header + .fm-tree-panel {
+.fm-tree-panel, .fm-left-menu.account + .nw-tree-panel-header + .fm-tree-panel, .fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
     height: -webkit-calc(100% - 48px);
     height: -moz-calc(100% - 48px);
     height: calc(100% - 48px);
@@ -4429,6 +4429,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+.fm-left-menu.dashboard + .nw-tree-panel-header {
+    display: none;
 }
 .nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
     height: 24px;
@@ -5094,6 +5097,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-left-menu.conversations {
     background-color: rgba(43,166,222,1);
 }
+.fm-left-menu.dashboard {
+    background-color: #FF333A;
+}
 .fm-left-menu.rubbish-bin {
     background-color: rgba(49,181,0,1);
 }
@@ -5223,7 +5229,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-left-menu.account + .nw-tree-panel-header {
     display: none;
 }
-.cloud-drive .nw-fm-tree-header.cloud-drive, .folder-link .nw-fm-tree-header.folder-link, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account {
+.cloud-drive .nw-fm-tree-header.cloud-drive, .folder-link .nw-fm-tree-header.folder-link, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard {
     display: block;
 }
 .nw-fm-search-icon {
@@ -5291,6 +5297,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
+}
+.nw-fm-left-icon.dashboard::before {
+    background-position: 2px -811px;
 }
 .nw-fm-left-icon.cloud-drive::before {
     background-position: 3px 8px;
@@ -5392,7 +5401,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 /**
  * hide sections of the site if the current visited link is a folder share link
  */
-.active-folder-link .nw-fm-left-icon.cloud-drive, .active-folder-link .nw-fm-tree-header.cloud-drive, .active-folder-link .nw-fm-left-icon.inbox, .active-folder-link .nw-fm-left-icon.shared-with-me, .active-folder-link .nw-fm-left-icon.contacts, .active-folder-link .nw-fm-left-icon.conversations, .active-folder-link .nw-fm-left-icon.rubbish-bin, .active-folder-link .nw-fm-left-icon.account {
+.active-folder-link .nw-fm-left-icon.cloud-drive, .active-folder-link .nw-fm-tree-header.cloud-drive, .active-folder-link .nw-fm-left-icon.inbox, .active-folder-link .nw-fm-left-icon.shared-with-me, .active-folder-link .nw-fm-left-icon.contacts, .active-folder-link .nw-fm-left-icon.conversations, .active-folder-link .nw-fm-left-icon.rubbish-bin, .active-folder-link .nw-fm-left-icon.account, .active-folder-link .nw-fm-left-icon.dashboard {
     display: none;
 }
 .nw-fm-left-icon .beta-text {
@@ -5426,6 +5435,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .nw-fm-left-icon.conversations.active .nw-fm-left-border {
     border-color: rgba(97,210,255,1);
+}
+.nw-fm-left-icon.dashboard.active .nw-fm-left-border {
+    border-color: #FF333A;
 }
 .nw-fm-left-icon.rubbish-bin.active .nw-fm-left-border {
     border-color: #13E03C;
@@ -11791,6 +11803,272 @@ table {
 .account-history-drop-items {
     line-height: 30px;
 }
+/* Dashboard section */
+.fm-right-block.dashboard {
+    height: 100%;
+    overflow: visible !important;
+    margin-left: 304px;
+    background-color: #FAFAFA;
+    min-width: 740px;
+}
+.dashboard.content-block {
+    padding: 12px 24px 24px 12px;
+    min-width: 740px;
+    margin: 0 auto;
+    max-width: 1064px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.dashboard .account.user-data-block {
+    padding: 32px 20px 20px 20px;
+}
+.account.left-pane.info-block {
+    padding: 20px 25px 24px 25px;
+}
+.account.left-pane.divider {
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+}
+.account.max-width-bl {
+    max-width: 1064px;
+}
+.account.left-pane.header {
+    padding: 0 0 0 0;
+    font-size: 18px;
+    line-height: 23px;
+    color: #999999;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.account.left-pane.header.bottom-pad {
+    padding-bottom: 19px;
+}
+.account.left-pane.big-txt {
+    padding: 3px 0 16px 0;
+    font-size: 24px;
+    line-height: 31px;
+    color: #333333;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.account.left-pane .progress-block {
+    background-color: rgba(0,0,0,0.05);
+}
+.account.left-pane .button {
+    margin: 9px 0 0 0;
+    height: 36px;
+    line-height: 35px;
+    max-width: 100%;
+}
+.account.left-pane .button.get-more-space {
+    margin: 16px 0 0 0;
+}
+.account.left-pane .button span {
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    display: block;
+}
+.account.left-pane.big-txt span {
+    color: #777777;
+}
+.account.left-pane.small-txt {
+    color: #666666;
+    font-size: 12px;
+    line-height: 15px;
+    margin: 0 0 -6px 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.account.widget .fm-account-blocks {
+    padding-top: 10px;
+}
+.chart-warning {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333333;
+    border-left: 2px solid #FFD300;
+    padding: 0 0 0 8px;
+    margin: 21px 0 1px 0;
+    position: relative;
+}
+.chart-warning a {
+    color: #D90007;
+    font-family: 'source_sans_prosemibold';
+}
+.chart-warning.red {
+    border-color: #D90007;
+}
+.chart-indicator {
+    display: none;
+    width: 8px;
+    height: 8px;
+    background-color: #FFD300;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    position: absolute;
+    z-index: 10;
+    left: 165px;
+    top: 26px;
+}
+.exceeded .big-icon.cloud {
+    background-position: 0px -10934px;
+}
+.exceeded .big-icon.speedometer {
+    background-position: 0px -10884px;
+}
+.exceeded .chart.data .perc-txt, .exceeded .chart.data .size-txt {
+    color: #D90007;
+}
+.exceeded .chart.progressbars span::before, .bandwidth.exceeded .chart.progressbars span::before {
+    background-color: #D90007;
+}
+.account.icon-button {
+    float: right;
+    margin: 2px -2px 0 0;
+    cursor: pointer;
+}
+.account.icon-button + .account.widget.title {
+    margin-right: 25px;
+}
+.account.widget.grey-text {
+    color: #666666;
+    padding: 14px 0 8px 0;
+}
+.account.widget.text a.blue {
+    color: #2BA6DE;
+    font-family: 'source_sans_prosemibold';
+}
+.account.widget.body.min-height {
+    min-height: 218px;
+}
+.account.data-table {
+    width: 100%;
+    display: table;
+    margin: 18px 0 -1px 0;
+}
+.account.data-table.data {
+    margin: 17px 0 -2px 0;
+}
+.account.data-table.hidden {
+    display: none;
+}
+.account.data-item {
+    display: table-row;
+}
+.account.data-left-td, .account.data-td {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 8px 15px 8px 0;
+    display: table-cell;
+}
+.data .account.data-td {
+    padding: 9px 15px 9px 0;
+}
+.account.data-td:last-child {
+    padding-right: 0;
+}
+.account.data-right-td {
+    width: 19px;
+    vertical-align: middle;
+    display: table-cell;
+    text-align: right;
+}
+.account.data-td .semi-small-icon {
+    margin-right: 7px;
+}
+.account.data-right-td span {
+    min-width: 19px;
+    height: 19px;
+    display: inline-block;
+    -moz-border-radius: 19px;
+    -webkit-border-radius: 19px;
+    border-radius: 19px;
+    -webkit-box-shadow: 0px 0px 0px 1px #EEEEEE;
+    -moz-box-shadow: 0px 0px 0px 1px #EEEEEE;
+    box-shadow: 0px 0px 0px 1px #EEEEEE;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    text-align: center;
+    padding: 0 6px;
+    margin: 1px 0 0 0;
+}
+.small.account.progress-list {
+    padding: 9px 0 12px 0;
+}
+.small .account.progress-indicator {
+    width: 8px;
+    height: 8px;
+    border: 0;
+    float: left;
+    margin: 8px 11px 0 0;
+}
+.account.progress-indicator.blue0, .account.progress-bar.blue0 {
+    background-color: #2798CC;
+}
+.account.progress-indicator.blue1, .account.progress-bar.blue1 {
+    background-color: #29C2FF;
+}
+.account.progress-indicator.blue2, .account.progress-bar.blue2 {
+    background-color: #2BA6DE;
+}
+.account.progress-indicator.blue3, .account.progress-bar.blue3 {
+    background-color: #61D2FF;
+}
+.account.progress-indicator.green0, .account.progress-bar.green0 {
+    background-color: #31B500;
+}
+.account.progress-indicator.green1, .account.progress-bar.green1 {
+    background-color: #13E03C;
+}
+.small .account.progress-title {
+    float: left;
+    height: 24px;
+    padding: 0;
+}
+.small .account.progress-size {
+    float: right;
+    font-size: 14px;
+    line-height: 24px;
+    color: #777777;
+}
+.account.progress-block.tiny {
+    height: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+}
+.tiny .account.progress-bar {
+    height: 8px;
+}
+.low-width .left-float-bl, .low-width .data-float-bl {
+    width: 63.7%;
+}
+.low-width .right-float-bl {
+    width: 36.3%;
+}
+.low-width .contacts-widget, .low-width .chat-widget {
+    width: 100%;
+    float: none;
+}
+/* End of Dashboard section */
+
 .top-head.startpage, .top-head.download-page, .top-head.browsers-page {
     background-color: white;
     position: relative;
@@ -24308,6 +24586,9 @@ div.camera-bottom-txt {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.half-sized.right {
+    float: right;
+}
 .account.data-block {
     padding: 30px 36px 16px 36px;
     -webkit-box-sizing: border-box;
@@ -24457,43 +24738,43 @@ div.camera-bottom-txt {
     height: 24px;
     display: inline-block;
 }
+.account.progress-block.small, .account.progress-bar.small {
+    height: 16px;
+}
 .account.progress-block.used-space, .used-space .account.progress-bar {
     height: 32px;
 }
 .achivements-table {
-    display: table;
-    width: 100%;
-    width: -webkit-calc(100% + 48px);
-    width: -moz-calc(100% + 48px);
-    width: calc(100% + 48px);
-    table-layout: fixed;
-    border-spacing: 24px;
-    margin: 0 0 -4px -24px;
-}
-.achivements-row {
-    display: table-row;
+    font-size: 0;
+    width: -webkit-calc(100% + 24px);
+    width: -moz-calc(100% + 24px);
+    width: calc(100% + 24px);
+    margin-left: -24px;
+    padding: 0 0 20px 0;
 }
 .achivements-cell {
-    display: table-cell;
+    display: inline-block;
+    vertical-align: top;
+    margin: 24px 0 0 24px;
     width: 50%;
     position: relative;
-    height: 122px;
+    min-height: 122px;
     padding: 25px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
-.low-width .achivements-cell, .low-width .achivements-table {
-    display: block;
-    height: auto;
-    margin: 0 0 20px 0;
-    width: 100%;
-    border-spacing: 0;
+    width: -webkit-calc(50% - 24px);
+    width: -moz-calc(50% -24px);
+    width: calc(50% - 24px);
 }
 .low-width .achivements-cell {
-    margin: 24px 0 0 0;
+    display: block;
+    width: -webkit-calc(100% - 24px);
+    width: -moz-calc(100% -24px);
+    width: calc(100% - 24px);
+    
 }
-.achivements-cell.filled::before, .achivements-cell.filled::after, .account.widget.body::before, .account.widget.body::after {
+.achivements-cell::before, .achivements-cell::after, .account.widget.body::before, .account.widget.body::after {
     content: '';
     width: 100%;
     height: 100%;
@@ -24508,7 +24789,7 @@ div.camera-bottom-txt {
     border-radius: 4px;
     background-color: white;
 }
-.achivements-cell.filled::after, .account.widget.body::after {
+.achivements-cell::after, .account.widget.body::after {
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
@@ -24610,7 +24891,7 @@ div.camera-bottom-txt {
 }
 .account.widget.body {
     position: relative;
-    margin: 6px;
+    margin: 12px 0 0 12px;
 }
 .account.widget.body.masterkey {
     margin: 36px 20px 36px 10px;
@@ -24633,6 +24914,10 @@ div.camera-bottom-txt {
     font-size: 18px;
     line-height: 24px;
     color: #999999;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
 }
 .account.widget.text {
     font-size: 14px;
@@ -24780,6 +25065,7 @@ div.camera-bottom-txt {
     margin: 9px 0 0 89px;
     min-width: 84px;
     white-space: nowrap;
+    left: -3px;
 }
 .account.upgrade-account {
     padding: 21px 0 0 0;

@@ -14280,7 +14280,19 @@
         "context": "The photo library usage description. To protect user privacy Apple requires a string explaining why this will be accessed."
     },
     "9056": {
-        "text": "Please do not enter any URL into the Copyrighted work field, if you need to add more URLs please click on \"Add another URL\".",
+        "text": "Please do not enter any URL into the Copyrighted work field, if you need to add more URLs please click on Add another URL.",
         "context": "An error message which is shown when submitting a copyright notice and a URL is mistakenly inserted into the \"Copyrighted work claimed to have been infringed\" field."
+    },
+    "9057": {
+        "text": "The file you are about to add is older than the copy already on record, do you want to replace the file?",
+        "context": "A dialog message asking the user to confirm they want to replace the file."
+    },
+    "9058": {
+        "text": "Replace file",
+        "context": "A dialog title. This dialog is shown before replacing an existing file."
+    },
+    "9059": {
+        "text": "No, rename it as %1",
+        "context": "A dialog button label. This button renames the file with a different name instead of replacing the existing file. Please keep the %1 placeholder which will be replaced with the filename."
     }
 }

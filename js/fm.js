@@ -337,42 +337,6 @@ function treePanelType() {
     return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
 }
 
-/**
- * treePanelSortElements
- *
- * @param {String} type, key value for global variable $.sortTreepanel, can bi prexied with Copy and Move for those dialogs.
- * @param {Array} elements, elements that will be sorted
- * @param {type} handlers
- * @param {} ifEq
- */
-function treePanelSortElements(type, elements, handlers, ifEq) {
-
-    if (!$.sortTreePanel) {
-       // XX: not yet initialised, initUI was not called yet, which means that most likely rendering/sorting should not be
-       // triggered at the moment. Caused receiving action packets, BEFORE the ui was initialised, so this call can simply
-       // do nothing at this moment.
-
-       return;
-    }
-
-    var settings = $.sortTreePanel[type],
-        sort = handlers[settings.by];
-
-    if (!sort) {
-        return;
-    }
-
-    elements.sort(function(a, b) {
-
-        var d = sort(a, b);
-
-        if (d == 0 && ifEq) {
-            return ifEq(a, b);
-        }
-        return d * settings.dir;
-    });
-}
-
 function initUI() {
     if (d) {
         console.time('initUI');
@@ -2607,10 +2571,16 @@ function initContextUI() {
 
     $(c + '.startchat-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected && $.selected[0];
+        var user_handle = $.selected;
 
-        if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+
+        if (user_handle.length === 1) {
+            if (!$this.is(".disabled") && user_handle) {
+                window.location = "#fm/chat/" + user_handle;
+            }
+        }
+        else {
+            megaChat.createAndShowGroupRoomFor(user_handle);
         }
     });
 
@@ -6318,11 +6288,22 @@ function contextMenuUI(e, ll) {
         id = $(e.currentTarget).attr('id');
 
         if (id) {
-            id = id.replace('treea_', '');// if right clicked on left panel
+            
+            // Contacts left panel click
+            if (id.indexOf('contact_') !== -1) {
+                id = id.replace('contact_', '');
+            }
+            
+            // File manager left panel click
+            else if (id.indexOf('treea_') !== -1) {
+                id = id.replace('treea_', '');
+            }
         }
 
         if (id && !M.d[id]) {
-            id = undefined;// exist in node list
+
+            // exist in node list
+            id = undefined;
         }
 
         // In case that id belongs to contact, 11 char length
@@ -6332,12 +6313,16 @@ function contextMenuUI(e, ll) {
             $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
 
             // If selected contact is offline make sure that audio and video calls are forbiden (disabled)
-            if ($('#' + id).find('.offline').length) {
+            if ($('#' + id).find('.offline').length || $.selected.length > 1) {
                 $(menuCMI).filter('.startaudio-item').addClass('disabled');
                 $(menuCMI).filter('.startvideo-item').addClass('disabled');
             }
+
+            // Remove select-all item from context menu
+            $(m).find('.select-all').remove();
         }
-        else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1 || currNodeClass.indexOf('folder-link') > -1)) {
+        else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
+                    || currNodeClass.indexOf('folder-link') > -1)) {
             flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
@@ -6823,8 +6808,7 @@ function treeUI()
             $(e.target).parents('.fm-breadcrumbs').length ||
             $(e.target).hasClass('contact-details-user-name') ||
             $(e.target).hasClass('contact-details-email') ||
-            $(e.target).hasClass('nw-conversations-name') ||
-            ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+            $(e.target).hasClass('nw-conversations-name')) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6877,6 +6861,21 @@ function treeUI()
         }
 
         return false;
+    });
+
+    $('.fm-tree-panel .nw-contact-item').rebind('contextmenu.treeUI', function(e) {
+        var $self = $(this);
+
+        if ($self.attr('class').indexOf('selected') === -1) {
+            $('.content-panel.contacts .nw-contact-item.selected').removeClass('selected');
+            $self.addClass('selected');
+        }
+
+        $.selected = [$self.attr('id').replace('contact_', '')];
+        searchPath();
+        $.hideTopMenu();
+
+        return Boolean(contextMenuUI(e, 1));
     });
 
     /**
@@ -11053,6 +11052,12 @@ function contactUI() {
 
             handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
             fm_showoverlay();
+        });
+
+        // Remove contact button on contacts page
+        $('.fm-remove-contact').rebind('click', function() {
+            $.selected = [M.currentdirid];
+            fmremove();
         });
 
         if (!megaChatIsDisabled) {

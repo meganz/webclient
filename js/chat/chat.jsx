@@ -1541,11 +1541,6 @@ Chat.prototype.processRemovedUser = function(u) {
 
     self.logger.debug("removed: ", u);
 
-
-    var room = self.getPrivateRoom(u);
-    if (room) {
-        room.destroy(true);
-    }
     this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
     self.renderMyStatus();

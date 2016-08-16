@@ -1201,10 +1201,6 @@
 
 	    self.logger.debug("removed: ", u);
 
-	    var room = self.getPrivateRoom(u);
-	    if (room) {
-	        room.destroy(true);
-	    }
 	    this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
 	    self.renderMyStatus();
@@ -19442,12 +19438,13 @@
 	        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
 	        sortedConversations.forEach(function (chatRoom) {
+	            var contact;
 	            if (!chatRoom || !chatRoom.roomJid) {
 	                return;
 	            }
 
 	            if (chatRoom.type === "private") {
-	                var contact = chatRoom.getParticipantsExceptMe()[0];
+	                contact = chatRoom.getParticipantsExceptMe()[0];
 	                if (!contact) {
 	                    return;
 	                }
@@ -19464,6 +19461,7 @@
 	            currConvsList.push(React.makeElement(ConversationsListItem, {
 	                key: chatRoom.roomJid.split("@")[0],
 	                chatRoom: chatRoom,
+	                contact: contact,
 	                messages: chatRoom.messagesBuff,
 	                megaChat: megaChat,
 	                onConversationClicked: function onConversationClicked(e) {
@@ -22941,7 +22939,7 @@
 	        removeValue(excludedParticipants, u_handle, false);
 
 	        var dontShowTruncateButton = false;
-	        if (myPresence === 'offline' || !room.iAmOperator() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
+	        if (myPresence === 'offline' || !room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
 	            dontShowTruncateButton = true;
 	        }
 
@@ -27221,7 +27219,7 @@
 	                    }
 	                }
 	                if (!message.deleted) {
-	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && !message.requiresManualRetry) {
+	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
 	                        messageActionButtons = React.makeElement(
 	                            ButtonsUI.Button,
 	                            {

@@ -476,4 +476,8 @@ body.pro:after {
     background-image: url(../images/mega/account-sprite@2x.png);
     background-size: 172px auto;
 }
+.huge-icon.achivement {
+    background-image: url(../images/mega/big-achivements@2x.png);
+    background-size: 436px auto;
+}
 }

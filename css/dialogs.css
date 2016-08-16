@@ -199,3 +199,67 @@
     padding: 0 0 10px 0;
 }
 /* End of Limited available bandwidth dialog */
+
+/* Achivement dialog */
+.fm-dialog.achivement-dialog {
+    width: 484px;
+    margin: -242px 0 0 -242px;
+    font-size: 0;
+}
+.achivement-dialog.top-icon {
+    padding: 5px 0 23px 0;
+}
+.acivement-dialog.header {
+    font-size: 20px;
+    line-height: 25px;
+    color: #666666;
+    padding: 0 0 0 0;
+}
+.acivement-dialog.reward {
+    display: inline-block;
+    margin: 18px 21px 0 21px;
+    text-align: left;
+}
+.acivement-dialog.reward i {
+    vertical-align: top;
+}
+.acivement-dialog.reward-txt {
+    display: inline-block;
+    font-size: 14px;
+    line-height: 17px;
+    color: #777777;
+    vertical-align: top;
+    margin: 6px 0 0 15px;
+}
+.acivement-dialog.reward-txt span {
+    font-size: 18px;
+    line-height: 18px;
+    display: block;
+    text-transform: uppercase;
+    color: #2BA6DE;
+}
+.acivement-dialog.reward.storage span {
+    color: #2BA6DE;
+}
+.acivement-dialog.reward.bandwidth span {
+    color: #31B500;
+}
+.acivement-dialog.description {
+    padding: 18px 20px 0 20px;
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+}
+.acivement-dialog.expires-txt {
+    font-size: 14px;
+    line-height: 18px;
+    color: #FF333A;
+    padding: 15px 0 0 0;
+}
+.achivement-dialog .default-white-button {
+    display: inline-block;
+    margin: 24px 10px 12px 10px;
+    color: #777777;
+    min-width: 102px;
+}
+/* End of Achivement dialog */

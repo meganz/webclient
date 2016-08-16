@@ -3570,9 +3570,9 @@
     "9054": "MEGA p\u0159istupuje k va\u0161emu fotoapar\u00e1tu, kdy\u017e zaznamen\u00e1v\u00e1te video nebo fotografii v aplikaci.",
     "9055": "MEGA p\u0159istupuje k va\u0161im fotk\u00e1m a\/nebo vide\u00edm, kdy\u017e n\u011bkter\u00e9 z nich vyberete k nahr\u00e1n\u00ed, nebo kdy\u017e m\u00e1te povoleno Nahr\u00e1v\u00e1n\u00ed z fotoapar\u00e1tu.",
     "9056": "Nezad\u00e1vejte \u017e\u00e1dnou URL do pole D\u00edlo chr\u00e1n\u011bn\u00e9 autorsk\u00fdmi pr\u00e1vy. Pokud pot\u0159ebujete zadat v\u00edce URL, klikn\u011bte na P\u0159idat dal\u0161\u00ed URL.",
-    "9057": "The file you are about to add is older than the copy already on record, do you want to replace the file?",
-    "9058": "Replace file",
-    "9059": "No, rename it as %1",
+    "9057": "Soubor, kter\u00fd se chyst\u00e1te p\u0159idat, je star\u0161\u00ed ne\u017e ji\u017e zaznamenan\u00e1 kopie, chcete soubor nahradit?",
+    "9058": "Nahradit soubor",
+    "9059": "Ne, p\u0159ejmenovat ho na %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

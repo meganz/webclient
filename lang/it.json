@@ -3570,9 +3570,9 @@
     "9054": "MEGA ha accesso alla tua fotocamera quando fai una foto o registri un video all&#039;interno dell&#039;app.",
     "9055": "MEGA ha accesso alle tue foto e\/o video quando ne selezioni alcune per caricarle o quando hai attivato il Caricamento dalla fotocamera.",
     "9056": "Per favore, non aggiungere nessun URL nel campo Lavoro con Copyright, se devi aggiungere pi\u00f9 URL clicca su Aggiungi un altro URL.",
-    "9057": "The file you are about to add is older than the copy already on record, do you want to replace the file?",
-    "9058": "Replace file",
-    "9059": "No, rename it as %1",
+    "9057": "Il file che stai per aggiungere \u00e8 pi\u00f9 vecchio della copia gi\u00e0 presente, vuoi rimpiazzare il file?",
+    "9058": "Rimpiazza file",
+    "9059": "No, rinominalo come %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

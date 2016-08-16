@@ -1,4 +1,4 @@
-.tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon {
+.tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
     background-image: url(../images/mega/new-chat-sprite-v3.svg);
@@ -59,6 +59,10 @@
 .big-icon {
     width: 48px;
     height: 48px;
+}
+.huge-icon {
+    width: 140px;
+    height: 140px;
 }
 .white-medium-plus {
     background-position: -2px -1447px;
@@ -568,4 +572,31 @@
 .semi-small-icon.star {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -4px -11097px;
+}
+.huge-icon.achivement {
+    background-image: url(../images/mega/big-achivements.png);
+}
+.create-account .huge-icon.achivement {
+    background-position: -2px 6px;
+}
+.install-megasync .huge-icon.achivement {
+    background-position: -152px 6px;
+}
+.install-mobile-app .huge-icon.achivement {
+    background-position: -302px 6px;
+}
+.read-intro .huge-icon.achivement {
+    background-position: -2px -144px;
+}
+.invite-friend .huge-icon.achivement {
+    background-position: -152px -144px;
+}
+.verify-number .huge-icon.achivement {
+    background-position: -302px -144px;
+}
+.start-chat .huge-icon.achivement {
+    background-position: -2px -294px;
+}
+.share-folder .huge-icon.achivement {
+    background-position: -152px -294px;
 }

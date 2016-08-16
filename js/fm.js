@@ -9455,7 +9455,7 @@ function moveDialog() {
     });
 
     /**
-     * Create new foler button clicket inside move-dialog
+     * Create new folder button clicket inside move-dialog
      */
     $('.move-dialog .dialog-newfolder-button').rebind('click', function() {
 
@@ -10354,6 +10354,90 @@ function termsDialog(close, pp)
             $.termsDeny();
         termsDialog(1);
     });
+}
+
+/**
+ * Show achivement dialog
+ * @param {String} achivement title
+ * @param {String} close dialog parameter
+ */
+function achivementDialog(title, close) {
+    var headerTxt, descriptionTxt, storageSpace, transferQuota, monthNumber;
+    var $dialog = $('.fm-dialog.achivement-dialog')
+    if (close) {
+        $.dialog = false;
+        fm_hideoverlay();
+        $('.fm-dialog.achivement-dialog').addClass('hidden');
+        return true;
+    }
+    $.dialog = 'achivement';
+    fm_showoverlay();
+    $('.fm-dialog.achivement-dialog').removeClass('hidden');
+
+    $('.achivement-dialog .button.continue,.achivement-dialog .fm-dialog-close').rebind('click', function() {
+        achivementDialog(title, 1);
+    });
+    switch (title) {
+        case 'create-account':
+            headerTxt = 'Create an account in MEGA';
+            storageSpace = '10 GB';
+            monthNumber = 1;
+            break;
+        case 'install-megasync':
+            headerTxt = 'Install MEGAsync';
+            storageSpace = '20 GB';
+            transferQuota = '20 GB';
+            monthNumber = 2;
+            break;
+        case 'install-mobile-app':
+            headerTxt = 'Install a mobile app';
+            storageSpace = '20 GB';
+            transferQuota = '20 GB';
+            monthNumber = 2;
+            break;
+        case 'read-intro':
+            headerTxt = 'Read our introduction';
+            storageSpace = '20 GB';
+            transferQuota = '20 GB';
+            monthNumber = 2;
+            break;
+        case 'invite-friend':
+            headerTxt = 'Invite a friend to MEGA';
+            storageSpace = '20 GB';
+            transferQuota = '20 GB';
+            monthNumber = 2;
+            break;
+        case 'verify-number':
+            headerTxt = 'Verify your mobile number';
+            storageSpace = '20 GB';
+            transferQuota = '20 GB';
+            monthNumber = 2;
+            break;
+        case 'start-chat':
+            headerTxt = 'Start a group chat';
+            storageSpace = '20 GB';
+            transferQuota = '20 GB';
+            monthNumber = 2;
+            break;
+        case 'share-folder':
+            headerTxt = 'Share a folder';
+            storageSpace = '20 GB';
+            transferQuota = '20 GB';
+            monthNumber = 2;
+            break;
+    }
+    if(!descriptionTxt) {
+        descriptionTxt = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+    }
+    $dialog.find('.fm-dialog-title').text(headerTxt);
+    $dialog.find('.storage .reward-txt span').text(storageSpace);
+    if (transferQuota) {
+        $dialog.find('.bandwidth .reward-txt span').removeClass('hidden').text(transferQuota);
+    } else {
+        $dialog.find('.bandwidth .reward-txt span').addClass('hidden');
+    }
+    $dialog.find('.acivement-dialog.expires-txt span').text(monthNumber);
+    $dialog.attr('class','fm-dialog achivement-dialog ' + title);
 }
 
 var previews = {};

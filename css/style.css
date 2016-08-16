@@ -7108,6 +7108,14 @@ table {
 .fm-back-button {
     display: none;
 }
+.fm-header-buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0;
+    white-space: nowrap;
+    background-color: #f2f2f2;
+}
 .fm-breadcrumbs-block, .fm-share-breadcrumbs-block, .fm-dialog-breadcrumbs-bl {
     float: left;
     height: 36px;
@@ -7116,18 +7124,14 @@ table {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
-.long-path .fm-breadcrumbs-block {
-    max-width: -webkit-calc(100% - 230px);
-    max-width: -moz-calc(100% - 230px);
-    max-width: calc(100% - 230px);
-    height: 38px;
+    font-size: 0;
+    white-space: nowrap;
 }
 .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs {
     display: block;
     height: 24px;
     padding: 0 15px 0 0px;
-    float: left;
+    display: inline-block;
 }
 .fm-breadcrumbs:first-child .right-arrow-bg span {
     display: none;
@@ -7166,6 +7170,13 @@ table {
     padding: 0 0 0 42px;
     display: block;
     height: 24px;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+.fm-breadcrumbs .right-arrow-bg.short-foldername {
+    max-width: 110px;
 }
 .deactivated .fm-breadcrumbs .right-arrow-bg {
     cursor: default;

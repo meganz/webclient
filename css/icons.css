@@ -1,4 +1,4 @@
-.tiny-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon {
+.tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon {
     width: 20px;
     height: 20px;
     background-image: url(../images/mega/new-chat-sprite-v3.svg);
@@ -43,6 +43,10 @@
 .tiny-icon {
     width: 12px;
     height: 16px;
+}
+.semi-small-icon {
+    width: 18px;
+    height: 18px;
 }
 .medium-icon {
     width: 28px;
@@ -529,4 +533,39 @@
     background-position: -11px -10851px;
     width: 24px;
     height: 24px;
+}
+.small-icon.grey-chain {
+    background-position: -3px -2971px;
+}
+.small-icon.grey-plus {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -14px -10991px;
+}
+.semi-small-icon.file {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -4px -11021px;
+}
+.semi-small-icon.folder {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -4px -11047px;
+}
+.semi-small-icon.left-arrow {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -28px -11021px;
+}
+.semi-small-icon.right-arrow {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -28px -11046px;
+}
+.semi-small-icon.rubbish {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -4px -11073px;
+}
+.semi-small-icon.linked {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -28px -11071px;
+}
+.semi-small-icon.star {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -4px -11097px;
 }

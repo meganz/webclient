@@ -1267,7 +1267,7 @@ function MegaData()
     this.openFolder = function(id, force, chat) {
         var newHashLocation;
 
-        $('.fm-right-account-block').addClass('hidden');
+        $('.fm-right-account-block, .fm-right-block.dashboard').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
@@ -1327,6 +1327,8 @@ function MegaData()
         }
         else if (id && id.substr(0, 7) === 'account')
             accountUI();
+        else if (id && id.substr(0, 9) === 'dashboard')
+            dashboardUI();
         else if (id && id.substr(0, 13) === 'notifications')
             notificationsUI();
         else if (id && id.substr(0, 7) === 'search/')
@@ -1372,7 +1374,7 @@ function MegaData()
             // Force cleaning the current cloud contents and showing an empty msg
             M.renderMain();
         }
-        else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 13) !== 'notifications')) {
+        else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 9) !== 'dashboard') && (id.substr(0, 13) !== 'notifications')) {
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');

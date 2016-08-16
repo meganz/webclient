@@ -577,6 +577,10 @@ function init_page() {
         document.location.hash = 'fm/account';
         return false;
     }
+    else if (page == 'dashboard') {
+        document.location.hash = 'fm/dashboard';
+        return false;
+    }
     else if (page == 'register') {
         if (u_storage.sid && u_type !== 0) {
             document.location.hash = '#fm';
@@ -931,15 +935,6 @@ function init_page() {
             }
         }
         $('#topmenu').safeHTML(parsetopmenu());
-
-        $('.feedback-button')
-            .removeClass("hidden")
-            .rebind("click.feedbackDialog", function () {
-                var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
-                feedbackDialog._type = "top-button";
-
-                return false;
-            });
 
         $('#pageholder').hide();
         $('#startholder').hide();
@@ -1773,18 +1768,6 @@ function topmenuUI() {
         }
     });
 
-
-    $('.top-head .logo').rebind('click', function () {
-        if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
-            if (folderlink) {
-                M.openFolder(M.RootID, true);
-            }
-            else {
-                document.location.hash =
-                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
-            }
-        }
-    });
 
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         $('.fm-dialog.registration-page-success').addClass('hidden');

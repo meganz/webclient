@@ -12011,13 +12011,15 @@ table {
 }
 .small.account.progress-list {
     padding: 9px 0 12px 0;
+    display: block;
 }
 .small .account.progress-indicator {
     width: 8px;
     height: 8px;
-    border: 0;
     float: left;
-    margin: 8px 11px 0 0;
+    display: block;
+    border: 0;
+    top: 8px;
 }
 .account.progress-indicator.blue0, .account.progress-bar.blue0 {
     background-color: #2798CC;
@@ -24626,7 +24628,8 @@ div.camera-bottom-txt {
     float: none;
 }
 .account.progress-list {
-    padding: 15px 0 15px 0;
+    display: table;
+    padding: 15px 0 0px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -24638,7 +24641,21 @@ div.camera-bottom-txt {
     text-overflow: ellipsis;
 }
 .account.progress-list.half-sized + .account.progress-list.half-sized {
-    padding: 15px 0 15px 35px;
+    padding: 15px 0 14px 35px;
+}
+.account.progress-item {
+    display: table-row;
+}
+.account.progress-data {
+    display: table-cell;
+    width: 10px;
+    vertical-align: top;
+    white-space: nowrap;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-right: 12px;
+    height: 30px;
 }
 .account.progress-indicator {
     width: 12px;
@@ -24647,8 +24664,10 @@ div.camera-bottom-txt {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    margin: 9px 11px 9px 0;
-    float: left;
+    margin: 0 11px 0 0;
+    display: inline-block;
+    position: relative;
+    top: 9px;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
@@ -24695,13 +24714,12 @@ div.camera-bottom-txt {
 .account.progress-txt {
     font-size: 18px;
     color: #777777;
-    float: left;
-    min-width: 56px;
+    display: inline-block;
+    vertical-align: top;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 2px 12px 0 0;
-    height: 30px;
+    padding: 2px 0 0 0;
 }
 .account.progress-title {
     font-size: 14px;
@@ -24711,6 +24729,8 @@ div.camera-bottom-txt {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 30px;
+    display: table-cell;
+    vertical-align: top;
 }
 .account.used-space-block {
     padding-bottom: 20px;
@@ -24773,7 +24793,6 @@ div.camera-bottom-txt {
     width: -webkit-calc(100% - 24px);
     width: -moz-calc(100% -24px);
     width: calc(100% - 24px);
-    
 }
 .achivements-cell::before, .achivements-cell::after, .account.widget.body::before, .account.widget.body::after {
     content: '';

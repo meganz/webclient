@@ -118,12 +118,14 @@ var useravatar = (function() {
         }
 
         if (bg) {
-            bgBlock = '<div class="avatar-bg colorized"><span class="colorized color' + s.colorIndex + '"></span></div>';
+            bgBlock = '<div class="avatar-bg colorized">' +
+                '<span class="colorized color' + s.colorIndex + '"></span></div>';
         }
 
         _watching[id][className] = true;
         return bgBlock +
-                    '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '">'
+                    '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper '
+                        + className + ' ' + id +  ' color' + s.colorIndex + '">'
                     + '<span>'
                     + '<i class="verified_icon"></i>'
                     + s.letters
@@ -146,7 +148,7 @@ var useravatar = (function() {
             bgBlock = '<div class="avatar-bg"><span style="background-image: url(' + url + ');"></span></div>';
         }
 
-        return bgBlock 
+        return bgBlock
                 + '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">'
                 + '<i class="verified_icon"></i>'
                 + '<img src="' + url + '">'

@@ -388,7 +388,7 @@ if (!b_u && is_extension)
     {
         bootstaticpath = 'chrome://mega/content/';
         urlrootfile = 'secure.html';
-        if (d > 1) {
+        if (d) {
             staticpath = bootstaticpath;
         }
         else {

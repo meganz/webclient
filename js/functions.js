@@ -1069,10 +1069,6 @@ function numOfBytes(bytes, precision) {
 }
 
 function bytesToSize(bytes, precision, html_format) {
-    if (!bytes) {
-        return '0';
-    }
-
     var s_b = 'B';
     var s_kb = 'KB';
     var s_mb = 'MB';
@@ -1093,13 +1089,21 @@ function bytesToSize(bytes, precision, html_format) {
     var terabyte = gigabyte * 1024;
     var resultSize = 0;
     var resultUnit = '';
-    if (bytes > 1024 * 1024 * 1024) {
-        precision = 2;
+
+    if (precision === undefined) {
+        if (bytes > gigabyte) {
+            precision = 2;
+        }
+        else if (bytes > megabyte) {
+            precision = 1;
+        }
     }
-    else if (bytes > 1024 * 1024) {
-        precision = 1;
+
+    if (!bytes) {
+        resultSize = 0;
+        resultUnit = s_mb;
     }
-    if ((bytes >= 0) && (bytes < kilobyte)) {
+    else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
@@ -1123,9 +1127,13 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
-    if (html_format) {
+    if (html_format === 2) {
+        return resultSize + '<span>' + resultUnit + '</span>';
+    }
+    else if (html_format) {
         return '<span>' + resultSize + '</span>' + resultUnit;
-    } else {
+    }
+    else {
         return resultSize + ' ' + resultUnit;
     }
 }
@@ -1195,14 +1203,14 @@ function makeObservable(kls) {
 /**
  * Instantiates an enum-like list on the provided target object
  */
-function makeEnum(aEnum, aPrefix, aTarget) {
+function makeEnum(aEnum, aPrefix, aTarget, aNorm) {
     aTarget = aTarget || {};
 
     var len = aEnum.length;
     while (len--) {
         Object.defineProperty(aTarget,
             (aPrefix || '') + String(aEnum[len]).toUpperCase(), {
-                value: 1 << len,
+                value: aNorm ? len : (1 << len),
                 enumerable: true
             });
     }
@@ -3231,6 +3239,44 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
         );
     }
 }
+
+Object.defineProperty(mega, 'api', {
+    value: Object.freeze({
+        logger: new MegaLogger('API'),
+
+        setDomain: function(aDomain, aSave) {
+            apipath = 'https://' + aDomain + '/';
+
+            if (aSave) {
+                localStorage.apipath = apipath;
+            }
+        },
+
+        staging: function(aSave) {
+            this.setDomain('staging.api.mega.co.nz', aSave);
+        },
+        prod: function(aSave) {
+            this.setDomain('eu.api.mega.co.nz', aSave);
+        },
+
+        req: function(params) {
+            var promise = new MegaPromise();
+
+            api_req(params, {
+                callback: function(res) {
+                    if (typeof res === 'number' && res < 0) {
+                        promise.reject.apply(promise, arguments);
+                    }
+                    else {
+                        promise.resolve.apply(promise, arguments);
+                    }
+                }
+            });
+
+            return promise;
+        }
+    })
+});
 
 /**
  * execCommandUsable

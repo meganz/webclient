@@ -1374,7 +1374,10 @@ function MegaData()
             // Force cleaning the current cloud contents and showing an empty msg
             M.renderMain();
         }
-        else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 9) !== 'dashboard') && (id.substr(0, 13) !== 'notifications')) {
+        else if (id && (id.substr(0, 7) !== 'account')
+                && (id.substr(0, 9) !== 'dashboard')
+                && (id.substr(0, 13) !== 'notifications')) {
+
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');
@@ -1502,19 +1505,29 @@ function MegaData()
         $(document).trigger('MegaOpenFolder');
     };
 
+    this.getActiveContacts = function() {
+        var res = [];
+
+        if (typeof M.c.contacts === 'object') {
+            Object.keys(M.c.contacts)
+                .forEach(function(userHandle) {
+                    if (Object(M.u[userHandle]).c === 1) {
+                        res.push(userHandle);
+                    }
+                });
+        }
+
+        return res;
+    };
+
     // Contacts left panel handling
     this.contacts = function() {
 
         var i;
-        var activeContacts = [];
-
-        for (i in M.c['contacts']) {
-
-            // Filter out contacts without full relationship
-            if (M.d.hasOwnProperty(i) && (M.d[i].c === 1)) {
-                activeContacts.push(M.d[i]);
-            }
-        }
+        var activeContacts = this.getActiveContacts()
+            .map(function(handle) {
+                return M.d[handle];
+            });
 
         if (typeof this.i_cache !== "object") {
             this.i_cache = {};
@@ -1560,9 +1573,9 @@ function MegaData()
                     onlinestatus = [l[5926], 'offline'];
                 }
 
-                var name = M.getNameByHandle(activeContacts[i].u).toLowerCase();
+                var name = M.getNameByHandle(activeContacts[i].u);
 
-                if (!treesearch || name.indexOf(treesearch.toLowerCase()) > -1) {
+                if (!treesearch || name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1) {
 
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
@@ -3385,6 +3398,15 @@ function MegaData()
                 }
             });
 
+            api_req({a: 'maf', v: mega.achievem.RWDLVL}, {
+                account: account,
+                callback: function(res, ctx) {
+                    if (typeof res === 'object') {
+                        ctx.account.maf = res;
+                    }
+                }
+            });
+
             api_req({a: 'utt'}, {
                 account: account,
                 callback: function(res, ctx)
@@ -3973,6 +3995,119 @@ function MegaData()
         }
 
         return false;
+    };
+
+    /**
+     * Recursively retrieve node properties
+     * @param {String|Array} aNodes  ufs-node handle, or a list of them
+     */
+    this.getNodeProperties = function(aNodes) {
+        var res = {
+            favs: { cnt: 0, size: 0 },
+            links: { cnt: 0, size: 0 },
+            files: { cnt: 0, size: 0 },
+            folders: { cnt: 0, size: 0 },
+            oshares: { cnt: 0, size: 0 },
+        };
+
+        var forEach = function(nodes) {
+            var node;
+            var size;
+
+            for (var i in nodes) {
+                node = M.d[nodes[i]];
+
+                if (node) {
+                    if (node.t) {
+                        size = 0;
+
+                        if (M.c[node.h]) {
+                            size = res.files.size;
+
+                            forEach(Object.keys(M.c[node.h]));
+                            size = (res.files.size - size);
+                        }
+
+                        if (M.getNodeShareUsers(node, 'EXP').length) {
+                            res.oshares.cnt++;
+                            res.oshares.size += size;
+                        }
+
+                        res.folders.cnt++;
+                        res.folders.size += size;
+                    }
+                    else {
+                        size = node.s || 0;
+
+                        res.files.cnt++;
+                        res.files.size += size;
+
+                        if (node.ph) {
+                            res.links.cnt++;
+                            res.links.size += size;
+                        }
+                        if (node.fav) {
+                            res.favs.cnt++;
+                            res.favs.size += size;
+                        }
+                    }
+                }
+            }
+        };
+
+        if (!Array.isArray(aNodes)) {
+            if (M.c[aNodes]) {
+                aNodes = Object.keys(M.c[aNodes]);
+            }
+            else {
+                aNodes = [aNodes];
+            }
+        }
+
+        forEach(aNodes);
+
+        return res;
+    };
+
+    /**
+     * Retrieve dashboard statistics data
+     */
+    this.getDashboardData = function() {
+        var res = this.getNodeProperties(M.RootID);
+
+        [M.RubbishID, 'shares']
+            .forEach(function(handle) {
+                var key = 'rubbish';
+                var tmp = M.getNodeProperties(handle);
+
+                // remove unwanted properties
+                ['favs', 'links', 'oshares']
+                    .forEach(function(k) {
+                        if (d && tmp[k].cnt) {
+                            console.warn('getDashboardData: Found "%s" items for "%s"', k, handle);
+                        }
+                        delete tmp[k];
+                    });
+
+                tmp.cnt = tmp.files.cnt;
+                tmp.size = tmp.folders.size;
+
+                tmp.files = tmp.files.cnt;
+                tmp.folders = tmp.folders.cnt;
+
+                if (handle === 'shares') {
+                    key = 'ishares';
+                    tmp.cnt = Object.keys(M.c.shares || {}).length;
+                }
+                else if (!M.c[handle]) {
+                    // The rubbish is empty
+                    tmp.folders = 0;
+                }
+
+                res[key] = tmp;
+            });
+
+        return res;
     };
 
     /**
@@ -7462,3 +7597,106 @@ function balance2pro(callback)
         }
     });
 }
+
+// MEGA Achievements
+Object.defineProperty(mega, 'achievem', {
+    value: Object.create(null, {
+        RWDLVL: { value: 0 },
+
+        toString: {
+            value: function(ach) {
+                if (ach !== undefined) {
+                    var res = Object.keys(this)
+                        .filter(function(v) {
+                            return this[v] === ach;
+                        }.bind(this));
+
+                    return String(res);
+                }
+
+                return '[object MegaAchievements]';
+            }
+        },
+
+        prettify: {
+            value: function(maf) {
+                var data = Object(clone(maf.u));
+
+                // lookup reward from array of achievements
+                var lookup = function(r) {
+                    for (var i in maf.a) {
+                        if (maf.a.hasOwnProperty(i)) {
+                            if (maf.a[i].r === r) {
+                                return maf.a[i];
+                            }
+                        }
+                    }
+
+                    return null;
+                };
+
+                Object.keys(maf.r || {})
+                    .forEach(function(k) {
+                        var rwd = lookup(k | 0);
+
+                        data[k] = clone(maf.r[k]);
+
+                        if (rwd) {
+                            var ts = rwd.ts * 1000;
+                            var mdate = moment(ts);
+                            var left = String(data[k][2]).split('');
+
+                            switch (left.pop()) {
+                                case 'd': mdate.add(left | 0, 'days');    break;
+                                case 'w': mdate.add(left | 0, 'weeks');   break;
+                                case 'm': mdate.add(left | 0, 'months');  break;
+                                case 'y': mdate.add(left | 0, 'years');   break;
+                            }
+
+                            rwd.date = new Date(ts);
+                            rwd.left = Math.round(mdate.diff(rwd.date) / 86400000);
+
+                            data[k].rwd = rwd;
+                        }
+                    });
+
+                return data;
+            }
+        }
+    })
+});
+
+(function(o) {
+    var map = {
+        /*  1 */ 'WELCOME':     'rocket:#register',
+        /*  2 */ 'TOUR':        'mega-app',
+        /*  3 */ 'INVITE':      'profile:#fm/contacts',
+        /*  4 */ 'SYNCINSTALL': 'syncing-pc:#sync',
+        /*  5 */ 'APPINSTALL':  'mobile-device:#mobile',
+        /*  6 */ 'VERIFYE164':  'phone',
+        /*  7 */ 'GROUPCHAT':   'conversations:#fm/chat',
+        /*  8 */ 'FOLDERSHARE': 'shared-folder:#fm/contacts'
+    };
+    var mapToAction = Object.create(null);
+    var mapToElement = Object.create(null);
+
+    Object.keys(map).forEach(function(k, idx) {
+        Object.defineProperty(o, 'ACH_' + k, {
+            value: idx + 1,
+            enumerable: true
+        });
+
+        var tmp = map[k].split(':');
+        mapToAction[idx + 1] = tmp[1];
+        mapToElement[idx + 1] = tmp[0];
+    });
+
+    Object.defineProperty(o, 'mapToAction', {
+        value: Object.freeze(mapToAction)
+    });
+    Object.defineProperty(o, 'mapToElement', {
+        value: Object.freeze(mapToElement)
+    });
+
+    Object.freeze(o);
+})(mega.achievem);

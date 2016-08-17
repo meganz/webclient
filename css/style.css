@@ -11877,6 +11877,7 @@ table {
 }
 .account.left-pane.big-txt span {
     color: #777777;
+    padding-left: 5px;
 }
 .account.left-pane.small-txt {
     color: #666666;

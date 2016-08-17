@@ -1204,20 +1204,22 @@ function topmenuUI() {
 
             // Show the 'Upgrade your account' button in the main menu for all
             $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
+            $('.membership-icon-pad .membership-big-txt.plan-txt').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             $('.membership-status-block')
                 .safeHTML('<div class="membership-status @@">@@</div>', cssClass, purchasedPlan);
             $('.context-menu-divider.upgrade-your-account').addClass('pro');
-            $('.membership-popup.pro-popup');
+            $('.membership-popup').addClass('pro-popup');
             $('body').removeClass('free');
         }
         else {
             // Show the free badge
             $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
             $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
+            $('.membership-icon').attr('class','membership-icon');
             $('.membership-status').addClass('free');
             $('.membership-status').text(l[435]);
+            $('.membership-popup').removeClass('pro-popup');
             $('body').addClass('free');
         }
 
@@ -1414,11 +1416,11 @@ function topmenuUI() {
         if ($(this).attr('class').indexOf('active') == -1) {
             $(this).addClass('active');
             if (u_attr.p) {
-                $('.pro-popup').addClass('active');
+                $('.membership-popup').addClass('pro-popup');
+            } else {
+                $('.membership-popup').removeClass('pro-popup');
             }
-            else {
-                $('.free-popup').addClass('active');
-            }
+            $('.membership-popup').addClass('active');
 
             M.accountData(function (account) {
 
@@ -1431,12 +1433,12 @@ function topmenuUI() {
 
                 $('.membership-popup .membership-loading').hide();
                 $('.membership-popup .membership-main-block').show();
-                var $parent = $('.membership-popup.free-popup');
+                var $parent = $('.membership-popup');
+                $parent.find('.membership-usage-bl').removeClass('exceeded going-out');
 
                 if (u_attr.p) {
                     var planNum = u_attr.p;
                     var planName = getProPlan(planNum);
-                    $parent = $('.membership-popup.pro-popup');
 
                     $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
                     var $elm = $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt');
@@ -1451,9 +1453,10 @@ function topmenuUI() {
                     }
 
                     // Update current plan to PRO I, PRO II, PRO III or LITE in popup
-                    $('.membership-icon-pad .membership-big-txt.red').text(planName);
+                    $('.membership-icon-pad .membership-big-txt.plan-txt').text(planName);
                 }
                 else {
+                    $('.membership-icon-pad .membership-big-txt.plan-txt').text('FREE');
                     $('.membership-popup .upgrade-account').rebind('click', function () {
                         document.location.hash = 'pro';
                     });
@@ -1468,10 +1471,42 @@ function topmenuUI() {
                     $parent.find('.membership-price-txt .membership-big-txt').html('&euro; 0.00');
                 }
 
-                $parent.find('.storage .membership-circle-bg.blue-circle').attr('class',
-                    'membership-circle-bg blue-circle percents-' + percent.space);
-                $parent.find('.storage .membership-circle-bg.blue-circle')
-                    .safeHTML(percent.space  + '<span class="membership-small-txt">%</span>');
+                // Storage chart
+                var perc = percent.space;
+                warning = '';
+                if (perc > 100) {
+                    perc = 100;
+                } 
+                else if (perc > 99) {
+                    $parent.find('.membership-usage-bl.storage').addClass('exceeded');
+                     warning = l[1010]
+                        + '. '
+                        + l[1011]
+                        + ' <a href="#pro" class="upgradelink">'
+                        + l[920]
+                        + '</a>';
+                } 
+                else if (perc > 80) {
+                    $parent.find('.membership-usage-bl.storage').addClass('going-out');
+                    warning = l[1012]
+                        + ' '
+                        + l[1013]
+                        + ' <a href="#pro"  class="upgradelink">'
+                        + l[920]
+                        + '</a>';
+                }
+                if (warning) {
+                    $parent.find('.storage .tiny-chart .chart-warning').safeHTML(warning);
+                }
+
+                var deg =  227 * perc / 100;
+                if (deg <= 180) {
+                    $parent.find('.storage .tiny-chart .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+                } else {
+                    $parent.find('.storage .tiny-chart .main-chart.left-chart span').css('transform', 'rotate(180deg)');
+                    $parent.find('.storage .tiny-chart .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+                }
+
                 var b1 = bytesToSize(account.space_used);
                 b1 = b1.split(' ');
                 b1[0] = Math.round(b1[0]) + ' ';
@@ -1479,98 +1514,78 @@ function topmenuUI() {
                 b2 = b2.split(' ');
                 b2[0] = Math.round(b2[0]) + ' ';
 
+                // Maximum disk space
+                var b2 = bytesToSize(account.space);
+                b2 = b2.split(' ');
+                b2[0] = Math.round(b2[0]) + ' ';
+                $parent.find('.storage .tiny-chart .chart.data .pecents-txt').text((b2[0]));
+                $parent.find('.storage .tiny-chart .chart.data .gb-txt').text((b2[1]));
+                $parent.find('.storage .tiny-chart .chart.data .perc-txt').text(perc + '%');
+                $parent.find('.storage .tiny-chart .chart.data .size-txt').text(bytesToSize(account.space_used));
+                /* End of New Used Storage chart */
+
+
+                // Bandwidth
+                perc = percent.bw;
                 warning = '';
-                if (percent.space > 99) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1010] + '. ' + l[1011] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
+                var waittime = '30 minutes';
+
+                if (perc > 100) {
+                    perc = 100;
+                } 
+                else if (perc > 99) {
+                    $parent.find('.membership-usage-bl.bandwidth').addClass('exceeded');
+
+                    if (!u_attr.p) {
+                        warning = l[1054].replace('[X]',
+                                '<span class="green">' + waittime + '</span>')
+                            + ' '
+                            + l[1055]
+                            + ' <a href="#pro" class="upgradelink">'
+                            + l[920]
+                            + '</a>';
+                    }
+                    else {
+                        warning = l[1008]
+                            + ' '
+                            + l[1009]
+                            + ' <a href="#pro" class="upgradelink">'
+                            + l[920]
+                            + '</a>';
+                    }
+                } 
+                else if (perc > 80) {
+                    $parent.find('.membership-usage-bl.bandwidth').addClass('going-out');
+                    warning = l[1053]
+                        + ' '
+                        + l[1009]
+                        + ' <a href="#pro"  class="upgradelink">'
+                        + l[920]
+                        + '</a>';
                 }
-                else if (percent.space > 80) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1012] + ' ' + l[1013] + ' <a href="#pro"  class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
+                if (warning) {
+                    $parent.find('.bandwidth .tiny-chart .chart-warning').safeHTML(warning);
                 }
 
-                var usedspace =
-                    '<span class="membership-small-txt">' + l['439a'].replace('[X1]',
-                    '<span class="blue lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' +
-                    htmlentities(b1[1]) + '</span></span>').replace('[X2]',
-                        '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membership-small-txt">' +
-                    htmlentities(b2[1]) + '</span>') + '</span>';
-
-                var usedspacetxt = l[799];
-                if (lang == 'de') {
-                    usedspacetxt = l[799].charAt(0).toLowerCase() + l[799].slice(1);
+                deg =  227 * perc / 100;
+                if (deg <= 180) {
+                    $parent.find('.bandwidth .tiny-chart .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+                } else {
+                    $parent.find('.bandwidth .tiny-chart .main-chart.left-chart span').css('transform', 'rotate(180deg)');
+                    $parent.find('.bandwidth .tiny-chart .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
                 }
 
-                $parent.find('.storage .membership-usage-txt').safeHTML('<div class="membership-big-txt">' +
-                    usedspace + '</div><div class="membership-medium-txt">' + usedspacetxt +
-                    warning + '</div>');
-
-                if (percent.space > 80) {
-                    $parent.find('.storage .membership-usage-txt').addClass('exceeded');
-                }
-
-                $parent.find('.bandwidth  .membership-circle-bg.green-circle')
-                    .attr('class', 'membership-circle-bg green-circle percents-' + percent.bw);
-                $parent.find('.bandwidth  .membership-circle-bg.green-circle')
-                    .safeHTML(percent.bw + '<span class="membership-small-txt">%</span>');
+                // Maximum bandwidth
                 var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-                b1 = b1.split(' ');
-                b1[0] = Math.round(b1[0]) + ' ';
                 var b2 = bytesToSize(account.bw);
                 b2 = b2.split(' ');
                 b2[0] = Math.round(b2[0]) + ' ';
+                $parent.find('.bandwidth .tiny-chart .chart.data .size-txt').text((b1));
+                $parent.find('.bandwidth .tiny-chart .chart.data .pecents-txt').text((b2[0]));
+                $parent.find('.bandwidth .tiny-chart .chart.data .gb-txt').text((b2[1]));
+                $parent.find('.bandwidth .tiny-chart .chart.data .perc-txt').text(perc + '%');
+                /* End of New Used Bandwidth chart */
 
-                var waittime = '30 minutes';
-
-                warning = '';
-                if (percent.bw > 99 && !u_attr.p) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> <span class="red">'
-                        + l[17].toLowerCase() + '</span><br /> '
-                        + l[1054].replace('[X]',
-                            '<span class="green">' + waittime + '</span>')
-                        + ' ' + l[1055] + ' <a href="#pro"  class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-                else if (percent.bw > 99 && u_attr.p) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1008] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-                else if (percent.bw > 80) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1053] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-
-                var usedbw = '<span class="membership-small-txt">' + l['439a'].replace('[X1]',
-                    '<span class="green lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' +
-                    htmlentities(b1[1]) + '</span></span>').replace('[X2]',
-                    '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' +
-                    ' <span class="membership-small-txt">' +
-                    htmlentities(b2[1]) + '</span>') + '</span>';
-                var usedbwtxt = l[973];
-                if (lang == 'de') {
-                    usedbwtxt = l[973].charAt(0).toLowerCase() + l[973].slice(1);
-                }
-
-                $parent.find('.bandwidth .membership-usage-txt').safeHTML('<div class="membership-big-txt">' +
-                    usedbw + '</div><div class="membership-medium-txt">' + usedbwtxt + warning + '</div>');
-
-                if (percent.bw > 80) {
-                    $parent.find('.bandwidth .membership-usage-txt').addClass('exceeded');
-                }
 
                 $('.membership-popup .mem-button').rebind('click', function (e) {
                     document.location.hash = 'fm/account';

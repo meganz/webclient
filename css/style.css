@@ -10277,7 +10277,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     margin: -1px -1px 0 -5px;
 }
 .membership-icon-txt-bl {
-    padding: 22px 16px 25px 16px;
+    padding: 22px 10px 25px 10px;
     display: table-cell;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -10289,9 +10289,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     font-size: 15px;
     line-height: 21px;
     padding: 4px 0 6px 0;
-}
-.space.membership-big-txt, .free-bandwidth .membership-big-txt {
-    font-size: 18px;
 }
 .membership-big-txt.name {
     padding: 16px 0 0 0;
@@ -10320,8 +10317,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.membership-big-txt.red {
+.membership-big-txt.plan-txt {
+    color: #71AD32;
+}
+.pro-popup .membership-big-txt.plan-txt {
     color: #333333;
+}
+.pro-popup .membership-big-txt.balance {
+    color: #D90007;
+}
+.pro-popup .membership-medium-txt.green-bg, .membership-medium-txt.expires {
+    display: none;
+}
+.pro-popup .membership-medium-txt.expires {
+    display: block;
 }
 .membership-big-txt.floating {
     display: inline-block;
@@ -10372,6 +10381,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .membership-usage-bl {
     width: 234px;
+    padding: 18px 20px;
     float: left;
     min-height: inherit;
     -webkit-box-sizing: border-box;
@@ -10392,37 +10402,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .transfers .fm-account-blocks.bandwidth {
     padding-bottom: 20px;
 }
-.membership-circle {
-    width: 76px;
-    height: 76px;
-    float: left;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    border: 2px solid #e5e5e5;
-    margin: 14px 0 14px 14px;
-    padding: 4px;
-}
-.membership-circle-bg {
-    width: 64px;
-    height: 64px;
-    line-height: 62px;
-    font-size: 19px;
-    color: #666666;
-    text-align: center;
-    position: relative;
-}
 .membership-usage-txt {
-    padding: 14px 16px 14px 16px;
-    height: 100px;
-    display: table-cell;
+    padding: 0 0;
     vertical-align: middle;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    position: relative;
 }
 .membership-usage-txt .membership-big-txt {
     color: #333333;
@@ -11039,200 +11025,6 @@ table {
     opacity: 1;
     right: 100%;
     margin-right: 0;
-}
-.green-circle, .blue-circle, .game-circle {
-    background-image: url(../images/mega/rounded-progressbars.png);
-    background-repeat: no-repeat;
-    background-position: 0 0px;
-}
-.green-circle.percents-0 {
-    background-position: 0 0px;
-}
-.green-circle.percents-1, .green-circle.percents-2, .green-circle.percents-3, .green-circle.percents-4, .green-circle.percents-5, .green-circle.percents-6 {
-    background-position: 0 -80px;
-}
-.green-circle.percents-7, .green-circle.percents-8, .green-circle.percents-9, .green-circle.percents-10, .green-circle.percents-11, .green-circle.percents-12 {
-    background-position: 0 -160px;
-}
-.green-circle.percents-13, .green-circle.percents-14, .green-circle.percents-15, .green-circle.percents-16, .green-circle.percents-17, .green-circle.percents-18 {
-    background-position: 0 -240px;
-}
-.green-circle.percents-19, .green-circle.percents-20, .green-circle.percents-21, .green-circle.percents-22, .green-circle.percents-23, .green-circle.percents-24 {
-    background-position: 0 -320px;
-}
-.green-circle.percents-25, .green-circle.percents-26, .green-circle.percents-27, .green-circle.percents-28, .green-circle.percents-29, .green-circle.percents-30 {
-    background-position: 0 -400px;
-}
-.green-circle.percents-31, .green-circle.percents-32, .green-circle.percents-33, .green-circle.percents-34, .green-circle.percents-35, .green-circle.percents-36 {
-    background-position: 0 -480px;
-}
-.green-circle.percents-37, .green-circle.percents-38, .green-circle.percents-39, .green-circle.percents-40, .green-circle.percents-41, .green-circle.percents-42 {
-    background-position: 0 -560px;
-}
-.green-circle.percents-43, .green-circle.percents-44, .green-circle.percents-45 {
-    background-position: 0 -640px;
-}
-.green-circle.percents-46, .green-circle.percents-47, .green-circle.percents-48, .green-circle.percents-49 {
-    background-position: 0 -720px;
-}
-.green-circle.percents-50 {
-    background-position: 0 -800px;
-}
-.green-circle.percents-51, .green-circle.percents-52, .green-circle.percents-53, .green-circle.percents-54, .green-circle.percents-55, .green-circle.percents-56 {
-    background-position: 0 -880px;
-}
-.green-circle.percents-57, .green-circle.percents-58, .green-circle.percents-59, .green-circle.percents-60, .green-circle.percents-61, .green-circle.percents-62 {
-    background-position: 0 -960px;
-}
-.green-circle.percents-63, .green-circle.percents-64, .green-circle.percents-65, .green-circle.percents-66, .green-circle.percents-67 {
-    background-position: 0 -1040px;
-}
-.green-circle.percents-68, .green-circle.percents-69, .green-circle.percents-70, .green-circle.percents-71, .green-circle.percents-72 {
-    background-position: 0 -1120px;
-}
-.green-circle.percents-73, .green-circle.percents-74, .green-circle.percents-75, .green-circle.percents-76, .green-circle.percents-77 {
-    background-position: 0 -1200px;
-}
-.green-circle.percents-78, .green-circle.percents-79, .green-circle.percents-80, .green-circle.percents-81, .green-circle.percents-82 {
-    background-position: 0 -1280px;
-}
-.green-circle.percents-83, .green-circle.percents-84, .green-circle.percents-85, .green-circle.percents-86, .green-circle.percents-87 {
-    background-position: 0 -1360px;
-}
-.green-circle.percents-88, .green-circle.percents-89, .green-circle.percents-90, .green-circle.percents-91, .green-circle.percents-92 {
-    background-position: 0 -1440px;
-}
-.green-circle.percents-93, .green-circle.percents-94, .green-circle.percents-95, .green-circle.percents-96, .green-circle.percents-97, .green-circle.percents-98, .green-circle.percents-99 {
-    background-position: 0 -1520px;
-}
-.green-circle.percents-100 {
-    background-position: 0 -1600px;
-}
-.blue-circle.percents-0 {
-    background-position: 0 -1680px;
-}
-.blue-circle.percents-1, .blue-circle.percents-2, .blue-circle.percents-3, .blue-circle.percents-4, .blue-circle.percents-5, .blue-circle.percents-6 {
-    background-position: 0 -1760px;
-}
-.blue-circle.percents-7, .blue-circle.percents-8, .blue-circle.percents-9, .blue-circle.percents-10, .blue-circle.percents-11, .blue-circle.percents-12 {
-    background-position: 0 -1840px;
-}
-.blue-circle.percents-13, .blue-circle.percents-14, .blue-circle.percents-15, .blue-circle.percents-16, .blue-circle.percents-17, .blue-circle.percents-18 {
-    background-position: 0 -1920px;
-}
-.blue-circle.percents-19, .blue-circle.percents-20, .blue-circle.percents-21, .blue-circle.percents-22, .blue-circle.percents-23, .blue-circle.percents-24 {
-    background-position: 0 -2000px;
-}
-.blue-circle.percents-25, .blue-circle.percents-26, .blue-circle.percents-27, .blue-circle.percents-28, .blue-circle.percents-29, .blue-circle.percents-30 {
-    background-position: 0 -2080px;
-}
-.blue-circle.percents-31, .blue-circle.percents-32, .blue-circle.percents-33, .blue-circle.percents-34, .blue-circle.percents-35, .blue-circle.percents-36 {
-    background-position: 0 -2160px;
-}
-.blue-circle.percents-37, .blue-circle.percents-38, .blue-circle.percents-39, .blue-circle.percents-40, .blue-circle.percents-41, .blue-circle.percents-42 {
-    background-position: 0 -2240px;
-}
-.blue-circle.percents-43, .blue-circle.percents-44, .blue-circle.percents-45 {
-    background-position: 0 -2320px;
-}
-.blue-circle.percents-46, .blue-circle.percents-47, .blue-circle.percents-48, .blue-circle.percents-49 {
-    background-position: 0 -2400px;
-}
-.blue-circle.percents-50 {
-    background-position: 0 -2480px;
-}
-.blue-circle.percents-51, .blue-circle.percents-52, .blue-circle.percents-53, .blue-circle.percents-54, .blue-circle.percents-55, .blue-circle.percents-56 {
-    background-position: 0 -2560px;
-}
-.blue-circle.percents-57, .blue-circle.percents-58, .blue-circle.percents-59, .blue-circle.percents-60, .blue-circle.percents-61, .blue-circle.percents-62 {
-    background-position: 0 -2640px;
-}
-.blue-circle.percents-63, .blue-circle.percents-64, .blue-circle.percents-65, .blue-circle.percents-66, .blue-circle.percents-67 {
-    background-position: 0 -2720px;
-}
-.blue-circle.percents-68, .blue-circle.percents-69, .blue-circle.percents-70, .blue-circle.percents-71, .blue-circle.percents-72 {
-    background-position: 0 -2800px;
-}
-.blue-circle.percents-73, .blue-circle.percents-74, .blue-circle.percents-75, .blue-circle.percents-76, .blue-circle.percents-77 {
-    background-position: 0 -2880px;
-}
-.blue-circle.percents-78, .blue-circle.percents-79, .blue-circle.percents-80, .blue-circle.percents-81, .blue-circle.percents-82 {
-    background-position: 0 -2960px;
-}
-.blue-circle.percents-83, .blue-circle.percents-84, .blue-circle.percents-85, .blue-circle.percents-86, .blue-circle.percents-87 {
-    background-position: 0 -3040px;
-}
-.blue-circle.percents-88, .blue-circle.percents-89, .blue-circle.percents-90, .blue-circle.percents-91, .blue-circle.percents-92 {
-    background-position: 0 -3120px;
-}
-.blue-circle.percents-93, .blue-circle.percents-94, .blue-circle.percents-95, .blue-circle.percents-96, .blue-circle.percents-97, .blue-circle.percents-98, .blue-circle.percents-99 {
-    background-position: 0 -3200px;
-}
-.blue-circle.percents-100 {
-    background-position: 0 -3280px;
-}
-.game-circle.percents-0 {
-    background-position: 0 -1680px;
-}
-.game-circle.percents-1, .game-circle.percents-2, .game-circle.percents-3, .game-circle.percents-4, .game-circle.percents-5, .game-circle.percents-6 {
-    background-position: 0 -3360px;
-}
-.game-circle.percents-7, .game-circle.percents-8, .game-circle.percents-9, .game-circle.percents-10, .game-circle.percents-11, .game-circle.percents-12 {
-    background-position: 0 -3440px;
-}
-.game-circle.percents-13, .game-circle.percents-14, .game-circle.percents-15, .game-circle.percents-16, .game-circle.percents-17, .game-circle.percents-18 {
-    background-position: 0 -3520px;
-}
-.game-circle.percents-19, .game-circle.percents-20, .game-circle.percents-21, .game-circle.percents-22, .game-circle.percents-23, .game-circle.percents-24 {
-    background-position: 0 -3600px;
-}
-.game-circle.percents-25, .game-circle.percents-26, .game-circle.percents-27, .game-circle.percents-28, .game-circle.percents-29, .game-circle.percents-30 {
-    background-position: 0 -3680px;
-}
-.game-circle.percents-31, .game-circle.percents-32, .game-circle.percents-33, .game-circle.percents-34, .game-circle.percents-35, .game-circle.percents-36 {
-    background-position: 0 -3760px;
-}
-.game-circle.percents-37, .game-circle.percents-38, .game-circle.percents-39, .game-circle.percents-40, .game-circle.percents-41, .game-circle.percents-42 {
-    background-position: 0 -3840px;
-}
-.game-circle.percents-43, .game-circle.percents-44, .game-circle.percents-45 {
-    background-position: 0 -3920px;
-}
-.game-circle.percents-46, .game-circle.percents-47, .game-circle.percents-48, .game-circle.percents-49 {
-    background-position: 0 -4000px;
-}
-.game-circle.percents-50 {
-    background-position: 0 -4080px;
-}
-.game-circle.percents-51, .game-circle.percents-52, .game-circle.percents-53, .game-circle.percents-54, .game-circle.percents-55, .game-circle.percents-56 {
-    background-position: 0 -4160px;
-}
-.game-circle.percents-57, .game-circle.percents-58, .game-circle.percents-59, .game-circle.percents-60, .game-circle.percents-61, .game-circle.percents-62 {
-    background-position: 0 -4240px;
-}
-.game-circle.percents-63, .game-circle.percents-64, .game-circle.percents-65, .game-circle.percents-66, .game-circle.percents-67 {
-    background-position: 0 -4320px;
-}
-.game-circle.percents-68, .game-circle.percents-69, .game-circle.percents-70, .game-circle.percents-71, .game-circle.percents-72 {
-    background-position: 0 -4400px;
-}
-.game-circle.percents-73, .game-circle.percents-74, .game-circle.percents-75, .game-circle.percents-76, .game-circle.percents-77 {
-    background-position: 0 -4480px;
-}
-.game-circle.percents-78, .game-circle.percents-79, .game-circle.percents-80, .game-circle.percents-81, .game-circle.percents-82 {
-    background-position: 0 -4560px;
-}
-.game-circle.percents-83, .game-circle.percents-84, .game-circle.percents-85, .game-circle.percents-86, .game-circle.percents-87 {
-    background-position: 0 -4640px;
-}
-.game-circle.percents-88, .game-circle.percents-89, .game-circle.percents-90, .game-circle.percents-91, .game-circle.percents-92 {
-    background-position: 0 -4720px;
-}
-.game-circle.percents-93, .game-circle.percents-94, .game-circle.percents-95, .game-circle.percents-96, .game-circle.percents-97, .game-circle.percents-98, .game-circle.percents-99 {
-    background-position: 0 -4800px;
-}
-.game-circle.percents-100 {
-    background-position: 0 -4880px;
 }
 .fm-account-top {
     height: 48px;
@@ -11906,7 +11698,7 @@ table {
     color: #D90007;
     font-family: 'source_sans_prosemibold';
 }
-.chart-warning.red {
+.chart-warning.red, .exceeded .chart-warning {
     border-color: #D90007;
 }
 .chart-indicator {
@@ -11921,6 +11713,9 @@ table {
     z-index: 10;
     left: 165px;
     top: 26px;
+}
+.going-out .chart-indicator {
+    display: block;
 }
 .exceeded .big-icon.cloud {
     background-position: 0px -10934px;
@@ -25105,6 +24900,73 @@ div.camera-bottom-txt {
     display: table-cell;
     vertical-align: middle;
     width: 50px;
+}
+/* Small rounded chart */
+.tiny-chart .account.chart.body {
+    width: 76px;
+    height: 76px;
+}
+.tiny-chart .account.chart.overlay {
+    width: 68px;
+    height: 68px;
+    margin: 15px 0 0 40px;
+}
+.tiny-chart .account.chart.overlay span {
+    top: 53px;
+    left: -3px;
+}
+.tiny-chart .account.chart.overlay span:first-child {
+    top: -6px;
+    left: 22px;
+    transform: rotate(48deg);
+}
+.tiny-chart .chart.progressbars .right-chart {
+    clip: rect(0, 76px, 76px, 38px);
+}
+.tiny-chart .chart.progressbars .left-chart {
+    clip: rect(0, 38px, 76px, 0);
+}
+.tiny-chart .account.chart.body::after {
+    width: 68px;
+    height: 68px;
+}
+.tiny-chart .chart.icon {
+    left: 22px;
+    top: 35px;
+}
+.tiny-chart .account.chart.data {
+    margin: 6px 0 0 84px;
+}
+.tiny-chart .chart.data .perc-txt {
+    font-size: 24px;
+    line-height: 32px;
+}
+.tiny-chart .chart.data .size-txt {
+    font-size: 14px;
+    line-height: 18px;
+}
+.tiny-chart .chart.data .of-txt, .tiny-chart .chart.data .pecents-txt, .tiny-chart .chart.data .gb-txt {
+    font-size: 14px;
+    line-height: 22px;
+}
+.tiny-chart.account.chart-block {
+    padding: 12px 0 0 0;
+}
+.tiny-chart .chart-indicator {
+    left: 128px;
+    top: 20px;
+    width: 6px;
+    height: 6px;
+}
+.tiny-chart .chart-warning {
+    display: none;
+    font-size: 12px;
+}
+.exceeded .tiny-chart .chart-warning, .going-out .tiny-chart .chart-warning {
+    display: block;
+}
+.going-out .chart-warning a {
+    color: #333333;
 }
 /* MegaSync dialog */
 .megasync-content.slider {

@@ -600,3 +600,17 @@
 .share-folder .huge-icon.achivement {
     background-position: -152px -294px;
 }
+.semi-big-icon.cloud {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -9px -11164px;
+}
+.exceeded .semi-big-icon.cloud {
+    background-position: -9px -11234px;
+}
+.semi-big-icon.speedometer {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+        background-position: -9px -11129px;
+}
+.exceeded .semi-big-icon.speedometer {
+        background-position: -9px -11199px;
+}

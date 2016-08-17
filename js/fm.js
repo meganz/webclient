@@ -3024,6 +3024,8 @@ function dashboardUI() {
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
         $('.account.left-pane.balance-txt').safeHTML('@@ &euro; ', account.balance[0][0]);
+        
+        $('.fm-account-blocks.storage, .fm-account-blocks.bandwidth').removeClass('exceeded going-out');
 
         // Elements for free/pro accounts. Expites date / Registration date
         if (u_attr.p) {
@@ -3074,13 +3076,12 @@ function dashboardUI() {
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
-        }
-        if (perc > 99) {
+        } else if (perc > 99) {
             $('.fm-account-blocks.bandwidth').addClass('exceeded');
             b_exceeded = 1;
         }
 
-        var deg =  234 * perc_c / 100;
+        var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
         if (deg <= 180) {
@@ -3107,13 +3108,14 @@ function dashboardUI() {
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
-        }
-        if (perc > 99) {
+        } else if (perc > 99) {
             $('.fm-account-blocks.storage').addClass('exceeded');
             s_exceeded = 1;
+        } else if (perc > 80) {
+            $('.fm-account-blocks.storage').addClass('going-out');
         }
 
-        var deg =  234 * perc_c / 100;
+        var deg =  230 * perc_c / 100;
 
         // Used space chart
         if (deg <= 180) {
@@ -3135,20 +3137,20 @@ function dashboardUI() {
 
 
         /* Charts warning notifications */
-        $('.chart-warning:not(.hidden)').addClass('hidden');
+        $('.dashboard .chart-warning:not(.hidden)').addClass('hidden');
         if (b_exceeded && s_exceeded) {
             // Bandwidth and Storage quota exceeded
-            $('.chart-warning.storage-and-bandwidth').removeClass('hidden');
+            $('.dashboard .chart-warning.storage-and-bandwidth').removeClass('hidden');
         } else if (s_exceeded) {
             // Storage quota exceeded
-            $('.chart-warning.storage').removeClass('hidden');
+            $('.dashboard .chart-warning.storage').removeClass('hidden');
         } else if (b_exceeded) {
             // Bandwidth quota exceeded
-            $('.chart-warning.bandwidth').removeClass('hidden');
+            $('.dashboard .chart-warning.bandwidth').removeClass('hidden');
         }
         else if (perc > 97) {
             // Running out of cloud space
-            $('.chart-warning.out-of-space').removeClass('hidden');
+            $('.dashboard .chart-warning.out-of-space').removeClass('hidden');
         }
         /* End of Charts warning notifications */
 
@@ -3444,7 +3446,7 @@ function accountUI() {
         if (perc > 99)
             $('.fm-account-blocks.bandwidth').addClass('exceeded');
 
-        var deg =  234 * perc_c / 100;
+        var deg =  230 * perc_c / 100;
 
         /* Used Bandwidth chart */
         if (deg <= 180) {
@@ -3476,7 +3478,7 @@ function accountUI() {
         if (perc > 99)
             $('.fm-account-blocks.storage').addClass('exceeded');
 
-        var deg =  234 * perc_c / 100;
+        var deg =  230 * perc_c / 100;
 
         /* Used space chart */
         if (deg <= 180) {

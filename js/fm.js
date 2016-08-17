@@ -3550,13 +3550,13 @@ function accountUI() {
 
             $quotaTxt.safeHTML(quotaTxt
                 .replace('%1', bytesToSize(account.space_used))
-                .replace('%2', bytesToSize(account.space)));
+                .replace('%2', bytesToSize(account.space, 0)));
 
             $quotaTxt = $('.account.quota-txt.transfer', $achBlock);
 
             $quotaTxt.safeHTML(quotaTxt
                 .replace('%1', bytesToSize(account.downbw_used))
-                .replace('%2', bytesToSize(account.bw)));
+                .replace('%2', bytesToSize(account.bw, 0)));
 
             var bind = function(action) {
                 this.rebind('click', function() {
@@ -3568,7 +3568,22 @@ function accountUI() {
                     }
                 });
             };
+
+            // hide everything until seen on the api reply (maf)
             $('.achivements-cell').addClass('hidden');
+            $('.achivements-block .progress-bar.dark-violet').css('width', '0%');
+            var $items = $('.account.progress-list.achievem .progress-item')
+                .not('.baseq').addClass('hidden');
+            $items.find('.progress-indicator').removeClass('dark-violet active');
+            $('.progress-title span', $items).remove();
+
+            var $achStorage = $('.account.progress-list.achievem.storage');
+            var $achTransfer = $('.account.progress-list.achievem.transfer');
+            var $achTable = $('.account.data-block .achivements-table');
+            var storageMaxValue = 0;
+            var storageCurrentValue = 0;
+            var transferMaxValue = 0;
+            var transferCurrentValue = 0;
 
             var ach = mega.achievem;
             var maf = ach.prettify(account.maf);
@@ -3578,10 +3593,26 @@ function accountUI() {
                     var data = maf[idx];
                     var selector = ach.mapToElement[idx];
                     if (selector) {
-                        var $cell = $('.' + selector).closest('.achivements-cell');
+                        var $cell = $('.' + selector, $achTable).closest('.achivements-cell');
+                        var $storageItem = $('.progress-item.' + selector, $achStorage).removeClass('hidden');
 
+                        storageMaxValue += data[0];
+                        $('.progress-txt', $storageItem).text(bytesToSize(data[0], 0));
                         $('.rewards .reward:first-child .reward-txt', $cell).safeHTML(bytesToSize(data[0], 0, 2));
+
                         if (data[1]) {
+                            var $transferItem = $('.progress-item.' + selector, $achTransfer).removeClass('hidden');
+
+                            transferMaxValue += data[1];
+                            $('.progress-txt', $transferItem).text(bytesToSize(data[1], 0));
+
+                            if (data.rwd) {
+                                transferCurrentValue += data[1];
+                                $('.progress-indicator', $transferItem).addClass('dark-violet active');
+                                $('.progress-title', $transferItem)
+                                    .safeAppend('<span class="red-txt">(@@)</span>', '%1 days left'.replace('%1', data.rwd.left));
+                            }
+
                             $('.rewards .reward:last-child', $cell)
                                 .removeClass('hidden')
                                 .find('.reward-txt')
@@ -3593,6 +3624,10 @@ function accountUI() {
 
                         if (data.rwd) {
                             // Achieved
+                            storageCurrentValue += data[0];
+                            $('.progress-indicator', $storageItem).addClass('dark-violet active');
+                            $('.progress-title', $storageItem)
+                                .safeAppend('<span class="red-txt">(@@)</span>', '%1 days left'.replace('%1', data.rwd.left));
 
                             $('.status', $cell)
                                 .safeHTML(
@@ -3609,6 +3644,11 @@ function accountUI() {
                     }
                 }
             }
+
+            $('.account.data-block.storage .progress-block .dark-violet')
+                .css('width', Math.floor(storageCurrentValue * 100 / storageMaxValue - 3) + '%');
+            $('.account.data-block.transfer .progress-block .dark-violet')
+                .css('width', Math.floor(transferCurrentValue * 100 / transferMaxValue - 3) + '%');
 
             bind = undefined;
         }

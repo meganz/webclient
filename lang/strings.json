@@ -14294,5 +14294,9 @@
     "9059": {
         "text": "No, rename it as %1",
         "context": "A dialog button label. This button renames the file with a different name instead of replacing the existing file. Please keep the %1 placeholder which will be replaced with the filename."
+    },
+    "9060": {
+        "text": "Auto-replace file if a newly uploaded file has the same name\r\n\r\n",
+        "context": "Title for a setting\/option on the settings page to replace a file within a directory (rather than rename) if another file with the same name is uploaded to the same directory"
     }
 }

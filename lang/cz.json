@@ -3573,6 +3573,7 @@
     "9057": "Soubor, kter\u00fd se chyst\u00e1te p\u0159idat, je star\u0161\u00ed ne\u017e ji\u017e zaznamenan\u00e1 kopie, chcete soubor nahradit?",
     "9058": "Nahradit soubor",
     "9059": "Ne, p\u0159ejmenovat ho na %1",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

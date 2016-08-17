@@ -3573,6 +3573,7 @@
     "9057": "\ucd94\uac00\ud558\ub824\ub294 \ud30c\uc77c\uc774 \uc774\ubbf8 \uae30\ub85d\ub41c \ubcf5\uc0ac\ubcf8\ubcf4\ub2e4 \uc624\ub798\ub418\uc5c8\uc2b5\ub2c8\ub2e4, \ubc14\uafb8\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "9058": "\ud30c\uc77c \ub300\uccb4",
     "9059": "\uc544\ub2c8\uc624, %1\ub85c \uc774\ub984\uc744 \ubcc0\uacbd\ud569\ub2c8\ub2e4",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

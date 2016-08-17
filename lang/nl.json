@@ -3573,6 +3573,7 @@
     "9057": "The file you are about to add is older than the copy already on record, do you want to replace the file?",
     "9058": "Vervang bestand",
     "9059": "Nee, geef het een andere naam als %1",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

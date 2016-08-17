@@ -3573,6 +3573,7 @@
     "9057": "Eklemek \u00fczere oldu\u011funuz dosya kay\u0131tlardaki dosyadan daha eski, dosyay\u0131 de\u011fi\u015ftirmek ister misiniz?",
     "9058": "Dosyay\u0131 de\u011fi\u015ftir",
     "9059": "Hay\u0131r, %1 olarak yeniden adland\u0131r",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

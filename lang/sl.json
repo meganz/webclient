@@ -3573,6 +3573,7 @@
     "9057": "Datoteka, ki jo \u017eelite dodati, je starej\u0161a od kopije, ki jo \u017ee imate shranjeno, ali \u017eelite zamenjati datoteko?",
     "9058": "Zamenjaj datoteko",
     "9059": "Ne, preimenuj kot %1",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -3573,6 +3573,7 @@
     "9057": "Il file che stai per aggiungere \u00e8 pi\u00f9 vecchio della copia gi\u00e0 presente, vuoi rimpiazzare il file?",
     "9058": "Rimpiazza file",
     "9059": "No, rinominalo come %1",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

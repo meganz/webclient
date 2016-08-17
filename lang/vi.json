@@ -3573,6 +3573,7 @@
     "9057": "T\u1ec7p tin b\u1ea1n \u0111ang chu\u1ea9n b\u1ecb th\u00eam v\u00e0o c\u00f3 tr\u00f9ng v\u1edbi m\u1ed9t t\u1ec7p tin kh\u00e1c \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u0103ng t\u1ea3i t\u1eeb tr\u01b0\u1edbc, b\u1ea1n c\u00f3 mu\u1ed1n thay m\u1edbi b\u1eb1ng t\u1ec7p tin n\u00e0y kh\u00f4ng?",
     "9058": "Thay th\u1ebf t\u1ec7p tin",
     "9059": "Kh\u00f4ng, \u0111\u1ed5i t\u00ean t\u1ec7p tin n\u00e0y th\u00e0nh %1",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

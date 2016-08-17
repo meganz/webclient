@@ -3573,6 +3573,7 @@
     "9057": "Le fichier que vous vous appr\u00eatez \u00e0 ajouter est plus ancien que la copie pr\u00e9sente. Souhaitez-vous remplacer le fichier?",
     "9058": "Remplacer le fichier",
     "9059": "Non, le renommer %1",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -3573,6 +3573,7 @@
     "9057": "Plik, kt\u00f3ry chcesz doda\u0107 jest starszy od posiadanej kopii, czy na pewno chcesz zamieni\u0107 plik?",
     "9058": "Zamie\u0144 plik",
     "9059": "Nie, zamien go na %1",
+    "9060": "Auto-replace file if a newly uploaded file has the same name",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

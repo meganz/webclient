@@ -136,6 +136,9 @@ body {
     min-width: 987px;
     font-family: 'source_sans_proregular', Arial;
 }
+.hidden, div.hidden {
+    display: none;
+}
 ::selection {
     background: rgba(0,0,0,0.1);
 }
@@ -24438,6 +24441,9 @@ div.camera-bottom-txt {
 .account.progress-item {
     display: table-row;
 }
+.account.progress-item.hidden {
+    display: none;
+}
 .account.progress-data {
     display: table-cell;
     width: 10px;
@@ -26047,7 +26053,4 @@ table.speed-table {
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
     opacity: 0.5 !important;
     background-color: rgb(102, 102, 102) !important;
-}
-.hidden {
-    display: none;
 }

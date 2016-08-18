@@ -1410,8 +1410,8 @@ function topmenuUI() {
         }
     });
     $('.membership-status-block').rebind('click', function (e) {
-        $('.membership-popup .membership-main-block').hide();
-        $('.membership-popup .membership-loading').show();
+        $('.membership-popup .membership-main-block').addClass('hidden');
+        $('.membership-popup .membership-loading').removeClass('hidden');
 
         if ($(this).attr('class').indexOf('active') == -1) {
             $(this).addClass('active');
@@ -1431,8 +1431,8 @@ function topmenuUI() {
                 };
 
 
-                $('.membership-popup .membership-loading').hide();
-                $('.membership-popup .membership-main-block').show();
+                $('.membership-popup .membership-loading').addClass('hidden');
+                $('.membership-popup .membership-main-block').removeClass('hidden');
                 var $parent = $('.membership-popup');
                 $parent.find('.membership-usage-bl').removeClass('exceeded going-out');
 

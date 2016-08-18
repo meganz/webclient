@@ -152,9 +152,6 @@ div, span, input, object, texarea {
 .bottom-pages.developers #pageholder {
     background-image: none;
 }
-.hidden {
-    display: none !important;
-}
 .italic {
     font-style: italic;
 }
@@ -24424,7 +24421,7 @@ div.camera-bottom-txt {
 }
 .account.progress-list {
     display: table;
-    padding: 15px 0 0px 0;
+    padding: 15px 0 14px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -26050,4 +26047,7 @@ table.speed-table {
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
     opacity: 0.5 !important;
     background-color: rgb(102, 102, 102) !important;
+}
+.hidden {
+    display: none;
 }

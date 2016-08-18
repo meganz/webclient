@@ -10623,7 +10623,10 @@ function achivementDialog(title, close) {
  * @param {String} close dialog parameter
  */
 function achivementsListDialog(close) {
-    var $dialog = $('.fm-dialog.achivements-list-dialog');
+    var $dialog = $('.fm-dialog.achivements-list-dialog'),
+        $scrollBlock = $dialog.find('.achivements-scroll'),
+        bodyHeight = $('body').height(),
+        $contentBlock;
     if (close) {
         $.dialog = false;
         fm_hideoverlay();
@@ -10647,14 +10650,15 @@ function achivementsListDialog(close) {
     $dialog.removeClass('hidden');
 
     // Init scroll
-    var $contentBlock = $dialog.find('.acivements-content');
-    var scrollBlock = '.achivements-list-dialog .achivements-scroll';
+    $contentBlock = $dialog.find('.acivements-content');
 
-    if ($contentBlock.outerHeight() > 666) {
-        $(scrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-        jScrollFade(scrollBlock);
+    if ($dialog.outerHeight() > bodyHeight) {
+        $scrollBlock.css('max-height', bodyHeight - 60);
+        $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    } else if ($contentBlock.outerHeight() > 666) {
+        $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     } else {
-        deleteScrollPanel(scrollBlock, 'jsp');
+        deleteScrollPanel($scrollBlock, 'jsp');
     }
 
     // Dialog aligment

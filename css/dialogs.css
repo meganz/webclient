@@ -220,6 +220,10 @@
     margin: 18px 21px 0 21px;
     text-align: left;
 }
+.acivement-dialog.reward.hidden {
+    display: none;
+    
+}
 .acivement-dialog.reward i {
     vertical-align: top;
 }
@@ -253,8 +257,11 @@
 .acivement-dialog.expires-txt {
     font-size: 14px;
     line-height: 18px;
-    color: #FF333A;
+    color: #333333;
     padding: 15px 0 0 0;
+}
+.acivement-dialog.expires-txt.red {
+    color: #FF333A;
 }
 .achivement-dialog .default-white-button {
     display: inline-block;
@@ -263,3 +270,122 @@
     min-width: 102px;
 }
 /* End of Achivement dialog */
+
+
+/* Achivements list dialog */
+.fm-dialog.achivements-list-dialog {
+    width: 964px;
+    margin: -354px 0 0 -482px;
+    background-color: #f7f7f7;
+}
+.achivements-scroll .achivements-cell {
+    display: table;
+    width: auto;
+    margin: 0 0 12px 0;
+}
+.achivements-scroll .achivements-cell.hidden {
+    display: none;
+}
+.achivements-cell-body {
+    display: table-row;
+}
+.acivements-content .achivement-full.info {
+    margin: 0;
+    padding: 0 36px 0 0;
+}
+.acivement-dialog.left-icon {
+    display: table-cell;
+    width: 200px;
+    position: relative;
+    z-index: 1;
+    vertical-align: middle;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 18px;
+}
+.acivement-dialog.left-icon i {
+        margin: -5px 0;
+}
+.acivement-dialog.right-block {
+    display: table-cell;
+    width: 223px;
+    border-left: 1px solid #e5e5e5;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    vertical-align: top;
+    text-align: center;
+    padding: 0 15px;
+    
+}
+.achivements-scroll {
+    max-height: 666px;
+    margin-top:8px;
+    overflow:hidden;
+}
+.acivements-content {
+    padding: 2px 24px 12px 24px;
+}
+.achivement-full.expires-txt {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333333;
+    padding: 10px 0 0 0;
+}
+.achivement-full.expires-txt.red {
+    color: #333333;
+}
+.acivement-dialog.right-block .reward {
+        margin: 0px 0 17px 0;
+}
+.acivement-dialog.right-block .reward i {
+    margin: -2px 0 0 0;
+}
+.acivement-dialog.right-block .reward-txt {
+    margin: -4px 0 0 13px;
+}
+.achivements-cell-body .expires-txt {
+    padding: 12px 0 0 0;
+}
+.acivement-dialog.status-block {
+    position:absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+}
+.acivement-dialog.status-block .button {
+    display: inline-block;
+    min-width: 126px;
+}
+.achived .acivement-dialog.status-block .button {
+    display: none;
+}
+.acivement-dialog.status-txt {
+    font-size: 18px;
+    color:#31B500;
+    line-height: 26px;
+    text-transform:uppercase;
+    display: none;
+}
+.achived .acivement-dialog.status-txt {
+    display:block;
+}
+.one-reward .acivement-dialog.right-block {
+    vertical-align: middle;
+}
+.one-reward .acivement-dialog.right-block .reward {
+    margin: 0px 0 4px 0;
+}
+.one-reward .right-block .reward.bandwidth {
+    display: none;
+}
+.achived .acivement-dialog.right-block .reward {
+        filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}
+/* End of Achivements list dialog */

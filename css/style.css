@@ -24577,7 +24577,7 @@ div.camera-bottom-txt {
     margin: 24px 0 0 24px;
     width: 50%;
     position: relative;
-    min-height: 122px;
+    min-height: 182px;
     padding: 25px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -24591,6 +24591,9 @@ div.camera-bottom-txt {
     width: -webkit-calc(100% - 24px);
     width: -moz-calc(100% -24px);
     width: calc(100% - 24px);
+}
+.achivements-cell.hidden {
+    display: none;
 }
 .achivements-cell::before, .achivements-cell::after, .account.widget.body::before, .account.widget.body::after {
     content: '';
@@ -24632,7 +24635,7 @@ div.camera-bottom-txt {
     margin: 0 0 0 -37px;
 }
 .achivement-full.info {
-    padding: 0 24px 49px 0;
+    padding: 0 24px 50px 0;
     margin-left: 138px;
     position: relative;
     z-index: 1;
@@ -24641,7 +24644,6 @@ div.camera-bottom-txt {
     font-size: 18px;
     line-height: 22px;
     color: #333333;
-    padding: 1px 0 0 0;
 }
 .achivement-full.description {
     font-size: 14px;

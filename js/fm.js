@@ -3599,7 +3599,7 @@ function accountUI() {
             };
 
             // hide everything until seen on the api reply (maf)
-            $('.achivements-cell').addClass('hidden');
+            $('.achivements-table .achivements-cell').addClass('hidden');
             $('.achivements-block .progress-bar.dark-violet').css('width', '0%');
             var $items = $('.account.progress-list.achievem .progress-item')
                 .not('.baseq').addClass('hidden');
@@ -10545,12 +10545,12 @@ function achivementDialog(title, close) {
     if (close) {
         $.dialog = false;
         fm_hideoverlay();
-        $('.fm-dialog.achivement-dialog').addClass('hidden');
+        $dialog.addClass('hidden');
         return true;
     }
     $.dialog = 'achivement';
     fm_showoverlay();
-    $('.fm-dialog.achivement-dialog').removeClass('hidden');
+    $dialog.removeClass('hidden');
 
     $('.achivement-dialog .button.continue,.achivement-dialog .fm-dialog-close').rebind('click', function() {
         achivementDialog(title, 1);
@@ -10616,6 +10616,49 @@ function achivementDialog(title, close) {
     }
     $dialog.find('.acivement-dialog.expires-txt span').text(monthNumber);
     $dialog.attr('class','fm-dialog achivement-dialog ' + title);
+}
+
+/**
+ * Show achivements list dialog
+ * @param {String} close dialog parameter
+ */
+function achivementsListDialog(close) {
+    var $dialog = $('.fm-dialog.achivements-list-dialog');
+    if (close) {
+        $.dialog = false;
+        fm_hideoverlay();
+        $dialog.addClass('hidden');
+        return true;
+    }
+    $.dialog = 'achivements';
+
+    $dialog.find('.fm-dialog-close').rebind('click', function() {
+        achivementsListDialog(1);
+    });
+
+    // Demo of Complete achivement
+    $dialog.find('.achivements-cell.create-account').addClass('achived');
+
+    // Demo of achivement with only Storage reward
+    $dialog.find('.achivements-cell.create-account').addClass('one-reward');
+
+    // Show dialog
+    fm_showoverlay();
+    $dialog.removeClass('hidden');
+
+    // Init scroll
+    var $contentBlock = $dialog.find('.acivements-content');
+    var scrollBlock = '.achivements-list-dialog .achivements-scroll';
+
+    if ($contentBlock.outerHeight() > 666) {
+        $(scrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+        jScrollFade(scrollBlock);
+    } else {
+        deleteScrollPanel(scrollBlock, 'jsp');
+    }
+
+    // Dialog aligment
+    $dialog.css('margin-top', '-' + $dialog.outerHeight()/2 + 'px');
 }
 
 var previews = {};

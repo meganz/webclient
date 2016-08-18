@@ -113,7 +113,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup'
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since'
         ];
 
         for (var n in u_attr) {

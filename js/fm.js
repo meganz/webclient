@@ -1819,12 +1819,12 @@ function addContactUI() {
             .focus();
     }
 
-    $('.add-user-notification textarea').on('focus', function() {
+    $('.add-user-notification textarea').rebind('focus', function() {
         var $this = $(this);
         $this.parent().addClass('active');
     });
 
-    $('.add-user-notification textarea').on('blur', function() {
+    $('.add-user-notification textarea').rebind('blur', function() {
         $('.add-user-notification').removeClass('active');
     });
 
@@ -1913,6 +1913,7 @@ function addContactUI() {
         }
 
         iconSize(true);
+        return false;
     });
 
     // List of elements related to pending contacts
@@ -1935,16 +1936,14 @@ function addContactUI() {
     // fm-received-requests 'View received requests'
 
     // View received contact requests, M.ipc
-    $('.fm-received-requests, .empty-sent-requests-button').off('click');
-    $('.fm-received-requests, .empty-sent-requests-button').on('click', function() {
+    $('.fm-received-requests, .empty-sent-requests-button').rebind('click', function() {
         M.openFolder('ipc');
         $('.fm-contact-requests').removeClass('active');
         $(this).addClass('active');
     });
 
     // View sent contact requests, M.opc
-    $('.fm-contact-requests, .empty-contact-requests-button').off('click');
-    $('.fm-contact-requests, .empty-contact-requests-button').on('click', function() {
+    $('.fm-contact-requests, .empty-contact-requests-button').rebind('click', function() {
         M.openFolder('opc');
         $('.fm-received-requests').removeClass('active');
         $(this).addClass('active');
@@ -1986,14 +1985,12 @@ function addContactUI() {
         }
     });
 
-    $('.add-user-popup-button').off('click');
-    $('.add-user-popup-button').on('click', function() {
+    $('.add-user-popup-button').rebind('click', function() {
 
         addNewContact($(this));
     });
 
-    $('.add-user-popup .fm-dialog-close').off('click');
-    $('.add-user-popup .fm-dialog-close').on('click', function() {
+    $('.add-user-popup .fm-dialog-close').rebind('click', function() {
 
         fm_hideoverlay();
         $('.add-user-popup').addClass('hidden');
@@ -2001,8 +1998,7 @@ function addContactUI() {
         clearScrollPanel('.add-user-popup');
     });
 
-    $('.add-user-popup .import-contacts-service').unbind('click');
-    $('.add-user-popup .import-contacts-service').bind('click', function() {
+    $('.add-user-popup .import-contacts-service').rebind('click', function() {
 
         // NOT imported
         if (!$(this).is('.imported')) {
@@ -2023,8 +2019,7 @@ function addContactUI() {
         }
     });
 
-    $('.add-user-popup .import-contacts-link').unbind('click');
-    $('.add-user-popup .import-contacts-link').bind('click', function(e) {
+    $('.add-user-popup .import-contacts-link').rebind('click', function(e) {
 
         if (!$(this).is('.active')) {
             $('.add-user-popup .import-contacts-link').addClass('active');// Do not use this, because of doubled class
@@ -3015,6 +3010,20 @@ function dashboardUI() {
         $('.membership-big-txt.email').hide();
     }
 
+    // Add-contact plus
+    $('.dashboard .add-contacts').rebind('click', function() {
+        addContactUI();
+        $('.fm-add-user').trigger('click');
+        $('.add-user-size-icon').trigger('click');
+        return false;
+    });
+
+    // Data plus, upload file
+    $('.data-float-bl .icon-button').rebind('click', function() {
+        $('.fm-file-upload input').trigger('click');
+        return false;
+    });
+
 
     // Account data
     M.accountData(function(account) {
@@ -3024,8 +3033,35 @@ function dashboardUI() {
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
         $('.account.left-pane.balance-txt').safeHTML('@@ &euro; ', account.balance[0][0]);
-        
+
         $('.fm-account-blocks.storage, .fm-account-blocks.bandwidth').removeClass('exceeded going-out');
+
+        // Free Storage Quota
+        var curStorage = 0;
+        var maxStorage = 0;
+        var $fsq = $('.account.left-pane.info-block.fsq');
+        if (account.maf) {
+            var maf = mega.achievem.prettify(account.maf);
+
+            Object.keys(maf).forEach(function(k) {
+                maxStorage += maf[k][0];
+
+                if (maf[k].rwd) {
+                    curStorage += maf[k][0];
+                }
+            });
+        }
+        else {
+            maxStorage = (200 * 1024 * 1024 * 1024);
+        }
+        $('.button', $fsq).rebind('click', function() {
+            alert('TODO');
+        });
+        $('.progress-bar.dark-violet', $fsq)
+            .css('width', Math.floor(curStorage * 100 / maxStorage - 3) + '%');
+        $('.left-pane.big-txt', $fsq)
+            .safeHTML('@@ [S]of @@[/S]'.replace('[S]', '<span>').replace('[/S]', '</span>'),
+                        bytesToSize(curStorage, 0), bytesToSize(maxStorage, 0));
 
         // Elements for free/pro accounts. Expites date / Registration date
         if (u_attr.p) {
@@ -3041,7 +3077,7 @@ function dashboardUI() {
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
                     var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.account.left-pane.date-val').text(dateString);
+                    $('.account.left-pane.date-val').text(time2date(timestamp, 0, 0));
                     $('.account.left-pane.date-info').text(l[7354]);
                 }
                 else {
@@ -3052,9 +3088,7 @@ function dashboardUI() {
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
                 $('.account.left-pane.date-info').text(l[987]);
-                var date = new Date(time2date(account.expiry));
-                var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                $('.account.left-pane.date-val').text(dateString);
+                $('.account.left-pane.date-val').text(time2date(account.expiry, 0, 0));
             }
         }
         else {
@@ -3065,9 +3099,8 @@ function dashboardUI() {
             })
             $('.account.left-pane.date-info').text('MEMBER SINCE');
 
-
             // TODO: Get registration date
-            $('.account.left-pane.date-val').text('??');
+            $('.account.left-pane.date-val').text(time2date(u_attr.since, 0, 0));
         }
 
 
@@ -3370,9 +3403,7 @@ function accountUI() {
 
                 // Display the date their subscription
                 if (timestamp > 0) {
-                    var date = new Date(timestamp * 1000);
-                    var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.account.plan-info.expiry').text(dateString);
+                    $('.account.plan-info.expiry').text(time2date(timestamp, 0, 0));
                     $('.account.plan-info.expiry-txt').text(l[7354]);
                 }
                 else {
@@ -3405,9 +3436,7 @@ function accountUI() {
                     document.location = $(this).attr('href');
                 });
                 $('.account.plan-info.expiry-txt').text(l[987]);
-                var date = new Date(time2date(account.expiry));
-                var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                $('.account.plan-info.expiry a').text(dateString);
+                $('.account.plan-info.expiry a').text(time2date(account.expiry, 0, 0));
                 $('.account.data-block .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }

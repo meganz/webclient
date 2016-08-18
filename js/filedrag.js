@@ -205,16 +205,12 @@
         $($.ddhelper).remove();
         $.ddhelper = undefined;
 
-        if (
-            (
-                folderlink ||
-                (
-                    M.currentdirid !== 'transfers' &&
-                    (RightsbyID(M.currentdirid || '') | 0) < 1
-                )
-            ) &&
-            String(M.currentdirid).indexOf("chat/") === -1
-        ) {
+        if (folderlink
+                || (M.currentdirid !== 'transfers'
+                    && M.currentdirid !== 'dashboard'
+                    && !M.chat &&
+                    (RightsbyID(M.currentdirid || '') | 0) < 1)) {
+
             msgDialog('warningb', l[1676], l[1023]);
             return true;
         }

@@ -4943,7 +4943,7 @@ function MegaData()
             target = $.onDroppedTreeFolder;
             delete $.onDroppedTreeFolder;
         }
-        else if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
+        else if (String(M.currentdirid).length !== 8) {
             target = M.lastSeenCloudFolder || M.RootID;
         }
         else {

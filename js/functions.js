@@ -847,20 +847,29 @@ function countrydetails(isocode) {
  * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
  * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
  */
-function time2date(unixTime, ignoreTime) {
+function time2date(unixTime, ignoreTime, iso) {
 
-    var myDate = new Date(unixTime * 1000 || 0);
-    var myDateString =
-        myDate.getFullYear() + '-'
-        + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + myDate.getDate()).slice(-2);
+    var result;
+    var date = new Date(unixTime * 1000 || 0);
 
-    if (!ignoreTime) {
-        myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
-            + ('0' + myDate.getMinutes()).slice(-2);
+    if (iso === undefined) {
+        iso = true;
     }
 
-    return myDateString;
+    if (iso) {
+        var parts = date.toISOString().split('T');
+
+        result = parts[0];
+
+        if (!ignoreTime) {
+            result += ' ' + parts[1].substr(0, 5);
+        }
+    }
+    else {
+        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+
+    return result;
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:

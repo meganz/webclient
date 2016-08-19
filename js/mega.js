@@ -7660,6 +7660,8 @@ Object.defineProperty(mega, 'achievem', {
                         }
                     });
 
+                data.baseq = maf.s;
+
                 return data;
             }
         }

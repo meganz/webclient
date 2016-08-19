@@ -3031,17 +3031,25 @@ function dashboardUI() {
         // Free Storage Quota
         var curStorage = 0;
         var maxStorage = 0;
+        var bsqStorage = 0;
         var $fsq = $('.account.left-pane.info-block.fsq');
         if (account.maf) {
             var maf = mega.achievem.prettify(account.maf);
 
             Object.keys(maf).forEach(function(k) {
+                if (k === 'baseq') {
+                    bsqStorage = maf[k];
+                    return;
+                }
                 maxStorage += maf[k][0];
 
                 if (maf[k].rwd) {
                     curStorage += maf[k][0];
                 }
             });
+
+            curStorage += bsqStorage;
+            maxStorage += bsqStorage;
         }
         else {
             maxStorage = (200 * 1024 * 1024 * 1024);
@@ -3049,8 +3057,10 @@ function dashboardUI() {
         $('.button', $fsq).rebind('click', function() {
             alert('TODO');
         });
+        bsqStorage = Math.round(bsqStorage * 100 / maxStorage);
+        $('.progress-bar.red', $fsq).css('width', bsqStorage + '%');
         $('.progress-bar.dark-violet', $fsq)
-            .css('width', Math.floor(curStorage * 100 / maxStorage - 3) + '%');
+            .css('width', Math.floor(curStorage * 100 / maxStorage - bsqStorage) + '%');
         $('.left-pane.big-txt', $fsq)
             .safeHTML('@@ [S]of @@[/S]'.replace('[S]', '<span>').replace('[/S]', '</span>'),
                         bytesToSize(curStorage, 0), bytesToSize(maxStorage, 0));
@@ -3563,22 +3573,6 @@ function accountUI() {
         else {
             $('.fm-right-account-block').addClass('active-achivements');
 
-            // TODO: l[]
-            var quotaTxt = '[S]%1[/S] of %2'.replace('[S]', '<span>').replace('[/S]', '</span>');
-
-            var $achBlock = $('.account.achivements-block');
-            var $quotaTxt = $('.account.quota-txt.storage', $achBlock);
-
-            $quotaTxt.safeHTML(quotaTxt
-                .replace('%1', bytesToSize(account.space_used))
-                .replace('%2', bytesToSize(account.space, 0)));
-
-            $quotaTxt = $('.account.quota-txt.transfer', $achBlock);
-
-            $quotaTxt.safeHTML(quotaTxt
-                .replace('%1', bytesToSize(account.downbw_used))
-                .replace('%2', bytesToSize(account.bw, 0)));
-
             var bind = function(action) {
                 this.rebind('click', function() {
                     if (action) {
@@ -3666,10 +3660,38 @@ function accountUI() {
                 }
             }
 
+            storageMaxValue += maf.baseq;
+            storageCurrentValue += maf.baseq;
+            transferMaxValue += maf.baseq;
+            transferCurrentValue += maf.baseq;
+
+            var storageBaseQuota = Math.round(maf.baseq * 100 / transferMaxValue);
+            var transferBaseQuota = Math.round(maf.baseq * 100 / transferMaxValue);
+
+            $('.account.data-block.storage .progress-block .red')
+                .css('width', storageBaseQuota + '%');
+            $('.account.data-block.transfer .progress-block .red')
+                .css('width', transferBaseQuota + '%');
             $('.account.data-block.storage .progress-block .dark-violet')
-                .css('width', Math.floor(storageCurrentValue * 100 / storageMaxValue - 3) + '%');
+                .css('width', Math.floor(storageCurrentValue * 100 / storageMaxValue - storageBaseQuota) + '%');
             $('.account.data-block.transfer .progress-block .dark-violet')
-                .css('width', Math.floor(transferCurrentValue * 100 / transferMaxValue - 3) + '%');
+                .css('width', Math.floor(transferCurrentValue * 100 / transferMaxValue - transferBaseQuota) + '%');
+
+            // TODO: l[]
+            var quotaTxt = '[S]@@[/S] of @@'.replace('[S]', '<span>').replace('[/S]', '</span>');
+
+            var $achBlock = $('.account.achivements-block');
+            var $quotaTxt = $('.account.quota-txt.storage', $achBlock);
+
+            $quotaTxt.safeHTML(quotaTxt,
+                bytesToSize(storageCurrentValue, 0),
+                bytesToSize(storageMaxValue, 0));
+
+            $quotaTxt = $('.account.quota-txt.transfer', $achBlock);
+
+            $quotaTxt.safeHTML(quotaTxt,
+                bytesToSize(transferCurrentValue, 0),
+                bytesToSize(transferMaxValue, 0));
 
             bind = undefined;
         }

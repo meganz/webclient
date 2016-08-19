@@ -999,6 +999,9 @@ function checkUserLogin() {
                     }
                 }
 
+                // Initialize account notifications.
+                mega.notif.setup(fmconfig.anf);
+
                 if (fminitialized) {
                     var view = Object(fmconfig.viewmodes)[M.currentdirid];
                     var sort = Object(fmconfig.sortmodes)[M.currentdirid];

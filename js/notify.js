@@ -76,6 +76,10 @@ var notify = {
                 // Loop through the notifications
                 for (var i = 0; i < notifications.length; i++) {
 
+                    if (notify.isUnwantedNotification(notifications[i])) {
+                        continue;
+                    }
+
                     var notification = notifications[i];            // The full notification object
                     var id = makeid(10);                            // Make random ID
                     var type = notification.t;                      // Type of notification e.g. share
@@ -109,7 +113,7 @@ var notify = {
     notifyFromActionPacket: function(actionPacket) {
 
         // We should not show notifications if we haven't yet done the initial notifications load yet
-        if (!notify.initialLoadComplete) {
+        if (!notify.initialLoadComplete || notify.isUnwantedNotification(actionPacket)) {
             return false;
         }
 
@@ -141,6 +145,58 @@ var notify = {
         if (notify.$popup.hasClass('active')) {
             notify.renderNotifications();
         }
+    },
+
+    /**
+     * Check whether we should omit a notification.
+     * @param {Object} notification
+     * @returns {Boolean}
+     */
+    isUnwantedNotification: function(notification) {
+        var action;
+
+        switch (notification.a || notification.t) {
+            case 'put':
+            case 'share':
+            case 'dshare':
+                if (!mega.notif.has('cloud_enabled')) {
+                    return true;
+                }
+                break;
+
+            case 'c':
+            case 'ipc':
+            case 'upci':
+            case 'upco':
+                if (!mega.notif.has('contacts_enabled')) {
+                    return true;
+                }
+                break;
+        }
+
+        switch (notification.a || notification.t) {
+            case 'ipc':
+                if (!mega.notif.has('contacts_fcrin')) {
+                    return true;
+                }
+                break;
+
+            case 'c':
+                action = (typeof notification.c !== 'undefined') ? notification.c : notification.u[0].c;
+                if (action === 0 && !mega.notif.has('contacts_fcrdel')) {
+                    return true;
+                }
+                break;
+
+            case 'upco':
+                action = (typeof notification.s !== 'undefined') ? notification.s : notification.u[0].s;
+                if (action === 2 && !mega.notif.has('contacts_fcracpt')) {
+                    return true;
+                }
+            default:
+                break;
+        }
+        return false;
     },
 
     /**

@@ -867,8 +867,7 @@ function initUI() {
         }
     });
 
-    $('.nw-fm-left-icon').unbind('mouseover');
-    $('.nw-fm-left-icon').bind('mouseover', function() {
+    $('.nw-fm-left-icon').rebind('mouseover.nw-fm-left-icon', function() {
         var tooltip = $(this).find('.nw-fm-left-tooltip');
         if ($.liTooltipTimer)
             clearTimeout($.liTooltipTimer);
@@ -878,8 +877,7 @@ function initUI() {
             }, 1000);
     });
 
-    $('.nw-fm-left-icon').unbind('mouseout');
-    $('.nw-fm-left-icon').bind('mouseout', function() {
+    $('.nw-fm-left-icon').rebind('mouseout.nw-fm-left-icon', function() {
         $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
         clearTimeout($.liTooltipTimer);
     });
@@ -1819,12 +1817,12 @@ function addContactUI() {
             .focus();
     }
 
-    $('.add-user-notification textarea').rebind('focus', function() {
+    $('.add-user-notification textarea').rebind('focus.add-user-n', function() {
         var $this = $(this);
         $this.parent().addClass('active');
     });
 
-    $('.add-user-notification textarea').rebind('blur', function() {
+    $('.add-user-notification textarea').rebind('blur.add-user-n', function() {
         $('.add-user-notification').removeClass('active');
     });
 
@@ -2025,8 +2023,7 @@ function addContactUI() {
             $('.add-user-popup .import-contacts-link').addClass('active');// Do not use this, because of doubled class
             $('.add-user-popup .import-contacts-dialog').fadeIn(200);
 
-            $('.imported-notification-close').unbind('click');
-            $('.imported-notification-close').bind('click', function()
+            $('.imported-notification-close').rebind('click', function()
             {
                 $('.imported-contacts-notification').fadeOut(200);
             });
@@ -2041,13 +2038,11 @@ function addContactUI() {
         e.preventDefault();
     });
 
-    $('.add-user-popup .import-contacts-info').unbind('mouseover');
-    $('.add-user-popup .import-contacts-info').bind('mouseover', function() {
+    $('.add-user-popup .import-contacts-info').rebind('mouseover.add-user-p', function() {
         $('.add-user-popup .import-contacts-info-txt').fadeIn(200);
     });
 
-    $('.add-user-popup .import-contacts-info').unbind('mouseout');
-    $('.add-user-popup .import-contacts-info').bind('mouseout', function() {
+    $('.add-user-popup .import-contacts-info').rebind('mouseout.add-user-p', function() {
         $('.add-user-popup .import-contacts-info-txt').fadeOut(200);
     });
 }
@@ -2813,8 +2808,7 @@ function createFolderUI() {
         $('.create-new-folder input').focus();
     });
 
-    $('.create-new-folder input').unbind('keyup');
-    $('.create-new-folder input').bind('keyup', function(e) {
+    $('.create-new-folder input').rebind('keyup.create-new-f', function(e) {
         $('.create-new-folder').addClass('filled-input');
         if ($(this).val() == '') {
             $('.create-new-folder').removeClass('filled-input');
@@ -2824,16 +2818,14 @@ function createFolderUI() {
         }
     });
 
-    $('.create-new-folder input').unbind('focus');
-    $('.create-new-folder input').bind('focus', function() {
+    $('.create-new-folder input').rebind('focus.create-new-f', function() {
         if ($(this).val() == l[157]) {
             $(this).val('');
         }
         $('.create-new-folder').addClass('focused');
     });
 
-    $('.create-new-folder input').unbind('blur');
-    $('.create-new-folder input').bind('blur', function() {
+    $('.create-new-folder input').rebind('blur.create-new-f', function() {
         if ($('.create-new-folder input').val() == '') {
             $('.create-new-folder input').val(l[157]);
         }
@@ -3686,8 +3678,7 @@ function accountUI() {
         /* End of New Used space */
 
 
-        $('.fm-account-main .pro-upgrade').unbind('click');
-        $('.fm-account-main .pro-upgrade').bind('click', function(e)
+        $('.fm-account-main .pro-upgrade').rebind('click', function(e)
         {
             window.location.hash = 'pro';
         });
@@ -4002,7 +3993,7 @@ function accountUI() {
         $newEmail.val('');
         $emailInfoMessage.addClass('hidden');
 
-        $passwords.bind('keyup', function() {
+        $passwords.rebind('keyup', function() {
             var texts = [];
             $passwords.each(function() {
                 texts.push($(this).val());
@@ -4047,8 +4038,7 @@ function accountUI() {
         {
             $('.fm-account-save-block').removeClass('hidden');
         });
-        $('.fm-account-cancel').unbind('click');
-        $('.fm-account-cancel').bind('click', function(e)
+        $('.fm-account-cancel').rebind('click', function(e)
         {
             $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
@@ -4383,8 +4373,7 @@ function accountUI() {
                 .parent()
                 .removeClass('radioOff').addClass('radioOn');
         }
-        $('.ulspeedradio input').unbind('click');
-        $('.ulspeedradio input').bind('click', function(e)
+        $('.ulspeedradio input').rebind('click', function(e)
         {
             var id = $(this).attr('id');
             if (id == 'rad2')
@@ -4403,8 +4392,7 @@ function accountUI() {
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
         });
-        $('.uifontsize input').unbind('click');
-        $('.uifontsize input').bind('click', function(e)
+        $('.uifontsize input').rebind('click', function(e)
         {
             $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
             $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
@@ -4412,8 +4400,7 @@ function accountUI() {
             M.account.font_size = $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
         });
-        $('#ulspeedvalue').unbind('click keyup');
-        $('#ulspeedvalue').bind('click keyup', function(e)
+        $('#ulspeedvalue').rebind('click keyup', function(e)
         {
             $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
             $('#rad3,#rad3_div').addClass('radioOn').removeClass('radioOff');
@@ -4431,8 +4418,7 @@ function accountUI() {
         }
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.ulskip input').unbind('click');
-        $('.ulskip input').bind('click', function(e)
+        $('.ulskip input').rebind('click', function(e)
         {
             var id = $(this).attr('id');
             if (id == 'rad4')
@@ -4452,8 +4438,7 @@ function accountUI() {
         }
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.dlThroughMEGAsync input').unbind('click');
-        $('.dlThroughMEGAsync input').bind('click', function(e)
+        $('.dlThroughMEGAsync input').rebind('click', function(e)
         {
             var id = $(this).attr('id');
             if (id === 'rad18') {
@@ -4474,8 +4459,7 @@ function accountUI() {
             i = 9;
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.uisorting input').unbind('click');
-        $('.uisorting input').bind('click', function(e)
+        $('.uisorting input').rebind('click', function(e)
         {
             var id = $(this).attr('id');
             if (id == 'rad8')
@@ -4494,8 +4478,7 @@ function accountUI() {
             i = 11;
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.uiviewmode input').unbind('click');
-        $('.uiviewmode input').bind('click', function(e)
+        $('.uiviewmode input').rebind('click', function(e)
         {
             var id = $(this).attr('id');
             if (id == 'rad10')
@@ -4560,8 +4543,7 @@ function accountUI() {
             initAccountScroll(1);
         });
 
-        $('.redeem-voucher').unbind('click');
-        $('.redeem-voucher').bind('click', function(event)
+        $('.redeem-voucher').rebind('click', function(event)
         {
             var $this = $(this);
             if ($this.attr('class').indexOf('active') == -1)
@@ -4585,22 +4567,19 @@ function accountUI() {
             }
         });
 
-        $('.fm-voucher-body input').unbind('focus');
-        $('.fm-voucher-body input').bind('focus', function(e)
+        $('.fm-voucher-body input').rebind('focus', function(e)
         {
             if ($(this).val() == l[487])
                 $(this).val('');
         });
 
-        $('.fm-voucher-body input').unbind('blur');
-        $('.fm-voucher-body input').bind('blur', function(e)
+        $('.fm-voucher-body input').rebind('blur', function(e)
         {
             if ($(this).val() == '')
                 $(this).val(l[487]);
         });
 
-        $('.fm-voucher-button').unbind('click');
-        $('.fm-voucher-button').bind('click', function(e)
+        $('.fm-voucher-button').rebind('click', function(e)
         {
             if ($('.fm-voucher-body input').val() == l[487])
                 msgDialog('warninga', l[135], l[1015]);
@@ -4632,8 +4611,7 @@ function accountUI() {
             }
         });
 
-        $('.vouchercreate').unbind('click');
-        $('.vouchercreate').bind('click', function(e)
+        $('.vouchercreate').rebind('click', function(e)
         {
             var vouchertype = $('.default-select.vouchertype .default-dropdown-item.active').attr('data-value');
             var voucheramount = parseInt($('#account-voucheramount').val());
@@ -4726,8 +4704,7 @@ function accountUI() {
             bindDropdownEvents($('.default-select.vouchertype'));
         }
 
-        $('.fm-purchase-voucher,.default-white-button.topup').unbind('click');
-        $('.fm-purchase-voucher,.default-white-button.topup').bind('click', function(e)
+        $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
         {
             document.location.hash = 'resellers';
         });
@@ -4741,8 +4718,7 @@ function accountUI() {
             i = 6;
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.usessl input').unbind('click');
-        $('.usessl input').bind('click', function(e)
+        $('.usessl input').rebind('click', function(e)
         {
             var id = $(this).attr('id');
             if (id == 'rad7')
@@ -4768,8 +4744,7 @@ function accountUI() {
             });
         });
 
-        $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
-        $('.fm-account-change-avatar,.fm-account-avatar').bind('click', function(e)
+        $('.fm-account-change-avatar,.fm-account-avatar').rebind('click', function(e)
         {
             avatarDialog();
         });
@@ -4868,8 +4843,7 @@ function accountUI() {
         document.location.hash = 'backup';
     });
 
-    $('.fm-account-button').unbind('click');
-    $('.fm-account-button').bind('click', function() {
+    $('.fm-account-button').rebind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
             switch (true) {
                 case ($(this).hasClass('account-s')):
@@ -4891,8 +4865,7 @@ function accountUI() {
         }
     });
 
-    $('.account.tab-lnk').unbind('click');
-    $('.account.tab-lnk').bind('click', function() {
+    $('.account.tab-lnk').rebind('click', function() {
         if (!$(this).hasClass('active')) {
             var $this = $(this);
             var $sectionBlock = $this.closest('.fm-account-sections');
@@ -4907,7 +4880,7 @@ function accountUI() {
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').bind('keyup', function(el)
+    $('#account-new-password').rebind('keyup', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
         if ($(this).val() !== '') {
@@ -4926,12 +4899,116 @@ function accountUI() {
         }
     });
 
-    $('#account-confirm-password').bind('keyup', function(el) {
+    $('#account-confirm-password').rebind('keyup', function(el) {
 
         if ($(this).val() === $('#account-new-password').val()) {
             $('.fm-account-save-block').removeClass('hidden');
         }
     });
+
+    // Account Notifications settings handling
+    var accNotifHandler = function accNotifHandler() {
+        var $parent = $(this);
+        var $input = $parent.find('input');
+        var $tab = $parent.closest('.tab-content');
+        var type = $input.attr('type');
+        var tab = accNotifHandler.getTabName($tab);
+
+        if (type === 'radio') {
+            var RADIO_ENABLE = "1";
+            var RADIO_DISABLE = "2";
+
+            var $container = $parent.closest('.radio-buttons');
+
+            $('.radioOn', $container)
+                .removeClass('radioOn').addClass('radioOff');
+
+            $input.removeClass('radioOff').addClass('radioOn');
+            $parent.removeClass('radioOff').addClass('radioOn');
+
+            switch ($input.val()) {
+                case RADIO_ENABLE:
+                    mega.notif.set('enabled', tab);
+                    break;
+                case RADIO_DISABLE:
+                    mega.notif.unset('enabled', tab);
+                    break;
+                default:
+                    console.error('Invalid radio value...', tab, $input);
+                    break;
+            }
+        }
+        else if (type === 'checkbox') {
+
+            if ($input.hasClass('checkboxOn')) {
+                $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
+                $parent.removeClass('checkboxOn').addClass('checkboxOff');
+                mega.notif.unset($input.attr('name'), tab);
+            }
+            else {
+                $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
+                $parent.removeClass('checkboxOff').addClass('checkboxOn');
+                mega.notif.set($input.attr('name'), tab);
+            }
+        }
+        else {
+            console.error('Unknown type.', type, $input);
+        }
+
+        return false;
+    };
+    accNotifHandler.getTabName = function($tab) {
+        var tab = String($tab.attr('class'))
+            .split(" ").filter(function(c) {
+                return ({
+                    'chat': 1,
+                    'contacts': 1,
+                    'cloud-drive': 1
+                })[c];
+            });
+        return String(tab).split('-').shift();
+    };
+    $('.fm-account-notifications input').each(function(i, e) {
+        $(e).parent().rebind('click', accNotifHandler);
+    });
+    $('.fm-account-notifications .tab-content').each(function(i, e) {
+        var $input;
+        var $tab = $(e);
+        var $radios = $('.radio-buttons', $tab);
+        var tab = accNotifHandler.getTabName($tab);
+
+        $('.radioOn', $radios)
+            .removeClass('radioOn').addClass('radioOff');
+
+        if (mega.notif.has('enabled', tab)) {
+            $input = $('input:first', $radios);
+        }
+        else {
+            $input = $('input:last', $radios);
+        }
+
+        $input.removeClass('radioOff').addClass('radioOn');
+        $input.parent().removeClass('radioOff').addClass('radioOn');
+
+        var $checkboxes = $('.checkbox-buttons', $tab);
+        if ($checkboxes.length) {
+            $('input', $checkboxes).each(function(i, e) {
+                var $input = $(e);
+                var $item = $input.closest('.checkbox-item');
+
+                $('.checkboxOn', $item)
+                    .removeClass('checkboxOn')
+                    .addClass('checkboxOff')
+                    .prop('checked', false);
+
+                if (mega.notif.has($input.attr('name'), tab)) {
+                    $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
+                    $input.parent().removeClass('checkboxOff').addClass('checkboxOn');
+                }
+            });
+        }
+    });
+    accNotifHandler = undefined;
 }
 
 function handleResetSuccessDialogs(dialog, txt, dlgString) {
@@ -4997,8 +5074,7 @@ function avatarDialog(close)
 
             }
         });
-    $('#fm-cancel-avatar,.fm-dialog.avatar-dialog .fm-dialog-close').unbind('click');
-    $('#fm-cancel-avatar,.fm-dialog.avatar-dialog .fm-dialog-close').bind('click', function(e)
+    $('#fm-cancel-avatar,.fm-dialog.avatar-dialog .fm-dialog-close').rebind('click', function(e)
     {
         avatarDialog(1);
     });
@@ -5328,18 +5404,13 @@ var QuickFinder = function(searchable_elements, containers) {
     var next_idx = 0;
 
     // hide on page change
-    $(window).unbind('hashchange.quickfinder');
-    $(window).bind('hashchange.quickfinder', function() {
+    $(window).rebind('hashchange.quickfinder', function() {
         if (self.is_active()) {
             self.deactivate();
         }
     });
 
-    // unbind if already bound.
-    $(window).unbind('keypress.quickFinder');
-
-    // bind
-    $(window).bind('keypress.quickFinder', function(e) {
+    $(window).rebind('keypress.quickFinder', function(e) {
 
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
@@ -5674,8 +5745,7 @@ var SelectionManager = function($selectable) {
 var selectionManager;
 
 function UIkeyevents() {
-    $(window).unbind('keydown.uikeyevents');
-    $(window).bind('keydown.uikeyevents', function(e) {
+    $(window).rebind('keydown.uikeyevents', function(e) {
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
         }
@@ -7704,8 +7774,7 @@ function renameDialog() {
             $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
         }
 
-        $('.rename-dialog input').unbind('focus');
-        $('.rename-dialog input').bind('focus', function() {
+        $('.rename-dialog input').rebind('focus', function() {
             var selEnd;
             $(this).closest('.rename-dialog').addClass('focused');
             var d = $(this).val().lastIndexOf('.');
@@ -7720,8 +7789,7 @@ function renameDialog() {
 
         });
 
-        $('.rename-dialog input').unbind('blur');
-        $('.rename-dialog input').bind('blur', function() {
+        $('.rename-dialog input').rebind('blur', function() {
             $(this).closest('.rename-dialog').removeClass('focused');
         });
 
@@ -9852,24 +9920,21 @@ function createFolderDialog(close)
         return true;
     }
 
-    $('.create-folder-dialog input').unbind('focus');
-    $('.create-folder-dialog input').bind('focus', function() {
+    $('.create-folder-dialog input').rebind('focus', function() {
         if ($(this).val() == l[157]) {
             $('.create-folder-dialog input').val('');
         }
         $('.create-folder-dialog').addClass('focused');
     });
 
-    $('.create-folder-dialog input').unbind('blur');
-    $('.create-folder-dialog input').bind('blur', function() {
+    $('.create-folder-dialog input').rebind('blur', function() {
         if ($('.create-folder-dialog input').val() == '') {
             $('.create-folder-dialog input').val(l[157]);
         }
         $('.create-folder-dialog').removeClass('focused');
     });
 
-    $('.create-folder-dialog input').unbind('keyup');
-    $('.create-folder-dialog input').bind('keyup', function() {
+    $('.create-folder-dialog input').rebind('keyup', function() {
         if ($('.create-folder-dialog input').val() === '' || $('.create-folder-dialog input').val() === l[157]) {
             $('.create-folder-dialog').removeClass('active');
         }
@@ -9878,8 +9943,7 @@ function createFolderDialog(close)
         }
     });
 
-    $('.create-folder-dialog input').unbind('keypress');
-    $('.create-folder-dialog input').bind('keypress', function(e) {
+    $('.create-folder-dialog input').rebind('keypress', function(e) {
 
         if (e.which === 13 && $(this).val() !== '') {
             if (!$.cftarget) {
@@ -9936,13 +10000,11 @@ function chromeDialog(close)
     fm_showoverlay();
     $('.fm-dialog.chrome-dialog').removeClass('hidden');
     $.dialog = 'chrome';
-    $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').unbind('click')
-    $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').bind('click', function()
+    $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').rebind('click', function()
     {
         chromeDialog(1);
     });
-    $('#chrome-checkbox').unbind('click');
-    $('#chrome-checkbox').bind('click', function()
+    $('#chrome-checkbox').rebind('click', function()
     {
         if ($(this).attr('class').indexOf('checkboxOn') == -1)
         {
@@ -10062,8 +10124,7 @@ function browserDialog(close) {
         browserDialog(1);
     });
 
-    $('#browsers-checkbox').unbind('click');
-    $('#browsers-checkbox').bind('click', function() {
+    $('#browsers-checkbox').rebind('click', function() {
         if ($(this).attr('class').indexOf('checkboxOn') == -1) {
             localStorage.browserDialog = 1;
             $(this).attr('class', 'checkboxOn');
@@ -10423,8 +10484,7 @@ function propertiesDialog(close) {
     }
 
     if (pd.attr('class').indexOf('shared') > -1) {
-        $('.contact-list-icon').unbind('click');
-        $('.contact-list-icon').bind('click', function() {
+        $('.contact-list-icon').rebind('click', function() {
             if ($(this).attr('class').indexOf('active') == -1) {
                 $(this).addClass('active');
                 $('.properties-context-menu').css({
@@ -10438,8 +10498,7 @@ function propertiesDialog(close) {
                 $('.properties-context-menu').fadeOut(200);
             }
         });
-        $('.properties-context-item').unbind('click');
-        $('.properties-context-item').bind('click', function() {
+        $('.properties-context-item').rebind('click', function() {
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
         });
@@ -10509,24 +10568,21 @@ function termsDialog(close, pp)
     $('.terms-body').jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
     jScrollFade('.terms-body');
 
-    $('.fm-terms-cancel').unbind('click');
-    $('.fm-terms-cancel').bind('click', function(e)
+    $('.fm-terms-cancel').rebind('click', function(e)
     {
         if ($.termsDeny)
             $.termsDeny();
         termsDialog(1);
     });
 
-    $('.fm-terms-agree').unbind('click');
-    $('.fm-terms-agree').bind('click', function(e)
+    $('.fm-terms-agree').rebind('click', function(e)
     {
         if ($.termsAgree)
             $.termsAgree();
         termsDialog(1);
     });
 
-    $('.terms-dialog .fm-dialog-close').unbind('click');
-    $('.terms-dialog .fm-dialog-close').bind('click', function(e)
+    $('.terms-dialog .fm-dialog-close').rebind('click', function(e)
     {
         if ($.termsDeny)
             $.termsDeny();
@@ -10777,8 +10833,7 @@ function slideshow(id, close)
         $('.slideshow-getlink').show();
         $('.slideshow-line').show();
     }
-    $('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').unbind('click');
-    $('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').bind('click', function(e)
+    $('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').rebind('click', function(e)
     {
         slideshow(id, 1);
     });
@@ -10799,8 +10854,7 @@ function slideshow(id, close)
         $('.slideshow-prev-button').addClass('active');
     if (steps.forward.length > 0)
         $('.slideshow-next-button').addClass('active');
-    $('.slideshow-prev-button,.slideshow-next-button').unbind('click');
-    $('.slideshow-prev-button,.slideshow-next-button').bind('click', function(e)
+    $('.slideshow-prev-button,.slideshow-next-button').rebind('click', function(e)
     {
         var c = $(this).attr('class');
         if (c && c.indexOf('active') > -1)
@@ -11619,7 +11673,7 @@ function contactUI() {
         );
         $('.contact-top-details .contact-details-email').text(user.m);
 
-        $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {
+        $('.contact-details-pad .grid-url-arrow').rebind('click', function(e) {
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
             // $(this).addClass('active');
@@ -12128,7 +12182,7 @@ function removeFromMultiInputDDL(dialog, item) {
             $('.nw-fm-tree-header input').prop('readonly', false);
 
             // Left panel header click, show search input box
-            $('.nw-fm-tree-header').bind('click', function(e) {
+            $('.nw-fm-tree-header').rebind('click', function(e) {
 
                 var $self = $(this);
 
@@ -12154,7 +12208,7 @@ function removeFromMultiInputDDL(dialog, item) {
             }); // END left panel header click
 
             // Make a search
-            $('.nw-fm-search-icon').bind('click', function() {
+            $('.nw-fm-search-icon').rebind('click', function() {
 
                 var $self = $(this);
 
@@ -12164,7 +12218,7 @@ function removeFromMultiInputDDL(dialog, item) {
                 $self.parent().find('input').blur();
             });
 
-            $('.nw-fm-tree-header input').bind('keyup', function(e) {
+            $('.nw-fm-tree-header input').rebind('keyup', function(e) {
 
                 var $self = $(this);
 
@@ -12188,7 +12242,7 @@ function removeFromMultiInputDDL(dialog, item) {
                 treeredraw();
             });
 
-            $('.nw-fm-tree-header input').bind('blur', function() {
+            $('.nw-fm-tree-header input').rebind('blur', function() {
 
                 var $self = $(this);
 

@@ -3665,7 +3665,7 @@ function accountUI() {
             transferMaxValue += maf.baseq;
             transferCurrentValue += maf.baseq;
 
-            var storageBaseQuota = Math.round(maf.baseq * 100 / transferMaxValue);
+            var storageBaseQuota = Math.round(maf.baseq * 100 / storageMaxValue);
             var transferBaseQuota = Math.round(maf.baseq * 100 / transferMaxValue);
 
             $('.account.data-block.storage .progress-block .red')

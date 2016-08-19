@@ -175,6 +175,24 @@ var notify = {
         }
 
         switch (notification.a || notification.t) {
+            case 'put':
+                if (!mega.notif.has('cloud_newfiles')) {
+                    return true;
+                }
+                break;
+
+            case 'share':
+                if (!mega.notif.has('cloud_newshare')) {
+                    return true;
+                }
+                break;
+
+            case 'dshare':
+                if (!mega.notif.has('cloud_delshare')) {
+                    return true;
+                }
+                break;
+
             case 'ipc':
                 if (!mega.notif.has('contacts_fcrin')) {
                     return true;

@@ -31,6 +31,7 @@
         emailCheck: false,
         accountHolder: '',
         url: '',
+        visibleComma: false,
         scrollLocation: 'add',
         /**
          * resultsFormatter
@@ -95,6 +96,7 @@
             var id;
             var avatar;
             var email = item[this.tokenValue];
+            var comma;
 
             M.u.forEach(function (contact, contactHandle) {
                 if (contact.m === email) {
@@ -105,10 +107,12 @@
             });
 
             avatar = useravatar.contact(id || email, 'search-avatar', 'span');
-
+            comma = ',';
             return '<li class="share-added-contact">'
                     + (this.addAvatar ? avatar : '')
-                    + (this.enableHTML ? email : _escapeHTML(email)) + '</li>';
+                    + (this.enableHTML ? email : _escapeHTML(email)) 
+                    + (this.visibleComma ? comma : '') 
+                    + '</li>';
         },
         // Tokenization settings
         tokenLimit: null,
@@ -140,6 +144,7 @@
         tokenList: "token-input-list",
         token: "token-input-token",
         tokenDelete: "token-input-delete-token",
+        selectedToken: "selected",
         selectedToken: "token-input-selected-token",
         highlightedToken: "token-input-highlighted-token",
         dropdown: "token-input-dropdown",
@@ -417,6 +422,13 @@
                 else if ($(input).data("settings").tokenLimit === null || $(input).data("settings").tokenLimit !== token_count) {
                     show_dropdown_hint();
                 }
+                if ($(input).data("settings").visibleComma) {
+                    var $prevItem = input_token.prev();
+                    if ($prevItem.length) {
+                        $prevItem.text($prevItem.text() + ',');
+                    }
+                }
+                $(this).removeClass('tiny');
                 token_list.addClass($(input).data("settings").classes.focused);
                 $('.multiple-input').parent().addClass('active');
                 $('.permissions-menu').fadeOut(200);
@@ -426,13 +438,19 @@
             })
             .blur(function() {
                 hide_dropdown();
-
                 if ($(input).data("settings").allowFreeTagging) {
                     add_freetagging_tokens();
                 }
-
-                $(this).val("");
+                if ($(input).data("settings").visibleComma) {
+                    var $prevItem = input_token.prev();
+                    if ($prevItem.length) {
+                        $prevItem.text($prevItem.text().replace(',', ''));
+                    }
+                }
+                $(this).addClass('tiny');
+                $(this).val('');
                 $('.multiple-input').parent().removeClass('active');
+                $('.multiple-input *').removeClass('red');
             })
             .bind("keyup keydown blur update", resize_input)
             .keydown(function(event) {
@@ -504,7 +522,8 @@
                                 hidden_input.change();
                             }
                             else if (previous_token.length) {
-                                select_token($(previous_token.get(0)));
+                                delete_token($(previous_token.get(0)));
+                                focus_with_timeout(input_box);
                             }
 
                             return false;

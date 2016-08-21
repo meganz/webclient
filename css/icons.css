@@ -486,28 +486,28 @@
     width: 72px;
     height: 72px;
 }
-.huge-white-icon.achivement.rocket {
+.huge-white-icon.achivement.ach-create-account {
     background-position: 0 -86px;
 }
-.huge-white-icon.achivement.syncing-pc {
+.huge-white-icon.achivement.ach-install-megasync {
     background-position: -104px -86px;
 }
-.huge-white-icon.achivement.mobile-device {
+.huge-white-icon.achivement.ach-install-mobile-app {
     background-position: 0 -175px;
 }
-.huge-white-icon.achivement.mega-app {
+.huge-white-icon.achivement.ach-take-tour {
     background-position: -104px -175px;
 }
-.huge-white-icon.achivement.phone {
+.huge-white-icon.achivement.ach-verify-number {
     background-position: 0 -264px;
 }
-.huge-white-icon.achivement.profile {
+.huge-white-icon.achivement.ach-invite-friend {
     background-position: -104px -264px;
 }
-.huge-white-icon.achivement.conversations {
+.huge-white-icon.achivement.ach-group-chat {
     background-position: 0 -353px;
 }
-.huge-white-icon.achivement.shared-folder {
+.huge-white-icon.achivement.ach-share-folder {
     background-position: -104px -353px;
 }
 .big-icon.cloud {
@@ -576,28 +576,28 @@
 .huge-icon.achivement {
     background-image: url(../images/mega/big-achivements.png);
 }
-.create-account .huge-icon.achivement {
+.ach-create-account .huge-icon.achivement {
     background-position: -2px 6px;
 }
-.install-megasync .huge-icon.achivement {
+.ach-install-megasync .huge-icon.achivement {
     background-position: -152px 6px;
 }
-.install-mobile-app .huge-icon.achivement {
+.ach-install-mobile-app .huge-icon.achivement {
     background-position: -302px 6px;
 }
-.read-intro .huge-icon.achivement {
+.ach-take-tour .huge-icon.achivement {
     background-position: -2px -144px;
 }
-.invite-friend .huge-icon.achivement {
+.ach-invite-friend .huge-icon.achivement {
     background-position: -152px -144px;
 }
-.verify-number .huge-icon.achivement {
+.ach-verify-number .huge-icon.achivement {
     background-position: -302px -144px;
 }
-.start-chat .huge-icon.achivement {
+.ach-group-chat .huge-icon.achivement {
     background-position: -2px -294px;
 }
-.share-folder .huge-icon.achivement {
+.ach-share-folder .huge-icon.achivement {
     background-position: -152px -294px;
 }
 .semi-big-icon.cloud {

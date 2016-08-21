@@ -3570,6 +3570,9 @@
     "9054": "Ina-access ng MEGA ang iyong camera kapag nakakuha ka ng video o litrato sa app.",
     "9055": "MEGA accesses your photos or\/and videos when you select some of them to upload or when you have enabled the Camera Uploads.",
     "9056": "Please do not enter any URL into the Copyrighted work field, if you need to add more URLs please click on Add another URL.",
+    "9057": "The file you are about to add is older than the copy already on record, do you want to replace the file?",
+    "9058": "Replace file",
+    "9059": "No, rename it as %1",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

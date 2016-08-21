@@ -2587,10 +2587,16 @@ function initContextUI() {
 
     $(c + '.startchat-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected && $.selected[0];
+        var user_handle = $.selected;
 
-        if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+
+        if (user_handle.length === 1) {
+            if (!$this.is(".disabled") && user_handle) {
+                window.location = "#fm/chat/" + user_handle;
+            }
+        }
+        else {
+            megaChat.createAndShowGroupRoomFor(user_handle);
         }
     });
 
@@ -6869,7 +6875,7 @@ function contextMenuUI(e, ll) {
             $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
 
             // If selected contact is offline make sure that audio and video calls are forbiden (disabled)
-            if ($('#' + id).find('.offline').length) {
+            if ($('#' + id).find('.offline').length || $.selected.length > 1) {
                 $(menuCMI).filter('.startaudio-item').addClass('disabled');
                 $(menuCMI).filter('.startvideo-item').addClass('disabled');
             }

@@ -3035,12 +3035,14 @@ function dashboardUI() {
         $('.fm-account-blocks.storage, .fm-account-blocks.bandwidth').removeClass('exceeded going-out');
 
         // Free Storage Quota
-        var curStorage = 0;
-        var maxStorage = 0;
-        var bsqStorage = 0;
         var $fsq = $('.account.left-pane.info-block.fsq');
         if (account.maf) {
+            var curStorage = 0;
+            var maxStorage = 0;
+            var bsqStorage = 0;
             var maf = mega.achievem.prettify(account.maf);
+
+            $fsq.removeClass('hidden');
 
             Object.keys(maf).forEach(function(k) {
                 if (k === 'baseq') {
@@ -3056,20 +3058,21 @@ function dashboardUI() {
 
             curStorage += bsqStorage;
             maxStorage += bsqStorage;
+
+            $('.button', $fsq).rebind('click', function() {
+                achivementsListDialog();
+            });
+            bsqStorage = Math.round(bsqStorage * 100 / maxStorage);
+            $('.progress-bar.red', $fsq).css('width', bsqStorage + '%');
+            $('.progress-bar.dark-violet', $fsq)
+                .css('width', Math.floor(curStorage * 100 / maxStorage - bsqStorage) + '%');
+            $('.left-pane.big-txt', $fsq)
+                .safeHTML('@@ [S]of @@[/S]'.replace('[S]', '<span>').replace('[/S]', '</span>'),
+                            bytesToSize(curStorage, 0), bytesToSize(maxStorage, 0));
         }
         else {
-            maxStorage = (200 * 1024 * 1024 * 1024);
+            $fsq.addClass('hidden');
         }
-        $('.button', $fsq).rebind('click', function() {
-            alert('TODO');
-        });
-        bsqStorage = Math.round(bsqStorage * 100 / maxStorage);
-        $('.progress-bar.red', $fsq).css('width', bsqStorage + '%');
-        $('.progress-bar.dark-violet', $fsq)
-            .css('width', Math.floor(curStorage * 100 / maxStorage - bsqStorage) + '%');
-        $('.left-pane.big-txt', $fsq)
-            .safeHTML('@@ [S]of @@[/S]'.replace('[S]', '<span>').replace('[/S]', '</span>'),
-                        bytesToSize(curStorage, 0), bytesToSize(maxStorage, 0));
 
         // Elements for free/pro accounts. Expites date / Registration date
         if (u_attr.p) {
@@ -10707,10 +10710,11 @@ function achivementDialog(title, close) {
  * @param {String} close dialog parameter
  */
 function achivementsListDialog(close) {
-    var $dialog = $('.fm-dialog.achivements-list-dialog'),
-        $scrollBlock = $dialog.find('.achivements-scroll'),
-        bodyHeight = $('body').height(),
-        $contentBlock;
+    var $dialog = $('.fm-dialog.achivements-list-dialog');
+    var $scrollBlock = $dialog.find('.achivements-scroll');
+    var bodyHeight = $('body').height();
+    var $contentBlock;
+
     if (close) {
         $.dialog = false;
         fm_hideoverlay();
@@ -10719,15 +10723,63 @@ function achivementsListDialog(close) {
     }
     $.dialog = 'achivements';
 
-    $dialog.find('.fm-dialog-close').rebind('click', function() {
-        achivementsListDialog(1);
-    });
+    $dialog.find('.fm-dialog-close').rebind('click', achivementsListDialog);
 
-    // Demo of Complete achivement
-    $dialog.find('.achivements-cell.create-account').addClass('achived');
+    // hide everything until seen on the api reply (maf)
+    $('.achivements-cell', $dialog).addClass('hidden');
 
-    // Demo of achivement with only Storage reward
-    $dialog.find('.achivements-cell.create-account').addClass('one-reward');
+    var bind = function(action) {
+        this.rebind('click', function() {
+            if (action) {
+                location.href = action;
+            }
+            else {
+                alert('TODO');
+            }
+        });
+    };
+
+    var ach = mega.achievem;
+    var maf = ach.prettify(account.maf);
+    for (var idx in maf) {
+        if (maf.hasOwnProperty(idx)) {
+            idx |= 0;
+            var data = maf[idx];
+            var selector = ach.mapToElement[idx];
+            if (selector) {
+                var $cell = $('.achivements-cell.' + selector, $dialog).removeClass('hidden');
+
+                var locFmt = '[S]@@[/S] storage space'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                $('.reward.storage .reward-txt', $cell)
+                    .safeHTML(locFmt, bytesToSize(data[0], 0));
+
+                if (!data[1]) {
+                    $cell.addClass('one-reward');
+                }
+                else {
+                    locFmt = '[S]@@[/S] transfer quota'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                    $('.reward.bandwidth .reward-txt', $cell)
+                        .safeHTML(locFmt, bytesToSize(data[1], 0));
+                }
+
+                if (data.rwd) {
+                    $cell.addClass('achived');
+
+                    locFmt = '(Expires in [S]@@[/S] days)'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                    $('.expires-txt', $cell).addClass('red').safeHTML(locFmt, data.rwd.left);
+                }
+                else {
+                    bind.call($('.button', $cell), ach.mapToAction[idx]);
+
+                    locFmt = '(Expires after [S]@@[/S] @@)'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                    $('.expires-txt', $cell).removeClass('red').safeHTML(locFmt, data.expiry.value, data.expiry.utxt);
+                }
+
+                $cell.removeClass('hidden');
+            }
+        }
+    }
+    bind = maf = ach = undefined;
 
     // Show dialog
     fm_showoverlay();
@@ -10739,9 +10791,11 @@ function achivementsListDialog(close) {
     if ($dialog.outerHeight() > bodyHeight) {
         $scrollBlock.css('max-height', bodyHeight - 60);
         $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    } else if ($contentBlock.outerHeight() > 666) {
+    }
+    else if ($contentBlock.outerHeight() > 666) {
         $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    } else {
+    }
+    else {
         deleteScrollPanel($scrollBlock, 'jsp');
     }
 

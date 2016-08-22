@@ -7625,7 +7625,7 @@ Object.defineProperty(mega, 'achievem', {
                     for (var i in maf.a) {
                         if (maf.a.hasOwnProperty(i)) {
                             if (maf.a[i].r === r) {
-                                return maf.a[i];
+                                return clone(maf.a[i]);
                             }
                         }
                     }
@@ -7633,28 +7633,61 @@ Object.defineProperty(mega, 'achievem', {
                     return null;
                 };
 
+                var setExpiry = function(data) {
+                    var time = String(data[2]).split('');
+                    var unit = time.pop();
+                    time = time.join('') | 0;
+
+                    if (time === 1 && unit === 'y') {
+                        time = 12;
+                        unit = 'm';
+                    }
+
+                    var result = {
+                        unit: unit,
+                        value: time
+                    };
+
+                    // TODO: translate this
+                    switch (unit) {
+                        case 'd': result.utxt = (time < 2) ? 'day'   : 'days';    break;
+                        case 'w': result.utxt = (time < 2) ? 'week'  : 'weeks';   break;
+                        case 'm': result.utxt = (time < 2) ? 'month' : 'months';  break;
+                        case 'y': result.utxt = (time < 2) ? 'year'  : 'years';   break;
+                    }
+
+                    data.expiry = result;
+                    return result;
+                };
+
                 Object.keys(maf.r || {})
                     .forEach(function(k) {
                         var rwd = lookup(k | 0);
-
                         data[k] = clone(maf.r[k]);
+                        var exp = setExpiry(data[k]);
 
                         if (rwd) {
                             var ts = rwd.ts * 1000;
                             var mdate = moment(ts);
-                            var left = String(data[k][2]).split('');
 
-                            switch (left.pop()) {
-                                case 'd': mdate.add(left | 0, 'days');    break;
-                                case 'w': mdate.add(left | 0, 'weeks');   break;
-                                case 'm': mdate.add(left | 0, 'months');  break;
-                                case 'y': mdate.add(left | 0, 'years');   break;
+                            switch (exp.unit) {
+                                case 'd': mdate.add(exp.value, 'days');    break;
+                                case 'w': mdate.add(exp.value, 'weeks');   break;
+                                case 'm': mdate.add(exp.value, 'months');  break;
+                                case 'y': mdate.add(exp.value, 'years');   break;
                             }
 
                             rwd.date = new Date(ts);
                             rwd.left = Math.round(mdate.diff(rwd.date) / 86400000);
 
                             data[k].rwd = rwd;
+                        }
+                    });
+
+                Object.keys(data)
+                    .forEach(function(k) {
+                        if (!data[k].expiry) {
+                            setExpiry(data[k]);
                         }
                     });
 
@@ -7668,14 +7701,14 @@ Object.defineProperty(mega, 'achievem', {
 
 (function(o) {
     var map = {
-        /*  1 */ 'WELCOME':     'rocket:#register',
-        /*  2 */ 'TOUR':        'mega-app',
-        /*  3 */ 'INVITE':      'profile:#fm/contacts',
-        /*  4 */ 'SYNCINSTALL': 'syncing-pc:#sync',
-        /*  5 */ 'APPINSTALL':  'mobile-device:#mobile',
-        /*  6 */ 'VERIFYE164':  'phone',
-        /*  7 */ 'GROUPCHAT':   'conversations:#fm/chat',
-        /*  8 */ 'FOLDERSHARE': 'shared-folder:#fm/contacts'
+        /*  1 */ 'WELCOME':     'ach-create-account:#register',
+        /*  2 */ 'TOUR':        'ach-take-tour',
+        /*  3 */ 'INVITE':      'ach-invite-friend:#fm/contacts',
+        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:#sync',
+        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:#mobile',
+        /*  6 */ 'VERIFYE164':  'ach-verify-number',
+        /*  7 */ 'GROUPCHAT':   'ach-group-chat:#fm/chat',
+        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:#fm/contacts'
     };
     var mapToAction = Object.create(null);
     var mapToElement = Object.create(null);
@@ -7766,28 +7799,18 @@ Object.defineProperty(mega, 'achievem', {
                 },
 
                 has: function has(flag, tag) {
-                    if (d) {
-                        this.logger.debug('Checking flag', flag, tag, flags & check(flag, tag));
-                    }
-
                     return flags & check(flag, tag);
                 },
 
                 set: function set(flag, tag) {
-                    this.logger.debug('Setting flag', flag, tag);
-
                     flags |= check(flag, tag);
                     mega.config.set('anf', flags);
                 },
 
                 unset: function unset(flag, tag) {
-                    this.logger.debug('Cleaning flag', flag, tag);
-
                     flags &= ~check(flag, tag);
                     mega.config.set('anf', flags);
-                },
-
-                logger: new MegaLogger('ACCNOTIF')
+                }
             };
         })(0))
     });

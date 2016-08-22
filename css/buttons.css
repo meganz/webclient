@@ -76,6 +76,7 @@
     line-height: 31px;
     color: #333333;
     padding: 0 15px;
+    min-width: 102px;
     height: 32px;
     text-align: center;
     cursor: pointer;
@@ -102,6 +103,20 @@
     background: -webkit-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
     background: linear-gradient(to bottom, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
 }
+.default-white-button.inline, .default-grey-button.inline {
+    display: inline-block;
+    margin: 0 5px;
+}
+.default-white-button.hidden, .default-grey-button.hidden {
+    display: none;
+}
+.default-white-button.disabled, .default-grey-button.disabled {
+    cursor: default;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
 .default-white-button.semi-big, .default-grey-button.semi-big {
     line-height: 35px;
     height: 36px;
@@ -126,7 +141,7 @@
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
 }
-.default-grey-button:hover {
+.default-grey-button:not(.disabled):hover {
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
@@ -139,7 +154,7 @@
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
 }
-.default-white-button:not(.tiny-button):hover {
+.default-white-button:not(.tiny-button):not(.disabled):hover {
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
@@ -156,6 +171,7 @@
 .default-white-button.tiny-button {
     width: 16px;
     height: 16px;
+    min-width: 0;
     padding: 0;
     float: right;
     text-align: left;

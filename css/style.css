@@ -8409,8 +8409,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 45px;
 }
 .nw-fm-dialog-title, .fm-dialog-title {
-    font-size: 17px;
-    line-height: 21px;
+    font-size: 20px;
+    line-height: 20px;
     color: #999999;
     padding: 15px 33px 2px 33px;
     text-align: center;

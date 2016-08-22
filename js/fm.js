@@ -10701,7 +10701,7 @@ function achivementDialog(title, close) {
     } else {
         $dialog.find('.bandwidth .reward-txt span').addClass('hidden');
     }
-    $dialog.find('.acivement-dialog.expires-txt span').text(monthNumber);
+    $dialog.find('.achivement-dialog.expires-txt span').text(monthNumber);
     $dialog.attr('class','fm-dialog achivement-dialog ' + title);
 }
 
@@ -10801,6 +10801,98 @@ function achivementsListDialog(close) {
 
     // Dialog aligment
     $dialog.css('margin-top', '-' + $dialog.outerHeight()/2 + 'px');
+}
+
+/**
+ * Show Invite a friend dialog
+ * @param {String} close dialog parameter
+ */
+function inviteFriendDialog(close) {
+    var $dialog = $('.fm-dialog.invite-dialog');
+
+    if (close) {
+        $.dialog = false;
+        fm_hideoverlay();
+        $dialog.addClass('hidden');
+        return true;
+    }
+    $.dialog = 'invite-friend';
+
+    $dialog.find('.fm-dialog-close').rebind('click', function() {
+        inviteFriendDialog(1);
+    });
+
+    // Show dialog
+    fm_showoverlay();
+    $dialog.removeClass('hidden');
+
+    // TODO: Show "Invitation Status" button if invitations were sent before
+    $('.default-white-button.inline.status').removeClass('hidden');
+
+    // Init textarea logic
+    var $this  = $('.achivement-dialog.input');
+    var $inputWrapper  = $('.achivement-dialog.input-field');
+    var $sendButton = $dialog.find('.default-grey-button.send');
+    var contacts = getContactsEMails();
+    $this.tokenInput(contacts, {
+        theme: "invite",
+        hintText: '',
+        searchingText: "",
+        noResultsText: "",
+        addAvatar: false,
+        autocomplete: null,
+        searchDropdown: false,
+        emailCheck: true,
+        preventDoublet: false,
+        tokenValue: "id",
+        propertyToSearch: "name",
+        resultsLimit: 5,
+        minChars: 1,
+        visibleComma: true,
+        accountHolder: '',
+        onEmailCheck: function() {
+            $('.achivement-dialog.input-info').addClass('red').text(l[7415]);
+            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+        },
+        onDoublet: function(u) {
+            $('.achivement-dialog.input-info').addClass('red').text(l[7413]);
+            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+        },
+        onHolder: function() {
+            $('.achivement-dialog.input-info').addClass('red').text(l[7414]);
+            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+        },
+        onReady: function() {
+            var $input = $('.achivement-dialog.input-field').find('li input').eq(0);
+            $input.rebind('keyup click', function() {
+                var value = $.trim($input.val());
+                var $wrapper = $('.achivement-dialog.input-field');
+                if ($wrapper.find('.share-added-contact').length > 0 || checkMail(value) === false) {
+                    $wrapper.find('li input').eq(0).removeClass('red');
+                    $('.achivement-dialog.input-info').removeClass('red').text('Enter multiple email addresses separated by commas');
+                    $('.invite-dialog .default-grey-button.send').removeClass('disabled');
+                } else {
+                    $('.invite-dialog .default-grey-button.send').addClass('disabled');
+                }
+                // TODO: scroll more then 64px of .input-field block
+            });
+            $('.achivement-dialog.input-info').text('Enter multiple email addresses separated by commas');
+        },
+        onAdd: function() {
+            // TODO:
+        },
+        onDelete: function() {
+            var itemNum;
+            // Get number of emails
+            itemNum = $('.achivement-dialog.input-field').find('.share-added-contact').length;
+            if (itemNum === 0) {
+                $('.invite-dialog .default-grey-button.send').addClass('disabled');
+            }
+            else {
+                $('.invite-dialog .default-grey-button.send').removeClass('disabled');
+            }
+        }
+    });
 }
 
 var previews = {};

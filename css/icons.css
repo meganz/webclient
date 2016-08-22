@@ -614,3 +614,7 @@
 .exceeded .semi-big-icon.speedometer {
     background-position: -9px -11199px;
 }
+.semi-small-icon.tick {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -9px -11129px;
+}

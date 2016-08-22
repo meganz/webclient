@@ -10818,9 +10818,14 @@ function inviteFriendDialog(close) {
     }
     $.dialog = 'invite-friend';
 
-    $dialog.find('.fm-dialog-close').rebind('click', function() {
-        inviteFriendDialog(1);
-    });
+    $dialog.find('.fm-dialog-close').rebind('click', inviteFriendDialog);
+
+    var ach = mega.achievem;
+    var maf = ach.prettify(M.account.maf);
+    maf = maf[ach.ACH_INVITE];
+
+    var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend that installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
+    $('.header', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
     // Show dialog
     fm_showoverlay();

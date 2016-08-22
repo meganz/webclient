@@ -7708,7 +7708,7 @@ Object.defineProperty(mega, 'achievem', {
     var map = {
         /*  1 */ 'WELCOME':     'ach-create-account:#register',
         /*  2 */ 'TOUR':        'ach-take-tour',
-        /*  3 */ 'INVITE':      'ach-invite-friend:#fm/contacts',
+        /*  3 */ 'INVITE':      'ach-invite-friend:~inviteFriendDialog',
         /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:#sync',
         /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:#mobile',
         /*  6 */ 'VERIFYE164':  'ach-verify-number',
@@ -7734,6 +7734,30 @@ Object.defineProperty(mega, 'achievem', {
     });
     Object.defineProperty(o, 'mapToElement', {
         value: Object.freeze(mapToElement)
+    });
+    Object.defineProperty(o, 'bind', {
+        value: function bind(action) {
+            this.rebind('click', function() {
+                if (action) {
+                    switch (action[0]) {
+                        case '#':
+                            location.hash = action;
+                            break;
+
+                        case '~':
+                            var fn = action.substr(1);
+                            if (typeof window[fn] === 'function') {
+                                if (fn.toLowerCase().indexOf('dialog') > 0) {
+                                    closeDialog();
+                                }
+                                window[fn]();
+                            }
+                            break;
+                    }
+                }
+                return false;
+            });
+        }
     });
 
     Object.freeze(o);

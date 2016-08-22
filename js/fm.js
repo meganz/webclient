@@ -3582,17 +3582,6 @@ function accountUI() {
         else {
             $('.fm-right-account-block').addClass('active-achivements');
 
-            var bind = function(action) {
-                this.rebind('click', function() {
-                    if (action) {
-                        location.href = action;
-                    }
-                    else {
-                        alert('TODO');
-                    }
-                });
-            };
-
             // hide everything until seen on the api reply (maf)
             $('.achivements-table .achivements-cell').addClass('hidden');
             $('.achivements-block .progress-bar.dark-violet').css('width', '0%');
@@ -3662,7 +3651,7 @@ function accountUI() {
                                     '%1 days left'.replace('%1', data.rwd.left));
                         }
                         else {
-                            bind.call($('.button', $cell), ach.mapToAction[idx]);
+                            ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
                         }
                         $cell.removeClass('hidden');
                     }
@@ -3701,8 +3690,6 @@ function accountUI() {
             $quotaTxt.safeHTML(quotaTxt,
                 bytesToSize(transferCurrentValue, 0),
                 bytesToSize(transferMaxValue, 0));
-
-            bind = undefined;
         }
         /* End of No achivements */
 
@@ -10728,17 +10715,6 @@ function achivementsListDialog(close) {
     // hide everything until seen on the api reply (maf)
     $('.achivements-cell', $dialog).addClass('hidden');
 
-    var bind = function(action) {
-        this.rebind('click', function() {
-            if (action) {
-                location.href = action;
-            }
-            else {
-                alert('TODO');
-            }
-        });
-    };
-
     var ach = mega.achievem;
     var maf = ach.prettify(account.maf);
     for (var idx in maf) {
@@ -10769,7 +10745,7 @@ function achivementsListDialog(close) {
                     $('.expires-txt', $cell).addClass('red').safeHTML(locFmt, data.rwd.left);
                 }
                 else {
-                    bind.call($('.button', $cell), ach.mapToAction[idx]);
+                    ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
 
                     locFmt = '(Expires after [S]@@[/S] @@)'.replace('[S]', '<span>').replace('[/S]', '</span>');
                     $('.expires-txt', $cell).removeClass('red').safeHTML(locFmt, data.expiry.value, data.expiry.utxt);
@@ -10779,7 +10755,7 @@ function achivementsListDialog(close) {
             }
         }
     }
-    bind = maf = ach = undefined;
+    maf = ach = undefined;
 
     // Show dialog
     fm_showoverlay();
@@ -10832,7 +10808,12 @@ function inviteFriendDialog(close) {
     $dialog.removeClass('hidden');
 
     // TODO: Show "Invitation Status" button if invitations were sent before
-    $('.default-white-button.inline.status').removeClass('hidden');
+    $('.default-white-button.inline.status')
+        .removeClass('hidden')
+        .rebind('click', function() {
+            closeDialog();
+            invitationStatusDialog();
+        });
 
     // Init textarea logic
     var $this  = $('.achivement-dialog.input');
@@ -10919,6 +10900,21 @@ function invitationStatusDialog(close) {
 
     $dialog.find('.fm-dialog-close').rebind('click', invitationStatusDialog);
 
+    var ach = mega.achievem;
+    var maf = ach.prettify(M.account.maf);
+    maf = maf[ach.ACH_INVITE];
+
+    var locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
+    $('.hint', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+
+    $('.button.reinvite-all', $dialog).rebind('click', function() {
+        alert('TODO');
+    });
+    $('.button.invite-more', $dialog).rebind('click', function() {
+        closeDialog();
+        inviteFriendDialog();
+    });
+
     // Show dialog
     fm_showoverlay();
     $dialog.removeClass('hidden');
@@ -10932,6 +10928,9 @@ function invitationStatusDialog(close) {
     else {
         deleteScrollPanel($scrollBlock, 'jsp');
     }
+
+    // Dialog aligment
+    $dialog.css('margin-top', '-' + $dialog.outerHeight()/2 + 'px');
 }
 
 var previews = {};

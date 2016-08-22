@@ -616,5 +616,19 @@
 }
 .semi-small-icon.tick {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-    background-position: -9px -11129px;
+        background-position: -15px -11322px;
+}
+.semi-small-icon.dots {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -15px -11288px;
+}
+.semi-small-icon.rounded-arrow {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+        background-position: -15px -11362px;
+
+}
+.semi-small-icon.exclamation-point {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+        background-position: -15px -11404px;
+
 }

@@ -10723,7 +10723,7 @@ function achivementsListDialog(close) {
     }
     $.dialog = 'achivements';
 
-    $dialog.find('.fm-dialog-close').rebind('click', achivementsListDialog);
+    $dialog.find('.fm-dialog-close').rebind('click', achivementsListDialog(1));
 
     // hide everything until seen on the api reply (maf)
     $('.achivements-cell', $dialog).addClass('hidden');
@@ -10818,7 +10818,7 @@ function inviteFriendDialog(close) {
     }
     $.dialog = 'invite-friend';
 
-    $dialog.find('.fm-dialog-close').rebind('click', inviteFriendDialog);
+    $dialog.find('.fm-dialog-close').rebind('click', inviteFriendDialog(1));
 
     var ach = mega.achievem;
     var maf = ach.prettify(M.account.maf);
@@ -10898,6 +10898,40 @@ function inviteFriendDialog(close) {
             }
         }
     });
+}
+
+/**
+ * Show invitation status dialog
+ * @param {String} close dialog parameter
+ */
+function invitationStatusDialog(close) {
+    var $dialog = $('.fm-dialog.invitation-dialog');
+    var $scrollBlock = $dialog.find('.table-scroll');
+    var $contentBlock;
+
+    if (close) {
+        $.dialog = false;
+        fm_hideoverlay();
+        $dialog.addClass('hidden');
+        return true;
+    }
+    $.dialog = 'invitations';
+
+    $dialog.find('.fm-dialog-close').rebind('click', invitationStatusDialog(1));
+
+    // Show dialog
+    fm_showoverlay();
+    $dialog.removeClass('hidden');
+
+    // Init scroll
+    $contentBlock = $dialog.find('.table-bg');
+
+    if ($contentBlock.height() > 384) {
+        $table.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    }
+    else {
+        deleteScrollPanel($scrollBlock, 'jsp');
+    }
 }
 
 var previews = {};

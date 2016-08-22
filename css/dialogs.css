@@ -543,25 +543,27 @@
 /* Invite a friend dialog */
 .fm-dialog.invitation-dialog {
     width: 724px;
-    margin: -406px 0 0 -304px;
+    margin: -406px 0 0 -362px;
     background-color: #FAFAFA;
 }
 .fm-dialog-body.invitation-dialog {
-    padding: 0 0 0 0;
+    padding: 14px 0 36px 0;
+    text-align: center;
 }
 .invitation-dialog.table {
     display: table;
     width: 100%;
-    margin: 14px 0 0 0;
+    table-layout: fixed;
+    text-align: left;
 }
 .invitation-dialog.table-row {
     display: table-row;
 }
-.invitation-dialog.table-row:not(.header):nth-child(even) .table-cell {
+.invitation-dialog.table-row:not(.header):nth-child(odd) .table-cell {
     background-color: white;
 }
-.invitation-dialog.table-row:not(.header):nth-child(odd) .table-cell {
-    background-color: rgba(0,0,0,0.02);
+.invitation-dialog.table-row:not(.header):nth-child(even) .table-cell {
+    background-color: #f5f5f5;
 }
 .invitation-dialog.table-cell {
     font-size: 13px;
@@ -574,14 +576,35 @@
     vertical-align: middle;
     height: 48px;
     border-left: 1px dashed rgba(0,0,0,0.1);
-    padding: 0 12px 0 12px
+    padding: 0 12px 0 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+}
+.invitation-dialog.table-cell *:not(.button) {
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
 }
 .invitation-dialog.table-cell span {
-    display:block;
+    display: block;
 }
 .invitation-dialog.table-cell:first-child {
     border-left: 0;
-    width: 32px;
+    width: 35px;
+    padding: 0 9px;
+}
+.invitation-dialog.table-cell:nth-child(3) {
+    width: 170px;
+}
+.invitation-dialog.table-cell:nth-child(4) {
+    width: 190px;
 }
 .invitation-dialog.table-row.header .table-cell {
     font-size: 13px;
@@ -594,18 +617,76 @@
     padding: 0 12px 4px 12px;
     display: table-cell;
 }
+.invitation-dialog.table-cell strong {
+    font-size: 14px;
+}
+.invitation-dialog.table-cell .dark-grey {
+    color: #333333;
+}
 .invitation-dialog.table-cell .light-grey {
     color: #999999;
 }
-.invitation-dialog.table-cell .bold-green {
+.invitation-dialog.table-cell .green {
     color: #31B500;
-    font-family: 'source_sans_prosemibold';
-    font-size: 14px;
+    font-size: 13px;
+}
+.invitation-dialog.table-cell .green {
+    color: #31B500;
+    font-size: 13px;
+}
+.invitation-dialog.table-cell .orange {
+    color: #FFA500;
+    font-size: 13px;
 }
 .invitation-dialog.table-cell.small {
     color: #999999;
 }
-.fm-dialog-body.invitation-dialog {
-    min-height: 368px;
+.invitation-dialog.table-cell span {
+    display: block;
+    cursor: pointer;
+    margin-right: 8px;
+}
+.invitation-dialog.table-cell span.desc {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: right -11445px;
+    background-repeat: no-repeat;
+}
+.invitation-dialog.table-cell span.asc {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: right -11475px;
+    background-repeat: no-repeat;
+}
+.invitation-dialog.table-scroll {
+    height: 385px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.invitation-dialog.table-bg {
+    min-height: 100%;
+    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MCIgaGVpZ2h0PSI5NiI+CjxyZWN0IHdpZHRoPSI5MCIgaGVpZ2h0PSI0OCIgZmlsbD0iI2Y1ZjVmNSI+PC9yZWN0Pgo8cmVjdCB3aWR0aD0iOTAiIGhlaWdodD0iNDgiIGZpbGw9IndoaXRlIj48L3JlY3Q+Cjwvc3ZnPg==");
+}
+.invitation-dialog.table-info {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 24px 48px 23px 48px;
+    text-align: left;
+}
+.invitation-dialog.table-info span {
+    color: #FF333A;
+}
+.invitation-dialog .default-grey-button, .invitation-dialog .default-white-button:not(.small-square-button) {
+    padding: 0 24px;
+}
+.invitation-dialog.table-cell .small-square-button {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    margin: -12px 0 0 0;
+}
+.invitation-dialog.table-cell .small-square-button span {
+    margin-right: 30px;
 }
 /* End of Invite a friend dialog */

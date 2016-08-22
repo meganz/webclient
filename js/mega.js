@@ -1279,6 +1279,10 @@ function MegaData()
             return false;
         }
 
+        // open the dashboard by default
+        id = id || 'dashboard';
+
+
         if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
             notificationsUI(1);
         }
@@ -1294,6 +1298,7 @@ function MegaData()
         else if (id && id === this.currentdirid && !force) {// Do nothing if same path is choosen
             return false;
         }
+
 
         if (id === 'rubbish')
             id = this.RubbishID;

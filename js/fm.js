@@ -10723,7 +10723,7 @@ function achivementsListDialog(close) {
     }
     $.dialog = 'achivements';
 
-    $dialog.find('.fm-dialog-close').rebind('click', achivementsListDialog(1));
+    $dialog.find('.fm-dialog-close').rebind('click', achivementsListDialog);
 
     // hide everything until seen on the api reply (maf)
     $('.achivements-cell', $dialog).addClass('hidden');
@@ -10818,7 +10818,7 @@ function inviteFriendDialog(close) {
     }
     $.dialog = 'invite-friend';
 
-    $dialog.find('.fm-dialog-close').rebind('click', inviteFriendDialog(1));
+    $dialog.find('.fm-dialog-close').rebind('click', inviteFriendDialog);
 
     var ach = mega.achievem;
     var maf = ach.prettify(M.account.maf);
@@ -10917,7 +10917,7 @@ function invitationStatusDialog(close) {
     }
     $.dialog = 'invitations';
 
-    $dialog.find('.fm-dialog-close').rebind('click', invitationStatusDialog(1));
+    $dialog.find('.fm-dialog-close').rebind('click', invitationStatusDialog);
 
     // Show dialog
     fm_showoverlay();

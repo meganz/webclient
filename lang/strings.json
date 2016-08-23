@@ -14370,5 +14370,9 @@
     "9078": {
         "text": "Encrypting",
         "context": "The button text on the Export Link dialog when the process to start encrypting the link has begun."
+    },
+    "9079": {
+        "text": "Encrypted",
+        "context": "The button text on the Export Link dialog to indicate that the link has been encrypted successfully."
     }
 }

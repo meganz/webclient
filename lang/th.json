@@ -3574,7 +3574,7 @@
     "9058": "Replace file",
     "9059": "No, rename it as %1",
     "9060": "Auto-replace file if a newly uploaded file has the same name",
-    "9061": "Encrypt",
+    "9061": "\u0e40\u0e02\u0e49\u0e32\u0e23\u0e2b\u0e31\u0e2a\u0e25\u0e31\u0e1a",
     "9062": "Show PRO options",
     "9063": "Set password protection",
     "9064": "Hide options",
@@ -3592,6 +3592,7 @@
     "9076": "The link could not be decrypted. The password could be incorrect, or the data was corrupted or modified. Check the link and try entering the password again.",
     "9077": "Decrypted",
     "9078": "Encrypting",
+    "9079": "Encrypted",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3758,6 +3759,8 @@
         "retype-password": 9075,
         "link-could-not-be-decrypted": 9076,
         "decrypted": 9077,
-        "encrypting": 9078
+        "encrypting": 9078,
+        "general": 1712,
+        "encrypted": 9079
     }
 }

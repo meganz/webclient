@@ -2,6 +2,7 @@ function init_blogarticle() {
     if (blogposts === null) {
         return init_blog();
     }
+    blog_bind_search();
 
     var post = blogposts['post_' + blogid];
     for (var e in post.attaches) {

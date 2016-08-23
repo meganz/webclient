@@ -726,13 +726,13 @@ function init_page() {
         });
         return;
     }
-    else if (page == 'sourcecode') {
+    else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page == 'terms') {
+    else if (page === 'terms') {
         parsepage(pages['terms']);
     }
-    else if (page == 'general') {
+    else if (page === 'general') {
         parsepage(pages['general']);
     }
     else if (page == 'takedown') {

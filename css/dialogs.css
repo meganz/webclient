@@ -259,7 +259,7 @@
     color: #31B500;
 }
 .achivement-dialog.description {
-    padding: 18px 20px 0 20px;
+    padding: 18px 0 0 0;
     font-size: 14px;
     line-height: 18px;
     color: #666666;
@@ -299,7 +299,7 @@
 .achivements-cell-body {
     display: table-row;
 }
-.achivement-dialog.info-contents-content .achivement-full.info {
+.achivements-list-dialog .achivement-full.info {
     margin: 0;
     padding: 0 36px 0 0;
 }
@@ -335,7 +335,7 @@
     margin-top: 8px;
     overflow: hidden;
 }
-.achivement-dialog.info-contents-content {
+.achivements-list-dialog .acivements-content {
     padding: 2px 24px 12px 24px;
 }
 .achivement-full.expires-txt {
@@ -543,7 +543,7 @@
 /* Invite a friend dialog */
 .fm-dialog.invitation-dialog {
     width: 724px;
-    margin: -406px 0 0 -362px;
+    margin: -406px 0 0 -303px;
     background-color: #FAFAFA;
 }
 .fm-dialog-body.invitation-dialog {

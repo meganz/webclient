@@ -543,7 +543,7 @@
 /* Invite a friend dialog */
 .fm-dialog.invitation-dialog {
     width: 724px;
-    margin: -406px 0 0 -303px;
+    margin: -303px 0 0 -362px;
     background-color: #FAFAFA;
 }
 .fm-dialog-body.invitation-dialog {

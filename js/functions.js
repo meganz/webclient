@@ -842,31 +842,33 @@ function countrydetails(isocode) {
 }
 
 /**
- * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
- * @param {Number} unixTime The UNIX timestamp in seconds e.g. 1464829467
- * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
- * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
+ * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
+ *
+ * @param {Number} unixTime  The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Number} format    The readable time format to return
+ * @returns {String}
+ *
+ * Formats:
+ *       0: yyyy-mm-dd hh:mm
+ *       1: yyyy-mm-dd
+ *       2: dd fmn yyyy (fmn: Full month name, based on the locale)
  */
-function time2date(unixTime, ignoreTime, iso) {
+function time2date(unixTime, format) {
 
     var result;
     var date = new Date(unixTime * 1000 || 0);
 
-    if (iso === undefined) {
-        iso = true;
+    if (format === 2) {
+        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
     }
-
-    if (iso) {
+    else {
         var parts = date.toISOString().split('T');
 
         result = parts[0];
 
-        if (!ignoreTime) {
+        if (!format) {
             result += ' ' + parts[1].substr(0, 5);
         }
-    }
-    else {
-        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
     }
 
     return result;

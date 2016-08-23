@@ -3310,33 +3310,18 @@ function MegaData()
         $.tresizer();
     };
 
-    this.accountSessions = function(cb) {
-        /* x: 1, load the session ids
-           useful to expire the session from the session manager */
-        api_req({ a: 'usl', x: 1 }, {
-            account: account,
-            callback: function(res, ctx)
-            {
-                if (typeof res != 'object')
-                    res = [];
-                ctx.account.sessions = res;
-                if (typeof cb === "function") {
-                    cb();
-                }
-            }
-        });
-    };
-
     this.accountData = function(cb, blockui)
     {
-        if (this.account && this.account.lastupdate > new Date().getTime() - 300000 && cb)
-            cb(this.account);
-        else
-        {
-            if (blockui)
-                loadingDialog.show();
+        var account = Object(this.account);
 
-            account = {};
+        if (account.lastupdate > Date.now() - 300000 && cb) {
+            cb(account);
+        }
+        else {
+
+            if (blockui) {
+                loadingDialog.show();
+            }
 
             api_req({a: 'uq', strg: 1, xfer: 1, pro: 1}, {
                 account: account,
@@ -3433,7 +3418,17 @@ function MegaData()
                 }
             });
 
-            this.accountSessions();
+            /* x: 1, load the session ids
+               useful to expire the session from the session manager */
+            api_req({ a: 'usl', x: 1 }, {
+                account: account,
+                callback: function(res, ctx) {
+                    if (typeof res != 'object') {
+                        res = [];
+                    }
+                    ctx.account.sessions = res;
+                }
+            });
 
             api_req({a: 'ug'}, {
                 cb: cb,

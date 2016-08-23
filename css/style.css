@@ -1253,6 +1253,7 @@ input.radioOn, input.radioOff {
     -khtml-opacity: 0;
     opacity: 0;
     z-index: 1;
+    cursor: pointer;
 }
 .radio-txt {
     float: left;

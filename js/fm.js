@@ -3022,7 +3022,6 @@ function dashboardUI() {
         return false;
     });
 
-
     // Account data
     M.accountData(function(account) {
 
@@ -3088,7 +3087,7 @@ function dashboardUI() {
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
                     var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.account.left-pane.date-val').text(time2date(timestamp, 0, 0));
+                    $('.account.left-pane.date-val').text(time2date(timestamp, 2));
                     $('.account.left-pane.date-info').text(l[7354]);
                 }
                 else {
@@ -3099,7 +3098,7 @@ function dashboardUI() {
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
                 $('.account.left-pane.date-info').text(l[987]);
-                $('.account.left-pane.date-val').text(time2date(account.expiry, 0, 0));
+                $('.account.left-pane.date-val').text(time2date(account.expiry, 2));
             }
         }
         else {
@@ -3109,9 +3108,7 @@ function dashboardUI() {
                 window.location.hash = 'pro';
             })
             $('.account.left-pane.date-info').text('MEMBER SINCE');
-
-            // TODO: Get registration date
-            $('.account.left-pane.date-val').text(time2date(u_attr.since, 0, 0));
+            $('.account.left-pane.date-val').text(time2date(u_attr.since, 2));
         }
 
 
@@ -3130,17 +3127,15 @@ function dashboardUI() {
         // Used Bandwidth chart
         if (deg <= 180) {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-        } else {
+        }
+        else {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
             $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum bandwidth
-        var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-        var b2 = bytesToSize(account.bw);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
-        $('.bandwidth .chart.data .size-txt').text((b1));
+        var b2 = bytesToSize(account.bw, 0).split(' ');
+        $('.bandwidth .chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
         $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
         $('.bandwidth .chart.data .gb-txt').text((b2[1]));
         $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
@@ -3164,15 +3159,14 @@ function dashboardUI() {
         // Used space chart
         if (deg <= 180) {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-        } else {
+        }
+        else {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
             $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum disk space
-        var b2 = bytesToSize(account.space);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
+        var b2 = bytesToSize(account.space, 0).split(' ');
         $('.storage .chart.data .pecents-txt').text((b2[0]));
         $('.storage .chart.data .gb-txt').text((b2[1]));
         $('.storage .chart.data .perc-txt').text(perc_c + '%');
@@ -3185,10 +3179,12 @@ function dashboardUI() {
         if (b_exceeded && s_exceeded) {
             // Bandwidth and Storage quota exceeded
             $('.dashboard .chart-warning.storage-and-bandwidth').removeClass('hidden');
-        } else if (s_exceeded) {
+        }
+        else if (s_exceeded) {
             // Storage quota exceeded
             $('.dashboard .chart-warning.storage').removeClass('hidden');
-        } else if (b_exceeded) {
+        }
+        else if (b_exceeded) {
             // Bandwidth quota exceeded
             $('.dashboard .chart-warning.bandwidth').removeClass('hidden');
         }
@@ -3211,7 +3207,7 @@ function dashboardUI() {
             iSharesBytes += c[k[i]][0];
             percents[2] += (100 * c[k[i]][0] / account.space);
         }
-        for (i = 0; i < 4; i++) {
+        for (var i = 0; i < 4; i++) {
             $('.storage .account.progress-bar.blue' + i).css('width', percents[i] + '%');
         }
         // Cloud drive
@@ -3240,7 +3236,8 @@ function dashboardUI() {
         if (!contacts.length) {
             $('.account.widget.text.contacts').removeClass('hidden');
             $('.account.data-table.contacts').addClass('hidden');
-        } else {
+        }
+        else {
             var recent = 0;
             var now = unixtime();
             contacts.forEach(function(handle) {
@@ -3265,7 +3262,8 @@ function dashboardUI() {
         if (!chat) {
             $('.account.widget.text.chat').removeClass('hidden');
             $('.account.data-table.chat').addClass('hidden');
-        } else {
+        }
+        else {
             $('.account.widget.text.chat').addClass('hidden');
             $('.account.data-table.chat').removeClass('hidden');
             $('.data-right-td.new-chat span').text('0');
@@ -3293,11 +3291,11 @@ function dashboardUI() {
                 elm.children[1].textContent = String(str).replace('[X]', props.cnt)
                 elm.children[2].textContent = bytesToSize(props.size);
             });
+
+
+        initTreeScroll();
+        initDashboardScroll();
     });
-
-
-    initTreeScroll();
-    initDashboardScroll();
 }
 
 function accountUI() {
@@ -3349,12 +3347,12 @@ function accountUI() {
 
             if (is_chrome_firefox) {
                 if (!$('#acc_dls_folder').length) {
-                    $('#acc_use_ssl').before(
-                        $('<div id="acc_dls_folder" style="margin-top:25px">' +
-                            '<div class="account-bandwidth-txt">Downloads folder:</div>' +
+                    $('.transfer-settings').safeAppend(
+                        '<div id="acc_dls_folder">' +
+                            '<div class="fm-account-header">Downloads folder:</div>' +
                             '<input type="button" value="Browse..." style="-moz-appearance:' +
                                 'button;margin-right:12px;cursor:pointer" />' +
-                            '</div>'));
+                            '</div>');
                     var fld = mozGetDownloadsFolder();
                     $('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
                     $('#acc_dls_folder input').click(function() {
@@ -3414,7 +3412,7 @@ function accountUI() {
 
                 // Display the date their subscription
                 if (timestamp > 0) {
-                    $('.account.plan-info.expiry').text(time2date(timestamp, 0, 0));
+                    $('.account.plan-info.expiry').text(time2date(timestamp, 2));
                     $('.account.plan-info.expiry-txt').text(l[7354]);
                 }
                 else {
@@ -3447,7 +3445,7 @@ function accountUI() {
                     document.location = $(this).attr('href');
                 });
                 $('.account.plan-info.expiry-txt').text(l[987]);
-                $('.account.plan-info.expiry a').text(time2date(account.expiry, 0, 0));
+                $('.account.plan-info.expiry a').text(time2date(account.expiry, 2));
                 $('.account.data-block .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }
@@ -3462,21 +3460,10 @@ function accountUI() {
         }
 
         // Maximum bandwidth
-        var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-        b1 = b1.split(' ');
-        b1[0] = Math.round(b1[0]) + ' ';
-        var b2 = bytesToSize(account.bw);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
-
-        $('.account.plan-info.bandwidth').text((b2[0]) + ' ' + (b2[1]));
+        $('.account.plan-info.bandwidth').text(bytesToSize(account.bw, 0));
 
         // Maximum disk space
-        var b2 = bytesToSize(account.space);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
-
-        $('.account.plan-info.storage').text((b2[0]) + ' ' + (b2[1]));
+        $('.account.plan-info.storage').text(bytesToSize(account.space, 0));
 
         /* New Used Bandwidth chart */
         perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
@@ -3491,19 +3478,15 @@ function accountUI() {
         /* Used Bandwidth chart */
         if (deg <= 180) {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-        } else {
+        }
+        else {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
             $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum bandwidth
-        var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-        b1 = b1.split(' ');
-        b1[0] = Math.round(b1[0]) + ' ';
-        var b2 = bytesToSize(account.bw);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
-        $('.bandwidth .chart.data .size-txt').text((b1));
+        var b2 = bytesToSize(account.bw, 0).split(' ');
+        $('.bandwidth .chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
         $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
         $('.bandwidth .chart.data .gb-txt').text((b2[1]));
         $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
@@ -3523,7 +3506,8 @@ function accountUI() {
         /* Used space chart */
         if (deg <= 180) {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-        } else {
+        }
+        else {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
             $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
@@ -3532,15 +3516,14 @@ function accountUI() {
         deg = (deg <= 20) ? deg : 20;
         if (deg <= 180) {
             $('.storage .achivement.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-        } else {
+        }
+        else {
             $('.storage .achivement.left-chart span').css('transform', 'rotate(180deg)');
             $('.storage .achivement.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum disk space
-        var b2 = bytesToSize(account.space);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
+        var b2 = bytesToSize(account.space, 0).split(' ');
         $('.storage .chart.data .pecents-txt').text(b2[0]);
         $('.storage .chart.data .gb-txt').text(b2[1]);
         $('.storage .chart.data .perc-txt').text(perc_c + '%');
@@ -3553,7 +3536,7 @@ function accountUI() {
 
             $('.account.quota-txt.used-space')
                 .safeHTML('<span>@@</span> @@ @@',
-                    bytesToSize(account.space_used), l[5528], (b2[0] + b2[1]));
+                    bytesToSize(account.space_used, 0), l[5528], b2.join(' '));
 
             var c = account.cstrgn, k = Object.keys(c), iSharesBytes = 0;
             var percents = [
@@ -3566,7 +3549,7 @@ function accountUI() {
                 iSharesBytes += c[k[i]][0];
                 percents[2] += (100 * c[k[i]][0] / account.space);
             }
-            for (i = 0; i < 4; i++) {
+            for (var i = 0; i < 4; i++) {
                 $('.account.progress-bar.pr' + i).css('width', percents[i] + '%');
             }
 

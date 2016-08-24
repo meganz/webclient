@@ -3048,11 +3048,12 @@ function dashboardUI() {
                     bsqStorage = maf[k];
                     return;
                 }
-                maxStorage += maf[k][0];
+                var achStorage = (maf[k][0] * (Object(maf[k].rwds).length || 1));
 
                 if (maf[k].rwd) {
-                    curStorage += maf[k][0];
+                    curStorage += achStorage;
                 }
+                maxStorage += achStorage;
             });
 
             curStorage += bsqStorage;
@@ -3589,24 +3590,40 @@ function accountUI() {
                     var data = maf[idx];
                     var selector = ach.mapToElement[idx];
                     if (selector) {
+                        var base = (Object(data.rwds).length || 1);
+                        var storageValue = (data[0] * base);
                         var $cell = $('.' + selector, $achTable).closest('.achivements-cell');
                         var $storageItem = $('.progress-item.' + selector, $achStorage).removeClass('hidden');
 
-                        storageMaxValue += data[0];
-                        $('.progress-txt', $storageItem).text(bytesToSize(data[0], 0));
+                        storageMaxValue += storageValue;
+                        $('.progress-txt', $storageItem).text(bytesToSize(storageValue, 0));
                         $('.rewards .reward:first-child .reward-txt', $cell).safeHTML(bytesToSize(data[0], 0, 2));
 
                         if (data[1]) {
+                            var transferValue = (data[1] * base);
                             var $transferItem = $('.progress-item.' + selector, $achTransfer).removeClass('hidden');
 
-                            transferMaxValue += data[1];
-                            $('.progress-txt', $transferItem).text(bytesToSize(data[1], 0));
+                            transferMaxValue += transferValue;
+                            $('.progress-txt', $transferItem).text(bytesToSize(transferValue, 0));
 
                             if (data.rwd) {
-                                transferCurrentValue += data[1];
+                                transferCurrentValue += transferValue;
                                 $('.progress-indicator', $transferItem).addClass('dark-violet active');
-                                $('.progress-title', $transferItem)
-                                    .safeAppend('<span class="red-txt">(@@)</span>', '%1 days left'.replace('%1', data.rwd.left));
+
+                                if (idx !== ach.ACH_INVITE) {
+                                    $('.progress-title', $transferItem)
+                                        .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
+                                            '%1 days left'.replace('%1', data.rwd.left));
+                                }
+                                else {
+                                    if (base > 1) {
+                                        ach.bind.call($transferItem, '~invitationStatusDialog');
+                                        $transferItem
+                                            .css('cursor', 'pointer')
+                                            .attr('title',
+                                                'Achieved %1 times, click for status.'.replace('%1', base));
+                                    }
+                                }
                             }
 
                             $('.rewards .reward:last-child', $cell)
@@ -3618,12 +3635,29 @@ function accountUI() {
                             $('.rewards .reward:last-child', $cell).addClass('hidden');
                         }
 
-                        if (data.rwd) {
+
+                        if (idx === ach.ACH_INVITE) {
+                            ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
+
+                            if (data.rwd) {
+                                storageCurrentValue += storageValue;
+                                $('.progress-indicator', $storageItem).addClass('dark-violet active');
+
+                                if (base > 1) {
+                                    ach.bind.call($storageItem, '~invitationStatusDialog');
+                                    $storageItem
+                                        .css('cursor', 'pointer')
+                                        .attr('title',
+                                            'Achieved %1 times, click for status.'.replace('%1', base));
+                                }
+                            }
+                        }
+                        else if (data.rwd) {
                             // Achieved
-                            storageCurrentValue += data[0];
+                            storageCurrentValue += storageValue;
                             $('.progress-indicator', $storageItem).addClass('dark-violet active');
                             $('.progress-title', $storageItem)
-                                .safeAppend('<span class="red-txt">(@@)</span>', '%1 days left'.replace('%1', data.rwd.left));
+                                .safeAppend('<span class="red-txt">&nbsp;(@@)</span>', '%1 days left'.replace('%1', data.rwd.left));
 
                             $('.status', $cell)
                                 .safeHTML(
@@ -10699,7 +10733,7 @@ function achivementsListDialog(close) {
     $('.achivements-cell', $dialog).addClass('hidden');
 
     var ach = mega.achievem;
-    var maf = ach.prettify(account.maf);
+    var maf = ach.prettify(M.account.maf);
     for (var idx in maf) {
         if (maf.hasOwnProperty(idx)) {
             idx |= 0;
@@ -10721,7 +10755,7 @@ function achivementsListDialog(close) {
                         .safeHTML(locFmt, bytesToSize(data[1], 0));
                 }
 
-                if (data.rwd) {
+                if (data.rwd && idx !== ach.ACH_INVITE) {
                     $cell.addClass('achived');
 
                     locFmt = '(Expires in [S]@@[/S] days)'.replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -10790,13 +10824,18 @@ function inviteFriendDialog(close) {
     fm_showoverlay();
     $dialog.removeClass('hidden');
 
-    // TODO: Show "Invitation Status" button if invitations were sent before
-    $('.default-white-button.inline.status')
-        .removeClass('hidden')
-        .rebind('click', function() {
-            closeDialog();
-            invitationStatusDialog();
-        });
+    // Show "Invitation Status" button if invitations were sent before
+    if (maf.rwd) {
+        $('.default-white-button.inline.status', $dialog)
+            .removeClass('hidden')
+            .rebind('click', function() {
+                closeDialog();
+                invitationStatusDialog();
+            });
+    }
+    else {
+        $('.default-white-button.inline.status', $dialog).addClass('hidden');
+    }
 
     // Init textarea logic
     var $this  = $('.achivement-dialog.input');

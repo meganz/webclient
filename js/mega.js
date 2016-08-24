@@ -7616,22 +7616,34 @@ Object.defineProperty(mega, 'achievem', {
             }
         },
 
+        bind: {
+            value: function bind(action) {
+                this.rebind('click', function() {
+                    if (action) {
+                        switch (action[0]) {
+                            case '#':
+                                location.hash = action;
+                                break;
+
+                            case '~':
+                                var fn = action.substr(1);
+                                if (typeof window[fn] === 'function') {
+                                    if (fn.toLowerCase().indexOf('dialog') > 0) {
+                                        closeDialog();
+                                    }
+                                    window[fn]();
+                                }
+                                break;
+                        }
+                    }
+                    return false;
+                });
+            }
+        },
+
         prettify: {
             value: function prettify(maf) {
                 var data = Object(clone(maf.u));
-
-                // lookup reward from array of achievements
-                var lookup = function(r) {
-                    for (var i in maf.a) {
-                        if (maf.a.hasOwnProperty(i)) {
-                            if (maf.a[i].r === r) {
-                                return clone(maf.a[i]);
-                            }
-                        }
-                    }
-
-                    return null;
-                };
 
                 var setExpiry = function(data) {
                     var time = String(data[2]).split('');
@@ -7660,36 +7672,46 @@ Object.defineProperty(mega, 'achievem', {
                     return result;
                 };
 
-                Object.keys(maf.r || {})
-                    .forEach(function(k) {
-                        var rwd = lookup(k | 0);
-                        data[k] = clone(maf.r[k]);
-                        var exp = setExpiry(data[k]);
-
-                        if (rwd) {
-                            var ts = rwd.ts * 1000;
-                            var mdate = moment(ts);
-
-                            switch (exp.unit) {
-                                case 'd': mdate.add(exp.value, 'days');    break;
-                                case 'w': mdate.add(exp.value, 'weeks');   break;
-                                case 'm': mdate.add(exp.value, 'months');  break;
-                                case 'y': mdate.add(exp.value, 'years');   break;
-                            }
-
-                            rwd.date = new Date(ts);
-                            rwd.left = Math.round(mdate.diff(rwd.date) / 86400000);
-
-                            data[k].rwd = rwd;
-                        }
-                    });
-
                 Object.keys(data)
                     .forEach(function(k) {
-                        if (!data[k].expiry) {
-                            setExpiry(data[k]);
-                        }
+                        setExpiry(data[k]);
                     });
+
+                var mafr = Object(maf.r);
+                var mafa = Object(maf.a);
+                var alen = mafa.length;
+                while (alen--) {
+                    var ach = clone(mafa[alen]);
+
+                    if (!data[ach.a]) {
+                        data[ach.a] = Object(clone(mafr[ach.r]));
+                        setExpiry(data[ach.a]);
+                    }
+                    var exp = data[ach.a].expiry;
+
+                    var ts = ach.ts * 1000;
+                    var date = moment(ts);
+
+                    switch (exp.unit) {
+                        case 'd': date.add(exp.value, 'days');    break;
+                        case 'w': date.add(exp.value, 'weeks');   break;
+                        case 'm': date.add(exp.value, 'months');  break;
+                        case 'y': date.add(exp.value, 'years');   break;
+                    }
+
+                    ach.date = new Date(ts);
+                    ach.left = Math.round(date.diff(ach.date) / 86400000);
+
+                    if (data[ach.a].rwds) {
+                        data[ach.a].rwds.push(ach);
+                    }
+                    else if (data[ach.a].rwd) {
+                        data[ach.a].rwds = [data[ach.a].rwd, ach];
+                    }
+                    else {
+                        data[ach.a].rwd = ach;
+                    }
+                }
 
                 data.baseq = maf.s;
 
@@ -7729,30 +7751,6 @@ Object.defineProperty(mega, 'achievem', {
     });
     Object.defineProperty(o, 'mapToElement', {
         value: Object.freeze(mapToElement)
-    });
-    Object.defineProperty(o, 'bind', {
-        value: function bind(action) {
-            this.rebind('click', function() {
-                if (action) {
-                    switch (action[0]) {
-                        case '#':
-                            location.hash = action;
-                            break;
-
-                        case '~':
-                            var fn = action.substr(1);
-                            if (typeof window[fn] === 'function') {
-                                if (fn.toLowerCase().indexOf('dialog') > 0) {
-                                    closeDialog();
-                                }
-                                window[fn]();
-                            }
-                            break;
-                    }
-                }
-                return false;
-            });
-        }
     });
 
     Object.freeze(o);

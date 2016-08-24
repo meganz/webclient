@@ -12,11 +12,17 @@ var JinglePlugin = {
         this.callRequests = {};
         this.ice_config = {iceServers: []};
         this.pc_constraints = {};
-        this.media_constraints = {
-          mandatory: {
-            'OfferToReceiveAudio': true,
-            'OfferToReceiveVideo': true
-          }
+        if (RTC.browser === "firefox") {
+            this.media_constraints = {
+                'offerToReceiveAudio': true,
+                'offerToReceiveVideo': true
+            }
+        } else {
+            this.media_constraints = {
+                mandatory: {
+                    'OfferToReceiveAudio': true,
+                    'OfferToReceiveVideo': true
+            }
         };
         // MozDontOfferDataChannel: true when this is firefox
         this.connection = conn;

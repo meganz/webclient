@@ -412,7 +412,7 @@ function stats_getBrowserVersion() {
     var ver;
     if ((b === 'chrome') || (b === 'opera')) {
         var m = ua.match(/Chrome\/(\d+)\./);
-        if (m && (m.length >= 2))
+        if(m && (m.length >= 2))
             ver = m[1];
     } else if (b === "firefox") {
         var m = ua.match(/Firefox\/(\d+)\./);

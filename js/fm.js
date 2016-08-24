@@ -10758,8 +10758,8 @@ function achivementsListDialog(close) {
                 if (data.rwd && idx !== ach.ACH_INVITE) {
                     $cell.addClass('achived');
 
-                    locFmt = '(Expires in [S]@@[/S] days)'.replace('[S]', '<span>').replace('[/S]', '</span>');
-                    $('.expires-txt', $cell).addClass('red').safeHTML(locFmt, data.rwd.left);
+                    locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                    $('.expires-txt', $cell).addClass('red').safeHTML(locFmt, data.rwd.left, 'days');
                 }
                 else {
                     ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
@@ -10910,7 +10910,6 @@ function inviteFriendDialog(close) {
 function invitationStatusDialog(close) {
     var $dialog = $('.fm-dialog.invitation-dialog');
     var $scrollBlock = $dialog.find('.table-scroll');
-    var $contentBlock;
 
     if (close) {
         $.dialog = false;
@@ -10919,6 +10918,12 @@ function invitationStatusDialog(close) {
         return true;
     }
     $.dialog = 'invitations';
+    var $table = $scrollBlock.find('.table');
+
+    if (!invitationStatusDialog.$tmpl) {
+        invitationStatusDialog.$tmpl = $('.table-row:first', $table).clone();
+    }
+    $table.empty();
 
     $dialog.find('.fm-dialog-close').rebind('click', invitationStatusDialog);
 
@@ -10931,18 +10936,76 @@ function invitationStatusDialog(close) {
 
     $('.button.reinvite-all', $dialog).rebind('click', function() {
         alert('TODO');
+        return false;
     });
     $('.button.invite-more', $dialog).rebind('click', function() {
         closeDialog();
         inviteFriendDialog();
+        return false;
     });
+
+    var locFmt;
+    var ach = mega.achievem;
+    var maf = ach.prettify(M.account.maf);
+    maf = maf[ach.ACH_INVITE];
+    var rwds = maf.rwds;
+    var rlen = rwds.length;
+
+    while (rlen--) {
+        var rwd = rwds[rlen];
+        var $tmpl = invitationStatusDialog.$tmpl.clone();
+
+        $('.email strong', $tmpl).text(rwd.m[0]);
+        $('.date span', $tmpl).text(time2date(rwd.ts));
+
+        // If no pending (the invitee signed up)
+        if (rwd.csu) {
+
+            if (rwd.c) {
+                // Granted
+
+                $('.status', $tmpl)
+                    .safeHTML(
+                        '<strong class="green">@@</strong>' +
+                        '<span class="light-grey"></span>',
+                        'Quota Granted');
+
+                locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '').replace('[/S]', '');
+                $('.status .light-grey', $tmpl)
+                    .safeHTML(locFmt, maf.expiry.value, maf.expiry.utxt);
+
+                $('.icon i', $tmpl).removeClass('dots').addClass('tick');
+            }
+            else {
+                // Pending APP Install
+                $('.status', $tmpl)
+                    .safeHTML('<strong class="orange">@@</span>', 'Pending App Install');
+
+                $('.icon i', $tmpl).removeClass('dots').addClass('exclamation-point');
+            }
+
+            // Remove reinvite button
+            $('.date div', $tmpl).remove();
+        }
+        else {
+            // Pending
+
+            $('.date div', $tmpl).rebind('click', function() {
+                alert('TODO');
+
+                return false;
+            });
+        }
+
+        $table.append($tmpl);
+    }
 
     // Show dialog
     fm_showoverlay();
     $dialog.removeClass('hidden');
 
     // Init scroll
-    $contentBlock = $dialog.find('.table-bg');
+    var $contentBlock = $dialog.find('.table-bg');
 
     if ($contentBlock.height() > 384) {
         $table.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});

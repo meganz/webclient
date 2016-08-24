@@ -20,9 +20,10 @@ var JinglePlugin = {
         } else {
             this.media_constraints = {
                 mandatory: {
-                'OfferToReceiveAudio': true,
-                'OfferToReceiveVideo': true
-            }};
+                    'OfferToReceiveAudio': true,
+                    'OfferToReceiveVideo': true
+                }
+            };
         };
         // MozDontOfferDataChannel: true when this is firefox
         this.connection = conn;

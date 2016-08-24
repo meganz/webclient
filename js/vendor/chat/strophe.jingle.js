@@ -14,15 +14,15 @@ var JinglePlugin = {
         this.pc_constraints = {};
         if (RTC.browser === "firefox") {
             this.media_constraints = {
+                'offerToReceiveAudio': true,
+                'offerToReceiveVideo': true
+            };
+        } else {
+            this.media_constraints = {
                 mandatory: {
                 'OfferToReceiveAudio': true,
                 'OfferToReceiveVideo': true
             }};
-        } else {
-                this.media_constraints = {
-                    'offerToReceiveAudio': true,
-                    'offerToReceiveVideo': true
-                };
         };
         // MozDontOfferDataChannel: true when this is firefox
         this.connection = conn;

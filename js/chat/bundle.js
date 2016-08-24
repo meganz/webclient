@@ -23136,6 +23136,7 @@
 	            } else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
 	                self.setState({ fullScreenModeEnabled: true });
 	            }
+	            self.forceUpdate();
 	        });
 
 	        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
@@ -23561,6 +23562,7 @@
 	            } else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
 	                self.setState({ isFullscreenModeEnabled: true });
 	            }
+	            self.forceUpdate();
 	        });
 
 	        if (doResize !== false) {
@@ -24182,6 +24184,7 @@
 	                    chatRoom: this.props.chatRoom,
 	                    contacts: self.props.contacts,
 	                    megaChat: this.props.chatRoom.megaChat,
+	                    unreadCount: this.props.chatRoom.messagesBuff.getUnreadCount(),
 	                    onMessagesToggle: function onMessagesToggle(isActive) {
 	                        self.setState({
 	                            'messagesToggledInCall': isActive

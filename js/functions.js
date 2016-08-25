@@ -4838,10 +4838,10 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        if ($.removedContactsFromShare.length > 0) {
+        if ($.remvoedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
             self.removeContactFromShare();
         }
-        if ($.changedPermissions.length > 0) {
+        if ($.changedPermissions && ($.changedPermissions.length > 0)) {
             doShare($.selected[0], $.changedPermissions, true);
         }
         addContactToFolderShare();

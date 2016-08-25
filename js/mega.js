@@ -2632,7 +2632,10 @@ function MegaData()
             });
         }
 
-        this.inviteContactMessageHandler(proceed);
+        // In case of invite-dialog we will use notifications
+        if ($.dialog !== 'invite-friend') {
+            this.inviteContactMessageHandler(proceed);
+        }
 
         return proceed;
     };

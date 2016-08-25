@@ -3581,6 +3581,8 @@ function accountUI() {
             var storageCurrentValue = 0;
             var transferMaxValue = 0;
             var transferCurrentValue = 0;
+            var storageBaseQuota = 0;
+            var transferBaseQuota = 0;
 
             var ach = mega.achievem;
             var maf = ach.prettify(account.maf);
@@ -3675,13 +3677,34 @@ function accountUI() {
                 }
             }
 
-            storageMaxValue += maf.baseq;
-            storageCurrentValue += maf.baseq;
-            transferMaxValue += maf.baseq;
-            transferCurrentValue += maf.baseq;
+            // For free users only show base quota for storage and remove it for bandwidth.
+            // For pro users replace base quota by pro quota
+            if (u_attr.p) {
+                var $baseq = $('.achivements-block .data-block.storage .baseq');
+                storageBaseQuota = account.space;
+                $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
+                $('.progress-title', $baseq).text('PRO Quota');
 
-            var storageBaseQuota = Math.round(maf.baseq * 100 / storageMaxValue);
-            var transferBaseQuota = Math.round(maf.baseq * 100 / transferMaxValue);
+                transferBaseQuota = account.bw;
+                $baseq = $('.achivements-block .data-block.transfer .baseq');
+                $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
+                $('.progress-title', $baseq).text('PRO Quota');
+            }
+            else {
+                storageBaseQuota = maf.baseq;
+                $('.achivements-block .data-block.transfer .baseq').addClass('hidden');
+            }
+
+            storageMaxValue += storageBaseQuota;
+            storageCurrentValue += storageBaseQuota;
+            transferMaxValue += transferBaseQuota;
+            transferCurrentValue += transferBaseQuota;
+
+            storageMaxValue = Math.max(50 * (1024 * 1024 * 1024), storageMaxValue * 1.3);
+            transferMaxValue = Math.max(50 * (1024 * 1024 * 1024), transferMaxValue * 1.3);
+
+            storageBaseQuota = Math.round(storageBaseQuota * 100 / storageMaxValue);
+            transferBaseQuota = Math.round(transferBaseQuota * 100 / transferMaxValue);
 
             $('.account.data-block.storage .progress-block .red')
                 .css('width', storageBaseQuota + '%');
@@ -10944,7 +10967,6 @@ function invitationStatusDialog(close) {
         return false;
     });
 
-    var locFmt;
     var ach = mega.achievem;
     var maf = ach.prettify(M.account.maf);
     maf = maf[ach.ACH_INVITE];
@@ -10970,9 +10992,10 @@ function invitationStatusDialog(close) {
                         '<span class="light-grey"></span>',
                         'Quota Granted');
 
-                locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '').replace('[/S]', '');
+                var expiry = rwd.expiry || maf.expiry;
+                var locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '').replace('[/S]', '');
                 $('.status .light-grey', $tmpl)
-                    .safeHTML(locFmt, maf.expiry.value, maf.expiry.utxt);
+                    .safeHTML(locFmt, expiry.value, expiry.utxt);
 
                 $('.icon i', $tmpl).removeClass('dots').addClass('tick');
             }

@@ -409,19 +409,22 @@ function stats_getBrowserVersion() {
     var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
     var b = RTC.browser;
     var ua = navigator.userAgent;
-    var ver;
+    var ver, m;
     if ((b === 'chrome') || (b === 'opera')) {
-        var m = ua.match(/Chrome\/(\d+)\./);
-        if(m && (m.length >= 2))
+        m = ua.match(/Chrome\/(\d+)\./);
+        if(m && (m.length >= 2)) {
             ver = m[1];
+        }
     } else if (b === "firefox") {
-        var m = ua.match(/Firefox\/(\d+)\./);
-        if (m && (m.length >= 2))
+        m = ua.match(/Firefox\/(\d+)\./);
+        if (m && (m.length >= 2)) {
             ver = m[1];
+        }
     } else {
         ver = null;
     }
-    if (ver)
-        browser+=(':'+ver);
+    if (ver) {
+        browser += (':'+ver);
+    }
     return browser;
 }

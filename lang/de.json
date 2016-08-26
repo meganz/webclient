@@ -590,7 +590,7 @@
     "1128": "Stark",
     "1129": "Ihr Passwort ist zu schwach, um fortzufahren.",
     "1130": "Ung\u00fcltige E-Mail und\/oder Passwort",
-    "1131": "Bitte best\u00e4tigen SIe Ihr Konto",
+    "1131": "Bitte best\u00e4tigen Sie Ihr Konto",
     "1133": "Dieses Spiel soll Sie dazu verleiten, mit Ihren Mausbewegungen [A]Entropie[\/A] zu erzeugen.",
     "1134": "Dies wird Ihren [A]RSA-Schl\u00fcssel[\/A] st\u00e4rken. ",
     "1138": "Fortfahren",
@@ -3593,6 +3593,9 @@
     "9077": "Decrypted",
     "9078": "Encrypting",
     "9079": "Encrypted",
+    "9080": "Rename Group",
+    "9081": "Changed group chat name to %s",
+    "9082": "This account has not completed the registration process yet. First check your email, click on the Activate Account button and reconfirm your chosen password.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3761,6 +3764,9 @@
         "decrypted": 9077,
         "encrypting": 9078,
         "general": 1712,
-        "encrypted": 9079
+        "encrypted": 9079,
+        "rename-chat": 9080,
+        "rename-chat-message": 9081,
+        "message-incomplete-registration": 9082
     }
 }

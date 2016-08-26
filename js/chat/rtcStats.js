@@ -409,10 +409,11 @@ function stats_getBrowserVersion() {
     var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
     var b = RTC.browser;
     var ua = navigator.userAgent;
-    var ver, m;
+    var ver;
+    var m;
     if ((b === 'chrome') || (b === 'opera')) {
         m = ua.match(/Chrome\/(\d+)\./);
-        if(m && (m.length >= 2)) {
+        if (m && (m.length >= 2)) {
             ver = m[1];
         }
     } else if (b === "firefox") {
@@ -424,7 +425,7 @@ function stats_getBrowserVersion() {
         ver = null;
     }
     if (ver) {
-        browser += (':'+ver);
+        browser += (':' + ver);
     }
     return browser;
 }

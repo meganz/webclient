@@ -880,7 +880,7 @@ var ENOENT = -9;
 var ECIRCULAR = -10;
 var EACCESS = -11;
 var EEXIST = -12;
-var EINCOMPLETE = -13; // They have not completed registration properly (need to confirm their email first)
+var EINCOMPLETE = -13;
 
 // crypto errors
 var EKEY = -14;

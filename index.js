@@ -726,11 +726,14 @@ function init_page() {
         });
         return;
     }
-    else if (page == 'sourcecode') {
+    else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page == 'terms') {
+    else if (page === 'terms') {
         parsepage(pages['terms']);
+    }
+    else if (page === 'general') {
+        parsepage(pages['general']);
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -1667,6 +1670,9 @@ function topmenuUI() {
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';
+        }
+        else if (className.indexOf('general') > -1) {
+            document.location.hash = 'general';
         }
         else if (className.indexOf('privacypolicy') > -1) {
             document.location.hash = 'privacy';

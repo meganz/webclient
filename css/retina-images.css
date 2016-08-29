@@ -457,7 +457,7 @@ body.pro:after {
     background-size: 240px auto;
 }
 .chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-download-button, a.chrome-download-button {
-    background-image: url(../images/mega/chrome-app_v2@2x.png);
+    background-image: url(../images/mega/chrome-app_v3@2x.png);
     background-size: 700px auto;
 }
 .chrome-app-button.new-app, .sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button, .chrome-app-button, .win-phone-button, .products-top-arrow {

@@ -14462,5 +14462,9 @@
     "9101": {
         "text": "If you can't find what you are looking for, please contact our support team for direct assistance.",
         "context": "A message for the Get Support section informing the user to contact MEGA support if they can't find the help they need."
+    },
+    "9102": {
+        "text": "Go Back",
+        "context": "A button in the Help section to take the user back to a previous screen on the website."
     }
 }

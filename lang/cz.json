@@ -3606,15 +3606,16 @@
     "9090": "Ov\u011b\u0159en\u00ed n\u00e1kupu selhalo",
     "9091": "Ov\u011b\u0159ov\u00e1n\u00ed...",
     "9092": "N\u00e1kup z aplikace",
-    "9093": "You can add multiple people at once with e-mail addresses separated by commas",
-    "9094": "Frequently Asked Questions",
-    "9095": "How can we help you today?",
-    "9096": "Support Centre",
-    "9097": "Articles",
-    "9098": "We can&#039;t find what you are after",
-    "9099": "Please try your search again or contact our support team directly",
-    "9100": "Email Support",
-    "9101": "If you can&#039;t find what you are looking for, please contact our support team for direct assistance.",
+    "9093": "V\u00edce lid\u00ed najednou m\u016f\u017eete p\u0159idat pomoc\u00ed e-mailov\u00fdch adres odd\u011blen\u00fdch \u010d\u00e1rkami",
+    "9094": "\u010casto kladen\u00e9 ot\u00e1zky",
+    "9095": "Jak v\u00e1m m\u016f\u017eeme pomoci?",
+    "9096": "Centrum podpory",
+    "9097": "\u010cl\u00e1nky",
+    "9098": "Nem\u016f\u017eeme nal\u00e9zt, co jste hledali",
+    "9099": "Zkuste znovu hledat nebo se obra\u0165te p\u0159\u00edmo na n\u00e1\u0161 t\u00fdm podpory",
+    "9100": "Podpora prost\u0159ednictv\u00edm e-mailu",
+    "9101": "Pokud nem\u016f\u017eete nal\u00e9zt, co hled\u00e1te, obra\u0165te se na n\u00e1\u0161 t\u00fdm podpory pro p\u0159\u00edmou pomoc.",
+    "9102": "Go Back",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3794,6 +3795,7 @@
         "no-search-results": 9098,
         "please-try-searching-again": 9099,
         "email-support": 9100,
-        "contact-support-team-message": 9101
+        "contact-support-team-message": 9101,
+        "go-back": 9102
     }
 }

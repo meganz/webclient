@@ -3606,15 +3606,16 @@
     "9090": "Sat\u0131nalma do\u011frulanamad\u0131",
     "9091": "Do\u011frulan\u0131yor...",
     "9092": "Uygulama i\u00e7i sat\u0131nalma",
-    "9093": "You can add multiple people at once with e-mail addresses separated by commas",
-    "9094": "Frequently Asked Questions",
-    "9095": "How can we help you today?",
-    "9096": "Support Centre",
-    "9097": "Articles",
-    "9098": "We can&#039;t find what you are after",
-    "9099": "Please try your search again or contact our support team directly",
-    "9100": "Email Support",
-    "9101": "If you can&#039;t find what you are looking for, please contact our support team for direct assistance.",
+    "9093": "Eposta adresleri aras\u0131na virg\u00fcl koyarak birden \u00e7ok ki\u015fiyi tek seferde ekleyebilirsiniz.",
+    "9094": "S\u0131k Sorulan Sorular",
+    "9095": "Bug\u00fcn size nas\u0131l yard\u0131mc\u0131 olabiliriz?",
+    "9096": "Destek Merkezi",
+    "9097": "Makaleler",
+    "9098": "Arad\u0131\u011f\u0131n\u0131z bilgiyi bulamad\u0131k",
+    "9099": "L\u00fctfen tekrar aramay\u0131 deneyin veya direkt destek tak\u0131m\u0131m\u0131z ile irtibat sa\u011flay\u0131n",
+    "9100": "Eposta Deste\u011fi",
+    "9101": "Arad\u0131\u011f\u0131n\u0131z \u015feyi bulam\u0131yorsan\u0131z l\u00fctfen direkt yard\u0131m i\u00e7in destek tak\u0131m\u0131 ile irtibat sa\u011flay\u0131n.",
+    "9102": "Go Back",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3794,6 +3795,7 @@
         "no-search-results": 9098,
         "please-try-searching-again": 9099,
         "email-support": 9100,
-        "contact-support-team-message": 9101
+        "contact-support-team-message": 9101,
+        "go-back": 9102
     }
 }

@@ -10850,16 +10850,15 @@ function inviteFriendDialog(close) {
     // Remove all previously added emails
     $('.invite-dialog .share-added-contact.token-input-token-invite').remove();
 
-//    initTextareaScrolling($('.add-user-textarea textarea'), 39);
-
     // Show dialog
     fm_showoverlay();
+    $dialog.removeClass('hidden');
 
     // Remove unfinished user inputs
-    $dialog.find('#token-input-').val('');
+    $('#token-input-ach-invite-dialog-input', $dialog).val('');
 
     // Set focus on input so user can type asap
-    $('.token-input-list-invite').click();
+    $('.token-input-list-invite', $dialog).click();
 
     // Show "Invitation Status" button if invitations were sent before
     if (maf.rwd) {
@@ -10873,8 +10872,6 @@ function inviteFriendDialog(close) {
     else {
         $('.default-white-button.inline.status', $dialog).addClass('hidden');
     }
-
-    $dialog.removeClass('hidden');
 }
 
 function initInviteDialogMultiInputPlugin() {

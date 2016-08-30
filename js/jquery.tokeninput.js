@@ -794,7 +794,7 @@
             // Enter new content into resizer and resize input accordingly
             input_resizer.html(_escapeHTML(input_val) || _escapeHTML(settings.placeholder));
             // Get maximum width, minimum the size of input and maximum the widget's width
-            input_box.width(Math.min(token_list.width(),
+            input_box.width(Math.min(token_list.width() || 30,
                 Math.max(width_left, input_resizer.width() + 30)));
         }
 

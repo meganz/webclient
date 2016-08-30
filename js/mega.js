@@ -3747,7 +3747,7 @@ function MegaData()
         }
     };
 
-    this.delNodeShare = function(h, u) {
+    this.delNodeShare = function(h, u, okd) {
 
         if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
             var a = 0;
@@ -3766,23 +3766,37 @@ function MegaData()
                     break;
                 }
             }
+
             if (a === 0) {
                 delete this.d[h].shares;
                 M.nodeAttr({ h: h, shares: undefined });
+
                 if (fminitialized) {
                     sharedUInode(h);
                 }
-                // XXX: Do not delete sharekeys for now...due some issue we've noticed
-                //     with missing keys...and let's see, what can go wrong doing this?
-                if (0) {
-                    delete u_sharekeys[h];
-                    if (typeof mDB === 'object') {
-                        mDBdel('ok', h);
-                    }
-                }
             }
+
             if (typeof mDB === 'object') {
                 mDBdel('s', h + '_' + u);
+            }
+        }
+
+        if (okd) {
+            // The node is no longer shared with anybody, ensure it's properly cleared..
+
+            var users = this.getNodeShareUsers(h, 'EXP');
+
+            if (users.length) {
+                console.error('The node "%s" still has shares on it!', h);
+
+                users.forEach(function(user) {
+                    M.delNodeShare(h, user);
+                });
+            }
+
+            delete u_sharekeys[h];
+            if (typeof mDB === 'object') {
+                mDBdel('ok', h);
             }
         }
     };
@@ -5482,7 +5496,7 @@ function execsc(actionPackets, callback) {
             }
 
             // Full share
-            else if (actionPacket.a === 's') {
+            else if (actionPacket.a === 's' || actionPacket.a === 's2') {
 
                 // Used during share dialog removal of contact from share list
                 // Find out is this a full share delete
@@ -5498,8 +5512,18 @@ function execsc(actionPackets, callback) {
                     }
                 }
 
-                // Full share contains .h param
-                sharedUInode(actionPacket.h);
+                if (actionPacket.okd) {
+                    M.delNodeShare(actionPacket.n, actionPacket.u, actionPacket.okd);
+                }
+
+                if (actionPacket.a === 's2') {
+                    processPS([actionPacket]);
+                }
+
+                if (fminitialized) {
+                    // Full share contains .h param
+                    sharedUInode(actionPacket.h);
+                }
             }
 
             // Outgoing pending contact
@@ -5517,11 +5541,6 @@ function execsc(actionPackets, callback) {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
                 notify.notifyFromActionPacket(actionPacket);
-            }
-
-            // Pending shares
-            else if (actionPacket.a === 's2') {
-                processPS([actionPacket]);
             }
 
             // Export link (public handle)
@@ -5592,7 +5611,7 @@ function execsc(actionPackets, callback) {
                 }
                 // If access right are undefined then share is deleted
                 else if (typeof actionPacket.r === "undefined") {
-                    M.delNodeShare(actionPacket.n, actionPacket.u);
+                    M.delNodeShare(actionPacket.n, actionPacket.u, actionPacket.okd);
                 }
                 else {
                     var handle = actionPacket.n;

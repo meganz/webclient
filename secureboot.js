@@ -277,9 +277,9 @@ if (!b_u) try
 
     var contenterror = 0;
     var nocontentcheck = false;
-    
+
     if (!is_extension && (window.dd || location.host !== 'mega.nz')) {
-        
+
         nocontentcheck = true;
         var devhost = window.location.host;
         // handle subdirs
@@ -1198,7 +1198,13 @@ else if (!b_u)
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                return siteLoadError(dump.m, url);
+                if (url || ln !== 1) {
+                    siteLoadError(dump.m, url + ':' + ln);
+                }
+                else {
+                    console.error(dump.m, arguments);
+                }
+                return;
             }
 
             if (~dump.m.indexOf('took +10s'))

@@ -361,6 +361,7 @@ var ConversationAudioVideoPanel = React.createClass({
                 else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({fullScreenModeEnabled: true});
                 }
+                self.forceUpdate();
             });
 
         var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
@@ -798,6 +799,7 @@ var ConversationPanel = React.createClass({
                 else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({isFullscreenModeEnabled: true});
                 }
+                self.forceUpdate();
             });
 
         if (doResize !== false) {
@@ -1523,6 +1525,7 @@ var ConversationPanel = React.createClass({
                         chatRoom={this.props.chatRoom}
                         contacts={self.props.contacts}
                         megaChat={this.props.chatRoom.megaChat}
+                        unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
                         onMessagesToggle={function(isActive) {
                             self.setState({
                                 'messagesToggledInCall': isActive

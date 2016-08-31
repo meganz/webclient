@@ -277,9 +277,9 @@ if (!b_u) try
 
     var contenterror = 0;
     var nocontentcheck = false;
-    
+
     if (!is_extension && (window.dd || location.host !== 'mega.nz')) {
-        
+
         nocontentcheck = true;
         var devhost = window.location.host;
         // handle subdirs
@@ -1198,7 +1198,13 @@ else if (!b_u)
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                return siteLoadError(dump.m, url);
+                if (url || ln !== 1) {
+                    siteLoadError(dump.m, url + ':' + ln);
+                }
+                else {
+                    console.error(dump.m, arguments);
+                }
+                return;
             }
 
             if (~dump.m.indexOf('took +10s'))
@@ -1607,6 +1613,7 @@ else if (!b_u)
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
@@ -1689,7 +1696,18 @@ else if (!b_u)
         'dev': {f:'html/dev.html', n: 'dev', j:0},
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
+        'gallery': { f: 'html/gallery.tpl', n: 'gallery', j: 0},
+        'help_goback': {f:'html/help2_goback.tpl', n: 'help_goback', j:0},
+        'help_sidebar_tags': {f:'html/help2_sidebar_tags.tpl', n: 'help_sidebar_tags', j:0},
+        'help_section': {f:'html/help2_sections.tpl', n: 'help_section', j:0},
+        'help_welcome': {f:'html/help2_welcome.tpl', n: 'help_welcome', j:0},
+        'help_header': {f:'html/help2_header.tpl', n: 'help_header', j:0},
+        'help_clients': {f:'html/help2_clients.tpl', n: 'help_clients', j:0},
+        'help_listing': {f:'html/help2_listing.tpl', n: 'help_listing', j:0},
+        'help_search': {f:'html/help2_search.tpl', n: 'help_search', j:0},
+        'help_client_index': {f:'html/help2_client_index.tpl', n: 'help_client_index', j:0},
+        'lunr_js': {f:'js/vendor/elasticlunr.js', n: 'lunr_js', j:1},
+        'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
@@ -1739,7 +1757,12 @@ else if (!b_u)
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
-        'help': ['help_js'],
+        'help': [
+            'help_section', 'help_welcome', 'help_header',
+            'help_clients', 'help_listing', 'help_client_index', 'help_search',
+            'help_goback', 'help_sidebar_tags', 'gallery',
+            'lunr_js', 'help_js'
+        ],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['chrome', 'chrome_js', 'firefox', 'firefox_js'],

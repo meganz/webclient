@@ -900,6 +900,11 @@ function acc_time2date(unixtime, yearIsOptional) {
     return result;
 }
 
+function humandate(unixtime) {
+    var date = new Date(unixtime * 1000);
+    return date.getDate() + ' ' + date_months[date.getMonth()] +  ' ' + date.getFullYear();
+}
+
 function time2last(timestamp) {
     var sec = (new Date().getTime() / 1000) - timestamp;
     if (sec < 4) {
@@ -5123,6 +5128,49 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     }
 };
+
+
+/**
+ *  strip_tags — Strip HTML tags from a string
+ *
+ *  @param {String} html    HTML code
+ *  @returns {String}   The text without any HTML markups
+ */
+function strip_tags(html) {
+    return $('<div>').safeHTML(html).text();
+}
+
+/**
+ * Returns the current language in which the current user
+ * runs MEGA
+ *
+ * @returns {String}  Two letters language code
+ */
+function getCurrentLanguage() {
+    return $('body').attr('class').split(/\s+/).filter(function(klass) {
+        return klass.length === 2;
+    })[0];
+}
+
+$.fn.rotate = function AnimateRotate(finalAngle, initialAngle, time) {
+    return this.each(function() {
+        var $this = $(this);
+
+        // we use a pseudo object for the animation
+        $({deg: initialAngle || 0}).animate({deg: finalAngle}, {
+            duration: time || 1000,
+            step: function(now) {
+                // in the step-callback (that is fired each step of the animation),
+                // you can use the `now` paramter which contains the current
+                // animation-position (`initalAngle` up to `finalAngle`)
+                $this.css({
+                    transform: 'rotate(' + now + 'deg)'
+                });
+            }
+        });
+    });
+};
+
 
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
 

@@ -1782,8 +1782,8 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
 };
 
 Chat.prototype.updateDashboard = function() {
-    if (window.location.hash === "#fm/dashboard") {
-        M.openFolder("dashboard", true);
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updchat', dashboardUI.updateChatWidget);
     }
 };
 

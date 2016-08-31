@@ -3231,102 +3231,112 @@ function dashboardUI() {
         $('.account.progress-size.uploads').text('0 MB');
         /* End of Used Bandwidth progressbar */
 
-
-        /* Contacts block */
-        var contacts = M.getActiveContacts();
-        if (!contacts.length) {
-            $('.account.widget.text.contacts').removeClass('hidden');
-            $('.account.data-table.contacts').addClass('hidden');
-        }
-        else {
-            var recent = 0;
-            var now = unixtime();
-            contacts.forEach(function(handle) {
-                var user = M.getUserByHandle(handle);
-
-                if ((now - user.ts) < (7 * 86400)) {
-                    recent++;
-                }
-            });
-            $('.account.widget.text.contacts').addClass('hidden');
-            $('.account.data-table.contacts').removeClass('hidden');
-            $('.data-right-td.all-contacts span').text(contacts.length);
-            $('.data-right-td.new-contacts span').text(recent);
-            $('.data-right-td.waiting-approval span').text(Object.keys(M.ipc || {}).length);
-            $('.data-right-td.sent-requests span').text(Object.keys(M.opc || {}).length);
-        }
-        /* End of Contacts block */
-
-
-        /* TODO: Chat block */
-        var allChats = 0;
-        var privateChats = 0;
-        var groupChats = 0;
-        var unreadMessages = $('.nw-fm-left-icon.conversations > .new-messages-indicator:visible').text();
-        unreadMessages = unreadMessages ? unreadMessages : 0;
-
-        if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
-            megaChat.chats.forEach(function(chatRoom) {
-                if (chatRoom.type === "group") {
-                    groupChats++;
-                }
-                else {
-                    privateChats++;
-                }
-                allChats++;
-            });
-        }
-        if (allChats === 0) {
-            $('.account.widget.text.chat').removeClass('hidden');
-            $('.account.data-table.chat').addClass('hidden');
-        }
-        else {
-            $('.account.widget.text.chat').addClass('hidden');
-            $('.account.data-table.chat').removeClass('hidden');
-            $('.data-right-td.all-chats span').text(allChats);
-            $('.data-right-td.group-chats span').text(groupChats);
-            $('.data-right-td.private-chats span').text(privateChats);
-            $('.data-right-td.unread-messages-data span').text(
-                unreadMessages
-            );
-        }
-        $('.chat-widget .account.data-item, .chat-widget .account.widget.title').rebind('click.chatlink', function() {
-            window.location = '#fm/chat';
-        });
-        $('.chat-widget .add-contacts').rebind('click.chatlink', function() {
-            window.location = '#fm/chat';
-            Soon(function() {
-                $('.conversations .small-icon.white-medium-plus').parent().trigger('click')
-            });
-        });
-        /* End of Chat block */
-
-        // Cloud data block
-        var file1 = 835;
-        var files = 833;
-        var folder1 = 834;
-        var folders = 832;
-        var data = M.getDashboardData();
-        var locale = [files, folders, files, folders, folders, files, files];
-        var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'favs'];
-        $('.data-float-bl').find('.data-item')
-            .each(function(idx, elm) {
-                var props = data[map[idx]];
-                var str = l[locale[idx]];
-
-                if (props.cnt === 1) {
-                    str = l[(locale[idx] === files) ? file1 : folder1];
-                }
-
-                elm.children[1].textContent = String(str).replace('[X]', props.cnt)
-                elm.children[2].textContent = bytesToSize(props.size);
-            });
-
+        // Fill rest of widgets
+        dashboardUI.updateWidgets();
 
         initTreeScroll();
         initDashboardScroll();
     });
 }
+dashboardUI.updateWidgets = function(widget) {
+    /* Contacts block */
+    dashboardUI.updateContactsWidget();
+
+    /* Chat block */
+    dashboardUI.updateChatWidget();
+
+    // Cloud data block
+    dashboardUI.updateCloudDataWidget();
+};
+dashboardUI.updateContactsWidget = function() {
+    var contacts = M.getActiveContacts();
+    if (!contacts.length) {
+        $('.account.widget.text.contacts').removeClass('hidden');
+        $('.account.data-table.contacts').addClass('hidden');
+    }
+    else {
+        var recent = 0;
+        var now = unixtime();
+        contacts.forEach(function(handle) {
+            var user = M.getUserByHandle(handle);
+
+            if ((now - user.ts) < (7 * 86400)) {
+                recent++;
+            }
+        });
+        $('.account.widget.text.contacts').addClass('hidden');
+        $('.account.data-table.contacts').removeClass('hidden');
+        $('.data-right-td.all-contacts span').text(contacts.length);
+        $('.data-right-td.new-contacts span').text(recent);
+        $('.data-right-td.waiting-approval span').text(Object.keys(M.ipc || {}).length);
+        $('.data-right-td.sent-requests span').text(Object.keys(M.opc || {}).length);
+    }
+};
+dashboardUI.updateChatWidget = function() {
+    var allChats = 0;
+    var privateChats = 0;
+    var groupChats = 0;
+    var unreadMessages = $('.nw-fm-left-icon.conversations > .new-messages-indicator:visible').text();
+
+    if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
+        megaChat.chats.forEach(function(chatRoom) {
+            if (chatRoom.type === "group") {
+                groupChats++;
+            }
+            else {
+                privateChats++;
+            }
+            allChats++;
+        });
+    }
+    if (allChats === 0) {
+        $('.account.widget.text.chat').removeClass('hidden');
+        $('.account.data-table.chat').addClass('hidden');
+    }
+    else {
+        $('.account.widget.text.chat').addClass('hidden');
+        $('.account.data-table.chat').removeClass('hidden');
+        $('.data-right-td.all-chats span').text(allChats);
+        $('.data-right-td.group-chats span').text(groupChats);
+        $('.data-right-td.private-chats span').text(privateChats);
+        $('.data-right-td.unread-messages-data span').text(unreadMessages | 0);
+    }
+    $('.chat-widget .account.data-item, .chat-widget .account.widget.title')
+        .rebind('click.chatlink', function() {
+            window.location = '#fm/chat';
+        });
+    $('.chat-widget .add-contacts').rebind('click.chatlink', function() {
+        window.location = '#fm/chat';
+        Soon(function() {
+            $('.conversations .small-icon.white-medium-plus').parent().trigger('click');
+        });
+    });
+};
+dashboardUI.updateCloudDataWidget = function() {
+    var file1 = 835;
+    var files = 833;
+    var folder1 = 834;
+    var folders = 832;
+    var data = M.getDashboardData();
+    var locale = [files, folders, files, folders, folders, files, files];
+    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'favs'];
+
+    $('.data-float-bl').find('.data-item')
+        .each(function(idx, elm) {
+            var props = data[map[idx]];
+            var str = l[locale[idx]];
+
+            if (props.cnt === 1) {
+                str = l[(locale[idx] === files) ? file1 : folder1];
+            }
+
+            elm.children[1].textContent = String(str).replace('[X]', props.cnt)
+            elm.children[2].textContent = bytesToSize(props.size);
+        });
+};
+dashboardUI.prototype = undefined;
+Object.freeze(dashboardUI);
+
 
 function accountUI() {
 

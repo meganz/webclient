@@ -5567,6 +5567,10 @@ function renderNew() {
         topmenuUI();
     }
 
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:upd', dashboardUI, 2000);
+    }
+
     newnodes = undefined;
     if (d) {
         console.timeEnd('rendernew');
@@ -7183,6 +7187,10 @@ function process_u(u) {
             // Update user attributes M.u
             M.addUser(u[i]);
         }
+    }
+
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updcontacts', dashboardUI.updateContactsWidget);
     }
 }
 

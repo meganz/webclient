@@ -3259,16 +3259,36 @@ function dashboardUI() {
 
 
         /* TODO: Chat block */
-        var chat = false;
-        if (!chat) {
+        var allChats = 0;
+        var privateChats = 0;
+        var groupChats = 0;
+        var unreadMessages = $('.nw-fm-left-icon.conversations > .new-messages-indicator:visible').text();
+        unreadMessages = unreadMessages ? unreadMessages : 0;
+
+        if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
+            megaChat.chats.forEach(function(chatRoom) {
+                if (chatRoom.type === "group") {
+                    groupChats++;
+                }
+                else {
+                    privateChats++;
+                }
+                allChats++;
+            });
+        }
+        if (allChats === 0) {
             $('.account.widget.text.chat').removeClass('hidden');
             $('.account.data-table.chat').addClass('hidden');
         }
         else {
             $('.account.widget.text.chat').addClass('hidden');
             $('.account.data-table.chat').removeClass('hidden');
-            $('.data-right-td.new-chat span').text('0');
-            $('.data-right-td.new-messages span').text('0');
+            $('.data-right-td.all-chats span').text(allChats);
+            $('.data-right-td.group-chats span').text(groupChats);
+            $('.data-right-td.private-chats span').text(privateChats);
+            $('.data-right-td.unread-messages-data span').text(
+                unreadMessages
+            );
         }
         $('.chat-widget .account.data-item, .chat-widget .account.widget.title').rebind('click.chatlink', function() {
             window.location = '#fm/chat';

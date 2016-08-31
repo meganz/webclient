@@ -3259,16 +3259,36 @@ function dashboardUI() {
 
 
         /* TODO: Chat block */
-        var chat = false;
-        if (!chat) {
+        var allChats = 0;
+        var privateChats = 0;
+        var groupChats = 0;
+        var unreadMessages = $('.nw-fm-left-icon.conversations > .new-messages-indicator:visible').text();
+        unreadMessages = unreadMessages ? unreadMessages : 0;
+
+        if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
+            megaChat.chats.forEach(function(chatRoom) {
+                if (chatRoom.type === "group") {
+                    groupChats++;
+                }
+                else {
+                    privateChats++;
+                }
+                allChats++;
+            });
+        }
+        if (allChats === 0) {
             $('.account.widget.text.chat').removeClass('hidden');
             $('.account.data-table.chat').addClass('hidden');
         }
         else {
             $('.account.widget.text.chat').addClass('hidden');
             $('.account.data-table.chat').removeClass('hidden');
-            $('.data-right-td.new-chat span').text('0');
-            $('.data-right-td.new-messages span').text('0');
+            $('.data-right-td.all-chats span').text(allChats);
+            $('.data-right-td.group-chats span').text(groupChats);
+            $('.data-right-td.private-chats span').text(privateChats);
+            $('.data-right-td.unread-messages-data span').text(
+                unreadMessages
+            );
         }
         /* End of Contacts block */
 
@@ -10841,7 +10861,7 @@ function inviteFriendDialog(close) {
     maf = maf[ach.ACH_INVITE];
 
     var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend that installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
-    $('.header', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+    $('.header.default', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
     if (!$('.achivement-dialog.input').tokenInput("getSettings")) {
         initInviteDialogMultiInputPlugin();
@@ -10878,8 +10898,8 @@ function initInviteDialogMultiInputPlugin() {
 
     // Init textarea logic
     var $dialog = $('.fm-dialog.invite-dialog');
-    var $this  = $('.achivement-dialog.input');
-    var $inputWrapper  = $('.achivement-dialog.input-field');
+    var $this  = $('.achivement-dialog.input-field.emails input');
+    var $inputWrapper  = $('.achivement-dialog.input-field.emails');
     var $sendButton = $dialog.find('.default-grey-button.send');
     var contacts = getContactsEMails();
 
@@ -10907,17 +10927,17 @@ function initInviteDialogMultiInputPlugin() {
         enableHTML: true,
         onEmailCheck: function() {
             $('.achivement-dialog.input-info').addClass('red').text(l[7415]);
-            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            $('.achivement-dialog.input-field.emails').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onDoublet: function(u) {
             $('.achivement-dialog.input-info').addClass('red').text(l[7413]);
-            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            $('.achivement-dialog.input-field.emails').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onHolder: function() {
             $('.achivement-dialog.input-info').addClass('red').text(l[7414]);
-            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            $('.achivement-dialog.input-field.emails').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onReady: function() {// Called once on dialog initialization
@@ -10925,7 +10945,7 @@ function initInviteDialogMultiInputPlugin() {
 
             $input.rebind('keyup click', function() {
                 var value = $.trim($input.val());
-                var $wrapper = $('.achivement-dialog.input-field');
+                var $wrapper = $('.achivement-dialog.input-field.emails');
                 if ($wrapper.find('.share-added-contact').length > 0 || checkMail(value) === false) {
                     $wrapper.find('li input').eq(0).removeClass('red');
                     $('.achivement-dialog.input-info').removeClass('red').text(l[9093]);
@@ -11003,7 +11023,7 @@ function initInviteDialogMultiInputPlugin() {
                 .removeClass('red')
                 .text(l[9093]);
 
-            $('.achivement-dialog.input-field').find('li input').eq(0).removeClass('red');
+            $('.achivement-dialog.input-field.emails').find('li input').eq(0).removeClass('red');
         }, timeOut);
     }
 

@@ -600,6 +600,9 @@
 .ach-share-folder .huge-icon.achivement {
     background-position: -152px -294px;
 }
+.green-tick .huge-icon.achivement {
+    background-position: -2px -444px;
+}
 .semi-big-icon.cloud {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -9px -11164px;

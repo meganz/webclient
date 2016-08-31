@@ -77,7 +77,7 @@ function mainScroll() {
         verticalDragMinHeight: 150,
         enableKeyboardNavigation: true
     });
-    $('.main-scroll-block').unbind('jsp-scroll-y');
+    $('.main-scroll-block').unbind('jsp-scroll-y.menu');
     jScrollFade('.main-scroll-block');
     if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
         scrollMenu();
@@ -100,6 +100,7 @@ function scrollMenu() {
         }
     });
 }
+
 
 function init_page() {
 
@@ -600,6 +601,7 @@ function init_page() {
         }
     }
     else if (page.substr(0, 4) == 'help') {
+        return Help.render();
         function doRenderHelp() {
             if (window.helpTemplate) {
                 parsepage(window.helpTemplate);

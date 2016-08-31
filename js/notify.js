@@ -298,10 +298,10 @@ var notify = {
             notify.$popup.removeClass('hidden');
             notify.$popupIcon.addClass('active');
             topPopupAlign(notify.$popupIcon, notify.$popup);
-        });
 
-        // Render and show notifications currently in list
-        notify.renderNotifications();
+            // Render and show notifications currently in list
+            notify.renderNotifications();
+        });
     },
 
     /**

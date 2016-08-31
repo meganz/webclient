@@ -2863,47 +2863,91 @@
     </div>
 </div>
 
+<!-- Please add "success" class !-->
 <div class="fm-dialog invite-dialog hidden">
     <div class="fm-dialog-close"></div>
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">Invite a friend to MEGA</div>
     </div>
     <div class="fm-dialog-body achivement-dialog centered-content">
-        <div class="achivement-dialog top-icon ach-invite-friend">
-            <i class="huge-icon achivement"></i>
-        </div>
-        <div class="achivement-dialog header">
-            <!-- do NOT translate this, it's on the JS side -->
-            Get <span>X GB</span>  free storage and <span>X GB</span> of transfer quota for each friend that installs a MEGA app
-        </div>
-        <div class="achivement-dialog green-header">
-            How it works
-        </div>
-        <div class="achivement-dialog info-block">
-            <div class="achivement-dialog info-icon">
-                <i class="huge-white-icon achivement ach-create-account"></i>
+        <div class="achivement-dialog default-content">
+            <div class="achivement-dialog top-icon ach-invite-friend">
+                <i class="huge-icon achivement"></i>
             </div>
-            <div class="achivement-dialog info-body">
-                <p>
-                    Your friend needs to register for a free account on MEGA and <strong>install at least one MEGA client application</strong> (either the sync client or one of our mobile apps)
-                </p>
-                <p class="italic">
-                    You can notify your friend through any method. You will earn the quota if you have entered your friend's email here prior to them registering with that address.
-                </p>
+            <div class="achivement-dialog header default">
+                <!-- do NOT translate this, it's on the JS side -->
+                Get <span>X GB</span>  free storage and <span>X GB</span> of transfer quota for each friend that installs a MEGA app
+            </div>
+            <div class="achivement-dialog green-header">
+                How it works
+            </div>
+            <div class="achivement-dialog info-block">
+                <div class="achivement-dialog info-icon">
+                    <i class="huge-white-icon achivement ach-create-account"></i>
+                </div>
+                <div class="achivement-dialog info-body">
+                    <p>
+                        Your friend needs to register for a free account on MEGA and <strong>install at least one MEGA client application</strong> (either the sync client or one of our mobile apps)
+                    </p>
+                    <p class="italic">
+                        You can notify your friend through any method. You will earn the quota if you have entered your friend's email here prior to them registering with that address.
+                    </p>
+                </div>
+            </div>
+            <div class="achivement-dialog input-header">
+                Insert your friend's email(s):
+            </div>
+            <div class="achivement-dialog input-field multiple-input emails">
+                <input type="text" class="achivement-dialog input" name="" id="ach-invite-dialog-input" />
+                <div class="clear"></div>
+            </div>
+            <div class="achivement-dialog input-info">
+                [$9093]
             </div>
         </div>
-        <div class="achivement-dialog input-header">
-            Insert your friend's email(s):
+        <div class="achivement-dialog success-content">
+            <div class="achivement-dialog top-icon green-tick">
+                <i class="huge-icon achivement"></i>
+            </div>
+            <div class="achivement-dialog header">
+                Thanks! We have sent that user an invitation email.
+            </div>
+            <div class="achivement-dialog green-header">
+                You can now:
+            </div>
+            <div class="achivement-dialog info-block">
+                <div class="achivement-dialog info-body">
+                    <p>
+                        Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive you <span class="red">free <span>XXGB</span> of transfer quota</span>.
+                    </p>
+                    <div class="achivement-dialog links-block">
+                        <div class="achivement-dialog input-label">
+                            Direct URL to MEGAsync:
+                        </div>
+                        <div class="achivement-dialog input-label">
+                            Direct URL to our mobile apps:
+                        </div>
+                    </div>
+                    <div class="achivement-dialog links-block inputs">
+                        <div class="achivement-dialog input-field">
+                            <input type="text" class="achivement-dialog input" value="https://mega.nz/#sync">
+                        </div>
+                        <div class="achivement-dialog input-field">
+                            <input type="text" class="achivement-dialog input" value="https://mega.nz/#mobile">
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="achivement-dialog success-info">
+                You can always see your pending invitations on section > subsection
+            </div>
         </div>
-        <div class="achivement-dialog input-field multiple-input">
-            <input type="text" class="achivement-dialog input" name="" id="ach-invite-dialog-input" />
-            <div class="clear"></div>
-        </div>
-        <div class="achivement-dialog input-info">
-            [$9093]
+        <div class="button default-grey-button inline back">
+            [$822]
         </div>
         <div class="button default-grey-button inline disabled send">
-            Send
+            [$1940]
         </div>
         <div class="button default-white-button inline status hidden">
             Invitation Status

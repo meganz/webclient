@@ -221,6 +221,9 @@
     line-height: 30px;
     color: #666666;
     padding: 0;
+    height: 60px;
+    display: table-cell;
+    width: 544px;
 }
 .achivement-dialog.header span {
     color: #FF333A;
@@ -456,6 +459,9 @@
     font-style: italic;
     color: #999999;
 }
+.achivement-dialog.info-body p .red {
+    color: #FF333A;
+}
 .achivement-dialog.input-header {
     font-size: 16px;
     line-height: 20px;
@@ -497,7 +503,7 @@
     cursor: default;
     font-size: 14px;
     color: #333333;
-    padding: 5px 0 0 4px;
+    padding: 6px 0 0 4px;
     display: inline-block;
     white-space: nowrap;
     position: relative;
@@ -529,18 +535,60 @@
 .achivement-dialog.input-info.red, .achivement-dialog.input-field input.red {
     color: #E54C51;
 }
-.achivement-dialog.input-info {
+.achivement-dialog.input-info, .achivement-dialog.success-info {
     font-size: 12px;
     line-height: 15px;
     color: #999999;
     padding: 12px 0 15px 0;
 }
+.achivement-dialog.success-info {
+    padding: 23px 0 26px 0;
+}
+.achivement-dialog.success-content, .success .achivement-dialog.default-content, .invite-dialog .default-grey-button.back, .invite-dialog.success .default-grey-button.send {
+    display: none;
+}
+.success .achivement-dialog.success-content {
+    display: block;
+}
+.invite-dialog.success .default-grey-button.back {
+    display: inline-block;
+}
 .achivement-dialog .default-white-button.hidden {
     display: none;
 }
+.achivement-dialog.links-block {
+    float: left;
+    width: 50%;
+    padding: 14px 12px 2px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.achivement-dialog.links-block.inputs {
+    float: left;
+    width: 50%;
+    padding: 14px 0 2px 12px;
+}
+.achivement-dialog.links-block input {
+    width: 100%;
+    margin-top: 6px;
+}
+.achivement-dialog.links-block .input-field {
+    margin: 16px 0;
+    padding: 0 14px 0 14px;
+}
+.achivement-dialog.links-block .input-label {
+    margin: 16px 0;
+    height: 32px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: right;
+    color: #333333;
+    font-family: 'source_sans_prosemibold', Arial;
+}
 /* End of Invite a friend dialog */
 
-/* Invite a friend dialog */
+/* Invitation status dialog */
 .fm-dialog.invitation-dialog {
     width: 724px;
     margin: -303px 0 0 -362px;
@@ -689,4 +737,4 @@
 .invitation-dialog.table-cell .small-square-button span {
     margin-right: 30px;
 }
-/* End of Invite a friend dialog */
+/* End of Invitation status dialog */

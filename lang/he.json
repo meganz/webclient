@@ -3593,6 +3593,9 @@
     "9077": "\u05de\u05e4\u05d5\u05e2\u05e0\u05d7",
     "9078": "\u05de\u05e6\u05e4\u05d9\u05df",
     "9079": "Encrypted",
+    "9080": "Rename Group",
+    "9081": "Changed group chat name to %s",
+    "9082": "This account has not completed the registration process yet. First check your email, click on the Activate Account button and reconfirm your chosen password.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3761,6 +3764,9 @@
         "decrypted": 9077,
         "encrypting": 9078,
         "general": 1712,
-        "encrypted": 9079
+        "encrypted": 9079,
+        "rename-chat": 9080,
+        "rename-chat-message": 9081,
+        "message-incomplete-registration": 9082
     }
 }

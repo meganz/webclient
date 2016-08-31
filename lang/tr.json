@@ -3592,7 +3592,10 @@
     "9076": "Link de\u015fifrelenemiyor. Parolan\u0131z yanl\u0131\u015f olabilir, veya veri de\u011fi\u015ftirilmi\u015f veya bozulmu\u015f olabilir. L\u00fctfen linki kontrol edin ve parolay\u0131 tekrar girin.",
     "9077": "De\u015fifrelendi",
     "9078": "\u015eifreleniyor",
-    "9079": "Encrypted",
+    "9079": "\u015eifrelendi",
+    "9080": "Grubun \u0130smini De\u011fi\u015ftir",
+    "9081": "Grup ad\u0131n\u0131 %s olarak de\u011fi\u015ftirdi",
+    "9082": "This account has not completed the registration process yet. First check your email, click on the Activate Account button and reconfirm your chosen password.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3761,6 +3764,9 @@
         "decrypted": 9077,
         "encrypting": 9078,
         "general": 1712,
-        "encrypted": 9079
+        "encrypted": 9079,
+        "rename-chat": 9080,
+        "rename-chat-message": 9081,
+        "message-incomplete-registration": 9082
     }
 }

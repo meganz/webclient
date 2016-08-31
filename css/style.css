@@ -16836,6 +16836,9 @@ strong, b {
 .resellers-link.first:hover {
     margin: 22px 0 22px 0;
 }
+.resellers-link.single {
+    margin-left: 3px;
+}
 .resellers-logo {
     display: block;
     margin: 25px auto 29px auto;

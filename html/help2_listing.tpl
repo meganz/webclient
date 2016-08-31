@@ -110,7 +110,7 @@
                                 </div>
                                 <div class="feedback-suggestions-list">
                                     <div class="feedback-suggestions-title">
-                                        We’re sorry you didn’t find this helpful. What can we do to improve it?
+                                        We're sorry you didn't find this helpful. What can we do to improve it?
                                     </div>
                                     <ul>
                                         <li class="adv-search-selected checked">

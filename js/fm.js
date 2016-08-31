@@ -10869,11 +10869,14 @@ function inviteFriendDialog(close) {
     var maf = ach.prettify(M.account.maf);
     maf = maf[ach.ACH_INVITE];
 
-    var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend that installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
-    $('.header', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+    var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend who installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
+    $('.header.default', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
     if (!$('.achivement-dialog.input').tokenInput("getSettings")) {
         initInviteDialogMultiInputPlugin();
+
+        locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
+        $('.success-content .info-body p:first', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
     }
 
     // Remove all previously added emails

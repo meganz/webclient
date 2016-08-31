@@ -14386,5 +14386,93 @@
     "9082": {
         "text": "This account has not completed the registration process yet. First check your email, click on the Activate Account button and reconfirm your chosen password.",
         "context": "An error dialog message which is shown when the user tries to log in to their account they created, but they haven't clicked the confirmation link in their email yet."
+    },
+    "9083": {
+        "text": "Your purchase of a MEGA subscription has failed because you have already purchased this item.",
+        "context": "The message in a dialog which is displayed when a user has already purchased an item from the store."
+    },
+    "9084": {
+        "text": "Already purchased",
+        "context": "A title of the dialog which is displayed when a user has already purchased an item from the store."
+    },
+    "9085": {
+        "text": "Your purchase of a MEGA subscription has failed or has been cancelled. Please try again or contact Windows Store support.",
+        "context": "A message in a dialog which is displayed when a user tries to purchase an item from the store and the process failed."
+    },
+    "9086": {
+        "text": "Purchase failed or cancelled",
+        "context": "The title of a dialog which is displayed when a user tries to purchase an item from the store but the purchase failed."
+    },
+    "9087": {
+        "text": "Your MEGA subcription purchase has succeeded.",
+        "context": "A message in a dialog which is displayed when a user has successfully purchased an item from the store."
+    },
+    "9088": {
+        "text": "Purchase succeeded",
+        "context": "A title of a dialog which is displayed when a user has purchased an item from the store."
+    },
+    "9089": {
+        "text": "Your puchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
+        "context": "A message in a dialog which is displayed when validation of the in app purchase has failed at the MEGA License server."
+    },
+    "9090": {
+        "text": "Purchase validation failed",
+        "context": "A title of a dialog which is displayed when the validation of the in app purchase has failed at the MEGA licence server."
+    },
+    "9091": {
+        "text": "Validating...",
+        "context": "A progress indicator message when validating a purchase receipt."
+    },
+    "9092": {
+        "text": "In app purchase",
+        "context": "A label for any 'In app purchase' (IAP) button, link, text, title, etc."
+    },
+    "9093": {
+        "text": "You can add multiple people at once with e-mail addresses separated by commas",
+        "context": "Invite dialog default info text, below input box and above Send button."
+    },
+    "9094": {
+        "text": "Frequently Asked Questions",
+        "context": "A title for the commonly asked questions in the Help section of the site."
+    },
+    "9095": {
+        "text": "How can we help you today?",
+        "context": "A title for the main page of the Help section of the site. A casual question about how Mega can help the user"
+    },
+    "9096": {
+        "text": "Support Centre",
+        "context": "A button for going back to the Support Centre, the main page of the Help section of the site."
+    },
+    "9097": {
+        "text": "Articles",
+        "context": "A title for a list of help content articles."
+    },
+    "9098": {
+        "text": "We can't find what you are after",
+        "context": "A message which is displayed when the search query does not return any results"
+    },
+    "9099": {
+        "text": "Please try your search again or contact our support team directly",
+        "context": "A message which is displayed when the search query does not return any results."
+    },
+    "9100": {
+        "text": "Email Support",
+        "context": "A button to contact MEGA support via email."
+    },
+    "9101": {
+        "text": "If you can't find what you are looking for, please contact our support team for direct assistance.",
+        "context": "A message for the Get Support section informing the user to contact MEGA support if they can't find the help they need."
+    },
+    "9102": {
+        "text": "Go Back",
+        "context": "A button in the Help section to take the user back to a previous screen on the website."
+    },
+    "9103": {
+        "text": "Copy the link below to share the article.",
+        "context": "Body for dialog with a link to share an article of our help section"
+    },
+    "9104": {
+        "text": "Share the Article",
+        "context": "Title for dialog"
     }
 }

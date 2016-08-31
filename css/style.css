@@ -178,7 +178,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .image-scale-hack {
     transform: rotate( .0001deg );
 }
-.clear {
+#help2 .clear {
     clear: both;
     margin: 0px;
     padding: 0px;

@@ -1699,7 +1699,7 @@ function initAddDialogMultiInputPlugin() {
                     h2 = $multiInput.height();
 
                 // show/hide scroll box
-                if (5 <= h2 / h1 && h2 / h1 < 6) {
+                if ((5 <= h2 / h1) && (h2 / h1 < 6)) {
                     $multiInput.jScrollPane({
                         enableKeyboardNavigation: false,
                         showArrows: true,
@@ -3581,6 +3581,8 @@ function accountUI() {
             var storageCurrentValue = 0;
             var transferMaxValue = 0;
             var transferCurrentValue = 0;
+            var storageBaseQuota = 0;
+            var transferBaseQuota = 0;
 
             var ach = mega.achievem;
             var maf = ach.prettify(account.maf);
@@ -3675,13 +3677,34 @@ function accountUI() {
                 }
             }
 
-            storageMaxValue += maf.baseq;
-            storageCurrentValue += maf.baseq;
-            transferMaxValue += maf.baseq;
-            transferCurrentValue += maf.baseq;
+            // For free users only show base quota for storage and remove it for bandwidth.
+            // For pro users replace base quota by pro quota
+            if (u_attr.p) {
+                var $baseq = $('.achivements-block .data-block.storage .baseq');
+                storageBaseQuota = account.space;
+                $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
+                $('.progress-title', $baseq).text('PRO Quota');
 
-            var storageBaseQuota = Math.round(maf.baseq * 100 / storageMaxValue);
-            var transferBaseQuota = Math.round(maf.baseq * 100 / transferMaxValue);
+                transferBaseQuota = account.bw;
+                $baseq = $('.achivements-block .data-block.transfer .baseq');
+                $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
+                $('.progress-title', $baseq).text('PRO Quota');
+            }
+            else {
+                storageBaseQuota = maf.baseq;
+                $('.achivements-block .data-block.transfer .baseq').addClass('hidden');
+            }
+
+            storageMaxValue += storageBaseQuota;
+            storageCurrentValue += storageBaseQuota;
+            transferMaxValue += transferBaseQuota;
+            transferCurrentValue += transferBaseQuota;
+
+            storageMaxValue = Math.max(50 * (1024 * 1024 * 1024), storageMaxValue * 1.3);
+            transferMaxValue = Math.max(50 * (1024 * 1024 * 1024), transferMaxValue * 1.3);
+
+            storageBaseQuota = Math.round(storageBaseQuota * 100 / storageMaxValue);
+            transferBaseQuota = Math.round(transferBaseQuota * 100 / transferMaxValue);
 
             $('.account.data-block.storage .progress-block .red')
                 .css('width', storageBaseQuota + '%');
@@ -10820,9 +10843,22 @@ function inviteFriendDialog(close) {
     var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend that installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
     $('.header', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
+    if (!$('.achivement-dialog.input').tokenInput("getSettings")) {
+        initInviteDialogMultiInputPlugin();
+    }
+
+    // Remove all previously added emails
+    $('.invite-dialog .share-added-contact.token-input-token-invite').remove();
+
     // Show dialog
     fm_showoverlay();
     $dialog.removeClass('hidden');
+
+    // Remove unfinished user inputs
+    $('#token-input-ach-invite-dialog-input', $dialog).val('');
+
+    // Set focus on input so user can type asap
+    $('.token-input-list-invite', $dialog).click();
 
     // Show "Invitation Status" button if invitations were sent before
     if (maf.rwd) {
@@ -10836,15 +10872,20 @@ function inviteFriendDialog(close) {
     else {
         $('.default-white-button.inline.status', $dialog).addClass('hidden');
     }
+}
+
+function initInviteDialogMultiInputPlugin() {
 
     // Init textarea logic
+    var $dialog = $('.fm-dialog.invite-dialog');
     var $this  = $('.achivement-dialog.input');
     var $inputWrapper  = $('.achivement-dialog.input-field');
     var $sendButton = $dialog.find('.default-grey-button.send');
     var contacts = getContactsEMails();
+
     $this.tokenInput(contacts, {
         theme: "invite",
-        hintText: '',
+        hintText: l[5908],
         searchingText: "",
         noResultsText: "",
         addAvatar: false,
@@ -10855,51 +10896,153 @@ function inviteFriendDialog(close) {
         tokenValue: "id",
         propertyToSearch: "name",
         resultsLimit: 5,
-        minChars: 1,
+        // Prevent showing of drop down list with contacts email addresses
+        // Max allowed email address is 254 chars
+        minChars: 255,
         visibleComma: true,
-        accountHolder: '',
+        accountHolder: (M.u[u_handle] || {}).m || '',
+        scrolLocation: 'invite',
+        excludeCurrent: false,
+        visibleComma: true,
+        enableHTML: true,
         onEmailCheck: function() {
             $('.achivement-dialog.input-info').addClass('red').text(l[7415]);
             $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            resetInfoText();
         },
         onDoublet: function(u) {
             $('.achivement-dialog.input-info').addClass('red').text(l[7413]);
             $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            resetInfoText();
         },
         onHolder: function() {
             $('.achivement-dialog.input-info').addClass('red').text(l[7414]);
             $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            resetInfoText();
         },
-        onReady: function() {
-            var $input = $('.achivement-dialog.input-field').find('li input').eq(0);
+        onReady: function() {// Called once on dialog initialization
+            var $input = $this.find('li input').eq(0);
+
             $input.rebind('keyup click', function() {
                 var value = $.trim($input.val());
                 var $wrapper = $('.achivement-dialog.input-field');
                 if ($wrapper.find('.share-added-contact').length > 0 || checkMail(value) === false) {
                     $wrapper.find('li input').eq(0).removeClass('red');
-                    $('.achivement-dialog.input-info').removeClass('red').text('Enter multiple email addresses separated by commas');
+                    $('.achivement-dialog.input-info').removeClass('red').text(l[9093]);
                     $('.invite-dialog .default-grey-button.send').removeClass('disabled');
                 } else {
                     $('.invite-dialog .default-grey-button.send').addClass('disabled');
                 }
                 // TODO: scroll more then 64px of .input-field block
             });
-            $('.achivement-dialog.input-info').text('Enter multiple email addresses separated by commas');
+            resetInfoText(0);
         },
         onAdd: function() {
-            // TODO:
+            var $inviteDialog = $('.invite-dialog');
+
+            $('.invite-dialog .default-grey-button.send').removeClass('disabled');
+
+            var $inputTokens = $inviteDialog.find('.share-added-contact.token-input-token-invite');
+            var itemNum = $inputTokens.length;
+            var $multiInput = $inviteDialog.find('.achivement-dialog.input-field.multiple-input');
+            var h1 = $inputTokens.outerHeight(true);// margin included
+            var h2 = $multiInput.height();
+
+            // show scroll box when we have more then 2 rows
+            if ((2 <= h2 / h1) && (h2 / h1 < 3)) {
+                $multiInput.jScrollPane({
+                    enableKeyboardNavigation: false,
+                    showArrows: true,
+                    arrowSize: 8,
+                    animateScroll: true
+                });
+            }
+
+            resetInfoText(0);
         },
-        onDelete: function() {
-            var itemNum;
+        onDelete: function(item) {
+            var $inviteDialog = $('.invite-dialog');
+            var $inputTokens = $inviteDialog.find('.share-added-contact.token-input-token-invite');
+            var itemNum = $inputTokens.length;
+            var $multiInput = $inviteDialog.find('.achivement-dialog.input-field.multiple-input');
+            var $scrollBox = $('.achivement-dialog.input-field.multiple-input .jspPane')[0];
+            var h1 = $inputTokens.outerHeight(true);// margin included
+            var h2 = 0;
+
             // Get number of emails
-            itemNum = $('.achivement-dialog.input-field').find('.share-added-contact').length;
             if (itemNum === 0) {
                 $('.invite-dialog .default-grey-button.send').addClass('disabled');
             }
             else {
                 $('.invite-dialog .default-grey-button.send').removeClass('disabled');
+
+                // Calculate complete scroll box height
+                if ($scrollBox) {
+                    h2 = $scrollBox.scrollHeight;
+                }
+                else { // Just multi input height
+                    h2 = $multiInput.height();
+                }
+
+                // Remove scroll when we have less then 3 rows
+                if (h2 / h1 < 3) {
+                    clearScrollPanel('.invite-dialog');
+                }
             }
         }
+    });
+
+    // Rest input info text and color
+    function resetInfoText(timeOut) {
+
+        timeOut = timeOut || 3000;
+
+        setTimeout(function() {
+            // Rest input info text and color
+            $('.achivement-dialog.input-info')
+                .removeClass('red')
+                .text(l[9093]);
+
+            $('.achivement-dialog.input-field').find('li input').eq(0).removeClass('red');
+        }, timeOut);
+    }
+
+    // Invite dialog send button click event handler
+    $('.invite-dialog .button.send').rebind('click', function() {
+
+        // Text message
+        var emailText = l[5878];
+
+        // List of email address planned for addition
+        var $mails = $('.token-input-list-invite .token-input-token-invite');
+        var mailNum = $mails.length;
+
+        if (mailNum) {
+
+            // Loop through new email list
+            $mails.each(function(index, value) {
+
+                // Extract email addresses one by one
+                var email = $(value).text().replace(',', '');
+
+                M.inviteContact(M.u[u_handle].m, email, emailText);
+            });
+
+            // Singular or plural
+            if (mailNum === 1) {
+                title = l[150]; // Contact invited
+                // The user [X] has been invited and will appear in your contact list once accepted.
+                msg = l[5898].replace('[X]', email);
+            }
+            else {
+                title = l[165] + ' ' + l[5859]; // Contacts Invited
+                msg = l[5899]; // The users have been invited and will appear in your contact list once accepted
+            }
+
+            showToast('settings', msg);
+        }
+
+        inviteFriendDialog('close');
     });
 }
 
@@ -10944,7 +11087,6 @@ function invitationStatusDialog(close) {
         return false;
     });
 
-    var locFmt;
     var ach = mega.achievem;
     var maf = ach.prettify(M.account.maf);
     maf = maf[ach.ACH_INVITE];
@@ -10970,9 +11112,10 @@ function invitationStatusDialog(close) {
                         '<span class="light-grey"></span>',
                         'Quota Granted');
 
-                locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '').replace('[/S]', '');
+                var expiry = rwd.expiry || maf.expiry;
+                var locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '').replace('[/S]', '');
                 $('.status .light-grey', $tmpl)
-                    .safeHTML(locFmt, maf.expiry.value, maf.expiry.utxt);
+                    .safeHTML(locFmt, expiry.value, expiry.utxt);
 
                 $('.icon i', $tmpl).removeClass('dots').addClass('tick');
             }
@@ -12247,8 +12390,9 @@ function bindDropdownEvents($dropdown, saveOption) {
         }
     });
 
-    $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e)
-    {
+    $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e) {
+
+        // ToDo: Narrow this condition and find main reason why it's made
         if (!$(e.target).hasClass('default-select')) {
             $selectBlock = $('.default-select.active');
             $selectBlock.find('.default-select-dropdown').fadeOut(200);

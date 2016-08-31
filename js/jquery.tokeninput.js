@@ -110,8 +110,8 @@
             comma = ',';
             return '<li class="share-added-contact">'
                     + (this.addAvatar ? avatar : '')
-                    + (this.enableHTML ? email : _escapeHTML(email)) 
-                    + (this.visibleComma ? comma : '') 
+                    + (this.enableHTML ? email : _escapeHTML(email))
+                    + (this.visibleComma ? comma : '')
                     + '</li>';
         },
         // Tokenization settings
@@ -424,7 +424,7 @@
                 }
                 if ($(input).data("settings").visibleComma) {
                     var $prevItem = input_token.prev();
-                    if ($prevItem.length) {
+                    if ($prevItem.length && ($prevItem.text().indexOf(',') === -1)) {
                         $prevItem.text($prevItem.text() + ',');
                     }
                 }
@@ -570,7 +570,7 @@
 
                         // If users press enter/return on empty input field behave like done/share button is clicked
                         else {
-                            
+
                             var share = new mega.Share();
                             share.updateNodeShares();
 
@@ -794,7 +794,7 @@
             // Enter new content into resizer and resize input accordingly
             input_resizer.html(_escapeHTML(input_val) || _escapeHTML(settings.placeholder));
             // Get maximum width, minimum the size of input and maximum the widget's width
-            input_box.width(Math.min(token_list.width(),
+            input_box.width(Math.min(token_list.width() || 30,
                 Math.max(width_left, input_resizer.width() + 30)));
         }
 

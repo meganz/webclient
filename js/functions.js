@@ -1085,6 +1085,7 @@ function bytesToSize(bytes, precision, html_format) {
     var s_mb = 'MB';
     var s_gb = 'GB';
     var s_tb = 'TB';
+    var s_pb = 'PB';
 
     if (lang === 'fr') {
         s_b = 'O';
@@ -1092,12 +1093,14 @@ function bytesToSize(bytes, precision, html_format) {
         s_mb = 'Mo';
         s_gb = 'Go';
         s_tb = 'To';
+        s_pb = 'Po';
     }
 
     var kilobyte = 1024;
     var megabyte = kilobyte * 1024;
     var gigabyte = megabyte * 1024;
     var terabyte = gigabyte * 1024;
+    var petabyte = terabyte * 1024;
     var resultSize = 0;
     var resultUnit = '';
 
@@ -1130,9 +1133,13 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = (bytes / gigabyte).toFixed(precision);
         resultUnit = s_gb;
     }
-    else if (bytes >= terabyte) {
+    else if ((bytes >= terabyte) && (bytes < petabyte)) {
         resultSize = (bytes / terabyte).toFixed(precision);
         resultUnit = s_tb;
+    }
+    else if (bytes >= petabyte) {
+        resultSize = (bytes / petabyte).toFixed(precision);
+        resultUnit = s_pb;
     }
     else {
         resultSize = parseInt(bytes);
@@ -4831,10 +4838,10 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        if ($.removedContactsFromShare.length > 0) {
+        if ($.remvoedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
             self.removeContactFromShare();
         }
-        if ($.changedPermissions.length > 0) {
+        if ($.changedPermissions && ($.changedPermissions.length > 0)) {
             doShare($.selected[0], $.changedPermissions, true);
         }
         addContactToFolderShare();

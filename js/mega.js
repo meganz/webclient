@@ -2632,7 +2632,10 @@ function MegaData()
             });
         }
 
-        this.inviteContactMessageHandler(proceed);
+        // In case of invite-dialog we will use notifications
+        if ($.dialog !== 'invite-friend') {
+            this.inviteContactMessageHandler(proceed);
+        }
 
         return proceed;
     };
@@ -7645,7 +7648,7 @@ Object.defineProperty(mega, 'achievem', {
             value: function prettify(maf) {
                 var data = Object(clone(maf.u));
 
-                var setExpiry = function(data) {
+                var setExpiry = function(data, out) {
                     var time = String(data[2]).split('');
                     var unit = time.pop();
                     time = time.join('') | 0;
@@ -7668,7 +7671,8 @@ Object.defineProperty(mega, 'achievem', {
                         case 'y': result.utxt = (time < 2) ? 'year'  : 'years';   break;
                     }
 
-                    data.expiry = result;
+                    out = out || data;
+                    out.expiry = result;
                     return result;
                 };
 
@@ -7687,7 +7691,7 @@ Object.defineProperty(mega, 'achievem', {
                         data[ach.a] = Object(clone(mafr[ach.r]));
                         setExpiry(data[ach.a]);
                     }
-                    var exp = data[ach.a].expiry;
+                    var exp = setExpiry(mafr[ach.r] || data[ach.a], ach);
 
                     var ts = ach.ts * 1000;
                     var date = moment(ts);

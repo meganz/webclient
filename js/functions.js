@@ -5131,7 +5131,7 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
 
 /**
- *  strip_tags — Strip HTML tags from a string
+ *  strip_tags - Strip HTML tags from a string
  *
  *  @param {String} html    HTML code
  *  @returns {String}   The text without any HTML markups

@@ -3,6 +3,17 @@
 	padding: 0;
 	list-style-type: none;
 }
+.section.conversations .fm-left-panel {
+    height: -webkit-calc(100% +48px);
+    height: -moz-calc(100% + 48px);
+    height: calc(100% + 48px);
+    margin: -48px 0 0 0;
+}
+.content-panel.conversations {
+    background-image: url(../images/mega/nw-chat-bg.svg);
+    background-repeat:repeat;
+    min-height: 100%;
+}
 .conversations-pane li {
 	padding: 8px 12px;
 	display: block;
@@ -11,6 +22,12 @@
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	cursor: pointer;
+}
+.conversations-pane li:nth-child(even) {
+    background-color: #F6F6F6;
+}
+.conversations-pane li:nth-child(odd) {
+    background-color: #EEEEEE;
 }
 .user-card-name.conversation-name {
 	padding: 0 26px 0 0;

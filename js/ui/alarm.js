@@ -22,21 +22,21 @@ var alarm = {
 
         // If permanently hidden, make sure it stays hidden
         if (alarm.hidden === 2) {
-            $container.addClass('hidden');
-            $dialog.removeClass('active');
+            $container.addClass('hidden').removeClass('active');
+            $dialog.addClass('hidden');
         }
 
         // If they have seen it already, we still want to let them open the dialog
         // So just show the warning icon and they can click to re-show the dialog if they want
         else if (alarm.hidden === 1) {
-            $container.removeClass('hidden');
-            $dialog.removeClass('active');
+            $container.removeClass('hidden active');
+            $dialog.addClass('hidden');
         }
 
         // Otherwise auto show the dialog and warning icon
         else {
-            $container.removeClass('hidden');
-            $dialog.addClass('active');
+            $container.removeClass('hidden').addClass('active');
+            $dialog.removeClass('hidden');
         }
     },
 
@@ -45,11 +45,11 @@ var alarm = {
      */
     hideAllWarningPopups: function() {
 
-        var $containers = $('.warning-popup-icon');
+        var $containers = $('.top-icon.warning');
         var $dialogs = $containers.find('.top-warning-popup');
 
-        $containers.addClass('hidden');
-        $dialogs.removeClass('active');
+        $containers.addClass('hidden').removeClass('active');
+        $dialogs.addClass('hidden');
     },
 
     /**
@@ -60,20 +60,25 @@ var alarm = {
     initWarningIconButton: function($container, $dialog) {
 
         // On warning icon click
-        $container.find('.warning-icon-area').rebind('click', function() {
+        $container.rebind('click', function() {
 
             // If the popup is currently visible
-            if ($dialog.hasClass('active')) {
+            if (!$dialog.hasClass('hidden')) {
 
                 // Hide the popup
-                $dialog.removeClass('active');
+                $dialog.addClass('hidden');
+                $container.removeClass('active');
 
                 // Set flag so it doesn't auto show each time
                 alarm.hidden = 1;
             }
             else {
                 // Otherwise show the popup
-                $dialog.addClass('active');
+                Soon(function() {
+                    $dialog.removeClass('hidden');
+                    $container.addClass('active');
+                    topPopupAlign($container, dialog);
+                });
             }
         });
     },
@@ -90,8 +95,8 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $container = $('.warning-popup-icon.over-quota');
-            var $dialog = $container.find('.top-warning-popup');
+            var $container = $('.top-icon.warning.over-quota');
+            var $dialog = $('.top-warning-popup.over-quota');
 
             // Add button click handler
             this.initUpgradeButton($dialog);
@@ -132,8 +137,8 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $container = $('.warning-popup-icon.ephemeral-session');
-            var $dialog = $container.find('.top-warning-popup');
+            var $container = $('.top-icon.warning.ephemeral-session');
+            var $dialog = $('.top-warning-popup.ephemeral-session');
 
             // Add button click handler
             this.initRegisterButton($dialog);
@@ -162,7 +167,8 @@ var alarm = {
                 alarm.hidden = 1;
 
                 // Hide the dialog and go to register page
-                $dialog.removeClass('active');
+                $dialog.addClass('hidden');
+                $container.removeClass('active');
                 document.location.hash = 'register';
             });
         }
@@ -183,8 +189,8 @@ var alarm = {
         render: function(recentPurchase) {
 
             // Cache lookups
-            var $container = $('.warning-popup-icon.non-activated-account');
-            var $dialog = $container.find('.top-warning-popup');
+            var $container = $('.top-icon.warning.non-activated-account');
+            var $dialog = $('.top-warning-popup.non-activated-account');
 
             // If they just purchased it, log specific event
             if (recentPurchase) {
@@ -238,8 +244,8 @@ var alarm = {
             }
 
             // Cache lookups
-            var $container = $('.warning-popup-icon.astropay-payment-reminder');
-            var $dialog = $container.find('.top-warning-popup');
+            var $container = $('.top-icon.warning.astropay-payment-reminder');
+            var $dialog = $('.top-warning-popup.astropay-payment-reminder');
 
             // Get PRO plan name e.g. PRO III
             var proNum = this.lastPayment.p;
@@ -291,7 +297,8 @@ var alarm = {
             $dialog.find('.warning-button.choose').rebind('click', function() {
 
                 // Hide the dialog and go to pro page
-                $dialog.removeClass('active');
+                $dialog.addClass('hidden');
+                $container.removeClass('active');
 
                 // Set a flag so it doesn't show each time
                 alarm.hidden = 1;
@@ -315,7 +322,8 @@ var alarm = {
             $dialog.find('.warning-button.renew').rebind('click', function() {
 
                 // Hide the dialog
-                $dialog.removeClass('active');
+                $dialog.addClass('hidden');
+                $container.removeClass('active');
 
                 // Set a flag so it doesn't show each time
                 alarm.hidden = 1;
@@ -551,8 +559,8 @@ var alarm = {
         render: function(serverBuildVersion, reRender) {
 
             // Cache lookups
-            var $container = $('.warning-popup-icon.site-update-available');
-            var $dialog = $container.find('.top-warning-popup');
+            var $container = $('.top-icon.warning.site-update-available');
+            var $dialog = $('.top-warning-popup.site-update-available');
 
             // Convert versions to integers for easier comparison
             var localVersion = mega.utils.vtol(buildVersion.website);
@@ -625,7 +633,8 @@ var alarm = {
                 alarm.hidden = 1;
 
                 // Hide the warning dialog
-                $dialog.removeClass('active');
+                $dialog.addClass('hidden');
+                $container.removeClass('active');
 
                 // Check for pending transfers and if there are, prompt user to see if they want to continue
                 mega.utils.abortTransfers().then(function() {

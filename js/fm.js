@@ -11039,11 +11039,13 @@ function initInviteDialogMultiInputPlugin() {
 
         if (mailNum) {
 
+            var email = '';
+
             // Loop through new email list
             $mails.each(function(index, value) {
 
                 // Extract email addresses one by one
-                var email = $(value).text().replace(',', '');
+                email = $(value).text().replace(',', '');
 
                 M.inviteContact(M.u[u_handle].m, email, emailText);
             });
@@ -11051,6 +11053,10 @@ function initInviteDialogMultiInputPlugin() {
             // Singular or plural
             if (mailNum === 1) {
                 title = l[150]; // Contact invited
+
+                // Extract email address
+                email = $($mails).text().replace(',', '');
+
                 // The user [X] has been invited and will appear in your contact list once accepted.
                 msg = l[5898].replace('[X]', email);
             }

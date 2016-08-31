@@ -124,7 +124,7 @@ var Help = (function() {
             e.preventDefault();
             document.location.hash = getPreviousUrl(data);
         });
-        $('.support-go-back-heading').text(getPreviousUrl(data) === url('welcome') ? 'Support Centre' : 'Go Back');
+        $('.support-go-back-heading').text(getPreviousUrl(data) === url('welcome') ? l[9096] : l[9102]);
 
         var buttons = $('.support-search,.support-go-back');
         buttons.rebind('mouseover', function() {

@@ -10870,7 +10870,7 @@ function inviteFriendDialog(close) {
     maf = maf[ach.ACH_INVITE];
 
     var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend that installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
-    $('.header', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+    $('.header.default', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
     if (!$('.achivement-dialog.input').tokenInput("getSettings")) {
         initInviteDialogMultiInputPlugin();
@@ -10907,8 +10907,8 @@ function initInviteDialogMultiInputPlugin() {
 
     // Init textarea logic
     var $dialog = $('.fm-dialog.invite-dialog');
-    var $this  = $('.achivement-dialog.input');
-    var $inputWrapper  = $('.achivement-dialog.input-field');
+    var $this  = $('.achivement-dialog.input-field.emails input');
+    var $inputWrapper  = $('.achivement-dialog.input-field.emails');
     var $sendButton = $dialog.find('.default-grey-button.send');
     var contacts = getContactsEMails();
 
@@ -10936,17 +10936,17 @@ function initInviteDialogMultiInputPlugin() {
         enableHTML: true,
         onEmailCheck: function() {
             $('.achivement-dialog.input-info').addClass('red').text(l[7415]);
-            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            $('.achivement-dialog.input-field.emails').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onDoublet: function(u) {
             $('.achivement-dialog.input-info').addClass('red').text(l[7413]);
-            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            $('.achivement-dialog.input-field.emails').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onHolder: function() {
             $('.achivement-dialog.input-info').addClass('red').text(l[7414]);
-            $('.achivement-dialog.input-field').find('li input').eq(0).addClass('red');
+            $('.achivement-dialog.input-field.emails').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onReady: function() {// Called once on dialog initialization
@@ -10954,7 +10954,7 @@ function initInviteDialogMultiInputPlugin() {
 
             $input.rebind('keyup click', function() {
                 var value = $.trim($input.val());
-                var $wrapper = $('.achivement-dialog.input-field');
+                var $wrapper = $('.achivement-dialog.input-field.emails');
                 if ($wrapper.find('.share-added-contact').length > 0 || checkMail(value) === false) {
                     $wrapper.find('li input').eq(0).removeClass('red');
                     $('.achivement-dialog.input-info').removeClass('red').text(l[9093]);
@@ -11032,7 +11032,7 @@ function initInviteDialogMultiInputPlugin() {
                 .removeClass('red')
                 .text(l[9093]);
 
-            $('.achivement-dialog.input-field').find('li input').eq(0).removeClass('red');
+            $('.achivement-dialog.input-field.emails').find('li input').eq(0).removeClass('red');
         }, timeOut);
     }
 
@@ -11048,11 +11048,13 @@ function initInviteDialogMultiInputPlugin() {
 
         if (mailNum) {
 
+            var email = '';
+
             // Loop through new email list
             $mails.each(function(index, value) {
 
                 // Extract email addresses one by one
-                var email = $(value).text().replace(',', '');
+                email = $(value).text().replace(',', '');
 
                 M.inviteContact(M.u[u_handle].m, email, emailText);
             });
@@ -11060,6 +11062,10 @@ function initInviteDialogMultiInputPlugin() {
             // Singular or plural
             if (mailNum === 1) {
                 title = l[150]; // Contact invited
+
+                // Extract email address
+                email = $($mails).text().replace(',', '');
+
                 // The user [X] has been invited and will appear in your contact list once accepted.
                 msg = l[5898].replace('[X]', email);
             }

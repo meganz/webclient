@@ -600,6 +600,9 @@
 .ach-share-folder .huge-icon.achivement {
     background-position: -152px -294px;
 }
+.green-tick .huge-icon.achivement {
+    background-position: -2px -444px;
+}
 .semi-big-icon.cloud {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -9px -11164px;
@@ -616,7 +619,7 @@
 }
 .semi-small-icon.tick {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-        background-position: -15px -11322px;
+    background-position: -15px -11322px;
 }
 .semi-small-icon.dots {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
@@ -624,11 +627,9 @@
 }
 .semi-small-icon.rounded-arrow {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-        background-position: -15px -11362px;
-
+    background-position: -15px -11362px;
 }
 .semi-small-icon.exclamation-point {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-        background-position: -15px -11404px;
-
+    background-position: -15px -11404px;
 }

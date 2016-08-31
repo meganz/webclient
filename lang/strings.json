@@ -14466,5 +14466,13 @@
     "9102": {
         "text": "Go Back",
         "context": "A button in the Help section to take the user back to a previous screen on the website."
+    },
+    "9103": {
+        "text": "Copy the link below to share the article.",
+        "context": "Body for dialog with a link to share an article of our help section"
+    },
+    "9104": {
+        "text": "Share the Article",
+        "context": "Title for dialog"
     }
 }

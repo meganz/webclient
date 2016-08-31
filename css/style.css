@@ -11774,6 +11774,9 @@ table {
 .account.data-item {
     display: table-row;
 }
+.chat-widget .account.data-item, .chat-widget .account.widget.title {
+    cursor: pointer;
+}
 .account.data-left-td, .account.data-td {
     font-size: 14px;
     line-height: 18px;

@@ -3009,7 +3009,7 @@ function dashboardUI() {
     }
 
     // Add-contact plus
-    $('.dashboard .add-contacts').rebind('click', function() {
+    $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
         addContactUI();
         $('.fm-add-user').trigger('click');
         $('.add-user-size-icon').trigger('click');
@@ -3270,7 +3270,16 @@ function dashboardUI() {
             $('.data-right-td.new-chat span').text('0');
             $('.data-right-td.new-messages span').text('0');
         }
-        /* End of Contacts block */
+        $('.chat-widget .account.data-item, .chat-widget .account.widget.title').rebind('click.chatlink', function() {
+            window.location = '#fm/chat';
+        });
+        $('.chat-widget .add-contacts').rebind('click.chatlink', function() {
+            window.location = '#fm/chat';
+            Soon(function() {
+                $('.conversations .small-icon.white-medium-plus').parent().trigger('click')
+            });
+        });
+        /* End of Chat block */
 
         // Cloud data block
         var file1 = 835;
